@@ -85,8 +85,8 @@ B1 satisfied - description L3, purpose L10-14 and use-when L16-25 state the job 
 
 ### P8 - .claude/skills/risk-tiered-validation-selector/references/classifier-rules.md - read whole, L1-111
 **Purpose/normal use:** The classifier rules artifact for risk-tiered validation: ordered rules, override lists, starter rules table, tier contents and worked classification (read on demand).
-B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job and reader. B2 partial - L12 uses the class label full and L13 docs-only before the L65-70 tier contents define them; L29 uses CI in the forced-full comment without expansion; L61 uses fast before the L67 tier definition; L104 uses PR without expansion. B3 satisfied - rule semantics L8-19, starter rules L21-46, tier contents L63-74 and worked classification L76-92 give concrete rules and a full example. B4 satisfied - rules/design guidance; no shipped/deployed or measured-result claim, and examples are not presented as measured results. B5 satisfied - owning ../SKILL.md link resolves; the fail-closed/no-silent-growth safety boundary is preserved. B6 UNVERIFIED - no non-author read-only reviewer statement exists.
-**Verdict:** PARTIAL - named B2 gaps: L12 full, L13 docs-only, L29 CI, L61 fast, L104 PR. B6 unverified; no keeper/acceptance row.
+B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job and reader. B2 partial - L12 uses the class label full and L13 docs-only before the L65-70 tier contents define them; L17 uses fast (aggregate tier MAX line) before its L68 tier definition; L29 uses CI in the forced-full comment without expansion; L104 uses PR in the anti-pattern Trusting the PR description without expansion. B3 satisfied - rule semantics L8-19, starter rules L21-46, tier contents L63-74 and worked classification L76-92 give concrete rules and a full example. B4 satisfied - rules/design guidance; no shipped/deployed or measured-result claim, and examples are not presented as measured results. B5 satisfied - owning ../SKILL.md link resolves; the fail-closed/no-silent-growth safety boundary is preserved. B6 UNVERIFIED - no non-author read-only reviewer statement exists.
+**Verdict:** PARTIAL - named B2 gaps (line-ascending): L12 full, L13 docs-only, L17 fast, L29 CI, L104 PR. B6 unverified; no keeper/acceptance row.
 
 **Canonical B6 limitation, restated.** For every page the reader is the record's author, and no independent read-only reviewer statement exists; **canonical B6 is UNVERIFIED for all eight pages and cannot support FULL**. Every page is PARTIAL; no page is FULL or keeper-eligible.
 
@@ -96,13 +96,13 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 
 **Named B2 gaps aligned with the inventory (one source of truth for sections 5 and 7):**
 - **P1:** **L11 PR**
-- **P2:** **L3 CI**, **L3 PR**, **L152 SHA**, **L65 comms**
+- **P2:** **L3 CI**, **L3 PR**, **L65 comms**, **L152 SHA**
 - **P3:** none beyond the canonical B6 limitation.
 - **P4:** none beyond the canonical B6 limitation.
 - **P5:** none beyond the canonical B6 limitation.
 - **P6:** none beyond the canonical B6 limitation.
 - **P7:** none beyond the canonical B6 limitation.
-- **P8:** **L29 CI**, **L104 PR**, **L13 `docs-only`**, **L61 `fast`**, **L12 `full`**
+- **P8:** **L12 `full`**, **L13 `docs-only`**, **L17 `fast`**, **L29 CI**, **L104 PR**
 
 **Keeper exclusion (strengthened).** **No page is keeper-eligible on this record.** Canonical B6 requires a read-only review by someone who did not write the page; this record cannot establish that condition, so it authors **no acceptance row, no keeper row, no ledger edit and no index edit**. Keeper recording remains a separate later act under AEGIS-APR-101/APR-117 with its own independence evidence.
 
@@ -148,7 +148,7 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 | 11 | P2 | 123 | D backticked/placeholder/unit/operator | <each: what, why blocking, the exact evidence that flips it> | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 12 | P2 | 115 | D backticked/placeholder/unit/operator | <release/version/scope> | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 13 | P2 | 3 | A uppercase/acronym | CI | gap | CI first used in description L3 before the L8 reading-key definition |
-| 14 | P2 | 3 | E viewport/edition/lifecycle/status | MISSING | defined | status label used with plain meaning; documented exclusion |
+| 14 | P2 | 3 | E viewport/edition/lifecycle/status | MISSING | excluded | status label used with plain meaning, not a coded identifier; documented exclusion |
 | 15 | P2 | 116 | E viewport/edition/lifecycle/status | NO-GO | excluded | ordinary English all-caps emphasis/status word with plain meaning, not a coded identifier |
 | 16 | P2 | 3 | A uppercase/acronym | PR | gap | PR first used in description L3 before the L8 reading-key definition |
 | 17 | P2 | 152 | A uppercase/acronym | SHA | gap | SHA first used L152 without expansion |
@@ -233,12 +233,12 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 | 96 | P6 | 8 | A uppercase/acronym | DNS | defined | defined at L8 |
 | 97 | P6 | 4 | A uppercase/acronym | DR | defined | defined at L4 |
 | 98 | P6 | 72 | A uppercase/acronym | FIT | excluded | ordinary English all-caps emphasis/status word with plain meaning, not a coded identifier |
-| 99 | P6 | 82 | E viewport/edition/lifecycle/status | GAP | defined | explained inline L82 |
+| 99 | P6 | 82 | E viewport/edition/lifecycle/status | GAP | excluded | status word explained inline L82; documented exclusion, not a coded identifier |
 | 100 | P6 | 6 | A uppercase/acronym | RPO | defined | defined at L6 |
 | 101 | P6 | 5 | A uppercase/acronym | RTO | defined | defined at L5 |
 | 102 | P6 | 7 | A uppercase/acronym | SLO | defined | defined at L7 |
 | 103 | P6 | 9 | A uppercase/acronym | TTL | defined | defined at L9 |
-| 104 | P6 | 87 | E viewport/edition/lifecycle/status | UNVERIFIED | defined | explained inline L87-88 |
+| 104 | P6 | 87 | E viewport/edition/lifecycle/status | UNVERIFIED | excluded | status word explained inline L87-88; documented exclusion, not a coded identifier |
 | 105 | P6 | 9 | C lowercase shorthand | app | excluded | hostname component in app.example.com |
 | 106 | P6 | 9 | D backticked/placeholder/unit/operator | `app.example.com` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 107 | P6 | 84 | D backticked/placeholder/unit/operator | `database-backup-verifier` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
@@ -272,7 +272,7 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 | 135 | P8 | 78 | D backticked/placeholder/unit/operator | `.github/workflows/ci.yml` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 136 | P8 | 105 | D backticked/placeholder/unit/operator | <base> | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 137 | P8 | 29 | A uppercase/acronym | CI | gap | CI first used L29 in forced-full comment without expansion |
-| 138 | P8 | 104 | A uppercase/acronym | PR | gap | unexpanded technical acronym/status token at first use |
+| 138 | P8 | 104 | A uppercase/acronym | PR | gap | PR first used in the anti-pattern Trusting the PR description L104 without expansion |
 | 139 | P8 | 78 | D backticked/placeholder/unit/operator | `README.md` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 140 | P8 | 27 | C lowercase shorthand | auth | excluded | path token in **/auth/** |
 | 141 | P8 | 94 | D backticked/placeholder/unit/operator | `change-classification-gate` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
@@ -282,7 +282,7 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 | 145 | P8 | 17 | D backticked/placeholder/unit/operator | `docs-only < fast < full` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 146 | P8 | 83 | D backticked/placeholder/unit/operator | `docs/**` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 147 | P8 | 78 | D backticked/placeholder/unit/operator | `docs/upgrade-guide.md` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
-| 148 | P8 | 61 | D backticked/placeholder/unit/operator | `fast` | gap | class label fast first used L16/L61 before its L67 tier definition |
+| 148 | P8 | 17 | D backticked/placeholder/unit/operator | `fast` | gap | class label fast first used L17 before its L68 tier definition |
 | 149 | P8 | 12 | D backticked/placeholder/unit/operator | `full` | gap | class label full first used L12 before its L65 tier definition |
 | 150 | P8 | 60 | D backticked/placeholder/unit/operator | `gen/**` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 151 | P8 | 105 | D backticked/placeholder/unit/operator | `git diff --name-status -M <base>...HEAD` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
@@ -303,9 +303,9 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 
 **Per-class counts (from the final table):** A=21 / B=0 / C=20 / D=112 / E=6 = **159**.
 
-**Per-disposition counts (from the final table):** named-gaps=10 / defined-at-first-use=17 / documented-exclusions=132 = **159**.
+**Per-disposition counts (from the final table):** named-gaps=10 / defined-at-first-use=14 / documented-exclusions=135 = **159**.
 
-**Alignment.** Section 5 B2/verdict named gaps and section 6 named-gap list are generated from the **named-gap** rows above (P1 PR; P2 CI, PR, comms, SHA; P8 full, docs-only, CI, fast, PR); no page line in sections 5/6 contradicts this table. **P3-P7 named gaps are none after the stated definitions/exclusions; their PARTIAL is solely the unverified canonical B6 limitation.**
+**Alignment.** Section 5 B2/verdict named gaps and section 6 named-gap list are generated from the **named-gap** rows above, in line-ascending order (P1 L11 PR; P2 L3 CI, L3 PR, L65 comms, L152 SHA; P8 L12 full, L13 docs-only, L17 fast, L29 CI, L104 PR); no page line in sections 5/6 contradicts this table. **P3-P7 named gaps are none after the stated definitions/exclusions; their PARTIAL is solely the unverified canonical B6 limitation.**
 
 ## 11. Record self-state, counts and authorship chain
 
