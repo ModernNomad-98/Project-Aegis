@@ -111,7 +111,7 @@ Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 n
 
 **Verdict: PARTIAL** - named gaps: L3 `DSR` before its L8 definition; L80 `stats`; canonical **B6 unverified**.
 
-## 4.1 Systematic token audit (widened to include lowercase shorthand)
+### 4.1 Systematic token audit (widened to include lowercase shorthand)
 
 **Method (widened after SD-D REVISE 6247165600).** For each pinned page I extracted the frontmatter, title, description, headings, whole body, inline code, every backticked identifier and every candidate shorthand token. Candidate classes are: **(a)** uppercase tokens of any length; **(b)** **lowercase shorthand and abbreviation-like tokens** (shortened forms such as `ops`, `auth`, `perf`, `repo`, `stats`, `lab`, `incl.`, domain shorthand and dropped-letter forms), judged in context rather than filtered by case; **(c)** backticked identifiers; **(d)** template labels, placeholders and units. Ordinary English words used in their standard sense and code keywords used inside code blocks are excluded **only after reading their context**. For each candidate I compared the first occurrence in reading order with the nearest definition/expansion, and separately checked the batch-16-20 missed-token classes (HTTP/TCP/ID, GitOps/Application, svh/lvh/dvh, vh/100vh, coded identifiers, frontmatter/title/description first uses, LLM04/LLM08/LLM09/SEV-class tokens). The scan is independent of the per-page prose in section 4.
 
