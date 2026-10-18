@@ -11,6 +11,8 @@
 ## 1. Scope and diff accounting
 
 - **Added: exactly one path** - `docs/evidence/documentation/readability-lane-b-batch-8-2026-10-18.md`. **Modified: 0. Deleted: 0.** No keeper row, index JSON edit, ledger edit, page edit, register edit, manifest edit, tool/test/workflow change, plan file or other documentation change. Change class **`docs-only`**.
+- **Repair note (this revision).** This revision answers SD-D REVISE **6246657526**: the P2 named-gap set gains **IEC L49** (ISO/IEC 27001:2022) in sections 3, 4 and 4.1 and the PR body. No page, scope, disposition, tally or plan-binding change; P2 stays PARTIAL and P5/P7 stay FULL.
+
 - **Eight pages read, zero pages edited**; every page's drift from the pinned ref to the implementation base is 0. The record's commit is DCO-signed and model-attributed; later repair commits, if any, update this record rather than silently widening its claims.
 - **No acceptance row, keeper row or index edit is authored here.**
 
@@ -63,7 +65,7 @@ Each page below was read whole at its pinned blob; the read range is L1-last. Th
 
 **Purpose and normal use:** maintain one control row from the foundation catalog across ISO 27001 Annex A, SOC 2 TSC, ISO 42001 Annex A and optional NIST AI RMF functions, pinning editions, labeling design coverage FULL/PARTIAL/NONE and marking every unverified cell.
 
-**B1 satisfied** - title L1, frontmatter L3 and reading key L10-15 state the job and terms; Use When L29-43 and inputs L45-58 are clear. **B2 partial** - the frontmatter at **L3** uses `ISO`, `SOC` and `NIST AI RMF` before the reading key at **L10-15**; `ISO` and `SOC` are never expanded on the page, and NIST AI RMF is expanded only later. Additional first-use failures: **L68 `ID`**, **L106 `CC`**, **L139 `AICPA`**, **L150 `GRC`**. **B3 satisfied** - pin-editions workflow L60-96, output L98-114, validation checklist L116-129, precision rules L131-143, gotchas L145-162 and stop conditions L164-177 are concrete. **B4 satisfied** - a design/crosswalk reference; no operation or compliance claim is executed. **B5 satisfied** - links at L67 and L181 (`assets/crosswalk-row-template.md`) resolve. **B6 basis/limit in section 6.** **Verdict: PARTIAL, no edit. Named gaps: L3 frontmatter ISO/SOC/NIST AI RMF before L10-15 (ISO/SOC never expanded); L68 ID; L106 CC; L139 AICPA; L150 GRC; B6 independence UNVERIFIED.**
+**B1 satisfied** - title L1, frontmatter L3 and reading key L10-15 state the job and terms; Use When L29-43 and inputs L45-58 are clear. **B2 partial** - the frontmatter at **L3** uses `ISO`, `SOC` and `NIST AI RMF` before the reading key at **L10-15**; `ISO` and `SOC` are never expanded on the page, and NIST AI RMF is expanded only later. Additional first-use failures: **L49 `IEC`** (ISO/IEC 27001:2022 at L49-50), **L68 `ID`**, **L106 `CC`**, **L139 `AICPA`**, **L150 `GRC`**. **B3 satisfied** - pin-editions workflow L60-96, output L98-114, validation checklist L116-129, precision rules L131-143, gotchas L145-162 and stop conditions L164-177 are concrete. **B4 satisfied** - a design/crosswalk reference; no operation or compliance claim is executed. **B5 satisfied** - links at L67 and L181 (`assets/crosswalk-row-template.md`) resolve. **B6 basis/limit in section 6.** **Verdict: PARTIAL, no edit. Named gaps: L3 frontmatter ISO/SOC/NIST AI RMF before L10-15 (ISO/SOC never expanded); L49 IEC; L68 ID; L106 CC; L139 AICPA; L150 GRC; B6 independence UNVERIFIED.**
 
 **Quoted evidence (L3):** `description: 'Maintain the control crosswalk between compliance-control-foundation and framework projections: map each control to ISO 27001 Annex A, SOC 2 Trust Services Criteria, ISO 42001 Annex A, and optionally NIST AI RMF functions.`
 
@@ -122,7 +124,7 @@ Each page below was read whole at its pinned blob; the read range is L1-last. Th
 | Page | Candidate tokens checked | Defined at/ before first use | Undocumented first uses added as gaps | Result |
 | --- | --- | --- | --- | --- |
 | P1 | OWASP, LLM, LLM03, LLM04, LLM05, RLHF, RAG, D6, plus emphasis words | OWASP L4-5; LLM L6; RLHF L6-7; RAG L7-8; D6 L9; LLM05 named at L5 | LLM04 L6 before L8; LLM03 L8 prior-edition code | PARTIAL |
-| P2 | TSC, NIST AI RMF, ISMS, AIMS, SoA, PoF, ISO, SOC, ID, CC, AICPA, GRC, FULL/PARTIAL/NONE labels | TSC/NIST AI RMF/ISMS/AIMS/SoA/PoF L10-15; FULL/PARTIAL/NONE are explained vocabulary, not abbreviations | ISO/SOC/NIST AI RMF frontmatter L3 before L10-15; ID L68; CC L106; AICPA L139; GRC L150 | PARTIAL |
+| P2 | TSC, NIST AI RMF, ISMS, AIMS, SoA, PoF, ISO, SOC, IEC, ID, CC, AICPA, GRC, FULL/PARTIAL/NONE labels | TSC/NIST AI RMF/ISMS/AIMS/SoA/PoF L10-15; FULL/PARTIAL/NONE are explained vocabulary, not abbreviations | ISO/SOC/NIST AI RMF frontmatter L3 before L10-15; IEC L49; ID L68; CC L106; AICPA L139; GRC L150 | PARTIAL |
 | P3 | TSC, PoF, AICPA, AI RMF, fn, CC, ISO/IEC, NIST, SOC, RMF function labels, date placeholders | TSC/PoF/AICPA/AI RMF/fn/CC L5-10; RMF function labels are named function words; DATE placeholder pattern is a template convention | ISO/IEC L17; NIST L20; SOC L28 | PARTIAL |
 | P4 | RLS, DB, ORM, SQL, QA, AI | RLS L35; DB L68; ORM L53; SQL L38; QA L101; SQL/QA inline | RLS frontmatter L3 before L35 | PARTIAL |
 | P5 | DB, ORM, API, DELETE, DROP, SCHEMA, WHERE, NULL | DB/ORM/API L4-5; DELETE/DROP explained L6-7; SQL keywords used after explanation | none | FULL |
