@@ -436,7 +436,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P8 | 204 | v | `<area: dep / script / CI / artifact>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 205 | v | `<weakness → attacker action → material impact>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 206 | v | `<reachable/exploitable \| install-time \| latent>` | documented exclusion — self-describing placeholder, not an abbreviation |
-| P8 | 207 | v | `<pin SHA / upgrade to <v>` | documented exclusion — self-describing placeholder, not an abbreviation |
+| P8 | 207 | v | `<pin SHA / upgrade to <v> / remove / isolate / split job>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 207 | v | `<v>` | documented exclusion — nested placeholder token, not an abbreviation |
 | P8 | 208 | v | `<scripts that run + risk>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 209 | v | `<triggers, token scope, action pinning, secret exposure>` | documented exclusion — self-describing placeholder, not an abbreviation |
@@ -483,11 +483,11 @@ Pages were read at pinned ref 2db1ffb7 from the tree rather than from plan text;
 
 ## 9. Stage C declaration, AC statuses and self-state
 
-Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, four DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + this repair-3 commit; exact repair-3 SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
+Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, five DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + repair-3 2e9ed37c + this repair-4 commit; exact repair-4 SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
 
 | AC | Status | Basis |
 | --- | --- | --- |
-| AC1 | MET in PR diff | one added record path vs 6afc845a; four DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + this repair-3 commit; exact repair-3 SHA in PR body/handoff); no other tracked path |
+| AC1 | MET in PR diff | one added record path vs 6afc845a; five DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + this repair-3 commit; exact repair-3 SHA in PR body/handoff); no other tracked path |
 | AC2 | MET | eight blobs/bytes/LF above; zero drift; pending/unread |
 | AC3 | MET in this record | whole-page B1-B6; ONE contiguous table; five-cell/zero-duplicate proof; no fabricated rows |
 | AC4 | MET | strict FULL bar; B6 verified via existing review; B2 gaps keep 0F/8P/0 UNRUN; no keeper |
