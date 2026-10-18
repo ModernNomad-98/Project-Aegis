@@ -1,6 +1,6 @@
 # Readability Phase 4 re-read — lane B batch 20 evidence record
 
-**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Stage C repair-4, role **sd-c-read-b20-c5**; true identity **sd-f-794-r1**. Role history: C-initial reader/account author **sd-c-read-b20-c1** (true identity sd-e-802-r1); C repair holder **sd-c-read-b20-c2** (sd-f-794-r1); this repair **sd-c-read-b20-c5** (sd-f-794-r1). Both names signed. Rebased implementation base **3821259533d73eae862b452e348886f3c0249ac8** (#839 39th); original PR base 7cea211e (37th); live main **2c3c6ffe** (#840 40th); block **264-271**; batch **20**; one added docs evidence path.
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Stage C repair-6, role **sd-c-read-b20-c7**; true identity **sd-f-794-r1**. Role history: C-initial reader/account author **sd-c-read-b20-c1** (true identity sd-e-802-r1); C repair holders **sd-c-read-b20-c2** (repair), **sd-c-read-b20-c5** (repair-4), **sd-c-read-b20-c7** (this repair-6); all repair holders share true identity sd-f-794-r1. Both names signed. Rebased implementation base **3821259533d73eae862b452e348886f3c0249ac8** (#839 39th); original PR base 7cea211e (37th); live main **2c3c6ffe** (#840 40th); block **264-271**; batch **20**; one added docs evidence path.
 
 ## 1. Scope, plan binding and diff accounting
 
@@ -410,13 +410,13 @@
 
 ## 8. Provenance, page authorship, zero drift and reader independence
 
-**Base:** 3821259533 (merge commit of #839, 39th session record merge; parents f325daac + 95bd9364); original PR base 7cea211e (#837, 37th); live main currently 2c3c6ffe (#840, 40th); plan captured at 6f584c9d (#833, 36th). **Plan:** 6248840176 + B ACCEPT 6248870170. **Reader:** sd-c-read-b20-c1 (true identity sd-e-802-r1) read all eight pages whole at the pinned blob; no display elision. **Current record repair:** sd-c-read-b20-c5 (true identity sd-f-794-r1); C repair holder history c1 initial + c2 repair. **Page authors are not this reader** (git metadata only; not B6 proof). **Witness rows:** section 3 is the per-page witness; each blob resolves at 2db1ffb7 and is identical at base 3821259533 (zero drift). **Author metadata only - NOT B6 evidence.**
+**Base:** 3821259533 (merge commit of #839, 39th session record merge; parents f325daac + 95bd9364); original PR base 7cea211e (#837, 37th); live main currently 2c3c6ffe (#840, 40th); plan captured at 6f584c9d (#833, 36th). **Plan:** 6248840176 + B ACCEPT 6248870170. **Reader:** sd-c-read-b20-c1 (true identity sd-e-802-r1) read all eight pages whole at the pinned blob; no display elision. **Current record repair:** sd-c-read-b20-c7 (true identity sd-f-794-r1); C repair holder history c1 initial + c2 repair + c5 repair-4 + c7 repair-6. **Page authors are not this reader** (git metadata only; not B6 proof). **Witness rows:** section 3 is the per-page witness; each blob resolves at 2db1ffb7 and is identical at base 3821259533 (zero drift). **Author metadata only - NOT B6 evidence.**
 
 ## 9. Stage C declaration, AC statuses and self-state consistency
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET in this record | exactly one added record path; no other tracked path; **two DCO-signed model commits** (original C commit 4dab131f + repair/rebase commit de127649) |
+| AC1 one-path | MET in this record | exactly one added record path; no other tracked path; **four DCO-signed model commits after this repair**: 4dab131f (initial), de127649 (repair-2), fccc2a4f (repair-4), plus this repair-6 commit (4th DCO-signed commit); delivered head count = four |
 | AC2 pages | MET in this record | eight pages 264-271 by blob; totals 57,263/1,027; zero drift; no keeper |
 | AC3 inventory | MET in this record | one contiguous 237-row table; 237 unique keys; zero duplicates/extra; five-cell proof; counts recomputed; no fabricated rows |
 | AC4 dispositions | MET in this record | strict FULL bar; 0 FULL/8 PARTIAL/0 UNRUN; B6 unverified; named gaps aligned |
@@ -425,10 +425,10 @@
 | AC7 provenance | MET in this record | plan/B lineage, base and reservations, merge attribution, zero drift, absent path |
 | AC8 stages | MET for C | C only acts here; D/E/F/G separate; no merge |
 
-**Self-state consistency.** Section 2 scheduling facts, section 6 counts and this table agree: base 3821259533; merged lane-B 144-263; no open reservation in 240-263; this block 264-271; next 272; batch 20. **Merge attribution:** 2c3c6ffe = #840 40th; 38212595 = #839 39th; f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = two DCO-signed model commits after rebase (original C commit + repair/rebase commit)**; this repair adds one DCO commit, head moves.
+**Self-state consistency.** Section 2 scheduling facts, section 6 counts and this table agree: base 3821259533; merged lane-B 144-263; no open reservation in 240-263; this block 264-271; next 272; batch 20. **Merge attribution:** 2c3c6ffe = #840 40th; 38212595 = #839 39th; f325daac = #838 38th; 7cea211e = #837 37th; 6f584c9d = #833 36th; a06360d4 = #835 35th; a141c64f = #836 34th; e7acaca4 = #834 33rd; 84a5295d = #831 32nd; 655e40ea = #828 31st; 883bf690 = #832 30th. No unresolved head placeholder; **actual commit count = four DCO-signed model commits after this repair** (4dab131f + de127649 + fccc2a4f + this repair-6 commit); this repair adds one DCO commit and moves the head.
 
 
-**Provenance note.** The C-initial skills account below is preserved as authored by **sd-c-read-b20-c1 / true identity sd-e-802-r1** at its historical base f325daac; its Row source targets are historical and are not rewritten. The current record repair is **sd-c-read-b20-c5 / sd-f-794-r1**; the header, section 8 and closing signature identify the current repair and distinguish the C-initial author. This resolves the role/identity inconsistency without fabricating provenance.
+**Provenance note.** The C-initial skills account below is preserved as authored by **sd-c-read-b20-c1 / true identity sd-e-802-r1** at its historical base f325daac; its Row source targets are historical and are not rewritten. The current record repair is **sd-c-read-b20-c7 / sd-f-794-r1**; the header, section 8 and closing signature identify the current repair and distinguish the C-initial author. This resolves the role/identity inconsistency without fabricating provenance.
 
 ## 10. My Stage C skills rows, Row sources and six-field lines
 
@@ -454,7 +454,7 @@ change-classification-gate@08d91a834460 / stage=C row=3 / reason: C owes docs-on
 skill-usage-ledger@6a27b5c8e690 / stage=C row=4 / reason: C owes self-authored provenance / applied: four names at main 7cea211e; rows/per-row sources/six fields; binding sha256 27b67531057cbef82f443d1db0a61b947d599eb340fd00714edd457e68cdebda / result: four rows/four sources/four six-field lines / incomplete: publisher/body insertion / by: C, sd-c-read-b20-c1 (true identity sd-e-802-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 ~~~
 
-## 11. DeepSeek review triage (SD-C repair-4)
+## 11. DeepSeek review triage (SD-C repair-6)
 
 Reviews are advisory comments, not approvals. GraphQL reports **0 review threads** on PR #841, so there are no thread objects to resolve; dispositions below name the fixing commit SHA (new repair commit on the PR) and are non-blocking where explicitly justified.
 
@@ -474,11 +474,11 @@ Reviews are advisory comments, not approvals. GraphQL reports **0 review threads
 | 5562608286 | Digest binding fragility | Non-blocking design; E/Stage F independently recompute the live body/PROC. |
 | 5562608286 | AC in-this-record wording | Fixed: AC5/AC6 now say asserted here; verified in handoff; AC1 commit count corrected. |
 | 5562608286 | Table cell escaping/readability | Non-blocking: escaped pipes are deliberate and parsed; long cells are verbatim page text. |
-| 5562608286 | One-DCO assertion unevidenced | Fixed: AC1 now states two DCO commits with hashes; actual DCO check is two signed. |
+| 5562608286 | One-DCO assertion unevidenced | Fixed: AC1 now states **four DCO commits** with hashes/count; actual DCO check is four signed after repair-6. |
 | 5562632523 | Row/unique-key count contradiction | Fixed: section 10 C account now says 237 unique keys, matching 237/237/0. |
 | 5562632523 | Disposition tally arithmetic | Fixed: section 7 exclusions corrected 194 -> 197; 21+19+197=237. |
 | 5562632523 | Header/reader identity inconsistency | Fixed: header and closing signature identify current repair c5/sd-f; C-initial account/reader c1/sd-e is explicitly retained as historical provenance. |
-| 5562632523 | Commit-count contradiction | Fixed: AC1 two DCO commits; self-state two commits; this repair adds one commit. |
+| 5562632523 | Commit-count contradiction | Fixed: AC1 and self-state now state **four DCO commits after repair-6**; this repair adds one commit and moves the head. |
 | 5562632523 | Truncated purpose prose | Non-blocking bounded excerpts as above. |
 | 5562632523 | B2 defined claims lack per-token evidence | Non-blocking: defined rows rely on pinned first-use text and reasons; section 5 prose is not a citation layer. No row disposition changes without page evidence. |
 | 5562632523 | SLIs/M-class exclusion rationale wording | Non-blocking: class M/L exclusion covers mixed-case/plural acronym forms; rationale wording coarse, token keys/dispositions unchanged. |
@@ -486,8 +486,8 @@ Reviews are advisory comments, not approvals. GraphQL reports **0 review threads
 | 5562632523 | B2 quote illustrative codes | Non-blocking: CP-WP-003/OD-1/T03 quote is the canonical rule text, not a page-content claim. |
 | 5562632523 | Long table/three representations | Non-blocking: inline table required by plan; markdown/comment/text block are the ledger format, not duplicate data. |
 
-**Fixing commit for the factual fixes:** the new Stage C repair-4 commit on PR #841 (SHA published in the SD-C REPAIR-4 comment; record cannot embed its own future SHA).
+**Fixing commit for the factual fixes:** this Stage C repair-6 commit on PR #841 (the 4th DCO-signed commit; its SHA is published in the SD-C REPAIR-6 comment and body because a commit cannot contain its own final SHA). Count verification after push: local check_dco over base..head = 4 signed = record stated count 4 = body stated count 4.
 
 ## 12. Limits and unverifiable items
 
-Canonical B6 is unverified for all eight pages; no page is FULL and no keeper is created. B4 is assessed for instructional/reference content only; no synthetic test, passing check or approved design is described as deployed or measured. Hosted CI/Codex states are observed in the handoff. **Signed with both names: true identity sd-f-794-r1; stage role sd-c-read-b20-c5.** C-initial account/reader rows retain their self-authored sd-e-802-r1 provenance. **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+Canonical B6 is unverified for all eight pages; no page is FULL and no keeper is created. B4 is assessed for instructional/reference content only; no synthetic test, passing check or approved design is described as deployed or measured. Hosted CI/Codex states are observed in the handoff. **Signed with both names: true identity sd-f-794-r1; stage role sd-c-read-b20-c7.** C-initial account/reader rows retain their self-authored sd-e-802-r1 provenance. **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
