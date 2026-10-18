@@ -126,7 +126,7 @@ The six bullets are the repository's "Acceptance for each page": **B1** open wit
 | AC5 Record integrity and body/PROC-04 | **OWED after this file is frozen** - the PR body binds the plan capture and this record's final bytes/LF/sha256 outside the record; PROC-04 recomputed from the final body; body checker at the head. |
 | AC6 Codex loop plan | **OWED after the PR exists at its head** - trigger, fetch every inline finding, fix P1/P2 in repair commits, reply naming the fixing SHA, resolve, retrigger; head-bound unavailability only after all P1/P2 triaged; never a pass; two-round stop applies. |
 | AC7 Provenance and no regression | **MET in this record** - plan capture binding (revision 2 6245949982; revision 1 void), derivation base, lane B quarter and R2 selection stated, already-read 148-155 named; no page/keeper/index/ledger/register/manifest change; zero drift; official count restated. |
-| AC8 Stage entry conditions | **SATISFIED for C** - acted only on the fresh Stage B ACCEPT 6245975350 bound to plan revision 2 6245949982; rebased onto then-current live main 06613a02; added exactly the one record path in one DCO-signed model-attributed commit; posts the SD-C handoff; D/E/F/G remain separate agents and G owns merge. |
+| AC8 Stage entry conditions | **SATISFIED for C** - acted only on the fresh Stage B ACCEPT 6245975350 bound to plan revision 2 6245949982; rebased onto then-current live main 06613a02; added exactly the one record path in three DCO-signed model-attributed commits (c0093d15 -> d04d402d -> d7a0dfc9), with this base/citation repair adding a fourth; posts the SD-C handoff; D/E/F/G remain separate agents and G owns merge. |
 
 ## 9. Validation actually run while authoring (before commit)
 
