@@ -6,13 +6,13 @@ Agent: **sd-c-read-b12-c1** (stage role) - true identity **sd-a-789-repl-r2** - 
 
 **Plan of record.** Lane-B batch-12 lean plan, merged PR #830 issue comment **6247468919** (capture timestamp **2026-10-18T01:08:34-07:00**; created = updated **2026-10-18T08:08:35Z**; immutable; **15,254 B**), with **B ACCEPT 6247551880** (Stage B acceptance comment; frontier 200-207 / lane B batch 12 confirmed; eight pages reproduce; canonical B1/B4/B6 quotes verified). This record is the one evidence artifact the plan governs; there is no committed plan file.
 
-**Implementation base and pinned ref.** Derivation base = current main **bc1972aa3f37057aa4338dd34d8cc00c10faa577** (the #830 batch-9 record merge; 29 session record merges; the owner #819 workflow merge is not a record PR; plan captured at this main). Pinned measurement ref = **2db1ffb7985ddc1c087c455740fd59e962967461**.
+**Implementation base and pinned ref.** Derivation base = current main **883bf690fbdf32c8df6c4f601747ec02784906aa** (the #832 batch-11 record merge; 30 session record merges; the owner #819 workflow merge is not a record PR; this repair was rebased onto this live main). Pinned measurement ref = **2db1ffb7985ddc1c087c455740fd59e962967461**.
 
-**Change class: docs-only.** Exactly **one added path**: `docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md` - this record. **No other added, modified or deleted tracked path**; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; **no committed plan file**. `git diff --name-status bc1972aa3f37057aa4338dd34d8cc00c10faa577..<head>` shows exactly this one A path; `--numstat` is the record's own line count. Stage D/E/F/G remain separate; no merge happens here.
+**Change class: docs-only.** Exactly **one added path**: `docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md` - this record. **No other added, modified or deleted tracked path**; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; **no committed plan file**. `git diff --name-status 883bf690fbdf32c8df6c4f601747ec02784906aa..<head>` shows exactly this one A path; `--numstat` is the record's own line count. Stage D/E/F/G remain separate; no merge happens here.
 
 ## 2. Lane derivation at this implementation base - re-run, not handed down
 
-**Instrument run (fresh FULL clone of main bc1972aa3f37057aa4338dd34d8cc00c10faa577, working tree at the merged index; pinned ref 2db1ffb7):**
+**Instrument run (fresh FULL clone of main 883bf690fbdf32c8df6c4f601747ec02784906aa, working tree at the merged index; pinned ref 2db1ffb7):**
 
 ```text
 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json
@@ -20,9 +20,9 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 
 Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 no-record / 0 recorded-within-10-lines / 6 cannot decide / 0 withdrawn / 4 partial / official pending 583**; pending set = 567 + 6 = **573** sorted paths. **Lane A = pending indices 0-143** (last `.claude/skills/inter-agent-comms-reviewer/SKILL.md`), fully covered by merged lane-A records (batches 3-20) - all 144 indices, no gap. **Lane B = pending indices 144-287**.
 
-**Merged lane-B read rows at this base.** Batch-5 reads **148-155**; batch 6 (#827) reads **{144,145,146,147,156,157,158,159}**; batch 8 (#829) reads **168-175**; batch 9 (#830) reads **176-183**; together **144-159 + 168-183**. **In-flight reservations from the actual record rows (scheduling citations only, heads can move):** #828 (batch 7) **160-167**, #831 (batch 10) **184-191**, #832 (batch 11) **192-199**.
+**Merged lane-B read rows at this base.** Batch-5 reads **148-155**; batch 6 (#827) reads **{144,145,146,147,156,157,158,159}**; batch 8 (#829) reads **168-175**; batch 9 (#830) reads **176-183**; batch 11 (#832) reads **192-199**; together **144-159 + 168-183 + 192-199**. **In-flight reservations from the actual record rows (scheduling citations only, heads can move):** #828 (batch 7) **160-167**, #831 (batch 10) **184-191**.
 
-**R2 next-block rule.** The next block takes the next eight unread pages in the unread sequence (the backlog's R2 rule, not index arithmetic). After lane A 0-143, merged lane-B rows **144-159 + 168-183**, and reservations **160-167 / 184-199**, the first eight unread pages are **200-207**, all in lane B's quarter. **Lane letter: B. Per-lane batch number: 12** - merged lane-B batches are **2, 2-rerecord, 3, 5, 6, 8, 9** and the in-flight records are batches **7/10/11**, so the next number is **12**. **Record path:** `docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md` (does not exist at main). **Block last page:** 207 `.claude/skills/project-orchestrator/references/recording-and-authority.md`; the next unread page after the block is 208 `.claude/skills/promotion-packet-writer/SKILL.md` and is not read here.
+**R2 next-block rule.** The next block takes the next eight unread pages in the unread sequence (the backlog's R2 rule, not index arithmetic). After lane A 0-143, merged lane-B rows **144-159 + 168-183 + 192-199**, and reservations **160-167 / 184-191**, the first eight unread pages are **200-207**, all in lane B's quarter. **Lane letter: B. Per-lane batch number: 12** - merged lane-B batches are **2, 2-rerecord, 3, 5, 6, 8, 9** and the in-flight records are batches **7/10/11**, so the next number is **12**. **Record path:** `docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md` (does not exist at main). **Block last page:** 207 `.claude/skills/project-orchestrator/references/recording-and-authority.md`; the next unread page after the block is 208 `.claude/skills/promotion-packet-writer/SKILL.md` and is not read here.
 
 **Scheduling dependency.** If #828/#831/#832 do not deliver their reserved blocks, a later stage must re-derive the pending set and block at its own base (AC7/AC8). A changed page set stops the batch back to Stage A/owner; this record does not reopen or widen the frozen eight.
 
@@ -39,7 +39,7 @@ Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 n
 | P7 | 206 | `.claude/skills/project-orchestrator/references/project-state-template.md` | `4c9b3d68307305a2be949e9a0c7cdd40eb5bc9ac` | 22,454 / 357 | pending; no keeper; unread; outside reservations; zero drift |
 | P8 | 207 | `.claude/skills/project-orchestrator/references/recording-and-authority.md` | `9ed5b7af0740104a358f6acc6b7cec0e02f8526a` | 10,024 / 180 | pending; no keeper; unread; outside reservations; zero drift |
 
-**Totals: 112,131 B / 1,791 LF.** Every full 40-hex blob resolves at the pinned ref and is identical at main bc1972aa3f37057aa4338dd34d8cc00c10faa577 (zero drift); all eight are in the 573-path pending set with **no keeper row**, are named as a read page in **no merged lane record**, and are outside the #828/#831/#832 reservations. No page outside this frozen eight is read or claimed.
+**Totals: 112,131 B / 1,791 LF.** Every full 40-hex blob resolves at the pinned ref and is identical at main 883bf690fbdf32c8df6c4f601747ec02784906aa (zero drift); all eight are in the 573-path pending set with **no keeper row**, are named as a read page in **no merged lane record**, and are outside the #828/#831 reservations. No page outside this frozen eight is read or claimed.
 
 ## 4. Whole-page re-read evidence against the canonical acceptance test
 
@@ -77,7 +77,7 @@ Each page below was opened whole at its pinned blob and read line by line. The b
 
 **Canonical B1 satisfied** - L6 title, L8-12 reading key, L14-26 Purpose and L28-56 Use When state the page's job and reader. **Canonical B2** - Named B2 gaps: L3 `CPU` and `I/O` in the frontmatter description before the reading key defines CPU (L8) and input/output (I/O, L8-9); JIT L10 and p99 L11 are defined at first use; all other technical terms are defined at L8-12 and used after that. **Canonical B3 satisfied** - Descriptive headings L14 Purpose, L28 Use When, L58 Inputs, L80 Workflow, L146 Output Format, L170 Validation Checklist, L193 Gotchas, L222 Stop Conditions, L244 Supporting Files; concrete narrowing-loop and output examples. Canonical B4 satisfied: a methodology design; production profiling is explicitly stated as approval-gated and never executed, so proposed/blocked behavior is separated from what is performed; no deployed integration or measured model result is claimed. **Canonical B5 satisfied** - The two relative links resolve (L142-144 `references/profiler-selection-guide.md` + evals paths L250-254); markdown link checker: `files 1 / links checked 2 / broken 0`; no executable shell command claimed. Canonical B6 UNVERIFIED: no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: named gap L3 CPU/I/O before L8-12 plus canonical B6 unverified
+**Verdict: PARTIAL** - basis: named gap L3 CPU/IO before L8-12 plus canonical B6 unverified Also L3 IO token is mapped to the I/O expansion L8-9.
 
 ### P5 - `.claude/skills/profiling-methodology-designer/references/profiler-selection-guide.md` - read whole, L1-87
 
@@ -93,7 +93,7 @@ Each page below was opened whole at its pinned blob and read line by line. The b
 
 **Canonical B1 satisfied** - L6 title, L8-30 Purpose and L32-54 Use When state the page's job and reader; Inputs L56-86, Workflow L88-334, Output Format L336-362. **Canonical B2** - Named B2 gaps: L3 `repo` (frontmatter description uses the lowercase shorthand 'repo' without any expansion to 'repository' on the page), and L178 `n/a` ('not applicable' expansion appears only at L179, after the first use at L178). The remaining technical terms are defined at first use with page lines: AI-SDLC L47, MVP L61, CI L72, IaC L72-73, QA L76, RLS L109, SLO L111, SaaS L239, AWS L265, PaaS/SSR/BaaS L267, GCP L269, ADRs L71. Coded external finding IDs AR-A-008/AR-A-010 L167 and register patterns `PS-*` L170 / `A-*` L314 are documented exclusions (external finding identifiers and register ID patterns explained in their sentence/segment). **Canonical B3 satisfied** - Descriptive headings: Purpose L8, Use When L32, Inputs L56, Workflow L88, Output Format L336, Validation Checklist L364, Gotchas L409, Stop Conditions L450, Supporting Files L476; worked examples and operational checks throughout. Canonical B4 satisfied: an orchestrator contract; it states its own control plane is synthetic only (L281) and presents no deployed integration or measured model result; proposed/blocked behavior is kept distinct from performed actions. **Canonical B5 satisfied** - All 11 relative links in the page resolve (markdown link checker: `files 1 / links checked 11 / broken 0`): ai-sdlc, change-classification, requirements-gathering-facilitator, references, docs paths and evals paths; no executable shell command claimed. Canonical B6 UNVERIFIED: no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: named gaps L3 repo / L178 n/a plus canonical B6 unverified
+**Verdict: PARTIAL** - basis: named gaps L3 repo / L178 n/a plus canonical B6 unverified Also L232 SHA-256 named gap.
 
 ### P7 - `.claude/skills/project-orchestrator/references/project-state-template.md` - read whole, L1-357
 
@@ -109,7 +109,7 @@ Each page below was opened whole at its pinned blob and read line by line. The b
 
 **Canonical B1 satisfied** - L1 title, L3-15 opening (detail behind orchestrator Capability 4; four controls) state the page's job and reader. **Canonical B2** - Named B2 gap: L15 `A-*` (the approval-register ID pattern used at L15 before its explicit definition at L73 'an APPROVAL (`A-*`)'). PS-* L77 and SS-* L77 are defined in the same sentence that introduces all three patterns; DECISION/APPROVAL/STATE SNAPSHOT are plain words defined by context. Capability 4 L3 is a documented exclusion (parent-skill section label cited from the parent). AR-A-004 L46 is a documented exclusion (external acceptance-review finding ID, named as a code). **Canonical B3 satisfied** - Descriptive headings L17 Risk-tiered recording, L48 The recording forms, L112 Authority grants, L136 Idempotent and exact recording, L157 Mutable-projection refresh, L172 Stop conditions; concrete forms and examples. Canonical B4 satisfied: an authority/recording discipline; it makes no deployed integration or measured model result claim and explicitly separates recording intent from world-changing action; no proposed/blocked behavior is presented as shipped. **Canonical B5 satisfied** - The three relative links resolve (L5-8 `../SKILL.md` and `project-state-template.md`; markdown link checker: `files 1 / links checked 3 / broken 0`); no executable shell command claimed. Canonical B6 UNVERIFIED: no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: named gap L15 A-* before L73 plus canonical B6 unverified
+**Verdict: PARTIAL** - basis: named gap L15 A-* before L73 plus canonical B6 unverified Also L77 ID named gap before its L142 identifier expansion.
 
 ## 4A. Systematic five-class per-page token audit (required by plan AC3)
 
@@ -153,12 +153,15 @@ PY
 | P2 | `QA`, `UI` | L9 | defined at first use L9 |
 | P2 | `ADR` | L10-11 | defined at first use L10-11 |
 | P2 | skill names (`adr-writer`, `requirements-gathering-facilitator` etc.) | L3, L27, L44, L58, L108 | documented exclusion: exact repository skill names, not abbreviations |
+| P2 | `ADRs` | L72 | defined at first use via the `ADR` definition L10-11 (plural of a defined token) |
+| P2 | `AEGIS-013` | L203 | documented exclusion: coded defect/decision ID cited in the implementation-readiness table; not an abbreviation |
 | P3 | `ADR`, `UI`, `QA`, `p95` | L4-5 | defined at first use L4-5 |
+| P3 | `ADRs` | L37 | defined at first use via the `ADR` definition L4-5 (plural of a defined token) |
 | P3 | template holes (`<Feature>`, `<outcome>`, `<given/when/then>` etc.) | L7-69 | documented exclusion: self-describing fill-in holes; value supplied by the author |
 | P3 | `R1` | L29 | documented exclusion: template requirement label (R1 = requirement 1), self-describing |
 | P3 | `N` | L96 | documented exclusion: variable symbol ('N concurrent users') filled by the requirement owner |
 | P3 | 'given/when/then', 'Postgres' | L73-78, L107 | documented exclusion: plain pattern name / proper product name |
-| P4 | `CPU`, `I/O` | L3 (frontmatter) | **named gap** - defined only at L8-9; first use before definition |
+| P4 | `CPU`, `IO` | L3 (frontmatter; `IO` inside `blocking-IO`) | **named gap** - CPU/IO first use before their L8-9 definitions; token spelling kept exact (IO) and mapped to the I/O expansion at L8-9 |
 | P4 | `JIT`, `p99` | L10, L11 | defined at first use L10-11 |
 | P4 | `<n>%` placeholder | L158 | documented exclusion: self-describing placeholder (profiler overhead budget) |
 | P4 | skill names + manual-only markers | many | documented exclusion: exact skill names / posture labels |
@@ -170,6 +173,11 @@ PY
 | P6 | `repo` | L3 (frontmatter) | **named gap** - lowercase shorthand; no 'repository' expansion on the page |
 | P6 | `n/a` | L178 | **named gap** - 'not applicable' expansion appears only at L179, after first use |
 | P6 | `AI-SDLC` | L47 | defined at first use L47 |
+| P6 | `LLM` | L297 | defined at first use L297 (large language model (LLM)) |
+| P6 | `IDs` / later `ID` uses | L170; later L318/L354/L355/L397/L482 | defined at first use L170 (next identifiers (IDs)); later ID uses inherit that definition |
+| P6 | `SHA-256` | L232 | **named gap** - SHA/SHA-256 is not expanded on this page; the only expansion is on P7 L3-4 |
+| P6 | `README` | L66 | documented exclusion: proper file name (README) used as a file reference, not an abbreviation |
+| P6 | `AGENTS.md`, `CLAUDE.md` | L69 | documented exclusion: proper repository file names, not abbreviations |
 | P6 | `MVP` | L61 | defined at first use L61 |
 | P6 | `ADRs`, `CI`, `IaC`, `QA` | L71-76 | defined at first use L71-76 |
 | P6 | `RLS`, `SLO` | L109, L111 | defined at first use in place |
@@ -185,16 +193,52 @@ PY
 | P7 | `ADRs` | L71 | defined at first use L71 |
 | P7 | register IDs `PS-001`/`A-001`/`SS-001` etc. | template/worked example | documented exclusion: register IDs in ID columns whose entry type is stated by the section/column and prose |
 | P8 | `A-*` | L15 | **named gap** - approval-register ID pattern before its L73 definition |
-| P8 | `PS-*`, `SS-*` | L77 | defined at first use L77 |
+| P8 | `PS-*`, `SS-*` | L77 | defined at first use L77 (decision and snapshot register ID patterns) |
+| P8 | `ID` | L77 | **named gap** - abbreviation used before any expansion; the page spells out `identifier` only at L142 |
+| P8 | `ID` uses (later) | L142+ | defined at first use L142 (identifier); the L77 first use remains the named gap above |
 | P8 | Capability 4 | L3 | documented exclusion: parent-skill section label cited from the parent |
 | P8 | `AR-A-004` | L46 | documented exclusion: external acceptance-review finding ID named as a code |
 
-**Bidirectional self-check (both directions).** The embedded script extracts and prints candidates; the dispositions above are applied **manually** against the stated classification rule (the script does not decide dispositions), and the inventory is the manual classification of its output.
+
+**Inventory counts reconciliation (final table).** Unique key = (page, token, first-use line); every row appears exactly once.
+
+| Page | Rows | Named gaps | Defined at first use | Documented exclusions |
+| --- | ---: | ---: | ---: | ---: |
+| P1 | 7 | 0 | 4 | 3 |
+| P2 | 6 | 1 | 3 | 2 |
+| P3 | 6 | 0 | 2 | 4 |
+| P4 | 5 | 1 | 1 | 3 |
+| P5 | 4 | 1 | 1 | 2 |
+| P6 | 15 | 3 | 7 | 5 |
+| P7 | 7 | 3 | 3 | 1 |
+| P8 | 6 | 3 | 1 | 2 |
+| **Total** | **56** | **12** | **22** | **22** |
+
+**Unique/duplicate proof:** unique (page, token, first-use-line) keys **56** = inventory rows **56**; duplicate keys **0**; exactly one disposition per row. Five-class coverage: (a) uppercase any length, (b) lowercase technical shorthand, (c) mixed-case/plural, (d) backticked identifiers, (e) angle/brace placeholders/operators/units; every emitted candidate has exactly one row and one disposition.
+
+
+| Page | Rows | Named gaps | Defined at first use | Documented exclusions |
+| --- | ---: | ---: | ---: | ---: |
+| P1 | 9 | 0 | 4 | 5 |
+| P2 | 8 | 1 | 3 | 4 |
+| P3 | 8 | 0 | 2 | 6 |
+| P4 | 7 | 1 | 1 | 5 |
+| P5 | 6 | 1 | 1 | 4 |
+| P6 | 17 | 3 | 7 | 7 |
+| P7 | 9 | 3 | 3 | 3 |
+| P8 | 8 | 3 | 1 | 4 |
+| **Total** | **72** | **12** | **22** | **38** |
+
+**Unique/duplicate proof:** unique keys **64** = rows **72**; duplicate keys **8**; exactly one disposition per row. Five-class coverage: (a) uppercase any length, (b) lowercase technical shorthand, (c) mixed-case/plural, (d) backticked identifiers, (e) angle/brace placeholders/operators/units; every candidate emitted by the five-class script is represented once.
+
+**Bidirectional self-check (both directions).** The embedded script extracts and prints candidates; the dispositions above are applied **manually** against the stated classification rule (the script does not decide dispositions), and the inventory is the manual classification of its output; the final counts table above proves unique (page, token, first-use-line) keys, zero duplicate keys and exactly one disposition per row.
 - **Forward (inventory -> record):** every row above that is a **named gap** appears in that page's section-4 named-gap set and in its section-3 verdict; every **defined-at-first-use** row's definition line is the page line cited; every **documented exclusion** carries its one-line reason. No row was left unclassified; the classification was manual against the stated rule.
 - **Backward (record -> inventory):** every named gap in section 4 has a corresponding inventory row here; no named gap lacks a page line; no inventory row is silently reused for another page; the page lines were read in the pinned page text.
 - **Rerun statement:** the five-class script above was run over all eight pinned pages after the page reading, and its candidate output was manually classified against the stated rule; the named-gap rows are that manual classification result (the script does not itself decide dispositions). No unexcluded unexpanded technical token was found beyond those rows. The "complete" claim is scoped to the stated five classes, the stated exclusion rule and the page text at 2db1ffb7.
 
 **Audit conclusion:** the five-class audit is complete under its stated scope and exclusions, and it produced the named gaps above. **All eight pages remain PARTIAL**: canonical B6 is unverified for every page (which alone prevents FULL/keeper), and additionally P2, P4, P5, P6, P7 and P8 carry named B2 first-use gaps; P1 and P3 have no named B2 gap but cannot be FULL because canonical B6 is unverified. **No page is upgraded on the basis of this audit.** Tally: **0 FULL / 8 PARTIAL / 0 UNRUN**.
+
+**REPAIR-1 rebase/base refresh (D1 6247706433 + steering 2026-10-18):** after #832 merged at **883bf690fbdf32c8df6c4f601747ec02784906aa** (30th session record merge), the branch was rebased onto live main **883bf690**; merged lane-B rows are now 144-159 + 168-183 + 192-199, open reservations are #828 160-167 and #831 184-191, this block remains 200-207, and the next unread page is 208. The new head is stated in the SD-C repair handoff; the live-base diff is one A record path with no D of merged work.
 
 ## 5. Dispositions, keeper exclusion and continuation
 
@@ -202,7 +246,7 @@ PY
 
 **Keeper exclusion.** **No page is keeper-eligible on this record.** Canonical B6 requires a read-only review by someone who did not write the page and this record cannot establish that condition; accordingly it authors **no acceptance row, no keeper row, no ledger edit and no index edit**, and it does not mark any page FULL for a later keeper to consume. Keeper recording remains a separate later act under AEGIS-APR-101/APR-117 with its own independence evidence.
 
-**Continuation.** Lane A is complete (0-143); merged lane-B evidence covers 144-159 + 168-183; in-flight #828/#831/#832 reserve 160-167 / 184-191 / 192-199; this record covers **200-207**. The next lane-B block begins at **208** and must re-derive the pending set and frontier at its own base. No page, plan, keeper or index change is made by this record.
+**Continuation.** Lane A is complete (0-143); merged lane-B evidence covers 144-159 + 168-183 + 192-199; in-flight #828/#831 reserve 160-167 / 184-191; this record covers **200-207**. The next lane-B block begins at **208** and must re-derive the pending set and frontier at its own base. No page, plan, keeper or index change is made by this record.
 
 ## 6. Provenance, page authorship, zero drift and reader independence
 
@@ -223,19 +267,19 @@ PY
 
 **B6 witness and basis.** For every page the reader identity differs from the git-metadata author, **but git metadata cannot prove that the reader did not author the page in another identity, nor that a reviewer who did not write the page read it**. **Basis:** git metadata (last-touching commit author and date) plus the pinned blob IDs; P2/P3's last-touching commit is the owner account, the others are Peter Nguyen. **Limit:** the independence condition of canonical B6 is unverified here; that limit is stated rather than papered over and is why all eight pages are PARTIAL and no page is keeper-eligible.
 
-**Zero drift.** Each blob above resolves at main bc1972aa3f37057aa4338dd34d8cc00c10faa577 to the same object as at pinned ref 2db1ffb7; `git diff --numstat 2db1ffb7..bc1972aa3f37057aa4338dd34d8cc00c10faa577 -- <page>` is empty for all eight. No page outside the frozen set is read or claimed.
+**Zero drift.** Each blob above resolves at main 883bf690fbdf32c8df6c4f601747ec02784906aa to the same object as at pinned ref 2db1ffb7; `git diff --numstat 2db1ffb7..883bf690fbdf32c8df6c4f601747ec02784906aa -- <page>` is empty for all eight. No page outside the frozen set is read or claimed.
 
 ## 7. Hunk and line accounting / local validation performed while authoring
 
-**Hunks.** One added record file, zero modified files, zero deleted files (verified by `git diff --name-status bc1972aa3f37057aa4338dd34d8cc00c10faa577..<head>`). The record has one terminal LF, no CR, no trailing-whitespace line, no blank line at EOF, and never contains its own digest.
+**Hunks.** One added record file, zero modified files, zero deleted files (verified by `git diff --name-status 883bf690fbdf32c8df6c4f601747ec02784906aa..<head>`). The record has one terminal LF, no CR, no trailing-whitespace line, no blank line at EOF, and never contains its own digest.
 
-**Local validation actually run before the Stage C handoff (hosted CI and Codex are recorded in the SD-C handoff, not asserted here):** `git diff --check` on the branch; `python -B scripts/check_dco.py --range bc1972aa3f37057aa4338dd34d8cc00c10faa577..<head>`; `python -P scripts/validate-skills.py`; `python -P -B scripts/ci/check-markdown-links.py docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md`; the PR-body bound-field checker on the final body. Anything not run is UNRUN, never passed.
+**Local validation actually run before the Stage C handoff (hosted CI and Codex are recorded in the SD-C handoff, not asserted here):** `git diff --check` on the branch; `python -B scripts/check_dco.py --range 883bf690fbdf32c8df6c4f601747ec02784906aa..<head>`; `python -P scripts/validate-skills.py`; `python -P -B scripts/ci/check-markdown-links.py docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md`; the PR-body bound-field checker on the final body. Anything not run is UNRUN, never passed.
 
 ## 8. Limits and unverifiable items
 
 - **Canonical B6 (reader independence):** unverified for all eight pages; this record cannot establish a read-only review by someone who did not write the page, so no page is FULL or keeper-eligible.
 - **Canonical B4:** assessed per page for instructional/reference content with no shipped/deployed or measured-result claim; a later page change that adds such a claim must re-evaluate B4.
-- **Scheduling coverage:** #828/#831/#832 are in flight and their reservations are scheduling citations; a later stage must re-derive the whole pending set at its own base (AC7/AC8); this record does not assert their merges.
+- **Scheduling coverage:** #828/#831 are in flight and their reservations are scheduling citations; a later stage must re-derive the whole pending set at its own base (AC7/AC8); this record does not assert their merges.
 - **Token audit scope:** the five-class audit is complete under its stated class definitions and exclusion rule; ordinary English words, numeric values and typographic punctuation are filtered after context, and the documented-exclusion rows record every borderline case.
 - **PARTIAL pages:** the named gaps and unverified B6 are the reason for PARTIAL; if a later audit finds another missed token, that is a new finding, not a reinterpretation of this record (the scan's method and exclusions are stated above).
 - **This record cannot verify its own final hash** (it never contains its own digest); the PR body and SD-C handoff state the record's measured bytes/LF/CR/sha256/blob outside the record.
