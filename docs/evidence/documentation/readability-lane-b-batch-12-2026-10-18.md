@@ -99,7 +99,7 @@ Each page below was opened whole at its pinned blob and read line by line. The b
 
 **Purpose/normal use (from the page alone):** the docs/project-state.md schema and template: three append-only dated entry types, the immutable-evidence vs mutable-projection split, the propose to approve to append flow, and the full copyable template plus a worked example.
 
-**Canonical B1 satisfied** - L1 title and L3-17 opening (companion to project-orchestrator; SHA-256/MVP/v1 definitions) state the page's job and reader. **Canonical B2** - Named B2 gaps: L15 `repo` (lowercase shorthand 'product repo' with no 'repository' expansion on the page), L25 `ID` (uppercase abbreviation used as 'stable ID' before any expansion), and L70 `ISO` (ISO date, no expansion to International Organization for Standardization). MVP and v1 are defined at L3-4; SHA-256 at L3; AI at L62 (AI means artificial intelligence); ADRs at L71. Register IDs `PS-001`/`A-001`/`SS-001` and `PS-*`/`A-*`/`SS-*` are documented exclusions (register IDs in ID columns whose entry type is stated by the section/column and prose). **Canonical B3 satisfied** - Descriptive headings: Composition L23, Non-negotiable rules L47, Section mutability L96, Template L170, Worked example L247, worked lifecycle append L345; tables, templates and worked examples. Canonical B4 satisfied: schema/template guidance; the worked example is explicitly a generic illustration and the lifecycle-append example states it grants/revokes no real project permission (L356-357); no shipped integration or measured model result is claimed. **Canonical B5 satisfied** - The relative links L3 `../SKILL.md` and L5 `project-state-template.md` resolve; markdown link checker: `files 1 / links checked 1 / broken 0` for this page; code fences are templates, not commands claimed run. Canonical B6 UNVERIFIED: no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
+**Canonical B1 satisfied** - L1 title and L3-17 opening (companion to project-orchestrator; SHA-256/MVP/v1 definitions) state the page's job and reader. **Canonical B2** - Named B2 gaps: L15 `repo` (lowercase shorthand 'product repo' with no 'repository' expansion on the page), L25 `ID` (uppercase abbreviation used as 'stable ID' before any expansion), and L70 `ISO` (ISO date, no expansion to International Organization for Standardization). MVP and v1 are defined at L3-4; SHA-256 at L3; AI at L62 (AI means artificial intelligence); ADRs at L71. Register IDs `PS-001`/`A-001`/`SS-001` and `PS-*`/`A-*`/`SS-*` are documented exclusions (register IDs in ID columns whose entry type is stated by the section/column and prose). **Canonical B3 satisfied** - Descriptive headings: Composition L23, Non-negotiable rules L47, Section mutability L96, Template L170, Worked example L247, worked lifecycle append L345; tables, templates and worked examples. Canonical B4 satisfied: schema/template guidance; the worked example is explicitly a generic illustration and the lifecycle-append example states it grants/revokes no real project permission (L356-357); no shipped integration or measured model result is claimed. **Canonical B5 satisfied** - L3 `../SKILL.md` resolves; L5 links the page to itself (`project-state-template.md` is this page) as a companion cross-reference, not an external target, so the checker counts **one checked relative link / 0 broken** for this page; code fences are templates, not commands claimed run. Canonical B6 UNVERIFIED: no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
 **Verdict: PARTIAL** - basis: named gaps L15 repo / L25 ID / L70 ISO plus canonical B6 unverified
 
@@ -142,10 +142,10 @@ PY
 
 | Page | Token(s) | First-use line | Disposition |
 | --- | --- | --- | --- |
-| P1 | `UI` | L6, L8 | defined at first use L6-8 (user interface) |
-| P1 | `IP` | L7, L36 | defined at first use L7 (Internet Protocol address) |
+| P1 | `UI` | L6 | defined at first use L6 (user interface) |
+| P1 | `IP` | L7 | defined at first use L7 (Internet Protocol address) |
 | P1 | `QA` | L7 | defined at first use L7 (quality assurance) |
-| P1 | `geo` | L8, L36 | defined at first use L8 (geographic location) |
+| P1 | `geo` | L8 | defined at first use L8 (geographic location) |
 | P1 | `visibilitychange`, `pagehide` | L53 | documented exclusion: backticked browser event names explained by the beacon sentence; not abbreviations |
 | P1 | 'Do-Not-Track' | L34 | documented exclusion: plain policy phrase, not a typed token |
 | P1 | 'vs' / 'e.g.' | L21 / L44 | documented exclusion: ordinary English abbreviations used in their standard sense |
@@ -153,7 +153,6 @@ PY
 | P2 | `QA`, `UI` | L9 | defined at first use L9 |
 | P2 | `ADR` | L10-11 | defined at first use L10-11 |
 | P2 | skill names (`adr-writer`, `requirements-gathering-facilitator` etc.) | L3, L27, L44, L58, L108 | documented exclusion: exact repository skill names, not abbreviations |
-| P2 | 'TESTABLE' / 'e.g.' | L? / L? | documented exclusion: emphasis word / ordinary English abbreviation |
 | P3 | `ADR`, `UI`, `QA`, `p95` | L4-5 | defined at first use L4-5 |
 | P3 | template holes (`<Feature>`, `<outcome>`, `<given/when/then>` etc.) | L7-69 | documented exclusion: self-describing fill-in holes; value supplied by the author |
 | P3 | `R1` | L29 | documented exclusion: template requirement label (R1 = requirement 1), self-describing |
@@ -161,13 +160,13 @@ PY
 | P3 | 'given/when/then', 'Postgres' | L73-78, L107 | documented exclusion: plain pattern name / proper product name |
 | P4 | `CPU`, `I/O` | L3 (frontmatter) | **named gap** - defined only at L8-9; first use before definition |
 | P4 | `JIT`, `p99` | L10, L11 | defined at first use L10-11 |
-| P4 | `<n>%` placeholder | L115 | documented exclusion: self-describing placeholder |
+| P4 | `<n>%` placeholder | L158 | documented exclusion: self-describing placeholder (profiler overhead budget) |
 | P4 | skill names + manual-only markers | many | documented exclusion: exact skill names / posture labels |
 | P4 | 'e.g.' | L105 | documented exclusion: ordinary English abbreviation |
 | P5 | `p99` | L66 | **named gap** - no definition on this page; first use in the example artifact name |
 | P5 | `CPU`, `GC`, `OOM`, `I/O`, `prod` | L6-7 | defined at first use L6-7 |
 | P5 | `<n>%` | L45 | documented exclusion: self-describing placeholder |
-| P5 | '2×', '≥3', 'vs' | L27-47 | documented exclusion: numeric/prose notation used in standard sense |
+| P5 | '2×', '≥3' | L28, L42 | documented exclusion: numeric/prose notation used in standard sense |
 | P6 | `repo` | L3 (frontmatter) | **named gap** - lowercase shorthand; no 'repository' expansion on the page |
 | P6 | `n/a` | L178 | **named gap** - 'not applicable' expansion appears only at L179, after first use |
 | P6 | `AI-SDLC` | L47 | defined at first use L47 |
@@ -178,7 +177,6 @@ PY
 | P6 | `AR-A-008`, `AR-A-010` | L167 | documented exclusion: external acceptance-review finding IDs cited with the runbook link |
 | P6 | `PS-*`, `A-*` | L170, L314 | documented exclusion: register ID patterns explained by the surrounding decision/approval sentence |
 | P6 | GO/CONDITIONAL-GO/NO-GO, N/A status labels | L306, L345-351 | documented exclusion: self-describing decision labels explained in their sentence |
-| P6 | 'e.g.' | many | documented exclusion: ordinary English abbreviation |
 | P7 | `repo` | L15 | **named gap** - lowercase shorthand 'product repo'; no expansion on the page |
 | P7 | `ID` | L25 | **named gap** - abbreviation 'ID' used without expansion |
 | P7 | `ISO` | L70 | **named gap** - ISO date; no expansion on the page |
@@ -186,17 +184,15 @@ PY
 | P7 | `AI` | L62 | defined at first use L62 (AI means artificial intelligence) |
 | P7 | `ADRs` | L71 | defined at first use L71 |
 | P7 | register IDs `PS-001`/`A-001`/`SS-001` etc. | template/worked example | documented exclusion: register IDs in ID columns whose entry type is stated by the section/column and prose |
-| P7 | 'e.g.' | many | documented exclusion: ordinary English abbreviation |
 | P8 | `A-*` | L15 | **named gap** - approval-register ID pattern before its L73 definition |
 | P8 | `PS-*`, `SS-*` | L77 | defined at first use L77 |
 | P8 | Capability 4 | L3 | documented exclusion: parent-skill section label cited from the parent |
 | P8 | `AR-A-004` | L46 | documented exclusion: external acceptance-review finding ID named as a code |
-| P8 | § references / 'e.g.' | many | documented exclusion: section-symbol references / ordinary English abbreviation |
 
-**Bidirectional self-check (both directions).**
-- **Forward (inventory -> record):** every row above that is a **named gap** appears in that page's section-4 named-gap set and in its section-3 verdict; every **defined-at-first-use** row's definition line is the page line cited; every **documented exclusion** carries its one-line reason. No row was left unclassified.
+**Bidirectional self-check (both directions).** The embedded script extracts and prints candidates; the dispositions above are applied **manually** against the stated classification rule (the script does not decide dispositions), and the inventory is the manual classification of its output.
+- **Forward (inventory -> record):** every row above that is a **named gap** appears in that page's section-4 named-gap set and in its section-3 verdict; every **defined-at-first-use** row's definition line is the page line cited; every **documented exclusion** carries its one-line reason. No row was left unclassified; the classification was manual against the stated rule.
 - **Backward (record -> inventory):** every named gap in section 4 has a corresponding inventory row here; no named gap lacks a page line; no inventory row is silently reused for another page; the page lines were read in the pinned page text.
-- **Rerun statement:** the five-class script above was run over all eight pinned pages after the page reading; the named-gap set it produced is exactly the inventory's named-gap rows. No unexcluded unexpanded technical token was found beyond those rows. The "complete" claim is scoped to the stated five classes, the stated exclusion rule and the page text at 2db1ffb7.
+- **Rerun statement:** the five-class script above was run over all eight pinned pages after the page reading, and its candidate output was manually classified against the stated rule; the named-gap rows are that manual classification result (the script does not itself decide dispositions). No unexcluded unexpanded technical token was found beyond those rows. The "complete" claim is scoped to the stated five classes, the stated exclusion rule and the page text at 2db1ffb7.
 
 **Audit conclusion:** the five-class audit is complete under its stated scope and exclusions, and it produced the named gaps above. **All eight pages remain PARTIAL**: canonical B6 is unverified for every page (which alone prevents FULL/keeper), and additionally P2, P4, P5, P6, P7 and P8 carry named B2 first-use gaps; P1 and P3 have no named B2 gap but cannot be FULL because canonical B6 is unverified. **No page is upgraded on the basis of this audit.** Tally: **0 FULL / 8 PARTIAL / 0 UNRUN**.
 
