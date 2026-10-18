@@ -6,19 +6,19 @@ Agent: **sd-c-read-b16-c1** (stage role) - true identity **sd-c-802-r4-codex** -
 
 **Plan of record.** Lane-B batch-16 lean plan, merged PR #831 issue comment **6248180046** (capture timestamp **2026-10-18T09:21:18Z**; created = updated **2026-10-18T09:21:18Z**; immutable; **15,326 B / 93 LF**), with **Stage B ACCEPT 6248227748** (created = updated **2026-10-18T09:26:31Z**; canonical B1-B6 quotes 6/6 verbatim; frontier 232-239 / lane B batch 16 confirmed; eight pages reproduce). This record is the one evidence artifact the plan governs; there is no committed plan file. **Provenance chain:** this is the Stage C repair answering SD-D REVISE **6248394619** (repair commit **73aa08f5**); the plan/B binding above is unchanged.
 
-**Implementation base and pinned ref.** Derivation base = current main **84a5295daa35d9df027da2dba56e6de52cb8a44a** (the **32nd** session record merge = PR #831, merged 2026-10-18T09:14:34Z; merge parents **655e40ea** + **df0249e2**; #828 was the 31st at 655e40ea and #832 the 30th at 883bf690). Pinned measurement ref = **2db1ffb7985ddc1c087c455740fd59e962967461**.
+**Implementation base and pinned ref.** Capture/derivation base = **84a5295daa35d9df027da2dba56e6de52cb8a44a** (the **32nd** session record merge = PR #831, merged 2026-10-18T09:14:34Z; parents **655e40ea** + **df0249e2**; #828 was the 31st at 655e40ea and #832 the 30th at 883bf690). The branch was **rebased onto live main a141c64f52e3ca62300e6afbd6204dfd4a17c670** after the **34th** session record merge (#836, merged 2026-10-18T10:16:27Z; parents **e7acaca4** + **be93382e**; e7acaca4 = #834 33rd). Pinned measurement ref = **2db1ffb7985ddc1c087c455740fd59e962967461**; page identities are unchanged at the rebased base (checked below).
 
-**Change class: docs-only.** Exactly **one added path**: `docs/evidence/documentation/readability-lane-b-batch-16-2026-10-18.md` - this record. **No other added, modified or deleted tracked path**; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; **no committed plan file**. `git diff --name-status 84a5295d..HEAD` shows exactly this one A path; `--numstat` is the record's own line count. Stage D/E/F/G remain separate; no merge happens here.
+**Change class: docs-only.** Exactly **one added path**: `docs/evidence/documentation/readability-lane-b-batch-16-2026-10-18.md` - this record. **No other added, modified or deleted tracked path**; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; **no committed plan file**. `git diff --name-status a141c64f..HEAD` shows exactly this one A path; `--numstat` is the record's own line count. Stage D/E/F/G remain separate; no merge happens here.
 
 ## 2. Lane derivation at this implementation base - re-run, not handed down
 
-**Instrument run (fresh clone of main 84a5295daa35d9df027da2dba56e6de52cb8a44a, working tree at the merged index; pinned ref 2db1ffb7):**
+**Instrument run (fresh clone of capture main 84a5295daa35d9df027da2dba56e6de52cb8a44a, working tree at the merged index; pinned ref 2db1ffb7; page identities re-checked at the rebased live base a141c64f):**
 
 ```text
 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json
 ```
 
-Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 no-record / 0 recorded-within-10-lines / 6 cannot decide / 0 withdrawn / 4 partial / official pending 583** = 690 reader pages − 107 accepted; it decomposes as **573 lane-derivation pending (567 no-record + 6 provably pending) + 6 cannot-decide + 4 partial-disposition**, so official 583 includes the 4 partial and 6 cannot-decide paths that the 573 lane-derivation set excludes. **Lane A = indices 0-143 (complete); lane B = 144-287.** **Merged lane-B rows at this base are 144-199** (144-167 + 168-183 + 184-191 via #831 + 192-199 via #832). **Reservations:** #833 **200-207**, #834 **208-215**, #835 **216-223**, #836 **224-231**. This block is **232-239** (lane B batch 16); the next unread page after the block is **240** `.claude/skills/saas-platform-architect/SKILL.md`. The record path does not exist at the base (checked with `git cat-file -e`). All eight pages are pending, unread by merged lane records, outside reservations, have **no keeper row**, and are **zero-drift** between pinned ref and base.
+Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 no-record / 0 recorded-within-10-lines / 6 cannot decide / 0 withdrawn / 4 partial / official pending 583** = 690 reader pages − 107 accepted; it decomposes as **573 lane-derivation pending (567 no-record + 6 provably pending) + 6 cannot-decide + 4 partial-disposition**, so official 583 includes the 4 partial and 6 cannot-decide paths that the 573 lane-derivation set excludes. **Lane A = indices 0-143 (complete); lane B = 144-287.** **Merged lane-B rows at this base are 144-199 + 208-215 + 224-231** (144-167 + 168-183 + 184-191 via #831, 192-199 via #832; 208-215 via #834 batch 13; 224-231 via #836 batch 15). **Reservations:** #833 **200-207**, #835 **216-223**; this PR's block is **232-239**; the next unread page after the block is **240** `.claude/skills/saas-platform-architect/SKILL.md`. The record path does not exist at the base (checked with `git cat-file -e`). All eight pages are pending, unread by merged lane records, outside reservations, have **no keeper row**, and are **zero-drift** between pinned ref and base.
 
 ## 3. The eight frozen pages - measured at pinned ref 2db1ffb7
 
@@ -34,7 +34,7 @@ Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 n
 | P8 | 239 | `.claude/skills/saas-cost-architect/SKILL.md` | `e841526729bdd66f39e6424c3b8e19ac95e1f1a1` | 11,953 / 212 |
 | | | **Totals** | | **69,755 / 1,256** |
 
-All blobs resolve at the pinned ref and are identical at main 84a5295d (zero drift); no keeper/acceptance row; no page outside the eight is read or claimed.
+All blobs resolve at the pinned ref and are identical at capture base 84a5295d and at the rebased live base a141c64f (zero drift); no keeper/acceptance row; no page outside the eight is read or claimed.
 
 ## 4. Whole-page re-read evidence against the canonical acceptance test
 
@@ -410,19 +410,19 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 
 ## 6. Dispositions, keeper exclusion and continuation
 
-**Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** P1/P2/P5/P7/P8 are PARTIAL on their named first-use B2 gaps plus canonical B6; P3/P4/P6 are PARTIAL solely on canonical B6. **No page is FULL:** canonical B6 is unverified for all eight and no other FULL-supporting condition can be established from this record. **No keeper/acceptance row** is authored; B6 alone cannot support a keeper, and keeper recording remains a separate later act under AEGIS-APR-101/117. **Continuation:** lane A is complete (0-143); merged lane-B evidence covers **144-199**; #833/#834/#835/#836 reserve **200-207/208-215/216-223/224-231**; this record covers **232-239**; next unread page is **240**. No page, plan, keeper or index change is made here.
+**Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** P1/P2/P5/P7/P8 are PARTIAL on their named first-use B2 gaps plus canonical B6; P3/P4/P6 are PARTIAL solely on canonical B6. **No page is FULL:** canonical B6 is unverified for all eight and no other FULL-supporting condition can be established from this record. **No keeper/acceptance row** is authored; B6 alone cannot support a keeper, and keeper recording remains a separate later act under AEGIS-APR-101/117. **Continuation:** lane A is complete (0-143); merged lane-B evidence covers **144-199 + 208-215 + 224-231**; #833/#835 reserve **200-207/216-223**; this record covers **232-239**; next unread page is **240**. No page, plan, keeper or index change is made here.
 
 ## 7. Provenance, page authorship, zero drift and reader independence
 
 - **Reader:** sd-c-802-r4-codex / stage role sd-c-read-b16-c1 read all eight pages whole at the pinned blob; no display elision. Page authors are not this reader (git metadata is stated only as metadata, not as B6 proof).
-- **Witness rows:** the section 3 table is the per-page witness (index, path, pinned blob, measured bytes/LF); each blob resolves at 2db1ffb7 and is identical at 84a5295d (zero drift).
+- **Witness rows:** the section 3 table is the per-page witness (index, path, pinned blob, measured bytes/LF); each blob resolves at 2db1ffb7 and is identical at capture base 84a5295d and the rebased live base a141c64f (zero drift).
 - **No regression:** no page/keeper/index/ledger/register/manifest/tool/test/workflow change; no plan file; exactly one added record path; eight pages zero drift.
 
 ## 8. Hunk/line accounting and local validation performed while authoring
 
-**Hunks.** One added record file, zero modified files, zero deleted files (`git diff --name-status 84a5295d..HEAD`). The record has one terminal LF, no CR, no trailing-whitespace line, no blank line at EOF, and never contains its own digest (meaning the record file's own sha256/blob; the eight page blobs in section 3 are cited evidence, not this record's digest). Final record bytes/LF/CR/sha256/blob are measured outside the record and published in the PR body and SD-C handoff.
+**Hunks.** One added record file, zero modified files, zero deleted files (`git diff --name-status a141c64f..HEAD`). The record has one terminal LF, no CR, no trailing-whitespace line, no blank line at EOF, and never contains its own digest (meaning the record file's own sha256/blob; the eight page blobs in section 3 are cited evidence, not this record's digest). Final record bytes/LF/CR/sha256/blob are measured outside the record and published in the PR body and SD-C handoff.
 
-**Local validation actually run before the Stage C handoff:** `git diff --check`; `python -B scripts/check_dco.py --range 84a5295d..HEAD`; `python -P scripts/validate-skills.py`; `python -P -B scripts/ci/check-markdown-links.py <record>`; the PR-body bound-field checker on the final body; the record integrity check (bytes/LF/CR/trailing whitespace/EOF). Hosted CI and Codex are recorded in the SD-C handoff, not asserted here; anything not run is UNRUN, never passed.
+**Local validation actually run before the Stage C handoff:** `git diff --check`; `python -B scripts/check_dco.py --range a141c64f..HEAD`; `python -P scripts/validate-skills.py`; `python -P -B scripts/ci/check-markdown-links.py <record>`; the PR-body bound-field checker on the final body; the record integrity check (bytes/LF/CR/trailing whitespace/EOF). Hosted CI and Codex are recorded in the SD-C handoff, not asserted here; anything not run is UNRUN, never passed.
 
 ## 9. Stage C declaration against AC1-AC8 and self-state consistency
 
@@ -434,10 +434,10 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | **AC4** | Honest dispositions under the strict FULL bar: **0 FULL / 8 PARTIAL / 0 UNRUN**; B6 UNVERIFIED and never FULL-supporting; no silent upgrade; every PARTIAL names its basis. |
 | **AC5** | Record integrity; body binds plan/head/record facts outside the record; PROC-04 published == live-body recompute (SD-C handoff); self-authored skills rows/protocol Row sources (round and row=<n>) and the manifest-bound six-field skill-usage lines outside the bound fields, per AEGIS-APR-101/117 (gloss: the six-field line records skill hash, reason, applied, result, incomplete and author; definitions: docs/delivery-workflow.md skills-provenance section and docs/approvals/APPROVAL_REGISTER.md). |
 | **AC6** | Codex loop is run at the exact head and triaged per the owner loop rule; no pass claim; SD-C handoff records the head-bound state/unavailability. |
-| **AC7** | Plan binding 6248180046 + B ACCEPT 6248227748; derivation base 84a5295d (**#831 32nd**, **655e40ea = #828 31st**, **883bf690 = #832 30th**); merged lane-B rows 144-199; reservations 200-207/208-215/216-223/224-231; block 232-239; next 240; official count re-stated; zero drift. |
-| **AC8** | C acts only on the fresh B ACCEPT bound to this plan, branches from then-current main 84a5295d, adds exactly the one record path, records base/head/tree/objects, posts SD-C COMPLETE; D/E/F/G separate; no merge here. |
+| **AC7** | Plan binding 6248180046 + B ACCEPT 6248227748; capture base 84a5295d (**#831 32nd**, **655e40ea = #828 31st**, **883bf690 = #832 30th**), rebased live base a141c64f (**#836 34th**, **e7acaca4 = #834 33rd**); merged lane-B rows 144-199 + 208-215 + 224-231; reservations #833 200-207 / #835 216-223; block 232-239; next 240; official count re-stated; zero drift. |
+| **AC8** | C acts only on the fresh B ACCEPT bound to this plan, originally branches from then-current main 84a5295d and rebases onto live main a141c64f, adds exactly the one record path, records base/head/tree/objects, posts SD-C COMPLETE; D/E/F/G separate; no merge here. |
 
-**Self-state consistency:** section 2's scheduling facts, section 9's counts and the authorship chain agree with the capture revision: **84a5295d = #831 (32nd)**, **655e40ea = #828 (31st)**, **883bf690 = #832 (30th)**; no unresolved head placeholders are used in the operative facts.
+**Self-state consistency:** section 2's scheduling facts, section 9's counts and the authorship chain agree with the capture and rebased revisions: **a141c64f = #836 (34th)**, **e7acaca4 = #834 (33rd)**, **84a5295d = #831 (32nd)**, **655e40ea = #828 (31st)**, **883bf690 = #832 (30th)**; no unresolved head placeholders are used in the operative facts.
 
 ## 10. Limits and unverifiable items
 
