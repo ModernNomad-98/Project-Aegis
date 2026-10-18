@@ -44,7 +44,7 @@ Canonical acceptance is bound by plan r3 6255973042 and B FINAL DELTA ACCEPT 625
 
 ### P2 - index 385 - `docs/evidence/documentation/forecast-navigation-2026-09-23.md` - read whole file (L1 to final line; full line/byte count above)
 
-**B1:** Backlog forecast navigation batch record for maintainers; current-reading note distinguishes the historical snapshot from the active forecast.
+**B1:** Purpose is a historical backlog-forecast navigation snapshot; current-reading note distinguishes it from the active forecast. The opening does **not** name maintainers or another intended audience (only a generic later "reader" reference), so the B1 audience claim is **not met** and is recorded as a gap.
 **B2:** Named gaps are in section 6; defined/exclusion rows are counted in section 5.
 **B3:** Scope and estimate, source reconciliation and verification/timing sections; concrete hashes, URLs and observed wall interval examples.
 **B4:** Historical receipt is kept separate from the current forecast/ledger; pre-merge estimates are not presented as measured active labor.
@@ -54,7 +54,7 @@ Canonical acceptance is bound by plan r3 6255973042 and B FINAL DELTA ACCEPT 625
 
 ### P3 - index 386 - `docs/evidence/documentation/full-page-readability-all-remaining-after-237-2026-09-24.md` - read whole file (L1 to final line; full line/byte count above)
 
-**B1:** Full remaining-page readability batch record for maintainers; states the baseline, the 129 pages without recorded acceptance and the batch's purpose.
+**B1:** Purpose is the full remaining-page readability batch; states the baseline, 129 pages without recorded acceptance and the batch's purpose. The opening does **not** name an intended audience, so the B1 audience claim is **not met** and is recorded as a gap.
 **B2:** Named gaps are in section 6; defined/exclusion rows are counted in section 5.
 **B3:** Page-level disposition sections (previously corrected, dated notes, other reader pages, synthetic fixtures) plus integrity/accounting; concrete page lists and counts.
 **B4:** Prospective post-merge estimates and historical acceptances are explicitly distinguished from the current ledger; no synthetic check is called measured throughput.
@@ -84,7 +84,7 @@ Canonical acceptance is bound by plan r3 6255973042 and B FINAL DELTA ACCEPT 625
 
 ### P6 - index 389 - `docs/evidence/documentation/full-page-readability-batch-after-211-2026-09-24.md` - read whole file (L1 to final line; full line/byte count above)
 
-**B1:** Full-page documentation review after PR #211 record for maintainers; scope/reading rule states the 20-page batch and audience.
+**B1:** Purpose is the full-page documentation review after PR #211; scope/reading rule states the 20-page batch. The opening does **not** name an intended audience across the batch, so the B1 audience claim is **not met** and is recorded as a gap.
 **B2:** Named gaps are in section 6; defined/exclusion rows are counted in section 5.
 **B3:** Scope and reading rule, page-level dispositions, terms and exclusions; concrete merge hash, page counts and review limits.
 **B4:** Current-reading note distinguishes historical checkpoints from current repository state; no provider call/deployment/administrator authority is claimed.
@@ -104,7 +104,7 @@ Canonical acceptance is bound by plan r3 6255973042 and B FINAL DELTA ACCEPT 625
 
 ### P8 - index 391 - `docs/evidence/documentation/full-page-readability-batch-after-214-2026-09-24.md` - read whole file (L1 to final line; full line/byte count above)
 
-**B1:** Twenty-page batch after PR #214 record for maintainers; opening current-reading note and scope state purpose/audience.
+**B1:** Purpose is the twenty-page batch after PR #214; current-reading note and scope state purpose. The opening does **not** name maintainers or another intended audience, so the B1 audience claim is **not met** and is recorded as a gap.
 **B2:** Named gaps are in section 6; defined/exclusion rows are counted in section 5.
 **B3:** Current-reading note, exact base/reviewer method and page-level dispositions; concrete hash, flags and counts.
 **B4:** Candidate/future exact-head language is historical pre-merge context; present acceptance status is the ledger, and no implementation/grant is claimed closed.
@@ -120,7 +120,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | --- | ---: | --- | --- | --- |
 | P1 | 1 | i | `README` | named gap - first use before any expansion on this page |
 | P1 | 3 | ii | `page` | named gap - first use before any expansion on this page |
-| P1 | 4 | i | `PR` | named gap - first use before any expansion on this page |
+| P1 | 4 | i | `PR` | defined at first use - "pull request (PR)" expansion on this page |
 | P1 | 5 | iv | `a092f8e07429c75cdc06d46befe084cb84a35d13` | documented exclusion - inline code identifier/command, not a prose abbreviation |
 | P1 | 6 | iv | `scripts/tests/fixtures/README.md` | documented exclusion - inline code identifier/command, not a prose abbreviation |
 | P1 | 7 | iv | `gate-guard` | documented exclusion - inline code identifier/command, not a prose abbreviation |
@@ -158,9 +158,10 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P2 | 12 | iv | `4b083b4b36d9d6cb7ad993baec9bc84e0a5f4891` | documented exclusion - inline code identifier/command, not a prose abbreviation |
 | P2 | 12 | iv | `origin/main` | documented exclusion - inline code identifier/command, not a prose abbreviation |
 | P2 | 13 | ii | `page` | named gap - first use before any expansion on this page |
+| P2 | 13 | iii | `PRs` | defined at first use - "pull requests (PRs)" expansion on this page |
 | P2 | 18 | v | `1–3` | documented exclusion - placeholder/operator/unit/lifecycle/status token, not a prose abbreviation |
 | P2 | 18 | ii | `hours` | named gap - first use before any expansion on this page |
-| P2 | 19 | v | `175–394` | documented exclusion - placeholder/operator/unit/lifecycle/status token, not a prose abbreviation |
+| P2 | 3 | v | `175–394` | documented exclusion - placeholder/operator/unit/lifecycle/status token, not a prose abbreviation |
 | P2 | 19 | v | `80–200` | documented exclusion - placeholder/operator/unit/lifecycle/status token, not a prose abbreviation |
 | P2 | 25 | ii | `checkpoint` | named gap - first use before any expansion on this page |
 | P2 | 25 | i | `PR` | named gap - first use before any expansion on this page |
@@ -540,7 +541,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | P7 | 29 | iv | `.claude/skills/change-classification-gate/SKILL.md` | documented exclusion - inline code identifier/command, not a prose abbreviation |
 | P7 | 30 | iv | `.claude/skills/chat-backlog-reconciliation/SKILL.md` | documented exclusion - inline code identifier/command, not a prose abbreviation |
 | P7 | 30 | i | `ADR` | named gap - first use before any expansion on this page |
-| P7 | 30 | i | `AI` | named gap - first use before any expansion on this page |
+| P7 | 30 | i | `AI` | defined at first use - "artificial intelligence (AI)" expansion on this page |
 | P7 | 30 | i | `SHA` | named gap - first use before any expansion on this page |
 | P7 | 31 | iv | `.claude/skills/ci-pipeline-architect/SKILL.md` | documented exclusion - inline code identifier/command, not a prose abbreviation |
 | P7 | 32 | iv | `.claude/skills/clickthrough-test-engineer/SKILL.md` | documented exclusion - inline code identifier/command, not a prose abbreviation |
@@ -603,30 +604,30 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Rows | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P1 | 5 | 14 | 2 | 9 | 3 | 33 | 17 | 2 | 14 |
-| P2 | 2 | 10 | 4 | 4 | 4 | 24 | 12 | 0 | 12 |
+| P1 | 5 | 14 | 2 | 9 | 3 | 33 | 16 | 3 | 14 |
+| P2 | 2 | 10 | 5 | 4 | 4 | 25 | 12 | 1 | 12 |
 | P3 | 13 | 17 | 8 | 149 | 5 | 192 | 30 | 0 | 162 |
 | P4 | 4 | 12 | 2 | 26 | 5 | 49 | 13 | 3 | 33 |
 | P5 | 7 | 10 | 2 | 23 | 7 | 49 | 14 | 3 | 32 |
 | P6 | 9 | 12 | 1 | 25 | 2 | 49 | 16 | 5 | 28 |
-| P7 | 14 | 7 | 1 | 21 | 2 | 45 | 20 | 1 | 24 |
+| P7 | 14 | 7 | 1 | 21 | 2 | 45 | 19 | 2 | 24 |
 | P8 | 3 | 11 | 1 | 22 | 2 | 39 | 14 | 0 | 25 |
-| **Total** | **57** | **93** | **21** | **279** | **30** | **480** | **136** | **14** | **330** |
+| **Total** | **57** | **93** | **22** | **279** | **30** | **481** | **134** | **17** | **330** |
 
-**Zero-duplicate proof:** final-table rows = **480** = unique (page, real first-use line, normalized token) keys = **480**; duplicate keys = **0**; extra rows after final table = **0**; per-page/class/disposition sums equal row count; one contiguous inventory table only. **Five-column proof:** all **480** rows parse exactly five cells with in-token pipes escaped and **0** bad rows. **Reconciliation:** section 3 B2/verdicts and section 6 named-gap list agree with this final table; no fabricated/placeholder row.
+**Zero-duplicate proof:** final-table rows = **481** = unique (page, real first-use line, normalized token) keys = **481**; duplicate keys = **0**; extra rows after final table = **0**; per-page/class/disposition sums equal row count; one contiguous inventory table only. **Five-column proof:** all **481** rows parse exactly five cells with in-token pipes escaped and **0** bad rows. **Reconciliation:** section 3 B2/verdicts and section 6 named-gap list agree with this final table; no fabricated/placeholder row.
 
 ## 6. Dispositions, verdicts, keeper exclusion and continuation
 
-**Disposition tally: 14 defined at first use / 136 named gaps / 330 documented exclusions = 480 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED and named B2 gaps remain; no keeper/acceptance row.
+**Disposition tally: 17 defined at first use / 134 named gaps / 330 documented exclusions = 481 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED and named B2 gaps remain; B1 audience gaps are recorded for P2/P3/P6/P8; no keeper/acceptance row.
 
 **Named-gap list (from the final table):**
-- **P1 (384)**: `README` L1, `page` L3, `PR` L4, `merge` L8, `https` L12, `D55` L17, `commit` L19, `SHA` L19, `reviewer` L26, `branch` L27, `git` L29, `diff` L29, `estimate` L32, `inventory` L34, `active` L37, `hours` L38, `queue` L38
+- **P1 (384)**: `README` L1, `page` L3, `merge` L8, `https` L12, `D55` L17, `commit` L19, `SHA` L19, `reviewer` L26, `branch` L27, `git` L29, `diff` L29, `estimate` L32, `inventory` L34, `active` L37, `hours` L38, `queue` L38
 - **P2 (385)**: `batch` L1, `active` L5, `estimate` L6, `page` L13, `hours` L18, `checkpoint` L25, `PR` L25, `UTC` L41, `python` L45, `git` L46, `diff` L46, `review` L47
 - **P3 (386)**: `batch` L1, `review` L3, `README` L3, `estimate` L5, `active` L5, `hours` L5, `page` L8, `PR` L11, `merge` L13, `inventory` L14, `AGENTS` L32, `CLAUDE` L32, `SECURITY` L32, `CHANGELOG` L33, `TRADEMARKS` L35, `AEGIS-001` L35, `CONTRIBUTING` L36, `HISTORY` L36, `read` L41, `artifact` L150, `LF` L150, `SHA-256` L150, `manifest` L150, `repo` L167, `SKILL` L168, `json` L197, `python` L199, `git` L202, `diff` L202, `split` L208
 - **P4 (387)**: `page` L1, `batch` L1, `PR` L3, `UTC` L10, `commit` L11, `active` L12, `hours` L12, `estimate` L14, `read` L18, `SKILL` L30, `AGENTS` L40, `reviewer` L42, `merge` L80
 - **P5 (388)**: `page` L1, `batch` L1, `PR` L3, `UTC` L9, `merge` L10, `estimate` L11, `active` L12, `hours` L12, `SKILL` L30, `queue` L32, `reviewer` L41, `README` L58, `R1` L60, `R5` L60
 - **P6 (389)**: `page` L1, `review` L1, `PR` L3, `batch` L3, `merge` L11, `checkpoint` L19, `CI` L22, `SKILL` L25, `active` L38, `README` L46, `HOSTED` L53, `DELIVERY` L54, `reviewer` L59, `git` L72, `diff` L72, `queue` L79
-- **P7 (390)**: `page` L1, `batch` L1, `PR` L3, `merge` L10, `active` L13, `hours` L13, `review` L20, `SKILL` L25, `API/DB` L25, `HTTP` L27, `CDN` L27, `DB` L27, `TTL` L27, `API` L27, `AI` L30, `ADR` L30, `SHA` L30, `UI` L32, `URL` L32, `D9` L37
+- **P7 (390)**: `page` L1, `batch` L1, `PR` L3, `merge` L10, `active` L13, `hours` L13, `review` L20, `SKILL` L25, `API/DB` L25, `HTTP` L27, `CDN` L27, `DB` L27, `TTL` L27, `API` L27, `ADR` L30, `SHA` L30, `UI` L32, `URL` L32, `D9` L37
 - **P8 (391)**: `page` L1, `batch` L1, `PR` L3, `review` L8, `merge` L11, `active` L14, `hours` L15, `SKILL` L28, `workflow` L29, `pipeline` L33, `inventory` L42, `checkpoint` L44, `estimate` L46, `JSON` L51
 
 **Continuation:** lane B complete 144-279; lane C batches 1-15 merged; this record covers 384-391 (lane C batch 16); next unread block 392-399 stated not read/claimed.
@@ -641,7 +642,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 | --- | --- | --- |
 | AC1 one-path | MET in branch | exactly one added record path; no other tracked path; no plan file; DCO model commit measured post-commit |
 | AC2 frozen pages | MET | eight 40-hex blobs, bytes/LF, zero drift, pending/unread by lane-batch records, outside reservations |
-| AC3 whole-page + inventory | MET in this record | whole-page B1-B6; ONE contiguous 480-row table; five-cell/zero-duplicate proof; counts from final table; no fabricated rows |
+| AC3 whole-page + inventory | MET in this record | whole-page B1-B6; ONE contiguous 481-row table; five-cell/zero-duplicate proof; counts from final table; no fabricated rows |
 | AC4 dispositions | MET | strict FULL bar; B6 UNVERIFIED/not FULL-supporting; 0F/8P/0U; named gaps; no keeper |
 | AC5 record/body/PROC | asserted in PR body/handoff | record facts outside record; witness/skills/security fields; PROC-04 from live final body with published==recomputed and literal presence; checker 0; body CI list inclusive/truthful at posting |
 | AC6 Codex | asserted in PR body/handoff | Codex never a pass; trigger/triage/thread state truthfully reported in SD-C handoff; 0 unresolved target; MG3 belongs to G |
@@ -669,7 +670,7 @@ Keyed by **(page, real first-use line, token)**. One row per REAL token at its r
 **Six-field lines (outside bound fields).**
 
 ```text
-acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C must apply canonical bar / applied: read eight whole pages, B1-B6, B4 per page, exact-once inventory / result: 0F/8P; 480 rows; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-384-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
+acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C must apply canonical bar / applied: read eight whole pages, B1-B6, B4 per page, exact-once inventory / result: 0F/8P; 481 rows; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-384-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 source-of-truth-reconciler@b5fd9feda972 / reason: base/pages must be re-derived / applied: base b8163798, union616/154 quarters, page blobs/bytes/LF, duplicate audit / result: block384-391; 63,225/677; zero drift; 0/58 lane hits / incomplete: none / by: C, sd-c-read-lc-384-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 change-classification-gate@08d91a834460 / reason: docs-only one path / applied: record path absence, branch diff / result: one added record path; no other path / incomplete: none / by: C, sd-c-read-lc-384-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / reason: C owes manifest-bound provenance / applied: four names at base; rows/sources/six fields; retained capture / result: four rows/four sources/four lines; binding b2e9cfb645684faa2d90bf5b41ab2cae5c57e490cbe4650520b015ac80144807 / incomplete: none / by: C, sd-c-read-lc-384-c1 (true identity sd-e-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
