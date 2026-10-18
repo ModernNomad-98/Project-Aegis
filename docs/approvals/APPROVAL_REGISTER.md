@@ -6635,3 +6635,76 @@ entry.
 Stage A planning agent. **Recorded by:** the Stage C implementing agent, which
 names its exact model in the pull request body and the commit message that
 carry this append, as the register's naming rule requires.
+
+### AEGIS-APR-139: Standing owner instructions transcribed — corrected revision-4 planning limit, #805 reporting-channel protocol, MG3 head-bound-unavailability reading, and coordinator record rotation (recording only)
+
+- **Event:** POLICY DECISION — records four standing owner instructions as the owner's
+  decision directs; **grants no work, no permission and no supersession**. It is **not a
+  GRANT**; it appends no lifecycle event, changes no existing entry and confers no
+  authority beyond the recording itself.
+- **Status at recording:** **ACTIVE — recorded, not granted.** The four items are recorded
+  as standing owner instructions, not converted into grants; this entry confers no
+  authority and must not be cited as a grant for any action.
+- **Date / Grantor:** 2026-10-17 / Peter Nguyen, as relayed in owner decision comment
+  `6242532417` (owner inbox #805, 2026-10-17T22:45:16Z; application ODR-1).
+- **Owner decision:** the owner's decision comment `6242532417` directs this recording
+  (**item 3**, option (b): one docs-only PR recording four standing instructions in the
+  approval register — recording only, no change to approval semantics) and supplies the
+  corrected revision-4 text (**item 7**). The four items, in substance:
+  - **(i) The corrected revision-4 planning rule (item 7, superseding the earlier session
+    instruction of 2026-10-17).** A plan revision **≥4** on one item **stops planning on
+    that item**. **One lean re-open** (item 1) is allowed **per item and is counted**; a
+    re-open **never resets the revision count**, and **no item gets a second re-open**.
+    Any item that reaches that limit goes on **WAITING-ON-OWNER** with the default
+    **"park unmerged"** applied.
+  - **(ii) The #805 reporting-channel protocol.** The owner inbox is GitHub **issue
+    #805**; 30-minute check-ins are posted as issue comments that **name the model**. On
+    each 15-minute tick the coordinator reads the #805 comments: a comment whose **first
+    line is OWNER DECISION** is an **owner instruction** — apply it and record the outcome
+    in the next check-in; a comment whose first line is **MONITOR** is **Claude-verifier
+    information** — re-derive the fact it names and record the outcome. **Nothing in #805
+    changes any stage, gate, check, receipt, bound field or authority.**
+  - **(iii) The MG3 reading.** MG3 — the merge-gate condition that requires the automated
+    Codex review — **may be satisfied by a head-bound Codex unavailability notice**: an
+    unavailability notice bound to the exact head, **once every existing P1/P2 finding
+    has been triaged per AEGIS-APR-050** (fixed-and-replied, or recorded as not a defect)
+    **and resolved**. It is **never recorded as a pass**, and a **head move voids it**.
+  - **(iv) The coordinator record-rotation rule.** When the coordinator record file
+    passes **50 KB**, write a **checkpoint**, start a **fresh record** that references the
+    checkpoint, and keep the old record as an **archive**. **Rotation is not a restart**:
+    work, state and continuity carry through the checkpoint reference; nothing is
+    discarded by rotating.
+  - **Recording only.** No approval entry is created, edited or repealed by this entry;
+    no grant, revocation, expiry, consumption, supersession or lifecycle event is added;
+    no approval path is altered; the four items are recorded, not granted.
+- **Evidence:** owner decision comment `6242532417` on owner inbox #805 (item 3 directs
+  this recording; item 7 supplies the corrected revision-4 text; relayed
+  2026-10-17T22:45:16Z) and the ODR-1 application record. The transcription work item's
+  plan of record is PR #808 issue comment `6243556915` (plan revision 2), independently
+  audited and accepted by comment `6243570674`. Register baseline at the recording base
+  (main `147479583fc498c50028f1b7dbf8311c8708544e`): 448,455 B / 6,637 LF / sha256
+  `607a66a278ea0db62901dc1852fe52fc03e240ce5713c0e4ea25c53d2a580116`; AEGIS-APR-139 was
+  the next free ID. This entry is a pure append: no existing line is edited.
+- **Glosses for the labels this entry uses** (one plain-English line each, as the
+  standing naming rule requires). **AEGIS-APR-nnn / APR-nnn** — a register entry
+  identifier; a lookup key, never the subject of a sentence. **POLICY DECISION** — a
+  register event type that records a decision and grants no work. **The corrected
+  revision-4 rule** — the owner's planning limit: a fourth plan revision on one item
+  stops planning on it. **Lean re-open** — the single fresh re-capture allowed per item
+  under the owner decision, counted against the item's revision count. **WAITING-ON-OWNER**
+  — the queue for items that reach the planning limit; **park unmerged** is its default
+  disposition. **#805** — the owner's inbox issue. **OWNER DECISION** — a #805 comment
+  whose first line marks it as an owner instruction. **MONITOR** — a #805 comment whose
+  first line marks it as Claude-verifier information. **MG3** — the merge gate that
+  requires the automated Codex review. **Head-bound unavailability notice** — a Codex
+  usage-limit or failure notice bound to one exact head. **P1/P2** — the two highest
+  Codex finding severities. **AEGIS-APR-050** — the register entry governing Codex
+  waiting and P1/P2 triage. **Coordinator record** — the coordinator's working record
+  file. **Checkpoint** — a written summary a fresh record references after rotation.
+  **Rotation** — starting a fresh record from a checkpoint while keeping the old record
+  as an archive; not a restart. **Archive** — the retained old record after rotation.
+
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Recorded as the
+Stage C implementing agent of the transcription work item; the model is also named in
+the pull request body and the commit message that carry this append, as the register's
+naming rule requires.
