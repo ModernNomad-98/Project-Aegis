@@ -619,6 +619,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P4 | 319 | iv | claim_scope | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P4 | 319 | iv | workspace_role | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
 | P4 | 319 | v | ↔ | documented exclusion - operator token, not a prose abbreviation |
+| P4 | 319 | v | ⇔ | documented exclusion - operator token, not a prose abbreviation |
 | P4 | 324 | i | UNVERIFIED | named gap - first use before any expansion on this page |
 | P4 | 324 | i | VERIFIED | documented exclusion - inline code/identifier/status reference, not a prose abbreviation |
 | P4 | 326 | iv | onerror | documented exclusion - inline code/identifier/command reference, not a prose abbreviation |
@@ -1515,18 +1516,18 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | P1 | 53 | 18 | 2 | 20 | 10 | 3 | 0 | 16 | 37 |
 | P2 | 128 | 30 | 4 | 76 | 11 | 7 | 0 | 33 | 95 |
 | P3 | 113 | 49 | 4 | 39 | 13 | 8 | 5 | 47 | 61 |
-| P4 | 320 | 82 | 5 | 98 | 118 | 17 | 1 | 78 | 241 |
+| P4 | 321 | 82 | 5 | 98 | 118 | 18 | 1 | 78 | 242 |
 | P5 | 301 | 83 | 3 | 132 | 73 | 10 | 2 | 81 | 218 |
 | P6 | 393 | 134 | 4 | 132 | 108 | 15 | 5 | 120 | 268 |
 | P7 | 40 | 16 | 2 | 10 | 12 | 0 | 0 | 16 | 24 |
 | P8 | 45 | 12 | 2 | 19 | 11 | 1 | 0 | 12 | 33 |
-| **Total** | **1393** | **424** | **26** | **526** | **356** | **61** | **13** | **403** | **977** |
+| **Total** | **1394** | **424** | **26** | **526** | **356** | **62** | **13** | **403** | **978** |
 
-**Zero-duplicate proof:** final table rows = **1393** = unique (page, first-use line, normalized token) keys = **1393**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous table only. **Five-column cell-count proof:** all **1393** rows parse exactly five columns with in-token pipes escaped and **0** bad rows. **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this final table; every row resolves to real pinned/main page text at its real first occurrence; no fabricated/placeholder/stale row.
+**Zero-duplicate proof:** final table rows = **1394** = unique (page, first-use line, normalized token) keys = **1394**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous table only. **Five-column cell-count proof:** all **1394** rows parse exactly five columns with in-token pipes escaped and **0** bad rows. **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this final table; every row resolves to real pinned/main page text at its real first occurrence; no fabricated/placeholder/stale row.
 
 ## 6. Dispositions, verdicts, keeper exclusion and continuation
 
-**Disposition tally: 13 defined at first use / 403 named gaps / 977 documented exclusions = 1393 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps force PARTIAL where present. **No keeper/acceptance row** is created; a later keeper decides.
+**Disposition tally: 13 defined at first use / 403 named gaps / 978 documented exclusions = 1394 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps force PARTIAL where present. **No keeper/acceptance row** is created; a later keeper decides.
 
 **Continuation:** lane A complete; lane B complete 144-279; lane C batches 1-10 merged; this record covers 344-351 (batch 11); next unread 352-359, stated not read. Exactly one added path; no plan file, keeper/index/ledger/register/manifest/tool/test/workflow change.
 
@@ -1536,7 +1537,7 @@ Method: one row per REAL token at its REAL first-use line; classes i uppercase/a
 | --- | --- | --- |
 | AC1 one-path | MET in this record | exactly one added record path; no other path; DCO-signed commit(s) measured post-commit |
 | AC2 frozen pages | MET | eight pages above; blobs/bytes/LF; all zero-drift at main; no page outside set |
-| AC3 whole-page + inventory | MET | whole-page B1-B6; ONE 1393-row table; five-cell/zero-duplicate proof; final-table counts |
+| AC3 whole-page + inventory | MET | whole-page B1-B6; ONE 1394-row table; five-cell/zero-duplicate proof; final-table counts |
 | AC4 dispositions | MET | strict FULL bar; B6 UNVERIFIED; 0F/8P/0 UNRUN; named gaps; no keeper |
 | AC5 record/body/PROC | MET in handoff | record facts outside; body witness/skills/security; PROC-04 live-final-body published==recomputed literal; checker 0 |
 | AC6 Codex | honest at C handoff | Codex never a pass; trigger/triage/thread state reported in PR body/SD-C handoff; MG3 G-only |
