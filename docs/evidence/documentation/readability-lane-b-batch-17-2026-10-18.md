@@ -49,7 +49,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 
 **Canonical B1 satisfied** - the title, opening and purpose/use section state the page job and reader. **Canonical B2** - Named B2 gaps: L10 RLS (pooled-model row-scoping line uses RLS before any expansion on this page) and L28 DB (support-tooling line uses DB without expanding database on this page). multi-tenant/single-tenant are plain compounds; N-1 is a step-label operator; the skill name is an exclusion. **Canonical B3 satisfied** - L6 Deployment model catalog, L18 Control-plane capability checklist, L36 Single-tenant to multi-tenant conversion patterns; tables with isolation mechanisms and costs. **Canonical B4 satisfied** - the page is instructional/reference content; it makes no deployed or measured-result claim and does not present proposed or blocked behavior as shipped. **Canonical B5 satisfied** - the page navigation/reference links were inspected in the whole-page read; no broken reference was observed. **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gap(s) s: L10 RLS (pooled-model row-scoping line uses RLS before any expansion on this page) and L28 DB (support-tooling line uses DB without expanding database on this page). multi-tenant/single-tenant are plain compounds.
+**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gaps: L10 RLS (pooled-model row-scoping line uses RLS before any expansion on this page) and L28 DB (support-tooling line uses DB without expanding database on this page). multi-tenant/single-tenant are plain compounds.
 
 ### P3 - .claude/skills/sast-orchestration-designer/SKILL.md - read whole, L1-197
 
@@ -73,7 +73,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 
 **Canonical B1 satisfied** - the title, opening and purpose/use section state the page job and reader. **Canonical B2** - Named B2 gaps: L23 DDL (playbook uses DDL before any expansion on this page) and L47 FK (FK used without expanding foreign key on this page). NULL is a SQL keyword, FULL is ordinary emphasis, dual-write/pre-existing are plain compounds, and the register-template placeholders are documented exclusions. **Canonical B3 satisfied** - L7 Compatibility matrix, L20 Stage templates, L53 Deprecation register format, L65 Backfill handoff contract, L73 Gate evidence examples. **Canonical B4 satisfied** - the page is instructional/reference content; it makes no deployed or measured-result claim and does not present proposed or blocked behavior as shipped. **Canonical B5 satisfied** - the page navigation/reference links were inspected in the whole-page read; no broken reference was observed. **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gap(s) s: L23 DDL (playbook uses DDL before any expansion on this page) and L47 FK (FK used without expanding foreign key on this page). NULL is a SQL keyword, FULL is ordinary emphasis, dual-write/pre-existing are plain compounds, and the register-template placeholders are documented exclusions..
+**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gaps: L23 DDL (playbook uses DDL before any expansion on this page) and L47 FK (FK used without expanding foreign key on this page). NULL is a SQL keyword, FULL is ordinary emphasis, dual-write/pre-existing are plain compounds, and the register-template placeholders are documented exclusions.
 
 ### P6 - .claude/skills/scoped-approval-register/SKILL.md - read whole, L1-193
 
@@ -97,7 +97,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 
 **Canonical B1 satisfied** - the title, opening and purpose/use section state the page job and reader. **Canonical B2** - Named B2 gaps: L3 PII (description uses PII before any expansion on this page) and L3 E2E (description uses E2E before any expansion on this page). L37 QA (quality assurance), L42 PR (pull request) and L101 UI (user interface) are defined at first use; risk-worthy is a plain compound and filenames/placeholders/skill names are documented exclusions. **Canonical B3 satisfied** - L8 Purpose, L18 Use When, L40 Inputs, L56 Workflow, L104 Output Format, L124 Validation Checklist, L139 Safety Rules, L148 Gotchas, L164 Stop Conditions, L176 Supporting Files. **Canonical B4 satisfied** - the page is instructional/reference content; it makes no deployed or measured-result claim and does not present proposed or blocked behavior as shipped. **Canonical B5 satisfied** - the page navigation/reference links were inspected in the whole-page read; no broken reference was observed. **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gap(s) s: L3 PII (description uses PII before any expansion on this page) and L3 E2E (description uses E2E before any expansion on this page). L37 QA (quality assurance), L42 PR (pull request) and L101 UI (user interface) are defined at first use.
+**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gaps: L3 PII (description uses PII before any expansion on this page) and L3 E2E (description uses E2E before any expansion on this page). L37 QA (quality assurance), L42 PR (pull request) and L101 UI (user interface) are defined at first use.
 
 
 
@@ -129,7 +129,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 | P3 | SCA | L9 | U | defined at first use - L9: software composition analysis |
 | P3 | CI | L10 | U | defined at first use - L10: continuous integration |
 | P3 | FP | L11 | U | defined at first use - L11: false positive |
-| P3 | PR | L11 | U | defined at first use - L10: pull request |
+| P3 | PR | L11 | U | defined at first use - L11: pull request |
 | P3 | TP | L11 | U | defined at first use - L11: true positive |
 | P3 | full-repo | L44 | L | documented exclusion - plain descriptive compound, explained by the line |
 | P3 | <repo> | L116 | B | documented exclusion - self-describing output-template placeholder |
