@@ -24,7 +24,7 @@ Observed summary: **690 reader pages / 107 accepted / 6 provably pending / 567 n
 
 **Merged lane-B read rows at this base.** Batch-5 reads **148-155**; batch 6 (#827) reads **{144,145,146,147,156,157,158,159}**; batch 8 (#829) reads **168-175**; batch 9 (#830) reads **176-183**; batch 10 (#831) reads **184-191** and is merged; batch 11 (#832) reads **192-199**; together **144-199 = 144-167 + 168-183 + 184-191 + 192-199**. **Reservations at this base:** #834 (batch 13) **208-215**; #835 (batch 14) **216-223**. #833 is this PR covering **200-207**; it is not a future reservation.
 
-**R2 next-block rule.** The next block takes the next eight unread pages in the unread sequence (the backlog's R2 rule, not index arithmetic). After lane A 0-143, merged lane-B rows **144-199**, and reservations **208-215, 216-223**, the first eight unread pages are **200-207**, all in lane B's quarter. **Lane letter: B. Per-lane batch number: 12** - merged lane-B batches are **2, 2-rerecord, 3, 5, 6, 7, 8, 9, 10, 11**; open/planned are **#834=13, #835=14, batch-15 plan=15**, and this PR is **#833=12**, so this block is batch **12**. **Record path:** docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md (does not exist at main). **Block last page:** 207; the next page after the block is **208** (reserved by #834); the next unread page after all reservations is **216**.
+**R2 next-block rule.** The next block takes the next eight unread pages in the unread sequence (the backlog's R2 rule, not index arithmetic). After lane A 0-143, merged lane-B rows **144-199**, and reservations **208-215, 216-223**, the first eight unread pages are **200-207**, all in lane B's quarter. **Lane letter: B. Per-lane batch number: 12** - merged lane-B batches are **2, 2-rerecord, 3, 5, 6, 7, 8, 9, 10, 11** (no separate batch-4 lane-B record exists; 2-rerecord is the historical label of the second batch-2 record); open/planned are **#834=13, #835=14, batch-15 plan=15**, and this PR is **#833=12**, so this block is batch **12**. **Record path:** docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md (does not exist at main). **Block last page:** 207; the next page after the block is **208** (reserved by #834); the next unread page after all reservations is **216**.
 
 **Scheduling dependency.** #828 (batch 7), #831 (batch 10) and #832 (batch 11) are merged; #834 (batch 13) and #835 (batch 14) are in flight; #833 is this PR. If an in-flight reservation or page set changes, a later stage must re-derive the pending set and block at its own base (AC7/AC8). A changed page set stops the batch back to Stage A/owner; this record does not reopen or widen the frozen eight.
 
@@ -237,7 +237,7 @@ Each page below was opened whole at its pinned blob and read line by line. The b
 
 ## 6. Provenance, page authorship, zero drift and reader independence
 
-**Reader.** One reader - **sd-a-789-repl-r2 / stage role sd-c-read-b12-c1**, DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) - read all eight pages whole, line by line, as prose at the pinned blob; no display elision. The page authors are not this reader.
+**Reader.** One reader - **sd-c-793-r2 / stage role sd-c-read-b12-c5**, DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) - read all eight pages whole, line by line, as prose at the pinned blob; no display elision. The page authors are not this reader.
 
 **Page authorship and witness rows (blob-bound):**
 
@@ -252,9 +252,9 @@ Each page below was opened whole at its pinned blob and read line by line. The b
 | P7 | 206 | `.claude/skills/project-orchestrator/references/project-state-template.md` | `4c9b3d68307305a2be949e9a0c7cdd40eb5bc9ac` | `8459ac73ba6e0b280338aca9a97be7a3336ce356` | Peter Nguyen | 2026-09-28 |
 | P8 | 207 | `.claude/skills/project-orchestrator/references/recording-and-authority.md` | `9ed5b7af0740104a358f6acc6b7cec0e02f8526a` | `d629d3a163a4731d3956ba9a113f276976ba1c9d` | Peter Nguyen | 2026-09-23 |
 
-**B6 witness and basis.** For every page the reader identity differs from the git-metadata author, **but git metadata cannot prove that the reader did not author the page in another identity, nor that a reviewer who did not write the page read it**. **Basis:** git metadata (last-touching commit author and date) plus the pinned blob IDs; P2/P3's last-touching commit is the owner account, the others are Peter Nguyen. **Limit:** the independence condition of canonical B6 is unverified here; that limit is stated rather than papered over and is why all eight pages are PARTIAL and no page is keeper-eligible.
+**Author metadata only - NOT B6 evidence. B6 witness and basis.** For every page the reader identity differs from the git-metadata author, **but git metadata cannot prove that the reader did not author the page in another identity, nor that a reviewer who did not write the page read it**. **Basis:** git metadata (last-touching commit author and date) plus the pinned blob IDs; P2/P3's last-touching commit is the owner account, the others are Peter Nguyen. **Limit:** the independence condition of canonical B6 is unverified here; that limit is stated rather than papered over and is why all eight pages are PARTIAL and no page is keeper-eligible.
 
-**Zero drift.** Each blob above resolves at main 84a5295daa35d9df027da2dba56e6de52cb8a44a to the same object as at pinned ref 2db1ffb7; `git diff --numstat 2db1ffb7..84a5295daa35d9df027da2dba56e6de52cb8a44a -- <page>` is empty for all eight. No page outside the frozen set is read or claimed.
+**Zero drift.** Each blob above resolves at main 84a5295daa35d9df027da2dba56e6de52cb8a44a to the same object as at pinned ref 2db1ffb7; `git diff --numstat 2db1ffb7..84a5295daa35d9df027da2dba56e6de52cb8a44a -- <page>` is empty for all eight; the literal command output is zero diff lines for each page. No page outside the frozen set is read or claimed.
 
 ## 7. Hunk and line accounting / local validation performed while authoring
 
