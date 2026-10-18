@@ -12,7 +12,7 @@
 
 - **Added: exactly one path** - `docs/evidence/documentation/readability-lane-b-batch-8-2026-10-18.md`. **Modified: 0. Deleted: 0.** No keeper row, index JSON edit, ledger edit, page edit, register edit, manifest edit, tool/test/workflow change, plan file or other documentation change. Change class **`docs-only`**.
 - **Eight pages read, zero pages edited**; every page's drift from the pinned ref to the implementation base is 0. The record's commit is DCO-signed and model-attributed; later repair commits, if any, update this record rather than silently widening its claims.
-- The record itself is a new reader page and enters the pending set as **no_recorded_acceptance** pending its own later review - the self-cost every batch record states. **No acceptance row, keeper row or index edit is authored here.**
+- **No acceptance row, keeper row or index edit is authored here.**
 
 ## 2. Lane derivation at this implementation base - re-run, not handed down
 
@@ -115,7 +115,7 @@ Each page below was read whole at its pinned blob; the read range is L1-last. Th
 
 **Quoted evidence (L3):** `description: "MANUAL-ONLY; never auto-invoke. Detect and design out chatty data-access patterns - the N+1 (one query per row), repeated identical queries in one request, serial awaited calls in loops, and over-fetching... plus the regression guard: query-count budgets asserted in tests so the pattern cannot return.`
 
-## 4A. Systematic token audit (required by plan AC4)
+### 4.1 Systematic token audit (required by plan AC4)
 
 **Method.** From each pinned page I extracted the frontmatter, title, headings and whole body; collected every uppercase token of 2-7 characters and every backticked identifier; filtered ordinary emphasis words and SQL keywords only after checking their context; then compared each candidate's first occurrence with the nearest expansion/definition, and separately checked the page's section headings and code blocks for coded identifiers. This is the same systematic scan the batches-16-20 audits use; it is a token/first-use audit, not a prose judgment.
 
@@ -153,13 +153,13 @@ Each page below was read whole at its pinned blob; the read range is L1-last. Th
 | P7 | multi-tenant-security-tester/references/negative-test-matrix.md | f5384d94cccdc4c9556da0e5c62b8a51f917cd4e | f3afd19dbf71e885855ef48e02de87881799b08c | Peter Nguyen | 2026-09-23 | none |
 | P8 | n-plus-one-detector/SKILL.md | f7c65b23ecce4646343e00855e4ef4c008121486 | d629d3a163a4731d3956ba9a113f276976ba1c9d | Peter Nguyen | 2026-09-23 | none |
 
-**Plan capture binding.** plan comment 6246463008 (revision 2, 14,970 B, created = updated 2026-10-18T06:15:47Z; capture timestamp 2026-10-17T23:15:02-07:00 (authoring clock; the immutable comment creation time is 2026-10-18T06:15:47Z = 23:15:47-07:00, 45 seconds later, so the plan text timestamp and the comment creation time are the same capture session, not two different events); capture host #827 merged 2026-10-18T06:12:12Z at main 8aa88c7d); revision 1 6246460605 (15,795 B) is void. **Derivation base:** main f5cde4b7 (the #819 owner-workflow merge moved main from the plan-capture base 8aa88c7d; only `.github/workflows/deepseek-code-review.yml` changed; the eight pages remain zero-drift). **B ACCEPT:** 6246510267. **B observation O-1:** corrected here by naming batch-5 (148-155) + #827 batch-6 ({144-147,156-159}) for merged 144-159; #828 (head 04270411 at derivation; plan-capture head 0671f5a0) is a scheduling citation only.
+**Plan capture binding.** plan comment 6246463008 (revision 2, 14,970 B, created = updated 2026-10-18T06:15:47Z; capture timestamp 2026-10-17T23:15:02-07:00 (authoring clock; the immutable comment creation time is 2026-10-18T06:15:47Z = 23:15:47-07:00, 45 seconds later, **Inference, not independently verified:** the plan text timestamp and the comment creation time are consistent with one capture session, but only the comment creation time is independently established); capture host #827 merged 2026-10-18T06:12:12Z at main 8aa88c7d); revision 1 6246460605 (15,795 B) is void. **Derivation base:** main f5cde4b7 (the #819 owner-workflow merge moved main from the plan-capture base 8aa88c7d; only `.github/workflows/deepseek-code-review.yml` changed; the eight pages remain zero-drift). **B ACCEPT:** 6246510267. **B observation O-1:** corrected here by naming batch-5 (148-155) + #827 batch-6 ({144-147,156-159}) for merged 144-159; #828 (head 04270411 at derivation; plan-capture head 0671f5a0) is a scheduling citation only.
 
 **Reader independence - B6 asserted with its limit, not overstated.** The page author is Peter Nguyen for all eight pages; this reader's stage identity (sd-d-802-r3 / sd-c-read-b8-c1) committed none of these pages. **Basis:** git metadata author identity and the reader's non-authorship. **Limit:** git metadata cannot prove non-authorship of commits made under the owner account or that a human executed the read; therefore B6 is **UNVERIFIED** as an independent-human-review fact for every page. On P5 and P7 the FULL verdict rests on the page-text evidence B1-B5 plus this declared B6 metadata basis; the remaining six pages are PARTIAL regardless of B6 because they carry the named B2 first-use gaps above. The record does not claim more than the metadata supports.
 
 ## 7. Validation and handoff accounting
 
-**Checks to run at the committed head; this record does not pre-claim their results.** The check set is: exactly-one-path diff/numstat; `git diff --check`; the DCO check over the base..head range; `python -P scripts/validate-skills.py`; the Markdown link checker over this record; the PR-body bound-field checker; the record object bytes/LF/CR/sha256 and PROC-04 from the final body; hosted CI at the exact head (path-filtered jobs recorded skipped, never passed); and the Codex trigger/triage under AEGIS-APR-050. Their actual results are recorded in the Stage C handoff and PR body after they run; any check that cannot run is recorded UNRUN with its reason.
+**Checks to run at the committed head; this record does not pre-claim their results.** The check set is: exactly-one-path diff/numstat; `git diff --check`; the DCO check over the base..head range; `python -P scripts/validate-skills.py`; the Markdown link checker over this record; the PR-body bound-field checker; the record object bytes/LF/CR/sha256 and PROC-04 from the final body; hosted CI at the exact head, with each job's actual status recorded; and the Codex trigger/triage under AEGIS-APR-050. Their actual results are recorded in the Stage C handoff and PR body after they run; any check that cannot run is recorded UNRUN with its reason.
 
 **Owed and not claimed in this record:** the repository checks, hosted CI results and Codex state are recorded in the SD-C handoff and PR body after they have actually run; any check that cannot run is recorded UNRUN with its reason. This record makes no pre-claim about those results.
 
@@ -167,7 +167,7 @@ Each page below was read whole at its pinned blob; the read range is L1-last. Th
 
 - The act of reading as prose is not machine-checkable; this record is the reader's account of whole-page reads, with page-line evidence.
 - B6 independence is UNVERIFIED for all eight pages as a human-review fact; the metadata basis and its limit are stated in section 6.
-- The token audit can miss a token that is neither uppercase nor backticked; the method, candidate set and per-page result are stated in section 4A so a later audit can reproduce it.
+- The token audit can miss a token that is neither uppercase nor backticked; the method, candidate set and per-page result are stated in section 4.1 so a later audit can reproduce it.
 - The plan's block arithmetic depends on #828's reservation 160-167; if #828 changes its read rows or base, Stage C's base re-derivation and this block may need re-checking before any later stage. No page set change occurred at derivation.
 
 **Signed with both names (true identity **sd-d-802-r3** and stage role **sd-c-read-b8-c1**); the model line is separate.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** No page was edited, no keeper/ledger/index row was authored, no plan file was committed, and no merge occurred.
