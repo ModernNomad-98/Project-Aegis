@@ -1,0 +1,163 @@
+# Readability Phase 4 re-read lane B - Stage C batch record, lane B batch 6, 2026-10-18
+
+**Batch record for the Phase 4 documentation-readability re-read, lane B batch 6 - eight whole-page re-reads, zero page edits, the first block after lane A completion.** This record is the Stage C evidence artifact for the lane B batch-6 item; it is the only tracked change in its pull request.
+
+**Plan of record.** Lean plan **revision 2**, merged PR #825 issue comment **6245949982** (created = updated 2026-10-18T05:08:04Z; immutable; **15,213 B <= 15 KB**), with Stage B **ACCEPT 6245975350**. **Plan revision 1 (6245940383) is void as a plan artifact** - it was 16,195 B, over the lean-plan 15 KB limit, and its author declared it void immediately; it is retained only as immutable history. This record follows revision 2 literally. The plan is not a committed plan file and no plan file exists in this change.
+
+**Capture facts and in-flight delivery at this base.** The plan capture host is merged PR **#825** (batch-19 record merged 2026-10-18T05:02:29Z at main **cb1269c1cdff7b5735e32784bbbde282b84fea16**, the implementation base). **In-flight PR #826** (lane A batch-20 record, head **e9ee30652aa9d9c897574d51f44b282958e026d7**, base exactly this main) is **still open at this base** and is not merged; its single added record (lane A batch-20, +165/-0) maps to lane A indices **136-143**. The plan marks it in flight and the lane A coverage statement is therefore "merged lane-A records 0-135 + in-flight #826 136-143 => lane A covered 0-143"; this record confirms #826 has not delivered a merge at this base and treats it as scheduling context only. No other PR was touched.
+
+**Implementation base.** main = **cb1269c1cdff7b5735e32784bbbde282b84fea16** (live main at branch creation). **Pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
+
+**Agent, model and stage.** Written by DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness); agent identity sd-d-793-r2, stage role sd-c-read-b6-c1. Stage C only: I read each frozen page whole at the pinned blob, authored this record, and did not edit any page, keep any ledger row, rebuild any index, open any other pull request, act on any Codex thread, or merge. The record is signed with both names at its footer.
+
+## 1. Lane derivation at this implementation base
+
+**Instrument run (fresh clone of main cb1269c1):** python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json exits 0 with summary **690 reader pages / 107 accepted / 6 provably pending / 567 no-record / 0 recorded-within-10 / 6 cannot decide / 0 withdrawn / 4 partial / official 583**. The lane-arithmetic pending set = 567 + 6 = **573** sorted paths. **Lane A = indices 0-143**; **lane B = indices 144-287**.
+
+**Lane A completion and lane B start.** Merged lane-A batch records name actual P1-P8 read rows covering **0-135**; in-flight **#826** covers **136-143** (unmerged at this base). Lane A is therefore covered 0-143 with #826 in flight, and lane B's quarter begins at **144**. **Merged lane-B batch-5 record** (readability-lane-b-batch-5-2026-10-15.md) reads exactly **148-155**; merged lane-B batches 2, 2-rerecord and 3 add no rows in this block. The **R2 unread sequence** (next eight unread pages in the sorted unread sequence, not naive index arithmetic) is therefore **144, 145, 146, 147, 156, 157, 158, 159** - all in lane B's quarter. **Lane B index:** these pending indices minus 144 give lane B indices 0-3, 12-15. **Batch number:** latest merged lane-B record is batch 5 and numbering is per lane, so this item is **lane B batch 6** and the record path is docs/evidence/documentation/readability-lane-b-batch-6-2026-10-18.md.
+
+**Eligibility of the eight frozen pages (measured in this clone).** Each page is in the 573-path pending set at the pinned ref (no keeper row), is in lane B's quarter, is named as a read page in **no lane record** (the merged-read scan found zero P1-P8 hits for all eight across **31** merged lane records), and has **zero drift** from the pinned ref to main cb1269c1. No page outside the frozen eight is read or claimed.
+
+## 2. Roster, reader independence and role separation
+
+- **Reader:** one reader - sd-d-793-r2 / stage role sd-c-read-b6-c1, DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) - read all eight pages whole, line by line, as prose at the pinned blob; no display elision.
+- **Page authorship (git metadata):** the last-touching commit and author of each page are in section 6; all eight are Peter Nguyen. The reader stage is a distinct agent identity and committed none of the pages.
+- **Role separation:** Stage C is the evidence author, not the page author, not the keeper and not the merger. Keeper recording is a separate later act under AEGIS-APR-101/APR-117; this record authors no keeper row, no ledger edit, no index rebuild, no acceptance-row insertion and no approval change. Stage D audits at the exact head; E checks; F reviews; G owns merge.
+- **Concurrency:** one reader for this eight-page batch.
+
+## 3. The frozen page set - eight pages, measured at the pinned ref
+
+All eight pages were read whole at the pinned-ref blob; bytes/LF were measured by command and sum to **51,163 bytes / 878 LF**. No page was edited; every page diff count is 0.
+
+| # | Pending index | Page (path) | Git blob at 2db1ffb7 | Bytes / LF | Verdict | Gaps named (page line) | Edits |
+| --- | ---: | --- | --- | ---: | --- | --- | ---: |
+| P1 | 144 | .claude/skills/inter-agent-comms-reviewer/references/inter-agent-comms-checklist.md | 858f070ef4b1824c6331dfb3e6db13e9202978cf | 5,254 / 88 | **PARTIAL** | B2: ASI07 unexpanded at L1; ASI04 at L13; ASI03 at L15; B6 independence UNVERIFIED | 0 |
+| P2 | 145 | .claude/skills/intra-tenant-scope-architect/SKILL.md | a176eb00177713f5a19f52de81f0c2eb6fb7a4d8 | 14,401 / 229 | **PARTIAL** | B2: frontmatter SaaS, authz and tenant_id unexpanded at L3; B6 independence UNVERIFIED | 0 |
+| P3 | 146 | .claude/skills/iso-27001-isms-architect/references/isms-clause-map.md | 9cc57758e7291be1bb78bb1ad9e16f74e9b7de29 | 5,041 / 74 | **PARTIAL** | B2: ISMS/ISO/IEC/Amd unexpanded at title L1, TOC/PDF at L3 before the L12 reading key, and D28 undefined at L42; B6 independence UNVERIFIED | 0 |
+| P4 | 147 | .claude/skills/iso-42001-aims-architect/references/aims-clause-map.md | 5ff544c30c72025a270e81439dad6026e8c3124f | 5,085 / 71 | **PARTIAL** | B2: AIMS/ISO/IEC unexpanded at title L1, TOC/PDF at L3 and JTC/SC at L4 before the L14 reading key; B6 independence UNVERIFIED | 0 |
+| P13 | 156 | .claude/skills/load-test-planner/references/workload-model-worksheet.md | 693498f3e5c6c25f7466c0a51f41b42b2f65bc64 | 4,630 / 91 | **PARTIAL** | B2: API unexpanded at L39 (and L51); B6 independence UNVERIFIED | 0 |
+| P14 | 157 | .claude/skills/local-ci-mirror-preflight/references/preflight-procedure.md | b99395217b11d36f347a094f92c3febf63037514 | 5,605 / 108 | **PARTIAL** | B2: CI unexpanded at title L1 before its L5 definition; env unexpanded at L19; B6 independence UNVERIFIED | 0 |
+| P15 | 158 | .claude/skills/manual-test-case-creator/SKILL.md | 3443ce5586893b0aaed6f4061b3e3bac567b8c04 | 8,048 / 147 | **PARTIAL** | B2: QA at L25, UI at L44, API/DB at L65 unexpanded; B6 independence UNVERIFIED | 0 |
+| P16 | 159 | .claude/skills/manual-test-case-creator/references/manual-case-template.md | daad8bec6aee9417279372de7d5fff2521b4ff97 | 3,099 / 70 | **PARTIAL** | B2: env unexpanded at L17 and L29; B6 independence UNVERIFIED | 0 |
+
+**Totals: 8 pages / 51,163 bytes / 878 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Full 40-character blob ids are in the table; every id resolves at pinned ref 2db1ffb7 and every page blob is identical at main cb1269c1 (zero drift).
+
+## 4. Per-page dispositions - what is and is not accepted
+
+The record uses the lane vocabulary: **FULL** means all six acceptance bullets hold for the whole page at the bound revision **and** strict B2 holds (every abbreviation/acronym/coded identifier expanded or defined at first use); **PARTIAL** means at least one named defect stands at the bound revision; **UNRUN-with-reason** means the page could not be read/judged and the reason is recorded. One undocumented B2 first use forces PARTIAL with the page line named; no disposition is upgraded.
+
+**Disposition tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** All eight pages carry measured B2 first-use defects, named in section 3; all eight additionally have **B6 independence UNVERIFIED** (the metadata cannot establish the read-only review bullet), so no page reaches FULL. **No page is eligible for a full-page-acceptance row from this evidence**, so no keeper row is recorded from this batch.
+
+**Keeper exclusion (stated so a partial page cannot be laundered).** No page may receive an acceptance/keeper row from this evidence; the record does not add a keeper row, ledger row, acceptance-index change or targeted-review row, and carries no acceptance-row authority. A later eligible keeper under AEGIS-APR-101/APR-117 would need separate whole-page evidence.
+
+## 5. Per-page read detail - ranges, six acceptance bullets, purpose restatements, gaps
+
+The six bullets are the repository's "Acceptance for each page": **B1** open with what the page is for and who should read it; **B2** define an abbreviation or coded identifier at first use; **B3** descriptive headings, short paragraphs, lists/tables for distinct functions, at least one concrete example, and command contracts where safe use depends on it; **B4** state shipped behavior separately from proposed/blocked behavior; **B5** keep navigation links current and check every referenced file or command exists, preserving the technical contract and safety boundaries; **B6** obtain a read-only review from someone who did not write the page, who can explain the purpose and normal use from the page alone.
+
+**Purpose and normal use:** a checklist for reviewing agent-to-agent communications security across transports, integrity/replay defenses, confidentiality, topology enforcement and receiver-side content handling, with a red-team catalog of spoof/tamper/replay cases.
+**B1 satisfied** — the H1 L1 and the L3 "Detail file for [inter-agent-comms-reviewer]" line state what the checklist is and which owning skill reads it. **B2 partial** — the terms block L4-7 expands MCP, SSE, MITM, TLS, ACL, RPC, SPIFFE, authn, authz and DB, but **ASI07 at L1, ASI04 at L13 and ASI03 at L15 are coded identifiers used before any definition** (no definition appears on the page). **B3 satisfied** — descriptive sections L9-87 with per-transport tables, integrity/replay lists, topology rules and a red-team catalog; the tables are concrete and each section has a distinct function. **B4 satisfied** — review guidance only; no shipped-behavior claim. **B5 satisfied** — the internal link L3 resolves; named skill files exist; no executable shell command is given. **B6 basis/limit** — git metadata names Peter Nguyen as last-touching author (2026-09-23) and this reader stage identity committed none of the pages; metadata cannot prove non-authorship under the owner account or that a human performed the read, so B6 is UNVERIFIED and the page is PARTIAL.
+**Quoted evidence (L3):** "Detail file for inter-agent-comms-reviewer (../SKILL.md). Read on demand."
+**Verdict: PARTIAL, no edit. Named gaps: ASI07 L1, ASI04 L13, ASI03 L15; B6 independence UNVERIFIED.**
+
+**Purpose and normal use:** design a second mandatory data-scoping axis below the tenant (location/site/region/org-unit/business-unit) for a multi-tenant system: the per-user scope-grant model, the composite row-filter predicate on every scoped table, role classification, server-side propagation and the live-schema migration design.
+**B1 satisfied** — frontmatter description L3, Purpose L13-27 and Use When L28-51 state the job, the reader and the do-not-use boundaries. **B2 partial** — the terms block L8-10 defines HQ, ORM, IDOR, RLS, SQL and UI, but the frontmatter description at L3 uses **SaaS, authz and tenant_id before any definition** (authz is only parenthetically explained later at L45; SaaS and tenant_id are never defined). **B3 satisfied** — a 7-step workflow L67-125, Output Format L126-150, Validation Checklist L151-174, concrete predicate/migration examples L106-125 and tenant-isolation rules L175-189. **B4 satisfied** — design guidance; the live migration is explicitly designed, not executed, and no shipped-behavior claim is made. **B5 satisfied** — the internal links and named skill references resolve; no executable shell command is required by the page. **B6 basis/limit** — git metadata names Peter Nguyen as last-touching author (2026-09-28); this reader stage identity committed none of the pages; metadata cannot prove non-authorship under the owner account or a human read, so B6 is UNVERIFIED and the page is PARTIAL.
+**Quoted evidence (L8-10):** "Terms: HQ means headquarters; ORM means object-relational mapper; IDOR means insecure direct object reference; RLS means row-level security; SQL means structured query language; UI means user interface."
+**Verdict: PARTIAL, no edit. Named gaps: SaaS/authz/tenant_id L3; B6 independence UNVERIFIED.**
+
+**Purpose and normal use:** a clause map for ISO/IEC 27001:2022 (with Amd 1:2024) that pre-sorts the clause 4-10 artifact checklist, the Annex A theme walk, the internal-audit and management-review patterns, and the amendment note for ISMS design.
+**B1 satisfied** — the H1 L1 and the L3-11 verification/edition statement identify the map and its boundary; the reading key L12-18 identifies the reader terms. **B2 partial** — the title L1 uses **ISMS, ISO, IEC and Amd before the L12-18 reading key**, L3 uses **TOC and PDF before that key**, and **D28 at L42 is a coded identifier never defined on the page**. **B3 satisfied** — clause checklist L19-30, Annex A theme walk L31-47, internal-audit pattern L48-56, management-review pattern L57-66 and amendment note L67-73 are concrete tables/lists. **B4 satisfied** — a planning map that explicitly retains the licensed-text verification boundary; no shipped-behavior claim. **B5 satisfied** — external standard links L7-8 are correctly formed; the parent-skill link resolves; no executable shell command is required. **B6 basis/limit** — git metadata names Peter Nguyen as last-touching author (2026-09-26); this reader stage identity committed none of the pages; metadata cannot prove non-authorship under the owner account or a human read, so B6 is UNVERIFIED and the page is PARTIAL.
+**Quoted evidence (L12-15):** "Reading key: ISO is the International Organization for Standardization; IEC is the International Electrotechnical Commission; ISMS is an information security management system; Amd means amendment; TOC means table of contents; and SoA is the statement of applicability."
+**Verdict: PARTIAL, no edit. Named gaps: ISMS/ISO/IEC/Amd L1, TOC/PDF L3, D28 L42; B6 independence UNVERIFIED.**
+
+**Purpose and normal use:** a clause map for ISO/IEC 42001:2023 that lays out the three AI assessments (risk assessment, risk treatment, impact assessment), the clause 4-10 delta checklist, the shipped-artifact mechanism map and the impact-assessment design pattern for an AIMS.
+**B1 satisfied** — the H1 L1 and the L3-12 status/edition statement identify the map; the reading key L14-21 identifies the terms and reader. **B2 partial** — the title L1 uses **AIMS, ISO and IEC before the L14-21 reading key**, L3 uses **TOC and PDF before that key**, and L4 uses **JTC and SC before the key defines them**. **B3 satisfied** — three-assessment table L23-32, clause delta checklist L34-45, shipped-artifact map L46-59 and impact-assessment pattern L60-70 are concrete tables/lists. **B4 satisfied** — a planning map with a stated licensed-text boundary; no shipped-behavior claim. **B5 satisfied** — external standard links L10-12 are formed correctly; the parent-skill reference resolves; no executable shell command is required. **B6 basis/limit** — git metadata names Peter Nguyen as last-touching author (2026-09-28); this reader stage identity committed none of the pages; metadata cannot prove non-authorship under the owner account or a human read, so B6 is UNVERIFIED and the page is PARTIAL.
+**Quoted evidence (L14-18):** "Reading key: AIMS is an artificial intelligence management system; AI is artificial intelligence. ISO is the International Organization for Standardization and IEC the International Electrotechnical Commission. JTC means joint technical committee, SC subcommittee, TOC table of contents, and PDF portable document format."
+**Verdict: PARTIAL, no edit. Named gaps: AIMS/ISO/IEC L1, TOC/PDF L3, JTC/SC L4; B6 independence UNVERIFIED.**
+
+**Purpose and normal use:** a worksheet backing the load-test-planner plan: the workload-model table, the test-type selection table, tenant-mix and noisy-neighbor templates, the ramp/abort profile, extrapolation-honesty rules and a per-scenario safety envelope.
+**B1 satisfied** — the H1 L1 and the L3 "Templates and tables backing the [load-test-planner]" line state the page purpose and owning skill. **B2 partial** — the terms block L5-7 defines APM, p95, p99, 3P and coordinated omission, but **API at L39 and L51 is used without a first-use expansion** (API is never defined on the page). **B3 satisfied** — worksheet L9-22, test-type table L23-32, tenant-mix template L33-44, noisy-neighbor template L45-58, ramp/abort profile L59-70, extrapolation rules L71-83 and safety checklist L84-91 are concrete. **B4 satisfied** — templates and procedure text; no shipped-behavior claim. **B5 satisfied** — the internal link L3 resolves; named skills exist; commands are illustrative shell snippets in a procedure template, not a required page command. **B6 basis/limit** — git metadata names Peter Nguyen as last-touching author (2026-09-23); this reader stage identity committed none of the pages; metadata cannot prove non-authorship under the owner account or a human read, so B6 is UNVERIFIED and the page is PARTIAL.
+**Quoted evidence (L5-7):** "APM means application performance monitoring; p95 and p99 are the 95th and 99th latency percentiles. 3P means third party; coordinated omission means a load generator fails to count delays while it is blocked."
+**Verdict: PARTIAL, no edit. Named gaps: API L39/L51; B6 independence UNVERIFIED.**
+
+**Purpose and normal use:** the procedure detail behind local-ci-mirror-preflight: the workflow-to-local derivation table, the mainline-baseline worktree procedure, the work pass, failure classification with evidence standards, the docs-only lightweight path, a worked record and the post-push cross-check.
+**B1 satisfied** — the H1 L1 and the L3 companion line state the page purpose and owning skill; the terms L4-7 identify CI, E2E, PR and gh. **B2 partial** — **CI at the title L1 appears before its L4-7 definition**, and **env at L19 and L46 is an unexpanded abbreviation for environment** (never defined on the page). **B3 satisfied** — derivation table L9-30, baseline procedure L31-51, work pass L52-58, failure-classification table L59-73, docs-only path L74-84 and worked example L85-102 are concrete with commands. **B4 satisfied** — procedure/reference page; no shipped-behavior claim. **B5 satisfied** — the internal link resolves; named skills exist; commands are documented procedure text (gh, git worktree) with valid forms. **B6 basis/limit** — git metadata names Peter Nguyen as last-touching author (2026-09-23); this reader stage identity committed none of the pages; metadata cannot prove non-authorship under the owner account or a human read, so B6 is UNVERIFIED and the page is PARTIAL.
+**Quoted evidence (L4-7):** "CI means continuous integration; E2E means end-to-end; PR means pull request; gh is the GitHub command-line tool."
+**Verdict: PARTIAL, no edit. Named gaps: CI title L1 before L4-7, env L19/L46; B6 independence UNVERIFIED.**
+
+**Purpose and normal use:** write full manual test cases that another tester can execute with zero tribal knowledge: ids and traces, role/persona and environment, preconditions and exact data, numbered steps with one observable expected result, screenshot checkpoints, pass/fail criteria and cleanup.
+**B1 satisfied** — frontmatter description L2-3, Purpose L14-22 and Use When L23-39 state the job, the reader and the do-not-use boundaries. **B2 partial** — the terms L8-10 define MC, P0/P1/P2 and CP, but **QA at L25, UI at L44 and API/DB at L65 are used without first-use expansions** (none is defined anywhere on the page). **B3 satisfied** — a 7-step workflow L54-80, Output Format L81-102, Validation Checklist L103-114 and concrete case/template examples L87-100. **B4 satisfied** — document-authoring guidance; no shipped-behavior claim. **B5 satisfied** — the template link L142 resolves; named skills/handoffs exist; no executable shell command is required. **B6 basis/limit** — git metadata names Peter Nguyen as last-touching author (2026-09-23); this reader stage identity committed none of the pages; metadata cannot prove non-authorship under the owner account or a human read, so B6 is UNVERIFIED and the page is PARTIAL.
+**Quoted evidence (L8-10):** "In the case template, MC-<area>-<###> is a stable manual-case identifier; P0, P1, and P2 rank cases from highest to lowest priority; CP-1 is the first screenshot checkpoint."
+**Verdict: PARTIAL, no edit. Named gaps: QA L25, UI L44, API/DB L65; B6 independence UNVERIFIED.**
+
+**Purpose and normal use:** the case template and step rules behind manual-test-case-creator: the full case template, the step-writing rules, a worked negative-path example and library-hygiene rules.
+**B1 satisfied** — the H1 L1 and the L3-9 explanation state the page purpose and the owning skill; the terms define MC, REQ, P0/P1/P2, CP, API, DB, URL and PR. **B2 partial** — **env at L17 and L29 is an unexpanded abbreviation for environment** (never defined on the page). **B3 satisfied** — full template L11-30, step-writing rules L32-43, worked example L44-63 and library hygiene L64-70 are concrete. **B4 satisfied** — reference/template page; no shipped-behavior claim. **B5 satisfied** — the parent-skill link resolves; no executable shell command is required. **B6 basis/limit** — git metadata names Peter Nguyen as last-touching author (2026-09-23); this reader stage identity committed none of the pages; metadata cannot prove non-authorship under the owner account or a human read, so B6 is UNVERIFIED and the page is PARTIAL.
+**Quoted evidence (L4-9):** "MC identifies a manual case; REQ identifies the traced requirement. P0, P1, and P2 rank case priority from highest to lowest; CP marks a screenshot checkpoint. API means application programming interface, DB means database, URL means Uniform Resource Locator (web address), and PR means pull request."
+**Verdict: PARTIAL, no edit. Named gaps: env L17/L29; B6 independence UNVERIFIED.**
+
+## 6. Provenance and reader-independence witness rows
+
+| # | Page | Full blob id (40 hex) | Last-touching commit (40 hex) | Commit author | Commit date | Reader identity (did not write the page) |
+| --- | --- | --- | --- | --- | --- | --- |
+| P1 | .claude/skills/inter-agent-comms-reviewer/references/inter-agent-comms-checklist.md | 858f070ef4b1824c6331dfb3e6db13e9202978cf | cce5c378d8702dbc9b8b67f1cae9d5a1bea2dd8e | Peter Nguyen | 2026-09-23 | sd-c-read-b6-c1 |
+| P2 | .claude/skills/intra-tenant-scope-architect/SKILL.md | a176eb00177713f5a19f52de81f0c2eb6fb7a4d8 | 6ba6e1ad71ef6c3cea6297b806838fec72323c10 | Peter Nguyen | 2026-09-28 | sd-c-read-b6-c1 |
+| P3 | .claude/skills/iso-27001-isms-architect/references/isms-clause-map.md | 9cc57758e7291be1bb78bb1ad9e16f74e9b7de29 | 27354a19baab45a4a25ac50c6328ce4d409cc387 | Peter Nguyen | 2026-09-26 | sd-c-read-b6-c1 |
+| P4 | .claude/skills/iso-42001-aims-architect/references/aims-clause-map.md | 5ff544c30c72025a270e81439dad6026e8c3124f | 8459ac73ba6e0b280338aca9a97be7a3336ce356 | Peter Nguyen | 2026-09-28 | sd-c-read-b6-c1 |
+| P13 | .claude/skills/load-test-planner/references/workload-model-worksheet.md | 693498f3e5c6c25f7466c0a51f41b42b2f65bc64 | f3afd19dbf71e885855ef48e02de87881799b08c | Peter Nguyen | 2026-09-23 | sd-c-read-b6-c1 |
+| P14 | .claude/skills/local-ci-mirror-preflight/references/preflight-procedure.md | b99395217b11d36f347a094f92c3febf63037514 | f3afd19dbf71e885855ef48e02de87881799b08c | Peter Nguyen | 2026-09-23 | sd-c-read-b6-c1 |
+| P15 | .claude/skills/manual-test-case-creator/SKILL.md | 3443ce5586893b0aaed6f4061b3e3bac567b8c04 | 56908537ea9dd839287ab3042568b5cd10b6a7e2 | Peter Nguyen | 2026-09-23 | sd-c-read-b6-c1 |
+| P16 | .claude/skills/manual-test-case-creator/references/manual-case-template.md | daad8bec6aee9417279372de7d5fff2521b4ff97 | d615bc82eabee4e4c42220f61dfff1103906f342 | Peter Nguyen | 2026-09-23 | sd-c-read-b6-c1 |
+
+**Reader-independence witness (B6).** For every page the reader is a different agent identity from the git-metadata author. **Basis:** each page last-touching author is Peter Nguyen, and this reader stage identity committed none of the pages. **Limit:** git metadata cannot prove non-authorship of commits made under the owner account, nor that a human executed the reading; the record does not claim more than the metadata can carry (section 10). Every page is PARTIAL with B6 UNVERIFIED a named gap.
+
+## 7. Hunk and line accounting
+
+- **Tracked change:** exactly one added path - this record docs/evidence/documentation/readability-lane-b-batch-6-2026-10-18.md - and no other tracked path; 0 modified, 0 deleted, 0 renames. The branch is created from main cb1269c1, so the only hunk in the live-base PR diff is the addition of this file.
+- **Page accounting:** zero hunks touch any of the eight pages; every page diff 2db1ffb7..cb1269c1 is empty; the batch made no page edit, no keeper row, no index/ledger/register/manifest/tool/test/workflow change.
+- **Record's own measurement:** per the plan's AC5, this record's final bytes/LF/sha256 are measured and stated in the PR body binding outside this record, not inside it; the body is updated after this file freezes at the PR head.
+
+## 8. Plan AC1-AC8 - Stage C declaration
+
+| AC | Stage C status and evidence |
+| --- | --- |
+| AC1 Tree proof | **MET at the final head by construction** - exactly one added path (this record) from main cb1269c1; 0 modified/deleted; exact head/tree/base posted in the SD-C handoff and PR body. |
+| AC2 Frozen page set by blob hash | **MET in this record** - eight paths, pending indices 144/145/146/147/156/157/158/159, blobs/bytes/LF at pinned ref 2db1ffb7, identical at base (zero drift). |
+| AC3 Whole-page re-read evidence | **MET in this record** - each page read whole L1-last; six bullets addressed with page-line cites; links, named files and tokens measured; no display elision. |
+| AC4 Honest per-page disposition | **MET in this record** - 0 FULL / 8 PARTIAL / 0 UNRUN, one basis per page; every PARTIAL names its gaps (B2 lines for all eight, B6 for all); strict FULL bar applied; no acceptance row authored. |
+| AC5 Record integrity and body/PROC-04 | **OWED after this file is frozen** - the PR body binds the plan capture and this record's final bytes/LF/sha256 outside the record; PROC-04 recomputed from the final body; body checker at the head. |
+| AC6 Codex loop plan | **OWED after the PR exists at its head** - trigger, fetch every inline finding, fix P1/P2 in repair commits, reply naming the fixing SHA, resolve, retrigger; head-bound unavailability only after all P1/P2 triaged; never a pass; two-round stop applies. |
+| AC7 Provenance and no regression | **MET in this record** - plan capture binding (revision 2 6245949982; revision 1 void), derivation base, lane B quarter and R2 selection stated, already-read 148-155 named; no page/keeper/index/ledger/register/manifest change; zero drift; official count restated. |
+| AC8 Stage entry conditions | **SATISFIED for C** - acted only on the fresh Stage B ACCEPT 6245975350 bound to plan revision 2 6245949982; branched from then-current main cb1269c1; added exactly the one record path in one DCO-signed model-attributed commit; posts the SD-C handoff; D/E/F/G remain separate agents and G owns merge. |
+
+## 9. Validation actually run while authoring (before commit)
+
+| Check | Command / method | Result |
+| --- | --- | --- |
+| Instrument at pinned ref | python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json in a fresh clone of main cb1269c1 | exit 0; summary 690 / 107 / 6 / 567 / 0 / 6 / 0 / 4 / 583 (section 1) |
+| Page blobs, bytes, LF | git rev-parse 2db1ffb7:<page>; git cat-file -s; newline counts over the pinned blob for all eight | blob ids match the plan/B table; sizes/LF match; totals 51,163 B / 878 LF |
+| Zero drift | git diff --numstat 2db1ffb7..cb1269c1 -- <page> for all eight | empty for all eight |
+| Unread check | scan all 31 merged lane records' P1-P8 rows for the eight paths | zero hits; all eight unread |
+| In-flight check | PR #826 state and files at base cb1269c1 | open, head e9ee3065, one added lane A batch-20 record +165/-0 (136-143); not merged |
+| Internal links | extract every Markdown link from the eight pages and resolve relative targets at main cb1269c1 | all internal links resolve |
+| Named skill references | resolve backticked skill names to existing skill files at main | named skill files exist |
+| Commands | search for concrete shell command lines in the eight pages | commands appear as procedure text only; no broken command reference |
+| Authorship metadata | git log -1 --format=%H|%an|%ad --date=short -- <page> for all eight | recorded in section 6 |
+| Page edits | branch state before adding this record | none of the eight pages modified; only pending change is this added record |
+
+**Not yet run at this point (owed and declared, never claimed):** post-commit git diff --check, DCO check, validate-skills, markdown link suite, PR-body bound-field checker, hosted CI at the exact head and the Codex loop. They are recorded in the SD-C handoff and PR body at the exact head once they have run; any that cannot run is recorded UNRUN with its reason.
+
+## 10. What this batch could not verify (stated, not hidden)
+
+- **B6 as a human act.** Metadata shows the reader identity differs from the page authors, but it cannot prove non-authorship of commits made under the owner account or that a human performed the reading; every page is PARTIAL for this reason and no acceptance/keeper row is offered.
+- **Future keeper acceptance.** This record creates no acceptance rows; a later eligible keeper under AEGIS-APR-101/APR-117 decides.
+- **Hosted checks and Codex.** No PR/head existed while this record was authored; hosted CI, the PR-body checker and the Codex loop are owed at the head and are not claimed here.
+- **Drift after the base.** The frozen blobs are measured at the pinned ref and main cb1269c1; a later movement reopens the batch.
+- **In-flight #826.** The lane A completion statement includes in-flight #826 (136-143); if #826 changes or fails to merge, the lane A statement must be re-read, but the lane B block 144/145/146/147/156/157/158/159 is unaffected.
+- **Prose reading as a quality judgment.** The record lists what each page says and where; it does not claim a formal usability study beyond the six bullets.
+
+## 11. Continuation - what the next stage needs
+
+The record is the only added path; the branch is created from main cb1269c1 and carries one DCO-signed model-attributed commit. **Stage D** independently audits AC1-AC8 at the exact head, including the lane B/R2 derivation, the frozen blob set, the one-path tree proof, the dispositions and the body binding. **Stage E** runs the repository checks at the head and records every UNRUN honestly. **Stage F** reviews the exact head and the final PROC-04. **Stage G** applies the merge gates including MG3 under the recorded reading; no merge occurs before G, and any need outside the one-path blast radius stops the ladder and returns to Stage A/the owner.
+
+**Boundary.** Stage C only: no page edited; no keeper row, ledger, index, register, manifest, tool, test or workflow changed; no other PR touched (#826 and #819 were read only); no Codex thread replied to or resolved; no merge.
+
+**Signed with both names: true identity sd-d-793-r2; stage role sd-c-read-b6-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
