@@ -185,7 +185,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P2 | 135 | v | <system/domain> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P2 | 135 | i | ARCHITECTURE | named gap — first use before any expansion on this page |
 | P2 | 135 | i | SEARCH | named gap — first use before any expansion on this page |
-| P2 | 136 | v | <in-DB full-text (tsvector/pg_trgm) | dedicated engine> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
+| P2 | 136 | v | <in-DB full-text (tsvector/pg_trgm) \| dedicated engine> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P2 | 138 | v | <entities, per-tenant + total size, query volume, result type> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P2 | 139 | i | FRESHNESS | named gap — first use before any expansion on this page |
 | P2 | 139 | i | LAG | named gap — first use before any expansion on this page |
@@ -244,7 +244,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P3 | 96 | i | HARDENING | named gap — first use before any expansion on this page |
 | P3 | 96 | i | IDENTITY | named gap — first use before any expansion on this page |
 | P3 | 96 | i | SECRETS | named gap — first use before any expansion on this page |
-| P3 | 97 | v | <var — public | server-only | CI-only | deploy-only> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
+| P3 | 97 | v | <var — public \| server-only \| CI-only \| deploy-only> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 98 | v | <name/location — how exposed> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 99 | v | <class> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 99 | v | <path / obtained?> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
@@ -254,7 +254,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P3 | 101 | v | <how> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 101 | v | <proxy> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 101 | v | <secret — moved to <store> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
-| P3 | 102 | v | <credential — rotated? (approval) | rotation still required> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
+| P3 | 102 | v | <credential — rotated? (approval) \| rotation still required> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 103 | v | <identity — grants removed → least privilege> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 104 | v | <flags/expiry/revocation added + tests> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P3 | 105 | v | <git history, secrets not yet rotated, out-of-scope stores> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
@@ -383,7 +383,7 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P5 | 104 | v | <op — data loss? reversible?> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P5 | 105 | v | <expand/contract respected? breaks live code?> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P5 | 106 | v | <hot-table lock risk + online alternative> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
-| P5 | 107 | v | <reversible cleanly | forward-fix only | irreversible (accepted?)> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
+| P5 | 107 | v | <reversible cleanly \| forward-fix only \| irreversible (accepted?)> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P5 | 108 | v | <tenant/authz change → test> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
 | P5 | 108 | ii | authz | named gap — lowercase technical shorthand first use; no expansion on this page |
 | P5 | 109 | v | <...> | documented exclusion — self-describing template placeholder (fill-in hole), not an abbreviation |
