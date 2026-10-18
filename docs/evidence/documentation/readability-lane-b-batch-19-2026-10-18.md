@@ -6,7 +6,7 @@
 
 **Plan of record.** Lane-B batch-19 lean plan, merged PR #834 issue comment **6248572986** (captured at **e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f**; created=updated 2026-10-18T10:06:38Z; immutable; **13,469 B**) with the self-authored Stage A addendum **6248606770** and **Stage B ACCEPT 6248639487** (frontier 256-263 / lane B batch 19 confirmed; canonical B4/B6 normalized-verbatim; eight pages 70,477 B / 1,241 LF reproduce). The plan is the artifact of record; there is no committed plan file.
 
-**Capture base and implementation base (base drift disclosed).** The plan was captured when live main was **e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f** (33rd session record merge = PR #834, merged 2026-10-18T09:34:12Z). After that capture, PR #836 (lane B batch-15 record) merged as the **34th session record merge** at **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3** (tree 79f335b1, parents e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f + be93382e), and then PR #835 (lane B batch-14 record) merged as the **35th session record merge** at **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3** (tree 753b9b7b, parents a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 + efaf156a). This Stage C record is written from the later live main **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3**, not the plan capture base. After the initial push, live main advanced again to **6f584c9dd187b84e3175472906fe7553a2c1bc97** (36th session record merge = PR #833 merged 10:28:55Z; parents a06360d4 + d4f3e276). This repair does not rebase; the record stays based on a06360d4 and discloses the a06360d4 -> 6f584c9d drift for G. The plan is immutable and the eight frozen pages are byte-identical at these refs; no plan/page change.
+**Capture base and implementation base (base drift disclosed).** The plan was captured when live main was **e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f** (33rd session record merge = PR #834, merged 2026-10-18T09:34:12Z). After that capture: PR #836 (batch 15) merged as the **34th** at **a141c64f52e3ca62300e6afbd6204dfd4a17c670** (tree 79f335b1, parents e7acaca4 + be93382e); PR #835 (batch 14) merged as the **35th** at **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3** (tree 753b9b7b, parents a141c64f + efaf156a); PR #833 (batch 12) merged as the **36th** at **6f584c9dd187b84e3175472906fe7553a2c1bc97** (tree 69f0e058, parents a06360d4 + d4f3e276); PR #837 (batch 16) merged as the **37th** at **7cea211eb1bd67911c5f83265ebe1ba356db9c7e** (tree f1a43128, parents 6f584c9d + 79d260c3). This Stage C record is written from the PR implementation base **a06360d4**, not the plan capture base. The live main is now **7cea211e**; this repair does not rebase and discloses the a06360d4 -> 7cea211e drift for G. The plan is immutable and the eight frozen pages are byte-identical at these refs; no plan/page change.
 
 **Change class: docs-only.** Exactly **one added path**: docs/evidence/documentation/readability-lane-b-batch-19-2026-10-18.md - this record. No other added, modified or deleted tracked path; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; no committed plan file. The record is authored at the branch head; record facts, body facts and the final PROC-04 are stated outside the record by the PR body and the Stage C handoff.
 
@@ -14,11 +14,11 @@
 
 **Instrument at pinned ref 2db1ffb7985ddc1c087c455740fd59e962967461 on a full clone of the tree:** 690 reader pages / 107 accepted / 6 provably pending / 567 no record / 0 recorded-within-10-lines / 6 cannot decide / 0 withdrawn / 4 partial / official pending **583**; the lane-arithmetic pending set is **567 + 6 = 573** sorted paths. **Lane A is complete 0-143; lane B is 144-287.**
 
-- **Merged lane-B rows at current live main 6f584c9dd187b84e3175472906fe7553a2c1bc97: 144-199 AND 200-207 AND 208-215 AND 216-223 AND 224-231** (144-199 from batches 2/2r/3/5/6/7/8/9/10/11; 200-207 from #833 batch 12; 208-215 from #834 batch 13; 216-223 from #835 batch 14; 224-231 from #836 batch 15). The PR implementation base is a06360d4; this live-main state is disclosed as drift for G.
-- **Open reservations at current live main:** #837 **232-239** (batch 16); #838 **240-247** (batch 17); #839 **248-255** (batch 18). These are scheduling citations only; heads can move.
+- **Merged lane-B rows at current live main 7cea211eb1bd67911c5f83265ebe1ba356db9c7e: 144-199 AND 200-207 AND 208-215 AND 216-223 AND 224-231 AND 232-239** (144-199 from batches 2/2r/3/5/6/7/8/9/10/11; 200-207 from #833 batch 12; 208-215 from #834 batch 13; 216-223 from #835 batch 14; 224-231 from #836 batch 15; 232-239 from #837 batch 16). The PR implementation base is a06360d4; this live-main state is disclosed as drift for G.
+- **Open reservations at current live main:** #838 **240-247** (batch 17); #839 **248-255** (batch 18). These are scheduling citations only; heads can move.
 - **R2 next eight:** excluding the merged rows and the five reservations, the sorted unread sequence gives **256-263**, all in lane B quarter 144-287. The **next unread after this block is 264**, .claude/skills/slo-reliability-architect/references/slo-derivation.md, which this record does not read.
 - **Per-lane batch number:** merged lane-B batches are 2/2r/3/5/6/7/8/9/10/11/13; in-flight/merged reservations are 12/14/15/16/17/18, so this block is **lane B batch 19**. The record path does not exist at the implementation base.
-- **Merge attribution used throughout this record:** 6f584c9dd187b84e3175472906fe7553a2c1bc97 = **#833 36th**; a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 = **#835 35th**; a141c64f52e3ca62300e6afbd6204dfd4a17c670 = **#836 34th**; e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f = **#834 33rd**; 84a5295d = **#831 32nd**; 655e40ea = **#828 31st**; 883bf690 = **#832 30th**.
+- **Merge attribution used throughout this record:** 7cea211eb1bd67911c5f83265ebe1ba356db9c7e = **#837 37th**; 6f584c9dd187b84e3175472906fe7553a2c1bc97 = **#833 36th**; a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 = **#835 35th**; a141c64f52e3ca62300e6afbd6204dfd4a17c670 = **#836 34th**; e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f = **#834 33rd**; 84a5295d = **#831 32nd**; 655e40ea = **#828 31st**; 883bf690 = **#832 30th**.
 
 ## 3. The eight frozen pages — measured at pinned ref 2db1ffb7985ddc1c087c455740fd59e962967461
 
@@ -164,7 +164,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 
 **Canonical B1 satisfied** - title L1, use line L3 and term key L5-8 state the runner/gate design reference job and reader; the schema and gate shapes are L14-90.
 
-**Canonical B2** - Named B2 gaps: L98 api, L117 PR. Defined-at-first-use rows and documented-exclusion rows for the remaining first uses are in the section 6 inventory.
+**Canonical B2** - Named B2 gaps: L25 api, L117 PR. Defined-at-first-use rows and documented-exclusion rows for the remaining first uses are in the section 6 inventory.
 
 **Canonical B3 satisfied** - headings Status-file schema, Runner modes & resume law, Aggregate-gate CI shape, Shard-map balancing, worked interruption-resume trace, interaction notes; concrete JSON/YAML shapes and a worked trace are included.
 
@@ -174,7 +174,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 
 **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship. B6 does not support FULL.
 
-**Verdict: PARTIAL** - basis: named B2 gaps: api L98, PR L117 plus canonical B6 unverified.
+**Verdict: PARTIAL** - basis: named B2 gaps: api L25, PR L117 plus canonical B6 unverified.
 
 ### P8 - share-link-access-architect/SKILL.md - read whole, L1-220
 
@@ -200,10 +200,10 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 
 | Page | Class | Token | First-use line | Disposition (reason) |
 | --- | --- | --- | ---: | --- |
-| P1 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
+| P1 | U | A | L122 | single uppercase letter/heading token, not an abbreviation |
 | P1 | U | ACTUAL | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P1 | U | CI | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
-| P1 | U | N | L3 | single uppercase letter/heading token, not an abbreviation |
+| P1 | U | N | L88 | single uppercase letter/heading token, not an abbreviation |
 | P1 | U | NOT | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P1 | U | PR | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P1 | U | SSRF | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
@@ -278,7 +278,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P2 | U | JSON | L6 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P2 | U | JWT | L6 | defined at first use - L6 |
 | P2 | U | UI | L6 | defined at first use - L6 |
-| P2 | U | A | L7 | single uppercase letter/heading token, not an abbreviation |
+| P2 | U | A | L69 | single uppercase letter/heading token, not an abbreviation |
 | P2 | U | API | L7 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P2 | U | REST | L7 | defined at first use - L7 |
 | P2 | U | RPC | L7 | defined at first use - L7 |
@@ -318,13 +318,13 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P2 | B | supply-chain-security-reviewer | L75 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P2 | B | static-analysis-reviewer | L76 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P2 | B | appsec-implementer | L77 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P3 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
+| P3 | U | A | L14 | single uppercase letter/heading token, not an abbreviation |
 | P3 | U | AGGREGATES | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | CATEGORIES | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | CLI | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P3 | U | GAP | L3 | ordinary all-caps emphasis word or verb, not a status/lifecycle code |
 | P3 | M | IaC | L3 | proper name, filename or plain compound identifier, not a prose abbreviation |
-| P3 | U | N | L3 | single uppercase letter/heading token, not an abbreviation |
+| P3 | U | N | L43 | single uppercase letter/heading token, not an abbreviation |
 | P3 | U | NEVER | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | NOT | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | ONE | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -388,7 +388,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P3 | B | evals/trigger-evals.json | L196 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | B | trigger-evals.json | L196 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | B | references/ | L201 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P4 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
+| P4 | U | A | L105 | single uppercase letter/heading token, not an abbreviation |
 | P4 | U | AI | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P4 | U | BEFORE | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P4 | U | LLM | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
@@ -434,10 +434,10 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P4 | B | trigger-evals.json | L163 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P5 | U | SKILL | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P5 | M | SKILL.md | L3 | proper name, filename or plain compound identifier, not a prose abbreviation |
-| P5 | U | A | L4 | single uppercase letter/heading token, not an abbreviation |
+| P5 | U | A | L76 | single uppercase letter/heading token, not an abbreviation |
 | P5 | U | LLM02 | L4 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P5 | U | OWASP | L4 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
-| P5 | U | B | L5 | single uppercase letter/heading token, not an abbreviation |
+| P5 | U | B | L76 | single uppercase letter/heading token, not an abbreviation |
 | P5 | U | BACK | L5 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P5 | U | ID | L5 | ordinary identifier noun in prose, not a coded abbreviation |
 | P5 | U | INTO | L5 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -462,7 +462,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P5 | B | ai-governance-risk-reviewer | L69 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P5 | U | MECHANISM | L70 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P5 | U | NEVER | L74 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P6 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
+| P6 | U | A | L162 | single uppercase letter/heading token, not an abbreviation |
 | P6 | U | FAILURES | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | NOT | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | ONE | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -478,7 +478,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P6 | B | interrupted | L16 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | FAILURE | L17 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | CI | L18 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
-| P6 | L | preflight | L20 | proper skill/phase reference, not a prose abbreviation |
+| P6 | L | preflight | L3 | proper skill/phase reference, not a prose abbreviation |
 | P6 | L | repo | L20 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P6 | B | ci-failure-classifier | L27 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | WHICH | L35 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -522,7 +522,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P7 | U | CI | L5 | defined at first use - L5 |
 | P7 | U | JSON | L5 | defined at first use - L5 |
 | P7 | M | JavaScript | L5 | proper name, filename or plain compound identifier, not a prose abbreviation |
-| P7 | U | A | L6 | single uppercase letter/heading token, not an abbreviation |
+| P7 | U | A | L42 | single uppercase letter/heading token, not an abbreviation |
 | P7 | U | API | L6 | defined at first use - L6 |
 | P7 | U | UI | L6 | defined at first use - L6 |
 | P7 | U | E2E | L7 | defined at first use - L7 |
@@ -573,7 +573,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P7 | U | ONE | L85 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | B | ≈ | L96 | typographic operator/unit, not an abbreviation |
 | P7 | U | FUNCTION | L98 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P7 | L | api | L98 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P7 | L | api | L25 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P7 | B | misc | L99 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | % | L101 | typographic operator/unit, not an abbreviation |
 | P7 | B | × | L102 | typographic operator/unit, not an abbreviation |
@@ -589,7 +589,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P7 | B | local-ci-mirror-preflight | L123 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | U | IS | L126 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | B | flaky-test-detective | L129 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P8 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
+| P8 | U | A | L11 | single uppercase letter/heading token, not an abbreviation |
 | P8 | U | API | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P8 | U | CAPABILITY | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P8 | U | MEMBER | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -660,11 +660,11 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 
 **Keeper exclusion.** No page is keeper-eligible on this record: canonical B6 requires a read-only review by someone who did not write the page and this record cannot establish that condition. The record authors no acceptance row, no keeper row, no ledger edit and no index edit, and does not mark any page FULL for a later keeper to consume. Keeper recording remains a separate later act.
 
-**Continuation.** Lane A is complete 0-143; at current live main 6f584c9d merged lane-B evidence covers **144-199 and 200-207 and 208-215 and 216-223 and 224-231**; reservations are #837 232-239, #838 240-247, #839 248-255; this record covers **256-263**. The next page after the block is **264**; later stages re-derive the pending set at their own base. No page, plan, keeper or index change is made by this record.
+**Continuation.** Lane A is complete 0-143; at current live main 7cea211e merged lane-B evidence covers **144-199 and 200-207 and 208-215 and 216-223 and 224-231 and 232-239**; reservations are #838 240-247, #839 248-255; this record covers **256-263**. The next page after the block is **264**; later stages re-derive the pending set at their own base. No page, plan, keeper or index change is made by this record.
 
 ## 8. Provenance, page authorship, zero drift and reader independence
 
-**Plan/derivation.** Plan 6248572986 (immutable, 13,469 B) + A addendum 6248606770 + B ACCEPT 6248639487; capture base e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f (#834 33rd), PR implementation base a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 (#835 35th), current live main 6f584c9dd187b84e3175472906fe7553a2c1bc97 (#833 36th) disclosed in section 1; pending 573; merged lane-B rows at live main 144-199 + 200-207 + 208-215 + 216-223 + 224-231; block 256-263; batch 19; next unread 264; record path absent at base.
+**Plan/derivation.** Plan 6248572986 (immutable, 13,469 B) + A addendum 6248606770 + B ACCEPT 6248639487; capture base e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f (#834 33rd), PR implementation base a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 (#835 35th), current live main 7cea211eb1bd67911c5f83265ebe1ba356db9c7e (#837 37th) disclosed in section 1; pending 573; merged lane-B rows at live main 144-199 + 200-207 + 208-215 + 216-223 + 224-231 + 232-239; block 256-263; batch 19; next unread 264; record path absent at base.
 
 **Author metadata only - not B6 evidence.** Last-touching git author/date is recorded for provenance but cannot prove non-authorship or an independent read-only review; canonical B6 is unverified for all eight pages.
 
