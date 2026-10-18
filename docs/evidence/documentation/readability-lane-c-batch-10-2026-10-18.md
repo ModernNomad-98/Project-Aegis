@@ -10,7 +10,7 @@
 
 **Honest selection/duplicate-read wording.** The eight pages are **unread by every lane A-D BATCH record**: exact-path audit over all **52** merged lane batch records (including batch 9) found **0 page-read-row hits**; incidental references/inventory-token mentions are not reads. Older **pre-lane evidence-record** reads are **R2-nonbinding per adjudication 6250828860**: docs/delivery-workflow.md closeout-reread-2026-10-12 full read + after-706 accepted unchanged; docs/design/behavioral-eval-runner-v1-fast-track-successor.md, docs/design/behavioral-eval-runner-v1.md and docs/design/resumable-control-plane-v1.md in full-page-readability-all-remaining-after-237-2026-09-24.md L68-L70. Exact-path scan found no older evidence-record reads for 336, 340, 342, 343. This record does **not** claim unread by every merged record; a broader no-reread policy would require an owner amendment.
 
-**Merge attribution:** 9085bf6a=#847 46th; 9a5cb28d=#846 45th; e3f535e4=#845 44th; 3ef6c735=#844 43rd; 6afc845a=#842 42nd; 4b99f69f=#841 41st; 2c3c6ffe=#840 40th; 38212595=#839 39th; f325daac=#838 38th; 7cea211e=#837 37th; 6f584c9d=#833 36th. Lane A is complete; lane B is complete 144-279; lane C batches 1-9 are merged (through 304-335); this block is lane C 336-343 batch 10; next unread 344-351 stated not read. Commit facts are measured after the record commit and published outside the record.
+**Merge attribution:** 9085bf6a=#847 46th; 9a5cb28d=#846 45th; e3f535e4=#845 44th; 3ef6c735=#844 43rd; 6afc845a=#842 42nd; 4b99f69f=#841 41st; 2c3c6ffe=#840 40th; 38212595=#839 39th; f325daac=#838 38th; 7cea211e=#837 37th; 6f584c9d=#833 36th. Lane A is complete; lane B is complete 144-279; lane C batches 1-9 are merged (through 336-343 pending this record); this block is lane C 336-343 batch 10; next unread 344-351 stated not read. Commit facts are measured after the record commit and published outside the record.
 
 ## 2. The eight pages
 
@@ -49,7 +49,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 
 **B1:** delivery workflow - operational delivery workflow: stages, responsibilities, gates, evidence and handoff rules for changes; the page opens with its purpose/audience and intended-use context.
 
-**B2:** 331 inventory rows; defined-at-first-use 22; named first-use gaps: `rule` L1, `stage` L1, `PR` L3, `key` L3, `repository` L3, `request` L3, `CI` L4, `integration` L4, `checks` L5, `head` L5, `SHA` L6, `consumer` L7, `source` L7, `workspace` L8, `canonical` L12, `model` L13, `provider` L13, `binding` L14, `harness` L14, `artifact` L15, `reference` L15, `disposition` L25, `PLAN` L27, `acceptance` L27, `AUDIT` L28, `INDEPENDENT` L28, `bound` L28, `content` L28, `hash` L28, `immutable` L28, `revision` L28, `routing` L28, `tests` L28, `verdict` L28, `IMPLEMENT` L29, `block` L29, `entry` L29, `governance` L29, `local` L29, `IMPLEMENTATION` L30, `audit` L30, `UNRUN` L31, `VALIDATE` L31, `CODE` L32, `FINAL` L32, `REVIEW` L32, `author` L32, `table` L32, `MERGE` L33, `authority` L33, `conditions` L33, `gate` L33, `AFFIRMATIVE` L42, `classification` L45, `MET` L49, `build` L54, `LISTED` L57, `status` L59, `contract` L71, `name` L71, `records` L72, `SKILL` L77, `scope` L77, `ACCEPT` L84, `validation` L85, `action` L103, `boundary` L103, `branch` L103, `decision` L103, `grant` L103, `answer` L120, `mechanism` L127, `surface` L131, `bounded` L138, `lane` L143, `policy` L144, `runner` L152, `provenance` L153, `protocol` L158, `row` L158 ... (142 total; full list in section 5).
+**B2:** 332 inventory rows; defined-at-first-use 22; named first-use gaps: `rule` L1, `stage` L1, `PR` L3, `key` L3, `repository` L3, `request` L3, `CI` L4, `integration` L4, `checks` L5, `head` L5, `SHA` L6, `consumer` L7, `source` L7, `workspace` L8, `canonical` L12, `model` L13, `provider` L13, `binding` L14, `harness` L14, `artifact` L15, `reference` L15, `disposition` L25, `PLAN` L27, `acceptance` L27, `AUDIT` L28, `INDEPENDENT` L28, `bound` L28, `content` L28, `hash` L28, `immutable` L28, `revision` L28, `routing` L28, `tests` L28, `verdict` L28, `IMPLEMENT` L29, `block` L29, `entry` L29, `governance` L29, `local` L29, `IMPLEMENTATION` L30, `audit` L30, `UNRUN` L31, `VALIDATE` L31, `CODE` L32, `FINAL` L32, `REVIEW` L32, `author` L32, `table` L32, `MERGE` L33, `authority` L33, `conditions` L33, `gate` L33, `AFFIRMATIVE` L42, `classification` L45, `MET` L49, `build` L54, `LISTED` L57, `status` L59, `contract` L71, `name` L71, `records` L72, `SKILL` L77, `scope` L77, `ACCEPT` L84, `validation` L85, `action` L103, `boundary` L103, `branch` L103, `decision` L103, `grant` L103, `answer` L120, `mechanism` L127, `surface` L131, `bounded` L138, `lane` L143, `policy` L144, `runner` L152, `provenance` L153, `protocol` L158, `row` L158 ... (142 total; full list in section 5).
 **B3:** descriptive headings, tables/lists and concrete examples are present; inputs, workflow/outputs and stop conditions are distinguished where supplied.
 
 **B4:** reference/decision/design content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result. Proposed/blocked behavior is kept separate from shipped behavior.
@@ -79,7 +79,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 
 **B1:** Behavioral Eval Runner v1 design - full design specification for a proposed behavioral eval runner v1: contracts, isolation, cases, judging, evidence and phased implementation; the page opens with its purpose/audience and intended-use context.
 
-**B2:** 769 inventory rows; defined-at-first-use 61; named first-use gaps: `behavior` L4, `runner` L5, `tools` L5, `authority` L6, `scope` L6, `integration` L8, `release` L9, `hash` L12, `tree` L12, `review` L14, `contract` L15, `decision` L15, `evidence` L15, `history` L15, `model` L15, `status` L16, `version` L18, `BER` L19, `register` L19, `PR` L20, `WP` L20, `records` L20, `repository` L21, `calibration` L22, `units` L25, `baseline` L27, `body` L27, `input` L35, `live` L35, `provider` L35, `approved` L37, `DESIGN` L46, `SPECIFICATION` L46, `SKILL` L47, `HEAD` L49, `main` L49, `content` L52, `revision` L53, `budget` L55, `phase` L55, `state` L55, `workspace` L56, `surface` L59, `answer` L60, `isolation` L60, `path` L60, `blocker` L61, `verdict` L61, `governance` L62, `quarantine` L62, `assertion` L63, `judge` L64, `stale` L65, `marker` L69, `binding` L70, `hashes` L70, `stability` L70, `routing` L71, `rule` L71, `suite` L82, `canonical` L88, `docs` L91, `evals` L92, `acceptance` L98, `reconciliation` L98, `audit` L101, `validator` L101, `workflows` L103, `index` L105, `block` L109, `EVAL` L112, `RUNNER` L112, `cases` L113, `json` L113, `AUTHORED` L114, `prompt` L114, `POTENTIAL` L115, `scenario` L115, `RUNNABLE` L116, `NEVER` L117 ... (258 total; full list in section 5).
+**B2:** 782 inventory rows; defined-at-first-use 61; named first-use gaps: `behavior` L4, `runner` L5, `tools` L5, `authority` L6, `scope` L6, `integration` L8, `release` L9, `hash` L12, `tree` L12, `review` L14, `contract` L15, `decision` L15, `evidence` L15, `history` L15, `model` L15, `status` L16, `version` L18, `BER` L19, `register` L19, `PR` L20, `WP` L20, `records` L20, `repository` L21, `calibration` L22, `units` L25, `baseline` L27, `body` L27, `input` L35, `live` L35, `provider` L35, `approved` L37, `DESIGN` L46, `SPECIFICATION` L46, `SKILL` L47, `HEAD` L49, `main` L49, `content` L52, `revision` L53, `budget` L55, `phase` L55, `state` L55, `workspace` L56, `surface` L59, `answer` L60, `isolation` L60, `path` L60, `blocker` L61, `verdict` L61, `governance` L62, `quarantine` L62, `assertion` L63, `judge` L64, `stale` L65, `marker` L69, `binding` L70, `hashes` L70, `stability` L70, `routing` L71, `rule` L71, `suite` L82, `canonical` L88, `docs` L91, `evals` L92, `acceptance` L98, `reconciliation` L98, `audit` L101, `validator` L101, `workflows` L103, `index` L105, `block` L109, `EVAL` L112, `RUNNER` L112, `cases` L113, `json` L113, `AUTHORED` L114, `prompt` L114, `POTENTIAL` L115, `scenario` L115, `RUNNABLE` L116, `NEVER` L117 ... (258 total; full list in section 5).
 **B3:** descriptive headings, tables/lists and concrete examples are present; inputs, workflow/outputs and stop conditions are distinguished where supplied.
 
 **B4:** reference/decision/design content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result. Proposed/blocked behavior is kept separate from shipped behavior.
@@ -109,7 +109,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 
 **B1:** resumable control plane v1 - proposed resumable control-plane design: durable lifecycle, checkpoints, recovery and authority boundaries; the page opens with its purpose/audience and intended-use context.
 
-**B2:** 407 inventory rows; defined-at-first-use 23; named first-use gaps: `contract` L1, `offline` L4, `recovery` L7, `state` L7, `acceptance` L8, `authority` L8, `rules` L8, `action` L9, `provider` L9, `boundary` L11, `evidence` L13, `review` L13, `tools` L13, `process` L18, `stale` L19, `baseline` L29, `validator` L29, `consumer` L30, `repository` L30, `approval` L34, `receipt` L34, `parent` L39, `scope` L41, `calibration` L46, `gates` L48, `adapter` L51, `register` L57, `lifecycle` L59, `entry` L60, `dispatch` L68, `model` L68, `policy` L68, `release` L69, `behavior` L70, `containment` L71, `external` L71, `live` L71, `disposition` L76, `JSON` L82, `REUSE` L82, `accepted` L82, `canonical` L82, `hash` L82, `versioned` L82, `OS` L83, `assertion` L83, `item` L83, `retained` L83, `semantics` L83, `ADS` L84, `BEHIND` L84, `INTERFACE` L84, `WRAP` L84, `capability` L84, `checks` L84, `path` L84, `build` L85, `fixture` L85, `preflight` L85, `proof` L85, `verdict` L85, `cleanup` L86, `BEFORE` L88, `CORRECTION` L88, `REQUIRES` L88, `accounting` L88, `block` L88, `budget` L88, `checkpoint` L88, `decision` L88, `intent` L88, `lock` L88, `SDK` L89, `durable` L89, `judge` L89, `local` L89, `bound` L90, `resume` L90, `terminal` L90, `finalization` L92 ... (203 total; full list in section 5).
+**B2:** 463 inventory rows; defined-at-first-use 23; named first-use gaps: `contract` L1, `offline` L4, `recovery` L7, `state` L7, `acceptance` L8, `authority` L8, `rules` L8, `action` L9, `provider` L9, `boundary` L11, `evidence` L13, `review` L13, `tools` L13, `process` L18, `stale` L19, `baseline` L29, `validator` L29, `consumer` L30, `repository` L30, `approval` L34, `receipt` L34, `parent` L39, `scope` L41, `calibration` L46, `gates` L48, `adapter` L51, `register` L57, `lifecycle` L59, `entry` L60, `dispatch` L68, `model` L68, `policy` L68, `release` L69, `behavior` L70, `containment` L71, `external` L71, `live` L71, `disposition` L76, `JSON` L82, `REUSE` L82, `accepted` L82, `canonical` L82, `hash` L82, `versioned` L82, `OS` L83, `assertion` L83, `item` L83, `retained` L83, `semantics` L83, `ADS` L84, `BEHIND` L84, `INTERFACE` L84, `WRAP` L84, `capability` L84, `checks` L84, `path` L84, `build` L85, `fixture` L85, `preflight` L85, `proof` L85, `verdict` L85, `cleanup` L86, `BEFORE` L88, `CORRECTION` L88, `REQUIRES` L88, `accounting` L88, `block` L88, `budget` L88, `checkpoint` L88, `decision` L88, `intent` L88, `lock` L88, `SDK` L89, `durable` L89, `judge` L89, `local` L89, `bound` L90, `resume` L90, `terminal` L90, `finalization` L92 ... (203 total; full list in section 5).
 **B3:** descriptive headings, tables/lists and concrete examples are present; inputs, workflow/outputs and stop conditions are distinguished where supplied.
 
 **B4:** reference/decision/design content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result. Proposed/blocked behavior is kept separate from shipped behavior.
@@ -124,7 +124,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 
 **B1:** evidence README - navigation/index for the evidence directory: accepted/verified/unverified evidence classes and how to read records; the page opens with its purpose/audience and intended-use context.
 
-**B2:** 132 inventory rows; defined-at-first-use 24; named first-use gaps: `decision` L3, `index` L3, `approval` L5, `grant` L5, `authority` L6, `status` L6, `register` L7, `tree` L12, `SCIF` L14, `row` L15, `base` L17, `name` L20, `revision` L20, `docs` L23, `BER` L25, `tool` L25, `CP` L26, `recovery` L26, `state` L26, `BKL` L27, `WP` L27, `bounded` L27, `phase` L27, `records` L27, `entry` L28, `calibration` L29, `judge` L29, `PR` L30, `gates` L30, `CI` L31, `checks` L31, `repository` L31, `hash` L34, `test` L34, `boundary` L39, `accepted` L42, `live` L42, `offline` L42, `scope` L42, `summary` L42, `proof` L43, `approved` L45, `input` L45, `preflight` L45, `DONE` L46, `integrity` L46, `actual` L55, `contract` L55, `rule` L57, `sha256` L57, `REVISE` L58, `audit` L58, `body` L58, `bound` L58, `table` L58, `governance` L66, `path` L67, `external` L69, `OWED` L76, `cases` L79, `durable` L86.
+**B2:** 133 inventory rows; defined-at-first-use 30; named first-use gaps: `decision` L3, `index` L3, `approval` L5, `grant` L5, `authority` L6, `status` L6, `register` L7, `tree` L12, `SCIF` L14, `row` L15, `base` L17, `name` L20, `revision` L20, `docs` L23, `tool` L25, `recovery` L26, `state` L26, `bounded` L27, `phase` L27, `records` L27, `entry` L28, `calibration` L29, `judge` L29, `gates` L30, `checks` L31, `repository` L31, `hash` L34, `test` L34, `boundary` L39, `accepted` L42, `live` L42, `offline` L42, `scope` L42, `summary` L42, `proof` L43, `approved` L45, `input` L45, `preflight` L45, `DONE` L46, `integrity` L46, `actual` L55, `contract` L55, `rule` L57, `sha256` L57, `REVISE` L58, `audit` L58, `body` L58, `bound` L58, `table` L58, `governance` L66, `path` L67, `external` L69, `OWED` L76, `cases` L79, `durable` L86.
 **B3:** descriptive headings, tables/lists and concrete examples are present; inputs, workflow/outputs and stop conditions are distinguished where supplied.
 
 **B4:** reference/decision/design content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result. Proposed/blocked behavior is kept separate from shipped behavior.
@@ -137,7 +137,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 
 ### P8 - index 343 - `docs/evidence/backlog-status-reconciliation-2026-09-12.md` - read whole L1-84
 
-**B1:** backlog status reconciliation 2026-09-12 - historical status-reconciliation record for backlog items, acceptable dispositions and open gaps; the page opens with its purpose/audience and intended-use context.
+**B1:** backlog status reconciliation 2026-09-12 - historical status-reconciliation record for backlog items, acceptable dispositions and open gaps. The purpose (historical crosswalk and redirect to current status sources) is clear, but the page does not state who should read it; the missing audience is an additional PARTIAL basis, not a B1 pass.
 
 **B2:** 141 inventory rows; defined-at-first-use 11; named first-use gaps: `status` L1, `records` L3, `item` L5, `request` L5, `runner` L5, `schema` L5, `evidence` L8, `index` L8, `BER` L11, `tool` L11, `entry` L13, `register` L14, `OD` L15, `calibration` L15, `disposition` L15, `PR` L16, `repository` L16, `main` L17, `revision` L17, `source` L17, `RLS` L18, `policy` L18, `cleanup` L20, `stale` L20, `review` L21, `authority` L23, `BACKLOG` L29, `DONE` L29, `accounting` L29, `actual` L29, `report` L29, `tests` L29, `tools` L29, `containment` L30, `offline` L30, `proof` L30, `budget` L31, `state` L31, `artifact` L32, `census` L32, `gates` L32, `json` L32, `docs` L33, `SKILL` L34, `author` L35, `test` L35, `live` L36, `CANDIDATE` L37, `audit` L37, `branch` L37, `fixture` L37, `integration` L37, `subagent` L37, `metadata` L39, `github` L41, `compatibility` L54, `accepted` L58, `activation` L58, `judge` L60, `phase` L60, `selection` L60, `threshold` L60, `rule` L65, `acceptance` L68, `behavior` L69, `binding` L69, `claims` L69, `diff` L70, `governance` L71, `capability` L75, `semantic` L75, `runtime` L76, `assertions` L80, `validator` L80, `checks` L81.
 **B3:** descriptive headings, tables/lists and concrete examples are present; inputs, workflow/outputs and stop conditions are distinguished where supplied.
@@ -557,6 +557,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P2 | 1142 | ii | ci | named gap - first use before any expansion on this page |
 | P2 | 1142 | iii | offline-ci.md | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P2 | 1144 | iii | APPROVAL_REGISTER.md | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P2 | 1144 | v | APPROVAL_REGISTER | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P2 | 1145 | ii | lifecycle | named gap - first use before any expansion on this page |
 | P2 | 1148 | iv | `D72` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P2 | 1148 | iv | `D` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
@@ -949,11 +950,24 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P4 | 168 | i | OWNER-RATIFIED | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P4 | 168 | ii | thresholds | named gap - first use before any expansion on this page |
 | P4 | 169 | ii | threshold | named gap - first use before any expansion on this page |
+| P4 | 170 | v | JUDGE_ERROR | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P4 | 171 | i | ATTEMPT | defined at first use - line 171 contains the expansion |
 | P4 | 172 | i | ERROR | named gap - first use before any expansion on this page |
+| P4 | 175 | v | INSUFFICIENT_ATTEMPTS | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 175 | v | PRECHECK_EXCLUDED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P4 | 176 | i | ORTHOGONAL | named gap - first use before any expansion on this page |
+| P4 | 176 | v | BUDGET_EXHAUSTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 176 | v | NOT_SELECTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P4 | 177 | i | ACTIVE | named gap - first use before any expansion on this page |
 | P4 | 177 | i | INACTIVE | named gap - first use before any expansion on this page |
+| P4 | 178 | v | AMBIGUOUS_ACTIVATION | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 178 | v | MISSING_PREREQUISITE | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 179 | v | FIXTURE_SETUP_FAILED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 179 | v | INCOMPATIBLE_INVOCATION_MODE | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 179 | v | MISSING_FIXTURE | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 180 | v | BUDGET_CAP | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 180 | v | EVIDENCE_INTEGRITY_FAILURE | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P4 | 180 | v | UNJUDGEABLE_ASSERTION | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P4 | 182 | ii | reason | named gap - first use before any expansion on this page |
 | P4 | 183 | ii | field | named gap - first use before any expansion on this page |
 | P4 | 184 | ii | cost | named gap - first use before any expansion on this page |
@@ -1741,6 +1755,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P6 | 13 | iii | README.md | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 13 | iii | cp-wp-001-review.md | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 13 | iii | resumable-control-plane-backlog.md | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 13 | v | APPROVAL_REGISTER | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 18 | ii | process | named gap - first use before any expansion on this page |
 | P6 | 19 | ii | stale | named gap - first use before any expansion on this page |
 | P6 | 26 | iii | 1.1 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
@@ -1953,7 +1968,10 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P6 | 193 | iv | `main` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 197 | ii | hashes | defined at first use - line 197 contains the expansion |
 | P6 | 197 | ii | semantic | defined at first use - line 197 contains the expansion |
+| P6 | 198 | v | EFFECT_DEFINED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 203 | i | T28 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 207 | v | DIFFERENT_FROM | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 208 | v | REPEAT_OF | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 209 | i | COMPENSATES | named gap - first use before any expansion on this page |
 | P6 | 215 | i | SAME | named gap - first use before any expansion on this page |
 | P6 | 215 | iii | 7.4 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
@@ -1974,6 +1992,8 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P6 | 268 | i | CONSUMED | named gap - first use before any expansion on this page |
 | P6 | 268 | i | RELEASED | named gap - first use before any expansion on this page |
 | P6 | 268 | i | RESERVED | named gap - first use before any expansion on this page |
+| P6 | 269 | v | EFFECT_ADOPTION | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 269 | v | EXECUTION_INTENT | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 281 | iii | 5.3 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 283 | i | T03 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 286 | i | OTHER | named gap - first use before any expansion on this page |
@@ -1985,9 +2005,17 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P6 | 309 | ii | isolated | named gap - first use before any expansion on this page |
 | P6 | 318 | i | STOPPED | named gap - first use before any expansion on this page |
 | P6 | 318 | i | T26 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 318 | v | FAILED_FINAL | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 334 | iii | 5.4 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 337 | i | ADJUSTED | named gap - first use before any expansion on this page |
+| P6 | 337 | v | UNKNOWN_WORST_CASE_CHARGED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 338 | v | INTENT_COMMITTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 341 | ii | units | named gap - first use before any expansion on this page |
+| P6 | 348 | v | BUDGET_RESERVED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 349 | v | BUDGET_CONSUMED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 350 | v | BUDGET_ADJUSTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 351 | v | BUDGET_RELEASED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 352 | v | BUDGET_UNKNOWN | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 355 | ii | reason | named gap - first use before any expansion on this page |
 | P6 | 360 | i | UNKNOWN | named gap - first use before any expansion on this page |
 | P6 | 364 | ii | attempts | named gap - first use before any expansion on this page |
@@ -1999,51 +2027,87 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P6 | 395 | i | PAUSED | named gap - first use before any expansion on this page |
 | P6 | 395 | ii | cursor | named gap - first use before any expansion on this page |
 | P6 | 396 | i | VALIDATING | named gap - first use before any expansion on this page |
+| P6 | 397 | v | RECONCILIATION_REQUIRED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 398 | v | BLOCKED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 403 | v | READY | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 403 | v | WAITING_FOR_APPROVAL | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 404 | v | APPROVAL_REQUIRED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 404 | v | FAILED_RECOVERABLE | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 405 | i | UI | named gap - first use before any expansion on this page |
 | P6 | 405 | ii | conditions | named gap - first use before any expansion on this page |
 | P6 | 420 | iii | 6.2 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 430 | ii | repo | named gap - first use before any expansion on this page |
+| P6 | 430 | v | PLAN_ACCEPTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 431 | i | T02 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 431 | v | READINESS_EVALUATED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 432 | i | C02 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 432 | i | C03 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 432 | i | C08 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 433 | i | T04 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 433 | v | PAUSE_REQUESTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 433 | v | PAUSE_SETTLED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 434 | i | T05 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 435 | i | T06 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 436 | i | T07 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 437 | i | T08 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 438 | i | T09 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 439 | i | T10 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 439 | v | RECEIPT_RECORDED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 440 | i | FINALIZING | named gap - first use before any expansion on this page |
 | P6 | 440 | i | T11 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 440 | v | APPLY_VALIDATION | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 440 | v | VALIDATION_PASSED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 441 | i | T12 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 441 | ii | branch | named gap - first use before any expansion on this page |
+| P6 | 441 | v | VALIDATION_FAILED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 442 | ii | blocker | named gap - first use before any expansion on this page |
+| P6 | 442 | v | AUTHORITY_INVALIDATED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 443 | i | T14 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 443 | i | T17 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 443 | iii | 8.1 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 443 | v | RESUME_ACCEPTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 444 | i | T15 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 444 | v | BINDING_MISMATCH | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 445 | v | BLOCKER_RESOLVED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 445 | v | FINALIZE_OPERATION | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 445 | v | OPERATION_FINALIZED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 446 | v | RECONCILIATION_RECORDED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 447 | i | T18 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 447 | i | T20 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 447 | v | STOP_RECORDED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 448 | i | T19 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 449 | v | STOP_ESCALATED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 450 | i | PID | named gap - first use before any expansion on this page |
 | P6 | 450 | i | T21 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 451 | i | T22 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 452 | ii | routing | named gap - first use before any expansion on this page |
+| P6 | 452 | v | LATE_RECEIPT_RECORDED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 452 | v | RETRY_INITIATION_DISABLED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 453 | i | RESULT | defined at first use - line 453 contains the expansion |
 | P6 | 453 | i | T24 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 453 | v | CEASED_RESULT_UNAVAILABLE | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 453 | v | CESSATION_RECORDED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 453 | v | VALIDATOR_INTERRUPTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 453 | v | VALIDATOR_OBSERVATION_RECORDED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 454 | i | T25 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 454 | v | NONDISPATCH_PROVEN | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 454 | v | OPERATION_RETRY | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 455 | v | TERMINAL_VALIDATION_SETTLED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 456 | i | C09 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 456 | v | VALIDATOR_INTENT_COMMITTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 457 | i | C01 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 457 | i | C05 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 457 | i | FREE | named gap - first use before any expansion on this page |
+| P6 | 457 | v | ADOPTION_AUTHORITY_CONSUMED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 457 | v | ADOPT_VERIFIED_EFFECT | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 457 | v | EFFECT_ADOPTED | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 542 | i | APPLY | named gap - first use before any expansion on this page |
 | P6 | 560 | i | CURRENT | named gap - first use before any expansion on this page |
 | P6 | 564 | ii | phase | defined at first use - line 564 contains the expansion |
 | P6 | 569 | i | FAILED | named gap - first use before any expansion on this page |
 | P6 | 569 | i | PASSED | named gap - first use before any expansion on this page |
+| P6 | 570 | v | CANCELLED_AFTER_START | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 571 | v | CANCELLED_WITHOUT_START | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 597 | iii | 6.3 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 604 | i | C04 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 606 | i | C06 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
@@ -2059,6 +2123,10 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P6 | 651 | ii | reconcile | named gap - first use before any expansion on this page |
 | P6 | 658 | iii | 7.2 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 673 | iii | 7.3 | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 717 | v | VERIFIED_RECEIPT | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 718 | v | PROVEN_NONEXECUTION | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 719 | v | SAFE_SAME_EFFECT_RETRY | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 720 | v | OWNER_NONDISPATCHING_DISPOSITION | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 756 | ii | json | named gap - first use before any expansion on this page |
 | P6 | 756 | iii | `control-plane/project.json` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 756 | iii | `control-plane/work-items/*.json` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
@@ -2072,6 +2140,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P6 | 758 | iii | `%LOCALAPPDATA%/ProjectAegis/control-plane/<repo-id>/` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 758 | v | % | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 758 | v | <repo-id> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
+| P6 | 758 | v | XDG_STATE_HOME | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 759 | iii | `raw-evidence/<run-id>/` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 759 | v | <run-id> | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 760 | ii | manifest | named gap - first use before any expansion on this page |
@@ -2085,6 +2154,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P6 | 775 | iv | `.gitignore` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 785 | iii | `artifacts/recovery/` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P6 | 786 | iii | `artifacts/reviews/` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P6 | 800 | v | REPORT_ONLY | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P6 | 824 | ii | marker | named gap - first use before any expansion on this page |
 | P6 | 825 | ii | protocol | defined at first use - line 825 contains the expansion |
 | P6 | 839 | i | SHA | defined at first use - line 839 contains the expansion |
@@ -2128,6 +2198,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P7 | 6 | ii | status | named gap - first use before any expansion on this page |
 | P7 | 7 | ii | register | named gap - first use before any expansion on this page |
 | P7 | 7 | iii | APPROVAL_REGISTER.md | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P7 | 7 | v | APPROVAL_REGISTER | documented exclusion - self-describing placeholder/operator/unit/lifecycle token, not a prose abbreviation |
 | P7 | 8 | ii | behavioral | defined at first use - line 8 contains the expansion |
 | P7 | 8 | ii | eval | defined at first use - line 8 contains the expansion |
 | P7 | 8 | ii | runner | defined at first use - line 8 contains the expansion |
@@ -2156,14 +2227,14 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P7 | 23 | ii | docs | named gap - first use before any expansion on this page |
 | P7 | 23 | iii | `docs/roadmaps/aegis-ci-baseline-2026-10-11.md` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
 | P7 | 23 | iii | aegis-ci-baseline-2026-10-11.md | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
-| P7 | 25 | i | BER | named gap - first use before any expansion on this page |
+| P7 | 25 | i | BER | defined at first use - line 25 contains the expansion |
 | P7 | 25 | ii | key | defined at first use - line 25 contains the expansion |
 | P7 | 25 | ii | tool | named gap - first use before any expansion on this page |
-| P7 | 26 | i | CP | named gap - first use before any expansion on this page |
+| P7 | 26 | i | CP | defined at first use - line 26 contains the expansion |
 | P7 | 26 | ii | recovery | named gap - first use before any expansion on this page |
 | P7 | 26 | ii | state | named gap - first use before any expansion on this page |
-| P7 | 27 | i | BKL | named gap - first use before any expansion on this page |
-| P7 | 27 | i | WP | named gap - first use before any expansion on this page |
+| P7 | 27 | i | BKL | defined at first use - line 27 contains the expansion |
+| P7 | 27 | i | WP | defined at first use - line 27 contains the expansion |
 | P7 | 27 | ii | bounded | named gap - first use before any expansion on this page |
 | P7 | 27 | ii | item | defined at first use - line 27 contains the expansion |
 | P7 | 27 | ii | phase | named gap - first use before any expansion on this page |
@@ -2176,11 +2247,11 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | P7 | 29 | ii | calibration | named gap - first use before any expansion on this page |
 | P7 | 29 | ii | judge | named gap - first use before any expansion on this page |
 | P7 | 29 | iv | `OD-1` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
-| P7 | 30 | i | PR | named gap - first use before any expansion on this page |
+| P7 | 30 | i | PR | defined at first use - line 30 contains the expansion |
 | P7 | 30 | ii | capability | defined at first use - line 30 contains the expansion |
 | P7 | 30 | ii | gates | named gap - first use before any expansion on this page |
 | P7 | 30 | ii | request | defined at first use - line 30 contains the expansion |
-| P7 | 31 | i | CI | named gap - first use before any expansion on this page |
+| P7 | 31 | i | CI | defined at first use - line 31 contains the expansion |
 | P7 | 31 | ii | checks | named gap - first use before any expansion on this page |
 | P7 | 31 | ii | integration | defined at first use - line 31 contains the expansion |
 | P7 | 31 | ii | repository | named gap - first use before any expansion on this page |
@@ -2398,20 +2469,20 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Rows | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P1 | 10 | 58 | 3 | 5 | 0 | 76 | 55 | 9 | 12 |
-| P2 | 57 | 132 | 42 | 81 | 19 | 331 | 142 | 22 | 167 |
+| P2 | 57 | 132 | 42 | 81 | 20 | 332 | 142 | 22 | 168 |
 | P3 | 38 | 105 | 7 | 10 | 4 | 164 | 105 | 20 | 39 |
-| P4 | 234 | 194 | 89 | 232 | 20 | 769 | 258 | 61 | 450 |
+| P4 | 234 | 194 | 89 | 232 | 33 | 782 | 258 | 61 | 463 |
 | P5 | 96 | 85 | 15 | 7 | 13 | 216 | 92 | 20 | 104 |
-| P6 | 146 | 173 | 72 | 9 | 7 | 407 | 203 | 23 | 181 |
-| P7 | 26 | 74 | 21 | 11 | 0 | 132 | 61 | 24 | 47 |
+| P6 | 146 | 173 | 72 | 9 | 63 | 463 | 203 | 23 | 237 |
+| P7 | 26 | 74 | 21 | 11 | 1 | 133 | 55 | 30 | 48 |
 | P8 | 33 | 76 | 18 | 13 | 1 | 141 | 75 | 11 | 55 |
-| **Total** | **640** | **897** | **267** | **368** | **64** | **2236** | **991** | **190** | **1055** |
+| **Total** | **640** | **897** | **267** | **368** | **135** | **2307** | **985** | **196** | **1126** |
 
-**Zero-duplicate proof:** final table rows = **2236** = unique (page, first-use line, normalized token) keys = **2236**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous table; all 2236 rows parse exactly five cells with pipes escaped and 0 bad rows. **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this final table; every row resolves to real pinned/live page text at its real first occurrence; no fabricated/placeholder/stale rows.
+**Zero-duplicate proof:** final table rows = **2307** = unique (page, first-use line, normalized token) keys = **2307**; duplicate keys = **0**; extra rows after the final table = **0**; per-page/class/disposition sums equal the row count; one contiguous table; all 2307 rows parse exactly five cells with pipes escaped and 0 bad rows. **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this final table; every row resolves to real pinned/live page text at its real first occurrence; no fabricated/placeholder/stale rows.
 
 ## 6. Dispositions, verdicts, keeper exclusion and continuation
 
-**Disposition tally: 190 defined at first use / 991 named gaps / 1055 documented exclusions = 2236 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps also force PARTIAL where present. **No keeper/acceptance row** is created.
+**Disposition tally: 196 defined at first use / 985 named gaps / 1126 documented exclusions = 2307 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED for every page; named B2 gaps also force PARTIAL where present. **No keeper/acceptance row** is created.
 
 **Named-gap list (from the final table):**
 - P1 (336): compatibility L1, policy L1, schema L1, BER L3, records L4, contract L5, report L6, valid L6, versioned L9, JSON L10, evidence L10, checkpoint L11, event L14, WP L15, bounded L15, field L15, rule L15, calibration L18, external L24, checks L27, hashes L27, accepted L28, path L29, tests L29, artifact L30, permission L32, approval L33, release L33, input L47, marker L49, aggregate L50, decision L54, integrity L56, CLI L57, validation L57, diff L65, dispatch L65, key L65, PR L67, binding L68, retained L78, review L81, source L86, digest L87, quarantine L90, approved L92, hash L92, operation L94, revision L96, immutable L98, disposition L99, request L99, baseline L100, rules L101, item L104
@@ -2420,7 +2491,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 - P4 (339): behavior L4, runner L5, tools L5, authority L6, scope L6, integration L8, release L9, hash L12, tree L12, review L14, contract L15, decision L15, evidence L15, history L15, model L15, status L16, version L18, BER L19, register L19, PR L20, WP L20, records L20, repository L21, calibration L22, units L25, baseline L27, body L27, input L35, live L35, provider L35, approved L37, DESIGN L46, SPECIFICATION L46, SKILL L47, HEAD L49, main L49, content L52, revision L53, budget L55, phase L55, state L55, workspace L56, surface L59, answer L60, isolation L60, path L60, blocker L61, verdict L61, governance L62, quarantine L62, assertion L63, judge L64, stale L65, marker L69, binding L70, hashes L70, stability L70, routing L71, rule L71, suite L82, canonical L88, docs L91, evals L92, acceptance L98, reconciliation L98, audit L101, validator L101, workflows L103, index L105, block L109, EVAL L112, RUNNER L112, cases L113, json L113, AUTHORED L114, prompt L114, POTENTIAL L115, scenario L115, RUNNABLE L116, NEVER L117, capability L117, DIVERGENT L119, LEGACY L119, SEPARATED L125, TRUSTED L125, manifests L126, selection L128, SANITIZED L129, test L129, runtime L130, versioned L132, CORPUS L135, FULL L135, SHIPPED L135, immutable L135, ALWAYS L136, classification L140, gates L142, EXCLUDED L144, tests L144, FRESH L149, isolated L149, sandbox L149, EXECUTION L150, PINNED L150, permission L152, policy L152, configuration L153, EXPECTED L156, INVOCATION L156, MODE L156, assertions L159, artifact L163, DATA L164, MEASURED L165, thresholds L168, threshold L169, ERROR L172, ORTHOGONAL L176, ACTIVE L177, INACTIVE L177, reason L182, field L183, cost L184, integrity L185, DETACHED L189, report L189, rollup L192, external L193, attempts L194, quorum L194, CRITICAL L199, HIGH L199, STANDARD L199, metadata L199, BLOCKS L201, RESERVATION L203, reconcile L205, bounded L206, DETERMINISTIC L207, containment L209, DECIDED L212, DISABLED L213, token L214, SELECTED L215, UNKNOWN L215, ADVISORY L217, MATCHING L218, BASELINES L221, SUCCESSFUL L221, accounting L222, BEFORE L229, DECISION L229, PROMOTION L229, REQUIRED L229, approval L230, durable L230, REVIEWED L231, github L231, lane L231, ISOLATION L233, EFFECTIVE L236, semantics L241, EXCEPT L243, DECISIONS L244, DURING L245, EVIDENCE L248, mechanism L248, observation L248, accepted L256, head L256, AUTOMATED L258, GENERAL L258, summary L263, proof L272, consumer L276, stage L304, bound L305, drift L352, repo L352, retained L362, item L402, action L444, CASE L446, REFUSAL L446, TYPE L446, name L465, dispatch L510, tier L512, checks L537, conditions L562, git L616, sha L620, reference L630, PARTIAL L685, valid L770, CHANGES L866, node L874, local L885, OUTSIDE L886, HOST L919, DISK L920, HYPOTHESIS L965, adapter L966, CORROBORATING L974, EXIT L976, GATE L976, OWNERS L976, RECORDING L976, STATUS L976, base L979, TYPED L1021, parent L1022, digest L1062, FIXED L1063, preview L1066, deploy L1069, validation L1133, COHERENT L1169, DISCOVERY L1169, TOPIC L1169, TURN L1169, workflow L1177, COMPLETE L1292, FIRST L1379, EXISTING L1483, BOUND L1484, UPPER L1484, tokens L1501, HARD L1527, DEFAULT L1534, WHICH L1560, key L1649, EXACTLY L1658, slot L1710, MANDATORY L1716, terminal L1807, READ L1833, OUTPUT L1834, AFTER L1850, FINALIZE L1895, FINAL L1896, SNAPSHOT L1896, BUNDLE L1897, PROVEN L1926, lifecycle L1971, OTHER L2003, command L2006, PLANE L2043, SANDBOX L2043, TOOL L2043, CODEOWNERS L2109, ACTUALLY L2198, LATER L2535, entry L2542, DEFERRED L2775, RESERVE L2795, WOULD L3041
 - P5 (340): FAST L1, SAVE L1, protocol L1, HAND L4, OFF L4, policy L5, main L8, action L11, DOCUMENTED L15, POLICY L15, decision L16, QA L17, scope L26, FAILED L28, checkpoint L28, state L28, contract L29, ID L33, command L35, item L35, approved L38, durable L38, versioned L38, bounded L39, STOPPED L41, UNKNOWN L41, resume L42, CI L49, build L49, tests L49, cleanup L50, acceptance L79, authority L88, field L88, version L92, id L95, dispatch L96, reference L104, tokens L107, records L112, SAVED L130, ACTIVE L131, INCOMPLETE L131, PAUSE L131, report L135, MEASUREMENT L140, TARGET L141, evidence L141, session L155, SKILL L161, register L165, repository L165, governance L166, binding L168, stage L169, entry L189, path L206, ids L213, scenario L228, behavior L233, condition L233, history L238, validation L238, tree L239, offline L240, content L248, source L248, FAILURE L249, verdict L249, REAL L251, actual L251, test L253, UNRUN L254, audit L258, runtime L271, classification L282, docs L282, workflow L282, SHA L283, git L283, head L283, row L283, base L284, index L291, PR L296, tools L297, artifact L299, schema L309, review L310, phase L314, key L322, revision L329
 - P6 (341): contract L1, offline L4, recovery L7, state L7, acceptance L8, authority L8, rules L8, action L9, provider L9, boundary L11, evidence L13, review L13, tools L13, process L18, stale L19, baseline L29, validator L29, consumer L30, repository L30, approval L34, receipt L34, parent L39, scope L41, calibration L46, gates L48, adapter L51, register L57, lifecycle L59, entry L60, dispatch L68, model L68, policy L68, release L69, behavior L70, containment L71, external L71, live L71, disposition L76, JSON L82, REUSE L82, accepted L82, canonical L82, hash L82, versioned L82, OS L83, assertion L83, item L83, retained L83, semantics L83, ADS L84, BEHIND L84, INTERFACE L84, WRAP L84, capability L84, checks L84, path L84, build L85, fixture L85, preflight L85, proof L85, verdict L85, cleanup L86, BEFORE L88, CORRECTION L88, REQUIRES L88, accounting L88, block L88, budget L88, checkpoint L88, decision L88, intent L88, lock L88, SDK L89, durable L89, judge L89, local L89, bound L90, resume L90, terminal L90, finalization L92, manifests L92, report L92, schema L92, cases L93, runtime L94, surface L94, coverage L95, quorum L95, records L95, claims L97, history L97, test L98, workflow L102, name L107, bounded L112, condition L119, rule L119, integration L121, approved L122, operation L122, slot L122, retry L124, COMPLETED L126, obligations L126, revision L126, validation L126, reconciliation L127, ID L128, binding L128, immutable L128, key L128, settlement L130, uncertainty L130, usage L130, cost L136, request L149, CLI L151, payload L151, reference L151, head L153, integrity L153, content L154, digest L154, provenance L154, permission L156, workspace L156, artifact L157, classification L157, metadata L157, version L159, preview L161, AI L172, input L178, UID L185, configuration L186, tree L191, COMPENSATES L209, SAME L215, index L217, actual L223, grant L224, EXPIRED L225, event L225, adoption L229, valid L232, gate L240, fence L246, CAS L249, mechanism L253, token L263, CONSUMED L268, RELEASED L268, RESERVED L268, OTHER L286, BOTH L290, observation L294, aggregate L296, isolated L309, STOPPED L318, ADJUSTED L337, units L341, reason L355, UNKNOWN L360, attempts L364, PLANNED L392, RUNNING L393, PAUSING L394, PAUSED L395, cursor L395, VALIDATING L396, UI L405, conditions L405, repo L430, FINALIZING L440, branch L441, blocker L442, PID L450, routing L452, FREE L457, APPLY L542, CURRENT L560, FAILED L569, PASSED L569, body L625, selection L635, reconcile L651, json L756, LOCALAPPDATA L758, id L758, manifest L760, docs L761, env L762, tokens L762, marker L824, API L855, ACL L872, tool L876, prompt L883, isolation L884, compatibility L890, assertions L901, UNC L923, scenario L968
-- P7 (342): decision L3, index L3, approval L5, grant L5, authority L6, status L6, register L7, tree L12, SCIF L14, row L15, base L17, name L20, revision L20, docs L23, BER L25, tool L25, CP L26, recovery L26, state L26, BKL L27, WP L27, bounded L27, phase L27, records L27, entry L28, calibration L29, judge L29, PR L30, gates L30, CI L31, checks L31, repository L31, hash L34, test L34, boundary L39, accepted L42, live L42, offline L42, scope L42, summary L42, proof L43, approved L45, input L45, preflight L45, DONE L46, integrity L46, actual L55, contract L55, rule L57, sha256 L57, REVISE L58, audit L58, body L58, bound L58, table L58, governance L66, path L67, external L69, OWED L76, cases L79, durable L86
+- P7 (342): decision L3, index L3, approval L5, grant L5, authority L6, status L6, register L7, tree L12, SCIF L14, row L15, base L17, name L20, revision L20, docs L23, tool L25, recovery L26, state L26, bounded L27, phase L27, records L27, entry L28, calibration L29, judge L29, gates L30, checks L31, repository L31, hash L34, test L34, boundary L39, accepted L42, live L42, offline L42, scope L42, summary L42, proof L43, approved L45, input L45, preflight L45, DONE L46, integrity L46, actual L55, contract L55, rule L57, sha256 L57, REVISE L58, audit L58, body L58, bound L58, table L58, governance L66, path L67, external L69, OWED L76, cases L79, durable L86
 - P8 (343): status L1, records L3, item L5, request L5, runner L5, schema L5, evidence L8, index L8, BER L11, tool L11, entry L13, register L14, OD L15, calibration L15, disposition L15, PR L16, repository L16, main L17, revision L17, source L17, RLS L18, policy L18, cleanup L20, stale L20, review L21, authority L23, BACKLOG L29, DONE L29, accounting L29, actual L29, report L29, tests L29, tools L29, containment L30, offline L30, proof L30, budget L31, state L31, artifact L32, census L32, gates L32, json L32, docs L33, SKILL L34, author L35, test L35, live L36, CANDIDATE L37, audit L37, branch L37, fixture L37, integration L37, subagent L37, metadata L39, github L41, compatibility L54, accepted L58, activation L58, judge L60, phase L60, selection L60, threshold L60, rule L65, acceptance L68, behavior L69, binding L69, claims L69, diff L70, governance L71, capability L75, semantic L75, runtime L76, assertions L80, validator L80, checks L81
 
 **Continuation:** lane A complete; lane B complete 144-279; lane C batches 1-9 merged (through 304-335); this record covers 336-343 (batch 10); next unread 344-351, stated not read.
@@ -2435,7 +2506,7 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 | --- | --- | --- |
 | AC1 one-path | MET in branch | exactly one added record path; no other tracked path; no plan file; DCO model commit measured post-commit |
 | AC2 frozen pages | MET | eight pages with exact blobs/bytes/LF; all eight zero-drift at 2db1ffb7/main; no page outside set |
-| AC3 whole-page + inventory | MET in this record | whole-page B1-B6; ONE contiguous 2236-row table; five-cell/zero-duplicate proof; final-table counts; no fabricated rows |
+| AC3 whole-page + inventory | MET in this record | whole-page B1-B6; ONE contiguous 2307-row table; five-cell/zero-duplicate proof; final-table counts; no fabricated rows |
 | AC4 dispositions | MET | strict FULL bar; B6 UNVERIFIED/not FULL-supporting; 0F/8P; named gaps; no keeper |
 | AC5 record/body/PROC | asserted in PR body/handoff | record facts outside record; witness/skills/security body fields; PROC-04 live-final-body published==recomputed with literal presence; checker 0 |
 | AC6 Codex | honest at C handoff | Codex never a pass; trigger/triage/thread state truthfully reported in PR body/SD-C handoff; MG3 G-only |
@@ -2446,18 +2517,18 @@ Canonical acceptance bar quoted from backlog L2841-2862 at base: B1 purpose/read
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-10 / sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole at pinned/main blobs; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built one exact-once inventory. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2236-row inventory; no keeper |
+| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-10 / sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole at pinned/main blobs; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built one exact-once inventory. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2307-row inventory; no keeper |
 | [source-of-truth-reconciler](../../../.claude/skills/source-of-truth-reconciler/SKILL.md) @ b5fd9feda972 | C batch-10 / sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main 9085bf6a; re-derived frontier/union/quarters, eight page blobs and duplicate audit; verified record-path absence. | block 336-343/batch10; union610/quarters153; 485,973 B/6,169 LF; 52 lane records/0 page-read hits |
 | [change-classification-gate](../../../.claude/skills/change-classification-gate/SKILL.md) @ 08d91a834460 | C batch-10 / sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main; classified docs-only exactly one added path. | one added docs/evidence/documentation/readability-lane-c-batch-10-2026-10-18.md; no other path |
 | [skill-usage-ledger](../../../.claude/skills/skill-usage-ledger/SKILL.md) @ 6a27b5c8e690 | C batch-10 / sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main; resolved manifest hashes and authored rows/Row sources/six fields. | 4 rows / 4 per-row sources / 4 six-field lines |
 
-<!-- Row source: agent=sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this batch-10 record commit on branch from 9085bf6a; source=_A/evidence/read-lc-336-c1/Crows.txt line 1 of 4; binding=sha256 2806402b19d1daff6d5be794bd162422f457a02a0ee629f03a52f760524e4405 over 1612 B / 4 LF whole capture; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this batch-10 record commit on branch from 9085bf6a; source=_A/evidence/read-lc-336-c1/Crows.txt line 2 of 4; binding=sha256 2806402b19d1daff6d5be794bd162422f457a02a0ee629f03a52f760524e4405 over 1612 B / 4 LF whole capture; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this batch-10 record commit on branch from 9085bf6a; source=_A/evidence/read-lc-336-c1/Crows.txt line 3 of 4; binding=sha256 2806402b19d1daff6d5be794bd162422f457a02a0ee629f03a52f760524e4405 over 1612 B / 4 LF whole capture; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this batch-10 record commit on branch from 9085bf6a; source=_A/evidence/read-lc-336-c1/Crows.txt line 4 of 4; binding=sha256 2806402b19d1daff6d5be794bd162422f457a02a0ee629f03a52f760524e4405 over 1612 B / 4 LF whole capture; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this batch-10 record commit on branch from 9085bf6a; source=_A/evidence/read-lc-336-c1/Crows.txt line 1 of 4; binding=sha256 5cf55715451befb6741d4892b3ed06092f27deab3ef970bfa5341b4b309c90e5 over 1612 B / 4 LF whole capture; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this batch-10 record commit on branch from 9085bf6a; source=_A/evidence/read-lc-336-c1/Crows.txt line 2 of 4; binding=sha256 5cf55715451befb6741d4892b3ed06092f27deab3ef970bfa5341b4b309c90e5 over 1612 B / 4 LF whole capture; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this batch-10 record commit on branch from 9085bf6a; source=_A/evidence/read-lc-336-c1/Crows.txt line 3 of 4; binding=sha256 5cf55715451befb6741d4892b3ed06092f27deab3ef970bfa5341b4b309c90e5 over 1612 B / 4 LF whole capture; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-336-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this batch-10 record commit on branch from 9085bf6a; source=_A/evidence/read-lc-336-c1/Crows.txt line 4 of 4; binding=sha256 5cf55715451befb6741d4892b3ed06092f27deab3ef970bfa5341b4b309c90e5 over 1612 B / 4 LF whole capture; limits=digest binds captured text, not human identity; status=current -->
 
 **Six-field lines (outside any bound field):**
-acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical acceptance/inventory proof / applied: read eight pages whole, B1-B6, B4 per page, B6 unverified, 2236-row inventory / result: 0F/8P; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-336-c1 (true identity sd-f-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
+acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical acceptance/inventory proof / applied: read eight pages whole, B1-B6, B4 per page, B6 unverified, 2307-row inventory / result: 0F/8P; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-336-c1 (true identity sd-f-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 source-of-truth-reconciler@b5fd9feda972 / reason: frontier/pages must come from live state / applied: main 9085bf6a, union 610/quarters 153, eight page blobs, 52-record duplicate audit / result: block 336-343; 485,973 B / 6,169 LF; 0/52 lane-batch hits / incomplete: C reads whole / by: C, sd-c-read-lc-336-c1 (true identity sd-f-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 change-classification-gate@08d91a834460 / reason: scope must be docs-only one path / applied: checked record path absence/no other change / result: one added record path / incomplete: none / by: C, sd-c-read-lc-336-c1 (true identity sd-f-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / reason: C handoff owes provenance / applied: resolved four names at main 9085bf6a, authored rows/sources/six / result: 4 rows/4 sources/4 lines / incomplete: none / by: C, sd-c-read-lc-336-c1 (true identity sd-f-794-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
