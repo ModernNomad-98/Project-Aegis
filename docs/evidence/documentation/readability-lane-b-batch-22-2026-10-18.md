@@ -134,7 +134,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Panel taxonomy & cross-tenant read-security model - read-security model, panel menu, read model and panel spec; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `API`, `DB`, `SQL`, `UI`, `OLTP`, `RLS`, `AI`, `QA`, `SLO`, `id`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `id`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -148,7 +148,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 **B1:** Supply-Chain Security Reviewer - supply-chain review: dependencies, lockfiles, builds, CI/CD, artifacts; the page states its purpose and intended readers.
 
-**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `CVEs`, `json`, `https`. First-use lines are in section 6.
+**B2:** technical vocabulary is defined on page where present; named gaps from the final inventory: `CVEs`, `json`, `https`, `GITHUB_TOKEN`, `pull_request_target`. First-use lines are in section 6.
 
 **B3:** descriptive headings, tables/lists and concrete operational examples are present; inputs, workflow, outputs and stop conditions are distinguished where applicable.
 
@@ -243,6 +243,7 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P3 | 68 | iv | `ai-evaluation-harness` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P3 | 75 | v | `→` | documented exclusion — operator token, not an abbreviation |
 | P4 | 3 | i | `API` | defined at first use — expansion/definition present on this page |
+| P4 | 16 | v | `404` | defined at first use — HTTP status code explained as not found on this line |
 | P4 | 26 | iv | `skill-deprecation-planner` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P4 | 39 | v | `→` | documented exclusion — operator token, not an abbreviation |
 | P4 | 46 | iv | `api-event-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
@@ -271,9 +272,13 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P5 | 13 | v | `→` | documented exclusion — operator token, not an abbreviation |
 | P5 | 22 | v | `≥` | documented exclusion — operator token, not an abbreviation |
 | P5 | 27 | iv | `api-event-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P5 | 38 | v | `T-2d` | documented exclusion — timeline/lifecycle code token, not an abbreviation |
+| P5 | 38 | v | `T-2wk` | documented exclusion — timeline/lifecycle code token, not an abbreviation |
 | P5 | 45 | iv | `Deprecation: @1688169599` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P5 | 46 | iv | `Sunset: Sun, 31 Dec 2023 23:59:59 GMT` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P5 | 48 | iv | `Link` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P5 | 58 | v | `404` | documented exclusion — HTTP status code token, not an abbreviation |
+| P5 | 58 | v | `500` | documented exclusion — HTTP status code token, not an abbreviation |
 | P5 | 71 | iv | `notification-webhook-ux-designer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P5 | 73 | iv | `skill-deprecation-planner` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 3 | i | `DB` | defined at first use — expansion/definition present on this page |
@@ -332,23 +337,25 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P6 | 332 | ii | `json` | named gap — first use before any expansion on this page |
 | P6 | 335 | iv | `evals/trigger-evals.json` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P7 | 3 | iii | `SKILL.md` | documented exclusion — exact file/path identifier, not a prose abbreviation |
-| P7 | 12 | i | `API` | named gap — first use before any expansion on this page |
-| P7 | 12 | i | `DB` | named gap — first use before any expansion on this page |
-| P7 | 12 | i | `SQL` | named gap — first use before any expansion on this page |
-| P7 | 12 | i | `UI` | named gap — first use before any expansion on this page |
-| P7 | 14 | i | `OLTP` | named gap — first use before any expansion on this page |
-| P7 | 14 | i | `RLS` | named gap — first use before any expansion on this page |
+| P7 | 12 | i | `API` | defined at first use — expansion/definition present on this page |
+| P7 | 12 | i | `DB` | defined at first use — expansion/definition present on this page |
+| P7 | 12 | i | `SQL` | defined at first use — expansion/definition present on this page |
+| P7 | 12 | i | `UI` | defined at first use — expansion/definition present on this page |
+| P7 | 14 | i | `OLTP` | defined at first use — expansion/definition present on this page |
+| P7 | 14 | i | `RLS` | defined at first use — expansion/definition present on this page |
 | P7 | 17 | i | `ETL` | defined at first use — expansion/definition present on this page |
 | P7 | 17 | i | `IA` | defined at first use — expansion/definition present on this page |
-| P7 | 19 | i | `AI` | named gap — first use before any expansion on this page |
-| P7 | 19 | i | `QA` | named gap — first use before any expansion on this page |
-| P7 | 19 | i | `SLO` | named gap — first use before any expansion on this page |
+| P7 | 19 | i | `AI` | defined at first use — expansion/definition present on this page |
+| P7 | 19 | i | `QA` | defined at first use — expansion/definition present on this page |
+| P7 | 19 | i | `SLO` | defined at first use — expansion/definition present on this page |
 | P7 | 33 | iv | `granted_by` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 34 | iv | `granted_at` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 34 | iv | `note` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 36 | iv | `USING (false)` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 59 | v | `→` | documented exclusion — operator token, not an abbreviation |
+| P7 | 59 | v | `403` | documented exclusion — HTTP status code token, not an abbreviation |
 | P7 | 64 | iv | `is_platform_admin(uid)` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P7 | 64 | i | `SECURITY-DEFINER` | named gap — internal SQL role/class identifier first use; no plain expansion on this page |
 | P7 | 79 | iv | `admin-console-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 84 | ii | `id` | named gap — first use before any expansion on this page |
 | P7 | 87 | iv | `audit-log-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
@@ -420,8 +427,8 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P8 | 127 | v | `→` | documented exclusion — operator token, not an abbreviation |
 | P8 | 132 | v | `≠` | documented exclusion — operator token, not an abbreviation |
 | P8 | 137 | iii | `references/supply-chain-checklist.md` | documented exclusion — exact file/path identifier, not a prose abbreviation |
-| P8 | 138 | iv | `pull_request_target` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P8 | 139 | iv | `GITHUB_TOKEN` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P8 | 138 | iv | `pull_request_target` | named gap — first use before any expansion on this page |
+| P8 | 139 | iv | `GITHUB_TOKEN` | named gap — first use before any expansion on this page |
 | P8 | 152 | iv | `weights_only` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P8 | 200 | v | `<repo/scope>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P8 | 201 | v | `<direct N / transitive M — from lockfile>` | documented exclusion — self-describing placeholder, not an abbreviation |
@@ -452,9 +459,9 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 ### 6.1 Reconciliation and independent cell-count proof (ONE proof section)
 
-**Counts from the FINAL table:** **285 data rows**; **285 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 24, P2: 32, P3: 22, P4: 22, P5: 12, P6: 55, P7: 40, P8: 78; classes: i: 60, ii: 11, iii: 10, iv: 113, v: 91; dispositions: defined at first use: 50, named gap: 27, documented exclusion: 208. All sums equal 285.
+**Counts from the FINAL table:** **292 data rows**; **292 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 24, P2: 32, P3: 22, P4: 23, P5: 16, P6: 55, P7: 42, P8: 78; classes: i: 61, ii: 11, iii: 10, iv: 113, v: 97; dispositions: defined at first use: 60, named gap: 21, documented exclusion: 211. All sums equal 292.
 
-**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **285 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
+**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **292 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
 
 ## 7. Dispositions, named gaps, keeper exclusion and continuation
 
@@ -465,8 +472,8 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 - **P4**: `json`.
 - **P5**: `HTTP`.
 - **P6**: `SaaS`, `URL`, `json`.
-- **P7**: `API`, `DB`, `SQL`, `UI`, `OLTP`, `RLS`, `AI`, `QA`, `SLO`, `id`.
-- **P8**: `CVEs`, `json`, `https`.
+- **P7**: `id`.
+- **P8**: `CVEs`, `json`, `https`, `GITHUB_TOKEN`, `pull_request_target`.
 
 **Continuation:** this block exhausts lane B pending at 287; first unread after block is 288 `.claude/skills/supply-chain-security-reviewer/references/supply-chain-checklist.md`, outside lane B. Later work requires a fresh lane/block decision; no lane-B batch 23 block exists.
 
@@ -476,11 +483,11 @@ Pages were read at pinned ref 2db1ffb7 from the tree rather than from plan text;
 
 ## 9. Stage C declaration, AC statuses and self-state
 
-Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, three DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + this repair-2 commit; exact repair-2 SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
+Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, four DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + this repair-3 commit; exact repair-3 SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
 
 | AC | Status | Basis |
 | --- | --- | --- |
-| AC1 | MET in PR diff | one added record path vs 6afc845a; three DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + this repair-2 commit; exact repair-2 SHA in PR body/handoff); no other tracked path |
+| AC1 | MET in PR diff | one added record path vs 6afc845a; four DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + repair-2 da202e42 + this repair-3 commit; exact repair-3 SHA in PR body/handoff); no other tracked path |
 | AC2 | MET | eight blobs/bytes/LF above; zero drift; pending/unread |
 | AC3 | MET in this record | whole-page B1-B6; ONE contiguous table; five-cell/zero-duplicate proof; no fabricated rows |
 | AC4 | MET | strict FULL bar; B6 verified via existing review; B2 gaps keep 0F/8P/0 UNRUN; no keeper |
