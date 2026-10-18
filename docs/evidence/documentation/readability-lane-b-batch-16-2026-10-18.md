@@ -252,7 +252,7 @@ Each page was opened whole at its pinned blob and read line by line. The bullets
 | P2 | (v) | `<exactly which deliverables + date RANGES the named human approved, and the approval date — bounds the binding commitment; a scope change needs a NEW approval \| n/a>` | L151 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P2 | (iv) | `Approval scope + date` | L151 | documented exclusion | field-name literal in output template, not an abbreviation |
 | P2 | (v) | `<unverified targets \| none>` | L154 | documented exclusion | self-describing angle placeholder, supplied by the author |
-| P2 | (v) | `<verified velocity evidence + calculation (minus maintenance/interrupts, buffer) \| none — missing <named capacity evidence>` | L155 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
+| P2 | (v) | `<verified velocity evidence + calculation (minus maintenance/interrupts, buffer) \| none — missing <named capacity evidence>>` | L155 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
 | P2 | (iv) | `Capacity basis` | L155 | documented exclusion | field-name literal in output template, not an abbreviation |
 | P2 | (v) | `<named capacity evidence>` | L156 | documented exclusion | self-describing angle placeholder, supplied by the author |
 | P2 | (v) | `<deliverable — date RANGE — capacity-backed, dependency-clear, high-confidence \| none — readiness is NOT COMMIT-ABLE \| none — awaiting named human decision>` | L157 | documented exclusion | self-describing multiline angle placeholder, supplied by the author |
