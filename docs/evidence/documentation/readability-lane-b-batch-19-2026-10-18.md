@@ -6,7 +6,7 @@
 
 **Plan of record.** Lane-B batch-19 lean plan, merged PR #834 issue comment **6248572986** (captured at **e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f**; created=updated 2026-10-18T10:06:38Z; immutable; **13,469 B**) with the self-authored Stage A addendum **6248606770** and **Stage B ACCEPT 6248639487** (frontier 256-263 / lane B batch 19 confirmed; canonical B4/B6 normalized-verbatim; eight pages 70,477 B / 1,241 LF reproduce). The plan is the artifact of record; there is no committed plan file.
 
-**Capture base and implementation base (base drift disclosed).** The plan was captured when live main was **e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f** (33rd session record merge = PR #834, merged 2026-10-18T09:34:12Z). After that capture, PR #836 (lane B batch-15 record) merged as the **34th session record merge** at **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3** (tree 79f335b1, parents e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f + be93382e), and then PR #835 (lane B batch-14 record) merged as the **35th session record merge** at **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3** (tree 753b9b7b, parents a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 + efaf156a). This Stage C record is written from the later live main **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3**, not the plan capture base. The plan is immutable and the eight frozen pages are byte-identical at both refs, so this is a disclosed base drift, not a plan/page change. A later stage must re-derive the frontier at its own base.
+**Capture base and implementation base (base drift disclosed).** The plan was captured when live main was **e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f** (33rd session record merge = PR #834, merged 2026-10-18T09:34:12Z). After that capture, PR #836 (lane B batch-15 record) merged as the **34th session record merge** at **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3** (tree 79f335b1, parents e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f + be93382e), and then PR #835 (lane B batch-14 record) merged as the **35th session record merge** at **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3** (tree 753b9b7b, parents a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 + efaf156a). This Stage C record is written from the later live main **a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3**, not the plan capture base. After the initial push, live main advanced again to **6f584c9dd187b84e3175472906fe7553a2c1bc97** (36th session record merge = PR #833 merged 10:28:55Z; parents a06360d4 + d4f3e276). This repair does not rebase; the record stays based on a06360d4 and discloses the a06360d4 -> 6f584c9d drift for G. The plan is immutable and the eight frozen pages are byte-identical at these refs; no plan/page change.
 
 **Change class: docs-only.** Exactly **one added path**: docs/evidence/documentation/readability-lane-b-batch-19-2026-10-18.md - this record. No other added, modified or deleted tracked path; no keeper row, acceptance-index row, ledger, register, manifest, tool, test or workflow change; no page edit; no committed plan file. The record is authored at the branch head; record facts, body facts and the final PROC-04 are stated outside the record by the PR body and the Stage C handoff.
 
@@ -14,11 +14,11 @@
 
 **Instrument at pinned ref 2db1ffb7985ddc1c087c455740fd59e962967461 on a full clone of the tree:** 690 reader pages / 107 accepted / 6 provably pending / 567 no record / 0 recorded-within-10-lines / 6 cannot decide / 0 withdrawn / 4 partial / official pending **583**; the lane-arithmetic pending set is **567 + 6 = 573** sorted paths. **Lane A is complete 0-143; lane B is 144-287.**
 
-- **Merged lane-B rows at base a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3: 144-199 AND 208-215 AND 216-223 AND 224-231** (144-199 from batches 2/2r/3/5/6/7/8/9/10/11; 208-215 from #834 batch 13; 216-223 from #835 batch 14; 224-231 from #836 batch 15).
-- **Open reservations:** #833 **200-207** (batch 12); #837 **232-239** (batch 16); #838 **240-247** (batch 17); #839 **248-255** (batch 18). These are scheduling citations only; heads can move.
+- **Merged lane-B rows at current live main 6f584c9dd187b84e3175472906fe7553a2c1bc97: 144-199 AND 200-207 AND 208-215 AND 216-223 AND 224-231** (144-199 from batches 2/2r/3/5/6/7/8/9/10/11; 200-207 from #833 batch 12; 208-215 from #834 batch 13; 216-223 from #835 batch 14; 224-231 from #836 batch 15). The PR implementation base is a06360d4; this live-main state is disclosed as drift for G.
+- **Open reservations at current live main:** #837 **232-239** (batch 16); #838 **240-247** (batch 17); #839 **248-255** (batch 18). These are scheduling citations only; heads can move.
 - **R2 next eight:** excluding the merged rows and the five reservations, the sorted unread sequence gives **256-263**, all in lane B quarter 144-287. The **next unread after this block is 264**, .claude/skills/slo-reliability-architect/references/slo-derivation.md, which this record does not read.
 - **Per-lane batch number:** merged lane-B batches are 2/2r/3/5/6/7/8/9/10/11/13; in-flight/merged reservations are 12/14/15/16/17/18, so this block is **lane B batch 19**. The record path does not exist at the implementation base.
-- **Merge attribution used throughout this record:** a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 = **#835 35th**; a141c64f52e3ca62300e6afbd6204dfd4a17c670 = **#836 34th**; e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f = **#834 33rd**; 84a5295d = **#831 32nd**; 655e40ea = **#828 31st**; 883bf690 = **#832 30th**.
+- **Merge attribution used throughout this record:** 6f584c9dd187b84e3175472906fe7553a2c1bc97 = **#833 36th**; a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 = **#835 35th**; a141c64f52e3ca62300e6afbd6204dfd4a17c670 = **#836 34th**; e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f = **#834 33rd**; 84a5295d = **#831 32nd**; 655e40ea = **#828 31st**; 883bf690 = **#832 30th**.
 
 ## 3. The eight frozen pages — measured at pinned ref 2db1ffb7985ddc1c087c455740fd59e962967461
 
@@ -200,29 +200,31 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 
 | Page | Class | Token | First-use line | Disposition (reason) |
 | --- | --- | --- | ---: | --- |
+| P1 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
 | P1 | U | ACTUAL | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P1 | U | CI | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P1 | U | N | L3 | single uppercase letter/heading token, not an abbreviation |
 | P1 | U | NOT | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P1 | U | PR | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P1 | U | SSRF | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P1 | M | SaaS | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P1 | B | code-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | L | config | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
-| P1 | B | code-reviewer | L14 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P1 | B | error-handling-security-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P1 | B | secure-migration-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P1 | B | static-analysis-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P1 | B | supply-chain-security-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P1 | B | threat-modeler | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | L | auth | L24 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
-| P1 | B | threat-modeler | L28 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P1 | B | supply-chain-security-reviewer | L30 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P1 | B | secure-migration-reviewer | L32 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | M | CodeQL | L33 | proper product/query-language name, not a prose abbreviation |
 | P1 | U | SARIF | L33 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P1 | U | SAST | L33 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
-| P1 | B | static-analysis-reviewer | L34 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P1 | B | error-handling-security-reviewer | L37 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | B | <base> | L43 | self-describing template placeholder/operator, not a prose abbreviation |
 | P1 | B | <branch> | L43 | self-describing template placeholder/operator, not a prose abbreviation |
 | P1 | B | <n> | L43 | self-describing template placeholder/operator, not a prose abbreviation |
 | P1 | B | gh pr diff <n> | L43 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P1 | B | git diff | L43 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | B | git diff <base>...<branch> | L43 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P1 | B | git diff | L44 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | B | git diff --staged | L44 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | B | → | L44 | typographic operator/unit, not an abbreviation |
 | P1 | U | DB | L61 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
@@ -235,7 +237,6 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P1 | F | HIGH | L77 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P1 | B | <PR/branch/diff id> | L88 | self-describing template placeholder/operator, not a prose abbreviation |
 | P1 | B | <ref> | L88 | self-describing template placeholder/operator, not a prose abbreviation |
-| P1 | U | N | L88 | single uppercase letter/heading token, not an abbreviation |
 | P1 | U | REVIEW | L88 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P1 | U | SECURITY | L88 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P1 | B | <command> | L89 | self-describing template placeholder/operator, not a prose abbreviation |
@@ -256,7 +257,6 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P1 | U | HIGH/CRITICAL | L117 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P1 | B | claude-skills-master-generation-prompts-v4.md | L118 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | L | docs | L118 | file path/plural shorthand in prose/path context, not a B2 abbreviation |
-| P1 | U | A | L122 | single uppercase letter/heading token, not an abbreviation |
 | P1 | B | human-approval-boundary | L125 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | B | appsec-implementer | L127 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P1 | U | THIS | L135 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -278,6 +278,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P2 | U | JSON | L6 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P2 | U | JWT | L6 | defined at first use - L6 |
 | P2 | U | UI | L6 | defined at first use - L6 |
+| P2 | U | A | L7 | single uppercase letter/heading token, not an abbreviation |
 | P2 | U | API | L7 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P2 | U | REST | L7 | defined at first use - L7 |
 | P2 | U | RPC | L7 | defined at first use - L7 |
@@ -311,18 +312,19 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P2 | B | → | L62 | typographic operator/unit, not an abbreviation |
 | P2 | B | <what would confirm it> | L63 | self-describing template placeholder/operator, not a prose abbreviation |
 | P2 | U | FAIL | L67 | ordinary all-caps emphasis word or verb, not a status/lifecycle code |
-| P2 | U | A | L69 | single uppercase letter/heading token, not an abbreviation |
 | P2 | U | DB | L73 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P2 | B | secure-migration-reviewer | L73 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P2 | B | rls-policy-auditor | L74 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P2 | B | supply-chain-security-reviewer | L75 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P2 | B | static-analysis-reviewer | L76 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P2 | B | appsec-implementer | L77 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P3 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
 | P3 | U | AGGREGATES | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | CATEGORIES | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | CLI | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P3 | U | GAP | L3 | ordinary all-caps emphasis word or verb, not a status/lifecycle code |
 | P3 | M | IaC | L3 | proper name, filename or plain compound identifier, not a prose abbreviation |
+| P3 | U | N | L3 | single uppercase letter/heading token, not an abbreviation |
 | P3 | U | NEVER | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | NOT | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | ONE | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -332,27 +334,25 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P3 | U | SCA | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P3 | U | TRIAGE | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | L | config | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P3 | B | dast-safety-harness-designer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | L | repo | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P3 | B | sast-orchestration-designer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P3 | B | static-analysis-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P3 | B | supply-chain-security-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | U | CVE | L10 | defined at first use - L10 |
 | P3 | U | CI | L11 | defined at first use - L11 |
 | P3 | U | PR | L11 | defined at first use - L11 |
 | P3 | U | TP/FP | L12 | abbreviation used before expansion on this page |
 | P3 | F | CRIT | L13 | defined at first use - L13 |
 | P3 | F | MED | L13 | defined at first use - L13 |
-| P3 | U | A | L14 | single uppercase letter/heading token, not an abbreviation |
 | P3 | U | WHOLE-REPO | L20 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | JUDGMENT | L30 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P3 | B | static-analysis-reviewer | L31 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P3 | B | supply-chain-security-reviewer | L32 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | U | PRODUCES | L33 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | L | dedup | L41 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
-| P3 | U | N | L43 | single uppercase letter/heading token, not an abbreviation |
 | P3 | U | MEANS | L52 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | RUN | L54 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | U | HOW | L55 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P3 | B | sast-orchestration-designer | L57 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | U | DYNAMIC | L59 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P3 | B | dast-safety-harness-designer | L60 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | B | ci-pipeline-architect | L63 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | U | THIS | L70 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P3 | L | id | L95 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
@@ -388,6 +388,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P3 | B | evals/trigger-evals.json | L196 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | B | trigger-evals.json | L196 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P3 | B | references/ | L201 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P4 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
 | P4 | U | AI | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P4 | U | BEFORE | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P4 | U | LLM | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
@@ -395,16 +396,16 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P4 | U | NOT | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P4 | U | OWASP | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P4 | U | PII | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P4 | B | ai-governance-risk-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P4 | B | hidden-context-exposure-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P4 | B | llm-output-safety-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P4 | B | rag-security-architect | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P4 | B | secrets-identity-hardener | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P4 | B | tenant-isolation-reviewer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P4 | U | INTO | L12 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P4 | U | BACK | L13 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P4 | B | tenant-isolation-reviewer | L17 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P4 | B | secrets-identity-hardener | L18 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P4 | U | WHICH | L28 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P4 | U | WHO | L28 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P4 | B | rag-security-architect | L29 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P4 | B | llm-output-safety-reviewer | L30 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P4 | B | hidden-context-exposure-reviewer | L32 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P4 | B | ai-governance-risk-reviewer | L33 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P4 | B | → | L56 | typographic operator/unit, not an abbreviation |
 | P4 | B | disclosure-controls.md | L62 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P4 | B | observability-operator | L73 | inline code, command, path or proper skill identifier, not a prose abbreviation |
@@ -425,7 +426,6 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P4 | B | SEV | L94 | self-describing severity placeholder in output format, not a prose abbreviation |
 | P4 | B | <canary / cross-user / echo cases> | L95 | self-describing template placeholder/operator, not a prose abbreviation |
 | P4 | B | <areas + why> | L96 | self-describing template placeholder/operator, not a prose abbreviation |
-| P4 | U | A | L105 | single uppercase letter/heading token, not an abbreviation |
 | P4 | B | human-approval-boundary | L150 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P4 | B | incident-response-runbook | L154 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P4 | B | evals.json | L162 | inline code, command, path or proper skill identifier, not a prose abbreviation |
@@ -434,8 +434,10 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P4 | B | trigger-evals.json | L163 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P5 | U | SKILL | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P5 | M | SKILL.md | L3 | proper name, filename or plain compound identifier, not a prose abbreviation |
+| P5 | U | A | L4 | single uppercase letter/heading token, not an abbreviation |
 | P5 | U | LLM02 | L4 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P5 | U | OWASP | L4 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P5 | U | B | L5 | single uppercase letter/heading token, not an abbreviation |
 | P5 | U | BACK | L5 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P5 | U | ID | L5 | ordinary identifier noun in prose, not a coded abbreviation |
 | P5 | U | INTO | L5 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -460,40 +462,39 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P5 | B | ai-governance-risk-reviewer | L69 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P5 | U | MECHANISM | L70 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P5 | U | NEVER | L74 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P5 | U | A | L76 | single uppercase letter/heading token, not an abbreviation |
-| P5 | U | B | L76 | single uppercase letter/heading token, not an abbreviation |
+| P6 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
 | P6 | U | FAILURES | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | NOT | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | ONE | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | ONLY | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
+| P6 | B | ci-pipeline-architect | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P6 | B | flaky-test-detective | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P6 | B | local-ci-mirror-preflight | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P6 | B | risk-tiered-validation-selector | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | L | spec | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P6 | B | uncategorized | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P6 | B | running | L12 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | B | L14 | single uppercase letter/heading token, not an abbreviation |
+| P6 | B | interrupted | L16 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | FAILURE | L17 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | CI | L18 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P6 | L | preflight | L20 | proper skill/phase reference, not a prose abbreviation |
 | P6 | L | repo | L20 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P6 | B | ci-failure-classifier | L27 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | WHICH | L35 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P6 | B | risk-tiered-validation-selector | L36 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P6 | B | local-ci-mirror-preflight | L39 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P6 | B | ci-pipeline-architect | L42 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P6 | B | flaky-test-detective | L45 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P6 | B | platform | L61 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | NAMED | L71 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | B | api-integration | L72 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | B | core-domain | L72 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P6 | B | platform | L72 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | B | ui-e2e | L72 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | EXACTLY | L74 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P6 | B | uncategorized | L76 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | EMPTY | L77 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | AND | L78 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | B | shard-runner-design.md | L82 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P6 | B | running | L83 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P6 | B | pending | L83 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P6 | B | failed | L84 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P6 | B | passed | L84 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | M | -Resume | L87 | proper name, filename or plain compound identifier, not a prose abbreviation |
-| P6 | B | passed | L88 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P6 | B | interrupted | L89 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P6 | B | pending | L89 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P6 | B | failed | L90 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P6 | U | NEW | L93 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | B | → | L94 | typographic operator/unit, not an abbreviation |
 | P6 | U | SOLE | L95 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -509,7 +510,6 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P6 | B | <spec + reference YAML → ci-pipeline-architect/human> | L120 | self-describing template placeholder/operator, not a prose abbreviation |
 | P6 | U | REAL | L147 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | U | SHA | L152 | defined at first use - L152 |
-| P6 | U | A | L162 | single uppercase letter/heading token, not an abbreviation |
 | P6 | U | FUNCTION | L163 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P6 | F | FAILED | L171 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P6 | B | .github/workflows/** | L182 | inline code, command, path or proper skill identifier, not a prose abbreviation |
@@ -522,64 +522,65 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P7 | U | CI | L5 | defined at first use - L5 |
 | P7 | U | JSON | L5 | defined at first use - L5 |
 | P7 | M | JavaScript | L5 | proper name, filename or plain compound identifier, not a prose abbreviation |
+| P7 | U | A | L6 | single uppercase letter/heading token, not an abbreviation |
 | P7 | U | API | L6 | defined at first use - L6 |
 | P7 | U | UI | L6 | defined at first use - L6 |
 | P7 | U | E2E | L7 | defined at first use - L7 |
 | P7 | U | SHA | L7 | defined at first use - L7 |
+| P7 | B | commit | L7 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | L | p95 | L7 | defined at first use - L7 |
 | P7 | B | sharded-validation-with-resume | L10 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | ci-pipeline-architect | L11 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | <commit-sha> | L20 | self-describing template placeholder/operator, not a prose abbreviation |
 | P7 | B | <timestamp> | L20 | self-describing template placeholder/operator, not a prose abbreviation |
 | P7 | B | <sha> | L21 | self-describing template placeholder/operator, not a prose abbreviation |
+| P7 | B | full | L22 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | duration_s | L24 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | passed | L24 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | tests_executed | L24 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | failed | L25 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | interrupted | L26 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | ui-e2e | L26 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | { "state": "interrupted", "duration_s": 1800, "tests_executed": 41, "failure_class": "timeout" } | L26 | self-describing template placeholder/operator, not a prose abbreviation |
+| P7 | B | pending | L27 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | platform | L27 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | { "state": "pending" } | L27 | self-describing template placeholder/operator, not a prose abbreviation |
 | P7 | U | ONLY | L28 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
+| P7 | B | uncategorized | L28 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | { "state": "passed", "tests_executed": 0, "policy": "empty-or-fail", "note": "0 matched = policy-pass ONLY because membership rules matched nothing" } | L28 | self-describing template placeholder/operator, not a prose abbreviation |
 | P7 | B | running | L35 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | state ∈ pending \| running \| passed \| failed \| interrupted | L35 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | failed | L36 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | failure_class ∈ assertions \| timeout \| infra | L36 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | interrupted | L38 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | tests_executed | L39 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | U | FAILURE | L40 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P7 | U | A | L42 | single uppercase letter/heading token, not an abbreviation |
-| P7 | B | commit | L42 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | M | -Resume <run_id> | L50 | proper name, filename or plain compound identifier, not a prose abbreviation |
 | P7 | B | <run_id> | L50 | self-describing template placeholder/operator, not a prose abbreviation |
 | P7 | U | NOT | L50 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P7 | B | passed | L50 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | pending | L50 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | M | -Shard <name> | L51 | proper name, filename or plain compound identifier, not a prose abbreviation |
 | P7 | B | <name> | L51 | self-describing template placeholder/operator, not a prose abbreviation |
 | P7 | B | interrupted/timeout | L58 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | risk-tiered-validation-selector | L67 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | { tier: ... } | L68 | self-describing template placeholder/operator, not a prose abbreviation |
 | P7 | U | CHECK | L74 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | U | REQUIRED | L74 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | U | STATUS | L74 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | U | THE | L74 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
+| P7 | B | validation-gate | L74 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P7 | B | if: always() | L76 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | U | SKIPPED | L80 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | B | → | L80 | typographic operator/unit, not an abbreviation |
 | P7 | U | FAILS | L82 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | B | ≠ | L82 | typographic operator/unit, not an abbreviation |
 | P7 | U | ONE | L85 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P7 | B | validation-gate | L86 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | if: always() | L88 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | duration_s | L94 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | ≈ | L96 | typographic operator/unit, not an abbreviation |
 | P7 | U | FUNCTION | L98 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | L | api | L98 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P7 | B | misc | L99 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | uncategorized | L99 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | % | L101 | typographic operator/unit, not an abbreviation |
 | P7 | B | × | L102 | typographic operator/unit, not an abbreviation |
 | P7 | B | ab12cd3 | L106 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | full | L106 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | interrupted (timeout @1800s) | L107 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | passed (0 matched) | L109 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | M | -Resume ab12cd3-… | L110 | proper name, filename or plain compound identifier, not a prose abbreviation |
-| P7 | B | platform | L110 | inline code, command, path or proper skill identifier, not a prose abbreviation |
-| P7 | B | ui-e2e | L110 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | U | OVER | L112 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P7 | B | failed (assertions: 2) | L112 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | M | -Shard ui-e2e | L113 | proper name, filename or plain compound identifier, not a prose abbreviation |
@@ -587,8 +588,8 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P7 | U | PR | L117 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P7 | B | local-ci-mirror-preflight | L123 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | U | IS | L126 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P7 | B | risk-tiered-validation-selector | L126 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P7 | B | flaky-test-detective | L129 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P8 | U | A | L3 | single uppercase letter/heading token, not an abbreviation |
 | P8 | U | API | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P8 | U | CAPABILITY | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P8 | U | MEMBER | L3 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -596,19 +597,18 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P8 | U | OTP | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P8 | U | RBAC | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P8 | M | SaaS | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
+| P8 | B | api-event-architect | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
+| P8 | B | authorization-matrix-designer | L3 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P8 | L | spec | L3 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P8 | B | × | L3 | typographic operator/unit, not an abbreviation |
 | P8 | U | PII | L9 | defined at first use - L9 |
 | P8 | U | CSPRNG | L10 | defined at first use - L10 |
 | P8 | U | IP | L10 | defined at first use - L10 |
-| P8 | U | A | L11 | single uppercase letter/heading token, not an abbreviation |
 | P8 | U | TOKEN | L33 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P8 | U | SESSION | L35 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P8 | L | ids | L37 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
-| P8 | B | authorization-matrix-designer | L40 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P8 | B | → | L41 | typographic operator/unit, not an abbreviation |
 | P8 | U | MACHINE | L43 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
-| P8 | B | api-event-architect | L44 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P8 | L | id | L68 | acronym/coded identifier, lifecycle/status code or technical shorthand used before any expansion on this page |
 | P8 | U | ONE | L73 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P8 | U | IS | L93 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
@@ -618,8 +618,15 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P8 | U | ACCESS | L120 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P8 | U | DESIGN | L120 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
 | P8 | U | SHARE-LINK | L120 | ordinary all-caps emphasis word, keyword, heading or proper name, not an abbreviation |
+| P8 | B | <opaque, high-entropy source; no embedded scope/claims \| vetted signed+scoped; expiry default + max lifetime; revocation immediate, checked every use> | L121-122 | self-describing template placeholder/operator, not a prose abbreviation |
+| P8 | B | <verified token → one resource(set) + one permission; server-side verifier/fingerprint, no plaintext token storage or client-supplied scope; no view→edit escalation> | L123-125 | self-describing template placeholder/operator, not a prose abbreviation |
+| P8 | B | <ephemeral, link-scoped; NOT a membership/role; recheck link expiry/revocation/scope on every request> | L126-127 | self-describing template placeholder/operator, not a prose abbreviation |
+| P8 | B | <password/one-time passcode (OTP); rate-limited; lockout on brute force> | L128-129 | self-describing template placeholder/operator, not a prose abbreviation |
+| P8 | B | <entropy, per-token+IP-address rate limit, uniform invalid/expired/revoked response, creation cap> | L130-131 | self-describing template placeholder/operator, not a prose abbreviation |
 | P8 | B | <link exposes exactly the resource; no sibling/tenant reach> | L132 | self-describing template placeholder/operator, not a prose abbreviation |
+| P8 | B | <creation / access by non-secret link id or keyed fingerprint / gate attempts / revocation → audit-log schema; never raw token> | L133-134 | self-describing template placeholder/operator, not a prose abbreviation |
 | P8 | B | <each with risk-if-wrong / who answers> | L135 | self-describing template placeholder/operator, not a prose abbreviation |
+| P8 | B | <terms; why now; options with money, setup/maintenance costs, pros and cons, why each exists; unknowns labeled; recommendation and why it fits; one owner question> | L136-138 | self-describing template placeholder/operator, not a prose abbreviation |
 | P8 | U | UI | L146 | defined at first use - L146 |
 | P8 | B | human-approval-boundary | L203 | inline code, command, path or proper skill identifier, not a prose abbreviation |
 | P8 | B | pii-lifecycle-designer | L203 | inline code, command, path or proper skill identifier, not a prose abbreviation |
@@ -640,10 +647,10 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | P5 | 30 | 19 | 1 | 2 | 8 | 0 | 1 | 4 | 25 |
 | P6 | 55 | 22 | 1 | 4 | 27 | 1 | 1 | 6 | 48 |
 | P7 | 72 | 22 | 6 | 3 | 41 | 0 | 7 | 2 | 63 |
-| P8 | 39 | 20 | 1 | 3 | 15 | 0 | 5 | 7 | 27 |
-| **Total** | **428** | **180** | **20** | **21** | **195** | **12** | **35** | **63** | **330** |
+| P8 | 46 | 20 | 1 | 3 | 22 | 0 | 5 | 7 | 34 |
+| **Total** | **435** | **180** | **20** | **21** | **202** | **12** | **35** | **63** | **337** |
 
-**Zero-duplicate proof.** The final table has **428 data rows** and **428 unique (page, first-use line, token) keys**; duplicate keys = **0**; extra rows = **0**. Disposition sums equal the row count: **63 named gaps + 35 defined at first use + 330 documented exclusions = 428**. Class sums equal the row count: **180 U + 20 M + 21 L + 195 B + 12 F = 428**. Page sums equal the row count: **70 + 48 + 70 + 44 + 30 + 55 + 72 + 39 = 428**.
+**Zero-duplicate proof.** The final table has **435 data rows** and **435 unique (page, first-use line, token) keys**; duplicate keys = **0**; extra rows = **0**. Disposition sums equal the row count: **63 named gaps + 35 defined at first use + 337 documented exclusions = 435**. Class sums equal the row count: **180 U + 20 M + 21 L + 202 B + 12 F = 435**. Page sums equal the row count: **70 + 48 + 70 + 44 + 30 + 55 + 72 + 46 = 435**.
 
 **Reconciliation and completeness.** The count table above was recomputed from the final inventory table; the eight per-page sums, the five class sums and the three disposition sums all equal the row count and no duplicate normalized key exists. The named-gap rows are exactly the gaps cited in section 5; the defined-at-first-use rows carry their definition line; every documented exclusion carries its one-line reason. No fabricated, placeholder, numeric-only or grouped row was added; every row resolves to the stated pinned page line. This is the ONE reconciliation/proof section after the inventory.
 
@@ -653,11 +660,11 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 
 **Keeper exclusion.** No page is keeper-eligible on this record: canonical B6 requires a read-only review by someone who did not write the page and this record cannot establish that condition. The record authors no acceptance row, no keeper row, no ledger edit and no index edit, and does not mark any page FULL for a later keeper to consume. Keeper recording remains a separate later act.
 
-**Continuation.** Lane A is complete 0-143; merged lane-B evidence covers **144-199 and 208-215 and 216-223 and 224-231**; reservations are #833 200-207, #837 232-239, #838 240-247, #839 248-255; this record covers **256-263**. The next page after the block is **264**; later stages re-derive the pending set at their own base. No page, plan, keeper or index change is made by this record.
+**Continuation.** Lane A is complete 0-143; at current live main 6f584c9d merged lane-B evidence covers **144-199 and 200-207 and 208-215 and 216-223 and 224-231**; reservations are #837 232-239, #838 240-247, #839 248-255; this record covers **256-263**. The next page after the block is **264**; later stages re-derive the pending set at their own base. No page, plan, keeper or index change is made by this record.
 
 ## 8. Provenance, page authorship, zero drift and reader independence
 
-**Plan/derivation.** Plan 6248572986 (immutable, 13,469 B) + A addendum 6248606770 + B ACCEPT 6248639487; capture base e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f (#834 33rd), implementation base a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 (#835 35th) disclosed in section 1; pending 573; merged lane-B rows 144-199 + 208-215 + 216-223 + 224-231; reservations 200-255; block 256-263; batch 19; next unread 264; record path absent at base.
+**Plan/derivation.** Plan 6248572986 (immutable, 13,469 B) + A addendum 6248606770 + B ACCEPT 6248639487; capture base e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f (#834 33rd), PR implementation base a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3 (#835 35th), current live main 6f584c9dd187b84e3175472906fe7553a2c1bc97 (#833 36th) disclosed in section 1; pending 573; merged lane-B rows at live main 144-199 + 200-207 + 208-215 + 216-223 + 224-231; block 256-263; batch 19; next unread 264; record path absent at base.
 
 **Author metadata only - not B6 evidence.** Last-touching git author/date is recorded for provenance but cannot prove non-authorship or an independent read-only review; canonical B6 is unverified for all eight pages.
 
@@ -673,7 +680,7 @@ Each page was opened whole at its pinned blob and read line by line. The named B
 | --- | --- | --- |
 | AC1 one-path tree proof | MET | exactly one added batch-19 record path at a06360d4f3e1d5d746ec19b2a4f9bb897d5d41f3; no other added/modified/deleted path; no plan file |
 | AC2 frozen eight-page set by blob | MET | eight pages 256-263 with 40-hex blobs, bytes/LF, totals 70,477/1,241; zero drift; no keeper; no page outside set |
-| AC3 whole-page + five-class exact-once inventory | MET in this record | section 5 whole-page B1-B6; section 6 ONE contiguous 428-row table, 428 unique keys, zero duplicates, one reconciliation/proof, real first-use lines, no fabricated/placeholder/numeric/grouped rows |
+| AC3 whole-page + five-class exact-once inventory | MET in this record | section 5 whole-page B1-B6; section 6 ONE contiguous 435-row table, 435 unique keys, zero duplicates, one reconciliation/proof, real first-use lines, no fabricated/placeholder/numeric/grouped rows |
 | AC4 honest per-page disposition | MET in this record | 0 FULL / 8 PARTIAL / 0 UNRUN; B6 unverified; named B2 gaps listed; no keeper/acceptance row |
 | AC5 record/body/PROC + provenance | MET in handoff | record facts outside the record; live-body PROC-04 published==recomputed; body bound-field checker 0; Stage C self-authored rows/per-row Row sources/six fields in body; stage accounts not fabricated |
 | AC6 Codex loop | recorded in handoff | exact-head Codex trigger/triage recorded by the Stage C handoff; Codex never a pass and MG3 head-bound only |
