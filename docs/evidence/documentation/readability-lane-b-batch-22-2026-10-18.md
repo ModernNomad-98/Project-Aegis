@@ -190,13 +190,13 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P1 | 96 | v | `<field(s) carried>` | documented exclusion — self-describing placeholder, not an abbreviation |
 | P2 | 3 | v | `→` | documented exclusion — operator token, not an abbreviation |
 | P2 | 3 | iv | `agent-tool-safety-guard` | documented exclusion — inline code identifier, not a prose abbreviation |
-| P2 | 3 | i | `AI` | named gap — first use before any expansion on this page |
 | P2 | 3 | iv | `ai-misinformation-guard` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P2 | 3 | iv | `ai-router-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P2 | 3 | i | `AI` | named gap — first use before any expansion on this page |
 | P2 | 3 | ii | `authz` | named gap — first use before any expansion on this page |
 | P2 | 3 | i | `JSON` | named gap — first use before any expansion on this page |
-| P2 | 3 | i | `LLM` | named gap — first use before any expansion on this page |
 | P2 | 3 | iv | `llm-output-safety-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P2 | 3 | i | `LLM` | named gap — first use before any expansion on this page |
 | P2 | 9 | i | `XSS` | defined at first use — expansion/definition present on this page |
 | P2 | 24 | v | `≠` | documented exclusion — operator token, not an abbreviation |
 | P2 | 49 | iv | `JSON.parse` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
@@ -304,6 +304,8 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P6 | 148 | iv | `product-analytics-instrumenter` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 150 | v | `{feed-owner, read-scope, wired?}` | documented exclusion — placeholder/operator/unit token, not a prose abbreviation |
 | P6 | 151 | iv | `wired: false` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
+| P6 | 156 | v | `70%` | documented exclusion — unit token, not an abbreviation |
+| P6 | 156 | v | `85%` | documented exclusion — unit token, not an abbreviation |
 | P6 | 167 | iv | `rls-policy-auditor` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 167 | iv | `tenant-isolation-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P6 | 168 | iv | `multi-tenant-security-tester` | documented exclusion — inline code identifier, not a prose abbreviation |
@@ -364,6 +366,10 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 | P7 | 136 | iv | `synthetic-monitoring-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 136 | iv | `tenant-isolation-reviewer` | documented exclusion — inline code identifier, not a prose abbreviation |
 | P7 | 137 | iv | `plan-entitlement-architect` | documented exclusion — inline code identifier, not a prose abbreviation |
+| P7 | 162 | v | `70%` | documented exclusion — unit token, not an abbreviation |
+| P7 | 162 | v | `85%` | documented exclusion — unit token, not an abbreviation |
+| P7 | 164 | v | `90%` | documented exclusion — unit token, not an abbreviation |
+| P7 | 164 | v | `95%` | documented exclusion — unit token, not an abbreviation |
 | P7 | 217 | iv | `wired: false` | documented exclusion — inline code/path/command identifier, not a prose abbreviation |
 | P8 | 3 | i | `A2A` | defined at first use — expansion/definition present on this page |
 | P8 | 3 | i | `AI/ML` | defined at first use — expansion/definition present on this page |
@@ -446,9 +452,9 @@ All eight blobs resolve at pinned ref 2db1ffb7 and are byte-identical at main 6a
 
 ### 6.1 Reconciliation and independent cell-count proof (ONE proof section)
 
-**Counts from the FINAL table:** **279 data rows**; **279 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 24, P2: 32, P3: 22, P4: 22, P5: 12, P6: 53, P7: 36, P8: 78; classes: i: 60, ii: 11, iii: 10, iv: 113, v: 85; dispositions: defined at first use: 50, named gap: 27, documented exclusion: 202. All sums equal 279.
+**Counts from the FINAL table:** **285 data rows**; **285 unique (page, first-use line, token) keys**; **0 duplicate keys / 0 extra rows**; per-page: P1: 24, P2: 32, P3: 22, P4: 22, P5: 12, P6: 55, P7: 40, P8: 78; classes: i: 60, ii: 11, iii: 10, iv: 113, v: 91; dispositions: defined at first use: 50, named gap: 27, documented exclusion: 208. All sums equal 285.
 
-**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **279 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
+**Five-column parse proof:** hide escaped pipes `\|`, split each row on remaining Markdown delimiters, and require exactly five cells. The final table has **285 data rows and 0 bad rows**; a literal pipe would produce more than five cells. **Zero-duplicate proof:** unique-key count equals row count after stripping backticks and unescaping pipes; no inventory rows exist after this proof.
 
 ## 7. Dispositions, named gaps, keeper exclusion and continuation
 
@@ -470,11 +476,11 @@ Pages were read at pinned ref 2db1ffb7 from the tree rather than from plan text;
 
 ## 9. Stage C declaration, AC statuses and self-state
 
-Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, two DCO-signed model commits after repair (initial 7b52ce2e + this repair commit; exact repair SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
+Authored by **sd-c-read-b22-c1** / true identity sd-e-794-r1, branch from main 6afc845a, three DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + this repair-2 commit; exact repair-2 SHA in PR body/handoff) and exactly one added path; no merge. **AC statuses:**
 
 | AC | Status | Basis |
 | --- | --- | --- |
-| AC1 | MET in PR diff | one added record path vs 6afc845a; two DCO-signed model commits after repair (initial 7b52ce2e + this repair commit; exact repair SHA in PR body/handoff); no other tracked path |
+| AC1 | MET in PR diff | one added record path vs 6afc845a; three DCO-signed model commits after repair (initial 7b52ce2e + repair-1 377c2def + this repair-2 commit; exact repair-2 SHA in PR body/handoff); no other tracked path |
 | AC2 | MET | eight blobs/bytes/LF above; zero drift; pending/unread |
 | AC3 | MET in this record | whole-page B1-B6; ONE contiguous table; five-cell/zero-duplicate proof; no fabricated rows |
 | AC4 | MET | strict FULL bar; B6 verified via existing review; B2 gaps keep 0F/8P/0 UNRUN; no keeper |
