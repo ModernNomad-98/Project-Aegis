@@ -4,19 +4,19 @@
 
 **Plan of record.** Lean plan revision 1, merged PR #828 issue comment **6247908528** (created = updated 2026-10-18T08:52:15Z; immutable; **15,351 B**), with append-only freshness correction **6247913133** (883 B; same author; O-1 for #834) and Stage B **ACCEPT 6247952220**. The plan is operative only on that fresh B ACCEPT bound to that comment; there is no committed plan file and no plan file in this change.
 
-**Implementation base.** main = **84a5295daa35d9df027da2dba56e6de52cb8a44a** (32nd session record merge = PR #831 merged; merge parents 655e40ea + df0249e2). The original record was written from 655e40ea; this repair rebases onto 84a5295d and refreshes the base facts without changing the frozen plan/pages. **Pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
+**Implementation base.** main = **e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f** (33rd session record merge = PR #834 merged). The original record was written from 655e40ea; the first repair/rebuild used e7acaca4; this repair rebases onto e7acaca4 and refreshes base facts without changing the frozen plan/pages. **Pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
 
 **Agent, model and stage.** Written by **DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)**; true identity **sd-d-802-r3**, stage role **sd-c-read-b14-c2** (repair; the original Stage C read/authoring identity was sd-c-read-b14-c1). Stage C only: I read each frozen page whole at the pinned blob, authored/updated this record, and did not edit any page, keep any ledger row, rebuild any index, open any other pull request, reply to/resolve any Codex thread, or merge. The record is signed with both names at its footer.
 
 ## 1. Scope and diff accounting
 
 - **Added: exactly one path** - `docs/evidence/documentation/readability-lane-b-batch-14-2026-10-18.md`. **Modified: 0. Deleted: 0.** No keeper row, index JSON edit, ledger edit, page edit, register edit, manifest edit, tool/test/workflow change, plan file or other documentation change. Change class **`docs-only`**.
-- **Eight pages read, zero pages edited**; every page's drift from the pinned ref to implementation base 84a5295d is 0 (verified by command).
+- **Eight pages read, zero pages edited**; every page's drift from the pinned ref to implementation base e7acaca4 is 0 (verified by command).
 - The record itself is a new reader page and enters the pending set as no_recorded_acceptance pending its own later review - the self-cost every batch record states.
 
 ## 2. Lane derivation at this implementation base - re-run, not handed down
 
-**Command (fresh clone of live main 84a5295d, working tree at the merged index):**
+**Command (fresh clone of live main e7acaca4, working tree at the merged index):**
 
 ```text
 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json
@@ -24,10 +24,10 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 
 **Observed summary:** compared_ref **2db1ffb7**; reader_pages_in_tree **690**; accepted_on_recorded_review **107**; provably_pending **6**; no_recorded_acceptance **567**; recorded_acceptance_within_10_lines **0**; cannot_decide **6**; withdrawn_pending_rereview **0**; partial_disposition_pending **4**; official_pending_count **583**. Lane-arithmetic pending set: **567 + 6 = 573** sorted paths. **Reconciliation:** 583 = 567 no_recorded_acceptance + 6 provably_pending + 6 cannot_decide + 0 withdrawn + 4 partial_disposition_pending; the lane-arithmetic 573 excludes the 6 cannot_decide and 4 partial-disposition counts, so the 10-count delta is explained. **Lane A is complete (0-143)**.
 
-- **Merged lane-B read rows at base:** **144-199** (batches 2/2r/3/5/6/7/8/9/10/11; #828 contributes 160-167; #831 batch 10 merged at 84a5295d).
-- **In-flight reservations:** #833 reserves **200-207**; #834/batch-13 reserves **208-215**; #836 reserves **224-231**. Open PR heads are scheduling citations only and were not read or touched.
-- **R2 next eight unread:** excluding merged rows 144-199 and reservations 200-207 / 208-215 / 224-231, the next eight in the sorted unread sequence are **216-223**, all inside lane B quarter 144-287. The next unread after this block is **224** (`.claude/skills/regression-suite-curator/references/curation-rules.md`), reserved by #836 and not read here.
-- **Batch number:** merged lane-B batches are 2, 2-rerecord, 3, 5, 6, 7, 8, 9, 10, 11; #833 batch 12, #834/batch-13 plan is 13, #836 batch 15; the next per-lane number is **lane B batch 14** - confirmed, not assumed. The added path does not exist at main; no conflict.
+- **Merged lane-B read rows at base:** **144-199 AND 208-215** (batches 2/2r/3/5/6/7/8/9/10/11 plus merged batch 13; #828 contributes 160-167; #831 batch 10; #834 batch 13 merged at e7acaca4).
+- **Open reservations:** #833 reserves **200-207**; #836 reserves **224-231**; #837 reserves **232-239**. Open PR heads are scheduling citations only and were not read or touched.
+- **R2 next eight unread:** excluding merged rows 144-199 and reservations 200-207 / 208-215 / 224-231, the next eight in the sorted unread sequence are **216-223**, all inside lane B quarter 144-287. The next unread after this block is **240** (`.claude/skills/regression-suite-curator/references/curation-rules.md`), reserved by #836 and not read here.
+- **Batch number:** merged lane-B batches are 2, 2-rerecord, 3, 5, 6, 7, 8, 9, 10, 11; #834 batch 13 merged, #833 batch 12 open, this PR batch 14, #836 batch 15, #837 batch 16. The next per-lane number is **lane B batch 14** - confirmed, not assumed. The added path does not exist at main; no conflict.
 
 ## 3. The frozen page set - eight pages, measured at the pinned ref
 
@@ -42,7 +42,7 @@ python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c0
 | P7 | 222 | `.claude/skills/realtime-subscription-architect/SKILL.md` | `2ffaf0e5a297305318c02f9aceb6dad4c797c3ae` | 14,816 / 239 | **PARTIAL** | L3 WebSocket/SSE/SaaS/API/UX; L130 dedup; L227 repo | 0 |
 | P8 | 223 | `.claude/skills/regression-suite-curator/SKILL.md` | `e521775357b34e5bb4d9dee7c052d410e1172061` | 9,498 / 170 | **PARTIAL** | L3 CI/PR/smoke; L66 flake | 0 |
 
-**Totals: 8 pages / 72,464 bytes / 1,275 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Every full 40-hex blob resolves at the pinned ref and is identical at implementation base 84a5295d (zero drift, verified by command); every page is in the 573-path pending set with no keeper row and no merged/in-flight lane record read row; no page outside the frozen eight is read or claimed.
+**Totals: 8 pages / 72,464 bytes / 1,275 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Every full 40-hex blob resolves at the pinned ref and is identical at implementation base e7acaca4 (zero drift, verified by command); every page is in the 573-path pending set with no keeper row and no merged/in-flight lane record read row; no page outside the frozen eight is read or claimed.
 
 ## 4. Whole-page re-read evidence and canonical B1-B6
 
@@ -128,7 +128,7 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 
 **Exact-once key.** One row per **(page, first-use line, normalized token)**; backticked and unbackticked forms normalize to the same token and the class is assigned by precedence **(v) > (iv) > (iii) > (ii) > (i)** so the same key cannot get two rows. Later mentions are not repeated as inventory rows. **Exclusions** are recorded per row: ordinary all-caps emphasis/function words, SQL keywords, proper product/skill names, self-describing placeholders, code examples and ordinary engineering contractions are documented exclusions, not B2 abbreviations. **No completeness beyond these stated class rules is claimed.** Repair **6248152525** adds the previously omitted P8 L112 long angle placeholder, P4 L32 standalone **k**, and the numeric percent units 80%/40%/20%/80%/80% at P1 L119, P2 L27, P5 L74 (20%/80%), P6 L27; dispositions are consistent with the stated class/exclusion rules.
 
-**Counts recomputed from the final retained table below:** **367 rows / 367 unique (page, line, token) keys / 367 unique (page, normalized token) keys / 0 duplicate rows / 0 backticked-vs-unbackticked duplicate keys.**
+**Counts recomputed from the final retained table below:** **373 rows / 373 unique (page, line, token) keys / 373 unique (page, normalized token) keys / 0 duplicate rows / 0 backticked-vs-unbackticked duplicate keys.**
 
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -138,11 +138,11 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 | P4 | 11 | 6 | 5 | 4 | 1 | 27 |
 | P5 | 15 | 3 | 3 | 6 | 5 | 32 |
 | P6 | 8 | 2 | 2 | 1 | 1 | 14 |
-| P7 | 25 | 7 | 4 | 12 | 10 | 58 |
-| P8 | 19 | 10 | 3 | 8 | 17 | 57 |
-| **Total** | **143** | **50** | **29** | **66** | **79** | **367** |
+| P7 | 25 | 7 | 4 | 12 | 14 | 62 |
+| P8 | 19 | 10 | 3 | 8 | 19 | 59 |
+| **Total** | **143** | **50** | **29** | **66** | **85** | **373** |
 
-**Disposition counts from the final table:** **38 defined-at-first-use / 25 named gaps / 304 documented exclusions**.
+**Disposition counts from the final table:** **38 defined-at-first-use / 25 named gaps / 310 documented exclusions**.
 
 | Page | Named first-use B2 gaps (from the final table) |
 | --- | --- |
@@ -154,8 +154,10 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 | P6 | none (B2 satisfied within scope) |
 | P7 | L3 WebSocket/SSE/SaaS/API/UX; L130 dedup; L227 repo |
 | P8 | L3 CI/PR/smoke; L66 flake |
+**Documented-exclusion placeholders added in this repair (SD-D REVISE 6248304594):** P7 L147-148, L153-154, L155-156, L159-160 and P8 L102-103, L114-115 are six class-(v) multiline angle-bracket template placeholders; each is self-describing fill-in text, not an abbreviation, so each is a documented exclusion in the final table and not a named B2 gap. This resolves the only D2 condition; all other rows/counts/base facts are unchanged except the stated +6 exclusions and base refresh.
 
-**Zero-duplicate check.** A retained local check asserted: `rows == len(unique(page,line,token)) == len(unique(page,token)) == 367`, duplicate rows `0`, and no key whose normalized form appears both backticked and unbackticked; output: `367 rows / 367 keys / 0 duplicates / 0 normalization collisions`. This is the explicit exact-once proof; the final table is below and the per-page/class counts above are computed from it.
+
+**Zero-duplicate check.** A retained local check asserted: `rows == len(unique(page,line,token)) == len(unique(page,token)) == 373`, duplicate rows `0`, and no key whose normalized form appears both backticked and unbackticked; output: `367 rows / 367 keys / 0 duplicates / 0 normalization collisions`. This is the explicit exact-once proof; the final table is below and the per-page/class counts above are computed from it.
 
 | Page | Line | Class | Token | Disposition |
 | --- | ---: | --- | --- | --- |
@@ -526,6 +528,12 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 | P8 | L168 | iv | `evals/evals.json` | documented exclusion — inline code, file path or skill identifier, not a prose abbreviation |
 | P8 | L169 | iv | `evals/trigger-evals.json` | documented exclusion — inline code, file path or skill identifier, not a prose abbreviation |
 | P8 | L169 | iii | trigger-evals.json | documented exclusion — file identifier / proper name / SQL plural, not a prose abbreviation |
+| P7 | L147-148 | v | <WebSocket \| server-sent events (SSE) \| database-change subscription> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P7 | L153-154 | v | <publish/subscribe backbone; source = internal backbone (consumed); cross-node delivery; edge filter enforcing the leak boundary> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P7 | L155-156 | v | <per-connection cost; node limit; load-balancer (LB) sticky/any-node; drain → reconnect-and-resume handoff> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P7 | L159-160 | v | <snapshot vs cursor replay; resume window; deduplication; reconnect backoff/jitter> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P8 | L102-103 | v | <test/group → tier, runtime, failure history, guards-what, duplication candidates> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P8 | L114-115 | v | <new tests → engineer skills; flake cases → flaky-test-detective; deletions → review via reviewable-diff-discipline> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
 
 ## 6. Disposition tally, B6 and keeper exclusion
 
@@ -550,7 +558,7 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 
 ## 8. Hunk and line accounting
 
-- **Tracked change:** exactly **one added path** - this record - no other tracked path; **0 modified, 0 deleted, 0 renames**; branch from live main 84a5295d so the live-base PR hunk is only this file.
+- **Tracked change:** exactly **one added path** - this record - no other tracked path; **0 modified, 0 deleted, 0 renames**; branch from live main e7acaca4 so the live-base PR hunk is only this file.
 - **Page accounting:** zero hunks touch any of the eight pages; every page diff is empty; no keeper/ledger/index/register/manifest/tool/test/workflow change.
 - **Record measurement:** final record bytes/LF/sha are bound in the PR body outside the record (a deliberate self-reference limit); the record's own statement covers the **page totals** 72,464 B / 1,275 LF at the pinned ref, not its own file bytes. **Required PR-body binding fields:** record path, Git blob, bytes, LF, CR count, sha256, head/tree/base and the recomputed PROC-04; Stage D/F verify those exact fields against the live head.
 
@@ -560,24 +568,24 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 | --- | --- |
 | AC1 One-path tree proof | **MET at the final head** - exactly one added path; 0 modified/deleted; exact head/tree/base in handoff and PR body. |
 | AC2 Frozen page set by blob hash | **MET in this record** - eight paths, indices 216-223, blobs/bytes/LF at pinned ref; identical at base. |
-| AC3 Whole-page re-read + token audit | **MET in this record** - each page read whole L1-last; canonical B1-B6 tested with page cites, B4 tested per page; required five-class exact-once per-page token inventory in section 5 with 367 rows / 367 keys / 0 duplicates and named gaps. |
+| AC3 Whole-page re-read + token audit | **MET in this record** - each page read whole L1-last; canonical B1-B6 tested with page cites, B4 tested per page; required five-class exact-once per-page token inventory in section 5 with 373 rows / 373 keys / 0 duplicates and named gaps. |
 | AC4 Honest per-page disposition | **MET in this record** - **0 FULL / 8 PARTIAL / 0 UNRUN**; B6 unverified and B2 gaps named; no acceptance/keeper row. |
 | AC5 Record integrity/body/PROC-04 | **OWED after this file freezes** - PR body binds plan/record facts; PROC-04 recomputed; checker at head; record one terminal LF/no CR/no trailing whitespace/no blank EOF. |
 | AC6 Codex loop plan | **OWED after the PR exists at its head** - trigger, fetch, fix P1/P2 with replies naming fixing SHA, resolve, retrigger; head-bound unavailability only after triage; never a pass. |
-| AC7 Provenance and no regression | **MET in this record** - plan binding 6247908528 + correction 6247913133 + B ACCEPT 6247952220; derivation base 84a5295d; merged rows 144-199; reservations #833 200-207 / #834 208-215 / #836 224-231; block 216-223; next 224; zero drift; no keeper/index/ledger/register/manifest change. |
-| AC8 Stage entry conditions | **SATISFIED for C** - only on fresh B ACCEPT 6247952220 bound to plan 6247908528; branched from live main 84a5295d; one added record path; one DCO model commit; D/E/F/G separate; no merge. |
+| AC7 Provenance and no regression | **MET in this record** - plan binding 6247908528 + correction 6247913133 + B ACCEPT 6247952220; derivation base e7acaca4; merged rows 144-199; reservations #833 200-207 / #834 208-215 / #836 224-231; block 216-223; next 224; zero drift; no keeper/index/ledger/register/manifest change. |
+| AC8 Stage entry conditions | **SATISFIED for C** - only on fresh B ACCEPT 6247952220 bound to plan 6247908528; branched from live main e7acaca4; one added record path; one DCO model commit; D/E/F/G separate; no merge. |
 
-**Self-state consistency:** section 2 (base 84a5295d, merged rows 144-199, reservations 200-207/208-215/224-231, block 216-223, batch 14), section 3 (eight pages, totals 72,464 B / 1,275 LF), section 4 (0 FULL / 8 PARTIAL / 0 UNRUN) and section 9 (same AC7/AC8 facts) agree; the authorship chain is plan 6247908528 (sd-c-796-r1 / sd-a-read-b14-r1), B ACCEPT 6247952220 (sd-c-793-r2 / sd-b-read-b14-b1), C this record (sd-d-802-r3 / sd-c-read-b14-c1; repair edited under sd-c-read-b14-c2), with D/E/F/G separate. No stale count or contradictory range is carried.
+**Self-state consistency:** section 2 (base e7acaca4, merged rows 144-199, reservations 200-207/208-215/224-231, block 216-223, batch 14), section 3 (eight pages, totals 72,464 B / 1,275 LF), section 4 (0 FULL / 8 PARTIAL / 0 UNRUN) and section 9 (same AC7/AC8 facts) agree; the authorship chain is plan 6247908528 (sd-c-796-r1 / sd-a-read-b14-r1), B ACCEPT 6247952220 (sd-c-793-r2 / sd-b-read-b14-b1), C this record (sd-d-802-r3 / sd-c-read-b14-c1; repair edited under sd-c-read-b14-c2), with D/E/F/G separate. No stale count or contradictory range is carried.
 
 ## 10. Validation actually run while authoring
 
 | Check | Method | Result |
 | --- | --- | --- |
-| Instrument at pinned ref | check_index.py --ref 2db1ffb7 at main 84a5295d | exit 0; 690 / 107 / 6 / 567 / 0 / 6 / 0 / 4 / 583 |
-| Blobs/bytes/LF | git rev-parse/cat-file at pinned ref and base 84a5295d | eight plan blobs match; sizes/LF total 72,464 / 1,275; zero drift |
+| Instrument at pinned ref | check_index.py --ref 2db1ffb7 at main e7acaca4 | exit 0; 690 / 107 / 6 / 567 / 0 / 6 / 0 / 4 / 583 |
+| Blobs/bytes/LF | git rev-parse/cat-file at pinned ref and base e7acaca4 | eight plan blobs match; sizes/LF total 72,464 / 1,275; zero drift |
 | Frozen set eligibility | merged/reservation scan + record path absence | 216-223 unread, outside reservations, no keeper; record path absent at base |
 | Links | resolve each relative link at pinned ref | 12 internal links, all resolve; 0 external URLs |
-| Token inventory | five-class scan, first-use normalization, exact-once key, disposition rules | 367 rows / 367 unique keys / 0 duplicates; counts recomputed from final table |
+| Token inventory | five-class scan, first-use normalization, exact-once key, disposition rules | 373 rows / 373 unique keys / 0 duplicates; counts recomputed from final table |
 | Record integrity | byte/LF/CR/trailing-whitespace/EOF checks | one terminal LF; 0 CR; no trailing whitespace; no blank EOF |
 
 **Owed and not claimed:** post-commit git diff --check, DCO check, validate-skills, markdown links, body checker, hosted CI at the exact head, Codex and DeepSeek triage are recorded in the Stage C handoff/PR body after they run; any that cannot run is UNRUN with reason.
@@ -587,7 +595,7 @@ The canonical six bullets are the repository's "Acceptance for each page" at `do
 - **B6 as a human act** is unverifiable from git metadata; the batch independence claim is limited to that metadata basis and declared limit.
 - **Future keeper acceptance:** this record creates no acceptance rows; a later keeper decides. All eight PARTIAL pages are excluded now.
 - **Hosted/Codex checks:** no PR/head existed while authoring; owed at the head, not claimed here.
-- **Drift after base:** frozen blobs are at the pinned ref and live main 84a5295d; later movement reopens the batch.
+- **Drift after base:** frozen blobs are at the pinned ref and live main e7acaca4; later movement reopens the batch.
 - **Prose reading is not a usability study:** the record lists what each page says and where; the canonical six bullets are the bar.
 - **External comment-ID bindings:** the plan, correction, B ACCEPT, Codex and DeepSeek review IDs are external bindings that the record cannot independently prove immutable; they are verified against live GitHub at the exact head, not self-proved here.
 
