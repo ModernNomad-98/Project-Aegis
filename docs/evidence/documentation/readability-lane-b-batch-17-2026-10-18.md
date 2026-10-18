@@ -57,7 +57,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 
 **Canonical B1 satisfied** - the title, opening and purpose/use section state the page job and reader. **Canonical B2** - Named B2 gap: L54 IaC is used in the scan-scope line without any expansion on this page. Terms block L8-11 defines SAST (static application security testing), SCA (software composition analysis), CVE (Common Vulnerabilities and Exposures identifier), CI (continuous integration), PR (pull request), FP (false positive) and TP (true positive) at first use; the status word GAP, compound full-repo and placeholders are documented exclusions. **Canonical B3 satisfied** - L15 Purpose, L36 Use When, L65 Inputs, L80 Workflow, L113 Output Format, L132 Validation Checklist, L150 Gotchas, L169 Stop Conditions, L185 Supporting Files. **Canonical B4 satisfied** - the page is instructional/reference content; it makes no deployed or measured-result claim and does not present proposed or blocked behavior as shipped. **Canonical B5 satisfied** - the page navigation/reference links were inspected in the whole-page read; no broken reference was observed. **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: canonical B6 unverified.
+**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gap L54 IaC.
 
 ### P4 - .claude/skills/schema-evolution-planner/SKILL.md - read whole, L1-219
 
@@ -81,7 +81,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 
 **Canonical B1 satisfied** - the title, opening and purpose/use section state the page job and reader. **Canonical B2** - Named B2 gaps: L46 ADRs (first use before any expansion on this page), L100 IDs (entry IDs before expansion), L108 ID (grant ID before any identifier expansion) and L111 ISO (ISO timestamp without expansion). GRANT L107 is a lifecycle event label documented exclusion; L26 defines PR as pull request at first use; FORBIDDEN is a field label, append-only/one-time are plain compounds, the lifecycle status words are defined by the register protocol, and paths/skill names are documented exclusions. **Canonical B3 satisfied** - L8 Purpose, L24 Use When, L48 Inputs, L65 Workflow, L102 Output Format, L123 Validation Checklist, L141 Gotchas, L167 Stop Conditions, L184 Supporting Files. **Canonical B4 satisfied** - the page is instructional/reference content; it makes no deployed or measured-result claim and does not present proposed or blocked behavior as shipped. **Canonical B5 satisfied** - the page navigation/reference links were inspected in the whole-page read; no broken reference was observed. **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: canonical B6 unverified.
+**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gaps L46 ADRs, L100 IDs, L108 ID, L111 ISO.
 
 ### P7 - .claude/skills/scoped-approval-register/references/register-format.md - read whole, L1-136
 
@@ -89,7 +89,7 @@ Each page below was opened whole at its pinned blob and read line by line. The c
 
 **Canonical B1 satisfied** - the title, opening and purpose/use section state the page job and reader. **Canonical B2** - Named B2 gaps: L13 ISO (ISO timestamp without expansion), L22 ID (entry ID before any identifier expansion) and L56 IDs (unique record IDs without expansion). Concrete register IDs (APR-013/APR-014) and GRANT/ACTIVE/CONSUMED/REVOKED/EXPIRED/SUPERSEDED lifecycle labels are documented exclusions defined by the template/protocol; paths, placeholders and append-only are documented exclusions. **Canonical B3 satisfied** - L6 Immutable grant template, L27 Lifecycle event template, L54 Effective-status procedure, L91 Citation rule, L100 Persistence and placement, L117 Worked lifecycle, L128 Anti-patterns. **Canonical B4 satisfied** - the page is instructional/reference content; it makes no deployed or measured-result claim and does not present proposed or blocked behavior as shipped. **Canonical B5 satisfied** - the page navigation/reference links were inspected in the whole-page read; no broken reference was observed. **Canonical B6 UNVERIFIED** - no independent read-only reviewer who did not write the page has explained purpose/normal use from the page alone; git metadata cannot prove non-authorship.
 
-**Verdict: PARTIAL** - basis: canonical B6 unverified.
+**Verdict: PARTIAL** - basis: canonical B6 unverified, plus named B2 gaps L13 ISO, L22 ID, L56 IDs.
 
 ### P8 - .claude/skills/screenshot-evidence-planner/SKILL.md - read whole, L1-183
 
