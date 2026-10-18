@@ -217,20 +217,6 @@ PY
 **Unique/duplicate proof:** unique (page, token, first-use-line) keys **56** = inventory rows **56**; duplicate keys **0**; exactly one disposition per row. Five-class coverage: (a) uppercase any length, (b) lowercase technical shorthand, (c) mixed-case/plural, (d) backticked identifiers, (e) angle/brace placeholders/operators/units; every emitted candidate has exactly one row and one disposition.
 
 
-| Page | Rows | Named gaps | Defined at first use | Documented exclusions |
-| --- | ---: | ---: | ---: | ---: |
-| P1 | 9 | 0 | 4 | 5 |
-| P2 | 8 | 1 | 3 | 4 |
-| P3 | 8 | 0 | 2 | 6 |
-| P4 | 7 | 1 | 1 | 5 |
-| P5 | 6 | 1 | 1 | 4 |
-| P6 | 17 | 3 | 7 | 7 |
-| P7 | 9 | 3 | 3 | 3 |
-| P8 | 8 | 3 | 1 | 4 |
-| **Total** | **72** | **12** | **22** | **38** |
-
-**Unique/duplicate proof:** unique keys **64** = rows **72**; duplicate keys **8**; exactly one disposition per row. Five-class coverage: (a) uppercase any length, (b) lowercase technical shorthand, (c) mixed-case/plural, (d) backticked identifiers, (e) angle/brace placeholders/operators/units; every candidate emitted by the five-class script is represented once.
-
 **Bidirectional self-check (both directions).** The embedded script extracts and prints candidates; the dispositions above are applied **manually** against the stated classification rule (the script does not decide dispositions), and the inventory is the manual classification of its output; the final counts table above proves unique (page, token, first-use-line) keys, zero duplicate keys and exactly one disposition per row.
 - **Forward (inventory -> record):** every row above that is a **named gap** appears in that page's section-4 named-gap set and in its section-3 verdict; every **defined-at-first-use** row's definition line is the page line cited; every **documented exclusion** carries its one-line reason. No row was left unclassified; the classification was manual against the stated rule.
 - **Backward (record -> inventory):** every named gap in section 4 has a corresponding inventory row here; no named gap lacks a page line; no inventory row is silently reused for another page; the page lines were read in the pinned page text.
