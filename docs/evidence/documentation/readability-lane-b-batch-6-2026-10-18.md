@@ -4,15 +4,15 @@
 
 **Plan of record.** Lean plan **revision 2**, merged PR #825 issue comment **6245949982** (created = updated 2026-10-18T05:08:04Z; immutable; **15,213 B <= 15 KB**), with Stage B **ACCEPT 6245975350**. **Plan revision 1 (6245940383) is void as a plan artifact** - it was 16,195 B, over the lean-plan 15 KB limit, and its author declared it void immediately; it is retained only as immutable history. This record follows revision 2 literally. The plan is not a committed plan file and no plan file exists in this change.
 
-**Capture facts and in-flight delivery at this base.** The plan capture host is merged PR **#825** (batch-19 record merged 2026-10-18T05:02:29Z at main **cb1269c1cdff7b5735e32784bbbde282b84fea16**, the implementation base). **In-flight PR #826** (lane A batch-20 record, head **e9ee30652aa9d9c897574d51f44b282958e026d7**, base exactly this main) is **still open at this base** and is not merged; its single added record (lane A batch-20, +165/-0) maps to lane A indices **136-143**. The plan marks it in flight and the lane A coverage statement is therefore "merged lane-A records 0-135 + in-flight #826 136-143 => lane A covered 0-143"; this record confirms #826 has not delivered a merge at this base and treats it as scheduling context only. No other PR was touched.
+**Capture facts and base currency.** The plan captured merged PR **#825** (batch-19 record merged 2026-10-18T05:02:29Z at main **cb1269c1cdff7b5735e32784bbbde282b84fea16**) as its historical capture base. Since capture, **PR #826 (lane A batch-20 record) has merged**: its merge commit is **06613a02101f99951768e88d439c9478be92af0c**, which is now the live main and the implementation base. The branch was cut at cb1269c1 before that merge and has been **rebased onto live main 06613a02** (force-with-lease; head moved). The lane A coverage statement is "merged lane-A records 0-135 + merged #826 136-143 => lane A covered 0-143"; no other PR was touched.
 
-**Implementation base.** main = **cb1269c1cdff7b5735e32784bbbde282b84fea16** (live main at branch creation). **Pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
+**Implementation base (live-base currency).** main = **06613a02101f99951768e88d439c9478be92af0c** (live main at the repair-3 rebase; the branch was cut at cb1269c1 before #826 merged). **Pinned measurement ref** = **2db1ffb7985ddc1c087c455740fd59e962967461**, at which the eight frozen pages are bound by Git blob id below.
 
 **Agent, model and stage.** Written by DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness); agent identity sd-d-793-r2, stage role sd-c-read-b6-c1. Stage C only: I read each frozen page whole at the pinned blob, authored this record, and did not edit any page, keep any ledger row, rebuild any index, open any other pull request, act on any Codex thread, or merge. The record is signed with both names at its footer.
 
 ## 1. Lane derivation at this implementation base
 
-**Instrument run (fresh clone of main cb1269c1):** python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json exits 0 with summary **690 reader pages / 107 accepted / 6 provably pending / 567 no-record / 0 recorded-within-10 / 6 cannot decide / 0 withdrawn / 4 partial / official 583**. The lane-arithmetic pending set = 567 + 6 = **573** sorted paths. **Lane A = indices 0-143**; **lane B = indices 144-287**.
+**Instrument run (fresh clone of live main 06613a02; the pinned-ref derivation is unchanged from the capture run at cb1269c1 because #826 added only a docs evidence file):** python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json exits 0 with summary **690 reader pages / 107 accepted / 6 provably pending / 567 no-record / 0 recorded-within-10 / 6 cannot decide / 0 withdrawn / 4 partial / official 583**. The lane-arithmetic pending set = 567 + 6 = **573** sorted paths. **Lane A = indices 0-143**; **lane B = indices 144-287**.
 
 **Lane A completion and lane B start.** Merged lane-A batch records name actual P1-P8 read rows covering **0-135**; in-flight **#826** covers **136-143** (unmerged at this base). Lane A is therefore covered 0-143 with #826 in flight, and lane B's quarter begins at **144**. **Merged lane-B batch-5 record** (readability-lane-b-batch-5-2026-10-15.md) reads exactly **148-155**; merged lane-B batches 2, 2-rerecord and 3 add no rows in this block. The **R2 unread sequence** (next eight unread pages in the sorted unread sequence, not naive index arithmetic) is therefore **144, 145, 146, 147, 156, 157, 158, 159** - all in lane B's quarter. **Lane B index:** these pending indices minus 144 give lane B indices 0-3, 12-15. **Batch number:** latest merged lane-B record is batch 5 and numbering is per lane, so this item is **lane B batch 6** and the record path is docs/evidence/documentation/readability-lane-b-batch-6-2026-10-18.md.
 
@@ -40,7 +40,7 @@ All eight pages were read whole at the pinned-ref blob; bytes/LF were measured b
 | P7 | 158 | .claude/skills/manual-test-case-creator/SKILL.md | 3443ce5586893b0aaed6f4061b3e3bac567b8c04 | 8,048 / 147 | **PARTIAL** | B2: QA at L25, UI at L44, API/DB at L65 and ID at L87 unexpanded; B6 independence UNVERIFIED | 0 |
 | P8 | 159 | .claude/skills/manual-test-case-creator/references/manual-case-template.md | daad8bec6aee9417279372de7d5fff2521b4ff97 | 3,099 / 70 | **PARTIAL** | B2: env unexpanded at L17 and L29; ID at L14 unexpanded; B6 independence UNVERIFIED | 0 |
 
-**Totals: 8 pages / 51,163 bytes / 878 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Full 40-character blob ids are in the table; every id resolves at pinned ref 2db1ffb7 and every page blob is identical at main cb1269c1 (zero drift).
+**Totals: 8 pages / 51,163 bytes / 878 LF / 0 FULL / 8 PARTIAL / 0 UNRUN / 0 edits.** Full 40-character blob ids are in the table; every id resolves at pinned ref 2db1ffb7 and every page blob is identical at live main 06613a02 (zero drift).
 
 ## 4. Per-page dispositions - what is and is not accepted
 
@@ -111,33 +111,33 @@ The six bullets are the repository's "Acceptance for each page": **B1** open wit
 
 ## 7. Hunk and line accounting
 
-- **Tracked change:** exactly one added path - this record docs/evidence/documentation/readability-lane-b-batch-6-2026-10-18.md - and no other tracked path; 0 modified, 0 deleted, 0 renames. The branch is created from main cb1269c1, so the only hunk in the live-base PR diff is the addition of this file.
-- **Page accounting:** zero hunks touch any of the eight pages; every page diff 2db1ffb7..cb1269c1 is empty; the batch made no page edit, no keeper row, no index/ledger/register/manifest/tool/test/workflow change.
+- **Tracked change:** exactly one added path - this record docs/evidence/documentation/readability-lane-b-batch-6-2026-10-18.md - and no other tracked path; 0 modified, 0 deleted, 0 renames. The branch is rebased onto live main 06613a02, so the only hunk in the live-base PR diff is the addition of this file.
+- **Page accounting:** zero hunks touch any of the eight pages; every page diff 2db1ffb7..06613a02 is empty; the batch made no page edit, no keeper row, no index/ledger/register/manifest/tool/test/workflow change.
 - **Record's own measurement:** per the plan's AC5, this record's final bytes/LF/sha256 are measured and stated in the PR body binding outside this record, not inside it; the body is updated after this file freezes at the PR head.
 
 ## 8. Plan AC1-AC8 - Stage C declaration
 
 | AC | Stage C status and evidence |
 | --- | --- |
-| AC1 Tree proof | **MET at the final head by construction** - exactly one added path (this record) from main cb1269c1; 0 modified/deleted; exact head/tree/base posted in the SD-C handoff and PR body. |
+| AC1 Tree proof | **MET at the final head by construction** - exactly one added path (this record) from live main 06613a02; 0 modified/deleted; exact head/tree/base posted in the SD-C handoff and PR body. |
 | AC2 Frozen page set by blob hash | **MET in this record** - eight paths, pending indices 144/145/146/147/156/157/158/159, blobs/bytes/LF at pinned ref 2db1ffb7, identical at base (zero drift). |
 | AC3 Whole-page re-read evidence | **MET after the Stage C repair** - each page read whole L1-last; six bullets addressed with page-line cites; links, named files and tokens measured; named-gap lists now include P1 HTTP L14/TCP L17, P7 ID L87 and P8 ID L14, and the P6 env cite is consistent (L19/L46); no display elision. |
 | AC4 Honest per-page disposition | **MET in this record** - 0 FULL / 8 PARTIAL / 0 UNRUN, one basis per page; every PARTIAL names its gaps (B2 lines for all eight, B6 for all); strict FULL bar applied; no acceptance row authored. |
 | AC5 Record integrity and body/PROC-04 | **OWED after this file is frozen** - the PR body binds the plan capture and this record's final bytes/LF/sha256 outside the record; PROC-04 recomputed from the final body; body checker at the head. |
 | AC6 Codex loop plan | **OWED after the PR exists at its head** - trigger, fetch every inline finding, fix P1/P2 in repair commits, reply naming the fixing SHA, resolve, retrigger; head-bound unavailability only after all P1/P2 triaged; never a pass; two-round stop applies. |
 | AC7 Provenance and no regression | **MET in this record** - plan capture binding (revision 2 6245949982; revision 1 void), derivation base, lane B quarter and R2 selection stated, already-read 148-155 named; no page/keeper/index/ledger/register/manifest change; zero drift; official count restated. |
-| AC8 Stage entry conditions | **SATISFIED for C** - acted only on the fresh Stage B ACCEPT 6245975350 bound to plan revision 2 6245949982; branched from then-current main cb1269c1; added exactly the one record path in one DCO-signed model-attributed commit; posts the SD-C handoff; D/E/F/G remain separate agents and G owns merge. |
+| AC8 Stage entry conditions | **SATISFIED for C** - acted only on the fresh Stage B ACCEPT 6245975350 bound to plan revision 2 6245949982; rebased onto then-current live main 06613a02; added exactly the one record path in one DCO-signed model-attributed commit; posts the SD-C handoff; D/E/F/G remain separate agents and G owns merge. |
 
 ## 9. Validation actually run while authoring (before commit)
 
 | Check | Command / method | Result |
 | --- | --- | --- |
-| Instrument at pinned ref | python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json in a fresh clone of main cb1269c1 | exit 0; summary 690 / 107 / 6 / 567 / 0 / 6 / 0 / 4 / 583 (section 1) |
+| Instrument at pinned ref | python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json in a fresh clone of live main 06613a02 | exit 0; summary 690 / 107 / 6 / 567 / 0 / 6 / 0 / 4 / 583 (section 1) |
 | Page blobs, bytes, LF | git rev-parse 2db1ffb7:<page>; git cat-file -s; newline counts over the pinned blob for all eight | blob ids match the plan/B table; sizes/LF match; totals 51,163 B / 878 LF |
-| Zero drift | git diff --numstat 2db1ffb7..cb1269c1 -- <page> for all eight | empty for all eight |
+| Zero drift | git diff --numstat 2db1ffb7..06613a02 -- <page> for all eight | empty for all eight |
 | Unread check | scan all 31 merged lane records' P1-P8 rows for the eight paths | zero hits; all eight unread |
-| In-flight check | PR #826 state and files at base cb1269c1 | open, head e9ee3065, one added lane A batch-20 record +165/-0 (136-143); not merged |
-| Internal links | extract every Markdown link from the eight pages and resolve relative targets at main cb1269c1 | all internal links resolve |
+| Delivery check | PR #826 merge commit 06613a02; live main 06613a02 | merged; one added lane A batch-20 record +165/-0 covering lane A 136-143 |
+| Internal links | extract every Markdown link from the eight pages and resolve relative targets at live main 06613a02 | all internal links resolve |
 | Named skill references | resolve backticked skill names to existing skill files at main | named skill files exist |
 | Commands | search for concrete shell command lines in the eight pages | commands appear as procedure text only; no broken command reference |
 | Authorship metadata | git log -1 --format=%H|%an|%ad --date=short -- <page> for all eight | recorded in section 6 |
@@ -150,13 +150,13 @@ The six bullets are the repository's "Acceptance for each page": **B1** open wit
 - **B6 as a human act.** Metadata shows the reader identity differs from the page authors, but it cannot prove non-authorship of commits made under the owner account or that a human performed the reading; every page is PARTIAL for this reason and no acceptance/keeper row is offered.
 - **Future keeper acceptance.** This record creates no acceptance rows; a later eligible keeper under AEGIS-APR-101/APR-117 decides.
 - **Hosted checks and Codex.** No PR/head existed while this record was authored; hosted CI, the PR-body checker and the Codex loop are owed at the head and are not claimed here.
-- **Drift after the base.** The frozen blobs are measured at the pinned ref and main cb1269c1; a later movement reopens the batch.
+- **Drift after the base.** The frozen blobs are measured at the pinned ref and live main 06613a02; a later movement reopens the batch.
 - **In-flight #826.** The lane A completion statement includes in-flight #826 (136-143); if #826 changes or fails to merge, the lane A statement must be re-read, but the lane B block 144/145/146/147/156/157/158/159 is unaffected.
 - **Prose reading as a quality judgment.** The record lists what each page says and where; it does not claim a formal usability study beyond the six bullets.
 
 ## 11. Continuation - what the next stage needs
 
-The record is the only added path; the branch is created from main cb1269c1 and carries one DCO-signed model-attributed commit. **Stage D** independently audits AC1-AC8 at the exact head, including the lane B/R2 derivation, the frozen blob set, the one-path tree proof, the dispositions and the body binding. **Stage E** runs the repository checks at the head and records every UNRUN honestly. **Stage F** reviews the exact head and the final PROC-04. **Stage G** applies the merge gates including MG3 under the recorded reading; no merge occurs before G, and any need outside the one-path blast radius stops the ladder and returns to Stage A/the owner.
+The record is the only added path; the branch is rebased onto live main 06613a02 and carries the DCO-signed model-attributed commits plus this base-currency repair commit. **Stage D** independently audits AC1-AC8 at the exact head, including the lane B/R2 derivation, the frozen blob set, the one-path tree proof, the dispositions and the body binding. **Stage E** runs the repository checks at the head and records every UNRUN honestly. **Stage F** reviews the exact head and the final PROC-04. **Stage G** applies the merge gates including MG3 under the recorded reading; no merge occurs before G, and any need outside the one-path blast radius stops the ladder and returns to Stage A/the owner.
 
 **Boundary.** Stage C only: no page edited; no keeper row, ledger, index, register, manifest, tool, test or workflow changed; no other PR touched (#826 and #819 were read only); no Codex thread replied to or resolved; no merge.
 
