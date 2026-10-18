@@ -1,6 +1,6 @@
 # Readability Phase 4 re-read lane B - Stage C batch record, lane B batch 15, 2026-10-18
 
-**Authorship chain and reader.** Original and only Stage C author **sd-e-802-r1** (true identity) - stage role **sd-c-read-b15-c1**; the same reader read all eight pages whole at the pinned blobs. **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Signed with both names: **sd-e-802-r1 (true identity) - sd-c-read-b15-c1 (stage role).**
+**Authorship chain and reader.** Original Stage C author **sd-e-802-r1** (true identity) - stage role **sd-c-read-b15-c1**; repair-1 stage role **sd-c-read-b15-c2** (true identity **sd-a-789-repl-r2**) added the class-B/C/D inventory rows below; the same reader read all eight pages whole at the pinned blobs. **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Signed with both names: **sd-e-802-r1 (original true identity) / sd-c-read-b15-c1 (original stage role); sd-a-789-repl-r2 (repair true identity) / sd-c-read-b15-c2 (repair stage role).**
 
 ## 1. Scope, plan binding and diff accounting
 
@@ -88,7 +88,7 @@ B1 satisfied - description L3, purpose L10-14 and use-when L16-25 state the job 
 B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job and reader. B2 partial - L12 uses the class label full and L13 docs-only before the L65-70 tier contents define them; L17 uses fast (aggregate tier MAX line) before its L68 tier definition; L29 uses CI in the forced-full comment without expansion; L104 uses PR in the anti-pattern Trusting the PR description without expansion. B3 satisfied - rule semantics L8-19, starter rules L21-46, tier contents L63-74 and worked classification L76-92 give concrete rules and a full example. B4 satisfied - rules/design guidance; no shipped/deployed or measured-result claim, and examples are not presented as measured results. B5 satisfied - owning ../SKILL.md link resolves; the fail-closed/no-silent-growth safety boundary is preserved. B6 UNVERIFIED - no non-author read-only reviewer statement exists.
 **Verdict:** PARTIAL - named B2 gaps (line-ascending): L12 full, L13 docs-only, L17 fast, L29 CI, L104 PR. B6 unverified; no keeper/acceptance row.
 
-**Canonical B6 limitation, restated.** For every page the reader is the record's author, and no independent read-only reviewer statement exists; **canonical B6 is UNVERIFIED for all eight pages and cannot support FULL**. Every page is PARTIAL; no page is FULL or keeper-eligible.
+**Canonical B6 limitation, restated.** For every page the reader is the record's author, and no independent read-only reviewer statement exists; **canonical B6 is UNVERIFIED for all eight pages and cannot support FULL**. Every page is PARTIAL; no page is FULL or keeper-eligible. **Repair-1 (c2):** the added class-B/C/D rows are documented exclusions, so the section 5/6 named-gap set is unchanged.
 
 ## 6. Dispositions, named gaps and keeper exclusion
 
@@ -103,6 +103,8 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 - **P6:** none beyond the canonical B6 limitation.
 - **P7:** none beyond the canonical B6 limitation.
 - **P8:** **L12 `full`**, **L13 `docs-only`**, **L17 `fast`**, **L29 CI**, **L104 PR**
+
+**Repair-1 (c2) inventory note.** The repair adds **26 documented-exclusion rows** (class B 12 / class C 5 / class D 9) and no named gaps; the inventory now has **185 rows**, and the named-gap list above remains aligned.
 
 **Keeper exclusion (strengthened).** **No page is keeper-eligible on this record.** Canonical B6 requires a read-only review by someone who did not write the page; this record cannot establish that condition, so it authors **no acceptance row, no keeper row, no ledger edit and no index edit**. Keeper recording remains a separate later act under AEGIS-APR-101/APR-117 with its own independence evidence.
 
@@ -129,7 +131,7 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 
 ## 8. Five-class systematic token audit - method
 
-**Method.** A read-only pass over the eight pages at pinned ref 2db1ffb7 extracts every candidate under five stated classes: **(A) uppercase/acronym tokens**, **(B) mixed-case/plural tokens**, **(C) lowercase technical abbreviations/shorthand**, **(D) backticked identifiers, angle/brace placeholders, units and operators**, and **(E) viewport/edition/lifecycle/status codes**. A candidate is keyed by (page, first-use line, token); **backticked and unbackticked variants of the same token are normalized to one key**; occurrences on later lines are not separate candidates. Each key gets exactly one disposition: **defined-at-first-use with definition line**, **named-gap with page line**, or **documented exclusion with a one-line reason**. Ordinary English all-caps emphasis/heading words, file/skill/command references, template fill-in holes and ordinary engineering contractions are documented exclusions, not B2 abbreviations. The inventory below is the **single contiguous exact-once table**; per-page, per-class and per-disposition counts are recomputed from this final table in section 10, with an explicit zero-duplicate check; there is no second inventory table and no inventory row after this table.
+**Method.** A read-only pass over the eight pages at pinned ref 2db1ffb7 extracts every candidate under five stated classes: **(A) uppercase/acronym tokens**, **(B) mixed-case/plural tokens**, **(C) lowercase technical abbreviations/shorthand**, **(D) backticked identifiers, angle/brace placeholders, units and operators**, and **(E) viewport/edition/lifecycle/status codes**. A candidate is keyed by (page, first-use line, token); **backticked and unbackticked variants of the same token are normalized to one key**; occurrences on later lines are not separate candidates. Each key gets exactly one disposition: **defined-at-first-use with definition line**, **named-gap with page line**, or **documented exclusion with a one-line reason**. Ordinary English all-caps emphasis/heading words, file/skill/command references, template fill-in holes and ordinary engineering contractions are documented exclusions, not B2 abbreviations. **Repair-1 rule (c2):** the same classes include mixed-case/plural file and skill identifiers (class B), typographic operator tokens (class D), and lowercase file-extension/scheme/test-tier shorthand (class C); when these are literal references rather than prose abbreviations they are documented exclusions, and every added row resolves to its cited page line. The inventory below is the **single contiguous exact-once table**; per-page, per-class and per-disposition counts are recomputed from this final table in section 10, with an explicit zero-duplicate check; there is no second inventory table and no inventory row after this table.
 
 ## 9. EXACT-ONCE five-class inventory (one contiguous table, keyed by page/line/token)
 
@@ -294,22 +296,48 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 | 157 | P8 | 79 | D backticked/placeholder/unit/operator | `tools/gen/**` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 158 | P8 | 79 | D backticked/placeholder/unit/operator | `tools/gen/schema.g.ts` | excluded | backticked literal/placeholder/path/command/skill reference, not a first-use abbreviation |
 | 159 | P8 | 79 | C lowercase shorthand | ts | excluded | file extension in src/lib/retry.ts |
+| 160 | P1 | 3 | B mixed-case/plural | SKILL.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 161 | P1 | 11 | D backticked/placeholder/unit/operator | → | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 162 | P1 | 51 | D backticked/placeholder/unit/operator | × | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 163 | P2 | 84 | D backticked/placeholder/unit/operator | → | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 164 | P3 | 3 | B mixed-case/plural | SKILL.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 165 | P3 | 27 | D backticked/placeholder/unit/operator | → | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 166 | P3 | 28 | D backticked/placeholder/unit/operator | ≠ | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 167 | P4 | 63 | B mixed-case/plural | project-orchestrator/SKILL.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 168 | P4 | 65 | B mixed-case/plural | elicitation-sheet.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 169 | P4 | 187 | D backticked/placeholder/unit/operator | → | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 170 | P5 | 3 | B mixed-case/plural | SKILL.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 171 | P5 | 47 | D backticked/placeholder/unit/operator | → | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 172 | P5 | 50 | D backticked/placeholder/unit/operator | ← | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 173 | P6 | 4 | B mixed-case/plural | SKILL.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 174 | P7 | 40 | B mixed-case/plural | skill-generation-standard.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 175 | P7 | 104 | D backticked/placeholder/unit/operator | → | excluded | typographic operator token, not an abbreviation; excluded under the class-D operator rule |
+| 176 | P8 | 3 | B mixed-case/plural | SKILL.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 177 | P8 | 26 | C lowercase shorthand | sql | excluded | file-extension literal in **/*.sql; path token, not a prose abbreviation |
+| 178 | P8 | 31 | B mixed-case/plural | package-lock.json | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 179 | P8 | 31 | B mixed-case/plural | pnpm-lock.yaml | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 180 | P8 | 31 | C lowercase shorthand | json | excluded | file-extension literal in package-lock.json; path token, not a prose abbreviation |
+| 181 | P8 | 31 | C lowercase shorthand | yaml | excluded | file-extension literal in pnpm-lock.yaml; path token, not a prose abbreviation |
+| 182 | P8 | 32 | B mixed-case/plural | CLAUDE.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 183 | P8 | 32 | B mixed-case/plural | AGENTS.md | excluded | exact repository file/identifier reference (mixed-case filename), not a prose abbreviation |
+| 184 | P8 | 33 | C lowercase shorthand | https | excluded | URL scheme literal; standard protocol token, not a prose abbreviation |
+| 185 | P8 | 69 | C lowercase shorthand | e2e | excluded | ordinary engineering contraction (end-to-end) in the tier bundle; excluded shorthand, not a first-use abbreviation |
 
 ## 10. Reconciliation and proof (counts recomputed from the final inventory table)
 
-**Extraction/duplicate proof.** The normalized key set is (page, first-use line, token) with backticked/unbackticked normalization. The final table has **159 rows = 159 mentions = 159 unique keys**, **0 duplicate keys** and **0 extra mentions** in a full re-key check; there is no second inventory table and no inventory row after the table above.
+**Extraction/duplicate proof.** The normalized key set is (page, first-use line, token) with backticked/unbackticked normalization. The final table has **185 rows = 185 mentions = 185 unique keys**, **0 duplicate keys** and **0 extra mentions** in a full re-key check; there is no second inventory table and no inventory row after the table above.
 
-**Per-page row counts (from the final table):** P1=6 / P2=31 / P3=16 / P4=19 / P5=10 / P6=27 / P7=22 / P8=28 = **159**.
+**Per-page row counts (from the final table):** P1=9 / P2=32 / P3=19 / P4=22 / P5=13 / P6=28 / P7=24 / P8=38 = **185**.
 
-**Per-class counts (from the final table):** A=21 / B=0 / C=20 / D=112 / E=6 = **159**.
+**Per-class counts (from the final table):** A=21 / B=12 / C=25 / D=121 / E=6 = **185**.
 
-**Per-disposition counts (from the final table):** named-gaps=10 / defined-at-first-use=14 / documented-exclusions=135 = **159**.
+**Per-disposition counts (from the final table):** named-gaps=10 / defined-at-first-use=14 / documented-exclusions=161 = **185**.
 
-**Alignment.** Section 5 B2/verdict named gaps and section 6 named-gap list are generated from the **named-gap** rows above, in line-ascending order (P1 L11 PR; P2 L3 CI, L3 PR, L65 comms, L152 SHA; P8 L12 full, L13 docs-only, L17 fast, L29 CI, L104 PR); no page line in sections 5/6 contradicts this table. **P3-P7 named gaps are none after the stated definitions/exclusions; their PARTIAL is solely the unverified canonical B6 limitation.**
+**Alignment.** Section 5 B2/verdict named gaps and section 6 named-gap list are generated from the **named-gap** rows above, in line-ascending order (P1 L11 PR; P2 L3 CI, L3 PR, L65 comms, L152 SHA; P8 L12 full, L13 docs-only, L17 fast, L29 CI, L104 PR); no page line in sections 5/6 contradicts this table. **P3-P7 named gaps are none after the stated definitions/exclusions; their PARTIAL is solely the unverified canonical B6 limitation.** **Repair-1 (c2) adds 26 excluded rows (class B 12 / class C 5 / class D 9); no new named gap was created, and the count lines above are recomputed from the final 185-row table.**
 
 ## 11. Record self-state, counts and authorship chain
 
-**Self-state.** This record is the **initial Stage C record** (stage role **sd-c-read-b15-c1**, true identity **sd-e-802-r1**), with no repair chain yet. The eight-page set in section 3 and the totals **56,556 B / 1,081 LF** agree with the plan/Stage-B acceptance and with sections 9-10 counts; the live base is **84a5295d** (#831 32nd; #828 31st at 655e40ea; #832 30th at 883bf690), while the plan captured at **655e40ea** (pre-#831 merge; disclosed). The record path is the only added path and did not exist at base. **Authored by sd-e-802-r1 / sd-c-read-b15-c1; the page reader is the same agent; no other author or repair stage appears.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Signed with both names.
+**Self-state.** This record is the **initial Stage C record plus repair-1** (original stage role **sd-c-read-b15-c1**, true identity **sd-e-802-r1**; repair-1 stage role **sd-c-read-b15-c2**, true identity **sd-a-789-repl-r2**). The eight-page set in section 3 and totals **56,556 B / 1,081 LF** agree with the plan/Stage-B acceptance; the inventory now has **185 rows** with all counts recomputed from the final table; the live base is **84a5295d** (#831 32nd; #828 31st at 655e40ea; #832 30th at 883bf690), while the plan captured at **655e40ea** (pre-#831 merge; disclosed). The record path is the only added path and did not exist at base. **Original author sd-e-802-r1 / c1; repair-1 by sd-a-789-repl-r2 / c2; the page reader is the same agent.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Signed with both names.
 
 ## 12. Hunk/line accounting, local validation and declared limits
 
@@ -323,4 +351,13 @@ B1 satisfied - L1-6 title/owning-skill/rules-artifact statement state the job an
 
 Lane A is complete (0-143); merged lane-B evidence covers 144-199; open PRs reserve 200-207/208-215/216-223; this record covers 224-231. The next unread page after the block is **232**. A later stage must re-derive the pending set/frontier at its own base. **Stage C only:** no page, plan, keeper, index, ledger, register, manifest or other PR is changed; no merge. Lane A is complete and is not reopened.
 
-**Signed with both names: true identity sd-e-802-r1; stage role sd-c-read-b15-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+## 14. Repair-1 disclosure (answers SD-D REVISE 6248241232)
+
+**Repair scope and author.** Repair-1 stage role **sd-c-read-b15-c2** (true identity **sd-a-789-repl-r2**, DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) adds class-B/C/D documented-exclusion rows to the existing inventory; no page, plan, keeper, index, ledger, register, manifest or other path changes; no merge. The prior table's 159 rows and all dispositions are retained; the repair adds **26 rows (class B 12 / class C 5 / class D 9)**, each resolving to its cited page line, and recomputes every count from the final table.
+
+**Why.** SD-D REVISE **6248241232** found class B empty despite mixed-case file identifiers, class-D operator keys unmapped, and class-C lowercase technical keys missing. The repair applies the stated classes consistently: file/skill identifiers and literal path/URL/file-extension tokens are documented exclusions; typographic operator tokens are class-D documented exclusions. No new named gap is created, and **0 FULL / 8 PARTIAL / 0 UNRUN**, canonical B4/B6, no-keeper, page/total and record/body evidence facts are unchanged.
+
+**Final counts.** **185 rows = 185 mentions = 185 unique keys, 0 duplicates**; per-page **9/32/19/22/13/28/24/38**; classes **A=21 / B=12 / C=25 / D=121 / E=6**; dispositions **named-gaps=10 / defined-at-first-use=14 / documented-exclusions=161**. The added rows are §9 rows 160-185; every cited page line was read at the pinned blob before inclusion.
+
+
+**Signed with both names: original true identity sd-e-802-r1 / stage role sd-c-read-b15-c1; repair true identity sd-a-789-repl-r2 / stage role sd-c-read-b15-c2.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
