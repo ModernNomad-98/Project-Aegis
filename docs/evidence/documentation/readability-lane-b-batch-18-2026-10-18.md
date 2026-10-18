@@ -505,22 +505,27 @@ This record is the Stage C evidence artifact for the eight frozen lane-B batch-1
 | P8 | 27 | ii | ids | named gap — lowercase technical shorthand first use; no expansion on this page |
 | P8 | 30 | i | SSRF- | named gap — first use before any expansion on this page |
 | P8 | 30 | i | WAF- | named gap — first use before any expansion on this page |
+| P2 | 139 | D backticked/placeholder/unit/operator | <sync vs async; write→searchable path; FRESHNESS LAG stated; reindex/backfill; delete + permission-change propagation to index> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
+| P2 | 148 | D backticked/placeholder/unit/operator | <index growth, reindex cost, freshness/error monitoring, engine-down degrade behavior> | documented exclusion — self-describing multiline template placeholder (fill-in hole), not an abbreviation |
 
 ## 5. Inventory counts, reconciliation and zero-duplicate proof
 
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Rows | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P1 | 9 | 2 | 2 | 11 | 8 | 32 | 11 | 0 | 21 |
-| P2 | 20 | 4 | 5 | 10 | 11 | 50 | 19 | 1 | 30 |
+| P2 | 20 | 4 | 5 | 12 | 11 | 52 | 19 | 1 | 32 |
 | P3 | 22 | 4 | 6 | 11 | 14 | 57 | 19 | 4 | 34 |
 | P4 | 20 | 2 | 4 | 10 | 0 | 36 | 17 | 2 | 17 |
 | P5 | 40 | 5 | 9 | 21 | 19 | 94 | 36 | 1 | 57 |
 | P6 | 32 | 1 | 2 | 20 | 0 | 55 | 24 | 6 | 25 |
 | P7 | 16 | 5 | 3 | 8 | 0 | 32 | 16 | 3 | 13 |
 | P8 | 12 | 3 | 2 | 1 | 1 | 19 | 14 | 1 | 4 |
-| **Total** | **171** | **26** | **33** | **92** | **53** | **375** | **156** | **18** | **201** |
+| **Total** | **171** | **26** | **33** | **94** | **53** | **377** | **156** | **18** | **203** |
 
-**Zero-duplicate proof:** final table rows = 375 = unique (page, line, token) keys = 375; duplicate keys = 0; extra rows after the final table = 0; per-page/class/disposition sums equal the row count; one contiguous table only, no second inventory table.
+**Zero-duplicate proof:** final table rows = 377 = unique (page, line, token) keys = 377; duplicate keys = 0; extra rows after the final table = 0; per-page/class/disposition sums equal the row count; one contiguous table only, no second inventory table.
+
+
+**Documented-exclusion placeholders added in this repair (SD-D REVISE 6248561626):** P2 (249) L139-140 and L148-149 are two self-describing multiline class-D template placeholders; each is a documented exclusion in the final table and not a named B2 gap. This is the only table change; both rows resolve to the pinned page text.
 
 **Reconciliation:** section 3 B2/verdicts and section 5 named-gap list agree with this table: every page is PARTIAL under the strict FULL bar because canonical B6 is UNVERIFIED and named B2 gaps are named; no page is FULL/keeper-eligible, and no undocumented first use is omitted.
 
