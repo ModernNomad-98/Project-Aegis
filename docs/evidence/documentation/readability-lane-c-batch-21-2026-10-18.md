@@ -137,7 +137,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 **Drift/link proof:** the command git diff --stat d1f12cc3..HEAD -- the eight pages returns empty; git diff --numstat also empty. Link-check all eight pages: files 8 / links checked 3 / anchors checked 1 / broken 0 / dead 0 / external-skipped 0 / other-skipped 0.
 
-## 3. ONE exact-once five-class inventory
+## 3. Candidate-token inventory (five classes; not source-exhaustive exact-once proof)
 
 **Tokenizer rule (repair finding #1).** Real raw tokens only, with source offsets. Priority: (1) a whole backticked span is ONE class-iv raw token and is never scanned inside; (2) remaining text gives dates YYYY-MM-DD[THH:MM[:SS][+-]HH:MM] as DATE, SHA hex 7-40 as SHA, numeric ranges/percent/formulas as RANGE, operator glyphs as OPERATOR, angle/brace placeholders as PLACEHOLDER; (3) repo-relative paths and real commands only as whole spans; (4) uppercase/coded/status tokens only as complete boundary-delimited tokens: no regex fragments, prefixes, basenames, substrings, or duplicate cross-class extraction. Ordinary prose words are class ii exclusions and are NOT B2 named gaps. Key = (page,line,source offset,raw token); one row per real token at first occurrence; ONE contiguous block.
 
@@ -2585,18 +2585,18 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 **PROC-04 method (no digest invented here):** body step publishes witness/skills/security bound fields; PROC is whole-line sentinels, whitespace-collapsed, LF-joined in that order, SHA-256; body publishes short+full digest/lens and literal-presence proof after final body edit. This record does not assert a PROC digest.
 
-**Canonical B4/B5/B6:** B4 N/A for lane records with no product-behavior claim; B5 partial (link check only; referenced paths/commands not exhaustively checked); B6 UNVERIFIED: a non-author Stage C reader exists, but no B6 interview/purpose-and-use check was performed; never FULL-supporting; 0 FULL / 8 PARTIAL / 0 UNRUN; no keeper. **Limits:** no page edit; no keeper/index/ledger/register/manifest/tool/test/workflow change; no public-CI change; no merge; review-disposition discipline applies: DeepSeek advisory only, findings addressed or visibly disposed, dispositions do not block; Codex never a pass; 0 unresolved before G. **0 unresolved review findings is not the same as 0 unmet ACs:** this repair moves AC3/AC5/AC7 to in-branch verification and states AC statuses explicitly; no silent waiver.
+**Canonical B4/B5/B6:** B4 N/A for lane records with no product-behavior claim; B5 partial (link check only; referenced paths/commands not exhaustively checked); B6 UNVERIFIED: a non-author Stage C reader exists, but no B6 interview/purpose-and-use check was performed; never FULL-supporting; 0 FULL / 8 PARTIAL / 0 UNRUN; no keeper. **Limits:** no page edit; no keeper/index/ledger/register/manifest/tool/test/workflow change; no public-CI change; no merge; review-disposition discipline applies: DeepSeek advisory only, findings addressed or visibly disposed, dispositions do not block; Codex never a pass; no unresolved Codex threads; this is not a permanent zero-findings claim. **0 unresolved review findings is not the same as 0 unmet ACs:** this repair moves AC3/AC5/AC7 to in-branch verification and states AC statuses explicitly; no silent waiver.
 
 ## 7. AC1-AC8 status at Stage C handoff
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET | exactly one added record path; no other path; SIXTEEN DCO-signed model commits measured post-commit; base d1f12cc3 |
+| AC1 one-path | MET | exactly one added record path; no other path; SEVENTEEN DCO-signed model commits measured post-commit; base d1f12cc3 |
 | AC2 frozen pages | MET WITH WAIVER | mixed pin 1 pinned-equal + 7 re-pinned at d1f12cc3; totals 300,510 B/2,066 LF; waiver/basis defined under population definitions |
 | AC3 whole-page+inventory | MET WITH WAIVER / PARTIAL (table-level self-consistency only) | embedded verifier recomputes rows/keys/overlaps/classes/dispositions/codes/per-page and Crows.json from this record's table; source-page semantics/first-use remain manually asserted, not source-page cross-checked |
 | AC4 dispositions | MET for 0 FULL / 8 PARTIAL / 0 UNRUN (genuinely supported after semantic corrections) | B2/line-range/identifier/placeholder invariants and per-page B2 counts corrected; B4 N/A rationale, B5 partial limitation, B6 precise gap; no keeper/FULL claim |
 | AC5 record/body/PROC | MET WITH EXTERNAL ARTIFACT (live PR body/PROC/checker) | final live body publishes PROC-04 short/full/lens and literal presence; published == recomputed; body checker 0 (proof in PR body and SD-C repair comment) |
-| AC6 Codex/reviews | MET WITH EXTERNAL ARTIFACT (visible PR review-thread dispositions) | Codex never a pass, 0 threads/0 unresolved; latest review 5568366388 answered in visible findings-response comment with FIXED/DISPOSED; prior reviews 5568319753 and 5568285030 answered; earlier reviews remain answered; DeepSeek advisory only, never a gate |
+| AC6 Codex/reviews | MET WITH EXTERNAL ARTIFACT (visible PR review-thread dispositions) | Codex never a pass; no unresolved Codex threads. **As of this record's capture time 2026-10-19T07:58:00Z, the latest visible review was 5568449119**; its findings are verified addressed/disposed at this head in the visible findings-response, and prior visible reviews 5568366388, 5568319753, 5568285030, 5568130077, 5568051580 and earlier are answered/disposed. Reviews posted after capture are dispositioned in the PR thread (external artifacts) and do not invalidate this as-of-capture AC6 statement. DeepSeek is advisory only, never a gate. |
 | AC7 provenance | MET (inline canonical evidence) | section 12 inlines A-rows/README/preview/MANIFEST/Crows content with measured B/LF/sha; Crows.json carries its trailing-LF/full-totals convention; external copies convenience only |
 | AC8 stage entry | MET for C | fresh B ACCEPT 6260430607; one record; D/E/F/G separate; no merge |
 
@@ -3006,7 +3006,8 @@ for r in rows:
 
 # duplicate canonical measurement consistency
 text_all=open(p,encoding="utf-8").read().split("### Embedded verifier source")[0]
-for badmeas in ["Crows.json is 3,036","3036 B / 89 LF","3,036 B / 89 LF"]:
+BADMEAS=["Crows.json is 3,"+"036","3036 B / 89 LF","3,"+"036 B / 89 LF"]
+for badmeas in BADMEAS:
  if badmeas in text_all: err("stale duplicate measurement: "+badmeas)
 
 if raw_count<1: err("no raw <...> placeholders"); raw_ok=False
@@ -3018,7 +3019,7 @@ for r in rows:
   elif r[3]=="v" and not re.fullmatch(r"<[^<>]+>",inner): err("class-v placeholder shape "+repr(r)); raw_ok=False
 if errors:
  print("VERIFIER FAIL:"); [print(" -",e) for e in errors]; sys.exit(1)
-print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d inline-artifacts=%d/6 crows-block=exact class-backtick=ok cross-file=%s duplicate-measurements=ok"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,inline_ok,"ok" if cross_ok else "FAIL"))
+print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-angle-tokens=%d placeholder-dispositions=%d inline-artifacts=%d/6 crows-block=exact class-backtick=ok cross-file=%s duplicate-measurements=ok"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,codes.get("PLACEHOLDER",0),inline_ok,"ok" if cross_ok else "FAIL"))
 ~~~~
 
 **Mechanically verified by the verifier:** table parse/rows/keys/classes/dispositions/codes/per-page totals/Crows.json row1 count/malformed rows/overlaps. **Manually asserted, not source-page cross-checked:** page-token meanings, first-use judgments, B2/AC dispositions; AC3 is therefore MET WITH WAIVER/PARTIAL: table-level self-consistency only.
@@ -3026,7 +3027,7 @@ print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=
 ### Embedded verifier expected output
 
 ~~~~text
-VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 596, 'i': 443, 'iii': 9} disps={'excluded': 2016, 'named': 373, 'defined': 10} exclusions=2016 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127 inline-artifacts=6/6 crows-block=exact class-backtick=ok cross-file=ok duplicate-measurements=ok
+VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 596, 'i': 443, 'iii': 9} disps={'excluded': 2016, 'named': 373, 'defined': 10} exclusions=2016 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-angle-tokens=127 placeholder-dispositions=82 inline-artifacts=6/6 crows-block=exact class-backtick=ok cross-file=ok duplicate-measurements=ok
 ~~~~
 
 External convenience copies: _A/evidence/read-lc-424-c1/Crows.txt 1542/4/sha8a8a2564..., A-rows path above, README/preview/MANIFEST/Crows.json above. No in-branch claim of files outside this record.
