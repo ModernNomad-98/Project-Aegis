@@ -26,9 +26,11 @@
 | P423 | 423 | docs/evidence/documentation/readability-lane-a-batch-4-2026-10-17.md | e54fbee076cc152a7d470417fccd6b1096d0a4c3 | 27326 / 159 | absent at pin -> re-pin |
 | **Totals** | | **eight pages** | | **311,123 / 3,059** | mixed |
 
+Pinned blob hashes for the three pinned-equal pages: P418 4bbe6bd54fcfd584ed2253e57ca3bf00d61e89ee; P419 dcb115e88645ef9e5e35cb141cc03b47cec6ee65; P421 205413beb9e3d6ed61f232f981c57c42a65514be. All three equal the live-main blobs above.
+
 ## 3. Whole-page re-read evidence and canonical B1-B6 per page
 
-All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is intentionally templated; one page-specific anchor per page is recorded below.
+All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors and link-check evidence are inside each page block below, so the evidence is not identical boilerplate. Full check-markdown-links.py over all eight pages: files 8, links checked 4, anchors checked 3, broken 0, dead 0, external-skipped 0, other-skipped 0. Drift check: git diff --stat 70b6159d..HEAD -- <the eight pages> returns empty; no page was edited at the branch head.
 
 - P416 anchor heading: # Readability Phase 4 re-read lane A - Stage C batch record, batch 18, 2026-10-18
 - P417 anchor heading: # Readability Phase 4 re-read lane A — Stage C batch record, batch 19, 2026-10-18
@@ -48,6 +50,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A - Stage C batch record, batch 18, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and diff accounting; B4 anchor L22 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740f; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P417 - index 417 - docs/evidence/documentation/readability-lane-a-batch-19-2026-10-18.md - absent at pin -> re-pin - read whole L1-183
@@ -58,6 +61,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 19, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and hunk/line accounting; B4 anchor L15 - **Eight pages read, zero pages edited**; every page's `git diff --numstat 2db1ffb7..0e28; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P418 - index 418 - docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md - present equal at pin - read whole L1-622
@@ -68,6 +72,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 2, 2026-10-15; B2 row count/classes per section5; B3 heading L39 ## 1. Lane derivation — the command, not a handed-down list; B4 anchor L7 session: `git ls-remote origin refs/heads/main` still resolves to `e2a3e20b7c20ef8385b219b; B5 link ../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page at L139, check-markdown-links.py files: 1   links checked: 1   anchors checked: 1   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob 4bbe6bd54fcfd584ed2253e57ca3bf00d61e89ee.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P419 - index 419 - docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md - present equal at pin - read whole L1-195
@@ -78,6 +83,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
+**Page-specific B1-B6 evidence:** B1 title L1 AEGIS-APR-117 withdrawal and re-record — Phase 4 re-read lane A, batch 2, 2026-10-16; B2 row count/classes per section5; B3 heading L9 ## Why these rows exist; B4 anchor L30 `Blob ID` equals `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>`. All eigh; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob dcb115e88645ef9e5e35cb141cc03b47cec6ee65.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P420 - index 420 - docs/evidence/documentation/readability-lane-a-batch-20-2026-10-18.md - absent at pin -> re-pin - read whole L1-165
@@ -88,6 +94,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A - Stage C batch record, batch 20, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and diff accounting; B4 anchor L22 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740f; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P421 - index 421 - docs/evidence/documentation/readability-lane-a-batch-3-2026-10-15.md - present equal at pin - read whole L1-549
@@ -98,6 +105,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 3, 2026-10-15; B2 row count/classes per section5; B3 heading L32 ## 1. Lane derivation — the command, not a handed-down list; B4 anchor L8 session: `git ls-remote origin refs/heads/main` still resolves to `e2a3e20b7c20ef8385b219b; B5 link ../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page at L144, check-markdown-links.py files: 1   links checked: 1   anchors checked: 1   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob 205413beb9e3d6ed61f232f981c57c42a65514be.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P422 - index 422 - docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md - absent at pin -> re-pin - read whole L1-1025
@@ -108,6 +116,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 4, 2026-10-15; B2 row count/classes per section5; B3 heading L107 ## 1. Lane derivation — the command, not a handed-down list; B4 anchor L9 `e8c8a67c7f99feb4a02c6b334f4ca1a8aea83c5c` failed the required `validate-skills` job on it; B5 link ../../roadmaps/aegis-documentation-readability-backlog.md at L83, check-markdown-links.py files: 1   links checked: 2   anchors checked: 1   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P423 - index 423 - docs/evidence/documentation/readability-lane-a-batch-4-2026-10-17.md - absent at pin -> re-pin - read whole L1-159
@@ -118,13 +127,14 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 4, 2026-10-17; B2 row count/classes per section5; B3 heading L7 ## 1. Scope and diff accounting; B4 anchor L11 - **Eight pages read, zero pages edited**; every page's net line change is 0. **Four DCO-s; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ## 4. Systematic five-class exact-once token inventory - ONE contiguous table
 
-**Normalization and dispatch.** **Escape/exact-once clarification (finding #4).** Markdown pipes in cells are escaped as backslash-pipe; the raw token text is preserved as the key, so the P423 L54 plain-pipe token and P423 L135 escaped-pipe token remain distinct raw tokens at distinct first-use lines. An independent parser that splits on unescaped table pipes and counts raw token cells still finds 2,716 rows and 2,716 unique raw keys; every tally sums to 2,716.
+**Normalization and dispatch.** **Escape/exact-once clarification (finding #4).** Markdown pipes in cells are escaped as backslash-pipe; the raw token text is preserved as the key, so the P423 L54 plain-pipe token and P423 L135 escaped-pipe token remain distinct raw tokens at distinct first-use lines. The unique key is **(page, line, class, raw token text)**; an independent parser that splits on unescaped table pipes and counts raw token cells finds 2,716 rows = 2,716 unique keys / 0 duplicate keys, and every tally sums to 2,716. This key is explicitly not token-text alone (which would collide across pages).
 
- Keys are **case-sensitive verbatim token text** as displayed; backtick wrappers are retained in class iv tokens; whitespace is collapsed only for multiline DOTALL placeholders; plurals are not stemmed; no case-folding/punctuation folding/Unicode normalization. Case-fold collisions are retained only when each variant is a real token at a real first-use line and are listed with per-row dispositions below. Dispatch: **i** uppercase acronyms/proper names/roles/page-line-AC IDs/coded identifiers not statuses; class v is UPPERCASE-ONLY lifecycle/status keywords (lowercase status prose remains class ii); **ii** lowercase technical/audience prose; **iii** non-backticked file/path/identifier; **iv** whole backticked code/identifier/command tokens incl command-like; **v** lifecycle/status keywords, numeric ranges/units, angle placeholders, operator glyphs. Section4 is the single source of truth; sections 3/5/6 are derived and reconciled; every tally sums to the final row count. Pipes escaped; every row parses five cells.
+ Keys are **case-sensitive verbatim token text** as displayed; backtick wrappers are retained in class iv tokens; whitespace is collapsed only for multiline DOTALL placeholders; plurals are not stemmed; no case-folding/punctuation folding/Unicode normalization. Case-fold collisions are retained only when each variant is a real token at a real first-use line and are listed with per-row dispositions below. Dispatch: **i** uppercase acronyms/proper names/roles/page-line-AC IDs/coded identifiers not statuses; **ii** lowercase technical/audience prose; **iii** non-backticked file/path/identifier; **iv** whole backticked code/identifier/command tokens incl command-like; **v = status keywords (uppercase ONLY for the status-keyword part) + numeric ranges/units/dates + angle placeholders + operator glyphs**. Lowercase status prose remains class ii; all non-status class-v rows use the numeric/range/placeholder/operator members of this definition. Section4 is the single source of truth; sections 3/5/6 are derived and reconciled; every tally sums to the final row count. Pipes escaped; every row parses five cells.
 
 **Auxiliary case-fold collision examples (not part of the ONE contiguous main inventory; labels are the actual page of each variant).**
 
@@ -168,7 +178,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 7 | ii | diff | named gap - first use before any expansion on this page |
 | P416 | 7 | ii | id | named gap - first use before any expansion on this page |
 | P416 | 7 | ii | main | defined at first use - line 7 contains the expansion |
-| P416 | 7 | iv | `0e28bc8c..HEAD` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 7 | iv | `0e28bc8c..HEAD` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 9 | i | V4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P416 | 9 | ii | model | named gap - first use before any expansion on this page |
 | P416 | 9 | ii | open | named gap - first use before any expansion on this page |
@@ -179,9 +189,9 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 13 | ii | test | named gap - first use before any expansion on this page |
 | P416 | 13 | ii | workflow | named gap - first use before any expansion on this page |
 | P416 | 13 | iii | readability-lane-a-batch-18-2026-10-18.md | documented exclusion - PATH: file or path identifier |
-| P416 | 13 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 13 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 13 | iv | `docs/evidence/documentation/readability-lane-a-batch-18-2026-10-18.md` | documented exclusion - PATH: file or path identifier |
-| P416 | 13 | v | 18-2026 | documented exclusion - RANGE: numeric range/unit token |
+| P416 | 13 | v | 18-2026 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P416 | 14 | i | DCO | defined at first use - line 14 contains the expansion |
 | P416 | 14 | ii | drift | named gap - first use before any expansion on this page |
 | P416 | 15 | ii | pending | named gap - first use before any expansion on this page |
@@ -197,11 +207,11 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 25 | iii | SKILL.md | documented exclusion - PATH: file or path identifier |
 | P416 | 25 | iv | `.claude/skills/error-handling-security-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P416 | 25 | iv | `.claude/skills/feature-flag-rollout-planner/SKILL.md` | documented exclusion - PATH: file or path identifier |
-| P416 | 25 | v | 0-103 | documented exclusion - RANGE: numeric range/unit token |
-| P416 | 25 | v | 0-143 | documented exclusion - RANGE: numeric range/unit token |
-| P416 | 25 | v | 104-111 | documented exclusion - RANGE: numeric range/unit token |
-| P416 | 25 | v | 112-119 | documented exclusion - RANGE: numeric range/unit token |
-| P416 | 25 | v | 120-127 | documented exclusion - RANGE: numeric range/unit token |
+| P416 | 25 | v | 0-103 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P416 | 25 | v | 0-143 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P416 | 25 | v | 104-111 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P416 | 25 | v | 112-119 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P416 | 25 | v | 120-127 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P416 | 31 | i | LF | named gap - first use before any expansion on this page |
 | P416 | 33 | i | L10 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 33 | i | L103 | documented exclusion - LINE-RANGE: page-line reference |
@@ -231,7 +241,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 36 | iii | error-model-sheet.md | documented exclusion - PATH: file or path identifier |
 | P416 | 36 | iv | `.claude/skills/error-taxonomy-designer/references/error-model-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P416 | 36 | iv | `c514d182f658d383c82ea94e0cb69b1e1d0adcf0` | documented exclusion - SHA: hash/commit identifier |
-| P416 | 36 | v | 4xx | documented exclusion - RANGE: numeric range/unit token |
+| P416 | 36 | v | 4xx | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P416 | 37 | i | AI | named gap - first use before any expansion on this page |
 | P416 | 37 | i | CI | named gap - first use before any expansion on this page |
 | P416 | 37 | i | P5 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -288,8 +298,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 50 | ii | owner | defined at first use - line 50 contains the expansion |
 | P416 | 50 | ii | partial | named gap - first use before any expansion on this page |
 | P416 | 51 | i | A10 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P416 | 51 | iv | `Terms: PR ... OWASP means ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P416 | 51 | iv | `description: ... Closes OWASP Top 10:2025 A10 ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 51 | iv | `Terms: PR ... OWASP means ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P416 | 51 | iv | `description: ... Closes OWASP Top 10:2025 A10 ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 54 | i | L1-92 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 56 | i | B1-B5 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P416 | 56 | i | IP | named gap - first use before any expansion on this page |
@@ -301,7 +311,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 56 | i | L77-84 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 56 | i | L86-92 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 56 | ii | tenant | named gap - first use before any expansion on this page |
-| P416 | 56 | iv | `403-vs-404 asymmetry` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 56 | iv | `403-vs-404 asymmetry` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 59 | i | L1-206 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 61 | i | DSN | named gap - first use before any expansion on this page |
 | P416 | 61 | i | L118-134 | documented exclusion - LINE-RANGE: page-line reference |
@@ -312,8 +322,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 61 | i | L67-117 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 61 | i | L8-11 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 61 | i | UI | named gap - first use before any expansion on this page |
-| P416 | 62 | iv | `Terms: API means application programming interface ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P416 | 62 | iv | `description: Design the error model for an API ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 62 | iv | `Terms: API means application programming interface ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P416 | 62 | iv | `description: Design the error model for an API ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 65 | i | L1-96 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 66 | ii | rules | named gap - first use before any expansion on this page |
 | P416 | 66 | ii | surface | named gap - first use before any expansion on this page |
@@ -327,10 +337,10 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 67 | i | L86-96 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 67 | i | ORM | named gap - first use before any expansion on this page |
 | P416 | 67 | i | RPC | named gap - first use before any expansion on this page |
-| P416 | 67 | v | 5xx | documented exclusion - RANGE: numeric range/unit token |
+| P416 | 67 | v | 5xx | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P416 | 68 | i | L5-8 | documented exclusion - LINE-RANGE: page-line reference |
-| P416 | 68 | iv | `HTTP 4xx means a client-error response ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P416 | 68 | iv | `HTTP means Hypertext Transfer Protocol ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 68 | iv | `HTTP 4xx means a client-error response ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P416 | 68 | iv | `HTTP means Hypertext Transfer Protocol ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 71 | i | L1-224 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 72 | ii | policy | named gap - first use before any expansion on this page |
 | P416 | 72 | ii | rule | named gap - first use before any expansion on this page |
@@ -343,8 +353,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 73 | i | L28-50 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 73 | i | L71-129 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 73 | ii | spec | named gap - first use before any expansion on this page |
-| P416 | 74 | iv | `... advisory CI ... AI feature's ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P416 | 74 | iv | `Terms: ... CI means continuous integration; AI means artificial intelligence ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 74 | iv | `... advisory CI ... AI feature's ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P416 | 74 | iv | `Terms: ... CI means continuous integration; AI means artificial intelligence ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 77 | i | L1-106 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 78 | ii | decision | named gap - first use before any expansion on this page |
 | P416 | 79 | i | CHANGED | named gap - first use before any expansion on this page |
@@ -355,8 +365,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 79 | i | L7-17 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 79 | i | L77-88 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 79 | i | L90-98 | documented exclusion - LINE-RANGE: page-line reference |
-| P416 | 79 | iv | `PR tier ... CHANGED in the PR` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P416 | 80 | iv | `Semantic - content ... \| LLM judge with rubric derived from the assertion text \|` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 79 | iv | `PR tier ... CHANGED in the PR` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P416 | 80 | iv | `Semantic - content ... \| LLM judge with rubric derived from the assertion text \|` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 83 | i | L1-203 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 84 | ii | webhook | named gap - first use before any expansion on this page |
 | P416 | 85 | i | CDC | named gap - first use before any expansion on this page |
@@ -369,8 +379,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 85 | i | L68-113 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 85 | i | L8-10 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 85 | i | QA | named gap - first use before any expansion on this page |
-| P416 | 86 | iv | `... and PII minimization.` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P416 | 86 | iv | `Terms: PII means personally identifiable information ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 86 | iv | `... and PII minimization.` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P416 | 86 | iv | `Terms: PII means personally identifiable information ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 89 | i | L1-80 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 91 | i | B2B | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P416 | 91 | i | ISO | named gap - first use before any expansion on this page |
@@ -381,8 +391,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P416 | 91 | i | L66-72 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 91 | i | L74-80 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 91 | i | L9-18 | documented exclusion - LINE-RANGE: page-line reference |
-| P416 | 91 | iv | `Detail for event-schema-architect. Read on demand.` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P416 | 91 | iv | `currency enum ... [USD, EUR, GBP, ...]` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P416 | 91 | iv | `Detail for event-schema-architect. Read on demand.` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P416 | 91 | iv | `currency enum ... [USD, EUR, GBP, ...]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P416 | 104 | iv | `4173c3db78c082f2b5c903171a7fb741856a04e6` | documented exclusion - SHA: hash/commit identifier |
 | P416 | 104 | v | 2026-09 | documented exclusion - DATE: date/time or version fragment |
 | P416 | 105 | iv | `f3a9c70e3a5ca56765a0505e86e4a8b2011f95a4` | documented exclusion - SHA: hash/commit identifier |
@@ -423,27 +433,27 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 5 | i | D-1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 5 | i | D-2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 5 | i | PR | named gap - first use before any expansion on this page |
-| P417 | 5 | v | 128-135 | documented exclusion - RANGE: numeric range/unit token |
+| P417 | 5 | v | 128-135 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P417 | 7 | ii | base | named gap - first use before any expansion on this page |
 | P417 | 7 | ii | blob | named gap - first use before any expansion on this page |
 | P417 | 7 | ii | branch | named gap - first use before any expansion on this page |
 | P417 | 7 | ii | id | named gap - first use before any expansion on this page |
-| P417 | 7 | iv | `built_at_ref` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P417 | 7 | iv | `main` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 7 | iv | `built_at_ref` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P417 | 7 | iv | `main` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 9 | i | V4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 9 | ii | model | named gap - first use before any expansion on this page |
 | P417 | 9 | ii | open | named gap - first use before any expansion on this page |
 | P417 | 13 | ii | docs | named gap - first use before any expansion on this page |
 | P417 | 13 | iii | readability-lane-a-batch-19-2026-10-18.md | documented exclusion - PATH: file or path identifier |
 | P417 | 13 | iv | `docs/evidence/documentation/readability-lane-a-batch-19-2026-10-18.md` | documented exclusion - PATH: file or path identifier |
-| P417 | 13 | v | 19-2026 | documented exclusion - RANGE: numeric range/unit token |
+| P417 | 13 | v | 19-2026 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P417 | 14 | i | JSON | named gap - first use before any expansion on this page |
 | P417 | 14 | ii | diff | defined at first use - line 14 contains the expansion |
 | P417 | 14 | ii | manifest | named gap - first use before any expansion on this page |
 | P417 | 14 | ii | register | named gap - first use before any expansion on this page |
 | P417 | 14 | ii | test | named gap - first use before any expansion on this page |
 | P417 | 14 | ii | workflow | named gap - first use before any expansion on this page |
-| P417 | 14 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 14 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 15 | i | DCO | defined at first use - line 15 contains the expansion |
 | P417 | 15 | ii | drift | named gap - first use before any expansion on this page |
 | P417 | 15 | ii | git | named gap - first use before any expansion on this page |
@@ -453,7 +463,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 16 | ii | accepted | named gap - first use before any expansion on this page |
 | P417 | 16 | ii | pending | named gap - first use before any expansion on this page |
 | P417 | 16 | ii | reader | named gap - first use before any expansion on this page |
-| P417 | 16 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 16 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 20 | iv | `0e28bc8c` | documented exclusion - SHA: hash/commit identifier |
 | P417 | 23 | ii | json | named gap - first use before any expansion on this page |
 | P417 | 23 | iii | check_index.py | documented exclusion - PATH: file or path identifier |
@@ -464,7 +474,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 28 | iii | adr-template.md | documented exclusion - PATH: file or path identifier |
 | P417 | 28 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - PATH: file or path identifier |
 | P417 | 28 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
-| P417 | 28 | v | 0–143 | documented exclusion - RANGE: numeric range/unit token |
+| P417 | 28 | v | 0–143 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P417 | 30 | i | AC7 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 30 | i | P1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 30 | i | P1-P8 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -480,11 +490,11 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 30 | ii | union | named gap - first use before any expansion on this page |
 | P417 | 30 | iv | `.claude/skills/feature-flag-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P417 | 30 | iv | `.claude/skills/human-approval-boundary/SKILL.md` | documented exclusion - PATH: file or path identifier |
-| P417 | 30 | v | 0–111 | documented exclusion - RANGE: numeric range/unit token |
-| P417 | 30 | v | 0–127 | documented exclusion - RANGE: numeric range/unit token |
-| P417 | 30 | v | 112–119 | documented exclusion - RANGE: numeric range/unit token |
-| P417 | 30 | v | 120–127 | documented exclusion - RANGE: numeric range/unit token |
-| P417 | 30 | v | 128–135 | documented exclusion - RANGE: numeric range/unit token |
+| P417 | 30 | v | 0–111 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P417 | 30 | v | 0–127 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P417 | 30 | v | 112–119 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P417 | 30 | v | 120–127 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P417 | 30 | v | 128–135 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P417 | 32 | i | P4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 32 | iv | `flag-rollout-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P417 | 36 | i | LF | named gap - first use before any expansion on this page |
@@ -496,7 +506,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 40 | i | L9 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 40 | i | L90 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 40 | i | SDK | named gap - first use before any expansion on this page |
-| P417 | 40 | iv | `ID` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 40 | iv | `ID` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 40 | iv | `a9137e64d93a58226688bc74b145e3764b093481` | documented exclusion - SHA: hash/commit identifier |
 | P417 | 40 | v | PARTIAL | named gap - first use before any expansion on this page |
 | P417 | 41 | i | P2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -519,7 +529,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 45 | i | P6 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 45 | iv | `.claude/skills/horizontal-scalability-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P417 | 45 | iv | `1f24433819d1794090893effa97cf187977a0fb2` | documented exclusion - SHA: hash/commit identifier |
-| P417 | 45 | iv | `MED` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 45 | iv | `MED` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 46 | i | AI | named gap - first use before any expansion on this page |
 | P417 | 46 | i | ASI09 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 46 | i | L11 | documented exclusion - LINE-RANGE: page-line reference |
@@ -529,7 +539,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 46 | i | P7 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 46 | iv | `.claude/skills/human-agent-trust-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P417 | 46 | iv | `26c46095b073a90275becfe39291a1faaa0a4af2` | documented exclusion - SHA: hash/commit identifier |
-| P417 | 46 | iv | `SEV` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 46 | iv | `SEV` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 47 | i | API | named gap - first use before any expansion on this page |
 | P417 | 47 | i | L1 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 47 | i | L18 | documented exclusion - LINE-RANGE: page-line reference |
@@ -572,8 +582,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 59 | i | TTL | named gap - first use before any expansion on this page |
 | P417 | 59 | ii | user | defined at first use - line 59 contains the expansion |
 | P417 | 59 | iv | `references/flag-system-sheet.md` | documented exclusion - PATH: file or path identifier |
-| P417 | 59 | iv | `stable-ID` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P417 | 59 | iv | `user-ID` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 59 | iv | `stable-ID` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P417 | 59 | iv | `user-ID` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 59 | v | UNVERIFIED | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P417 | 65 | i | L10 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 65 | i | L100 | documented exclusion - LINE-RANGE: page-line reference |
@@ -635,7 +645,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 89 | i | LOW | named gap - first use before any expansion on this page |
 | P417 | 89 | i | SLO | named gap - first use before any expansion on this page |
 | P417 | 89 | ii | token | defined at first use - line 89 contains the expansion |
-| P417 | 89 | iv | `[BLOCKER\|HIGH\|MED\|LOW]` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 89 | iv | `[BLOCKER\|HIGH\|MED\|LOW]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 89 | iv | `references/` | documented exclusion - PATH: file or path identifier |
 | P417 | 95 | i | L13 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 95 | i | L165 | documented exclusion - LINE-RANGE: page-line reference |
@@ -643,13 +653,13 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 95 | i | L205 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 95 | i | L29 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 95 | i | L70 | documented exclusion - LINE-RANGE: page-line reference |
-| P417 | 95 | iv | `[SEV]` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 95 | iv | `[SEV]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 95 | iv | `references/trust-exploitation-patterns.md` | documented exclusion - PATH: file or path identifier |
 | P417 | 101 | i | L21 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 101 | i | L56 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 101 | i | L72 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 101 | i | O1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P417 | 101 | iv | `N` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 101 | iv | `N` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 124 | iv | `44b104d6d8da90d230eac1bbf82e9a0533a6f835` | documented exclusion - SHA: hash/commit identifier |
 | P417 | 125 | iv | `037f883ede2135bf2e32d6f5a1e9b0d40637e340` | documented exclusion - SHA: hash/commit identifier |
 | P417 | 126 | iv | `61ca13055799dbc78954b5c402c84e064de815cb` | documented exclusion - SHA: hash/commit identifier |
@@ -671,13 +681,13 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P417 | 161 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
 | P417 | 161 | iv | `python -B scripts/ci/check-markdown-links.py <eight pages>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P417 | 161 | v | <eight pages> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P417 | 163 | iv | `laneA[128]…laneA[135]` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P417 | 163 | iv | `laneA[128]…laneA[135]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 167 | i | SD-C | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 167 | ii | handoff | named gap - first use before any expansion on this page |
 | P417 | 181 | i | AEGIS-APR-115 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 181 | ii | partial | named gap - first use before any expansion on this page |
-| P417 | 181 | v | 112-119 | documented exclusion - RANGE: numeric range/unit token |
-| P417 | 181 | v | 120-127 | documented exclusion - RANGE: numeric range/unit token |
+| P417 | 181 | v | 112-119 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P417 | 181 | v | 120-127 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 1 | ii | batch | named gap - first use before any expansion on this page |
 | P418 | 1 | ii | lane | named gap - first use before any expansion on this page |
 | P418 | 1 | ii | record | named gap - first use before any expansion on this page |
@@ -699,10 +709,10 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 9 | ii | rule | named gap - first use before any expansion on this page |
 | P418 | 10 | i | AI | named gap - first use before any expansion on this page |
 | P418 | 10 | ii | owner | named gap - first use before any expansion on this page |
-| P418 | 11 | iv | `readability-lane-a-implementer-c` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 11 | iv | `readability-lane-a-implementer-c` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 12 | v | REVISE | named gap - first use before any expansion on this page |
 | P418 | 12 | i | SD-D | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P418 | 12 | iv | `SD-D: REVISE` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 12 | iv | `SD-D: REVISE` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 13 | ii | head | named gap - first use before any expansion on this page |
 | P418 | 13 | iv | `05ad76072d12070164aaf9135223e49e28a296ae` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 14 | iii | DeepSeek-4.1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -713,24 +723,24 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 17 | ii | withdrawal | named gap - first use before any expansion on this page |
 | P418 | 21 | ii | correction | named gap - first use before any expansion on this page |
 | P418 | 26 | ii | evidence | named gap - first use before any expansion on this page |
-| P418 | 28 | iv | `Quote` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 28 | iv | `Quote` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 32 | iv | `refs/remotes/origin/main` | documented exclusion - PATH: file or path identifier |
 | P418 | 33 | ii | base | defined at first use - line 33 contains the expansion |
 | P418 | 33 | iv | `git merge-base --is-ancestor e2a3e20b7c20ef8385b219b39c6405237163406f refs/remotes/origin/main` | documented exclusion - PATH: file or path identifier |
 | P418 | 35 | ii | reader | named gap - first use before any expansion on this page |
 | P418 | 36 | ii | diff | named gap - first use before any expansion on this page |
-| P418 | 41 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 41 | iv | `provably_pending` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 41 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 41 | iv | `provably_pending` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 42 | ii | instrument | named gap - first use before any expansion on this page |
 | P418 | 42 | ii | quarters | named gap - first use before any expansion on this page |
 | P418 | 47 | ii | json | defined at first use - line 47 contains the expansion |
 | P418 | 47 | iii | check_index.py | documented exclusion - PATH: file or path identifier |
-| P418 | 58 | iv | `git ls-tree -r --name-only e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - COMMAND: command/CLI token |
+| P418 | 58 | iv | `git ls-tree -r --name-only e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P418 | 60 | iii | acceptance-index.json | documented exclusion - PATH: file or path identifier |
-| P418 | 60 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 60 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 60 | iv | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - PATH: file or path identifier |
-| P418 | 61 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 62 | iv | `ceil(590 / 4) = 148` | documented exclusion - PATH: file or path identifier |
+| P418 | 61 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 62 | iv | `ceil(590 / 4) = 148` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 65 | ii | count | defined at first use - line 65 contains the expansion |
 | P418 | 65 | ii | reviewer | named gap - first use before any expansion on this page |
 | P418 | 65 | iii | ai-security-red-team-reviewer.md | documented exclusion - PATH: file or path identifier |
@@ -739,18 +749,18 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 66 | iv | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 67 | ii | next | named gap - first use before any expansion on this page |
 | P418 | 67 | ii | range | named gap - first use before any expansion on this page |
-| P418 | 67 | v | 8-15 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 67 | v | 9-16 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 68 | v | 1-8 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 67 | v | 8-15 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 67 | v | 9-16 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 68 | v | 1-8 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 70 | i | JSON | named gap - first use before any expansion on this page |
 | P418 | 76 | i | B2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 76 | ii | test | defined at first use - line 76 contains the expansion |
 | P418 | 76 | iv | `.claude/skills/` | documented exclusion - PATH: file or path identifier |
-| P418 | 76 | iv | `ab-test-designer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 76 | iv | `acceptance-criteria-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 76 | iv | `accessibility-test-harness` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 76 | iv | `admin-console-architect` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 76 | iv | `adr-sequencer` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 76 | iv | `ab-test-designer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 76 | iv | `acceptance-criteria-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 76 | iv | `accessibility-test-harness` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 76 | iv | `admin-console-architect` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 76 | iv | `adr-sequencer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 76 | iv | `e2a3e20b7c20…` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 79 | i | L3000-3006 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 83 | i | AEGIS-APR-101 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -765,7 +775,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 91 | i | K-097W | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 92 | i | K-106 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 92 | i | K-113 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P418 | 92 | iv | `deepseek-flash-apr117-keeper` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 92 | iv | `deepseek-flash-apr117-keeper` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 96 | ii | docs | named gap - first use before any expansion on this page |
 | P418 | 96 | ii | rerecord | defined at first use - line 96 contains the expansion |
 | P418 | 96 | iii | readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | documented exclusion - PATH: file or path identifier |
@@ -813,7 +823,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 125 | i | K-105 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 125 | ii | audit | defined at first use - line 125 contains the expansion |
 | P418 | 127 | v | PARTIAL | named gap - first use before any expansion on this page |
-| P418 | 130 | iv | `Blob ID` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 130 | iv | `Blob ID` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 131 | iv | `build_index.py` | documented exclusion - PATH: file or path identifier |
 | P418 | 132 | iv | `git rev-parse <Acceptance revision>:<Page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 132 | v | <Acceptance revision> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -837,14 +847,14 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 151 | iv | `.claude/skills/adr-sequencer/references/adr-corpus-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 153 | ii | counts | defined at first use - line 153 contains the expansion |
 | P418 | 153 | iv | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P418 | 155 | iv | `wc -l` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 155 | iv | `wc -l` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 156 | i | DSH | named gap - first use before any expansion on this page |
 | P418 | 156 | i | UTF-8 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P418 | 157 | iii | 8.7 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 157 | iii | 8.7 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 161 | ii | purpose | named gap - first use before any expansion on this page |
 | P418 | 163 | i | L1-228 | documented exclusion - LINE-RANGE: page-line reference |
-| P418 | 171 | iv | `funnel-definition-designer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 172 | iv | `feature-flag-rollout-strategist` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 171 | iv | `funnel-definition-designer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 172 | iv | `feature-flag-rollout-strategist` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 173 | i | B1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 173 | ii | audience | defined at first use - line 173 contains the expansion |
 | P418 | 175 | i | CI | named gap - first use before any expansion on this page |
@@ -852,27 +862,27 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 175 | i | SRM | named gap - first use before any expansion on this page |
 | P418 | 175 | ii | partial | named gap - first use before any expansion on this page |
 | P418 | 177 | i | L178 | documented exclusion - LINE-RANGE: page-line reference |
-| P418 | 177 | iii | 0.05 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 177 | iv | `p<0.05` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 177 | iii | 0.05 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 177 | iv | `p<0.05` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 178 | i | L176-177 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 180 | i | L13 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 180 | iv | `references/ab-test-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 181 | i | L183 | documented exclusion - LINE-RANGE: page-line reference |
-| P418 | 181 | iv | `p-hacking` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 181 | iv | `p-hacking` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 183 | i | L82 | documented exclusion - LINE-RANGE: page-line reference |
-| P418 | 187 | iii | 8.3 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 187 | iii | 8.3 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 189 | i | B3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 189 | ii | gate | named gap - first use before any expansion on this page |
 | P418 | 190 | ii | workflow | named gap - first use before any expansion on this page |
-| P418 | 191 | iii | 0.5 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 191 | iii | 2.1 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 191 | iii | 3.7 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 191 | v | 0.5–3.7 | documented exclusion - OPERATOR: operator glyph |
+| P418 | 191 | iii | 0.5 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 191 | iii | 2.1 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 191 | iii | 3.7 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 191 | v | 0.5–3.7 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 193 | i | B4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 193 | ii | tests | named gap - first use before any expansion on this page |
 | P418 | 194 | i | B5 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 194 | ii | blocked | named gap - first use before any expansion on this page |
-| P418 | 196 | iv | `git ls-tree e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - COMMAND: command/CLI token |
+| P418 | 196 | iv | `git ls-tree e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P418 | 197 | i | B6 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 197 | iii | evals.json | documented exclusion - PATH: file or path identifier |
 | P418 | 197 | iii | trigger-evals.json | documented exclusion - PATH: file or path identifier |
@@ -881,9 +891,9 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 201 | i | L1-69 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 204 | ii | corrections | named gap - first use before any expansion on this page |
 | P418 | 208 | i | SUTVA | defined at first use - line 208 contains the expansion |
-| P418 | 211 | iii | 0.80 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 211 | iii | 0.90 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 211 | v | 0.80–0.90 | documented exclusion - OPERATOR: operator glyph |
+| P418 | 211 | iii | 0.80 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 211 | iii | 0.90 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 211 | v | 0.80–0.90 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 212 | iv | `../SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 216 | i | L1-234 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 218 | ii | spec | named gap - first use before any expansion on this page |
@@ -894,7 +904,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 222 | i | UNTESTABLE | named gap - first use before any expansion on this page |
 | P418 | 223 | ii | done | named gap - first use before any expansion on this page |
 | P418 | 225 | i | QA | named gap - first use before any expansion on this page |
-| P418 | 226 | v | ms | documented exclusion - OPERATOR: operator glyph |
+| P418 | 226 | v | ms | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 230 | v | 2026-09 | documented exclusion - DATE: date/time or version fragment |
 | P418 | 232 | iv | `references/criteria-review-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 240 | i | L1-84 | documented exclusion - LINE-RANGE: page-line reference |
@@ -903,7 +913,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 247 | i | CSV | defined at first use - line 247 contains the expansion |
 | P418 | 248 | i | GAP | named gap - first use before any expansion on this page |
 | P418 | 248 | ii | rules | named gap - first use before any expansion on this page |
-| P418 | 251 | iv | `multi-tenant-security-tester` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 251 | iv | `multi-tenant-security-tester` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 255 | i | L1-196 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 256 | i | WCAG | defined at first use - line 256 contains the expansion |
 | P418 | 257 | i | E2E | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -928,12 +938,12 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 280 | ii | policy | named gap - first use before any expansion on this page |
 | P418 | 282 | i | JAWS | defined at first use - line 282 contains the expansion |
 | P418 | 282 | i | NVDA | named gap - first use before any expansion on this page |
-| P418 | 283 | iii | 2.2 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 283 | iii | 2.2 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 289 | i | L1-243 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 294 | ii | operator | named gap - first use before any expansion on this page |
 | P418 | 295 | i | DESIGN | named gap - first use before any expansion on this page |
 | P418 | 298 | i | API | named gap - first use before any expansion on this page |
-| P418 | 298 | iv | `authz` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 298 | iv | `authz` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 299 | i | L143 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 300 | i | L160 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 300 | i | POLICY | named gap - first use before any expansion on this page |
@@ -944,10 +954,10 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 302 | i | ENFORCES | named gap - first use before any expansion on this page |
 | P418 | 302 | i | L25 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 304 | i | L146 | documented exclusion - LINE-RANGE: page-line reference |
-| P418 | 304 | iv | `authorization-matrix-designer` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 304 | iv | `authorization-matrix-designer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 310 | ii | approval | named gap - first use before any expansion on this page |
 | P418 | 311 | iv | `references/` | documented exclusion - PATH: file or path identifier |
-| P418 | 311 | iv | `references` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 311 | iv | `references` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 319 | i | L1-75 | documented exclusion - LINE-RANGE: page-line reference |
 | P418 | 321 | ii | lifecycle | defined at first use - line 321 contains the expansion |
 | P418 | 321 | ii | status | named gap - first use before any expansion on this page |
@@ -957,16 +967,16 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 350 | i | D84 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 350 | ii | official | defined at first use - line 350 contains the expansion |
 | P418 | 353 | iv | `build_index.py --report` | documented exclusion - PATH: file or path identifier |
-| P418 | 354 | iv | `git rev-parse --is-shallow-repository` | documented exclusion - COMMAND: command/CLI token |
-| P418 | 355 | iv | `false` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 354 | iv | `git rev-parse --is-shallow-repository` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P418 | 355 | iv | `false` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 355 | iv | `refs/pull/*/head` | documented exclusion - PATH: file or path identifier |
 | P418 | 356 | i | D73 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 358 | ii | blob | named gap - first use before any expansion on this page |
 | P418 | 358 | ii | passed | named gap - first use before any expansion on this page |
-| P418 | 359 | iv | `git rev-parse` | documented exclusion - COMMAND: command/CLI token |
-| P418 | 360 | iv | `--write` | documented exclusion - COMMAND: command/CLI token |
+| P418 | 359 | iv | `git rev-parse` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P418 | 360 | iv | `--write` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P418 | 371 | ii | frontier | defined at first use - line 371 contains the expansion |
-| P418 | 371 | v | 1-4 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 371 | v | 1-4 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 375 | iv | `50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 378 | iv | `.claude/skills/agent-instruction-consolidator/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 379 | iii | instruction-file-map.md | documented exclusion - PATH: file or path identifier |
@@ -980,7 +990,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 384 | iii | tool-permission-matrix.md | documented exclusion - PATH: file or path identifier |
 | P418 | 384 | iv | `.claude/skills/agent-tool-safety-guard/references/tool-permission-matrix.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 385 | iv | `.claude/skills/agentic-loop-designer/SKILL.md` | documented exclusion - PATH: file or path identifier |
-| P418 | 392 | iii | 8.2 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 392 | iii | 8.2 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 392 | iv | `0be76bc0…` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 392 | iv | `28e20697…` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 392 | iv | `56899580…` | documented exclusion - SHA: hash/commit identifier |
@@ -996,24 +1006,24 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 392 | v | × | documented exclusion - OPERATOR: operator glyph |
 | P418 | 394 | ii | ci | named gap - first use before any expansion on this page |
 | P418 | 394 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
-| P418 | 394 | iv | `files: 8   links checked: 9   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 394 | iv | `files: 8   links checked: 9   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 394 | iv | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - PATH: file or path identifier |
 | P418 | 395 | i | OK | defined at first use - line 395 contains the expansion |
 | P418 | 395 | iii | validate-skills.py | documented exclusion - PATH: file or path identifier |
-| P418 | 395 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 395 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 395 | iv | `python -P scripts/validate-skills.py` | documented exclusion - PATH: file or path identifier |
 | P418 | 396 | iii | test_validator.py | documented exclusion - PATH: file or path identifier |
-| P418 | 396 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 396 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 396 | iv | `python scripts/tests/test_validator.py` | documented exclusion - PATH: file or path identifier |
 | P418 | 398 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 399 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - PATH: file or path identifier |
 | P418 | 401 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref <this batch's committed head>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P418 | 401 | iv | `table_rows 109, events 109, full_page_acceptances 89, lost_commit_events 10, reader_pages_with_rows 76` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 401 | iv | `table_rows 109, events 109, full_page_acceptances 89, lost_commit_events 10, reader_pages_with_rows 76` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 401 | v | <this batch's committed head> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 407 | i | F1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 407 | i | F5 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 408 | i | F3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P418 | 414 | iii | 8.1 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 414 | iii | 8.1 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 420 | iv | `git grep -n -i -F -e authz e2a3e20b7c20ef8385b219b39c6405237163406f -- .claude/skills/admin-console-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 425 | i | F2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 432 | iv | `28e206977eacb05084844fcbc7d5aff7f90f1ed1` | documented exclusion - SHA: hash/commit identifier |
@@ -1027,16 +1037,16 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 449 | iii | 8.3.1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 449 | iii | 8.3.2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 452 | iv | `e2a3e20b…` | documented exclusion - SHA: hash/commit identifier |
-| P418 | 459 | iv | `Overall Evaluation Criterion` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 459 | iv | `Overall Evaluation Criterion` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 468 | ii | auditor | named gap - first use before any expansion on this page |
 | P418 | 485 | i | F4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P418 | 485 | iii | 8.4 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 485 | iii | 8.4 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 488 | i | C-3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P418 | 488 | v | 17-24 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 488 | v | 17-24 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 502 | iv | `50241ba5…` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 507 | i | CONFIRMED | named gap - first use before any expansion on this page |
 | P418 | 507 | v | UNAVAILABILITY | named gap - first use before any expansion on this page |
-| P418 | 507 | iii | 8.5 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 507 | iii | 8.5 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 510 | ii | failed | named gap - first use before any expansion on this page |
 | P418 | 514 | ii | usage | named gap - first use before any expansion on this page |
 | P418 | 514 | iv | `2026-10-15T19:03:46Z` | documented exclusion - DATE: date/time or version fragment |
@@ -1044,10 +1054,10 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 515 | iv | `GET /pulls/777/reviews` | documented exclusion - PATH: file or path identifier |
 | P418 | 516 | iv | `GET /issues/777/comments` | documented exclusion - PATH: file or path identifier |
 | P418 | 516 | iv | `GET /pulls/777/comments` | documented exclusion - PATH: file or path identifier |
-| P418 | 517 | iv | `chatgpt-codex-connector[bot]` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 517 | iv | `chatgpt-codex-connector[bot]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 519 | ii | triage | named gap - first use before any expansion on this page |
-| P418 | 523 | iii | 8.6 | documented exclusion - RANGE: numeric range/unit token |
-| P418 | 535 | iv | `full-page-acceptance` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 523 | iii | 8.6 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P418 | 535 | iv | `full-page-acceptance` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 550 | ii | build | named gap - first use before any expansion on this page |
 | P418 | 555 | i | F6 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 555 | iii | 8.7.1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1055,11 +1065,11 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 575 | iii | 8.7.2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 582 | iii | 8.7.3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 583 | i | PROC-04 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P418 | 583 | iv | `70ef 1815 189f e918` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 583 | iv | `70ef 1815 189f e918` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 583 | iv | `70ef1815189fe918` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 584 | i | SHA-256 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 585 | ii | payload | named gap - first use before any expansion on this page |
-| P418 | 591 | iii | 8.8 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 591 | iii | 8.8 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 597 | iv | `git grep -n -i -F -e authz … -- .claude/skills/admin-console-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 598 | i | OEC | named gap - first use before any expansion on this page |
 | P418 | 599 | iv | `git show …:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -1067,12 +1077,12 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 600 | v | <the repair head> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 601 | iv | `/comments` | documented exclusion - PATH: file or path identifier |
 | P418 | 601 | iv | `/issues/777/comments` | documented exclusion - PATH: file or path identifier |
-| P418 | 604 | iii | 8.9 | documented exclusion - RANGE: numeric range/unit token |
+| P418 | 604 | iii | 8.9 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 615 | v | CONFLICTING | named gap - first use before any expansion on this page |
 | P418 | 615 | v | DIRTY | named gap - first use before any expansion on this page |
-| P418 | 616 | iv | `mergeable: false` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 616 | iv | `mergeable_state: "dirty"` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P418 | 617 | iv | `pull_request` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P418 | 616 | iv | `mergeable: false` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 616 | iv | `mergeable_state: "dirty"` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 617 | iv | `pull_request` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 1 | i | AEGIS-APR-117 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 1 | ii | batch | named gap - first use before any expansion on this page |
 | P419 | 1 | ii | lane | named gap - first use before any expansion on this page |
@@ -1080,24 +1090,24 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P419 | 1 | ii | withdrawal | named gap - first use before any expansion on this page |
 | P419 | 1 | v | 2026-10 | documented exclusion - DATE: date/time or version fragment |
 | P419 | 3 | iii | DeepSeek-4.1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P419 | 4 | iv | `deepseek-flash-apr117-keeper` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 4 | iv | `deepseek-flash-apr117-keeper` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 5 | i | PR | defined at first use - line 5 contains the expansion |
 | P419 | 6 | v | REVISE | named gap - first use before any expansion on this page |
 | P419 | 6 | i | SD-D | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 6 | ii | head | named gap - first use before any expansion on this page |
-| P419 | 6 | iv | `SD-D: REVISE` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 6 | iv | `SD-D: REVISE` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 7 | iv | `05ad76072d12070164aaf9135223e49e28a296ae` | documented exclusion - SHA: hash/commit identifier |
 | P419 | 11 | i | AEGIS-APR-101 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 11 | ii | register | named gap - first use before any expansion on this page |
 | P419 | 12 | ii | reviewer | named gap - first use before any expansion on this page |
 | P419 | 13 | i | K-090 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 13 | i | K-097 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P419 | 14 | iv | `readability-lane-a-implementer-c` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 14 | iv | `readability-lane-a-implementer-c` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 15 | i | K-074 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 15 | i | K-081 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 15 | ii | decision | named gap - first use before any expansion on this page |
 | P419 | 15 | iii | K-074..K | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P419 | 15 | v | 10-15 | documented exclusion - RANGE: numeric range/unit token |
+| P419 | 15 | v | 10-15 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P419 | 18 | ii | evidence | named gap - first use before any expansion on this page |
 | P419 | 19 | ii | partial | named gap - first use before any expansion on this page |
 | P419 | 21 | i | K-090W | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1107,13 +1117,13 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P419 | 27 | iv | `e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - SHA: hash/commit identifier |
 | P419 | 30 | i | ID | named gap - first use before any expansion on this page |
 | P419 | 30 | ii | git | named gap - first use before any expansion on this page |
-| P419 | 30 | iv | `Blob ID` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 30 | iv | `Blob ID` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 30 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P419 | 30 | v | <page> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P419 | 33 | ii | docs | named gap - first use before any expansion on this page |
 | P419 | 33 | iii | readability-lane-a-batch-2-2026-10-15.md | documented exclusion - PATH: file or path identifier |
 | P419 | 33 | iv | `docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md` | documented exclusion - PATH: file or path identifier |
-| P419 | 33 | v | 2-2026 | documented exclusion - RANGE: numeric range/unit token |
+| P419 | 33 | v | 2-2026 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P419 | 35 | ii | build | defined at first use - line 35 contains the expansion |
 | P419 | 36 | iv | `build_index.py` | documented exclusion - PATH: file or path identifier |
 | P419 | 38 | i | WD-A2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1133,7 +1143,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P419 | 49 | ii | rule | defined at first use - line 49 contains the expansion |
 | P419 | 49 | v | OPEN | named gap - first use before any expansion on this page |
 | P419 | 50 | ii | batches | named gap - first use before any expansion on this page |
-| P419 | 50 | iv | `main` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 50 | iv | `main` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 52 | i | K-098 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 52 | i | K-104 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 53 | i | K-089 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1193,22 +1203,22 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P419 | 157 | i | L13 | documented exclusion - LINE-RANGE: page-line reference |
 | P419 | 157 | i | L176-177 | documented exclusion - LINE-RANGE: page-line reference |
 | P419 | 157 | i | L178 | documented exclusion - LINE-RANGE: page-line reference |
-| P419 | 157 | iii | 0.05 | documented exclusion - RANGE: numeric range/unit token |
-| P419 | 157 | iv | `p<0.05` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 157 | iii | 0.05 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P419 | 157 | iv | `p<0.05` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 157 | iv | `references/ab-test-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P419 | 157 | v | % | documented exclusion - OPERATOR: operator glyph |
 | P419 | 158 | i | L183 | documented exclusion - LINE-RANGE: page-line reference |
-| P419 | 158 | iv | `p-hacking` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 158 | iv | `p-hacking` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 159 | i | L82 | documented exclusion - LINE-RANGE: page-line reference |
-| P419 | 159 | iv | `Overall Evaluation Criterion` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 159 | iv | `Overall Evaluation Criterion` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 160 | i | ENFORCES | named gap - first use before any expansion on this page |
 | P419 | 160 | i | L143 | documented exclusion - LINE-RANGE: page-line reference |
 | P419 | 160 | i | L146 | documented exclusion - LINE-RANGE: page-line reference |
 | P419 | 160 | i | L160 | documented exclusion - LINE-RANGE: page-line reference |
 | P419 | 160 | i | L25 | documented exclusion - LINE-RANGE: page-line reference |
 | P419 | 160 | ii | policy | named gap - first use before any expansion on this page |
-| P419 | 160 | iv | `authorization-matrix-designer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P419 | 160 | iv | `authz` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 160 | iv | `authorization-matrix-designer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P419 | 160 | iv | `authz` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 162 | iv | `origin/main` | documented exclusion - PATH: file or path identifier |
 | P419 | 167 | ii | auditor | named gap - first use before any expansion on this page |
 | P419 | 170 | i | CONFIRMED | named gap - first use before any expansion on this page |
@@ -1223,7 +1233,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P419 | 177 | iv | `GET /pulls/777/reviews` | documented exclusion - PATH: file or path identifier |
 | P419 | 178 | iv | `GET /issues/777/comments` | documented exclusion - PATH: file or path identifier |
 | P419 | 178 | iv | `GET /pulls/777/comments` | documented exclusion - PATH: file or path identifier |
-| P419 | 179 | iv | `chatgpt-codex-connector[bot]` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P419 | 179 | iv | `chatgpt-codex-connector[bot]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 181 | ii | triage | named gap - first use before any expansion on this page |
 | P419 | 182 | ii | records | named gap - first use before any expansion on this page |
 | P419 | 194 | ii | pending | named gap - first use before any expansion on this page |
@@ -1233,12 +1243,12 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 1 | v | 2026-10 | documented exclusion - DATE: date/time or version fragment |
 | P420 | 3 | i | LAST | named gap - first use before any expansion on this page |
 | P420 | 3 | ii | evidence | named gap - first use before any expansion on this page |
-| P420 | 3 | v | 136-143 | documented exclusion - RANGE: numeric range/unit token |
+| P420 | 3 | v | 136-143 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P420 | 5 | v | ACCEPT | named gap - first use before any expansion on this page |
 | P420 | 5 | i | LANE | named gap - first use before any expansion on this page |
 | P420 | 5 | i | PR | named gap - first use before any expansion on this page |
 | P420 | 5 | ii | frontier | named gap - first use before any expansion on this page |
-| P420 | 5 | v | 0-143 | documented exclusion - RANGE: numeric range/unit token |
+| P420 | 5 | v | 0-143 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P420 | 5 | v | PASS | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P420 | 7 | ii | base | named gap - first use before any expansion on this page |
 | P420 | 7 | ii | blob | named gap - first use before any expansion on this page |
@@ -1257,9 +1267,9 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 13 | ii | test | named gap - first use before any expansion on this page |
 | P420 | 13 | ii | workflow | named gap - first use before any expansion on this page |
 | P420 | 13 | iii | readability-lane-a-batch-20-2026-10-18.md | documented exclusion - PATH: file or path identifier |
-| P420 | 13 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 13 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 13 | iv | `docs/evidence/documentation/readability-lane-a-batch-20-2026-10-18.md` | documented exclusion - PATH: file or path identifier |
-| P420 | 13 | v | 20-2026 | documented exclusion - RANGE: numeric range/unit token |
+| P420 | 13 | v | 20-2026 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P420 | 14 | i | DCO | defined at first use - line 14 contains the expansion |
 | P420 | 14 | ii | drift | named gap - first use before any expansion on this page |
 | P420 | 15 | ii | pending | named gap - first use before any expansion on this page |
@@ -1278,11 +1288,11 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 27 | ii | count | defined at first use - line 27 contains the expansion |
 | P420 | 27 | ii | next | defined at first use - line 27 contains the expansion |
 | P420 | 27 | iv | `.claude/skills/human-approval-boundary/SKILL.md` | documented exclusion - PATH: file or path identifier |
-| P420 | 27 | v | 0-111 | documented exclusion - RANGE: numeric range/unit token |
-| P420 | 27 | v | 0-135 | documented exclusion - RANGE: numeric range/unit token |
-| P420 | 27 | v | 112-119 | documented exclusion - RANGE: numeric range/unit token |
-| P420 | 27 | v | 120-127 | documented exclusion - RANGE: numeric range/unit token |
-| P420 | 27 | v | 128-135 | documented exclusion - RANGE: numeric range/unit token |
+| P420 | 27 | v | 0-111 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P420 | 27 | v | 0-135 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P420 | 27 | v | 112-119 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P420 | 27 | v | 120-127 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P420 | 27 | v | 128-135 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P420 | 33 | i | LF | named gap - first use before any expansion on this page |
 | P420 | 35 | i | L3 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 35 | i | L8 | documented exclusion - LINE-RANGE: page-line reference |
@@ -1359,8 +1369,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 52 | ii | partial | named gap - first use before any expansion on this page |
 | P420 | 52 | ii | repo | named gap - first use before any expansion on this page |
 | P420 | 53 | ii | policy | named gap - first use before any expansion on this page |
-| P420 | 53 | iv | `... RLS or security policy ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P420 | 53 | iv | `Terms: **RLS** means row-level security.` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 53 | iv | `... RLS or security policy ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P420 | 53 | iv | `Terms: **RLS** means row-level security.` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 56 | i | L1-205 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 57 | ii | deploy | defined at first use - line 57 contains the expansion |
 | P420 | 58 | i | ADR | named gap - first use before any expansion on this page |
@@ -1378,7 +1388,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 58 | i | L8-20 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 58 | i | L80-123 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 59 | iv | `... CDK, Pulumi ... IAM/RBAC ...` | documented exclusion - PATH: file or path identifier |
-| P420 | 59 | iv | `Terms: IaC means ... CDK means ... PR means ... IAM means ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 59 | iv | `Terms: IaC means ... CDK means ... PR means ... IAM means ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 62 | i | L1-69 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 64 | i | ACL | named gap - first use before any expansion on this page |
 | P420 | 64 | i | ARM | named gap - first use before any expansion on this page |
@@ -1392,7 +1402,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 64 | i | L62-69 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 64 | i | L66 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 64 | i | NSG | named gap - first use before any expansion on this page |
-| P420 | 65 | iv | `- [ ] Data stores ... DNS ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 65 | iv | `- [ ] Data stores ... DNS ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 68 | i | L1-216 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 69 | i | SEV | named gap - first use before any expansion on this page |
 | P420 | 69 | ii | tenant | defined at first use - line 69 contains the expansion |
@@ -1409,8 +1419,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 70 | i | SLA | named gap - first use before any expansion on this page |
 | P420 | 70 | i | SLO | named gap - first use before any expansion on this page |
 | P420 | 70 | ii | handoff | named gap - first use before any expansion on this page |
-| P420 | 71 | iv | `... SEV1–SEV4 ... SLI-verified ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P420 | 71 | iv | `Terms: **SEV1–SEV4** ... **SLI** ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 71 | iv | `... SEV1–SEV4 ... SLI-verified ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P420 | 71 | iv | `Terms: **SEV1–SEV4** ... **SLI** ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 74 | i | L1-75 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 75 | ii | disposition | named gap - first use before any expansion on this page |
 | P420 | 76 | i | B1-B5 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1425,7 +1435,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 76 | iv | `SEV<h>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P420 | 76 | v | <h> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P420 | 77 | i | L5-7 | documented exclusion - LINE-RANGE: page-line reference |
-| P420 | 77 | iv | `SEV means incident severity level ... IC is the incident commander ... p99 is the 99th-percentile observed latency ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 77 | iv | `SEV means incident severity level ... IC is the incident commander ... p99 is the 99th-percentile observed latency ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 80 | i | L1-195 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 81 | ii | auth | defined at first use - line 81 contains the expansion |
 | P420 | 81 | ii | tests | named gap - first use before any expansion on this page |
@@ -1442,8 +1452,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 82 | i | UI | named gap - first use before any expansion on this page |
 | P420 | 82 | ii | spec | named gap - first use before any expansion on this page |
 | P420 | 83 | i | BETWEEN | named gap - first use before any expansion on this page |
-| P420 | 83 | iv | `... BETWEEN unit and E2E ... third-party APIs ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P420 | 83 | iv | `Terms: E2E means ... API means ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 83 | iv | `... BETWEEN unit and E2E ... third-party APIs ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P420 | 83 | iv | `Terms: E2E means ... API means ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 86 | i | L1-53 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 87 | i | FAKED | named gap - first use before any expansion on this page |
 | P420 | 87 | i | REAL | named gap - first use before any expansion on this page |
@@ -1452,9 +1462,9 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 88 | i | L4-6 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 88 | i | L47-53 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 88 | i | L8-22 | documented exclusion - LINE-RANGE: page-line reference |
-| P420 | 88 | iv | `third-party HTTP (payments, email, LLM)` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P420 | 88 | v | 2xx | documented exclusion - RANGE: numeric range/unit token |
-| P420 | 89 | iv | `third-party HTTP (payments, email, LLM) \| external \| FAKED ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 88 | iv | `third-party HTTP (payments, email, LLM)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P420 | 88 | v | 2xx | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P420 | 89 | iv | `third-party HTTP (payments, email, LLM) \| external \| FAKED ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 92 | i | L1-215 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 93 | ii | rule | named gap - first use before any expansion on this page |
 | P420 | 94 | i | ASI03 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1471,8 +1481,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P420 | 94 | i | TLS | named gap - first use before any expansion on this page |
 | P420 | 94 | ii | e2e | named gap - first use before any expansion on this page |
 | P420 | 94 | ii | ts | defined at first use - line 94 contains the expansion |
-| P420 | 95 | iv | `... OWASP Agentic ASI07 ... A2A, MCP ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P420 | 95 | iv | `Terms used below: OWASP means ... ASI07 ... MCP ... A2A ... API ...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P420 | 95 | iv | `... OWASP Agentic ASI07 ... A2A, MCP ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P420 | 95 | iv | `Terms used below: OWASP means ... ASI07 ... MCP ... A2A ... API ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 108 | iv | `1829959620400a8b87723d2ccd6b0aa87b8776ad` | documented exclusion - SHA: hash/commit identifier |
 | P420 | 108 | v | 2026-09 | documented exclusion - DATE: date/time or version fragment |
 | P420 | 109 | iv | `f5a6dabb7c8b243c059272aa1ca051a34f5bae65` | documented exclusion - SHA: hash/commit identifier |
@@ -1507,7 +1517,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 1 | ii | batch | named gap - first use before any expansion on this page |
 | P421 | 1 | ii | lane | named gap - first use before any expansion on this page |
 | P421 | 1 | ii | record | named gap - first use before any expansion on this page |
-| P421 | 1 | v | 10-15 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 1 | v | 10-15 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 1 | v | 2026-10 | documented exclusion - DATE: date/time or version fragment |
 | P421 | 3 | i | LANE | named gap - first use before any expansion on this page |
 | P421 | 3 | i | PHASE | named gap - first use before any expansion on this page |
@@ -1527,8 +1537,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 10 | ii | rule | named gap - first use before any expansion on this page |
 | P421 | 11 | i | AI | named gap - first use before any expansion on this page |
 | P421 | 11 | ii | owner | named gap - first use before any expansion on this page |
-| P421 | 12 | iv | `readability-lane-a-implementer-c` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 15 | iv | `Quote` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 12 | iv | `readability-lane-a-implementer-c` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 15 | iv | `Quote` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 17 | i | NOTHING | named gap - first use before any expansion on this page |
 | P421 | 17 | ii | diff | named gap - first use before any expansion on this page |
 | P421 | 18 | ii | base | named gap - first use before any expansion on this page |
@@ -1541,17 +1551,17 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 25 | iv | `refs/remotes/origin/main` | documented exclusion - PATH: file or path identifier |
 | P421 | 26 | iv | `git merge-base --is-ancestor e2a3e20b7c20ef8385b219b39c6405237163406f refs/remotes/origin/main` | documented exclusion - PATH: file or path identifier |
 | P421 | 28 | ii | reader | named gap - first use before any expansion on this page |
-| P421 | 34 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 35 | iv | `provably_pending` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 34 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 35 | iv | `provably_pending` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 36 | ii | instrument | named gap - first use before any expansion on this page |
 | P421 | 37 | ii | quarters | named gap - first use before any expansion on this page |
 | P421 | 41 | ii | json | defined at first use - line 41 contains the expansion |
 | P421 | 41 | iii | check_index.py | documented exclusion - PATH: file or path identifier |
-| P421 | 52 | iv | `git ls-tree -r --name-only e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 52 | iv | `git ls-tree -r --name-only e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P421 | 54 | iii | acceptance-index.json | documented exclusion - PATH: file or path identifier |
-| P421 | 54 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 54 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 54 | iv | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - PATH: file or path identifier |
-| P421 | 55 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 55 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 56 | iv | `ceil(590 / 4) = 148` | documented exclusion - PATH: file or path identifier |
 | P421 | 58 | ii | count | defined at first use - line 58 contains the expansion |
 | P421 | 58 | ii | reviewer | named gap - first use before any expansion on this page |
@@ -1561,28 +1571,28 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 59 | iv | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 60 | ii | next | named gap - first use before any expansion on this page |
 | P421 | 60 | ii | range | named gap - first use before any expansion on this page |
-| P421 | 60 | v | 16-23 | documented exclusion - RANGE: numeric range/unit token |
-| P421 | 60 | v | 17-24 | documented exclusion - RANGE: numeric range/unit token |
-| P421 | 61 | v | 1-8 | documented exclusion - RANGE: numeric range/unit token |
-| P421 | 61 | v | 9-16 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 60 | v | 16-23 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P421 | 60 | v | 17-24 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P421 | 61 | v | 1-8 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P421 | 61 | v | 9-16 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 63 | i | JSON | named gap - first use before any expansion on this page |
 | P421 | 64 | ii | reconciliation | defined at first use - line 64 contains the expansion |
 | P421 | 66 | iii | _laneA_paths.json | documented exclusion - PATH: file or path identifier |
 | P421 | 66 | iv | `wt-laneA-b1/_laneA_paths.json` | documented exclusion - PATH: file or path identifier |
 | P421 | 67 | ii | records | defined at first use - line 67 contains the expansion |
 | P421 | 68 | iv | `ceil(590/4)=148` | documented exclusion - PATH: file or path identifier |
-| P421 | 69 | v | 0-147 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 69 | v | 0-147 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 71 | ii | lanes | named gap - first use before any expansion on this page |
 | P421 | 72 | iv | `laneB-pages.json` | documented exclusion - PATH: file or path identifier |
-| P421 | 76 | iv | `git ls-tree -r` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 76 | iv | `git ls-tree -r` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P421 | 76 | iv | `refs/heads` | documented exclusion - PATH: file or path identifier |
 | P421 | 76 | iv | `refs/remotes` | documented exclusion - PATH: file or path identifier |
 | P421 | 79 | ii | union | named gap - first use before any expansion on this page |
 | P421 | 79 | iv | `ceil(590/4) = 148` | documented exclusion - PATH: file or path identifier |
-| P421 | 82 | iv | `cannot_decide` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 82 | iv | `cannot_decide` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 85 | iii | aws-baseline.md | documented exclusion - PATH: file or path identifier |
 | P421 | 85 | iv | `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md` | documented exclusion - PATH: file or path identifier |
-| P421 | 85 | iv | `undecided` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 85 | iv | `undecided` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 86 | iii | azure-baseline.md | documented exclusion - PATH: file or path identifier |
 | P421 | 86 | iii | gcp-baseline.md | documented exclusion - PATH: file or path identifier |
 | P421 | 86 | iii | supabase-baseline.md | documented exclusion - PATH: file or path identifier |
@@ -1597,11 +1607,11 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 94 | i | ADR | named gap - first use before any expansion on this page |
 | P421 | 94 | i | B3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 94 | iv | `.claude/skills/` | documented exclusion - PATH: file or path identifier |
-| P421 | 94 | iv | `adr-writer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 94 | iv | `aegis-setup` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 94 | iv | `agent-authorization-matrix` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 94 | iv | `agent-containment-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 94 | iv | `agent-failure-recovery` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 94 | iv | `adr-writer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 94 | iv | `aegis-setup` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 94 | iv | `agent-authorization-matrix` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 94 | iv | `agent-containment-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 94 | iv | `agent-failure-recovery` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 94 | iv | `e2a3e20b7c20…` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 97 | i | L3000-3006 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 110 | v | % | documented exclusion - OPERATOR: operator glyph |
@@ -1628,7 +1638,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 126 | i | ID | defined at first use - line 126 contains the expansion |
 | P421 | 126 | i | KEEPER-ID-ALLOCATION | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 126 | iv | `KEEPER-ID-ALLOCATION.md` | documented exclusion - PATH: file or path identifier |
-| P421 | 128 | iv | `git grep -l KEEPER-ID-ALLOCATION e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 128 | iv | `git grep -l KEEPER-ID-ALLOCATION e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P421 | 131 | iv | `3b0d6cd54222442e2e0b1598829bd078c03a22d4` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 132 | ii | scope | defined at first use - line 132 contains the expansion |
 | P421 | 135 | i | AEGIS-APR-039 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1664,7 +1674,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 181 | ii | outcome | named gap - first use before any expansion on this page |
 | P421 | 183 | iii | readability-lane-a-batch-5-2026-10-15.md | documented exclusion - PATH: file or path identifier |
 | P421 | 183 | iv | `docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md` | documented exclusion - PATH: file or path identifier |
-| P421 | 183 | v | 5-2026 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 183 | v | 5-2026 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 186 | ii | blob | named gap - first use before any expansion on this page |
 | P421 | 187 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 187 | v | × | documented exclusion - OPERATOR: operator glyph |
@@ -1679,7 +1689,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 201 | ii | purpose | named gap - first use before any expansion on this page |
 | P421 | 206 | ii | marker | named gap - first use before any expansion on this page |
 | P421 | 206 | iv | `>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P421 | 207 | iv | `…` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 207 | iv | `…` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 210 | i | L3 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 214 | i | L1 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 214 | i | L1-65 | documented exclusion - LINE-RANGE: page-line reference |
@@ -1687,12 +1697,12 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 220 | i | B1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 220 | ii | audience | defined at first use - line 220 contains the expansion |
 | P421 | 222 | ii | status | named gap - first use before any expansion on this page |
-| P421 | 222 | iv | `MMMM` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 222 | iv | `NNNN` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 222 | iv | `MMMM` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 222 | iv | `NNNN` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 223 | ii | unknown | named gap - first use before any expansion on this page |
-| P421 | 223 | iv | `(confirmed)` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 223 | iv | `(inferred)` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 223 | iv | `(unknown)` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 223 | iv | `(confirmed)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 223 | iv | `(inferred)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 223 | iv | `(unknown)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 225 | ii | tenant | named gap - first use before any expansion on this page |
 | P421 | 226 | i | B4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 229 | i | B5 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1706,7 +1716,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 241 | i | BER | named gap - first use before any expansion on this page |
 | P421 | 242 | i | OS | defined at first use - line 242 contains the expansion |
 | P421 | 243 | ii | tokens | named gap - first use before any expansion on this page |
-| P421 | 250 | iv | `selected` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 250 | iv | `selected` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 250 | iv | `verified` | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P421 | 251 | i | L112-113 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 253 | iv | `references/state-contract.md` | documented exclusion - PATH: file or path identifier |
@@ -1728,7 +1738,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 269 | i | UTF-8 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 270 | i | UNC | named gap - first use before any expansion on this page |
 | P421 | 272 | iv | `C:/` | documented exclusion - PATH: file or path identifier |
-| P421 | 272 | iv | `C:\...` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 272 | iv | `C:\...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 282 | i | L1-177 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 286 | ii | deploy | named gap - first use before any expansion on this page |
 | P421 | 287 | ii | approval | defined at first use - line 287 contains the expansion |
@@ -1739,7 +1749,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 293 | v | APPLIED | named gap - first use before any expansion on this page |
 | P421 | 293 | v | AWAITING | named gap - first use before any expansion on this page |
 | P421 | 294 | i | STOP | named gap - first use before any expansion on this page |
-| P421 | 297 | iv | `gh` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 297 | iv | `gh` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P421 | 297 | iv | `references/matrix-template.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 303 | i | L1-84 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 305 | i | TRIGGERS | named gap - first use before any expansion on this page |
@@ -1748,12 +1758,12 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 313 | i | AUTONOMOUS | named gap - first use before any expansion on this page |
 | P421 | 313 | i | FORBIDDEN | named gap - first use before any expansion on this page |
 | P421 | 314 | i | AEGIS-APR-002 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P421 | 315 | iv | `mergedBy` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 315 | iv | `mergedBy` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 320 | iii | APPROVAL_REGISTER.md | documented exclusion - PATH: file or path identifier |
 | P421 | 320 | iv | `../../../../docs/approvals/APPROVAL_REGISTER.md` | documented exclusion - PATH: file or path identifier |
-| P421 | 320 | v | APPROVAL_REGISTER | documented exclusion - OPERATOR: operator glyph |
+| P421 | 320 | i | APPROVAL_REGISTER | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 321 | ii | audit | named gap - first use before any expansion on this page |
-| P421 | 321 | iv | `agent-governance-audit` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 321 | iv | `agent-governance-audit` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 325 | i | L1-218 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 327 | i | ASI08 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 327 | i | OWASP | named gap - first use before any expansion on this page |
@@ -1761,10 +1771,10 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 332 | i | API | named gap - first use before any expansion on this page |
 | P421 | 332 | i | LLM | named gap - first use before any expansion on this page |
 | P421 | 333 | i | SIGKILL | defined at first use - line 333 contains the expansion |
-| P421 | 333 | iv | `SEV` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 333 | iv | `SEV` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 334 | ii | token | named gap - first use before any expansion on this page |
 | P421 | 336 | i | HIGH | defined at first use - line 336 contains the expansion |
-| P421 | 339 | iv | `incident-response-runbook` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 339 | iv | `incident-response-runbook` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 340 | i | L50-52 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 343 | iv | `references/containment-patterns.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 346 | ii | operator | named gap - first use before any expansion on this page |
@@ -1775,9 +1785,9 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 366 | i | ASI01 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 366 | i | L10 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 367 | i | L76 | documented exclusion - LINE-RANGE: page-line reference |
-| P421 | 372 | iv | `ACL` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 372 | iv | `ACLs` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 373 | iii | 2.1 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 372 | iv | `ACL` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 372 | iv | `ACLs` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 373 | iii | 2.1 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 375 | i | L13 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 375 | i | L13-14 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 375 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
@@ -1788,34 +1798,34 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 398 | ii | blocked | named gap - first use before any expansion on this page |
 | P421 | 399 | ii | known | defined at first use - line 399 contains the expansion |
 | P421 | 399 | v | → | documented exclusion - OPERATOR: operator glyph |
-| P421 | 403 | iv | `-u` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 403 | iv | `-u` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 410 | iii | recovery-playbooks.md | documented exclusion - PATH: file or path identifier |
 | P421 | 410 | iv | `references/recovery-playbooks.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 437 | iv | `git diff --numstat e2a3e20b..<this repair's commit>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 437 | v | <this repair's commit> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 438 | ii | head | named gap - first use before any expansion on this page |
 | P421 | 438 | iv | `27ee6291` | documented exclusion - SHA: hash/commit identifier |
-| P421 | 438 | iv | `385 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 441 | iv | `d3eba65b..27ee6291` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 438 | iv | `385 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 441 | iv | `d3eba65b..27ee6291` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 442 | iv | `27ee6291..<this repair's commit>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P421 | 444 | iv | `-` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 444 | iv | `-` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 447 | i | D84 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P421 | 447 | iv | `- **This lane publishes no readability count of its own** (the D84 official-count switch). The` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 448 | iv | `-- **This lane…` | documented exclusion - COMMAND: command/CLI token |
-| P421 | 450 | iv | `- **Next batch selection rule:** the next 8 paths…` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 450 | iv | `-- **Next batch…` | documented exclusion - COMMAND: command/CLI token |
-| P421 | 451 | iv | `--` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 447 | iv | `- **This lane publishes no readability count of its own** (the D84 official-count switch). The` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 448 | iv | `-- **This lane…` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 450 | iv | `- **Next batch selection rule:** the next 8 paths…` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 450 | iv | `-- **Next batch…` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 451 | iv | `--` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P421 | 459 | iii | build_index.py | documented exclusion - PATH: file or path identifier |
 | P421 | 459 | iv | `build_index.py --report` | documented exclusion - PATH: file or path identifier |
 | P421 | 463 | iv | `build_index.py --write` | documented exclusion - PATH: file or path identifier |
 | P421 | 469 | ii | sha256 | defined at first use - line 469 contains the expansion |
-| P421 | 469 | iv | `## Footer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 469 | iv | `sha256:` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 469 | iv | `## Footer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 469 | iv | `sha256:` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 472 | ii | hash | named gap - first use before any expansion on this page |
-| P421 | 475 | iv | `6342e38b3cf2adfddf72b51d4bee4311afd990d2a730445f331771ce6c739727` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 476 | v | 1-650 | documented exclusion - RANGE: numeric range/unit token |
-| P421 | 477 | iv | `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 478 | v | 1-721 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 475 | iv | `6342e38b3cf2adfddf72b51d4bee4311afd990d2a730445f331771ce6c739727` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 476 | v | 1-650 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P421 | 477 | iv | `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 478 | v | 1-721 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 482 | i | UNREAD | named gap - first use before any expansion on this page |
 | P421 | 488 | iv | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 489 | iv | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | documented exclusion - PATH: file or path identifier |
@@ -1828,13 +1838,13 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 494 | iv | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 495 | iii | agent-identity-patterns.md | documented exclusion - PATH: file or path identifier |
 | P421 | 495 | iv | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - PATH: file or path identifier |
-| P421 | 496 | v | 25-32 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 496 | v | 25-32 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 498 | ii | frontier | named gap - first use before any expansion on this page |
-| P421 | 499 | v | 1-3 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 499 | v | 1-3 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 503 | iv | `f6a4e4189ecfbe874f97ec9b6b09bf8fe14f49ad` | documented exclusion - SHA: hash/commit identifier |
-| P421 | 503 | v | 0-7 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 503 | v | 0-7 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 504 | iv | `05ad76072d12070164aaf9135223e49e28a296ae` | documented exclusion - SHA: hash/commit identifier |
-| P421 | 504 | v | 8-15 | documented exclusion - RANGE: numeric range/unit token |
+| P421 | 504 | v | 8-15 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 505 | iv | `de2bfe7237d6e853fa81925faa9f68a82881bba7` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 509 | iv | `ceil(595/4) = 149` | documented exclusion - PATH: file or path identifier |
 | P421 | 512 | iv | `.claude/skills/file-upload-storage-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
@@ -1848,43 +1858,43 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P421 | 524 | iv | `f8d3ad11…` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 526 | ii | ci | named gap - first use before any expansion on this page |
 | P421 | 526 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
-| P421 | 526 | iv | `files: 8   links checked: 13   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 526 | iv | `files: 8   links checked: 13   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 526 | iv | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - PATH: file or path identifier |
 | P421 | 527 | i | OK | defined at first use - line 527 contains the expansion |
 | P421 | 527 | iii | validate-skills.py | documented exclusion - PATH: file or path identifier |
-| P421 | 527 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 527 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 527 | iv | `python -P scripts/validate-skills.py` | documented exclusion - PATH: file or path identifier |
 | P421 | 528 | ii | passed | named gap - first use before any expansion on this page |
 | P421 | 528 | ii | tests | named gap - first use before any expansion on this page |
 | P421 | 528 | iii | test_validator.py | documented exclusion - PATH: file or path identifier |
-| P421 | 528 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 528 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 528 | iv | `python scripts/tests/test_validator.py` | documented exclusion - PATH: file or path identifier |
 | P421 | 530 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 531 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - PATH: file or path identifier |
 | P421 | 535 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref <this batch's committed head>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 535 | iv | `refs/pull/*/head` | documented exclusion - PATH: file or path identifier |
 | P421 | 535 | v | <this batch's committed head> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P421 | 537 | v | 1-13 | documented exclusion - RANGE: numeric range/unit token |
-| P421 | 537 | v | 14-20 | documented exclusion - RANGE: numeric range/unit token |
-| P421 | 543 | iv | `--ref e2a3e20b` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 537 | v | 1-13 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P421 | 537 | v | 14-20 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P421 | 543 | iv | `--ref e2a3e20b` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P421 | 543 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref 27ee6291` | documented exclusion - PATH: file or path identifier |
-| P421 | 543 | iv | `table_rows 101, events 101, full_page_acceptances 81, lost_commit_events 10, reader_pages_with_rows 68` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P421 | 543 | iv | `table_rows 101, events 101, full_page_acceptances 81, lost_commit_events 10, reader_pages_with_rows 68` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 544 | i | KL | named gap - first use before any expansion on this page |
 | P421 | 544 | i | T-001 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 544 | i | T-010 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 544 | ii | id | named gap - first use before any expansion on this page |
 | P421 | 544 | iii | T-001..T | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P421 | 544 | iv | `T-001..T-010` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 544 | iv | `[KL]-digits` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 545 | iv | `links checked: 13   broken: 0   dead: 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 547 | iv | `git diff --check e2a3e20b` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 544 | iv | `T-001..T-010` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 544 | iv | `[KL]-digits` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 545 | iv | `links checked: 13   broken: 0   dead: 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 547 | iv | `git diff --check e2a3e20b` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P421 | 548 | iv | `inter-agent-comms-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 549 | iii | 27ee6291..this | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P421 | 549 | iv | `184 20` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 549 | iv | `20 3` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 549 | iv | `27ee6291..this repair's commit` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 549 | iv | `549 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P421 | 549 | iv | `git diff --numstat` | documented exclusion - COMMAND: command/CLI token |
+| P421 | 549 | iv | `184 20` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 549 | iv | `20 3` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 549 | iv | `27ee6291..this repair's commit` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 549 | iv | `549 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P421 | 549 | iv | `git diff --numstat` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 1 | ii | batch | named gap - first use before any expansion on this page |
 | P422 | 1 | ii | lane | named gap - first use before any expansion on this page |
 | P422 | 1 | ii | record | named gap - first use before any expansion on this page |
@@ -1895,11 +1905,11 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 8 | ii | head | named gap - first use before any expansion on this page |
 | P422 | 9 | ii | failed | named gap - first use before any expansion on this page |
 | P422 | 9 | iv | `e8c8a67c7f99feb4a02c6b334f4ca1a8aea83c5c` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 9 | iv | `validate-skills` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 10 | iv | `markdown-link-corpus` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 9 | iv | `validate-skills` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 10 | iv | `markdown-link-corpus` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 11 | i | CHECK | named gap - first use before any expansion on this page |
 | P422 | 11 | ii | passed | named gap - first use before any expansion on this page |
-| P422 | 11 | iv | `CHECK skills: exit 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 11 | iv | `CHECK skills: exit 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 13 | iv | `../roadmaps/` | documented exclusion - PATH: file or path identifier |
 | P422 | 14 | i | SKILL | named gap - first use before any expansion on this page |
 | P422 | 14 | iii | SKILL.md | documented exclusion - PATH: file or path identifier |
@@ -1936,24 +1946,24 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 37 | ii | branch | named gap - first use before any expansion on this page |
 | P422 | 37 | iv | `f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 37 | iv | `f490c16f` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 37 | iv | `main` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 37 | iv | `main` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 37 | iv | `origin/main` | documented exclusion - PATH: file or path identifier |
 | P422 | 37 | v | <base> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 39 | ii | diff | named gap - first use before any expansion on this page |
 | P422 | 41 | ii | status | named gap - first use before any expansion on this page |
 | P422 | 42 | iv | `648ac7670bec2e260279a74716289b39f7cf2c9a` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 43 | i | HEAD | named gap - first use before any expansion on this page |
-| P422 | 43 | iv | `git diff --name-status 648ac767…HEAD` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 43 | iv | `git diff --numstat 648ac767…HEAD` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 43 | iv | `git diff --name-status 648ac767…HEAD` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 43 | iv | `git diff --numstat 648ac767…HEAD` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 44 | ii | docs | named gap - first use before any expansion on this page |
 | P422 | 44 | iv | `docs/` | documented exclusion - PATH: file or path identifier |
 | P422 | 46 | ii | handoff | named gap - first use before any expansion on this page |
 | P422 | 46 | ii | owner | named gap - first use before any expansion on this page |
 | P422 | 46 | ii | rule | named gap - first use before any expansion on this page |
 | P422 | 47 | iv | `648ac767…` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 48 | iv | `451 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 48 | iv | `858 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 48 | iv | `f490c16f..f848b1a9` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 48 | iv | `451 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 48 | iv | `858 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 48 | iv | `f490c16f..f848b1a9` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 48 | iv | `f7ae12a3` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 54 | iii | readability-lane-a-batch-4-plan-2026-10-16.md | documented exclusion - PATH: file or path identifier |
 | P422 | 54 | iv | `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` | documented exclusion - PATH: file or path identifier |
@@ -2000,8 +2010,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 104 | i | AEGIS-APR-137 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 104 | ii | approval | named gap - first use before any expansion on this page |
 | P422 | 109 | ii | instrument | named gap - first use before any expansion on this page |
-| P422 | 109 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 109 | iv | `provably_pending` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 109 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 109 | iv | `provably_pending` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 113 | iii | check_index.py | documented exclusion - PATH: file or path identifier |
 | P422 | 113 | iv | `tools/readability_acceptance/check_index.py` | documented exclusion - PATH: file or path identifier |
 | P422 | 114 | ii | json | named gap - first use before any expansion on this page |
@@ -2010,9 +2020,9 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 130 | i | JSON | named gap - first use before any expansion on this page |
 | P422 | 131 | iv | `git ls-tree -r --name-only <base>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 132 | iv | `scripts/` | documented exclusion - PATH: file or path identifier |
-| P422 | 133 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 133 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 135 | iv | `ceil(593 / 4) = 149` | documented exclusion - PATH: file or path identifier |
-| P422 | 137 | v | 0–148 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 137 | v | 0–148 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 140 | iii | ai-security-red-team-reviewer.md | documented exclusion - PATH: file or path identifier |
 | P422 | 140 | iv | `.claude/agents/ai-security-red-team-reviewer.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 141 | iv | `.claude/skills/file-upload-storage-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
@@ -2021,13 +2031,13 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 144 | iv | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 147 | ii | next | named gap - first use before any expansion on this page |
 | P422 | 147 | ii | range | named gap - first use before any expansion on this page |
-| P422 | 147 | v | 24–31 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 147 | v | 25–32 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 148 | v | 17–24 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 148 | v | 1–8 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 148 | v | 9–16 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 151 | v | 0–23 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 153 | iv | `cannot_decide` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 147 | v | 24–31 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 147 | v | 25–32 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 148 | v | 17–24 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 148 | v | 1–8 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 148 | v | 9–16 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 151 | v | 0–23 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 153 | iv | `cannot_decide` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 154 | i | D73 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 155 | ii | counts | named gap - first use before any expansion on this page |
 | P422 | 157 | iii | aws-baseline.md | documented exclusion - PATH: file or path identifier |
@@ -2043,11 +2053,11 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 159 | iv | `.claude/skills/database-backup-verifier/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 166 | i | B4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 166 | iv | `.claude/skills/` | documented exclusion - PATH: file or path identifier |
-| P422 | 166 | iv | `agent-failure-recovery` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 166 | iv | `agent-goal-hijack-defender` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 166 | iv | `agent-governance-audit` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 166 | iv | `agent-harness-architect` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 166 | iv | `agent-identity-privilege-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 166 | iv | `agent-failure-recovery` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 166 | iv | `agent-goal-hijack-defender` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 166 | iv | `agent-governance-audit` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 166 | iv | `agent-harness-architect` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 166 | iv | `agent-identity-privilege-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 166 | iv | `f490c16f…` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 177 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 177 | v | % | documented exclusion - OPERATOR: operator glyph |
@@ -2067,7 +2077,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 187 | iv | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 188 | iii | agent-identity-patterns.md | documented exclusion - PATH: file or path identifier |
 | P422 | 188 | iv | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - PATH: file or path identifier |
-| P422 | 190 | iv | `git log --all --author="F reviewer"` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 190 | iv | `git log --all --author="F reviewer"` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 191 | iv | `refs/pull/*/head` | documented exclusion - PATH: file or path identifier |
 | P422 | 194 | ii | scope | defined at first use - line 194 contains the expansion |
 | P422 | 211 | i | B1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2079,14 +2089,14 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 218 | v | FULL | named gap - first use before any expansion on this page |
 | P422 | 227 | i | L17 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 227 | i | L31 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 227 | iv | `WIP` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 227 | iv | `WIP` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 228 | i | L145 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 228 | iv | `authz` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 228 | iv | `authz` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 229 | i | L83 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 229 | iv | `API` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 229 | iv | `API` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 230 | i | L167 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 230 | iii | 1.5 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 230 | iv | `Phase 1.5` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 230 | iii | 1.5 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 230 | iv | `Phase 1.5` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 233 | i | L157 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 234 | i | L3 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 238 | iv | `git show f490c16f9ed23f3d489e42f7696323bffcce6fd3:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -2109,28 +2119,28 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 277 | i | L5 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 280 | iv | `.claude/skills` | documented exclusion - PATH: file or path identifier |
 | P422 | 281 | ii | tokens | defined at first use - line 281 contains the expansion |
-| P422 | 281 | iv | `CORRECT` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 281 | iv | `CORRECT` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 282 | i | L47 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 282 | i | L63 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 282 | i | L73 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 282 | iv | `ONLY` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 282 | iv | `ONLY` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 283 | i | L14 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 283 | iv | `git stash push -u -m` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 283 | iv | `git stash push -u -m` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 284 | i | L81 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 288 | iv | `reset --soft` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 288 | iv | `stash push -u` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 288 | iv | `reset --soft` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 288 | iv | `stash push -u` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 289 | ii | restore | defined at first use - line 289 contains the expansion |
-| P422 | 289 | iv | `--abort` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 289 | iv | `--continue` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 289 | iv | `branch -vv` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 289 | iv | `restore --staged` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 291 | iv | `grep -r '<<<<<<<' --include=*` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 289 | iv | `--abort` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 289 | iv | `--continue` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 289 | iv | `branch -vv` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 289 | iv | `restore --staged` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 291 | iv | `grep -r '<<<<<<<' --include=*` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 292 | i | GNU | named gap - first use before any expansion on this page |
-| P422 | 292 | iv | `*` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 292 | iv | `--include=*` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 292 | iv | `--include=` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 293 | iv | `grep` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 294 | iv | `bash` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 292 | iv | `*` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 292 | iv | `--include=*` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 292 | iv | `--include=` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 293 | iv | `grep` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 294 | iv | `bash` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 296 | iv | `4290095430` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 300 | i | POSIX | named gap - first use before any expansion on this page |
 | P422 | 305 | i | MANUAL-ONLY | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2147,38 +2157,38 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 324 | iii | trigger-evals.json | documented exclusion - PATH: file or path identifier |
 | P422 | 324 | iv | `evals/evals.json` | documented exclusion - PATH: file or path identifier |
 | P422 | 324 | iv | `evals/trigger-evals.json` | documented exclusion - PATH: file or path identifier |
-| P422 | 325 | iv | `memory-context-poisoning-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 325 | iv | `prompt-injection-defender` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 326 | iv | `agent-containment-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 326 | iv | `agent-tool-safety-guard` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 326 | iv | `ai-threat-modeler` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 325 | iv | `memory-context-poisoning-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 325 | iv | `prompt-injection-defender` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 326 | iv | `agent-containment-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 326 | iv | `agent-tool-safety-guard` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 326 | iv | `ai-threat-modeler` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 327 | ii | operator | named gap - first use before any expansion on this page |
-| P422 | 327 | iv | `agent-authorization-matrix` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 327 | iv | `human-approval-boundary` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 327 | iv | `observability-operator` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 328 | iv | `ai-evaluation-harness` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 328 | iv | `incident-response-runbook` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 328 | iv | `inter-agent-comms-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 327 | iv | `agent-authorization-matrix` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 327 | iv | `human-approval-boundary` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 327 | iv | `observability-operator` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 328 | iv | `ai-evaluation-harness` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 328 | iv | `incident-response-runbook` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 328 | iv | `inter-agent-comms-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 331 | iv | `4290095408` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 335 | ii | schema | named gap - first use before any expansion on this page |
 | P422 | 336 | ii | rules | named gap - first use before any expansion on this page |
 | P422 | 337 | ii | payload | named gap - first use before any expansion on this page |
-| P422 | 343 | iv | `objective` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 344 | iv | `constraints` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 344 | iv | `principal` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 344 | iv | `provenance` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 343 | iv | `objective` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 344 | iv | `constraints` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 344 | iv | `principal` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 344 | iv | `provenance` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 345 | i | L12-18 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 347 | ii | token | named gap - first use before any expansion on this page |
-| P422 | 349 | iii | 10.1 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 349 | iii | 10.1 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 350 | i | L77 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 350 | iv | `SAFE` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 352 | iv | `SEV` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 350 | iv | `SAFE` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 352 | iv | `SEV` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 354 | i | L41 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 355 | i | L65 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 355 | i | L82 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 355 | ii | doc | named gap - first use before any expansion on this page |
 | P422 | 357 | i | L9 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 361 | iv | `authorization-matrix-designer` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 361 | iv | `authorization-matrix-designer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 364 | iv | `4303335249` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 367 | ii | policy | named gap - first use before any expansion on this page |
 | P422 | 368 | v | FAIL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
@@ -2189,29 +2199,29 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 373 | i | L16 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 373 | i | L8 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 375 | ii | known | named gap - first use before any expansion on this page |
-| P422 | 377 | iv | `Phase 7` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 377 | iv | `Phase 7` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 378 | i | L40 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 378 | i | L76 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 378 | iv | `iso-42001-aims-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 381 | i | L137 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 387 | iv | `gh` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 387 | iv | `gh` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 387 | iv | `references/audit-control-checklist.md` | documented exclusion - PATH: file or path identifier |
-| P422 | 388 | iv | `author` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 388 | iv | `mergedBy` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 388 | iv | `reviews` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 388 | iv | `author` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 388 | iv | `mergedBy` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 388 | iv | `reviews` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 389 | ii | pr | named gap - first use before any expansion on this page |
-| P422 | 389 | iv | `autoMergeRequest` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 389 | iv | `gh pr view --help` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 389 | iv | `statusCheckRollup` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 390 | iv | `change-classification-gate` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 389 | iv | `autoMergeRequest` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 389 | iv | `gh pr view --help` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 389 | iv | `statusCheckRollup` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 390 | iv | `change-classification-gate` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 391 | ii | auditor | named gap - first use before any expansion on this page |
-| P422 | 391 | iv | `ai-closeout-reporter` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 391 | iv | `code-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 391 | iv | `full-codebase-auditor` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 391 | iv | `security-pr-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 392 | iv | `agent-memory-governance` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 392 | iv | `ai-sdlc-operating-model` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 392 | iv | `release-readiness-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 391 | iv | `ai-closeout-reporter` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 391 | iv | `code-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 391 | iv | `full-codebase-auditor` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 391 | iv | `security-pr-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 392 | iv | `agent-memory-governance` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 392 | iv | `ai-sdlc-operating-model` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 392 | iv | `release-readiness-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 396 | i | L22 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 397 | i | L32 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 401 | i | C1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2220,21 +2230,21 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 406 | i | CONDITIONAL | defined at first use - line 406 contains the expansion |
 | P422 | 407 | i | L39 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 407 | i | L42 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 407 | iv | `discipline gap` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 407 | iv | `policy gap` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 407 | iv | `discipline gap` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 407 | iv | `policy gap` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 408 | i | L30 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 409 | ii | repo | named gap - first use before any expansion on this page |
-| P422 | 409 | iv | `auto_squash_enabled` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 409 | iv | `auto_squash_enabled` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 410 | i | MISSES | named gap - first use before any expansion on this page |
-| P422 | 410 | iv | `auto_merge_enabled` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 410 | iv | `auto_merge_enabled` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 411 | v | → | documented exclusion - OPERATOR: operator glyph |
 | P422 | 413 | ii | api | named gap - first use before any expansion on this page |
-| P422 | 413 | iv | `gh api` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 413 | iv | `gh pr view` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 414 | iv | `gh run list` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 414 | iv | `gh run view` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 414 | iv | `git diff` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 414 | iv | `git log` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 413 | iv | `gh api` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 413 | iv | `gh pr view` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 414 | iv | `gh run list` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 414 | iv | `gh run view` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 414 | iv | `git diff` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 414 | iv | `git log` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 420 | ii | runtime | named gap - first use before any expansion on this page |
 | P422 | 422 | ii | closed | named gap - first use before any expansion on this page |
 | P422 | 422 | ii | provider | named gap - first use before any expansion on this page |
@@ -2251,13 +2261,13 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 434 | ii | deploy | named gap - first use before any expansion on this page |
 | P422 | 435 | i | L245 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 436 | iv | `references/` | documented exclusion - PATH: file or path identifier |
-| P422 | 439 | iv | `agentic-loop-designer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 439 | iv | `command-gateway-architect` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 439 | iv | `model-context-designer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 440 | iv | `ai-cost-guardrail-designer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 440 | iv | `ai-router-architect` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 441 | iv | `audit-log-architect` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 441 | iv | `plan-entitlement-architect` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 439 | iv | `agentic-loop-designer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 439 | iv | `command-gateway-architect` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 439 | iv | `model-context-designer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 440 | iv | `ai-cost-guardrail-designer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 440 | iv | `ai-router-architect` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 441 | iv | `audit-log-architect` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 441 | iv | `plan-entitlement-architect` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 449 | ii | escalation | named gap - first use before any expansion on this page |
 | P422 | 451 | i | ASI03 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 452 | i | DB | named gap - first use before any expansion on this page |
@@ -2265,17 +2275,17 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 452 | i | L107 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 452 | i | RBAC | named gap - first use before any expansion on this page |
 | P422 | 452 | i | SDLC | named gap - first use before any expansion on this page |
-| P422 | 452 | iv | `[SEV]` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 452 | iv | `[SEV]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 453 | i | L156 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 453 | iv | `URL` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 453 | iv | `URL` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 459 | i | L158 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 459 | i | REQUESTER | named gap - first use before any expansion on this page |
 | P422 | 461 | i | L177 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 463 | iv | `references/agent-identity-patterns.md` | documented exclusion - PATH: file or path identifier |
-| P422 | 464 | iv | `secrets-identity-hardener` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 464 | iv | `secrets-identity-hardener` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 465 | ii | tenant | defined at first use - line 465 contains the expansion |
-| P422 | 465 | iv | `tenant-isolation-reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 467 | iv | `evals` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 465 | iv | `tenant-isolation-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 467 | iv | `evals` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 478 | i | A0 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 478 | i | A2A | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 478 | i | A3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2295,36 +2305,36 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 517 | iii | build_index.py | documented exclusion - PATH: file or path identifier |
 | P422 | 517 | iv | `build_index.py --report` | documented exclusion - PATH: file or path identifier |
 | P422 | 518 | iv | `de2bfe72…` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 519 | iv | `--write` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 519 | iv | `--write` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 522 | i | F4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 522 | iv | `4290095415` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 525 | v | 33–40 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 525 | v | 33–40 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 532 | iv | `git rev-parse origin/main` | documented exclusion - PATH: file or path identifier |
 | P422 | 533 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - PATH: file or path identifier |
-| P422 | 534 | iv | `git ls-tree -r --name-only f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 535 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 534 | iv | `git ls-tree -r --name-only f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 535 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 536 | iv | `git merge-base --is-ancestor f490c16f9ed23f3d489e42f7696323bffcce6fd3 refs/remotes/origin/main` | documented exclusion - PATH: file or path identifier |
 | P422 | 539 | iv | `git diff --numstat f490c16f9ed23f3d489e42f7696323bffcce6fd3 refs/remotes/origin/main -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 540 | ii | ci | named gap - first use before any expansion on this page |
 | P422 | 540 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
-| P422 | 540 | iv | `files: 8   links checked: 10   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 540 | iv | `files: 8   links checked: 10   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 540 | iv | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - PATH: file or path identifier |
 | P422 | 541 | i | OK | defined at first use - line 541 contains the expansion |
 | P422 | 541 | iii | validate-skills.py | documented exclusion - PATH: file or path identifier |
-| P422 | 541 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 541 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 541 | iv | `python -P scripts/validate-skills.py` | documented exclusion - PATH: file or path identifier |
 | P422 | 542 | ii | test | named gap - first use before any expansion on this page |
 | P422 | 542 | iii | test_validator.py | documented exclusion - PATH: file or path identifier |
-| P422 | 542 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 542 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 542 | iv | `python scripts/tests/test_validator.py` | documented exclusion - PATH: file or path identifier |
-| P422 | 543 | iv | `agent` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 543 | iv | `agents-svc` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 543 | iv | `chain` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 543 | iv | `schema-migration` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 543 | iv | `agent` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 543 | iv | `agents-svc` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 543 | iv | `chain` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 543 | iv | `schema-migration` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 545 | iv | `git log --all --author="F reviewer" --oneline -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 546 | iii | f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 546 | iv | `git diff --check f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 547 | iv | `mergedAt` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 546 | iv | `git diff --check f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 547 | iv | `mergedAt` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 548 | iv | `git grep -l -I -F -e 'Phase 1.5' f490c16f... -- '*.md'` | documented exclusion - PATH: file or path identifier |
 | P422 | 549 | iii | check_pr_body_skills.py | documented exclusion - PATH: file or path identifier |
 | P422 | 549 | iv | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -2333,21 +2343,21 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 550 | iii | main..HEAD | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 550 | iv | `python -B scripts/check_dco.py --range origin/main..HEAD` | documented exclusion - PATH: file or path identifier |
 | P422 | 551 | iv | `e8c8a67c…` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 551 | iv | `files: 666   links checked: 3775   anchors checked: 1111   broken: 6   dead: 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 551 | iv | `files: 666   links checked: 3777   anchors checked: 1112   broken: 0   dead: 0   external-skipped: 2073   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 551 | iv | `files: 666   links checked: 3775   anchors checked: 1111   broken: 6   dead: 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 551 | iv | `files: 666   links checked: 3777   anchors checked: 1112   broken: 0   dead: 0   external-skipped: 2073   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 551 | iv | `python -P scripts/ci/check-markdown-links.py` | documented exclusion - PATH: file or path identifier |
-| P422 | 551 | v | KB | documented exclusion - OPERATOR: operator glyph |
+| P422 | 551 | v | KB | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 552 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - PATH: file or path identifier |
-| P422 | 552 | iv | `table_rows 162, events 162, full_page_acceptances 110, lost_commit_events 10, reader_pages_with_rows 100` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 552 | iv | `table_rows 162, events 162, full_page_acceptances 110, lost_commit_events 10, reader_pages_with_rows 100` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 553 | iv | `de2bfe7237d6e853fa81925faa9f68a82881bba7` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 554 | i | EOF | named gap - first use before any expansion on this page |
 | P422 | 554 | ii | id | defined at first use - line 554 contains the expansion |
 | P422 | 554 | ii | ids | named gap - first use before any expansion on this page |
-| P422 | 554 | iv | `T-001` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 554 | iv | `T-010` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 554 | iv | `T-001` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 554 | iv | `T-010` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 554 | iv | `docs/roadmaps/aegis-documentation-readability-backlog.md` | documented exclusion - PATH: file or path identifier |
-| P422 | 554 | iv | `table_rows 162` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 554 | iv | `table_rows` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 554 | iv | `table_rows 162` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 554 | iv | `table_rows` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 561 | i | SHA-256 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 561 | i | UTF-8 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 563 | iv | `3913683c686e6e71` | documented exclusion - SHA: hash/commit identifier |
@@ -2372,25 +2382,25 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 593 | iv | `6231090198` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 594 | v | ACCEPT | named gap - first use before any expansion on this page |
 | P422 | 594 | i | SD-B | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 594 | iv | `SD-B: ACCEPT` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 594 | iv | `SD-B: ACCEPT` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 597 | i | D3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 614 | iv | `ModernNomad-98` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 617 | iv | `F reviewer` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 614 | iv | `ModernNomad-98` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 617 | iv | `F reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 619 | i | HTTPS | named gap - first use before any expansion on this page |
 | P422 | 619 | ii | http | named gap - first use before any expansion on this page |
 | P422 | 619 | iii | http.sslBackend | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 619 | iv | `-c http.sslBackend=openssl` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 619 | iv | `wt-*` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 620 | iv | `chatgpt-codex-connector[bot]` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 621 | iv | `original_commit_id` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 622 | iv | `commit_id` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 619 | iv | `-c http.sslBackend=openssl` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 619 | iv | `wt-*` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 620 | iv | `chatgpt-codex-connector[bot]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 621 | iv | `original_commit_id` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 622 | iv | `commit_id` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 624 | v | COMMENTED | named gap - first use before any expansion on this page |
 | P422 | 624 | iv | `5542076883` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 626 | iv | `original_commit_id = e8c8a67c…` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 626 | iv | `original_commit_id = e8c8a67c…` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 632 | i | L258-262 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 633 | i | D2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 633 | ii | build | defined at first use - line 633 contains the expansion |
-| P422 | 633 | v | 21–23 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 633 | v | 21–23 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 634 | iv | `4290095421` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 635 | i | D4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 635 | i | L50 | documented exclusion - LINE-RANGE: page-line reference |
@@ -2402,19 +2412,19 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 645 | iv | `intra-tenant-scope-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 645 | iv | `memory-context-poisoning-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 646 | iv | `model-context-designer/SKILL.md` | documented exclusion - PATH: file or path identifier |
-| P422 | 647 | iv | `authorization` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 647 | iv | `authorization` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 648 | i | L124 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 648 | i | L21 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 648 | i | L59 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 648 | i | L60 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 648 | i | L71 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 648 | i | L95 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 648 | iv | `authorizing` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 651 | iv | `authorization \(authz\)\|authz \(authorization` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 648 | iv | `authorizing` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 651 | iv | `authorization \(authz\)\|authz \(authorization` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 653 | i | H11-H15 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 653 | v | 3-6 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 653 | v | 3-6 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 662 | iv | `de2bfe72` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 662 | v | 21-23 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 662 | v | 21-23 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 667 | iii | delivery-workflow.md | documented exclusion - PATH: file or path identifier |
 | P422 | 667 | iv | `docs/delivery-workflow.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 668 | i | L601 | documented exclusion - LINE-RANGE: page-line reference |
@@ -2429,7 +2439,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 696 | iv | `./.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 719 | i | C-4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 727 | iv | `f848b1a9…` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 737 | iii | 11.2 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 737 | iii | 11.2 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 741 | ii | receipt | named gap - first use before any expansion on this page |
 | P422 | 742 | iv | `f848b1a902d67e1b40c325587df6455daa17771e` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 746 | iv | `4303335212` | documented exclusion - SHA: hash/commit identifier |
@@ -2438,45 +2448,45 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 746 | iv | `4303335244` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 746 | iv | `4303335257` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 746 | iv | `5558604135` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 746 | iv | `original_commit_id = f848b1a9…` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 746 | iv | `original_commit_id = f848b1a9…` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 747 | iv | `4303397265` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 747 | iv | `4303397270` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 747 | iv | `5558680242` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 749 | iv | `NOT MERGED` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 749 | iv | `NOT MERGED` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 749 | v | MERGED | named gap - first use before any expansion on this page |
 | P422 | 750 | iv | `6236306995` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 750 | iv | `6236313003` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 753 | iii | 10.7 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 763 | iv | `git grep` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 753 | iii | 10.7 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 763 | iv | `git grep` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 763 | iv | `git show f490c16f:….claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - PATH: file or path identifier |
-| P422 | 764 | iii | 10.2 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 764 | iv | `git diff --name-status 0c994d77 f848b1a9` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 764 | iv | `git diff --name-status 44d8f431 f848b1a9` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 765 | iii | 10.3 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 764 | iii | 10.2 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 764 | iv | `git diff --name-status 0c994d77 f848b1a9` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 764 | iv | `git diff --name-status 44d8f431 f848b1a9` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 765 | iii | 10.3 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 765 | iv | `gh api …/issues/789/comments` | documented exclusion - PATH: file or path identifier |
-| P422 | 766 | iii | 10.4 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 766 | iv | `git diff --stat` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 767 | iii | 10.5 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 766 | iii | 10.4 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 766 | iv | `git diff --stat` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 767 | iii | 10.5 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 767 | iii | 5dc96eda..f848b1a9 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 767 | iii | f490c16f..5dc96eda | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 767 | iv | `git diff --numstat 5dc96eda..f848b1a9` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 767 | iv | `git rev-list --count f490c16f..5dc96eda` | documented exclusion - COMMAND: command/CLI token |
-| P422 | 768 | iii | 10.6 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 768 | iv | `Row source` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 768 | iv | `WHAT:` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 767 | iv | `git diff --numstat 5dc96eda..f848b1a9` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 767 | iv | `git rev-list --count f490c16f..5dc96eda` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P422 | 768 | iii | 10.6 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 768 | iv | `Row source` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 768 | iv | `WHAT:` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 785 | i | H17 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 786 | i | AC6 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 796 | iv | `M` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 796 | iv | `git diff --numstat` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 796 | iv | `M` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 796 | iv | `git diff --numstat` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 799 | i | RESULT | named gap - first use before any expansion on this page |
-| P422 | 800 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 800 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 801 | ii | github | named gap - first use before any expansion on this page |
 | P422 | 801 | iv | `.claude/` | documented exclusion - PATH: file or path identifier |
 | P422 | 801 | iv | `.github/` | documented exclusion - PATH: file or path identifier |
 | P422 | 801 | iv | `tools/` | documented exclusion - PATH: file or path identifier |
-| P422 | 807 | iv | `44d8f431..f848b1a9` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 809 | iii | 11.3 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 809 | iv | `165/0` | documented exclusion - PATH: file or path identifier |
+| P422 | 807 | iv | `44d8f431..f848b1a9` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 809 | iii | 11.3 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 809 | iv | `165/0` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 826 | iv | `55a8d119…` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 826 | iv | `6230945952` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 827 | iv | `ac8da53e…` | documented exclusion - SHA: hash/commit identifier |
@@ -2486,83 +2496,83 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P422 | 837 | i | OWNER-DECISIONS-2026-10-15 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 837 | iii | OWNER-DECISIONS-2026-10-15.md | documented exclusion - PATH: file or path identifier |
 | P422 | 837 | iv | `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` | documented exclusion - PATH: file or path identifier |
-| P422 | 839 | iv | `+1,282/−0` | documented exclusion - PATH: file or path identifier |
-| P422 | 839 | iv | `442/0` | documented exclusion - PATH: file or path identifier |
-| P422 | 839 | iv | `675/0` | documented exclusion - PATH: file or path identifier |
+| P422 | 839 | iv | `+1,282/−0` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 839 | iv | `442/0` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 839 | iv | `675/0` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 840 | iv | `5dc96eda` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 841 | iv | `1,290` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 841 | iv | `15,919` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 849 | iv | `451/0` | documented exclusion - PATH: file or path identifier |
-| P422 | 849 | iv | `858/0` | documented exclusion - PATH: file or path identifier |
+| P422 | 841 | iv | `1,290` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 841 | iv | `15,919` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 849 | iv | `451/0` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 849 | iv | `858/0` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 856 | iv | `6213003590` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 857 | iv | `6213436600` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 857 | iv | `6213567787` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 861 | iv | `re.finditer` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 861 | iv | `rg -o 'Row source' …` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 872 | v | 1–9 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 861 | iv | `re.finditer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 861 | iv | `rg -o 'Row source' …` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 872 | v | 1–9 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 876 | i | L656 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 887 | v | UNAVAILABLE | named gap - first use before any expansion on this page |
-| P422 | 887 | v | 1-18 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 887 | v | 1-18 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 889 | i | L656-L664 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 890 | iv | `0c994d77` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 890 | iv | `405dfd44` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 891 | iv | `68cf0147` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 895 | iii | 10.8 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 895 | iii | 10.8 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 897 | i | DCO | defined at first use - line 897 contains the expansion |
 | P422 | 897 | iv | `build_index.py --write` | documented exclusion - PATH: file or path identifier |
 | P422 | 899 | v | UNRUN | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P422 | 907 | iii | readability-lane-a-batch-4-skills-records-2026-10-16.md | documented exclusion - PATH: file or path identifier |
 | P422 | 907 | iv | `docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md` | documented exclusion - PATH: file or path identifier |
-| P422 | 910 | iii | 11.1 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 910 | iii | 11.1 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 914 | i | L681-L690 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 918 | v | 1-9 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 920 | iv | `source=UNAVAILABLE; binding=none` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 918 | v | 1-9 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 920 | iv | `source=UNAVAILABLE; binding=none` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 932 | iv | `68cf0147…` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 935 | iv | `A` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 936 | iv | `D` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 938 | iv | `git diff --name-status <base>..HEAD` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 935 | iv | `A` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 936 | iv | `D` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 938 | iv | `git diff --name-status <base>..HEAD` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 950 | iv | `6242008717` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 950 | iv | `6242064103` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 953 | iv | `493c4841…` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 953 | iv | `675 0` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 953 | iv | `675 0` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 955 | i | H11-H13 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 955 | i | P1-P4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 957 | iii | 11.4 | documented exclusion - RANGE: numeric range/unit token |
-| P422 | 967 | iv | `sd-b-789-repl-r1` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 968 | iv | `sd-c-789-repl2-r1` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 969 | iv | `sd-c-789-fresh7-c1` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 970 | iv | `sd-c-789-lean1-c1` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 971 | iv | `sd-a-789-repl-r2` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 971 | iv | `sd-c-789-repl3-r1` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 957 | iii | 11.4 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P422 | 967 | iv | `sd-b-789-repl-r1` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 968 | iv | `sd-c-789-repl2-r1` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 969 | iv | `sd-c-789-fresh7-c1` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 970 | iv | `sd-c-789-lean1-c1` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 971 | iv | `sd-a-789-repl-r2` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 971 | iv | `sd-c-789-repl3-r1` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 972 | iv | `e632b3a1735af56c17282eee47f442f6206e8f75` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 979 | ii | manifest | named gap - first use before any expansion on this page |
 | P422 | 979 | ii | register | named gap - first use before any expansion on this page |
 | P422 | 987 | iv | `scripts/tests/test_validator.py` | documented exclusion - PATH: file or path identifier |
 | P422 | 988 | iii | test_markdown_links.py | documented exclusion - PATH: file or path identifier |
-| P422 | 989 | iv | `PermissionError: [Errno 13] Permission denied` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 989 | iv | `Ran 23 tests … FAILED (errors=10)` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 989 | iv | `PermissionError: [Errno 13] Permission denied` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 989 | iv | `Ran 23 tests … FAILED (errors=10)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 989 | v | FAILED | defined at first use - line 989 contains the expansion |
-| P422 | 990 | iv | `TEMP` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 990 | iv | `TMP` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 990 | iv | `diagnose-windows-sandbox-acl` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 1001 | v | 9-11 | documented exclusion - RANGE: numeric range/unit token |
+| P422 | 990 | iv | `TEMP` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 990 | iv | `TMP` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 990 | iv | `diagnose-windows-sandbox-acl` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 1001 | v | 9-11 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 1005 | iv | `6242664603` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 1008 | ii | sha256 | named gap - first use before any expansion on this page |
 | P422 | 1008 | iv | `3e23bc83f7b73166e44c6b1d8f4e79da784f6fb8` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 1009 | iv | `4bbf733d7cdabda425dc7ab1b608388a07ce0c0f8d39bb7b83a74bfaaaac1153` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 1011 | iv | `34c5c251018666eb6fc8d25b10278807fd6eea64b7fe238c6dcb263626b608cf` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 1009 | iv | `4bbf733d7cdabda425dc7ab1b608388a07ce0c0f8d39bb7b83a74bfaaaac1153` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 1011 | iv | `34c5c251018666eb6fc8d25b10278807fd6eea64b7fe238c6dcb263626b608cf` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 1012 | i | AC2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 1013 | iv | `git cat-file` | documented exclusion - COMMAND: command/CLI token |
+| P422 | 1013 | iv | `git cat-file` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 1015 | i | F1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 1017 | iv | `880ebf4381e1b7521bf057b30c8f7fbe154981af5783ffc4ed8fb43cd1427015` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P422 | 1018 | iv | `created_at = updated_at` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P422 | 1017 | iv | `880ebf4381e1b7521bf057b30c8f7fbe154981af5783ffc4ed8fb43cd1427015` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P422 | 1018 | iv | `created_at = updated_at` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 1021 | i | L681-689 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 1024 | i | ODR-1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 1024 | iv | `6242532417` | documented exclusion - SHA: hash/commit identifier |
 | P423 | 1 | ii | batch | named gap - first use before any expansion on this page |
 | P423 | 1 | ii | lane | named gap - first use before any expansion on this page |
 | P423 | 1 | ii | record | named gap - first use before any expansion on this page |
-| P423 | 1 | v | 10-17 | documented exclusion - RANGE: numeric range/unit token |
+| P423 | 1 | v | 10-17 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P423 | 1 | v | 2026-10 | documented exclusion - DATE: date/time or version fragment |
 | P423 | 3 | i | V4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 5 | i | AC12 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2578,7 +2588,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 5 | ii | main | named gap - first use before any expansion on this page |
 | P423 | 5 | ii | receipt | named gap - first use before any expansion on this page |
 | P423 | 5 | ii | sha256 | named gap - first use before any expansion on this page |
-| P423 | 5 | iv | `494cdd6a07a5dbda56fa5201e93c5041643df44b2b7cab174d0bab593be15fbb` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P423 | 5 | iv | `494cdd6a07a5dbda56fa5201e93c5041643df44b2b7cab174d0bab593be15fbb` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 5 | iv | `648ac7670bec2e260279a74716289b39f7cf2c9a` | documented exclusion - SHA: hash/commit identifier |
 | P423 | 5 | iv | `b3dfb81fec0806c97406dd403120853da8ffd402` | documented exclusion - SHA: hash/commit identifier |
 | P423 | 5 | v | ACCEPTED | named gap - first use before any expansion on this page |
@@ -2587,13 +2597,13 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 9 | ii | evidence | named gap - first use before any expansion on this page |
 | P423 | 9 | iii | readability-lane-a-batch-4-2026-10-17.md | documented exclusion - PATH: file or path identifier |
 | P423 | 9 | iv | `docs/evidence/documentation/readability-lane-a-batch-4-2026-10-17.md` | documented exclusion - PATH: file or path identifier |
-| P423 | 9 | v | 4-2026 | documented exclusion - RANGE: numeric range/unit token |
+| P423 | 9 | v | 4-2026 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P423 | 10 | i | JSON | named gap - first use before any expansion on this page |
 | P423 | 10 | ii | manifest | named gap - first use before any expansion on this page |
 | P423 | 10 | ii | register | named gap - first use before any expansion on this page |
 | P423 | 10 | ii | test | named gap - first use before any expansion on this page |
 | P423 | 10 | ii | workflow | named gap - first use before any expansion on this page |
-| P423 | 10 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P423 | 10 | iv | `docs-only` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 11 | i | DCO | defined at first use - line 11 contains the expansion |
 | P423 | 11 | ii | branch | named gap - first use before any expansion on this page |
 | P423 | 11 | ii | model | defined at first use - line 11 contains the expansion |
@@ -2607,17 +2617,17 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 16 | iv | `648ac767…` | documented exclusion - SHA: hash/commit identifier |
 | P423 | 19 | ii | json | named gap - first use before any expansion on this page |
 | P423 | 19 | iii | check_index.py | documented exclusion - PATH: file or path identifier |
-| P423 | 22 | iv | `accepted_on_recorded_review` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `built_at_ref` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `cannot_decide` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `compared_ref` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `official_pending_count` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `partial_disposition_pending` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `provably_pending` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `reader_pages_in_tree` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `recorded_acceptance_within_10_lines` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 22 | iv | `withdrawn_pending_rereview` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P423 | 22 | iv | `accepted_on_recorded_review` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `built_at_ref` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `cannot_decide` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `compared_ref` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `no_recorded_acceptance` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `official_pending_count` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `partial_disposition_pending` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `provably_pending` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `reader_pages_in_tree` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `recorded_acceptance_within_10_lines` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 22 | iv | `withdrawn_pending_rereview` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 24 | i | D73 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 24 | i | SKILL | named gap - first use before any expansion on this page |
 | P423 | 24 | ii | active | defined at first use - line 24 contains the expansion |
@@ -2629,11 +2639,11 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 24 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - PATH: file or path identifier |
 | P423 | 24 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P423 | 24 | iv | `ceil(573 / 4)` | documented exclusion - PATH: file or path identifier |
-| P423 | 24 | iv | `no_recorded_acceptance + provably_pending` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 24 | v | 0–143 | documented exclusion - RANGE: numeric range/unit token |
-| P423 | 24 | v | 144–287 | documented exclusion - RANGE: numeric range/unit token |
-| P423 | 24 | v | 288–431 | documented exclusion - RANGE: numeric range/unit token |
-| P423 | 24 | v | 432–572 | documented exclusion - RANGE: numeric range/unit token |
+| P423 | 24 | iv | `no_recorded_acceptance + provably_pending` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 24 | v | 0–143 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P423 | 24 | v | 144–287 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P423 | 24 | v | 288–431 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P423 | 24 | v | 432–572 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P423 | 26 | i | A1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 26 | i | A2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 26 | i | A3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2650,8 +2660,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 26 | ii | lineage | named gap - first use before any expansion on this page |
 | P423 | 26 | ii | next | named gap - first use before any expansion on this page |
 | P423 | 26 | ii | records | named gap - first use before any expansion on this page |
-| P423 | 26 | v | 0–7 | documented exclusion - RANGE: numeric range/unit token |
-| P423 | 26 | v | 8–15 | documented exclusion - RANGE: numeric range/unit token |
+| P423 | 26 | v | 0–7 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
+| P423 | 26 | v | 8–15 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P423 | 28 | ii | drift | defined at first use - line 28 contains the expansion |
 | P423 | 28 | ii | git | named gap - first use before any expansion on this page |
 | P423 | 28 | iv | `git diff --numstat 2db1ffb7… 648ac767… -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -2715,14 +2725,14 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 54 | i | L84 | documented exclusion - LINE-RANGE: page-line reference |
 | P423 | 54 | i | L88 | documented exclusion - LINE-RANGE: page-line reference |
 | P423 | 54 | iv | `(-m \| --message) <message>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P423 | 54 | iv | `WIP` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 54 | iv | `git merge --abort` | documented exclusion - COMMAND: command/CLI token |
-| P423 | 54 | iv | `git merge -h` | documented exclusion - COMMAND: command/CLI token |
-| P423 | 54 | iv | `git rebase --abort` | documented exclusion - COMMAND: command/CLI token |
-| P423 | 54 | iv | `git rebase -h` | documented exclusion - COMMAND: command/CLI token |
-| P423 | 54 | iv | `git stash -h` | documented exclusion - COMMAND: command/CLI token |
-| P423 | 54 | iv | `git stash push -u -m` | documented exclusion - COMMAND: command/CLI token |
-| P423 | 54 | iv | `rebase/merge --abort` | documented exclusion - PATH: file or path identifier |
+| P423 | 54 | iv | `WIP` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 54 | iv | `git merge --abort` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P423 | 54 | iv | `git merge -h` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P423 | 54 | iv | `git rebase --abort` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P423 | 54 | iv | `git rebase -h` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P423 | 54 | iv | `git stash -h` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P423 | 54 | iv | `git stash push -u -m` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P423 | 54 | iv | `rebase/merge --abort` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 54 | iv | `rebase/merge` | documented exclusion - PATH: file or path identifier |
 | P423 | 54 | v | <message> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 54 | v | UNVERIFIED | documented exclusion - STATUS: uppercase lifecycle/status keyword |
@@ -2746,7 +2756,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 60 | i | MANUAL-ONLY | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 60 | iii | evals.json | documented exclusion - PATH: file or path identifier |
 | P423 | 60 | iii | trigger-evals.json | documented exclusion - PATH: file or path identifier |
-| P423 | 60 | iv | `authz` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P423 | 60 | iv | `authz` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 60 | iv | `evals/evals.json` | documented exclusion - PATH: file or path identifier |
 | P423 | 60 | iv | `evals/trigger-evals.json` | documented exclusion - PATH: file or path identifier |
 | P423 | 64 | ii | payload | named gap - first use before any expansion on this page |
@@ -2759,7 +2769,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 66 | i | L63-73 | documented exclusion - LINE-RANGE: page-line reference |
 | P423 | 66 | i | L80-87 | documented exclusion - LINE-RANGE: page-line reference |
 | P423 | 66 | i | L83 | documented exclusion - LINE-RANGE: page-line reference |
-| P423 | 66 | iv | `API` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P423 | 66 | iv | `API` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 70 | v | FAIL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P423 | 70 | v | PASS | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P423 | 70 | v | UNVERIFIABLE | named gap - first use before any expansion on this page |
@@ -2780,7 +2790,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 72 | ii | owner | named gap - first use before any expansion on this page |
 | P423 | 72 | ii | repo | named gap - first use before any expansion on this page |
 | P423 | 72 | ii | timeline | named gap - first use before any expansion on this page |
-| P423 | 72 | iv | `--paginate` | documented exclusion - COMMAND: command/CLI token |
+| P423 | 72 | iv | `--paginate` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 72 | iv | `gh api repos/{owner}/{repo}/issues/<n>/timeline` | documented exclusion - PATH: file or path identifier |
 | P423 | 72 | v | <n> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 76 | ii | known | named gap - first use before any expansion on this page |
@@ -2792,7 +2802,7 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 78 | i | L5-7 | documented exclusion - LINE-RANGE: page-line reference |
 | P423 | 78 | i | RLS | named gap - first use before any expansion on this page |
 | P423 | 78 | ii | rule | named gap - first use before any expansion on this page |
-| P423 | 78 | iv | `prod` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P423 | 78 | iv | `prod` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 82 | ii | provider | named gap - first use before any expansion on this page |
 | P423 | 82 | ii | versioned | named gap - first use before any expansion on this page |
 | P423 | 84 | i | L10-11 | documented exclusion - LINE-RANGE: page-line reference |
@@ -2826,8 +2836,8 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 90 | i | RBAC | named gap - first use before any expansion on this page |
 | P423 | 90 | i | SDLC | named gap - first use before any expansion on this page |
 | P423 | 90 | i | SEV | named gap - first use before any expansion on this page |
-| P423 | 90 | iv | `URL` | documented exclusion - LITERAL: backticked literal/prose fragment |
-| P423 | 90 | iv | `[SEV]` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P423 | 90 | iv | `URL` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P423 | 90 | iv | `[SEV]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 96 | i | A0-A3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 96 | i | A2A | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 96 | i | L14-20 | documented exclusion - LINE-RANGE: page-line reference |
@@ -2849,21 +2859,21 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P423 | 130 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7… --json` | documented exclusion - PATH: file or path identifier |
 | P423 | 131 | v | × | documented exclusion - OPERATOR: operator glyph |
 | P423 | 132 | iv | `git show 2db1ffb7…:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P423 | 134 | iv | `grep -n 'WIP'` | documented exclusion - COMMAND: command/CLI token |
+| P423 | 134 | iv | `grep -n 'WIP'` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 135 | iv | `(-m \\\\\| --message) <message>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P423 | 136 | iv | `gh api --help` | documented exclusion - COMMAND: command/CLI token |
+| P423 | 136 | iv | `gh api --help` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 137 | ii | scope | named gap - first use before any expansion on this page |
 | P423 | 137 | iii | 648ac767..8fa0b89d | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P423 | 137 | iv | `git log --oneline 648ac767..8fa0b89d` | documented exclusion - COMMAND: command/CLI token |
-| P423 | 139 | iv | `grep -n SEV` | documented exclusion - COMMAND: command/CLI token |
-| P423 | 140 | iv | `grep -n` | documented exclusion - COMMAND: command/CLI token |
+| P423 | 137 | iv | `git log --oneline 648ac767..8fa0b89d` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P423 | 139 | iv | `grep -n SEV` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
+| P423 | 140 | iv | `grep -n` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 141 | ii | ci | named gap - first use before any expansion on this page |
 | P423 | 141 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
 | P423 | 141 | iv | `python -B scripts/ci/check-markdown-links.py <8 pages>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 141 | v | <8 pages> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 142 | i | OK | defined at first use - line 142 contains the expansion |
 | P423 | 142 | iii | validate-skills.py | documented exclusion - PATH: file or path identifier |
-| P423 | 142 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose fragment |
+| P423 | 142 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 142 | iv | `python -P scripts/validate-skills.py` | documented exclusion - PATH: file or path identifier |
 | P423 | 143 | iv | `git cat-file -e 2db1ffb7…:.claude/skills/agent-harness-architect/references` | documented exclusion - PATH: file or path identifier |
 | P423 | 144 | i | SD-C | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2878,16 +2888,37 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 | P418 | 118 | 78 | 44 | 132 | 23 | 395 | 98 | 26 | 271 |
 | P419 | 64 | 34 | 10 | 35 | 11 | 154 | 36 | 8 | 110 |
 | P420 | 152 | 57 | 9 | 39 | 20 | 277 | 97 | 13 | 167 |
-| P421 | 85 | 77 | 33 | 160 | 26 | 381 | 87 | 23 | 271 |
+| P421 | 86 | 77 | 33 | 160 | 25 | 381 | 87 | 23 | 271 |
 | P422 | 159 | 91 | 48 | 336 | 40 | 674 | 119 | 16 | 539 |
 | P423 | 129 | 60 | 13 | 82 | 25 | 309 | 77 | 11 | 221 |
-| **Total** | 971 | 505 | 174 | 882 | 184 | 2716 | 676 | 118 | 1922 |
+| **Total** | 972 | 505 | 174 | 882 | 183 | 2716 | 676 | 118 | 1922 |
 
-**Exclusion-code legend (all 1,922 exclusion rows carry the actual code shown before the reason):** DATE = date/time or version fragment; SHA = hash/commit identifier; PATH = file/path identifier; LINE-RANGE = page-line reference; STATUS = uppercase lifecycle/status keyword; COMMAND = command/CLI token; RANGE = numeric range/unit token; PLACEHOLDER = angle/brace placeholder; OPERATOR = operator glyph; LITERAL = backticked literal/prose fragment; IDENTIFIER = identifier/acronym/role token. Class v is UPPERCASE-ONLY lifecycle/status keywords; lowercase status prose remains class ii.
+**Exclusion-code legend and deterministic assignment rules (all 1,922 exclusion rows carry one code; counts are from the final table):** DATE: 16 | SHA: 217 | PATH: 376 | LINE-RANGE: 396 | STATUS: 14 | COMMAND: 59 | RANGE: 114 | PLACEHOLDER: 69 | OPERATOR: 16 | LITERAL: 292 | IDENTIFIER: 353.
+
+| Code | Count |
+| --- | ---: |
+| DATE | 16 |
+| SHA | 217 |
+| PATH | 376 |
+| LINE-RANGE | 396 |
+| STATUS | 14 |
+| COMMAND | 59 |
+| RANGE | 114 |
+| PLACEHOLDER | 69 |
+| OPERATOR | 16 |
+| LITERAL | 292 |
+| IDENTIFIER | 353 |
+| **Total** | **1,922** |
+
+**Deterministic exclusion-code priority (applied to every exclusion row):** DATE = date/time/version fragment; SHA = hash/commit/comment-id token; PLACEHOLDER = angle/brace placeholder; OPERATOR = operator glyph only; COMMAND = command/CLI invocation including command-like flags; PATH = file/path identifier; LINE-RANGE = page-line reference or page-line label; RANGE = numeric range, unit, date fragment or diff/stat value; LITERAL = backticked literal/prose/label/formula; IDENTIFIER = identifier/acronym/role token; STATUS = uppercase lifecycle/status keyword. If two patterns match, the earlier category in this priority list wins. Adjudicated examples: APPROVAL_REGISTER -> IDENTIFIER (class i); ms and KB -> RANGE; +1,282/−0, 442/0, 675/0, 165/0, 451/0, 858/0 and 675 0 -> RANGE; ceil(590 / 4) = 148 -> LITERAL; -- **This lane…, -- **Next batch… and sha256: -> LITERAL; rebase/merge --abort -> COMMAND. No row may carry two codes; the invariant proof below asserts this.
+
+**Class-v rule:** class v = status keywords (uppercase ONLY for the status-keyword part) + numeric ranges/units/dates + angle placeholders + operator glyphs; lowercase status prose remains class ii. No v row is an uppercase-only lifecycle token unless it is one of the status keywords.
+
+**Invariant proof (final table):** rows 2,716 = unique (page,line,class,raw token) keys 2,716 = 0 duplicates; every row has five cells; class totals i972 / ii505 / iii174 / iv882 / v183 = 2,716; disposition totals 118 defined / 676 named gaps / 1,922 documented exclusions = 2,716; exclusion-code counts sum to 1,922; no row carries two codes; every per-page class sum equals that page's row count.
 
 ## 6. Batch mapping, continuation and named gaps
 
-**Batch->page mapping (lane C 8-page blocks).** batch1 264-271, batch2 272-279 (both overlap lane B completed144-279), batch3 280-287 ... batch19 408-415, batch20 416-423 (this record). The 62 merged lane records decompose as A22+B20+C19+D1; current batch20 not included. Quarters need not align to batch boundaries.
+**Batch->page mapping (lane C 8-page blocks).** batch1 264-271, batch2 272-279 (both overlap lane B completed144-279), batch3 280-287 ... batch19 408-415, batch20 416-423 (this record). **B20 clarification (review #5):** the 62 merged record files decompose as A22+B20+C19+D1 (record-file counts, not eight-page-block counts); lane B page coverage is complete for pages 144-279 = 17 eight-page blocks, and the 20 lane-B records include re-records/withdrawal records plus the ordinary batches, so 20 records is not 20 page blocks. Current batch20 is not included in the 62. Quarters need not align to batch boundaries.
 
 **Named-gap list (from the final table):**
 - P416 (416): batch L1, lane L1, record L1, evidence L3, ACCEPT L5, PR L5, frontier L5, HEAD L7, blob L7, diff L7, id L7, model L9, open L9, JSON L13, manifest L13, register L13, test L13, workflow L13, drift L14, pending L15, reader L15, json L22, SKILL L25, next L25, range L25, records L25, reviewer L25, LF L31, OWASP L33, PARTIAL L33, SQL L33, UX L33, authz L33, HTTP L34, status L34, API L35, AI L37, CI L37, LLM L38, PII L39, EUR L40, GBP L40, USD L40, FULL L42, purpose L44, blocked L46, closed L49, ADR L50, SAST L50, cannot L50, git L50, partial L50, IP L56, tenant L56, DSN L61, UI L61, rules L66, surface L66, CLI L67, ORM L67, RPC L67, policy L72, rule L72, spec L73, decision L78, CHANGED L79, webhook L84, CDC L85, DLQ L85, QA L85, ISO L91, disposition L113, AC L123, MET L125, handoff L125, head L125, hash L126, CR L129, EOF L129, OWED L129, SHA L130, triage L130, SATISFIED L132, counts L139, gates L157
@@ -2903,7 +2934,9 @@ All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is
 
 ## 7. Provenance, artifacts, checker and limits
 
-**Plan:** 6258744106 + B6258762512. **Base/main:** 70b6159d (56 record merges latest#858 + owner CI-only #848 merge d5a8905e); capture basis70b6159d. **Reader:** sd-c-read-lc-416-c1 (true identity sd-c-793-r2) read all eight whole at main70b6159d; mixed pin/re-pin per section2. **Page authors are not this reader** (git metadata only; not B6 proof). **Selection:**0/62 lane-batch hits; lane-B batch5 review-table rows are not page reads; no older pre-lane reference. **Artifacts:** A-rows _A/evidence/read-lc-416-a1/A-rows.txt **1,166 B/4 LF/sha 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27**; canonical-inline Crows capture _A/evidence/read-lc-416-c1/Crows-2716.txt **1484 B/4 LF/sha ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f** (raw-file digest, no normalization). Checker recomputes raw bytes/LF/sha and fails on mismatch. Small artifacts are inlined in appendix section11; external _A files are ephemeral non-authoritative convenience copies; one canonical directory quoted. **Limits:** B6 unverified; no page output edited; no keeper/index/ledger/register/manifest/tool/test/workflow change; no merge by C.
+**Plan:** 6258744106 + B6258762512. **Base/main:** 70b6159d (56 record merges latest#858 + owner CI-only #848 merge d5a8905e); capture basis70b6159d. **Reader:** sd-c-read-lc-416-c1 (true identity sd-c-793-r2) read all eight whole at main70b6159d; mixed pin/re-pin per section2. **Page authors are not this reader** (git metadata only; not B6 proof). **Selection:**0/62 lane-batch hits; lane-B batch5 review-table rows are not page reads; no older pre-lane reference. **Artifacts:** A-rows _A/evidence/read-lc-416-a1/A-rows.txt **1,166 B/4 LF/sha 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27**; canonical-inline Crows capture _A/evidence/read-lc-416-c1/Crows-2716.txt **1484 B/4 LF/sha ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f** (raw-file digest, no normalization). Checker recomputes raw bytes/LF/sha and fails on mismatch. Small artifacts are inlined in appendix section11; external _A files are ephemeral non-authoritative convenience copies; one canonical directory quoted. **Link/drift evidence (review #4):** check-markdown-links.py over all eight pages = files 8, links checked 4, anchors checked 3, broken 0, dead 0, external-skipped 0, other-skipped 0; per-page summaries are in section3. Drift command at the pre-repair head: git diff --stat 70b6159d..e343cb60 -- <eight pages> returns empty; new-head verification repeats the same empty output (no page edited). Pinned blob hashes for P418/P419/P421 are in section2. **Limits:** B6 unverified; no page output edited; no keeper/index/ledger/register/manifest/tool/test/workflow change; no merge by C.
+
+**Latest-review disposition (DeepSeek 5566822041, advisory only):** findings #1-#5 are addressed in this record and the visible PR review-response comment: #1 class-v definition rewritten and rows rechecked (class totals now i972/ii505/iii174/iv882/v183); #2 deterministic exclusion-code rules + legend/counts with the listed reclassifications applied; #3 unique key defined as (page,line,class,raw token) with 2,716 unique / 0 duplicates; #4 page-specific B1-B6 evidence, per-page link-check output, pinned blob hashes and drift output added; #5 B20 record-count vs eight-page-block clarification added. The review is not a gate and is not claimed as a pass.
 
 ## 8. AC1-AC8 status at this Stage C handoff
 
