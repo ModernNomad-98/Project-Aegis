@@ -104,6 +104,9 @@ own proven practice, including failures it absorbed during its own construction.
    checks it, and a rule that lives only in a session's memory is not a rule —
    it is a habit nobody can audit.
 
+10. **Apply Aegis skills and record review evidence.** Before working, find and read the matching Aegis skill; before merge, the pull request carries the owner-mandated "Aegis skills applied" section and the review-feedback dispositions. The rule is stated once in [AGENTS.md](AGENTS.md); this rule is a short non-normative pointer and the AGENTS.md section governs.
+   *Why:* skills and review evidence are what let a reviewer tell what was actually checked from what was merely claimed, and a session-only practice cannot be audited.
+
 ## Write documentation for a new reader
 
 Every changed documentation page should make sense to a human developer or an

@@ -73,6 +73,28 @@ table is not. Do not create a separate document for this table.
 
 <!-- bound-field: end -->
 
+## Aegis skills applied (required — owner rule 2026-10-19)
+
+The owner made this section mandatory for every PR on 2026-10-19. The rule's normative text is stated once in [AGENTS.md](https://github.com/ModernNomad-98/Project-Aegis/blob/main/AGENTS.md) under "Source-library owner rule: Aegis skills applied and review evidence"; this template supplies the owner-mandated form and a non-normative summary of its requirements, and the AGENTS.md section governs if the two ever diverge.
+
+Record the actual use of Aegis skills across the relevant stages of this work, in the owner's five-column format:
+
+| Skill and source revision | Actor / role | Purpose | How applied | Result, evidence, and limitations |
+| --- | --- | --- | --- | --- |
+| <exact skill name and its source revision: the repository path/commit, or the sha256 of the exact SKILL.md bytes read> | <who performed the work — agent/stage/round and model> | <why the skill applies> | <the specific checks or actions performed> | <findings, disposition, evidence links, and remaining uncertainty> |
+
+Requirements:
+- Record actual use across the relevant stages, not a list of skills that were merely listed or skimmed.
+- Name the exact skill and its source revision; never invent, guess or remember a revision.
+- Link supporting source lines, diffs, tests, logs or review records.
+- State incomplete checks, failures, unavailable evidence and unresolved findings; do not omit them.
+- If no skill applies, explain the assessment rather than claiming compliance.
+- Keep the section current, and complete it before an otherwise authorized merge. Comments, work logs, memory and receipts may supplement it but cannot replace it.
+- For work that produces no PR, put the same record in the final report; if that work later becomes a PR, put the record in the PR body.
+- This section is additional to the four-column "Aegis skills used" table above. The four-column table is the machine-checked structural record of each stage's self-authored row; this five-column section is the owner-mandated record of what was applied, what it established and what remains incomplete. Neither replaces the other.
+
+Why both sections exist: the four-column table sits inside one of the three bound fields and is the machine-checked structural record — the checker contract is described in the [delivery workflow](https://github.com/ModernNomad-98/Project-Aegis/blob/main/docs/delivery-workflow.md). The owner's five-column section is an evidence narrative that no machine check parses; the final independent review checks it. Neither replaces the other, and no fourth bound field is added.
+
 ## Security-relevant surface? (required)
 
 Answer this on every pull request (PR). Does this PR touch a security-relevant
