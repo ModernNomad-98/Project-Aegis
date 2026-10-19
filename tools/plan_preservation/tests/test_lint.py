@@ -311,7 +311,8 @@ class DroppedRequirementTests(TempFilesMixin, unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(data["dropped_requirements"], [])
         self.assertEqual(data["stale_basis"], [])
-        self.assertEqual(data["status"], "CLEAN")
+        self.assertEqual(data["summary"]["findings"], 0)
+        self.assertEqual(data["exit_code"], 0)
         self.assertEqual(data["size"]["status"], "ok")
 
     def test_reformatted_body_is_clean(self):
@@ -588,6 +589,22 @@ class CliAndJsonTests(TempFilesMixin, unittest.TestCase):
         self.assertIn("DeepSeek V4 Flash", data["model"])
         self.assertEqual(data["inputs"]["previous"], [previous])
         self.assertEqual(data["inputs"]["new"], new)
+        self.assertNotIn("status", data)
+        self.assertEqual(
+            set(data),
+            {
+                "tool",
+                "version",
+                "model",
+                "inputs",
+                "size",
+                "dropped_requirements",
+                "stale_basis",
+                "warnings",
+                "summary",
+                "exit_code",
+            },
+        )
         self.assertNotIn("timestamp", raw.lower())
         self.assertNotIn("generated_at", raw.lower())
 
@@ -696,6 +713,108 @@ class StaticHygieneTests(TempFilesMixin, unittest.TestCase):
             if path.is_file() and not path.name.endswith(".pyc") and "__pycache__" not in path.parts:
                 delivered.add(path.relative_to(TOOL_DIR).as_posix())
         self.assertEqual(delivered, {"lint.py", "README.md", "tests/test_lint.py"})
+
+
+class _FakeStdin:
+    """A fake standard input exposing a binary buffer like a real stream."""
+
+    def __init__(self, data: bytes):
+        self.buffer = io.BytesIO(data)
+
+    def read(self):  # pragma: no cover - text fallback is not used with a buffer
+        return self.buffer.read().decode("utf-8")
+
+
+class EdgeCaseTests(TempFilesMixin, unittest.TestCase):
+    """Regression tests for the input-validation and matching edge cases."""
+
+    def test_empty_basis_arguments_are_usage_errors(self):
+        path = self.write("b.md", "body\n")
+        code, _stdout, stderr = self.run_lint(
+            ["--previous", path, "--new", path, "--declared-basis", ""]
+        )
+        self.assertEqual(code, 2)
+        self.assertIn("--declared-basis", stderr)
+        code, _stdout, stderr = self.run_lint(
+            ["--previous", path, "--new", path, "--live-main", ""]
+        )
+        self.assertEqual(code, 2)
+        self.assertIn("--live-main", stderr)
+
+    def test_trailing_newline_in_a_basis_argument_is_rejected(self):
+        path = self.write("b.md", "body\n")
+        code, _stdout, stderr = self.run_lint(
+            ["--previous", path, "--new", path, "--declared-basis", "5a1d8c07\n"]
+        )
+        self.assertEqual(code, 2)
+        self.assertIn("--declared-basis", stderr)
+
+    def test_nonpositive_size_cap_is_a_usage_error(self):
+        path = self.write("b.md", "body\n")
+        for cap in ("0", "-5"):
+            code, _stdout, stderr = self.run_lint(
+                ["--previous", path, "--new", path, "--size-cap", cap]
+            )
+            self.assertEqual(code, 2, cap)
+            self.assertIn("--size-cap", stderr)
+
+    def test_invalid_utf8_stdin_exits_2(self):
+        previous = self.write("prev.md", "body\n")
+        with mock.patch("sys.stdin", _FakeStdin(b"\xff\xfe bad bytes")):
+            code, _stdout, stderr = self.run_lint(
+                ["--previous", previous, "--new", "-"]
+            )
+        self.assertEqual(code, 2)
+        self.assertIn("not valid UTF-8", stderr)
+
+    def test_stdin_buffer_is_read_as_utf8(self):
+        body = "clean body\n".encode("utf-8")
+        previous = self.write("prev.md", "clean body\n")
+        with mock.patch("sys.stdin", _FakeStdin(body)):
+            code, _stdout, stderr = self.run_lint(
+                ["--previous", previous, "--new", "-", "--quiet"]
+            )
+        self.assertEqual(code, 0, stderr)
+
+    def test_lookalike_markers_are_not_exemptions(self):
+        lines = [
+            "xsha256=5a1d8c07 lookalike",
+            "mysha256 5a1d8c07 lookalike",
+        ]
+        path = self.write("lookalike.md", "\n".join(lines) + "\n")
+        code, data, _raw = self.run_json(
+            ["--previous", path, "--new", path, "--declared-basis", "25f1e63a"]
+        )
+        self.assertEqual(code, 1)
+        self.assertEqual(len(data["stale_basis"]), 2)
+        self.assertEqual({item["token"] for item in data["stale_basis"]}, {"5a1d8c07"})
+
+    def test_abbreviated_basis_accepts_short_tokens_only(self):
+        body = (
+            "short 25f1e63a is the declared basis.\n"
+            "full 25f1e63a1616b9a91a3423e7cca6e210570a9720 citation.\n"
+        )
+        path = self.write("prefix.md", body)
+        code, data, _raw = self.run_json(
+            ["--previous", path, "--new", path, "--declared-basis", "25f1e63a"]
+        )
+        self.assertEqual(code, 1)
+        self.assertEqual(len(data["stale_basis"]), 1)
+        self.assertEqual(data["stale_basis"][0]["line"], 2)
+        code, data, _raw = self.run_json(
+            [
+                "--previous",
+                path,
+                "--new",
+                path,
+                "--declared-basis",
+                "25f1e63a",
+                "--allow-sha",
+                "25f1e63a1616b9a91a3423e7cca6e210570a9720",
+            ]
+        )
+        self.assertEqual(code, 0, data["stale_basis"])
+
 
 if __name__ == "__main__":
     unittest.main()

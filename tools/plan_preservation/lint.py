@@ -75,7 +75,7 @@ QUALIFIERS = (
 
 AC_ROW_RE = re.compile(r"^\s*\d+\.\s+\*\*AC\d+")
 HEX_TOKEN_RE = re.compile(r"(?<![0-9a-f])[0-9a-f]{7,40}(?![0-9a-f])")
-HEX_INPUT_RE = re.compile(r"^[0-9a-f]{7,64}$")
+HEX_INPUT_RE = re.compile(r"^[0-9a-f]{7,64}\Z")
 MIN_CLAUSE_LEN = 8
 
 TRANSLATION = str.maketrans(
@@ -204,18 +204,23 @@ def cell_is_exact_token(line: str, start: int, end: int, token: str) -> bool:
     return cell.strip().strip("\u0060").strip() == token
 
 
+HASH_MARKER_RES = (
+    re.compile(r"(?<![0-9A-Za-z_])sha256=$"),
+    re.compile(r"(?<![0-9A-Za-z_])sha256:$"),
+    re.compile(r"(?<![0-9A-Za-z_])sha256 $"),
+    re.compile(r"(?<![0-9A-Za-z_])binding=sha256 $"),
+)
+
+
 def has_recorded_hash_marker(line: str, start: int) -> bool:
     """True when the token carries a recorded-hash marker: sha256=, sha256:,
     sha256 followed by a space, binding=sha256 followed by a space, or a skill
-    reference (name, space, at sign, space)."""
+    reference (name, space, at sign, space). Markers are matched on word
+    boundaries so a lookalike such as xsha256= is not an exemption."""
     prefix = line[:start]
-    if prefix.endswith("sha256=") or prefix.endswith("sha256:"):
+    if any(pattern.search(prefix) for pattern in HASH_MARKER_RES):
         return True
-    if prefix.endswith("sha256 "):
-        return True
-    if prefix.endswith("binding=sha256 "):
-        return True
-    return bool(re.search(r"\S+ @ $", prefix))
+    return bool(re.search(r"(?<!\S)(\S+) @ $", prefix))
 
 
 def token_is_accepted(
@@ -276,6 +281,26 @@ def collect_stale(
             findings.append({"token": token, "line": line_number, "reason": STALE_REASON})
     findings.sort(key=lambda item: (int(item["line"]), str(item["token"])))
     return findings
+
+
+def read_stdin_text() -> str:
+    """Read standard input as strict UTF-8 bytes when a binary buffer is
+    available, avoiding locale encoding and newline translation; fall back to
+    text mode for string streams."""
+    stream = getattr(sys.stdin, "buffer", None)
+    if stream is not None:
+        try:
+            data = stream.read()
+        except OSError as exc:
+            raise UsageError("--new -: %s" % exc) from exc
+        try:
+            return data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise UsageError("--new - is not valid UTF-8: %s" % exc) from exc
+    try:
+        return sys.stdin.read()
+    except OSError as exc:
+        raise UsageError("--new -: %s" % exc) from exc
 
 
 def validate_hex(value: str, flag: str) -> str:
@@ -446,18 +471,23 @@ def run(argv: Optional[Sequence[str]] = None) -> int:
         return EXIT_USAGE
 
     try:
-        declared_basis = validate_hex(args.declared_basis, "--declared-basis") if args.declared_basis else None
-        live_main = validate_hex(args.live_main, "--live-main") if args.live_main else None
+        declared_basis = (
+            validate_hex(args.declared_basis, "--declared-basis")
+            if args.declared_basis is not None
+            else None
+        )
+        live_main = (
+            validate_hex(args.live_main, "--live-main")
+            if args.live_main is not None
+            else None
+        )
         allow_sha = [validate_hex(value, "--allow-sha") for value in args.allow_sha]
         previous: List[Tuple[str, str]] = []
         for path in args.previous:
             previous.append((path, read_body(path, "--previous")))
         if args.new == "-":
             new_label = "<stdin>"
-            try:
-                new_text = sys.stdin.read()
-            except OSError as exc:
-                raise UsageError("--new -: %s" % exc) from exc
+            new_text = read_stdin_text()
         else:
             new_label = args.new
             new_text = read_body(args.new, "--new")
@@ -475,7 +505,8 @@ def run(argv: Optional[Sequence[str]] = None) -> int:
         return EXIT_USAGE
 
     if args.json:
-        print(json.dumps(result, indent=2, sort_keys=True))
+        payload = {key: value for key, value in result.items() if key != "status"}
+        print(json.dumps(payload, indent=2, sort_keys=True))
     elif args.quiet:
         print("RESULT: %s (%d finding(s))" % (result["status"], result["summary"]["findings"]))
     else:
@@ -488,7 +519,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return run(argv)
     except SystemExit:
         raise
-    except BaseException as exc:  # noqa: BLE001 - mapped to the internal-error exit
+    except Exception as exc:  # noqa: BLE001 - mapped to the internal-error exit
         print("lint.py: internal error: %s: %s" % (type(exc).__name__, exc), file=sys.stderr)
         return EXIT_INTERNAL
 

@@ -26,7 +26,8 @@ item 1 (2026-10-19). Standard library only; no third-party dependency.
 - `--allow-sha HEX` - an additional accepted hash value (repeatable; 7-64
   lowercase hex). Use it for pinned hashes and other legitimate references the
   qualifier list does not recognise.
-- `--size-cap BYTES` - UTF-8 byte cap for the new body; default **15,360**.
+- `--size-cap BYTES` - UTF-8 byte cap for the new body; default **15,360**. A
+  non-positive value is a usage error (exit 2).
 - `--json` - emit a deterministic JSON record with sort_keys and no timestamps.
 - `--quiet` - print only the `RESULT:` line in human output.
 
@@ -60,7 +61,10 @@ runs, and only tokens containing at least one a-f letter are considered
 these holds:
 
 1. It equals or is a prefix of `--declared-basis`, `--live-main`, or an
-   `--allow-sha` value.
+   `--allow-sha` value. The rule is one-way by design: a short declared basis
+   accepts short citations, but a full 40/64-hex citation is only accepted when
+   the declared/live/allow value is itself that full hash (pass the full basis
+   to accept full citations).
 2. **Cell-level content-hash exemption:** the token's pipe-delimited table cell,
    trimmed and backtick-stripped, is exactly the token (for example a Blob
    column cell holding one 40-hex hash). A cell such as `Blob at 5a1d8c07` is
@@ -87,7 +91,8 @@ encoded bytes) against `--size-cap` (default 15,360). Over-cap is a finding.
 Human output reports size, dropped requirements, stale basis references,
 warnings, and a final `RESULT:` line. `--json` emits a deterministic record
 with the keys: tool, version, model, inputs, size, dropped_requirements,
-stale_basis, warnings, summary, exit_code. Findings are sorted; JSON uses
+stale_basis, warnings, summary, exit_code (the human `status` line is not part of
+ the JSON schema). Findings are sorted; JSON uses
 sort_keys; no timestamps or environment-dependent values are emitted, so two
 runs on identical input are byte-identical.
 
