@@ -12,7 +12,7 @@
 
 ## 1. Page table
 
-| Page | Index | Path | Blob at d1f12cc3 | 2db1ffb7 | Bytes / LF |
+| Page | Index | Path | Blob at d1f12cc3 | Pin status at 2db1ffb7 | Bytes / LF |
 | --- | ---: | --- | --- | --- | ---: |
 | P424 | 424 | docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md | a1f537a9d507724a2a0ef35718c9e9353769e49a | pin | 54279 / 665 |
 | P425 | 425 | docs/evidence/documentation/readability-lane-a-batch-6-2026-10-18.md | 0070056c238e26a62980c391e7db458e1f185b50 | re-pin | 26443 / 168 |
@@ -108,7 +108,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P429 - index 429 - docs/evidence/documentation/readability-lane-b-batch-10-2026-10-18.md - 53323 B / 212 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane B - Stage C batch record, lane B batch 10, 2026-10-18.
-**B2:** 419 inventory rows; defined 0; named gaps 47; documented exclusions 372; all rows in section 3.
+**B2:** 418 inventory rows; defined 0; named gaps 47; documented exclusions 371; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L5 ## 1. Scope, plan binding and diff accounting.
 **B4:** GAP - page anchor is generic and does not demonstrate shipped-vs-proposed behavior; B4 is not claimed tested. Verdict remains PARTIAL with B1/B4/B6 gaps.
 **B5:** navigation/reference links checked; no relative links; check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0.
@@ -141,7 +141,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 **Tokenizer rule (repair finding #1).** Real raw tokens only, with source offsets. Priority: (1) a whole backticked span is ONE class-iv raw token and is never scanned inside; (2) remaining text gives dates YYYY-MM-DD[THH:MM[:SS][+-]HH:MM] as DATE, SHA hex 7-40 as SHA, numeric ranges/percent/formulas as RANGE, operator glyphs as OPERATOR, angle/brace placeholders as PLACEHOLDER; (3) repo-relative paths and real commands only as whole spans; (4) uppercase/coded/status tokens only as complete boundary-delimited tokens: no regex fragments, prefixes, basenames, substrings, or duplicate cross-class extraction. Ordinary prose words are class ii exclusions and are NOT B2 named gaps. Key = (page,line,source offset,raw token); one row per real token at first occurrence; ONE contiguous block.
 
-**Dispatch/status rule (findings #2/#7).** i = uppercase acronyms/coded identifiers/roles/page-line-AC IDs not statuses; ii = lowercase technical/audience prose; iii = non-backticked path/identifier; iv = whole backticked code/command/identifier; v = uppercase lifecycle/status keywords (vocabulary: ACCEPTED, REVISE, PASS, FAIL/FAILED, COMPLETE, UNRUN, OWED, SATISFIED, MET, FULL, PARTIAL, PENDING, BLOCKED, OPEN, CLOSED, MERGED, APPLIED, UNVERIFIED, COMMENTED, AWAITING, SUCCESS, etc.), numeric ranges/units, operators, placeholders. B2 gaps are only real abbreviations/coded identifiers/status codes/acronyms with no actual expansion on the line.
+**Dispatch/status rule (findings #2/#7).** i = uppercase acronyms/coded identifiers/roles/page-line-AC IDs not statuses; ii = lowercase technical/audience prose; iii = non-backticked path/identifier; iv = whole backticked code/command/identifier; v = lifecycle/status keywords, case-insensitive (vocabulary: ACCEPTED, REVISE, PASS, FAIL/FAILED, COMPLETE, UNRUN, OWED, SATISFIED, MET, FULL, PARTIAL, PENDING, BLOCKED, OPEN, CLOSED, MERGED, APPLIED, UNVERIFIED, COMMENTED, AWAITING, SUCCESS, etc.), numeric ranges/units, operators, placeholders. B2 gaps are only real abbreviations/coded identifiers/status codes/acronyms with no actual expansion on the line.
 
 **Generation/verification command (finding #9; artifacts externally retained).** Run the retained external generator/verifier: python -P _A/evidence/read-lc-424-c1/generate_inventory.py --verify (retained outside this one-path PR, so externally retained/unverified from the branch); it tokenizes the eight page blobs at capture basis d1f12cc3, emits this table and checks (page,line,offset,token) uniqueness, five-cell rows, class/disposition/code sums. Table kept inline because the PR is one added Markdown path; tradeoff is size.
 
@@ -169,7 +169,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 16@20 | i | RE-READ | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 16@28 | i | LANE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 18@63 | ii | quarter | documented exclusion - PROSE: ordinary prose word |
-| 424 | 18@86 | v | pending | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 424 | 18@86 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 424 | 19@36 | ii | lanes | documented exclusion - PROSE: ordinary prose word |
 | 424 | 19@67 | ii | quarters | documented exclusion - PROSE: ordinary prose word |
 | 424 | 21@2 | ii | workflow | documented exclusion - PROSE: ordinary prose word |
@@ -291,22 +291,22 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 197@7 | iv | `.claude/skills/agentic-loop-designer/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 424 | 197@57 | iv | `6ba6e1ad` | documented exclusion - SHA: commit/blob hash |
 | 424 | 199@56 | iv | `git log --all --author="F reviewer"` | documented exclusion - COMMAND: real command |
-| 424 | 200@68 | v | open | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 424 | 200@68 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 424 | 210@15 | ii | dispositions | documented exclusion - PROSE: ordinary prose word |
 | 424 | 217@2 | i | B1 | named gap - first use before expansion on this page |
 | 424 | 217@64 | i | B2 | named gap - first use before expansion on this page |
 | 424 | 218@27 | i | B3 | named gap - first use before expansion on this page |
 | 424 | 220@6 | i | B4 | named gap - first use before expansion on this page |
-| 424 | 220@62 | v | blocked | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 424 | 220@62 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 424 | 222@19 | i | B6 | named gap - first use before expansion on this page |
-| 424 | 229@1 | v | accepted | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 424 | 229@1 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 424 | 236@87 | v | L167 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 236@93 | iv | `Phase 1.5` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 245@0 | iv | `git show 988b50673cdd0e9ab0c15df891744cd02d1d2d2b:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 249@44 | v | partial | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 424 | 245@0 | iv | `git show 988b50673cdd0e9ab0c15df891744cd02d1d2d2b:<page>` | documented exclusion - COMMAND: real command |
+| 424 | 249@44 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 424 | 253@50 | ii | official | documented exclusion - PROSE: ordinary prose word |
 | 424 | 259@81 | ii | hash | documented exclusion - PROSE: ordinary prose word |
-| 424 | 261@0 | iv | `git rev-parse 988b50673cdd0e9ab0c15df891744cd02d1d2d2b:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 261@0 | iv | `git rev-parse 988b50673cdd0e9ab0c15df891744cd02d1d2d2b:<page>` | documented exclusion - COMMAND: real command |
 | 424 | 261@64 | v | × | documented exclusion - OPERATOR: operator glyph |
 | 424 | 266@66 | iv | `9fc556f443ff1d1bf85099292f133bab4a159621` | documented exclusion - SHA: commit/blob hash |
 | 424 | 267@92 | iv | `304fb814f0707e725087e1c8225182fd26fdec10` | documented exclusion - SHA: commit/blob hash |
@@ -379,10 +379,10 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 349@0 | v | L96 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 350@33 | iv | `evals/trigger-evals.json` | documented exclusion - PATH: file/path reference |
 | 424 | 351@47 | ii | ids | documented exclusion - PROSE: ordinary prose word |
-| 424 | 352@0 | iv | `git log` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 352@11 | iv | `git branch -a` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 352@0 | iv | `git log` | documented exclusion - COMMAND: real command |
+| 424 | 352@11 | iv | `git branch -a` | documented exclusion - COMMAND: real command |
 | 424 | 352@28 | iv | `gh pr list --state all` | documented exclusion - COMMAND: real command |
-| 424 | 352@57 | iv | `gh pr view <n>` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 352@57 | iv | `gh pr view <n>` | documented exclusion - COMMAND: real command |
 | 424 | 357@27 | v | L141 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 366@25 | v | L29 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 374@36 | iv | `gh pr view <n> --json state,title,mergedAt,headRefName` | documented exclusion - COMMAND: real command |
@@ -410,12 +410,12 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 406@10 | iv | `docs/skills-catalog.md` | documented exclusion - PATH: file/path reference |
 | 424 | 406@36 | iv | `scripts/validate-skills.py` | documented exclusion - PATH: file/path reference |
 | 424 | 407@0 | iv | `artifacts/audits/skill-contract-audit-baseline.json` | documented exclusion - PATH: file/path reference |
-| 424 | 408@23 | iv | `git remote -v` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 408@23 | iv | `git remote -v` | documented exclusion - COMMAND: real command |
 | 424 | 408@40 | iv | `ls` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 408@49 | iv | `git log --oneline -5` | documented exclusion - COMMAND: real command |
 | 424 | 416@52 | ii | surface | documented exclusion - PROSE: ordinary prose word |
 | 424 | 418@26 | ii | user | documented exclusion - PROSE: ordinary prose word |
-| 424 | 420@49 | v | closed | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 424 | 420@49 | v | closed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 424 | 422@4 | i | NOT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 422@29 | v | L31 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 423@24 | i | OWASP | named gap - first use before expansion on this page |
@@ -468,8 +468,8 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 477@79 | iv | `references/` | documented exclusion - PATH: file/path reference |
 | 424 | 481@71 | v | L3022 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 483@36 | v | L136 | documented exclusion - LINE-RANGE: line-range reference |
-| 424 | 494@46 | iv | `git ls-tree` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 494@62 | iv | `git show` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 494@46 | iv | `git ls-tree` | documented exclusion - COMMAND: real command |
+| 424 | 494@62 | iv | `git show` | documented exclusion - COMMAND: real command |
 | 424 | 501@2 | iv | `MANUAL-ONLY` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 505@2 | iv | `repo` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 506@2 | iv | `verdict` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -511,18 +511,18 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 591@21 | iv | `check_index.py` | documented exclusion - PATH: file/path reference |
 | 424 | 594@2 | iv | `build_index.py --write` | documented exclusion - COMMAND: real command |
 | 424 | 599@19 | ii | head | documented exclusion - PROSE: ordinary prose word |
-| 424 | 606@6 | iv | `git rev-parse origin/main` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 606@6 | iv | `git rev-parse origin/main` | documented exclusion - COMMAND: real command |
 | 424 | 607@6 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref 988b5067…` | documented exclusion - COMMAND: real command |
 | 424 | 608@6 | iv | `git ls-tree -r --name-only 988b5067…` | documented exclusion - COMMAND: real command |
 | 424 | 609@64 | iv | `events` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 610@6 | iv | `git merge-base --is-ancestor 988b5067… refs/remotes/origin/main` | documented exclusion - COMMAND: real command |
-| 424 | 611@6 | iv | `git rev-parse 988b5067…:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 612@6 | iv | `git show 988b5067…:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 611@6 | iv | `git rev-parse 988b5067…:<page>` | documented exclusion - COMMAND: real command |
+| 424 | 612@6 | iv | `git show 988b5067…:<page>` | documented exclusion - COMMAND: real command |
 | 424 | 613@6 | iv | `git diff --numstat 988b5067… refs/remotes/origin/main -- <page>` | documented exclusion - COMMAND: real command |
-| 424 | 614@6 | iv | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 615@7 | iv | `python -P scripts/validate-skills.py` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 614@6 | iv | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - COMMAND: real command |
+| 424 | 615@7 | iv | `python -P scripts/validate-skills.py` | documented exclusion - COMMAND: real command |
 | 424 | 615@56 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 616@7 | iv | `python scripts/tests/test_validator.py` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 616@7 | iv | `python scripts/tests/test_validator.py` | documented exclusion - COMMAND: real command |
 | 424 | 616@58 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 617@59 | iv | `evals` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 618@7 | iv | `gh pr view 794 --json state,title,mergedAt,headRefName,mergeCommit,autoMergeRequest,reviews,author,statusCheckRollup` | documented exclusion - COMMAND: real command |
@@ -537,7 +537,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 657@48 | i | LF | named gap - first use before expansion on this page |
 | 424 | 658@42 | v | 1-650 | documented exclusion - RANGE: numeric range/unit/formula |
 | 424 | 659@41 | iv | `## Footer` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 661@58 | iv | `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 424 | 661@58 | iv | `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` | documented exclusion - SHA: commit/blob hash |
 | 424 | 663@45 | iv | `3913683c686e6e71` | documented exclusion - SHA: commit/blob hash |
 | 424 | 663@70 | iv | `82ed906d2f228f0e` | documented exclusion - SHA: commit/blob hash |
 | 424 | 664@5 | iv | `15328d3c5603fe61` | documented exclusion - SHA: commit/blob hash |
@@ -567,9 +567,9 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 10@72 | iv | `7fd41cf3f8cd0c902f99cef1beaaefb34ec8cbf8` | documented exclusion - SHA: commit/blob hash |
 | 425 | 10@203 | iv | `Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 425 | 10@333 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
-| 425 | 11@30 | v | accepted | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 425 | 11@30 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 425 | 11@57 | ii | reader | documented exclusion - PROSE: ordinary prose word |
-| 425 | 11@84 | v | pending | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 425 | 11@84 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 425 | 11@148 | ii | review | documented exclusion - PROSE: ordinary prose word |
 | 425 | 15@31 | iv | `147479583` | documented exclusion - SHA: commit/blob hash |
 | 425 | 18@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
@@ -580,7 +580,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 23@91 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 425 | 23@146 | ii | lanes | documented exclusion - PROSE: ordinary prose word |
 | 425 | 23@191 | iv | `cannot_decide` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 425 | 23@241 | v | partial | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 425 | 23@241 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 425 | 25@28 | ii | frontier | documented exclusion - PROSE: ordinary prose word |
 | 425 | 25@64 | ii | records | documented exclusion - PROSE: ordinary prose word |
 | 425 | 25@84 | i | A1 | named gap - first use before expansion on this page |
@@ -631,17 +631,17 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 39@153 | iv | `5b4d2018afbb` | documented exclusion - SHA: commit/blob hash |
 | 425 | 40@7 | iv | `.claude/skills/ai-governance-risk-reviewer/references/ai-governance-framework.md` | documented exclusion - PATH: file/path reference |
 | 425 | 40@122 | iv | `415f87f4a665863bfffd5ed970ecf7e724a9d500` | documented exclusion - SHA: commit/blob hash |
-| 425 | 42@79 | iv | `git cat-file -s` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 425 | 42@79 | iv | `git cat-file -s` | documented exclusion - COMMAND: real command |
 | 425 | 42@111 | ii | count | documented exclusion - PROSE: ordinary prose word |
-| 425 | 42@244 | iv | `git rev-parse 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 425 | 42@244 | iv | `git rev-parse 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` | documented exclusion - COMMAND: real command |
 | 425 | 42@479 | iv | `git rev-list --count 2db1ffb7985ddc1c087c455740fd59e962967461 -- <page>` | documented exclusion - COMMAND: real command |
 | 425 | 44@65 | ii | purpose | documented exclusion - PROSE: ordinary prose word |
 | 425 | 46@302 | i | B1 | named gap - first use before expansion on this page |
-| 425 | 46@307 | v | open | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 425 | 46@307 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 425 | 46@364 | i | B2 | named gap - first use before expansion on this page |
 | 425 | 46@428 | i | B3 | named gap - first use before expansion on this page |
 | 425 | 46@611 | i | B4 | named gap - first use before expansion on this page |
-| 425 | 46@667 | v | blocked | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 425 | 46@667 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 425 | 46@687 | i | B5 | named gap - first use before expansion on this page |
 | 425 | 46@816 | i | B6 | named gap - first use before expansion on this page |
 | 425 | 46@903 | v | FULL | defined at first use - line 46 contains expansion |
@@ -649,7 +649,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 48@283 | ii | disposition | documented exclusion - PROSE: ordinary prose word |
 | 425 | 50@72 | v | L1 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 50@218 | ii | scope | documented exclusion - PROSE: ordinary prose word |
-| 425 | 50@304 | v | done | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 425 | 50@304 | v | done | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 425 | 50@333 | ii | tests | documented exclusion - PROSE: ordinary prose word |
 | 425 | 50@512 | i | SHA | named gap - first use before expansion on this page |
 | 425 | 50@519 | i | CI | named gap - first use before expansion on this page |
@@ -665,7 +665,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 54@314 | v | L105 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 54@351 | v | L100 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 54@356 | v | L101 | documented exclusion - LINE-RANGE: line-range reference |
-| 425 | 54@389 | iv | `git status` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 425 | 54@389 | iv | `git status` | documented exclusion - COMMAND: real command |
 | 425 | 54@403 | iv | `git diff --stat` | documented exclusion - COMMAND: real command |
 | 425 | 54@422 | v | L42 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 54@426 | v | L43 | documented exclusion - LINE-RANGE: line-range reference |
@@ -775,15 +775,15 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 110@526 | v | L82 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 110@530 | v | L92 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 132@214 | ii | counts | documented exclusion - PROSE: ordinary prose word |
-| 425 | 141@6 | iv | `git rev-parse origin/main` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 425 | 141@6 | iv | `git rev-parse origin/main` | documented exclusion - COMMAND: real command |
 | 425 | 142@6 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json` | documented exclusion - COMMAND: real command |
 | 425 | 143@6 | iv | `python -P -B tools/readability_acceptance/check_index.py --path <page> --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json` | documented exclusion - COMMAND: real command |
 | 425 | 143@133 | v | × | documented exclusion - OPERATOR: operator glyph |
-| 425 | 145@6 | iv | `git cat-file -s 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 425 | 148@6 | iv | `git show 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 425 | 150@73 | iv | `git cat-file -e 2db1ffb7985ddc1c087c455740fd59e962967461:<target>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 425 | 151@7 | iv | `python -B scripts/ci/check-markdown-links.py <8 pages>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 425 | 152@7 | iv | `python -P scripts/validate-skills.py` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 425 | 145@6 | iv | `git cat-file -s 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` | documented exclusion - COMMAND: real command |
+| 425 | 148@6 | iv | `git show 2db1ffb7985ddc1c087c455740fd59e962967461:<page>` | documented exclusion - COMMAND: real command |
+| 425 | 150@73 | iv | `git cat-file -e 2db1ffb7985ddc1c087c455740fd59e962967461:<target>` | documented exclusion - COMMAND: real command |
+| 425 | 151@7 | iv | `python -B scripts/ci/check-markdown-links.py <8 pages>` | documented exclusion - COMMAND: real command |
+| 425 | 152@7 | iv | `python -P scripts/validate-skills.py` | documented exclusion - COMMAND: real command |
 | 425 | 152@57 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 425 | 153@7 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
 | 425 | 166@567 | i | AEGIS-APR-115 | named gap - first use before expansion on this page |
@@ -792,7 +792,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 426 | 1@53 | ii | record | documented exclusion - PROSE: ordinary prose word |
 | 426 | 1@70 | v | 2026-10-18 | documented exclusion - DATE: date/timestamp |
 | 426 | 3@68 | i | V4 | named gap - first use before expansion on this page |
-| 426 | 5@47 | v | accepted | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 426 | 5@47 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 426 | 5@107 | i | PR | named gap - first use before expansion on this page |
 | 426 | 5@267 | v | ACCEPTED | named gap - first use before expansion on this page |
 | 426 | 5@292 | ii | audit | documented exclusion - PROSE: ordinary prose word |
@@ -813,7 +813,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 426 | 10@158 | iv | `docs-only` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 426 | 11@122 | i | DCO | named gap - first use before expansion on this page |
 | 426 | 12@69 | ii | reader | documented exclusion - PROSE: ordinary prose word |
-| 426 | 12@96 | v | pending | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 426 | 12@96 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 426 | 16@13 | ii | count | documented exclusion - PROSE: ordinary prose word |
 | 426 | 16@40 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740fd59e962967461 --json` | documented exclusion - COMMAND: real command |
 | 426 | 16@163 | iv | `reader_pages_in_tree` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -878,14 +878,14 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 426 | 32@60 | iv | `3d6883c3f7825ac3be4e03fb6777ec590e620911` | documented exclusion - SHA: commit/blob hash |
 | 426 | 33@12 | iv | `.claude/skills/ai-router-architect/references/ai-router-design.md` | documented exclusion - PATH: file/path reference |
 | 426 | 33@82 | iv | `535b0de585d0d3a70a7bd4ef24b0ab5d2588ee47` | documented exclusion - SHA: commit/blob hash |
-| 426 | 35@88 | iv | `git rev-parse 2db1ffb7…:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 426 | 35@122 | iv | `git show 2db1ffb7…:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 426 | 35@88 | iv | `git rev-parse 2db1ffb7…:<page>` | documented exclusion - COMMAND: real command |
+| 426 | 35@122 | iv | `git show 2db1ffb7…:<page>` | documented exclusion - COMMAND: real command |
 | 426 | 39@198 | i | B1 | named gap - first use before expansion on this page |
-| 426 | 39@203 | v | open | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 426 | 39@203 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 426 | 39@260 | i | B2 | named gap - first use before expansion on this page |
 | 426 | 39@324 | i | B3 | named gap - first use before expansion on this page |
 | 426 | 39@507 | i | B4 | named gap - first use before expansion on this page |
-| 426 | 39@563 | v | blocked | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 426 | 39@563 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 426 | 39@583 | i | B5 | named gap - first use before expansion on this page |
 | 426 | 39@712 | i | B6 | named gap - first use before expansion on this page |
 | 426 | 39@729 | ii | review | documented exclusion - PROSE: ordinary prose word |
@@ -1014,7 +1014,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 426 | 87@328 | i | VITE_ | named gap - first use before expansion on this page |
 | 426 | 87@388 | v | L18-21 | documented exclusion - LINE-RANGE: line-range reference |
 | 426 | 87@506 | v | L3-4 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 104@285 | v | partial | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 426 | 104@285 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 426 | 110@7 | iv | `5b4d2018afbb3e6210a4668c8b937de2ed24d9f6` | documented exclusion - SHA: commit/blob hash |
 | 426 | 112@7 | iv | `14ecd0c3dc9dd0b2402990fd757df46ac28986e5` | documented exclusion - SHA: commit/blob hash |
 | 426 | 113@7 | iv | `8459ac73ba6e0b280338aca9a97be7a3336ce356` | documented exclusion - SHA: commit/blob hash |
@@ -1022,11 +1022,11 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 426 | 120@107 | ii | counts | documented exclusion - PROSE: ordinary prose word |
 | 426 | 120@119 | iv | `git rev-list --count main -- <page>` | documented exclusion - COMMAND: real command |
 | 426 | 121@13 | iv | `git diff --numstat 2db1ffb7… 14747958… -- <page>` | documented exclusion - COMMAND: real command |
-| 426 | 123@47 | v | closed | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 426 | 123@47 | v | closed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 426 | 124@82 | iv | `.claude/skills/<name>/SKILL.md` | documented exclusion - PATH: file/path reference |
-| 426 | 143@6 | iv | `git rev-parse origin/main` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 426 | 143@6 | iv | `git rev-parse origin/main` | documented exclusion - COMMAND: real command |
 | 426 | 144@6 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7… --json` | documented exclusion - COMMAND: real command |
-| 426 | 148@6 | iv | `python -B scripts/ci/check-markdown-links.py <eight pages>` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 426 | 148@6 | iv | `python -B scripts/ci/check-markdown-links.py <eight pages>` | documented exclusion - COMMAND: real command |
 | 426 | 150@30 | iv | `laneA[32]…laneA[39]` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 426 | 153@36 | i | CI | named gap - first use before expansion on this page |
 | 426 | 167@273 | ii | base | documented exclusion - PROSE: ordinary prose word |
@@ -1054,7 +1054,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 11@94 | ii | model | documented exclusion - PROSE: ordinary prose word |
 | 427 | 11@433 | ii | branch | documented exclusion - PROSE: ordinary prose word |
 | 427 | 12@30 | ii | reader | documented exclusion - PROSE: ordinary prose word |
-| 427 | 12@57 | v | pending | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 427 | 12@57 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 427 | 12@83 | iv | `no_recorded_acceptance` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 427 | 16@31 | iv | `147479583...` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 427 | 19@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
@@ -1091,7 +1091,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 26@348 | v | 0-7 | documented exclusion - RANGE: numeric range/unit/formula |
 | 427 | 26@367 | v | 8-15 | documented exclusion - RANGE: numeric range/unit/formula |
 | 427 | 26@431 | v | 16-23 | documented exclusion - RANGE: numeric range/unit/formula |
-| 427 | 26@488 | v | accepted | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 427 | 26@488 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 427 | 26@587 | ii | next | documented exclusion - PROSE: ordinary prose word |
 | 427 | 26@643 | v | 24-31 | documented exclusion - RANGE: numeric range/unit/formula |
 | 427 | 26@713 | v | 32-39 | documented exclusion - RANGE: numeric range/unit/formula |
@@ -1129,17 +1129,17 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 41@7 | iv | `.claude/skills/api-contract-test-designer/references/contract-test-patterns.md` | documented exclusion - PATH: file/path reference |
 | 427 | 41@120 | iv | `97b4a782c03bcfdcd9b0bc6f13bacd424a964b7d` | documented exclusion - SHA: commit/blob hash |
 | 427 | 41@178 | iv | `5e0e9ad7d79b` | documented exclusion - SHA: commit/blob hash |
-| 427 | 43@74 | iv | `git show 2db1ffb7...:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 427 | 43@188 | iv | `git rev-parse 2db1ffb7...:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 427 | 43@74 | iv | `git show 2db1ffb7...:<page>` | documented exclusion - COMMAND: real command |
+| 427 | 43@188 | iv | `git rev-parse 2db1ffb7...:<page>` | documented exclusion - COMMAND: real command |
 | 427 | 43@405 | ii | counts | documented exclusion - PROSE: ordinary prose word |
 | 427 | 45@65 | ii | purpose | documented exclusion - PROSE: ordinary prose word |
 | 427 | 47@77 | iv | `2db1ffb7` | documented exclusion - SHA: commit/blob hash |
 | 427 | 47@227 | i | B1 | named gap - first use before expansion on this page |
-| 427 | 47@232 | v | open | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 427 | 47@232 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 427 | 47@289 | i | B2 | named gap - first use before expansion on this page |
 | 427 | 47@353 | i | B3 | named gap - first use before expansion on this page |
 | 427 | 47@536 | i | B4 | named gap - first use before expansion on this page |
-| 427 | 47@592 | v | blocked | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 427 | 47@592 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 427 | 47@612 | i | B5 | named gap - first use before expansion on this page |
 | 427 | 47@741 | i | B6 | named gap - first use before expansion on this page |
 | 427 | 47@758 | ii | review | documented exclusion - PROSE: ordinary prose word |
@@ -1272,18 +1272,18 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 95@303 | v | L39-48 | documented exclusion - LINE-RANGE: line-range reference |
 | 427 | 95@325 | v | L50-56 | documented exclusion - LINE-RANGE: line-range reference |
 | 427 | 95@348 | v | L41-44 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 112@321 | v | partial | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 427 | 112@321 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 427 | 112@394 | ii | count | documented exclusion - PROSE: ordinary prose word |
 | 427 | 118@108 | iv | `sd-c-796-r1` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 427 | 125@6 | iv | `git rev-parse origin/main` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 427 | 125@6 | iv | `git rev-parse origin/main` | documented exclusion - COMMAND: real command |
 | 427 | 125@55 | iv | `147479583fc498c50028f1b7dbf8311c8708544e` | documented exclusion - SHA: commit/blob hash |
 | 427 | 126@6 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json` | documented exclusion - COMMAND: real command |
 | 427 | 129@6 | iv | `git diff --numstat 2db1ffb7... 147479583... -- <page>` | documented exclusion - COMMAND: real command |
-| 427 | 130@6 | iv | `python -B scripts/ci/check-markdown-links.py <8 pages>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 427 | 131@6 | iv | `python -P scripts/validate-skills.py` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 427 | 130@6 | iv | `python -B scripts/ci/check-markdown-links.py <8 pages>` | documented exclusion - COMMAND: real command |
+| 427 | 131@6 | iv | `python -P scripts/validate-skills.py` | documented exclusion - COMMAND: real command |
 | 427 | 131@56 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 427 | 132@6 | iv | `grep -n` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 427 | 133@6 | iv | `git log -1` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 427 | 133@6 | iv | `git log -1` | documented exclusion - COMMAND: real command |
 | 427 | 133@21 | iv | `git rev-list --count` | documented exclusion - COMMAND: real command |
 | 427 | 134@7 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
 | 427 | 146@567 | i | AEGIS-APR-115 | named gap - first use before expansion on this page |
@@ -1304,7 +1304,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 7@291 | ii | blob | documented exclusion - PROSE: ordinary prose word |
 | 428 | 9@9 | ii | model | documented exclusion - PROSE: ordinary prose word |
 | 428 | 9@50 | i | V4 | named gap - first use before expansion on this page |
-| 428 | 9@314 | v | open | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 428 | 9@314 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 16@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
 | 428 | 16@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
 | 428 | 21@108 | ii | quarter | documented exclusion - PROSE: ordinary prose word |
@@ -1336,7 +1336,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 31@158 | i | AEGIS-APR-101 | named gap - first use before expansion on this page |
 | 428 | 31@311 | ii | approval | documented exclusion - PROSE: ordinary prose word |
 | 428 | 31@368 | ii | head | documented exclusion - PROSE: ordinary prose word |
-| 428 | 36@108 | iv | `git cat-file -s` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 428 | 36@108 | iv | `git cat-file -s` | documented exclusion - COMMAND: real command |
 | 428 | 36@277 | ii | count | documented exclusion - PROSE: ordinary prose word |
 | 428 | 38@47 | iv | `2db1ffb7` | documented exclusion - SHA: commit/blob hash |
 | 428 | 40@67 | iv | `ce0c26dbf2bc1fdd3dd6b610f5e8dd9b9f4ba2ee` | documented exclusion - SHA: commit/blob hash |
@@ -1380,10 +1380,10 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 49@69 | v | UNRUN | named gap - first use before expansion on this page |
 | 428 | 49@111 | i | ID | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 51@15 | ii | dispositions | documented exclusion - PROSE: ordinary prose word |
-| 428 | 51@49 | v | accepted | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 428 | 51@49 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 53@374 | ii | disposition | documented exclusion - PROSE: ordinary prose word |
 | 428 | 55@399 | ii | register | documented exclusion - PROSE: ordinary prose word |
-| 428 | 57@32 | v | partial | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 428 | 57@32 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 57@45 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
 | 428 | 57@326 | ii | review | documented exclusion - PROSE: ordinary prose word |
 | 428 | 59@61 | ii | purpose | documented exclusion - PROSE: ordinary prose word |
@@ -1392,7 +1392,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 61@191 | i | B2 | named gap - first use before expansion on this page |
 | 428 | 61@255 | i | B3 | named gap - first use before expansion on this page |
 | 428 | 61@503 | i | B4 | named gap - first use before expansion on this page |
-| 428 | 61@559 | v | blocked | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 428 | 61@559 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 61@579 | i | B5 | named gap - first use before expansion on this page |
 | 428 | 61@724 | i | B6 | named gap - first use before expansion on this page |
 | 428 | 63@76 | v | L1 | documented exclusion - LINE-RANGE: line-range reference |
@@ -1542,11 +1542,11 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 156@179 | i | SHA | named gap - first use before expansion on this page |
 | 428 | 157@33 | v | SATISFIED | named gap - first use before expansion on this page |
 | 428 | 163@33 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json` | documented exclusion - COMMAND: real command |
-| 428 | 164@26 | iv | `git rev-parse 2db1ffb7:<page>` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 428 | 164@26 | iv | `git rev-parse 2db1ffb7:<page>` | documented exclusion - COMMAND: real command |
 | 428 | 167@73 | iv | `.claude/skills/<name>/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 428 | 167@132 | iv | `evals/` | documented exclusion - PATH: file/path reference |
 | 428 | 168@152 | v | <cmd> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 428 | 171@80 | v | failed | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 428 | 171@80 | v | failed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 174@78 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
 | 428 | 174@109 | iv | `validate-skills.py` | documented exclusion - PATH: file/path reference |
 | 428 | 180@134 | ii | outcome | documented exclusion - PROSE: ordinary prose word |
@@ -1578,7 +1578,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 9@17 | ii | base | documented exclusion - PROSE: ordinary prose word |
 | 429 | 9@188 | ii | owner | documented exclusion - PROSE: ordinary prose word |
 | 429 | 9@194 | ii | workflow | documented exclusion - PROSE: ordinary prose word |
-| 429 | 9@436 | v | pending | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 429 | 9@436 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 11@16 | ii | docs | documented exclusion - PROSE: ordinary prose word |
 | 429 | 11@57 | iv | `docs/evidence/documentation/readability-lane-b-batch-10-2026-10-18.md` | documented exclusion - PATH: file/path reference |
 | 429 | 11@243 | ii | register | documented exclusion - PROSE: ordinary prose word |
@@ -1590,9 +1590,9 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 15@24 | v | FULL | named gap - first use before expansion on this page |
 | 429 | 18@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
 | 429 | 18@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
-| 429 | 21@43 | v | accepted | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 429 | 21@43 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 21@122 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
-| 429 | 21@154 | v | partial | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 429 | 21@154 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 21@164 | ii | official | documented exclusion - PROSE: ordinary prose word |
 | 429 | 21@261 | v | 0-143 | documented exclusion - RANGE: numeric range/unit/formula |
 | 429 | 21@275 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - PATH: file/path reference |
@@ -1609,11 +1609,11 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 23@216 | v | 176-183 | documented exclusion - RANGE: numeric range/unit/formula |
 | 429 | 23@231 | v | 192-199 | documented exclusion - RANGE: numeric range/unit/formula |
 | 429 | 23@408 | v | 200-207 | documented exclusion - RANGE: numeric range/unit/formula |
-| 429 | 23@435 | v | closed | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 429 | 23@435 | v | closed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 25@2 | i | R2 | named gap - first use before expansion on this page |
 | 429 | 25@5 | ii | next | documented exclusion - PROSE: ordinary prose word |
 | 429 | 25@16 | ii | rule | documented exclusion - PROSE: ordinary prose word |
-| 429 | 25@219 | v | open | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 429 | 25@219 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 25@283 | v | 184-191 | documented exclusion - RANGE: numeric range/unit/formula |
 | 429 | 25@310 | ii | quarter | documented exclusion - PROSE: ordinary prose word |
 | 429 | 25@508 | ii | main | documented exclusion - PROSE: ordinary prose word |
@@ -1652,7 +1652,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 46@533 | i | B3 | named gap - first use before expansion on this page |
 | 429 | 46@668 | ii | purpose | documented exclusion - PROSE: ordinary prose word |
 | 429 | 46@828 | i | B4 | named gap - first use before expansion on this page |
-| 429 | 46@885 | v | blocked | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 429 | 46@885 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 46@1011 | ii | model | documented exclusion - PROSE: ordinary prose word |
 | 429 | 46@1027 | i | B5 | named gap - first use before expansion on this page |
 | 429 | 46@1202 | i | B6 | named gap - first use before expansion on this page |
@@ -1870,7 +1870,6 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 146@269 | i | TOTAL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 146@296 | i | DESC | named gap - first use before expansion on this page |
 | 429 | 146@634 | iv | `<` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 429 | 146@635 | v | <`@45 (operator fragment, exclusion), `> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 146@673 | iv | `>` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 146@764 | v | <last_created_at> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 146@786 | v | <last_id> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -1901,7 +1900,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 147@1063 | v | <passed> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@1064 | ii | passed | documented exclusion - PROSE: ordinary prose word |
 | 429 | 147@1076 | v | <failed> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@1077 | v | failed | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 429 | 147@1077 | v | failed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 147@1089 | v | <unrun> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 148@202 | i | ALL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 148@210 | i | DEVIATION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
@@ -1968,8 +1967,8 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 187@142 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
 | 429 | 187@168 | ii | branch | documented exclusion - PROSE: ordinary prose word |
 | 429 | 187@176 | iv | `python -B scripts/check_dco.py --range 655e40ea8d6a16cbdaeab1a9a7eb77fd26207e75..<head>` | documented exclusion - COMMAND: real command |
-| 429 | 187@267 | iv | `python -P scripts/validate-skills.py` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 429 | 187@307 | iv | `python -P -B scripts/ci/check-markdown-links.py docs/evidence/documentation/readability-lane-b-batch-10-2026-10-18.md` | documented exclusion - RANGE: numeric range/unit/formula |
+| 429 | 187@267 | iv | `python -P scripts/validate-skills.py` | documented exclusion - COMMAND: real command |
+| 429 | 187@307 | iv | `python -P -B scripts/ci/check-markdown-links.py docs/evidence/documentation/readability-lane-b-batch-10-2026-10-18.md` | documented exclusion - COMMAND: real command |
 | 429 | 187@428 | iv | `python -P scripts/ci/check_pr_body_skills.py --author ModernNomad-98` | documented exclusion - COMMAND: real command |
 | 429 | 196@44 | ii | hash | documented exclusion - PROSE: ordinary prose word |
 | 429 | 200@139 | i | F-1 | named gap - first use before expansion on this page |
@@ -1987,7 +1986,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 1@53 | ii | record | documented exclusion - PROSE: ordinary prose word |
 | 430 | 1@71 | v | 2026-10-18 | documented exclusion - DATE: date/timestamp |
 | 430 | 3@168 | ii | next | documented exclusion - PROSE: ordinary prose word |
-| 430 | 3@173 | v | pending | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 430 | 3@173 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 3@224 | ii | evidence | documented exclusion - PROSE: ordinary prose word |
 | 430 | 5@49 | i | PR | named gap - first use before expansion on this page |
 | 430 | 5@105 | v | 2026-10-18T00:34:41-07:00 | documented exclusion - DATE: date/timestamp |
@@ -2000,7 +1999,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 7@372 | ii | blob | documented exclusion - PROSE: ordinary prose word |
 | 430 | 9@9 | ii | model | documented exclusion - PROSE: ordinary prose word |
 | 430 | 9@50 | i | V4 | named gap - first use before expansion on this page |
-| 430 | 9@314 | v | open | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 430 | 9@314 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 11@16 | ii | diff | documented exclusion - PROSE: ordinary prose word |
 | 430 | 13@32 | iv | `docs/evidence/documentation/readability-lane-b-batch-11-2026-10-18.md` | documented exclusion - PATH: file/path reference |
 | 430 | 13@155 | i | JSON | named gap - first use before expansion on this page |
@@ -2012,7 +2011,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 15@116 | ii | review | documented exclusion - PROSE: ordinary prose word |
 | 430 | 22@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
 | 430 | 22@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
-| 430 | 25@270 | v | partial | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 430 | 25@270 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 25@278 | ii | disposition | documented exclusion - PROSE: ordinary prose word |
 | 430 | 25@616 | ii | counts | documented exclusion - PROSE: ordinary prose word |
 | 430 | 27@38 | ii | batches | documented exclusion - PROSE: ordinary prose word |
@@ -2081,8 +2080,8 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 47@48 | i | B1-B6 | named gap - first use before expansion on this page |
 | 430 | 49@85 | v | L2841-2862 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 49@99 | i | B4 | defined at first use - line 49 contains expansion |
-| 430 | 49@207 | v | blocked | documented exclusion - STATUS: uppercase lifecycle/status keyword |
-| 430 | 49@440 | ii | git | documented exclusion - PROSE: ordinary prose word |
+| 430 | 49@207 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
+| 430 | 49@440 | ii | git | documented exclusion - COMMAND: real command |
 | 430 | 49@453 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
 | 430 | 49@483 | v | UNVERIFIED | named gap - first use before expansion on this page |
 | 430 | 51@59 | v | L1-201 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2257,10 +2256,10 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 17@24 | v | FULL | named gap - first use before expansion on this page |
 | 431 | 20@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
 | 431 | 20@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
-| 431 | 23@43 | v | accepted | documented exclusion - STATUS: uppercase lifecycle/status keyword |
-| 431 | 23@65 | v | pending | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 431 | 23@43 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
+| 431 | 23@65 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 23@122 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
-| 431 | 23@154 | v | partial | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 431 | 23@154 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 23@164 | ii | official | documented exclusion - PROSE: ordinary prose word |
 | 431 | 23@261 | v | 0-143 | documented exclusion - RANGE: numeric range/unit/formula |
 | 431 | 23@275 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - PATH: file/path reference |
@@ -2283,7 +2282,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 27@16 | ii | rule | documented exclusion - PROSE: ordinary prose word |
 | 431 | 27@313 | ii | quarter | documented exclusion - PROSE: ordinary prose word |
 | 431 | 27@403 | ii | rerecord | documented exclusion - PROSE: ordinary prose word |
-| 431 | 27@577 | v | open | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 431 | 27@577 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 27@642 | v | 240-247 | documented exclusion - RANGE: numeric range/unit/formula |
 | 431 | 29@269 | i | AC7 | named gap - first use before expansion on this page |
 | 431 | 33@23 | ii | blob | documented exclusion - PROSE: ordinary prose word |
@@ -2319,7 +2318,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 48@425 | ii | lifecycle | documented exclusion - PROSE: ordinary prose word |
 | 431 | 48@493 | i | B3 | named gap - first use before expansion on this page |
 | 431 | 48@718 | v | L2854-2856 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 48@784 | v | blocked | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| 431 | 48@784 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 48@908 | ii | model | documented exclusion - PROSE: ordinary prose word |
 | 431 | 48@926 | i | B5 | named gap - first use before expansion on this page |
 | 431 | 48@1115 | v | L2860-2862 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2436,7 +2435,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 96@563 | v | L354 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@568 | v | NONE | named gap - first use before expansion on this page |
 | 431 | 96@577 | v | L355 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@582 | i | AWAITING | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 431 | 96@582 | i | AWAITING | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 96@671 | v | L179 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@682 | v | L266 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@688 | i | MVP | named gap - first use before expansion on this page |
@@ -2544,17 +2543,17 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 282@99 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
 | 431 | 282@126 | iv | `python -B scripts/check_dco.py --range e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f..HEAD` | documented exclusion - COMMAND: real command |
 | 431 | 282@214 | i | OK | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 431 | 282@239 | iv | `python -P scripts/validate-skills.py` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 431 | 282@304 | iv | `python -P -B scripts/ci/check-markdown-links.py docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md` | documented exclusion - RANGE: numeric range/unit/formula |
+| 431 | 282@239 | iv | `python -P scripts/validate-skills.py` | documented exclusion - COMMAND: real command |
+| 431 | 282@304 | iv | `python -P -B scripts/ci/check-markdown-links.py docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md` | documented exclusion - COMMAND: real command |
 | 431 | 282@556 | ii | passed | documented exclusion - PROSE: ordinary prose word |
 | 431 | 289@16 | ii | scope | documented exclusion - PROSE: ordinary prose word |
 | 431 | 291@44 | ii | hash | documented exclusion - PROSE: ordinary prose word |
 
 ## 4. Counts, reconciliation and zero-duplicate proof
 
-**Verification status:** counts are externally generated/unverified in branch; overlap backtick nesting is rejected by the external verifier; see section3.
+**Verification status:** counts are externally generated/unverified in branch; overlap/nesting rejected by the external verifier; AC3 is NOT MET in branch.
 
-**Totals from final table:** rows **2400**; unique (page,line,offset,raw token) keys **2400**; duplicate keys **0**; overlapping/nested spans **0**; bad five-cell rows **0**. Classes: i445 / ii367 / iii9 / iv599 / v980 = 2400 . Dispositions: 15 defined / 376 named gaps / 2009 documented exclusions = 2400 .
+**Totals from final table:** rows **2399**; unique (page,line,offset,raw token) keys **2399**; duplicate keys **0**; overlapping/nested spans **0**; bad five-cell rows **0**. Classes: i445 / ii367 / iii9 / iv599 / v979 = 2399 . Dispositions: 15 defined / 376 named gaps / 2008 documented exclusions = 2399 .
 
 | Page | Rows | i | ii | iii | iv | v | Defined | Named | Excluded |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -2563,14 +2562,14 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | P426 | 244 | 39 | 33 | 0 | 61 | 111 | 2 | 33 | 209 |
 | P427 | 256 | 48 | 44 | 1 | 60 | 103 | 4 | 47 | 205 |
 | P428 | 276 | 58 | 53 | 1 | 70 | 94 | 3 | 57 | 216 |
-| P429 | 419 | 88 | 52 | 1 | 85 | 193 | 0 | 47 | 372 |
+| P429 | 418 | 88 | 52 | 1 | 85 | 192 | 0 | 47 | 371 |
 | P430 | 240 | 45 | 44 | 1 | 31 | 119 | 1 | 49 | 190 |
 | P431 | 327 | 61 | 50 | 3 | 48 | 165 | 2 | 59 | 266 |
-| **Total** | **2400** | **445** | **367** | **9** | **599** | **980** | **15** | **376** | **2009** |
+| **Total** | **2399** | **445** | **367** | **9** | **599** | **979** | **15** | **376** | **2008** |
 
-**Exclusion-code counts:** DATE 34 | SHA 124 | LINE-RANGE 688 | STATUS 44 | COMMAND 51 | RANGE 89 | PATH 163 | PLACEHOLDER 80 | OPERATOR 6 | LITERAL 6 | IDENTIFIER 204 | EMPHASIS 153 | PROSE 367 = 2009.
+**Exclusion-code counts:** DATE 34 | SHA 125 | LINE-RANGE 688 | STATUS 45 | COMMAND 91 | RANGE 87 | PATH 163 | PLACEHOLDER 79 | OPERATOR 6 | LITERAL 6 | IDENTIFIER 166 | EMPHASIS 152 | PROSE 366 = 2008.
 
-**Reconciliation:** per-page rows sum to 2400 ; class totals sum to 2400 ; disposition totals sum to 2400 ; code totals sum to 2009 ; unique keys equal rows; duplicate/overlap keys 0; ONE contiguous table; every row five cells; sections 2/4/5/6 derived.
+**Reconciliation:** per-page rows sum to 2399 ; class totals sum to 2399 ; disposition totals sum to 2399 ; code totals sum to 2008 ; unique keys equal rows; duplicate/overlap keys 0; ONE contiguous table; every row five cells; malformed review-note rows removed.
 
 ## 5. Batch mapping, selection and continuation
 
@@ -2580,19 +2579,19 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 6. Provenance, artifacts, checker and limits
 
-**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (external retained, not in PR). **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08; README.md 1554/23/4984be21df88e2b6bf01a7954b99ac781b7c0b6999837a61c8e29f739d5aeb7f; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/c39a2928af622b6c9b4edd51c093a3e45b8b7fd259a4c88fb1d193420213bab1; Crows.json 2575/58/e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e957587acc0d04244eb. These _A paths are externally retained convenience copies, NOT in the one-path branch and not independently verifiable in this PR; inline Crows block remains canonical for reproduction. No machine-specific absolute path is retained.
+**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (external retained, not in PR). **Generator (new review 5567574260 #1):** _A/evidence/read-lc-424-c1/generate_inventory.py 3194 B/48 LF/sha 51ca48c0f2c322fb3ce43da09d8cc041087bc36dbcca8c8274ef2c54d991a0a4 is externally retained and is NOT listed in MANIFEST.txt; AC3 is therefore NOT MET in branch and no in-branch reproducibility is claimed. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08; README.md 1554/23/4984be21df88e2b6bf01a7954b99ac781b7c0b6999837a61c8e29f739d5aeb7f; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/c39a2928af622b6c9b4edd51c093a3e45b8b7fd259a4c88fb1d193420213bab1; Crows.json 2575/58/e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e957587acc0d04244eb. These _A paths are externally retained convenience copies, NOT in the one-path branch and not independently verifiable in this PR; inline Crows block remains canonical for reproduction. No machine-specific absolute path is retained.
 
 **PROC-04 method (no digest invented here):** body step publishes witness/skills/security bound fields; PROC is whole-line sentinels, whitespace-collapsed, LF-joined in that order, SHA-256; body publishes short+full digest/lens and literal-presence proof after final body edit. This record does not assert a PROC digest.
 
-**Canonical B4/B6/Stage-C:** B4 tested per page; B6 UNVERIFIED and never FULL-supporting; 0 FULL / 8 PARTIAL / 0 UNRUN; no keeper. **Limits:** no page edit; no keeper/index/ledger/register/manifest/tool/test/workflow change; no public-CI change; no merge; review-disposition discipline applies: DeepSeek advisory only, findings addressed or visibly disposed, dispositions do not block; Codex never a pass; 0 unresolved before G.
+**Canonical B4/B6/Stage-C:** B4 assessed and failed/gap per page, not claimed tested; B6 UNVERIFIED and never FULL-supporting; 0 FULL / 8 PARTIAL / 0 UNRUN; no keeper. **Limits:** no page edit; no keeper/index/ledger/register/manifest/tool/test/workflow change; no public-CI change; no merge; review-disposition discipline applies: DeepSeek advisory only, findings addressed or visibly disposed, dispositions do not block; Codex never a pass; 0 unresolved before G.
 
 ## 7. AC1-AC8 status at Stage C handoff
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET in branch | exactly one added record path; no other path; DCO-signed model commits measured post-commit (three total after final repair); base d1f12cc3 |
+| AC1 one-path | MET in branch | exactly one added record path; no other path; DCO-signed model commits measured post-commit (four total after final repair); base d1f12cc3 |
 | AC2 frozen pages | MET | eight page blobs/bytes/LF; P424 pinned-equal + seven re-pinned; mixed1+7 disclosed; zero branch-head drift; totals300,510/2,066 |
-| AC3 whole-page+inventory | EXTERNALLY GENERATED / UNVERIFIED IN BRANCH | whole-page B1-B6; ONE 2400-row strict-tokenizer table; five-cell/zero-duplicate/overlap-rejected; dispatch/status/normalization/collision; every tally sums; counts externally generated, not independently verified in-branch |
+| AC3 whole-page+inventory | EXTERNALLY GENERATED / UNVERIFIED IN BRANCH | whole-page B1-B6; ONE 2399-row strict-tokenizer table; five-cell/zero-duplicate/overlap-rejected; dispatch/status/normalization/collision; every tally sums; counts externally generated, not independently verified in-branch |
 | AC4 dispositions | MET | 0 FULL / 8 PARTIAL / 0 UNRUN; B6 UNVERIFIED; B1 gaps; no keeper |
 | AC5 record/body/PROC | pending body step | record one terminal LF/no CR/no trailing whitespace; PROC method documented; body will publish actual digest |
 | AC6 Codex | honest, never a pass | no Codex pass claimed; 0 unresolved before G; MG3 G-only |
@@ -2605,7 +2604,7 @@ Plan r3 Stage A self-account (four rows, Row sources round=1 rows1-4, six fields
 
 ## 9. Stage C self-account (rows, Row sources, six fields)
 
-Stage C four-column skills rows are canonical in section 11 inline appendix (Crows block), also retained externally at _A/evidence/read-lc-424-c1/Crows.txt; no duplicate row table here. Six-field lines use exactly six key=value fields separated by ' / '; any support attributes are on separate lines, not extra fields.
+Stage C four-column skills rows are canonical in section 11 inline appendix (Crows block), also retained externally at _A/evidence/read-lc-424-c1/Crows.txt; no duplicate row table here. Field contract: the historical six-field label is retained; the fenced lines contain the skill@hash prefix plus seven key=value support fields (hash/entry/WHERE/size/model/plan_role/result) separated by ' / '; supporting attributes are explicitly enumerated.
 
 **Row sources (round=1, row=1..4; binding over Crows.txt):**
 Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 1 of 4; binding=sha256 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
@@ -2638,7 +2637,7 @@ skill-usage-ledger@6a27b5c8e690 / hash=6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6
 A-rows authoritative reference is external at _A/evidence/read-lc-424-a1/A-rows.txt and is not duplicated inline. The Crows block below is the ONE canonical inline copy; Crows.txt is the retained external working copy with the same bytes/hash.
 
 ```text
-| [acceptance-criteria-reviewer](.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-21 / sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole; applied canonical B1-B6/B4 per page/B6 UNVERIFIED and built the exact-once inventory under the dispatch/code rules. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2,400-row inventory; no keeper |
+| [acceptance-criteria-reviewer](.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-21 / sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole; applied canonical B1-B6/B4 per page/B6 UNVERIFIED and built the exact-once inventory under the dispatch/code rules. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2,399-row inventory; no keeper |
 | [source-of-truth-reconciler](.claude/skills/source-of-truth-reconciler/SKILL.md) @ b5fd9feda972 | C batch-21 / sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main d1f12cc3; verified mixed 1+7 pins/bytes/LF, frontier/quarters, 63-record duplicate search, artifacts and capture hashes. | block424-431/batch21; union621/156; 300,510/2,066; 0/63; mixed pin disclosed |
 | [change-classification-gate](.claude/skills/change-classification-gate/SKILL.md) @ 08d91a834460 | C batch-21 / sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path; no other path. | one added docs record path; absent at main |
 | [skill-usage-ledger](.claude/skills/skill-usage-ledger/SKILL.md) @ 6a27b5c8e690 | C batch-21 / sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved manifest hashes; authored rows/sources/six; retained Crows and support CLI/README. | 4 rows/4 per-row sources/4 six-field lines; capture |
