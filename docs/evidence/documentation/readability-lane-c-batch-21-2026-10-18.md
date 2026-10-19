@@ -2597,7 +2597,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | AC4 dispositions | MET for 0 FULL / 8 PARTIAL / 0 UNRUN (genuinely supported after semantic corrections) | B2/line-range/identifier/placeholder invariants and per-page B2 counts corrected; B4 N/A rationale, B5 partial limitation, B6 precise gap; no keeper/FULL claim |
 | AC5 record/body/PROC | MET (final body) | final live body publishes PROC-04 short/full/lens and literal presence; published == recomputed; body checker 0 (proof in PR body and SD-C repair comment) |
 | AC6 Codex/reviews | MET | Codex never a pass, 0 threads/0 unresolved; newest review 5567657046 answered in visible findings-response comment with FIXED/DISPOSED; DeepSeek advisory only, never a gate |
-| AC7 provenance | MET (inline canonical evidence) | section 12 inlines A-rows/README/preview/MANIFEST/Crows content with measured B/LF/sha; Crows.json carries its explicit no-trailing-LF convention; external copies convenience only |
+| AC7 provenance | MET (inline canonical evidence) | section 12 inlines A-rows/README/preview/MANIFEST/Crows content with measured B/LF/sha; Crows.json carries its trailing-LF/full-totals convention; external copies convenience only |
 | AC8 stage entry | MET for C | fresh B ACCEPT 6260430607; one record; D/E/F/G separate; no merge |
 
 **AC verdict (narrowed, review 5568051580 #8):** AC1-AC8 are MET under the AC2 waiver using in-branch record evidence plus external PR artifacts; AC5 relies on the live PR body/PROC/checker external to this file, AC6 on visible PR review-thread dispositions external to this file, and AC3 is table-level self-consistency only (not source-page cross-check). B6 reader evidence: a non-author Stage C reader exists, but no B6 interview exists; the B6 line does not claim an interview. This is not a DeepSeek pass/gate claim.
@@ -2626,7 +2626,7 @@ skill-usage-ledger@6a27b5c8e690 / hash=6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6
 ```
 
 **Support CLI proof (measured):** preview.py path -> _A/evidence/read-lc-424-c1/Crows.txt; sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; bytes=1542; lf=4 ; preview.py rows -> table_name=stage_c_skills; key=row; where=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21; rows=4; row=1 skill=acceptance-criteria-reviewer entry=.claude/skills/acceptance-criteria-reviewer/SKILL.md sha256=c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 size=14207 model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) plan_role=sd-c-read-lc-424-c1 ; preview.py query acceptance -> matches=1; {"entry": ".claude/skills/acceptance-criteria-reviewer/SKILL.md", "row": 1, "sha256": "c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021", "skill": "acceptance-criteria-reviewer", "where": "stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21"}.
-**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (5e4b5fb3e63eab2f48cdad7aa1dd0792400649b275dd175e7b0ffd00623237e3) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (7872afb2dc0665e78ff718f9b6367e7eef6df70e31161216890074a716bdd068) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 2,575 B / 58 LF / sha 9e0425032ff8efb34decfc40f09ec3de47d2518a385acba551438a4a46b32780. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3036 B / 89 LF / sha 9e0425032ff8efb34decfc40f09ec3de47d2518a385acba551438a4a46b32780.
+**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (5e4b5fb3e63eab2f48cdad7aa1dd0792400649b275dd175e7b0ffd00623237e3) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (37b422c73ccb827b19bc8435ea6eb8bd7004988d4a600c08a10bd09acd4fc9da) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 3,036 B / 89 LF / sha 9e0425032ff8efb34decfc40f09ec3de47d2518a385acba551438a4a46b32780. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3036 B / 89 LF / sha 9e0425032ff8efb34decfc40f09ec3de47d2518a385acba551438a4a46b32780.
 
 ## 10. Five required c-protocol questions (measured on final artifact)
 
@@ -2646,8 +2646,11 @@ A-rows is inlined canonically in section 12; _A/evidence/read-lc-424-a1/A-rows.t
 | [change-classification-gate](.claude/skills/change-classification-gate/SKILL.md) @ 08d91a834460 | C batch-21 / sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path; no other path. | one added docs record path; absent at main |
 | [skill-usage-ledger](.claude/skills/skill-usage-ledger/SKILL.md) @ 6a27b5c8e690 | C batch-21 / sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved manifest hashes; authored rows/sources/six; retained Crows and support CLI/README. | 4 rows/4 per-row sources/4 six-field lines; capture |
 
-**Canonical Crows block measured:** 1542 B / 4 LF / sha8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; external Crows.txt is a convenience copy with the same bytes/hash.
 ```
+
+
+
+**Canonical Crows block measured:** 1542 B / 4 LF / sha8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; external Crows.txt is a convenience copy with the same bytes/hash.
 
 **Record digest:** this record does not embed its own digest; record facts are published outside. All captures above are exact UTF-8/LF.
 
@@ -2731,7 +2734,7 @@ if __name__ == "__main__": sys.exit(main(sys.argv[1:]))
 ~~~~
 
 ### MANIFEST canonical block
-Measured: 561 B / 5 LF / sha 7872afb2dc0665e78ff718f9b6367e7eef6df70e31161216890074a716bdd068
+Measured: 561 B / 5 LF / sha 37b422c73ccb827b19bc8435ea6eb8bd7004988d4a600c08a10bd09acd4fc9da
 
 ~~~~text
 Crows.txt  sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3  bytes=1542  lf=4
@@ -2874,7 +2877,7 @@ try:
  i=next(i for i,l in enumerate(rec) if "Crows.json canonical block" in l)
  a=next(i for i in range(i,len(rec)) if rec[i].startswith("~~~~text"))
  b=next(i for i in range(a+1,len(rec)) if rec[i].startswith("~~~~"))
- content="\n".join(rec[a+1:b])+"\n"
+ content="\n".join(x.rstrip("\r") for x in rec[a+1:b])+"\n"
  cj=json.loads(content)
  if len(cj.get("rows",[]))!=4: err("Crows.json rows %d !=4"%len(cj.get("rows",[])))
  decl=None
@@ -2900,6 +2903,39 @@ try:
  cj_names=[x.get("skill") for x in cj.get("rows",[])] if cj else []
  if cb_names!=cj_names: err("Crows block skills != Crows.json skills")
 except Exception as e: err("Crows block compare: "+str(e))
+# inline canonical artifact measured facts
+block_names=["A-rows","README","preview","MANIFEST","Crows.json"]; inline_ok=0
+for name in block_names:
+ try:
+  h=next(i for i,l in enumerate(rec) if l.startswith("### "+name+" canonical block"))
+  a=next(i for i in range(h,h+5) if rec[i].startswith("~~~~text"))
+  b=next(i for i in range(a+1,len(rec)) if rec[i].startswith("~~~~"))
+  lines=[x.rstrip("\r") for x in rec[a+1:b]]
+  while lines and lines[-1].strip()=="": lines.pop()
+  content="\n".join(lines)+"\n"
+  decl=None
+  for j in range(h,a):
+   m=re.search(r"Measured:.*?(\d+) B / (\d+) LF / sha ?([0-9a-f]{64})",rec[j])
+   if m: decl=m.groups()
+  if not decl: err(name+" measured facts missing")
+  elif int(decl[0])!=len(content.encode()) or int(decl[1])!=content.count("\n") or decl[2]!=hashlib.sha256(content.encode()).hexdigest(): err(name+" inline measured facts mismatch")
+  else: inline_ok+=1
+ except Exception as e: err(name+" inline block: "+str(e))
+try:
+ i=next(i for i,l in enumerate(rec) if l.startswith("## 11."))
+ a=next(i for i in range(i,len(rec)) if rec[i].startswith(chr(96)*3+"text"))
+ b=next(i for i in range(a+1,len(rec)) if rec[i].startswith(chr(96)*3))
+ lines=[x.rstrip("\r") for x in rec[a+1:b]]
+ while lines and lines[-1].strip()=="": lines.pop()
+ content="\n".join(lines)+"\n"; decl=None
+ for j in range(b,min(len(rec),b+14)):
+  m=re.search(r"Canonical Crows block measured.*?(\d+) B / (\d+) LF / sha ?([0-9a-f]{64})",rec[j])
+  if m: decl=m.groups()
+ if not decl: err("Crows block measured facts missing")
+ elif int(decl[0])!=len(content.encode()) or int(decl[1])!=content.count("\n") or decl[2]!=hashlib.sha256(content.encode()).hexdigest(): err("Crows block measured facts mismatch")
+ else: inline_ok+=1
+except Exception as e: err("Crows block measured: "+str(e))
+
 per=Counter(); d=defaultdict(Counter); dd=defaultdict(Counter)
 for a,b,c,cl,t,di in rows: per[a]+=1; d[a][cl]+=1; dd[a]["defined" if di.startswith("defined") else ("named" if di.startswith("named") else "excluded")]+=1
 seen2=[]
@@ -2929,9 +2965,15 @@ for r in rows:
   code=re.match(r"documented exclusion - ([A-Z-]+):",r[5]).group(1)
   if code not in ALLOWED.get(r[3],set()): err("class/disposition incompatible "+repr(r))
 if raw_count<1: err("no raw <...> placeholders"); raw_ok=False
+for r in rows:
+ tok=r[4]
+ if ("<" in tok or ">" in tok):
+  inner=tok.strip().strip(chr(96))
+  if not (tok.startswith(chr(96)) and tok.endswith(chr(96))): err("placeholder token not code-spanned "+repr(r)); raw_ok=False
+  elif r[3]=="v" and not re.fullmatch(r"<[^<>]+>",inner): err("class-v placeholder shape "+repr(r)); raw_ok=False
 if errors:
  print("VERIFIER FAIL:"); [print(" -",e) for e in errors]; sys.exit(1)
-print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count))
+print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d inline-artifacts=%d/6"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,inline_ok))
 ~~~~
 
 **Mechanically verified by the verifier:** table parse/rows/keys/classes/dispositions/codes/per-page totals/Crows.json row1 count/malformed rows/overlaps. **Manually asserted, not source-page cross-checked:** page-token meanings, first-use judgments, B2/AC dispositions; AC3 is therefore table-level self-consistency only.
@@ -2939,7 +2981,7 @@ print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=
 ### Embedded verifier expected output
 
 ~~~~text
-VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 594, 'i': 445, 'iii': 9} disps={'excluded': 2053, 'named': 338, 'defined': 8} exclusions=2053 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127
+VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 594, 'i': 445, 'iii': 9} disps={'excluded': 2053, 'named': 338, 'defined': 8} exclusions=2053 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127 inline-artifacts=6/6
 ~~~~
 
 External convenience copies: _A/evidence/read-lc-424-c1/Crows.txt 1542/4/sha8a8a2564..., A-rows path above, README/preview/MANIFEST/Crows.json above. No in-branch claim of files outside this record.
