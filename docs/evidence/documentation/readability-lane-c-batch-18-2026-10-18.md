@@ -1189,7 +1189,7 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 
 ## 6. Dispositions, verdicts, keeper exclusion and continuation
 
-**Disposition tally: 90 defined at first use / 258 named gaps / 696 documented exclusions = 1056 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED and a B1 audience gap is recorded; no keeper/acceptance row.
+**Disposition tally: 90 defined at first use / 258 named gaps / 708 documented exclusions = 1056 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED and a B1 audience gap is recorded; no keeper/acceptance row.
 
 **Named-gap list (from the final table):**
 - P400 (400): batch L1, pending L4, status L6, PR L8, active L10, SKILL L17, grant L17, tenant L18, lifecycle L22, register L22, policy L26, reviewer L26, owner L27, provider L27, gate L29, unknown L30, review L34, checkpoint L41
