@@ -16,7 +16,7 @@ Basis/live main **907a602625255bcb4647beae60b0348e89fa6196** (60th record merge 
 | P453 | 453 | docs/evidence/documentation/readability-lane-c-batch-13-2026-10-18.md | 857ecb411fad0de5b8f9fa43c184c3766ebdfd37 | re-pin | 204,341 / 1,650 |
 | P454 | 454 | docs/evidence/documentation/readability-lane-c-batch-14-2026-10-18.md | 281e51fedd49cd5e4f0b0b3d428a0e285ca7f78d | re-pin | 99,933 / 809 |
 | P455 | 455 | docs/evidence/documentation/readability-lane-c-batch-15-2026-10-18.md | d5717a7b46f16f3bd56c50be3fd2c6dca47efe38 | re-pin | 33,018 / 262 |
-| **Totals** | | **eight pages** | | **1 pinned-equal / 7 re-pinned** | **404,305 / 3,428** |
+| **Totals** | | **eight pages** | | **1 pinned-equal / 7 re-pinned** | **1,031,654 / 8,697** |
 
 ## 3. Candidate-token inventory (never exact-once; unique keys; at-most-one defined/named per page/raw token)
 
@@ -4593,6 +4593,25 @@ for l in plines:
     except: err('bad per-page row');continue
     expect=[sum(per[pg])]+per[pg]+[pdisp[pg].get('defined',0),pdisp[pg].get('named',0),pdisp[pg].get('excluded',0)]
     if vals!=expect: err('per-page mismatch '+pg+' '+repr(vals)+' != '+repr(expect))
+# page total arithmetic check
+# page total arithmetic check (byte/LF rows must sum to declared totals)
+try:
+ pt=[l for l in text[:text.index('## 3.')].split(chr(10)) if l.startswith('| P4')]
+ if len(pt)!=8: err('page rows %d != 8'%len(pt))
+ pb=plf=0
+ for l in pt:
+  cells=[c.strip() for c in l.strip('|').split('|')]
+  if len(cells)<6: err('bad page row '+l[:40]); continue
+  m=re.fullmatch(r'([\d,]+) / ([\d,]+)',cells[-1])
+  if not m: err('bad page bytes/lf '+cells[-1]); continue
+  pb+=int(m.group(1).replace(',','')); plf+=int(m.group(2).replace(',',''))
+ if (pb,plf)!=(1031654,8697): err('page totals %d/%d != 1031654/8697'%(pb,plf))
+ tl=[l for l in text.split(chr(10)) if l.startswith('| **Totals**')]
+ if not tl or '1,031,654 / 8,697' not in tl[0]: err('page Totals line not 1,031,654/8,697')
+ for pat,val in [('i=635',635),('ii=55',55),('iii=172',172),('iv=1581',1581),('v=1723',1723)]:
+  pass
+except Exception as e: err('page totals arithmetic: '+str(e))
+
 # artifacts
 def extract(name):
     marker='### '+name+' canonical block'
