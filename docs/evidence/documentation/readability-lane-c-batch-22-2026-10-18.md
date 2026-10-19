@@ -3028,11 +3028,17 @@ def main(a):
 if __name__=="__main__": sys.exit(main(sys.argv[1:]))
 ~~~
 
-## 10. Embedded verifier, extraction and expected output
+## 10. Boundary
 
-**Extraction/execution:** copy the fenced python block under this section to a temporary verifier-432.py, then run `python verifier-432.py <this-record.md>`. No third-party dependency. Exit0 prints the expected line; any malformed/measured/cross-file/class/placeholder/stale/duplicate-token error prints VERIFIER FAIL and exits1; missing argument exits2. Table-level scope only (candidate inventory, not source-exhaustive).
+Stage C only; no merge; no body/PROC claim yet (body step follows); one added record path **docs/evidence/documentation/readability-lane-c-batch-22-2026-10-18.md** plus _A/evidence/read-lc432-c1 evidence files are working evidence, not committed paths; no page/keeper/index/manifest/tool/test/workflow change; owner #848 untouched. No record edit beyond this repair; every published text states exactly Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).
 
-### Embedded verifier source
+**Signed with both names - true identity: sd-c-796-r1; stage role: sd-c-read-lc-432-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+
+## 11. Embedded verifier source, extraction and expected output
+
+**Placement:** this is the final section of the record. The fenced python block below is ONE contiguous, complete block; it contains no headings, prose or signature lines. **Extraction/execution:** read the lines strictly between the opening and closing ~~~ fences of this section into a temp verifier-432.py, then run `python verifier-432.py <this-record.md>`. No third-party dependency; no asserts; explicit error list/exit codes; missing argument exits2. Table-level scope only (candidate inventory, not source-exhaustive).
+
+**Expected output line:** `VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok`
 
 ~~~python
 import sys,re,json,hashlib
@@ -3051,16 +3057,7 @@ for l in lines:
  if l.startswith('<!-- candidate-inventory:start -->'): intable=True; continue
  if l.startswith('<!-- candidate-inventory:end -->'): intable=False; continue
  if not intable or not l.startswith('| P4'): continue
- m=re.match(r'^\| (P\d{3}) \| (\d+)@(\d+) \| ([iv]+) \| (.+?) \| (.+?) \| `VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok`
-
-**Negative tests to reproduce:** (a) remove the code span from one angle-placeholder token -> exit1 raw-angle/placeholder; (b) change one class-iv backticked row to i -> exit1 class/backtick; (c) mutate the MANIFEST-432.txt sha -> exit1 measured/inline-artifacts; (d) duplicate one named token on the same page -> exit1 duplicate-token/at-most-one-defined-named. Each must be non-zero; never treat a pass as a merge gate.
-
-## 11. Boundary
-
-Stage C only; no merge; no body/PROC claim yet (body step follows); one added record path plus _A/evidence/read-lc432-c1 evidence files are working evidence, not committed paths; no page/keeper/index/manifest/tool/test/workflow change; owner #848 untouched. DCO commit follows; every published text states exactly Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).
-
-**Signed with both names - true identity: sd-c-796-r1; stage role: sd-c-read-lc-432-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
-,l)
+ m=re.match(r'^\| (P\d{3}) \| (\d+)@(\d+) \| ([iv]+) \| (.+?) \| (.+?) \|$',l)
  if not m: malformed+=1; continue
  pg,ln,off,cls,tok,disp=m.groups(); rows.append((pg,int(ln),int(off),cls,tok,disp))
 from collections import Counter
@@ -3127,31 +3124,13 @@ if len(arts)==6:
  read=arts['README-432.md']['text']
  for name,a in arts.items():
   if name in ('README-432.md','MANIFEST-432.txt'): continue
-  mm=re.search(r'^\| '+re.escape(name)+r' \| (\d+) \| (\d+) \| ([0-9a-f]{64}) \| `VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok`
-
-**Negative tests to reproduce:** (a) remove the code span from one angle-placeholder token -> exit1 raw-angle/placeholder; (b) change one class-iv backticked row to i -> exit1 class/backtick; (c) mutate the MANIFEST-432.txt sha -> exit1 measured/inline-artifacts; (d) duplicate one named token on the same page -> exit1 duplicate-token/at-most-one-defined-named. Each must be non-zero; never treat a pass as a merge gate.
-
-## 11. Boundary
-
-Stage C only; no merge; no body/PROC claim yet (body step follows); one added record path plus _A/evidence/read-lc432-c1 evidence files are working evidence, not committed paths; no page/keeper/index/manifest/tool/test/workflow change; owner #848 untouched. DCO commit follows; every published text states exactly Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).
-
-**Signed with both names - true identity: sd-c-796-r1; stage role: sd-c-read-lc-432-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
-,read,re.M)
+  mm=re.search(r'^\| '+re.escape(name)+r' \| (\d+) \| (\d+) \| ([0-9a-f]{64}) \|$',read,re.M)
   if not mm: err('README missing '+name); continue
   if (int(mm.group(1)),int(mm.group(2)),mm.group(3))!=(a['bytes'],a['lf'],a['sha']): err('README mismatch '+name)
  man=arts['MANIFEST-432.txt']['text']
  for name,a in arts.items():
   if name=='MANIFEST-432.txt': continue
-  mm=re.search(r'^'+re.escape(name)+r'  sha256=([0-9a-f]{64})  bytes=(\d+)  lf=(\d+) `VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok`
-
-**Negative tests to reproduce:** (a) remove the code span from one angle-placeholder token -> exit1 raw-angle/placeholder; (b) change one class-iv backticked row to i -> exit1 class/backtick; (c) mutate the MANIFEST-432.txt sha -> exit1 measured/inline-artifacts; (d) duplicate one named token on the same page -> exit1 duplicate-token/at-most-one-defined-named. Each must be non-zero; never treat a pass as a merge gate.
-
-## 11. Boundary
-
-Stage C only; no merge; no body/PROC claim yet (body step follows); one added record path plus _A/evidence/read-lc432-c1 evidence files are working evidence, not committed paths; no page/keeper/index/manifest/tool/test/workflow change; owner #848 untouched. DCO commit follows; every published text states exactly Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).
-
-**Signed with both names - true identity: sd-c-796-r1; stage role: sd-c-read-lc-432-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
-,man,re.M)
+  mm=re.search(r'^'+re.escape(name)+r'  sha256=([0-9a-f]{64})  bytes=(\d+)  lf=(\d+)$',man,re.M)
   if not mm: err('MANIFEST missing '+name); continue
   if (mm.group(1),int(mm.group(2)),int(mm.group(3)))!=(a['sha'],a['bytes'],a['lf']): err('MANIFEST mismatch '+name)
  try: compile(arts['preview-432.py']['text'],'preview-432.py','exec')
@@ -3163,12 +3142,5 @@ if errs:
 print(EXPECTED)
 ~~~
 
-**Expected output line:** `VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok`
+**Negative tests to reproduce:** (a) remove the code span from one angle-placeholder token -> exit1 raw-angle/placeholder; (b) change one class-iv backticked row to i -> exit1 class/backtick; (c) mutate the MANIFEST-432.txt measured sha -> exit1 measured mismatch; (d) duplicate one named token on the same page -> exit1 multiple defined/named per page+token; (e) no argument -> exit2. Each must be non-zero; never treat a pass as a merge gate.
 
-**Negative tests to reproduce:** (a) remove the code span from one angle-placeholder token -> exit1 raw-angle/placeholder; (b) change one class-iv backticked row to i -> exit1 class/backtick; (c) mutate the MANIFEST-432.txt sha -> exit1 measured/inline-artifacts; (d) duplicate one named token on the same page -> exit1 duplicate-token/at-most-one-defined-named. Each must be non-zero; never treat a pass as a merge gate.
-
-## 11. Boundary
-
-Stage C only; no merge; no body/PROC claim yet (body step follows); one added record path plus _A/evidence/read-lc432-c1 evidence files are working evidence, not committed paths; no page/keeper/index/manifest/tool/test/workflow change; owner #848 untouched. DCO commit follows; every published text states exactly Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).
-
-**Signed with both names - true identity: sd-c-796-r1; stage role: sd-c-read-lc-432-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
