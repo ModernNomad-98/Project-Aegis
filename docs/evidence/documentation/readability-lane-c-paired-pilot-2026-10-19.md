@@ -5507,7 +5507,7 @@ Basis/live main **61cacb2d5ace9aa91569351444a6da0b4cfcfc25** (tree 7e964962; par
 - Obtain a read-only review from someone who did not write the page. Ask the reviewer to explain the component's purpose and normal use from the page alone, and correct gaps before marking that batch complete. Page anchor: B6 reader UNVERIFIED.
 
 ## 6. Artifacts - immutable captures and canonical blocks
-Canonical policy: the inline blocks below are canonical and independently hash-verifiable; _A/evidence/read-lc-472-c1 files are retained, hash-cross-checked working copies, not independently authoritative. New filenames only; no in-place overwrite; superseded captures (old Crows/preview) retained and cited. ONE canonical block per artifact; no duplicate canonical blocks. **Basis manifests at 61cacb2d:** tools/skills-manifest.json **42,296 B / sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832**; tools/readability_acceptance/acceptance-index.json **214,089 B / sha256 ca8feb3612d5abd6a56d9b55e873685c0ff8eb3d92e26122d1534ddc40421d08**. **Canonical acceptance B1-B6:** 1,394 B / 19 LF / sha256 dfc49bf8a131e00a2b3499db46b7855be6a39655370520db2033908d4e4ae1aa, reproduced verbatim in section 5.
+Canonical policy: the inline blocks below are canonical and independently hash-verifiable; _A/evidence/read-lc-472-c1 files are retained, hash-cross-checked working copies, not independently authoritative. New filenames only; no in-place overwrite; superseded captures (old Crows/preview) retained and cited. ONE canonical block per artifact; no duplicate canonical blocks. **Provenance correction (SD-D D1):** the block-B Stage A account TABLE ROW of accepted plan r4 (comment 6279405619 line 76) is authoritative; its plan-bound capture was r1-era stale content, so this record cites the corrected immutable capture A-rows-blockB-r2.txt (reproduced from that row) as current and the old capture (837 B / 4 LF / e065f059...) as superseded. No plan or comment was edited; the old capture file is retained and never overwritten. **Basis manifests at 61cacb2d:** tools/skills-manifest.json **42,296 B / sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832**; tools/readability_acceptance/acceptance-index.json **214,089 B / sha256 ca8feb3612d5abd6a56d9b55e873685c0ff8eb3d92e26122d1534ddc40421d08**. **Canonical acceptance B1-B6:** 1,394 B / 19 LF / sha256 dfc49bf8a131e00a2b3499db46b7855be6a39655370520db2033908d4e4ae1aa, reproduced verbatim in section 5.
 
 ### Crows-472.txt canonical block
 **Measured:** 1462 B / 4 LF / sha b30e04dea85b4613df4f930190c80e3c078c8f04d4610bf60e3d40a317f80662
@@ -5733,35 +5733,39 @@ Canonical policy: the inline blocks below are canonical and independently hash-v
 <!-- artifact:Crows-472.json:end -->
 
 ### README-472.md canonical block
-**Measured:** 1090 B / 13 LF / sha 48cbd949c7a5ff5b27cee4c47045c92729e5a1f6dc50105cd2251ab3534e32d3
+**Measured:** 1726 B / 17 LF / sha 94267e2733f336a5f5f999cc2c9c1a960cf879fb35ee4c9cca573bd3d28e9ec5
 <!-- artifact:README-472.md:start -->
 ~~~text
 # Stage C paired-pilot evidence directory (read-lc-472-c1)
 
 Artifacts for the owner-approved paired-implementation pilot, union positions 473-488 (16 lane-D pages), basis 61cacb2d5ace9aa91569351444a6da0b4cfcfc25.
 
+**Provenance correction (SD-D D1 repair):** the accepted block-B plan r4 account TABLE ROW (comment 6279405619 line 76) is authoritative. Its bound capture (_A/evidence/read-lc-472-b1/A-rows.txt, 837 B / 4 LF / sha256 e065f059..., r1-era content) is stale and is retained/cited as SUPERSEDED; the corrected immutable capture is **A-rows-blockB-r2.txt**, reproduced faithfully from the plan r4 table row. No plan was edited.
+
 | Artifact | Bytes | LF | sha256 |
 | --- | ---: | ---: | --- |
 | A-rows-blockA.txt | 829 | 4 | 79dcb69b7cf4ca586433ee918a290d7a717945ad8568e8462030e246af94475a |
-| A-rows-blockB.txt | 837 | 4 | e065f05910b2777e96d843a03d6499fae7ebd7a1786c256b29d6a7ea07913d89 |
+| A-rows-blockB-r2.txt | 837 | 4 | 11a0bc696513882a13d59250089a44d50210d7777d3a4812473e3a0c3f809f19 |
 | Crows-472.txt | 1462 | 4 | b30e04dea85b4613df4f930190c80e3c078c8f04d4610bf60e3d40a317f80662 |
 | Crows-472.json | 4110 | 205 | b73584aa211d3942b0f8df332c2684baa75909e4ba0f14adddfe607c0ca02d78 |
 | preview-472.py | 603 | 12 | 810f30c9ed89d016e2d17c794fbf9e0c65f71605b0c68fa4f24dff696bf222ca |
 
-A-rows-blockA.txt is the retained Stage A account for block A (plan r1 comment 6278341224); A-rows-blockB.txt is the retained Stage A account for block B (plan r4 comment 6279405619). Crows-472.txt/Crows-472.json are the Stage C capture and JSON; preview-472.py is the support CLI. Immutable captures; new filenames only.
+Superseded (retained, not current): A-rows-blockB.txt 837 B / 4 LF / sha256 e065f05910b2777e96d843a03d6499fae7ebd7a1786c256b29d6a7ea07913d89 (old filename retained on disk; never overwritten).
+
+A-rows-blockA.txt is the retained Stage A account for block A (plan r1 comment 6278341224); A-rows-blockB-r2.txt is the corrected Stage A account for block B (plan r4 comment 6279405619 table row). Crows-472.txt/Crows-472.json are the Stage C capture and JSON; preview-472.py is the support CLI. Immutable captures; new filenames only.
 ~~~
 <!-- artifact:README-472.md:end -->
 
 ### MANIFEST-472.txt canonical block
-**Measured:** 641 B / 6 LF / sha 1a9b25de92111249d9a76fc4df15adff271ddda9a4da5346a8283f68b1502778
+**Measured:** 644 B / 6 LF / sha 6de6edb438535c4816fd8d43e9e4b014e0ebfed0a32f08ecb4126e6dbe7cf216
 <!-- artifact:MANIFEST-472.txt:start -->
 ~~~text
 A-rows-blockA.txt  sha256=79dcb69b7cf4ca586433ee918a290d7a717945ad8568e8462030e246af94475a  bytes=829  lf=4
-A-rows-blockB.txt  sha256=e065f05910b2777e96d843a03d6499fae7ebd7a1786c256b29d6a7ea07913d89  bytes=837  lf=4
+A-rows-blockB-r2.txt  sha256=11a0bc696513882a13d59250089a44d50210d7777d3a4812473e3a0c3f809f19  bytes=837  lf=4
 Crows-472.txt  sha256=b30e04dea85b4613df4f930190c80e3c078c8f04d4610bf60e3d40a317f80662  bytes=1462  lf=4
 Crows-472.json  sha256=b73584aa211d3942b0f8df332c2684baa75909e4ba0f14adddfe607c0ca02d78  bytes=4110  lf=205
 preview-472.py  sha256=810f30c9ed89d016e2d17c794fbf9e0c65f71605b0c68fa4f24dff696bf222ca  bytes=603  lf=12
-README-472.md  sha256=48cbd949c7a5ff5b27cee4c47045c92729e5a1f6dc50105cd2251ab3534e32d3  bytes=1090  lf=13
+README-472.md  sha256=94267e2733f336a5f5f999cc2c9c1a960cf879fb35ee4c9cca573bd3d28e9ec5  bytes=1726  lf=17
 ~~~
 <!-- artifact:MANIFEST-472.txt:end -->
 
@@ -5795,20 +5799,20 @@ if __name__=="__main__": sys.exit(main(sys.argv[1:]))
 ~~~
 <!-- artifact:A-rows-blockA.txt:end -->
 
-### A-rows-blockB.txt canonical block
-**Measured:** 837 B / 4 LF / sha e065f05910b2777e96d843a03d6499fae7ebd7a1786c256b29d6a7ea07913d89
-<!-- artifact:A-rows-blockB.txt:start -->
+### A-rows-blockB-r2.txt canonical block
+**Measured:** 837 B / 4 LF / sha 11a0bc696513882a13d59250089a44d50210d7777d3a4812473e3a0c3f809f19
+<!-- artifact:A-rows-blockB-r2.txt:start -->
 ~~~text
 | acceptance-criteria-reviewer @ c6e5d5649bf8 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | AC1-AC8 + canonical B1-B6 bound to block B (481-488) | AC1-AC8; canonical 1,394 B/19 LF/dfc49bf8 |
-| source-of-truth-reconciler @ b5fd9feda972 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | check_index f110160a; union/partition; 69 records; block B pages/pin | 744/107/6/621/6/0/4/637; union627; 481-488; 89,344/1,110; all pinned-equal; 0 page-read |
+| source-of-truth-reconciler @ b5fd9feda972 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | check_index 61cacb2d; union/partition; 69 records; block B pages/pin | 745/107/6/622/6/0/4/638; union628; 481-488; 89,344/1,110; all pinned-equal; 0 page-read |
 | change-classification-gate @ 08d91a834460 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | docs-only pilot: one added record path shared with block A | one added path; absent at basis and pin |
 | skill-usage-ledger @ 6a27b5c8e690 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | Stage A account + retained A-rows capture | four rows/sources/lines; non-zero binding |
 ~~~
-<!-- artifact:A-rows-blockB.txt:end -->
+<!-- artifact:A-rows-blockB-r2.txt:end -->
 
 ## 7. Stage A reference (two frozen plan accounts)
 
-Accepted paired-pilot plans of record: **block A plan r1 = merged-#867 issue comment 6278341224** (15,233 B; Stage A role sd-a-paired-pilot-a1; ACCEPT **6278483209**) and **block B plan r4 = merged-#867 issue comment 6279405619** (15,342 B; Stage A role sd-a-paired-pilot-b1; ACCEPT **6279439325**). Retained Stage A account captures: _A/evidence/read-lc-472-a1/A-rows.txt **829 B / 4 LF / sha256 79dcb69b7cf4ca586433ee918a290d7a717945ad8568e8462030e246af94475a** (block A) and _A/evidence/read-lc-472-b1/A-rows.txt **837 B / 4 LF / sha256 e065f05910b2777e96d843a03d6499fae7ebd7a1786c256b29d6a7ea07913d89** (block B); working copies retained here as A-rows-blockA.txt / A-rows-blockB.txt.
+Accepted paired-pilot plans of record: **block A plan r1 = merged-#867 issue comment 6278341224** (15,233 B; Stage A role sd-a-paired-pilot-a1; ACCEPT **6278483209**) and **block B plan r4 = merged-#867 issue comment 6279405619** (15,342 B; Stage A role sd-a-paired-pilot-b1; ACCEPT **6279439325**). Retained Stage A account captures: _A/evidence/read-lc-472-a1/A-rows.txt **829 B / 4 LF / sha256 79dcb69b7cf4ca586433ee918a290d7a717945ad8568e8462030e246af94475a** (block A; unchanged) and, for block B, the corrected immutable capture **A-rows-blockB-r2.txt 837 B / 4 LF / sha256 11a0bc696513882a13d59250089a44d50210d7777d3a4812473e3a0c3f809f19**, reproduced faithfully from the accepted plan r4 account TABLE ROW (comment 6279405619 line 76: check_index 61cacb2d; 745/107/6/622/6/4/638; union628; 481-488; 89,344/1,110; 0 page-read). **Provenance note:** the plan r4 account table row is authoritative; the plan's own previously bound capture (_A/evidence/read-lc-472-b1/A-rows.txt, 837 B / 4 LF / sha256 e065f05910b2777e96d843a03d6499fae7ebd7a1786c256b29d6a7ea07913d89, r1-era content) is stale and is retained/cited here as SUPERSEDED (no in-place overwrite, no plan edit); working copies retained here as A-rows-blockA.txt and A-rows-blockB-r2.txt.
 
 **Block A Stage A account (four rows; from plan 6278341224):**
 | Skill | Stage / agent | How applied | Result / evidence |
@@ -5822,7 +5826,7 @@ Accepted paired-pilot plans of record: **block A plan r1 = merged-#867 issue com
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
 | acceptance-criteria-reviewer @ c6e5d5649bf8 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | AC1-AC8 + canonical B1-B6 bound to block B (481-488) | AC1-AC8; canonical 1,394 B/19 LF/dfc49bf8 |
-| source-of-truth-reconciler @ b5fd9feda972 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | check_index f110160a; union/partition; 69 records; block B pages/pin | 744/107/6/621/6/0/4/637; union627; 481-488; 89,344/1,110; all pinned-equal; 0 page-read |
+| source-of-truth-reconciler @ b5fd9feda972 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | check_index 61cacb2d; union/partition; 69 records; block B pages/pin | 745/107/6/622/6/0/4/638; union628; 481-488; 89,344/1,110; all pinned-equal; 0 page-read |
 | change-classification-gate @ 08d91a834460 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | docs-only pilot: one added record path shared with block A | one added path; absent at basis and pin |
 | skill-usage-ledger @ 6a27b5c8e690 | A plan / sd-a-paired-pilot-b1 (DeepSeek V4 Flash) | Stage A account + retained A-rows capture | four rows/sources/lines; non-zero binding |
 
@@ -5991,7 +5995,7 @@ def extract(name):
     measured=re.search(r'\*\*Measured:\*\* (\d+) B / (\d+) LF / sha ([0-9a-f]{64})',text[i:aend])
     return content+'\n', measured
 artfacts={}
-for name in ['Crows-472.txt','Crows-472.json','README-472.md','MANIFEST-472.txt','preview-472.py','A-rows-blockA.txt','A-rows-blockB.txt']:
+for name in ['Crows-472.txt','Crows-472.json','README-472.md','MANIFEST-472.txt','preview-472.py','A-rows-blockA.txt','A-rows-blockB-r2.txt']:
     try: content,measured=extract(name)
     except Exception as e: err('artifact missing '+name+': '+str(e));continue
     b=content.encode();lf=b.count(b'\n');sha=hashlib.sha256(b).hexdigest()
@@ -6028,7 +6032,7 @@ except Exception: pass
 # manifest references
 try:
  man=artfacts['MANIFEST-472.txt'][0].decode('utf-8')
- for name in ['Crows-472.txt','Crows-472.json','README-472.md','preview-472.py','A-rows-blockA.txt','A-rows-blockB.txt']:
+ for name in ['Crows-472.txt','Crows-472.json','README-472.md','preview-472.py','A-rows-blockA.txt','A-rows-blockB-r2.txt']:
   b,lf,sha=artfacts[name]
   if name not in man or sha not in man or str(len(b)) not in man: err('MANIFEST missing '+name)
 except Exception as e: err('MANIFEST: '+str(e))
@@ -6047,7 +6051,7 @@ for bad in ['5568615474','370d0278','two DCO','source-exhaustive proof']:
  if bad in head: err('stale marker '+bad)
 # disk support
 base=r'C:\src\Project Aegis\_A\evidence\read-lc-472-c1'
-for name in ['Crows-472.txt','Crows-472.json','README-472.md','preview-472.py','A-rows-blockA.txt','A-rows-blockB.txt','MANIFEST-472.txt']:
+for name in ['Crows-472.txt','Crows-472.json','README-472.md','preview-472.py','A-rows-blockA.txt','A-rows-blockB-r2.txt','MANIFEST-472.txt']:
  p=os.path.join(base,name)
  if not os.path.exists(p): err('disk evidence missing '+name);continue
  d=open(p,'rb').read()
@@ -6056,6 +6060,7 @@ for name in ['Crows-472.txt','Crows-472.json','README-472.md','preview-472.py','
 if errors:
  print('VERIFIER FAIL:');[print(' -',e) for e in errors];sys.exit(1)
 print('VERIFIER OK rows=%d unique=%d malformed=%d classes=%s disps=%s exclusions=%d codes=%s per-page=16 Crows.json=full-totals+rows-agree raw-placeholders=%d inline-artifacts=7/7 stale=0 span=ok duplicate-token=ok support-cli=ok stage-a=ok row-source=ok crows-full=ok disk-support=ok stale-marker=ok page-totals=ok section4=ok'%(len(rows),len(keys),malformed,dict(classes),dict(disp),disp['excluded'],dict(codes),codes.get('PLACEHOLDER',0)))
+
 ~~~
 <!-- verifier:end -->
 
