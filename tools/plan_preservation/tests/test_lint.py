@@ -21,7 +21,6 @@ import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from unittest import mock
 
-ROOT = pathlib.Path(__file__).resolve().parents[3]
 TOOL_DIR = pathlib.Path(__file__).resolve().parents[1]
 LINT_PATH = TOOL_DIR / "lint.py"
 README_PATH = TOOL_DIR / "README.md"
@@ -815,6 +814,63 @@ class EdgeCaseTests(TempFilesMixin, unittest.TestCase):
         )
         self.assertEqual(code, 0, data["stale_basis"])
 
+
+    def test_keyword_matching_uses_word_boundaries(self):
+        previous = self.write(
+            "r2.md",
+            "The shallow mustard nevertheless shimmers.\n"
+            "This sentence must be retained.\n",
+        )
+        new = self.write("r3.md", "The shallow mustard nevertheless shimmers.\n")
+        _code, data, _raw = self.run_json(["--previous", previous, "--new", new])
+        clauses = [item["clause"] for item in data["dropped_requirements"]]
+        self.assertEqual(len(clauses), 1)
+        self.assertIn("must be retained", clauses[0])
+
+    def test_quiet_mode_still_surfaces_skipped_check_warning(self):
+        path = self.write("no-basis.md", F_A_BODY)
+        code, stdout, stderr = self.run_lint(
+            ["--previous", path, "--new", path, "--quiet"]
+        )
+        self.assertEqual(code, 0)
+        lines = [line for line in stdout.split("\n") if line]
+        self.assertEqual(len(lines), 1)
+        self.assertTrue(lines[0].startswith("RESULT: CLEAN"))
+        self.assertIn("no --declared-basis", stderr)
+
+    def test_64_hex_runs_are_outside_the_scan_window(self):
+        long_hash = "ab" * 32  # 64 hex characters: not a 7-40 candidate
+        path = self.write("long64.md", "hash " + long_hash + " only\n")
+        code, data, _raw = self.run_json(
+            ["--previous", path, "--new", path, "--declared-basis", "25f1e63a"]
+        )
+        self.assertEqual(code, 0, data["stale_basis"])
+        self.assertEqual(data["stale_basis"], [])
+
+    def test_human_output_escapes_control_characters(self):
+        previous = self.write(
+            "r2.md",
+            "1. **AC1:** must keep \x1b[31mred text retained.\n",
+        )
+        new = self.write("r3.md", "Different body.\n")
+        code, stdout, _stderr = self.run_lint(["--previous", previous, "--new", new])
+        self.assertEqual(code, 1)
+        self.assertNotIn("\x1b", stdout)
+        self.assertIn("\\x1b", stdout)
+
+    def test_escaped_pipe_and_exact_cell_exemption_are_naive_by_design(self):
+        # The accepted plan splits cells on the raw pipe character; this test
+        # documents that behaviour (an escaped pipe is not special).
+        lines = [
+            "| Basis | 5a1d8c07 |",
+            "| note \\| 5a1d8c07 |",
+        ]
+        path = self.write("cells.md", "\n".join(lines) + "\n")
+        code, data, _raw = self.run_json(
+            ["--previous", path, "--new", path, "--declared-basis", "25f1e63a"]
+        )
+        self.assertEqual(code, 0, data["stale_basis"])
+        self.assertEqual(data["stale_basis"], [])
 
 if __name__ == "__main__":
     unittest.main()

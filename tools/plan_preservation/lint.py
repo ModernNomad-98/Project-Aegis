@@ -78,6 +78,13 @@ HEX_TOKEN_RE = re.compile(r"(?<![0-9a-f])[0-9a-f]{7,40}(?![0-9a-f])")
 HEX_INPUT_RE = re.compile(r"^[0-9a-f]{7,64}\Z")
 MIN_CLAUSE_LEN = 8
 
+KEYWORD_RES = tuple(
+    re.compile(r"(?<![0-9a-z])(?:%s)(?![0-9a-z])" % re.escape(keyword))
+    for keyword in OBLIGATION_KEYWORDS
+)
+
+CONTROL_CHAR_RE = re.compile(r"[\x00-\x1f\x7f]")
+
 TRANSLATION = str.maketrans(
     {
         "\u2018": "'",
@@ -133,12 +140,32 @@ def read_body(path_text: str, field_name: str) -> str:
         ) from exc
 
 
+def has_obligation_keyword(lowered: str) -> bool:
+    """True when the line carries an obligation keyword as a whole word (so
+    shallow, nevertheless and mustard do not match shall, never, must)."""
+    return any(pattern.search(lowered) for pattern in KEYWORD_RES)
+
+
+def display(value: str) -> str:
+    """Escape control characters so untrusted plan text cannot manipulate the
+    human report (JSON output is escaped by json.dumps)."""
+    out: List[str] = []
+    for char in value:
+        if char == "\t":
+            out.append("\\t")
+        elif CONTROL_CHAR_RE.match(char):
+            out.append("\\x%02x" % ord(char))
+        else:
+            out.append(char)
+    return "".join(out)
+
+
 def extract_units(line: str) -> List[str]:
     """Requirement units of one previous line: the whole AC row, plus every
     semicolon-separated clause of at least MIN_CLAUSE_LEN characters."""
     units: List[str] = []
     is_ac_row = bool(AC_ROW_RE.match(line))
-    has_keyword = any(keyword in line.lower() for keyword in OBLIGATION_KEYWORDS)
+    has_keyword = has_obligation_keyword(line.lower())
     if not (is_ac_row or has_keyword):
         return units
     if is_ac_row:
@@ -359,20 +386,23 @@ def lint(
 
 
 def format_human(result: Dict[str, object], previous: Sequence[Tuple[str, str]], new_label: str) -> str:
-    """The deterministic human-readable report."""
+    """The deterministic human-readable report (control characters escaped)."""
     size = result["size"]
     inputs = result["inputs"]
     lines: List[str] = []
     lines.append("%s %s" % (TOOL, VERSION))
     lines.append("model: %s" % MODEL)
-    lines.append("previous: %s" % ", ".join(str(path) for path, _body in previous))
-    lines.append("new: %s" % new_label)
+    lines.append("previous: %s" % ", ".join(display(str(path)) for path, _body in previous))
+    lines.append("new: %s" % display(new_label))
     if inputs["declared_basis"]:
         lines.append("declared basis: %s" % inputs["declared_basis"])
     if inputs["live_main"]:
         lines.append("live main: %s" % inputs["live_main"])
     if inputs["allow_sha"]:
-        lines.append("allowed sha values: %s" % ", ".join(str(value) for value in inputs["allow_sha"]))
+        lines.append(
+            "allowed sha values: %s"
+            % ", ".join(display(str(value)) for value in inputs["allow_sha"])
+        )
     lines.append(
         "size: %d bytes / %d cap - %s"
         % (size["bytes"], size["cap"], "OK" if size["status"] == "ok" else "OVER CAP")
@@ -380,16 +410,24 @@ def format_human(result: Dict[str, object], previous: Sequence[Tuple[str, str]],
     dropped = result["dropped_requirements"]
     lines.append("dropped requirements: %d" % len(dropped))
     for item in dropped:
-        lines.append("  %s:%d: %s" % (item["previous_file"], item["line"], item["clause"]))
+        lines.append(
+            "  %s:%d: %s"
+            % (display(str(item["previous_file"])), item["line"], display(str(item["clause"])))
+        )
     stale = result["stale_basis"]
     lines.append("stale basis references: %d" % len(stale))
     for item in stale:
-        lines.append("  line %d: %s - %s" % (item["line"], item["token"], item["reason"]))
+        lines.append(
+            "  line %d: %s - %s"
+            % (item["line"], display(str(item["token"])), display(str(item["reason"])))
+        )
     if result["warnings"]:
         lines.append("warnings: %d" % len(result["warnings"]))
         for warning in result["warnings"]:
-            lines.append("  %s" % warning)
-    lines.append("RESULT: %s (%d finding(s))" % (result["status"], result["summary"]["findings"]))
+            lines.append("  %s" % display(str(warning)))
+    lines.append(
+        "RESULT: %s (%d finding(s))" % (result["status"], result["summary"]["findings"])
+    )
     return "\n".join(lines)
 
 
@@ -508,6 +546,8 @@ def run(argv: Optional[Sequence[str]] = None) -> int:
         payload = {key: value for key, value in result.items() if key != "status"}
         print(json.dumps(payload, indent=2, sort_keys=True))
     elif args.quiet:
+        for warning in result["warnings"]:
+            print("lint.py: warning: %s" % warning, file=sys.stderr)
         print("RESULT: %s (%d finding(s))" % (result["status"], result["summary"]["findings"]))
     else:
         print(format_human(result, previous, new_label))

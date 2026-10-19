@@ -62,9 +62,9 @@ these holds:
 
 1. It equals or is a prefix of `--declared-basis`, `--live-main`, or an
    `--allow-sha` value. The rule is one-way by design: a short declared basis
-   accepts short citations, but a full 40/64-hex citation is only accepted when
-   the declared/live/allow value is itself that full hash (pass the full basis
-   to accept full citations).
+   accepts short citations, but a full 40-hex citation is only accepted when the
+   declared/live/allow value is itself that full hash (pass the full basis to
+   accept full citations).
 2. **Cell-level content-hash exemption:** the token's pipe-delimited table cell,
    trimmed and backtick-stripped, is exactly the token (for example a Blob
    column cell holding one 40-hex hash). A cell such as `Blob at 5a1d8c07` is
@@ -104,6 +104,16 @@ runs on identical input are byte-identical.
   case (use `--allow-sha`).
 - The cell-level exemption applies only when a table cell is exactly one token.
 - Bodies are parsed as text, never executed.
+- The token scan window is 7-40 characters, so a full 64-character hash is not
+  itself a candidate; 64-character content hashes are covered only by the
+  exact-token table-cell and recorded-hash-marker exemptions.
+- Normalisation strips every `*` and `_` (the plan says to strip emphasis), so a
+  glob such as `*.md` normalises like `.md`; this is a documented limitation of
+  the heuristic, not a semantic check.
+- Human output escapes control characters in untrusted text; use `--json` for
+  machine parsing.
+- Without `--declared-basis` the stale-basis check is skipped; the warning is
+  shown in human output and also written to standard error under `--quiet`.
 - Flagging aid only; it is not a substitute for review.
 - No `.github/` workflow wiring was added for this tool (owner constraint), so
   its unit tests are not yet run by the fixed `tools-tests` CI suites; run them
