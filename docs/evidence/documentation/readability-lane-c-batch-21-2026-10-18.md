@@ -58,7 +58,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P424 - index 424 - docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md - 54279 B / 665 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A — Stage C batch record, batch 5, 2026-10-15.
-**B2:** 393 inventory rows; defined 0; named gaps 74; documented exclusions 319; all rows in section 3.
+**B2:** 393 inventory rows; defined 0; named gaps 46; documented exclusions 347; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L62 ## 1. Lane derivation — the command, not a handed-down list.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -68,7 +68,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P425 - index 425 - docs/evidence/documentation/readability-lane-a-batch-6-2026-10-18.md - 26443 B / 168 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A — Stage C batch record, batch 6, 2026-10-18.
-**B2:** 245 inventory rows; defined 1; named gaps 48; documented exclusions 196; all rows in section 3.
+**B2:** 245 inventory rows; defined 1; named gaps 36; documented exclusions 208; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L7 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -78,7 +78,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P426 - index 426 - docs/evidence/documentation/readability-lane-a-batch-7-2026-10-18.md - 28575 B / 169 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A — Stage C batch record, batch 7, 2026-10-18.
-**B2:** 244 inventory rows; defined 2; named gaps 35; documented exclusions 207; all rows in section 3.
+**B2:** 244 inventory rows; defined 5; named gaps 102; documented exclusions 137; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L7 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -88,7 +88,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P427 - index 427 - docs/evidence/documentation/readability-lane-a-batch-8-2026-10-18.md - 23347 B / 148 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A - Stage C batch record, batch 8, 2026-10-18.
-**B2:** 256 inventory rows; defined 1; named gaps 48; documented exclusions 207; all rows in section 3.
+**B2:** 256 inventory rows; defined 1; named gaps 113; documented exclusions 142; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L7 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -98,7 +98,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P428 - index 428 - docs/evidence/documentation/readability-lane-a-batch-9-2026-10-18.md - 40591 B / 205 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A — Stage C batch record, batch 9, 2026-10-18.
-**B2:** 276 inventory rows; defined 3; named gaps 63; documented exclusions 210; all rows in section 3.
+**B2:** 276 inventory rows; defined 3; named gaps 52; documented exclusions 221; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L11 ## 1. Lane derivation at this implementation base.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -108,7 +108,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P429 - index 429 - docs/evidence/documentation/readability-lane-b-batch-10-2026-10-18.md - 53323 B / 212 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane B - Stage C batch record, lane B batch 10, 2026-10-18.
-**B2:** 418 inventory rows; defined 0; named gaps 102; documented exclusions 316; all rows in section 3.
+**B2:** 418 inventory rows; defined 1; named gaps 78; documented exclusions 339; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L5 ## 1. Scope, plan binding and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -118,7 +118,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P430 - index 430 - docs/evidence/documentation/readability-lane-b-batch-11-2026-10-18.md - 26852 B / 206 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane B - Stage C batch record, batch 11, 2026-10-18.
-**B2:** 240 inventory rows; defined 1; named gaps 45; documented exclusions 194; all rows in section 3.
+**B2:** 240 inventory rows; defined 1; named gaps 107; documented exclusions 132; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L11 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -128,7 +128,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P431 - index 431 - docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md - 47100 B / 293 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane B - Stage C batch record, lane B batch 12, 2026-10-18.
-**B2:** 327 inventory rows; defined 4; named gaps 57; documented exclusions 266; all rows in section 3.
+**B2:** 327 inventory rows; defined 2; named gaps 79; documented exclusions 246; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L5 ## 1. Scope, plan binding and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -164,10 +164,10 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 14@2 | v | FULL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 424 | 14@15 | ii | count | documented exclusion - PROSE: ordinary prose word |
 | 424 | 14@42 | ii | blob | documented exclusion - PROSE: ordinary prose word |
-| 424 | 14@47 | i | ID | named gap - first use before any expansion on this page |
-| 424 | 16@12 | i | PHASE | named gap - first use before any expansion on this page |
+| 424 | 14@47 | i | ID | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 16@12 | i | PHASE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 16@20 | i | RE-READ | named gap - first use before any expansion on this page |
-| 424 | 16@28 | i | LANE | named gap - first use before any expansion on this page |
+| 424 | 16@28 | i | LANE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 18@63 | ii | quarter | documented exclusion - PROSE: ordinary prose word |
 | 424 | 18@86 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 424 | 19@36 | ii | lanes | documented exclusion - PROSE: ordinary prose word |
@@ -183,18 +183,18 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 33@12 | ii | model | documented exclusion - PROSE: ordinary prose word |
 | 424 | 33@35 | v | 2026-10-13 | documented exclusion - DATE: date/timestamp |
 | 424 | 33@46 | ii | rule | documented exclusion - PROSE: ordinary prose word |
-| 424 | 34@71 | i | AI | named gap - first use before any expansion on this page |
+| 424 | 34@71 | i | AI | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 35@2 | ii | owner | documented exclusion - PROSE: ordinary prose word |
 | 424 | 39@43 | iv | `F reviewer &lt;reviewer@example.invalid&gt;` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 424 | 44@23 | ii | records | documented exclusion - PROSE: ordinary prose word |
-| 424 | 48@50 | i | NOTHING | named gap - first use before any expansion on this page |
-| 424 | 49@41 | i | AEGIS-APR-101 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 48@50 | i | NOTHING | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 49@41 | i | AEGIS-APR-101 | named gap - first use before any expansion on this page |
 | 424 | 50@2 | ii | register | documented exclusion - PROSE: ordinary prose word |
-| 424 | 53@20 | i | AEGIS-APR-117 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 53@20 | i | AEGIS-APR-117 | named gap - first use before any expansion on this page |
 | 424 | 53@68 | ii | decision | documented exclusion - PROSE: ordinary prose word |
-| 424 | 56@4 | i | AEGIS-APR-039 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 56@4 | i | AEGIS-APR-039 | named gap - first use before any expansion on this page |
 | 424 | 56@36 | ii | grant | documented exclusion - PROSE: ordinary prose word |
-| 424 | 58@24 | i | AEGIS-APR-137 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 58@24 | i | AEGIS-APR-137 | named gap - first use before any expansion on this page |
 | 424 | 58@62 | ii | approval | documented exclusion - PROSE: ordinary prose word |
 | 424 | 64@23 | iv | `no_recorded_acceptance` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 64@52 | iv | `provably_pending` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -214,19 +214,19 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 101@35 | ii | frontier | documented exclusion - PROSE: ordinary prose word |
 | 424 | 103@23 | ii | next | documented exclusion - PROSE: ordinary prose word |
 | 424 | 105@4 | i | R1 | named gap - first use before any expansion on this page |
-| 424 | 108@44 | i | UNREAD | named gap - first use before any expansion on this page |
-| 424 | 108@51 | i | SEQUENCE | named gap - first use before any expansion on this page |
+| 424 | 108@44 | i | UNREAD | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 108@51 | i | SEQUENCE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 108@83 | v | APPLIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 424 | 108@91 | i | HERE | named gap - first use before any expansion on this page |
+| 424 | 108@91 | i | HERE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 112@4 | i | R3 | named gap - first use before any expansion on this page |
 | 424 | 115@69 | ii | batches | documented exclusion - PROSE: ordinary prose word |
 | 424 | 115@77 | v | 1–4 | documented exclusion - RANGE: numeric range/unit/formula |
 | 424 | 116@58 | v | 1–5 | documented exclusion - RANGE: numeric range/unit/formula |
 | 424 | 122@54 | iii | .claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md | documented exclusion - PATH: file/path reference |
-| 424 | 123@7 | i | PAGES | named gap - first use before any expansion on this page |
-| 424 | 123@13 | i | BEHIND | named gap - first use before any expansion on this page |
-| 424 | 123@20 | i | THE | named gap - first use before any expansion on this page |
-| 424 | 123@24 | i | FRONTIER | named gap - first use before any expansion on this page |
+| 424 | 123@7 | i | PAGES | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 123@13 | i | BEHIND | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 123@20 | i | THE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 123@24 | i | FRONTIER | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 130@52 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
 | 424 | 141@26 | v | 32–39 | documented exclusion - RANGE: numeric range/unit/formula |
 | 424 | 141@40 | ii | range | documented exclusion - PROSE: ordinary prose word |
@@ -286,7 +286,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 196@2 | i | P7 | named gap - first use before any expansion on this page |
 | 424 | 196@7 | iv | `.claude/skills/agent-tool-safety-guard/references/tool-permission-matrix.md` | documented exclusion - PATH: file/path reference |
 | 424 | 196@87 | iv | `356932ab` | documented exclusion - SHA: commit/blob hash |
-| 424 | 196@129 | i | NL | named gap - first use before any expansion on this page |
+| 424 | 196@129 | i | NL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 197@2 | i | P8 | named gap - first use before any expansion on this page |
 | 424 | 197@7 | iv | `.claude/skills/agentic-loop-designer/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 424 | 197@57 | iv | `6ba6e1ad` | documented exclusion - SHA: commit/blob hash |
@@ -335,7 +335,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 291@81 | v | L100 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 292@69 | v | L10 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 294@22 | v | L63 | documented exclusion - LINE-RANGE: line-range reference |
-| 424 | 294@30 | i | STOP | named gap - first use before any expansion on this page |
+| 424 | 294@30 | i | STOP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 294@50 | v | L88 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 294@58 | v | L107 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 296@0 | iv | `evals/evals.json` | documented exclusion - PATH: file/path reference |
@@ -362,9 +362,9 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 319@16 | v | L4 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 326@53 | v | 2026-09-26 | documented exclusion - DATE: date/timestamp |
 | 424 | 326@65 | v | 2026-09-27 | documented exclusion - DATE: date/timestamp |
-| 424 | 330@74 | i | WRITE | named gap - first use before any expansion on this page |
-| 424 | 331@19 | i | TRUST | named gap - first use before any expansion on this page |
-| 424 | 332@4 | i | HYGIENE | named gap - first use before any expansion on this page |
+| 424 | 330@74 | i | WRITE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 331@19 | i | TRUST | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 332@4 | i | HYGIENE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 334@68 | v | L16 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 334@88 | v | L27 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 336@35 | v | L77 | documented exclusion - LINE-RANGE: line-range reference |
@@ -401,7 +401,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 394@20 | iv | `.claude/skills/agent-startup-context-gate/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 424 | 394@73 | v | L56 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 394@81 | v | L115 | documented exclusion - LINE-RANGE: line-range reference |
-| 424 | 400@39 | i | README | named gap - first use before any expansion on this page |
+| 424 | 400@39 | i | README | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 400@67 | v | L18 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 400@73 | iv | `package.json` | documented exclusion - PATH: file/path reference |
 | 424 | 401@0 | iv | `pyproject.toml` | documented exclusion - PATH: file/path reference |
@@ -416,21 +416,21 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 416@52 | ii | surface | documented exclusion - PROSE: ordinary prose word |
 | 424 | 418@26 | ii | user | documented exclusion - PROSE: ordinary prose word |
 | 424 | 420@49 | v | closed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 424 | 422@4 | i | NOT | named gap - first use before any expansion on this page |
+| 424 | 422@4 | i | NOT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 422@29 | v | L31 | documented exclusion - LINE-RANGE: line-range reference |
-| 424 | 423@24 | i | OWASP | named gap - first use before any expansion on this page |
+| 424 | 423@24 | i | OWASP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 423@31 | i | LLM03 | named gap - first use before any expansion on this page |
 | 424 | 423@38 | i | LLM06 | named gap - first use before any expansion on this page |
 | 424 | 423@45 | i | ASI02 | named gap - first use before any expansion on this page |
 | 424 | 423@52 | i | ASI05 | named gap - first use before any expansion on this page |
 | 424 | 423@68 | iv | `authz` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 424 | 423@80 | i | RCE | named gap - first use before any expansion on this page |
+| 424 | 423@80 | i | RCE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 424@36 | i | LLM08 | named gap - first use before any expansion on this page |
 | 424 | 424@54 | v | L54 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 425@39 | iv | `acceptor` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 425@88 | iv | `r/w` | documented exclusion - PATH: file/path reference |
-| 424 | 427@32 | iv | `SEV` | named gap - first use before any expansion on this page |
-| 424 | 427@70 | iv | `SAFE` | named gap - first use before any expansion on this page |
+| 424 | 427@32 | iv | `SEV` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 427@70 | iv | `SAFE` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 430@23 | v | L124 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 430@56 | v | L67 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 430@83 | ii | passed | documented exclusion - PROSE: ordinary prose word |
@@ -460,7 +460,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 473@48 | v | L242 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 473@71 | v | L250 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 474@30 | v | L36 | documented exclusion - LINE-RANGE: line-range reference |
-| 424 | 474@50 | i | DESIGNS | named gap - first use before any expansion on this page |
+| 424 | 474@50 | i | DESIGNS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 475@31 | v | L53 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 476@29 | v | L282 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 476@72 | ii | deploy | documented exclusion - PROSE: ordinary prose word |
@@ -474,7 +474,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 505@2 | iv | `repo` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 506@2 | iv | `verdict` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 507@2 | iv | `SHA` | named gap - first use before any expansion on this page |
-| 424 | 508@2 | iv | `UTC` | named gap - first use before any expansion on this page |
+| 424 | 508@2 | iv | `UTC` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 509@2 | iv | `screen` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 510@2 | iv | `manifest` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 511@2 | iv | `URL` | named gap - first use before any expansion on this page |
@@ -500,12 +500,12 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 563@77 | iv | `targeted-review` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 564@0 | iv | `withdrawal` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 564@17 | iv | `lost-commit` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 424 | 576@16 | i | ROW | named gap - first use before any expansion on this page |
-| 424 | 576@20 | i | AND | named gap - first use before any expansion on this page |
-| 424 | 576@27 | i | ACCEPTANCE | named gap - first use before any expansion on this page |
-| 424 | 576@38 | i | OF | named gap - first use before any expansion on this page |
-| 424 | 576@41 | i | ANY | named gap - first use before any expansion on this page |
-| 424 | 576@45 | i | KIND | named gap - first use before any expansion on this page |
+| 424 | 576@16 | i | ROW | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 576@20 | i | AND | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 576@27 | i | ACCEPTANCE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 576@38 | i | OF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 576@41 | i | ANY | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 424 | 576@45 | i | KIND | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 590@60 | i | D84 | named gap - first use before any expansion on this page |
 | 424 | 590@72 | v | 2026-10-10 | documented exclusion - DATE: date/timestamp |
 | 424 | 591@21 | iv | `check_index.py` | documented exclusion - PATH: file/path reference |
@@ -534,7 +534,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 654@0 | ii | sha256 | documented exclusion - PROSE: ordinary prose word |
 | 424 | 656@84 | iv | `---` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 424 | 657@37 | i | UTF-8 | named gap - first use before any expansion on this page |
-| 424 | 657@48 | i | LF | named gap - first use before any expansion on this page |
+| 424 | 657@48 | i | LF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 658@42 | v | 1-650 | documented exclusion - RANGE: numeric range/unit/formula |
 | 424 | 659@41 | iv | `## Footer` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 661@58 | iv | `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` | documented exclusion - SHA: commit/blob hash |
@@ -603,7 +603,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 27@180 | iv | `official_pending_count` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 425 | 27@522 | ii | drift | documented exclusion - PROSE: ordinary prose word |
 | 425 | 27@557 | iv | `git diff --numstat 2db1ffb7985ddc1c087c455740fd59e962967461..HEAD -- &lt;page&gt;` | documented exclusion - COMMAND: real command |
-| 425 | 31@62 | i | ID | named gap - first use before any expansion on this page |
+| 425 | 31@62 | i | ID | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 33@7 | iv | `.claude/skills/ai-closeout-reporter/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 425 | 33@86 | iv | `45ff9b04e0bba1b60cd9dd20fb82135bcd0aed02` | documented exclusion - SHA: commit/blob hash |
 | 425 | 33@145 | iv | `cce2b453b87f` | documented exclusion - SHA: commit/blob hash |
@@ -660,7 +660,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 54@34 | v | L3 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 54@78 | v | L12 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 54@91 | v | L21 | documented exclusion - LINE-RANGE: line-range reference |
-| 425 | 54@171 | i | AI | named gap - first use before any expansion on this page |
+| 425 | 54@171 | i | AI | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 54@310 | v | L88 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 54@314 | v | L105 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 54@351 | v | L100 | documented exclusion - LINE-RANGE: line-range reference |
@@ -672,12 +672,12 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 56@60 | v | UNVERIFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 425 | 60@40 | iv | `Use all eight headings in this order.` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 425 | 62@68 | v | L18 | documented exclusion - LINE-RANGE: line-range reference |
-| 425 | 62@73 | i | REQUIRED | named gap - first use before any expansion on this page |
-| 425 | 62@82 | i | ALWAYS | named gap - first use before any expansion on this page |
+| 425 | 62@73 | i | REQUIRED | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 425 | 62@82 | i | ALWAYS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 62@309 | v | L77 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 62@409 | v | L49 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 62@413 | v | L61 | documented exclusion - LINE-RANGE: line-range reference |
-| 425 | 66@234 | i | OWASP | named gap - first use before any expansion on this page |
+| 425 | 66@234 | i | OWASP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 66@240 | i | LLM06 | named gap - first use before any expansion on this page |
 | 425 | 66@292 | ii | token | documented exclusion - PROSE: ordinary prose word |
 | 425 | 66@456 | ii | provider | documented exclusion - PROSE: ordinary prose word |
@@ -685,7 +685,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 68@40 | v | L29 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 68@45 | iv | `a cost/rate/budget check that errors DENIES the call, or it becomes the denial-of-wallet vector it was meant to stop (CWE-636)` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 425 | 70@70 | v | L40 | documented exclusion - LINE-RANGE: line-range reference |
-| 425 | 70@197 | i | IP | named gap - first use before any expansion on this page |
+| 425 | 70@197 | i | IP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 70@215 | v | L258 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 70@319 | v | L85 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 70@323 | v | L179 | documented exclusion - LINE-RANGE: line-range reference |
@@ -704,7 +704,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 78@153 | iv | `URL` | named gap - first use before any expansion on this page |
 | 425 | 78@162 | v | L54 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 78@170 | iv | `API` | named gap - first use before any expansion on this page |
-| 425 | 78@233 | iv | `CWE` | named gap - first use before any expansion on this page |
+| 425 | 78@233 | iv | `CWE` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 78@256 | v | L64 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 78@263 | iv | `CWE-636` | named gap - first use before any expansion on this page |
 | 425 | 78@708 | iv | `../SKILL.md` | documented exclusion - PATH: file/path reference |
@@ -731,7 +731,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 92@36 | v | L113 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 92@41 | v | L114 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 92@47 | iv | `Report only runs that actually executed, with real numbers and real spend.` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
-| 425 | 94@152 | i | ROUGE | named gap - first use before any expansion on this page |
+| 425 | 94@152 | i | ROUGE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 94@319 | v | L45 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 94@323 | v | L57 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 94@378 | v | L59 | documented exclusion - LINE-RANGE: line-range reference |
@@ -745,13 +745,13 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 100@83 | v | L71 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 100@88 | iv | `This heuristic does not classify the system under the EU AI Act; route that legal determination to counsel.` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 425 | 102@74 | v | L31 | documented exclusion - LINE-RANGE: line-range reference |
-| 425 | 102@107 | i | NIST | named gap - first use before any expansion on this page |
-| 425 | 102@115 | i | RMF | named gap - first use before any expansion on this page |
-| 425 | 102@120 | i | HITL | named gap - first use before any expansion on this page |
-| 425 | 102@126 | i | HOTL | named gap - first use before any expansion on this page |
+| 425 | 102@107 | i | NIST | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 425 | 102@115 | i | RMF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 425 | 102@120 | i | HITL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 425 | 102@126 | i | HOTL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 102@132 | i | PII | named gap - first use before any expansion on this page |
 | 425 | 102@137 | i | UX | named gap - first use before any expansion on this page |
-| 425 | 102@148 | i | SDLC | named gap - first use before any expansion on this page |
+| 425 | 102@148 | i | SDLC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 425 | 102@318 | v | L102 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 102@346 | v | L104 | documented exclusion - LINE-RANGE: line-range reference |
 | 425 | 102@351 | v | L119 | documented exclusion - LINE-RANGE: line-range reference |
@@ -786,7 +786,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 152@7 | iv | `python -P scripts/validate-skills.py` | documented exclusion - COMMAND: real command |
 | 425 | 152@57 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 425 | 153@7 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
-| 425 | 166@567 | i | AEGIS-APR-115 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 425 | 166@567 | i | AEGIS-APR-115 | named gap - first use before any expansion on this page |
 | 426 | 1@30 | ii | lane | documented exclusion - PROSE: ordinary prose word |
 | 426 | 1@47 | ii | batch | documented exclusion - PROSE: ordinary prose word |
 | 426 | 1@53 | ii | record | documented exclusion - PROSE: ordinary prose word |
@@ -893,127 +893,127 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 426 | 41@188 | v | PARTIAL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 426 | 41@296 | ii | disposition | documented exclusion - PROSE: ordinary prose word |
 | 426 | 41@364 | v | FULL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 426 | 43@81 | v | L1-L299 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 43@299 | i | AUTONOMOUS | named gap - first use before any expansion on this page |
-| 426 | 43@311 | i | CONFIRM | named gap - first use before any expansion on this page |
-| 426 | 43@322 | i | FORBIDDEN | defined at first use - line 43 contains expansion |
-| 426 | 45@74 | v | L8-23 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@89 | v | L25-40 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@106 | v | L42-77 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 43@81 | v | L1-L299 | named gap - first use before any expansion on this page |
+| 426 | 43@299 | i | AUTONOMOUS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 43@311 | i | CONFIRM | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 43@322 | i | FORBIDDEN | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 45@74 | v | L8-23 | named gap - first use before any expansion on this page |
+| 426 | 45@89 | v | L25-40 | named gap - first use before any expansion on this page |
+| 426 | 45@106 | v | L42-77 | named gap - first use before any expansion on this page |
 | 426 | 45@187 | v | L13 | documented exclusion - LINE-RANGE: line-range reference |
 | 426 | 45@217 | v | L14 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@236 | v | L15-16 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 45@236 | v | L15-16 | named gap - first use before any expansion on this page |
 | 426 | 45@254 | v | L16 | documented exclusion - LINE-RANGE: line-range reference |
 | 426 | 45@272 | v | L17 | documented exclusion - LINE-RANGE: line-range reference |
 | 426 | 45@277 | ii | tenant | documented exclusion - PROSE: ordinary prose word |
-| 426 | 45@284 | v | L18-20 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@308 | v | L20-21 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@332 | v | L21-22 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@352 | v | L22-23 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 45@284 | v | L18-20 | named gap - first use before any expansion on this page |
+| 426 | 45@308 | v | L20-21 | named gap - first use before any expansion on this page |
+| 426 | 45@332 | v | L21-22 | named gap - first use before any expansion on this page |
+| 426 | 45@352 | v | L22-23 | named gap - first use before any expansion on this page |
 | 426 | 45@360 | iv | `D70` | named gap - first use before any expansion on this page |
 | 426 | 45@369 | v | L37 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@547 | v | L99-179 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@581 | v | L183-209 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@641 | v | L245-263 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 45@797 | v | L265-285 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 45@547 | v | L99-179 | named gap - first use before any expansion on this page |
+| 426 | 45@581 | v | L183-209 | named gap - first use before any expansion on this page |
+| 426 | 45@641 | v | L245-263 | named gap - first use before any expansion on this page |
+| 426 | 45@797 | v | L265-285 | named gap - first use before any expansion on this page |
 | 426 | 45@906 | iv | `references/hitl-design-sheet.md` | documented exclusion - PATH: file/path reference |
-| 426 | 45@1012 | v | L231-243 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 45@1012 | v | L231-243 | named gap - first use before any expansion on this page |
 | 426 | 45@1114 | v | UNVERIFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 426 | 49@104 | v | L1-L106 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@24 | v | L1-8 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 49@104 | v | L1-L106 | named gap - first use before any expansion on this page |
+| 426 | 51@24 | v | L1-8 | defined at first use - line 51 contains expansion |
 | 426 | 51@49 | iv | `ai-human-in-the-loop-designer` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 426 | 51@158 | v | L4-5 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@175 | v | L5-6 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 51@158 | v | L4-5 | named gap - first use before any expansion on this page |
+| 426 | 51@175 | v | L5-6 | named gap - first use before any expansion on this page |
 | 426 | 51@214 | v | L7 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@235 | i | ADVISORY-ONLY | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 51@235 | i | ADVISORY-ONLY | named gap - first use before any expansion on this page |
 | 426 | 51@249 | v | L12 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@282 | v | L15-22 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@311 | v | L26-33 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@346 | v | L37-44 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@367 | v | L55-67 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@392 | v | L69-75 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 51@422 | v | L88-106 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 55@77 | v | L1-L227 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 55@417 | i | GOVERN | named gap - first use before any expansion on this page |
-| 426 | 55@425 | i | MAP | named gap - first use before any expansion on this page |
-| 426 | 55@430 | i | MEASURE | named gap - first use before any expansion on this page |
-| 426 | 55@442 | i | MANAGE | named gap - first use before any expansion on this page |
+| 426 | 51@282 | v | L15-22 | named gap - first use before any expansion on this page |
+| 426 | 51@311 | v | L26-33 | named gap - first use before any expansion on this page |
+| 426 | 51@346 | v | L37-44 | named gap - first use before any expansion on this page |
+| 426 | 51@367 | v | L55-67 | named gap - first use before any expansion on this page |
+| 426 | 51@392 | v | L69-75 | named gap - first use before any expansion on this page |
+| 426 | 51@422 | v | L88-106 | named gap - first use before any expansion on this page |
+| 426 | 55@77 | v | L1-L227 | named gap - first use before any expansion on this page |
+| 426 | 55@417 | i | GOVERN | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 55@425 | i | MAP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 55@430 | i | MEASURE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 55@442 | i | MANAGE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 426 | 55@561 | ii | owners | documented exclusion - PROSE: ordinary prose word |
-| 426 | 57@64 | v | L8-15 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@79 | v | L17-29 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@96 | v | L31-48 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@124 | v | L8-9 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 57@64 | v | L8-15 | named gap - first use before any expansion on this page |
+| 426 | 57@79 | v | L17-29 | named gap - first use before any expansion on this page |
+| 426 | 57@96 | v | L31-48 | named gap - first use before any expansion on this page |
+| 426 | 57@124 | v | L8-9 | named gap - first use before any expansion on this page |
 | 426 | 57@159 | v | L9 | documented exclusion - LINE-RANGE: line-range reference |
 | 426 | 57@199 | v | L10 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@204 | i | ISO | named gap - first use before any expansion on this page |
-| 426 | 57@212 | v | L14-15 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@246 | v | NIST-AI-600-1 | documented exclusion - RANGE: numeric range/unit/formula |
-| 426 | 57@260 | v | L61-64 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@303 | v | L20-22 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@344 | v | L70-125 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@378 | v | L129-143 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@409 | v | L145-160 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@457 | v | L179-198 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 57@607 | v | L200-216 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 57@204 | i | ISO | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 57@212 | v | L14-15 | named gap - first use before any expansion on this page |
+| 426 | 57@246 | v | NIST-AI-600-1 | named gap - first use before any expansion on this page |
+| 426 | 57@260 | v | L61-64 | named gap - first use before any expansion on this page |
+| 426 | 57@303 | v | L20-22 | named gap - first use before any expansion on this page |
+| 426 | 57@344 | v | L70-125 | named gap - first use before any expansion on this page |
+| 426 | 57@378 | v | L129-143 | named gap - first use before any expansion on this page |
+| 426 | 57@409 | v | L145-160 | named gap - first use before any expansion on this page |
+| 426 | 57@457 | v | L179-198 | named gap - first use before any expansion on this page |
+| 426 | 57@607 | v | L200-216 | named gap - first use before any expansion on this page |
 | 426 | 57@647 | iv | `references/ai-rmf-function-map.md` | documented exclusion - PATH: file/path reference |
-| 426 | 61@102 | v | L1-L58 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 61@102 | v | L1-L58 | named gap - first use before any expansion on this page |
 | 426 | 61@225 | v | × | documented exclusion - OPERATOR: operator glyph |
 | 426 | 61@366 | v | 2026-09-24 | documented exclusion - DATE: date/timestamp |
-| 426 | 63@24 | v | L1-10 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 63@24 | v | L1-10 | defined at first use - line 63 contains expansion |
 | 426 | 63@209 | v | L38 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 63@276 | v | L14-20 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 63@303 | v | L22-36 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 63@335 | v | L40-46 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 63@357 | v | L48-58 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 63@276 | v | L14-20 | named gap - first use before any expansion on this page |
+| 426 | 63@303 | v | L22-36 | named gap - first use before any expansion on this page |
+| 426 | 63@335 | v | L40-46 | named gap - first use before any expansion on this page |
+| 426 | 63@357 | v | L48-58 | named gap - first use before any expansion on this page |
 | 426 | 63@514 | iv | `../SKILL.md` | documented exclusion - PATH: file/path reference |
 | 426 | 63@554 | i | URL | named gap - first use before any expansion on this page |
-| 426 | 67@75 | v | L1-L187 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 67@75 | v | L1-L187 | named gap - first use before any expansion on this page |
 | 426 | 67@329 | i | LLM07 | defined at first use - line 67 contains expansion |
 | 426 | 67@549 | ii | user | documented exclusion - PROSE: ordinary prose word |
-| 426 | 69@64 | v | L8-13 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 69@79 | v | L15-26 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 69@96 | v | L28-46 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 69@64 | v | L8-13 | named gap - first use before any expansion on this page |
+| 426 | 69@79 | v | L15-26 | named gap - first use before any expansion on this page |
+| 426 | 69@96 | v | L28-46 | named gap - first use before any expansion on this page |
 | 426 | 69@230 | i | UX | named gap - first use before any expansion on this page |
 | 426 | 69@238 | i | XSS | named gap - first use before any expansion on this page |
 | 426 | 69@252 | v | L157 | documented exclusion - LINE-RANGE: line-range reference |
 | 426 | 69@279 | i | LLM09 | named gap - first use before any expansion on this page |
-| 426 | 69@304 | v | L9-10 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 69@373 | v | L63-99 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 69@406 | v | L101-114 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 69@437 | v | L116-129 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 69@476 | v | L143-162 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 69@554 | v | L131-141 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 69@304 | v | L9-10 | named gap - first use before any expansion on this page |
+| 426 | 69@373 | v | L63-99 | named gap - first use before any expansion on this page |
+| 426 | 69@406 | v | L101-114 | named gap - first use before any expansion on this page |
+| 426 | 69@437 | v | L116-129 | named gap - first use before any expansion on this page |
+| 426 | 69@476 | v | L143-162 | named gap - first use before any expansion on this page |
+| 426 | 69@554 | v | L131-141 | named gap - first use before any expansion on this page |
 | 426 | 69@643 | iv | `references/grounding-controls.md` | documented exclusion - PATH: file/path reference |
-| 426 | 73@99 | v | L1-L83 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 75@24 | v | L1-5 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 73@99 | v | L1-L83 | named gap - first use before any expansion on this page |
+| 426 | 75@24 | v | L1-5 | defined at first use - line 75 contains expansion |
 | 426 | 75@121 | v | L56 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 75@226 | v | L58-64 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 75@276 | v | L11-15 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 75@305 | v | L76-83 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 79@71 | v | L1-L215 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 75@226 | v | L58-64 | named gap - first use before any expansion on this page |
+| 426 | 75@276 | v | L11-15 | named gap - first use before any expansion on this page |
+| 426 | 75@305 | v | L76-83 | named gap - first use before any expansion on this page |
+| 426 | 79@71 | v | L1-L215 | named gap - first use before any expansion on this page |
 | 426 | 79@169 | i | MANUAL-ONLY | named gap - first use before any expansion on this page |
 | 426 | 79@287 | ii | provider | documented exclusion - PROSE: ordinary prose word |
 | 426 | 79@346 | ii | tests | documented exclusion - PROSE: ordinary prose word |
-| 426 | 81@64 | v | L9-17 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 81@79 | v | L19-33 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 81@96 | v | L35-49 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 81@64 | v | L9-17 | named gap - first use before any expansion on this page |
+| 426 | 81@79 | v | L19-33 | named gap - first use before any expansion on this page |
+| 426 | 81@96 | v | L35-49 | named gap - first use before any expansion on this page |
 | 426 | 81@145 | iv | `disable-model-invocation: true` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 426 | 81@348 | i | SDK | named gap - first use before any expansion on this page |
-| 426 | 81@429 | v | L12-13 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 81@576 | v | L71-116 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 81@610 | v | L120-134 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 81@630 | v | L136-156 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 81@667 | v | L170-190 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 81@784 | v | L192-203 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 81@429 | v | L12-13 | named gap - first use before any expansion on this page |
+| 426 | 81@576 | v | L71-116 | named gap - first use before any expansion on this page |
+| 426 | 81@610 | v | L120-134 | named gap - first use before any expansion on this page |
+| 426 | 81@630 | v | L136-156 | named gap - first use before any expansion on this page |
+| 426 | 81@667 | v | L170-190 | named gap - first use before any expansion on this page |
+| 426 | 81@784 | v | L192-203 | named gap - first use before any expansion on this page |
 | 426 | 81@883 | iv | `references/ai-router-design.md` | documented exclusion - PATH: file/path reference |
-| 426 | 87@24 | v | L1-13 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 87@233 | v | L15-25 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 87@256 | v | L27-38 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 87@281 | v | L47-60 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 87@301 | v | L68-76 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 87@24 | v | L1-13 | defined at first use - line 87 contains expansion |
+| 426 | 87@233 | v | L15-25 | named gap - first use before any expansion on this page |
+| 426 | 87@256 | v | L27-38 | named gap - first use before any expansion on this page |
+| 426 | 87@281 | v | L47-60 | named gap - first use before any expansion on this page |
+| 426 | 87@301 | v | L68-76 | named gap - first use before any expansion on this page |
 | 426 | 87@328 | i | VITE_ | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 426 | 87@388 | v | L18-21 | documented exclusion - LINE-RANGE: line-range reference |
-| 426 | 87@506 | v | L3-4 | documented exclusion - LINE-RANGE: line-range reference |
+| 426 | 87@388 | v | L18-21 | named gap - first use before any expansion on this page |
+| 426 | 87@506 | v | L3-4 | named gap - first use before any expansion on this page |
 | 426 | 104@285 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 426 | 110@7 | iv | `5b4d2018afbb3e6210a4668c8b937de2ed24d9f6` | documented exclusion - SHA: commit/blob hash |
 | 426 | 112@7 | iv | `14ecd0c3dc9dd0b2402990fd757df46ac28986e5` | documented exclusion - SHA: commit/blob hash |
@@ -1030,7 +1030,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 426 | 150@30 | iv | `laneA[32]…laneA[39]` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 426 | 153@36 | i | CI | named gap - first use before any expansion on this page |
 | 426 | 167@273 | ii | base | documented exclusion - PROSE: ordinary prose word |
-| 426 | 167@581 | i | AEGIS-APR-115 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 426 | 167@581 | i | AEGIS-APR-115 | named gap - first use before any expansion on this page |
 | 427 | 1@30 | ii | lane | documented exclusion - PROSE: ordinary prose word |
 | 427 | 1@47 | ii | batch | documented exclusion - PROSE: ordinary prose word |
 | 427 | 1@53 | ii | record | documented exclusion - PROSE: ordinary prose word |
@@ -1098,7 +1098,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 26@748 | v | 40-47 | documented exclusion - RANGE: numeric range/unit/formula |
 | 427 | 28@232 | ii | drift | documented exclusion - PROSE: ordinary prose word |
 | 427 | 28@303 | ii | ids | documented exclusion - PROSE: ordinary prose word |
-| 427 | 32@62 | i | ID | named gap - first use before any expansion on this page |
+| 427 | 32@62 | i | ID | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 427 | 34@2 | i | P1 | named gap - first use before any expansion on this page |
 | 427 | 34@7 | iv | `.claude/skills/ai-sdlc-operating-model/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 427 | 34@89 | iv | `1d63e183dd1d64794f7c83b65e6197a702635f19` | documented exclusion - SHA: commit/blob hash |
@@ -1146,41 +1146,41 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 47@828 | v | FULL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 427 | 47@878 | v | PARTIAL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 427 | 49@60 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
-| 427 | 51@75 | v | L1-167 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@46 | v | L8-11 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@61 | v | L13-26 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@93 | v | L28-46 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@116 | i | AI | named gap - first use before any expansion on this page |
-| 427 | 53@120 | i | SDLC | named gap - first use before any expansion on this page |
+| 427 | 51@75 | v | L1-167 | named gap - first use before any expansion on this page |
+| 427 | 53@46 | v | L8-11 | named gap - first use before any expansion on this page |
+| 427 | 53@61 | v | L13-26 | named gap - first use before any expansion on this page |
+| 427 | 53@93 | v | L28-46 | named gap - first use before any expansion on this page |
+| 427 | 53@116 | i | AI | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 53@120 | i | SDLC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 427 | 53@133 | i | CI | named gap - first use before any expansion on this page |
-| 427 | 53@171 | v | L8-10 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@263 | v | L48-61 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@280 | v | L63-100 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@305 | v | L102-116 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@336 | v | L118-130 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@354 | v | L132-146 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 53@379 | v | L10-11 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 53@171 | v | L8-10 | named gap - first use before any expansion on this page |
+| 427 | 53@263 | v | L48-61 | named gap - first use before any expansion on this page |
+| 427 | 53@280 | v | L63-100 | named gap - first use before any expansion on this page |
+| 427 | 53@305 | v | L102-116 | named gap - first use before any expansion on this page |
+| 427 | 53@336 | v | L118-130 | named gap - first use before any expansion on this page |
+| 427 | 53@354 | v | L132-146 | named gap - first use before any expansion on this page |
+| 427 | 53@379 | v | L10-11 | named gap - first use before any expansion on this page |
 | 427 | 53@438 | ii | grant | documented exclusion - PROSE: ordinary prose word |
 | 427 | 53@774 | v | UNVERIFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 427 | 57@95 | v | L1-65 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 57@95 | v | L1-65 | named gap - first use before any expansion on this page |
 | 427 | 57@274 | ii | lifecycle | documented exclusion - PROSE: ordinary prose word |
 | 427 | 57@429 | ii | surface | documented exclusion - PROSE: ordinary prose word |
 | 427 | 57@447 | ii | rule | documented exclusion - PROSE: ordinary prose word |
-| 427 | 59@69 | v | L3-12 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 59@97 | v | L14-25 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 59@171 | v | L3-7 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 59@69 | v | L3-12 | named gap - first use before any expansion on this page |
+| 427 | 59@97 | v | L14-25 | named gap - first use before any expansion on this page |
+| 427 | 59@171 | v | L3-7 | named gap - first use before any expansion on this page |
 | 427 | 59@212 | v | L21 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 59@275 | v | L31-37 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 59@298 | v | L39-53 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 59@321 | v | L55-65 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 59@344 | v | L41-42 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 59@275 | v | L31-37 | named gap - first use before any expansion on this page |
+| 427 | 59@298 | v | L39-53 | named gap - first use before any expansion on this page |
+| 427 | 59@321 | v | L55-65 | named gap - first use before any expansion on this page |
+| 427 | 59@344 | v | L41-42 | named gap - first use before any expansion on this page |
 | 427 | 59@477 | iv | `../SKILL.md` | documented exclusion - PATH: file/path reference |
-| 427 | 63@70 | v | L1-266 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 63@70 | v | L1-266 | named gap - first use before any expansion on this page |
 | 427 | 63@434 | ii | approval | documented exclusion - PROSE: ordinary prose word |
 | 427 | 63@481 | ii | owner | documented exclusion - PROSE: ordinary prose word |
-| 427 | 65@46 | v | L8-22 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@61 | v | L24-38 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@78 | v | L40-73 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 65@46 | v | L8-22 | named gap - first use before any expansion on this page |
+| 427 | 65@61 | v | L24-38 | named gap - first use before any expansion on this page |
+| 427 | 65@78 | v | L40-73 | named gap - first use before any expansion on this page |
 | 427 | 65@115 | ii | spec | documented exclusion - PROSE: ordinary prose word |
 | 427 | 65@157 | i | API | named gap - first use before any expansion on this page |
 | 427 | 65@194 | i | UI | named gap - first use before any expansion on this page |
@@ -1188,90 +1188,90 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 65@238 | ii | tenant | documented exclusion - PROSE: ordinary prose word |
 | 427 | 65@265 | i | ADR | named gap - first use before any expansion on this page |
 | 427 | 65@284 | v | L82 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@311 | v | L75-91 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@328 | v | L93-145 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@351 | v | L147-178 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@382 | v | L180-197 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 65@311 | v | L75-91 | named gap - first use before any expansion on this page |
+| 427 | 65@328 | v | L93-145 | named gap - first use before any expansion on this page |
+| 427 | 65@351 | v | L147-178 | named gap - first use before any expansion on this page |
+| 427 | 65@382 | v | L180-197 | named gap - first use before any expansion on this page |
 | 427 | 65@401 | ii | rules | documented exclusion - PROSE: ordinary prose word |
-| 427 | 65@407 | v | L199-213 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@425 | v | L215-232 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@452 | v | L253-266 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 65@477 | v | L36-37 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 69@90 | v | L1-109 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 71@34 | v | L3-8 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 71@161 | v | L4-8 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 71@193 | v | L10-23 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 71@220 | v | L25-38 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 71@248 | v | L40-47 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 71@265 | v | L49-75 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 71@288 | v | L77-109 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 65@407 | v | L199-213 | named gap - first use before any expansion on this page |
+| 427 | 65@425 | v | L215-232 | named gap - first use before any expansion on this page |
+| 427 | 65@452 | v | L253-266 | named gap - first use before any expansion on this page |
+| 427 | 65@477 | v | L36-37 | named gap - first use before any expansion on this page |
+| 427 | 69@90 | v | L1-109 | named gap - first use before any expansion on this page |
+| 427 | 71@34 | v | L3-8 | named gap - first use before any expansion on this page |
+| 427 | 71@161 | v | L4-8 | named gap - first use before any expansion on this page |
+| 427 | 71@193 | v | L10-23 | named gap - first use before any expansion on this page |
+| 427 | 71@220 | v | L25-38 | named gap - first use before any expansion on this page |
+| 427 | 71@248 | v | L40-47 | named gap - first use before any expansion on this page |
+| 427 | 71@265 | v | L49-75 | named gap - first use before any expansion on this page |
+| 427 | 71@288 | v | L77-109 | named gap - first use before any expansion on this page |
 | 427 | 71@312 | v | L74 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 75@69 | v | L1-189 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 75@69 | v | L1-189 | named gap - first use before any expansion on this page |
 | 427 | 75@209 | i | LLM | named gap - first use before any expansion on this page |
-| 427 | 75@222 | i | RAG | named gap - first use before any expansion on this page |
-| 427 | 75@305 | i | OWASP | named gap - first use before any expansion on this page |
-| 427 | 77@46 | v | L8-15 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@61 | v | L17-27 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@78 | v | L29-43 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@126 | i | STRIDE | named gap - first use before any expansion on this page |
-| 427 | 77@134 | i | SSRF | named gap - first use before any expansion on this page |
-| 427 | 77@159 | v | L8-14 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 75@222 | i | RAG | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 75@305 | i | OWASP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 77@46 | v | L8-15 | named gap - first use before any expansion on this page |
+| 427 | 77@61 | v | L17-27 | named gap - first use before any expansion on this page |
+| 427 | 77@78 | v | L29-43 | named gap - first use before any expansion on this page |
+| 427 | 77@126 | i | STRIDE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 77@134 | i | SSRF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 77@159 | v | L8-14 | named gap - first use before any expansion on this page |
 | 427 | 77@207 | iv | `URL` | named gap - first use before any expansion on this page |
 | 427 | 77@221 | v | L105 | documented exclusion - LINE-RANGE: line-range reference |
 | 427 | 77@267 | v | L117 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@297 | v | L45-59 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@314 | v | L61-105 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@352 | v | L88-91 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@374 | v | L107-122 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@405 | v | L124-136 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@433 | v | L138-148 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@451 | v | L150-166 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@476 | v | L14-15 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 77@585 | v | L168-179 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 77@297 | v | L45-59 | named gap - first use before any expansion on this page |
+| 427 | 77@314 | v | L61-105 | named gap - first use before any expansion on this page |
+| 427 | 77@352 | v | L88-91 | named gap - first use before any expansion on this page |
+| 427 | 77@374 | v | L107-122 | named gap - first use before any expansion on this page |
+| 427 | 77@405 | v | L124-136 | named gap - first use before any expansion on this page |
+| 427 | 77@433 | v | L138-148 | named gap - first use before any expansion on this page |
+| 427 | 77@451 | v | L150-166 | named gap - first use before any expansion on this page |
+| 427 | 77@476 | v | L14-15 | named gap - first use before any expansion on this page |
+| 427 | 77@585 | v | L168-179 | named gap - first use before any expansion on this page |
 | 427 | 79@90 | iv | `H/M/L` | documented exclusion - PATH: file/path reference |
-| 427 | 81@99 | v | L1-148 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 83@61 | v | L3-4 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 83@79 | v | L12-21 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 81@99 | v | L1-148 | named gap - first use before any expansion on this page |
+| 427 | 83@61 | v | L3-4 | named gap - first use before any expansion on this page |
+| 427 | 83@79 | v | L12-21 | named gap - first use before any expansion on this page |
 | 427 | 83@123 | i | PII | named gap - first use before any expansion on this page |
-| 427 | 83@128 | i | RLHF | named gap - first use before any expansion on this page |
-| 427 | 83@134 | i | HTML | named gap - first use before any expansion on this page |
+| 427 | 83@128 | i | RLHF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 83@134 | i | HTML | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 427 | 83@140 | i | XSS | named gap - first use before any expansion on this page |
 | 427 | 83@145 | i | SQL | named gap - first use before any expansion on this page |
-| 427 | 83@155 | i | ACL | named gap - first use before any expansion on this page |
-| 427 | 83@180 | v | L12-19 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 83@188 | i | QR | named gap - first use before any expansion on this page |
+| 427 | 83@155 | i | ACL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 83@180 | v | L12-19 | named gap - first use before any expansion on this page |
+| 427 | 83@188 | i | QR | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 427 | 83@203 | v | L50 | documented exclusion - LINE-RANGE: line-range reference |
 | 427 | 83@211 | i | UX | named gap - first use before any expansion on this page |
-| 427 | 83@265 | v | L25-40 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 83@321 | v | L42-141 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 83@346 | v | L143-148 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 83@265 | v | L25-40 | named gap - first use before any expansion on this page |
+| 427 | 83@321 | v | L42-141 | named gap - first use before any expansion on this page |
+| 427 | 83@346 | v | L143-148 | named gap - first use before any expansion on this page |
 | 427 | 83@392 | ii | decision | documented exclusion - PROSE: ordinary prose word |
-| 427 | 83@412 | v | L5-10 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 83@412 | v | L5-10 | named gap - first use before any expansion on this page |
 | 427 | 83@537 | ii | reconciliation | documented exclusion - PROSE: ordinary prose word |
-| 427 | 87@78 | v | L1-160 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 87@78 | v | L1-160 | named gap - first use before any expansion on this page |
 | 427 | 87@244 | ii | provider | documented exclusion - PROSE: ordinary prose word |
 | 427 | 87@254 | ii | webhook | documented exclusion - PROSE: ordinary prose word |
 | 427 | 87@386 | ii | version | documented exclusion - PROSE: ordinary prose word |
 | 427 | 87@430 | ii | gates | documented exclusion - PROSE: ordinary prose word |
 | 427 | 87@454 | ii | tests | documented exclusion - PROSE: ordinary prose word |
-| 427 | 89@46 | v | L8-12 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 89@61 | v | L14-24 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 89@78 | v | L25-43 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 89@110 | i | RPC | named gap - first use before any expansion on this page |
+| 427 | 89@46 | v | L8-12 | named gap - first use before any expansion on this page |
+| 427 | 89@61 | v | L14-24 | named gap - first use before any expansion on this page |
+| 427 | 89@78 | v | L25-43 | named gap - first use before any expansion on this page |
+| 427 | 89@110 | i | RPC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 427 | 89@121 | i | SDK | named gap - first use before any expansion on this page |
-| 427 | 89@126 | i | DB | named gap - first use before any expansion on this page |
-| 427 | 89@182 | v | L45-57 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 89@199 | v | L59-89 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 89@221 | v | L91-107 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 89@251 | v | L109-119 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 89@269 | v | L121-137 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 93@106 | v | L1-56 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 95@212 | v | L12-17 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 95@242 | v | L19-28 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 95@273 | v | L30-37 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 95@303 | v | L39-48 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 95@325 | v | L50-56 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 95@348 | v | L41-44 | documented exclusion - LINE-RANGE: line-range reference |
+| 427 | 89@126 | i | DB | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 89@182 | v | L45-57 | named gap - first use before any expansion on this page |
+| 427 | 89@199 | v | L59-89 | named gap - first use before any expansion on this page |
+| 427 | 89@221 | v | L91-107 | named gap - first use before any expansion on this page |
+| 427 | 89@251 | v | L109-119 | named gap - first use before any expansion on this page |
+| 427 | 89@269 | v | L121-137 | named gap - first use before any expansion on this page |
+| 427 | 93@106 | v | L1-56 | named gap - first use before any expansion on this page |
+| 427 | 95@212 | v | L12-17 | named gap - first use before any expansion on this page |
+| 427 | 95@242 | v | L19-28 | named gap - first use before any expansion on this page |
+| 427 | 95@273 | v | L30-37 | named gap - first use before any expansion on this page |
+| 427 | 95@303 | v | L39-48 | named gap - first use before any expansion on this page |
+| 427 | 95@325 | v | L50-56 | named gap - first use before any expansion on this page |
+| 427 | 95@348 | v | L41-44 | named gap - first use before any expansion on this page |
 | 427 | 112@321 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 427 | 112@394 | ii | count | documented exclusion - PROSE: ordinary prose word |
 | 427 | 118@108 | iv | `sd-c-796-r1` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -1286,7 +1286,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 133@6 | iv | `git log -1` | documented exclusion - COMMAND: real command |
 | 427 | 133@21 | iv | `git rev-list --count` | documented exclusion - COMMAND: real command |
 | 427 | 134@7 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
-| 427 | 146@567 | i | AEGIS-APR-115 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 146@567 | i | AEGIS-APR-115 | named gap - first use before any expansion on this page |
 | 428 | 1@30 | ii | lane | documented exclusion - PROSE: ordinary prose word |
 | 428 | 1@47 | ii | batch | documented exclusion - PROSE: ordinary prose word |
 | 428 | 1@53 | ii | record | documented exclusion - PROSE: ordinary prose word |
@@ -1294,7 +1294,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 3@156 | ii | evidence | documented exclusion - PROSE: ordinary prose word |
 | 428 | 5@42 | i | PR | named gap - first use before any expansion on this page |
 | 428 | 5@211 | ii | audit | documented exclusion - PROSE: ordinary prose word |
-| 428 | 5@219 | i | ACCEPT | named gap - first use before any expansion on this page |
+| 428 | 5@219 | i | ACCEPT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 5@262 | i | F1 | named gap - first use before any expansion on this page |
 | 428 | 7@17 | ii | base | documented exclusion - PROSE: ordinary prose word |
 | 428 | 7@25 | iv | `main` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -1333,7 +1333,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 25@263 | iv | `git diff --numstat 2db1ffb7..14747958 -- &lt;page&gt;` | documented exclusion - COMMAND: real command |
 | 428 | 25@313 | ii | drift | documented exclusion - PROSE: ordinary prose word |
 | 428 | 27@14 | ii | reader | documented exclusion - PROSE: ordinary prose word |
-| 428 | 31@158 | i | AEGIS-APR-101 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 428 | 31@158 | i | AEGIS-APR-101 | named gap - first use before any expansion on this page |
 | 428 | 31@311 | ii | approval | documented exclusion - PROSE: ordinary prose word |
 | 428 | 31@368 | ii | head | documented exclusion - PROSE: ordinary prose word |
 | 428 | 36@108 | iv | `git cat-file -s` | documented exclusion - COMMAND: real command |
@@ -1346,7 +1346,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 41@86 | iv | `aaa9134f3106736450e816af57f6e9c8c709ea05` | documented exclusion - SHA: commit/blob hash |
 | 428 | 41@146 | v | PARTIAL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 41@158 | v | L6 | documented exclusion - LINE-RANGE: line-range reference |
-| 428 | 41@162 | iv | `REST` | named gap - first use before any expansion on this page |
+| 428 | 41@162 | iv | `REST` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 42@2 | i | P3 | named gap - first use before any expansion on this page |
 | 428 | 42@12 | iv | `.claude/skills/api-event-architect/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 428 | 42@60 | iv | `4bc92cf83f3737b7027256076331a2aa3952968d` | documented exclusion - SHA: commit/blob hash |
@@ -1366,9 +1366,9 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 45@168 | v | L18 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 45@176 | iv | `4xx` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 428 | 45@183 | v | L24 | documented exclusion - LINE-RANGE: line-range reference |
-| 428 | 45@191 | iv | `HTML` | named gap - first use before any expansion on this page |
-| 428 | 45@198 | iv | `JS` | named gap - first use before any expansion on this page |
-| 428 | 45@203 | iv | `CSS` | named gap - first use before any expansion on this page |
+| 428 | 45@191 | iv | `HTML` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 428 | 45@198 | iv | `JS` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 428 | 45@203 | iv | `CSS` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 45@209 | iv | `URL` | named gap - first use before any expansion on this page |
 | 428 | 46@2 | i | P7 | named gap - first use before any expansion on this page |
 | 428 | 46@12 | iv | `.claude/skills/architecture-advisor/SKILL.md` | documented exclusion - PATH: file/path reference |
@@ -1378,7 +1378,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 47@163 | v | L26 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 47@168 | iv | `w/o` | documented exclusion - PATH: file/path reference |
 | 428 | 49@69 | v | UNRUN | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 428 | 49@111 | i | ID | named gap - first use before any expansion on this page |
+| 428 | 49@111 | i | ID | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 51@15 | ii | dispositions | documented exclusion - PROSE: ordinary prose word |
 | 428 | 51@49 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 53@374 | ii | disposition | documented exclusion - PROSE: ordinary prose word |
@@ -1445,8 +1445,8 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 79@277 | ii | versioned | documented exclusion - PROSE: ordinary prose word |
 | 428 | 81@45 | v | L16 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 81@149 | i | UX | named gap - first use before any expansion on this page |
-| 428 | 81@158 | i | SSRF | named gap - first use before any expansion on this page |
-| 428 | 81@167 | i | HMAC | named gap - first use before any expansion on this page |
+| 428 | 81@158 | i | SSRF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 428 | 81@167 | i | HMAC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 81@224 | v | L11 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 81@408 | v | L84 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 81@442 | v | L150 | documented exclusion - LINE-RANGE: line-range reference |
@@ -1458,7 +1458,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 81@628 | v | L109 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 81@830 | v | L248 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 81@914 | v | L129 | documented exclusion - LINE-RANGE: line-range reference |
-| 428 | 88@111 | i | RFC | named gap - first use before any expansion on this page |
+| 428 | 88@111 | i | RFC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 88@121 | i | HMAC-SHA256 | named gap - first use before any expansion on this page |
 | 428 | 88@155 | iv | `2xx` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 428 | 88@307 | iv | `JSON` | named gap - first use before any expansion on this page |
@@ -1473,7 +1473,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 95@85 | v | L13 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 95@260 | i | ORM | named gap - first use before any expansion on this page |
 | 428 | 95@269 | ii | authz | documented exclusion - PROSE: ordinary prose word |
-| 428 | 95@315 | i | RLS | named gap - first use before any expansion on this page |
+| 428 | 95@315 | i | RLS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 95@339 | i | UI | named gap - first use before any expansion on this page |
 | 428 | 95@345 | v | L118 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 95@434 | ii | token | documented exclusion - PROSE: ordinary prose word |
@@ -1490,8 +1490,8 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 102@713 | v | L27 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 102@718 | v | L35 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 102@765 | v | L19 | documented exclusion - LINE-RANGE: line-range reference |
-| 428 | 107@52 | i | STYLE | named gap - first use before any expansion on this page |
-| 428 | 109@137 | i | SOA | named gap - first use before any expansion on this page |
+| 428 | 107@52 | i | STYLE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 428 | 109@137 | i | SOA | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 109@382 | v | L70 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 109@414 | v | L119 | documented exclusion - LINE-RANGE: line-range reference |
 | 428 | 109@445 | v | L136 | documented exclusion - LINE-RANGE: line-range reference |
@@ -1523,7 +1523,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 144@86 | ii | sha256 | documented exclusion - PROSE: ordinary prose word |
 | 428 | 146@11 | i | AC1 | named gap - first use before any expansion on this page |
 | 428 | 146@15 | i | AC8 | named gap - first use before any expansion on this page |
-| 428 | 148@2 | i | AC | named gap - first use before any expansion on this page |
+| 428 | 148@2 | i | AC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 428 | 148@15 | ii | status | documented exclusion - PROSE: ordinary prose word |
 | 428 | 150@21 | v | MET | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 151@2 | i | AC2 | named gap - first use before any expansion on this page |
@@ -1538,7 +1538,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 155@18 | i | PROC-04 | named gap - first use before any expansion on this page |
 | 428 | 155@30 | v | OWED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 156@2 | i | AC7 | named gap - first use before any expansion on this page |
-| 428 | 156@139 | i | AEGIS-APR-050 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 428 | 156@139 | i | AEGIS-APR-050 | named gap - first use before any expansion on this page |
 | 428 | 156@179 | i | SHA | named gap - first use before any expansion on this page |
 | 428 | 157@33 | v | SATISFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 163@33 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7... --json` | documented exclusion - COMMAND: real command |
@@ -1553,10 +1553,10 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 184@29 | v | REVISE | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 186@71 | i | AC1-AC3 | named gap - first use before any expansion on this page |
 | 428 | 186@83 | i | AC5-AC8 | named gap - first use before any expansion on this page |
-| 428 | 186@130 | i | NOT | named gap - first use before any expansion on this page |
-| 428 | 188@58 | iv | `RPC` | named gap - first use before any expansion on this page |
-| 428 | 190@44 | v | L24-25 | documented exclusion - LINE-RANGE: line-range reference |
-| 428 | 190@68 | v | L18-19 | documented exclusion - LINE-RANGE: line-range reference |
+| 428 | 186@130 | i | NOT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 428 | 188@58 | iv | `RPC` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 428 | 190@44 | v | L24-25 | named gap - first use before any expansion on this page |
+| 428 | 190@68 | v | L18-19 | named gap - first use before any expansion on this page |
 | 428 | 191@4 | i | F4 | defined at first use - line 191 contains expansion |
 | 428 | 194@4 | i | O2 | defined at first use - line 194 contains expansion |
 | 428 | 195@4 | i | O3 | defined at first use - line 195 contains expansion |
@@ -1573,7 +1573,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 7@69 | i | PR | named gap - first use before any expansion on this page |
 | 429 | 7@127 | v | 2026-10-17T23:57:51-07:00 | documented exclusion - DATE: date/timestamp |
 | 429 | 7@278 | v | REVISE | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 429 | 7@290 | i | ACCEPT | named gap - first use before any expansion on this page |
+| 429 | 7@290 | i | ACCEPT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 7@367 | ii | evidence | documented exclusion - PROSE: ordinary prose word |
 | 429 | 9@17 | ii | base | documented exclusion - PROSE: ordinary prose word |
 | 429 | 9@188 | ii | owner | documented exclusion - PROSE: ordinary prose word |
@@ -1620,7 +1620,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 25@540 | iv | `.claude/skills/pii-lifecycle-designer/references/lifecycle-matrix.md` | documented exclusion - PATH: file/path reference |
 | 429 | 27@254 | i | AC7 | named gap - first use before any expansion on this page |
 | 429 | 31@23 | ii | blob | documented exclusion - PROSE: ordinary prose word |
-| 429 | 31@50 | i | LF | named gap - first use before any expansion on this page |
+| 429 | 31@50 | i | LF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 33@2 | i | P1 | named gap - first use before any expansion on this page |
 | 429 | 33@13 | iv | `.claude/skills/operational-vs-analytical-splitter/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 429 | 33@76 | iv | `d884c4ddf352615b8e13ecad3c96c913e57ba006` | documented exclusion - SHA: commit/blob hash |
@@ -1646,7 +1646,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 40@2 | i | P8 | named gap - first use before any expansion on this page |
 | 429 | 40@86 | iv | `eda131f5a2000b1b4dafc7aedca4acabc55f103d` | documented exclusion - SHA: commit/blob hash |
 | 429 | 46@194 | iv | `docs/roadmaps/aegis-documentation-readability-backlog.md` | documented exclusion - PATH: file/path reference |
-| 429 | 46@255 | v | L2841-2862 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 46@255 | v | L2841-2862 | named gap - first use before any expansion on this page |
 | 429 | 46@289 | i | B1 | named gap - first use before any expansion on this page |
 | 429 | 46@364 | i | B2 | named gap - first use before any expansion on this page |
 | 429 | 46@533 | i | B3 | named gap - first use before any expansion on this page |
@@ -1658,38 +1658,38 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 46@1202 | i | B6 | named gap - first use before any expansion on this page |
 | 429 | 46@1226 | ii | review | documented exclusion - PROSE: ordinary prose word |
 | 429 | 48@18 | v | UNVERIFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 429 | 50@84 | v | L1-230 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 54@19 | v | L1-6 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 54@34 | v | L8-13 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 54@89 | v | L15-28 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 54@109 | v | L30-56 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 50@84 | v | L1-230 | named gap - first use before any expansion on this page |
+| 429 | 54@19 | v | L1-6 | named gap - first use before any expansion on this page |
+| 429 | 54@34 | v | L8-13 | defined at first use - line 54 contains expansion |
+| 429 | 54@89 | v | L15-28 | named gap - first use before any expansion on this page |
+| 429 | 54@109 | v | L30-56 | named gap - first use before any expansion on this page |
 | 429 | 54@198 | iv | `OLTP` | named gap - first use before any expansion on this page |
-| 429 | 54@206 | iv | `OLAP` | named gap - first use before any expansion on this page |
-| 429 | 54@217 | iv | `CDC` | named gap - first use before any expansion on this page |
-| 429 | 54@414 | v | L136-152 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 54@699 | v | L132-134 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 54@206 | iv | `OLAP` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 54@217 | iv | `CDC` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 54@414 | v | L136-152 | named gap - first use before any expansion on this page |
+| 429 | 54@699 | v | L132-134 | named gap - first use before any expansion on this page |
 | 429 | 56@11 | v | PARTIAL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 429 | 58@114 | v | L1-88 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 62@32 | v | L3-5 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 62@54 | v | L7-14 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 58@114 | v | L1-88 | named gap - first use before any expansion on this page |
+| 429 | 62@32 | v | L3-5 | named gap - first use before any expansion on this page |
+| 429 | 62@54 | v | L7-14 | named gap - first use before any expansion on this page |
 | 429 | 62@112 | iv | `ops` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 62@121 | v | L35 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 62@179 | v | L8-14 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 62@179 | v | L8-14 | named gap - first use before any expansion on this page |
 | 429 | 62@256 | v | L48 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 62@260 | iv | `stats` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 62@271 | iv | `Evidence: &lt;stats source&gt;` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 429 | 62@302 | v | L21 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 62@306 | iv | `config` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 62@318 | iv | `provider/config supports it` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
-| 429 | 62@674 | v | L7-8 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 62@674 | v | L7-8 | named gap - first use before any expansion on this page |
 | 429 | 62@679 | iv | `../SKILL.md` | documented exclusion - PATH: file/path reference |
-| 429 | 66@76 | v | L1-216 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 66@76 | v | L1-216 | named gap - first use before any expansion on this page |
 | 429 | 68@133 | ii | versioned | documented exclusion - PROSE: ordinary prose word |
 | 429 | 68@242 | ii | tenant | documented exclusion - PROSE: ordinary prose word |
 | 429 | 68@260 | ii | scope | documented exclusion - PROSE: ordinary prose word |
 | 429 | 70@19 | v | L6 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 70@29 | v | L8-22 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 70@47 | v | L24-43 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 70@29 | v | L8-22 | named gap - first use before any expansion on this page |
+| 429 | 70@47 | v | L24-43 | named gap - first use before any expansion on this page |
 | 429 | 70@140 | iv | `UI` | named gap - first use before any expansion on this page |
 | 429 | 70@145 | iv | `UIs` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 70@158 | v | L26 | documented exclusion - LINE-RANGE: line-range reference |
@@ -1704,21 +1704,21 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 70@258 | v | L134 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 70@263 | iv | `auth` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 70@286 | v | L151 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 70@291 | iv | `ID` | named gap - first use before any expansion on this page |
+| 429 | 70@291 | iv | `ID` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 70@312 | v | L185 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 70@317 | iv | `URL` | named gap - first use before any expansion on this page |
-| 429 | 70@597 | v | L122-124 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 74@105 | v | L1-93 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 78@70 | v | L5-11 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 70@597 | v | L122-124 | named gap - first use before any expansion on this page |
+| 429 | 74@105 | v | L1-93 | named gap - first use before any expansion on this page |
+| 429 | 78@70 | v | L5-11 | named gap - first use before any expansion on this page |
 | 429 | 78@172 | iv | `base64url` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 78@225 | v | L9 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 78@229 | v | L46 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 82@106 | v | L1-95 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 82@106 | v | L1-95 | named gap - first use before any expansion on this page |
 | 429 | 84@166 | v | UNRUN | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 84@221 | ii | gate | documented exclusion - PROSE: ordinary prose word |
-| 429 | 86@46 | v | L7-12 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 86@46 | v | L7-12 | named gap - first use before any expansion on this page |
 | 429 | 86@116 | v | L81 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 86@120 | iv | `PERF` | named gap - first use before any expansion on this page |
+| 429 | 86@120 | iv | `PERF` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 86@142 | v | L36 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 86@146 | iv | `Config` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 86@197 | iv | `perf` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -1729,11 +1729,11 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 86@410 | iv | `lab` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 86@420 | v | L22 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 86@424 | iv | `incl.` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 429 | 90@97 | v | L1-80 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 90@97 | v | L1-80 | named gap - first use before any expansion on this page |
 | 429 | 92@45 | ii | handoff | documented exclusion - PROSE: ordinary prose word |
 | 429 | 92@84 | ii | rules | documented exclusion - PROSE: ordinary prose word |
-| 429 | 92@118 | i | NOT | named gap - first use before any expansion on this page |
-| 429 | 94@36 | v | L5-9 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 92@118 | i | NOT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 94@36 | v | L5-9 | named gap - first use before any expansion on this page |
 | 429 | 94@105 | iv | `D-id` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 94@113 | iv | `S1` | named gap - first use before any expansion on this page |
 | 429 | 94@122 | iv | `N` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
@@ -1741,28 +1741,28 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 94@188 | v | L39 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 94@201 | v | L55 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 94@205 | iv | `IDs` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 429 | 94@531 | v | L5-6 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 98@72 | v | L1-289 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 102@40 | v | L8-17 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 102@59 | v | L19-32 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 102@78 | v | L34-58 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 94@531 | v | L5-6 | named gap - first use before any expansion on this page |
+| 429 | 98@72 | v | L1-289 | named gap - first use before any expansion on this page |
+| 429 | 102@40 | v | L8-17 | named gap - first use before any expansion on this page |
+| 429 | 102@59 | v | L19-32 | named gap - first use before any expansion on this page |
+| 429 | 102@78 | v | L34-58 | named gap - first use before any expansion on this page |
 | 429 | 102@176 | iv | `PII` | named gap - first use before any expansion on this page |
-| 429 | 102@183 | iv | `DSR` | named gap - first use before any expansion on this page |
+| 429 | 102@183 | iv | `DSR` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 102@193 | iv | `LLM` | named gap - first use before any expansion on this page |
-| 429 | 102@212 | v | L8-12 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 102@212 | v | L8-12 | named gap - first use before any expansion on this page |
 | 429 | 102@231 | v | L72 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 102@235 | iv | `URLs` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 102@258 | v | L140 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 102@275 | v | L276 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 102@280 | iv | `repo` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 102@516 | ii | policy | documented exclusion - PROSE: ordinary prose word |
-| 429 | 102@661 | v | L167-169 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 106@94 | v | L1-92 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 110@29 | v | L3-4 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 110@46 | v | L6-12 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 102@661 | v | L167-169 | named gap - first use before any expansion on this page |
+| 429 | 106@94 | v | L1-92 | named gap - first use before any expansion on this page |
+| 429 | 110@29 | v | L3-4 | named gap - first use before any expansion on this page |
+| 429 | 110@46 | v | L6-12 | named gap - first use before any expansion on this page |
 | 429 | 110@168 | v | L53 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 110@182 | v | L80 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 110@504 | v | L6-7 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 110@504 | v | L6-7 | named gap - first use before any expansion on this page |
 | 429 | 114@25 | ii | audit | documented exclusion - PROSE: ordinary prose word |
 | 429 | 116@24 | i | SD-D | named gap - first use before any expansion on this page |
 | 429 | 116@262 | ii | tokens | documented exclusion - PROSE: ordinary prose word |
@@ -1772,36 +1772,36 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 116@1191 | ii | disposition | documented exclusion - PROSE: ordinary prose word |
 | 429 | 120@67 | v | L12 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 120@76 | v | L13 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 120@207 | v | L11-13 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 120@207 | v | L11-13 | named gap - first use before any expansion on this page |
 | 429 | 121@29 | v | L10 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 121@104 | i | KILL | named gap - first use before any expansion on this page |
+| 429 | 121@104 | i | KILL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 121@259 | v | L57 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 122@63 | i | COUNT | named gap - first use before any expansion on this page |
+| 429 | 122@63 | i | COUNT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 122@72 | v | L107 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 122@104 | v | L89 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 122@136 | v | L60 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 123@60 | v | L8-9 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 123@60 | v | L8-9 | named gap - first use before any expansion on this page |
 | 429 | 123@76 | v | L63 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 124@89 | i | TARGET | named gap - first use before any expansion on this page |
+| 429 | 124@89 | i | TARGET | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 124@96 | v | L18 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 124@118 | i | SPOTS | named gap - first use before any expansion on this page |
+| 429 | 124@118 | i | SPOTS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 124@124 | v | L42 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 124@129 | v | PASS | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 125@78 | v | L44 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 125@256 | iv | `superseded-by` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 429 | 125@272 | iv | `OK` | named gap - first use before any expansion on this page |
+| 429 | 125@272 | iv | `OK` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 126@84 | v | L14 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 126@107 | i | AUDIT | named gap - first use before any expansion on this page |
+| 429 | 126@107 | i | AUDIT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 126@124 | v | L70 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 126@129 | i | TODAY | named gap - first use before any expansion on this page |
+| 429 | 126@129 | i | TODAY | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 126@135 | v | L92 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 126@244 | v | L10-16 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 127@25 | i | IP | named gap - first use before any expansion on this page |
-| 429 | 127@63 | i | STORE | named gap - first use before any expansion on this page |
+| 429 | 126@244 | v | L10-16 | named gap - first use before any expansion on this page |
+| 429 | 127@25 | i | IP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 127@63 | i | STORE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 127@69 | v | L27 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 127@74 | i | EMISSION | named gap - first use before any expansion on this page |
-| 429 | 127@88 | i | AGING | named gap - first use before any expansion on this page |
-| 429 | 127@198 | v | L9-11 | documented exclusion - LINE-RANGE: line-range reference |
+| 429 | 127@74 | i | EMISSION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 127@88 | i | AGING | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 127@198 | v | L9-11 | named gap - first use before any expansion on this page |
 | 429 | 130@16 | iv | `M` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 130@73 | iv | `Workloads classified: &lt;N OLTP-stay / M offload candidates, ...&gt;` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 429 | 131@11 | iv | `nextCursor` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -1811,18 +1811,18 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 139@620 | iv | `Counts` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 139@639 | iv | `gaps / defined-at-first-use / documented-exclusions / candidates` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 429 | 139@833 | iv | `token@line` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 429 | 143@161 | i | DECISION | named gap - first use before any expansion on this page |
-| 429 | 143@180 | i | ONE | named gap - first use before any expansion on this page |
-| 429 | 143@188 | i | ISOLATION | named gap - first use before any expansion on this page |
-| 429 | 143@202 | i | PRESCRIBE | named gap - first use before any expansion on this page |
-| 429 | 143@222 | i | KNOWN | named gap - first use before any expansion on this page |
-| 429 | 143@233 | i | STAY | named gap - first use before any expansion on this page |
-| 429 | 143@243 | i | NEXT | named gap - first use before any expansion on this page |
-| 429 | 143@253 | i | OPERATIONAL | named gap - first use before any expansion on this page |
-| 429 | 143@270 | i | ANALYTICAL | named gap - first use before any expansion on this page |
-| 429 | 143@286 | i | SPLIT | named gap - first use before any expansion on this page |
-| 429 | 143@359 | i | CHEAPER | named gap - first use before any expansion on this page |
-| 429 | 143@372 | i | WILL | named gap - first use before any expansion on this page |
+| 429 | 143@161 | i | DECISION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@180 | i | ONE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@188 | i | ISOLATION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@202 | i | PRESCRIBE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@222 | i | KNOWN | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@233 | i | STAY | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@243 | i | NEXT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@253 | i | OPERATIONAL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@270 | i | ANALYTICAL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@286 | i | SPLIT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@359 | i | CHEAPER | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 143@372 | i | WILL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 143@835 | v | &lt;store/system&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 143@855 | v | &lt;N OLTP-stay / M offload candidates, evidence per candidate&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 143@921 | v | &lt;symptom → workload, with evidence source&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -1836,9 +1836,9 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 143@1150 | v | &lt;sequenced moves, each with dual-run + sign-off gate&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 143@1209 | v | &lt;load remaining on primary; next-review trigger&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 143@1263 | v | &lt;the one-bad-query check was performed; result&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@274 | i | EARNED | named gap - first use before any expansion on this page |
-| 429 | 144@301 | i | WORKLOAD | named gap - first use before any expansion on this page |
-| 429 | 144@314 | i | MOVE | named gap - first use before any expansion on this page |
+| 429 | 144@274 | i | EARNED | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 144@301 | i | WORKLOAD | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 144@314 | i | MOVE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 144@532 | v | &lt;name/query-family&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 144@575 | v | &lt;concurrency / duration / window&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 144@675 | v | &lt;who reads the result&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -1850,13 +1850,13 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 144@947 | v | &lt;switch reads; primary access removed (grant/role change)&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 144@986 | ii | grant | documented exclusion - PROSE: ordinary prose word |
 | 429 | 144@1010 | v | &lt;how to fall back within the window&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 145@226 | i | MECHANISM | named gap - first use before any expansion on this page |
-| 429 | 145@246 | i | MUST | named gap - first use before any expansion on this page |
-| 429 | 145@255 | i | ONLY | named gap - first use before any expansion on this page |
-| 429 | 145@264 | i | PLUS | named gap - first use before any expansion on this page |
-| 429 | 145@279 | i | PAGINATION | named gap - first use before any expansion on this page |
-| 429 | 145@295 | i | DESIGN | named gap - first use before any expansion on this page |
-| 429 | 145@307 | i | AND | named gap - first use before any expansion on this page |
+| 429 | 145@226 | i | MECHANISM | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 145@246 | i | MUST | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 145@255 | i | ONLY | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 145@264 | i | PLUS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 145@279 | i | PAGINATION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 145@295 | i | DESIGN | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 145@307 | i | AND | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 145@331 | ii | api | named gap - first use before any expansion on this page |
 | 429 | 145@916 | v | &lt;surface/endpoint&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 145@917 | ii | surface | documented exclusion - PROSE: ordinary prose word |
@@ -1866,20 +1866,20 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 145@986 | v | &lt;n&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 145@995 | v | &lt;...&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 145@1101 | v | &lt;explained count/page options, costs/unknowns, pros/cons, recommendation + why&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 146@258 | i | STRICT | named gap - first use before any expansion on this page |
-| 429 | 146@269 | i | TOTAL | named gap - first use before any expansion on this page |
-| 429 | 146@296 | i | DESC | named gap - first use before any expansion on this page |
+| 429 | 146@258 | i | STRICT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 146@269 | i | TOTAL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 146@296 | i | DESC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 146@634 | iv | `&lt;` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 146@673 | iv | `&gt;` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 146@764 | v | &lt;last_created_at&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 146@786 | v | &lt;last_id&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 146@800 | v | &lt;versioned sort/filter fingerprint&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@218 | i | ENVIRONMENT | named gap - first use before any expansion on this page |
-| 429 | 147@234 | i | CONTRACT | named gap - first use before any expansion on this page |
-| 429 | 147@267 | i | UNCHANGED | named gap - first use before any expansion on this page |
-| 429 | 147@281 | i | OUTSIDE | named gap - first use before any expansion on this page |
-| 429 | 147@293 | i | CURRENT | named gap - first use before any expansion on this page |
-| 429 | 147@343 | i | ADVISORY | named gap - first use before any expansion on this page |
+| 429 | 147@218 | i | ENVIRONMENT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 147@234 | i | CONTRACT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 147@267 | i | UNCHANGED | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 147@281 | i | OUTSIDE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 147@293 | i | CURRENT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 147@343 | i | ADVISORY | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 147@691 | v | &lt;harness tier&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@710 | v | &lt;instance/hardware class, pinned; dedicated runner rule&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@754 | ii | runner | documented exclusion - PROSE: ordinary prose word |
@@ -1902,10 +1902,10 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 147@1076 | v | &lt;failed&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@1077 | v | failed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 147@1089 | v | &lt;unrun&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@202 | i | ALL | named gap - first use before any expansion on this page |
-| 429 | 148@210 | i | DEVIATION | named gap - first use before any expansion on this page |
-| 429 | 148@224 | i | COLD | named gap - first use before any expansion on this page |
-| 429 | 148@233 | i | READING | named gap - first use before any expansion on this page |
+| 429 | 148@202 | i | ALL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 148@210 | i | DEVIATION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 148@224 | i | COLD | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 148@233 | i | READING | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 148@505 | v | &lt;N&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 148@513 | v | &lt;name&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 148@524 | v | &lt;path&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -1915,11 +1915,11 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 148@646 | v | &lt;plan/decision&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 148@666 | v | &lt;rationale&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 148@682 | v | &lt;item&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 149@256 | i | WHOLE | named gap - first use before any expansion on this page |
-| 429 | 149@265 | i | PROPAGATES | named gap - first use before any expansion on this page |
-| 429 | 149@286 | i | TEST | named gap - first use before any expansion on this page |
-| 429 | 149@326 | i | OF | named gap - first use before any expansion on this page |
-| 429 | 149@366 | i | LIFECYCLE | named gap - first use before any expansion on this page |
+| 429 | 149@256 | i | WHOLE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 149@265 | i | PROPAGATES | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 149@286 | i | TEST | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 149@326 | i | OF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 149@366 | i | LIFECYCLE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 149@930 | v | &lt;scope&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 149@943 | v | &lt;collection-time drops/transforms; new-field discipline&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 149@1005 | v | &lt;per class×store: period, trigger, MECHANISM, meaning of "deleted"&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -1927,7 +1927,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 149@1138 | v | &lt;new-PII detection; retention-job monitoring; DSR SLA&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 149@1198 | v | &lt;approximate-erasure stores, vendor gaps, legacy backups — explicit&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 149@1527 | v | &lt;pseudo vs anon per dataset; key custody; re-identification check + floors&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 150@291 | i | OUT | named gap - first use before any expansion on this page |
+| 429 | 150@291 | i | OUT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 150@498 | v | &lt;processor&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 150@514 | v | &lt;from table above&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 150@537 | v | &lt;producing surface/pipeline&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -1950,7 +1950,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 152@1209 | v | &lt;`/`&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 152@1240 | iv | `ANDed` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 152@1252 | v | L175 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 158@426 | i | AEGIS-APR-101 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 158@426 | i | AEGIS-APR-101 | named gap - first use before any expansion on this page |
 | 429 | 160@315 | ii | frontier | documented exclusion - PROSE: ordinary prose word |
 | 429 | 164@250 | v | 3-7 | documented exclusion - RANGE: numeric range/unit/formula |
 | 429 | 170@121 | iv | `8c6750ac262b890eb59a7303a4653a484593b668` | documented exclusion - SHA: commit/blob hash |
@@ -1961,8 +1961,8 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 175@134 | iv | `8e790000aa8a913722584fca7435d05f5dd0787f` | documented exclusion - SHA: commit/blob hash |
 | 429 | 176@109 | iv | `eb3ec53d31a91e7e96ba6ace7420a91b78225cad` | documented exclusion - SHA: commit/blob hash |
 | 429 | 181@141 | iv | `git diff --numstat 2db1ffb7..655e40ea8d6a16cbdaeab1a9a7eb77fd26207e75 -- &lt;page&gt;` | documented exclusion - COMMAND: real command |
-| 429 | 185@198 | i | CR | named gap - first use before any expansion on this page |
-| 429 | 185@248 | i | EOF | named gap - first use before any expansion on this page |
+| 429 | 185@198 | i | CR | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 185@248 | i | EOF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 187@99 | i | SD-C | named gap - first use before any expansion on this page |
 | 429 | 187@142 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
 | 429 | 187@168 | ii | branch | documented exclusion - PROSE: ordinary prose word |
@@ -1990,11 +1990,11 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 3@224 | ii | evidence | documented exclusion - PROSE: ordinary prose word |
 | 430 | 5@49 | i | PR | named gap - first use before any expansion on this page |
 | 430 | 5@105 | v | 2026-10-18T00:34:41-07:00 | documented exclusion - DATE: date/timestamp |
-| 430 | 5@173 | i | ACCEPT | named gap - first use before any expansion on this page |
+| 430 | 5@173 | i | ACCEPT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 430 | 7@17 | ii | base | documented exclusion - PROSE: ordinary prose word |
 | 430 | 7@25 | ii | main | documented exclusion - PROSE: ordinary prose word |
 | 430 | 7@197 | ii | owner | documented exclusion - PROSE: ordinary prose word |
-| 430 | 7@224 | i | LANE | named gap - first use before any expansion on this page |
+| 430 | 7@224 | i | LANE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 430 | 7@231 | v | COMPLETE | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 7@372 | ii | blob | documented exclusion - PROSE: ordinary prose word |
 | 430 | 9@9 | ii | model | documented exclusion - PROSE: ordinary prose word |
@@ -2027,7 +2027,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 29@157 | v | 192-199 | documented exclusion - RANGE: numeric range/unit/formula |
 | 430 | 29@186 | ii | quarter | documented exclusion - PROSE: ordinary prose word |
 | 430 | 30@51 | ii | rerecord | documented exclusion - PROSE: ordinary prose word |
-| 430 | 34@67 | i | LF | named gap - first use before any expansion on this page |
+| 430 | 34@67 | i | LF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 430 | 36@2 | i | P1 | named gap - first use before any expansion on this page |
 | 430 | 36@13 | iv | `.claude/skills/plan-entitlement-architect/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 430 | 36@68 | iv | `5baac4cab1e4bf0e3f639337042b5709d3b5274b` | documented exclusion - SHA: commit/blob hash |
@@ -2035,7 +2035,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 36@142 | v | L3 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 36@145 | i | UI | named gap - first use before any expansion on this page |
 | 430 | 36@156 | iv | `×` | documented exclusion - OPERATOR: operator glyph |
-| 430 | 36@167 | v | L8-10 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 36@167 | v | L8-10 | named gap - first use before any expansion on this page |
 | 430 | 36@174 | v | L77 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 37@2 | i | P2 | named gap - first use before any expansion on this page |
 | 430 | 37@13 | iv | `.claude/skills/plan-entitlement-architect/references/entitlement-matrix-template.md` | documented exclusion - PATH: file/path reference |
@@ -2045,7 +2045,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 38@13 | iv | `.claude/skills/playwright-e2e-engineer/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 430 | 38@65 | iv | `3b90636dd5590972becbac0333d3aa93960ce860` | documented exclusion - SHA: commit/blob hash |
 | 430 | 38@142 | i | E2E | named gap - first use before any expansion on this page |
-| 430 | 38@178 | v | L9-12 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 38@178 | v | L9-12 | named gap - first use before any expansion on this page |
 | 430 | 39@2 | i | P4 | named gap - first use before any expansion on this page |
 | 430 | 39@13 | iv | `.claude/skills/playwright-e2e-engineer/references/playwright-patterns.md` | documented exclusion - PATH: file/path reference |
 | 430 | 39@90 | iv | `8cebb0ea31056868563d855beaf016fac1e7037c` | documented exclusion - SHA: commit/blob hash |
@@ -2060,8 +2060,8 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 41@2 | i | P6 | named gap - first use before any expansion on this page |
 | 430 | 41@13 | iv | `.claude/skills/prioritization-frame-picker/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 430 | 41@69 | iv | `30075e04efa6e824681eb1b5379b562af0812387` | documented exclusion - SHA: commit/blob hash |
-| 430 | 41@146 | i | RICE | named gap - first use before any expansion on this page |
-| 430 | 41@199 | v | L8-15 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 41@146 | i | RICE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 430 | 41@199 | v | L8-15 | named gap - first use before any expansion on this page |
 | 430 | 41@206 | v | L90 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 42@2 | i | P7 | named gap - first use before any expansion on this page |
 | 430 | 42@13 | iv | `.claude/skills/prioritization-frame-picker/references/prioritization-frames-sheet.md` | documented exclusion - PATH: file/path reference |
@@ -2071,108 +2071,108 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 43@13 | iv | `.claude/skills/product-analytics-instrumenter/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 430 | 43@72 | iv | `e4f778a017547cbd429cab4f9cff34e65ad563e1` | documented exclusion - SHA: commit/blob hash |
 | 430 | 43@149 | i | PII | named gap - first use before any expansion on this page |
-| 430 | 43@163 | v | L8-9 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 43@163 | v | L8-9 | named gap - first use before any expansion on this page |
 | 430 | 43@169 | v | L126 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 43@191 | v | L104 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 43@201 | v | L201 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 45@48 | v | FULL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 45@69 | v | UNRUN | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 47@48 | i | B1-B6 | named gap - first use before any expansion on this page |
-| 430 | 49@85 | v | L2841-2862 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 49@85 | v | L2841-2862 | named gap - first use before any expansion on this page |
 | 430 | 49@99 | i | B4 | defined at first use - line 49 contains expansion |
 | 430 | 49@207 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 49@440 | ii | git | documented exclusion - COMMAND: real command |
 | 430 | 49@453 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
 | 430 | 49@483 | v | UNVERIFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 430 | 51@59 | v | L1-201 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 51@59 | v | L1-201 | named gap - first use before any expansion on this page |
 | 430 | 53@2 | i | B1 | named gap - first use before any expansion on this page |
-| 430 | 53@43 | v | L2-3 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 53@57 | v | L12-21 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 53@74 | v | L23-46 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 53@89 | v | L48-62 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 53@43 | v | L2-3 | named gap - first use before any expansion on this page |
+| 430 | 53@57 | v | L12-21 | named gap - first use before any expansion on this page |
+| 430 | 53@74 | v | L23-46 | named gap - first use before any expansion on this page |
+| 430 | 53@89 | v | L48-62 | named gap - first use before any expansion on this page |
 | 430 | 54@2 | i | B2 | named gap - first use before any expansion on this page |
 | 430 | 54@104 | ii | operator | documented exclusion - PROSE: ordinary prose word |
 | 430 | 54@130 | iv | `plan × feature × limit` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 430 | 55@2 | i | B3 | named gap - first use before any expansion on this page |
-| 430 | 55@28 | v | L64-108 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 55@44 | v | L110-131 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 55@65 | v | L133-150 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 55@85 | v | L152-159 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 55@103 | v | L161-177 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 55@28 | v | L64-108 | named gap - first use before any expansion on this page |
+| 430 | 55@44 | v | L110-131 | named gap - first use before any expansion on this page |
+| 430 | 55@65 | v | L133-150 | named gap - first use before any expansion on this page |
+| 430 | 55@85 | v | L152-159 | named gap - first use before any expansion on this page |
+| 430 | 55@103 | v | L161-177 | named gap - first use before any expansion on this page |
 | 430 | 57@2 | i | B5 | named gap - first use before any expansion on this page |
 | 430 | 57@37 | iv | `references/entitlement-matrix-template.md` | documented exclusion - PATH: file/path reference |
 | 430 | 57@90 | iv | `evals/*.json` | documented exclusion - PATH: file/path reference |
 | 430 | 58@50 | ii | reviewer | documented exclusion - PROSE: ordinary prose word |
-| 430 | 60@54 | v | L1-61 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 62@33 | v | L5-6 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 62@56 | v | L9-13 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 63@129 | v | L5-13 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 64@26 | v | L26-38 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 64@51 | v | L41-50 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 64@78 | v | L52-61 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 60@54 | v | L1-61 | named gap - first use before any expansion on this page |
+| 430 | 62@33 | v | L5-6 | named gap - first use before any expansion on this page |
+| 430 | 62@56 | v | L9-13 | named gap - first use before any expansion on this page |
+| 430 | 63@129 | v | L5-13 | named gap - first use before any expansion on this page |
+| 430 | 64@26 | v | L26-38 | named gap - first use before any expansion on this page |
+| 430 | 64@51 | v | L41-50 | named gap - first use before any expansion on this page |
+| 430 | 64@78 | v | L52-61 | named gap - first use before any expansion on this page |
 | 430 | 65@174 | ii | policy | documented exclusion - PROSE: ordinary prose word |
-| 430 | 69@56 | v | L1-170 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 69@56 | v | L1-170 | named gap - first use before any expansion on this page |
 | 430 | 70@92 | ii | user | documented exclusion - PROSE: ordinary prose word |
-| 430 | 71@57 | v | L14-20 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 71@74 | v | L22-41 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 71@89 | v | L43-57 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 73@28 | v | L59-99 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 73@43 | v | L101-118 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 73@64 | v | L120-132 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 73@82 | v | L134-147 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 78@46 | v | L1-69 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 80@33 | v | L5-12 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 80@46 | v | L7-12 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 71@57 | v | L14-20 | named gap - first use before any expansion on this page |
+| 430 | 71@74 | v | L22-41 | named gap - first use before any expansion on this page |
+| 430 | 71@89 | v | L43-57 | named gap - first use before any expansion on this page |
+| 430 | 73@28 | v | L59-99 | named gap - first use before any expansion on this page |
+| 430 | 73@43 | v | L101-118 | named gap - first use before any expansion on this page |
+| 430 | 73@64 | v | L120-132 | named gap - first use before any expansion on this page |
+| 430 | 73@82 | v | L134-147 | named gap - first use before any expansion on this page |
+| 430 | 78@46 | v | L1-69 | named gap - first use before any expansion on this page |
+| 430 | 80@33 | v | L5-12 | named gap - first use before any expansion on this page |
+| 430 | 80@46 | v | L7-12 | named gap - first use before any expansion on this page |
 | 430 | 81@33 | iv | `auth` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 430 | 82@34 | v | L14-24 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 82@60 | v | L26-34 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 82@80 | v | L36-53 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 82@102 | v | L55-60 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 82@120 | v | L62-69 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 87@55 | v | L1-139 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 89@57 | v | L8-16 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 89@73 | v | L18-32 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 89@88 | v | L34-46 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 90@187 | i | RDS | named gap - first use before any expansion on this page |
+| 430 | 82@34 | v | L14-24 | named gap - first use before any expansion on this page |
+| 430 | 82@60 | v | L26-34 | named gap - first use before any expansion on this page |
+| 430 | 82@80 | v | L36-53 | named gap - first use before any expansion on this page |
+| 430 | 82@102 | v | L55-60 | named gap - first use before any expansion on this page |
+| 430 | 82@120 | v | L62-69 | named gap - first use before any expansion on this page |
+| 430 | 87@55 | v | L1-139 | named gap - first use before any expansion on this page |
+| 430 | 89@57 | v | L8-16 | named gap - first use before any expansion on this page |
+| 430 | 89@73 | v | L18-32 | named gap - first use before any expansion on this page |
+| 430 | 89@88 | v | L34-46 | named gap - first use before any expansion on this page |
+| 430 | 90@187 | i | RDS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 430 | 90@203 | v | L117 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 91@28 | v | L48-73 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 91@43 | v | L75-90 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 91@62 | v | L92-103 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 91@79 | v | L105-120 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 96@60 | v | L1-194 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 91@28 | v | L48-73 | named gap - first use before any expansion on this page |
+| 430 | 91@43 | v | L75-90 | named gap - first use before any expansion on this page |
+| 430 | 91@62 | v | L92-103 | named gap - first use before any expansion on this page |
+| 430 | 91@79 | v | L105-120 | named gap - first use before any expansion on this page |
+| 430 | 96@60 | v | L1-194 | named gap - first use before any expansion on this page |
 | 430 | 97@66 | ii | decision | documented exclusion - PROSE: ordinary prose word |
-| 430 | 98@57 | v | L17-30 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 98@74 | v | L32-49 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 98@89 | v | L51-64 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 100@28 | v | L66-110 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 100@44 | v | L112-128 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 100@65 | v | L130-146 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 100@83 | v | L148-169 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 105@54 | v | L1-74 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 107@33 | v | L5-11 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 109@35 | v | L13-22 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 109@60 | v | L24-34 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 109@80 | v | L36-43 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 109@100 | v | L45-52 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 109@122 | v | L57-67 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 98@57 | v | L17-30 | named gap - first use before any expansion on this page |
+| 430 | 98@74 | v | L32-49 | named gap - first use before any expansion on this page |
+| 430 | 98@89 | v | L51-64 | named gap - first use before any expansion on this page |
+| 430 | 100@28 | v | L66-110 | named gap - first use before any expansion on this page |
+| 430 | 100@44 | v | L112-128 | named gap - first use before any expansion on this page |
+| 430 | 100@65 | v | L130-146 | named gap - first use before any expansion on this page |
+| 430 | 100@83 | v | L148-169 | named gap - first use before any expansion on this page |
+| 430 | 105@54 | v | L1-74 | named gap - first use before any expansion on this page |
+| 430 | 107@33 | v | L5-11 | named gap - first use before any expansion on this page |
+| 430 | 109@35 | v | L13-22 | named gap - first use before any expansion on this page |
+| 430 | 109@60 | v | L24-34 | named gap - first use before any expansion on this page |
+| 430 | 109@80 | v | L36-43 | named gap - first use before any expansion on this page |
+| 430 | 109@100 | v | L45-52 | named gap - first use before any expansion on this page |
+| 430 | 109@122 | v | L57-67 | named gap - first use before any expansion on this page |
 | 430 | 109@130 | ii | handoff | documented exclusion - PROSE: ordinary prose word |
-| 430 | 109@138 | v | L69-74 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 114@63 | v | L1-236 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 116@57 | v | L16-30 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 116@74 | v | L32-52 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 116@89 | v | L54-68 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 118@28 | v | L70-127 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 118@44 | v | L129-153 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 118@65 | v | L155-181 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 118@83 | v | L183-209 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 109@138 | v | L69-74 | named gap - first use before any expansion on this page |
+| 430 | 114@63 | v | L1-236 | named gap - first use before any expansion on this page |
+| 430 | 116@57 | v | L16-30 | named gap - first use before any expansion on this page |
+| 430 | 116@74 | v | L32-52 | named gap - first use before any expansion on this page |
+| 430 | 116@89 | v | L54-68 | named gap - first use before any expansion on this page |
+| 430 | 118@28 | v | L70-127 | named gap - first use before any expansion on this page |
+| 430 | 118@44 | v | L129-153 | named gap - first use before any expansion on this page |
+| 430 | 118@65 | v | L155-181 | named gap - first use before any expansion on this page |
+| 430 | 118@83 | v | L183-209 | named gap - first use before any expansion on this page |
 | 430 | 119@128 | ii | usage | documented exclusion - PROSE: ordinary prose word |
 | 430 | 123@26 | ii | token | documented exclusion - PROSE: ordinary prose word |
 | 430 | 123@32 | ii | audit | documented exclusion - PROSE: ordinary prose word |
 | 430 | 125@562 | iv | `[A-Z][A-Z0-9]{1,15}` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 430 | 125@603 | iv | `[A-Z][A-Za-z0-9]*[A-Z][A-Za-z0-9]*` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 430 | 125@978 | ii | tokens | documented exclusion - PROSE: ordinary prose word |
-| 430 | 129@39 | i | AI | named gap - first use before any expansion on this page |
-| 430 | 129@57 | v | L9-10 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 129@39 | i | AI | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 430 | 129@57 | v | L9-10 | named gap - first use before any expansion on this page |
 | 430 | 129@67 | v | L156 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 131@49 | v | L10 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 131@58 | v | L11 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2181,7 +2181,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 131@104 | v | L81 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 136@22 | i | SDK | named gap - first use before any expansion on this page |
 | 430 | 136@116 | v | L193 | documented exclusion - LINE-RANGE: line-range reference |
-| 430 | 136@169 | v | L10-13 | documented exclusion - LINE-RANGE: line-range reference |
+| 430 | 136@169 | v | L10-13 | named gap - first use before any expansion on this page |
 | 430 | 138@34 | i | SD-D | named gap - first use before any expansion on this page |
 | 430 | 138@228 | ii | scope | documented exclusion - PROSE: ordinary prose word |
 | 430 | 142@435 | ii | corrections | documented exclusion - PROSE: ordinary prose word |
@@ -2196,12 +2196,12 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 156@85 | iv | `181de4e67af2555872de0e023e43814d596287a5` | documented exclusion - SHA: commit/blob hash |
 | 430 | 157@94 | iv | `8c6750ac262b890eb59a7303a4653a484593b668` | documented exclusion - SHA: commit/blob hash |
 | 430 | 163@126 | ii | branch | documented exclusion - PROSE: ordinary prose word |
-| 430 | 165@333 | i | CR | named gap - first use before any expansion on this page |
+| 430 | 165@333 | i | CR | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 430 | 165@343 | ii | sha256 | documented exclusion - PROSE: ordinary prose word |
 | 430 | 165@351 | ii | head | documented exclusion - PROSE: ordinary prose word |
 | 430 | 165@385 | i | PROC-04 | named gap - first use before any expansion on this page |
 | 430 | 167@11 | i | AC1-AC8 | named gap - first use before any expansion on this page |
-| 430 | 169@2 | i | AC | named gap - first use before any expansion on this page |
+| 430 | 169@2 | i | AC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 430 | 171@2 | i | AC1 | named gap - first use before any expansion on this page |
 | 430 | 171@30 | v | MET | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 172@2 | i | AC2 | named gap - first use before any expansion on this page |
@@ -2210,14 +2210,14 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 174@2 | i | AC4 | named gap - first use before any expansion on this page |
 | 430 | 175@2 | i | AC5 | named gap - first use before any expansion on this page |
 | 430 | 175@40 | v | OWED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 430 | 175@204 | i | EOF | named gap - first use before any expansion on this page |
+| 430 | 175@204 | i | EOF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 430 | 176@2 | i | AC6 | named gap - first use before any expansion on this page |
 | 430 | 176@120 | i | SHA | named gap - first use before any expansion on this page |
 | 430 | 176@182 | ii | triage | documented exclusion - PROSE: ordinary prose word |
 | 430 | 177@2 | i | AC7 | named gap - first use before any expansion on this page |
 | 430 | 178@33 | v | SATISFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 178@174 | i | DCO | named gap - first use before any expansion on this page |
-| 430 | 200@21 | i | ID | named gap - first use before any expansion on this page |
+| 430 | 200@21 | i | ID | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 430 | 202@150 | ii | records | documented exclusion - PROSE: ordinary prose word |
 | 430 | 202@239 | ii | gates | documented exclusion - PROSE: ordinary prose word |
 | 430 | 202@255 | i | MG3 | named gap - first use before any expansion on this page |
@@ -2232,7 +2232,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 5@30 | ii | diff | documented exclusion - PROSE: ordinary prose word |
 | 431 | 7@54 | i | PR | named gap - first use before any expansion on this page |
 | 431 | 7@112 | v | 2026-10-18T01:08:34-07:00 | documented exclusion - DATE: date/timestamp |
-| 431 | 7@220 | i | ACCEPT | named gap - first use before any expansion on this page |
+| 431 | 7@220 | i | ACCEPT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 7@269 | ii | frontier | documented exclusion - PROSE: ordinary prose word |
 | 431 | 7@278 | v | 200-207 | documented exclusion - RANGE: numeric range/unit/formula |
 | 431 | 7@348 | i | B1 | named gap - first use before any expansion on this page |
@@ -2286,7 +2286,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 27@642 | v | 240-247 | documented exclusion - RANGE: numeric range/unit/formula |
 | 431 | 29@269 | i | AC7 | named gap - first use before any expansion on this page |
 | 431 | 33@23 | ii | blob | documented exclusion - PROSE: ordinary prose word |
-| 431 | 33@50 | i | LF | named gap - first use before any expansion on this page |
+| 431 | 33@50 | i | LF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 35@2 | i | P1 | named gap - first use before any expansion on this page |
 | 431 | 35@13 | iv | `.claude/skills/product-analytics-instrumenter/references/instrumentation-sheet.md` | documented exclusion - PATH: file/path reference |
 | 431 | 35@99 | iv | `09bdcb70ba472229e6c0d1374b2b5f7ef18893fd` | documented exclusion - SHA: commit/blob hash |
@@ -2313,25 +2313,25 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 42@13 | iv | `.claude/skills/project-orchestrator/references/recording-and-authority.md` | documented exclusion - PATH: file/path reference |
 | 431 | 42@91 | iv | `9ed5b7af0740104a358f6acc6b7cec0e02f8526a` | documented exclusion - SHA: commit/blob hash |
 | 431 | 48@154 | iv | `docs/roadmaps/aegis-documentation-readability-backlog.md` | documented exclusion - PATH: file/path reference |
-| 431 | 48@215 | v | L2841-2862 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 48@215 | v | L2841-2862 | named gap - first use before any expansion on this page |
 | 431 | 48@324 | i | B2 | named gap - first use before any expansion on this page |
 | 431 | 48@425 | ii | lifecycle | documented exclusion - PROSE: ordinary prose word |
 | 431 | 48@493 | i | B3 | named gap - first use before any expansion on this page |
-| 431 | 48@718 | v | L2854-2856 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 48@718 | v | L2854-2856 | named gap - first use before any expansion on this page |
 | 431 | 48@784 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 48@908 | ii | model | documented exclusion - PROSE: ordinary prose word |
 | 431 | 48@926 | i | B5 | named gap - first use before any expansion on this page |
-| 431 | 48@1115 | v | L2860-2862 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 48@1115 | v | L2860-2862 | named gap - first use before any expansion on this page |
 | 431 | 48@1241 | ii | purpose | documented exclusion - PROSE: ordinary prose word |
 | 431 | 50@18 | v | UNVERIFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 431 | 52@107 | v | L1-69 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 52@107 | v | L1-69 | named gap - first use before any expansion on this page |
 | 431 | 54@213 | i | QA | named gap - first use before any expansion on this page |
-| 431 | 56@70 | v | L5-9 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 56@70 | v | L5-9 | named gap - first use before any expansion on this page |
 | 431 | 56@165 | v | L27 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 56@267 | v | L41 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 56@288 | v | L6-8 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 56@288 | v | L6-8 | named gap - first use before any expansion on this page |
 | 431 | 56@301 | i | UI | named gap - first use before any expansion on this page |
-| 431 | 56@305 | i | IP | named gap - first use before any expansion on this page |
+| 431 | 56@305 | i | IP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 56@347 | v | L34 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 56@362 | ii | policy | documented exclusion - PROSE: ordinary prose word |
 | 431 | 56@380 | v | L48 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2345,14 +2345,14 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 56@991 | iv | `../SKILL.md` | documented exclusion - PATH: file/path reference |
 | 431 | 56@1015 | iv | `files 1 / links checked 1 / broken 0` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 431 | 58@11 | v | PARTIAL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 431 | 60@69 | v | L1-234 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 64@39 | v | L8-11 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 64@58 | v | L13-28 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 64@77 | v | L30-60 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 60@69 | v | L1-234 | named gap - first use before any expansion on this page |
+| 431 | 64@39 | v | L8-11 | named gap - first use before any expansion on this page |
+| 431 | 64@58 | v | L13-28 | named gap - first use before any expansion on this page |
+| 431 | 64@77 | v | L30-60 | named gap - first use before any expansion on this page |
 | 431 | 64@162 | iv | `PRD` | named gap - first use before any expansion on this page |
 | 431 | 64@328 | v | L9 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 64@367 | i | ADR | named gap - first use before any expansion on this page |
-| 431 | 64@371 | v | L10-11 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 64@371 | v | L10-11 | named gap - first use before any expansion on this page |
 | 431 | 64@480 | v | L62 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 64@492 | v | L77 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 64@506 | v | L131 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2360,12 +2360,12 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 64@553 | v | L180 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 64@567 | v | L207 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 64@589 | v | L223 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 64@909 | v | L127-129 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 64@909 | v | L127-129 | named gap - first use before any expansion on this page |
 | 431 | 64@918 | iv | `references/product-spec-sheet.md` | documented exclusion - PATH: file/path reference |
-| 431 | 64@973 | v | L229-233 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 64@973 | v | L229-233 | named gap - first use before any expansion on this page |
 | 431 | 64@1007 | iv | `files 1 / links checked 2 / broken 0` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
-| 431 | 68@93 | v | L1-111 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 72@42 | v | L3-5 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 68@93 | v | L1-111 | named gap - first use before any expansion on this page |
+| 431 | 72@42 | v | L3-5 | named gap - first use before any expansion on this page |
 | 431 | 72@227 | ii | decision | documented exclusion - PROSE: ordinary prose word |
 | 431 | 72@249 | ii | user | documented exclusion - PROSE: ordinary prose word |
 | 431 | 72@293 | iv | `p95` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -2376,16 +2376,16 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 72@642 | v | L71 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 72@677 | v | L89 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 72@708 | v | L100 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 76@80 | v | L1-254 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 76@80 | v | L1-254 | named gap - first use before any expansion on this page |
 | 431 | 78@218 | ii | handoff | documented exclusion - PROSE: ordinary prose word |
 | 431 | 78@255 | ii | approval | documented exclusion - PROSE: ordinary prose word |
-| 431 | 80@39 | v | L8-12 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 80@58 | v | L14-26 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 80@77 | v | L28-56 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 80@39 | v | L8-12 | named gap - first use before any expansion on this page |
+| 431 | 80@58 | v | L14-26 | named gap - first use before any expansion on this page |
+| 431 | 80@77 | v | L28-56 | named gap - first use before any expansion on this page |
 | 431 | 80@180 | i | CPU | named gap - first use before any expansion on this page |
 | 431 | 80@197 | i | IO | named gap - first use before any expansion on this page |
-| 431 | 80@223 | v | L8-9 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 80@249 | i | JIT | named gap - first use before any expansion on this page |
+| 431 | 80@223 | v | L8-9 | named gap - first use before any expansion on this page |
+| 431 | 80@249 | i | JIT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 80@326 | v | &lt;n%&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 431 | 80@331 | v | L158 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 80@454 | v | L58 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2395,15 +2395,15 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 80@527 | v | L193 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 80@541 | v | L222 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 80@563 | v | L244 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 80@945 | v | L142-144 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 80@945 | v | L142-144 | named gap - first use before any expansion on this page |
 | 431 | 80@954 | iv | `references/profiler-selection-guide.md` | documented exclusion - PATH: file/path reference |
-| 431 | 80@1009 | v | L250-254 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 84@110 | v | L1-87 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 88@39 | v | L3-7 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 80@1009 | v | L250-254 | named gap - first use before any expansion on this page |
+| 431 | 84@110 | v | L1-87 | named gap - first use before any expansion on this page |
+| 431 | 88@39 | v | L3-7 | named gap - first use before any expansion on this page |
 | 431 | 88@260 | v | L66 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 88@264 | iv | `p99` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 431 | 88@299 | iv | `checkout-warm-p99load-&lt;date&gt;-&lt;build&gt;` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 431 | 88@394 | v | L6-7 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 88@394 | v | L6-7 | named gap - first use before any expansion on this page |
 | 431 | 88@412 | i | GC | named gap - first use before any expansion on this page |
 | 431 | 88@416 | i | OOM | named gap - first use before any expansion on this page |
 | 431 | 88@581 | iv | `&lt;n&gt;%` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -2413,13 +2413,13 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 88@813 | v | L50 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 88@854 | v | L63 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 88@887 | v | L75 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 92@70 | v | L1-499 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 92@70 | v | L1-499 | named gap - first use before any expansion on this page |
 | 431 | 94@254 | ii | gate | documented exclusion - PROSE: ordinary prose word |
-| 431 | 96@39 | v | L8-30 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@57 | v | L32-54 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@113 | v | L56-86 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@130 | v | L88-334 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@153 | v | L336-362 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 96@39 | v | L8-30 | named gap - first use before any expansion on this page |
+| 431 | 96@57 | v | L32-54 | named gap - first use before any expansion on this page |
+| 431 | 96@113 | v | L56-86 | named gap - first use before any expansion on this page |
+| 431 | 96@130 | v | L88-334 | named gap - first use before any expansion on this page |
+| 431 | 96@153 | v | L336-362 | named gap - first use before any expansion on this page |
 | 431 | 96@200 | ii | repo | documented exclusion - PROSE: ordinary prose word |
 | 431 | 96@284 | i | AI-SDLC | defined at first use - line 96 contains expansion |
 | 431 | 96@342 | v | L110 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2429,7 +2429,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 96@508 | v | BLOCKED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 96@517 | v | L305 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@526 | v | L306 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@531 | i | CONDITIONAL-GO | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 431 | 96@531 | i | CONDITIONAL-GO | named gap - first use before any expansion on this page |
 | 431 | 96@553 | v | L351 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@558 | v | MET | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 96@563 | v | L354 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2438,60 +2438,60 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 96@582 | v | AWAITING | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 96@671 | v | L179 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@682 | v | L266 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@688 | i | MVP | named gap - first use before any expansion on this page |
+| 431 | 96@688 | i | MVP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 96@692 | v | L61 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@697 | i | CI | named gap - first use before any expansion on this page |
 | 431 | 96@704 | v | L72 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@712 | v | L76 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@727 | i | RLS | named gap - first use before any expansion on this page |
+| 431 | 96@727 | i | RLS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 96@731 | v | L109 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@737 | i | SLO | named gap - first use before any expansion on this page |
+| 431 | 96@737 | i | SLO | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 96@741 | v | L111 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@752 | v | L239 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@758 | i | AWS | named gap - first use before any expansion on this page |
+| 431 | 96@758 | i | AWS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 96@762 | v | L265 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@777 | v | L267 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@783 | i | GCP | named gap - first use before any expansion on this page |
+| 431 | 96@783 | i | GCP | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 96@787 | v | L269 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@793 | i | LLM | named gap - first use before any expansion on this page |
 | 431 | 96@797 | v | L297 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@803 | ii | auth | documented exclusion - PROSE: ordinary prose word |
 | 431 | 96@808 | v | L301 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@814 | i | ID | named gap - first use before any expansion on this page |
+| 431 | 96@814 | i | ID | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 96@855 | i | AR-A-008 | named gap - first use before any expansion on this page |
 | 431 | 96@873 | v | L167 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@894 | v | L315 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@912 | iii | AGENTS.md | documented exclusion - PATH: file/path reference |
 | 431 | 96@932 | v | L69 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 96@937 | i | README | named gap - first use before any expansion on this page |
+| 431 | 96@937 | i | README | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 96@985 | v | L318 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@1161 | v | L364 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@1175 | v | L409 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@1197 | v | L450 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@1220 | v | L476 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 96@1609 | iv | `files 1 / links checked 11 / broken 0` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
-| 431 | 100@98 | v | L1-357 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 100@98 | v | L1-357 | named gap - first use before any expansion on this page |
 | 431 | 102@50 | iii | docs/project-state.md | documented exclusion - PATH: file/path reference |
 | 431 | 102@72 | ii | schema | documented exclusion - PROSE: ordinary prose word |
-| 431 | 104@42 | v | L3-17 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 104@42 | v | L3-17 | named gap - first use before any expansion on this page |
 | 431 | 104@191 | v | COMPLETE | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 104@201 | v | L16 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 104@249 | v | L25 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 104@313 | v | L70 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 104@317 | i | ISO | defined at first use - line 104 contains expansion |
+| 431 | 104@317 | i | ISO | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 104@401 | v | L147 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 104@418 | v | L192 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 104@506 | v | L3-4 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 104@506 | v | L3-4 | named gap - first use before any expansion on this page |
 | 431 | 104@586 | i | PS-001 | named gap - first use before any expansion on this page |
 | 431 | 104@614 | i | YYYY-MM-DD | named gap - first use before any expansion on this page |
 | 431 | 104@675 | i | D4 | named gap - first use before any expansion on this page |
-| 431 | 104@687 | i | JS | named gap - first use before any expansion on this page |
+| 431 | 104@687 | i | JS | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 104@906 | ii | rules | documented exclusion - PROSE: ordinary prose word |
 | 431 | 104@971 | v | L247 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 104@1001 | v | L345 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 104@1469 | ii | counts | documented exclusion - PROSE: ordinary prose word |
-| 431 | 108@99 | v | L1-180 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 112@39 | v | L3-15 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 108@99 | v | L1-180 | named gap - first use before any expansion on this page |
+| 431 | 112@39 | v | L3-15 | named gap - first use before any expansion on this page |
 | 431 | 112@177 | v | L57 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 112@245 | v | L73 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 112@381 | v | L149 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2500,7 +2500,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 112@959 | v | L136 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 112@996 | v | L157 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 112@1029 | v | L172 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 112@1390 | v | L5-8 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 112@1390 | v | L5-8 | named gap - first use before any expansion on this page |
 | 431 | 112@1413 | iv | `project-state-template.md` | documented exclusion - PATH: file/path reference |
 | 431 | 112@1465 | iv | `files 1 / links checked 3 / broken 0` | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
 | 431 | 116@44 | ii | audit | documented exclusion - PROSE: ordinary prose word |
@@ -2509,7 +2509,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 132@32 | v | L68 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 138@7 | i | AEGIS-013 | named gap - first use before any expansion on this page |
 | 431 | 138@19 | v | L203 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 140@44 | v | L4-5 | documented exclusion - LINE-RANGE: line-range reference |
+| 431 | 140@44 | v | L4-5 | named gap - first use before any expansion on this page |
 | 431 | 143@7 | v | &lt;Feature&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 431 | 145@14 | v | L37 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 147@18 | v | L107 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2518,13 +2518,13 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 210@16 | v | L83 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 211@109 | v | L159 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 216@105 | v | L64 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 217@7 | i | APPROVAL | named gap - first use before any expansion on this page |
-| 431 | 218@7 | i | DECISION | named gap - first use before any expansion on this page |
-| 431 | 225@29 | i | FINAL | named gap - first use before any expansion on this page |
+| 431 | 217@7 | i | APPROVAL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 431 | 218@7 | i | DECISION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 431 | 225@29 | i | FINAL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 245@668 | ii | dispositions | documented exclusion - PROSE: ordinary prose word |
 | 431 | 245@1044 | v | UNRUN | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 245@1066 | i | D6 | named gap - first use before any expansion on this page |
-| 431 | 251@410 | i | AEGIS-APR-101 | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 431 | 251@410 | i | AEGIS-APR-101 | named gap - first use before any expansion on this page |
 | 431 | 263@144 | iv | `8e790000aa8a913722584fca7435d05f5dd0787f` | documented exclusion - SHA: commit/blob hash |
 | 431 | 263@204 | v | 2026-09-23 | documented exclusion - DATE: date/timestamp |
 | 431 | 264@106 | iv | `7645ca4998fd4f26be5c9236ae201cbab6216c10` | documented exclusion - SHA: commit/blob hash |
@@ -2535,14 +2535,14 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 268@107 | iv | `935411cf5b9258dc06c925a9258ab4a90e8e94fc` | documented exclusion - SHA: commit/blob hash |
 | 431 | 268@167 | v | 2026-10-04 | documented exclusion - DATE: date/timestamp |
 | 431 | 269@135 | iv | `8459ac73ba6e0b280338aca9a97be7a3336ce356` | documented exclusion - SHA: commit/blob hash |
-| 431 | 272@25 | i | NOT | named gap - first use before any expansion on this page |
+| 431 | 272@25 | i | NOT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 274@136 | iv | `git diff --numstat 2db1ffb7..e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f -- &lt;page&gt;` | documented exclusion - COMMAND: real command |
 | 431 | 276@30 | iv | `git diff --numstat 2db1ffb7..e7acaca4 -- .claude/skills/product-analytics-instrumenter/references/instrumentation-sheet.md` | documented exclusion - COMMAND: real command |
-| 431 | 280@196 | i | CR | named gap - first use before any expansion on this page |
-| 431 | 280@246 | i | EOF | named gap - first use before any expansion on this page |
+| 431 | 280@196 | i | CR | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 431 | 280@246 | i | EOF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 282@99 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
 | 431 | 282@126 | iv | `python -B scripts/check_dco.py --range e7acaca40c8df2ea15ae798e8ec4b0c6b13d551f..HEAD` | documented exclusion - COMMAND: real command |
-| 431 | 282@214 | i | OK | defined at first use - line 282 contains expansion |
+| 431 | 282@214 | i | OK | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 431 | 282@239 | iv | `python -P scripts/validate-skills.py` | documented exclusion - COMMAND: real command |
 | 431 | 282@304 | iv | `python -P -B scripts/ci/check-markdown-links.py docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md` | documented exclusion - COMMAND: real command |
 | 431 | 282@556 | ii | passed | documented exclusion - PROSE: ordinary prose word |
@@ -2551,25 +2551,25 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 4. Counts, reconciliation and zero-duplicate proof
 
-**In-branch status:** the following counts are recomputed by the embedded verifier (section 12) from this record's own table; AC3 is therefore MET in-branch. External _A copies remain convenience-only and are not required for these counts.
+**Verified vs asserted (review 5567823833 #3/#4):** the embedded verifier mechanically checks table rows/keys/overlaps/classes/dispositions/codes/per-page totals and Crows.json agreement. Source-page token semantics, first-use judgments and AC dispositions remain manually asserted and are not claimed as source-page cross-checks. AC3 is narrowed to **table-level self-consistency verified in-branch**.
 
-**Totals:** rows **2399**; unique (page,line,offset,raw token) keys **2399**; duplicates **0**; overlaps/nested **0**; bad five-cell rows **0**. Classes i444/ii367/iii9/iv599/v980=2399. Dispositions 12 defined / 472 named gaps / 1915 documented exclusions = 2399.
+**Totals:** rows **2399**; unique keys **2399**; duplicates **0**; malformed table rows **0**. Classes i444/ii367/iii9/iv599/v980=2399. Dispositions 14 defined / 613 named gaps / 1772 documented exclusions = 2399.
 
 | Page | Rows | i | ii | iii | iv | v | Defined | Named | Excluded |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P424 | 393 | 62 | 55 | 1 | 178 | 97 | 0 | 74 | 319 |
-| P425 | 245 | 44 | 36 | 1 | 66 | 98 | 1 | 48 | 196 |
-| P426 | 244 | 39 | 33 | 0 | 61 | 111 | 2 | 35 | 207 |
-| P427 | 256 | 48 | 44 | 1 | 60 | 103 | 1 | 48 | 207 |
-| P428 | 276 | 58 | 53 | 1 | 70 | 94 | 3 | 63 | 210 |
-| P429 | 418 | 88 | 52 | 1 | 85 | 192 | 0 | 102 | 316 |
-| P430 | 240 | 45 | 44 | 1 | 31 | 119 | 1 | 45 | 194 |
-| P431 | 327 | 60 | 50 | 3 | 48 | 166 | 4 | 57 | 266 |
-| **Total** | **2399** | **444** | **367** | **9** | **599** | **980** | **12** | **472** | **1915** |
+| P424 | 393 | 62 | 55 | 1 | 178 | 97 | 0 | 46 | 347 |
+| P425 | 245 | 44 | 36 | 1 | 66 | 98 | 1 | 36 | 208 |
+| P426 | 244 | 39 | 33 | 0 | 61 | 111 | 5 | 102 | 137 |
+| P427 | 256 | 48 | 44 | 1 | 60 | 103 | 1 | 113 | 142 |
+| P428 | 276 | 58 | 53 | 1 | 70 | 94 | 3 | 52 | 221 |
+| P429 | 418 | 88 | 52 | 1 | 85 | 192 | 1 | 78 | 339 |
+| P430 | 240 | 45 | 44 | 1 | 31 | 119 | 1 | 107 | 132 |
+| P431 | 327 | 60 | 50 | 3 | 48 | 166 | 2 | 79 | 246 |
+| **Total** | **2399** | **444** | **367** | **9** | **599** | **980** | **14** | **613** | **1772** |
 
-**Exclusion codes:** DATE 34 | SHA 125 | LINE-RANGE 688 | STATUS 91 | COMMAND 90 | RANGE 83 | PATH 163 | PLACEHOLDER 78 | OPERATOR 6 | LITERAL 42 | IDENTIFIER 109 | EMPHASIS 47 | PROSE 359 = 1915.
+**Exclusion codes:** DATE 34 | SHA 125 | LINE-RANGE 386 | STATUS 91 | COMMAND 90 | RANGE 82 | PATH 163 | PLACEHOLDER 78 | OPERATOR 6 | LITERAL 42 | IDENTIFIER 109 | EMPHASIS 207 | PROSE 359 = 1772.
 
-**Invariants checked by verifier:** status vocabulary case-insensitive class v; no regex under RANGE; no multi-word prose under IDENTIFIER; acronym allowlist acronyms are defined/named, not EMPHASIS; rows/keys/classes/dispositions/codes/per-page sums exact. **Limitation:** counts are verified in-branch; external copies are convenience only. Sections 2/4/5/6/7/12 are derived from section 3.
+**Reconciliation:** per-page rows/class/disposition table equals recomputed values; code totals equal exclusions; Crows.json row1 inventory count equals table rows; malformed/duplicate/overlap rows 0. **Manually asserted:** page-source token meanings/first-use and AC adjudications; not mechanically source-page cross-checked.
 
 ## 5. Batch mapping, selection and continuation
 
@@ -2581,7 +2581,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 6. Provenance, artifacts, checker and limits
 
-**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (external retained, not in PR). **Generator (new review 5567574260 #1):** the external convenience generator is not required for AC3; the canonical verifier is the inline block in section 12 and it is in-branch reproducible. The external copy is not claimed as a branch file. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08; README.md 1554/23/4984be21df88e2b6bf01a7954b99ac781b7c0b6999837a61c8e29f739d5aeb7f; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/c39a2928af622b6c9b4edd51c093a3e45b8b7fd259a4c88fb1d193420213bab1; Crows.json 2575/58/e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e957587acc0d04244eb. These _A paths are externally retained convenience copies, NOT in the one-path branch and not independently verifiable in this PR; inline Crows block remains canonical for reproduction. No machine-specific absolute path is retained.
+**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (inline canonical evidence in section 12; external copy is convenience only). **Generator (new review 5567574260 #1):** the external convenience generator is not required for AC3; the canonical verifier is the inline block in section 12 and it is in-branch reproducible. The external copy is not claimed as a branch file. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; README.md 1554/23/efb48664bb58636ec0dfe80588ee8f56621171a34cfba93392e5a786a7a48160; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/6cea5dcae53384831d830836823db864bfc44373c75e8ce24984cf5ed2fef26e; Crows.json 2575/58/f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29. These _A paths are convenience copies only; the inline canonical evidence in section 12 is the in-branch verifiable basis for AC7. No machine-specific absolute path is retained.
 
 **PROC-04 method (no digest invented here):** body step publishes witness/skills/security bound fields; PROC is whole-line sentinels, whitespace-collapsed, LF-joined in that order, SHA-256; body publishes short+full digest/lens and literal-presence proof after final body edit. This record does not assert a PROC digest.
 
@@ -2591,13 +2591,13 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET | exactly one added record path; no other path; seven DCO-signed model commits measured post-commit; base d1f12cc3 |
+| AC1 one-path | MET | exactly one added record path; no other path; eight DCO-signed model commits measured post-commit; base d1f12cc3 |
 | AC2 frozen pages | MET WITH WAIVER | mixed pin 1 pinned-equal + 7 re-pinned at d1f12cc3; totals 300,510 B/2,066 LF; waiver/basis defined under population definitions |
-| AC3 whole-page+inventory | MET (in-branch verifier) | section 12 embeds the verifier; it recomputes 2399 rows/unique/overlaps/classes/dispositions/codes/per-page tallies from this record's own table; output recorded |
+| AC3 whole-page+inventory | MET (table-level self-consistency verified in-branch) | embedded verifier recomputes rows/keys/overlaps/classes/dispositions/codes/per-page and Crows.json from this record's table; source-page semantics/first-use remain manually asserted, not source-page cross-checked |
 | AC4 dispositions | MET for 0 FULL / 8 PARTIAL / 0 UNRUN | B4 N/A rationale, B5 partial limitation, B6 precise gap recorded; no keeper; no FULL claim |
 | AC5 record/body/PROC | MET (final body) | final live body publishes PROC-04 short/full/lens and literal presence; published == recomputed; body checker 0 (proof in PR body and SD-C repair comment) |
 | AC6 Codex/reviews | MET | Codex never a pass, 0 threads/0 unresolved; newest review 5567657046 answered in visible findings-response comment with FIXED/DISPOSED; DeepSeek advisory only, never a gate |
-| AC7 provenance | MET (inline canonical evidence) | section 12 inlines A-rows/README/preview/MANIFEST/Crows content with measured B/LF/sha; external copies are convenience only; in-branch hashes/semantics verifiable |
+| AC7 provenance | MET (inline canonical evidence) | section 12 inlines A-rows/README/preview/MANIFEST/Crows content with measured B/LF/sha; Crows.json carries its explicit no-trailing-LF convention; external copies convenience only |
 | AC8 stage entry | MET for C | fresh B ACCEPT 6260430607; one record; D/E/F/G separate; no merge |
 
 **AC verdict:** all AC1-AC8 MET under the stated AC2 waiver and in-branch verifier/evidence. This is not a claim that DeepSeek is a pass/gate; it is a claim that the record itself is now self-verifying and the review findings are visibly dispositioned.
@@ -2611,10 +2611,10 @@ Plan r3 Stage A self-account (four rows, Row sources round=1 rows1-4, six fields
 Stage C four-column skills rows are canonical in section 11 inline appendix (Crows block), also retained externally as convenience at _A/evidence/read-lc-424-c1/Crows.txt; no duplicate row table here. **Skill-line schema (newest review #7):** the historical 'six-field' label is retained for continuity, but the actual fenced line schema is skill@hash prefix + seven key=value support fields (hash/entry/WHERE/size/model/plan_role/result) separated by ' / '; this is documented, not miscounted.
 
 **Row sources (round=1, row=1..4; binding over Crows.txt):**
-Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 1 of 4; binding=sha256 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
-Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 2 of 4; binding=sha256 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
-Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 3 of 4; binding=sha256 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
-Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 4 of 4; binding=sha256 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
+Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 1 of 4; binding=sha256 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
+Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 2 of 4; binding=sha256 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
+Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 3 of 4; binding=sha256 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
+Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=batch-21 PR / main d1f12cc3 / block424-431; source=_A/evidence/read-lc-424-c1/Crows.txt line 4 of 4; binding=sha256 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3 over 1542 B / 4 LF; table_name=stage_c_skills; key=row; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; support-cli=_A/evidence/read-lc-424-c1/preview.py; limits=digest binds captured text, not human identity; status=current
 
 **Six-field lines (OUTSIDE bound fields; fenced):**
 
@@ -2622,23 +2622,23 @@ Row source: agent=sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Fl
 acceptance-criteria-reviewer@c6e5d5649bf8 / hash=c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 / entry=.claude/skills/acceptance-criteria-reviewer/SKILL.md / WHERE=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 / size=14207 / model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) / plan_role=sd-c-read-lc-424-c1 / result=read pages; B4/page; B6 unverified
 source-of-truth-reconciler@b5fd9feda972 / hash=b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2 / entry=.claude/skills/source-of-truth-reconciler/SKILL.md / WHERE=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 / size=8663 / model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) / plan_role=sd-c-read-lc-424-c1 / result=frontier621/156; pages300,510/2,066; 0/63
 change-classification-gate@08d91a834460 / hash=08d91a834460beebc9c66fa896b8b422f064bf1d7524f6e5b1512cda3afdc996 / entry=.claude/skills/change-classification-gate/SKILL.md / WHERE=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 / size=7185 / model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) / plan_role=sd-c-read-lc-424-c1 / result=one added path; no other path
-skill-usage-ledger@6a27b5c8e690 / hash=6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / entry=.claude/skills/skill-usage-ledger/SKILL.md / WHERE=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 / size=5170 / model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) / plan_role=sd-c-read-lc-424-c1 / result=4 rows/4 sources/4 six fields; binding 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08
+skill-usage-ledger@6a27b5c8e690 / hash=6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4 / entry=.claude/skills/skill-usage-ledger/SKILL.md / WHERE=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 / size=5170 / model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) / plan_role=sd-c-read-lc-424-c1 / result=4 rows/4 sources/4 six fields; binding 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3
 ```
 
-**Support CLI proof (measured):** preview.py path -> _A/evidence/read-lc-424-c1/Crows.txt; sha256=6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08; bytes=1542; lf=4 ; preview.py rows -> table_name=stage_c_skills; key=row; where=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21; rows=4; row=1 skill=acceptance-criteria-reviewer entry=.claude/skills/acceptance-criteria-reviewer/SKILL.md sha256=c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 size=14207 model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) plan_role=sd-c-read-lc-424-c1 ; preview.py query acceptance -> matches=1; {"entry": ".claude/skills/acceptance-criteria-reviewer/SKILL.md", "row": 1, "sha256": "c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021", "skill": "acceptance-criteria-reviewer", "where": "stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21"}.
-**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (4984be21df88e2b6bf01a7954b99ac781b7c0b6999837a61c8e29f739d5aeb7f) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (c39a2928af622b6c9b4edd51c093a3e45b8b7fd259a4c88fb1d193420213bab1) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 2,575 B / 58 LF / sha e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e957587acc0d04244eb. **Crows.json convention exception:** this canonical block is measured WITHOUT a trailing LF; unlike other blocks its hash excludes the trailing LF. This single explicit exception is applied consistently in record and body.
+**Support CLI proof (measured):** preview.py path -> _A/evidence/read-lc-424-c1/Crows.txt; sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; bytes=1542; lf=4 ; preview.py rows -> table_name=stage_c_skills; key=row; where=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21; rows=4; row=1 skill=acceptance-criteria-reviewer entry=.claude/skills/acceptance-criteria-reviewer/SKILL.md sha256=c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 size=14207 model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) plan_role=sd-c-read-lc-424-c1 ; preview.py query acceptance -> matches=1; {"entry": ".claude/skills/acceptance-criteria-reviewer/SKILL.md", "row": 1, "sha256": "c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021", "skill": "acceptance-criteria-reviewer", "where": "stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21"}.
+**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (efb48664bb58636ec0dfe80588ee8f56621171a34cfba93392e5a786a7a48160) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (6cea5dcae53384831d830836823db864bfc44373c75e8ce24984cf5ed2fef26e) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 2,575 B / 58 LF / sha f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29. **Crows.json convention exception:** this canonical block is measured WITHOUT a trailing LF; unlike other blocks its hash excludes the trailing LF. This single explicit exception is applied consistently in record and body.
 
 ## 10. Five required c-protocol questions (measured on final artifact)
 
 1. **Real prior work:** yes. Lane A/B records and lane C batches1-20 are merged evidence; the only older exact-path refs for P424 are quote/cross-lane observations (section5), not page-read rows; pre-lane phase4-lane-d-batch3 reference is cited, not treated as a read.
 2. **What 1-2 skill rows would change:** acceptance-criteria-reviewer and source-of-truth-reconciler would change from a pass claim to REVISE if B6/audience or a per-page count were overclaimed; both are recorded PARTIAL/UNVERIFIED rather than passed.
 3. **Manifest completeness risk:** absence of Crows/README/preview/Row sources would leave binding and support unreproducible; the evidence directory and MANIFEST make each retained capture measurable; no missing capture is silently claimed.
-4. **Binding:** zero binding is incompleteness under contract d41b0dff; every Stage C row/source uses a non-zero sha256 over a real retained capture (Crows sha 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08); no skill@ placeholder is used.
+4. **Binding:** zero binding is incompleteness under contract d41b0dff; every Stage C row/source uses a non-zero sha256 over a real retained capture (Crows sha 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3); no skill@ placeholder is used.
 5. **Truth/capture:** results cannot fade because counts are single-sourced in this record and captures are retained with measured bytes/LF/sha; the verdict on this record assertions is PARTIAL-by-design (B1 gap/B6 UNVERIFIED) and no FULL/keeper claim is made.
 
 ## 11. Inline appendix: ONE canonical Crows artifact block
 
-A-rows authoritative reference is external at _A/evidence/read-lc-424-a1/A-rows.txt and is not duplicated inline. The Crows block below is the ONE canonical inline copy; Crows.txt is the retained external working copy with the same bytes/hash.
+A-rows is inlined canonically in section 12; _A/evidence/read-lc-424-a1/A-rows.txt is a convenience copy only. The Crows block below is the ONE canonical inline copy; Crows.txt is a convenience copy with the same bytes/hash.
 
 ```text
 | [acceptance-criteria-reviewer](.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-21 / sd-c-read-lc-424-c1 (true identity sd-f-794-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole; applied canonical B1-B6/B4 per page/B6 UNVERIFIED and built the exact-once inventory under the dispatch/code rules. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2,399-row inventory; no keeper |
@@ -2665,7 +2665,7 @@ Measured: 1175 B / 4 LF / sha11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc07
 ~~~~
 
 ### README canonical block
-Measured: 1554 B / 23 LF / sha4984be21df88e2b6bf01a7954b99ac781b7c0b6999837a61c8e29f739d5aeb7f
+Measured: 1554 B / 23 LF / shaefb48664bb58636ec0dfe80588ee8f56621171a34cfba93392e5a786a7a48160
 
 ~~~~text
 # Batch-21 Stage C evidence support
@@ -2676,8 +2676,8 @@ Capture files (immutable; new filenames; never overwritten in place):
 
 | file | table_name | key | WHERE | bytes / LF | sha256 |
 | --- | --- | --- | --- | --- | --- |
-| Crows.txt | stage_c_skills | row | stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 | 1542 / 4 | 6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08 |
-| Crows.json | stage_c_skills | row | same | 2575 / 58 | e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e957587acc0d04244eb |
+| Crows.txt | stage_c_skills | row | stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 | 1542 / 4 | 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3 |
+| Crows.json | stage_c_skills | row | same | 2575 / 58 | f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29 |
 | preview.py | support CLI | mode path/query/rows | local | 1481 / 29 | 6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6 |
 | A-rows.txt reference | Stage A sd-a-read-lc-424-r1 | source _A/evidence/read-lc-424-a1/A-rows.txt | stage=A AND block=424-431 | 1175 / 4 | 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 |
 
@@ -2729,18 +2729,18 @@ if __name__ == "__main__": sys.exit(main(sys.argv[1:]))
 ~~~~
 
 ### MANIFEST canonical block
-Measured: 561 B / 5 LF / sha c39a2928af622b6c9b4edd51c093a3e45b8b7fd259a4c88fb1d193420213bab1
+Measured: 561 B / 5 LF / sha 6cea5dcae53384831d830836823db864bfc44373c75e8ce24984cf5ed2fef26e
 
 ~~~~text
-Crows.txt  sha256=6e28caecf81dce6389484297f29c5de244eb04e7e1b93ad7ebed40a84d8eae08  bytes=1542  lf=4
-Crows.json  sha256=e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e957587acc0d04244eb  bytes=2575  lf=58
-README.md  sha256=4984be21df88e2b6bf01a7954b99ac781b7c0b6999837a61c8e29f739d5aeb7f  bytes=1554  lf=23
+Crows.txt  sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3  bytes=1542  lf=4
+Crows.json  sha256=f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29  bytes=2575  lf=58
+README.md  sha256=efb48664bb58636ec0dfe80588ee8f56621171a34cfba93392e5a786a7a48160  bytes=1554  lf=23
 preview.py  sha256=6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6  bytes=1481  lf=29
 A-rows reference  path=_A/evidence/read-lc-424-a1/A-rows.txt  sha256=11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430  bytes=1175  lf=4
 ~~~~
 
 ### Crows.json canonical block
-Measured: **2575 B / 58 LF / sha e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e957587acc0d04244eb** (explicit no-trailing-LF exception; all other canonical blocks include trailing LF in their measured bytes/hash).
+Measured: **2575 B / 58 LF / sha f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29** (explicit no-trailing-LF exception; all other canonical blocks include trailing LF in their measured bytes/hash).
 
 ~~~~text
 {
@@ -2759,7 +2759,7 @@ Measured: **2575 B / 58 LF / sha e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e9
    "model": "DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)",
    "plan_role": "sd-c-read-lc-424-c1",
    "applied": "Read all eight pages whole; applied canonical B1-B6/B4 per page/B6 UNVERIFIED and built the exact-once inventory under the dispatch/code rules.",
-   "result": "0 FULL / 8 PARTIAL / 0 UNRUN; 3,062-row inventory; no keeper"
+   "result": "0 FULL / 8 PARTIAL / 0 UNRUN; 2,399-row inventory; no keeper"
   },
   {
    "row": 2,
@@ -2808,38 +2808,71 @@ Measured: **2575 B / 58 LF / sha e4ce1263fcaeb82db64bf4156e9694cbb16682429b191e9
 
 ~~~~python
 #!/usr/bin/env python3
-import re,sys,hashlib
-from collections import Counter
+import re,sys,json
+from collections import Counter,defaultdict
 p=sys.argv[1]
 rec=open(p,encoding="utf-8").read().splitlines()
 pat=re.compile(r"^\|\s*(42[4-9]|43[01])\s*\|\s*(\d+)@(\d+)\s*\|\s*(i{1,3}|iv|v)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$")
-STATUS=set("ACCEPTED REJECTED REVISED REVISE PASS FAIL FAILED FAILURE COMPLETE COMPLETED INCOMPLETE UNRUN RUNNING PENDING BLOCKED BLOCKING OWED SATISFIED UNSATISFIED MET UNMET FULL PARTIAL NONE UNVERIFIED VERIFIED ACTIVE INACTIVE WAITING AWAITING OPEN CLOSED MERGED APPLIED APPROVED COMMENTED SUCCESS SUCCESSFUL CANCELLED SKIPPED DONE DRAFT READY DIRTY CLEAN CONFLICTING AVAILABLE UNAVAILABLE".split())
-rows=[]
+def fail(msg):
+ print("VERIFIER FAIL:",msg); sys.exit(1)
+rows=[]; malformed=0; insec=False
 for l in rec:
- m=pat.match(l)
- if m: rows.append((m.group(1),int(m.group(2)),int(m.group(3)),m.group(4),m.group(5),m.group(6)))
-assert len(rows)==2399, len(rows)
+ if l.startswith("## 3."): insec=True; continue
+ if l.startswith("## 4."): insec=False
+ if insec and l.startswith("|"):
+  if l.startswith("| Page") or l.startswith("| ---"): continue
+  m=pat.match(l)
+  if not m: malformed+=1
+  else: rows.append((m.group(1),int(m.group(2)),int(m.group(3)),m.group(4),m.group(5),m.group(6)))
+if malformed: fail("malformed table-like rows: %d"%malformed)
+if len(rows)!=2399: fail("row count %d != 2399"%len(rows))
 keys={(a,b,c,d) for a,b,c,d,e,f in rows}
-assert len(keys)==2399
+if len(keys)!=len(rows): fail("duplicate key count %d"%len(keys))
+if len(rows)!=2399: fail("unique count mismatch")
 classes=Counter(r[3] for r in rows); disp=Counter("defined" if r[5].startswith("defined") else ("named" if r[5].startswith("named") else "excluded") for r in rows)
 codes=Counter(re.match(r"documented exclusion - ([A-Z-]+):",r[5]).group(1) for r in rows if r[5].startswith("documented exclusion"))
-assert dict(classes)=={"i":444,"ii":367,"iii":9,"iv":599,"v":980}
-assert dict(disp)=={"defined":12,"named":472,"excluded":1915}
-assert sum(codes.values())==1915
+if dict(classes)!={"i":444,"ii":367,"iii":9,"iv":599,"v":980}: fail("classes "+str(dict(classes)))
+if dict(disp)!={"defined":14,"named":613,"excluded":1772}: fail("dispositions "+str(dict(disp)))
+if sum(codes.values())!=1772: fail("codes sum %d"%sum(codes.values()))
+# per-page table in section 4
+per=Counter(); d=defaultdict(Counter)
+for a,b,c,cl,t,di in rows:
+ per[a]+=1; d[a][cl]+=1
+seen=[]
+for l in rec:
+ m=re.match(r"^\|\s*(P42[4-9]|P43[01])\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|$",l)
+ if m:
+  pg=m.group(1)[1:]; vals=[int(m.group(i)) for i in range(2,11)]
+  if vals[0]!=per[pg]: fail("per-page rows %s %d != %d"%(pg,vals[0],per[pg]))
+  if vals[1:]!=[d[pg]["i"],d[pg]["ii"],d[pg]["iii"],d[pg]["iv"],d[pg]["v"],sum(1 for x in rows if x[0]==pg and x[5].startswith("defined")),sum(1 for x in rows if x[0]==pg and x[5].startswith("named")),sum(1 for x in rows if x[0]==pg and x[5].startswith("documented"))]: fail("per-page class/disposition mismatch "+pg)
+  seen.append(pg)
+if len(seen)!=8: fail("per-page table count %d"%len(seen))
+# Crows.json agreement
+try:
+ start=next(i for i,l in enumerate(rec) if l.startswith("### Crows.json canonical block"))
+ a=next(i for i in range(start,len(rec)) if rec[i].startswith("~~~~text"))
+ b=next(i for i in range(a+1,len(rec)) if rec[i].startswith("~~~~"))
+ cj=json.loads("\n".join(rec[a+1:b]))
+ txt=json.dumps(cj)
+ m=re.search(r"(\d[\d,]*)-row inventory",txt)
+ if not m or int(m.group(1).replace(",",""))!=len(rows): fail("Crows.json inventory count does not match table")
+except SystemExit: pass
+except Exception as e: fail("Crows.json parse/agreement: "+str(e))
+# invariants
+STATUS=set("ACCEPTED REJECTED REVISED REVISE PASS FAIL FAILED FAILURE COMPLETE COMPLETED INCOMPLETE UNRUN RUNNING PENDING BLOCKED BLOCKING OWED SATISFIED UNSATISFIED MET UNMET FULL PARTIAL NONE UNVERIFIED VERIFIED ACTIVE INACTIVE WAITING AWAITING OPEN CLOSED MERGED APPLIED APPROVED COMMENTED SUCCESS SUCCESSFUL CANCELLED SKIPPED DONE DRAFT READY DIRTY CLEAN CONFLICTING AVAILABLE UNAVAILABLE".split())
 for r in rows:
- if r[3]=="v" and r[4].isalpha() and r[4].upper() not in STATUS:
-  raise SystemExit("status-class invariant failure: "+repr(r))
- if r[5].startswith("documented exclusion - RANGE") and any(c in r[4] for c in "[]{}"):
-  raise SystemExit("regex-under-RANGE: "+repr(r))
- if r[5].startswith("documented exclusion - IDENTIFIER") and len(r[4].split())>=3:
-  raise SystemExit("prose-as-IDENTIFIER: "+repr(r))
-print("INLINE VERIFY OK rows=%d unique=%d classes=%s disps=%s exclusions=%d codes=%s"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),dict(codes)))
+ if r[3]=="v" and r[4].isalpha() and r[4].upper() not in STATUS: fail("status-class invariant "+repr(r))
+ if r[5].startswith("documented exclusion - RANGE") and any(c in r[4] for c in "[]{}"): fail("regex-under-RANGE "+repr(r))
+ if r[5].startswith("documented exclusion - IDENTIFIER") and len(r[4].split())>=3: fail("prose-as-IDENTIFIER "+repr(r))
+print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d codes=%s per-page=8 Crows.json=agrees(2399)"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),dict(codes)))
 ~~~~
+
+**Mechanically verified by the verifier:** table parse/rows/keys/classes/dispositions/codes/per-page totals/Crows.json row1 count/malformed rows/overlaps. **Manually asserted, not source-page cross-checked:** page-token meanings, first-use judgments, B2/AC dispositions; AC3 is therefore table-level self-consistency only.
 
 ### Embedded verifier expected output
 
 ~~~~text
-INLINE VERIFY OK rows=2399 unique=2399 classes={'ii': 367, 'v': 980, 'iv': 599, 'i': 444, 'iii': 9} disps={'excluded': 1915, 'named': 472, 'defined': 12} exclusions=1915 codes={'PROSE': 359, 'DATE': 34, 'IDENTIFIER': 109, 'STATUS': 91, 'SHA': 125, 'PATH': 163, 'COMMAND': 90, 'LITERAL': 42, 'EMPHASIS': 47, 'RANGE': 83, 'LINE-RANGE': 688, 'OPERATOR': 6, 'PLACEHOLDER': 78}
+VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 367, 'v': 980, 'iv': 599, 'i': 444, 'iii': 9} disps={'excluded': 1772, 'named': 613, 'defined': 14} exclusions=1772 codes={'PROSE': 359, 'DATE': 34, 'IDENTIFIER': 109, 'STATUS': 91, 'EMPHASIS': 207, 'SHA': 125, 'PATH': 163, 'COMMAND': 90, 'LITERAL': 42, 'RANGE': 82, 'LINE-RANGE': 386, 'OPERATOR': 6, 'PLACEHOLDER': 78} per-page=8 Crows.json=agrees(2399)
 ~~~~
 
-External convenience copies: _A/evidence/read-lc-424-c1/Crows.txt 1542/4/sha6e28caec..., A-rows path above, README/preview/MANIFEST/Crows.json above. No in-branch claim of files outside this record.
+External convenience copies: _A/evidence/read-lc-424-c1/Crows.txt 1542/4/sha8a8a2564..., A-rows path above, README/preview/MANIFEST/Crows.json above. No in-branch claim of files outside this record.
