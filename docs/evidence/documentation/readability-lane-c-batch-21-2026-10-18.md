@@ -1228,7 +1228,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 77@451 | v | L150-166 | documented exclusion - LINE-RANGE: line-range reference |
 | 427 | 77@476 | v | L14-15 | documented exclusion - LINE-RANGE: line-range reference |
 | 427 | 77@585 | v | L168-179 | documented exclusion - LINE-RANGE: line-range reference |
-| 427 | 79@90 | i | `H/M/L` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 427 | 79@90 | iv | `H/M/L` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 427 | 81@99 | v | L1-148 | documented exclusion - LINE-RANGE: line-range reference |
 | 427 | 83@61 | v | L3-4 | documented exclusion - LINE-RANGE: line-range reference |
 | 427 | 83@79 | v | L12-21 | documented exclusion - LINE-RANGE: line-range reference |
@@ -1704,7 +1704,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 70@258 | v | L134 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 70@263 | iv | `auth` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 70@286 | v | L151 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 70@291 | i | `ID` | documented exclusion - IDENTIFIER: backticked identifier/label |
+| 429 | 70@291 | iv | `ID` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 70@312 | v | L185 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 70@317 | iv | `URL` | named gap - first use before any expansion on this page |
 | 429 | 70@597 | v | L122-124 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2081,7 +2081,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 49@85 | v | L2841-2862 | documented exclusion - LINE-RANGE: line-range reference |
 | 430 | 49@99 | i | B4 | defined at first use - line 49 contains expansion |
 | 430 | 49@207 | v | blocked | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 430 | 49@440 | iv | git | documented exclusion - COMMAND: real command |
+| 430 | 49@440 | iv | `git` | documented exclusion - COMMAND: real command |
 | 430 | 49@453 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
 | 430 | 49@483 | v | UNVERIFIED | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 51@59 | v | L1-201 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2551,25 +2551,25 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 4. Counts, reconciliation and zero-duplicate proof
 
-**Verified vs asserted:** the hardened embedded verifier mechanically checks table rows/keys (including raw token)/ordering/offsets/classes/dispositions/codes/per-page totals, raw-token/HTML/placeholder encoding, class-disposition/acronym compatibility, Crows.json FULL totals and 4-row/block agreement, Crows.json measured facts, Crows block exact bytes/LF/SHA, inline artifact measurements, malformed rows and stale-value bans. Source-page token meanings, first-use judgments and AC dispositions remain manually asserted; they are not source-page cross-checked. AC3 is table-level self-consistency verified in-branch; it is not a page-source re-derivation.
+**Verified vs asserted:** the hardened embedded verifier mechanically checks table rows/keys (including raw token)/ordering/offsets/classes/dispositions/codes/per-page totals, raw-token/HTML/placeholder encoding, class/backtick compatibility (class-v placeholder/status exception documented), class-disposition/acronym compatibility, Crows.json FULL totals and 4-row/block agreement, Crows.json measured facts, Crows block exact bytes/LF/SHA, inline artifact measurements, MANIFEST hash, malformed rows and stale-value bans. Source-page token meanings, first-use judgments and AC dispositions remain manually asserted; they are not source-page cross-checked. AC3 is table-level self-consistency verified in-branch; it is not a page-source re-derivation.
 
-**Totals:** rows **2399**; unique keys **2399**; duplicates **0**; malformed table rows **0**. Classes i445/ii366/iii9/iv594/v985=2399. Dispositions 10 defined / 380 named gaps / 2009 documented exclusions = 2399.
+**Totals:** rows **2399**; unique keys **2399**; duplicates **0**; malformed table rows **0**. Classes i443/ii366/iii9/iv596/v985=2399. Dispositions 10 defined / 380 named gaps / 2009 documented exclusions = 2399.
 
 | Page | Rows | i | ii | iii | iv | v | Defined | Named | Excluded |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P424 | 393 | 62 | 55 | 1 | 178 | 97 | 0 | 52 | 341 |
 | P425 | 245 | 44 | 36 | 1 | 66 | 98 | 1 | 46 | 198 |
 | P426 | 244 | 40 | 33 | 0 | 61 | 110 | 1 | 32 | 211 |
-| P427 | 256 | 49 | 44 | 1 | 59 | 103 | 1 | 48 | 207 |
+| P427 | 256 | 48 | 44 | 1 | 60 | 103 | 1 | 48 | 207 |
 | P428 | 276 | 58 | 53 | 1 | 70 | 94 | 3 | 60 | 213 |
-| P429 | 418 | 89 | 52 | 1 | 81 | 195 | 0 | 50 | 368 |
+| P429 | 418 | 88 | 52 | 1 | 82 | 195 | 0 | 50 | 368 |
 | P430 | 240 | 45 | 43 | 1 | 32 | 119 | 1 | 41 | 198 |
 | P431 | 327 | 58 | 50 | 3 | 47 | 169 | 3 | 51 | 273 |
-| **Total** | **2399** | **445** | **366** | **9** | **594** | **985** | **10** | **380** | **2009** |
+| **Total** | **2399** | **443** | **366** | **9** | **596** | **985** | **10** | **380** | **2009** |
 
 **Exclusion codes:** DATE 34 | SHA 125 | LINE-RANGE 688 | STATUS 93 | COMMAND 92 | RANGE 82 | PATH 160 | PLACEHOLDER 82 | OPERATOR 6 | LITERAL 45 | IDENTIFIER 141 | EMPHASIS 102 | PROSE 359 = 2009.
 
-**Invariants:** line-range cannot be defined/named; lowercase/hyphenated backticked identifiers cannot be EMPHASIS; acronym allowlist tokens cannot be class-i EMPHASIS; token column raw code-spanned placeholders with no HTML entities; class/disposition/acronym compatibility; Crows.json FULL totals and 4 rows agree with canonical Crows block; Crows block exact bytes/LF/SHA checked; inline artifacts checked; per-page tallies checked; malformed/duplicate rows 0; stale values banned.
+**Invariants:** line-range cannot be defined/named; lowercase/hyphenated backticked identifiers cannot be EMPHASIS; acronym allowlist tokens cannot be class-i EMPHASIS; token column raw code-spanned placeholders with no HTML entities; backticked tokens are class iv except documented class-v placeholder/status tokens; unbackticked tokens are not class iv; class/disposition/acronym compatibility; Crows.json FULL totals and 4 rows agree with canonical Crows block; Crows block exact bytes/LF/SHA; inline artifacts + MANIFEST hash; per-page tallies; malformed/duplicate rows 0; stale values banned.
 
 ## 5. Batch mapping, selection and continuation
 
@@ -2581,7 +2581,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 6. Provenance, artifacts, checker and limits
 
-**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (inline canonical evidence in section 12; external copy is convenience only). **Generator (new review 5567574260 #1):** the external convenience generator is not required for AC3; the canonical verifier is the inline block in section 12 and it is in-branch reproducible. The external copy is not claimed as a branch file. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; README.md 1554/23/e65e53e0b4908bb0ee8e60dfa6d7f8fe8133bdda810d6bf30c925fbbacb0047a; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/7872afb2dc0665e78ff718f9b6367e7eef6df70e31161216890074a716bdd068; Crows.json 3037/89/4120b9078cd37b07c550fef4d0bdce20b2a3da65e770fcc235c7982b91f8d81e. These _A paths are convenience copies only; the inline canonical evidence in section 12 is the in-branch verifiable basis for AC7. No machine-specific absolute path is retained.
+**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (inline canonical evidence in section 12; external copy is convenience only). **Generator (new review 5567574260 #1):** the external convenience generator is not required for AC3; the canonical verifier is the inline block in section 12 and it is in-branch reproducible. The external copy is not claimed as a branch file. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; README.md 1554/23/3826ef40f82c049f6816756e628f4b27021e4698cfb764590b8ecfd762605fa2; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/05042a127f315f7cd5633a7327757a7aada46076e9caff7982d70866980e9b87; Crows.json 3037/89/92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d. These _A paths are convenience copies only; the inline canonical evidence in section 12 is the in-branch verifiable basis for AC7. No machine-specific absolute path is retained.
 
 **PROC-04 method (no digest invented here):** body step publishes witness/skills/security bound fields; PROC is whole-line sentinels, whitespace-collapsed, LF-joined in that order, SHA-256; body publishes short+full digest/lens and literal-presence proof after final body edit. This record does not assert a PROC digest.
 
@@ -2593,10 +2593,10 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | --- | --- | --- |
 | AC1 one-path | MET | exactly one added record path; no other path; eight DCO-signed model commits measured post-commit; base d1f12cc3 |
 | AC2 frozen pages | MET WITH WAIVER | mixed pin 1 pinned-equal + 7 re-pinned at d1f12cc3; totals 300,510 B/2,066 LF; waiver/basis defined under population definitions |
-| AC3 whole-page+inventory | MET (table-level self-consistency verified in-branch) | embedded verifier recomputes rows/keys/overlaps/classes/dispositions/codes/per-page and Crows.json from this record's table; source-page semantics/first-use remain manually asserted, not source-page cross-checked |
+| AC3 whole-page+inventory | MET WITH WAIVER / PARTIAL (table-level self-consistency only) | embedded verifier recomputes rows/keys/overlaps/classes/dispositions/codes/per-page and Crows.json from this record's table; source-page semantics/first-use remain manually asserted, not source-page cross-checked |
 | AC4 dispositions | MET for 0 FULL / 8 PARTIAL / 0 UNRUN (genuinely supported after semantic corrections) | B2/line-range/identifier/placeholder invariants and per-page B2 counts corrected; B4 N/A rationale, B5 partial limitation, B6 precise gap; no keeper/FULL claim |
-| AC5 record/body/PROC | MET (final body) | final live body publishes PROC-04 short/full/lens and literal presence; published == recomputed; body checker 0 (proof in PR body and SD-C repair comment) |
-| AC6 Codex/reviews | MET | Codex never a pass, 0 threads/0 unresolved; newest review 5567657046 answered in visible findings-response comment with FIXED/DISPOSED; DeepSeek advisory only, never a gate |
+| AC5 record/body/PROC | MET WITH EXTERNAL ARTIFACT (live PR body/PROC/checker) | final live body publishes PROC-04 short/full/lens and literal presence; published == recomputed; body checker 0 (proof in PR body and SD-C repair comment) |
+| AC6 Codex/reviews | MET WITH EXTERNAL ARTIFACT (visible PR review-thread dispositions) | Codex never a pass, 0 threads/0 unresolved; newest review 5567657046 answered in visible findings-response comment with FIXED/DISPOSED; DeepSeek advisory only, never a gate |
 | AC7 provenance | MET (inline canonical evidence) | section 12 inlines A-rows/README/preview/MANIFEST/Crows content with measured B/LF/sha; Crows.json carries its trailing-LF/full-totals convention; external copies convenience only |
 | AC8 stage entry | MET for C | fresh B ACCEPT 6260430607; one record; D/E/F/G separate; no merge |
 
@@ -2626,7 +2626,7 @@ skill-usage-ledger@6a27b5c8e690 / hash=6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6
 ```
 
 **Support CLI proof (measured):** preview.py path -> _A/evidence/read-lc-424-c1/Crows.txt; sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; bytes=1542; lf=4 ; preview.py rows -> table_name=stage_c_skills; key=row; where=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21; rows=4; row=1 skill=acceptance-criteria-reviewer entry=.claude/skills/acceptance-criteria-reviewer/SKILL.md sha256=c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 size=14207 model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) plan_role=sd-c-read-lc-424-c1 ; preview.py query acceptance -> matches=1; {"entry": ".claude/skills/acceptance-criteria-reviewer/SKILL.md", "row": 1, "sha256": "c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021", "skill": "acceptance-criteria-reviewer", "where": "stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21"}.
-**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (e65e53e0b4908bb0ee8e60dfa6d7f8fe8133bdda810d6bf30c925fbbacb0047a) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (6dee95a28c52c590d74b4f5dbd2ce3cf3de54ef6a18785353cda6f49a83eb8f0) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 3,036 B / 89 LF / sha 4120b9078cd37b07c550fef4d0bdce20b2a3da65e770fcc235c7982b91f8d81e. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3037 B / 89 LF / sha 4120b9078cd37b07c550fef4d0bdce20b2a3da65e770fcc235c7982b91f8d81e.
+**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (3826ef40f82c049f6816756e628f4b27021e4698cfb764590b8ecfd762605fa2) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (05042a127f315f7cd5633a7327757a7aada46076e9caff7982d70866980e9b87) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 3,036 B / 89 LF / sha 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3037 B / 89 LF / sha 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d.
 
 ## 10. Five required c-protocol questions (measured on final artifact)
 
@@ -2670,7 +2670,7 @@ Measured: 1175 B / 4 LF / sha11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc07
 ~~~~
 
 ### README canonical block
-Measured: 1554 B / 23 LF / sha e65e53e0b4908bb0ee8e60dfa6d7f8fe8133bdda810d6bf30c925fbbacb0047a
+Measured: 1554 B / 23 LF / sha 3826ef40f82c049f6816756e628f4b27021e4698cfb764590b8ecfd762605fa2
 
 ~~~~text
 # Batch-21 Stage C evidence support
@@ -2682,7 +2682,7 @@ Capture files (immutable; new filenames; never overwritten in place):
 | file | table_name | key | WHERE | bytes / LF | sha256 |
 | --- | --- | --- | --- | --- | --- |
 | Crows.txt | stage_c_skills | row | stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 | 1542 / 4 | 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3 |
-| Crows.json | stage_c_skills | row | same | 3037 / 89 | 4120b9078cd37b07c550fef4d0bdce20b2a3da65e770fcc235c7982b91f8d81e |
+| Crows.json | stage_c_skills | row | same | 3037 / 89 | 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d |
 | preview.py | support CLI | mode path/query/rows | local | 1481 / 29 | 6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6 |
 | A-rows.txt reference | Stage A sd-a-read-lc-424-r1 | source _A/evidence/read-lc-424-a1/A-rows.txt | stage=A AND block=424-431 | 1175 / 4 | 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 |
 
@@ -2734,18 +2734,18 @@ if __name__ == "__main__": sys.exit(main(sys.argv[1:]))
 ~~~~
 
 ### MANIFEST canonical block
-Measured: 561 B / 5 LF / sha 6dee95a28c52c590d74b4f5dbd2ce3cf3de54ef6a18785353cda6f49a83eb8f0
+Measured: 561 B / 5 LF / sha 05042a127f315f7cd5633a7327757a7aada46076e9caff7982d70866980e9b87
 
 ~~~~text
 Crows.txt  sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3  bytes=1542  lf=4
-Crows.json  sha256=4120b9078cd37b07c550fef4d0bdce20b2a3da65e770fcc235c7982b91f8d81e  bytes=3037  lf=89
+Crows.json  sha256=92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d  bytes=3037  lf=89
 README.md  sha256=5e4b5fb3e63eab2f48cdad7aa1dd0792400649b275dd175e7b0ffd00623237e3  bytes=1554  lf=23
 preview.py  sha256=6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6  bytes=1481  lf=29
 A-rows reference  path=_A/evidence/read-lc-424-a1/A-rows.txt  sha256=11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430  bytes=1175  lf=4
 ~~~~
 
 ### Crows.json canonical block
-Measured: **3037 B / 89 LF / sha 4120b9078cd37b07c550fef4d0bdce20b2a3da65e770fcc235c7982b91f8d81e** (includes trailing LF; Crows.json now carries FULL inventory totals).
+Measured: **3037 B / 89 LF / sha 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d** (includes trailing LF; Crows.json now carries FULL inventory totals).
 
 ~~~~text
 {
@@ -2809,10 +2809,10 @@ Measured: **3037 B / 89 LF / sha 4120b9078cd37b07c550fef4d0bdce20b2a3da65e770fcc
  "inventory_totals": {
   "rows": 2399,
   "classes": {
-   "i": 445,
+   "i": 443,
    "ii": 366,
    "iii": 9,
-   "iv": 594,
+   "iv": 596,
    "v": 985
   },
   "dispositions": {
@@ -2963,8 +2963,14 @@ for r in rows:
   code=re.match(r"documented exclusion - ([A-Z-]+):",r[5]).group(1)
   if code not in ALLOWED.get(r[3],set()): err("class/disposition incompatible "+repr(r))
 # stale value scan and acronym compatibility
-for stale in ["2,575","f73c629d","bd5162","no-trailing-LF","3,062","e4ce1263","6e28caec"]:
- if stale in open(p,encoding="utf-8").read(): err("stale value present: "+stale)
+# class/backtick compatibility (class-v placeholders/statuses are the documented exception)
+for r in rows:
+ tok=r[4].strip(); bt=tok.startswith(chr(96)) and tok.endswith(chr(96))
+ if bt and r[3] not in ("iv","v"): err("backticked token not class iv/v "+repr(r))
+ if r[3]=="iv" and not bt: err("class iv token not backticked "+repr(r))
+STALE=["2,"+"5"+"75","f7"+"3c"+"6"+"29d","bd"+"51"+"62","no-"+"trail"+"ing-LF","3,"+"0"+"62","e4"+"ce1"+"263","6e"+"28"+"caec"]
+for stale in STALE:
+ if stale in open(p,encoding="utf-8").read().split("### Embedded verifier source")[0]: err("stale value present: "+stale)
 ACR=set("CLI API CI PR SHA URL PII DCO ORM XSS ISMS AIMS FIFO HTTP HTTPS OLTP TLS SSO RBAC MFA KMS CDN SQL JSON YAML ADR SDK CPU IO GC OOM LLM QA E2E SAST OIDC TOML PRD CSV UI UX CTA CWE OLAP CDC RLS SLO AWS GCP MVP AI-SDLC OWASP RCE NIST RMF HITL HOTL SDLC AI AC ACL CR CSS DB DSR EOF HMAC HTML IP ISO JIT JS LF NL PERF QR RAG RDS RFC RLHF ROUGE RPC SEV SOA SSRF STRIDE UTC".split())
 for r in rows:
  tok=r[4].strip().strip(chr(96))
@@ -2979,7 +2985,7 @@ for r in rows:
   elif r[3]=="v" and not re.fullmatch(r"<[^<>]+>",inner): err("class-v placeholder shape "+repr(r)); raw_ok=False
 if errors:
  print("VERIFIER FAIL:"); [print(" -",e) for e in errors]; sys.exit(1)
-print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d inline-artifacts=%d/6 crows-block=exact"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,inline_ok))
+print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d inline-artifacts=%d/6 crows-block=exact class-backtick=ok"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,inline_ok))
 ~~~~
 
 **Mechanically verified by the verifier:** table parse/rows/keys/classes/dispositions/codes/per-page totals/Crows.json row1 count/malformed rows/overlaps. **Manually asserted, not source-page cross-checked:** page-token meanings, first-use judgments, B2/AC dispositions; AC3 is therefore table-level self-consistency only.
@@ -2987,7 +2993,7 @@ print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=
 ### Embedded verifier expected output
 
 ~~~~text
-VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 594, 'i': 445, 'iii': 9} disps={'excluded': 2009, 'named': 380, 'defined': 10} exclusions=2009 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127 inline-artifacts=6/6 crows-block=exact
+VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 596, 'i': 443, 'iii': 9} disps={'excluded': 2009, 'named': 380, 'defined': 10} exclusions=2009 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127 inline-artifacts=6/6 crows-block=exact class-backtick=ok
 ~~~~
 
 External convenience copies: _A/evidence/read-lc-424-c1/Crows.txt 1542/4/sha8a8a2564..., A-rows path above, README/preview/MANIFEST/Crows.json above. No in-branch claim of files outside this record.
