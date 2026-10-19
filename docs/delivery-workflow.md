@@ -179,7 +179,7 @@ column of the stage table. The maintenance rule is
 | `SD-C` | IMPLEMENT | **COMPLETE** or **INCOMPLETE**. **COMPLETE requires an immutable head: the commit SHA, the tree it resolves to (`git rev-parse <head>^{tree}`), and the base commit the change is against, all recorded** — so the next stage audits fixed objects rather than a moving branch, and "the diff at an exact head" is fully determined. The **tree** fixes content; the **base** fixes the diff. | COMPLETE |
 | `SD-D` | IMPL AUDIT | **ACCEPT** or **REVISE**, resolved **per acceptance criterion**: every criterion is `MET`, `NOT MET` or `UNRUN`. ACCEPT requires **no `NOT MET`**, and **every `UNRUN` must correspond to a criterion the plan at `SD-A` declared not verifiable at this head, with its reason recorded**. A criterion that becomes `UNRUN` at audit time and was **not** so declared forces **`REVISE`** — it is a finding about the implementation or the plan, not a gap to wave through. | ACCEPT |
 | `SD-E` | VALIDATE | **PASS**, **INCOMPLETE — UNRUN LISTED**, or **FAIL**. | PASS, and INCOMPLETE — UNRUN LISTED **only when its condition below is met** |
-| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran, each applicable row checked against its captured self-authored source under [the skills-row protocol](#authoring-and-publishing-skills-rows)**; **and the `## Reconciliation witness` block is present with one row per numbered site**; **and the verdict names a content hash over [the bound fields](#the-bound-fields), which void the verdict if they change.** | ACCEPT |
+| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran, each applicable row checked against its captured self-authored source under [the skills-row protocol](#authoring-and-publishing-skills-rows)**; **and the `## Reconciliation witness` block is present with one row per numbered site**; **and the verdict names a content hash over [the bound fields](#the-bound-fields), which void the verdict if they change.** **and the owner rule's "Aegis skills applied" section is present and complete** ([pointer](../AGENTS.md)). | ACCEPT |
 | `SD-G` | MERGE | **MERGED** or **NOT MERGED**, with [the receipt](#the-receipt-what-stage-g-must-be-able-to-show) recording a status per `MG` ID. | MERGED |
 
 > **`SD-E: INCOMPLETE — UNRUN LISTED`** is affirmative when every unrun
@@ -662,6 +662,8 @@ The rules for that table:
   fix a table*, the other says *if you change the table, the verdict you hold is
   void*.
 - **Do not create a separate document** merely to list skills.
+
+**Owner rule pointer (2026-10-19).** The owner's rule of 2026-10-19 adds a five-column "Aegis skills applied" evidence section to every PR, checked at SD-F. The rule is stated once in [AGENTS.md](../AGENTS.md) (section "Source-library owner rule: Aegis skills applied and review evidence"); this page's sentence is a non-normative pointer and the AGENTS.md section governs. The four-column table above and its bound-field contract are unchanged.
 
 ### Authoring and publishing skills rows
 

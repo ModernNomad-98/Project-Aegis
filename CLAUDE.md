@@ -13,3 +13,5 @@
 5. Skills whose description begins "MANUAL-ONLY" are never auto-invoked — only when the user names them explicitly.
 
 6. If the matching skill is not present in this copy of the library, say so plainly and continue with ordinary care — never invent a skill or silently substitute a different one.
+
+7. **Apply the owner's Aegis skills and review evidence rule.** From 2026-10-19 the owner requires every PR to record actual Aegis skill use in an "Aegis skills applied" section and to read and disposition review feedback from every provider. The rule is stated once, authoritatively, in AGENTS.md under "Source-library owner rule: Aegis skills applied and review evidence"; read it there. This item is a non-normative pointer summary — the AGENTS.md section governs if the two ever diverge.
