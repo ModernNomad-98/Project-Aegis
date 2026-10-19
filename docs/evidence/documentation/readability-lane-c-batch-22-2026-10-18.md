@@ -3194,4 +3194,3 @@ print(EXPECTED)
 ~~~
 
 **Negative tests to reproduce:** (a) remove the code span from one angle-placeholder token -> exit1 raw-angle/placeholder; (b) change one class-iv backticked row to i -> exit1 class/backtick; (c) mutate the MANIFEST-432.txt measured sha -> exit1 measured mismatch; (d) duplicate one named token on the same page -> exit1 multiple defined/named per page+token; (e) no argument -> exit2. Each must be non-zero; never treat a pass as a merge gate.
-
