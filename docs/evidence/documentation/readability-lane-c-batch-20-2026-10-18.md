@@ -45,73 +45,73 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 ### P416 - index 416 - docs/evidence/documentation/readability-lane-a-batch-18-2026-10-18.md - absent at pin -> re-pin - read whole L1-161
 
 **B1:** lane A batch 18 record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 262 inventory rows; defined-at-first-use 11; named-gap count 85; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 262 inventory rows; defined-at-first-use 11; named-gap count 82; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
-**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A - Stage C batch record, batch 18, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and diff accounting; B4 anchor L22 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740f; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A - Stage C batch record, batch 18, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and diff accounting; B4 anchor L22 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740f…; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P417 - index 417 - docs/evidence/documentation/readability-lane-a-batch-19-2026-10-18.md - absent at pin -> re-pin - read whole L1-183
 
 **B1:** lane A batch 19 record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 264 inventory rows; defined-at-first-use 10; named-gap count 77; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 264 inventory rows; defined-at-first-use 10; named-gap count 74; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
-**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 19, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and hunk/line accounting; B4 anchor L15 - **Eight pages read, zero pages edited**; every page's `git diff --numstat 2db1ffb7..0e28; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 19, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and hunk/line accounting; B4 anchor L15 - **Eight pages read, zero pages edited**; every page's `git diff --numstat 2db1ffb7..0e28…`; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P418 - index 418 - docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md - present equal at pin - read whole L1-622
 
 **B1:** lane A batch 2 record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 395 inventory rows; defined-at-first-use 26; named-gap count 98; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 395 inventory rows; defined-at-first-use 26; named-gap count 96; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
-**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 2, 2026-10-15; B2 row count/classes per section5; B3 heading L39 ## 1. Lane derivation — the command, not a handed-down list; B4 anchor L7 session: `git ls-remote origin refs/heads/main` still resolves to `e2a3e20b7c20ef8385b219b; B5 link ../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page at L139, check-markdown-links.py files: 1   links checked: 1   anchors checked: 1   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob 4bbe6bd54fcfd584ed2253e57ca3bf00d61e89ee.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 2, 2026-10-15; B2 row count/classes per section5; B3 heading L39 ## 1. Lane derivation — the command, not a handed-down list; B4 anchor L7 session: `git ls-remote origin refs/heads/main` still resolves to `e2a3e20b7c20ef8385b219b…`; B5 link ../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page at L139, check-markdown-links.py files: 1   links checked: 1   anchors checked: 1   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob 4bbe6bd54fcfd584ed2253e57ca3bf00d61e89ee.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P419 - index 419 - docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md - present equal at pin - read whole L1-195
 
 **B1:** lane A batch 2 APR-117 withdrawal/re-record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 154 inventory rows; defined-at-first-use 8; named-gap count 36; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 154 inventory rows; defined-at-first-use 8; named-gap count 34; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
-**Page-specific B1-B6 evidence:** B1 title L1 AEGIS-APR-117 withdrawal and re-record — Phase 4 re-read lane A, batch 2, 2026-10-16; B2 row count/classes per section5; B3 heading L9 ## Why these rows exist; B4 anchor L30 `Blob ID` equals `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>`. All eigh; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob dcb115e88645ef9e5e35cb141cc03b47cec6ee65.
+**Page-specific B1-B6 evidence:** B1 title L1 AEGIS-APR-117 withdrawal and re-record — Phase 4 re-read lane A, batch 2, 2026-10-16; B2 row count/classes per section5; B3 heading L9 ## Why these rows exist; B4 anchor L30 `Blob ID` equals `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>`. All eight pages…; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob dcb115e88645ef9e5e35cb141cc03b47cec6ee65.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P420 - index 420 - docs/evidence/documentation/readability-lane-a-batch-20-2026-10-18.md - absent at pin -> re-pin - read whole L1-165
 
 **B1:** lane A batch 20 record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 277 inventory rows; defined-at-first-use 13; named-gap count 97; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 277 inventory rows; defined-at-first-use 13; named-gap count 94; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
-**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A - Stage C batch record, batch 20, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and diff accounting; B4 anchor L22 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740f; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A - Stage C batch record, batch 20, 2026-10-18; B2 row count/classes per section5; B3 heading L11 ## 1. Scope and diff accounting; B4 anchor L22 python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7985ddc1c087c455740f…; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P421 - index 421 - docs/evidence/documentation/readability-lane-a-batch-3-2026-10-15.md - present equal at pin - read whole L1-549
 
 **B1:** lane A batch 3 record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 381 inventory rows; defined-at-first-use 23; named-gap count 87; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 381 inventory rows; defined-at-first-use 22; named-gap count 87; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
-**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 3, 2026-10-15; B2 row count/classes per section5; B3 heading L32 ## 1. Lane derivation — the command, not a handed-down list; B4 anchor L8 session: `git ls-remote origin refs/heads/main` still resolves to `e2a3e20b7c20ef8385b219b; B5 link ../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page at L144, check-markdown-links.py files: 1   links checked: 1   anchors checked: 1   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob 205413beb9e3d6ed61f232f981c57c42a65514be.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 3, 2026-10-15; B2 row count/classes per section5; B3 heading L32 ## 1. Lane derivation — the command, not a handed-down list; B4 anchor L8 session: `git ls-remote origin refs/heads/main` still resolves to `e2a3e20b7c20ef8385b219b…`; B5 link ../../roadmaps/aegis-documentation-readability-backlog.md#acceptance-for-each-page at L144, check-markdown-links.py files: 1   links checked: 1   anchors checked: 1   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review. Pinned blob 205413beb9e3d6ed61f232f981c57c42a65514be.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ### P422 - index 422 - docs/evidence/documentation/readability-lane-a-batch-4-2026-10-15.md - absent at pin -> re-pin - read whole L1-1025
 
 **B1:** lane A batch 4 record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 674 inventory rows; defined-at-first-use 16; named-gap count 119; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 674 inventory rows; defined-at-first-use 16; named-gap count 115; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
@@ -122,21 +122,21 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 ### P423 - index 423 - docs/evidence/documentation/readability-lane-a-batch-4-2026-10-17.md - absent at pin -> re-pin - read whole L1-159
 
 **B1:** lane A batch 4 re-record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 309 inventory rows; defined-at-first-use 11; named-gap count 77; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 309 inventory rows; defined-at-first-use 9; named-gap count 74; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
 **B6:** UNVERIFIED - no non-author read-only review claimed; B6 cannot support FULL.
-**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 4, 2026-10-17; B2 row count/classes per section5; B3 heading L7 ## 1. Scope and diff accounting; B4 anchor L11 - **Eight pages read, zero pages edited**; every page's net line change is 0. **Four DCO-s; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
+**Page-specific B1-B6 evidence:** B1 title L1 Readability Phase 4 re-read lane A — Stage C batch record, batch 4, 2026-10-17; B2 row count/classes per section5; B3 heading L7 ## 1. Scope and diff accounting; B4 anchor L11 - **Eight pages read, zero pages edited**; every page's net line change is 0. **Four DCO-signed…**; B5 no relative links (checker 0 links), check-markdown-links.py files: 1   links checked: 0   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0; B6 no non-author review.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
 ## 4. Systematic five-class exact-once token inventory - ONE contiguous table
 
-**Normalization and dispatch.** **Escape/exact-once clarification (finding #4).** Markdown pipes in cells are escaped as backslash-pipe; the raw token text is preserved as the key, so the P423 L54 plain-pipe token and P423 L135 escaped-pipe token remain distinct raw tokens at distinct first-use lines. The unique key is **(page, line, class, raw token text)**; an independent parser that splits on unescaped table pipes and counts raw token cells finds 2,716 rows = 2,716 unique keys / 0 duplicate keys, and every tally sums to 2,716. This key is explicitly not token-text alone (which would collide across pages).
+**Normalization, status vocabulary and dispatch.** **Status vocabulary (finding #2):** the only allowed STATUS tokens are the exact uppercase lifecycle/status keywords **PASS, FAIL, UNRUN, UNVERIFIED, FULL, PARTIAL, ACCEPT, ACCEPTED, REVISE, UNVERIFIABLE**. Any exact uppercase token in that vocabulary is class v and a documented exclusion carrying the STATUS code, on every page, regardless of whether the page expands it; lowercase/backticked prose variants (for example `verified`/`selected`) are class iv LITERAL, never STATUS. No first-use exception applies to STATUS tokens. **Escape/key rule (finding #4):** parse each table row by scanning left-to-right: a pipe is escaped only when immediately preceded by an odd number of backslashes; strip one backslash and treat the pipe as literal, otherwise split; then HTML-unescape `&lt;` -> `<`, `&gt;` -> `>`, `&amp;` -> `&`; the key is the resulting raw token text (code-span backticks retained, no further normalization). Angle placeholders in class-v cells are escaped as `&lt;...&gt;` so they render literally; they unescape once for the key. The P423 L54 plain-pipe token and L135 escaped-pipe token remain distinct raw tokens. The unique key is **(page, line, class, raw token text)**; an independent parser finds **2,716 rows = 2,716 unique keys / 0 duplicate keys**, and every tally sums to 2,716. This key is explicitly not token-text alone.
 
- Keys are **case-sensitive verbatim token text** as displayed; backtick wrappers are retained in class iv tokens; whitespace is collapsed only for multiline DOTALL placeholders; plurals are not stemmed; no case-folding/punctuation folding/Unicode normalization. Case-fold collisions are retained only when each variant is a real token at a real first-use line and are listed with per-row dispositions below. Dispatch: **i** uppercase acronyms/proper names/roles/page-line-AC IDs/coded identifiers not statuses; **ii** lowercase technical/audience prose; **iii** non-backticked file/path/identifier; **iv** whole backticked code/identifier/command tokens incl command-like; **v = status keywords (uppercase ONLY for the status-keyword part) + numeric ranges/units/dates + angle placeholders + operator glyphs**. Lowercase status prose remains class ii; all non-status class-v rows use the numeric/range/placeholder/operator members of this definition. Section4 is the single source of truth; sections 3/5/6 are derived and reconciled; every tally sums to the final row count. Pipes escaped; every row parses five cells.
+**Normalization:** keys are case-sensitive verbatim token text as displayed; backtick wrappers are retained in class iv tokens; whitespace is collapsed only for multiline DOTALL placeholders; plurals are not stemmed; no case-folding/punctuation folding/Unicode normalization. Case-fold collisions are retained only when each variant is a real token at a real first-use line and are listed below. Dispatch: **i** uppercase acronyms/proper names/roles/page-line-AC IDs/coded identifiers not statuses; **ii** lowercase technical/audience prose; **iii** non-backticked file/path/identifier; **iv** whole backticked code/identifier/command tokens incl command-like; **v = uppercase lifecycle/status/state keywords and acronyms (the 10 coded STATUS tokens plus state-like words such as MET, OWED, SATISFIED, UNAVAILABILITY, CONFLICTING, DIRTY, OPEN, APPLIED, AWAITING, COMMENTED, MERGED, UNAVAILABLE, FAILED) + numeric ranges/units/dates + angle placeholders + operator glyphs**. Lowercase status prose remains class ii; all non-status class-v rows use the numeric/range/placeholder/operator members. Class v totals after the status rule: **184**; class totals **i972 / ii505 / iii174 / iv881 / v184 = 2,716**; dispositions **115 defined / 656 named gaps / 1,945 documented exclusions = 2,716**. Section 4 is the single source of truth.
 
-**Auxiliary case-fold collision examples (not part of the ONE contiguous main inventory; labels are the actual page of each variant).**
+**Auxiliary case-fold collision examples (not part of the ONE contiguous main inventory; labels are the actual page of each variant).** This auxiliary table is a **pre-reclassification historical view**; its status-token dispositions are superseded by the uniform uppercase-STATUS rule and the canonical table in section 4. It is not used for any tally.
 
 | Variant group | Rows (page/token/line/disposition) |
 | --- | --- |
@@ -155,7 +155,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | E2E | P416 E2E L73 documented exclusion; P418 E2E L257 documented exclusion; P418 e2e L270 defined at first use; P420 E2E L40 documented exclusion; P420 e2e L94 named gap |
 | QA | P416 QA L85 named gap; P418 QA L225 named gap; P418 qa L270 defined at first use |
 | sha | P416 sha L119 defined at first use; P416 SHA L130 named gap; P420 sha L123 defined at first use; P420 SHA L134 named gap; P422 SHA L372 defined at first use; P423 SHA L72 named gap |
-| <page> | P417 <page> L15 documented exclusion; P418 <page> L100 documented exclusion; P418 <Page> L132 documented exclusion; P419 <page> L30 documented exclusion; P421 <page> L111 documented exclusion; P422 <page> L68 documented exclusion; P423 <page> L28 documented exclusion |
+| &lt;page&gt; | P417 &lt;page&gt; L15 documented exclusion; P418 &lt;page&gt; L100 documented exclusion; P418 <Page> L132 documented exclusion; P419 &lt;page&gt; L30 documented exclusion; P421 &lt;page&gt; L111 documented exclusion; P422 &lt;page&gt; L68 documented exclusion; P423 &lt;page&gt; L28 documented exclusion |
 | accepted | P417 accepted L16 named gap; P418 accepted L144 named gap; P419 accepted L74 defined at first use; P421 accepted L139 named gap; P422 accepted L504 defined at first use; P423 ACCEPTED L5 named gap; P423 accepted L12 named gap |
 | approval | P417 approval L30 defined at first use; P418 approval L310 named gap; P420 approval L27 defined at first use; P421 approval L287 defined at first use; P421 APPROVAL L293 named gap; P422 approval L104 named gap |
 | failed | P418 failed L510 named gap; P419 failed L173 named gap; P421 failed L397 named gap; P422 failed L9 named gap; P422 FAILED L989 defined at first use; P423 failed L52 named gap |
@@ -167,7 +167,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P416 | 1 | ii | record | named gap - first use before any expansion on this page |
 | P416 | 1 | v | 2026-10 | documented exclusion - DATE: date/time or version fragment |
 | P416 | 3 | ii | evidence | named gap - first use before any expansion on this page |
-| P416 | 5 | v | ACCEPT | named gap - first use before any expansion on this page |
+| P416 | 5 | v | ACCEPT | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P416 | 5 | i | PR | named gap - first use before any expansion on this page |
 | P416 | 5 | ii | frontier | named gap - first use before any expansion on this page |
 | P416 | 5 | v | PASS | documented exclusion - STATUS: uppercase lifecycle/status keyword |
@@ -223,7 +223,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P416 | 33 | i | UX | named gap - first use before any expansion on this page |
 | P416 | 33 | ii | authz | named gap - first use before any expansion on this page |
 | P416 | 33 | iv | `418dfdef2d37272d5959b6c4b0497cceae1faa79` | documented exclusion - SHA: hash/commit identifier |
-| P416 | 33 | v | PARTIAL | named gap - first use before any expansion on this page |
+| P416 | 33 | v | PARTIAL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P416 | 34 | i | HTTP | named gap - first use before any expansion on this page |
 | P416 | 34 | i | L68 | documented exclusion - LINE-RANGE: page-line reference |
 | P416 | 34 | i | P2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -268,7 +268,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P416 | 40 | iii | event-schema-sheet.md | documented exclusion - PATH: file or path identifier |
 | P416 | 40 | iv | `.claude/skills/event-schema-architect/references/event-schema-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P416 | 40 | iv | `1f59d2439a7435b26c805028306513fa6acfab79` | documented exclusion - SHA: hash/commit identifier |
-| P416 | 42 | v | FULL | named gap - first use before any expansion on this page |
+| P416 | 42 | v | FULL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P416 | 42 | v | UNRUN | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P416 | 44 | ii | purpose | named gap - first use before any expansion on this page |
 | P416 | 46 | i | AC4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -429,7 +429,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P417 | 1 | ii | record | named gap - first use before any expansion on this page |
 | P417 | 1 | v | 2026-10 | documented exclusion - DATE: date/time or version fragment |
 | P417 | 3 | ii | evidence | named gap - first use before any expansion on this page |
-| P417 | 5 | v | ACCEPT | named gap - first use before any expansion on this page |
+| P417 | 5 | v | ACCEPT | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P417 | 5 | i | D-1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 5 | i | D-2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 5 | i | PR | named gap - first use before any expansion on this page |
@@ -458,8 +458,8 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P417 | 15 | ii | drift | named gap - first use before any expansion on this page |
 | P417 | 15 | ii | git | named gap - first use before any expansion on this page |
 | P417 | 15 | iii | 2db1ffb7..0e28bc8c | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P417 | 15 | iv | `git diff --numstat 2db1ffb7..0e28bc8c -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P417 | 15 | v | <page> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P417 | 15 | iv | `git diff --numstat 2db1ffb7..0e28bc8c -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P417 | 15 | v | &lt;page&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P417 | 16 | ii | accepted | named gap - first use before any expansion on this page |
 | P417 | 16 | ii | pending | named gap - first use before any expansion on this page |
 | P417 | 16 | ii | reader | named gap - first use before any expansion on this page |
@@ -508,7 +508,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P417 | 40 | i | SDK | named gap - first use before any expansion on this page |
 | P417 | 40 | iv | `ID` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 40 | iv | `a9137e64d93a58226688bc74b145e3764b093481` | documented exclusion - SHA: hash/commit identifier |
-| P417 | 40 | v | PARTIAL | named gap - first use before any expansion on this page |
+| P417 | 40 | v | PARTIAL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P417 | 41 | i | P2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 41 | iii | flag-system-sheet.md | documented exclusion - PATH: file or path identifier |
 | P417 | 41 | iv | `.claude/skills/feature-flag-architect/references/flag-system-sheet.md` | documented exclusion - PATH: file or path identifier |
@@ -550,7 +550,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P417 | 47 | iii | trust-exploitation-patterns.md | documented exclusion - PATH: file or path identifier |
 | P417 | 47 | iv | `.claude/skills/human-agent-trust-reviewer/references/trust-exploitation-patterns.md` | documented exclusion - PATH: file or path identifier |
 | P417 | 47 | iv | `d76ed858c3c33c292e104447d51ad12ee2533207` | documented exclusion - SHA: hash/commit identifier |
-| P417 | 49 | v | FULL | named gap - first use before any expansion on this page |
+| P417 | 49 | v | FULL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P417 | 49 | v | UNRUN | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P417 | 51 | ii | purpose | named gap - first use before any expansion on this page |
 | P417 | 53 | i | B1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -608,7 +608,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P417 | 71 | i | L221 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 71 | i | L26 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 71 | i | L68 | documented exclusion - LINE-RANGE: page-line reference |
-| P417 | 71 | iv | `A/B` | documented exclusion - PATH: file or path identifier |
+| P417 | 71 | iv | `A/B` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 71 | iv | `references/flag-rollout-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P417 | 77 | i | L36 | documented exclusion - LINE-RANGE: page-line reference |
 | P417 | 77 | i | L45 | documented exclusion - LINE-RANGE: page-line reference |
@@ -667,20 +667,20 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P417 | 128 | iv | `8459ac73ba6e0b280338aca9a97be7a3336ce356` | documented exclusion - SHA: hash/commit identifier |
 | P417 | 129 | iv | `62adb08edbacdd3171fc3db4f8e359828a25e1ba` | documented exclusion - SHA: hash/commit identifier |
 | P417 | 130 | iv | `9c918ed2aadd667d90939fdfbf6aff8a00d92acf` | documented exclusion - SHA: hash/commit identifier |
-| P417 | 133 | iv | `git rev-parse 2db1ffb7…:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P417 | 133 | iv | `git rev-parse 2db1ffb7…:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P417 | 134 | ii | counts | named gap - first use before any expansion on this page |
-| P417 | 134 | iv | `git log -1 --format='%H\|%an\|%ad\|%s' -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P417 | 134 | iv | `git rev-list --count main -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P417 | 134 | iv | `git log -1 --format='%H\|%an\|%ad\|%s' -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P417 | 134 | iv | `git rev-list --count main -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P417 | 156 | iv | `0e28bc8c0a6d34bb63e35f6024cc7409495ea08c` | documented exclusion - SHA: hash/commit identifier |
 | P417 | 156 | iv | `git rev-parse origin/main` | documented exclusion - PATH: file or path identifier |
 | P417 | 157 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7… --json` | documented exclusion - PATH: file or path identifier |
 | P417 | 158 | v | × | documented exclusion - OPERATOR: operator glyph |
-| P417 | 159 | iv | `git show 2db1ffb7…:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P417 | 160 | iv | `git diff --numstat 2db1ffb7… 0e28bc8c… -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P417 | 159 | iv | `git show 2db1ffb7…:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P417 | 160 | iv | `git diff --numstat 2db1ffb7… 0e28bc8c… -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P417 | 161 | ii | ci | named gap - first use before any expansion on this page |
 | P417 | 161 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
 | P417 | 161 | iv | `python -B scripts/ci/check-markdown-links.py <eight pages>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P417 | 161 | v | <eight pages> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P417 | 161 | v | &lt;eight pages&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P417 | 163 | iv | `laneA[128]…laneA[135]` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P417 | 167 | i | SD-C | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P417 | 167 | ii | handoff | named gap - first use before any expansion on this page |
@@ -710,7 +710,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 10 | i | AI | named gap - first use before any expansion on this page |
 | P418 | 10 | ii | owner | named gap - first use before any expansion on this page |
 | P418 | 11 | iv | `readability-lane-a-implementer-c` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
-| P418 | 12 | v | REVISE | named gap - first use before any expansion on this page |
+| P418 | 12 | v | REVISE | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P418 | 12 | i | SD-D | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 12 | iv | `SD-D: REVISE` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 13 | ii | head | named gap - first use before any expansion on this page |
@@ -740,7 +740,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 60 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 60 | iv | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - PATH: file or path identifier |
 | P418 | 61 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
-| P418 | 62 | iv | `ceil(590 / 4) = 148` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
+| P418 | 62 | iv | `ceil(590 / 4) = 148` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 65 | ii | count | defined at first use - line 65 contains the expansion |
 | P418 | 65 | ii | reviewer | named gap - first use before any expansion on this page |
 | P418 | 65 | iii | ai-security-red-team-reviewer.md | documented exclusion - PATH: file or path identifier |
@@ -780,9 +780,9 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 96 | ii | rerecord | defined at first use - line 96 contains the expansion |
 | P418 | 96 | iii | readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | documented exclusion - PATH: file or path identifier |
 | P418 | 96 | iv | `docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md` | documented exclusion - PATH: file or path identifier |
-| P418 | 100 | iv | `git log -1 --format="%h %an" -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 100 | iv | `git log -1 --format="%h %an" -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 100 | v | % | documented exclusion - OPERATOR: operator glyph |
-| P418 | 100 | v | <page> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 100 | v | &lt;page&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 104 | i | P1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 104 | ii | batches | named gap - first use before any expansion on this page |
 | P418 | 104 | ii | review | named gap - first use before any expansion on this page |
@@ -822,12 +822,12 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 124 | i | K-104 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 125 | i | K-105 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 125 | ii | audit | defined at first use - line 125 contains the expansion |
-| P418 | 127 | v | PARTIAL | named gap - first use before any expansion on this page |
+| P418 | 127 | v | PARTIAL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P418 | 130 | iv | `Blob ID` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 131 | iv | `build_index.py` | documented exclusion - PATH: file or path identifier |
 | P418 | 132 | iv | `git rev-parse <Acceptance revision>:<Page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P418 | 132 | v | <Acceptance revision> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P418 | 132 | v | <Page> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 132 | v | &lt;Acceptance revision&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 132 | v | &lt;Page&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 134 | ii | dispositions | defined at first use - line 134 contains the expansion |
 | P418 | 139 | iii | aegis-documentation-readability-backlog.md | documented exclusion - PATH: file or path identifier |
 | P418 | 144 | i | SKILL | named gap - first use before any expansion on this page |
@@ -846,7 +846,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 151 | iii | adr-corpus-sheet.md | documented exclusion - PATH: file or path identifier |
 | P418 | 151 | iv | `.claude/skills/adr-sequencer/references/adr-corpus-sheet.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 153 | ii | counts | defined at first use - line 153 contains the expansion |
-| P418 | 153 | iv | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 153 | iv | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 155 | iv | `wc -l` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 156 | i | DSH | named gap - first use before any expansion on this page |
 | P418 | 156 | i | UTF-8 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1002,7 +1002,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 392 | iv | `84ed16ca…` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 392 | iv | `bf44030a…` | documented exclusion - SHA: hash/commit identifier |
 | P418 | 392 | iv | `d9500b3b…` | documented exclusion - SHA: hash/commit identifier |
-| P418 | 392 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 392 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 392 | v | × | documented exclusion - OPERATOR: operator glyph |
 | P418 | 394 | ii | ci | named gap - first use before any expansion on this page |
 | P418 | 394 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
@@ -1015,11 +1015,11 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 396 | iii | test_validator.py | documented exclusion - PATH: file or path identifier |
 | P418 | 396 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P418 | 396 | iv | `python scripts/tests/test_validator.py` | documented exclusion - PATH: file or path identifier |
-| P418 | 398 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 398 | iv | `git log -1 --format="%h %an %s" -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 399 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - PATH: file or path identifier |
 | P418 | 401 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref <this batch's committed head>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 401 | iv | `table_rows 109, events 109, full_page_acceptances 89, lost_commit_events 10, reader_pages_with_rows 76` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
-| P418 | 401 | v | <this batch's committed head> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 401 | v | &lt;this batch's committed head&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 407 | i | F1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 407 | i | F5 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 408 | i | F3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1061,7 +1061,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 550 | ii | build | named gap - first use before any expansion on this page |
 | P418 | 555 | i | F6 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 555 | iii | 8.7.1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P418 | 556 | iv | `git show e2a3e20b…:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 556 | iv | `git show e2a3e20b…:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 575 | iii | 8.7.2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 582 | iii | 8.7.3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P418 | 583 | i | PROC-04 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1072,9 +1072,9 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P418 | 591 | iii | 8.8 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P418 | 597 | iv | `git grep -n -i -F -e authz … -- .claude/skills/admin-console-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P418 | 598 | i | OEC | named gap - first use before any expansion on this page |
-| P418 | 599 | iv | `git show …:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 599 | iv | `git show …:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 600 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref <the repair head>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P418 | 600 | v | <the repair head> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P418 | 600 | v | &lt;the repair head&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P418 | 601 | iv | `/comments` | documented exclusion - PATH: file or path identifier |
 | P418 | 601 | iv | `/issues/777/comments` | documented exclusion - PATH: file or path identifier |
 | P418 | 604 | iii | 8.9 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
@@ -1092,7 +1092,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P419 | 3 | iii | DeepSeek-4.1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 4 | iv | `deepseek-flash-apr117-keeper` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P419 | 5 | i | PR | defined at first use - line 5 contains the expansion |
-| P419 | 6 | v | REVISE | named gap - first use before any expansion on this page |
+| P419 | 6 | v | REVISE | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P419 | 6 | i | SD-D | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 6 | ii | head | named gap - first use before any expansion on this page |
 | P419 | 6 | iv | `SD-D: REVISE` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
@@ -1118,8 +1118,8 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P419 | 30 | i | ID | named gap - first use before any expansion on this page |
 | P419 | 30 | ii | git | named gap - first use before any expansion on this page |
 | P419 | 30 | iv | `Blob ID` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
-| P419 | 30 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P419 | 30 | v | <page> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P419 | 30 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P419 | 30 | v | &lt;page&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P419 | 33 | ii | docs | named gap - first use before any expansion on this page |
 | P419 | 33 | iii | readability-lane-a-batch-2-2026-10-15.md | documented exclusion - PATH: file or path identifier |
 | P419 | 33 | iv | `docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md` | documented exclusion - PATH: file or path identifier |
@@ -1128,9 +1128,9 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P419 | 36 | iv | `build_index.py` | documented exclusion - PATH: file or path identifier |
 | P419 | 38 | i | WD-A2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 38 | iv | `WD-A2-<n>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P419 | 38 | v | <n> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P419 | 38 | v | &lt;n&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P419 | 39 | ii | ids | named gap - first use before any expansion on this page |
-| P419 | 40 | v | <the repair head> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P419 | 40 | v | &lt;the repair head&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P419 | 44 | ii | id | named gap - first use before any expansion on this page |
 | P419 | 44 | ii | open | named gap - first use before any expansion on this page |
 | P419 | 47 | i | K-082 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1148,7 +1148,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P419 | 52 | i | K-104 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 53 | i | K-089 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 55 | i | K-105 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P419 | 56 | v | PARTIAL | named gap - first use before any expansion on this page |
+| P419 | 56 | v | PARTIAL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P419 | 57 | i | P8 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P419 | 61 | iv | `50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b` | documented exclusion - SHA: hash/commit identifier |
 | P419 | 64 | ii | audit | named gap - first use before any expansion on this page |
@@ -1244,7 +1244,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P420 | 3 | i | LAST | named gap - first use before any expansion on this page |
 | P420 | 3 | ii | evidence | named gap - first use before any expansion on this page |
 | P420 | 3 | v | 136-143 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
-| P420 | 5 | v | ACCEPT | named gap - first use before any expansion on this page |
+| P420 | 5 | v | ACCEPT | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P420 | 5 | i | LANE | named gap - first use before any expansion on this page |
 | P420 | 5 | i | PR | named gap - first use before any expansion on this page |
 | P420 | 5 | ii | frontier | named gap - first use before any expansion on this page |
@@ -1299,7 +1299,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P420 | 35 | i | P1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P420 | 35 | i | RLS | named gap - first use before any expansion on this page |
 | P420 | 35 | iv | `05ead569afb3d06c43123b9b5ed493001284d99e` | documented exclusion - SHA: hash/commit identifier |
-| P420 | 35 | v | PARTIAL | named gap - first use before any expansion on this page |
+| P420 | 35 | v | PARTIAL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P420 | 36 | i | CDK | named gap - first use before any expansion on this page |
 | P420 | 36 | i | IAM | named gap - first use before any expansion on this page |
 | P420 | 36 | i | P2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1322,7 +1322,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P420 | 39 | iii | incident-runbook-template.md | documented exclusion - PATH: file or path identifier |
 | P420 | 39 | iv | `.claude/skills/incident-response-runbook/references/incident-runbook-template.md` | documented exclusion - PATH: file or path identifier |
 | P420 | 39 | iv | `b24fee58436372a33b854abd9f2c54f5bd825939` | documented exclusion - SHA: hash/commit identifier |
-| P420 | 39 | v | FULL | named gap - first use before any expansion on this page |
+| P420 | 39 | v | FULL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P420 | 40 | i | API | named gap - first use before any expansion on this page |
 | P420 | 40 | i | E2E | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P420 | 40 | i | P6 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1433,7 +1433,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P420 | 76 | i | L9 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 76 | ii | budget | named gap - first use before any expansion on this page |
 | P420 | 76 | iv | `SEV<h>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P420 | 76 | v | <h> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P420 | 76 | v | &lt;h&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P420 | 77 | i | L5-7 | documented exclusion - LINE-RANGE: page-line reference |
 | P420 | 77 | iv | `SEV means incident severity level ... IC is the incident commander ... p99 is the 99th-percentile observed latency ...` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P420 | 80 | i | L1-195 | documented exclusion - LINE-RANGE: page-line reference |
@@ -1562,7 +1562,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 54 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 54 | iv | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - PATH: file or path identifier |
 | P421 | 55 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
-| P421 | 56 | iv | `ceil(590 / 4) = 148` | documented exclusion - PATH: file or path identifier |
+| P421 | 56 | iv | `ceil(590 / 4) = 148` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 58 | ii | count | defined at first use - line 58 contains the expansion |
 | P421 | 58 | ii | reviewer | named gap - first use before any expansion on this page |
 | P421 | 58 | iii | ai-security-red-team-reviewer.md | documented exclusion - PATH: file or path identifier |
@@ -1580,7 +1580,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 66 | iii | _laneA_paths.json | documented exclusion - PATH: file or path identifier |
 | P421 | 66 | iv | `wt-laneA-b1/_laneA_paths.json` | documented exclusion - PATH: file or path identifier |
 | P421 | 67 | ii | records | defined at first use - line 67 contains the expansion |
-| P421 | 68 | iv | `ceil(590/4)=148` | documented exclusion - PATH: file or path identifier |
+| P421 | 68 | iv | `ceil(590/4)=148` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 69 | v | 0-147 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 71 | ii | lanes | named gap - first use before any expansion on this page |
 | P421 | 72 | iv | `laneB-pages.json` | documented exclusion - PATH: file or path identifier |
@@ -1588,7 +1588,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 76 | iv | `refs/heads` | documented exclusion - PATH: file or path identifier |
 | P421 | 76 | iv | `refs/remotes` | documented exclusion - PATH: file or path identifier |
 | P421 | 79 | ii | union | named gap - first use before any expansion on this page |
-| P421 | 79 | iv | `ceil(590/4) = 148` | documented exclusion - PATH: file or path identifier |
+| P421 | 79 | iv | `ceil(590/4) = 148` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 82 | iv | `cannot_decide` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 85 | iii | aws-baseline.md | documented exclusion - PATH: file or path identifier |
 | P421 | 85 | iv | `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md` | documented exclusion - PATH: file or path identifier |
@@ -1615,7 +1615,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 94 | iv | `e2a3e20b7c20…` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 97 | i | L3000-3006 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 110 | v | % | documented exclusion - OPERATOR: operator glyph |
-| P421 | 111 | v | <page> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P421 | 111 | v | &lt;page&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 115 | i | D15 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 115 | i | P1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 115 | iv | `b4751d58` | documented exclusion - SHA: hash/commit identifier |
@@ -1661,11 +1661,11 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 155 | iv | `.claude/skills/agent-containment-reviewer/references/containment-patterns.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 156 | iv | `.claude/skills/agent-failure-recovery/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 158 | ii | counts | defined at first use - line 158 contains the expansion |
-| P421 | 158 | iv | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P421 | 158 | iv | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 162 | i | B2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P421 | 163 | i | L88 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 167 | ii | cannot | named gap - first use before any expansion on this page |
-| P421 | 169 | v | PARTIAL | defined at first use - line 169 contains the expansion |
+| P421 | 169 | v | PARTIAL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P421 | 170 | ii | review | named gap - first use before any expansion on this page |
 | P421 | 173 | ii | official | named gap - first use before any expansion on this page |
 | P421 | 179 | i | L181-184 | documented exclusion - LINE-RANGE: page-line reference |
@@ -1676,7 +1676,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 183 | iv | `docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 183 | v | 5-2026 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 186 | ii | blob | named gap - first use before any expansion on this page |
-| P421 | 187 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P421 | 187 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 187 | v | × | documented exclusion - OPERATOR: operator glyph |
 | P421 | 192 | iv | `b0337e23a06d47b759c9e7263ed6050026ae752e` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 193 | iv | `8b45f8a2b3de6f54abd5a2c5c673f1e38bf4080b` | documented exclusion - SHA: hash/commit identifier |
@@ -1717,7 +1717,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 242 | i | OS | defined at first use - line 242 contains the expansion |
 | P421 | 243 | ii | tokens | named gap - first use before any expansion on this page |
 | P421 | 250 | iv | `selected` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
-| P421 | 250 | iv | `verified` | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| P421 | 250 | iv | `verified` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 251 | i | L112-113 | documented exclusion - LINE-RANGE: page-line reference |
 | P421 | 253 | iv | `references/state-contract.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 254 | ii | test | defined at first use - line 254 contains the expansion |
@@ -1802,7 +1802,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 410 | iii | recovery-playbooks.md | documented exclusion - PATH: file or path identifier |
 | P421 | 410 | iv | `references/recovery-playbooks.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 437 | iv | `git diff --numstat e2a3e20b..<this repair's commit>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P421 | 437 | v | <this repair's commit> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P421 | 437 | v | &lt;this repair's commit&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 438 | ii | head | named gap - first use before any expansion on this page |
 | P421 | 438 | iv | `27ee6291` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 438 | iv | `385 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
@@ -1846,7 +1846,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 504 | iv | `05ad76072d12070164aaf9135223e49e28a296ae` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 504 | v | 8-15 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 505 | iv | `de2bfe7237d6e853fa81925faa9f68a82881bba7` | documented exclusion - SHA: hash/commit identifier |
-| P421 | 509 | iv | `ceil(595/4) = 149` | documented exclusion - PATH: file or path identifier |
+| P421 | 509 | iv | `ceil(595/4) = 149` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 512 | iv | `.claude/skills/file-upload-storage-architect/SKILL.md` | documented exclusion - PATH: file or path identifier |
 | P421 | 524 | iv | `27fd4665…` | documented exclusion - SHA: hash/commit identifier |
 | P421 | 524 | iv | `3d79aaf5…` | documented exclusion - SHA: hash/commit identifier |
@@ -1869,11 +1869,11 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P421 | 528 | iii | test_validator.py | documented exclusion - PATH: file or path identifier |
 | P421 | 528 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P421 | 528 | iv | `python scripts/tests/test_validator.py` | documented exclusion - PATH: file or path identifier |
-| P421 | 530 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P421 | 530 | iv | `git log -1 --format="%h %an %s" -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 531 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - PATH: file or path identifier |
 | P421 | 535 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref <this batch's committed head>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 535 | iv | `refs/pull/*/head` | documented exclusion - PATH: file or path identifier |
-| P421 | 535 | v | <this batch's committed head> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P421 | 535 | v | &lt;this batch's committed head&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P421 | 537 | v | 1-13 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 537 | v | 14-20 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P421 | 543 | iv | `--ref e2a3e20b` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
@@ -1920,7 +1920,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 18 | i | B5 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 18 | ii | records | named gap - first use before any expansion on this page |
 | P422 | 19 | iii | DeepSeek-4.1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 21 | iv | `REVISE` | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| P422 | 21 | v | REVISE | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P422 | 22 | ii | audit | defined at first use - line 22 contains the expansion |
 | P422 | 23 | i | PR | named gap - first use before any expansion on this page |
 | P422 | 24 | i | SD-D | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1948,7 +1948,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 37 | iv | `f490c16f` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 37 | iv | `main` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 37 | iv | `origin/main` | documented exclusion - PATH: file or path identifier |
-| P422 | 37 | v | <base> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 37 | v | &lt;base&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 39 | ii | diff | named gap - first use before any expansion on this page |
 | P422 | 41 | ii | status | named gap - first use before any expansion on this page |
 | P422 | 42 | iv | `648ac7670bec2e260279a74716289b39f7cf2c9a` | documented exclusion - SHA: hash/commit identifier |
@@ -1976,15 +1976,15 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 58 | iv | `f848b1a9` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 61 | ii | drift | named gap - first use before any expansion on this page |
 | P422 | 61 | ii | reader | named gap - first use before any expansion on this page |
-| P422 | 68 | iv | `git diff --numstat <base> refs/remotes/origin/main -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P422 | 68 | v | <page> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 68 | iv | `git diff --numstat <base> refs/remotes/origin/main -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 68 | v | &lt;page&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 71 | ii | model | named gap - first use before any expansion on this page |
 | P422 | 73 | i | AI | named gap - first use before any expansion on this page |
 | P422 | 74 | i | V4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 77 | ii | reviewer | named gap - first use before any expansion on this page |
 | P422 | 77 | iii | example.invalid | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 77 | iv | `F reviewer <reviewer@example.invalid>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P422 | 77 | v | <reviewer@example.invalid> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 77 | v | &lt;reviewer@example.invalid&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 83 | iii | aegis-documentation-readability-backlog.md | documented exclusion - PATH: file or path identifier |
 | P422 | 85 | i | NOTHING | named gap - first use before any expansion on this page |
 | P422 | 86 | i | AC1 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -1999,7 +1999,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 94 | i | P3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 94 | i | P7 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 94 | i | P8 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 94 | v | PARTIAL | named gap - first use before any expansion on this page |
+| P422 | 94 | v | PARTIAL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P422 | 97 | i | ID | named gap - first use before any expansion on this page |
 | P422 | 98 | ii | batches | named gap - first use before any expansion on this page |
 | P422 | 99 | i | AEGIS-APR-117 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2021,7 +2021,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 131 | iv | `git ls-tree -r --name-only <base>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 132 | iv | `scripts/` | documented exclusion - PATH: file or path identifier |
 | P422 | 133 | iv | `reader_pages` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
-| P422 | 135 | iv | `ceil(593 / 4) = 149` | documented exclusion - PATH: file or path identifier |
+| P422 | 135 | iv | `ceil(593 / 4) = 149` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 137 | v | 0–148 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P422 | 140 | iii | ai-security-red-team-reviewer.md | documented exclusion - PATH: file or path identifier |
 | P422 | 140 | iv | `.claude/agents/ai-security-red-team-reviewer.md` | documented exclusion - PATH: file or path identifier |
@@ -2059,7 +2059,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 166 | iv | `agent-harness-architect` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 166 | iv | `agent-identity-privilege-reviewer` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 166 | iv | `f490c16f…` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 177 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 177 | iv | `git log -1 --format="%h %an %s" -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 177 | v | % | documented exclusion - OPERATOR: operator glyph |
 | P422 | 181 | iii | recovery-playbooks.md | documented exclusion - PATH: file or path identifier |
 | P422 | 181 | iv | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - PATH: file or path identifier |
@@ -2086,7 +2086,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 212 | i | B3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 214 | ii | blocked | named gap - first use before any expansion on this page |
 | P422 | 216 | i | B6 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P422 | 218 | v | FULL | named gap - first use before any expansion on this page |
+| P422 | 218 | v | FULL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P422 | 227 | i | L17 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 227 | i | L31 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 227 | iv | `WIP` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
@@ -2099,11 +2099,11 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 230 | iv | `Phase 1.5` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 233 | i | L157 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 234 | i | L3 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 238 | iv | `git show f490c16f9ed23f3d489e42f7696323bffcce6fd3:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 238 | iv | `git show f490c16f9ed23f3d489e42f7696323bffcce6fd3:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 242 | ii | partial | named gap - first use before any expansion on this page |
 | P422 | 248 | ii | gate | named gap - first use before any expansion on this page |
 | P422 | 252 | ii | hash | named gap - first use before any expansion on this page |
-| P422 | 254 | iv | `git rev-parse f490c16f9ed23f3d489e42f7696323bffcce6fd3:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 254 | iv | `git rev-parse f490c16f9ed23f3d489e42f7696323bffcce6fd3:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 254 | v | × | documented exclusion - OPERATOR: operator glyph |
 | P422 | 259 | iv | `dc376db435d565d55074a62b2d0deba953425e51` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 260 | iv | `491a766a0bd4aa949bb0e014274a0f1c3b14739b` | documented exclusion - SHA: hash/commit identifier |
@@ -2193,7 +2193,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 367 | ii | policy | named gap - first use before any expansion on this page |
 | P422 | 368 | v | FAIL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P422 | 368 | v | PASS | documented exclusion - STATUS: uppercase lifecycle/status keyword |
-| P422 | 368 | v | UNVERIFIABLE | named gap - first use before any expansion on this page |
+| P422 | 368 | v | UNVERIFIABLE | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P422 | 372 | i | CI | named gap - first use before any expansion on this page |
 | P422 | 372 | i | SHA | defined at first use - line 372 contains the expansion |
 | P422 | 373 | i | L16 | documented exclusion - LINE-RANGE: page-line reference |
@@ -2296,7 +2296,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 479 | i | L45 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 483 | ii | user | named gap - first use before any expansion on this page |
 | P422 | 486 | i | L55 | documented exclusion - LINE-RANGE: page-line reference |
-| P422 | 486 | v | <other tenant's doc> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 486 | v | &lt;other tenant's doc&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 500 | i | L31-32 | documented exclusion - LINE-RANGE: page-line reference |
 | P422 | 504 | ii | accepted | defined at first use - line 504 contains the expansion |
 | P422 | 506 | i | L157-158 | documented exclusion - LINE-RANGE: page-line reference |
@@ -2314,7 +2314,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 534 | iv | `git ls-tree -r --name-only f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 535 | iv | `events` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 536 | iv | `git merge-base --is-ancestor f490c16f9ed23f3d489e42f7696323bffcce6fd3 refs/remotes/origin/main` | documented exclusion - PATH: file or path identifier |
-| P422 | 539 | iv | `git diff --numstat f490c16f9ed23f3d489e42f7696323bffcce6fd3 refs/remotes/origin/main -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 539 | iv | `git diff --numstat f490c16f9ed23f3d489e42f7696323bffcce6fd3 refs/remotes/origin/main -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 540 | ii | ci | named gap - first use before any expansion on this page |
 | P422 | 540 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
 | P422 | 540 | iv | `files: 8   links checked: 10   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
@@ -2331,14 +2331,14 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 543 | iv | `agents-svc` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 543 | iv | `chain` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 543 | iv | `schema-migration` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
-| P422 | 545 | iv | `git log --all --author="F reviewer" --oneline -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 545 | iv | `git log --all --author="F reviewer" --oneline -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 546 | iii | f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 546 | iv | `git diff --check f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P422 | 547 | iv | `mergedAt` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 548 | iv | `git grep -l -I -F -e 'Phase 1.5' f490c16f... -- '*.md'` | documented exclusion - PATH: file or path identifier |
 | P422 | 549 | iii | check_pr_body_skills.py | documented exclusion - PATH: file or path identifier |
 | P422 | 549 | iv | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P422 | 549 | v | <the posted body> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 549 | v | &lt;the posted body&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 550 | iii | check_dco.py | documented exclusion - PATH: file or path identifier |
 | P422 | 550 | iii | main..HEAD | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 550 | iv | `python -B scripts/check_dco.py --range origin/main..HEAD` | documented exclusion - PATH: file or path identifier |
@@ -2380,7 +2380,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 593 | iv | `6218833659` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 593 | iv | `6230854823` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 593 | iv | `6231090198` | documented exclusion - SHA: hash/commit identifier |
-| P422 | 594 | v | ACCEPT | named gap - first use before any expansion on this page |
+| P422 | 594 | v | ACCEPT | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P422 | 594 | i | SD-B | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P422 | 594 | iv | `SD-B: ACCEPT` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P422 | 597 | i | D3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2434,7 +2434,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P422 | 675 | iv | `6231324438` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 675 | iv | `6231575941` | documented exclusion - SHA: hash/commit identifier |
 | P422 | 675 | iv | `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<id>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P422 | 675 | v | <id> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P422 | 675 | v | &lt;id&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P422 | 678 | ii | waiver | named gap - first use before any expansion on this page |
 | P422 | 696 | iv | `./.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - PATH: file or path identifier |
 | P422 | 719 | i | C-4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2577,7 +2577,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 3 | i | V4 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 5 | i | AC12 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 5 | i | AC7 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
-| P423 | 5 | v | ACCEPT | named gap - first use before any expansion on this page |
+| P423 | 5 | v | ACCEPT | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P423 | 5 | i | CR | named gap - first use before any expansion on this page |
 | P423 | 5 | i | LF | named gap - first use before any expansion on this page |
 | P423 | 5 | i | PR | named gap - first use before any expansion on this page |
@@ -2591,7 +2591,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 5 | iv | `494cdd6a07a5dbda56fa5201e93c5041643df44b2b7cab174d0bab593be15fbb` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 5 | iv | `648ac7670bec2e260279a74716289b39f7cf2c9a` | documented exclusion - SHA: hash/commit identifier |
 | P423 | 5 | iv | `b3dfb81fec0806c97406dd403120853da8ffd402` | documented exclusion - SHA: hash/commit identifier |
-| P423 | 5 | v | ACCEPTED | named gap - first use before any expansion on this page |
+| P423 | 5 | v | ACCEPTED | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P423 | 7 | ii | diff | named gap - first use before any expansion on this page |
 | P423 | 9 | ii | docs | named gap - first use before any expansion on this page |
 | P423 | 9 | ii | evidence | named gap - first use before any expansion on this page |
@@ -2638,7 +2638,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 24 | iii | adr-template.md | documented exclusion - PATH: file or path identifier |
 | P423 | 24 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - PATH: file or path identifier |
 | P423 | 24 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - PATH: file or path identifier |
-| P423 | 24 | iv | `ceil(573 / 4)` | documented exclusion - PATH: file or path identifier |
+| P423 | 24 | iv | `ceil(573 / 4)` | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P423 | 24 | iv | `no_recorded_acceptance + provably_pending` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 24 | v | 0–143 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P423 | 24 | v | 144–287 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
@@ -2664,8 +2664,8 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 26 | v | 8–15 | documented exclusion - RANGE: numeric range/unit or diff/stat value |
 | P423 | 28 | ii | drift | defined at first use - line 28 contains the expansion |
 | P423 | 28 | ii | git | named gap - first use before any expansion on this page |
-| P423 | 28 | iv | `git diff --numstat 2db1ffb7… 648ac767… -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P423 | 28 | v | <page> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 28 | iv | `git diff --numstat 2db1ffb7… 648ac767… -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 28 | v | &lt;page&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 32 | i | ID | named gap - first use before any expansion on this page |
 | P423 | 34 | iii | recovery-playbooks.md | documented exclusion - PATH: file or path identifier |
 | P423 | 34 | iv | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - PATH: file or path identifier |
@@ -2698,11 +2698,11 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 41 | iii | agent-identity-patterns.md | documented exclusion - PATH: file or path identifier |
 | P423 | 41 | iv | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - PATH: file or path identifier |
 | P423 | 41 | iv | `bfdbfbb619855f7818d61bfd94f7386ca3288a2f` | documented exclusion - SHA: hash/commit identifier |
-| P423 | 43 | iv | `git log -1 --format='%H\|%an\|%ad\|%s' -- <page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P423 | 43 | iv | `git rev-parse 2db1ffb7…:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P423 | 43 | iv | `git show <pinned>:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 43 | iv | `git log -1 --format='%H\|%an\|%ad\|%s' -- &lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 43 | iv | `git rev-parse 2db1ffb7…:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 43 | iv | `git show <pinned>:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 43 | v | % | documented exclusion - OPERATOR: operator glyph |
-| P423 | 43 | v | <pinned> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 43 | v | &lt;pinned&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 46 | ii | purpose | named gap - first use before any expansion on this page |
 | P423 | 48 | i | B2 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 48 | i | B3 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
@@ -2710,8 +2710,8 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 48 | ii | blocked | named gap - first use before any expansion on this page |
 | P423 | 48 | ii | open | named gap - first use before any expansion on this page |
 | P423 | 48 | ii | review | named gap - first use before any expansion on this page |
-| P423 | 48 | v | FULL | defined at first use - line 48 contains the expansion |
-| P423 | 48 | v | PARTIAL | defined at first use - line 48 contains the expansion |
+| P423 | 48 | v | FULL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
+| P423 | 48 | v | PARTIAL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P423 | 50 | ii | cannot | named gap - first use before any expansion on this page |
 | P423 | 52 | i | L1 | documented exclusion - LINE-RANGE: page-line reference |
 | P423 | 52 | ii | failed | named gap - first use before any expansion on this page |
@@ -2734,7 +2734,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 54 | iv | `git stash push -u -m` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 54 | iv | `rebase/merge --abort` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 54 | iv | `rebase/merge` | documented exclusion - PATH: file or path identifier |
-| P423 | 54 | v | <message> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 54 | v | &lt;message&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 54 | v | UNVERIFIED | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P423 | 58 | i | ASI01 | documented exclusion - IDENTIFIER: identifier/acronym/role token |
 | P423 | 58 | i | OWASP | named gap - first use before any expansion on this page |
@@ -2772,7 +2772,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 66 | iv | `API` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
 | P423 | 70 | v | FAIL | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P423 | 70 | v | PASS | documented exclusion - STATUS: uppercase lifecycle/status keyword |
-| P423 | 70 | v | UNVERIFIABLE | named gap - first use before any expansion on this page |
+| P423 | 70 | v | UNVERIFIABLE | documented exclusion - STATUS: uppercase lifecycle/status keyword |
 | P423 | 72 | i | AI | named gap - first use before any expansion on this page |
 | P423 | 72 | i | CI | named gap - first use before any expansion on this page |
 | P423 | 72 | i | L100-110 | documented exclusion - LINE-RANGE: page-line reference |
@@ -2792,7 +2792,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 72 | ii | timeline | named gap - first use before any expansion on this page |
 | P423 | 72 | iv | `--paginate` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 72 | iv | `gh api repos/{owner}/{repo}/issues/<n>/timeline` | documented exclusion - PATH: file or path identifier |
-| P423 | 72 | v | <n> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 72 | v | &lt;n&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 76 | ii | known | named gap - first use before any expansion on this page |
 | P423 | 78 | i | L11-19 | documented exclusion - LINE-RANGE: page-line reference |
 | P423 | 78 | i | L23-28 | documented exclusion - LINE-RANGE: page-line reference |
@@ -2858,7 +2858,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 129 | iv | `git rev-parse origin/main` | documented exclusion - PATH: file or path identifier |
 | P423 | 130 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7… --json` | documented exclusion - PATH: file or path identifier |
 | P423 | 131 | v | × | documented exclusion - OPERATOR: operator glyph |
-| P423 | 132 | iv | `git show 2db1ffb7…:<page>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 132 | iv | `git show 2db1ffb7…:&lt;page&gt;` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 134 | iv | `grep -n 'WIP'` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
 | P423 | 135 | iv | `(-m \\\\\| --message) <message>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 136 | iv | `gh api --help` | documented exclusion - COMMAND: command/CLI invocation including command-like flags |
@@ -2870,7 +2870,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | P423 | 141 | ii | ci | named gap - first use before any expansion on this page |
 | P423 | 141 | iii | check-markdown-links.py | documented exclusion - PATH: file or path identifier |
 | P423 | 141 | iv | `python -B scripts/ci/check-markdown-links.py <8 pages>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| P423 | 141 | v | <8 pages> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| P423 | 141 | v | &lt;8 pages&gt; | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | P423 | 142 | i | OK | defined at first use - line 142 contains the expansion |
 | P423 | 142 | iii | validate-skills.py | documented exclusion - PATH: file or path identifier |
 | P423 | 142 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - LITERAL: backticked literal/prose/label/formula |
@@ -2883,60 +2883,67 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Rows | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P416 | 142 | 55 | 8 | 39 | 18 | 262 | 85 | 11 | 166 |
-| P417 | 122 | 53 | 9 | 59 | 21 | 264 | 77 | 10 | 177 |
-| P418 | 118 | 78 | 44 | 132 | 23 | 395 | 98 | 26 | 271 |
-| P419 | 64 | 34 | 10 | 35 | 11 | 154 | 36 | 8 | 110 |
-| P420 | 152 | 57 | 9 | 39 | 20 | 277 | 97 | 13 | 167 |
-| P421 | 86 | 77 | 33 | 160 | 25 | 381 | 87 | 23 | 271 |
-| P422 | 159 | 91 | 48 | 336 | 40 | 674 | 119 | 16 | 539 |
-| P423 | 129 | 60 | 13 | 82 | 25 | 309 | 77 | 11 | 221 |
-| **Total** | 972 | 505 | 174 | 882 | 183 | 2716 | 676 | 118 | 1922 |
+| P416 | 142 | 55 | 8 | 39 | 18 | 262 | 82 | 11 | 169 |
+| P417 | 122 | 53 | 9 | 59 | 21 | 264 | 74 | 10 | 180 |
+| P418 | 118 | 78 | 44 | 132 | 23 | 395 | 96 | 26 | 273 |
+| P419 | 64 | 34 | 10 | 35 | 11 | 154 | 34 | 8 | 112 |
+| P420 | 152 | 57 | 9 | 39 | 20 | 277 | 94 | 13 | 170 |
+| P421 | 86 | 77 | 33 | 160 | 25 | 381 | 87 | 22 | 272 |
+| P422 | 159 | 91 | 48 | 335 | 41 | 674 | 115 | 16 | 543 |
+| P423 | 129 | 60 | 13 | 82 | 25 | 309 | 74 | 9 | 226 |
+| **Total** | 972 | 505 | 174 | 881 | 184 | 2716 | 656 | 115 | 1945 |
 
-**Exclusion-code legend and deterministic assignment rules (all 1,922 exclusion rows carry one code; counts are from the final table):** DATE: 16 | SHA: 217 | PATH: 376 | LINE-RANGE: 396 | STATUS: 14 | COMMAND: 59 | RANGE: 114 | PLACEHOLDER: 69 | OPERATOR: 16 | LITERAL: 292 | IDENTIFIER: 353.
+**Exclusion-code legend and deterministic assignment rules (all 1,945 exclusion rows carry one code; counts are from the final table):** DATE: 16 | SHA: 217 | PATH: 369 | LINE-RANGE: 396 | STATUS: 36 | COMMAND: 59 | RANGE: 121 | PLACEHOLDER: 69 | OPERATOR: 16 | LITERAL: 293 | IDENTIFIER: 353.
 
 | Code | Count |
 | --- | ---: |
 | DATE | 16 |
 | SHA | 217 |
-| PATH | 376 |
+| PATH | 369 |
 | LINE-RANGE | 396 |
-| STATUS | 14 |
+| STATUS | 36 |
 | COMMAND | 59 |
-| RANGE | 114 |
+| RANGE | 121 |
 | PLACEHOLDER | 69 |
 | OPERATOR | 16 |
-| LITERAL | 292 |
+| LITERAL | 293 |
 | IDENTIFIER | 353 |
-| **Total** | **1,922** |
+| **Total** | **1,945** |
 
-**Deterministic exclusion-code priority (applied to every exclusion row):** DATE = date/time/version fragment; SHA = hash/commit/comment-id token; PLACEHOLDER = angle/brace placeholder; OPERATOR = operator glyph only; COMMAND = command/CLI invocation including command-like flags; PATH = file/path identifier; LINE-RANGE = page-line reference or page-line label; RANGE = numeric range, unit, date fragment or diff/stat value; LITERAL = backticked literal/prose/label/formula; IDENTIFIER = identifier/acronym/role token; STATUS = uppercase lifecycle/status keyword. If two patterns match, the earlier category in this priority list wins. Adjudicated examples: APPROVAL_REGISTER -> IDENTIFIER (class i); ms and KB -> RANGE; +1,282/−0, 442/0, 675/0, 165/0, 451/0, 858/0 and 675 0 -> RANGE; ceil(590 / 4) = 148 -> LITERAL; -- **This lane…, -- **Next batch… and sha256: -> LITERAL; rebase/merge --abort -> COMMAND. No row may carry two codes; the invariant proof below asserts this.
+**Deterministic exclusion-code priority (applied to every exclusion row):** DATE = date/time/version fragment; SHA = hash/commit/comment-id token; PLACEHOLDER = angle/brace placeholder; OPERATOR = operator glyph only; COMMAND = command/CLI invocation including command-like flags; PATH = file/path identifier; LINE-RANGE = page-line reference or page-line label; RANGE = numeric range, unit, date fragment or diff/stat value; LITERAL = backticked literal/prose/label/formula; IDENTIFIER = identifier/acronym/role token; STATUS = exact uppercase lifecycle/status keyword from the vocabulary above. If two patterns match, the earlier category in this priority list wins. Adjudicated examples: APPROVAL_REGISTER -> IDENTIFIER (class i); ms and KB -> RANGE; +1,282/−0, 442/0, 675/0, 165/0, 451/0, 858/0 and 675 0 -> RANGE; ceil(590 / 4) -> RANGE; `<page>`/`<Page>`/`<n>`/`<h>`/`<eight pages>`/`<reviewer@example.invalid>` -> PLACEHOLDER after one HTML unescape.
 
-**Class-v rule:** class v = status keywords (uppercase ONLY for the status-keyword part) + numeric ranges/units/dates + angle placeholders + operator glyphs; lowercase status prose remains class ii. No v row is an uppercase-only lifecycle token unless it is one of the status keywords.
+**Class-v rule:** class v = uppercase lifecycle/status/state keywords and acronyms (the 10 coded STATUS tokens plus state-like words such as MET, OWED, SATISFIED, UNAVAILABILITY, CONFLICTING, DIRTY, OPEN, APPLIED, AWAITING, COMMENTED, MERGED, UNAVAILABLE, FAILED) + numeric ranges/units/dates + angle placeholders + operator glyphs; lowercase status prose remains class ii/iv and never STATUS. Every status token gets the same class/disposition on every page.
 
-**Invariant proof (final table):** rows 2,716 = unique (page,line,class,raw token) keys 2,716 = 0 duplicates; every row has five cells; class totals i972 / ii505 / iii174 / iv882 / v183 = 2,716; disposition totals 118 defined / 676 named gaps / 1,922 documented exclusions = 2,716; exclusion-code counts sum to 1,922; no row carries two codes; every per-page class sum equals that page's row count.
+**Invariant proof (final table):** rows 2,716 = unique (page,line,class,raw token) keys 2,716 = 0 duplicates; every row has five cells; class totals i972 / ii505 / iii174 / iv881 / v184 = 2,716; disposition totals 115 defined / 656 named gaps / 1,945 documented exclusions = 2,716; exclusion-code counts sum to 1,945; no row carries two codes; every per-page class sum equals that page's row count.
 
 ## 6. Batch mapping, continuation and named gaps
 
 **Batch->page mapping (lane C 8-page blocks).** batch1 264-271, batch2 272-279 (both overlap lane B completed144-279), batch3 280-287 ... batch19 408-415, batch20 416-423 (this record). **B20 clarification (review #5):** the 62 merged record files decompose as A22+B20+C19+D1 (record-file counts, not eight-page-block counts); lane B page coverage is complete for pages 144-279 = 17 eight-page blocks, and the 20 lane-B records include re-records/withdrawal records plus the ordinary batches, so 20 records is not 20 page blocks. Current batch20 is not included in the 62. Quarters need not align to batch boundaries.
 
 **Named-gap list (from the final table):**
-- P416 (416): batch L1, lane L1, record L1, evidence L3, ACCEPT L5, PR L5, frontier L5, HEAD L7, blob L7, diff L7, id L7, model L9, open L9, JSON L13, manifest L13, register L13, test L13, workflow L13, drift L14, pending L15, reader L15, json L22, SKILL L25, next L25, range L25, records L25, reviewer L25, LF L31, OWASP L33, PARTIAL L33, SQL L33, UX L33, authz L33, HTTP L34, status L34, API L35, AI L37, CI L37, LLM L38, PII L39, EUR L40, GBP L40, USD L40, FULL L42, purpose L44, blocked L46, closed L49, ADR L50, SAST L50, cannot L50, git L50, partial L50, IP L56, tenant L56, DSN L61, UI L61, rules L66, surface L66, CLI L67, ORM L67, RPC L67, policy L72, rule L72, spec L73, decision L78, CHANGED L79, webhook L84, CDC L85, DLQ L85, QA L85, ISO L91, disposition L113, AC L123, MET L125, handoff L125, head L125, hash L126, CR L129, EOF L129, OWED L129, SHA L130, triage L130, SATISFIED L132, counts L139, gates L157
-- P417 (417): batch L1, lane L1, record L1, evidence L3, ACCEPT L5, PR L5, base L7, blob L7, branch L7, id L7, model L9, open L9, docs L13, JSON L14, manifest L14, register L14, test L14, workflow L14, drift L15, git L15, accepted L16, pending L16, reader L16, json L23, SKILL L28, quarter L28, reviewer L28, disposition L30, head L30, next L30, range L30, records L30, union L30, LF L36, PARTIAL L40, SDK L40, GA L42, UX L43, AI L46, OWASP L46, API L47, UI L47, FULL L49, purpose L51, blocked L53, review L53, cannot L55, SYSTEM L57, audit L57, config L57, ADR L59, CI L59, SSO L59, SSR L59, TTL L59, gate L69, lifecycle L69, reviewers L81, tests L81, IP L83, LLM L83, MCP L83, PII L83, RAG L83, RBAC L83, URL L83, scope L83, BLOCKER L89, DB L89, HIGH L89, LB L89, LOW L89, SLO L89, counts L134, ci L161, handoff L167, partial L181
-- P418 (418): batch L1, lane L1, record L1, LANE L3, PHASE L3, pending L3, quarter L3, IMPLEMENT L4, PR L5, branch L5, main L5, git L7, model L9, rule L9, AI L10, owner L10, REVISE L12, head L13, records L16, withdrawal L17, correction L21, evidence L26, reader L35, diff L36, instrument L42, quarters L42, reviewer L65, next L67, range L67, JSON L70, decision L87, docs L96, batches L104, review L104, tenant L106, BATCH L110, id L123, open L123, PARTIAL L127, SKILL L144, accepted L144, DSH L156, purpose L161, CI L175, MDE L175, SRM L175, partial L175, gate L189, workflow L190, tests L193, blocked L194, corrections L204, spec L218, user L218, outcome L219, TESTABLE L222, UNTESTABLE L222, done L223, QA L225, GAP L248, rules L248, cannot L258, owners L261, ADA L262, EN L262, ARIA L263, ESC L263, SR L263, UI L263, UX L263, VPAT L263, unknown L266, policy L280, NVDA L282, operator L294, DESIGN L295, API L298, POLICY L300, TELEMETRY L300, fenced L301, ENFORCES L302, approval L310, status L321, blob L358, passed L358, ci L394, auditor L468, CONFIRMED L507, UNAVAILABILITY L507, failed L510, usage L514, GET L515, triage L519, build L550, payload L585, OEC L598, CONFLICTING L615, DIRTY L615
-- P419 (419): batch L1, lane L1, withdrawal L1, REVISE L6, head L6, register L11, reviewer L12, decision L15, evidence L18, partial L19, ID L30, git L30, docs L33, ids L39, id L44, open L44, OPEN L49, batches L50, PARTIAL L56, audit L64, SKILL L70, blob L76, ENFORCES L160, policy L160, auditor L167, CONFIRMED L170, UNAVAILABILITY L170, failed L173, status L173, next L175, usage L176, GET L177, counts L177, triage L181, records L182, pending L194
-- P420 (420): batch L1, lane L1, record L1, LAST L3, evidence L3, ACCEPT L5, LANE L5, PR L5, frontier L5, base L7, blob L7, branch L7, id L7, records L7, model L9, open L9, diff L11, JSON L13, manifest L13, register L13, test L13, workflow L13, drift L14, pending L15, reader L15, json L22, SKILL L25, reviewer L25, LF L33, PARTIAL L35, RLS L35, CDK L36, IAM L36, RBAC L36, DNS L37, SLI L38, FULL L39, API L40, LLM L41, MCP L42, OWASP L42, purpose L46, blocked L48, active L51, grant L51, owner L51, AI L52, cannot L52, git L52, partial L52, repo L52, policy L53, ADR L58, CIDR L58, DB L58, DDL L58, DML L58, ACL L64, ARM L64, AZ L64, NSG L64, SEV L69, triage L69, IC L70, SLA L70, SLO L70, handoff L70, disposition L75, budget L76, tests L81, HTTP L82, IDOR L82, SDK L82, SMS L82, UI L82, spec L82, BETWEEN L83, FAKED L87, REAL L87, rule L93, OS L94, SSE L94, TLS L94, e2e L94, AC L127, status L127, MET L129, head L129, hash L130, CR L133, EOF L133, OWED L133, SHA L134, SATISFIED L136, counts L143, decision L161, gates L161
-- P421 (421): batch L1, lane L1, record L1, LANE L3, PHASE L3, pending L3, quarter L3, evidence L4, PR L6, branch L6, main L6, git L8, model L10, rule L10, AI L11, owner L11, NOTHING L17, diff L17, base L18, batches L20, withdrawal L21, reader L28, instrument L36, quarters L37, reviewer L58, next L60, range L60, JSON L63, lanes L71, union L79, SKILL L87, ADR L94, accepted L139, partial L139, disposition L145, cannot L167, review L170, official L173, drift L180, outcome L181, blob L186, purpose L201, marker L206, decision L215, status L222, unknown L223, tenant L225, user L237, provider L238, BER L241, tokens L243, closed L260, rules L260, version L265, UTC L269, UNC L270, deploy L286, CI L290, CLI L290, workflow L291, APPLIED L293, APPROVAL L293, AWAITING L293, STOP L294, TRIGGERS L305, register L312, AUTONOMOUS L313, FORBIDDEN L313, audit L321, OWASP L327, API L332, LLM L332, token L334, operator L346, schema L356, gate L380, failed L397, blocked L398, head L438, hash L472, UNREAD L482, frontier L498, ci L526, passed L528, tests L528, KL L544, id L544
-- P422 (422): batch L1, lane L1, record L1, evidence L3, head L8, failed L9, CHECK L11, passed L11, SKILL L14, count L17, disposition L17, records L18, PR L23, review L25, dispositions L26, LANE L29, PHASE L29, pending L31, quarter L31, lanes L32, quarters L32, IMPLEMENT L33, workflow L34, git L36, branch L37, diff L39, status L41, HEAD L43, docs L44, handoff L46, owner L46, rule L46, blob L55, CR L56, LF L56, cannot L58, drift L61, reader L61, model L71, AI L73, reviewer L77, NOTHING L85, grant L93, PARTIAL L94, ID L97, batches L98, approval L104, instrument L109, json L114, JSON L130, next L147, range L147, counts L155, open L211, blocked L214, FULL L218, partial L242, gate L248, hash L252, purpose L268, tests L272, GNU L292, POSIX L300, OWASP L314, operator L327, schema L335, rules L336, payload L337, token L347, doc L355, policy L367, UNVERIFIABLE L368, CI L372, known L375, pr L389, auditor L391, RLS L405, repo L409, MISSES L410, api L413, runtime L420, closed L422, provider L422, versioned L422, LLM L425, SDK L425, budget L432, unknown L432, deploy L434, escalation L449, DB L452, IAM L452, RBAC L452, SDLC L452, REQUESTER L459, OIDC L478, STS L478, VM L478, user L483, official L514, ci L540, test L542, EOF L554, ids L554, correction L590, ACCEPT L594, HTTPS L619, http L619, COMMENTED L624, usage L642, waiver L678, receipt L741, MERGED L749, RESULT L799, github L801, UNAVAILABLE L887, manifest L979, register L979, sha256 L1008
-- P423 (423): batch L1, lane L1, record L1, ACCEPT L5, ACCEPTED L5, CR L5, LF L5, PR L5, blob L5, head L5, main L5, receipt L5, sha256 L5, diff L7, docs L9, evidence L9, JSON L10, manifest L10, register L10, test L10, workflow L10, branch L11, accepted L12, pending L12, reader L12, json L19, SKILL L24, instrument L24, partial L24, reviewer L24, closed L26, disposition L26, frontier L26, lineage L26, next L26, records L26, git L28, ID L32, audit L37, purpose L46, blocked L48, open L48, review L48, cannot L50, failed L52, tests L52, OWASP L58, LLM L60, payload L64, rules L64, schema L64, UNVERIFIABLE L70, AI L72, CI L72, SHA L72, api L72, owner L72, repo L72, timeline L72, known L76, RLS L78, rule L78, provider L82, versioned L82, SDK L84, escalation L88, DB L90, IAM L90, RBAC L90, SDLC L90, SEV L90, OIDC L96, STS L96, VM L96, count L115, scope L137, ci L141
+- P416 (416): batch L1, lane L1, record L1, evidence L3, PR L5, frontier L5, HEAD L7, blob L7, diff L7, id L7, model L9, open L9, JSON L13, manifest L13, register L13, test L13, workflow L13, drift L14, pending L15, reader L15, json L22, SKILL L25, next L25, range L25, records L25, reviewer L25, LF L31, OWASP L33, SQL L33, UX L33, authz L33, HTTP L34, status L34, API L35, AI L37, CI L37, LLM L38, PII L39, EUR L40, GBP L40, USD L40, purpose L44, blocked L46, closed L49, ADR L50, SAST L50, cannot L50, git L50, partial L50, IP L56, tenant L56, DSN L61, UI L61, rules L66, surface L66, CLI L67, ORM L67, RPC L67, policy L72, rule L72, spec L73, decision L78, CHANGED L79, webhook L84, CDC L85, DLQ L85, QA L85, ISO L91, disposition L113, AC L123, handoff L125, head L125, MET L125, hash L126, CR L129, EOF L129, OWED L129, SHA L130, triage L130, SATISFIED L132, counts L139, gates L157
+- P417 (417): batch L1, lane L1, record L1, evidence L3, PR L5, base L7, blob L7, branch L7, id L7, model L9, open L9, docs L13, JSON L14, manifest L14, register L14, test L14, workflow L14, drift L15, git L15, accepted L16, pending L16, reader L16, json L23, SKILL L28, quarter L28, reviewer L28, disposition L30, head L30, next L30, range L30, records L30, union L30, LF L36, SDK L40, GA L42, UX L43, AI L46, OWASP L46, API L47, UI L47, purpose L51, blocked L53, review L53, cannot L55, SYSTEM L57, audit L57, config L57, ADR L59, CI L59, SSO L59, SSR L59, TTL L59, gate L69, lifecycle L69, reviewers L81, tests L81, IP L83, LLM L83, MCP L83, PII L83, RAG L83, RBAC L83, URL L83, scope L83, BLOCKER L89, DB L89, HIGH L89, LB L89, LOW L89, SLO L89, counts L134, ci L161, handoff L167, partial L181
+- P418 (418): batch L1, lane L1, record L1, LANE L3, PHASE L3, pending L3, quarter L3, IMPLEMENT L4, PR L5, branch L5, main L5, git L7, model L9, rule L9, AI L10, owner L10, head L13, records L16, withdrawal L17, correction L21, evidence L26, reader L35, diff L36, instrument L42, quarters L42, reviewer L65, next L67, range L67, JSON L70, decision L87, docs L96, batches L104, review L104, tenant L106, BATCH L110, id L123, open L123, SKILL L144, accepted L144, DSH L156, purpose L161, CI L175, MDE L175, SRM L175, partial L175, gate L189, workflow L190, tests L193, blocked L194, corrections L204, spec L218, user L218, outcome L219, TESTABLE L222, UNTESTABLE L222, done L223, QA L225, GAP L248, rules L248, cannot L258, owners L261, ADA L262, EN L262, ARIA L263, ESC L263, SR L263, UI L263, UX L263, VPAT L263, unknown L266, policy L280, NVDA L282, operator L294, DESIGN L295, API L298, POLICY L300, TELEMETRY L300, fenced L301, ENFORCES L302, approval L310, status L321, blob L358, passed L358, ci L394, auditor L468, CONFIRMED L507, UNAVAILABILITY L507, failed L510, usage L514, GET L515, triage L519, build L550, payload L585, OEC L598, CONFLICTING L615, DIRTY L615
+- P419 (419): batch L1, lane L1, withdrawal L1, head L6, register L11, reviewer L12, decision L15, evidence L18, partial L19, ID L30, git L30, docs L33, ids L39, id L44, open L44, OPEN L49, batches L50, audit L64, SKILL L70, blob L76, ENFORCES L160, policy L160, auditor L167, CONFIRMED L170, UNAVAILABILITY L170, failed L173, status L173, next L175, usage L176, GET L177, counts L177, triage L181, records L182, pending L194
+- P420 (420): batch L1, lane L1, record L1, LAST L3, evidence L3, LANE L5, PR L5, frontier L5, base L7, blob L7, branch L7, id L7, records L7, model L9, open L9, diff L11, JSON L13, manifest L13, register L13, test L13, workflow L13, drift L14, pending L15, reader L15, json L22, SKILL L25, reviewer L25, LF L33, RLS L35, CDK L36, IAM L36, RBAC L36, DNS L37, SLI L38, API L40, LLM L41, MCP L42, OWASP L42, purpose L46, blocked L48, active L51, grant L51, owner L51, AI L52, cannot L52, git L52, partial L52, repo L52, policy L53, ADR L58, CIDR L58, DB L58, DDL L58, DML L58, ACL L64, ARM L64, AZ L64, NSG L64, SEV L69, triage L69, IC L70, SLA L70, SLO L70, handoff L70, disposition L75, budget L76, tests L81, HTTP L82, IDOR L82, SDK L82, SMS L82, UI L82, spec L82, BETWEEN L83, FAKED L87, REAL L87, rule L93, OS L94, SSE L94, TLS L94, e2e L94, AC L127, status L127, head L129, MET L129, hash L130, CR L133, EOF L133, OWED L133, SHA L134, SATISFIED L136, counts L143, decision L161, gates L161
+- P421 (421): batch L1, lane L1, record L1, LANE L3, PHASE L3, pending L3, quarter L3, evidence L4, PR L6, branch L6, main L6, git L8, model L10, rule L10, AI L11, owner L11, NOTHING L17, diff L17, base L18, batches L20, withdrawal L21, reader L28, instrument L36, quarters L37, reviewer L58, next L60, range L60, JSON L63, lanes L71, union L79, SKILL L87, ADR L94, accepted L139, partial L139, disposition L145, cannot L167, review L170, official L173, drift L180, outcome L181, blob L186, purpose L201, marker L206, decision L215, status L222, unknown L223, tenant L225, user L237, provider L238, BER L241, tokens L243, closed L260, rules L260, version L265, UTC L269, UNC L270, deploy L286, CI L290, CLI L290, workflow L291, APPROVAL L293, APPLIED L293, AWAITING L293, STOP L294, TRIGGERS L305, register L312, AUTONOMOUS L313, FORBIDDEN L313, audit L321, OWASP L327, API L332, LLM L332, token L334, operator L346, schema L356, gate L380, failed L397, blocked L398, head L438, hash L472, UNREAD L482, frontier L498, ci L526, passed L528, tests L528, KL L544, id L544
+- P422 (422): batch L1, lane L1, record L1, evidence L3, head L8, failed L9, CHECK L11, passed L11, SKILL L14, count L17, disposition L17, records L18, PR L23, review L25, dispositions L26, LANE L29, PHASE L29, pending L31, quarter L31, lanes L32, quarters L32, IMPLEMENT L33, workflow L34, git L36, branch L37, diff L39, status L41, HEAD L43, docs L44, handoff L46, owner L46, rule L46, blob L55, CR L56, LF L56, cannot L58, drift L61, reader L61, model L71, AI L73, reviewer L77, NOTHING L85, grant L93, ID L97, batches L98, approval L104, instrument L109, json L114, JSON L130, next L147, range L147, counts L155, open L211, blocked L214, partial L242, gate L248, hash L252, purpose L268, tests L272, GNU L292, POSIX L300, OWASP L314, operator L327, schema L335, rules L336, payload L337, token L347, doc L355, policy L367, CI L372, known L375, pr L389, auditor L391, RLS L405, repo L409, MISSES L410, api L413, runtime L420, closed L422, provider L422, versioned L422, LLM L425, SDK L425, budget L432, unknown L432, deploy L434, escalation L449, DB L452, IAM L452, RBAC L452, SDLC L452, REQUESTER L459, OIDC L478, STS L478, VM L478, user L483, official L514, ci L540, test L542, EOF L554, ids L554, correction L590, HTTPS L619, http L619, COMMENTED L624, usage L642, waiver L678, receipt L741, MERGED L749, RESULT L799, github L801, UNAVAILABLE L887, manifest L979, register L979, sha256 L1008
+- P423 (423): batch L1, lane L1, record L1, CR L5, LF L5, PR L5, blob L5, head L5, main L5, receipt L5, sha256 L5, diff L7, docs L9, evidence L9, JSON L10, manifest L10, register L10, test L10, workflow L10, branch L11, accepted L12, pending L12, reader L12, json L19, SKILL L24, instrument L24, partial L24, reviewer L24, closed L26, disposition L26, frontier L26, lineage L26, next L26, records L26, git L28, ID L32, audit L37, purpose L46, blocked L48, open L48, review L48, cannot L50, failed L52, tests L52, OWASP L58, LLM L60, payload L64, rules L64, schema L64, AI L72, CI L72, SHA L72, api L72, owner L72, repo L72, timeline L72, known L76, RLS L78, rule L78, provider L82, versioned L82, SDK L84, escalation L88, DB L90, IAM L90, RBAC L90, SDLC L90, SEV L90, OIDC L96, STS L96, VM L96, count L115, scope L137, ci L141
+
 
 **Continuation:** laneA complete; laneB complete144-279; laneC batches1-19 merged (through408-415); this record covers416-423 batch20; next unread424-431 stated not read.
 
 ## 7. Provenance, artifacts, checker and limits
 
-**Plan:** 6258744106 + B6258762512. **Base/main:** 70b6159d (56 record merges latest#858 + owner CI-only #848 merge d5a8905e); capture basis70b6159d. **Reader:** sd-c-read-lc-416-c1 (true identity sd-c-793-r2) read all eight whole at main70b6159d; mixed pin/re-pin per section2. **Page authors are not this reader** (git metadata only; not B6 proof). **Selection:**0/62 lane-batch hits; lane-B batch5 review-table rows are not page reads; no older pre-lane reference. **Artifacts:** A-rows _A/evidence/read-lc-416-a1/A-rows.txt **1,166 B/4 LF/sha 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27**; canonical-inline Crows capture _A/evidence/read-lc-416-c1/Crows-2716.txt **1484 B/4 LF/sha ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f** (raw-file digest, no normalization). Checker recomputes raw bytes/LF/sha and fails on mismatch. Small artifacts are inlined in appendix section11; external _A files are ephemeral non-authoritative convenience copies; one canonical directory quoted. **Link/drift evidence (review #4):** check-markdown-links.py over all eight pages = files 8, links checked 4, anchors checked 3, broken 0, dead 0, external-skipped 0, other-skipped 0; per-page summaries are in section3. Drift command at the pre-repair head: git diff --stat 70b6159d..e343cb60 -- <eight pages> returns empty; new-head verification repeats the same empty output (no page edited). Pinned blob hashes for P418/P419/P421 are in section2. **Limits:** B6 unverified; no page output edited; no keeper/index/ledger/register/manifest/tool/test/workflow change; no merge by C.
+**Plan:** 6258744106 + B6258762512. **Base/main:** 70b6159d (56 record merges latest#858 + owner CI-only #848 merge d5a8905e); capture basis70b6159d. **Reader:** sd-c-read-lc-416-c1 (true identity sd-c-793-r2) read all eight whole at main70b6159d; mixed pin/re-pin per section2. **Page authors are not this reader** (git metadata only; not B6 proof). **Selection:**0/62 lane-batch hits; lane-B batch5 review-table rows are not page reads; no older pre-lane reference. **Artifacts:** A-rows _A/evidence/read-lc-416-a1/A-rows.txt **1,166 B/4 LF/sha 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27**; canonical-inline Crows capture _A/evidence/read-lc-416-c1/Crows-fourrow.txt **1484 B/4 LF/sha ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f** (raw-file digest, no normalization). Checker recomputes raw bytes/LF/sha and fails on mismatch. Small artifacts are canonical in section 9 (A-rows) and section 10 (Crows-fourrow); section 11 references only; external _A files are ephemeral non-authoritative convenience copies; one canonical directory quoted. **Link/drift evidence (review #4):** check-markdown-links.py over all eight pages = files 8, links checked 4, anchors checked 3, broken 0, dead 0, external-skipped 0, other-skipped 0; new-record link check = files 1, links checked 4, anchors checked 0, broken 0, dead 0 (the four relative `.claude/skills/...` links in section10 are covered by this run); per-page summaries are in section3. Drift command at the pre-repair head: git diff --stat 70b6159d..e343cb60 -- <eight pages> returns empty; new-head verification repeats the same empty output (no page edited). Pinned blob hashes for P418/P419/P421 are in section2. **Limits:** B6 unverified; no page output edited; no keeper/index/ledger/register/manifest/tool/test/workflow change; no merge by C.
 
-**Latest-review disposition (DeepSeek 5566822041, advisory only):** findings #1-#5 are addressed in this record and the visible PR review-response comment: #1 class-v definition rewritten and rows rechecked (class totals now i972/ii505/iii174/iv882/v183); #2 deterministic exclusion-code rules + legend/counts with the listed reclassifications applied; #3 unique key defined as (page,line,class,raw token) with 2,716 unique / 0 duplicates; #4 page-specific B1-B6 evidence, per-page link-check output, pinned blob hashes and drift output added; #5 B20 record-count vs eight-page-block clarification added. The review is not a gate and is not claimed as a pass.
+**Review-response checker outputs (this repair):** delimiter-balance linter: 8/8 page-specific B4 evidence strings balanced (0 unmatched code spans, 0 unmatched bold markers); every truncation carries an explicit ellipsis. Table/class checker: 2,716 rows, 5 cells each, classes i972/ii505/iii174/iv881/v184, dispositions 115/656/1,945, unique keys 2,716, duplicate keys 0, exclusion codes sum 1,945; the only STATUS tokens are the 10 enumerated uppercase status keywords (36 rows); P423 L54/L135 remain distinct after one-pass pipe/HTML unescape. Body/PROC checker: run after body publication.
+
+**Latest-review disposition (DeepSeek 5567046488, advisory only):** finding #1 fixed: seven ceil(...) formula tokens reclassified PATH/LITERAL -> RANGE and P417 L71 `A/B` -> LITERAL; final codes DATE16/SHA217/PATH369/LINE-RANGE396/STATUS36/COMMAND59/RANGE121/PLACEHOLDER69/OPERATOR16/LITERAL293/IDENTIFIER353 = 1,945. Finding #2 fixed: auxiliary case-fold `<page>` display escaped as &lt;page&gt;. Finding #3 fixed: new-record link check files 1/links 4/anchors 0/broken 0 added to section7. Finding #4 fixed: blank line before Continuation. DeepSeek is advisory-only, never a pass or gate.
+
+**New-review disposition (DeepSeek 5566989704 at this repair head, advisory only):** finding #1 fixed: every page-specific B2 count now matches section 5 (P416 82/11/169; P417 74/10/180; P418 96/26/273; P419 34/8/112; P420 94/13/170; P421 87/22/272; P422 115/16/543; P423 74/9/226). Finding #2 fixed: the auxiliary case-fold table is explicitly marked pre-reclassification and non-tallying. Finding #3 fixed: class-v rule expanded to include state-like uppercase words (MET/OWED/SATISFIED/UNAVAILABILITY/CONFLICTING/DIRTY/OPEN/APPLIED/AWAITING/COMMENTED/MERGED/UNAVAILABLE/FAILED); class-v total 184 remains reproducible. Finding #4 fixed: P420 B4 now uses explicit ellipsis. Finding #5 fixed: parser text now defines the odd-backslash scan and key extraction (no mistyped regex). Finding #6 fixed: section 10 now shows the raw four-line Crows-fourrow capture as canonical/file-hash input, with the table marked derived. DeepSeek is advisory-only, never a pass or gate.
+
+**Latest-review disposition (DeepSeek 5566910051, advisory only):** finding #1 fixed: section 3 B4 delimiters closed and truncations use explicit ellipses; delimiter-balance checker output recorded. Finding #2 fixed: explicit uppercase STATUS vocabulary and uniform disposition rule; affected rows reclassified; class totals i972/ii505/iii174/iv881/v184 and dispositions 115/656/1,945. Finding #3 fixed: class-v angle placeholders escaped as &lt;...&gt; (one HTML unescape for the key). Finding #4 fixed: parser/unescape order and raw-key rule stated; P423 L54/L135 distinct. Finding #5 fixed: reproducible anchors/full text or explicit ellipses. Finding #6 fixed: single canonical artifact blocks in sections 9/10, section 11 references only; artifact renamed Crows-fourrow. DeepSeek is advisory-only and is not claimed as a pass or a gate.
 
 ## 8. AC1-AC8 status at this Stage C handoff
 
@@ -2951,7 +2958,7 @@ All eight pages were read whole L1-last at main 70b6159d. Page-specific anchors 
 | AC7 provenance | MET | plan/B binding; base70b6159d; 56 record merges + owner #848; lane B complete; block416-423; one path; mixed pin disclosed; artifacts real |
 | AC8 stage entry | MET for C | fresh B3 ACCEPT; one record; D/E/F/G separate; no merge |
 
-## 9. In-plan Stage A account (rendered view of the single canonical A-rows block in section 11; binding 4e478bf9 over A-rows 1,166 B/4 LF)
+## 9. In-plan Stage A account (canonical A-rows block; binding 4e478bf9 over A-rows 1,166 B/4 LF; external capture cited in section 7)
 
 ```text
 | acceptance-criteria-reviewer @ c6e5d5649bf8 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Bound canonical B1-B6, AC1-AC8 and dispatch rules to block 416-423; B4 per page; B6 UNVERIFIED | canonical exact; B4 per page; B6 unverified |
@@ -2974,6 +2981,17 @@ skill-usage-ledger@6a27b5c8e690 / reason: A account / applied: four rows/sources
 
 ## 10. My Stage C skills rows, Row sources and six-field lines
 
+**Canonical raw Crows-fourrow capture (four lines; sha256 ee9450… over 1,484 B/4 LF):**
+```text
+| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight mixed-pin pages whole; built canonical evidence and one exact-once inventory under known-defect/dispatch rules. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2716-row inventory; no keeper |
+| [source-of-truth-reconciler](../../../.claude/skills/source-of-truth-reconciler/SKILL.md) @ b5fd9feda972 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main 70b6159d; verified mixed pin/re-pin, frontier/quarters, selection and A-rows. | block416-423/batch20; union620/155; 311,123/3,059; 0/62; mixed pin disclosed |
+| [change-classification-gate](../../../.claude/skills/change-classification-gate/SKILL.md) @ 08d91a834460 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path. | one added record path; absent at main |
+| [skill-usage-ledger](../../../.claude/skills/skill-usage-ledger/SKILL.md) @ 6a27b5c8e690 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved manifest hashes; authored rows/Row sources/six fields; retained Crows capture. | 4 rows/4 per-row sources/4 six-field lines |
+```
+
+The table below is a rendered derived view of the skills account; the fenced four-line capture is the canonical artifact and the hash input.
+
+
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
 | [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight mixed-pin pages whole; built canonical evidence and one exact-once inventory under known-defect/dispatch rules. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2716-row inventory; no keeper |
@@ -2981,10 +2999,10 @@ skill-usage-ledger@6a27b5c8e690 / reason: A account / applied: four rows/sources
 | [change-classification-gate](../../../.claude/skills/change-classification-gate/SKILL.md) @ 08d91a834460 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path. | one added record path; absent at main |
 | [skill-usage-ledger](../../../.claude/skills/skill-usage-ledger/SKILL.md) @ 6a27b5c8e690 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved manifest hashes; authored rows/Row sources/six fields; retained Crows capture. | 4 rows/4 per-row sources/4 six-field lines |
 
-<!-- Row source: agent=sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-c1/Crows-2716.txt line 1 of 4; binding=sha256 ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f over four-row capture (1484 B/4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-c1/Crows-2716.txt line 2 of 4; binding=sha256 ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f over four-row capture (1484 B/4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-c1/Crows-2716.txt line 3 of 4; binding=sha256 ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f over four-row capture (1484 B/4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-c1/Crows-2716.txt line 4 of 4; binding=sha256 ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f over four-row capture (1484 B/4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-c1/Crows-fourrow.txt line 1 of 4; binding=sha256 ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f over four-row capture (1484 B/4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-c1/Crows-fourrow.txt line 2 of 4; binding=sha256 ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f over four-row capture (1484 B/4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-c1/Crows-fourrow.txt line 3 of 4; binding=sha256 ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f over four-row capture (1484 B/4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-c1/Crows-fourrow.txt line 4 of 4; binding=sha256 ee9450b3777949380eb4dc3c5e4fe6f288ddb7d2bee09259a73afd26d30a397f over four-row capture (1484 B/4 LF); limits=digest binds captured text, not human identity; status=current -->
 
 **Stage C six-field lines:**
 acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical acceptance/exact-once inventory / applied: read eight whole pages, B1-B6, B4 per page, B6 unverified, known-defect scan / result: 0F/8P; 2716 rows; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-416-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
@@ -2992,23 +3010,6 @@ source-of-truth-reconciler@b5fd9feda972 / reason: frontier/pin/selection/artifac
 change-classification-gate@08d91a834460 / reason: scope must be docs-only one path / applied: record path absence/name-only / result: one added path / incomplete: none / by: C, sd-c-read-lc-416-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / reason: C handoff owes provenance / applied: resolved four names at70b6159d, authored rows/sources/six; retained Crows / result: 4/4/4 / incomplete: none / by: C, sd-c-read-lc-416-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 
-## 11. Appendix: separate inline artifact blocks
+## 11. Canonical artifact references
 
-### A-rows inline text (canonical inline (external working copy hash-cross-checked): _A/evidence/read-lc-416-a1/A-rows.txt, 1,166 B/4 LF/sha 4e478bf9)
-```text
-| acceptance-criteria-reviewer @ c6e5d5649bf8 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Bound canonical B1-B6, AC1-AC8 and dispatch rules to block 416-423; B4 per page; B6 UNVERIFIED | canonical exact; B4 per page; B6 unverified |
-| source-of-truth-reconciler @ b5fd9feda972 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-ran check_index at 70b6159d; derived union620/155 quarters/block416-423; 62 lane records; measured eight pages | 737/107/6/614/6/4/630; union620; block416-423; 311,123/3,059; 0 page-read-row hits |
-| change-classification-gate @ 08d91a834460 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only one added record path; verified path absent at main | one record path; absent |
-| skill-usage-ledger @ 6a27b5c8e690 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Authored this Stage A account and retained capture | four rows/sources; non-zero binding |
-```
-
-### Crows-2716 inline text (canonical inline (external working copy hash-cross-checked): _A/evidence/read-lc-416-c1/Crows-2716.txt, 1,484 B/4 LF/sha ee9450)
-```text
-| [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight mixed-pin pages whole; built canonical evidence and one exact-once inventory under known-defect/dispatch rules. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2716-row inventory; no keeper |
-| [source-of-truth-reconciler](../../../.claude/skills/source-of-truth-reconciler/SKILL.md) @ b5fd9feda972 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main 70b6159d; verified mixed pin/re-pin, frontier/quarters, selection and A-rows. | block416-423/batch20; union620/155; 311,123/3,059; 0/62; mixed pin disclosed |
-| [change-classification-gate](../../../.claude/skills/change-classification-gate/SKILL.md) @ 08d91a834460 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path. | one added record path; absent at main |
-| [skill-usage-ledger](../../../.claude/skills/skill-usage-ledger/SKILL.md) @ 6a27b5c8e690 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved manifest hashes; authored rows/Row sources/six fields; retained Crows capture. | 4 rows/4 per-row sources/4 six-field lines |
-```
-
-The Crows-2716 artifact is a FOUR-ROW capture (four source rows), not the 2,716-row inventory table. The A-rows block is four rows. Each block is separately delimited; copying one block reproduces that file digest. Policy: the record inline blocks are canonical and independently hash-verifiable; the _A files are retained, hash-cross-checked working copies (not independently authoritative).
-**Boundary.** Stage C only: one record, no plan edit, no other path, no Codex thread act, no merge; owner CI PR #848 already merged and untouched. **Signed with both names: true identity sd-c-793-r2; stage role sd-c-read-lc-416-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
+The single canonical A-rows block is section 9; the single canonical Crows-fourrow block is section 10. External working copies are hash-cross-checked against the stated sha256 values and are not duplicated here; Crows-fourrow is a **four-row capture**, not the 2,716-row inventory.
