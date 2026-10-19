@@ -38,7 +38,7 @@ Basis/live main **61cacb2d5ace9aa91569351444a6da0b4cfcfc25** (tree 7e964962; par
 
 ## 3. Candidate-token inventory (never exact-once; unique keys; at-most-one defined/named per page/raw token)
 
-**Descriptor:** candidate-token inventory for the sixteen pages at basis 61cacb2d. Keys are unique (page,line,class,raw token); no duplicate mentions; at most one defined/named disposition per (page,raw token). Counts come from the FINAL table below. Class rules: i uppercase/coded identifiers/acronyms/roles; ii lowercase technical/audience prose; iii non-backticked path/identifier; iv whole backticked code/command/identifier/SHA; v statuses, dates, line-ranges, ranges, placeholders, operators. Disposition codes: defined at first use, named gap - first use before any expansion on this page, or documented exclusion - CODE: reason with legend DATE, LINE-RANGE, STATUS, RANGE, PLACEHOLDER, OPERATOR, PROSE, EMPHASIS, PATH, COMMAND, SHA, LITERAL. Status tokens ACCEPT/ACCEPTED and variants are class v; operator glyphs incl U+21D4/U+2194 are class v OPERATOR; SHA/commit hashes are class iv SHA; H/M/L/P placeholders class v PLACEHOLDER; all-caps common words class i EMPHASIS; coded IDs class i named/defined; lowercase json/api prose class ii PROSE; DATE/LINE-RANGE class v.
+**Descriptor:** candidate-token inventory for the sixteen pages at basis 61cacb2d. Keys are unique (page,line,class,raw token); no duplicate mentions; at most one defined/named disposition per (page,raw token). Counts come from the FINAL table below. Class rules: i uppercase/coded identifiers/acronyms/roles; ii lowercase technical/audience prose; iii non-backticked path/identifier; iv whole backticked code/command/identifier, or raw 40/12-hex SHA/commit hash; v statuses, dates, line-ranges, ranges, placeholders, operators. Disposition codes: defined at first use, named gap - first use before any expansion on this page, or documented exclusion - CODE: reason with legend DATE, LINE-RANGE, STATUS, RANGE, PLACEHOLDER, OPERATOR, PROSE, EMPHASIS, PATH, COMMAND, SHA, LITERAL. Status tokens ACCEPT/ACCEPTED and variants are class v; operator glyphs incl U+21D4/U+2194 are class v OPERATOR; SHA/commit hashes are class iv SHA; H/M/L/P placeholders class v PLACEHOLDER; all-caps common words class i EMPHASIS; coded IDs class i named/defined; lowercase json/api prose class ii PROSE; DATE/LINE-RANGE class v.
 
 | Page | Line@offset | Class | Raw token | Disposition |
 | --- | --- | --- | --- | --- |
@@ -5856,11 +5856,11 @@ The body publisher derives PROC-04 from the FINAL live PR body by: take whole-li
 
 ## 10. Embedded self-contained fail-safe verifier (extract and run)
 
-Extraction/execution: copy the single fenced python block below to verifier-472.py and run python verifier-472.py <this-record.md>. No third-party dependency. Exit0 prints the expected line; failures print VERIFIER FAIL and exit1; no argument exits2.
+Extraction/execution: copy the single fenced python block below to verifier-472.py and run python verifier-472.py <this-record.md>. No third-party dependency. Exit0 prints the expected line; failures print VERIFIER FAIL and exit1; no argument exits2. **Scope note:** this verifier validates table-level self-consistency and capture-vs-disk hash equality for the retained artifacts; the repository facts (page blobs/bytes/LF, basis commit, one-added-path, plan bindings) are independently measured in this record and the PR body, not asserted by the verifier, whose embedded artifact hashes are internal-consistency checks and not a trust boundary for executing extracted code.
 
 <!-- verifier:start -->
 ~~~python
-import io,re,json,hashlib,subprocess,sys,tempfile,os
+import io,re,json,hashlib,subprocess,sys,os,shutil
 if len(sys.argv)!=2:
     print('usage: python verifier-472.py <record.md>'); sys.exit(2)
 record=sys.argv[1]
@@ -5882,7 +5882,10 @@ for l in lines:
     cells=[];cur='';i=0
     while i<len(l):
         ch=l[i]
-        if ch=='\\' and i+1<len(l): cur+=l[i+1];i+=2;continue
+        if ch=='\\' and i+1<len(l):
+            nxt=l[i+1]
+            if nxt in ('|','\\'): cur+=nxt;i+=2;continue
+            cur+=ch;i+=1;continue
         if ch=='|': cells.append(cur.strip());cur='';i+=1;continue
         cur+=ch;i+=1
     cells=[c for c in cells if c!='']
@@ -5953,8 +5956,6 @@ try:
  if (pb,plf)!=(787102,7528): err('page totals %d/%d != 787102/7528'%(pb,plf))
  tl=[l for l in text.split(chr(10)) if l.startswith('| **Totals**')]
  if not any('787,102 / 7,528' in x for x in tl): err('pilot Totals line not 787,102/7,528')
- for pat,val in [('i=635',635),('ii=55',55),('iii=172',172),('iv=1581',1581),('v=1723',1723)]:
-  pass
 except Exception as e: err('page totals arithmetic: '+str(e))
 
 
@@ -5970,9 +5971,10 @@ try:
   if classes.get('i')!=698 or classes.get('ii')!=68 or classes.get('iii')!=97 or classes.get('iv')!=2943 or classes.get('v')!=1468: err('section4 class parsed mismatch')
   if disp.get('defined')!=10 or disp.get('named')!=658 or disp.get('excluded')!=4606: err('section4 disp parsed mismatch')
   if sum(codes.values())!=4606: err('section4 codes parsed mismatch')
-  if '635+55+172+1581+1723=5274' not in text: err('class sum line missing')
-  if '8+599+3559=5274' not in text: err('disposition sum line missing')
-  if '= 6552' not in text: err('codes sum 3559 missing')
+  _sec4 = text[text.index('## 4. Counts'):text.index('## 5.')]
+  if '698+68+97+2943+1468=5274' not in _sec4: err('class sum line missing')
+  if '10+658+4606=5274' not in _sec4: err('disposition sum line missing')
+  if '= 4606' not in _sec4: err('codes sum 4606 missing')
 except Exception as e: err('section4 matrix: '+str(e))
 
 # artifacts
@@ -6020,6 +6022,9 @@ try:
  data=json.loads(out.stdout)
  if not data or 'apply' not in data[0]: err('support-cli apply key missing')
 except Exception as e: err('support-cli: '+str(e))
+try:
+ shutil.rmtree(tf,ignore_errors=True)
+except Exception: pass
 # manifest references
 try:
  man=artfacts['MANIFEST-472.txt'][0].decode('utf-8')
@@ -6042,7 +6047,7 @@ for bad in ['5568615474','370d0278','two DCO','source-exhaustive proof']:
  if bad in head: err('stale marker '+bad)
 # disk support
 base=r'C:\src\Project Aegis\_A\evidence\read-lc-472-c1'
-for name in ['Crows-472.txt','Crows-472.json','README-472.md','preview-472.py','A-rows-blockA.txt','MANIFEST-472.txt']:
+for name in ['Crows-472.txt','Crows-472.json','README-472.md','preview-472.py','A-rows-blockA.txt','A-rows-blockB.txt','MANIFEST-472.txt']:
  p=os.path.join(base,name)
  if not os.path.exists(p): err('disk evidence missing '+name);continue
  d=open(p,'rb').read()
@@ -6050,11 +6055,11 @@ for name in ['Crows-472.txt','Crows-472.json','README-472.md','preview-472.py','
 # output
 if errors:
  print('VERIFIER FAIL:');[print(' -',e) for e in errors];sys.exit(1)
-print('VERIFIER OK rows=%d unique=%d malformed=%d classes=%s disps=%s exclusions=%d codes=%s per-page=16 Crows.json=full-totals+rows-agree raw-placeholders=%d inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok support-cli=ok stage-a=ok row-source=ok crows-full=ok disk-support=ok stale-marker=ok page-totals=ok section4=ok'%(len(rows),len(keys),malformed,dict(classes),dict(disp),disp['excluded'],dict(codes),codes.get('PLACEHOLDER',0)))
+print('VERIFIER OK rows=%d unique=%d malformed=%d classes=%s disps=%s exclusions=%d codes=%s per-page=16 Crows.json=full-totals+rows-agree raw-placeholders=%d inline-artifacts=7/7 stale=0 span=ok duplicate-token=ok support-cli=ok stage-a=ok row-source=ok crows-full=ok disk-support=ok stale-marker=ok page-totals=ok section4=ok'%(len(rows),len(keys),malformed,dict(classes),dict(disp),disp['excluded'],dict(codes),codes.get('PLACEHOLDER',0)))
 ~~~
 <!-- verifier:end -->
 
-**Expected output line:** VERIFIER OK rows=5274 unique=5274 malformed=0 classes={'v': 1468, 'i': 698, 'iv': 2943, 'iii': 97, 'ii': 68} disps={'excluded': 4606, 'named': 658, 'defined': 10} exclusions=4606 codes={'DATE': 112, 'RANGE': 122, 'STATUS': 83, 'SHA': 63, 'PATH': 782, 'PROSE': 68, 'LITERAL': 1382, 'LINE-RANGE': 1093, 'EMPHASIS': 650, 'COMMAND': 193, 'PLACEHOLDER': 50, 'OPERATOR': 8} per-page=16 Crows.json=full-totals+rows-agree raw-placeholders=50 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok support-cli=ok stage-a=ok row-source=ok crows-full=ok disk-support=ok stale-marker=ok page-totals=ok section4=ok
+**Expected output line:** VERIFIER OK rows=5274 unique=5274 malformed=0 classes={'v': 1468, 'i': 698, 'iv': 2943, 'iii': 97, 'ii': 68} disps={'excluded': 4606, 'named': 658, 'defined': 10} exclusions=4606 codes={'DATE': 112, 'RANGE': 122, 'STATUS': 83, 'SHA': 63, 'PATH': 782, 'PROSE': 68, 'LITERAL': 1382, 'LINE-RANGE': 1093, 'EMPHASIS': 650, 'COMMAND': 193, 'PLACEHOLDER': 50, 'OPERATOR': 8} per-page=16 Crows.json=full-totals+rows-agree raw-placeholders=50 inline-artifacts=7/7 stale=0 span=ok duplicate-token=ok support-cli=ok stage-a=ok row-source=ok crows-full=ok disk-support=ok stale-marker=ok page-totals=ok section4=ok
 
 ## 11. Boundary and pilot reporting
 
