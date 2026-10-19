@@ -61,7 +61,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 **B2:** 393 inventory rows; defined 0; named gaps 52; documented exclusions 341; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L62 ## 1. Lane derivation — the command, not a handed-down list.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
-**B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
+**B5:** PARTIAL - aggregate across eight pages (not page-specific) - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
 **B6:** UNVERIFIED - no non-author read-only review claimed; cannot support FULL.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
@@ -71,7 +71,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 **B2:** 245 inventory rows; defined 1; named gaps 45; documented exclusions 199; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L7 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
-**B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
+**B5:** PARTIAL - aggregate across eight pages (not page-specific) - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
 **B6:** UNVERIFIED - no non-author read-only review claimed; cannot support FULL.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
@@ -81,7 +81,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 **B2:** 244 inventory rows; defined 1; named gaps 32; documented exclusions 211; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L7 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
-**B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
+**B5:** PARTIAL - aggregate across eight pages (not page-specific) - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
 **B6:** UNVERIFIED - no non-author read-only review claimed; cannot support FULL.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
@@ -91,7 +91,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 **B2:** 256 inventory rows; defined 1; named gaps 47; documented exclusions 208; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L7 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
-**B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
+**B5:** PARTIAL - aggregate across eight pages (not page-specific) - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
 **B6:** UNVERIFIED - no non-author read-only review claimed; cannot support FULL.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
@@ -101,7 +101,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 **B2:** 276 inventory rows; defined 3; named gaps 59; documented exclusions 214; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L11 ## 1. Lane derivation at this implementation base.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
-**B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
+**B5:** PARTIAL - aggregate across eight pages (not page-specific) - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
 **B6:** UNVERIFIED - no non-author read-only review claimed; cannot support FULL.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
@@ -111,7 +111,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 **B2:** 418 inventory rows; defined 0; named gaps 48; documented exclusions 370; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L5 ## 1. Scope, plan binding and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
-**B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
+**B5:** PARTIAL - aggregate across eight pages (not page-specific) - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
 **B6:** UNVERIFIED - no non-author read-only review claimed; cannot support FULL.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
@@ -121,7 +121,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 **B2:** 240 inventory rows; defined 1; named gaps 40; documented exclusions 199; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L11 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
-**B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
+**B5:** PARTIAL - aggregate across eight pages (not page-specific) - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
 **B6:** UNVERIFIED - no non-author read-only review claimed; cannot support FULL.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
@@ -131,7 +131,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 **B2:** 327 inventory rows; defined 3; named gaps 50; documented exclusions 274; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L5 ## 1. Scope, plan binding and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
-**B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
+**B5:** PARTIAL - aggregate across eight pages (not page-specific) - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
 **B6:** UNVERIFIED - no non-author read-only review claimed; cannot support FULL.
 **Verdict: PARTIAL** - B6 UNVERIFIED and B1 audience gap; no keeper row.
 
@@ -145,7 +145,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 **Generation/verification command (finding #9):** the inline verifier embedded in section 12 is the primary in-branch verifier; extract its fenced python block to a temp file and run: python <temp.py> <this-record.md>. It parses this record's table, checks rows/unique keys/overlaps/classes/dispositions/codes/per-page tallies and invariants, and its output is recorded in section 12. External _A generator copies are convenience only and are not required for AC3. Table kept inline under the one-path constraint; tradeoff is size.
 
-**Verification status (new review #4):** rows/counts are recomputed by the embedded verifier (section 12) directly from this record's own table; **AC3 is MET in-branch**. External _A copies are convenience only.
+**Verification status (new review #4):** rows/counts are recomputed by the embedded verifier (section 12) directly from this record's own table; **AC3 is MET WITH WAIVER/PARTIAL (table-level self-consistency only)**. External _A copies are convenience only.
 
 | Page | Line@offset | Class | Token | Disposition |
 | --- | --- | --- | --- | --- |
@@ -2591,16 +2591,16 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET | exactly one added record path; no other path; FIFTEEN DCO-signed model commits measured post-commit; base d1f12cc3 |
+| AC1 one-path | MET | exactly one added record path; no other path; SIXTEEN DCO-signed model commits measured post-commit; base d1f12cc3 |
 | AC2 frozen pages | MET WITH WAIVER | mixed pin 1 pinned-equal + 7 re-pinned at d1f12cc3; totals 300,510 B/2,066 LF; waiver/basis defined under population definitions |
 | AC3 whole-page+inventory | MET WITH WAIVER / PARTIAL (table-level self-consistency only) | embedded verifier recomputes rows/keys/overlaps/classes/dispositions/codes/per-page and Crows.json from this record's table; source-page semantics/first-use remain manually asserted, not source-page cross-checked |
 | AC4 dispositions | MET for 0 FULL / 8 PARTIAL / 0 UNRUN (genuinely supported after semantic corrections) | B2/line-range/identifier/placeholder invariants and per-page B2 counts corrected; B4 N/A rationale, B5 partial limitation, B6 precise gap; no keeper/FULL claim |
 | AC5 record/body/PROC | MET WITH EXTERNAL ARTIFACT (live PR body/PROC/checker) | final live body publishes PROC-04 short/full/lens and literal presence; published == recomputed; body checker 0 (proof in PR body and SD-C repair comment) |
-| AC6 Codex/reviews | MET WITH EXTERNAL ARTIFACT (visible PR review-thread dispositions) | Codex never a pass, 0 threads/0 unresolved; latest review 5568319753 answered in visible findings-response comment with FIXED/DISPOSED; prior review 5568285030 answered; earlier reviews remain answered; DeepSeek advisory only, never a gate |
+| AC6 Codex/reviews | MET WITH EXTERNAL ARTIFACT (visible PR review-thread dispositions) | Codex never a pass, 0 threads/0 unresolved; latest review 5568366388 answered in visible findings-response comment with FIXED/DISPOSED; prior reviews 5568319753 and 5568285030 answered; earlier reviews remain answered; DeepSeek advisory only, never a gate |
 | AC7 provenance | MET (inline canonical evidence) | section 12 inlines A-rows/README/preview/MANIFEST/Crows content with measured B/LF/sha; Crows.json carries its trailing-LF/full-totals convention; external copies convenience only |
 | AC8 stage entry | MET for C | fresh B ACCEPT 6260430607; one record; D/E/F/G separate; no merge |
 
-**AC verdict (narrowed, review 5568051580 #8):** AC1-AC8 are MET under the AC2 waiver using in-branch record evidence plus external PR artifacts; AC5 relies on the live PR body/PROC/checker external to this file, AC6 on visible PR review-thread dispositions external to this file, and AC3 is table-level self-consistency only (not source-page cross-check). B6 reader evidence: a non-author Stage C reader exists, but no B6 interview exists; the B6 line does not claim an interview. This is not a DeepSeek pass/gate claim.
+**AC verdict (status summary, not an all-MET claim):** AC1 status as table; AC2 MET WITH WAIVER; AC3 MET WITH WAIVER/PARTIAL (table-level self-consistency only); AC4 MET for 0F/8P/0U; AC5 MET WITH EXTERNAL ARTIFACT (live PR body/PROC); AC6 MET WITH EXTERNAL ARTIFACT (visible review-thread dispositions); AC7 MET (inline evidence); AC8 MET. AC3 is not a full MET and there is no claim all ACs are fully MET. B6 reader evidence: a non-author Stage C reader exists, but no B6 interview exists; the B6 line does not claim an interview. This is not a DeepSeek pass/gate claim.
 
 ## 8. Stage A account reference
 
@@ -2626,7 +2626,7 @@ skill-usage-ledger@6a27b5c8e690 / hash=6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6
 ```
 
 **Support CLI proof (measured):** preview.py path -> _A/evidence/read-lc-424-c1/Crows.txt; sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; bytes=1542; lf=4 ; preview.py rows -> table_name=stage_c_skills; key=row; where=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21; rows=4; row=1 skill=acceptance-criteria-reviewer entry=.claude/skills/acceptance-criteria-reviewer/SKILL.md sha256=c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 size=14207 model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) plan_role=sd-c-read-lc-424-c1 ; preview.py query acceptance -> matches=1; {"entry": ".claude/skills/acceptance-criteria-reviewer/SKILL.md", "row": 1, "sha256": "c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021", "skill": "acceptance-criteria-reviewer", "where": "stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21"}.
-**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (738668bd0a288a5a0fc070f9726cbdd2488a411a9fe35b922502abf9eff066ef) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (6aabcfeb6a54a6d051270809a72e1853f7db0ef24a66a57ac00794a3c1327491) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 3,036 B / 89 LF / sha 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3037 B / 89 LF / sha 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499.
+**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (738668bd0a288a5a0fc070f9726cbdd2488a411a9fe35b922502abf9eff066ef) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (6aabcfeb6a54a6d051270809a72e1853f7db0ef24a66a57ac00794a3c1327491) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 3,037 B / 89 LF / sha 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3037 B / 89 LF / sha 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499.
 
 ## 10. Five required c-protocol questions (measured on final artifact)
 
@@ -2846,6 +2846,8 @@ Measured: **3037 B / 89 LF / sha 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79
 import re,sys,json,hashlib
 from collections import Counter,defaultdict
 sys.stdout.reconfigure(encoding='utf-8',errors='replace')
+if len(sys.argv)!=2:
+ print("usage: python verifier.py <record.md>"); sys.exit(2)
 p=sys.argv[1]; rec=open(p,encoding="utf-8").read().splitlines(); errors=[]
 def err(m): errors.append(m)
 pat=re.compile(r"^\|\s*(42[4-9]|43[01])\s*\|\s*(\d+)@(\d+)\s*\|\s*(i{1,3}|iv|v)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$")
@@ -2878,7 +2880,6 @@ try:
  a=next(i for i in range(i,len(rec)) if rec[i].startswith("~~~~text"))
  b=next(i for i in range(a+1,len(rec)) if rec[i].startswith("~~~~"))
  content="\n".join(x.rstrip("\r") for x in rec[a+1:b])+"\n"
-  blocks[name]=content
  cj=json.loads(content)
  if len(cj.get("rows",[]))!=4: err("Crows.json rows %d !=4"%len(cj.get("rows",[])))
  decl=None
@@ -2914,6 +2915,7 @@ for name in block_names:
   lines=[x.rstrip("\r") for x in rec[a+1:b]]
   while lines and lines[-1].strip()=="": lines.pop()
   content="\n".join(lines)+"\n"
+  blocks[name]=content
   decl=None
   for j in range(h,a):
    m=re.search(r"Measured:.*?(\d+) B / (\d+) LF / sha ?([0-9a-f]{64})",rec[j])
@@ -2927,7 +2929,7 @@ try:
  a=next(i for i in range(i,len(rec)) if rec[i].startswith(chr(96)*3+"text"))
  b=next(i for i in range(a+1,len(rec)) if rec[i].startswith(chr(96)*3))
  content="\n".join(x.rstrip("\r") for x in rec[a+1:b])+"\n"
-  blocks[name]=content; decl=None
+ blocks["Crows.txt"]=content; decl=None
  for j in range(b,min(len(rec),b+14)):
   m=re.search(r"Canonical Crows block measured.*?(\d+) B / (\d+) LF / sha ?([0-9a-f]{64})",rec[j])
   if m: decl=m.groups()
@@ -2970,7 +2972,7 @@ for r in rows:
  tok=r[4].strip(); bt=tok.startswith(chr(96)) and tok.endswith(chr(96))
  if bt and r[3] not in ("iv","v"): err("backticked token not class iv/v "+repr(r))
  if r[3]=="iv" and not bt: err("class iv token not backticked "+repr(r))
-STALE=["2,"+"5"+"75","f7"+"3c"+"6"+"29d","bd"+"51"+"62","no-"+"trail"+"ing-LF","3,"+"0"+"62","e4"+"ce1"+"263","6e"+"28"+"caec"]
+STALE=["2,"+"5"+"75","f7"+"3c"+"6"+"29d","bd"+"51"+"62","no-"+"trail"+"ing-LF","3,"+"0"+"62","3,"+"0"+"36","e4"+"ce1"+"263","6e"+"28"+"caec"]
 for stale in STALE:
  if stale in open(p,encoding="utf-8").read().split("### Embedded verifier source")[0]: err("stale value present: "+stale)
 ACR=set("CLI API CI PR SHA URL PII DCO ORM XSS ISMS AIMS FIFO HTTP HTTPS OLTP TLS SSO RBAC MFA KMS CDN SQL JSON YAML ADR SDK CPU IO GC OOM LLM QA E2E SAST OIDC TOML PRD CSV UI UX CTA CWE OLAP CDC RLS SLO AWS GCP MVP AI-SDLC OWASP RCE NIST RMF HITL HOTL SDLC AI AC ACL CR CSS DB DSR EOF HMAC HTML IP ISO JIT JS LF NL PERF QR RAG RDS RFC RLHF ROUGE RPC SEV SOA SSRF STRIDE UTC".split())
@@ -3002,6 +3004,11 @@ except Exception as e: err("cross-file: "+str(e))
 for r in rows:
  if r[3]=="ii" and r[5].startswith("named"): err("class ii named gap "+repr(r))
 
+# duplicate canonical measurement consistency
+text_all=open(p,encoding="utf-8").read().split("### Embedded verifier source")[0]
+for badmeas in ["Crows.json is 3,036","3036 B / 89 LF","3,036 B / 89 LF"]:
+ if badmeas in text_all: err("stale duplicate measurement: "+badmeas)
+
 if raw_count<1: err("no raw <...> placeholders"); raw_ok=False
 for r in rows:
  tok=r[4]
@@ -3011,15 +3018,15 @@ for r in rows:
   elif r[3]=="v" and not re.fullmatch(r"<[^<>]+>",inner): err("class-v placeholder shape "+repr(r)); raw_ok=False
 if errors:
  print("VERIFIER FAIL:"); [print(" -",e) for e in errors]; sys.exit(1)
-print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d inline-artifacts=%d/6 crows-block=exact class-backtick=ok cross-file=%s"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,inline_ok,"ok" if cross_ok else "FAIL"))
+print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d inline-artifacts=%d/6 crows-block=exact class-backtick=ok cross-file=%s duplicate-measurements=ok"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,inline_ok,"ok" if cross_ok else "FAIL"))
 ~~~~
 
-**Mechanically verified by the verifier:** table parse/rows/keys/classes/dispositions/codes/per-page totals/Crows.json row1 count/malformed rows/overlaps. **Manually asserted, not source-page cross-checked:** page-token meanings, first-use judgments, B2/AC dispositions; AC3 is therefore table-level self-consistency only.
+**Mechanically verified by the verifier:** table parse/rows/keys/classes/dispositions/codes/per-page totals/Crows.json row1 count/malformed rows/overlaps. **Manually asserted, not source-page cross-checked:** page-token meanings, first-use judgments, B2/AC dispositions; AC3 is therefore MET WITH WAIVER/PARTIAL: table-level self-consistency only.
 
 ### Embedded verifier expected output
 
 ~~~~text
-VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 596, 'i': 443, 'iii': 9} disps={'excluded': 2016, 'named': 373, 'defined': 10} exclusions=2016 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127 inline-artifacts=6/6 crows-block=exact class-backtick=ok cross-file=ok
+VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 596, 'i': 443, 'iii': 9} disps={'excluded': 2016, 'named': 373, 'defined': 10} exclusions=2016 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127 inline-artifacts=6/6 crows-block=exact class-backtick=ok cross-file=ok duplicate-measurements=ok
 ~~~~
 
 External convenience copies: _A/evidence/read-lc-424-c1/Crows.txt 1542/4/sha8a8a2564..., A-rows path above, README/preview/MANIFEST/Crows.json above. No in-branch claim of files outside this record.
