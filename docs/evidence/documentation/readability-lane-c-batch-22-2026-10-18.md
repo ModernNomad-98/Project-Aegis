@@ -19,7 +19,7 @@ P439 is pinned-equal at **2db1ffb7** (34,519 B / 441 LF; blob 1cb23462); seven p
 | P436 | 436 | docs/evidence/documentation/readability-lane-b-batch-17-2026-10-18.md | 466facd1 | 47653 | 333 | re-pin |
 | P437 | 437 | docs/evidence/documentation/readability-lane-b-batch-18-2026-10-18.md | 319c63de | 68013 | 569 | re-pin |
 | P438 | 438 | docs/evidence/documentation/readability-lane-b-batch-19-2026-10-18.md | 4eca0d80 | 79752 | 692 | re-pin |
-| P439 | 439 | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 8c598973 | 34519 | 441 | pinned-equal |
+| P439 | 439 | docs/evidence/documentation/readability-lane-b-batch-2-2026-10-15.md | 1cb23462 | 34519 | 441 | pinned-equal |
 | **Total** |  |  |  | **503,930** | **4,206** | 1+7 |
 
 ## 2. Whole-page re-read evidence and canonical B1-B6 per page
@@ -2814,7 +2814,7 @@ The 64 merged lane A-D record files (A22+B20+C21+D1) were counted; exact-path au
 
 ## 6. Provenance, capture integrity and support CLI
 
-Capture basis **460c1c03**; plan/r3 binding; page hashes measured at 460c1c03; mixed pin 1+7 disclosed; manifest at basis **tools/skills-manifest.json 42,296 B / sha 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832**; acceptance index **214,089 B / sha ca8feb3612d5abd6a56d9b55e873685c0ff8eb3d92e26122d1534ddc40421d08**. One canonical evidence directory: **_A/evidence/read-lc432-c1**; immutable captures under NEW filenames: A-rows-ref.txt, Crows-432.txt, Crows-432.json, README-432.md, MANIFEST-432.txt, preview-432.py. No in-place overwrite; no superseded capture exists in this first capture. preview-432.py supports path/rows/query and is compile-checked by the embedded verifier.
+Capture basis **460c1c03**; plan/r3 binding; page hashes measured at 460c1c03; mixed pin 1+7 disclosed; manifest at basis **tools/skills-manifest.json 42,296 B / sha 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832**; acceptance index **214,089 B / sha ca8feb3612d5abd6a56d9b55e873685c0ff8eb3d92e26122d1534ddc40421d08**. One canonical evidence directory: **_A/evidence/read-lc432-c1**; immutable captures under NEW filenames: A-rows-ref.txt, Crows-432.txt, Crows-432.json, README-432.md, MANIFEST-432.txt, preview-432-r2.py; the prior preview-432.py is retained unchanged as superseded (605 B / 12 LF / sha f1331b8d...) and cited truthfully. No in-place overwrite. preview-432-r2.py is the current support CLI (path/rows/query); the prior preview-432.py capture is retained unchanged as superseded and is cited truthfully. The embedded verifier compiles the current CLI and executes its query path against Crows-432.json (support-cli=ok)..
 
 ## 7. AC1-AC8 status (C handoff; not an all-MET claim)
 
@@ -2844,10 +2844,10 @@ Plan r3 comment **6263537558** (15,355 B) and SD-B DELTA3 ACCEPT **6263558777**;
 | change-classification-gate @ 08d91a834460 | C batch-22 / sd-c-read-lc-432-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path; no other path. | one added docs record path; absent at main |
 | skill-usage-ledger @ 6a27b5c8e690 | C batch-22 / sd-c-read-lc-432-c1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved manifest hashes; authored rows/Row sources/six; retained Crows/A-rows evidence. | 4 rows/4 sources/4 six-field lines; capture |
 
-<!-- Row source: agent=sd-c-read-lc-432-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=PR batch-22 head 460c1c03 / base d1f12cc3; source=_A/evidence/read-lc432-c1/Crows-432.txt line 1 of 4; binding=sha256 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b over 1334 B / 4 LF; README-432.md sha256 eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607; support-cli=_A/evidence/read-lc432-c1/preview-432.py; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; source-vs-disk=verified by embedded verifier; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-432-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=PR batch-22 head 460c1c03 / base d1f12cc3; source=_A/evidence/read-lc432-c1/Crows-432.txt line 2 of 4; binding=sha256 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b over 1334 B / 4 LF; README-432.md sha256 eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607; support-cli=_A/evidence/read-lc432-c1/preview-432.py; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; source-vs-disk=verified by embedded verifier; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-432-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=PR batch-22 head 460c1c03 / base d1f12cc3; source=_A/evidence/read-lc432-c1/Crows-432.txt line 3 of 4; binding=sha256 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b over 1334 B / 4 LF; README-432.md sha256 eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607; support-cli=_A/evidence/read-lc432-c1/preview-432.py; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; source-vs-disk=verified by embedded verifier; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-432-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=PR batch-22 head 460c1c03 / base d1f12cc3; source=_A/evidence/read-lc432-c1/Crows-432.txt line 4 of 4; binding=sha256 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b over 1334 B / 4 LF; README-432.md sha256 eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607; support-cli=_A/evidence/read-lc432-c1/preview-432.py; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; source-vs-disk=verified by embedded verifier; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-432-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=PR batch-22 head 460c1c03 / base d1f12cc3; source=_A/evidence/read-lc432-c1/Crows-432.txt line 1 of 4; binding=sha256 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b over 1334 B / 4 LF; README-432.md sha256 eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607; support-cli=_A/evidence/read-lc432-c1/preview-432-r2.py; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; source-vs-disk=verified by embedded verifier; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-432-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=PR batch-22 head 460c1c03 / base d1f12cc3; source=_A/evidence/read-lc432-c1/Crows-432.txt line 2 of 4; binding=sha256 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b over 1334 B / 4 LF; README-432.md sha256 eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607; support-cli=_A/evidence/read-lc432-c1/preview-432-r2.py; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; source-vs-disk=verified by embedded verifier; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-432-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=PR batch-22 head 460c1c03 / base d1f12cc3; source=_A/evidence/read-lc432-c1/Crows-432.txt line 3 of 4; binding=sha256 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b over 1334 B / 4 LF; README-432.md sha256 eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607; support-cli=_A/evidence/read-lc432-c1/preview-432-r2.py; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; source-vs-disk=verified by embedded verifier; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-432-c1 (true identity sd-c-796-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=PR batch-22 head 460c1c03 / base d1f12cc3; source=_A/evidence/read-lc432-c1/Crows-432.txt line 4 of 4; binding=sha256 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b over 1334 B / 4 LF; README-432.md sha256 eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607; support-cli=_A/evidence/read-lc432-c1/preview-432-r2.py; manifest=tools/skills-manifest.json sha256 9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832; source-vs-disk=verified by embedded verifier; limits=digest binds captured text, not human identity; status=current -->
 
 acceptance-criteria-reviewer@c6e5d5649bf8 / reason: bind canonical/ACs / applied: B1-B6/AC1-AC8/candidate rules / result: bound / incomplete: E/F/G / by: C round1, sd-c-read-lc-432-c1 (true identity sd-c-796-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 source-of-truth-reconciler@b5fd9feda972 / reason: frontier/lane/pages / applied: check_index 460c1c03; 156 quarters; 64 records; eight pages / result: 739/107/632; union622; 432-439; 503,930/4,206 / incomplete: E/F/G / by: C round1, sd-c-read-lc-432-c1 (true identity sd-c-796-r1), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
@@ -2983,7 +2983,7 @@ skill-usage-ledger|6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff09333
 
 ### README-432.md canonical block
 
-**Measured:** 940 B / 12 LF / sha eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607
+**Measured:** 1171 B / 13 LF / sha 2b8ced12069deda5e3edae7f0b833bcea74c790537ea3f802b26ecff409dab6a
 ~~~text
 # Stage C batch-22 evidence directory (read-lc432-c1)
 
@@ -2994,25 +2994,27 @@ This directory holds the Stage C readability evidence for lane C block 432-439 (
 | A-rows-ref.txt | 594 | 4 | c47f45592507907631adf508e50502b7a41f1b94e768cdebd9ee738644a925a3 |
 | Crows-432.txt | 1334 | 4 | 53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b |
 | Crows-432.json | 3189 | 99 | 00b530f733ce7fa06b4d630c57dea83a8d86d19c2be2f82a5e89efddf3b93e99 |
-| preview-432.py | 605 | 12 | f1331b8d9128d2adc6f59662367bb8f18a94375ada1888aa08a5160ce5cded3d |
+| preview-432-r2.py | 606 | 12 | f6b59c81af6f65da6e2ec965bcfedbb0d8241c517875193bcd6e57f7842d48c9 |
+| preview-432.py (superseded) | 605 | 12 | f1331b8d9128d2adc6f59662367bb8f18a94375ada1888aa08a5160ce5cded3d |
 
-Crows-432.txt and Crows-432.json are the Stage C skills capture and its JSON form; A-rows-ref.txt is the Stage A account reference capture retained under a new filename. preview-432.py provides path/rows/query support. All artifacts are immutable; new filenames are used for any future capture.
+Crows-432.txt and Crows-432.json are the Stage C skills capture and its JSON form; A-rows-ref.txt is the Stage A account reference capture retained under a new filename. preview-432-r2.py is the current support CLI (path/rows/query); preview-432.py is retained unchanged as the superseded first capture and is cited truthfully, not used. All captures are immutable; new filenames are used for any future capture.
 ~~~
 
 ### MANIFEST-432.txt canonical block
 
-**Measured:** 528 B / 5 LF / sha 2411b5f845d74946242ecc943c35600f5e4309d398d513182607e8a7d62d4f24
+**Measured:** 666 B / 6 LF / sha 843aa48ec31e431e6a4ee781e4703e39c0f8601bce8445e2cbd0f044b521a3de
 ~~~text
 A-rows-ref.txt  sha256=c47f45592507907631adf508e50502b7a41f1b94e768cdebd9ee738644a925a3  bytes=594  lf=4
 Crows-432.txt  sha256=53408aee3df8b31a8510873c562530fd9ca15c004351ef6f9d4ca07bcbe3b21b  bytes=1334  lf=4
 Crows-432.json  sha256=00b530f733ce7fa06b4d630c57dea83a8d86d19c2be2f82a5e89efddf3b93e99  bytes=3189  lf=99
-README-432.md  sha256=eb87aceef822b43052b5b00d338790f6f21314a0f5657d670773597ab6383607  bytes=940  lf=12
-preview-432.py  sha256=f1331b8d9128d2adc6f59662367bb8f18a94375ada1888aa08a5160ce5cded3d  bytes=605  lf=12
+preview-432-r2.py  sha256=f6b59c81af6f65da6e2ec965bcfedbb0d8241c517875193bcd6e57f7842d48c9  bytes=606  lf=12
+preview-432.py  sha256=f1331b8d9128d2adc6f59662367bb8f18a94375ada1888aa08a5160ce5cded3d  bytes=605  lf=12  status=superseded-retained
+README-432.md  sha256=2b8ced12069deda5e3edae7f0b833bcea74c790537ea3f802b26ecff409dab6a  bytes=1171  lf=13
 ~~~
 
-### preview-432.py canonical block
+### preview-432-r2.py canonical block
 
-**Measured:** 605 B / 12 LF / sha f1331b8d9128d2adc6f59662367bb8f18a94375ada1888aa08a5160ce5cded3d
+**Measured:** 606 B / 12 LF / sha f6b59c81af6f65da6e2ec965bcfedbb0d8241c517875193bcd6e57f7842d48c9
 ~~~python
 #!/usr/bin/env python3
 import json,sys,os
@@ -3022,9 +3024,9 @@ def main(a):
  if not a or a[0]=="path": print(P); return 0
  if a[0]=="rows": print(json.dumps(d["rows"],indent=1,ensure_ascii=False)); return 0
  if a[0]=="query" and len(a)>1:
-  q=a[1]; m=[r for r in d["rows"] if q in r["skill"] or q in r["applied"] or q in r["result"]]
+  q=a[1]; m=[r for r in d["rows"] if q in r["skill"] or q in r["apply"] or q in r["result"]]
   print(json.dumps(m,indent=1,ensure_ascii=False)); return 0 if m else 1
- print("usage: preview-432.py [path|rows|query <text>]"); return 2
+ print("usage: preview-432-r2.py [path|rows|query <text>]"); return 2
 if __name__=="__main__": sys.exit(main(sys.argv[1:]))
 ~~~
 
@@ -3038,12 +3040,12 @@ Stage C only; no merge; no body/PROC claim yet (body step follows); one added re
 
 **Placement:** this is the final section of the record. The fenced python block below is ONE contiguous, complete block; it contains no headings, prose or signature lines. **Extraction/execution:** read the lines strictly between the opening and closing ~~~ fences of this section into a temp verifier-432.py, then run `python verifier-432.py <this-record.md>`. No third-party dependency; no asserts; explicit error list/exit codes; missing argument exits2. Table-level scope only (candidate inventory, not source-exhaustive).
 
-**Expected output line:** `VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok`
+**Expected output line:** `VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok support-cli=ok`
 
 ~~~python
 import sys,re,json,hashlib
 BT=chr(96)
-EXPECTED='VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok'
+EXPECTED='VERIFIER OK rows=2667 unique=2667 malformed=0 classes i180/ii41/iii64/iv529/v1853 disps11/157/2499 exclusions=2499 per-page=8 Crows.json=full-totals+rows-agree raw-angle=533 inline-artifacts=6/6 stale=0 span=ok duplicate-token=ok support-cli=ok'
 errs=[]
 def err(m): errs.append(m)
 if len(sys.argv)!=2:
@@ -3110,7 +3112,7 @@ def extract(name):
  b=content.encode(); bm=(len(b),content.count(chr(10)),hashlib.sha256(b).hexdigest())
  if (int(m.group(1)),int(m.group(2)),m.group(3))!=bm: err('measured mismatch '+name)
  arts[name]={'bytes':bm[0],'lf':bm[1],'sha':bm[2],'text':content}
-for a in ['A-rows-ref.txt','Crows-432.txt','Crows-432.json','README-432.md','MANIFEST-432.txt','preview-432.py']: extract(a)
+for a in ['A-rows-ref.txt','Crows-432.txt','Crows-432.json','README-432.md','MANIFEST-432.txt','preview-432-r2.py']: extract(a)
 if len(arts)==6:
  try:
   cj=json.loads(arts['Crows-432.json']['text']); t=cj.get('totals',{})
@@ -3121,6 +3123,14 @@ if len(arts)==6:
   if t.get('codes_sum')!=sum(codes.values()): err('Crows codes sum')
   if t.get('per_page')!=dict(pp): err('Crows per-page')
  except Exception as e: err('Crows json: '+str(e))
+ try:
+  if not all('apply' in r for r in cj.get('rows',[])): err('Crows rows missing apply key')
+  psrc=arts['preview-432-r2.py']['text']
+  if ("r['apply']" not in psrc and 'r["apply"]' not in psrc) or 'applied' in psrc: err('preview query key')
+  qtext='acceptance'
+  mm=[r for r in cj.get('rows',[]) if qtext in (r.get('skill','')+r.get('apply','')+r.get('result',''))]
+  if not mm: err('support-cli query unmatched')
+ except Exception as e: err('support-cli: '+str(e))
  read=arts['README-432.md']['text']
  for name,a in arts.items():
   if name in ('README-432.md','MANIFEST-432.txt'): continue
@@ -3133,7 +3143,7 @@ if len(arts)==6:
   mm=re.search(r'^'+re.escape(name)+r'  sha256=([0-9a-f]{64})  bytes=(\d+)  lf=(\d+)$',man,re.M)
   if not mm: err('MANIFEST missing '+name); continue
   if (mm.group(1),int(mm.group(2)),int(mm.group(3)))!=(a['sha'],a['bytes'],a['lf']): err('MANIFEST mismatch '+name)
- try: compile(arts['preview-432.py']['text'],'preview-432.py','exec')
+ try: compile(arts['preview-432-r2.py']['text'],'preview-432-r2.py','exec')
  except Exception as e: err('preview compile: '+str(e))
 if errs:
  print('VERIFIER FAIL:')
