@@ -563,8 +563,10 @@ def blocks_partition(count):
     """Ceil-quarter lane partition: ceil(count/4) positions per lane A-D.
 
     Returns (ceil, bounds), where bounds[i] is the inclusive (first, last)
-    0-based position of lane BLOCK_LANES[i]. An empty union yields ceil 0 and
-    empty bounds.
+    0-based position of lane BLOCK_LANES[i]. The tuple always has four entries
+    for positional stability; an empty union (and a lane beyond the union)
+    yields the degenerate (0, -1) bound, which blocks_payload never uses for a
+    real position.
     """
     ceil = (count + 3) // 4
     bounds = []
@@ -578,9 +580,13 @@ def blocks_partition(count):
 def blocks_page_facts(root, ref, pin, path):
     """Blob, raw bytes, LF count and pin class for one page at --ref.
 
-    Every failure is loud: main() turns DispositionError into exit 2 with no
-    partial output. pinned-equal means the blob at --ref equals the same path's
-    blob at --pin; re-pin means it differs or the path is absent at --pin.
+    Every git failure for the compared ref is loud: main() turns
+    DispositionError into exit 2 with no partial output. The caller must pass a
+    --pin commit that main() has already resolved: a pin path that does not
+    resolve is treated as absent and yields re-pin (the documented two-state
+    classification), never an error. pinned-equal means the blob at --ref
+    equals the same path's blob at --pin; re-pin means it differs or the path
+    is absent at --pin.
     """
     code, out, err = run(["rev-parse", "--verify", "--quiet",
                           ref + ":" + path], root)
@@ -663,7 +669,8 @@ def main():
     ap.add_argument("--path", help="restrict to one page path")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--quiet", action="store_true",
-                    help="print only the summary block")
+                    help="print only the summary block (with --blocks, the "
+                         "block output still prints)")
     ap.add_argument("--blocks", action="store_true",
                     help="emit the remaining pending union as ordered blocks "
                          "(see the module docstring)")
@@ -679,16 +686,16 @@ def main():
 
     root = Path(args.repo).resolve()
     pin_sha = None
+    if args.block_size < 1:
+        print("--block-size must be >= 1", file=sys.stderr)
+        return 2
+    if args.block_limit is not None and args.block_limit < 1:
+        print("--block-limit must be >= 1", file=sys.stderr)
+        return 2
     if args.blocks:
-        if args.path:
+        if args.path is not None:
             print("--blocks cannot be combined with --path",
                   file=sys.stderr)
-            return 2
-        if args.block_size < 1:
-            print("--block-size must be >= 1", file=sys.stderr)
-            return 2
-        if args.block_limit is not None and args.block_limit < 1:
-            print("--block-limit must be >= 1", file=sys.stderr)
             return 2
         code, out, err = run(["rev-parse", "--verify", "--quiet",
                               args.pin + "^{commit}"], root)
@@ -951,7 +958,8 @@ def main():
         print("")
         print("blocks total {}  emitted {}{}".format(
             blocks["blocks_total"], blocks["blocks_emitted"],
-            "" if blocks["block_limit"] is None
+            "" if (blocks["block_limit"] is None
+                   or blocks["blocks_emitted"] >= blocks["blocks_total"])
             else "  (limited by --block-limit {})".format(
                 blocks["block_limit"])))
 

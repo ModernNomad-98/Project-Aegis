@@ -167,6 +167,7 @@ class T1DefaultOutputUnchanged(unittest.TestCase):
                        new_err.decode("utf-8", "replace")[:800]))
         self.assertEqual(base_code, new_code, message)
         self.assertEqual(base_out, new_out, message)
+        self.assertEqual(base_err, new_err, message)
 
     def test_t1_default_output_matches_base_checker(self):
         self._assert_identical("human (full)", ["--ref", BASIS_REF])
@@ -349,6 +350,8 @@ class T4CliJsonAndHuman(unittest.TestCase):
                       + summary["no_recorded_acceptance"])
         self.assertEqual(blocks["union_size"], union_size)
         self.assertEqual(blocks["blocks_total"], (union_size + 7) // 8)
+        self.assertGreater(union_size, 8,
+                           "T4 assumes a union larger than one 8-page block")
         self.assertEqual(blocks["blocks_emitted"], 1)
         self.assertEqual(len(blocks["blocks"]), 1)
         block = blocks["blocks"][0]
@@ -358,8 +361,8 @@ class T4CliJsonAndHuman(unittest.TestCase):
         self.assertEqual(block["index"], 0)
         self.assertEqual(block["start"], 0)
         self.assertEqual(block["lane"], "A")
-        self.assertFalse(block["partial"])
-        self.assertEqual(len(block["pages"]), min(8, union_size))
+        self.assertEqual(len(block["pages"]), 8)
+        self.assertEqual(block["partial"], len(block["pages"]) < 8)
         positions = [page["position"] for page in block["pages"]]
         self.assertEqual(positions, list(range(len(block["pages"]))))
         for page in block["pages"]:
@@ -401,6 +404,18 @@ class T4CliJsonAndHuman(unittest.TestCase):
         self.assertEqual(human_summary["compared_ref"], BASIS_REF)
         self.assertEqual(human_summary["reader_pages_in_tree"],
                          payload["summary"]["reader_pages_in_tree"])
+
+
+    def test_t4_quiet_still_prints_blocks(self):
+        code, stdout, stderr = _run_checker(
+            CHECKER, ["--ref", BASIS_REF, "--blocks", "--block-limit", "1",
+                      "--quiet"])
+        self.assertEqual(code, 0, stderr.decode("utf-8", "replace"))
+        text = stdout.decode("utf-8")
+        self.assertIn("BLOCKS — remaining pending union,", text)
+        self.assertIn("block 0: positions 0-", text)
+        self.assertIn("blocks total", text)
+        self.assertNotIn("PROVABLY PENDING", text)
 
 
 class T5DiscoveryContract(unittest.TestCase):
@@ -448,6 +463,10 @@ class T6ScopeAndHygiene(unittest.TestCase):
 
     def test_t6_only_the_two_planned_paths_changed(self):
         changes = self._changed_paths()
+        if not changes:
+            self.skipTest(
+                "no base diff (e.g. running on main after merge); the exact-"
+                "scope assertion applies to the implementing PR")
         paths = {entry[1] for entry in changes}
         self.assertEqual(paths, PLANNED_PATHS)
         statuses = {entry[1]: entry[0] for entry in changes}
