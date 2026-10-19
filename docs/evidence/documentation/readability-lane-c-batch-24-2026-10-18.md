@@ -4200,9 +4200,9 @@ Basis/live main **907a602625255bcb4647beae60b0348e89fa6196** (60th record merge 
 | P453 | 504 | 91 | 8 | 55 | 97 | 253 | 0 | 88 | 416 |
 | P454 | 503 | 40 | 7 | 24 | 122 | 310 | 0 | 37 | 466 |
 | P455 | 105 | 20 | 7 | 18 | 26 | 34 | 0 | 19 | 86 |
-| **Total** | **4166** | **635** | **55** | **172** | **1581** | **1723** | **3** | **280** | **2459** |
+| **Total** | **4166** | **635** | **55** | **172** | **1581** | **1723** | **8** | **599** | **3559** |
 
-**Class sum:** 301+45+17+1235+1144=4166. **Disposition sum:** 3+280+2459=4166. **Exclusion codes sum:** PROSE 55, RANGE 125, DATE 76, STATUS 147, SHA 389, COMMAND 29, PATH 346, LITERAL 619, EMPHASIS 398, PLACEHOLDER 68, LINE-RANGE 1292, OPERATOR 15 = 2459. **Exclusion-code legend:** DATE date/time literal; LINE-RANGE page-line reference; STATUS uppercase lifecycle/status keyword; RANGE numeric range/unit token; PLACEHOLDER angle/brace/letter placeholder; OPERATOR operator glyph; PROSE lowercase technical/audience prose; EMPHASIS all-caps common emphasis word; PATH file/path identifier; COMMAND command/CLI token; SHA commit/blob hash; LITERAL backticked literal/prose identifier. One reconciliation; every tally above sums; zero duplicate mentions (unique keys).
+**Class sum:** 635+55+172+1581+1723=4166. **Disposition sum:** 8+599+3559=4166. **Exclusion codes sum:** PROSE 55, RANGE 125, DATE 76, STATUS 147, SHA 389, COMMAND 29, PATH 346, LITERAL 619, EMPHASIS 398, PLACEHOLDER 68, LINE-RANGE 1292, OPERATOR 15 = 3559. **Exclusion-code legend:** DATE date/time literal; LINE-RANGE page-line reference; STATUS uppercase lifecycle/status keyword; RANGE numeric range/unit token; PLACEHOLDER angle/brace/letter placeholder; OPERATOR operator glyph; PROSE lowercase technical/audience prose; EMPHASIS all-caps common emphasis word; PATH file/path identifier; COMMAND command/CLI token; SHA commit/blob hash; LITERAL backticked literal/prose identifier. One reconciliation; every tally above sums; zero duplicate mentions (unique keys).
 
 ## 5. Whole-page B1-B6 evidence per page; mixed-pin/drift facts
 ### P448 - union 448 - docs/evidence/documentation/readability-lane-b-batch-9-2026-10-18.md - re-pin - read whole L1-175
@@ -4611,6 +4611,24 @@ try:
  for pat,val in [('i=635',635),('ii=55',55),('iii=172',172),('iv=1581',1581),('v=1723',1723)]:
   pass
 except Exception as e: err('page totals arithmetic: '+str(e))
+
+
+# section 4 tally matrix check (must agree with parsed inventory)
+try:
+ trows=[l for l in text.split(chr(10)) if l.startswith('| **Total** |')]
+ if len(trows)!=1: err('section4 Total rows %d != 1'%len(trows))
+ else:
+  tc=[c.strip() for c in trows[0].strip('|').split('|')]
+  vals=[int(x.replace(',','').replace('*','')) for x in tc[1:]]
+  expect=[4166,635,55,172,1581,1723,8,599,3559]
+  if vals!=expect: err('section4 matrix '+repr(vals)+' != '+repr(expect))
+  if classes.get('i')!=635 or classes.get('ii')!=55 or classes.get('iii')!=172 or classes.get('iv')!=1581 or classes.get('v')!=1723: err('section4 class parsed mismatch')
+  if disp.get('defined')!=8 or disp.get('named')!=599 or disp.get('excluded')!=3559: err('section4 disp parsed mismatch')
+  if sum(codes.values())!=3559: err('section4 codes parsed mismatch')
+  if '635+55+172+1581+1723=4166' not in text: err('class sum line missing')
+  if '8+599+3559=4166' not in text: err('disposition sum line missing')
+  if '= 3559' not in text: err('codes sum 3559 missing')
+except Exception as e: err('section4 matrix: '+str(e))
 
 # artifacts
 def extract(name):
