@@ -2591,7 +2591,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET | exactly one added record path; no other path; TWENTY DCO-signed model commits measured post-commit; base d1f12cc3 |
+| AC1 one-path | MET | exactly one added record path; no other path; TWENTY-THREE DCO-signed model commits measured post-commit; base d1f12cc3 |
 | AC2 frozen pages | MET WITH WAIVER | mixed pin 1 pinned-equal + 7 re-pinned at d1f12cc3; totals 300,510 B/2,066 LF; waiver/basis defined under population definitions |
 | AC3 whole-page+inventory | MET WITH WAIVER / PARTIAL (table-level self-consistency only) | embedded verifier recomputes rows/keys/overlaps/classes/dispositions/codes/per-page and Crows.json from this record's table; source-page semantics/first-use remain manually asserted, not source-page cross-checked |
 | AC4 dispositions | MET for 0 FULL / 8 PARTIAL / 0 UNRUN (genuinely supported after semantic corrections) | B2/line-range/identifier/placeholder invariants and per-page B2 counts corrected; B4 N/A rationale, B5 partial limitation, B6 precise gap; no keeper/FULL claim |
