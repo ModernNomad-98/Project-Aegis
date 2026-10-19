@@ -58,7 +58,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P424 - index 424 - docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md - 54279 B / 665 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A — Stage C batch record, batch 5, 2026-10-15.
-**B2:** 393 inventory rows; defined 0; named gaps 49; documented exclusions 344; all rows in section 3.
+**B2:** 393 inventory rows; defined 0; named gaps 48; documented exclusions 345; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L62 ## 1. Lane derivation — the command, not a handed-down list.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -166,7 +166,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 14@42 | ii | blob | documented exclusion - PROSE: ordinary prose word |
 | 424 | 14@47 | i | ID | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 16@12 | i | PHASE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 424 | 16@20 | i | RE-READ | named gap - first use before any expansion on this page |
+| 424 | 16@20 | i | RE-READ | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 16@28 | i | LANE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 424 | 18@63 | ii | quarter | documented exclusion - PROSE: ordinary prose word |
 | 424 | 18@86 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
@@ -358,7 +358,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 424 | 314@40 | iv | `KiB` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 424 | 314@47 | v | L19 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 317@57 | v | L40 | documented exclusion - LINE-RANGE: line-range reference |
-| 424 | 317@66 | v | <canonical> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 424 | 317@66 | v | `<canonical>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 424 | 319@16 | v | L4 | documented exclusion - LINE-RANGE: line-range reference |
 | 424 | 326@53 | v | 2026-09-26 | documented exclusion - DATE: date/timestamp |
 | 424 | 326@65 | v | 2026-09-27 | documented exclusion - DATE: date/timestamp |
@@ -1545,7 +1545,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 164@26 | iv | `git rev-parse 2db1ffb7:<page>` | documented exclusion - COMMAND: real command |
 | 428 | 167@73 | iv | `.claude/skills/<name>/SKILL.md` | documented exclusion - PATH: file/path reference |
 | 428 | 167@132 | iv | `evals/` | documented exclusion - PATH: file/path reference |
-| 428 | 168@152 | v | <cmd> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 428 | 168@152 | v | `<cmd>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 428 | 171@80 | v | failed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 174@78 | iv | `git diff --check` | documented exclusion - COMMAND: real command |
 | 428 | 174@109 | iv | `validate-skills.py` | documented exclusion - PATH: file/path reference |
@@ -1734,7 +1734,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 92@84 | ii | rules | documented exclusion - PROSE: ordinary prose word |
 | 429 | 92@118 | i | NOT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 94@36 | v | L5-9 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 94@105 | iv | `D-id` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
+| 429 | 94@105 | iv | `D-id` | documented exclusion - IDENTIFIER: backticked lowercase/hyphenated identifier |
 | 429 | 94@113 | iv | `S1` | named gap - first use before any expansion on this page |
 | 429 | 94@122 | iv | `N` | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 94@145 | i | D01 | named gap - first use before any expansion on this page |
@@ -1823,33 +1823,33 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 143@286 | i | SPLIT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 143@359 | i | CHEAPER | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 143@372 | i | WILL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 429 | 143@835 | v | <store/system> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@855 | v | <N OLTP-stay / M offload candidates, evidence per candidate> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@921 | v | <symptom → workload, with evidence source> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@835 | v | `<store/system>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@855 | v | `<N OLTP-stay / M offload candidates, evidence per candidate>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@921 | v | `<symptom → workload, with evidence source>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 143@930 | v | → | documented exclusion - OPERATOR: operator glyph |
-| 429 | 143@969 | v | <workload> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@1039 | v | <t> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@1048 | v | <d> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@1057 | v | <why not cheaper option> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@1087 | v | <list> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@1099 | v | <workloads banned from primary + enforcement> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@1150 | v | <sequenced moves, each with dual-run + sign-off gate> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@1209 | v | <load remaining on primary; next-review trigger> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 143@1263 | v | <the one-bad-query check was performed; result> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@969 | v | `<workload>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@1039 | v | `<t>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@1048 | v | `<d>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@1057 | v | `<why not cheaper option>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@1087 | v | `<list>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@1099 | v | `<workloads banned from primary + enforcement>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@1150 | v | `<sequenced moves, each with dual-run + sign-off gate>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@1209 | v | `<load remaining on primary; next-review trigger>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 143@1263 | v | `<the one-bad-query check was performed; result>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 144@274 | i | EARNED | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 144@301 | i | WORKLOAD | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 144@314 | i | MOVE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 429 | 144@532 | v | <name/query-family> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@575 | v | <concurrency / duration / window> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@675 | v | <who reads the result> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@702 | v | <tier, owner-signed> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@762 | v | <one sentence> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@796 | v | <mechanism> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@812 | v | <window; comparison method (row/aggregate parity, freshness measured)> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@887 | v | <consumer owner confirms parity + freshness in writing> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 144@947 | v | <switch reads; primary access removed (grant/role change)> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@532 | v | `<name/query-family>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@575 | v | `<concurrency / duration / window>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@675 | v | `<who reads the result>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@702 | v | `<tier, owner-signed>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@762 | v | `<one sentence>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@796 | v | `<mechanism>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@812 | v | `<window; comparison method (row/aggregate parity, freshness measured)>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@887 | v | `<consumer owner confirms parity + freshness in writing>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@947 | v | `<switch reads; primary access removed (grant/role change)>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 144@986 | ii | grant | documented exclusion - PROSE: ordinary prose word |
-| 429 | 144@1010 | v | <how to fall back within the window> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 144@1010 | v | `<how to fall back within the window>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 145@226 | i | MECHANISM | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 145@246 | i | MUST | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 145@255 | i | ONLY | documented exclusion - EMPHASIS: uppercase emphasis/common word |
@@ -1858,84 +1858,84 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 145@295 | i | DESIGN | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 145@307 | i | AND | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 145@331 | ii | api | named gap - first use before any expansion on this page |
-| 429 | 145@916 | v | <surface/endpoint> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 145@916 | v | `<surface/endpoint>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 145@917 | ii | surface | documented exclusion - PROSE: ordinary prose word |
-| 429 | 145@940 | v | <sort cols> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 145@957 | v | <tiebreaker> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 145@975 | v | <dir> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 145@986 | v | <n> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 145@995 | v | <...> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 145@1101 | v | <explained count/page options, costs/unknowns, pros/cons, recommendation + why> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 145@940 | v | `<sort cols>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 145@957 | v | `<tiebreaker>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 145@975 | v | `<dir>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 145@986 | v | `<n>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 145@995 | v | `<...>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 145@1101 | v | `<explained count/page options, costs/unknowns, pros/cons, recommendation + why>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 146@258 | i | STRICT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 146@269 | i | TOTAL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 146@296 | i | DESC | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 146@634 | iv | `<` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 146@673 | iv | `>` | documented exclusion - IDENTIFIER: backticked identifier/label |
-| 429 | 146@764 | v | <last_created_at> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 146@786 | v | <last_id> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 146@800 | v | <versioned sort/filter fingerprint> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 146@764 | v | `<last_created_at>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 146@786 | v | `<last_id>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 146@800 | v | `<versioned sort/filter fingerprint>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@218 | i | ENVIRONMENT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 147@234 | i | CONTRACT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 147@267 | i | UNCHANGED | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 147@281 | i | OUTSIDE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 147@293 | i | CURRENT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 147@343 | i | ADVISORY | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 429 | 147@691 | v | <harness tier> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@710 | v | <instance/hardware class, pinned; dedicated runner rule> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@691 | v | `<harness tier>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@710 | v | `<instance/hardware class, pinned; dedicated runner rule>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@754 | ii | runner | documented exclusion - PROSE: ordinary prose word |
-| 429 | 147@771 | v | <flags/limits mirroring production; deltas listed> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@771 | v | `<flags/limits mirroring production; deltas listed>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@872 | v | 12ms | documented exclusion - LITERAL: literal/prose/quote/regex/link-check summary/separator |
-| 429 | 147@881 | v | <tier> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@892 | v | <date> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@903 | v | <build> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@881 | v | `<tier>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@892 | v | `<date>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@903 | v | `<build>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@904 | ii | build | documented exclusion - PROSE: ordinary prose word |
-| 429 | 147@915 | v | <ref + stamp fields> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@940 | v | <id/date> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@962 | v | <observed> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@977 | v | <measurement> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@995 | v | <value> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@1007 | v | <reason> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@1020 | v | <gate summary> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@1039 | v | <standing footnote> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 147@1063 | v | <passed> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@915 | v | `<ref + stamp fields>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@940 | v | `<id/date>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@962 | v | `<observed>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@977 | v | `<measurement>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@995 | v | `<value>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@1007 | v | `<reason>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@1020 | v | `<gate summary>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@1039 | v | `<standing footnote>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@1063 | v | `<passed>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@1064 | ii | passed | documented exclusion - PROSE: ordinary prose word |
-| 429 | 147@1076 | v | <failed> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@1076 | v | `<failed>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 147@1077 | v | failed | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
-| 429 | 147@1089 | v | <unrun> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 147@1089 | v | `<unrun>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 148@202 | i | ALL | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 148@210 | i | DEVIATION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 148@224 | i | COLD | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 148@233 | i | READING | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 429 | 148@505 | v | <N> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@513 | v | <name> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@524 | v | <path> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@535 | v | <what/why> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@563 | v | <command> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@577 | v | <tell-tale output: counts / ids / timestamps / distinctive line> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@646 | v | <plan/decision> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@666 | v | <rationale> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 148@682 | v | <item> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@505 | v | `<N>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@513 | v | `<name>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@524 | v | `<path>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@535 | v | `<what/why>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@563 | v | `<command>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@577 | v | `<tell-tale output: counts / ids / timestamps / distinctive line>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@646 | v | `<plan/decision>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@666 | v | `<rationale>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 148@682 | v | `<item>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 149@256 | i | WHOLE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 149@265 | i | PROPAGATES | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 149@286 | i | TEST | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 149@326 | i | OF | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 149@366 | i | LIFECYCLE | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 429 | 149@930 | v | <scope> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 149@943 | v | <collection-time drops/transforms; new-field discipline> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 149@1005 | v | <per class×store: period, trigger, MECHANISM, meaning of "deleted"> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 149@1078 | v | <class→region pins; replicating stores; conflict list> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 149@1138 | v | <new-PII detection; retention-job monitoring; DSR SLA> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 149@1198 | v | <approximate-erasure stores, vendor gaps, legacy backups — explicit> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 149@1527 | v | <pseudo vs anon per dataset; key custody; re-identification check + floors> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 149@930 | v | `<scope>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 149@943 | v | `<collection-time drops/transforms; new-field discipline>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 149@1005 | v | `<per class×store: period, trigger, MECHANISM, meaning of "deleted">` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 149@1078 | v | `<class→region pins; replicating stores; conflict list>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 149@1138 | v | `<new-PII detection; retention-job monitoring; DSR SLA>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 149@1198 | v | `<approximate-erasure stores, vendor gaps, legacy backups — explicit>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 149@1527 | v | `<pseudo vs anon per dataset; key custody; re-identification check + floors>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 150@291 | i | OUT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 429 | 150@498 | v | <processor> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 150@514 | v | <from table above> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 150@537 | v | <producing surface/pipeline> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 150@585 | v | <period + trigger + MECHANISM> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 150@620 | v | <see semantics table> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 150@646 | v | <how a subject's rows/derivatives are found and removed here> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 150@712 | v | <region + replication reality> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
-| 429 | 150@747 | v | <k> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 150@498 | v | `<processor>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 150@514 | v | `<from table above>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 150@537 | v | `<producing surface/pipeline>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 150@585 | v | `<period + trigger + MECHANISM>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 150@620 | v | `<see semantics table>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 150@646 | v | `<how a subject's rows/derivatives are found and removed here>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 150@712 | v | `<region + replication reality>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 150@747 | v | `<k>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 152@412 | v | L45 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 152@820 | iv | `final_mentions=328` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 152@842 | iv | `final_unique_keys=328` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -1947,7 +1947,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 152@1153 | v | L135 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 152@1158 | iv | `prevCursor` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 152@1172 | v | L139 | documented exclusion - LINE-RANGE: line-range reference |
-| 429 | 152@1209 | v | <`/`> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 429 | 152@1209 | v | `<`/`>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 152@1240 | iv | `ANDed` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 429 | 152@1252 | v | L175 | documented exclusion - LINE-RANGE: line-range reference |
 | 429 | 158@426 | i | AEGIS-APR-101 | named gap - first use before any expansion on this page |
@@ -2386,7 +2386,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 80@197 | i | IO | named gap - first use before any expansion on this page |
 | 431 | 80@223 | v | L8-9 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 80@249 | i | JIT | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 431 | 80@326 | v | <n%> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 431 | 80@326 | v | `<n%>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 431 | 80@331 | v | L158 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 80@454 | v | L58 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 80@466 | v | L80 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2510,7 +2510,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 138@7 | i | AEGIS-013 | named gap - first use before any expansion on this page |
 | 431 | 138@19 | v | L203 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 140@44 | v | L4-5 | documented exclusion - LINE-RANGE: line-range reference |
-| 431 | 143@7 | v | <Feature> | documented exclusion - PLACEHOLDER: angle/brace placeholder |
+| 431 | 143@7 | v | `<Feature>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 431 | 145@14 | v | L37 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 147@18 | v | L107 | documented exclusion - LINE-RANGE: line-range reference |
 | 431 | 160@16 | v | L65 | documented exclusion - LINE-RANGE: line-range reference |
@@ -2551,13 +2551,13 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 4. Counts, reconciliation and zero-duplicate proof
 
-**Verified vs asserted:** the embedded verifier mechanically checks table rows/keys/classes/dispositions/codes/per-page totals, raw-token encoding, and Crows.json agreement. Source-page token meanings, first-use judgments and AC dispositions remain manually asserted and are not source-page cross-checked. AC3 is table-level self-consistency verified in-branch; AC4 disposition table is consistent with those outcomes.
+**Verified vs asserted:** the strengthened embedded verifier mechanically checks table rows/keys/classes/dispositions/codes/per-page totals, raw-token encoding, Crows.json FULL inventory totals, malformed rows, and the line-range/lowercase-identifier invariants. Source-page token meanings, first-use judgments and AC dispositions remain manually asserted and are not source-page cross-checked. AC3 is table-level self-consistency verified in-branch; AC4 uses the corrected counts.
 
-**Totals:** rows **2399**; unique keys **2399**; duplicates **0**; malformed table rows **0**. Classes i444/ii367/iii9/iv599/v980=2399. Dispositions 9 defined / 330 named gaps / 2060 documented exclusions = 2399.
+**Totals:** rows **2399**; unique keys **2399**; duplicates **0**; malformed table rows **0**. Classes i444/ii367/iii9/iv599/v980=2399. Dispositions 9 defined / 329 named gaps / 2061 documented exclusions = 2399.
 
 | Page | Rows | i | ii | iii | iv | v | Defined | Named | Excluded |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P424 | 393 | 62 | 55 | 1 | 178 | 97 | 0 | 49 | 344 |
+| P424 | 393 | 62 | 55 | 1 | 178 | 97 | 0 | 48 | 345 |
 | P425 | 245 | 44 | 36 | 1 | 66 | 98 | 1 | 43 | 201 |
 | P426 | 244 | 39 | 33 | 0 | 61 | 111 | 1 | 31 | 212 |
 | P427 | 256 | 48 | 44 | 1 | 60 | 103 | 1 | 39 | 216 |
@@ -2565,11 +2565,11 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | P429 | 418 | 88 | 52 | 1 | 85 | 192 | 0 | 41 | 377 |
 | P430 | 240 | 45 | 44 | 1 | 31 | 119 | 1 | 36 | 203 |
 | P431 | 327 | 60 | 50 | 3 | 48 | 166 | 2 | 41 | 284 |
-| **Total** | **2399** | **444** | **367** | **9** | **599** | **980** | **9** | **330** | **2060** |
+| **Total** | **2399** | **444** | **367** | **9** | **599** | **980** | **9** | **329** | **2061** |
 
-**Exclusion codes:** DATE 34 | SHA 125 | LINE-RANGE 688 | STATUS 91 | COMMAND 90 | RANGE 82 | PATH 163 | PLACEHOLDER 78 | OPERATOR 6 | LITERAL 42 | IDENTIFIER 136 | EMPHASIS 166 | PROSE 359 = 2060.
+**Exclusion codes:** DATE 34 | SHA 125 | LINE-RANGE 688 | STATUS 91 | COMMAND 90 | RANGE 82 | PATH 163 | PLACEHOLDER 78 | OPERATOR 6 | LITERAL 42 | IDENTIFIER 137 | EMPHASIS 166 | PROSE 359 = 2061.
 
-**Raw-token convention (review 5567937352 #4):** the Token column stores the raw token text, including literal < and > inside code spans. HTML entities are NOT used in the Token column; rendering/encoding is documented separately and the verifier rejects HTML entities there. Line ranges are LINE-RANGE exclusions and cannot be defined/named; lowercase/hyphenated backticked identifiers cannot be EMPHASIS. **Compact summary/index:** table section 3; counts/per-page this section; invariants and raw-token rule above; inline evidence+verifier section 12.
+**Invariants:** line ranges cannot be defined/named; lowercase/hyphenated backticked identifiers cannot be EMPHASIS; token column has no HTML entities and raw <...> placeholders remain code-spanned; Crows.json FULL inventory totals (rows/classes/dispositions/codes) equal the table; per-page tallies equal the table; malformed/duplicate rows 0. Verifier prints OK only after these checks pass.
 
 ## 5. Batch mapping, selection and continuation
 
@@ -2581,7 +2581,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 6. Provenance, artifacts, checker and limits
 
-**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (inline canonical evidence in section 12; external copy is convenience only). **Generator (new review 5567574260 #1):** the external convenience generator is not required for AC3; the canonical verifier is the inline block in section 12 and it is in-branch reproducible. The external copy is not claimed as a branch file. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; README.md 1554/23/efb48664bb58636ec0dfe80588ee8f56621171a34cfba93392e5a786a7a48160; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/6cea5dcae53384831d830836823db864bfc44373c75e8ce24984cf5ed2fef26e; Crows.json 2575/58/f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29. These _A paths are convenience copies only; the inline canonical evidence in section 12 is the in-branch verifiable basis for AC7. No machine-specific absolute path is retained.
+**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (inline canonical evidence in section 12; external copy is convenience only). **Generator (new review 5567574260 #1):** the external convenience generator is not required for AC3; the canonical verifier is the inline block in section 12 and it is in-branch reproducible. The external copy is not claimed as a branch file. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; README.md 1554/23/a8c6fe8d8b284b03ab0697c070ce30784e114ca0d0515c3f32824fa52b9a5abd; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/5e29598520528a01134748705fd0983901f3ea330a0ddd8609834b720218ac6c; Crows.json 3036/89/bd5162d0d317013ea7fd1c35d5bd50c6fc54baa3af2fc8efbad4d85b90255d87. These _A paths are convenience copies only; the inline canonical evidence in section 12 is the in-branch verifiable basis for AC7. No machine-specific absolute path is retained.
 
 **PROC-04 method (no digest invented here):** body step publishes witness/skills/security bound fields; PROC is whole-line sentinels, whitespace-collapsed, LF-joined in that order, SHA-256; body publishes short+full digest/lens and literal-presence proof after final body edit. This record does not assert a PROC digest.
 
@@ -2626,7 +2626,7 @@ skill-usage-ledger@6a27b5c8e690 / hash=6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6
 ```
 
 **Support CLI proof (measured):** preview.py path -> _A/evidence/read-lc-424-c1/Crows.txt; sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; bytes=1542; lf=4 ; preview.py rows -> table_name=stage_c_skills; key=row; where=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21; rows=4; row=1 skill=acceptance-criteria-reviewer entry=.claude/skills/acceptance-criteria-reviewer/SKILL.md sha256=c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 size=14207 model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) plan_role=sd-c-read-lc-424-c1 ; preview.py query acceptance -> matches=1; {"entry": ".claude/skills/acceptance-criteria-reviewer/SKILL.md", "row": 1, "sha256": "c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021", "skill": "acceptance-criteria-reviewer", "where": "stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21"}.
-**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (efb48664bb58636ec0dfe80588ee8f56621171a34cfba93392e5a786a7a48160) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (6cea5dcae53384831d830836823db864bfc44373c75e8ce24984cf5ed2fef26e) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 2,575 B / 58 LF / sha f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29. **Crows.json convention exception:** this canonical block is measured WITHOUT a trailing LF; unlike other blocks its hash excludes the trailing LF. This single explicit exception is applied consistently in record and body.
+**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (a8c6fe8d8b284b03ab0697c070ce30784e114ca0d0515c3f32824fa52b9a5abd) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (5e29598520528a01134748705fd0983901f3ea330a0ddd8609834b720218ac6c) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 2,575 B / 58 LF / sha bd5162d0d317013ea7fd1c35d5bd50c6fc54baa3af2fc8efbad4d85b90255d87. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3036 B / 89 LF / sha bd5162d0d317013ea7fd1c35d5bd50c6fc54baa3af2fc8efbad4d85b90255d87.
 
 ## 10. Five required c-protocol questions (measured on final artifact)
 
@@ -2665,7 +2665,7 @@ Measured: 1175 B / 4 LF / sha11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc07
 ~~~~
 
 ### README canonical block
-Measured: 1554 B / 23 LF / shaefb48664bb58636ec0dfe80588ee8f56621171a34cfba93392e5a786a7a48160
+Measured: 1554 B / 23 LF / shaa8c6fe8d8b284b03ab0697c070ce30784e114ca0d0515c3f32824fa52b9a5abd
 
 ~~~~text
 # Batch-21 Stage C evidence support
@@ -2677,7 +2677,7 @@ Capture files (immutable; new filenames; never overwritten in place):
 | file | table_name | key | WHERE | bytes / LF | sha256 |
 | --- | --- | --- | --- | --- | --- |
 | Crows.txt | stage_c_skills | row | stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 | 1542 / 4 | 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3 |
-| Crows.json | stage_c_skills | row | same | 2575 / 58 | f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29 |
+| Crows.json | stage_c_skills | row | same | 3036 / 89 | bd5162d0d317013ea7fd1c35d5bd50c6fc54baa3af2fc8efbad4d85b90255d87 |
 | preview.py | support CLI | mode path/query/rows | local | 1481 / 29 | 6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6 |
 | A-rows.txt reference | Stage A sd-a-read-lc-424-r1 | source _A/evidence/read-lc-424-a1/A-rows.txt | stage=A AND block=424-431 | 1175 / 4 | 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 |
 
@@ -2729,18 +2729,18 @@ if __name__ == "__main__": sys.exit(main(sys.argv[1:]))
 ~~~~
 
 ### MANIFEST canonical block
-Measured: 561 B / 5 LF / sha 6cea5dcae53384831d830836823db864bfc44373c75e8ce24984cf5ed2fef26e
+Measured: 561 B / 5 LF / sha 5e29598520528a01134748705fd0983901f3ea330a0ddd8609834b720218ac6c
 
 ~~~~text
 Crows.txt  sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3  bytes=1542  lf=4
-Crows.json  sha256=f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29  bytes=2575  lf=58
-README.md  sha256=efb48664bb58636ec0dfe80588ee8f56621171a34cfba93392e5a786a7a48160  bytes=1554  lf=23
+Crows.json  sha256=bd5162d0d317013ea7fd1c35d5bd50c6fc54baa3af2fc8efbad4d85b90255d87  bytes=3036  lf=89
+README.md  sha256=a8c6fe8d8b284b03ab0697c070ce30784e114ca0d0515c3f32824fa52b9a5abd  bytes=1554  lf=23
 preview.py  sha256=6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6  bytes=1481  lf=29
 A-rows reference  path=_A/evidence/read-lc-424-a1/A-rows.txt  sha256=11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430  bytes=1175  lf=4
 ~~~~
 
 ### Crows.json canonical block
-Measured: **2575 B / 58 LF / sha f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c049cfcf8dbc33bf29** (explicit no-trailing-LF exception; all other canonical blocks include trailing LF in their measured bytes/hash).
+Measured: **3036 B / 89 LF / sha bd5162d0d317013ea7fd1c35d5bd50c6fc54baa3af2fc8efbad4d85b90255d87** (includes trailing LF; Crows.json now carries FULL inventory totals).
 
 ~~~~text
 {
@@ -2800,7 +2800,37 @@ Measured: **2575 B / 58 LF / sha f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c
    "applied": "Resolved manifest hashes; authored rows/sources/six; retained Crows and support CLI/README.",
    "result": "4 rows/4 per-row sources/4 six-field lines; capture"
   }
- ]
+ ],
+ "inventory_totals": {
+  "rows": 2399,
+  "classes": {
+   "i": 444,
+   "ii": 367,
+   "iii": 9,
+   "iv": 599,
+   "v": 980
+  },
+  "dispositions": {
+   "defined": 9,
+   "named": 329,
+   "excluded": 2061
+  },
+  "codes": {
+   "DATE": 34,
+   "SHA": 125,
+   "LINE-RANGE": 688,
+   "STATUS": 91,
+   "COMMAND": 90,
+   "RANGE": 82,
+   "PATH": 163,
+   "PLACEHOLDER": 78,
+   "OPERATOR": 6,
+   "LITERAL": 42,
+   "IDENTIFIER": 137,
+   "EMPHASIS": 166,
+   "PROSE": 359
+  }
+ }
 }
 ~~~~
 
@@ -2809,12 +2839,13 @@ Measured: **2575 B / 58 LF / sha f73c629d8df3a8b758dc1a173ba67fc5fd557fa59daf86c
 ~~~~python
 #!/usr/bin/env python3
 import re,sys,json
+sys.stdout.reconfigure(encoding='utf-8',errors='replace')
 from collections import Counter,defaultdict
 p=sys.argv[1]
 rec=open(p,encoding="utf-8").read().splitlines()
 pat=re.compile(r"^\|\s*(42[4-9]|43[01])\s*\|\s*(\d+)@(\d+)\s*\|\s*(i{1,3}|iv|v)\s*\|\s*(.*?)\s*\|\s*(.*?)\s*\|$")
-def fail(msg):
- print("VERIFIER FAIL:",msg); sys.exit(1)
+errors=[]
+def err(m): errors.append(m)
 rows=[]; malformed=0; insec=False
 for l in rec:
  if l.startswith("## 3."): insec=True; continue
@@ -2824,47 +2855,58 @@ for l in rec:
   m=pat.match(l)
   if not m: malformed+=1
   else: rows.append((m.group(1),int(m.group(2)),int(m.group(3)),m.group(4),m.group(5),m.group(6)))
-if malformed: fail("malformed table-like rows: %d"%malformed)
-if len(rows)!=2399: fail("row count %d != 2399"%len(rows))
+if malformed: err("malformed table-like rows: %d"%malformed)
 keys={(a,b,c,d) for a,b,c,d,e,f in rows}
-if len(keys)!=len(rows): fail("duplicate key count %d"%len(keys))
-if len(rows)!=2399: fail("unique count mismatch")
+if len(keys)!=len(rows): err("duplicate keys: %d rows %d keys"%(len(rows),len(keys)))
 classes=Counter(r[3] for r in rows); disp=Counter("defined" if r[5].startswith("defined") else ("named" if r[5].startswith("named") else "excluded") for r in rows)
 codes=Counter(re.match(r"documented exclusion - ([A-Z-]+):",r[5]).group(1) for r in rows if r[5].startswith("documented exclusion"))
-if dict(classes)!={"i":444,"ii":367,"iii":9,"iv":599,"v":980}: fail("classes "+str(dict(classes)))
-if dict(disp)!={"defined":9,"named":330,"excluded":2060}: fail("dispositions "+str(dict(disp)))
-if sum(codes.values())!=2060: fail("codes sum %d"%sum(codes.values()))
-# per-page table in section 4
-per=Counter(); d=defaultdict(Counter)
-for a,b,c,cl,t,di in rows:
- per[a]+=1; d[a][cl]+=1
-seen=[]
-for l in rec:
- m=re.match(r"^\|\s*(P42[4-9]|P43[01])\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|$",l)
- if m:
-  pg=m.group(1)[1:]; vals=[int(m.group(i)) for i in range(2,11)]
-  if vals[0]!=per[pg]: fail("per-page rows %s %d != %d"%(pg,vals[0],per[pg]))
-  if vals[1:]!=[d[pg]["i"],d[pg]["ii"],d[pg]["iii"],d[pg]["iv"],d[pg]["v"],sum(1 for x in rows if x[0]==pg and x[5].startswith("defined")),sum(1 for x in rows if x[0]==pg and x[5].startswith("named")),sum(1 for x in rows if x[0]==pg and x[5].startswith("documented"))]: fail("per-page class/disposition mismatch "+pg)
-  seen.append(pg)
-if len(seen)!=8: fail("per-page table count %d"%len(seen))
-# Crows.json agreement
+# Crows.json full totals
+cj=None
 try:
  start=next(i for i,l in enumerate(rec) if l.startswith("### Crows.json canonical block"))
  a=next(i for i in range(start,len(rec)) if rec[i].startswith("~~~~text"))
  b=next(i for i in range(a+1,len(rec)) if rec[i].startswith("~~~~"))
  cj=json.loads("\n".join(rec[a+1:b]))
- txt=json.dumps(cj)
- m=re.search(r"(\d[\d,]*)-row inventory",txt)
- if not m or int(m.group(1).replace(",",""))!=len(rows): fail("Crows.json inventory count does not match table")
-except SystemExit: pass
-except Exception as e: fail("Crows.json parse/agreement: "+str(e))
+except Exception as e:
+ err("Crows.json parse: "+str(e))
+if cj is not None:
+ tot=cj.get("inventory_totals",{})
+ if not tot: err("Crows.json missing inventory_totals")
+ else:
+  if tot.get("rows")!=len(rows): err("Crows rows %r != table %d"%(tot.get("rows"),len(rows)))
+  if tot.get("classes")!=dict(classes): err("Crows classes %r != %r"%(tot.get("classes"),dict(classes)))
+  if tot.get("dispositions")!=dict(disp): err("Crows dispositions %r != %r"%(tot.get("dispositions"),dict(disp)))
+  if tot.get("codes")!=dict(codes): err("Crows codes %r != %r"%(tot.get("codes"),dict(codes)))
+# per-page table
+per=Counter(); d=defaultdict(Counter); dd=defaultdict(Counter)
+for a,b,c,cl,t,di in rows:
+ per[a]+=1; d[a][cl]+=1; dd[a]["defined" if di.startswith("defined") else ("named" if di.startswith("named") else "excluded")]+=1
+seen=[]
+for l in rec:
+ m=re.match(r"^\|\s*(P42[4-9]|P43[01])\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|$",l)
+ if m:
+  pg=m.group(1)[1:]; vals=[int(m.group(i)) for i in range(2,11)]
+  if vals[0]!=per[pg]: err("per-page rows %s %d != %d"%(pg,vals[0],per[pg]))
+  if vals[1:]!=[d[pg]["i"],d[pg]["ii"],d[pg]["iii"],d[pg]["iv"],d[pg]["v"],dd[pg]["defined"],dd[pg]["named"],dd[pg]["excluded"]]: err("per-page class/disposition mismatch "+pg)
+  seen.append(pg)
+if len(seen)!=8: err("per-page table rows %d != 8"%len(seen))
 # invariants
 STATUS=set("ACCEPTED REJECTED REVISED REVISE PASS FAIL FAILED FAILURE COMPLETE COMPLETED INCOMPLETE UNRUN RUNNING PENDING BLOCKED BLOCKING OWED SATISFIED UNSATISFIED MET UNMET FULL PARTIAL NONE UNVERIFIED VERIFIED ACTIVE INACTIVE WAITING AWAITING OPEN CLOSED MERGED APPLIED APPROVED COMMENTED SUCCESS SUCCESSFUL CANCELLED SKIPPED DONE DRAFT READY DIRTY CLEAN CONFLICTING AVAILABLE UNAVAILABLE".split())
+raw_placeholders=0
 for r in rows:
- if r[3]=="v" and r[4].isalpha() and r[4].upper() not in STATUS: fail("status-class invariant "+repr(r))
- if r[5].startswith("documented exclusion - RANGE") and any(c in r[4] for c in "[]{}"): fail("regex-under-RANGE "+repr(r))
- if r[5].startswith("documented exclusion - IDENTIFIER") and len(r[4].split())>=3: fail("prose-as-IDENTIFIER "+repr(r))
-print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d codes=%s per-page=8 Crows.json=agrees(2399) raw-token=ok"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),dict(codes)))
+ tok=r[4]; xx=tok.strip().strip(chr(96))
+ if r[3]=="v" and xx.isalpha() and xx.upper() not in STATUS: err("status-class invariant "+repr(r))
+ if re.fullmatch(r"L\d+(?:-L?\d+)?",xx) and r[5].startswith(("defined","named")): err("line-range defined/named "+repr(r))
+ if r[3]=="iv" and re.fullmatch(r"[a-z][a-z0-9]*(?:-[a-z0-9]+)+",xx) and "EMPHASIS" in r[5]: err("lowercase-hyphenated EMPHASIS "+repr(r))
+ if "&lt;" in tok or "&gt;" in tok: err("HTML entity in token column "+repr(r))
+ if ("<" in tok or ">" in tok): raw_placeholders+=1
+ if ("<" in tok or ">" in tok) and not (tok.startswith(chr(96)) and tok.endswith(chr(96))): err("raw < > outside code span "+repr(r))
+ if r[5].startswith("documented exclusion - RANGE") and any(c in tok for c in "[]{}"): err("regex-under-RANGE "+repr(r))
+ if r[5].startswith("documented exclusion - IDENTIFIER") and len(tok.split())>=3: err("prose-as-IDENTIFIER "+repr(r))
+if raw_placeholders<1: err("no raw <...> placeholder tokens found")
+if errors:
+ print("VERIFIER FAIL:"); [print(" -",e) for e in errors]; sys.exit(1)
+print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals-agree raw-placeholders=%d"%(len(rows),len(keys),dict(classes),dict(disp),len(rows)-disp["defined"]-disp["named"],raw_placeholders))
 ~~~~
 
 **Mechanically verified by the verifier:** table parse/rows/keys/classes/dispositions/codes/per-page totals/Crows.json row1 count/malformed rows/overlaps. **Manually asserted, not source-page cross-checked:** page-token meanings, first-use judgments, B2/AC dispositions; AC3 is therefore table-level self-consistency only.
@@ -2872,7 +2914,7 @@ print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=
 ### Embedded verifier expected output
 
 ~~~~text
-VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 367, 'v': 980, 'iv': 599, 'i': 444, 'iii': 9} disps={'excluded': 2060, 'named': 330, 'defined': 9} exclusions=2060 codes={'PROSE': 359, 'DATE': 34, 'IDENTIFIER': 136, 'STATUS': 91, 'EMPHASIS': 166, 'SHA': 125, 'PATH': 163, 'COMMAND': 90, 'LITERAL': 42, 'RANGE': 82, 'LINE-RANGE': 688, 'OPERATOR': 6, 'PLACEHOLDER': 78} per-page=8 Crows.json=agrees(2399) raw-token=ok
+VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 367, 'v': 980, 'iv': 599, 'i': 444, 'iii': 9} disps={'excluded': 2061, 'named': 329, 'defined': 9} exclusions=2061 per-page=8 Crows.json=full-totals-agree raw-placeholders=127
 ~~~~
 
 External convenience copies: _A/evidence/read-lc-424-c1/Crows.txt 1542/4/sha8a8a2564..., A-rows path above, README/preview/MANIFEST/Crows.json above. No in-branch claim of files outside this record.
