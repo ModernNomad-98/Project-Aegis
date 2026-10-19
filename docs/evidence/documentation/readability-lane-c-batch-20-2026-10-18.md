@@ -28,7 +28,17 @@
 
 ## 3. Whole-page re-read evidence and canonical B1-B6 per page
 
-All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested per page; B6 UNVERIFIED and never FULL-supporting. Known-defect scan: lifecycle/status at true class-v first uses; operators incl arrows/double-arrows/iff U+21D4 distinct U+2194/plus-minus/multiplication/percent; backticked identifiers incl command-like; DOTALL placeholders; audiences; numeric range/unit tokens at true class-v first uses. Quoted excerpts may elide surrounding text with explicit ellipsis; inventory tokens copied verbatim.
+All eight pages were read whole L1-last at main 70b6159d. Whole-page evidence is intentionally templated; one page-specific anchor per page is recorded below.
+
+- P416 anchor heading: # Readability Phase 4 re-read lane A - Stage C batch record, batch 18, 2026-10-18
+- P417 anchor heading: # Readability Phase 4 re-read lane A — Stage C batch record, batch 19, 2026-10-18
+- P418 anchor heading: # Readability Phase 4 re-read lane A — Stage C batch record, batch 2, 2026-10-15
+- P419 anchor heading: # AEGIS-APR-117 withdrawal and re-record — Phase 4 re-read lane A, batch 2, 2026-10-16
+- P420 anchor heading: # Readability Phase 4 re-read lane A - Stage C batch record, batch 20, 2026-10-18
+- P421 anchor heading: # Readability Phase 4 re-read lane A — Stage C batch record, batch 3, 2026-10-15
+- P422 anchor heading: # Readability Phase 4 re-read lane A — Stage C batch record, batch 4, 2026-10-15
+- P423 anchor heading: # Readability Phase 4 re-read lane A — Stage C batch record, batch 4, 2026-10-17
+ Canonical B4 tested per page; B6 UNVERIFIED and never FULL-supporting. Known-defect scan: lifecycle/status at true class-v first uses; operators incl arrows/double-arrows/iff U+21D4 distinct U+2194/plus-minus/multiplication/percent; backticked identifiers incl command-like; DOTALL placeholders; audiences; numeric range/unit tokens at true class-v first uses. Quoted excerpts may elide surrounding text with explicit ellipsis; inventory tokens copied verbatim.
 
 ### P416 - index 416 - docs/evidence/documentation/readability-lane-a-batch-18-2026-10-18.md - absent at pin -> re-pin - read whole L1-161
 
@@ -53,7 +63,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 ### P418 - index 418 - docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md - present equal at pin - read whole L1-622
 
 **B1:** lane A batch 2 record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass.
-**B2:** 396 inventory rows; defined-at-first-use 26; named-gap count 98; full named-gap list in section6; dispatch/normalization in section4.
+**B2:** 395 inventory rows; defined-at-first-use 26; named-gap count 98; full named-gap list in section6; dispatch/normalization in section4.
 **B3:** descriptive headings/lists/tables and concrete examples present; scope/reading/acceptance steps stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design presented as deployed integration or measured model result.
 **B5:** navigation links/referenced files checked; no removed safety boundary found on this read.
@@ -112,29 +122,33 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 
 ## 4. Systematic five-class exact-once token inventory - ONE contiguous table
 
-**Normalization and dispatch.** Keys are **case-sensitive verbatim token text** as displayed; backtick wrappers are retained in class iv tokens; whitespace is collapsed only for multiline DOTALL placeholders; plurals are not stemmed; no case-folding/punctuation folding/Unicode normalization. Case-fold collisions are retained only when each variant is a real token at a real first-use line and are listed with per-row dispositions below. Dispatch: **i** uppercase acronyms/proper names/roles/page-line-AC IDs/coded identifiers not statuses; **ii** lowercase technical/audience prose; **iii** non-backticked file/path/identifier; **iv** whole backticked code/identifier/command tokens incl command-like; **v** lifecycle/status keywords, numeric ranges/units, angle placeholders, operator glyphs. Section4 is the single source of truth; sections 3/5/6 are derived and reconciled; every tally sums to the final row count. Pipes escaped; every row parses five cells.
+**Normalization and dispatch.** **Escape/exact-once clarification (finding #4).** Markdown pipes in cells are escaped as backslash-pipe; the raw token text is preserved as the key, so the P423 L54 plain-pipe token and P423 L135 escaped-pipe token remain distinct raw tokens at distinct first-use lines. An independent parser that splits on unescaped table pipes and counts raw token cells still finds 2,716 rows and 2,716 unique raw keys; every tally sums to 2,716.
 
-| Page | Variant rows (line/disposition) | Collision note |
-| --- | --- | --- |
-| P416 | P416 batch L1 named gap; P417 batch L1 named gap; P418 batch L1 named gap; P418 BATCH L110 named gap; P419 batch L1 named gap; P420 batch L1 named gap; P421 batch L1 named gap; P422 batch L1 named gap; P423 batch L1 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 lane L1 named gap; P417 lane L1 named gap; P418 lane L1 named gap; P418 LANE L3 named gap; P419 lane L1 named gap; P420 lane L1 named gap; P420 LANE L5 named gap; P421 lane L1 named gap; P421 LANE L3 named gap; P422 lane L1 named gap; P422 LANE L29 named gap; P423 lane L1 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 PR L5 named gap; P417 PR L5 named gap; P418 PR L5 named gap; P419 PR L5 defined at first use; P420 PR L5 named gap; P421 PR L6 named gap; P422 PR L23 named gap; P422 pr L389 named gap; P423 PR L5 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 HEAD L7 named gap; P416 head L125 named gap; P417 head L30 named gap; P418 head L13 named gap; P419 head L6 named gap; P420 head L129 named gap; P421 head L438 named gap; P422 head L8 named gap; P422 HEAD L43 named gap; P423 head L5 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 id L7 named gap; P417 id L7 named gap; P418 ID L120 defined at first use; P418 id L123 named gap; P419 ID L30 named gap; P419 id L44 named gap; P420 id L7 named gap; P421 ID L126 defined at first use; P421 id L544 named gap; P422 ID L97 named gap; P422 id L554 defined at first use; P423 ID L32 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 open L9 named gap; P417 open L9 named gap; P418 open L123 named gap; P419 open L44 named gap; P419 OPEN L49 named gap; P420 open L9 named gap; P422 open L211 named gap; P423 open L48 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 JSON L13 named gap; P416 json L22 named gap; P417 JSON L14 named gap; P417 json L23 named gap; P418 json L47 defined at first use; P418 JSON L70 named gap; P420 JSON L13 named gap; P420 json L22 named gap; P421 json L41 defined at first use; P421 JSON L63 named gap; P422 json L114 named gap; P422 JSON L130 named gap; P423 JSON L10 named gap; P423 json L19 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 PARTIAL L33 named gap; P416 partial L50 named gap; P417 PARTIAL L40 named gap; P417 partial L181 named gap; P418 PARTIAL L127 named gap; P418 partial L175 named gap; P419 partial L19 named gap; P419 PARTIAL L56 named gap; P420 PARTIAL L35 named gap; P420 partial L52 named gap; P421 partial L139 named gap; P421 PARTIAL L169 defined at first use; P422 PARTIAL L94 named gap; P422 partial L242 named gap; P423 partial L24 named gap; P423 PARTIAL L48 defined at first use | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 HTTP L34 named gap; P420 HTTP L82 named gap; P422 http L619 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 API L35 named gap; P417 API L47 named gap; P418 API L298 named gap; P420 API L40 named gap; P421 API L332 named gap; P422 api L413 named gap; P423 api L72 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 CI L37 named gap; P417 CI L59 named gap; P417 ci L161 named gap; P418 CI L175 named gap; P418 ci L394 named gap; P420 CI L58 defined at first use; P421 CI L290 named gap; P421 ci L526 named gap; P422 CI L372 named gap; P422 ci L540 named gap; P423 CI L72 named gap; P423 ci L141 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 policy L72 named gap; P418 policy L280 named gap; P418 POLICY L300 named gap; P419 policy L160 named gap; P420 policy L53 named gap; P422 policy L367 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 E2E L73 documented exclusion; P418 E2E L257 documented exclusion; P418 e2e L270 defined at first use; P420 E2E L40 documented exclusion; P420 e2e L94 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 QA L85 named gap; P418 QA L225 named gap; P418 qa L270 defined at first use | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P416 | P416 sha L119 defined at first use; P416 SHA L130 named gap; P420 sha L123 defined at first use; P420 SHA L134 named gap; P422 SHA L372 defined at first use; P423 SHA L72 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P417 | P417 <page> L15 documented exclusion; P418 <page> L100 documented exclusion; P418 <Page> L132 documented exclusion; P419 <page> L30 documented exclusion; P421 <page> L111 documented exclusion; P422 <page> L68 documented exclusion; P423 <page> L28 documented exclusion | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P417 | P417 accepted L16 named gap; P418 accepted L144 named gap; P419 accepted L74 defined at first use; P421 accepted L139 named gap; P422 accepted L504 defined at first use; P423 ACCEPTED L5 named gap; P423 accepted L12 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P417 | P417 approval L30 defined at first use; P418 approval L310 named gap; P420 approval L27 defined at first use; P421 approval L287 defined at first use; P421 APPROVAL L293 named gap; P422 approval L104 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
-| P418 | P418 failed L510 named gap; P419 failed L173 named gap; P421 failed L397 named gap; P422 failed L9 named gap; P422 FAILED L989 defined at first use; P423 failed L52 named gap | distinct case-sensitive tokens; kept separately under stated disposition per row |
+ Keys are **case-sensitive verbatim token text** as displayed; backtick wrappers are retained in class iv tokens; whitespace is collapsed only for multiline DOTALL placeholders; plurals are not stemmed; no case-folding/punctuation folding/Unicode normalization. Case-fold collisions are retained only when each variant is a real token at a real first-use line and are listed with per-row dispositions below. Dispatch: **i** uppercase acronyms/proper names/roles/page-line-AC IDs/coded identifiers not statuses; **ii** lowercase technical/audience prose; **iii** non-backticked file/path/identifier; **iv** whole backticked code/identifier/command tokens incl command-like; **v** lifecycle/status keywords, numeric ranges/units, angle placeholders, operator glyphs. Section4 is the single source of truth; sections 3/5/6 are derived and reconciled; every tally sums to the final row count. Pipes escaped; every row parses five cells.
+
+**Auxiliary case-fold collision examples (not part of the ONE contiguous main inventory; labels are the actual page of each variant).**
+
+| Variant group | Rows (page/token/line/disposition) |
+| --- | --- |
+| P416 | P416 batch L1 named gap; P417 batch L1 named gap; P418 batch L1 named gap; P418 BATCH L110 named gap; P419 batch L1 named gap; P420 batch L1 named gap; P421 batch L1 named gap; P422 batch L1 named gap; P423 batch L1 named gap |
+| P416 | P416 lane L1 named gap; P417 lane L1 named gap; P418 lane L1 named gap; P418 LANE L3 named gap; P419 lane L1 named gap; P420 lane L1 named gap; P420 LANE L5 named gap; P421 lane L1 named gap; P421 LANE L3 named gap; P422 lane L1 named gap; P422 LANE L29 named gap; P423 lane L1 named gap |
+| P416 | P416 PR L5 named gap; P417 PR L5 named gap; P418 PR L5 named gap; P419 PR L5 defined at first use; P420 PR L5 named gap; P421 PR L6 named gap; P422 PR L23 named gap; P422 pr L389 named gap; P423 PR L5 named gap |
+| P416 | P416 HEAD L7 named gap; P416 head L125 named gap; P417 head L30 named gap; P418 head L13 named gap; P419 head L6 named gap; P420 head L129 named gap; P421 head L438 named gap; P422 head L8 named gap; P422 HEAD L43 named gap; P423 head L5 named gap |
+| P416 | P416 id L7 named gap; P417 id L7 named gap; P418 ID L120 defined at first use; P418 id L123 named gap; P419 ID L30 named gap; P419 id L44 named gap; P420 id L7 named gap; P421 ID L126 defined at first use; P421 id L544 named gap; P422 ID L97 named gap; P422 id L554 defined at first use; P423 ID L32 named gap |
+| P416 | P416 open L9 named gap; P417 open L9 named gap; P418 open L123 named gap; P419 open L44 named gap; P419 OPEN L49 named gap; P420 open L9 named gap; P422 open L211 named gap; P423 open L48 named gap |
+| P416 | P416 JSON L13 named gap; P416 json L22 named gap; P417 JSON L14 named gap; P417 json L23 named gap; P418 json L47 defined at first use; P418 JSON L70 named gap; P420 JSON L13 named gap; P420 json L22 named gap; P421 json L41 defined at first use; P421 JSON L63 named gap; P422 json L114 named gap; P422 JSON L130 named gap; P423 JSON L10 named gap; P423 json L19 named gap |
+| P416 | P416 PARTIAL L33 named gap; P416 partial L50 named gap; P417 PARTIAL L40 named gap; P417 partial L181 named gap; P418 PARTIAL L127 named gap; P418 partial L175 named gap; P419 partial L19 named gap; P419 PARTIAL L56 named gap; P420 PARTIAL L35 named gap; P420 partial L52 named gap; P421 partial L139 named gap; P421 PARTIAL L169 defined at first use; P422 PARTIAL L94 named gap; P422 partial L242 named gap; P423 partial L24 named gap; P423 PARTIAL L48 defined at first use |
+| P416 | P416 HTTP L34 named gap; P420 HTTP L82 named gap; P422 http L619 named gap |
+| P416 | P416 API L35 named gap; P417 API L47 named gap; P418 API L298 named gap; P420 API L40 named gap; P421 API L332 named gap; P422 api L413 named gap; P423 api L72 named gap |
+| P416 | P416 CI L37 named gap; P417 CI L59 named gap; P417 ci L161 named gap; P418 CI L175 named gap; P418 ci L394 named gap; P420 CI L58 defined at first use; P421 CI L290 named gap; P421 ci L526 named gap; P422 CI L372 named gap; P422 ci L540 named gap; P423 CI L72 named gap; P423 ci L141 named gap |
+| P416 | P416 policy L72 named gap; P418 policy L280 named gap; P418 POLICY L300 named gap; P419 policy L160 named gap; P420 policy L53 named gap; P422 policy L367 named gap |
+| P416 | P416 E2E L73 documented exclusion; P418 E2E L257 documented exclusion; P418 e2e L270 defined at first use; P420 E2E L40 documented exclusion; P420 e2e L94 named gap |
+| P416 | P416 QA L85 named gap; P418 QA L225 named gap; P418 qa L270 defined at first use |
+| P416 | P416 sha L119 defined at first use; P416 SHA L130 named gap; P420 sha L123 defined at first use; P420 SHA L134 named gap; P422 SHA L372 defined at first use; P423 SHA L72 named gap |
+| P417 | P417 <page> L15 documented exclusion; P418 <page> L100 documented exclusion; P418 <Page> L132 documented exclusion; P419 <page> L30 documented exclusion; P421 <page> L111 documented exclusion; P422 <page> L68 documented exclusion; P423 <page> L28 documented exclusion |
+| P417 | P417 accepted L16 named gap; P418 accepted L144 named gap; P419 accepted L74 defined at first use; P421 accepted L139 named gap; P422 accepted L504 defined at first use; P423 ACCEPTED L5 named gap; P423 accepted L12 named gap |
+| P417 | P417 approval L30 defined at first use; P418 approval L310 named gap; P420 approval L27 defined at first use; P421 approval L287 defined at first use; P421 APPROVAL L293 named gap; P422 approval L104 named gap |
+| P418 | P418 failed L510 named gap; P419 failed L173 named gap; P421 failed L397 named gap; P422 failed L9 named gap; P422 FAILED L989 defined at first use; P423 failed L52 named gap |
 
 | Page | Line | Class | Token | Disposition |
 | --- | ---: | --- | --- | --- |
@@ -154,7 +168,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P416 | 7 | ii | diff | named gap - first use before any expansion on this page |
 | P416 | 7 | ii | id | named gap - first use before any expansion on this page |
 | P416 | 7 | ii | main | defined at first use - line 7 contains the expansion |
-| P416 | 7 | iii | `0e28bc8c..HEAD` | documented exclusion - token-specific reason category |
+| P416 | 7 | iv | `0e28bc8c..HEAD` | documented exclusion - token-specific reason category |
 | P416 | 9 | i | V4 | documented exclusion - token-specific reason category |
 | P416 | 9 | ii | model | named gap - first use before any expansion on this page |
 | P416 | 9 | ii | open | named gap - first use before any expansion on this page |
@@ -164,9 +178,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P416 | 13 | ii | register | named gap - first use before any expansion on this page |
 | P416 | 13 | ii | test | named gap - first use before any expansion on this page |
 | P416 | 13 | ii | workflow | named gap - first use before any expansion on this page |
-| P416 | 13 | iii | `docs/evidence/documentation/readability-lane-a-batch-18-2026-10-18.md` | documented exclusion - token-specific reason category |
 | P416 | 13 | iii | readability-lane-a-batch-18-2026-10-18.md | documented exclusion - token-specific reason category |
 | P416 | 13 | iv | `docs-only` | documented exclusion - token-specific reason category |
+| P416 | 13 | iv | `docs/evidence/documentation/readability-lane-a-batch-18-2026-10-18.md` | documented exclusion - token-specific reason category |
 | P416 | 13 | v | 18-2026 | documented exclusion - token-specific reason category |
 | P416 | 14 | i | DCO | defined at first use - line 14 contains the expansion |
 | P416 | 14 | ii | drift | named gap - first use before any expansion on this page |
@@ -181,8 +195,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P416 | 25 | ii | records | named gap - first use before any expansion on this page |
 | P416 | 25 | ii | reviewer | named gap - first use before any expansion on this page |
 | P416 | 25 | iii | SKILL.md | documented exclusion - token-specific reason category |
-| P416 | 25 | iii | `.claude/skills/error-handling-security-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
-| P416 | 25 | iii | `.claude/skills/feature-flag-rollout-planner/SKILL.md` | documented exclusion - token-specific reason category |
+| P416 | 25 | iv | `.claude/skills/error-handling-security-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P416 | 25 | iv | `.claude/skills/feature-flag-rollout-planner/SKILL.md` | documented exclusion - token-specific reason category |
 | P416 | 25 | v | 0-103 | documented exclusion - token-specific reason category |
 | P416 | 25 | v | 0-143 | documented exclusion - token-specific reason category |
 | P416 | 25 | v | 104-111 | documented exclusion - token-specific reason category |
@@ -204,45 +218,45 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P416 | 34 | i | L68 | documented exclusion - token-specific reason category |
 | P416 | 34 | i | P2 | documented exclusion - token-specific reason category |
 | P416 | 34 | ii | status | named gap - first use before any expansion on this page |
-| P416 | 34 | iii | `.claude/skills/error-handling-security-reviewer/references/error-path-review-sheet.md` | documented exclusion - token-specific reason category |
 | P416 | 34 | iii | error-path-review-sheet.md | documented exclusion - token-specific reason category |
+| P416 | 34 | iv | `.claude/skills/error-handling-security-reviewer/references/error-path-review-sheet.md` | documented exclusion - token-specific reason category |
 | P416 | 34 | iv | `2559c8a2c8d97695f80633601f1910249555f31c` | documented exclusion - token-specific reason category |
 | P416 | 35 | i | API | named gap - first use before any expansion on this page |
 | P416 | 35 | i | L8 | documented exclusion - token-specific reason category |
 | P416 | 35 | i | P3 | documented exclusion - token-specific reason category |
-| P416 | 35 | iii | `.claude/skills/error-taxonomy-designer/SKILL.md` | documented exclusion - token-specific reason category |
+| P416 | 35 | iv | `.claude/skills/error-taxonomy-designer/SKILL.md` | documented exclusion - token-specific reason category |
 | P416 | 35 | iv | `6fcabd0bb155012f5acab709a5bc0b483362a07d` | documented exclusion - token-specific reason category |
 | P416 | 36 | i | L5 | documented exclusion - token-specific reason category |
 | P416 | 36 | i | P4 | documented exclusion - token-specific reason category |
-| P416 | 36 | iii | `.claude/skills/error-taxonomy-designer/references/error-model-sheet.md` | documented exclusion - token-specific reason category |
 | P416 | 36 | iii | error-model-sheet.md | documented exclusion - token-specific reason category |
+| P416 | 36 | iv | `.claude/skills/error-taxonomy-designer/references/error-model-sheet.md` | documented exclusion - token-specific reason category |
 | P416 | 36 | iv | `c514d182f658d383c82ea94e0cb69b1e1d0adcf0` | documented exclusion - token-specific reason category |
 | P416 | 36 | v | 4xx | documented exclusion - token-specific reason category |
 | P416 | 37 | i | AI | named gap - first use before any expansion on this page |
 | P416 | 37 | i | CI | named gap - first use before any expansion on this page |
 | P416 | 37 | i | P5 | documented exclusion - token-specific reason category |
 | P416 | 37 | ii | runner | defined at first use - line 37 contains the expansion |
-| P416 | 37 | iii | `.claude/skills/eval-runner-designer/SKILL.md` | documented exclusion - token-specific reason category |
+| P416 | 37 | iv | `.claude/skills/eval-runner-designer/SKILL.md` | documented exclusion - token-specific reason category |
 | P416 | 37 | iv | `130c8f016426fe0dc35eafaddbe2e97b90b8fd8b` | documented exclusion - token-specific reason category |
 | P416 | 38 | i | L25 | documented exclusion - token-specific reason category |
 | P416 | 38 | i | L90 | documented exclusion - token-specific reason category |
 | P416 | 38 | i | LLM | named gap - first use before any expansion on this page |
 | P416 | 38 | i | P6 | documented exclusion - token-specific reason category |
-| P416 | 38 | iii | `.claude/skills/eval-runner-designer/references/runner-design-blueprint.md` | documented exclusion - token-specific reason category |
 | P416 | 38 | iii | runner-design-blueprint.md | documented exclusion - token-specific reason category |
+| P416 | 38 | iv | `.claude/skills/eval-runner-designer/references/runner-design-blueprint.md` | documented exclusion - token-specific reason category |
 | P416 | 38 | iv | `f074fe0bb49f2ed2ed28e7722b26d0f025989366` | documented exclusion - token-specific reason category |
 | P416 | 39 | i | P7 | documented exclusion - token-specific reason category |
 | P416 | 39 | i | PII | named gap - first use before any expansion on this page |
 | P416 | 39 | ii | schema | defined at first use - line 39 contains the expansion |
-| P416 | 39 | iii | `.claude/skills/event-schema-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P416 | 39 | iv | `.claude/skills/event-schema-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P416 | 39 | iv | `1287795cc4ef3fab52ff8c378c428054e1eecf54` | documented exclusion - token-specific reason category |
 | P416 | 40 | i | EUR | named gap - first use before any expansion on this page |
 | P416 | 40 | i | GBP | named gap - first use before any expansion on this page |
 | P416 | 40 | i | L37 | documented exclusion - token-specific reason category |
 | P416 | 40 | i | P8 | documented exclusion - token-specific reason category |
 | P416 | 40 | i | USD | named gap - first use before any expansion on this page |
-| P416 | 40 | iii | `.claude/skills/event-schema-architect/references/event-schema-sheet.md` | documented exclusion - token-specific reason category |
 | P416 | 40 | iii | event-schema-sheet.md | documented exclusion - token-specific reason category |
+| P416 | 40 | iv | `.claude/skills/event-schema-architect/references/event-schema-sheet.md` | documented exclusion - token-specific reason category |
 | P416 | 40 | iv | `1f59d2439a7435b26c805028306513fa6acfab79` | documented exclusion - token-specific reason category |
 | P416 | 42 | v | FULL | named gap - first use before any expansion on this page |
 | P416 | 42 | v | UNRUN | documented exclusion - token-specific reason category |
@@ -342,7 +356,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P416 | 79 | i | L77-88 | documented exclusion - token-specific reason category |
 | P416 | 79 | i | L90-98 | documented exclusion - token-specific reason category |
 | P416 | 79 | iv | `PR tier ... CHANGED in the PR` | documented exclusion - token-specific reason category |
-| P416 | 80 | iii | `Semantic - content ... \| LLM judge with rubric derived from the assertion text \|` | documented exclusion - token-specific reason category |
+| P416 | 80 | iv | `Semantic - content ... \| LLM judge with rubric derived from the assertion text \|` | documented exclusion - token-specific reason category |
 | P416 | 83 | i | L1-203 | documented exclusion - token-specific reason category |
 | P416 | 84 | ii | webhook | named gap - first use before any expansion on this page |
 | P416 | 85 | i | CDC | named gap - first use before any expansion on this page |
@@ -420,8 +434,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 9 | ii | model | named gap - first use before any expansion on this page |
 | P417 | 9 | ii | open | named gap - first use before any expansion on this page |
 | P417 | 13 | ii | docs | named gap - first use before any expansion on this page |
-| P417 | 13 | iii | `docs/evidence/documentation/readability-lane-a-batch-19-2026-10-18.md` | documented exclusion - token-specific reason category |
 | P417 | 13 | iii | readability-lane-a-batch-19-2026-10-18.md | documented exclusion - token-specific reason category |
+| P417 | 13 | iv | `docs/evidence/documentation/readability-lane-a-batch-19-2026-10-18.md` | documented exclusion - token-specific reason category |
 | P417 | 13 | v | 19-2026 | documented exclusion - token-specific reason category |
 | P417 | 14 | i | JSON | named gap - first use before any expansion on this page |
 | P417 | 14 | ii | diff | defined at first use - line 14 contains the expansion |
@@ -434,7 +448,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 15 | ii | drift | named gap - first use before any expansion on this page |
 | P417 | 15 | ii | git | named gap - first use before any expansion on this page |
 | P417 | 15 | iii | 2db1ffb7..0e28bc8c | documented exclusion - token-specific reason category |
-| P417 | 15 | iii | `git diff --numstat 2db1ffb7..0e28bc8c -- <page>` | documented exclusion - token-specific reason category |
+| P417 | 15 | iv | `git diff --numstat 2db1ffb7..0e28bc8c -- <page>` | documented exclusion - token-specific reason category |
 | P417 | 15 | v | <page> | documented exclusion - token-specific reason category |
 | P417 | 16 | ii | accepted | named gap - first use before any expansion on this page |
 | P417 | 16 | ii | pending | named gap - first use before any expansion on this page |
@@ -447,9 +461,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 28 | ii | quarter | named gap - first use before any expansion on this page |
 | P417 | 28 | ii | reviewer | named gap - first use before any expansion on this page |
 | P417 | 28 | iii | SKILL.md | documented exclusion - token-specific reason category |
-| P417 | 28 | iii | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - token-specific reason category |
-| P417 | 28 | iii | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P417 | 28 | iii | adr-template.md | documented exclusion - token-specific reason category |
+| P417 | 28 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - token-specific reason category |
+| P417 | 28 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P417 | 28 | v | 0–143 | documented exclusion - token-specific reason category |
 | P417 | 30 | i | AC7 | documented exclusion - token-specific reason category |
 | P417 | 30 | i | P1 | documented exclusion - token-specific reason category |
@@ -464,15 +478,15 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 30 | ii | range | named gap - first use before any expansion on this page |
 | P417 | 30 | ii | records | named gap - first use before any expansion on this page |
 | P417 | 30 | ii | union | named gap - first use before any expansion on this page |
-| P417 | 30 | iii | `.claude/skills/feature-flag-architect/SKILL.md` | documented exclusion - token-specific reason category |
-| P417 | 30 | iii | `.claude/skills/human-approval-boundary/SKILL.md` | documented exclusion - token-specific reason category |
+| P417 | 30 | iv | `.claude/skills/feature-flag-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P417 | 30 | iv | `.claude/skills/human-approval-boundary/SKILL.md` | documented exclusion - token-specific reason category |
 | P417 | 30 | v | 0–111 | documented exclusion - token-specific reason category |
 | P417 | 30 | v | 0–127 | documented exclusion - token-specific reason category |
 | P417 | 30 | v | 112–119 | documented exclusion - token-specific reason category |
 | P417 | 30 | v | 120–127 | documented exclusion - token-specific reason category |
 | P417 | 30 | v | 128–135 | documented exclusion - token-specific reason category |
 | P417 | 32 | i | P4 | documented exclusion - token-specific reason category |
-| P417 | 32 | iii | `flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
+| P417 | 32 | iv | `flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
 | P417 | 36 | i | LF | named gap - first use before any expansion on this page |
 | P417 | 36 | ii | count | defined at first use - line 36 contains the expansion |
 | P417 | 38 | iv | `2db1ffb7` | documented exclusion - token-specific reason category |
@@ -486,24 +500,24 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 40 | iv | `a9137e64d93a58226688bc74b145e3764b093481` | documented exclusion - token-specific reason category |
 | P417 | 40 | v | PARTIAL | named gap - first use before any expansion on this page |
 | P417 | 41 | i | P2 | documented exclusion - token-specific reason category |
-| P417 | 41 | iii | `.claude/skills/feature-flag-architect/references/flag-system-sheet.md` | documented exclusion - token-specific reason category |
 | P417 | 41 | iii | flag-system-sheet.md | documented exclusion - token-specific reason category |
+| P417 | 41 | iv | `.claude/skills/feature-flag-architect/references/flag-system-sheet.md` | documented exclusion - token-specific reason category |
 | P417 | 41 | iv | `8ff224b44a7e4665112117f10960da02ca52cc44` | documented exclusion - token-specific reason category |
 | P417 | 42 | i | GA | named gap - first use before any expansion on this page |
 | P417 | 42 | i | P3 | documented exclusion - token-specific reason category |
-| P417 | 42 | iii | `.claude/skills/feature-flag-rollout-strategist/SKILL.md` | documented exclusion - token-specific reason category |
+| P417 | 42 | iv | `.claude/skills/feature-flag-rollout-strategist/SKILL.md` | documented exclusion - token-specific reason category |
 | P417 | 42 | iv | `e35b700208fd550612add12cf5feb29e74cf426d` | documented exclusion - token-specific reason category |
 | P417 | 43 | i | L61 | documented exclusion - token-specific reason category |
 | P417 | 43 | i | UX | named gap - first use before any expansion on this page |
-| P417 | 43 | iii | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
+| P417 | 43 | iv | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
 | P417 | 43 | iv | `7f3bcdb105e78337feb34860680838ccc6d72f08` | documented exclusion - token-specific reason category |
 | P417 | 44 | i | P5 | documented exclusion - token-specific reason category |
-| P417 | 44 | iii | `.claude/skills/hidden-context-exposure-reviewer/references/hidden-context-checks.md` | documented exclusion - token-specific reason category |
 | P417 | 44 | iii | hidden-context-checks.md | documented exclusion - token-specific reason category |
+| P417 | 44 | iv | `.claude/skills/hidden-context-exposure-reviewer/references/hidden-context-checks.md` | documented exclusion - token-specific reason category |
 | P417 | 44 | iv | `d52347169c7ee10f6c25c203e1d7be6a21c055ae` | documented exclusion - token-specific reason category |
 | P417 | 45 | i | L123 | documented exclusion - token-specific reason category |
 | P417 | 45 | i | P6 | documented exclusion - token-specific reason category |
-| P417 | 45 | iii | `.claude/skills/horizontal-scalability-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P417 | 45 | iv | `.claude/skills/horizontal-scalability-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P417 | 45 | iv | `1f24433819d1794090893effa97cf187977a0fb2` | documented exclusion - token-specific reason category |
 | P417 | 45 | iv | `MED` | documented exclusion - token-specific reason category |
 | P417 | 46 | i | AI | named gap - first use before any expansion on this page |
@@ -513,7 +527,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 46 | i | L8-L11 | documented exclusion - token-specific reason category |
 | P417 | 46 | i | OWASP | named gap - first use before any expansion on this page |
 | P417 | 46 | i | P7 | documented exclusion - token-specific reason category |
-| P417 | 46 | iii | `.claude/skills/human-agent-trust-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P417 | 46 | iv | `.claude/skills/human-agent-trust-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P417 | 46 | iv | `26c46095b073a90275becfe39291a1faaa0a4af2` | documented exclusion - token-specific reason category |
 | P417 | 46 | iv | `SEV` | documented exclusion - token-specific reason category |
 | P417 | 47 | i | API | named gap - first use before any expansion on this page |
@@ -523,8 +537,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 47 | i | L43 | documented exclusion - token-specific reason category |
 | P417 | 47 | i | L69 | documented exclusion - token-specific reason category |
 | P417 | 47 | i | UI | named gap - first use before any expansion on this page |
-| P417 | 47 | iii | `.claude/skills/human-agent-trust-reviewer/references/trust-exploitation-patterns.md` | documented exclusion - token-specific reason category |
 | P417 | 47 | iii | trust-exploitation-patterns.md | documented exclusion - token-specific reason category |
+| P417 | 47 | iv | `.claude/skills/human-agent-trust-reviewer/references/trust-exploitation-patterns.md` | documented exclusion - token-specific reason category |
 | P417 | 47 | iv | `d76ed858c3c33c292e104447d51ad12ee2533207` | documented exclusion - token-specific reason category |
 | P417 | 49 | v | FULL | named gap - first use before any expansion on this page |
 | P417 | 49 | v | UNRUN | documented exclusion - token-specific reason category |
@@ -557,7 +571,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 59 | i | SSR | named gap - first use before any expansion on this page |
 | P417 | 59 | i | TTL | named gap - first use before any expansion on this page |
 | P417 | 59 | ii | user | defined at first use - line 59 contains the expansion |
-| P417 | 59 | iii | `references/flag-system-sheet.md` | documented exclusion - token-specific reason category |
+| P417 | 59 | iv | `references/flag-system-sheet.md` | documented exclusion - token-specific reason category |
 | P417 | 59 | iv | `stable-ID` | documented exclusion - token-specific reason category |
 | P417 | 59 | iv | `user-ID` | documented exclusion - token-specific reason category |
 | P417 | 59 | v | UNVERIFIED | documented exclusion - token-specific reason category |
@@ -572,7 +586,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 65 | i | L7 | documented exclusion - token-specific reason category |
 | P417 | 65 | i | L78 | documented exclusion - token-specific reason category |
 | P417 | 65 | i | L91 | documented exclusion - token-specific reason category |
-| P417 | 65 | iii | `../SKILL.md` | documented exclusion - token-specific reason category |
+| P417 | 65 | iv | `../SKILL.md` | documented exclusion - token-specific reason category |
 | P417 | 69 | ii | gate | named gap - first use before any expansion on this page |
 | P417 | 69 | ii | lifecycle | named gap - first use before any expansion on this page |
 | P417 | 69 | v | % | documented exclusion - token-specific reason category |
@@ -584,8 +598,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 71 | i | L221 | documented exclusion - token-specific reason category |
 | P417 | 71 | i | L26 | documented exclusion - token-specific reason category |
 | P417 | 71 | i | L68 | documented exclusion - token-specific reason category |
-| P417 | 71 | iii | `A/B` | documented exclusion - token-specific reason category |
-| P417 | 71 | iii | `references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
+| P417 | 71 | iv | `A/B` | documented exclusion - token-specific reason category |
+| P417 | 71 | iv | `references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
 | P417 | 77 | i | L36 | documented exclusion - token-specific reason category |
 | P417 | 77 | i | L45 | documented exclusion - token-specific reason category |
 | P417 | 77 | i | L57 | documented exclusion - token-specific reason category |
@@ -621,16 +635,16 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 89 | i | LOW | named gap - first use before any expansion on this page |
 | P417 | 89 | i | SLO | named gap - first use before any expansion on this page |
 | P417 | 89 | ii | token | defined at first use - line 89 contains the expansion |
-| P417 | 89 | iii | `[BLOCKER\|HIGH\|MED\|LOW]` | documented exclusion - token-specific reason category |
-| P417 | 89 | iii | `references/` | documented exclusion - token-specific reason category |
+| P417 | 89 | iv | `[BLOCKER\|HIGH\|MED\|LOW]` | documented exclusion - token-specific reason category |
+| P417 | 89 | iv | `references/` | documented exclusion - token-specific reason category |
 | P417 | 95 | i | L13 | documented exclusion - token-specific reason category |
 | P417 | 95 | i | L165 | documented exclusion - token-specific reason category |
 | P417 | 95 | i | L188 | documented exclusion - token-specific reason category |
 | P417 | 95 | i | L205 | documented exclusion - token-specific reason category |
 | P417 | 95 | i | L29 | documented exclusion - token-specific reason category |
 | P417 | 95 | i | L70 | documented exclusion - token-specific reason category |
-| P417 | 95 | iii | `references/trust-exploitation-patterns.md` | documented exclusion - token-specific reason category |
 | P417 | 95 | iv | `[SEV]` | documented exclusion - token-specific reason category |
+| P417 | 95 | iv | `references/trust-exploitation-patterns.md` | documented exclusion - token-specific reason category |
 | P417 | 101 | i | L21 | documented exclusion - token-specific reason category |
 | P417 | 101 | i | L56 | documented exclusion - token-specific reason category |
 | P417 | 101 | i | L72 | documented exclusion - token-specific reason category |
@@ -643,19 +657,19 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P417 | 128 | iv | `8459ac73ba6e0b280338aca9a97be7a3336ce356` | documented exclusion - token-specific reason category |
 | P417 | 129 | iv | `62adb08edbacdd3171fc3db4f8e359828a25e1ba` | documented exclusion - token-specific reason category |
 | P417 | 130 | iv | `9c918ed2aadd667d90939fdfbf6aff8a00d92acf` | documented exclusion - token-specific reason category |
-| P417 | 133 | iii | `git rev-parse 2db1ffb7…:<page>` | documented exclusion - token-specific reason category |
+| P417 | 133 | iv | `git rev-parse 2db1ffb7…:<page>` | documented exclusion - token-specific reason category |
 | P417 | 134 | ii | counts | named gap - first use before any expansion on this page |
-| P417 | 134 | iii | `git log -1 --format='%H\|%an\|%ad\|%s' -- <page>` | documented exclusion - token-specific reason category |
-| P417 | 134 | iii | `git rev-list --count main -- <page>` | documented exclusion - token-specific reason category |
+| P417 | 134 | iv | `git log -1 --format='%H\|%an\|%ad\|%s' -- <page>` | documented exclusion - token-specific reason category |
+| P417 | 134 | iv | `git rev-list --count main -- <page>` | documented exclusion - token-specific reason category |
 | P417 | 156 | iv | `0e28bc8c0a6d34bb63e35f6024cc7409495ea08c` | documented exclusion - token-specific reason category |
 | P417 | 156 | iv | `git rev-parse origin/main` | documented exclusion - token-specific reason category |
-| P417 | 157 | iii | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7… --json` | documented exclusion - token-specific reason category |
+| P417 | 157 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7… --json` | documented exclusion - token-specific reason category |
 | P417 | 158 | v | × | documented exclusion - token-specific reason category |
-| P417 | 159 | iii | `git show 2db1ffb7…:<page>` | documented exclusion - token-specific reason category |
-| P417 | 160 | iii | `git diff --numstat 2db1ffb7… 0e28bc8c… -- <page>` | documented exclusion - token-specific reason category |
+| P417 | 159 | iv | `git show 2db1ffb7…:<page>` | documented exclusion - token-specific reason category |
+| P417 | 160 | iv | `git diff --numstat 2db1ffb7… 0e28bc8c… -- <page>` | documented exclusion - token-specific reason category |
 | P417 | 161 | ii | ci | named gap - first use before any expansion on this page |
-| P417 | 161 | iii | `python -B scripts/ci/check-markdown-links.py <eight pages>` | documented exclusion - token-specific reason category |
 | P417 | 161 | iii | check-markdown-links.py | documented exclusion - token-specific reason category |
+| P417 | 161 | iv | `python -B scripts/ci/check-markdown-links.py <eight pages>` | documented exclusion - token-specific reason category |
 | P417 | 161 | v | <eight pages> | documented exclusion - token-specific reason category |
 | P417 | 163 | iv | `laneA[128]…laneA[135]` | documented exclusion - token-specific reason category |
 | P417 | 167 | i | SD-C | documented exclusion - token-specific reason category |
@@ -677,8 +691,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 5 | i | PR | named gap - first use before any expansion on this page |
 | P418 | 5 | ii | branch | named gap - first use before any expansion on this page |
 | P418 | 5 | ii | main | named gap - first use before any expansion on this page |
-| P418 | 5 | iii | `origin/main` | documented exclusion - token-specific reason category |
 | P418 | 5 | iv | `e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
+| P418 | 5 | iv | `origin/main` | documented exclusion - token-specific reason category |
 | P418 | 7 | ii | git | named gap - first use before any expansion on this page |
 | P418 | 7 | iv | `git ls-remote origin refs/heads/main` | documented exclusion - token-specific reason category |
 | P418 | 9 | ii | model | named gap - first use before any expansion on this page |
@@ -700,7 +714,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 21 | ii | correction | named gap - first use before any expansion on this page |
 | P418 | 26 | ii | evidence | named gap - first use before any expansion on this page |
 | P418 | 28 | iv | `Quote` | documented exclusion - token-specific reason category |
-| P418 | 32 | iii | `refs/remotes/origin/main` | documented exclusion - token-specific reason category |
+| P418 | 32 | iv | `refs/remotes/origin/main` | documented exclusion - token-specific reason category |
 | P418 | 33 | ii | base | defined at first use - line 33 contains the expansion |
 | P418 | 33 | iv | `git merge-base --is-ancestor e2a3e20b7c20ef8385b219b39c6405237163406f refs/remotes/origin/main` | documented exclusion - token-specific reason category |
 | P418 | 35 | ii | reader | named gap - first use before any expansion on this page |
@@ -712,17 +726,17 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 47 | ii | json | defined at first use - line 47 contains the expansion |
 | P418 | 47 | iii | check_index.py | documented exclusion - token-specific reason category |
 | P418 | 58 | iv | `git ls-tree -r --name-only e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
-| P418 | 60 | iii | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - token-specific reason category |
 | P418 | 60 | iii | acceptance-index.json | documented exclusion - token-specific reason category |
 | P418 | 60 | iv | `reader_pages` | documented exclusion - token-specific reason category |
+| P418 | 60 | iv | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - token-specific reason category |
 | P418 | 61 | iv | `events` | documented exclusion - token-specific reason category |
 | P418 | 62 | iv | `ceil(590 / 4) = 148` | documented exclusion - token-specific reason category |
 | P418 | 65 | ii | count | defined at first use - line 65 contains the expansion |
 | P418 | 65 | ii | reviewer | named gap - first use before any expansion on this page |
-| P418 | 65 | iii | `.claude/agents/ai-security-red-team-reviewer.md` | documented exclusion - token-specific reason category |
 | P418 | 65 | iii | ai-security-red-team-reviewer.md | documented exclusion - token-specific reason category |
-| P418 | 66 | iii | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
+| P418 | 65 | iv | `.claude/agents/ai-security-red-team-reviewer.md` | documented exclusion - token-specific reason category |
 | P418 | 66 | iii | flag-rollout-sheet.md | documented exclusion - token-specific reason category |
+| P418 | 66 | iv | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
 | P418 | 67 | ii | next | named gap - first use before any expansion on this page |
 | P418 | 67 | ii | range | named gap - first use before any expansion on this page |
 | P418 | 67 | v | 8-15 | documented exclusion - token-specific reason category |
@@ -731,7 +745,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 70 | i | JSON | named gap - first use before any expansion on this page |
 | P418 | 76 | i | B2 | documented exclusion - token-specific reason category |
 | P418 | 76 | ii | test | defined at first use - line 76 contains the expansion |
-| P418 | 76 | iii | `.claude/skills/` | documented exclusion - token-specific reason category |
+| P418 | 76 | iv | `.claude/skills/` | documented exclusion - token-specific reason category |
 | P418 | 76 | iv | `ab-test-designer` | documented exclusion - token-specific reason category |
 | P418 | 76 | iv | `acceptance-criteria-reviewer` | documented exclusion - token-specific reason category |
 | P418 | 76 | iv | `accessibility-test-harness` | documented exclusion - token-specific reason category |
@@ -754,9 +768,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 92 | iv | `deepseek-flash-apr117-keeper` | documented exclusion - token-specific reason category |
 | P418 | 96 | ii | docs | named gap - first use before any expansion on this page |
 | P418 | 96 | ii | rerecord | defined at first use - line 96 contains the expansion |
-| P418 | 96 | iii | `docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md` | documented exclusion - token-specific reason category |
 | P418 | 96 | iii | readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md | documented exclusion - token-specific reason category |
-| P418 | 100 | iii | `git log -1 --format="%h %an" -- <page>` | documented exclusion - token-specific reason category |
+| P418 | 96 | iv | `docs/evidence/documentation/readability-lane-a-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md` | documented exclusion - token-specific reason category |
+| P418 | 100 | iv | `git log -1 --format="%h %an" -- <page>` | documented exclusion - token-specific reason category |
 | P418 | 100 | v | % | documented exclusion - token-specific reason category |
 | P418 | 100 | v | <page> | documented exclusion - token-specific reason category |
 | P418 | 104 | i | P1 | documented exclusion - token-specific reason category |
@@ -791,8 +805,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 120 | i | KEEPER-ID-ALLOCATION | documented exclusion - token-specific reason category |
 | P418 | 120 | i | KEEPER-ID-ALLOCATION-2026-10-15 | documented exclusion - token-specific reason category |
 | P418 | 120 | iii | KEEPER-ID-ALLOCATION-2026-10-15.md | documented exclusion - token-specific reason category |
-| P418 | 120 | iii | `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md` | documented exclusion - token-specific reason category |
-| P418 | 121 | iii | `KEEPER-ID-ALLOCATION.md` | documented exclusion - token-specific reason category |
+| P418 | 120 | iv | `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md` | documented exclusion - token-specific reason category |
+| P418 | 121 | iv | `KEEPER-ID-ALLOCATION.md` | documented exclusion - token-specific reason category |
 | P418 | 123 | ii | id | named gap - first use before any expansion on this page |
 | P418 | 123 | ii | open | named gap - first use before any expansion on this page |
 | P418 | 124 | i | K-104 | documented exclusion - token-specific reason category |
@@ -800,8 +814,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 125 | ii | audit | defined at first use - line 125 contains the expansion |
 | P418 | 127 | v | PARTIAL | named gap - first use before any expansion on this page |
 | P418 | 130 | iv | `Blob ID` | documented exclusion - token-specific reason category |
-| P418 | 131 | iii | `build_index.py` | documented exclusion - token-specific reason category |
-| P418 | 132 | iii | `git rev-parse <Acceptance revision>:<Page>` | documented exclusion - token-specific reason category |
+| P418 | 131 | iv | `build_index.py` | documented exclusion - token-specific reason category |
+| P418 | 132 | iv | `git rev-parse <Acceptance revision>:<Page>` | documented exclusion - token-specific reason category |
 | P418 | 132 | v | <Acceptance revision> | documented exclusion - token-specific reason category |
 | P418 | 132 | v | <Page> | documented exclusion - token-specific reason category |
 | P418 | 134 | ii | dispositions | defined at first use - line 134 contains the expansion |
@@ -809,20 +823,20 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 144 | i | SKILL | named gap - first use before any expansion on this page |
 | P418 | 144 | ii | accepted | named gap - first use before any expansion on this page |
 | P418 | 144 | iii | SKILL.md | documented exclusion - token-specific reason category |
-| P418 | 144 | iii | `.claude/skills/ab-test-designer/SKILL.md` | documented exclusion - token-specific reason category |
-| P418 | 145 | iii | `.claude/skills/ab-test-designer/references/ab-test-sheet.md` | documented exclusion - token-specific reason category |
+| P418 | 144 | iv | `.claude/skills/ab-test-designer/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 145 | iii | ab-test-sheet.md | documented exclusion - token-specific reason category |
-| P418 | 146 | iii | `.claude/skills/acceptance-criteria-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
-| P418 | 147 | iii | `.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md` | documented exclusion - token-specific reason category |
+| P418 | 145 | iv | `.claude/skills/ab-test-designer/references/ab-test-sheet.md` | documented exclusion - token-specific reason category |
+| P418 | 146 | iv | `.claude/skills/acceptance-criteria-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 147 | iii | criteria-review-sheet.md | documented exclusion - token-specific reason category |
-| P418 | 148 | iii | `.claude/skills/accessibility-test-harness/SKILL.md` | documented exclusion - token-specific reason category |
-| P418 | 149 | iii | `.claude/skills/accessibility-test-harness/references/a11y-checklists.md` | documented exclusion - token-specific reason category |
+| P418 | 147 | iv | `.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md` | documented exclusion - token-specific reason category |
+| P418 | 148 | iv | `.claude/skills/accessibility-test-harness/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 149 | iii | a11y-checklists.md | documented exclusion - token-specific reason category |
-| P418 | 150 | iii | `.claude/skills/admin-console-architect/SKILL.md` | documented exclusion - token-specific reason category |
-| P418 | 151 | iii | `.claude/skills/adr-sequencer/references/adr-corpus-sheet.md` | documented exclusion - token-specific reason category |
+| P418 | 149 | iv | `.claude/skills/accessibility-test-harness/references/a11y-checklists.md` | documented exclusion - token-specific reason category |
+| P418 | 150 | iv | `.claude/skills/admin-console-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 151 | iii | adr-corpus-sheet.md | documented exclusion - token-specific reason category |
+| P418 | 151 | iv | `.claude/skills/adr-sequencer/references/adr-corpus-sheet.md` | documented exclusion - token-specific reason category |
 | P418 | 153 | ii | counts | defined at first use - line 153 contains the expansion |
-| P418 | 153 | iii | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
+| P418 | 153 | iv | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
 | P418 | 155 | iv | `wc -l` | documented exclusion - token-specific reason category |
 | P418 | 156 | i | DSH | named gap - first use before any expansion on this page |
 | P418 | 156 | i | UTF-8 | documented exclusion - token-specific reason category |
@@ -839,10 +853,10 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 175 | ii | partial | named gap - first use before any expansion on this page |
 | P418 | 177 | i | L178 | documented exclusion - token-specific reason category |
 | P418 | 177 | iii | 0.05 | documented exclusion - token-specific reason category |
-| P418 | 177 | iii | `p<0.05` | documented exclusion - token-specific reason category |
+| P418 | 177 | iv | `p<0.05` | documented exclusion - token-specific reason category |
 | P418 | 178 | i | L176-177 | documented exclusion - token-specific reason category |
 | P418 | 180 | i | L13 | documented exclusion - token-specific reason category |
-| P418 | 180 | iii | `references/ab-test-sheet.md` | documented exclusion - token-specific reason category |
+| P418 | 180 | iv | `references/ab-test-sheet.md` | documented exclusion - token-specific reason category |
 | P418 | 181 | i | L183 | documented exclusion - token-specific reason category |
 | P418 | 181 | iv | `p-hacking` | documented exclusion - token-specific reason category |
 | P418 | 183 | i | L82 | documented exclusion - token-specific reason category |
@@ -860,17 +874,17 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 194 | ii | blocked | named gap - first use before any expansion on this page |
 | P418 | 196 | iv | `git ls-tree e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
 | P418 | 197 | i | B6 | documented exclusion - token-specific reason category |
-| P418 | 197 | iii | `evals/evals.json` | documented exclusion - token-specific reason category |
-| P418 | 197 | iii | `evals/trigger-evals.json` | documented exclusion - token-specific reason category |
 | P418 | 197 | iii | evals.json | documented exclusion - token-specific reason category |
 | P418 | 197 | iii | trigger-evals.json | documented exclusion - token-specific reason category |
+| P418 | 197 | iv | `evals/evals.json` | documented exclusion - token-specific reason category |
+| P418 | 197 | iv | `evals/trigger-evals.json` | documented exclusion - token-specific reason category |
 | P418 | 201 | i | L1-69 | documented exclusion - token-specific reason category |
 | P418 | 204 | ii | corrections | named gap - first use before any expansion on this page |
 | P418 | 208 | i | SUTVA | defined at first use - line 208 contains the expansion |
 | P418 | 211 | iii | 0.80 | documented exclusion - token-specific reason category |
 | P418 | 211 | iii | 0.90 | documented exclusion - token-specific reason category |
 | P418 | 211 | v | 80–0 | documented exclusion - token-specific reason category |
-| P418 | 212 | iii | `../SKILL.md` | documented exclusion - token-specific reason category |
+| P418 | 212 | iv | `../SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 216 | i | L1-234 | documented exclusion - token-specific reason category |
 | P418 | 218 | ii | spec | named gap - first use before any expansion on this page |
 | P418 | 218 | ii | user | named gap - first use before any expansion on this page |
@@ -882,7 +896,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 225 | i | QA | named gap - first use before any expansion on this page |
 | P418 | 226 | v | ms | documented exclusion - token-specific reason category |
 | P418 | 230 | v | 2026-09 | documented exclusion - token-specific reason category |
-| P418 | 232 | iii | `references/criteria-review-sheet.md` | documented exclusion - token-specific reason category |
+| P418 | 232 | iv | `references/criteria-review-sheet.md` | documented exclusion - token-specific reason category |
 | P418 | 240 | i | L1-84 | documented exclusion - token-specific reason category |
 | P418 | 246 | i | AC1 | documented exclusion - token-specific reason category |
 | P418 | 246 | ii | ids | defined at first use - line 246 contains the expansion |
@@ -905,7 +919,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 263 | i | VPAT | named gap - first use before any expansion on this page |
 | P418 | 263 | i | W3C | documented exclusion - token-specific reason category |
 | P418 | 266 | ii | unknown | named gap - first use before any expansion on this page |
-| P418 | 268 | iii | `references/a11y-checklists.md` | documented exclusion - token-specific reason category |
+| P418 | 268 | iv | `references/a11y-checklists.md` | documented exclusion - token-specific reason category |
 | P418 | 270 | ii | e2e | defined at first use - line 270 contains the expansion |
 | P418 | 270 | ii | playwright | defined at first use - line 270 contains the expansion |
 | P418 | 270 | ii | qa | defined at first use - line 270 contains the expansion |
@@ -932,20 +946,20 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 304 | i | L146 | documented exclusion - token-specific reason category |
 | P418 | 304 | iv | `authorization-matrix-designer` | documented exclusion - token-specific reason category |
 | P418 | 310 | ii | approval | named gap - first use before any expansion on this page |
-| P418 | 311 | iii | `references/` | documented exclusion - token-specific reason category |
+| P418 | 311 | iv | `references/` | documented exclusion - token-specific reason category |
 | P418 | 311 | iv | `references` | documented exclusion - token-specific reason category |
 | P418 | 319 | i | L1-75 | documented exclusion - token-specific reason category |
 | P418 | 321 | ii | lifecycle | defined at first use - line 321 contains the expansion |
 | P418 | 321 | ii | status | named gap - first use before any expansion on this page |
 | P418 | 323 | i | ADR | defined at first use - line 323 contains the expansion |
 | P418 | 326 | i | LRU | defined at first use - line 326 contains the expansion |
-| P418 | 332 | iii | `.claude/skills/adr-sequencer/SKILL.md` | documented exclusion - token-specific reason category |
+| P418 | 332 | iv | `.claude/skills/adr-sequencer/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 350 | i | D84 | documented exclusion - token-specific reason category |
 | P418 | 350 | ii | official | defined at first use - line 350 contains the expansion |
-| P418 | 353 | iii | `build_index.py --report` | documented exclusion - token-specific reason category |
+| P418 | 353 | iv | `build_index.py --report` | documented exclusion - token-specific reason category |
 | P418 | 354 | iv | `git rev-parse --is-shallow-repository` | documented exclusion - token-specific reason category |
-| P418 | 355 | iii | `refs/pull/*/head` | documented exclusion - token-specific reason category |
 | P418 | 355 | iv | `false` | documented exclusion - token-specific reason category |
+| P418 | 355 | iv | `refs/pull/*/head` | documented exclusion - token-specific reason category |
 | P418 | 356 | i | D73 | documented exclusion - token-specific reason category |
 | P418 | 358 | ii | blob | named gap - first use before any expansion on this page |
 | P418 | 358 | ii | passed | named gap - first use before any expansion on this page |
@@ -954,20 +968,19 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 371 | ii | frontier | defined at first use - line 371 contains the expansion |
 | P418 | 371 | v | 1-4 | documented exclusion - token-specific reason category |
 | P418 | 375 | iv | `50241ba5036e36ec9bcd1ce7a4b93ffa23a0392b` | documented exclusion - token-specific reason category |
-| P418 | 378 | iii | `.claude/skills/agent-instruction-consolidator/SKILL.md` | documented exclusion - token-specific reason category |
-| P418 | 379 | iii | `.claude/skills/agent-instruction-consolidator/references/instruction-file-map.md` | documented exclusion - token-specific reason category |
+| P418 | 378 | iv | `.claude/skills/agent-instruction-consolidator/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 379 | iii | instruction-file-map.md | documented exclusion - token-specific reason category |
-| P418 | 380 | iii | `.claude/skills/agent-memory-governance/SKILL.md` | documented exclusion - token-specific reason category |
-| P418 | 381 | iii | `.claude/skills/agent-memory-governance/references/memory-rules.md` | documented exclusion - token-specific reason category |
+| P418 | 379 | iv | `.claude/skills/agent-instruction-consolidator/references/instruction-file-map.md` | documented exclusion - token-specific reason category |
+| P418 | 380 | iv | `.claude/skills/agent-memory-governance/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 381 | iii | memory-rules.md | documented exclusion - token-specific reason category |
-| P418 | 382 | iii | `.claude/skills/agent-startup-context-gate/references/context-source-checklist.md` | documented exclusion - token-specific reason category |
+| P418 | 381 | iv | `.claude/skills/agent-memory-governance/references/memory-rules.md` | documented exclusion - token-specific reason category |
 | P418 | 382 | iii | context-source-checklist.md | documented exclusion - token-specific reason category |
-| P418 | 383 | iii | `.claude/skills/agent-tool-safety-guard/SKILL.md` | documented exclusion - token-specific reason category |
-| P418 | 384 | iii | `.claude/skills/agent-tool-safety-guard/references/tool-permission-matrix.md` | documented exclusion - token-specific reason category |
+| P418 | 382 | iv | `.claude/skills/agent-startup-context-gate/references/context-source-checklist.md` | documented exclusion - token-specific reason category |
+| P418 | 383 | iv | `.claude/skills/agent-tool-safety-guard/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 384 | iii | tool-permission-matrix.md | documented exclusion - token-specific reason category |
-| P418 | 385 | iii | `.claude/skills/agentic-loop-designer/SKILL.md` | documented exclusion - token-specific reason category |
+| P418 | 384 | iv | `.claude/skills/agent-tool-safety-guard/references/tool-permission-matrix.md` | documented exclusion - token-specific reason category |
+| P418 | 385 | iv | `.claude/skills/agentic-loop-designer/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 392 | iii | 8.2 | documented exclusion - token-specific reason category |
-| P418 | 392 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
 | P418 | 392 | iv | `0be76bc0…` | documented exclusion - token-specific reason category |
 | P418 | 392 | iv | `28e20697…` | documented exclusion - token-specific reason category |
 | P418 | 392 | iv | `56899580…` | documented exclusion - token-specific reason category |
@@ -979,28 +992,29 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 392 | iv | `84ed16ca…` | documented exclusion - token-specific reason category |
 | P418 | 392 | iv | `bf44030a…` | documented exclusion - token-specific reason category |
 | P418 | 392 | iv | `d9500b3b…` | documented exclusion - token-specific reason category |
+| P418 | 392 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
 | P418 | 392 | v | × | documented exclusion - token-specific reason category |
 | P418 | 394 | ii | ci | named gap - first use before any expansion on this page |
-| P418 | 394 | iii | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - token-specific reason category |
 | P418 | 394 | iii | check-markdown-links.py | documented exclusion - token-specific reason category |
 | P418 | 394 | iv | `files: 8   links checked: 9   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - token-specific reason category |
+| P418 | 394 | iv | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - token-specific reason category |
 | P418 | 395 | i | OK | defined at first use - line 395 contains the expansion |
-| P418 | 395 | iii | `python -P scripts/validate-skills.py` | documented exclusion - token-specific reason category |
 | P418 | 395 | iii | validate-skills.py | documented exclusion - token-specific reason category |
 | P418 | 395 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - token-specific reason category |
-| P418 | 396 | iii | `python scripts/tests/test_validator.py` | documented exclusion - token-specific reason category |
+| P418 | 395 | iv | `python -P scripts/validate-skills.py` | documented exclusion - token-specific reason category |
 | P418 | 396 | iii | test_validator.py | documented exclusion - token-specific reason category |
 | P418 | 396 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - token-specific reason category |
-| P418 | 398 | iii | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - token-specific reason category |
-| P418 | 399 | iii | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
-| P418 | 401 | iii | `python -B tools/readability_acceptance/build_index.py --report --ref <this batch's committed head>` | documented exclusion - token-specific reason category |
+| P418 | 396 | iv | `python scripts/tests/test_validator.py` | documented exclusion - token-specific reason category |
+| P418 | 398 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - token-specific reason category |
+| P418 | 399 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
+| P418 | 401 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref <this batch's committed head>` | documented exclusion - token-specific reason category |
 | P418 | 401 | iv | `table_rows 109, events 109, full_page_acceptances 89, lost_commit_events 10, reader_pages_with_rows 76` | documented exclusion - token-specific reason category |
 | P418 | 401 | v | <this batch's committed head> | documented exclusion - token-specific reason category |
 | P418 | 407 | i | F1 | documented exclusion - token-specific reason category |
 | P418 | 407 | i | F5 | documented exclusion - token-specific reason category |
 | P418 | 408 | i | F3 | documented exclusion - token-specific reason category |
 | P418 | 414 | iii | 8.1 | documented exclusion - token-specific reason category |
-| P418 | 420 | iii | `git grep -n -i -F -e authz e2a3e20b7c20ef8385b219b39c6405237163406f -- .claude/skills/admin-console-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P418 | 420 | iv | `git grep -n -i -F -e authz e2a3e20b7c20ef8385b219b39c6405237163406f -- .claude/skills/admin-console-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 425 | i | F2 | documented exclusion - token-specific reason category |
 | P418 | 432 | iv | `28e206977eacb05084844fcbc7d5aff7f90f1ed1` | documented exclusion - token-specific reason category |
 | P418 | 433 | iv | `56899580a8a30b194a1ba5cf63ab810984426604` | documented exclusion - token-specific reason category |
@@ -1037,7 +1051,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 550 | ii | build | named gap - first use before any expansion on this page |
 | P418 | 555 | i | F6 | documented exclusion - token-specific reason category |
 | P418 | 555 | iii | 8.7.1 | documented exclusion - token-specific reason category |
-| P418 | 556 | iii | `git show e2a3e20b…:<page>` | documented exclusion - token-specific reason category |
+| P418 | 556 | iv | `git show e2a3e20b…:<page>` | documented exclusion - token-specific reason category |
 | P418 | 575 | iii | 8.7.2 | documented exclusion - token-specific reason category |
 | P418 | 582 | iii | 8.7.3 | documented exclusion - token-specific reason category |
 | P418 | 583 | i | PROC-04 | documented exclusion - token-specific reason category |
@@ -1046,13 +1060,13 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P418 | 584 | i | SHA-256 | documented exclusion - token-specific reason category |
 | P418 | 585 | ii | payload | named gap - first use before any expansion on this page |
 | P418 | 591 | iii | 8.8 | documented exclusion - token-specific reason category |
-| P418 | 597 | iii | `git grep -n -i -F -e authz … -- .claude/skills/admin-console-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P418 | 597 | iv | `git grep -n -i -F -e authz … -- .claude/skills/admin-console-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P418 | 598 | i | OEC | named gap - first use before any expansion on this page |
-| P418 | 599 | iii | `git show …:<page>` | documented exclusion - token-specific reason category |
-| P418 | 600 | iii | `python -B tools/readability_acceptance/build_index.py --report --ref <the repair head>` | documented exclusion - token-specific reason category |
+| P418 | 599 | iv | `git show …:<page>` | documented exclusion - token-specific reason category |
+| P418 | 600 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref <the repair head>` | documented exclusion - token-specific reason category |
 | P418 | 600 | v | <the repair head> | documented exclusion - token-specific reason category |
-| P418 | 601 | iii | `/comments` | documented exclusion - token-specific reason category |
-| P418 | 601 | iii | `/issues/777/comments` | documented exclusion - token-specific reason category |
+| P418 | 601 | iv | `/comments` | documented exclusion - token-specific reason category |
+| P418 | 601 | iv | `/issues/777/comments` | documented exclusion - token-specific reason category |
 | P418 | 604 | iii | 8.9 | documented exclusion - token-specific reason category |
 | P418 | 615 | i | CONFLICTING | named gap - first use before any expansion on this page |
 | P418 | 615 | i | DIRTY | named gap - first use before any expansion on this page |
@@ -1093,17 +1107,17 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P419 | 27 | iv | `e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
 | P419 | 30 | i | ID | named gap - first use before any expansion on this page |
 | P419 | 30 | ii | git | named gap - first use before any expansion on this page |
-| P419 | 30 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
 | P419 | 30 | iv | `Blob ID` | documented exclusion - token-specific reason category |
+| P419 | 30 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
 | P419 | 30 | v | <page> | documented exclusion - token-specific reason category |
 | P419 | 33 | ii | docs | named gap - first use before any expansion on this page |
-| P419 | 33 | iii | `docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md` | documented exclusion - token-specific reason category |
 | P419 | 33 | iii | readability-lane-a-batch-2-2026-10-15.md | documented exclusion - token-specific reason category |
+| P419 | 33 | iv | `docs/evidence/documentation/readability-lane-a-batch-2-2026-10-15.md` | documented exclusion - token-specific reason category |
 | P419 | 33 | v | 2-2026 | documented exclusion - token-specific reason category |
 | P419 | 35 | ii | build | defined at first use - line 35 contains the expansion |
-| P419 | 36 | iii | `build_index.py` | documented exclusion - token-specific reason category |
+| P419 | 36 | iv | `build_index.py` | documented exclusion - token-specific reason category |
 | P419 | 38 | i | WD-A2 | documented exclusion - token-specific reason category |
-| P419 | 38 | iii | `WD-A2-<n>` | documented exclusion - token-specific reason category |
+| P419 | 38 | iv | `WD-A2-<n>` | documented exclusion - token-specific reason category |
 | P419 | 38 | v | <n> | documented exclusion - token-specific reason category |
 | P419 | 39 | ii | ids | named gap - first use before any expansion on this page |
 | P419 | 40 | v | <the repair head> | documented exclusion - token-specific reason category |
@@ -1114,8 +1128,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P419 | 47 | i | KEEPER-ID-ALLOCATION | documented exclusion - token-specific reason category |
 | P419 | 47 | i | KEEPER-ID-ALLOCATION-2026-10-15 | documented exclusion - token-specific reason category |
 | P419 | 47 | iii | KEEPER-ID-ALLOCATION-2026-10-15.md | documented exclusion - token-specific reason category |
-| P419 | 47 | iii | `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md` | documented exclusion - token-specific reason category |
-| P419 | 48 | iii | `KEEPER-ID-ALLOCATION.md` | documented exclusion - token-specific reason category |
+| P419 | 47 | iv | `docs/roadmaps/KEEPER-ID-ALLOCATION-2026-10-15.md` | documented exclusion - token-specific reason category |
+| P419 | 48 | iv | `KEEPER-ID-ALLOCATION.md` | documented exclusion - token-specific reason category |
 | P419 | 49 | ii | rule | defined at first use - line 49 contains the expansion |
 | P419 | 49 | v | OPEN | named gap - first use before any expansion on this page |
 | P419 | 50 | ii | batches | named gap - first use before any expansion on this page |
@@ -1132,7 +1146,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P419 | 70 | i | SKILL | named gap - first use before any expansion on this page |
 | P419 | 70 | ii | test | defined at first use - line 70 contains the expansion |
 | P419 | 70 | iii | SKILL.md | documented exclusion - token-specific reason category |
-| P419 | 73 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/ab-test-designer/SKILL.md` | documented exclusion - token-specific reason category |
+| P419 | 73 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/ab-test-designer/SKILL.md` | documented exclusion - token-specific reason category |
 | P419 | 74 | i | P1 | documented exclusion - token-specific reason category |
 | P419 | 74 | ii | accepted | defined at first use - line 74 contains the expansion |
 | P419 | 76 | ii | blob | named gap - first use before any expansion on this page |
@@ -1140,39 +1154,39 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P419 | 78 | i | K-107 | documented exclusion - token-specific reason category |
 | P419 | 78 | i | WD-A2-2 | documented exclusion - token-specific reason category |
 | P419 | 80 | iii | ab-test-sheet.md | documented exclusion - token-specific reason category |
-| P419 | 83 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/ab-test-designer/references/ab-test-sheet.md` | documented exclusion - token-specific reason category |
+| P419 | 83 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/ab-test-designer/references/ab-test-sheet.md` | documented exclusion - token-specific reason category |
 | P419 | 84 | i | P2 | documented exclusion - token-specific reason category |
 | P419 | 88 | i | K-092 | documented exclusion - token-specific reason category |
 | P419 | 88 | i | K-108 | documented exclusion - token-specific reason category |
 | P419 | 88 | i | WD-A2-3 | documented exclusion - token-specific reason category |
-| P419 | 93 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/acceptance-criteria-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P419 | 93 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/acceptance-criteria-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P419 | 94 | i | P3 | documented exclusion - token-specific reason category |
 | P419 | 98 | i | K-093 | documented exclusion - token-specific reason category |
 | P419 | 98 | i | K-109 | documented exclusion - token-specific reason category |
 | P419 | 98 | i | WD-A2-4 | documented exclusion - token-specific reason category |
 | P419 | 100 | ii | review | defined at first use - line 100 contains the expansion |
 | P419 | 100 | iii | criteria-review-sheet.md | documented exclusion - token-specific reason category |
-| P419 | 103 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md` | documented exclusion - token-specific reason category |
+| P419 | 103 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/acceptance-criteria-reviewer/references/criteria-review-sheet.md` | documented exclusion - token-specific reason category |
 | P419 | 104 | i | P4 | documented exclusion - token-specific reason category |
 | P419 | 108 | i | K-094 | documented exclusion - token-specific reason category |
 | P419 | 108 | i | K-110 | documented exclusion - token-specific reason category |
 | P419 | 108 | i | WD-A2-5 | documented exclusion - token-specific reason category |
-| P419 | 113 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/accessibility-test-harness/SKILL.md` | documented exclusion - token-specific reason category |
+| P419 | 113 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/accessibility-test-harness/SKILL.md` | documented exclusion - token-specific reason category |
 | P419 | 114 | i | P5 | documented exclusion - token-specific reason category |
 | P419 | 118 | i | K-095 | documented exclusion - token-specific reason category |
 | P419 | 118 | i | K-111 | documented exclusion - token-specific reason category |
 | P419 | 118 | i | WD-A2-6 | documented exclusion - token-specific reason category |
 | P419 | 120 | iii | a11y-checklists.md | documented exclusion - token-specific reason category |
-| P419 | 123 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/accessibility-test-harness/references/a11y-checklists.md` | documented exclusion - token-specific reason category |
+| P419 | 123 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/accessibility-test-harness/references/a11y-checklists.md` | documented exclusion - token-specific reason category |
 | P419 | 124 | i | P6 | documented exclusion - token-specific reason category |
 | P419 | 128 | i | K-096 | documented exclusion - token-specific reason category |
 | P419 | 128 | i | K-112 | documented exclusion - token-specific reason category |
 | P419 | 128 | i | WD-A2-7 | documented exclusion - token-specific reason category |
-| P419 | 133 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/admin-console-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P419 | 133 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/admin-console-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P419 | 134 | i | P7 | documented exclusion - token-specific reason category |
 | P419 | 138 | i | WD-A2-8 | documented exclusion - token-specific reason category |
 | P419 | 140 | iii | adr-corpus-sheet.md | documented exclusion - token-specific reason category |
-| P419 | 143 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/adr-sequencer/references/adr-corpus-sheet.md` | documented exclusion - token-specific reason category |
+| P419 | 143 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:.claude/skills/adr-sequencer/references/adr-corpus-sheet.md` | documented exclusion - token-specific reason category |
 | P419 | 148 | i | C-1 | documented exclusion - token-specific reason category |
 | P419 | 152 | ii | reader | defined at first use - line 152 contains the expansion |
 | P419 | 155 | iv | `e2a3e20b…` | documented exclusion - token-specific reason category |
@@ -1180,8 +1194,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P419 | 157 | i | L176-177 | documented exclusion - token-specific reason category |
 | P419 | 157 | i | L178 | documented exclusion - token-specific reason category |
 | P419 | 157 | iii | 0.05 | documented exclusion - token-specific reason category |
-| P419 | 157 | iii | `p<0.05` | documented exclusion - token-specific reason category |
-| P419 | 157 | iii | `references/ab-test-sheet.md` | documented exclusion - token-specific reason category |
+| P419 | 157 | iv | `p<0.05` | documented exclusion - token-specific reason category |
+| P419 | 157 | iv | `references/ab-test-sheet.md` | documented exclusion - token-specific reason category |
 | P419 | 157 | v | % | documented exclusion - token-specific reason category |
 | P419 | 158 | i | L183 | documented exclusion - token-specific reason category |
 | P419 | 158 | iv | `p-hacking` | documented exclusion - token-specific reason category |
@@ -1195,7 +1209,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P419 | 160 | ii | policy | named gap - first use before any expansion on this page |
 | P419 | 160 | iv | `authorization-matrix-designer` | documented exclusion - token-specific reason category |
 | P419 | 160 | iv | `authz` | documented exclusion - token-specific reason category |
-| P419 | 162 | iii | `origin/main` | documented exclusion - token-specific reason category |
+| P419 | 162 | iv | `origin/main` | documented exclusion - token-specific reason category |
 | P419 | 167 | ii | auditor | named gap - first use before any expansion on this page |
 | P419 | 170 | i | CONFIRMED | named gap - first use before any expansion on this page |
 | P419 | 170 | i | UNAVAILABILITY | named gap - first use before any expansion on this page |
@@ -1242,9 +1256,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P420 | 13 | ii | register | named gap - first use before any expansion on this page |
 | P420 | 13 | ii | test | named gap - first use before any expansion on this page |
 | P420 | 13 | ii | workflow | named gap - first use before any expansion on this page |
-| P420 | 13 | iii | `docs/evidence/documentation/readability-lane-a-batch-20-2026-10-18.md` | documented exclusion - token-specific reason category |
 | P420 | 13 | iii | readability-lane-a-batch-20-2026-10-18.md | documented exclusion - token-specific reason category |
 | P420 | 13 | iv | `docs-only` | documented exclusion - token-specific reason category |
+| P420 | 13 | iv | `docs/evidence/documentation/readability-lane-a-batch-20-2026-10-18.md` | documented exclusion - token-specific reason category |
 | P420 | 13 | v | 20-2026 | documented exclusion - token-specific reason category |
 | P420 | 14 | i | DCO | defined at first use - line 14 contains the expansion |
 | P420 | 14 | ii | drift | named gap - first use before any expansion on this page |
@@ -1256,14 +1270,14 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P420 | 25 | i | SKILL | named gap - first use before any expansion on this page |
 | P420 | 25 | ii | reviewer | named gap - first use before any expansion on this page |
 | P420 | 25 | iii | SKILL.md | documented exclusion - token-specific reason category |
-| P420 | 25 | iii | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - token-specific reason category |
-| P420 | 25 | iii | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P420 | 25 | iii | adr-template.md | documented exclusion - token-specific reason category |
+| P420 | 25 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - token-specific reason category |
+| P420 | 25 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P420 | 27 | i | O-1 | documented exclusion - token-specific reason category |
 | P420 | 27 | ii | approval | defined at first use - line 27 contains the expansion |
 | P420 | 27 | ii | count | defined at first use - line 27 contains the expansion |
 | P420 | 27 | ii | next | defined at first use - line 27 contains the expansion |
-| P420 | 27 | iii | `.claude/skills/human-approval-boundary/SKILL.md` | documented exclusion - token-specific reason category |
+| P420 | 27 | iv | `.claude/skills/human-approval-boundary/SKILL.md` | documented exclusion - token-specific reason category |
 | P420 | 27 | v | 0-111 | documented exclusion - token-specific reason category |
 | P420 | 27 | v | 0-135 | documented exclusion - token-specific reason category |
 | P420 | 27 | v | 112-119 | documented exclusion - token-specific reason category |
@@ -1280,35 +1294,35 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P420 | 36 | i | IAM | named gap - first use before any expansion on this page |
 | P420 | 36 | i | P2 | documented exclusion - token-specific reason category |
 | P420 | 36 | i | RBAC | named gap - first use before any expansion on this page |
-| P420 | 36 | iii | `.claude/skills/iac-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P420 | 36 | iv | `.claude/skills/iac-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P420 | 36 | iv | `28fcbd41c0506a8cdb24ee7305bad50b99e5ad46` | documented exclusion - token-specific reason category |
 | P420 | 37 | i | DNS | named gap - first use before any expansion on this page |
 | P420 | 37 | i | L31 | documented exclusion - token-specific reason category |
 | P420 | 37 | i | P3 | documented exclusion - token-specific reason category |
-| P420 | 37 | iii | `.claude/skills/iac-reviewer/references/iac-review-checklist.md` | documented exclusion - token-specific reason category |
 | P420 | 37 | iii | iac-review-checklist.md | documented exclusion - token-specific reason category |
+| P420 | 37 | iv | `.claude/skills/iac-reviewer/references/iac-review-checklist.md` | documented exclusion - token-specific reason category |
 | P420 | 37 | iv | `df7d70bf1c0092d199120c228cc6a512bb02dbba` | documented exclusion - token-specific reason category |
 | P420 | 38 | i | P4 | documented exclusion - token-specific reason category |
 | P420 | 38 | i | SEV1 | documented exclusion - token-specific reason category |
 | P420 | 38 | i | SEV1-4 | documented exclusion - token-specific reason category |
 | P420 | 38 | i | SLI | named gap - first use before any expansion on this page |
-| P420 | 38 | iii | `.claude/skills/incident-response-runbook/SKILL.md` | documented exclusion - token-specific reason category |
+| P420 | 38 | iv | `.claude/skills/incident-response-runbook/SKILL.md` | documented exclusion - token-specific reason category |
 | P420 | 38 | iv | `211604687c7a9cba136aadf8772e5f25e2bb35e1` | documented exclusion - token-specific reason category |
 | P420 | 39 | i | P5 | documented exclusion - token-specific reason category |
-| P420 | 39 | iii | `.claude/skills/incident-response-runbook/references/incident-runbook-template.md` | documented exclusion - token-specific reason category |
 | P420 | 39 | iii | incident-runbook-template.md | documented exclusion - token-specific reason category |
+| P420 | 39 | iv | `.claude/skills/incident-response-runbook/references/incident-runbook-template.md` | documented exclusion - token-specific reason category |
 | P420 | 39 | iv | `b24fee58436372a33b854abd9f2c54f5bd825939` | documented exclusion - token-specific reason category |
 | P420 | 39 | v | FULL | named gap - first use before any expansion on this page |
 | P420 | 40 | i | API | named gap - first use before any expansion on this page |
 | P420 | 40 | i | E2E | documented exclusion - token-specific reason category |
 | P420 | 40 | i | P6 | documented exclusion - token-specific reason category |
-| P420 | 40 | iii | `.claude/skills/integration-test-designer/SKILL.md` | documented exclusion - token-specific reason category |
+| P420 | 40 | iv | `.claude/skills/integration-test-designer/SKILL.md` | documented exclusion - token-specific reason category |
 | P420 | 40 | iv | `e5322bfe66f6f73fd1b3f01524261f7648a6ba60` | documented exclusion - token-specific reason category |
 | P420 | 41 | i | L17 | documented exclusion - token-specific reason category |
 | P420 | 41 | i | LLM | named gap - first use before any expansion on this page |
 | P420 | 41 | i | P7 | documented exclusion - token-specific reason category |
-| P420 | 41 | iii | `.claude/skills/integration-test-designer/references/boundary-catalog.md` | documented exclusion - token-specific reason category |
 | P420 | 41 | iii | boundary-catalog.md | documented exclusion - token-specific reason category |
+| P420 | 41 | iv | `.claude/skills/integration-test-designer/references/boundary-catalog.md` | documented exclusion - token-specific reason category |
 | P420 | 41 | iv | `254ff534b320177e877ada7b8f72c7c6d1202bfb` | documented exclusion - token-specific reason category |
 | P420 | 42 | i | A2A | documented exclusion - token-specific reason category |
 | P420 | 42 | i | ASI07 | documented exclusion - token-specific reason category |
@@ -1408,7 +1422,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P420 | 76 | i | L69-75 | documented exclusion - token-specific reason category |
 | P420 | 76 | i | L9 | documented exclusion - token-specific reason category |
 | P420 | 76 | ii | budget | named gap - first use before any expansion on this page |
-| P420 | 76 | iii | `SEV<h>` | documented exclusion - token-specific reason category |
+| P420 | 76 | iv | `SEV<h>` | documented exclusion - token-specific reason category |
 | P420 | 76 | v | <h> | documented exclusion - token-specific reason category |
 | P420 | 77 | i | L5-7 | documented exclusion - token-specific reason category |
 | P420 | 77 | iv | `SEV means incident severity level ... IC is the incident commander ... p99 is the 99th-percentile observed latency ...` | documented exclusion - token-specific reason category |
@@ -1440,7 +1454,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P420 | 88 | i | L8-22 | documented exclusion - token-specific reason category |
 | P420 | 88 | iv | `third-party HTTP (payments, email, LLM)` | documented exclusion - token-specific reason category |
 | P420 | 88 | v | 2xx | documented exclusion - token-specific reason category |
-| P420 | 89 | iii | `third-party HTTP (payments, email, LLM) \| external \| FAKED ...` | documented exclusion - token-specific reason category |
+| P420 | 89 | iv | `third-party HTTP (payments, email, LLM) \| external \| FAKED ...` | documented exclusion - token-specific reason category |
 | P420 | 92 | i | L1-215 | documented exclusion - token-specific reason category |
 | P420 | 93 | ii | rule | named gap - first use before any expansion on this page |
 | P420 | 94 | i | ASI03 | documented exclusion - token-specific reason category |
@@ -1505,8 +1519,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 6 | i | PR | named gap - first use before any expansion on this page |
 | P421 | 6 | ii | branch | named gap - first use before any expansion on this page |
 | P421 | 6 | ii | main | named gap - first use before any expansion on this page |
-| P421 | 6 | iii | `origin/main` | documented exclusion - token-specific reason category |
 | P421 | 6 | iv | `e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
+| P421 | 6 | iv | `origin/main` | documented exclusion - token-specific reason category |
 | P421 | 8 | ii | git | named gap - first use before any expansion on this page |
 | P421 | 8 | iv | `git ls-remote origin refs/heads/main` | documented exclusion - token-specific reason category |
 | P421 | 10 | ii | model | named gap - first use before any expansion on this page |
@@ -1524,7 +1538,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 20 | i | AEGIS-APR-117 | documented exclusion - token-specific reason category |
 | P421 | 20 | ii | batches | named gap - first use before any expansion on this page |
 | P421 | 21 | ii | withdrawal | named gap - first use before any expansion on this page |
-| P421 | 25 | iii | `refs/remotes/origin/main` | documented exclusion - token-specific reason category |
+| P421 | 25 | iv | `refs/remotes/origin/main` | documented exclusion - token-specific reason category |
 | P421 | 26 | iv | `git merge-base --is-ancestor e2a3e20b7c20ef8385b219b39c6405237163406f refs/remotes/origin/main` | documented exclusion - token-specific reason category |
 | P421 | 28 | ii | reader | named gap - first use before any expansion on this page |
 | P421 | 34 | iv | `no_recorded_acceptance` | documented exclusion - token-specific reason category |
@@ -1534,17 +1548,17 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 41 | ii | json | defined at first use - line 41 contains the expansion |
 | P421 | 41 | iii | check_index.py | documented exclusion - token-specific reason category |
 | P421 | 52 | iv | `git ls-tree -r --name-only e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
-| P421 | 54 | iii | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - token-specific reason category |
 | P421 | 54 | iii | acceptance-index.json | documented exclusion - token-specific reason category |
 | P421 | 54 | iv | `reader_pages` | documented exclusion - token-specific reason category |
+| P421 | 54 | iv | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - token-specific reason category |
 | P421 | 55 | iv | `events` | documented exclusion - token-specific reason category |
 | P421 | 56 | iv | `ceil(590 / 4) = 148` | documented exclusion - token-specific reason category |
 | P421 | 58 | ii | count | defined at first use - line 58 contains the expansion |
 | P421 | 58 | ii | reviewer | named gap - first use before any expansion on this page |
-| P421 | 58 | iii | `.claude/agents/ai-security-red-team-reviewer.md` | documented exclusion - token-specific reason category |
 | P421 | 58 | iii | ai-security-red-team-reviewer.md | documented exclusion - token-specific reason category |
-| P421 | 59 | iii | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
+| P421 | 58 | iv | `.claude/agents/ai-security-red-team-reviewer.md` | documented exclusion - token-specific reason category |
 | P421 | 59 | iii | flag-rollout-sheet.md | documented exclusion - token-specific reason category |
+| P421 | 59 | iv | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
 | P421 | 60 | ii | next | named gap - first use before any expansion on this page |
 | P421 | 60 | ii | range | named gap - first use before any expansion on this page |
 | P421 | 60 | v | 16-23 | documented exclusion - token-specific reason category |
@@ -1554,35 +1568,35 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 63 | i | JSON | named gap - first use before any expansion on this page |
 | P421 | 64 | ii | reconciliation | defined at first use - line 64 contains the expansion |
 | P421 | 66 | iii | _laneA_paths.json | documented exclusion - token-specific reason category |
-| P421 | 66 | iii | `wt-laneA-b1/_laneA_paths.json` | documented exclusion - token-specific reason category |
+| P421 | 66 | iv | `wt-laneA-b1/_laneA_paths.json` | documented exclusion - token-specific reason category |
 | P421 | 67 | ii | records | defined at first use - line 67 contains the expansion |
-| P421 | 68 | iii | `ceil(590/4)=148` | documented exclusion - token-specific reason category |
+| P421 | 68 | iv | `ceil(590/4)=148` | documented exclusion - token-specific reason category |
 | P421 | 69 | v | 0-147 | documented exclusion - token-specific reason category |
 | P421 | 71 | ii | lanes | named gap - first use before any expansion on this page |
-| P421 | 72 | iii | `laneB-pages.json` | documented exclusion - token-specific reason category |
-| P421 | 76 | iii | `refs/heads` | documented exclusion - token-specific reason category |
-| P421 | 76 | iii | `refs/remotes` | documented exclusion - token-specific reason category |
+| P421 | 72 | iv | `laneB-pages.json` | documented exclusion - token-specific reason category |
 | P421 | 76 | iv | `git ls-tree -r` | documented exclusion - token-specific reason category |
+| P421 | 76 | iv | `refs/heads` | documented exclusion - token-specific reason category |
+| P421 | 76 | iv | `refs/remotes` | documented exclusion - token-specific reason category |
 | P421 | 79 | ii | union | named gap - first use before any expansion on this page |
 | P421 | 79 | iv | `ceil(590/4) = 148` | documented exclusion - token-specific reason category |
 | P421 | 82 | iv | `cannot_decide` | documented exclusion - token-specific reason category |
-| P421 | 85 | iii | `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md` | documented exclusion - token-specific reason category |
 | P421 | 85 | iii | aws-baseline.md | documented exclusion - token-specific reason category |
+| P421 | 85 | iv | `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md` | documented exclusion - token-specific reason category |
 | P421 | 85 | iv | `undecided` | documented exclusion - token-specific reason category |
-| P421 | 86 | iii | `.../azure-baseline.md` | documented exclusion - token-specific reason category |
-| P421 | 86 | iii | `.../gcp-baseline.md` | documented exclusion - token-specific reason category |
-| P421 | 86 | iii | `.../supabase-baseline.md` | documented exclusion - token-specific reason category |
 | P421 | 86 | iii | azure-baseline.md | documented exclusion - token-specific reason category |
 | P421 | 86 | iii | gcp-baseline.md | documented exclusion - token-specific reason category |
 | P421 | 86 | iii | supabase-baseline.md | documented exclusion - token-specific reason category |
+| P421 | 86 | iv | `.../azure-baseline.md` | documented exclusion - token-specific reason category |
+| P421 | 86 | iv | `.../gcp-baseline.md` | documented exclusion - token-specific reason category |
+| P421 | 86 | iv | `.../supabase-baseline.md` | documented exclusion - token-specific reason category |
 | P421 | 87 | i | SKILL | named gap - first use before any expansion on this page |
 | P421 | 87 | iii | SKILL.md | documented exclusion - token-specific reason category |
-| P421 | 87 | iii | `.../vercel-baseline.md` | documented exclusion - token-specific reason category |
-| P421 | 87 | iii | `.claude/skills/database-backup-verifier/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 87 | iii | vercel-baseline.md | documented exclusion - token-specific reason category |
+| P421 | 87 | iv | `.../vercel-baseline.md` | documented exclusion - token-specific reason category |
+| P421 | 87 | iv | `.claude/skills/database-backup-verifier/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 94 | i | ADR | named gap - first use before any expansion on this page |
 | P421 | 94 | i | B3 | documented exclusion - token-specific reason category |
-| P421 | 94 | iii | `.claude/skills/` | documented exclusion - token-specific reason category |
+| P421 | 94 | iv | `.claude/skills/` | documented exclusion - token-specific reason category |
 | P421 | 94 | iv | `adr-writer` | documented exclusion - token-specific reason category |
 | P421 | 94 | iv | `aegis-setup` | documented exclusion - token-specific reason category |
 | P421 | 94 | iv | `agent-authorization-matrix` | documented exclusion - token-specific reason category |
@@ -1613,7 +1627,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 125 | i | K-180 | documented exclusion - token-specific reason category |
 | P421 | 126 | i | ID | defined at first use - line 126 contains the expansion |
 | P421 | 126 | i | KEEPER-ID-ALLOCATION | documented exclusion - token-specific reason category |
-| P421 | 126 | iii | `KEEPER-ID-ALLOCATION.md` | documented exclusion - token-specific reason category |
+| P421 | 126 | iv | `KEEPER-ID-ALLOCATION.md` | documented exclusion - token-specific reason category |
 | P421 | 128 | iv | `git grep -l KEEPER-ID-ALLOCATION e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
 | P421 | 131 | iv | `3b0d6cd54222442e2e0b1598829bd078c03a22d4` | documented exclusion - token-specific reason category |
 | P421 | 132 | ii | scope | defined at first use - line 132 contains the expansion |
@@ -1624,20 +1638,20 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 139 | ii | partial | named gap - first use before any expansion on this page |
 | P421 | 144 | iii | aegis-documentation-readability-backlog.md | documented exclusion - token-specific reason category |
 | P421 | 145 | ii | disposition | named gap - first use before any expansion on this page |
-| P421 | 149 | iii | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - token-specific reason category |
 | P421 | 149 | iii | adr-template.md | documented exclusion - token-specific reason category |
-| P421 | 150 | iii | `.claude/skills/aegis-setup/SKILL.md` | documented exclusion - token-specific reason category |
-| P421 | 151 | iii | `.claude/skills/aegis-setup/references/state-contract.md` | documented exclusion - token-specific reason category |
+| P421 | 149 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - token-specific reason category |
+| P421 | 150 | iv | `.claude/skills/aegis-setup/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 151 | iii | state-contract.md | documented exclusion - token-specific reason category |
-| P421 | 152 | iii | `.claude/skills/agent-authorization-matrix/SKILL.md` | documented exclusion - token-specific reason category |
-| P421 | 153 | iii | `.claude/skills/agent-authorization-matrix/references/matrix-template.md` | documented exclusion - token-specific reason category |
+| P421 | 151 | iv | `.claude/skills/aegis-setup/references/state-contract.md` | documented exclusion - token-specific reason category |
+| P421 | 152 | iv | `.claude/skills/agent-authorization-matrix/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 153 | iii | matrix-template.md | documented exclusion - token-specific reason category |
-| P421 | 154 | iii | `.claude/skills/agent-containment-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
-| P421 | 155 | iii | `.claude/skills/agent-containment-reviewer/references/containment-patterns.md` | documented exclusion - token-specific reason category |
+| P421 | 153 | iv | `.claude/skills/agent-authorization-matrix/references/matrix-template.md` | documented exclusion - token-specific reason category |
+| P421 | 154 | iv | `.claude/skills/agent-containment-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 155 | iii | containment-patterns.md | documented exclusion - token-specific reason category |
-| P421 | 156 | iii | `.claude/skills/agent-failure-recovery/SKILL.md` | documented exclusion - token-specific reason category |
+| P421 | 155 | iv | `.claude/skills/agent-containment-reviewer/references/containment-patterns.md` | documented exclusion - token-specific reason category |
+| P421 | 156 | iv | `.claude/skills/agent-failure-recovery/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 158 | ii | counts | defined at first use - line 158 contains the expansion |
-| P421 | 158 | iii | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
+| P421 | 158 | iv | `git show e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
 | P421 | 162 | i | B2 | documented exclusion - token-specific reason category |
 | P421 | 163 | i | L88 | documented exclusion - token-specific reason category |
 | P421 | 167 | ii | cannot | named gap - first use before any expansion on this page |
@@ -1645,14 +1659,14 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 170 | ii | review | named gap - first use before any expansion on this page |
 | P421 | 173 | ii | official | named gap - first use before any expansion on this page |
 | P421 | 179 | i | L181-184 | documented exclusion - token-specific reason category |
-| P421 | 179 | iii | `tools/readability_acceptance/check_index.py` | documented exclusion - token-specific reason category |
+| P421 | 179 | iv | `tools/readability_acceptance/check_index.py` | documented exclusion - token-specific reason category |
 | P421 | 180 | ii | drift | named gap - first use before any expansion on this page |
 | P421 | 181 | ii | outcome | named gap - first use before any expansion on this page |
-| P421 | 183 | iii | `docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md` | documented exclusion - token-specific reason category |
 | P421 | 183 | iii | readability-lane-a-batch-5-2026-10-15.md | documented exclusion - token-specific reason category |
+| P421 | 183 | iv | `docs/evidence/documentation/readability-lane-a-batch-5-2026-10-15.md` | documented exclusion - token-specific reason category |
 | P421 | 183 | v | 5-2026 | documented exclusion - token-specific reason category |
 | P421 | 186 | ii | blob | named gap - first use before any expansion on this page |
-| P421 | 187 | iii | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
+| P421 | 187 | iv | `git rev-parse e2a3e20b7c20ef8385b219b39c6405237163406f:<page>` | documented exclusion - token-specific reason category |
 | P421 | 187 | v | × | documented exclusion - token-specific reason category |
 | P421 | 192 | iv | `b0337e23a06d47b759c9e7263ed6050026ae752e` | documented exclusion - token-specific reason category |
 | P421 | 193 | iv | `8b45f8a2b3de6f54abd5a2c5c673f1e38bf4080b` | documented exclusion - token-specific reason category |
@@ -1664,7 +1678,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 199 | iv | `27fd46658f83c90aa9bfffb3e1ce89622e5d5ad0` | documented exclusion - token-specific reason category |
 | P421 | 201 | ii | purpose | named gap - first use before any expansion on this page |
 | P421 | 206 | ii | marker | named gap - first use before any expansion on this page |
-| P421 | 206 | iii | `>` | documented exclusion - token-specific reason category |
+| P421 | 206 | iv | `>` | documented exclusion - token-specific reason category |
 | P421 | 207 | iv | `…` | documented exclusion - token-specific reason category |
 | P421 | 210 | i | L3 | documented exclusion - token-specific reason category |
 | P421 | 214 | i | L1 | documented exclusion - token-specific reason category |
@@ -1682,9 +1696,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 225 | ii | tenant | named gap - first use before any expansion on this page |
 | P421 | 226 | i | B4 | documented exclusion - token-specific reason category |
 | P421 | 229 | i | B5 | documented exclusion - token-specific reason category |
-| P421 | 229 | iii | `../SKILL.md` | documented exclusion - token-specific reason category |
+| P421 | 229 | iv | `../SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 230 | i | B6 | documented exclusion - token-specific reason category |
-| P421 | 230 | iii | `.claude/skills/adr-writer/SKILL.md` | documented exclusion - token-specific reason category |
+| P421 | 230 | iv | `.claude/skills/adr-writer/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 234 | i | L1-134 | documented exclusion - token-specific reason category |
 | P421 | 235 | i | MANUAL-ONLY | documented exclusion - token-specific reason category |
 | P421 | 237 | ii | user | named gap - first use before any expansion on this page |
@@ -1695,16 +1709,16 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 250 | iv | `selected` | documented exclusion - token-specific reason category |
 | P421 | 250 | iv | `verified` | documented exclusion - token-specific reason category |
 | P421 | 251 | i | L112-113 | documented exclusion - token-specific reason category |
-| P421 | 253 | iii | `references/state-contract.md` | documented exclusion - token-specific reason category |
+| P421 | 253 | iv | `references/state-contract.md` | documented exclusion - token-specific reason category |
 | P421 | 254 | ii | test | defined at first use - line 254 contains the expansion |
-| P421 | 254 | iii | `evals/evals.json` | documented exclusion - token-specific reason category |
-| P421 | 254 | iii | `scripts/selection.ps1` | documented exclusion - token-specific reason category |
-| P421 | 254 | iii | `scripts/test-selection.ps1` | documented exclusion - token-specific reason category |
 | P421 | 254 | iii | evals.json | documented exclusion - token-specific reason category |
 | P421 | 254 | iii | selection.ps1 | documented exclusion - token-specific reason category |
 | P421 | 254 | iii | test-selection.ps1 | documented exclusion - token-specific reason category |
-| P421 | 255 | iii | `evals/trigger-evals.json` | documented exclusion - token-specific reason category |
+| P421 | 254 | iv | `evals/evals.json` | documented exclusion - token-specific reason category |
+| P421 | 254 | iv | `scripts/selection.ps1` | documented exclusion - token-specific reason category |
+| P421 | 254 | iv | `scripts/test-selection.ps1` | documented exclusion - token-specific reason category |
 | P421 | 255 | iii | trigger-evals.json | documented exclusion - token-specific reason category |
+| P421 | 255 | iv | `evals/trigger-evals.json` | documented exclusion - token-specific reason category |
 | P421 | 259 | i | L1-37 | documented exclusion - token-specific reason category |
 | P421 | 260 | ii | closed | named gap - first use before any expansion on this page |
 | P421 | 260 | ii | rules | named gap - first use before any expansion on this page |
@@ -1713,7 +1727,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 269 | i | UTC | named gap - first use before any expansion on this page |
 | P421 | 269 | i | UTF-8 | documented exclusion - token-specific reason category |
 | P421 | 270 | i | UNC | named gap - first use before any expansion on this page |
-| P421 | 272 | iii | `C:/` | documented exclusion - token-specific reason category |
+| P421 | 272 | iv | `C:/` | documented exclusion - token-specific reason category |
 | P421 | 272 | iv | `C:\...` | documented exclusion - token-specific reason category |
 | P421 | 282 | i | L1-177 | documented exclusion - token-specific reason category |
 | P421 | 286 | ii | deploy | named gap - first use before any expansion on this page |
@@ -1721,12 +1735,12 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 290 | i | CI | named gap - first use before any expansion on this page |
 | P421 | 290 | i | CLI | named gap - first use before any expansion on this page |
 | P421 | 291 | ii | workflow | named gap - first use before any expansion on this page |
-| P421 | 293 | i | APPLIED | named gap - first use before any expansion on this page |
 | P421 | 293 | i | APPROVAL | named gap - first use before any expansion on this page |
-| P421 | 293 | i | AWAITING | named gap - first use before any expansion on this page |
+| P421 | 293 | v | APPLIED | named gap - first use before any expansion on this page |
+| P421 | 293 | v | AWAITING | named gap - first use before any expansion on this page |
 | P421 | 294 | i | STOP | named gap - first use before any expansion on this page |
-| P421 | 297 | iii | `references/matrix-template.md` | documented exclusion - token-specific reason category |
 | P421 | 297 | iv | `gh` | documented exclusion - token-specific reason category |
+| P421 | 297 | iv | `references/matrix-template.md` | documented exclusion - token-specific reason category |
 | P421 | 303 | i | L1-84 | documented exclusion - token-specific reason category |
 | P421 | 305 | i | TRIGGERS | named gap - first use before any expansion on this page |
 | P421 | 312 | ii | register | named gap - first use before any expansion on this page |
@@ -1736,7 +1750,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 314 | i | AEGIS-APR-002 | documented exclusion - token-specific reason category |
 | P421 | 315 | iv | `mergedBy` | documented exclusion - token-specific reason category |
 | P421 | 320 | iii | APPROVAL_REGISTER.md | documented exclusion - token-specific reason category |
-| P421 | 320 | iii | `../../../../docs/approvals/APPROVAL_REGISTER.md` | documented exclusion - token-specific reason category |
+| P421 | 320 | iv | `../../../../docs/approvals/APPROVAL_REGISTER.md` | documented exclusion - token-specific reason category |
 | P421 | 320 | v | APPROVAL_REGISTER | documented exclusion - token-specific reason category |
 | P421 | 321 | ii | audit | named gap - first use before any expansion on this page |
 | P421 | 321 | iv | `agent-governance-audit` | documented exclusion - token-specific reason category |
@@ -1752,7 +1766,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 336 | i | HIGH | defined at first use - line 336 contains the expansion |
 | P421 | 339 | iv | `incident-response-runbook` | documented exclusion - token-specific reason category |
 | P421 | 340 | i | L50-52 | documented exclusion - token-specific reason category |
-| P421 | 343 | iii | `references/containment-patterns.md` | documented exclusion - token-specific reason category |
+| P421 | 343 | iv | `references/containment-patterns.md` | documented exclusion - token-specific reason category |
 | P421 | 346 | ii | operator | named gap - first use before any expansion on this page |
 | P421 | 352 | i | L1-104 | documented exclusion - token-specific reason category |
 | P421 | 355 | ii | checkpoint | defined at first use - line 355 contains the expansion |
@@ -1766,7 +1780,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 373 | iii | 2.1 | documented exclusion - token-specific reason category |
 | P421 | 375 | i | L13 | documented exclusion - token-specific reason category |
 | P421 | 375 | i | L13-14 | documented exclusion - token-specific reason category |
-| P421 | 375 | iii | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P421 | 375 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 376 | i | L14 | documented exclusion - token-specific reason category |
 | P421 | 380 | ii | gate | named gap - first use before any expansion on this page |
 | P421 | 396 | i | L1-122 | documented exclusion - token-specific reason category |
@@ -1775,15 +1789,15 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 399 | ii | known | defined at first use - line 399 contains the expansion |
 | P421 | 399 | v | → | documented exclusion - token-specific reason category |
 | P421 | 403 | iv | `-u` | documented exclusion - token-specific reason category |
-| P421 | 410 | iii | `references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
 | P421 | 410 | iii | recovery-playbooks.md | documented exclusion - token-specific reason category |
-| P421 | 437 | iii | `git diff --numstat e2a3e20b..<this repair's commit>` | documented exclusion - token-specific reason category |
+| P421 | 410 | iv | `references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
+| P421 | 437 | iv | `git diff --numstat e2a3e20b..<this repair's commit>` | documented exclusion - token-specific reason category |
 | P421 | 437 | v | <this repair's commit> | documented exclusion - token-specific reason category |
 | P421 | 438 | ii | head | named gap - first use before any expansion on this page |
 | P421 | 438 | iv | `27ee6291` | documented exclusion - token-specific reason category |
 | P421 | 438 | iv | `385 0` | documented exclusion - token-specific reason category |
-| P421 | 441 | iii | `d3eba65b..27ee6291` | documented exclusion - token-specific reason category |
-| P421 | 442 | iii | `27ee6291..<this repair's commit>` | documented exclusion - token-specific reason category |
+| P421 | 441 | iv | `d3eba65b..27ee6291` | documented exclusion - token-specific reason category |
+| P421 | 442 | iv | `27ee6291..<this repair's commit>` | documented exclusion - token-specific reason category |
 | P421 | 444 | iv | `-` | documented exclusion - token-specific reason category |
 | P421 | 447 | i | D84 | documented exclusion - token-specific reason category |
 | P421 | 447 | iv | `- **This lane publishes no readability count of its own** (the D84 official-count switch). The` | documented exclusion - token-specific reason category |
@@ -1791,9 +1805,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 450 | iv | `- **Next batch selection rule:** the next 8 paths…` | documented exclusion - token-specific reason category |
 | P421 | 450 | iv | `-- **Next batch…` | documented exclusion - token-specific reason category |
 | P421 | 451 | iv | `--` | documented exclusion - token-specific reason category |
-| P421 | 459 | iii | `build_index.py --report` | documented exclusion - token-specific reason category |
 | P421 | 459 | iii | build_index.py | documented exclusion - token-specific reason category |
-| P421 | 463 | iii | `build_index.py --write` | documented exclusion - token-specific reason category |
+| P421 | 459 | iv | `build_index.py --report` | documented exclusion - token-specific reason category |
+| P421 | 463 | iv | `build_index.py --write` | documented exclusion - token-specific reason category |
 | P421 | 469 | ii | sha256 | defined at first use - line 469 contains the expansion |
 | P421 | 469 | iv | `## Footer` | documented exclusion - token-specific reason category |
 | P421 | 469 | iv | `sha256:` | documented exclusion - token-specific reason category |
@@ -1803,17 +1817,17 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 477 | iv | `db9796c63ac8ab53022d8c4c237e62484cb4786ce19a261b81bbe36d9f58e2f8` | documented exclusion - token-specific reason category |
 | P421 | 478 | v | 1-721 | documented exclusion - token-specific reason category |
 | P421 | 482 | i | UNREAD | named gap - first use before any expansion on this page |
-| P421 | 488 | iii | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
-| P421 | 489 | iii | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | documented exclusion - token-specific reason category |
-| P421 | 490 | iii | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
+| P421 | 488 | iv | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
+| P421 | 489 | iv | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 490 | iii | goal-integrity-controls.md | documented exclusion - token-specific reason category |
-| P421 | 491 | iii | `.claude/skills/agent-governance-audit/SKILL.md` | documented exclusion - token-specific reason category |
-| P421 | 492 | iii | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | documented exclusion - token-specific reason category |
+| P421 | 490 | iv | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
+| P421 | 491 | iv | `.claude/skills/agent-governance-audit/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 492 | iii | audit-control-checklist.md | documented exclusion - token-specific reason category |
-| P421 | 493 | iii | `.claude/skills/agent-harness-architect/SKILL.md` | documented exclusion - token-specific reason category |
-| P421 | 494 | iii | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
-| P421 | 495 | iii | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - token-specific reason category |
+| P421 | 492 | iv | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | documented exclusion - token-specific reason category |
+| P421 | 493 | iv | `.claude/skills/agent-harness-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P421 | 494 | iv | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 495 | iii | agent-identity-patterns.md | documented exclusion - token-specific reason category |
+| P421 | 495 | iv | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - token-specific reason category |
 | P421 | 496 | v | 25-32 | documented exclusion - token-specific reason category |
 | P421 | 498 | ii | frontier | named gap - first use before any expansion on this page |
 | P421 | 499 | v | 1-3 | documented exclusion - token-specific reason category |
@@ -1823,7 +1837,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 504 | v | 8-15 | documented exclusion - token-specific reason category |
 | P421 | 505 | iv | `de2bfe7237d6e853fa81925faa9f68a82881bba7` | documented exclusion - token-specific reason category |
 | P421 | 509 | iv | `ceil(595/4) = 149` | documented exclusion - token-specific reason category |
-| P421 | 512 | iii | `.claude/skills/file-upload-storage-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P421 | 512 | iv | `.claude/skills/file-upload-storage-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 524 | iv | `27fd4665…` | documented exclusion - token-specific reason category |
 | P421 | 524 | iv | `3d79aaf5…` | documented exclusion - token-specific reason category |
 | P421 | 524 | iv | `8b45f8a2…` | documented exclusion - token-specific reason category |
@@ -1833,42 +1847,42 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P421 | 524 | iv | `d3b2df8f…` | documented exclusion - token-specific reason category |
 | P421 | 524 | iv | `f8d3ad11…` | documented exclusion - token-specific reason category |
 | P421 | 526 | ii | ci | named gap - first use before any expansion on this page |
-| P421 | 526 | iii | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - token-specific reason category |
 | P421 | 526 | iii | check-markdown-links.py | documented exclusion - token-specific reason category |
 | P421 | 526 | iv | `files: 8   links checked: 13   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - token-specific reason category |
+| P421 | 526 | iv | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - token-specific reason category |
 | P421 | 527 | i | OK | defined at first use - line 527 contains the expansion |
-| P421 | 527 | iii | `python -P scripts/validate-skills.py` | documented exclusion - token-specific reason category |
 | P421 | 527 | iii | validate-skills.py | documented exclusion - token-specific reason category |
 | P421 | 527 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - token-specific reason category |
+| P421 | 527 | iv | `python -P scripts/validate-skills.py` | documented exclusion - token-specific reason category |
 | P421 | 528 | ii | passed | named gap - first use before any expansion on this page |
 | P421 | 528 | ii | tests | named gap - first use before any expansion on this page |
-| P421 | 528 | iii | `python scripts/tests/test_validator.py` | documented exclusion - token-specific reason category |
 | P421 | 528 | iii | test_validator.py | documented exclusion - token-specific reason category |
 | P421 | 528 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - token-specific reason category |
-| P421 | 530 | iii | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - token-specific reason category |
-| P421 | 531 | iii | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
-| P421 | 535 | iii | `python -B tools/readability_acceptance/build_index.py --report --ref <this batch's committed head>` | documented exclusion - token-specific reason category |
-| P421 | 535 | iii | `refs/pull/*/head` | documented exclusion - token-specific reason category |
+| P421 | 528 | iv | `python scripts/tests/test_validator.py` | documented exclusion - token-specific reason category |
+| P421 | 530 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - token-specific reason category |
+| P421 | 531 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
+| P421 | 535 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref <this batch's committed head>` | documented exclusion - token-specific reason category |
+| P421 | 535 | iv | `refs/pull/*/head` | documented exclusion - token-specific reason category |
 | P421 | 535 | v | <this batch's committed head> | documented exclusion - token-specific reason category |
 | P421 | 537 | v | 1-13 | documented exclusion - token-specific reason category |
 | P421 | 537 | v | 14-20 | documented exclusion - token-specific reason category |
-| P421 | 543 | iii | `python -B tools/readability_acceptance/build_index.py --report --ref 27ee6291` | documented exclusion - token-specific reason category |
 | P421 | 543 | iv | `--ref e2a3e20b` | documented exclusion - token-specific reason category |
+| P421 | 543 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref 27ee6291` | documented exclusion - token-specific reason category |
 | P421 | 543 | iv | `table_rows 101, events 101, full_page_acceptances 81, lost_commit_events 10, reader_pages_with_rows 68` | documented exclusion - token-specific reason category |
 | P421 | 544 | i | KL | named gap - first use before any expansion on this page |
 | P421 | 544 | i | T-001 | documented exclusion - token-specific reason category |
 | P421 | 544 | i | T-010 | documented exclusion - token-specific reason category |
 | P421 | 544 | ii | id | named gap - first use before any expansion on this page |
 | P421 | 544 | iii | T-001..T | documented exclusion - token-specific reason category |
-| P421 | 544 | iii | `T-001..T-010` | documented exclusion - token-specific reason category |
+| P421 | 544 | iv | `T-001..T-010` | documented exclusion - token-specific reason category |
 | P421 | 544 | iv | `[KL]-digits` | documented exclusion - token-specific reason category |
 | P421 | 545 | iv | `links checked: 13   broken: 0   dead: 0` | documented exclusion - token-specific reason category |
 | P421 | 547 | iv | `git diff --check e2a3e20b` | documented exclusion - token-specific reason category |
-| P421 | 548 | iii | `inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P421 | 548 | iv | `inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P421 | 549 | iii | 27ee6291..this | documented exclusion - token-specific reason category |
-| P421 | 549 | iii | `27ee6291..this repair's commit` | documented exclusion - token-specific reason category |
 | P421 | 549 | iv | `184 20` | documented exclusion - token-specific reason category |
 | P421 | 549 | iv | `20 3` | documented exclusion - token-specific reason category |
+| P421 | 549 | iv | `27ee6291..this repair's commit` | documented exclusion - token-specific reason category |
 | P421 | 549 | iv | `549 0` | documented exclusion - token-specific reason category |
 | P421 | 549 | iv | `git diff --numstat` | documented exclusion - token-specific reason category |
 | P422 | 1 | ii | batch | named gap - first use before any expansion on this page |
@@ -1886,11 +1900,11 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 11 | i | CHECK | named gap - first use before any expansion on this page |
 | P422 | 11 | ii | passed | named gap - first use before any expansion on this page |
 | P422 | 11 | iv | `CHECK skills: exit 0` | documented exclusion - token-specific reason category |
-| P422 | 13 | iii | `../roadmaps/` | documented exclusion - token-specific reason category |
+| P422 | 13 | iv | `../roadmaps/` | documented exclusion - token-specific reason category |
 | P422 | 14 | i | SKILL | named gap - first use before any expansion on this page |
 | P422 | 14 | iii | SKILL.md | documented exclusion - token-specific reason category |
-| P422 | 14 | iii | `../SKILL.md` | documented exclusion - token-specific reason category |
-| P422 | 15 | iii | `../../roadmaps/` | documented exclusion - token-specific reason category |
+| P422 | 14 | iv | `../SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 15 | iv | `../../roadmaps/` | documented exclusion - token-specific reason category |
 | P422 | 17 | ii | count | named gap - first use before any expansion on this page |
 | P422 | 17 | ii | disposition | named gap - first use before any expansion on this page |
 | P422 | 18 | i | B5 | documented exclusion - token-specific reason category |
@@ -1920,10 +1934,10 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 36 | ii | git | named gap - first use before any expansion on this page |
 | P422 | 37 | i | F2 | documented exclusion - token-specific reason category |
 | P422 | 37 | ii | branch | named gap - first use before any expansion on this page |
-| P422 | 37 | iii | `origin/main` | documented exclusion - token-specific reason category |
 | P422 | 37 | iv | `f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - token-specific reason category |
 | P422 | 37 | iv | `f490c16f` | documented exclusion - token-specific reason category |
 | P422 | 37 | iv | `main` | documented exclusion - token-specific reason category |
+| P422 | 37 | iv | `origin/main` | documented exclusion - token-specific reason category |
 | P422 | 37 | v | <base> | documented exclusion - token-specific reason category |
 | P422 | 39 | ii | diff | named gap - first use before any expansion on this page |
 | P422 | 41 | ii | status | named gap - first use before any expansion on this page |
@@ -1932,17 +1946,17 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 43 | iv | `git diff --name-status 648ac767…HEAD` | documented exclusion - token-specific reason category |
 | P422 | 43 | iv | `git diff --numstat 648ac767…HEAD` | documented exclusion - token-specific reason category |
 | P422 | 44 | ii | docs | named gap - first use before any expansion on this page |
-| P422 | 44 | iii | `docs/` | documented exclusion - token-specific reason category |
+| P422 | 44 | iv | `docs/` | documented exclusion - token-specific reason category |
 | P422 | 46 | ii | handoff | named gap - first use before any expansion on this page |
 | P422 | 46 | ii | owner | named gap - first use before any expansion on this page |
 | P422 | 46 | ii | rule | named gap - first use before any expansion on this page |
 | P422 | 47 | iv | `648ac767…` | documented exclusion - token-specific reason category |
-| P422 | 48 | iii | `f490c16f..f848b1a9` | documented exclusion - token-specific reason category |
 | P422 | 48 | iv | `451 0` | documented exclusion - token-specific reason category |
 | P422 | 48 | iv | `858 0` | documented exclusion - token-specific reason category |
+| P422 | 48 | iv | `f490c16f..f848b1a9` | documented exclusion - token-specific reason category |
 | P422 | 48 | iv | `f7ae12a3` | documented exclusion - token-specific reason category |
-| P422 | 54 | iii | `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` | documented exclusion - token-specific reason category |
 | P422 | 54 | iii | readability-lane-a-batch-4-plan-2026-10-16.md | documented exclusion - token-specific reason category |
+| P422 | 54 | iv | `docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` | documented exclusion - token-specific reason category |
 | P422 | 55 | ii | blob | named gap - first use before any expansion on this page |
 | P422 | 55 | iv | `6242584888` | documented exclusion - token-specific reason category |
 | P422 | 55 | iv | `e632b3a1…` | documented exclusion - token-specific reason category |
@@ -1952,14 +1966,14 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 58 | iv | `f848b1a9` | documented exclusion - token-specific reason category |
 | P422 | 61 | ii | drift | named gap - first use before any expansion on this page |
 | P422 | 61 | ii | reader | named gap - first use before any expansion on this page |
-| P422 | 68 | iii | `git diff --numstat <base> refs/remotes/origin/main -- <page>` | documented exclusion - token-specific reason category |
+| P422 | 68 | iv | `git diff --numstat <base> refs/remotes/origin/main -- <page>` | documented exclusion - token-specific reason category |
 | P422 | 68 | v | <page> | documented exclusion - token-specific reason category |
 | P422 | 71 | ii | model | named gap - first use before any expansion on this page |
 | P422 | 73 | i | AI | named gap - first use before any expansion on this page |
 | P422 | 74 | i | V4 | documented exclusion - token-specific reason category |
 | P422 | 77 | ii | reviewer | named gap - first use before any expansion on this page |
-| P422 | 77 | iii | `F reviewer <reviewer@example.invalid>` | documented exclusion - token-specific reason category |
 | P422 | 77 | iii | example.invalid | documented exclusion - token-specific reason category |
+| P422 | 77 | iv | `F reviewer <reviewer@example.invalid>` | documented exclusion - token-specific reason category |
 | P422 | 77 | v | <reviewer@example.invalid> | documented exclusion - token-specific reason category |
 | P422 | 83 | iii | aegis-documentation-readability-backlog.md | documented exclusion - token-specific reason category |
 | P422 | 85 | i | NOTHING | named gap - first use before any expansion on this page |
@@ -1988,23 +2002,23 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 109 | ii | instrument | named gap - first use before any expansion on this page |
 | P422 | 109 | iv | `no_recorded_acceptance` | documented exclusion - token-specific reason category |
 | P422 | 109 | iv | `provably_pending` | documented exclusion - token-specific reason category |
-| P422 | 113 | iii | `tools/readability_acceptance/check_index.py` | documented exclusion - token-specific reason category |
 | P422 | 113 | iii | check_index.py | documented exclusion - token-specific reason category |
+| P422 | 113 | iv | `tools/readability_acceptance/check_index.py` | documented exclusion - token-specific reason category |
 | P422 | 114 | ii | json | named gap - first use before any expansion on this page |
-| P422 | 114 | iii | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - token-specific reason category |
 | P422 | 114 | iii | acceptance-index.json | documented exclusion - token-specific reason category |
+| P422 | 114 | iv | `tools/readability_acceptance/acceptance-index.json` | documented exclusion - token-specific reason category |
 | P422 | 130 | i | JSON | named gap - first use before any expansion on this page |
-| P422 | 131 | iii | `git ls-tree -r --name-only <base>` | documented exclusion - token-specific reason category |
-| P422 | 132 | iii | `scripts/` | documented exclusion - token-specific reason category |
+| P422 | 131 | iv | `git ls-tree -r --name-only <base>` | documented exclusion - token-specific reason category |
+| P422 | 132 | iv | `scripts/` | documented exclusion - token-specific reason category |
 | P422 | 133 | iv | `reader_pages` | documented exclusion - token-specific reason category |
 | P422 | 135 | iv | `ceil(593 / 4) = 149` | documented exclusion - token-specific reason category |
 | P422 | 137 | v | 0–148 | documented exclusion - token-specific reason category |
-| P422 | 140 | iii | `.claude/agents/ai-security-red-team-reviewer.md` | documented exclusion - token-specific reason category |
 | P422 | 140 | iii | ai-security-red-team-reviewer.md | documented exclusion - token-specific reason category |
-| P422 | 141 | iii | `.claude/skills/file-upload-storage-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 140 | iv | `.claude/agents/ai-security-red-team-reviewer.md` | documented exclusion - token-specific reason category |
+| P422 | 141 | iv | `.claude/skills/file-upload-storage-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P422 | 143 | iv | `e2a3e20b7c20ef8385b219b39c6405237163406f` | documented exclusion - token-specific reason category |
-| P422 | 144 | iii | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
 | P422 | 144 | iii | flag-rollout-sheet.md | documented exclusion - token-specific reason category |
+| P422 | 144 | iv | `.claude/skills/feature-flag-rollout-strategist/references/flag-rollout-sheet.md` | documented exclusion - token-specific reason category |
 | P422 | 147 | ii | next | named gap - first use before any expansion on this page |
 | P422 | 147 | ii | range | named gap - first use before any expansion on this page |
 | P422 | 147 | v | 24–31 | documented exclusion - token-specific reason category |
@@ -2016,45 +2030,45 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 153 | iv | `cannot_decide` | documented exclusion - token-specific reason category |
 | P422 | 154 | i | D73 | documented exclusion - token-specific reason category |
 | P422 | 155 | ii | counts | named gap - first use before any expansion on this page |
-| P422 | 157 | iii | `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md` | documented exclusion - token-specific reason category |
 | P422 | 157 | iii | aws-baseline.md | documented exclusion - token-specific reason category |
-| P422 | 158 | iii | `.../azure-baseline.md` | documented exclusion - token-specific reason category |
-| P422 | 158 | iii | `.../gcp-baseline.md` | documented exclusion - token-specific reason category |
-| P422 | 158 | iii | `.../supabase-baseline.md` | documented exclusion - token-specific reason category |
+| P422 | 157 | iv | `.claude/skills/cloud-security-baseline-reviewer/references/aws-baseline.md` | documented exclusion - token-specific reason category |
 | P422 | 158 | iii | azure-baseline.md | documented exclusion - token-specific reason category |
 | P422 | 158 | iii | gcp-baseline.md | documented exclusion - token-specific reason category |
 | P422 | 158 | iii | supabase-baseline.md | documented exclusion - token-specific reason category |
-| P422 | 159 | iii | `.../vercel-baseline.md` | documented exclusion - token-specific reason category |
-| P422 | 159 | iii | `.claude/skills/database-backup-verifier/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 158 | iv | `.../azure-baseline.md` | documented exclusion - token-specific reason category |
+| P422 | 158 | iv | `.../gcp-baseline.md` | documented exclusion - token-specific reason category |
+| P422 | 158 | iv | `.../supabase-baseline.md` | documented exclusion - token-specific reason category |
 | P422 | 159 | iii | vercel-baseline.md | documented exclusion - token-specific reason category |
+| P422 | 159 | iv | `.../vercel-baseline.md` | documented exclusion - token-specific reason category |
+| P422 | 159 | iv | `.claude/skills/database-backup-verifier/SKILL.md` | documented exclusion - token-specific reason category |
 | P422 | 166 | i | B4 | documented exclusion - token-specific reason category |
-| P422 | 166 | iii | `.claude/skills/` | documented exclusion - token-specific reason category |
+| P422 | 166 | iv | `.claude/skills/` | documented exclusion - token-specific reason category |
 | P422 | 166 | iv | `agent-failure-recovery` | documented exclusion - token-specific reason category |
 | P422 | 166 | iv | `agent-goal-hijack-defender` | documented exclusion - token-specific reason category |
 | P422 | 166 | iv | `agent-governance-audit` | documented exclusion - token-specific reason category |
 | P422 | 166 | iv | `agent-harness-architect` | documented exclusion - token-specific reason category |
 | P422 | 166 | iv | `agent-identity-privilege-reviewer` | documented exclusion - token-specific reason category |
 | P422 | 166 | iv | `f490c16f…` | documented exclusion - token-specific reason category |
-| P422 | 177 | iii | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - token-specific reason category |
+| P422 | 177 | iv | `git log -1 --format="%h %an %s" -- <page>` | documented exclusion - token-specific reason category |
 | P422 | 177 | v | % | documented exclusion - token-specific reason category |
-| P422 | 181 | iii | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
 | P422 | 181 | iii | recovery-playbooks.md | documented exclusion - token-specific reason category |
+| P422 | 181 | iv | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
 | P422 | 181 | iv | `1c2f026c` | documented exclusion - token-specific reason category |
-| P422 | 182 | iii | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 182 | iv | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | documented exclusion - token-specific reason category |
 | P422 | 182 | iv | `3d01e1c5` | documented exclusion - token-specific reason category |
-| P422 | 183 | iii | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
 | P422 | 183 | iii | goal-integrity-controls.md | documented exclusion - token-specific reason category |
-| P422 | 184 | iii | `.claude/skills/agent-governance-audit/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 183 | iv | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
+| P422 | 184 | iv | `.claude/skills/agent-governance-audit/SKILL.md` | documented exclusion - token-specific reason category |
 | P422 | 184 | iv | `ed5f8ae6` | documented exclusion - token-specific reason category |
-| P422 | 185 | iii | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | documented exclusion - token-specific reason category |
 | P422 | 185 | iii | audit-control-checklist.md | documented exclusion - token-specific reason category |
-| P422 | 186 | iii | `.claude/skills/agent-harness-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 185 | iv | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | documented exclusion - token-specific reason category |
+| P422 | 186 | iv | `.claude/skills/agent-harness-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P422 | 186 | iv | `8459ac73` | documented exclusion - token-specific reason category |
-| P422 | 187 | iii | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
-| P422 | 188 | iii | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - token-specific reason category |
+| P422 | 187 | iv | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P422 | 188 | iii | agent-identity-patterns.md | documented exclusion - token-specific reason category |
+| P422 | 188 | iv | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - token-specific reason category |
 | P422 | 190 | iv | `git log --all --author="F reviewer"` | documented exclusion - token-specific reason category |
-| P422 | 191 | iii | `refs/pull/*/head` | documented exclusion - token-specific reason category |
+| P422 | 191 | iv | `refs/pull/*/head` | documented exclusion - token-specific reason category |
 | P422 | 194 | ii | scope | defined at first use - line 194 contains the expansion |
 | P422 | 211 | i | B1 | documented exclusion - token-specific reason category |
 | P422 | 211 | i | B2 | documented exclusion - token-specific reason category |
@@ -2072,14 +2086,14 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 229 | iv | `API` | documented exclusion - token-specific reason category |
 | P422 | 230 | i | L167 | documented exclusion - token-specific reason category |
 | P422 | 230 | iii | 1.5 | documented exclusion - token-specific reason category |
-| P422 | 230 | iii | `Phase 1.5` | documented exclusion - token-specific reason category |
+| P422 | 230 | iv | `Phase 1.5` | documented exclusion - token-specific reason category |
 | P422 | 233 | i | L157 | documented exclusion - token-specific reason category |
 | P422 | 234 | i | L3 | documented exclusion - token-specific reason category |
-| P422 | 238 | iii | `git show f490c16f9ed23f3d489e42f7696323bffcce6fd3:<page>` | documented exclusion - token-specific reason category |
+| P422 | 238 | iv | `git show f490c16f9ed23f3d489e42f7696323bffcce6fd3:<page>` | documented exclusion - token-specific reason category |
 | P422 | 242 | ii | partial | named gap - first use before any expansion on this page |
 | P422 | 248 | ii | gate | named gap - first use before any expansion on this page |
 | P422 | 252 | ii | hash | named gap - first use before any expansion on this page |
-| P422 | 254 | iii | `git rev-parse f490c16f9ed23f3d489e42f7696323bffcce6fd3:<page>` | documented exclusion - token-specific reason category |
+| P422 | 254 | iv | `git rev-parse f490c16f9ed23f3d489e42f7696323bffcce6fd3:<page>` | documented exclusion - token-specific reason category |
 | P422 | 254 | v | × | documented exclusion - token-specific reason category |
 | P422 | 259 | iv | `dc376db435d565d55074a62b2d0deba953425e51` | documented exclusion - token-specific reason category |
 | P422 | 260 | iv | `491a766a0bd4aa949bb0e014274a0f1c3b14739b` | documented exclusion - token-specific reason category |
@@ -2093,7 +2107,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 271 | i | L1 | documented exclusion - token-specific reason category |
 | P422 | 272 | ii | tests | named gap - first use before any expansion on this page |
 | P422 | 277 | i | L5 | documented exclusion - token-specific reason category |
-| P422 | 280 | iii | `.claude/skills` | documented exclusion - token-specific reason category |
+| P422 | 280 | iv | `.claude/skills` | documented exclusion - token-specific reason category |
 | P422 | 281 | ii | tokens | defined at first use - line 281 contains the expansion |
 | P422 | 281 | iv | `CORRECT` | documented exclusion - token-specific reason category |
 | P422 | 282 | i | L47 | documented exclusion - token-specific reason category |
@@ -2110,7 +2124,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 289 | iv | `--continue` | documented exclusion - token-specific reason category |
 | P422 | 289 | iv | `branch -vv` | documented exclusion - token-specific reason category |
 | P422 | 289 | iv | `restore --staged` | documented exclusion - token-specific reason category |
-| P422 | 291 | iii | `grep -r '<<<<<<<' --include=*` | documented exclusion - token-specific reason category |
+| P422 | 291 | iv | `grep -r '<<<<<<<' --include=*` | documented exclusion - token-specific reason category |
 | P422 | 292 | i | GNU | named gap - first use before any expansion on this page |
 | P422 | 292 | iv | `*` | documented exclusion - token-specific reason category |
 | P422 | 292 | iv | `--include=*` | documented exclusion - token-specific reason category |
@@ -2128,11 +2142,11 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 319 | i | L11 | documented exclusion - token-specific reason category |
 | P422 | 319 | i | L151 | documented exclusion - token-specific reason category |
 | P422 | 320 | i | L176 | documented exclusion - token-specific reason category |
-| P422 | 323 | iii | `references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
-| P422 | 324 | iii | `evals/evals.json` | documented exclusion - token-specific reason category |
-| P422 | 324 | iii | `evals/trigger-evals.json` | documented exclusion - token-specific reason category |
+| P422 | 323 | iv | `references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
 | P422 | 324 | iii | evals.json | documented exclusion - token-specific reason category |
 | P422 | 324 | iii | trigger-evals.json | documented exclusion - token-specific reason category |
+| P422 | 324 | iv | `evals/evals.json` | documented exclusion - token-specific reason category |
+| P422 | 324 | iv | `evals/trigger-evals.json` | documented exclusion - token-specific reason category |
 | P422 | 325 | iv | `memory-context-poisoning-reviewer` | documented exclusion - token-specific reason category |
 | P422 | 325 | iv | `prompt-injection-defender` | documented exclusion - token-specific reason category |
 | P422 | 326 | iv | `agent-containment-reviewer` | documented exclusion - token-specific reason category |
@@ -2178,10 +2192,10 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 377 | iv | `Phase 7` | documented exclusion - token-specific reason category |
 | P422 | 378 | i | L40 | documented exclusion - token-specific reason category |
 | P422 | 378 | i | L76 | documented exclusion - token-specific reason category |
-| P422 | 378 | iii | `iso-42001-aims-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 378 | iv | `iso-42001-aims-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P422 | 381 | i | L137 | documented exclusion - token-specific reason category |
-| P422 | 387 | iii | `references/audit-control-checklist.md` | documented exclusion - token-specific reason category |
 | P422 | 387 | iv | `gh` | documented exclusion - token-specific reason category |
+| P422 | 387 | iv | `references/audit-control-checklist.md` | documented exclusion - token-specific reason category |
 | P422 | 388 | iv | `author` | documented exclusion - token-specific reason category |
 | P422 | 388 | iv | `mergedBy` | documented exclusion - token-specific reason category |
 | P422 | 388 | iv | `reviews` | documented exclusion - token-specific reason category |
@@ -2236,7 +2250,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 434 | i | L44 | documented exclusion - token-specific reason category |
 | P422 | 434 | ii | deploy | named gap - first use before any expansion on this page |
 | P422 | 435 | i | L245 | documented exclusion - token-specific reason category |
-| P422 | 436 | iii | `references/` | documented exclusion - token-specific reason category |
+| P422 | 436 | iv | `references/` | documented exclusion - token-specific reason category |
 | P422 | 439 | iv | `agentic-loop-designer` | documented exclusion - token-specific reason category |
 | P422 | 439 | iv | `command-gateway-architect` | documented exclusion - token-specific reason category |
 | P422 | 439 | iv | `model-context-designer` | documented exclusion - token-specific reason category |
@@ -2257,7 +2271,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 459 | i | L158 | documented exclusion - token-specific reason category |
 | P422 | 459 | i | REQUESTER | named gap - first use before any expansion on this page |
 | P422 | 461 | i | L177 | documented exclusion - token-specific reason category |
-| P422 | 463 | iii | `references/agent-identity-patterns.md` | documented exclusion - token-specific reason category |
+| P422 | 463 | iv | `references/agent-identity-patterns.md` | documented exclusion - token-specific reason category |
 | P422 | 464 | iv | `secrets-identity-hardener` | documented exclusion - token-specific reason category |
 | P422 | 465 | ii | tenant | defined at first use - line 465 contains the expansion |
 | P422 | 465 | iv | `tenant-isolation-reviewer` | documented exclusion - token-specific reason category |
@@ -2278,60 +2292,60 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 506 | i | L157-158 | documented exclusion - token-specific reason category |
 | P422 | 513 | i | D84 | documented exclusion - token-specific reason category |
 | P422 | 514 | ii | official | named gap - first use before any expansion on this page |
-| P422 | 517 | iii | `build_index.py --report` | documented exclusion - token-specific reason category |
 | P422 | 517 | iii | build_index.py | documented exclusion - token-specific reason category |
+| P422 | 517 | iv | `build_index.py --report` | documented exclusion - token-specific reason category |
 | P422 | 518 | iv | `de2bfe72…` | documented exclusion - token-specific reason category |
 | P422 | 519 | iv | `--write` | documented exclusion - token-specific reason category |
 | P422 | 522 | i | F4 | documented exclusion - token-specific reason category |
 | P422 | 522 | iv | `4290095415` | documented exclusion - token-specific reason category |
 | P422 | 525 | v | 33–40 | documented exclusion - token-specific reason category |
 | P422 | 532 | iv | `git rev-parse origin/main` | documented exclusion - token-specific reason category |
-| P422 | 533 | iii | `python -P -B tools/readability_acceptance/check_index.py --json --ref f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - token-specific reason category |
+| P422 | 533 | iv | `python -P -B tools/readability_acceptance/check_index.py --json --ref f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - token-specific reason category |
 | P422 | 534 | iv | `git ls-tree -r --name-only f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - token-specific reason category |
 | P422 | 535 | iv | `events` | documented exclusion - token-specific reason category |
 | P422 | 536 | iv | `git merge-base --is-ancestor f490c16f9ed23f3d489e42f7696323bffcce6fd3 refs/remotes/origin/main` | documented exclusion - token-specific reason category |
-| P422 | 539 | iii | `git diff --numstat f490c16f9ed23f3d489e42f7696323bffcce6fd3 refs/remotes/origin/main -- <page>` | documented exclusion - token-specific reason category |
+| P422 | 539 | iv | `git diff --numstat f490c16f9ed23f3d489e42f7696323bffcce6fd3 refs/remotes/origin/main -- <page>` | documented exclusion - token-specific reason category |
 | P422 | 540 | ii | ci | named gap - first use before any expansion on this page |
-| P422 | 540 | iii | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - token-specific reason category |
 | P422 | 540 | iii | check-markdown-links.py | documented exclusion - token-specific reason category |
 | P422 | 540 | iv | `files: 8   links checked: 10   anchors checked: 0   broken: 0   dead: 0   external-skipped: 0   other-skipped: 0` | documented exclusion - token-specific reason category |
+| P422 | 540 | iv | `python -B scripts/ci/check-markdown-links.py` | documented exclusion - token-specific reason category |
 | P422 | 541 | i | OK | defined at first use - line 541 contains the expansion |
-| P422 | 541 | iii | `python -P scripts/validate-skills.py` | documented exclusion - token-specific reason category |
 | P422 | 541 | iii | validate-skills.py | documented exclusion - token-specific reason category |
 | P422 | 541 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - token-specific reason category |
+| P422 | 541 | iv | `python -P scripts/validate-skills.py` | documented exclusion - token-specific reason category |
 | P422 | 542 | ii | test | named gap - first use before any expansion on this page |
-| P422 | 542 | iii | `python scripts/tests/test_validator.py` | documented exclusion - token-specific reason category |
 | P422 | 542 | iii | test_validator.py | documented exclusion - token-specific reason category |
 | P422 | 542 | iv | `OK: 181 gate self-test assertion(s) passed.` | documented exclusion - token-specific reason category |
+| P422 | 542 | iv | `python scripts/tests/test_validator.py` | documented exclusion - token-specific reason category |
 | P422 | 543 | iv | `agent` | documented exclusion - token-specific reason category |
 | P422 | 543 | iv | `agents-svc` | documented exclusion - token-specific reason category |
 | P422 | 543 | iv | `chain` | documented exclusion - token-specific reason category |
 | P422 | 543 | iv | `schema-migration` | documented exclusion - token-specific reason category |
-| P422 | 545 | iii | `git log --all --author="F reviewer" --oneline -- <page>` | documented exclusion - token-specific reason category |
-| P422 | 546 | iii | `git diff --check f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD` | documented exclusion - token-specific reason category |
+| P422 | 545 | iv | `git log --all --author="F reviewer" --oneline -- <page>` | documented exclusion - token-specific reason category |
 | P422 | 546 | iii | f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD | documented exclusion - token-specific reason category |
+| P422 | 546 | iv | `git diff --check f490c16f9ed23f3d489e42f7696323bffcce6fd3..HEAD` | documented exclusion - token-specific reason category |
 | P422 | 547 | iv | `mergedAt` | documented exclusion - token-specific reason category |
-| P422 | 548 | iii | `git grep -l -I -F -e 'Phase 1.5' f490c16f... -- '*.md'` | documented exclusion - token-specific reason category |
-| P422 | 549 | iii | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | documented exclusion - token-specific reason category |
+| P422 | 548 | iv | `git grep -l -I -F -e 'Phase 1.5' f490c16f... -- '*.md'` | documented exclusion - token-specific reason category |
 | P422 | 549 | iii | check_pr_body_skills.py | documented exclusion - token-specific reason category |
+| P422 | 549 | iv | `python -P scripts/ci/check_pr_body_skills.py --body-file <the posted body>` | documented exclusion - token-specific reason category |
 | P422 | 549 | v | <the posted body> | documented exclusion - token-specific reason category |
-| P422 | 550 | iii | `python -B scripts/check_dco.py --range origin/main..HEAD` | documented exclusion - token-specific reason category |
 | P422 | 550 | iii | check_dco.py | documented exclusion - token-specific reason category |
 | P422 | 550 | iii | main..HEAD | documented exclusion - token-specific reason category |
-| P422 | 551 | iii | `python -P scripts/ci/check-markdown-links.py` | documented exclusion - token-specific reason category |
+| P422 | 550 | iv | `python -B scripts/check_dco.py --range origin/main..HEAD` | documented exclusion - token-specific reason category |
 | P422 | 551 | iv | `e8c8a67c…` | documented exclusion - token-specific reason category |
 | P422 | 551 | iv | `files: 666   links checked: 3775   anchors checked: 1111   broken: 6   dead: 0` | documented exclusion - token-specific reason category |
 | P422 | 551 | iv | `files: 666   links checked: 3777   anchors checked: 1112   broken: 0   dead: 0   external-skipped: 2073   other-skipped: 0` | documented exclusion - token-specific reason category |
+| P422 | 551 | iv | `python -P scripts/ci/check-markdown-links.py` | documented exclusion - token-specific reason category |
 | P422 | 551 | v | KB | documented exclusion - token-specific reason category |
-| P422 | 552 | iii | `python -B tools/readability_acceptance/build_index.py --report --ref f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - token-specific reason category |
+| P422 | 552 | iv | `python -B tools/readability_acceptance/build_index.py --report --ref f490c16f9ed23f3d489e42f7696323bffcce6fd3` | documented exclusion - token-specific reason category |
 | P422 | 552 | iv | `table_rows 162, events 162, full_page_acceptances 110, lost_commit_events 10, reader_pages_with_rows 100` | documented exclusion - token-specific reason category |
 | P422 | 553 | iv | `de2bfe7237d6e853fa81925faa9f68a82881bba7` | documented exclusion - token-specific reason category |
 | P422 | 554 | i | EOF | named gap - first use before any expansion on this page |
 | P422 | 554 | ii | id | defined at first use - line 554 contains the expansion |
 | P422 | 554 | ii | ids | named gap - first use before any expansion on this page |
-| P422 | 554 | iii | `docs/roadmaps/aegis-documentation-readability-backlog.md` | documented exclusion - token-specific reason category |
 | P422 | 554 | iv | `T-001` | documented exclusion - token-specific reason category |
 | P422 | 554 | iv | `T-010` | documented exclusion - token-specific reason category |
+| P422 | 554 | iv | `docs/roadmaps/aegis-documentation-readability-backlog.md` | documented exclusion - token-specific reason category |
 | P422 | 554 | iv | `table_rows 162` | documented exclusion - token-specific reason category |
 | P422 | 554 | iv | `table_rows` | documented exclusion - token-specific reason category |
 | P422 | 561 | i | SHA-256 | documented exclusion - token-specific reason category |
@@ -2364,8 +2378,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 617 | iv | `F reviewer` | documented exclusion - token-specific reason category |
 | P422 | 619 | i | HTTPS | named gap - first use before any expansion on this page |
 | P422 | 619 | ii | http | named gap - first use before any expansion on this page |
-| P422 | 619 | iii | `-c http.sslBackend=openssl` | documented exclusion - token-specific reason category |
 | P422 | 619 | iii | http.sslBackend | documented exclusion - token-specific reason category |
+| P422 | 619 | iv | `-c http.sslBackend=openssl` | documented exclusion - token-specific reason category |
 | P422 | 619 | iv | `wt-*` | documented exclusion - token-specific reason category |
 | P422 | 620 | iv | `chatgpt-codex-connector[bot]` | documented exclusion - token-specific reason category |
 | P422 | 621 | iv | `original_commit_id` | documented exclusion - token-specific reason category |
@@ -2385,9 +2399,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 636 | iv | `4290095417` | documented exclusion - token-specific reason category |
 | P422 | 637 | i | D6 | documented exclusion - token-specific reason category |
 | P422 | 642 | ii | usage | named gap - first use before any expansion on this page |
-| P422 | 645 | iii | `intra-tenant-scope-architect/SKILL.md` | documented exclusion - token-specific reason category |
-| P422 | 645 | iii | `memory-context-poisoning-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
-| P422 | 646 | iii | `model-context-designer/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 645 | iv | `intra-tenant-scope-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 645 | iv | `memory-context-poisoning-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P422 | 646 | iv | `model-context-designer/SKILL.md` | documented exclusion - token-specific reason category |
 | P422 | 647 | iv | `authorization` | documented exclusion - token-specific reason category |
 | P422 | 648 | i | L124 | documented exclusion - token-specific reason category |
 | P422 | 648 | i | L21 | documented exclusion - token-specific reason category |
@@ -2396,23 +2410,23 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 648 | i | L71 | documented exclusion - token-specific reason category |
 | P422 | 648 | i | L95 | documented exclusion - token-specific reason category |
 | P422 | 648 | iv | `authorizing` | documented exclusion - token-specific reason category |
-| P422 | 651 | iii | `authorization \(authz\)\|authz \(authorization` | documented exclusion - token-specific reason category |
+| P422 | 651 | iv | `authorization \(authz\)\|authz \(authorization` | documented exclusion - token-specific reason category |
 | P422 | 653 | i | H11-H15 | documented exclusion - token-specific reason category |
 | P422 | 653 | v | 3-6 | documented exclusion - token-specific reason category |
 | P422 | 662 | iv | `de2bfe72` | documented exclusion - token-specific reason category |
 | P422 | 662 | v | 21-23 | documented exclusion - token-specific reason category |
-| P422 | 667 | iii | `docs/delivery-workflow.md` | documented exclusion - token-specific reason category |
 | P422 | 667 | iii | delivery-workflow.md | documented exclusion - token-specific reason category |
+| P422 | 667 | iv | `docs/delivery-workflow.md` | documented exclusion - token-specific reason category |
 | P422 | 668 | i | L601 | documented exclusion - token-specific reason category |
 | P422 | 670 | i | L404 | documented exclusion - token-specific reason category |
 | P422 | 671 | i | AGENTS | documented exclusion - token-specific reason category |
-| P422 | 671 | iii | `AGENTS.md` | documented exclusion - token-specific reason category |
-| P422 | 675 | iii | `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<id>` | documented exclusion - token-specific reason category |
+| P422 | 671 | iv | `AGENTS.md` | documented exclusion - token-specific reason category |
 | P422 | 675 | iv | `6231324438` | documented exclusion - token-specific reason category |
 | P422 | 675 | iv | `6231575941` | documented exclusion - token-specific reason category |
+| P422 | 675 | iv | `gh api repos/ModernNomad-98/Project-Aegis/issues/comments/<id>` | documented exclusion - token-specific reason category |
 | P422 | 675 | v | <id> | documented exclusion - token-specific reason category |
 | P422 | 678 | ii | waiver | named gap - first use before any expansion on this page |
-| P422 | 696 | iii | `./.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
+| P422 | 696 | iv | `./.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
 | P422 | 719 | i | C-4 | documented exclusion - token-specific reason category |
 | P422 | 727 | iv | `f848b1a9…` | documented exclusion - token-specific reason category |
 | P422 | 737 | iii | 11.2 | documented exclusion - token-specific reason category |
@@ -2428,13 +2442,13 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 747 | iv | `4303397265` | documented exclusion - token-specific reason category |
 | P422 | 747 | iv | `4303397270` | documented exclusion - token-specific reason category |
 | P422 | 747 | iv | `5558680242` | documented exclusion - token-specific reason category |
-| P422 | 749 | i | MERGED | named gap - first use before any expansion on this page |
 | P422 | 749 | iv | `NOT MERGED` | documented exclusion - token-specific reason category |
+| P422 | 749 | v | MERGED | named gap - first use before any expansion on this page |
 | P422 | 750 | iv | `6236306995` | documented exclusion - token-specific reason category |
 | P422 | 750 | iv | `6236313003` | documented exclusion - token-specific reason category |
 | P422 | 753 | iii | 10.7 | documented exclusion - token-specific reason category |
-| P422 | 763 | iii | `git show f490c16f:….claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
 | P422 | 763 | iv | `git grep` | documented exclusion - token-specific reason category |
+| P422 | 763 | iv | `git show f490c16f:….claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
 | P422 | 764 | iii | 10.2 | documented exclusion - token-specific reason category |
 | P422 | 764 | iv | `git diff --name-status 0c994d77 f848b1a9` | documented exclusion - token-specific reason category |
 | P422 | 764 | iv | `git diff --name-status 44d8f431 f848b1a9` | documented exclusion - token-specific reason category |
@@ -2444,9 +2458,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 766 | iv | `git diff --stat` | documented exclusion - token-specific reason category |
 | P422 | 767 | iii | 10.5 | documented exclusion - token-specific reason category |
 | P422 | 767 | iii | 5dc96eda..f848b1a9 | documented exclusion - token-specific reason category |
-| P422 | 767 | iii | `git diff --numstat 5dc96eda..f848b1a9` | documented exclusion - token-specific reason category |
-| P422 | 767 | iii | `git rev-list --count f490c16f..5dc96eda` | documented exclusion - token-specific reason category |
 | P422 | 767 | iii | f490c16f..5dc96eda | documented exclusion - token-specific reason category |
+| P422 | 767 | iv | `git diff --numstat 5dc96eda..f848b1a9` | documented exclusion - token-specific reason category |
+| P422 | 767 | iv | `git rev-list --count f490c16f..5dc96eda` | documented exclusion - token-specific reason category |
 | P422 | 768 | iii | 10.6 | documented exclusion - token-specific reason category |
 | P422 | 768 | iv | `Row source` | documented exclusion - token-specific reason category |
 | P422 | 768 | iv | `WHAT:` | documented exclusion - token-specific reason category |
@@ -2457,33 +2471,33 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 799 | i | RESULT | named gap - first use before any expansion on this page |
 | P422 | 800 | iv | `docs-only` | documented exclusion - token-specific reason category |
 | P422 | 801 | ii | github | named gap - first use before any expansion on this page |
-| P422 | 801 | iii | `.claude/` | documented exclusion - token-specific reason category |
-| P422 | 801 | iii | `.github/` | documented exclusion - token-specific reason category |
-| P422 | 801 | iii | `tools/` | documented exclusion - token-specific reason category |
-| P422 | 807 | iii | `44d8f431..f848b1a9` | documented exclusion - token-specific reason category |
+| P422 | 801 | iv | `.claude/` | documented exclusion - token-specific reason category |
+| P422 | 801 | iv | `.github/` | documented exclusion - token-specific reason category |
+| P422 | 801 | iv | `tools/` | documented exclusion - token-specific reason category |
+| P422 | 807 | iv | `44d8f431..f848b1a9` | documented exclusion - token-specific reason category |
 | P422 | 809 | iii | 11.3 | documented exclusion - token-specific reason category |
-| P422 | 809 | iii | `165/0` | documented exclusion - token-specific reason category |
+| P422 | 809 | iv | `165/0` | documented exclusion - token-specific reason category |
 | P422 | 826 | iv | `55a8d119…` | documented exclusion - token-specific reason category |
 | P422 | 826 | iv | `6230945952` | documented exclusion - token-specific reason category |
 | P422 | 827 | iv | `ac8da53e…` | documented exclusion - token-specific reason category |
-| P422 | 831 | iii | `git rev-parse f848b1a9:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` | documented exclusion - token-specific reason category |
+| P422 | 831 | iv | `git rev-parse f848b1a9:docs/plans/readability-lane-a-batch-4-plan-2026-10-16.md` | documented exclusion - token-specific reason category |
 | P422 | 832 | iv | `ac8da53e011796bc9086a355b14e4cc9fca8eb81` | documented exclusion - token-specific reason category |
 | P422 | 837 | i | L301 | documented exclusion - token-specific reason category |
 | P422 | 837 | i | OWNER-DECISIONS-2026-10-15 | documented exclusion - token-specific reason category |
 | P422 | 837 | iii | OWNER-DECISIONS-2026-10-15.md | documented exclusion - token-specific reason category |
-| P422 | 837 | iii | `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` | documented exclusion - token-specific reason category |
-| P422 | 839 | iii | `+1,282/−0` | documented exclusion - token-specific reason category |
-| P422 | 839 | iii | `442/0` | documented exclusion - token-specific reason category |
-| P422 | 839 | iii | `675/0` | documented exclusion - token-specific reason category |
+| P422 | 837 | iv | `docs/roadmaps/OWNER-DECISIONS-2026-10-15.md` | documented exclusion - token-specific reason category |
+| P422 | 839 | iv | `+1,282/−0` | documented exclusion - token-specific reason category |
+| P422 | 839 | iv | `442/0` | documented exclusion - token-specific reason category |
+| P422 | 839 | iv | `675/0` | documented exclusion - token-specific reason category |
 | P422 | 840 | iv | `5dc96eda` | documented exclusion - token-specific reason category |
 | P422 | 841 | iv | `1,290` | documented exclusion - token-specific reason category |
 | P422 | 841 | iv | `15,919` | documented exclusion - token-specific reason category |
-| P422 | 849 | iii | `451/0` | documented exclusion - token-specific reason category |
-| P422 | 849 | iii | `858/0` | documented exclusion - token-specific reason category |
+| P422 | 849 | iv | `451/0` | documented exclusion - token-specific reason category |
+| P422 | 849 | iv | `858/0` | documented exclusion - token-specific reason category |
 | P422 | 856 | iv | `6213003590` | documented exclusion - token-specific reason category |
 | P422 | 857 | iv | `6213436600` | documented exclusion - token-specific reason category |
 | P422 | 857 | iv | `6213567787` | documented exclusion - token-specific reason category |
-| P422 | 861 | iii | `re.finditer` | documented exclusion - token-specific reason category |
+| P422 | 861 | iv | `re.finditer` | documented exclusion - token-specific reason category |
 | P422 | 861 | iv | `rg -o 'Row source' …` | documented exclusion - token-specific reason category |
 | P422 | 872 | v | 1–9 | documented exclusion - token-specific reason category |
 | P422 | 876 | i | L656 | documented exclusion - token-specific reason category |
@@ -2495,10 +2509,10 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 891 | iv | `68cf0147` | documented exclusion - token-specific reason category |
 | P422 | 895 | iii | 10.8 | documented exclusion - token-specific reason category |
 | P422 | 897 | i | DCO | defined at first use - line 897 contains the expansion |
-| P422 | 897 | iii | `build_index.py --write` | documented exclusion - token-specific reason category |
+| P422 | 897 | iv | `build_index.py --write` | documented exclusion - token-specific reason category |
 | P422 | 899 | v | UNRUN | documented exclusion - token-specific reason category |
-| P422 | 907 | iii | `docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md` | documented exclusion - token-specific reason category |
 | P422 | 907 | iii | readability-lane-a-batch-4-skills-records-2026-10-16.md | documented exclusion - token-specific reason category |
+| P422 | 907 | iv | `docs/evidence/documentation/readability-lane-a-batch-4-skills-records-2026-10-16.md` | documented exclusion - token-specific reason category |
 | P422 | 910 | iii | 11.1 | documented exclusion - token-specific reason category |
 | P422 | 914 | i | L681-L690 | documented exclusion - token-specific reason category |
 | P422 | 918 | v | 1-9 | documented exclusion - token-specific reason category |
@@ -2506,7 +2520,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 932 | iv | `68cf0147…` | documented exclusion - token-specific reason category |
 | P422 | 935 | iv | `A` | documented exclusion - token-specific reason category |
 | P422 | 936 | iv | `D` | documented exclusion - token-specific reason category |
-| P422 | 938 | iii | `git diff --name-status <base>..HEAD` | documented exclusion - token-specific reason category |
+| P422 | 938 | iv | `git diff --name-status <base>..HEAD` | documented exclusion - token-specific reason category |
 | P422 | 950 | iv | `6242008717` | documented exclusion - token-specific reason category |
 | P422 | 950 | iv | `6242064103` | documented exclusion - token-specific reason category |
 | P422 | 953 | iv | `493c4841…` | documented exclusion - token-specific reason category |
@@ -2523,7 +2537,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P422 | 972 | iv | `e632b3a1735af56c17282eee47f442f6206e8f75` | documented exclusion - token-specific reason category |
 | P422 | 979 | ii | manifest | named gap - first use before any expansion on this page |
 | P422 | 979 | ii | register | named gap - first use before any expansion on this page |
-| P422 | 987 | iii | `scripts/tests/test_validator.py` | documented exclusion - token-specific reason category |
+| P422 | 987 | iv | `scripts/tests/test_validator.py` | documented exclusion - token-specific reason category |
 | P422 | 988 | iii | test_markdown_links.py | documented exclusion - token-specific reason category |
 | P422 | 989 | iv | `PermissionError: [Errno 13] Permission denied` | documented exclusion - token-specific reason category |
 | P422 | 989 | iv | `Ran 23 tests … FAILED (errors=10)` | documented exclusion - token-specific reason category |
@@ -2554,7 +2568,6 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 5 | i | AC12 | documented exclusion - token-specific reason category |
 | P423 | 5 | i | AC7 | documented exclusion - token-specific reason category |
 | P423 | 5 | i | ACCEPT | named gap - first use before any expansion on this page |
-| P423 | 5 | i | ACCEPTED | named gap - first use before any expansion on this page |
 | P423 | 5 | i | CR | named gap - first use before any expansion on this page |
 | P423 | 5 | i | LF | named gap - first use before any expansion on this page |
 | P423 | 5 | i | PR | named gap - first use before any expansion on this page |
@@ -2568,11 +2581,12 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 5 | iv | `494cdd6a07a5dbda56fa5201e93c5041643df44b2b7cab174d0bab593be15fbb` | documented exclusion - token-specific reason category |
 | P423 | 5 | iv | `648ac7670bec2e260279a74716289b39f7cf2c9a` | documented exclusion - token-specific reason category |
 | P423 | 5 | iv | `b3dfb81fec0806c97406dd403120853da8ffd402` | documented exclusion - token-specific reason category |
+| P423 | 5 | v | ACCEPTED | named gap - first use before any expansion on this page |
 | P423 | 7 | ii | diff | named gap - first use before any expansion on this page |
 | P423 | 9 | ii | docs | named gap - first use before any expansion on this page |
 | P423 | 9 | ii | evidence | named gap - first use before any expansion on this page |
-| P423 | 9 | iii | `docs/evidence/documentation/readability-lane-a-batch-4-2026-10-17.md` | documented exclusion - token-specific reason category |
 | P423 | 9 | iii | readability-lane-a-batch-4-2026-10-17.md | documented exclusion - token-specific reason category |
+| P423 | 9 | iv | `docs/evidence/documentation/readability-lane-a-batch-4-2026-10-17.md` | documented exclusion - token-specific reason category |
 | P423 | 9 | v | 4-2026 | documented exclusion - token-specific reason category |
 | P423 | 10 | i | JSON | named gap - first use before any expansion on this page |
 | P423 | 10 | ii | manifest | named gap - first use before any expansion on this page |
@@ -2611,9 +2625,9 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 24 | ii | partial | named gap - first use before any expansion on this page |
 | P423 | 24 | ii | reviewer | named gap - first use before any expansion on this page |
 | P423 | 24 | iii | SKILL.md | documented exclusion - token-specific reason category |
-| P423 | 24 | iii | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - token-specific reason category |
-| P423 | 24 | iii | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P423 | 24 | iii | adr-template.md | documented exclusion - token-specific reason category |
+| P423 | 24 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - token-specific reason category |
+| P423 | 24 | iv | `.claude/skills/inter-agent-comms-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P423 | 24 | iv | `ceil(573 / 4)` | documented exclusion - token-specific reason category |
 | P423 | 24 | iv | `no_recorded_acceptance + provably_pending` | documented exclusion - token-specific reason category |
 | P423 | 24 | v | 0–143 | documented exclusion - token-specific reason category |
@@ -2640,43 +2654,43 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 26 | v | 8–15 | documented exclusion - token-specific reason category |
 | P423 | 28 | ii | drift | defined at first use - line 28 contains the expansion |
 | P423 | 28 | ii | git | named gap - first use before any expansion on this page |
-| P423 | 28 | iii | `git diff --numstat 2db1ffb7… 648ac767… -- <page>` | documented exclusion - token-specific reason category |
+| P423 | 28 | iv | `git diff --numstat 2db1ffb7… 648ac767… -- <page>` | documented exclusion - token-specific reason category |
 | P423 | 28 | v | <page> | documented exclusion - token-specific reason category |
 | P423 | 32 | i | ID | named gap - first use before any expansion on this page |
-| P423 | 34 | iii | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
 | P423 | 34 | iii | recovery-playbooks.md | documented exclusion - token-specific reason category |
+| P423 | 34 | iv | `.claude/skills/agent-failure-recovery/references/recovery-playbooks.md` | documented exclusion - token-specific reason category |
 | P423 | 34 | iv | `1c2f026cb0b5` | documented exclusion - token-specific reason category |
 | P423 | 34 | iv | `dc376db435d565d55074a62b2d0deba953425e51` | documented exclusion - token-specific reason category |
 | P423 | 35 | i | P2 | documented exclusion - token-specific reason category |
-| P423 | 35 | iii | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | documented exclusion - token-specific reason category |
+| P423 | 35 | iv | `.claude/skills/agent-goal-hijack-defender/SKILL.md` | documented exclusion - token-specific reason category |
 | P423 | 35 | iv | `3d01e1c5ba90` | documented exclusion - token-specific reason category |
 | P423 | 35 | iv | `491a766a0bd4aa949bb0e014274a0f1c3b14739b` | documented exclusion - token-specific reason category |
 | P423 | 36 | i | P3 | documented exclusion - token-specific reason category |
-| P423 | 36 | iii | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
 | P423 | 36 | iii | goal-integrity-controls.md | documented exclusion - token-specific reason category |
+| P423 | 36 | iv | `.claude/skills/agent-goal-hijack-defender/references/goal-integrity-controls.md` | documented exclusion - token-specific reason category |
 | P423 | 36 | iv | `0c58f08e95c9a41c26f5e1b2003cfab8278b1754` | documented exclusion - token-specific reason category |
 | P423 | 37 | i | P4 | documented exclusion - token-specific reason category |
 | P423 | 37 | ii | audit | named gap - first use before any expansion on this page |
-| P423 | 37 | iii | `.claude/skills/agent-governance-audit/SKILL.md` | documented exclusion - token-specific reason category |
+| P423 | 37 | iv | `.claude/skills/agent-governance-audit/SKILL.md` | documented exclusion - token-specific reason category |
 | P423 | 37 | iv | `afc90207424ff813f44a2f60500f82663eecdc01` | documented exclusion - token-specific reason category |
 | P423 | 37 | iv | `ed5f8ae6035f` | documented exclusion - token-specific reason category |
 | P423 | 38 | i | P5 | documented exclusion - token-specific reason category |
-| P423 | 38 | iii | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | documented exclusion - token-specific reason category |
 | P423 | 38 | iii | audit-control-checklist.md | documented exclusion - token-specific reason category |
+| P423 | 38 | iv | `.claude/skills/agent-governance-audit/references/audit-control-checklist.md` | documented exclusion - token-specific reason category |
 | P423 | 38 | iv | `65262f51d7e344e999a1a312887c9fffc582063d` | documented exclusion - token-specific reason category |
 | P423 | 39 | i | P6 | documented exclusion - token-specific reason category |
-| P423 | 39 | iii | `.claude/skills/agent-harness-architect/SKILL.md` | documented exclusion - token-specific reason category |
+| P423 | 39 | iv | `.claude/skills/agent-harness-architect/SKILL.md` | documented exclusion - token-specific reason category |
 | P423 | 39 | iv | `3b0acb9741bc1df9dc1e759def919ecc10aa3a05` | documented exclusion - token-specific reason category |
 | P423 | 39 | iv | `8459ac73ba6e` | documented exclusion - token-specific reason category |
 | P423 | 40 | i | P7 | documented exclusion - token-specific reason category |
-| P423 | 40 | iii | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
+| P423 | 40 | iv | `.claude/skills/agent-identity-privilege-reviewer/SKILL.md` | documented exclusion - token-specific reason category |
 | P423 | 40 | iv | `4d2e46d0e210193a9846036eabaeca5878961292` | documented exclusion - token-specific reason category |
-| P423 | 41 | iii | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - token-specific reason category |
 | P423 | 41 | iii | agent-identity-patterns.md | documented exclusion - token-specific reason category |
+| P423 | 41 | iv | `.claude/skills/agent-identity-privilege-reviewer/references/agent-identity-patterns.md` | documented exclusion - token-specific reason category |
 | P423 | 41 | iv | `bfdbfbb619855f7818d61bfd94f7386ca3288a2f` | documented exclusion - token-specific reason category |
-| P423 | 43 | iii | `git log -1 --format='%H\|%an\|%ad\|%s' -- <page>` | documented exclusion - token-specific reason category |
-| P423 | 43 | iii | `git rev-parse 2db1ffb7…:<page>` | documented exclusion - token-specific reason category |
-| P423 | 43 | iii | `git show <pinned>:<page>` | documented exclusion - token-specific reason category |
+| P423 | 43 | iv | `git log -1 --format='%H\|%an\|%ad\|%s' -- <page>` | documented exclusion - token-specific reason category |
+| P423 | 43 | iv | `git rev-parse 2db1ffb7…:<page>` | documented exclusion - token-specific reason category |
+| P423 | 43 | iv | `git show <pinned>:<page>` | documented exclusion - token-specific reason category |
 | P423 | 43 | v | % | documented exclusion - token-specific reason category |
 | P423 | 43 | v | <pinned> | documented exclusion - token-specific reason category |
 | P423 | 46 | ii | purpose | named gap - first use before any expansion on this page |
@@ -2700,8 +2714,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 54 | i | L5-8 | documented exclusion - token-specific reason category |
 | P423 | 54 | i | L84 | documented exclusion - token-specific reason category |
 | P423 | 54 | i | L88 | documented exclusion - token-specific reason category |
-| P423 | 54 | iii | `(-m \| --message) <message>` | documented exclusion - token-specific reason category |
-| P423 | 54 | iii | `rebase/merge` | documented exclusion - token-specific reason category |
+| P423 | 54 | iv | `(-m \| --message) <message>` | documented exclusion - token-specific reason category |
 | P423 | 54 | iv | `WIP` | documented exclusion - token-specific reason category |
 | P423 | 54 | iv | `git merge --abort` | documented exclusion - token-specific reason category |
 | P423 | 54 | iv | `git merge -h` | documented exclusion - token-specific reason category |
@@ -2710,6 +2723,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 54 | iv | `git stash -h` | documented exclusion - token-specific reason category |
 | P423 | 54 | iv | `git stash push -u -m` | documented exclusion - token-specific reason category |
 | P423 | 54 | iv | `rebase/merge --abort` | documented exclusion - token-specific reason category |
+| P423 | 54 | iv | `rebase/merge` | documented exclusion - token-specific reason category |
 | P423 | 54 | v | <message> | documented exclusion - token-specific reason category |
 | P423 | 54 | v | UNVERIFIED | documented exclusion - token-specific reason category |
 | P423 | 58 | i | ASI01 | documented exclusion - token-specific reason category |
@@ -2730,11 +2744,11 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 60 | i | LLM | named gap - first use before any expansion on this page |
 | P423 | 60 | i | LLM01 | documented exclusion - token-specific reason category |
 | P423 | 60 | i | MANUAL-ONLY | documented exclusion - token-specific reason category |
-| P423 | 60 | iii | `evals/evals.json` | documented exclusion - token-specific reason category |
-| P423 | 60 | iii | `evals/trigger-evals.json` | documented exclusion - token-specific reason category |
 | P423 | 60 | iii | evals.json | documented exclusion - token-specific reason category |
 | P423 | 60 | iii | trigger-evals.json | documented exclusion - token-specific reason category |
 | P423 | 60 | iv | `authz` | documented exclusion - token-specific reason category |
+| P423 | 60 | iv | `evals/evals.json` | documented exclusion - token-specific reason category |
+| P423 | 60 | iv | `evals/trigger-evals.json` | documented exclusion - token-specific reason category |
 | P423 | 64 | ii | payload | named gap - first use before any expansion on this page |
 | P423 | 64 | ii | rules | named gap - first use before any expansion on this page |
 | P423 | 64 | ii | schema | named gap - first use before any expansion on this page |
@@ -2766,8 +2780,8 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 72 | ii | owner | named gap - first use before any expansion on this page |
 | P423 | 72 | ii | repo | named gap - first use before any expansion on this page |
 | P423 | 72 | ii | timeline | named gap - first use before any expansion on this page |
-| P423 | 72 | iii | `gh api repos/{owner}/{repo}/issues/<n>/timeline` | documented exclusion - token-specific reason category |
 | P423 | 72 | iv | `--paginate` | documented exclusion - token-specific reason category |
+| P423 | 72 | iv | `gh api repos/{owner}/{repo}/issues/<n>/timeline` | documented exclusion - token-specific reason category |
 | P423 | 72 | v | <n> | documented exclusion - token-specific reason category |
 | P423 | 76 | ii | known | named gap - first use before any expansion on this page |
 | P423 | 78 | i | L11-19 | documented exclusion - token-specific reason category |
@@ -2793,7 +2807,7 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 84 | i | L8-9 | documented exclusion - token-specific reason category |
 | P423 | 84 | i | L94-139 | documented exclusion - token-specific reason category |
 | P423 | 84 | i | SDK | named gap - first use before any expansion on this page |
-| P423 | 84 | iii | `references/` | documented exclusion - token-specific reason category |
+| P423 | 84 | iv | `references/` | documented exclusion - token-specific reason category |
 | P423 | 88 | i | ASI03 | documented exclusion - token-specific reason category |
 | P423 | 88 | ii | escalation | named gap - first use before any expansion on this page |
 | P423 | 90 | i | DB | named gap - first use before any expansion on this page |
@@ -2832,25 +2846,25 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 | P423 | 115 | ii | count | named gap - first use before any expansion on this page |
 | P423 | 120 | ii | counts | defined at first use - line 120 contains the expansion |
 | P423 | 129 | iv | `git rev-parse origin/main` | documented exclusion - token-specific reason category |
-| P423 | 130 | iii | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7… --json` | documented exclusion - token-specific reason category |
+| P423 | 130 | iv | `python -P -B tools/readability_acceptance/check_index.py --ref 2db1ffb7… --json` | documented exclusion - token-specific reason category |
 | P423 | 131 | v | × | documented exclusion - token-specific reason category |
-| P423 | 132 | iii | `git show 2db1ffb7…:<page>` | documented exclusion - token-specific reason category |
+| P423 | 132 | iv | `git show 2db1ffb7…:<page>` | documented exclusion - token-specific reason category |
 | P423 | 134 | iv | `grep -n 'WIP'` | documented exclusion - token-specific reason category |
-| P423 | 135 | iii | `(-m \\| --message) <message>` | documented exclusion - token-specific reason category |
+| P423 | 135 | iv | `(-m \| --message) <message>` | documented exclusion - token-specific reason category |
 | P423 | 136 | iv | `gh api --help` | documented exclusion - token-specific reason category |
 | P423 | 137 | ii | scope | named gap - first use before any expansion on this page |
 | P423 | 137 | iii | 648ac767..8fa0b89d | documented exclusion - token-specific reason category |
-| P423 | 137 | iii | `git log --oneline 648ac767..8fa0b89d` | documented exclusion - token-specific reason category |
+| P423 | 137 | iv | `git log --oneline 648ac767..8fa0b89d` | documented exclusion - token-specific reason category |
 | P423 | 139 | iv | `grep -n SEV` | documented exclusion - token-specific reason category |
 | P423 | 140 | iv | `grep -n` | documented exclusion - token-specific reason category |
 | P423 | 141 | ii | ci | named gap - first use before any expansion on this page |
-| P423 | 141 | iii | `python -B scripts/ci/check-markdown-links.py <8 pages>` | documented exclusion - token-specific reason category |
 | P423 | 141 | iii | check-markdown-links.py | documented exclusion - token-specific reason category |
+| P423 | 141 | iv | `python -B scripts/ci/check-markdown-links.py <8 pages>` | documented exclusion - token-specific reason category |
 | P423 | 141 | v | <8 pages> | documented exclusion - token-specific reason category |
 | P423 | 142 | i | OK | defined at first use - line 142 contains the expansion |
-| P423 | 142 | iii | `python -P scripts/validate-skills.py` | documented exclusion - token-specific reason category |
 | P423 | 142 | iii | validate-skills.py | documented exclusion - token-specific reason category |
 | P423 | 142 | iv | `OK: 205 skill(s) valid, 0 warning(s)` | documented exclusion - token-specific reason category |
+| P423 | 142 | iv | `python -P scripts/validate-skills.py` | documented exclusion - token-specific reason category |
 | P423 | 143 | iv | `git cat-file -e 2db1ffb7…:.claude/skills/agent-harness-architect/references` | documented exclusion - token-specific reason category |
 | P423 | 144 | i | SD-C | documented exclusion - token-specific reason category |
 | P423 | 157 | i | AEGIS-APR-115 | documented exclusion - token-specific reason category |
@@ -2859,15 +2873,15 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Rows | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P416 | 143 | 55 | 20 | 27 | 17 | 262 | 85 | 11 | 166 |
-| P417 | 123 | 53 | 37 | 31 | 20 | 264 | 77 | 10 | 177 |
-| P418 | 122 | 78 | 98 | 78 | 19 | 395 | 98 | 26 | 271 |
-| P419 | 66 | 34 | 27 | 18 | 9 | 154 | 36 | 8 | 110 |
-| P420 | 153 | 57 | 21 | 27 | 19 | 277 | 97 | 13 | 167 |
-| P421 | 87 | 77 | 102 | 91 | 24 | 381 | 87 | 23 | 271 |
-| P422 | 163 | 91 | 136 | 248 | 36 | 674 | 119 | 16 | 539 |
-| P423 | 131 | 60 | 40 | 55 | 23 | 309 | 77 | 11 | 221 |
-| **Total** | **988** | **505** | **481** | **575** | **167** | **2716** | **676** | **118** | **1922** |
+| P416 | 143 | 55 | 8 | 39 | 17 | 262 | 85 | 11 | 166 |
+| P417 | 123 | 53 | 9 | 59 | 20 | 264 | 77 | 10 | 177 |
+| P418 | 122 | 78 | 44 | 132 | 19 | 395 | 98 | 26 | 271 |
+| P419 | 66 | 34 | 10 | 35 | 9 | 154 | 36 | 8 | 110 |
+| P420 | 153 | 57 | 9 | 39 | 19 | 277 | 97 | 13 | 167 |
+| P421 | 85 | 77 | 33 | 160 | 26 | 381 | 87 | 23 | 271 |
+| P422 | 162 | 91 | 48 | 336 | 37 | 674 | 119 | 16 | 539 |
+| P423 | 130 | 60 | 13 | 82 | 24 | 309 | 77 | 11 | 221 |
+| **Total** | **984** | **505** | **174** | **882** | **171** | **2716** | **676** | **118** | **1922** |
 
 ## 6. Batch mapping, continuation and named gaps
 
@@ -2912,10 +2926,10 @@ All eight pages were read whole L1-last at main 70b6159d. Canonical B4 tested pe
 ```
 
 
-<!-- Row source: agent=sd-a-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=A; round=1; row=1; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-a1/A-rows.txt line 1 of 4; binding=sha256 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27 over 1166 B/4 LF; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-a-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=A; round=1; row=2; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-a1/A-rows.txt line 2 of 4; binding=sha256 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27 over 1166 B/4 LF; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-a-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=A; round=1; row=3; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-a1/A-rows.txt line 3 of 4; binding=sha256 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27 over 1166 B/4 LF; limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-a-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=A; round=1; row=4; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-a1/A-rows.txt line 4 of 4; binding=sha256 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27 over 1166 B/4 LF; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=A; round=1; row=1; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-a1/A-rows.txt line 1 of 4; binding=sha256 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27 over 1166 B/4 LF; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=A; round=1; row=2; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-a1/A-rows.txt line 2 of 4; binding=sha256 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27 over 1166 B/4 LF; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=A; round=1; row=3; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-a1/A-rows.txt line 3 of 4; binding=sha256 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27 over 1166 B/4 LF; limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=A; round=1; row=4; target=this batch-20 record commit on branch from 70b6159d, plan6258744106 / B ACCEPT6258762512; source=_A/evidence/read-lc-416-a1/A-rows.txt line 4 of 4; binding=sha256 4e478bf94e442418c9551486db916870edb3aa8307f13830c73ebef8ddc88c27 over 1166 B/4 LF; limits=digest binds captured text, not human identity; status=current -->
 
 **Stage A six-field lines:**
 acceptance-criteria-reviewer@c6e5d5649bf8 / reason: bind canonical/ACs / applied: B1-B6/AC1-AC8/dispatch / result: bound / incomplete: C / by: A r3, DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
@@ -2943,19 +2957,23 @@ source-of-truth-reconciler@b5fd9feda972 / reason: frontier/pin/selection/artifac
 change-classification-gate@08d91a834460 / reason: scope must be docs-only one path / applied: record path absence/name-only / result: one added path / incomplete: none / by: C, sd-c-read-lc-416-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / reason: C handoff owes provenance / applied: resolved four names at70b6159d, authored rows/sources/six; retained Crows / result: 4/4/4 / incomplete: none / by: C, sd-c-read-lc-416-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 
-## 11. Appendix: inline verifiable artifact text
+## 11. Appendix: separate inline artifact blocks
 
+### A-rows inline text (authoritative external: _A/evidence/read-lc-416-a1/A-rows.txt, 1,166 B/4 LF/sha 4e478bf9)
 ```text
 | acceptance-criteria-reviewer @ c6e5d5649bf8 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Bound canonical B1-B6, AC1-AC8 and dispatch rules to block 416-423; B4 per page; B6 UNVERIFIED | canonical exact; B4 per page; B6 unverified |
 | source-of-truth-reconciler @ b5fd9feda972 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-ran check_index at 70b6159d; derived union620/155 quarters/block416-423; 62 lane records; measured eight pages | 737/107/6/614/6/4/630; union620; block416-423; 311,123/3,059; 0 page-read-row hits |
 | change-classification-gate @ 08d91a834460 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only one added record path; verified path absent at main | one record path; absent |
 | skill-usage-ledger @ 6a27b5c8e690 | A plan / sd-a-read-lc-416-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Authored this Stage A account and retained capture | four rows/sources; non-zero binding |
----
+```
+
+### Crows-2716 inline text (authoritative external: _A/evidence/read-lc-416-c1/Crows-2716.txt, 1,484 B/4 LF/sha ee9450)
+```text
 | [acceptance-criteria-reviewer](../../../.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ c6e5d5649bf8 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight mixed-pin pages whole; built canonical evidence and one exact-once inventory under known-defect/dispatch rules. | 0 FULL / 8 PARTIAL / 0 UNRUN; 2716-row inventory; no keeper |
 | [source-of-truth-reconciler](../../../.claude/skills/source-of-truth-reconciler/SKILL.md) @ b5fd9feda972 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main 70b6159d; verified mixed pin/re-pin, frontier/quarters, selection and A-rows. | block416-423/batch20; union620/155; 311,123/3,059; 0/62; mixed pin disclosed |
 | [change-classification-gate](../../../.claude/skills/change-classification-gate/SKILL.md) @ 08d91a834460 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Classified docs-only exactly one added record path. | one added record path; absent at main |
 | [skill-usage-ledger](../../../.claude/skills/skill-usage-ledger/SKILL.md) @ 6a27b5c8e690 | C batch-20 / sd-c-read-lc-416-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Resolved manifest hashes; authored rows/Row sources/six fields; retained Crows capture. | 4 rows/4 per-row sources/4 six-field lines |
 ```
 
-A-rows inline text is byte-identical to plan-bound external _A/evidence/read-lc-416-a1/A-rows.txt (1,166 B/4 LF/sha256 4e478bf9...; raw digest). Crows inline text is byte-identical to authoritative external _A/evidence/read-lc-416-c1/Crows-2716.txt (1,484 B/4 LF/sha256 ee9450b3...; raw digest, no normalization). Superseded historical _A/evidence/read-lc-416-c1/Crows.txt (1,484 B/4 LF/sha256 f936ee37...) contains the 2,717-row pre-correction text and is retained, not overwritten; it is NOT byte-identical to the authoritative capture. External _A files are ephemeral non-authoritative convenience copies; inline text verifies digests. One canonical directory per artifact: a1 for A-rows, c1 for C captures.
+The Crows-2716 artifact is a FOUR-ROW capture (four source rows), not the 2,716-row inventory table. The A-rows block is four rows. Each block is separately delimited; copying one block reproduces that file digest. External _A files are ephemeral non-authoritative convenience copies; inline text makes digests verifiable.
 **Boundary.** Stage C only: one record, no plan edit, no other path, no Codex thread act, no merge; owner CI PR #848 already merged and untouched. **Signed with both names: true identity sd-c-793-r2; stage role sd-c-read-lc-416-c1.** **Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).**
