@@ -68,7 +68,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P425 - index 425 - docs/evidence/documentation/readability-lane-a-batch-6-2026-10-18.md - 26443 B / 168 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A — Stage C batch record, batch 6, 2026-10-18.
-**B2:** 245 inventory rows; defined 1; named gaps 46; documented exclusions 198; all rows in section 3.
+**B2:** 245 inventory rows; defined 1; named gaps 45; documented exclusions 199; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L7 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -88,7 +88,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P427 - index 427 - docs/evidence/documentation/readability-lane-a-batch-8-2026-10-18.md - 23347 B / 148 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A - Stage C batch record, batch 8, 2026-10-18.
-**B2:** 256 inventory rows; defined 1; named gaps 48; documented exclusions 207; all rows in section 3.
+**B2:** 256 inventory rows; defined 1; named gaps 47; documented exclusions 208; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L7 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -98,7 +98,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P428 - index 428 - docs/evidence/documentation/readability-lane-a-batch-9-2026-10-18.md - 40591 B / 205 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane A — Stage C batch record, batch 9, 2026-10-18.
-**B2:** 276 inventory rows; defined 3; named gaps 60; documented exclusions 213; all rows in section 3.
+**B2:** 276 inventory rows; defined 3; named gaps 59; documented exclusions 214; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L11 ## 1. Lane derivation at this implementation base.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -108,7 +108,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P429 - index 429 - docs/evidence/documentation/readability-lane-b-batch-10-2026-10-18.md - 53323 B / 212 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane B - Stage C batch record, lane B batch 10, 2026-10-18.
-**B2:** 418 inventory rows; defined 0; named gaps 50; documented exclusions 368; all rows in section 3.
+**B2:** 418 inventory rows; defined 0; named gaps 48; documented exclusions 370; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L5 ## 1. Scope, plan binding and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -118,7 +118,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P430 - index 430 - docs/evidence/documentation/readability-lane-b-batch-11-2026-10-18.md - 26852 B / 206 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane B - Stage C batch record, batch 11, 2026-10-18.
-**B2:** 240 inventory rows; defined 1; named gaps 41; documented exclusions 198; all rows in section 3.
+**B2:** 240 inventory rows; defined 1; named gaps 40; documented exclusions 199; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L11 ## 1. Scope and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -128,7 +128,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 ### P431 - index 431 - docs/evidence/documentation/readability-lane-b-batch-12-2026-10-18.md - 47100 B / 293 LF
 
 **B1:** lane record; purpose/scope stated; intended audience is not explicitly named in the opening, so B1 is a gap rather than a pass. Page anchor: L1 title Readability Phase 4 re-read lane B - Stage C batch record, lane B batch 12, 2026-10-18.
-**B2:** 327 inventory rows; defined 3; named gaps 51; documented exclusions 273; all rows in section 3.
+**B2:** 327 inventory rows; defined 3; named gaps 50; documented exclusions 274; all rows in section 3.
 **B3:** headings/lists/tables present; page anchor L5 ## 1. Scope, plan binding and diff accounting.
 **B4:** N/A for this lane record: the page contains evidence/acceptance-record content only, with no shipped-vs-proposed product behavior claim; B4 is not applicable rather than a pass or a page gap.
 **B5:** PARTIAL - aggregate link check files8/links3/anchors1/broken0; referenced backticked paths/commands are not exhaustively checked in this evidence pass; limitation recorded, no B5 pass claimed.
@@ -573,7 +573,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 425 | 11@148 | ii | review | documented exclusion - PROSE: ordinary prose word |
 | 425 | 15@31 | iv | `147479583` | documented exclusion - SHA: commit/blob hash |
 | 425 | 18@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
-| 425 | 18@106 | ii | json | named gap - first use before any expansion on this page |
+| 425 | 18@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
 | 425 | 21@410 | iv | `built_at_ref` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 425 | 23@19 | v | 0–143 | documented exclusion - RANGE: numeric range/unit/formula |
 | 425 | 23@34 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - PATH: file/path reference |
@@ -1058,7 +1058,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 427 | 12@83 | iv | `no_recorded_acceptance` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 427 | 16@31 | iv | `147479583...` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 427 | 19@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
-| 427 | 19@106 | ii | json | named gap - first use before any expansion on this page |
+| 427 | 19@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
 | 427 | 22@22 | iv | `compared_ref` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 427 | 22@83 | iv | `reader_pages_in_tree` | documented exclusion - IDENTIFIER: backticked identifier/label |
 | 427 | 22@115 | iv | `accepted_on_recorded_review` | documented exclusion - IDENTIFIER: backticked identifier/label |
@@ -1306,7 +1306,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 428 | 9@50 | i | V4 | named gap - first use before any expansion on this page |
 | 428 | 9@314 | v | open | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 428 | 16@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
-| 428 | 16@106 | ii | json | named gap - first use before any expansion on this page |
+| 428 | 16@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
 | 428 | 21@108 | ii | quarter | documented exclusion - PROSE: ordinary prose word |
 | 428 | 21@141 | v | 0–143 | documented exclusion - RANGE: numeric range/unit/formula |
 | 428 | 21@161 | iv | `.claude/skills/adr-writer/assets/adr-template.md` | documented exclusion - PATH: file/path reference |
@@ -1589,7 +1589,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 11@478 | ii | count | documented exclusion - PROSE: ordinary prose word |
 | 429 | 15@24 | v | FULL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 18@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
-| 429 | 18@106 | ii | json | named gap - first use before any expansion on this page |
+| 429 | 18@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
 | 429 | 21@43 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 429 | 21@122 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
 | 429 | 21@154 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
@@ -1857,7 +1857,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 429 | 145@279 | i | PAGINATION | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 145@295 | i | DESIGN | documented exclusion - EMPHASIS: uppercase emphasis/common word |
 | 429 | 145@307 | i | AND | documented exclusion - EMPHASIS: uppercase emphasis/common word |
-| 429 | 145@331 | ii | api | named gap - first use before any expansion on this page |
+| 429 | 145@331 | ii | api | documented exclusion - PROSE: ordinary prose word |
 | 429 | 145@916 | v | `<surface/endpoint>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
 | 429 | 145@917 | ii | surface | documented exclusion - PROSE: ordinary prose word |
 | 429 | 145@940 | v | `<sort cols>` | documented exclusion - PLACEHOLDER: angle/brace placeholder |
@@ -2010,7 +2010,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 430 | 15@29 | ii | reader | documented exclusion - PROSE: ordinary prose word |
 | 430 | 15@116 | ii | review | documented exclusion - PROSE: ordinary prose word |
 | 430 | 22@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
-| 430 | 22@106 | ii | json | named gap - first use before any expansion on this page |
+| 430 | 22@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
 | 430 | 25@270 | v | partial | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 430 | 25@278 | ii | disposition | documented exclusion - PROSE: ordinary prose word |
 | 430 | 25@616 | ii | counts | documented exclusion - PROSE: ordinary prose word |
@@ -2255,7 +2255,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 | 431 | 13@476 | ii | count | documented exclusion - PROSE: ordinary prose word |
 | 431 | 17@24 | v | FULL | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 20@13 | iii | tools/readability_acceptance/check_index.py | documented exclusion - PATH: file/path reference |
-| 431 | 20@106 | ii | json | named gap - first use before any expansion on this page |
+| 431 | 20@106 | ii | json | documented exclusion - PROSE: ordinary prose word |
 | 431 | 23@43 | v | accepted | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 23@65 | v | pending | documented exclusion - STATUS: lifecycle/status keyword (case-insensitive) |
 | 431 | 23@122 | ii | cannot | documented exclusion - PROSE: ordinary prose word |
@@ -2551,25 +2551,25 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 4. Counts, reconciliation and zero-duplicate proof
 
-**Verified vs asserted:** the hardened embedded verifier mechanically checks table rows/keys (including raw token)/ordering/offsets/classes/dispositions/codes/per-page totals, raw-token/HTML/placeholder encoding, class/backtick compatibility (class-v placeholder/status exception documented), class-disposition/acronym compatibility, Crows.json FULL totals and 4-row/block agreement, Crows.json measured facts, Crows block exact bytes/LF/SHA, inline artifact measurements, MANIFEST hash, malformed rows and stale-value bans. Source-page token meanings, first-use judgments and AC dispositions remain manually asserted; they are not source-page cross-checked. AC3 is table-level self-consistency verified in-branch; it is not a page-source re-derivation.
+**Candidate-token inventory, not source-exhaustive proof (review 5568319753 #4):** this is a selected candidate-token inventory with table-level self-consistency; it is not a claim of one row per real token at first source occurrence or a source-page exhaustive proof. The verifier checks table-level rows/keys/classes/dispositions/codes/per-page totals, raw-token/placeholder/class-backtick/acronym compatibility, Crows.json totals/rows/measured facts, Crows block exact bytes/LF/SHA, inline artifact measurements, cross-file MANIFEST/README references, MANIFEST hash, malformed rows and stale-value bans. Source-page token selection, first-use judgments and AC dispositions remain manually asserted.
 
-**Totals:** rows **2399**; unique keys **2399**; duplicates **0**; malformed table rows **0**. Classes i443/ii366/iii9/iv596/v985=2399. Dispositions 10 defined / 380 named gaps / 2009 documented exclusions = 2399.
+**Totals:** rows **2399**; unique keys **2399**; duplicates **0**; malformed table rows **0**. Classes i443/ii366/iii9/iv596/v985=2399. Dispositions 10 defined / 373 named gaps / 2016 documented exclusions = 2399.
 
 | Page | Rows | i | ii | iii | iv | v | Defined | Named | Excluded |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | P424 | 393 | 62 | 55 | 1 | 178 | 97 | 0 | 52 | 341 |
-| P425 | 245 | 44 | 36 | 1 | 66 | 98 | 1 | 46 | 198 |
+| P425 | 245 | 44 | 36 | 1 | 66 | 98 | 1 | 45 | 199 |
 | P426 | 244 | 40 | 33 | 0 | 61 | 110 | 1 | 32 | 211 |
-| P427 | 256 | 48 | 44 | 1 | 60 | 103 | 1 | 48 | 207 |
-| P428 | 276 | 58 | 53 | 1 | 70 | 94 | 3 | 60 | 213 |
-| P429 | 418 | 88 | 52 | 1 | 82 | 195 | 0 | 50 | 368 |
-| P430 | 240 | 45 | 43 | 1 | 32 | 119 | 1 | 41 | 198 |
-| P431 | 327 | 58 | 50 | 3 | 47 | 169 | 3 | 51 | 273 |
-| **Total** | **2399** | **443** | **366** | **9** | **596** | **985** | **10** | **380** | **2009** |
+| P427 | 256 | 48 | 44 | 1 | 60 | 103 | 1 | 47 | 208 |
+| P428 | 276 | 58 | 53 | 1 | 70 | 94 | 3 | 59 | 214 |
+| P429 | 418 | 88 | 52 | 1 | 82 | 195 | 0 | 48 | 370 |
+| P430 | 240 | 45 | 43 | 1 | 32 | 119 | 1 | 40 | 199 |
+| P431 | 327 | 58 | 50 | 3 | 47 | 169 | 3 | 50 | 274 |
+| **Total** | **2399** | **443** | **366** | **9** | **596** | **985** | **10** | **373** | **2016** |
 
-**Exclusion codes:** DATE 34 | SHA 125 | LINE-RANGE 688 | STATUS 93 | COMMAND 92 | RANGE 82 | PATH 160 | PLACEHOLDER 82 | OPERATOR 6 | LITERAL 45 | IDENTIFIER 141 | EMPHASIS 102 | PROSE 359 = 2009.
+**Exclusion codes:** DATE 34 | SHA 125 | LINE-RANGE 688 | STATUS 93 | COMMAND 92 | RANGE 82 | PATH 160 | PLACEHOLDER 82 | OPERATOR 6 | LITERAL 45 | IDENTIFIER 141 | EMPHASIS 102 | PROSE 366 = 2016.
 
-**Invariants:** line-range cannot be defined/named; lowercase/hyphenated backticked identifiers cannot be EMPHASIS; acronym allowlist tokens cannot be class-i EMPHASIS; token column raw code-spanned placeholders with no HTML entities; backticked tokens are class iv except documented class-v placeholder/status tokens; unbackticked tokens are not class iv; class/disposition/acronym compatibility; Crows.json FULL totals and 4 rows agree with canonical Crows block; Crows block exact bytes/LF/SHA; inline artifacts + MANIFEST hash; per-page tallies; malformed/duplicate rows 0; stale values banned.
+**Rules:** lowercase json/api are ordinary prose EXCLUDED (not named gaps); class ii named gaps banned by verifier. Line ranges LINE-RANGE; lower/hyphen identifiers IDENTIFIER; placeholders code-spanned; backticked tokens class iv except documented class-v placeholder/status exception; Crows block exact; cross-file MANIFEST/README values checked.
 
 ## 5. Batch mapping, selection and continuation
 
@@ -2581,7 +2581,7 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 ## 6. Provenance, artifacts, checker and limits
 
-**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (inline canonical evidence in section 12; external copy is convenience only). **Generator (new review 5567574260 #1):** the external convenience generator is not required for AC3; the canonical verifier is the inline block in section 12 and it is in-branch reproducible. The external copy is not claimed as a branch file. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; README.md 1554/23/3826ef40f82c049f6816756e628f4b27021e4698cfb764590b8ecfd762605fa2; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/05042a127f315f7cd5633a7327757a7aada46076e9caff7982d70866980e9b87; Crows.json 3037/89/92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d. These _A paths are convenience copies only; the inline canonical evidence in section 12 is the in-branch verifiable basis for AC7. No machine-specific absolute path is retained.
+**Reader/authority and evidence disposition (findings #5/#8):** Stage C reader sd-c-read-lc-424-c1 read all eight pages whole at the mixed pin basis; page authors are not this reader; git metadata is not B6 proof. **Capture basis:** d1f12cc3. **Stage A:** _A/evidence/read-lc-424-a1/A-rows.txt 1175 B/4 LF/sha 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 (inline canonical evidence in section 12; external copy is convenience only). **Generator (new review 5567574260 #1):** the external convenience generator is not required for AC3; the canonical verifier is the inline block in section 12 and it is in-branch reproducible. The external copy is not claimed as a branch file. **Stage C evidence:** _A/evidence/read-lc-424-c1/Crows.txt 1542 B/4 LF/sha 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; README.md 1554/23/738668bd0a288a5a0fc070f9726cbdd2488a411a9fe35b922502abf9eff066ef; preview.py 1481/29/6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6; MANIFEST.txt 561/5/6aabcfeb6a54a6d051270809a72e1853f7db0ef24a66a57ac00794a3c1327491; Crows.json 3037/89/74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499. These _A paths are convenience copies only; the inline canonical evidence in section 12 is the in-branch verifiable basis for AC7. No machine-specific absolute path is retained.
 
 **PROC-04 method (no digest invented here):** body step publishes witness/skills/security bound fields; PROC is whole-line sentinels, whitespace-collapsed, LF-joined in that order, SHA-256; body publishes short+full digest/lens and literal-presence proof after final body edit. This record does not assert a PROC digest.
 
@@ -2591,12 +2591,12 @@ All eight pages were read whole L1-last at the plan mixed basis. Canonical B1-B6
 
 | AC | Status | Evidence |
 | --- | --- | --- |
-| AC1 one-path | MET | exactly one added record path; no other path; eight DCO-signed model commits measured post-commit; base d1f12cc3 |
+| AC1 one-path | MET | exactly one added record path; no other path; FIFTEEN DCO-signed model commits measured post-commit; base d1f12cc3 |
 | AC2 frozen pages | MET WITH WAIVER | mixed pin 1 pinned-equal + 7 re-pinned at d1f12cc3; totals 300,510 B/2,066 LF; waiver/basis defined under population definitions |
 | AC3 whole-page+inventory | MET WITH WAIVER / PARTIAL (table-level self-consistency only) | embedded verifier recomputes rows/keys/overlaps/classes/dispositions/codes/per-page and Crows.json from this record's table; source-page semantics/first-use remain manually asserted, not source-page cross-checked |
 | AC4 dispositions | MET for 0 FULL / 8 PARTIAL / 0 UNRUN (genuinely supported after semantic corrections) | B2/line-range/identifier/placeholder invariants and per-page B2 counts corrected; B4 N/A rationale, B5 partial limitation, B6 precise gap; no keeper/FULL claim |
 | AC5 record/body/PROC | MET WITH EXTERNAL ARTIFACT (live PR body/PROC/checker) | final live body publishes PROC-04 short/full/lens and literal presence; published == recomputed; body checker 0 (proof in PR body and SD-C repair comment) |
-| AC6 Codex/reviews | MET WITH EXTERNAL ARTIFACT (visible PR review-thread dispositions) | Codex never a pass, 0 threads/0 unresolved; newest review 5567657046 answered in visible findings-response comment with FIXED/DISPOSED; DeepSeek advisory only, never a gate |
+| AC6 Codex/reviews | MET WITH EXTERNAL ARTIFACT (visible PR review-thread dispositions) | Codex never a pass, 0 threads/0 unresolved; latest review 5568319753 answered in visible findings-response comment with FIXED/DISPOSED; prior review 5568285030 answered; earlier reviews remain answered; DeepSeek advisory only, never a gate |
 | AC7 provenance | MET (inline canonical evidence) | section 12 inlines A-rows/README/preview/MANIFEST/Crows content with measured B/LF/sha; Crows.json carries its trailing-LF/full-totals convention; external copies convenience only |
 | AC8 stage entry | MET for C | fresh B ACCEPT 6260430607; one record; D/E/F/G separate; no merge |
 
@@ -2626,7 +2626,7 @@ skill-usage-ledger@6a27b5c8e690 / hash=6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6
 ```
 
 **Support CLI proof (measured):** preview.py path -> _A/evidence/read-lc-424-c1/Crows.txt; sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3; bytes=1542; lf=4 ; preview.py rows -> table_name=stage_c_skills; key=row; where=stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21; rows=4; row=1 skill=acceptance-criteria-reviewer entry=.claude/skills/acceptance-criteria-reviewer/SKILL.md sha256=c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021 size=14207 model=DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness) plan_role=sd-c-read-lc-424-c1 ; preview.py query acceptance -> matches=1; {"entry": ".claude/skills/acceptance-criteria-reviewer/SKILL.md", "row": 1, "sha256": "c6e5d5649bf89658036cf38abba9c626701220e7b00831c2d843ceff94d81021", "skill": "acceptance-criteria-reviewer", "where": "stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21"}.
-**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (3826ef40f82c049f6816756e628f4b27021e4698cfb764590b8ecfd762605fa2) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (05042a127f315f7cd5633a7327757a7aada46076e9caff7982d70866980e9b87) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 3,036 B / 89 LF / sha 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3037 B / 89 LF / sha 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d.
+**Support CLI/README:** _A/evidence/read-lc-424-c1/README.md (738668bd0a288a5a0fc070f9726cbdd2488a411a9fe35b922502abf9eff066ef) documents table_name stage_c_skills, key row, WHERE stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21, capture hashes, source-vs-disk equality; _A/evidence/read-lc-424-c1/preview.py (6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6) supports modes path/query/rows; _A/evidence/read-lc-424-c1/MANIFEST.txt (6aabcfeb6a54a6d051270809a72e1853f7db0ef24a66a57ac00794a3c1327491) excludes itself and lists Crows/README/preview and A-rows reference. Crows.json is 3,036 B / 89 LF / sha 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499. **Crows.json convention:** this canonical block now includes its trailing LF and its full inventory totals (rows/classes/dispositions/codes); measured 3037 B / 89 LF / sha 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499.
 
 ## 10. Five required c-protocol questions (measured on final artifact)
 
@@ -2670,7 +2670,7 @@ Measured: 1175 B / 4 LF / sha11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc07
 ~~~~
 
 ### README canonical block
-Measured: 1554 B / 23 LF / sha 3826ef40f82c049f6816756e628f4b27021e4698cfb764590b8ecfd762605fa2
+Measured: 1554 B / 23 LF / sha 738668bd0a288a5a0fc070f9726cbdd2488a411a9fe35b922502abf9eff066ef
 
 ~~~~text
 # Batch-21 Stage C evidence support
@@ -2682,7 +2682,7 @@ Capture files (immutable; new filenames; never overwritten in place):
 | file | table_name | key | WHERE | bytes / LF | sha256 |
 | --- | --- | --- | --- | --- | --- |
 | Crows.txt | stage_c_skills | row | stage=C AND agent=sd-c-read-lc-424-c1 AND batch=21 | 1542 / 4 | 8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3 |
-| Crows.json | stage_c_skills | row | same | 3037 / 89 | 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d |
+| Crows.json | stage_c_skills | row | same | 3037 / 89 | 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499 |
 | preview.py | support CLI | mode path/query/rows | local | 1481 / 29 | 6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6 |
 | A-rows.txt reference | Stage A sd-a-read-lc-424-r1 | source _A/evidence/read-lc-424-a1/A-rows.txt | stage=A AND block=424-431 | 1175 / 4 | 11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430 |
 
@@ -2734,18 +2734,18 @@ if __name__ == "__main__": sys.exit(main(sys.argv[1:]))
 ~~~~
 
 ### MANIFEST canonical block
-Measured: 561 B / 5 LF / sha 05042a127f315f7cd5633a7327757a7aada46076e9caff7982d70866980e9b87
+Measured: 561 B / 5 LF / sha 6aabcfeb6a54a6d051270809a72e1853f7db0ef24a66a57ac00794a3c1327491
 
 ~~~~text
 Crows.txt  sha256=8a8a2564869ea7fbac87bb010eb9c9e8ea00b1b2b609e503ebd1bb4ee4c27ed3  bytes=1542  lf=4
-Crows.json  sha256=92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d  bytes=3037  lf=89
-README.md  sha256=5e4b5fb3e63eab2f48cdad7aa1dd0792400649b275dd175e7b0ffd00623237e3  bytes=1554  lf=23
+Crows.json  sha256=74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499  bytes=3037  lf=89
+README.md  sha256=738668bd0a288a5a0fc070f9726cbdd2488a411a9fe35b922502abf9eff066ef  bytes=1554  lf=23
 preview.py  sha256=6c21be05a5da953733966504a65175ee354f663a843c3f4b5f88cfad6ee331e6  bytes=1481  lf=29
 A-rows reference  path=_A/evidence/read-lc-424-a1/A-rows.txt  sha256=11c2e9b36467905ba3c5550da18a463e35fa6252b019209fc075d5cbc7db2430  bytes=1175  lf=4
 ~~~~
 
 ### Crows.json canonical block
-Measured: **3037 B / 89 LF / sha 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b136f3c086c1c6e820d** (includes trailing LF; Crows.json now carries FULL inventory totals).
+Measured: **3037 B / 89 LF / sha 74df7a4c5cab3379987784beb8f7997338ad25291ce0a79d88c621681fdf9499** (includes trailing LF; Crows.json now carries FULL inventory totals).
 
 ~~~~text
 {
@@ -2817,8 +2817,8 @@ Measured: **3037 B / 89 LF / sha 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b1
   },
   "dispositions": {
    "defined": 10,
-   "named": 380,
-   "excluded": 2009
+   "named": 373,
+   "excluded": 2016
   },
   "codes": {
    "DATE": 34,
@@ -2833,7 +2833,7 @@ Measured: **3037 B / 89 LF / sha 92a85a75a7adb4bd5a60bd8a89bb830c72eba9a5c0123b1
    "LITERAL": 45,
    "IDENTIFIER": 141,
    "EMPHASIS": 102,
-   "PROSE": 359
+   "PROSE": 366
   }
  }
 }
@@ -2878,6 +2878,7 @@ try:
  a=next(i for i in range(i,len(rec)) if rec[i].startswith("~~~~text"))
  b=next(i for i in range(a+1,len(rec)) if rec[i].startswith("~~~~"))
  content="\n".join(x.rstrip("\r") for x in rec[a+1:b])+"\n"
+  blocks[name]=content
  cj=json.loads(content)
  if len(cj.get("rows",[]))!=4: err("Crows.json rows %d !=4"%len(cj.get("rows",[])))
  decl=None
@@ -2904,7 +2905,7 @@ try:
  if cb_names!=cj_names: err("Crows block skills != Crows.json skills")
 except Exception as e: err("Crows block compare: "+str(e))
 # inline canonical artifact measured facts
-block_names=["A-rows","README","preview","MANIFEST","Crows.json"]; inline_ok=0
+block_names=["A-rows","README","preview","MANIFEST","Crows.json"]; inline_ok=0; blocks={}
 for name in block_names:
  try:
   h=next(i for i,l in enumerate(rec) if l.startswith("### "+name+" canonical block"))
@@ -2925,7 +2926,8 @@ try:
  i=next(i for i,l in enumerate(rec) if l.startswith("## 11."))
  a=next(i for i in range(i,len(rec)) if rec[i].startswith(chr(96)*3+"text"))
  b=next(i for i in range(a+1,len(rec)) if rec[i].startswith(chr(96)*3))
- content="\n".join(x.rstrip("\r") for x in rec[a+1:b])+"\n"; decl=None
+ content="\n".join(x.rstrip("\r") for x in rec[a+1:b])+"\n"
+  blocks[name]=content; decl=None
  for j in range(b,min(len(rec),b+14)):
   m=re.search(r"Canonical Crows block measured.*?(\d+) B / (\d+) LF / sha ?([0-9a-f]{64})",rec[j])
   if m: decl=m.groups()
@@ -2976,6 +2978,30 @@ for r in rows:
  tok=r[4].strip().strip(chr(96))
  if r[3]=="i" and "EMPHASIS" in r[5] and tok.upper() in ACR: err("acronym classified EMPHASIS "+repr(r))
 
+# cross-file MANIFEST/README checks
+cross_ok=0
+try:
+ def fact(name):
+  c=blocks.get(name)
+  return (len(c.encode()),c.count("\n"),hashlib.sha256(c.encode()).hexdigest()) if c else None
+ man="\n".join(x.rstrip("\r") for x in blocks.get("MANIFEST","").splitlines())
+ for fn,key in [("Crows.txt","Crows.txt"),("Crows.json","Crows.json"),("README.md","README"),("preview.py","preview")]:
+  m=re.search(r"(?m)^"+re.escape(fn)+r"\s+sha256=([0-9a-f]{64})\s+bytes=(\d+)\s+lf=(\d+)",man)
+  if not m: err("MANIFEST missing "+fn); continue
+  f=fact(key)
+  if f is None or (int(m.group(2)),int(m.group(3)),m.group(1))!=f: err("MANIFEST mismatch "+fn)
+ read="\n".join(x.rstrip("\r") for x in blocks.get("README","").splitlines())
+ for fn,key in [("Crows.txt","Crows.txt"),("Crows.json","Crows.json"),("preview.py","preview")]:
+  m=re.search(r"(?m)^\| "+re.escape(fn)+r" \|[^|]*\|[^|]*\|[^|]*\| (\d+) / (\d+) \| ([0-9a-f]{64}) \|",read)
+  if not m: err("README missing "+fn); continue
+  f=fact(key)
+  if f is None or (int(m.group(1)),int(m.group(2)),m.group(3))!=f: err("README mismatch "+fn)
+ cross_ok=1
+except Exception as e: err("cross-file: "+str(e))
+# class ii named gaps banned (lowercase prose exception)
+for r in rows:
+ if r[3]=="ii" and r[5].startswith("named"): err("class ii named gap "+repr(r))
+
 if raw_count<1: err("no raw <...> placeholders"); raw_ok=False
 for r in rows:
  tok=r[4]
@@ -2985,7 +3011,7 @@ for r in rows:
   elif r[3]=="v" and not re.fullmatch(r"<[^<>]+>",inner): err("class-v placeholder shape "+repr(r)); raw_ok=False
 if errors:
  print("VERIFIER FAIL:"); [print(" -",e) for e in errors]; sys.exit(1)
-print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d inline-artifacts=%d/6 crows-block=exact class-backtick=ok"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,inline_ok))
+print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=%d per-page=8 Crows.json=full-totals+rows-agree raw-token=%s raw-placeholders=%d inline-artifacts=%d/6 crows-block=exact class-backtick=ok cross-file=%s"%(len(rows),len(keys),dict(classes),dict(disp),sum(codes.values()),"ok" if raw_ok else "FAIL",raw_count,inline_ok,"ok" if cross_ok else "FAIL"))
 ~~~~
 
 **Mechanically verified by the verifier:** table parse/rows/keys/classes/dispositions/codes/per-page totals/Crows.json row1 count/malformed rows/overlaps. **Manually asserted, not source-page cross-checked:** page-token meanings, first-use judgments, B2/AC dispositions; AC3 is therefore table-level self-consistency only.
@@ -2993,7 +3019,7 @@ print("VERIFIER OK rows=%d unique=%d malformed=0 classes=%s disps=%s exclusions=
 ### Embedded verifier expected output
 
 ~~~~text
-VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 596, 'i': 443, 'iii': 9} disps={'excluded': 2009, 'named': 380, 'defined': 10} exclusions=2009 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127 inline-artifacts=6/6 crows-block=exact class-backtick=ok
+VERIFIER OK rows=2399 unique=2399 malformed=0 classes={'ii': 366, 'v': 985, 'iv': 596, 'i': 443, 'iii': 9} disps={'excluded': 2016, 'named': 373, 'defined': 10} exclusions=2016 per-page=8 Crows.json=full-totals+rows-agree raw-token=ok raw-placeholders=127 inline-artifacts=6/6 crows-block=exact class-backtick=ok cross-file=ok
 ~~~~
 
 External convenience copies: _A/evidence/read-lc-424-c1/Crows.txt 1542/4/sha8a8a2564..., A-rows path above, README/preview/MANIFEST/Crows.json above. No in-branch claim of files outside this record.
