@@ -31,7 +31,7 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 ### P400 - index 400 - docs/evidence/documentation/full-page-readability-batch-after-225-2026-09-24.md - read whole L1-44
 
 **B1:** full-page readability batch after 225 - readability batch record after PR 225. The page states its purpose; the intended audience is not explicitly named in the opening, so B1 is recorded as a gap rather than a pass.
-**B2:** 60 inventory rows; defined-at-first-use 9; named first-use gaps: batch L1, pending L4, status L6, PR L8, active L10, SKILL L17, grant L17, tenant L18, lifecycle L22, register L22, policy L26, reviewer L26, owner L27, provider L27, gate L29, unknown L30, review L34, checkpoint L41.
+**B2:** 62 inventory rows; defined-at-first-use 9; named first-use gaps: batch L1, pending L4, status L6, PR L8, active L10, SKILL L17, grant L17, tenant L18, lifecycle L22, register L22, policy L26, reviewer L26, owner L27, provider L27, gate L29, unknown L30, review L34, checkpoint L41.
 **B3:** descriptive headings/lists/tables and concrete examples are present; scope and reading/acceptance steps are stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result.
 **B5:** navigation links and referenced files were checked; no removed safety boundary found on this read.
@@ -41,7 +41,7 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 ### P401 - index 401 - docs/evidence/documentation/full-page-readability-batch-after-226-2026-09-24.md - read whole L1-39
 
 **B1:** full-page readability batch after 226 - readability batch record after PR 226. The page states its purpose; the intended audience is not explicitly named in the opening, so B1 is recorded as a gap rather than a pass.
-**B2:** 67 inventory rows; defined-at-first-use 6; named first-use gaps: batch L1, PR L3, active L5, pending L8, SKILL L12, scope L12, tenant L12, unknown L12, review L13, reviewer L13, SAST L14, status L14, failed L16, URL L17, audit L17, token L17, evidence L18, usage L18, workflow L21, owner L22, owners L22, purpose L26, reader L26, checkpoint L36, forecast L36, grant L38, provider L38.
+**B2:** 69 inventory rows; defined-at-first-use 6; named first-use gaps: batch L1, PR L3, active L5, pending L8, SKILL L12, scope L12, tenant L12, unknown L12, review L13, reviewer L13, SAST L14, status L14, failed L16, URL L17, audit L17, token L17, evidence L18, usage L18, workflow L21, owner L22, owners L22, purpose L26, reader L26, checkpoint L36, forecast L36, grant L38, provider L38.
 **B3:** descriptive headings/lists/tables and concrete examples are present; scope and reading/acceptance steps are stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result.
 **B5:** navigation links and referenced files were checked; no removed safety boundary found on this read.
@@ -51,7 +51,7 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 ### P402 - index 402 - docs/evidence/documentation/full-page-readability-batch-after-228-2026-09-24.md - read whole L1-39
 
 **B1:** full-page readability batch after 228 - readability batch record after PR 228. The page states its purpose; the intended audience is not explicitly named in the opening, so B1 is recorded as a gap rather than a pass.
-**B2:** 60 inventory rows; defined-at-first-use 10; named first-use gaps: batch L1, PR L3, active L5, pending L8, SKILL L12, auditor L13, status L13, can L16, owner L16, reviewer L16, evidence L18, triage L18, tenant L19, unrun L24, version L27, grant L38, provider L38.
+**B2:** 62 inventory rows; defined-at-first-use 10; named first-use gaps: batch L1, PR L3, active L5, pending L8, SKILL L12, auditor L13, status L13, can L16, owner L16, reviewer L16, evidence L18, triage L18, tenant L19, unrun L24, version L27, grant L38, provider L38.
 **B3:** descriptive headings/lists/tables and concrete examples are present; scope and reading/acceptance steps are stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result.
 **B5:** navigation links and referenced files were checked; no removed safety boundary found on this read.
@@ -61,7 +61,7 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 ### P403 - index 403 - docs/evidence/documentation/full-page-readability-batch-after-229-2026-09-24.md - read whole L1-45
 
 **B1:** full-page readability batch after 229 - readability batch record after PR 229. The page states its purpose; the intended audience is not explicitly named in the opening, so B1 is recorded as a gap rather than a pass.
-**B2:** 62 inventory rows; defined-at-first-use 7; named first-use gaps: batch L1, pending L4, status L6, PR L8, active L10, CORS L17, SKILL L17, model L18, reviewer L18, version L18, grant L19, evidence L20, workflow L20, owner L21, unrun L24, must L25, CI L26, scope L26, provider L30, JSON L40, gates L41.
+**B2:** 64 inventory rows; defined-at-first-use 7; named first-use gaps: batch L1, pending L4, status L6, PR L8, active L10, CORS L17, SKILL L17, model L18, reviewer L18, version L18, grant L19, evidence L20, workflow L20, owner L21, unrun L24, must L25, CI L26, scope L26, provider L30, JSON L40, gates L41.
 **B3:** descriptive headings/lists/tables and concrete examples are present; scope and reading/acceptance steps are stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result.
 **B5:** navigation links and referenced files were checked; no removed safety boundary found on this read.
@@ -71,7 +71,7 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 ### P404 - index 404 - docs/evidence/documentation/full-page-readability-batch-after-230-2026-09-24.md - read whole L1-40
 
 **B1:** full-page readability batch after 230 - readability batch record after PR 230. The page states its purpose; the intended audience is not explicitly named in the opening, so B1 is recorded as a gap rather than a pass.
-**B2:** 76 inventory rows; defined-at-first-use 17; named first-use gaps: batch L1, PR L3, active L5, pending L8, SKILL L12, must L12, grant L13, provider L15, reconciliation L15, tenant L15, evidence L16, version L17, decision L18, branch L19, reviewer L20, DNS L21, SSRF L21, CI L23, purpose L24, may L27, backfill L29, operators L31, gates L36.
+**B2:** 78 inventory rows; defined-at-first-use 17; named first-use gaps: batch L1, PR L3, active L5, pending L8, SKILL L12, must L12, grant L13, provider L15, reconciliation L15, tenant L15, evidence L16, version L17, decision L18, branch L19, reviewer L20, DNS L21, SSRF L21, CI L23, purpose L24, may L27, backfill L29, operators L31, gates L36.
 **B3:** descriptive headings/lists/tables and concrete examples are present; scope and reading/acceptance steps are stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result.
 **B5:** navigation links and referenced files were checked; no removed safety boundary found on this read.
@@ -81,7 +81,7 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 ### P405 - index 405 - docs/evidence/documentation/full-page-readability-batch-after-231-2026-09-24.md - read whole L1-40
 
 **B1:** full-page readability batch after 231 - readability batch record after PR 231. The page states its purpose; the intended audience is not explicitly named in the opening, so B1 is recorded as a gap rather than a pass.
-**B2:** 74 inventory rows; defined-at-first-use 11; named first-use gaps: batch L1, PR L3, active L5, pending L8, scope L12, tenant L12, may L13, operator L13, policy L13, versioned L16, evidence L17, grant L17, rule L17, runner L17, tests L21, marker L26, approval L27, gate L30, review L35, gates L36, provider L39.
+**B2:** 76 inventory rows; defined-at-first-use 11; named first-use gaps: batch L1, PR L3, active L5, pending L8, scope L12, tenant L12, may L13, operator L13, policy L13, versioned L16, evidence L17, grant L17, rule L17, runner L17, tests L21, marker L26, approval L27, gate L30, review L35, gates L36, provider L39.
 **B3:** descriptive headings/lists/tables and concrete examples are present; scope and reading/acceptance steps are stated where supplied.
 **B4:** reference/status/acceptance-record content only; no synthetic test, passing check or approved design is presented as a deployed integration or measured model result.
 **B5:** navigation links and referenced files were checked; no removed safety boundary found on this read.
@@ -1158,26 +1158,38 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 | P407 | 563 | i | CONFLICTING | named gap - first use before any expansion on this page |
 | P407 | 563 | ii | pr | named gap - first use before any expansion on this page |
 | P407 | 563 | iv | `gh pr view 771` | documented exclusion - inline code/path/command/identifier, not a prose abbreviation |
+| P400 | 10 | v | 3–6 | documented exclusion - range/unit token, not a prose abbreviation |
+| P400 | 11 | v | 130–334 | documented exclusion - range/unit token, not a prose abbreviation |
+| P401 | 5 | v | 3–6 | documented exclusion - range/unit token, not a prose abbreviation |
+| P401 | 6 | v | 130–329 | documented exclusion - range/unit token, not a prose abbreviation |
+| P402 | 5 | v | 3–6 | documented exclusion - range/unit token, not a prose abbreviation |
+| P402 | 6 | v | 130–324 | documented exclusion - range/unit token, not a prose abbreviation |
+| P403 | 10 | v | 3–6 | documented exclusion - range/unit token, not a prose abbreviation |
+| P403 | 11 | v | 125–319 | documented exclusion - range/unit token, not a prose abbreviation |
+| P404 | 5 | v | 3–6 | documented exclusion - range/unit token, not a prose abbreviation |
+| P404 | 6 | v | 125–319 | documented exclusion - range/unit token, not a prose abbreviation |
+| P405 | 5 | v | 3–6 | documented exclusion - range/unit token, not a prose abbreviation |
+| P405 | 6 | v | 125–314 | documented exclusion - range/unit token, not a prose abbreviation |
 
 ## 5. Counts, reconciliation and zero-duplicate proof
 
 | Page | (i) | (ii) | (iii) | (iv) | (v) | Rows | Named gaps | Defined | Exclusions |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| P400 | 2 | 25 | 32 | 1 | 0 | 60 | 18 | 9 | 33 |
-| P401 | 5 | 29 | 32 | 1 | 0 | 67 | 27 | 6 | 34 |
-| P402 | 2 | 25 | 32 | 1 | 0 | 60 | 17 | 10 | 33 |
-| P403 | 6 | 23 | 32 | 1 | 0 | 62 | 21 | 7 | 34 |
-| P404 | 5 | 35 | 35 | 1 | 0 | 76 | 23 | 17 | 36 |
-| P405 | 1 | 31 | 41 | 1 | 0 | 74 | 21 | 11 | 42 |
+| P400 | 2 | 25 | 32 | 1 | 2 | 62 | 18 | 9 | 35 |
+| P401 | 5 | 29 | 32 | 1 | 2 | 69 | 27 | 6 | 36 |
+| P402 | 2 | 25 | 32 | 1 | 2 | 62 | 17 | 10 | 35 |
+| P403 | 6 | 23 | 32 | 1 | 2 | 64 | 21 | 7 | 36 |
+| P404 | 5 | 35 | 35 | 1 | 2 | 78 | 23 | 17 | 38 |
+| P405 | 1 | 31 | 41 | 1 | 2 | 76 | 21 | 11 | 44 |
 | P406 | 167 | 50 | 90 | 7 | 3 | 317 | 53 | 11 | 253 |
 | P407 | 102 | 65 | 93 | 61 | 7 | 328 | 78 | 19 | 231 |
-| **Total** | **290** | **283** | **387** | **74** | **10** | **1044** | **258** | **90** | **696** |
+| **Total** | **290** | **283** | **387** | **74** | **22** | **1056** | **258** | **90** | **708** |
 
-**Zero-duplicate proof:** final table rows = **1044** = unique (page, normalized token) keys = **1044**; duplicate keys = **0**; extra rows after final table = **0**; per-page/class/disposition sums equal row count; one contiguous table; all rows parse exactly five cells with pipes escaped and **0** bad rows. Every row resolves to real page text at its real first occurrence; no fabricated/placeholder row. **Reconciliation:** section 3 B2/verdicts and section 6 named-gap list agree with the final table.
+**Zero-duplicate proof:** final table rows = **1056** = unique (page, normalized token) keys = **1056**; duplicate keys = **0**; extra rows after final table = **0**; per-page/class/disposition sums equal row count; one contiguous table; all rows parse exactly five cells with pipes escaped and **0** bad rows. Every row resolves to real page text at its real first occurrence; no fabricated/placeholder row. **Reconciliation:** section 3 B2/verdicts and section 6 named-gap list agree with the final table.
 
 ## 6. Dispositions, verdicts, keeper exclusion and continuation
 
-**Disposition tally: 90 defined at first use / 258 named gaps / 696 documented exclusions = 1044 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED and a B1 audience gap is recorded; no keeper/acceptance row.
+**Disposition tally: 90 defined at first use / 258 named gaps / 696 documented exclusions = 1056 rows.** **Verdict tally: 0 FULL / 8 PARTIAL / 0 UNRUN.** No page is FULL because canonical B6 is UNVERIFIED and a B1 audience gap is recorded; no keeper/acceptance row.
 
 **Named-gap list (from the final table):**
 - P400 (400): batch L1, pending L4, status L6, PR L8, active L10, SKILL L17, grant L17, tenant L18, lifecycle L22, register L22, policy L26, reviewer L26, owner L27, provider L27, gate L29, unknown L30, review L34, checkpoint L41
@@ -1193,7 +1205,7 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 
 ## 7. Provenance, reader, artifacts and limits
 
-**Plan:** 6257088011 + B FINAL DELTA ACCEPT 6257149613. **Base/main:** d5a8905e (owner CI #848 merge after d7314294); record merges 54, latest record #856 d7314294. **Reader:** sd-c-read-lc-400-c1 (true identity sd-c-793-r2) read all eight whole at 2db1ffb7 and main d5a8905e; no display elision. **Page authors are not this reader** (git metadata only; not B6 proof). **Capture basis:** d5a8905e stated consistently in record and body. **Duplicate-read disclosure:** 0/60 lane-batch hits; older reads R2-nonbinding per 6250828860. **Retained artifacts:** _A/evidence/read-lc-400-c1/Crows.txt 4 rows / 1,609 B / 4 LF / sha256 39dd8cd8a16a8d233eed5a0f1c9be050e8c9f53eb9952b3d310297c5c62c6406; Stage A capture 606dac7a615eaa21099cbc606b99716a16f2f4a1154804d9ed7a4205ad733d12 (935 B/4 LF). **Witness:** section 2 page table; all eight pinned 2db1ffb7 and byte-identical at main d5a8905e; zero drift. **Record digest** is not embedded; record facts are published outside this record. **Commit facts:** DCO-signed model commit(s); post-commit count/SHA/tree measured in PR body/SD-C handoff. **Limits:** B6 unverified; no page output edited; no keeper/index/ledger/register/manifest/tool/test/workflow change; no merge by C.
+**Plan:** 6257088011 + B FINAL DELTA ACCEPT 6257149613. **Base/main:** d5a8905e (owner CI #848 merge after d7314294); record merges 54, latest record #856 d7314294. **Reader:** sd-c-read-lc-400-c1 (true identity sd-c-793-r2) read all eight whole at 2db1ffb7 and main d5a8905e; no display elision. **Page authors are not this reader** (git metadata only; not B6 proof). **Capture basis:** d5a8905e stated consistently in record and body. **Duplicate-read disclosure:** 0/60 lane-batch hits; older reads R2-nonbinding per 6250828860. **Retained artifacts:** _A/evidence/read-lc-400-c1/Crows.txt 4 rows / 1,399 B / 4 LF / sha256 634b8e130d388f932b2eb138ca65f096f0ed44dcc68633fdd2b7223365f05a7e6; Stage A capture 606dac7a615eaa21099cbc606b99716a16f2f4a1154804d9ed7a4205ad733d12 (935 B/4 LF). **Witness:** section 2 page table; all eight pinned 2db1ffb7 and byte-identical at main d5a8905e; zero drift. **Record digest** is not embedded; record facts are published outside this record. **Commit facts:** DCO-signed model commit(s); post-commit count/SHA/tree measured in PR body/SD-C handoff. **Limits:** B6 unverified; no page output edited; no keeper/index/ledger/register/manifest/tool/test/workflow change; no merge by C.
 
 ## 8. AC1-AC8 status at this Stage C handoff
 
@@ -1213,10 +1225,10 @@ All eight pages were read whole L1-last; P406 (520 LF) and P407 (575 LF) were re
 ```text
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| [`acceptance-criteria-reviewer`](.claude/skills/acceptance-criteria-reviewer/SKILL.md) @ `c6e5d5649bf8` | Stage A plan / `sd-a-read-lc-400-r1` (true identity `sd-e-802-r1`; DeepSeek V4 Flash) | Bound canonical/ACs to block 400-407; B4 per page; B6 UNVERIFIED | canonical exact; B4 per page; B6 unverified |
-| [`source-of-truth-reconciler`](.claude/skills/source-of-truth-reconciler/SKILL.md) @ `b5fd9feda972` | Stage A plan / `sd-a-read-lc-400-r1` (true identity `sd-e-802-r1`; DeepSeek V4 Flash) | Re-ran check_index; 155 quarters; 60 records; eight pages | 735/107/6/612/6/4/628; union618; block400-407; 132,267/1,342; 0 read-row hits |
-| [`change-classification-gate`](.claude/skills/change-classification-gate/SKILL.md) @ `08d91a834460` | Stage A plan / `sd-a-read-lc-400-r1` (true identity `sd-e-802-r1`; DeepSeek V4 Flash) | Docs-only one added record path | one record path; absent at main |
-| [`skill-usage-ledger`](.claude/skills/skill-usage-ledger/SKILL.md) @ `6a27b5c8e690` | Stage A plan / `sd-a-read-lc-400-r1` (true identity `sd-e-802-r1`; DeepSeek V4 Flash) | Authored account/capture | four rows/sources; non-zero binding |
+| acceptance-criteria-reviewer @ c6e5d5649bf8 | A plan / sd-a-read-lc-400-r1 (true identity sd-e-802-r1; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Bound canonical/ACs to block 400-407; B4 per page; B6 UNVERIFIED | canonical exact; B4 per page; B6 unverified |
+| source-of-truth-reconciler @ b5fd9feda972 | A plan / sd-a-read-lc-400-r1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Re-ran check_index; 155 quarters; 60 records; eight pages | 735/107/6/612/6/4/628; union618; block400-407; 132,267/1,342; 0 read-row hits |
+| change-classification-gate @ 08d91a834460 | A plan / sd-a-read-lc-400-r1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Docs-only one added record path | one record path; absent at main |
+| skill-usage-ledger @ 6a27b5c8e690 | A plan / sd-a-read-lc-400-r1 (DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Authored account/capture | four rows/sources; non-zero binding |
 
 <!-- Row source: agent=sd-a-read-lc-400-r1; true identity sd-e-802-r1; stage=A; round=1; row=1; target=PR #856 / main d73142946c39aa01573d2a3a2992b58aefde2727 / block 400-407; source=_A/evidence/read-lc400-a1/A-rows.txt line 1 of 4; binding=sha256 606dac7a615eaa21099cbc606b99716a16f2f4a1154804d9ed7a4205ad733d12 over 935 B / 4 LF; status=current -->
 <!-- Row source: agent=sd-a-read-lc-400-r1; true identity sd-e-802-r1; stage=A; round=1; row=2; target=PR #856 / main d73142946c39aa01573d2a3a2992b58aefde2727 / block 400-407; source=_A/evidence/read-lc400-a1/A-rows.txt line 2 of 4; binding=sha256 606dac7a615eaa21099cbc606b99716a16f2f4a1154804d9ed7a4205ad733d12 over 935 B / 4 LF; status=current -->
@@ -1235,18 +1247,18 @@ skill-usage-ledger@6a27b5c8e690 / reason: A account / applied: four rows/sources
 
 | Skill | Stage / agent | How applied | Result / evidence |
 | --- | --- | --- | --- |
-| acceptance-criteria-reviewer @ c6e5d5649bf8 | C batch-18 / sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built one exact-once inventory under the known-defect scan. | 0 FULL / 8 PARTIAL / 0 UNRUN; 1045-row inventory; no keeper |
+| acceptance-criteria-reviewer @ c6e5d5649bf8 | C batch-18 / sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read all eight pages whole; applied canonical B1-B6, B4 per page and B6 UNVERIFIED; built one exact-once inventory under the known-defect scan. | 0 FULL / 8 PARTIAL / 0 UNRUN; 1056-row inventory; no keeper |
 | source-of-truth-reconciler @ b5fd9feda972 | C batch-18 / sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main d5a8905e; re-verified pin/main drift, frontier/quarters, duplicate-read and the retained artifacts. | block 400-407/batch18; union618/155 quarters; 132,267 B/1342 LF; 0/60 lane-batch hits; capture basis d5a8905e |
 | change-classification-gate @ 08d91a834460 | C batch-18 / sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main; classified docs-only exactly one added path. | one added docs/evidence/documentation/readability-lane-c-batch-18-2026-10-18.md; no other path |
 | skill-usage-ledger @ 6a27b5c8e690 | C batch-18 / sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)) | Read at main; resolved manifest hashes and authored rows/Row sources/six fields; retained Crows.txt capture. | 4 rows / 4 per-row sources / 4 six-field lines |
 
-<!-- Row source: agent=sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this batch-18 record commit on branch from d5a8905e, plan 6257088011 / B ACCEPT 6257149613; source=_A/evidence/read-lc-400-c1/Crows.txt line 1 of 4; binding=sha256 39dd8cd8a16a8d233eed5a0f1c9be050e8c9f53eb9952b3d310297c5c62c6406 over four-row capture (1609 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this batch-18 record commit on branch from d5a8905e, plan 6257088011 / B ACCEPT 6257149613; source=_A/evidence/read-lc-400-c1/Crows.txt line 2 of 4; binding=sha256 39dd8cd8a16a8d233eed5a0f1c9be050e8c9f53eb9952b3d310297c5c62c6406 over four-row capture (1609 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this batch-18 record commit on branch from d5a8905e, plan 6257088011 / B ACCEPT 6257149613; source=_A/evidence/read-lc-400-c1/Crows.txt line 3 of 4; binding=sha256 39dd8cd8a16a8d233eed5a0f1c9be050e8c9f53eb9952b3d310297c5c62c6406 over four-row capture (1609 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
-<!-- Row source: agent=sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this batch-18 record commit on branch from d5a8905e, plan 6257088011 / B ACCEPT 6257149613; source=_A/evidence/read-lc-400-c1/Crows.txt line 4 of 4; binding=sha256 39dd8cd8a16a8d233eed5a0f1c9be050e8c9f53eb9952b3d310297c5c62c6406 over four-row capture (1609 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=1; target=this batch-18 record commit on branch from d5a8905e, plan 6257088011 / B ACCEPT 6257149613; source=_A/evidence/read-lc-400-c1/Crows.txt line 1 of 4; binding=sha256 634b8e130d388f932b2eb138ca65f096f0ed44dcc68633fdd2b7223365f05a7e6 over four-row capture (1399 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=2; target=this batch-18 record commit on branch from d5a8905e, plan 6257088011 / B ACCEPT 6257149613; source=_A/evidence/read-lc-400-c1/Crows.txt line 2 of 4; binding=sha256 634b8e130d388f932b2eb138ca65f096f0ed44dcc68633fdd2b7223365f05a7e6 over four-row capture (1399 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=3; target=this batch-18 record commit on branch from d5a8905e, plan 6257088011 / B ACCEPT 6257149613; source=_A/evidence/read-lc-400-c1/Crows.txt line 3 of 4; binding=sha256 634b8e130d388f932b2eb138ca65f096f0ed44dcc68633fdd2b7223365f05a7e6 over four-row capture (1399 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
+<!-- Row source: agent=sd-c-read-lc-400-c1 (true identity sd-c-793-r2; DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)); stage=C; round=1; row=4; target=this batch-18 record commit on branch from d5a8905e, plan 6257088011 / B ACCEPT 6257149613; source=_A/evidence/read-lc-400-c1/Crows.txt line 4 of 4; binding=sha256 634b8e130d388f932b2eb138ca65f096f0ed44dcc68633fdd2b7223365f05a7e6 over four-row capture (1399 B / 4 LF); limits=digest binds captured text, not human identity; status=current -->
 
 **Six-field lines (outside any bound field):**
-acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical acceptance and one exact-once inventory / applied: read eight whole pages, B1-B6, B4 per page, B6 unverified, known-defect scan / result: 0F/8P; 1045 rows; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-400-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
+acceptance-criteria-reviewer@c6e5d5649bf8 / reason: C owes canonical acceptance and one exact-once inventory / applied: read eight whole pages, B1-B6, B4 per page, B6 unverified, known-defect scan / result: 0F/8P; 1056 rows; no keeper / incomplete: D/E/F/G / by: C, sd-c-read-lc-400-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 source-of-truth-reconciler@b5fd9feda972 / reason: frontier/pages/artifacts must come from live state / applied: main d5a8905e, union618/155 quarters, eight pins zero drift, duplicate audit, artifacts / result: block400-407; 132,267/1342; 0/60 lane-batch hits / incomplete: C reads whole / by: C, sd-c-read-lc-400-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 change-classification-gate@08d91a834460 / reason: scope must be docs-only one path / applied: checked record path absence/no other change / result: one added record path / incomplete: none / by: C, sd-c-read-lc-400-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
 skill-usage-ledger@6a27b5c8e690 / reason: C handoff owes provenance / applied: resolved four names at main d5a8905e, authored rows/sources/six, retained Crows capture / result: 4 rows/4 sources/4 lines / incomplete: none / by: C, sd-c-read-lc-400-c1 (true identity sd-c-793-r2), DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness)
