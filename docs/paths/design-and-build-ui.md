@@ -84,11 +84,13 @@ for what materially blocks the next useful action.
    sources is resolved explicitly, not by taking the one that is easier to
    read.
 
-   **If the project is new and keeps no such file yet,** the fallback is the
-   step-2 spec and the reviewable design itself: record the authority with
-   that artifact now, and move it into the project's own state file when the
-   existing setup flow creates one. This path never invents a new project
-   file on its own.
+   **If the project is new, or existing but keeps no such file yet,** the fallback
+   is the step-2 spec and the reviewable design itself: record the authority
+   with that artifact now, and move it into the project's own state file when
+   the existing setup flow creates one. For an existing project with no such
+   file and no step-2 artifact, ask you where the authority should live (or
+   record it outside the project tree) rather than inventing a new project
+   file. This path never invents a new project file on its own.
 
    *No Aegis skill owns the design itself.* When design is the task, the agent
    produces a reviewable interface structure, a visual direction and a

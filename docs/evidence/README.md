@@ -21,7 +21,7 @@ route-register and unrun record row, added 2026-10-20 by this change against bas
 `a4fecf1a`, whose provenance is this change's own evidence page. Each of the four
 records its own date and base revision where the row records it: the FU-3,
 capture-publication and new UX/UI rows state their base revisions, and the SCIF
-row states its provenance commit `503c3b30` (the commit that added its page).
+row's introductory paragraph names commit `503c3b30`, which added that row's page.
 None cites the commit that contains this index page -
 a page cannot cite its own commit, the convention
 `docs/roadmaps/aegis-ci-baseline-2026-10-11.md` L51-L52 states for itself.
