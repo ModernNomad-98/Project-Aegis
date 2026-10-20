@@ -832,7 +832,11 @@ keeps a human as the approval gate on anything irreversible. See
     SOC 2 (+ NIST AI RMF): one control foundation, framework projections, a crosswalk, evidence,
     gap audit. *e.g.* `compliance-control-foundation`, `multi-framework-crosswalk`,
     `compliance-gap-auditor`, `soc2-trust-criteria-mapper`.
-11. **Library meta / self-application** *(D13, 5 + selector, 6)* — the library applied to itself: quality review, whole-PR review, eval-execution design, usage instrumentation, deprecation planning, and goal→skill-set selection. *e.g.* `skill-quality-reviewer`, `library-diff-reviewer`, `eval-runner-designer`, `skill-usage-instrumenter`, `skill-deprecation-planner`, `skill-selection-advisor`.
+11. **Library meta / self-application** *(D13, 5 + selector, 6)* — the library applied to itself:
+    quality review, whole-PR review, eval-execution design, usage instrumentation, deprecation
+    planning, and goal→skill-set selection. *e.g.* `skill-quality-reviewer`,
+    `library-diff-reviewer`, `eval-runner-designer`, `skill-usage-instrumenter`,
+    `skill-deprecation-planner`, `skill-selection-advisor`.
 12. **Operational workflow patterns** *(D12.8, 10)* — the concrete, invocable rules of the
     **Zero Trust AI Engineering Discipline**: approval registers, CI-mirror preflight,
     risk-tiered + sharded validation, merge-is-deploy governance. *e.g.*
@@ -1311,8 +1315,9 @@ Rules section:
 Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`.
 
 D13 — library meta / self-application (D18 + D22): the library applies its
-own discipline to itself, end to end. All five are pure review/design
-skills (verdicts, specs, plans — none edits anything) → model-invocable.
+own discipline to itself, end to end. All five D13 skills, and the later family-11
+addition, are pure review/design skills (verdicts, specs, plans — none edits
+anything) → model-invocable.
 `skill-quality-reviewer` **composes** `scripts/validate-skills.py` as its
 entry gate; `library-diff-reviewer` composes `skill-quality-reviewer` as
 its single-skill inner loop (the seam pinned at D18, now owned from both
@@ -1328,11 +1333,6 @@ D25, with the SKILL-vs-DOC seam pinned in trigger-evals:
 | `eval-runner-designer` | Designs how the eval corpus would actually EXECUTE — per-case-type semantics (fresh isolated session; refusal cases fire AND refuse), pairwise discrimination scoring, deterministic-vs-LLM-judge assertion routing with `JUDGE_ERROR` honesty, UNRUN-default reporting, cost/sampling tiers, flake policy, advisory-first CI. Design/spec only: never claims a runner exists or that evals pass. | auto + manual |
 | `skill-usage-instrumenter` | Designs the usage-evidence layer: invocation signals (auto vs explicit, coarse enums — never prompt content or user identifiers), wrong-fire/correction events, never-fired lists over a stated window, evidence tiers, thresholds naming an action AND consumer, and the rare-but-critical exemption so low usage alone never condemns a safety-net skill. Adds no hooks; edits nothing. | auto + manual |
 | `skill-deprecation-planner` | Plans a skill's staged retirement: qualifying trigger (superseded + coverage diff / absorbed / evidenced disuse / defect), reverse-link sweep with a disposition per inbound reference, mark → redirect-window → remove with rollback per stage (squash removal reverts as one ordinary commit), registration rows moved to a retired record. Plan only; every stage is human-approved. | auto + manual |
-
-Family 11 addition — goal→skill-set selection (owner instruction 2026-10-20; not part of D13 scope):
-
-| Skill | What it does | Invocation |
-|---|---|---|
 | `skill-selection-advisor` | Turns a goal into a ranked shortlist of existing shipped skills: roles, fit, order, gaps, manual-only flags and the source revision it read; read-only, never invents, never invokes any skill; flags MANUAL-ONLY skills for the human. | auto + manual |
 
 D12.8 — operational workflow patterns (D21): the 10 evidence-extracted

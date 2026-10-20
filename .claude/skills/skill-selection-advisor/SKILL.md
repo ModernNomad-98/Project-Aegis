@@ -1,6 +1,6 @@
 ---
 name: skill-selection-advisor
-description: 'Turn a goal into a ranked shortlist of already-shipped Aegis skills — the read-only selection layer above the catalog. Use when the user describes an outcome and asks which skills to use, in what order, or what the library does not cover. It ranks at most five EXISTING shipped skills with each one''s role, fit and order plus the source revision the answer was built from and any manual-only flag. It never invents a skill, never presents a GAP as installed, never writes or executes anything, and never auto-invokes a MANUAL-ONLY skill. Do NOT use when a single skill is already named or the request is one clearly-scoped step (use that skill directly), when a beginner with no project stage needs lifecycle routing (project-orchestrator), when the question is one skill''s design quality (skill-quality-reviewer), when the request is a whole-PR library audit (library-diff-reviewer), or when the user wants to browse the catalog (see docs/skills-catalog.md).'
+description: 'Turn a goal into a ranked shortlist of already-shipped Aegis skills — the read-only selection layer above the catalog. Use when the user states an outcome and asks which skills to use, in what order, what the library does not cover, or "I am using X; what else should I add?" (a complement question). It ranks at most five EXISTING shipped skills with each one''s role, fit and order plus the source revision the answer was built from and any manual-only flag. It never invents a skill, never treats a GAP as installed, never writes or executes, and never invokes any skill (MANUAL-ONLY ones flagged for the human). Do NOT use when a skill is named and only its invocation is asked, or the request is one clearly-scoped step (use it directly); for beginner lifecycle routing (project-orchestrator); for one skill''s design quality (skill-quality-reviewer); for a whole-PR library audit (library-diff-reviewer); to classify a change first (change-classification-gate); or to browse the catalog (see docs/skills-catalog.md).'
 ---
 
 # Skill Selection Advisor
@@ -31,8 +31,9 @@ backlog — never an installed capability.
   together, or what is missing from the shipped set.
 - Use when: the user wants a shortlist with rationale and a named source
   revision they can verify.
-- Do NOT use when: the user already named the skill, or the task is one
-  clearly scoped step — invoke that skill directly instead of re-routing it.
+- Do NOT use when: the user names a skill and asks only to invoke it, or the
+  task is one clearly scoped step — invoke that skill directly. (A complement
+  question — "I'm using X; what else should I add?" — still uses this skill.)
 - Do NOT use when: the user is a non-developer with no defined project stage
   and needs lifecycle routing from the beginning — that is
   `project-orchestrator` (stage detection and one-question-at-a-time
@@ -47,8 +48,9 @@ backlog — never an installed capability.
   AI/agentic vs schema, and its validation floor) — that is
   `change-classification-gate`.
 - Do NOT use when: the request is a whole-PR library audit — that is
-  `library-diff-reviewer`, which composes this skill only when a
-  goal-to-shortlist question is part of its review.
+  `library-diff-reviewer` (PR-level mechanics are its job, not this skill's;
+  a goal-to-shortlist question inside such an audit is simply answered by this
+  skill — no composition is claimed).
 
 ## Inputs to Inspect
 
@@ -247,12 +249,12 @@ output.
 ## Supporting Files
 
 - `evals/evals.json` — behavior cases: multi-skill goal ranking, manual-only
-  flagging, no-fit gap honesty, unreadable-input unknown, and
-  should-not-trigger cases for catalog lookup, beginner stage routing and
-  single-skill already-named requests.
+  flagging, no-fit gap honesty, deterministic unreadable-input unknown,
+  refusal-to-invoke, and should-not-trigger cases for catalog lookup, beginner
+  stage routing, single-skill invocation-only requests and whole-PR audits.
 - `evals/trigger-evals.json` — trigger discrimination against
-  `project-orchestrator`, `skill-quality-reviewer`, `change-classification-gate`
-  and the catalog-navigation route.
+  `project-orchestrator`, `skill-quality-reviewer`, `library-diff-reviewer`,
+  `change-classification-gate` and the catalog-navigation route.
 - [`docs/skills-catalog.md`](../../../docs/skills-catalog.md) — the catalog this
   answer cites and the source of family placement.
 - [`tools/skills-manifest.json`](../../../tools/skills-manifest.json) — the

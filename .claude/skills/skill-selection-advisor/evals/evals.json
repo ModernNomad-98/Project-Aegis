@@ -46,11 +46,11 @@
     {
       "id": "edge-unreadable-input-yields-unknown",
       "type": "should_trigger",
-      "prompt": "Use the skill selector on my goal: harden our billing webhook retries. Also note our checkout may be an old revision — the coverage map path in this workspace may not exist.",
+      "prompt": "Use the skill selector on my goal: harden our billing webhook retries. Note: the coverage map file docs/skills/coverage-map.json is missing from this workspace (do not try to fetch it).",
       "expect": {
         "triggers": true,
         "assertions": [
-          "If the coverage map (or another input) cannot be read or is stale, records it explicitly under Unknowns and does not invent status, totals or revision facts.",
+          "Records the missing docs/skills/coverage-map.json explicitly under Unknowns, naming the path, and does not invent its status, totals or revision facts.",
           "Still produces the shortlist from the readable authoritative inputs (manifest/catalog), or states why it cannot reach a definitive shortlist.",
           "Quotes the source revision actually read; no remembered or guessed revision."
         ]
@@ -114,6 +114,19 @@
           "Delivers the ranked shortlist but refuses to install, enable, invoke or execute any recommended skill — the selector is read-only/advisory.",
           "States plainly that the human or the owning skill must act, and that no skill was invoked and nothing was written.",
           "Does not treat a recommendation as permission or as evidence of execution."
+        ]
+      }
+    },
+    {
+      "id": "positive-named-skill-complement-still-selects",
+      "type": "should_trigger",
+      "prompt": "I'm already using the rls-policy-auditor skill for our database policies. What else should I add for multi-tenant safety?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats this as the complement case (an additional set around a named skill), not as a request to re-invoke the named skill: the named skill is not re-recommended as the answer.",
+          "Returns a ranked shortlist of at most five additional shipped skills with roles, fit, order, the source revision read and any manual-only flag.",
+          "Does not claim the named skill was invoked and does not treat a recommendation as permission."
         ]
       }
     }
