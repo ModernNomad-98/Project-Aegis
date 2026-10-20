@@ -71,6 +71,28 @@ PLANNED_PATHS = {
     "tools/readability_acceptance/check_index.py",
     "tools/readability_acceptance/tests/test_blocks.py",
 }
+
+
+def _should_assert_exact_scope(paths):
+    """True iff the changed path set is exactly this item's planned paths.
+
+    T6's exact-scope assertions only apply to this item's implementing PR.
+    Any other change set (another item's PR, or a partial overlap) must skip
+    with a distinct reason instead of failing the shared readability suite.
+    """
+    return set(paths) == PLANNED_PATHS
+
+
+def _exact_scope_skip_message(paths):
+    """The skip reason for a change set that is not the implementing PR."""
+    changed = set(paths)
+    if not changed:
+        return ("no base diff (e.g. running on main after merge); the exact-"
+                "scope assertion applies to the implementing PR")
+    if changed & PLANNED_PATHS:
+        return ("partial overlap with the planned paths (not the implementing "
+                "PR)")
+    return "another item's PR context"
 ALLOWED_IMPORTS = {
     "__future__", "argparse", "json", "re", "subprocess", "sys", "pathlib",
     "build_index",
@@ -462,6 +484,7 @@ class T5DiscoveryContract(unittest.TestCase):
             "test_t4_quiet_still_prints_blocks",
             "test_t5_discovery_contract",
             "test_t6_only_the_two_planned_paths_changed",
+            "test_t6_exact_scope_helper_semantics",
             "test_t6_no_new_imports_stdlib_only",
             "test_t6_no_network_tokens",
             "test_t6_cli_input_errors_exit_2",
@@ -493,11 +516,13 @@ class T6ScopeAndHygiene(unittest.TestCase):
 
     def test_t6_only_the_two_planned_paths_changed(self):
         changes = self._changed_paths()
-        if not changes:
-            self.skipTest(
-                "no base diff (e.g. running on main after merge); the exact-"
-                "scope assertion applies to the implementing PR")
         paths = {entry[1] for entry in changes}
+        if not changes:
+            self.skipTest(_exact_scope_skip_message(paths))
+        if not _should_assert_exact_scope(paths):
+            self.skipTest(_exact_scope_skip_message(paths))
+        # T10: the implementing case retains the exact scope/status/hygiene
+        # assertions below unchanged.
         self.assertEqual(paths, PLANNED_PATHS)
         statuses = {entry[1]: entry[0] for entry in changes}
         self.assertEqual(
@@ -509,6 +534,30 @@ class T6ScopeAndHygiene(unittest.TestCase):
             self.assertNotEqual(path, "tools/readability_acceptance/README.md")
             self.assertFalse(path.endswith("acceptance-index.json"), path)
             self.assertFalse(path.endswith("partial-dispositions.json"), path)
+
+    def test_t6_exact_scope_helper_semantics(self):
+        """T9: helper semantics (equal/empty/disjoint/partial + messages).
+
+        The equal case is also T10: the implementing PR must keep the exact
+        scope/status/hygiene assertions active (helper True -> T6 asserts).
+        """
+        planned = sorted(PLANNED_PATHS)
+        self.assertTrue(
+            _should_assert_exact_scope(planned),
+            "the implementing PR must keep the exact-scope assertions active")
+        self.assertFalse(_should_assert_exact_scope([]))
+        self.assertIn("no base diff", _exact_scope_skip_message([]))
+        disjoint = sorted(["tools/record_verifier/run.py",
+                           "tools/record_verifier/README.md"])
+        self.assertFalse(_should_assert_exact_scope(disjoint))
+        self.assertEqual(_exact_scope_skip_message(disjoint),
+                         "another item's PR context")
+        partial = sorted(["tools/readability_acceptance/check_index.py",
+                          "tools/record_verifier/run.py"])
+        self.assertFalse(_should_assert_exact_scope(partial))
+        self.assertEqual(
+            _exact_scope_skip_message(partial),
+            "partial overlap with the planned paths (not the implementing PR)")
 
     def test_t6_no_new_imports_stdlib_only(self):
         tree = ast.parse(CHECKER.read_text(encoding="utf-8"))
