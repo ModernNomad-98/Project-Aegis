@@ -4,8 +4,7 @@
   "overlaps_with": [
     "project-orchestrator",
     "skill-quality-reviewer",
-    "change-classification-gate",
-    "catalog-navigation"
+    "change-classification-gate"
   ],
   "cases": [
     {
@@ -21,15 +20,14 @@
     {
       "id": "catalog-navigation-not-selection",
       "prompt": "List the shipped meta skills and where each is documented.",
-      "expected_skill": "catalog-navigation",
       "expected_route": "docs/skills-catalog.md",
       "should_not_trigger": [
         "skill-selection-advisor",
         "project-orchestrator",
         "skill-quality-reviewer"
       ],
-      "reason": "Browse/lookup is answered by the catalog document, not a goal-to-shortlist; expected_skill is a route label, not a skill. The validator only requires this file to parse; a structural BER route label is recorded rather than inventing a skill.",
-      "note": "ROUTE-TOKEN CASE — catalog-navigation is a documentation route, not an installed skill; the answer is the catalog page itself."
+      "reason": "Browse/lookup is answered by the catalog document, not a goal-to-shortlist. The selector's job is goal→shortlist; a catalogue lookup is a documentation route. EVAL-004 enforces that trigger-eval machine fields name only real skills/agents, so the route is encoded in expected_route (docs/skills-catalog.md) and NOT as a fabricated expected_skill — the plan's recorded structural-limitation contingency.",
+      "note": "ROUTE-TOKEN CASE — catalogue navigation is a documentation route, not an installed skill. To satisfy the live contract-audit EVAL-004 rule (trigger-eval machine fields must resolve to real skills/agents), expected_skill and overlaps_with deliberately name only real skills; expected_route carries the document route."
     },
     {
       "id": "beginner-lifecycle-goes-to-project-orchestrator",
