@@ -1,10 +1,11 @@
 {
   "skill": "skill-selection-advisor",
-  "description": "Trigger discrimination: goal-to-skill-set selection (this skill) vs beginner lifecycle routing (project-orchestrator), one-skill design quality (skill-quality-reviewer), catalog browsing/lookup (a documentation route), change classification (change-classification-gate), and a request that already names its skill.",
+  "description": "Trigger discrimination: goal-to-skill-set selection (this skill) vs beginner lifecycle routing (project-orchestrator), one-skill design quality (skill-quality-reviewer), whole-PR library audit (library-diff-reviewer), change classification (change-classification-gate), catalogue browsing/lookup (a documentation route), and a request that already names its skill.",
   "overlaps_with": [
     "project-orchestrator",
     "skill-quality-reviewer",
-    "change-classification-gate"
+    "change-classification-gate",
+    "library-diff-reviewer"
   ],
   "cases": [
     {
@@ -64,6 +65,16 @@
         "skill-selection-advisor"
       ],
       "reason": "The user already names the skill and the task is one scoped step; a selector that re-routes a direct request adds friction and can silently substitute a different skill."
+    },
+    {
+      "id": "whole-pr-audit-goes-to-library-diff-reviewer",
+      "prompt": "Audit this skill-library pull request end-to-end: CI validator evidence, catalog/README registration integrity, and the quality of the skill it adds.",
+      "expected_skill": "library-diff-reviewer",
+      "should_not_trigger": [
+        "skill-selection-advisor",
+        "skill-quality-reviewer"
+      ],
+      "reason": "A whole-PR library audit owns PR-level mechanics and composes the single-skill quality reviewer inside it; the selector only ranks shipped skills for a stated goal."
     }
   ]
 }

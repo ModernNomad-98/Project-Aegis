@@ -866,7 +866,7 @@
     {
       "name": "skill-selection-advisor",
       "path": ".claude/skills/skill-selection-advisor/SKILL.md",
-      "sha256": "8ef793bd6f245356a76a2fa31f8f4a00c33d6f548b41cc8de648c1cb5c5166b6"
+      "sha256": "e4bce254923155a75cb850ea414459279b490ed10a0255ddec6f5587f9c6002f"
     },
     {
       "name": "skill-usage-instrumenter",

@@ -1329,11 +1329,11 @@ D25, with the SKILL-vs-DOC seam pinned in trigger-evals:
 | `skill-usage-instrumenter` | Designs the usage-evidence layer: invocation signals (auto vs explicit, coarse enums — never prompt content or user identifiers), wrong-fire/correction events, never-fired lists over a stated window, evidence tiers, thresholds naming an action AND consumer, and the rare-but-critical exemption so low usage alone never condemns a safety-net skill. Adds no hooks; edits nothing. | auto + manual |
 | `skill-deprecation-planner` | Plans a skill's staged retirement: qualifying trigger (superseded + coverage diff / absorbed / evidenced disuse / defect), reverse-link sweep with a disposition per inbound reference, mark → redirect-window → remove with rollback per stage (squash removal reverts as one ordinary commit), registration rows moved to a retired record. Plan only; every stage is human-approved. | auto + manual |
 
-D13 family addition — goal→skill-set selection (owner instruction 2026-10-20; the D13 scope above remains five):
+Family 11 addition — goal→skill-set selection (owner instruction 2026-10-20; not part of D13 scope):
 
 | Skill | What it does | Invocation |
 |---|---|---|
-| `skill-selection-advisor` | Turns a goal into a ranked shortlist of existing shipped skills: roles, fit, order, gaps, manual-only flags, source revision; read-only, never invents, never auto-invokes a MANUAL-ONLY skill. | auto |
+| `skill-selection-advisor` | Turns a goal into a ranked shortlist of existing shipped skills: roles, fit, order, gaps, manual-only flags and the source revision it read; read-only, never invents, never invokes any skill; flags MANUAL-ONLY skills for the human. | auto + manual |
 
 D12.8 — operational workflow patterns (D21): the 10 evidence-extracted
 patterns from the read-only audit of two production multi-agent repositories

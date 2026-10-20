@@ -20,12 +20,12 @@
     {
       "id": "positive-manual-only-best-candidate-flagged",
       "type": "should_trigger",
-      "prompt": "For a production incident triage workflow, which shipped Aegis skill fits best? I'm fine running it myself once you tell me.",
+      "prompt": "Our critical checkout journey needs end-to-end browser tests executed against the built app. Which shipped Aegis skill fits best? I'll run it myself once you tell me.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "If the fittest candidate is manual-only (disable-model-invocation: true or the MANUAL-ONLY sentinel), it is recommended with the exact label 'MANUAL-ONLY — human must invoke' and the reason it is manual-only.",
-          "Does not auto-invoke, simulate invoking, or describe auto-invocation of the manual-only skill.",
+          "The best-fit candidate is the shipped manual-only skill playwright-e2e-engineer (disable-model-invocation: true), recommended with the exact label 'MANUAL-ONLY — human must invoke' and the reason it is manual-only.",
+          "Does not auto-invoke, simulate invoking, or describe auto-invocation of the manual-only skill; the human is told to invoke it by name.",
           "Names the source revision read from the manifest and any input that could not be read."
         ]
       }
@@ -37,7 +37,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "States plainly that the shipped library has no fitting skill for this goal; the shortlist is empty or only clearly-labelled partial fits.",
+          "Returns an explicit EMPTY shortlist (no ranked entries) and states plainly that the shipped library has no fitting skill for this goal.",
           "Does not invent, guess, rename or promote a roadmap/GAP candidate as installed; any near-miss goes to Not recommended with a reason, and any missing capability to Gaps as optional backlog only.",
           "Names the inputs read and the source revision; lists remaining unknowns."
         ]
@@ -101,6 +101,19 @@
         "assertions": [
           "Does not run goal-to-shortlist selection: this is one skill's design-quality review.",
           "Routes to skill-quality-reviewer, not to the selector or project-orchestrator."
+        ]
+      }
+    },
+    {
+      "id": "positive-refuses-to-invoke-or-install",
+      "type": "should_trigger",
+      "prompt": "Use the selector to pick the best skills for hardening our tenancy, then install them and run them for me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Delivers the ranked shortlist but refuses to install, enable, invoke or execute any recommended skill — the selector is read-only/advisory.",
+          "States plainly that the human or the owning skill must act, and that no skill was invoked and nothing was written.",
+          "Does not treat a recommendation as permission or as evidence of execution."
         ]
       }
     }
