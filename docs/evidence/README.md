@@ -19,8 +19,10 @@ workspace-citation-durability capture publication row, added 2026-10-15 by the D
 capture-publication change against base `e2a3e20b`; and the UX/UI open-workflow
 route-register and unrun record row, added 2026-10-20 by this change against base
 `a4fecf1a`, whose provenance is this change's own evidence page. Each of the four
-records its own date and base revision where the row records it (the new row states
-both; the SCIF row's provenance is its recorded commit). None of the four rows can name the commit that contains it (the SCIF row's `503c3b30` is its provenance commit, not the commit that contains this page) -
+records its own date and base revision where the row records it: the FU-3,
+capture-publication and new UX/UI rows state their base revisions, and the SCIF
+row states its provenance commit `503c3b30` (the commit that added its page).
+None cites the commit that contains this index page -
 a page cannot cite its own commit, the convention
 `docs/roadmaps/aegis-ci-baseline-2026-10-11.md` L51-L52 states for itself.
 
