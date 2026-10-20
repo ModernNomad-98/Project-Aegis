@@ -1,6 +1,6 @@
 # Project Aegis evidence: where to read next
 
-This index helps maintainers and reviewing agents find **18 selected decision
+This index helps maintainers and reviewing agents find **19 selected decision
 and delivery evidence pages**. These pages record what was checked or decided
 at a particular time. They are not a current work queue, approval grant, or
 instruction to repeat an old run. For current authority and status, read the
@@ -11,13 +11,15 @@ instruction to repeat an old run. For current authority and status, read the
 The current-reading boundaries below were checked on 2026-09-23 against the
 source-library tree at `e2145b1`; recheck the owning registers after later work.
 This index was created that day and fifteen of its eighteen rows date from that
-sweep. **Exactly three rows post-date it and are therefore not covered by it:** the SCIF
+sweep. **Exactly four rows post-date it and are therefore not covered by it:** the SCIF
 close-out corrections row, added 2026-10-11 by commit `503c3b30`, whose provenance is
 that commit's record; the FU-3 record publication row, added 2026-10-13 by the
 workspace-citation-durability change against base `dbe2ee28`; and the
 workspace-citation-durability capture publication row, added 2026-10-15 by the D2
-capture-publication change against base `e2a3e20b`. Each of the three states its own
-date and base revision in the row itself. None of the three rows can name the commit that
+capture-publication change against base `e2a3e20b`; and the UX/UI open-workflow
+route-register and unrun record row, added 2026-10-20 by this change against base
+`a4fecf1a`, whose provenance is this change's own evidence page. Each of the four
+states its own date and base revision in the row itself. None of the four rows can name the commit that
 contains it -
 a page cannot cite its own commit, the convention
 `docs/roadmaps/aegis-ci-baseline-2026-10-11.md` L51-L52 states for itself.
@@ -56,10 +58,11 @@ to the dated record that reports them.
 | What the #723/#729 close-out record got wrong, corrected forward | [SCIF close-out corrections](scif/scif-closeout-corrections-2026-10-11.md) | Dated corrections only; the approval register is untouched and no authority is created. |
 | Where the evidence cited by the O-F1 publication note now lives, and the rule that keeps citations retrievable | [FU-3 record publication](fu3-record-publication-2026-10-13/README.md) | Published copies with per-file sha256 digests; the superseded citations were accurate but not retrievable from a fresh checkout. **Added 2026-10-13 by the workspace-citation-durability change, against base `dbe2ee28` - not part of the 2026-09-23 sweep at `e2145b1`.** |
 | Where the supporting files the merged PR #766 body's 56 skills-table Row source records cite now live, with their digests and sanitization status | [Workspace-citation-durability captures](workspace-citation-durability-2026-10-13/README.md) | 24 byte-identical copies and 3 labelled sanitized derivatives with per-file sha256 digests, plus a committed digest-bound extraction of the defining 56 records; every cited artifact is retrievable except the superseded Stage F round-1 revision, whose bytes survive nowhere, while 48 uncited archive files stay out-of-tree and are counted. **Added 2026-10-15 by the D2 capture-publication change, against base `e2a3e20b` - not part of the 2026-09-23 sweep at `e2145b1`; corrected in place 2026-10-16 under the Stage D *REVISE* verdict (the implementation audit that asked for corrections) at `56a8e603`.** |
+| What the UX/UI guided-path change froze before execution and what it did not run | [UX/UI open-workflow route register and unrun record](ux-ui-open-workflow-2026-10-20/README.md) | Dated record at base `a4fecf1a`; AC1–AC8 and AC10 UNRUN with named prerequisites; AC9 declared UNRUN; no host execution. |
 
 Other dated records are reachable from the owning backlogs and the
 [documentation index](../README.md). Do not infer that an unlisted evidence
-page has been reviewed or that these 18 pages cover the full repository.
+page has been reviewed or that these 19 pages cover the full repository.
 
 ## Citation durability
 

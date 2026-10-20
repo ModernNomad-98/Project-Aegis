@@ -255,7 +255,7 @@ here.
   `change-classification-gate`, `docs-first-implementer` *(manual-only)*,
   `tdd-engineer` *(manual-only)*, `reviewable-diff-discipline` *(manual-only)*,
   `local-ci-mirror-preflight` *(manual-only)*, `code-reviewer`, `security-pr-reviewer`,
-  `ai-closeout-reporter`. Route to them via that map; do not re-derive the gates.
+  `ai-closeout-reporter`. Route to them via that map; do not re-derive the gates. For user-interface slices, also follow the [UI path](../../../docs/paths/design-and-build-ui.md), which names the UI owners in order; it adds no gate and removes none.
 - **Stage 7 — Prove it works.** → `qa-strategy-architect` →
   `test-plan-designer`. *By evidence:* `integration-test-designer`,
   `api-contract-test-designer`, `playwright-e2e-engineer` *(manual-only)*,
