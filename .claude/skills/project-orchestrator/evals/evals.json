@@ -770,6 +770,32 @@
           "Does NOT start product discovery (no requirements question, no `requirements-gathering-facilitator` invocation, no docs/project-state.md proposal) before offering `/aegis-setup`; it may offer to continue with the product idea afterwards."
         ]
       }
+    },
+    {
+      "id": "should-not-trigger-known-next-step-ui-extension",
+      "type": "should_not_trigger",
+      "prompt": "We already have a working task-list app with a design system. Add a status filter to the existing task list, matching that design system. I know exactly what I want, so don't ask me requirement questions.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke project-orchestrator: the user already knows the next step and the change is a direct UI extension.",
+          "Names change-classification-gate and docs/paths/design-and-build-ui.md as the expected route.",
+          "Asks no question already answered by the prompt."
+        ]
+      }
+    },
+    {
+      "id": "should-trigger-stage6-ui-slice-routes-to-ui-path",
+      "type": "should_trigger",
+      "prompt": "We are midway through the project and need the account-settings screens built: profile, notifications and a save-confirmation state, following the design system we already have.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Invokes project-orchestrator and identifies the Stage 6 user-interface slice.",
+          "Keeps the core inner lifecycle while routing the UI work through docs/paths/design-and-build-ui.md.",
+          "Names change-classification-gate before any UI implementation work."
+        ]
+      }
     }
   ]
 }
