@@ -10,7 +10,7 @@ instruction to repeat an old run. For current authority and status, read the
 [setup routing plan](../roadmaps/aegis-setup-routing-plan.md).
 The current-reading boundaries below were checked on 2026-09-23 against the
 source-library tree at `e2145b1`; recheck the owning registers after later work.
-This index was created that day and fifteen of its eighteen rows date from that
+This index was created that day and fifteen of its nineteen rows date from that
 sweep. **Exactly four rows post-date it and are therefore not covered by it:** the SCIF
 close-out corrections row, added 2026-10-11 by commit `503c3b30`, whose provenance is
 that commit's record; the FU-3 record publication row, added 2026-10-13 by the

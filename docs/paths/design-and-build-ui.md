@@ -23,7 +23,7 @@ reuse the components and tokens we already have, and tell me which Aegis skill
 you invoke and why."** Or, from nothing: **"I have a one-paragraph idea for a
 sign-up flow and no design. Draft the journey, the screens and a visual
 direction I can review, then build it."** Two skills on this path are
-**manual-only — name it explicitly**: you start them by typing the skill's name,
+**manual-only — name them explicitly**: you start them by typing the skill's name,
 and your agent must never start them for you.
 
 Steps marked *"If…"* are conditional — skip them honestly when they don't match
@@ -35,7 +35,7 @@ your starting point.
 |---|---|---|
 | A written idea or brief, no design yet | Develops the journey, the interface structure and a visual direction from the brief — it does not demand a design file first. | Step 1, then step 2 in full. |
 | An existing application | Inspects the affected journey, components, tokens and interaction patterns, then extends or improves only the requested surface while preserving unrelated behavior. | Step 1, then step 3 with your app as the authority. |
-| A design file, prototype or screenshot | Extracts the design intent and states it can actually observe, separates them from behavior it cannot see, and asks only where implementation depends on the unknown. | Step 1, then step 3 with the file as the authority for what it shows. |
+| A design file, prototype or screenshot | Extracts the design intent and states what it can actually observe, separates them from behavior it cannot see, and asks only where implementation depends on the unknown. | Step 1, then step 3 with the file as the authority for what it shows. |
 | A design system already in your code | Uses its components, tokens and conventions directly; they keep their authority. | Step 1, then step 3 — do not let the agent build a parallel copy. |
 | A named public repository or tool | Inspects its relevant source and instructions, establishes what it is actually good for, and applies it within this task's scope — under the rules in *If you bring in an external repository* below. | Step 1, then the step the tool serves. |
 | "You pick the tool" | Researches a proportionate set of candidates, explains the recommended fit and the material tradeoffs with cited evidence, and proceeds within the authority you delegated. Unknown capability is not counted as present. | Step 1, then the step the tool serves. |
@@ -83,6 +83,12 @@ for what materially blocks the next useful action.
    library owns the supported API), the record says so. A conflict between
    sources is resolved explicitly, not by taking the one that is easier to
    read.
+
+   **If the project is new and keeps no such file yet,** the fallback is the
+   step-2 spec and the reviewable design itself: record the authority with
+   that artifact now, and move it into the project's own state file when the
+   existing setup flow creates one. This path never invents a new project
+   file on its own.
 
    *No Aegis skill owns the design itself.* When design is the task, the agent
    produces a reviewable interface structure, a visual direction and a
