@@ -52,11 +52,16 @@ BT = chr(96)
 GENERIC = "no exact-line verifier block found"
 LEGACY_A = "legacy verifier format (out of scope)"
 LEGACY_B = "no exact-line verifier markers"
-PLANNED_PATHS = {
+PLANNED_ADDED_PATHS = {
     "tools/record_verifier/run.py",
     "tools/record_verifier/README.md",
     "tools/readability_acceptance/tests/test_record_verifier_cli.py",
 }
+PLANNED_MODIFIED_PATHS = {
+    # Owner-authorized test-only repair of the merged item-4 T6 scope test.
+    "tools/readability_acceptance/tests/test_blocks.py",
+}
+PLANNED_PATHS = PLANNED_ADDED_PATHS | PLANNED_MODIFIED_PATHS
 ALLOWED_IMPORTS = {
     "__future__", "argparse", "glob", "hashlib", "json", "os", "re",
     "shutil", "subprocess", "sys", "tempfile", "pathlib",
@@ -521,10 +526,7 @@ class T8RepoStateAndScope(unittest.TestCase):
         untracked = _git(
             ROOT, "ls-files", "--others", "--exclude-standard").splitlines()
         for path in untracked:
-            if (path.startswith("tools/record_verifier/")
-                    or path ==
-                    "tools/readability_acceptance/tests/"
-                    "test_record_verifier_cli.py"):
+            if path in PLANNED_ADDED_PATHS:
                 entries.append(["A", path])
         return entries
 
@@ -537,15 +539,25 @@ class T8RepoStateAndScope(unittest.TestCase):
         after = _git(ROOT, "status", "--porcelain")
         self.assertEqual(before, after, "the verifier run modified the repo")
 
-    def test_t8_exactly_three_planned_paths(self):
+    def test_t8_exact_3_added_1_modified_paths(self):
+        """AC6: exactly 3 added + 1 modified, statuses and no .github change.
+
+        The 3 added paths are enumerated from git ls-files --others while they
+        are untracked (and appear as A in the tracked diff once committed); the
+        owner-authorized test-only repair appears as the tracked M path.
+        """
         changes = self._changed_paths()
         if not changes:
             self.skipTest("no base diff (running on main after merge)")
-        paths = {entry[1] for entry in changes}
-        self.assertEqual(paths, PLANNED_PATHS)
-        for status, path in changes:
-            self.assertEqual(status, "A", path)
+        statuses = {entry[1]: entry[0] for entry in changes}
+        self.assertEqual(set(statuses), PLANNED_PATHS)
+        for path in PLANNED_ADDED_PATHS:
+            self.assertEqual(statuses[path], "A", path)
+        for path in PLANNED_MODIFIED_PATHS:
+            self.assertIn(statuses[path], ("M", "A"), path)
+        for path, status in statuses.items():
             self.assertFalse(path.startswith(".github/"), path)
+            self.assertIn(status, ("A", "M"), path)
 
     def test_t8_stdlib_only_and_readme_present(self):
         tree = ast.parse(CLI.read_text(encoding="utf-8"))
