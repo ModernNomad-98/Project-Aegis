@@ -33,7 +33,7 @@ your starting point.
 
 | Your starting point | What the agent does first | Where you join the order |
 |---|---|---|
-| A written idea or brief, no design yet | Develops the journey, the interface structure and a visual direction from the brief — it does not demand a design file first. | Step 1, then step 2 in full. |
+| A written idea or brief, no design yet | Develops the journey, the interface structure and a visual direction from the brief — it does not demand a design file first. | Step 1, then step 2 as applicable (skip what the brief already answers). |
 | An existing application | Inspects the affected journey, components, tokens and interaction patterns, then extends or improves only the requested surface while preserving unrelated behavior. | Step 1, then step 3 with your app as the authority. |
 | A design file, prototype or screenshot | Extracts the design intent and states what it can actually observe, separates them from behavior it cannot see, and asks only where implementation depends on the unknown. | Step 1, then step 3 with the file as the authority for what it shows. |
 | A design system already in your code | Uses its components, tokens and conventions directly; they keep their authority. | Step 1, then step 3 — do not let the agent build a parallel copy. |
@@ -246,7 +246,8 @@ skill's name and the agent never starts one for you.
 
 If `.claude/skills` is not one of your configured roots, use the
 explicit-read fallback: point each required `SKILL.md` at its real path and
-read it there. Do not copy the skill tree, and do not commit an
+read it there. Do not use this fallback to start a manual-only skill unless the
+human explicitly named that skill; otherwise stop and ask. Do not copy the skill tree, and do not commit an
 `.agents/skills` copy to this repository. This note is DSH-specific: the method above
 stays host-agnostic, and no other host is required to behave this way.
 

@@ -779,7 +779,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke project-orchestrator: the user already knows the next step and the change is a direct UI extension.",
-          "Names change-classification-gate and docs/paths/design-and-build-ui.md as the expected route.",
+          "Does not invoke project-orchestrator routing for a change the user already specified; if a route is mentioned, it comes from repository context the agent already read, not from the orchestrator not being triggered.",
           "Asks no question already answered by the prompt."
         ]
       }
