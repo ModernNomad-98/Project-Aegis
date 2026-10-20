@@ -7,6 +7,8 @@ Use [Implemented](#implemented) for shipped entries and
 describes a capability; the matching `.claude/skills/<name>/SKILL.md` contains
 the actual instructions and trigger.
 
+- **Coverage map:** [all 300 roadmap candidates](skills/coverage-map.md) — optional backlog status; authoritative JSON in [coverage-map.json](skills/coverage-map.json).
+
 ## Find and use an entry
 
 1. Read [Skills vs. Agents](#skills-vs-agents) if you need to choose between a
