@@ -94,7 +94,8 @@ path (standard design and build remains the default).
    and do not offer iteration.
 2. **Decide the mode; return the record.** Return the exact selection record
    (mode, feature/task scope, instruction source, delivery endpoint, iteration
-   budget, selection/offer count) to the host/user or the project's state owner
+   budget, selection/offer count, record_location) to the host/user or the
+   project's state owner
    for persistence; do not write the project artefact yourself. The choice is
    reused across turns, resumes, and tool or agent changes; a missing record is
    recovered from context, not treated as an opt-out, and a later user change is
@@ -134,7 +135,8 @@ path (standard design and build remains the default).
    disposition. Before advancing, independently retest the changed or
    unchanged candidate; no manufactured change and no unearned PASS. The
    reviewed handoff preserves the selected flow, content, states, visual
-   direction, authority, open items, evidence and next action, and composes
+   direction, authority, open items, evidence, budget state and next action, and
+   composes
    the handoff owner rather than re-designing the protocol.
 10. **Budget and readiness.** Defaults are **up to three concepts and up to
     three independent evaluation passes** (at least two non-cosmetic flows),

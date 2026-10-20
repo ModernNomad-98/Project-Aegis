@@ -55,7 +55,7 @@ and honored.
 8. **Disposition and independent retest** - every finding dispositioned; the
    changed or unchanged candidate independently retested before advancing; no
    manufactured change; the handoff preserves flow, content, states, visual
-   direction, authority, open items, evidence and next action.
+   direction, authority, open items, evidence, budget state and next action.
 9. **Defaults, concepts and passes** - up to three concepts and up to three
    independent passes by default (at least two non-cosmetic flows), configurable
    with a recorded reason; every pass counts including unchanged retests; no

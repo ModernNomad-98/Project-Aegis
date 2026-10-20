@@ -140,7 +140,6 @@
         "triggers": true,
         "assertions": [
           "Verifies the retest is independent of the author, records it as a legitimate independent pass in the budget ledger and invents no change.",
-          "Records the retest as a legitimate independent pass, not as a failed iteration or a reason to reset.",
           "Does not manufacture a revision, and does not advance on a check that remains failed or UNRUN."
         ]
       },
