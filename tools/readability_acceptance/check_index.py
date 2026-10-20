@@ -71,6 +71,29 @@ or partial (active), never both, and it is counted once.
     python -B tools/readability_acceptance/check_index.py --ref <sha> --json
     python -B tools/readability_acceptance/check_index.py --ref <sha> \
         --partial-dispositions tools/readability_acceptance/partial-dispositions.json
+
+OPT-IN ORDERED BLOCKS (production item 4, owner-approved 2026-10-19)
+------------------------------------------------------------------
+With --blocks the checker also emits the remaining pending union - the sorted
+unknown + provably-pending page paths, exactly as this checker classifies them -
+as ordered blocks of --block-size pages (default 8):
+
+    python -B tools/readability_acceptance/check_index.py --ref <sha> --blocks
+    python -B tools/readability_acceptance/check_index.py --ref <sha> --blocks \
+        --block-size 8 --block-limit 2 --pin <commit> --json
+
+Each page reports its 0-based union position, path, blob at --ref, raw byte and
+LF counts, and its pin class: pinned-equal when the page blob equals the same
+path's blob at --pin (default `2db1ffb7...`), otherwise re-pin. Each block
+reports its index, first/last position, lane (A-D, the ceil-quarter lane of its
+first position), whether it is the final partial block, the pages, and totals.
+blocks_total is ceil(union_size / block-size); blocks_emitted is
+min(blocks_total, --block-limit). --block-limit is applied while computing page
+facts, so a limited run does no extra git work for unemitted blocks.
+Human output prints the blocks before the unchanged summary; --quiet still
+prints them. --json with --blocks adds one "blocks" object with sort_keys and no
+timestamps. Without --blocks every existing output byte is unchanged.
+--blocks cannot be combined with --path. Exit codes: 0 success, 2 bad input.
 """
 
 from __future__ import annotations
@@ -92,6 +115,9 @@ FIXTURE_EXCEPTIONS = ("scripts/tests/fixtures/README.md",)
 GENERATED_REPORTS = ("docs/audits/skill-contract-audit-baseline.md",)
 SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
 PARTIAL_DISPOSITION = "partial"
+BLOCK_SIZE_DEFAULT = 8
+BLOCK_PIN_DEFAULT = "2db1ffb7985ddc1c087c455740fd59e962967461"
+BLOCK_LANES = ("A", "B", "C", "D")
 
 # The keeper-table parser and the per-row validator are the builder's own
 # (plan R5): one parser, one validator, no second implementation. The module
@@ -527,6 +553,112 @@ def inactive_reason(row, effective_id, disposition):
             + ", not the declared withdrawal at that revision")
 
 
+def run_bytes(args, root):
+    """Binary-safe git capture: blob bytes and LF counts must be exact."""
+    proc = subprocess.run(["git", "-C", str(root), *args], capture_output=True)
+    return proc.returncode, proc.stdout, proc.stderr
+
+
+def blocks_partition(count):
+    """Ceil-quarter lane partition: ceil(count/4) positions per lane A-D.
+
+    Returns (ceil, bounds), where bounds[i] is the supposed inclusive
+    (first, last) 0-based position of lane BLOCK_LANES[i]. The tuple always has
+    four entries for positional stability. An EMPTY union yields four (0, -1)
+    bounds. For a non-empty union a lane beyond the union is degenerate with
+    first > last (for example count=5 gives lane D = (6, 4)); blocks_payload
+    never uses those bounds for a real position.
+    """
+    ceil = (count + 3) // 4
+    bounds = []
+    for lane in range(4):
+        first = lane * ceil
+        last = min(first + ceil - 1, count - 1)
+        bounds.append((first, last) if count else (0, -1))
+    return ceil, bounds
+
+
+def blocks_page_facts(root, ref, pin, path):
+    """Blob, raw bytes, LF count and pin class for one page at --ref.
+
+    Every git failure for the compared ref is loud: main() turns
+    DispositionError into exit 2 with no partial output. The caller must pass a
+    --pin commit that main() has already resolved: a pin path that does not
+    resolve is treated as absent and yields re-pin (the documented two-state
+    classification), never an error. pinned-equal means the blob at --ref
+    equals the same path's blob at --pin; re-pin means it differs or the path
+    is absent at --pin.
+    """
+    code, out, err = run(["rev-parse", "--verify", "--quiet",
+                          ref + ":" + path], root)
+    if code != 0:
+        raise DispositionError(
+            "cannot resolve " + path + " at " + ref + ": "
+            + err.strip()[:120])
+    blob = out.strip()
+    code, raw, err = run_bytes(["cat-file", "blob", blob], root)
+    if code != 0:
+        raise DispositionError(
+            "cannot read blob " + blob + " for " + path + ": "
+            + err.decode("utf-8", "replace").strip()[:120])
+    code, out, _err = run(["rev-parse", "--verify", "--quiet",
+                           pin + ":" + path], root)
+    pin_blob = out.strip() if code == 0 else None
+    return {"blob": blob, "bytes": len(raw), "lf": raw.count(b"\n"),
+            "pin": ("pinned-equal" if pin_blob == blob else "re-pin")}
+
+
+def blocks_payload(root, ref, pin, union, size, limit):
+    """Ordered remaining-page blocks with positions, lanes, facts and totals.
+
+    union must be the sorted remaining page paths (unknown + provably pending)
+    as this checker classifies them. Page facts are computed only for emitted
+    blocks, so --block-limit costs no git work for unemitted blocks.
+    """
+    _ceil, bounds = blocks_partition(len(union))
+    total = (len(union) + size - 1) // size
+    emitted = total if limit is None else min(total, limit)
+    blocks = []
+    for index in range(emitted):
+        start = index * size
+        end = min(start + size - 1, len(union) - 1)
+        lane = BLOCK_LANES[0]
+        for lane_index, (first, last) in enumerate(bounds):
+            if first <= start <= last:
+                lane = BLOCK_LANES[lane_index]
+                break
+        pages = []
+        for position in range(start, end + 1):
+            facts = blocks_page_facts(root, ref, pin, union[position])
+            pages.append({"position": position, "path": union[position],
+                          **facts})
+        blocks.append({
+            "index": index,
+            "start_position": start,
+            "end_position": end,
+            "lane": lane,
+            "partial": (end - start + 1) < size,
+            "pages": pages,
+            "totals": {
+                "bytes": sum(page["bytes"] for page in pages),
+                "lf": sum(page["lf"] for page in pages),
+                "pinned_equal": sum(1 for page in pages
+                                    if page["pin"] == "pinned-equal"),
+                "repin": sum(1 for page in pages
+                             if page["pin"] == "re-pin"),
+            },
+        })
+    return {
+        "block_size": size,
+        "block_limit": limit,
+        "pin": pin,
+        "union_size": len(union),
+        "blocks_total": total,
+        "blocks_emitted": emitted,
+        "blocks": blocks,
+    }
+
+
 def main():
     ap = argparse.ArgumentParser(description="Decide pending pages from the repaired acceptance index.")
     ap.add_argument("--repo", default=str(REPO_ROOT))
@@ -538,10 +670,41 @@ def main():
     ap.add_argument("--path", help="restrict to one page path")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--quiet", action="store_true",
-                    help="print only the summary block")
+                    help="print only the summary block (with --blocks, the "
+                         "block output still prints)")
+    ap.add_argument("--blocks", action="store_true",
+                    help="emit the remaining pending union as ordered blocks "
+                         "(see the module docstring)")
+    ap.add_argument("--block-size", type=int, default=BLOCK_SIZE_DEFAULT,
+                    metavar="N",
+                    help="pages per block (default: %d)" % BLOCK_SIZE_DEFAULT)
+    ap.add_argument("--block-limit", type=int, default=None, metavar="N",
+                    help="emit at most N blocks (default: all)")
+    ap.add_argument("--pin", default=BLOCK_PIN_DEFAULT, metavar="COMMIT",
+                    help="commit whose page blobs classify pinned-equal "
+                         "(default: " + BLOCK_PIN_DEFAULT + ")")
     args = ap.parse_args()
 
     root = Path(args.repo).resolve()
+    pin_sha = None
+    if args.block_size < 1:
+        print("--block-size must be >= 1", file=sys.stderr)
+        return 2
+    if args.block_limit is not None and args.block_limit < 1:
+        print("--block-limit must be >= 1", file=sys.stderr)
+        return 2
+    if args.blocks:
+        if args.path is not None:
+            print("--blocks cannot be combined with --path",
+                  file=sys.stderr)
+            return 2
+        code, out, err = run(["rev-parse", "--verify", "--quiet",
+                              args.pin + "^{commit}"], root)
+        if code != 0:
+            print("cannot resolve --pin " + args.pin + ": " + err.strip(),
+                  file=sys.stderr)
+            return 2
+        pin_sha = out.strip()
     index = json.loads((root / args.index).read_text(encoding="utf-8"))
     code, out, err = run(["rev-parse", "--verify", "--quiet", args.ref], root)
     if code != 0:
@@ -692,11 +855,27 @@ def main():
             "targeted-review row); computed at the pinned --ref"),
     }
 
+    blocks = None
+    if args.blocks:
+        union = sorted([entry["path"] for entry in unknown]
+                       + [entry["path"] for entry in pending])
+        try:
+            blocks = blocks_payload(root, ref_sha, pin_sha, union,
+                                    args.block_size, args.block_limit)
+        except DispositionError as exc:
+            print("blocks: " + str(exc), file=sys.stderr)
+            return 2
+
     if args.json:
-        print(json.dumps({"summary": summary, "pending": pending,
-                          "undecided": undecided, "small_drift": small,
-                          "accepted": accepted, "withdrawn": withdrawn,
-                          "partial": partial}, indent=2))
+        payload = {"summary": summary, "pending": pending,
+                   "undecided": undecided, "small_drift": small,
+                   "accepted": accepted, "withdrawn": withdrawn,
+                   "partial": partial}
+        if blocks is not None:
+            payload["blocks"] = blocks
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(json.dumps(payload, indent=2))
         return 0
 
     if not args.quiet:
@@ -754,6 +933,37 @@ def main():
                 print("      " + rec["withdrawal_id"] + " at "
                       + rec["withdrawal_revision"][:12] + ": "
                       + rec["reason"])
+
+    if blocks is not None:
+        print("")
+        print("BLOCKS — remaining pending union, {} page(s), block size {}, "
+              "pin {}, ref {}".format(blocks["union_size"],
+                                      blocks["block_size"],
+                                      blocks["pin"], ref_sha[:12]))
+        for block in blocks["blocks"]:
+            print("")
+            print("block {}: positions {}-{} ({} page(s)){}; lane {}".format(
+                block["index"], block["start_position"],
+                block["end_position"],
+                block["end_position"] - block["start_position"] + 1,
+                " PARTIAL" if block["partial"] else "", block["lane"]))
+            print("{:>5}  {:4}  {:12}  {:>9}  {:>7}  {:12}  path".format(
+                "pos", "lane", "pin", "bytes", "LF", "blob"))
+            for page in block["pages"]:
+                print("{:>5}  {:4}  {:12}  {:>9}  {:>7}  {:12}  {}".format(
+                    page["position"], block["lane"], page["pin"],
+                    page["bytes"], page["lf"], page["blob"][:12],
+                    page["path"]))
+            print("  totals: bytes {}  LF {}  pinned-equal {}  re-pin {}".format(
+                block["totals"]["bytes"], block["totals"]["lf"],
+                block["totals"]["pinned_equal"], block["totals"]["repin"]))
+        print("")
+        print("blocks total {}  emitted {}{}".format(
+            blocks["blocks_total"], blocks["blocks_emitted"],
+            "" if (blocks["block_limit"] is None
+                   or blocks["blocks_emitted"] >= blocks["blocks_total"])
+            else "  (limited by --block-limit {})".format(
+                blocks["block_limit"])))
 
     print("")
     print(json.dumps(summary, indent=2))
