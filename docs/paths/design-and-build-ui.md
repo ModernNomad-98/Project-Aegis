@@ -22,7 +22,7 @@ the existing task list, matching our design system. Classify the change first,
 reuse the components and tokens we already have, and tell me which Aegis skill
 you invoke and why."** Or, from nothing: **"I have a one-paragraph idea for a
 sign-up flow and no design. Draft the journey, the screens and a visual
-direction I can review, then build it."** Two skills on this path are
+direction I can review, then build it."** Two verification skills named directly below are
 **manual-only — name them explicitly**: you start them by typing the skill's name,
 and your agent must never start them for you.
 
@@ -140,7 +140,8 @@ for what materially blocks the next useful action.
    is the map, not the builder.** Its `references/stage-gate-map.md` names the
    enforcer to invoke at each stage (context → classify → plan → implement →
    validate → review → merge → close); route to them through that map and do
-   not re-derive the gates here. Some of those enforcers are manual-only and
+   not re-derive the gates here. Some of those stage enforcers (in addition to the
+two verification skills named above) are manual-only and
    the map says which; your agent names them for you to type. Build in the
    application environment you chose. Reuse an existing component where it
    meets the requirement; where one is missing, the agent names the gap and
@@ -248,7 +249,8 @@ If `.claude/skills` is not one of your configured roots, use the
 explicit-read fallback: point each required `SKILL.md` at its real path and
 read it there. Do not use this fallback to start a manual-only skill unless the
 human explicitly named that skill; otherwise stop and ask. Do not copy the skill tree, and do not commit an
-`.agents/skills` copy to this repository. This note is DSH-specific: the method above
+`.agents/skills` copy into the Aegis repository (and do not copy a skill tree into
+your own project). This note is DSH-specific: the method above
 stays host-agnostic, and no other host is required to behave this way.
 
 ## What this is — and isn't

@@ -54,6 +54,16 @@ Columns are the plan §G convention: **documented** = primary source fetched and
 | **DeepSeek Harness** | Skill roots by rank: `<project>/.dsh/skills`, `<project>/.agents/skills`, `<dshHome>/skills`, `<agentsHome>/skills`; `customSkillDirs` adds roots; nested `**/SKILL.md` not discovered; `disable-model-invocation` honoured; `AGENTS.md`/`CLAUDE.md` loaded as project instructions with a profile `maxBytes` cap | **Inspected in the implementation session:** DSH host; instruction files present and read by explicit path; `.claude/skills` was not a discovered skill root, so the explicit-read fallback was used; no skill tree copied and no `.agents/skills` copy committed | **UNRUN** — no Phase-4 scenario was executed in this session; prerequisite = disposable workspace + runnable host + (for AC9) a second-root-class receiver | In use (owner-reported); this session's host family; model route recorded truthfully as DeepSeek V4 Flash / `deepseek-flash` (owner label "V4.1 Flash" is not the configured model id) |
 | VS Code + Ollama | Skills from `.github/skills`, `.claude/skills`, `.agents/skills`; Ollama extension requirements documented; agent-mode file-edit/tool exposure not stated | — | UNRUN — no scenario executed | In use (owner-reported); Ollama agent-mode exposure remains unverified |
 
+**Source notes for the documented column.** The DeepSeek Harness row's roots,
+instruction-file and `disable-model-invocation` claims come from the plan's §G
+inspection of the DeepSeek Harness source at revision `687f282e`
+(`packages/skill/skill-filesystem/README.md:36–56`, `src/index.ts:52–80`,
+`config-catalog.md`); the Cursor, Claude Code, Codex, Gemini/Antigravity and
+VS Code + Ollama rows are the plan §G documented column, whose primary-document
+links and fetch dates are recorded in the plan. The plan and review are
+hash-bound above and retained under `_A/evidence/prod-uxui-a1/inputs/`; `_A`
+captures are deliberately not committed to this repository, and no run is claimed.
+
 ## What is not established
 
 - No runtime PASS anywhere: no host execution, no disposable workspace, no rendered capture, no executed journey, no second-root-class receiver session.

@@ -779,7 +779,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke project-orchestrator: the user already knows the next step and the change is a direct UI extension.",
-          "Does not invoke project-orchestrator routing for a change the user already specified; if a route is mentioned, it comes from repository context the agent already read, not from the orchestrator not being triggered.",
+          "Classifies the change (a UI extension) and inspects the existing design system before editing.",
           "Asks no question already answered by the prompt."
         ]
       }

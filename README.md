@@ -113,7 +113,7 @@ Codex CLI and other Agent Skills tools](#using-aegis-with-codex-cli-and-other-ag
   then prove they hold.
 - **"I want to design or build screens — or extend an app's UI — and keep it
   consistent."** → [Design and build UI](docs/paths/design-and-build-ui.md): start
-  where you are (brief, existing app, design file, or a named tool), keep one design
+  where you are (brief, existing app, design file, or a named tool), keep each design decision's
   authority, and hand off between agents without re-explaining.
 - **"It works — now I want to launch."** → tell your coding agent: *"My app is built — use
   project-orchestrator to get me ready to release."* It picks up at the deploy-prep stage
