@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "ux-design-iteration",
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (13 cases E1-E13). Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12 and E13. Every case is a behavioural prompt/assertion case; none is a JSON/schema check.",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "We're about to build the account settings screens for our app, but the flow isn't settled - can we explore a couple of approaches before implementing?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Offers the one-time choice between A (standard design and build, the default) and B (explore and refine first) before any implementation.",
+          "Makes clear that B adds flow comparison, an interactive prototype, an independent review and a bounded budget, without inventing time or price.",
+          "Records mode, scope, instruction source, delivery endpoint, budget and offer count before iteration work begins.",
+          "Records the selection record fields including where the record will be persisted (record_location)."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E2",
+      "type": "should_not_trigger",
+      "prompt": "Add a status filter to the existing task list, matching our current design system. I know exactly what I want - don't ask me requirement questions.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not offer or select iteration: the direction is settled, so standard design and build applies and the ordinary route to the project's standard design/build path is left in place.",
+          "Does not claim iteration ran, and does not ask a question already answered by the prompt."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "We chose B - explore and refine first. Run the design iteration on the onboarding flow before we build anything.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Invokes the iteration method and records mode B with its scope and budget.",
+          "Defines the evidence-backed brief, end-to-end story, at least two meaningfully different flows and the scoped prototype (included/mocked/incomplete parts and fixtures), and explicitly delegates prototype creation to the host/user under existing authority.",
+          "Holds production/implementation until the readiness criteria pass on the advanced candidate."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E4",
+      "type": "should_trigger",
+      "prompt": "Resume yesterday's design iteration on the account settings screens. I already chose option B - just continue where we left off.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reuses the recorded selection and offer count instead of offering the choice again.",
+          "Preserves the prior evidence, candidate versions, budget ledger and open items across the resume.",
+          "Treats missing context as recovery evidence, not as an opt-out or a reason to reset the iteration."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Hand this design iteration to a different agent/tool and continue building next session - don't lose what we decided.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a reviewed handoff that preserves selected flow, content, states, visual direction, authority, open items, evidence pointers and next action.",
+          "Composes the existing handoff owner rather than re-designing a new handoff protocol.",
+          "Does not re-offer the mode choice on resume and does not reset the budget ledger.",
+          "The reviewed handoff preserves budget state as well as selection, evidence and the next action."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Continue the untitled design iteration from last week; I don't remember the state and the repo has no docs/project-state.md.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Recovers the recorded mode/scope/budget from the existing artifacts and evidence instead of treating missing context as an opt-out.",
+          "States exactly what could not be recovered and what must be re-confirmed with the user, without inventing facts.",
+          "Does not silently default to either mode or discard prior evidence."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E7",
+      "type": "should_trigger",
+      "prompt": "Actually, switch us back to A - standard design and build - but keep what we learned from the first prototype.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Honors the later mode change, records the reason and retains the prior iteration evidence and design baseline.",
+          "Does not delete or reset the record; marks which evidence remains valid for the build and which is superseded.",
+          "Does not re-offer the choice again after the change."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E8",
+      "type": "should_trigger",
+      "prompt": "For now, just prototype the save-confirmation flow for the settings page; we are not building it yet.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declares the prototype scope (included, mocked, incomplete) and its fixtures, keeps the artifact the smallest that exercises the named interaction, and explicitly delegates prototype creation to the host/user under existing authority.",
+          "Claims no production authority, install, deployment or merge from the prototype.",
+          "After readiness, full delivery proceeds under existing authority and still verifies the integrated feature (production boundary respected), with no per-round owner approval."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E9",
+      "type": "should_trigger",
+      "prompt": "An independent reviewer retested the same unchanged candidate and it behaved the same - record that and tell me whether we can advance.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Verifies the retest is independent of the author, records it as a legitimate independent pass in the budget ledger and invents no change.",
+          "Records the retest as a legitimate independent pass, not as a failed iteration or a reason to reset.",
+          "Does not manufacture a revision, and does not advance on a check that remains failed or UNRUN."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E10",
+      "type": "should_trigger",
+      "prompt": "We've hit the iteration budget and the accessibility check could not run - can we call it done and build now?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declares NOT READY rather than COMPLETE or PASS.",
+          "Names the unrun accessibility check as UNRUN with its exact prerequisite, and cannot hide it behind other passing checks.",
+          "Presents the smallest decision (extend budget, accept a recorded limitation, change scope or stop) and leaves production blocked."
+        ]
+      },
+      "host_evidence": true,
+      "evidence_pointer": "not committed (repository evidence policy): _A/evidence/prod-uxui-iteration-c1/HOST-DEMO/HOST-DEMO-MANIFEST.json",
+      "host_evidence_in_repo": false
+    },
+    {
+      "id": "E11",
+      "type": "should_trigger",
+      "prompt": "We changed one candidate's layout after the review - is the earlier evidence still valid?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Invalidates only the affected evidence after the changed candidate/scope/fixtures/baseline and records why.",
+          "Re-tests the affected results before advancing; unaffected results are reused with their binding, not re-run for ceremony.",
+          "Does not silently keep, remove or redefine a required check."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E12",
+      "type": "should_trigger",
+      "prompt": "The AI reviewer liked the prototype, so we can tell users and the team that real users validated the design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses the human-user validation claim: an AI review is not participant/user validation.",
+          "Distinguishes an AI reviewer from actual users and reports the limitation explicitly.",
+          "Does not fabricate personas, quotes, timing, rates or results, and does not claim unexercised interaction."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E13",
+      "type": "should_not_trigger",
+      "prompt": "Implement the settings page now; the requirements are clear, the design system is settled and no exploration is needed.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not invoke the optional iteration method or offer the A/B choice for a settled implementation.",
+          "Routes the ordinary build request through the standard lifecycle/classification route.",
+          "Does not claim iteration work was performed."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    }
+  ]
+}

@@ -4168,9 +4168,9 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 82 of 206 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 207 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
   "totals": {
-    "beyond_roadmap_skills": 82,
+    "beyond_roadmap_skills": 83,
     "by_area": {
       "01": 55,
       "02": 35,
@@ -4206,7 +4206,7 @@
       "P1": 35,
       "P2": 9
     },
-    "manifest_skills": 206,
+    "manifest_skills": 207,
     "review_pending": 160
   }
 }

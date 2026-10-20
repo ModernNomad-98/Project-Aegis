@@ -127,6 +127,14 @@ for what materially blocks the next useful action.
    promoted to the product's source of truth; a link alone does not prove a
    tool loaded what it links to.
 
+   If the experience direction is still unsettled and you want to compare
+   flows before building, the optional
+   [`ux-design-iteration`](../../.claude/skills/ux-design-iteration/SKILL.md)
+   offers one up-front choice between the standard journey and explore-and-refine.
+   It owns only the iteration method, composes the owners above, keeps step 3's
+   design authority unchanged, and never makes iteration mandatory;
+   details/record template live in the skill.
+
 4. **Design the parts teams forget** — use the parts that match the change:
 
    - **Every non-happy state —
