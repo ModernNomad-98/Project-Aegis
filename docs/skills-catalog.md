@@ -921,6 +921,12 @@ SKILL-vs-DOC seam pinned in trigger-evals.
 | `skill-usage-instrumenter` | reconciliation §3 D13 (D22) — usage telemetry design: invoked vs unused, wrong-fire evidence | yes | Designs the library's usage-evidence layer: invocation signals (auto vs explicit, coarse enums only — never prompt content or user identifiers), wrong-fire/correction events, computed never-fired lists over a stated window, evidence tiers (host-recorded vs self-reported), thresholds that name an action AND consumer, and the rare-but-critical exemption so low usage alone never condemns a safety-net skill. Adds no hooks; edits nothing. |
 | `skill-deprecation-planner` | reconciliation §3 D13 (D22) — safe skill sunset: mark, redirect, remove | yes | Plans a skill's staged retirement: qualifying trigger (superseded + coverage diff / absorbed / evidenced disuse / defect), reverse-link sweep with a disposition per inbound reference, mark → redirect-window → remove with rollback per stage (squash removal reverts as one ordinary commit), registration rows moved to a retired record — never silently deleted. Plan only; every stage is human-approved. |
 
+
+### Family 11 addition — goal→skill-set selection (owner instruction 2026-10-20; not part of D13 scope)
+
+| Skill | Source | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `skill-selection-advisor` | owner instruction 2026-10-20 — new family 11 meta-skill; D13 scope above remains five | yes | Ranks ≤5 existing shipped skills with roles/order/rationale/gaps/source revision; read-only, never invents/auto-invokes MANUAL-ONLY. |
 ### Skills (D12.8 — operational workflow patterns pack)
 
 Evidence-extracted pack (reconciliation §3 D12.8, banked by D15, built by D21):

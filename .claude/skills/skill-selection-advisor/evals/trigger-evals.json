@@ -1,0 +1,71 @@
+{
+  "skill": "skill-selection-advisor",
+  "description": "Trigger discrimination: goal-to-skill-set selection (this skill) vs beginner lifecycle routing (project-orchestrator), one-skill design quality (skill-quality-reviewer), catalog browsing/lookup (a documentation route), change classification (change-classification-gate), and a request that already names its skill.",
+  "overlaps_with": [
+    "project-orchestrator",
+    "skill-quality-reviewer",
+    "change-classification-gate",
+    "catalog-navigation"
+  ],
+  "cases": [
+    {
+      "id": "goal-to-skill-set-wins-here",
+      "prompt": "Given our goal of making this multi-tenant app launch-ready, which shipped Aegis skills should we use and in what order?",
+      "expected_skill": "skill-selection-advisor",
+      "should_not_trigger": [
+        "project-orchestrator",
+        "skill-quality-reviewer"
+      ],
+      "reason": "A stated outcome becomes a ranked set of existing skills with roles and order — no lifecycle stage detection and no single-skill quality verdict is requested."
+    },
+    {
+      "id": "catalog-navigation-not-selection",
+      "prompt": "List the shipped meta skills and where each is documented.",
+      "expected_skill": "catalog-navigation",
+      "expected_route": "docs/skills-catalog.md",
+      "should_not_trigger": [
+        "skill-selection-advisor",
+        "project-orchestrator",
+        "skill-quality-reviewer"
+      ],
+      "reason": "Browse/lookup is answered by the catalog document, not a goal-to-shortlist; expected_skill is a route label, not a skill. The validator only requires this file to parse; a structural BER route label is recorded rather than inventing a skill.",
+      "note": "ROUTE-TOKEN CASE — catalog-navigation is a documentation route, not an installed skill; the answer is the catalog page itself."
+    },
+    {
+      "id": "beginner-lifecycle-goes-to-project-orchestrator",
+      "prompt": "I'm not a developer, I have an app idea but no project yet, and I don't know where to start.",
+      "expected_skill": "project-orchestrator",
+      "should_not_trigger": [
+        "skill-selection-advisor"
+      ],
+      "reason": "With no defined stage, the request is lifecycle routing and requirements discovery from stage zero — the orchestrator's front-door job — not a shortlist of skills for a stated goal."
+    },
+    {
+      "id": "one-skill-quality-goes-to-skill-quality-reviewer",
+      "prompt": "Review whether this drafted skill's description is trigger-oriented and whether it collides with shipped skills.",
+      "expected_skill": "skill-quality-reviewer",
+      "should_not_trigger": [
+        "skill-selection-advisor"
+      ],
+      "reason": "One skill's design quality is the quality reviewer's judgment layer; the selector compares shipped skills for a goal, it does not judge a definition."
+    },
+    {
+      "id": "change-classification-goes-to-change-classification-gate",
+      "prompt": "Before I start this change, tell me which class it is and what validation floor applies — docs-only or AI/agentic behavior?",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "skill-selection-advisor"
+      ],
+      "reason": "Classifying the change and setting its validation floor precedes any selection; the gate owns the class decision, the selector does not."
+    },
+    {
+      "id": "already-named-skill-wins-directly",
+      "prompt": "Use the rls-policy-auditor skill to audit our database policies.",
+      "expected_skill": "rls-policy-auditor",
+      "should_not_trigger": [
+        "skill-selection-advisor"
+      ],
+      "reason": "The user already names the skill and the task is one scoped step; a selector that re-routes a direct request adds friction and can silently substitute a different skill."
+    }
+  ]
+}
