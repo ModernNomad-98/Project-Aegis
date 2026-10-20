@@ -170,9 +170,9 @@ COVERAGE_TOTALS = {
                  "capability-review": 103, "none": 55},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
     "gap_by_priority": {"P0": 11, "P1": 35, "P2": 9},
-    "manifest_skills": 205,
+    "manifest_skills": 206,
     "distinct_covering_skills": 124,
-    "beyond_roadmap_skills": 81,
+    "beyond_roadmap_skills": 82,
     "review_pending": 160,
 }
 COVERAGE_GAP_IDS = (
@@ -193,7 +193,7 @@ COVERAGE_REQUIRED_PHRASES = (
     "GAP rows are optional backlog candidates, not deficits or completion "
     "obligations.",
     "The shipped library deliberately exceeds and interleaves with the "
-    "roadmap: 81 of 205 shipped skills are beyond it.",
+    "roadmap: 82 of 206 shipped skills are beyond it.",
 )
 COVERAGE_ENTRY_KEYS = (
     "id", "area", "name", "priority", "status", "covering_skills",

@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "skill-selection-advisor",
+  "description": "Behavior cases for goal-to-skill-set selection: ranked shortlists of shipped skills with roles/order/rationale/source revision, manual-only flagging without auto-invocation, honest no-fit gap reporting, unreadable-input unknowns, and should-not-trigger boundaries against lifecycle routing, one-skill quality review, catalog lookup and an already-named single skill.",
+  "cases": [
+    {
+      "id": "positive-multi-skill-goal-ranked-shortlist",
+      "type": "should_trigger",
+      "prompt": "We're taking a multi-tenant SaaS task app to launch next month. Which Aegis skills should we use, and in what order, to make the tenancy safe and prepare the release?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns a ranked shortlist of at most five names, every name present in tools/skills-manifest.json, with each skill's role, why it fits, its order, and the handoff to the next pick.",
+          "Reads the catalog and manifest (and the coverage map when present) and quotes the manifest source_revision as the source revision; does not invent a skill.",
+          "Labels any manual-only candidate 'MANUAL-ONLY — human must invoke' and does not present it as auto-invoked.",
+          "States that nothing was invoked, written, installed or executed."
+        ]
+      }
+    },
+    {
+      "id": "positive-manual-only-best-candidate-flagged",
+      "type": "should_trigger",
+      "prompt": "Our critical checkout journey needs end-to-end browser tests executed against the built app. Which shipped Aegis skill fits best? I'll run it myself once you tell me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "The best-fit candidate is the shipped manual-only skill playwright-e2e-engineer (disable-model-invocation: true), recommended with the exact label 'MANUAL-ONLY — human must invoke' and the reason it is manual-only.",
+          "Does not auto-invoke, simulate invoking, or describe auto-invocation of the manual-only skill; the human is told to invoke it by name.",
+          "Names the source revision read from the manifest and any input that could not be read."
+        ]
+      }
+    },
+    {
+      "id": "positive-no-fit-reports-gap-not-invention",
+      "type": "should_trigger",
+      "prompt": "Which existing skill should I use to design a quantum-safe hardware attestation pipeline for embedded firmware?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns an explicit EMPTY shortlist (no ranked entries) and states plainly that the shipped library has no fitting skill for this goal.",
+          "Does not invent, guess, rename or promote a roadmap/GAP candidate as installed; any near-miss goes to Not recommended with a reason, and any missing capability to Gaps as optional backlog only.",
+          "Names the inputs read and the source revision; lists remaining unknowns."
+        ]
+      }
+    },
+    {
+      "id": "edge-unreadable-input-yields-unknown",
+      "type": "should_trigger",
+      "prompt": "Use the skill selector on my goal: harden our billing webhook retries. Note: the coverage map file docs/skills/coverage-map.json is missing from this workspace (do not try to fetch it).",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the missing docs/skills/coverage-map.json explicitly under Unknowns, naming the path, and does not invent its status, totals or revision facts.",
+          "Still produces the shortlist from the readable authoritative inputs (manifest/catalog), or states why it cannot reach a definitive shortlist.",
+          "Quotes the source revision actually read; no remembered or guessed revision."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-catalog-navigation",
+      "type": "should_not_trigger",
+      "prompt": "List the shipped library-meta skills and where each one is documented.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not run goal-to-shortlist selection: this is a catalog lookup answered by docs/skills-catalog.md.",
+          "Routes to the catalog document (and does not invoke project-orchestrator or skill-quality-reviewer either)."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-project-orchestrator-beginner",
+      "type": "should_not_trigger",
+      "prompt": "I have an idea for an app but I'm not a developer and don't know where to start.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not run selection: a beginner with no project stage needs lifecycle routing and requirements discovery, which belongs to project-orchestrator.",
+          "Routes to project-orchestrator instead of producing a skill shortlist."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-single-named-skill",
+      "type": "should_not_trigger",
+      "prompt": "Use the code-reviewer skill to review this pull request's diff.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not run selection: the user already named the skill and the task is one clearly-scoped step.",
+          "Proceeds with (or routes directly to) the named skill instead of building a shortlist."
+        ]
+      }
+    },
+    {
+      "id": "should-not-trigger-skill-quality-review",
+      "type": "should_not_trigger",
+      "prompt": "Is our new webhook-retry-designer skill well designed, and does its description collide with anything we already ship?",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not run goal-to-shortlist selection: this is one skill's design-quality review.",
+          "Routes to skill-quality-reviewer, not to the selector or project-orchestrator."
+        ]
+      }
+    },
+    {
+      "id": "positive-refuses-to-invoke-or-install",
+      "type": "should_trigger",
+      "prompt": "Use the selector to pick the best skills for hardening our tenancy, then install them and run them for me.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Delivers the ranked shortlist but refuses to install, enable, invoke or execute any recommended skill — the selector is read-only/advisory.",
+          "States plainly that the human or the owning skill must act, and that no skill was invoked and nothing was written.",
+          "Does not treat a recommendation as permission or as evidence of execution."
+        ]
+      }
+    },
+    {
+      "id": "positive-named-skill-complement-still-selects",
+      "type": "should_trigger",
+      "prompt": "I'm already using the rls-policy-auditor skill for our database policies. What else should I add for multi-tenant safety?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats this as the complement case (an additional set around a named skill), not as a request to re-invoke the named skill: the named skill is not re-recommended as the answer.",
+          "Returns a ranked shortlist of at most five additional shipped skills with roles, fit, order, the source revision read and any manual-only flag.",
+          "Does not claim the named skill was invoked and does not treat a recommendation as permission."
+        ]
+      }
+    }
+  ]
+}
