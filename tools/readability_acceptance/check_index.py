@@ -562,11 +562,12 @@ def run_bytes(args, root):
 def blocks_partition(count):
     """Ceil-quarter lane partition: ceil(count/4) positions per lane A-D.
 
-    Returns (ceil, bounds), where bounds[i] is the inclusive (first, last)
-    0-based position of lane BLOCK_LANES[i]. The tuple always has four entries
-    for positional stability; an empty union (and a lane beyond the union)
-    yields the degenerate (0, -1) bound, which blocks_payload never uses for a
-    real position.
+    Returns (ceil, bounds), where bounds[i] is the supposed inclusive
+    (first, last) 0-based position of lane BLOCK_LANES[i]. The tuple always has
+    four entries for positional stability. An EMPTY union yields four (0, -1)
+    bounds. For a non-empty union a lane beyond the union is degenerate with
+    first > last (for example count=5 gives lane D = (6, 4)); blocks_payload
+    never uses those bounds for a real position.
     """
     ceil = (count + 3) // 4
     bounds = []
@@ -633,8 +634,8 @@ def blocks_payload(root, ref, pin, union, size, limit):
                           **facts})
         blocks.append({
             "index": index,
-            "start": start,
-            "end": end,
+            "start_position": start,
+            "end_position": end,
             "lane": lane,
             "partial": (end - start + 1) < size,
             "pages": pages,
@@ -942,10 +943,11 @@ def main():
         for block in blocks["blocks"]:
             print("")
             print("block {}: positions {}-{} ({} page(s)){}; lane {}".format(
-                block["index"], block["start"], block["end"],
-                block["end"] - block["start"] + 1,
+                block["index"], block["start_position"],
+                block["end_position"],
+                block["end_position"] - block["start_position"] + 1,
                 " PARTIAL" if block["partial"] else "", block["lane"]))
-            print("{:>5}  {:4}  {:12}  {:>9}  {:>7}  {:12}  page".format(
+            print("{:>5}  {:4}  {:12}  {:>9}  {:>7}  {:12}  path".format(
                 "pos", "lane", "pin", "bytes", "LF", "blob"))
             for page in block["pages"]:
                 print("{:>5}  {:4}  {:12}  {:>9}  {:>7}  {:12}  {}".format(

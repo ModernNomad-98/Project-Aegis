@@ -36,7 +36,6 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -55,6 +54,11 @@ BASE_COMMIT = "f110160a12d54165ba99df60ac8e127f05283b8b"
 BASE_CHECKER_BLOB = "041d681647473c91d6c2394b2fe05e789b08e651"
 BASE_CHECKER_SHA256 = (
     "44c9f8cad3f7e80e7438d7c0c03a338be3e01f9a63b5ba5722fe338a96734a1d")
+# The pinned base build_index.py blob: T1 materializes the checker's own module
+# from the same historical commit so the whole baseline pair is digest-pinned.
+BASE_BUILD_INDEX_BLOB = "ac3c92230f586190efa7bb95cb52bde8880fcc84"
+BASE_BUILD_INDEX_SHA256 = (
+    "d2c26f779f998a99f1cee24f4c566cc15476879b6265960db125273f00166f26")
 
 # A fixed historical ref: deterministic output and no dependence on today's
 # origin/main. It is the item-1 merge commit (live main at plan time).
@@ -96,18 +100,29 @@ def _run_checker(checker, argv):
 
 
 def _materialize_base_checker(directory):
-    """Extract the digest-verified pre-change checker beside build_index."""
+    """Extract the digest-verified pre-change baseline pair.
+
+    Both check_index.py and its module build_index.py come from the pinned base
+    commit blobs and their sha256 digests are verified, so the T1 comparison
+    cannot silently drift to a working-tree module.
+    """
     directory.mkdir(parents=True, exist_ok=True)
-    blob = _git(ROOT, "cat-file", "blob", BASE_CHECKER_BLOB, binary=True)
-    digest = hashlib.sha256(blob).hexdigest()
-    if digest != BASE_CHECKER_SHA256:
+    checker_blob = _git(ROOT, "cat-file", "blob", BASE_CHECKER_BLOB, binary=True)
+    checker_digest = hashlib.sha256(checker_blob).hexdigest()
+    if checker_digest != BASE_CHECKER_SHA256:
         raise AssertionError(
-            "base checker blob drifted: " + digest + " != " + BASE_CHECKER_SHA256)
+            "base checker blob drifted: " + checker_digest + " != "
+            + BASE_CHECKER_SHA256)
+    module_blob = _git(
+        ROOT, "cat-file", "blob", BASE_BUILD_INDEX_BLOB, binary=True)
+    module_digest = hashlib.sha256(module_blob).hexdigest()
+    if module_digest != BASE_BUILD_INDEX_SHA256:
+        raise AssertionError(
+            "base build_index blob drifted: " + module_digest + " != "
+            + BASE_BUILD_INDEX_SHA256)
     checker = directory / "check_index.py"
-    checker.write_bytes(blob)
-    shutil.copyfile(
-        ROOT / "tools/readability_acceptance/build_index.py",
-        directory / "build_index.py")
+    checker.write_bytes(checker_blob)
+    (directory / "build_index.py").write_bytes(module_blob)
     return checker
 
 
@@ -211,8 +226,8 @@ class T2BlocksContract(unittest.TestCase):
         self.assertEqual(payload["blocks_total"], 2)
         self.assertEqual(payload["blocks_emitted"], 2)
         first, second = payload["blocks"]
-        self.assertEqual((first["start"], first["end"]), (0, 7))
-        self.assertEqual((second["start"], second["end"]), (8, 9))
+        self.assertEqual((first["start_position"], first["end_position"]), (0, 7))
+        self.assertEqual((second["start_position"], second["end_position"]), (8, 9))
         self.assertFalse(first["partial"])
         self.assertTrue(second["partial"])
         self.assertEqual(first["index"], 0)
@@ -236,7 +251,7 @@ class T2BlocksContract(unittest.TestCase):
             self.union, 3, None)
         self.assertEqual([block["lane"] for block in sized["blocks"]],
                          ["A", "B", "C", "D"])
-        self.assertEqual([block["start"] for block in sized["blocks"]],
+        self.assertEqual([block["start_position"] for block in sized["blocks"]],
                          [0, 3, 6, 9])
         self.assertTrue(sized["blocks"][-1]["partial"])
         self.assertEqual(sized["blocks_total"], 4)
@@ -357,9 +372,10 @@ class T4CliJsonAndHuman(unittest.TestCase):
         block = blocks["blocks"][0]
         self.assertEqual(
             set(block),
-            {"index", "start", "end", "lane", "partial", "pages", "totals"})
+            {"index", "start_position", "end_position", "lane", "partial",
+             "pages", "totals"})
         self.assertEqual(block["index"], 0)
-        self.assertEqual(block["start"], 0)
+        self.assertEqual(block["start_position"], 0)
         self.assertEqual(block["lane"], "A")
         self.assertEqual(len(block["pages"]), 8)
         self.assertEqual(block["partial"], len(block["pages"]) < 8)
@@ -393,7 +409,10 @@ class T4CliJsonAndHuman(unittest.TestCase):
         self.assertIn("BLOCKS — remaining pending union,", text)
         self.assertIn("block 0: positions 0-", text)
         self.assertIn("lane A", text)
-        self.assertIn("pos  lane", text)
+        self.assertRegex(
+            text,
+            r"pos\s+lane\s+pin\s+bytes\s+LF\s+blob\s+path",
+            "human blocks table header must end with the path column")
         self.assertIn("totals: bytes", text)
         self.assertIn("blocks total", text)
         payload = json.loads(self.out1.decode("utf-8"))
@@ -431,14 +450,25 @@ class T5DiscoveryContract(unittest.TestCase):
             source = path.read_text(encoding="utf-8")
             total += len(re.findall(r"^    def test_", source, re.MULTILINE))
         self.assertGreaterEqual(total, 50)
-        source = Path(__file__).read_text(encoding="utf-8")
-        for name in ("test_t1_default_output_matches_base_checker",
-                     "test_t2_flatten_is_the_sorted_union",
-                     "test_t3_page_facts_at_two_refs",
-                     "test_t4_json_schema_and_types",
-                     "test_t5_discovery_contract",
-                     "test_t6_scope_and_hygiene"):
-            self.assertIn(name, source)
+        tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+        methods = {node.name for node in ast.walk(tree)
+                   if isinstance(node, ast.FunctionDef)
+                   and node.name.startswith("test_")}
+        expected = {
+            "test_t1_default_output_matches_base_checker",
+            "test_t2_flatten_is_the_sorted_union",
+            "test_t3_page_facts_at_two_refs",
+            "test_t4_json_schema_and_types",
+            "test_t4_quiet_still_prints_blocks",
+            "test_t5_discovery_contract",
+            "test_t6_only_the_two_planned_paths_changed",
+            "test_t6_no_new_imports_stdlib_only",
+            "test_t6_no_network_tokens",
+            "test_t6_cli_input_errors_exit_2",
+            "test_t6_suite_writes_no_tracked_data",
+        }
+        self.assertEqual(expected - methods, set(),
+                         "expected test methods are missing from this file")
 
 
 class T6ScopeAndHygiene(unittest.TestCase):
