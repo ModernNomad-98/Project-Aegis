@@ -2160,17 +2160,57 @@ def test_coverage_map_totals_mismatch():
 
 
 def test_coverage_map_summary_totals_mismatch():
-    """Summary totals: the human summary must carry the JSON totals."""
+    """T9b: each seeded summary totals/per-area defect is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
             return text.replace("| GAP | 55 |", "| GAP | 54 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'GAP'",
                          "coverage map: summary totals mismatch rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            return text.replace(
+                "| 01 Software Architecture & Engineering | 55 |",
+                "| 01 Software Architecture & Engineering | 54 |", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "summary per-area row 01: entries is 54",
+                         "coverage map: summary per-area entries mismatch "
+                         "rejected (area named)")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            return text.replace("| explicit-id | 128 |",
+                                "| explicit-id | 127 |", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "summary total 'explicit-id'",
+                         "coverage map: summary by_grade mismatch rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            return text.replace("| P0 / P1 / P2 | 126 / 149 / 25 |",
+                                "| P0 / P1 / P2 | 127 / 149 / 25 |", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "summary priority totals",
+                         "coverage map: summary priority totals mismatch "
+                         "rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            return text.replace("| P0 / P1 / P2 gaps | 11 / 35 / 9 |",
+                                "| P0 / P1 / P2 gaps | 12 / 35 / 9 |", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "summary gap-priority totals",
+                         "coverage map: summary gap-priority totals mismatch "
+                         "rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            return text.replace("| Review pending | 160 |",
+                                "| Review pending | 161 |", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "summary total 'Review pending'",
+                         "coverage map: summary review_pending mismatch "
+                         "rejected")
 
 
 def test_coverage_map_hygiene():
-    """Hygiene: unsorted ids, timestamps and non-canonical JSON are rejected."""
+    """T10: unsorted ids, timestamps, canonical form and pinned totals rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def unsorted(payload):
             payload["entries"].reverse()
@@ -2183,6 +2223,21 @@ def test_coverage_map_hygiene():
         with mutated_coverage(Path(tmp), timestamped) as rep:
             expect_error(rep, "must not carry timestamps",
                          "coverage map: timestamp rejected")
+    for key, bad_value, needle, label in (
+            ("beyond_roadmap_skills", 80, "totals.beyond_roadmap_skills",
+             "coverage map: beyond-roadmap pinned total mismatch rejected"),
+            ("manifest_skills", 204, "totals.manifest_skills",
+             "coverage map: manifest pinned total mismatch rejected"),
+            ("distinct_covering_skills", 123,
+             "totals.distinct_covering_skills",
+             "coverage map: distinct-covering pinned total mismatch rejected"),
+            ("entries", 299, "totals.entries",
+             "coverage map: entries pinned total mismatch rejected")):
+        with tempfile.TemporaryDirectory() as tmp:
+            def mutate(payload, key=key, bad_value=bad_value):
+                payload["totals"][key] = bad_value
+            with mutated_coverage(Path(tmp), mutate) as rep:
+                expect_error(rep, needle, label)
 
 
 def test_coverage_map_by_grade_totals():
@@ -2231,11 +2286,14 @@ def test_coverage_map_anomaly_rules():
     """T14: #186/#299 keep their exact recovered covering-skill sets."""
     with tempfile.TemporaryDirectory() as tmp:
         def wrong_set(payload):
-            coverage_entry(payload, 299)["covering_skills"] = [
-                "adr-writer", "api-contract-designer"]
+            coverage_entry(payload, 299)["covering_skills"] = sorted(
+                ["ai-router-architect", "feature-flag-architect"])
         with mutated_coverage(Path(tmp), wrong_set) as rep:
             expect_error(rep, "covering_skills must be exactly",
-                         "coverage map: #299 wrong covering set rejected")
+                         "coverage map: #299 manifest-present wrong set rejected")
+            expect_error(
+                rep, "got: [ai-router-architect, feature-flag-architect]",
+                "coverage map: #299 anomaly error reports the observed got set")
     with tempfile.TemporaryDirectory() as tmp:
         def dropped(payload):
             coverage_entry(payload, 299)["covering_skills"] = [

@@ -1790,6 +1790,23 @@ def _coverage_summary_ids(text: str, heading: str,
     return {int(token) for token in re.findall(r"\d+", section)}
 
 
+COVERAGE_AREA_ROW_RE = re.compile(
+    r"^\| *(\d{2})(?: [^|]*?)? *\| *(\d+) *\| *(\d+) *\| *(\d+) *\|"
+    r" *(\d+) *\| *(\d+) *\|$")
+
+
+def _coverage_summary_per_area(text: str) -> dict[str, tuple[int, ...]]:
+    """Parse the summary per-area table: area -> (entries, S, C, P, G)."""
+    section = _coverage_section(text, "## Per-area status")
+    rows: dict[str, tuple[int, ...]] = {}
+    for line in section.splitlines():
+        match = COVERAGE_AREA_ROW_RE.match(line.strip())
+        if match:
+            rows[match.group(1)] = tuple(int(match.group(index))
+                                         for index in range(2, 7))
+    return rows
+
+
 def check_coverage_map(rep: Report) -> None:
     """HARD: docs/skills/coverage-map.json and its summary reconcile.
 
@@ -1873,6 +1890,7 @@ def check_coverage_map(rep: Report) -> None:
     by_grade: dict[str, int] = {}
     by_priority: dict[str, int] = {}
     gap_by_priority: dict[str, int] = {}
+    area_status_counts: dict[str, dict[str, int]] = {}
     for index, entry in enumerate(entries):
         if not isinstance(entry, dict):
             rep.error("[" + ctx + "] entry[" + str(index)
@@ -1964,6 +1982,8 @@ def check_coverage_map(rep: Report) -> None:
             rep.error(entry_ctx + "notes must be a string (empty when not "
                       "applicable)")
         by_area[str(area)] = by_area.get(str(area), 0) + 1
+        area_counts = area_status_counts.setdefault(str(area), {})
+        area_counts[str(status)] = area_counts.get(str(status), 0) + 1
         by_status[str(status)] = by_status.get(str(status), 0) + 1
         by_grade[str(grade)] = by_grade.get(str(grade), 0) + 1
         by_priority[str(entry.get("priority"))] = by_priority.get(
@@ -1993,10 +2013,16 @@ def check_coverage_map(rep: Report) -> None:
             rep.error("[" + ctx + "] anomaly row " + str(row_id)
                       + " must keep evidence_grade catalog-decision")
         skills = target.get("covering_skills")
+        if isinstance(skills, list):
+            observed = "[" + ", ".join(str(name)
+                                       for name in sorted(skills, key=str)) + "]"
+        else:
+            observed = repr(skills)
         if not isinstance(skills, list) or set(skills) != set(expected):
             rep.error("[" + ctx + "] anomaly row " + str(row_id)
-                      + " covering_skills must be exactly "
-                      + ", ".join(sorted(expected)))
+                      + " covering_skills must be exactly ["
+                      + ", ".join(sorted(expected)) + "] (got: "
+                      + observed + ")")
     for entry in entries:
         if not isinstance(entry, dict):
             continue
@@ -2128,6 +2154,28 @@ def check_coverage_map(rep: Report) -> None:
     if not gap_match or gap_match.group(1) != gap_expected:
         rep.error("[" + md_ctx + "] summary gap-priority totals must be "
                   + gap_expected)
+    summary_area_rows = _coverage_summary_per_area(summary)
+    if set(summary_area_rows) != set(COVERAGE_AREA_RANGES):
+        rep.error("[" + md_ctx + "] summary per-area table must have exactly "
+                  "one row for each area 01..09 (found: "
+                  + ", ".join(sorted(summary_area_rows)) + ")")
+    for area in sorted(COVERAGE_AREA_RANGES):
+        if area not in summary_area_rows:
+            continue
+        expected_area_counts = (
+            by_area.get(area, 0),
+            area_status_counts.get(area, {}).get("SHIPPED", 0),
+            area_status_counts.get(area, {}).get("COVERED", 0),
+            area_status_counts.get(area, {}).get("PARTIAL", 0),
+            area_status_counts.get(area, {}).get("GAP", 0),
+        )
+        for label, observed_count, expected_count in zip(
+                ("entries", "SHIPPED", "COVERED", "PARTIAL", "GAP"),
+                summary_area_rows[area], expected_area_counts):
+            if observed_count != expected_count:
+                rep.error("[" + md_ctx + "] summary per-area row " + area
+                          + ": " + label + " is " + str(observed_count)
+                          + ", expected " + str(expected_count))
     summary_gap_ids = _coverage_summary_ids(
         summary, "## GAP candidates (all " + str(len(COVERAGE_GAP_IDS))
         + " ids)", after_colon=True)
