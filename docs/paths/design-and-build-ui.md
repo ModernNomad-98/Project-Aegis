@@ -47,8 +47,13 @@ for what materially blocks the next useful action.
 
 ## The order
 
-1. **Classify the change and lock its scope —
-   [`change-classification-gate`](../../.claude/skills/change-classification-gate/SKILL.md).**
+1. **Establish context, then classify the change and lock its scope —
+   [`agent-startup-context-gate`](../../.claude/skills/agent-startup-context-gate/SKILL.md)
+   then [`change-classification-gate`](../../.claude/skills/change-classification-gate/SKILL.md).**
+   The startup context gate is an explicit prerequisite: it establishes the repository
+   identity, governing instructions and current state before any UI inspection or
+   classification, so a wrong workspace or stale instructions cannot be classified as
+   the work.
    Yields the change class (UI/style, frontend logic, or a mix that also
    touches an API or schema), the validation depth it needs, and the approved
    file set. A direct request to improve one existing screen stays one
@@ -90,7 +95,11 @@ for what materially blocks the next useful action.
    the existing setup flow creates one. For an existing project with no such
    file and no step-2 artifact, ask you where the authority should live (or
    record it outside the project tree) rather than inventing a new project
-   file. This path never invents a new project file on its own.
+   file. If `docs/project-state.md` exists, record through that project's own
+   project-state workflow (its approved append-only decision/approval/state
+   format) rather than writing arbitrary fields into it; in every case mark the
+   record's location so the next agent can find it. This path never invents a new
+   project file on its own.
 
    *No Aegis skill owns the design itself.* When design is the task, the agent
    produces a reviewable interface structure, a visual direction and a
@@ -107,9 +116,10 @@ for what materially blocks the next useful action.
    mismatch and the decisions it affects; it does not silently refresh the
    source, continue with unverified values, or mark dependent work complete.
    Completed work is preserved and only tasks whose inputs remain valid
-   continue. A refresh happens only under an explicitly pinned revision or an
-   existing refresh authority that actually covers it — otherwise the single
-   affected source choice goes to you. After an authorized refresh, only the
+   continue. A refresh happens only when **both** a resolved/pinned revision **and** an
+   applicable recorded refresh authority cover it — a named revision by itself
+   authorizes nothing. Otherwise leave dependent work incomplete, preserve unaffected
+   work, and put the single affected source choice to you. After an authorized refresh, only the
    dependent projections are updated and only the checks the change
    invalidated are rerun. Permission to read a source is not permission to
    change the approved design. A tool-specific projection of your tokens or
@@ -168,9 +178,11 @@ for what materially blocks the next useful action.
      image to the output revision it came from.
 
    Verification inspects the implemented interface, exercises the named
-   journey — including invalid input, failed-save recovery and a repeated
-   request — and compares the result against the step-3 authority and the
-   step-4 checklist at every named viewport. Prefer automated interactions,
+   journey using the states the specification actually defines (for example
+   invalid input, failed-save recovery or a repeated request where those states
+   exist; a read-only or purely presentational change verifies only the states it
+   defines), and compares the result against the step-3 authority and the
+   applicable step-4 checklist at every named viewport. Prefer automated interactions,
    build checks and accessibility assertions, supplemented by rendered
    inspection; a visual judgment names the observations behind it. This path
    does not create a separate human smoke-test campaign and does not ask you
@@ -192,7 +204,11 @@ for what materially blocks the next useful action.
    consistently with it; finding a skill folder or copying an instruction
    file is not a completed handoff. The receiver loads context through its
    own documented discovery route, and you are not asked to repeat design
-   decisions you already supplied.
+   decisions you already supplied. **Use the designer once to establish the
+   protocol, then require the current actor to populate it at every actual
+   switch** with the concrete decisions, changed files, evidence and open items;
+   a receiver handed a blank or newly redesigned template has not received a
+   handoff.
 
 ## If you bring in an external repository
 

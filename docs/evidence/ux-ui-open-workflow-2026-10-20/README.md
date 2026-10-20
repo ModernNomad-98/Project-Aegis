@@ -6,6 +6,17 @@
 
 **Bindings.** Plan `AEGIS-UX-UI-DEEPSEEK-IMPLEMENTATION-PLAN.md` — 50,273 B / sha256 `b20818316c9b7db7f2c1856c2ace1bfe9a65a20d2f240098e4e1d78f629945ac` (SD-B: ACCEPT, round 3). Independent plan review `AEGIS-UX-UI-DEEPSEEK-PLAN-REVIEW.md` — 51,019 B / sha256 `a93178949164b1c5c5d45a6e0784410e96e55030a94466de2a44768b0e7f0191`. Stage A addendum `_A/evidence/prod-uxui-a1/PLAN-ADDENDUM-REV4.md` — 26,728 B / 129 LF / sha256 `01d9ba9e3b821758aa192fe37f67afe976171126f1513d856a2da35466f25c83` — owner amendment and D106 text; independent Stage B audit `_A/evidence/prod-uxui-b1/AUDIT-B-ADDENDUM-REV4.md` — 6,714 B / sha256 `3e75edf0a3a1d462fd031c156aeb5487b40802cd0f6f2cbd38f4686dc09f2ab9` = **SD-B: ACCEPT**. Handoff `AEGIS-UX-UI-DEEPSEEK-HANDOFF.md` — 15,369 B / sha256 `a1a2742b8cfc0c29ee52f5405269babe8ab781e504ec6393cfba9019d44e7aa5`. Fixture research `RESEARCH-ac8-ac9-fixtures.md` — 25,397 B / sha256 `517a8e9b2bf52a4280122f75f98bdde76f6f39725b9c5d3ec713c98fd64149ec`.
 
+**Availability (citation-durability rule).** **None of the six bound artifacts is
+committed to this repository; all six are explicitly marked UNAVAILABLE from a fresh
+checkout:**
+- Plan `AEGIS-UX-UI-DEEPSEEK-IMPLEMENTATION-PLAN.md` — external locator `_A/evidence/prod-uxui-a1/inputs/AEGIS-UX-UI-DEEPSEEK-IMPLEMENTATION-PLAN.md` — retained in the Stage A evidence workspace, **not retrievable from the repository checkout**; identity bound by the sha256 above.
+- Independent plan review `AEGIS-UX-UI-DEEPSEEK-PLAN-REVIEW.md` — external locator `_A/evidence/prod-uxui-a1/inputs/AEGIS-UX-UI-DEEPSEEK-PLAN-REVIEW.md` — **unavailable from a fresh checkout**; identity bound by the sha256 above.
+- Stage A addendum REV4 — external locator `_A/evidence/prod-uxui-a1/PLAN-ADDENDUM-REV4.md` — **unavailable from a fresh checkout**; identity bound by the sha256 above.
+- Stage B ACCEPT audit REV4 — external locator `_A/evidence/prod-uxui-b1/AUDIT-B-ADDENDUM-REV4.md` — **unavailable from a fresh checkout**; identity bound by the sha256 above.
+- Handoff `AEGIS-UX-UI-DEEPSEEK-HANDOFF.md` — external locator `_A/evidence/prod-uxui-a1/inputs/AEGIS-UX-UI-DEEPSEEK-HANDOFF.md` — **unavailable from a fresh checkout**; identity bound by the sha256 above.
+- Fixture research `RESEARCH-ac8-ac9-fixtures.md` — external locator `_A/evidence/prod-uxui-a1/inputs/RESEARCH-ac8-ac9-fixtures.md` — **unavailable from a fresh checkout**; identity bound by the sha256 above.
+Publishing committed copies under this page would be a separate authorized path outside this PR's eight-file scope; that decision is explicitly left to Lead/owner and is recorded here as the limitation instead of being claimed as durable.
+
 **Scope (B1, Lead-authorized):** six planned deliverables / seven planned paths / eight touched files. The seventh path is the D91 `tools/skills-manifest.json` refresh — machine-generated consistency only, +2/−2 lines (`source_revision` and the `project-orchestrator` sha256); no skill, count, family or catalog change. Plan B3's "manifest untouched" is superseded for this PR only; the immutable plan hash is unchanged.
 
 ## Stage A declaration (SD-A: COMPLETE)

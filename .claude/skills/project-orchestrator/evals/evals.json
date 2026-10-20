@@ -779,8 +779,21 @@
         "triggers": false,
         "assertions": [
           "Does not invoke project-orchestrator: the user already knows the next step and the change is a direct UI extension.",
-          "Classifies the change (a UI extension) and inspects the existing design system before editing.",
+          "Names change-classification-gate and docs/paths/design-and-build-ui.md as the expected route.",
           "Asks no question already answered by the prompt."
+        ]
+      }
+    },
+    {
+      "id": "should-trigger-stage6-ui-slice-routes-to-ui-path",
+      "type": "should_trigger",
+      "prompt": "We are midway through the project and need the account-settings screens built: profile, notifications and a save-confirmation state, following the design system we already have.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Invokes project-orchestrator and identifies the Stage 6 user-interface slice.",
+          "Keeps the core inner lifecycle while routing the UI work through docs/paths/design-and-build-ui.md.",
+          "Names change-classification-gate before any UI implementation work."
         ]
       }
     }
