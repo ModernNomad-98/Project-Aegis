@@ -62,7 +62,6 @@ Return, in this order:
 ## Gotchas
 
 - Never reproduce secrets, tokens or PII in the diagram; use classification labels and compose with sensitive-disclosure-guard.
-
 - A diagram copied from docs is a claim, not evidence; verify it against code.
 - Missing side effects (emails, payments, webhooks) is the most common false diagram.
 - Too much detail hides the trust boundary; choose a named level.

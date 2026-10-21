@@ -1206,7 +1206,7 @@ production-safe smoke delivery #188):
 | `mobile-journey-test-designer` | (G1, #230) Designs mobile-journey QA: critical journeys × breakpoints/touch/dialogs/navigation/orientation/keyboard/safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. | auto + manual |
 | `role-coverage-test-designer` | (G1, #229) Designs role-coverage QA: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Designs; executes nothing. | auto + manual |
 | `property-based-test-designer` | (G2, #194) Designs property-based test coverage: domain invariants per target, bounded generator domains with shrinking, counterexample triage, runner handoff. On-demand specialized coverage. Designs; writes and runs no tests. | auto + manual |
-| `production-safe-smoke-tester` | Designs production-safe smoke checks: read-only/reversible probes, seeded fixtures, forbidden operations, stop/escalation and explicitly unexercised areas; execution delegated. | auto + manual |
+| `production-safe-smoke-tester` | Designs production-safe smoke checks: read-only/reversible probes, pre-seeded isolated/disposable-tenant fixtures only (no real customer data), forbidden operations, stop/escalation and explicitly unexercised areas; execution delegated. | auto + manual |
 
 Phase 6 — cloud, DevOps, reliability & release pack (`rollback-strategy-designer`
 merged into `rollback-runbook-author` per reconciliation §3; expansion builds under D71):

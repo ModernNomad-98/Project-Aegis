@@ -98,7 +98,7 @@
       "covering_skills": [
         "layered-architecture-enforcer"
       ],
-      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `layered-architecture-enforcer` for roadmap #6 (docs/skills-catalog.md, README.md); covering skill: layered-architecture-enforcer; D108 (2026-10-21).",
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `layered-architecture-enforcer` for roadmap #6 (roadmap-ID mapping: docs/skills-catalog.md + D108; shipped status: README.md); covering skill: layered-architecture-enforcer; D108 (2026-10-21).",
       "evidence_grade": "explicit-id",
       "id": 6,
       "name": "Layered Architecture Enforcement",
@@ -112,7 +112,7 @@
       "covering_skills": [
         "dependency-direction-guard"
       ],
-      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `dependency-direction-guard` for roadmap #7 (docs/skills-catalog.md, README.md); covering skill: dependency-direction-guard; D108 (2026-10-21).",
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `dependency-direction-guard` for roadmap #7 (roadmap-ID mapping: docs/skills-catalog.md + D108; shipped status: README.md); covering skill: dependency-direction-guard; D108 (2026-10-21).",
       "evidence_grade": "explicit-id",
       "id": 7,
       "name": "Dependency Direction Guard",
@@ -126,7 +126,7 @@
       "covering_skills": [
         "interface-first-designer"
       ],
-      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `interface-first-designer` for roadmap #8 (docs/skills-catalog.md, README.md); covering skill: interface-first-designer; D108 (2026-10-21).",
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `interface-first-designer` for roadmap #8 (roadmap-ID mapping: docs/skills-catalog.md + D108; shipped status: README.md); covering skill: interface-first-designer; D108 (2026-10-21).",
       "evidence_grade": "explicit-id",
       "id": 8,
       "name": "Interface-First Engineering",
@@ -676,7 +676,7 @@
       "covering_skills": [
         "data-flow-diagrammer"
       ],
-      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `data-flow-diagrammer` for roadmap #49 (docs/skills-catalog.md, README.md); covering skill: data-flow-diagrammer; D108 (2026-10-21).",
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `data-flow-diagrammer` for roadmap #49 (roadmap-ID mapping: docs/skills-catalog.md + D108; shipped status: README.md); covering skill: data-flow-diagrammer; D108 (2026-10-21).",
       "evidence_grade": "explicit-id",
       "id": 49,
       "name": "Data Flow Diagramming",
@@ -1730,7 +1730,7 @@
       "covering_skills": [
         "security-regression-harness-designer"
       ],
-      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `security-regression-harness-designer` for roadmap #125 (docs/skills-catalog.md, README.md); covering skill: security-regression-harness-designer; D108 (2026-10-21).",
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `security-regression-harness-designer` for roadmap #125 (roadmap-ID mapping: docs/skills-catalog.md + D108; shipped status: README.md); covering skill: security-regression-harness-designer; D108 (2026-10-21).",
       "evidence_grade": "explicit-id",
       "id": 125,
       "name": "Security Regression Harness",
@@ -1758,7 +1758,7 @@
       "covering_skills": [
         "security-impact-note-author"
       ],
-      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `security-impact-note-author` for roadmap #127 (docs/skills-catalog.md, README.md); covering skill: security-impact-note-author; D108 (2026-10-21).",
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `security-impact-note-author` for roadmap #127 (roadmap-ID mapping: docs/skills-catalog.md + D108; shipped status: README.md); covering skill: security-impact-note-author; D108 (2026-10-21).",
       "evidence_grade": "explicit-id",
       "id": 127,
       "name": "Security Impact Note Authoring",
@@ -2149,7 +2149,7 @@
       "covering_skills": [
         "concurrency-race-reviewer"
       ],
-      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `concurrency-race-reviewer` for roadmap #155 (docs/skills-catalog.md, README.md); covering skill: concurrency-race-reviewer; D108 (2026-10-21).",
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `concurrency-race-reviewer` for roadmap #155 (roadmap-ID mapping: docs/skills-catalog.md + D108; shipped status: README.md); covering skill: concurrency-race-reviewer; D108 (2026-10-21).",
       "evidence_grade": "explicit-id",
       "id": 155,
       "name": "Concurrency Race Review",
@@ -2595,7 +2595,7 @@
       "covering_skills": [
         "production-safe-smoke-tester"
       ],
-      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `production-safe-smoke-tester` for roadmap #188 (docs/skills-catalog.md, README.md); covering skill: production-safe-smoke-tester; D108 (2026-10-21).",
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `production-safe-smoke-tester` for roadmap #188 (roadmap-ID mapping: docs/skills-catalog.md + D108; shipped status: README.md); covering skill: production-safe-smoke-tester; D108 (2026-10-21).",
       "evidence_grade": "explicit-id",
       "id": 188,
       "name": "Production-Safe Smoke Testing",

@@ -2705,7 +2705,6 @@ def test_coverage_map_triage_rows_and_phrase():
     assert "80 of 215" in mmd and "83 of 215" not in mmd
 
 
-
 def test_coverage_map_batch1_deliveries():
     """T35: the eight Batch 1 GAPs are SHIPPED/explicit-id on their new skills."""
     mapping = {
@@ -2731,7 +2730,9 @@ def test_coverage_map_batch1_deliveries():
     assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
     assert len(validator.COVERAGE_GAP_IDS) == 46
     assert validator.COVERAGE_P0_GAP_IDS == (161, 162, 164)
-    assert "80 of 215" in validator.COVERAGE_REQUIRED_PHRASES[2]
+    phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
+               if "80 of 215" in item]
+    assert phrases, "an optionality phrase must carry 80 of 215"
 
 
 TESTS = [

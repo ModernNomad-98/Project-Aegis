@@ -72,7 +72,7 @@ Return, in this order:
 - The request is classifying an existing flaky test: route to flaky-test-detective.
 - The request is resilience/availability strategy: route to resilience-architecture-reviewer.
 - The request is a general diff review: route to code-reviewer.
-- The request is job-queue or background-job semantics: route to background-job-orchestration-architect.
+- The request is designing queue semantics/architecture (delivery, ordering, dead letters): route to background-job-orchestration-architect; consumer-race reviews stay with this skill.
 - The request is a per-change test plan: route to test-plan-designer.
 - The caller wants code edits: return fix options and delegate implementation.
 - The data model/transaction boundaries are unknown: state assumptions and ask for evidence.
