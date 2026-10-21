@@ -190,7 +190,7 @@ COVERAGE_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 COVERAGE_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 COVERAGE_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 COVERAGE_HTML_BLOCK_RE = re.compile(
-    r"<(?:pre|code|script|style)\b[^>]*>.*?</(?:pre|code|script|style)>",
+    r"<(?P<tag>pre|code|script|style)\b[^>]*>.*?</(?P=tag)>",
     re.DOTALL | re.IGNORECASE)
 COVERAGE_FENCE_RE = re.compile(
     r"^(?:(?: {0,3}>[ \t]?)+)? {0,3}(\x60{3,}|~{3,})(.*)$")
@@ -1852,6 +1852,14 @@ def _coverage_reject_json_constant(name: str):
     raise ValueError("non-finite JSON number '" + name + "' is not permitted")
 
 
+def _coverage_reject_json_float(text: str):
+    """json.loads parse_float hook: reject an overflowing literal such as 1e999."""
+    value = float(text)
+    if value != value or value in (float("inf"), float("-inf")):
+        raise ValueError("non-finite JSON number '" + text + "' is not permitted")
+    return value
+
+
 def _coverage_rendered_markdown(text: str) -> str:
     """Return the visible summary text only.
 
@@ -1867,17 +1875,21 @@ def _coverage_rendered_markdown(text: str) -> str:
     # comment cannot open or close a fence in the parser below.
     without_comments = COVERAGE_HTML_COMMENT_RE.sub(
         lambda match: "\n" * match.group(0).count("\n"), text)
+    # CommonMark renders an unterminated <!-- as an HTML comment through EOF.
+    if "<!--" in without_comments:
+        without_comments = without_comments.split("<!--", 1)[0]
     out: list[str] = []
     fence = None  # (fence_char, fence_length) while inside a fenced block
     for line in without_comments.splitlines():
+        content = re.sub(r"^(?: {0,3}>[ \t]?)+", "", line)
         match = COVERAGE_FENCE_RE.match(line)
         if fence is None:
             if match:
                 marker = match.group(1)
                 fence = (marker[0], len(marker))
                 continue
-            if line.startswith("    ") or line.startswith("\t"):
-                continue  # indented code block is not rendered prose
+            if content.startswith("    ") or content.startswith("\t"):
+                continue  # indented code block (incl. blockquoted) is not prose
             out.append(line)
         else:
             if match:
@@ -1903,7 +1915,7 @@ def _coverage_require_exact_ints(rep: Report, ctx: str, value, label: str) -> No
     if not _coverage_is_exact_int(value):
         shown = "totals" + label
         rep.error("[" + ctx + "] " + shown
-                  + " must be an exact integer (booleans and floats are "
+                  + " must be an exact integer (booleans, floats, strings "
                   "rejected)")
 
 def _coverage_check_basis(rep: Report, ctx: str, basis) -> None:
@@ -1917,13 +1929,15 @@ def _coverage_check_basis(rep: Report, ctx: str, basis) -> None:
     for key in sorted(set(basis) - set(COVERAGE_BASIS_KEYS)):
         rep.error("[" + ctx + "] basis has unexpected key '" + key + "'")
     commit = basis.get("repo_commit")
-    if not isinstance(commit, str) or not COVERAGE_COMMIT_RE.match(commit) \
-            or commit != COVERAGE_BASIS_COMMIT:
+    if "repo_commit" in basis and (not isinstance(commit, str)
+            or not COVERAGE_COMMIT_RE.match(commit)
+            or commit != COVERAGE_BASIS_COMMIT):
         rep.error("[" + ctx + "] basis.repo_commit must be the pinned 40-hex "
                   "audit commit " + COVERAGE_BASIS_COMMIT)
     date = basis.get("repo_date")
-    if not isinstance(date, str) or not COVERAGE_DATE_RE.match(date) \
-            or date != COVERAGE_BASIS_REPO_DATE:
+    if "repo_date" in basis and (not isinstance(date, str)
+            or not COVERAGE_DATE_RE.match(date)
+            or date != COVERAGE_BASIS_REPO_DATE):
         rep.error("[" + ctx + "] basis.repo_date must be the pinned audit date "
                   + COVERAGE_BASIS_REPO_DATE)
     artifacts = basis.get("audit_artifacts")
@@ -1938,6 +1952,8 @@ def _coverage_check_basis(rep: Report, ctx: str, basis) -> None:
             rep.error("[" + ctx + "] basis.audit_artifacts has unexpected key '"
                       + name + "'")
         for name, expected in COVERAGE_AUDIT_ARTIFACTS.items():
+            if name not in artifacts:
+                continue
             artifact = artifacts.get(name)
             label = "basis.audit_artifacts." + name
             if not isinstance(artifact, dict):
@@ -1970,6 +1986,8 @@ def _coverage_check_basis(rep: Report, ctx: str, basis) -> None:
             rep.error("[" + ctx + "] basis.source_files has unexpected key '"
                       + key + "'")
         for key, expected in COVERAGE_SOURCE_FILES.items():
+            if key not in sources:
+                continue
             digest = sources.get(key)
             if not isinstance(digest, str) or not COVERAGE_SHA256_RE.match(digest) \
                     or digest != expected:
@@ -2028,8 +2046,10 @@ def check_coverage_map(rep: Report) -> None:
                       + " has trailing whitespace")
             break
     try:
-        payload = json.loads(text,
-                             parse_constant=_coverage_reject_json_constant)
+        payload = json.loads(
+            text,
+            parse_constant=_coverage_reject_json_constant,
+            parse_float=_coverage_reject_json_float)
     except ValueError as exc:  # JSONDecodeError and the non-finite hook
         rep.error("[" + ctx + "] is not valid JSON: " + str(exc))
         return
@@ -2244,9 +2264,8 @@ def check_coverage_map(rep: Report) -> None:
         "distinct_covering_skills": len(covering_union),
         "beyond_roadmap_skills": (len(manifest - covering_union)
                                   if manifest is not None else 0),
-        "review_pending": (by_grade.get("catalog-decision", 0)
-                           + by_grade.get("capability-review", 0)
-                           + by_grade.get("none", 0)),
+        "review_pending": sum(count for grade, count in by_grade.items()
+                              if grade != "explicit-id"),
     }
     _coverage_require_exact_ints(rep, ctx, totals, "")
     for key in sorted(COVERAGE_TOTALS):
@@ -2296,7 +2315,7 @@ def check_coverage_map(rep: Report) -> None:
         if not _coverage_phrase_present(summary_visible, phrase):
             rep.error("[" + md_ctx + "] missing the required optionality "
                       "phrase (visible rendered text only): '" + phrase + "'")
-    summary_totals = _coverage_summary_totals(summary)
+    summary_totals = _coverage_summary_totals(summary_visible)
     expected_rows = {
         "Entries": computed["entries"],
         "SHIPPED": by_status.get("SHIPPED", 0),
@@ -2357,12 +2376,12 @@ def check_coverage_map(rep: Report) -> None:
                           + ": " + label + " is " + str(observed_count)
                           + ", expected " + str(expected_count))
     summary_gap_ids = _coverage_summary_ids(
-        summary, "## GAP candidates (all " + str(len(COVERAGE_GAP_IDS))
+        summary_visible, "## GAP candidates (all " + str(len(COVERAGE_GAP_IDS))
         + " ids)", after_colon=True)
     if summary_gap_ids != set(COVERAGE_GAP_IDS):
         rep.error("[" + md_ctx + "] summary GAP id set must equal the JSON "
                   "GAP set (all " + str(len(COVERAGE_GAP_IDS)) + " ids)")
-    summary_p0_ids = _coverage_summary_ids(summary, "## P0 gap candidates (all "
+    summary_p0_ids = _coverage_summary_ids(summary_visible, "## P0 gap candidates (all "
                                            + str(len(COVERAGE_P0_GAP_IDS))
                                            + " ids)")
     if summary_p0_ids != set(COVERAGE_P0_GAP_IDS):

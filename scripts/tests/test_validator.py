@@ -2444,7 +2444,7 @@ def test_coverage_map_optionality_fence_hidden():
     """T20: an optionality phrase hidden in a fenced code block does not count."""
     phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
     fence = chr(96) * 3
-    hidden = fence + "\n" + phrase + "\n" + fence
+    hidden = "\n" + fence + "\n" + phrase + "\n" + fence
     assert phrase not in validator._coverage_rendered_markdown(hidden), (
         "fenced code blocks must be stripped from rendered text"
     )
@@ -2503,6 +2503,11 @@ def test_coverage_map_triage_review_pending():
                 + validator.COVERAGE_TOTALS["by_grade"]["capability-review"]
                 + validator.COVERAGE_TOTALS["by_grade"]["none"])
     assert expected == 172, "review_pending must be derived from non-explicit-id grades"
+    derived = sum(count for grade, count in validator.COVERAGE_TOTALS["by_grade"].items()
+                  if grade != "explicit-id")
+    assert derived == 172, (
+        "review_pending must derive from every non-explicit-id grade"
+    )
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
             payload["totals"]["review_pending"] = 160
@@ -2558,6 +2563,7 @@ def test_coverage_map_rendered_visibility_edges():
     hidden = [
         fence + "\n" + fence + "not-a-close\n" + phrase + "\n" + fence,
         "> " + fence + "\n> " + phrase + "\n> " + fence,
+        ">     " + phrase,
         "    " + phrase,
         "<pre>\n" + phrase + "\n</pre>",
     ]
@@ -2593,6 +2599,55 @@ def test_coverage_map_exact_int_totals():
                          "coverage map: bool grouped total rejected")
 
 
+
+def test_coverage_map_unterminated_comment_hidden():
+    """T27: an unterminated HTML comment hides the rest of the summary."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    hidden = "<!-- unterminated\n" + phrase
+    assert phrase not in validator._coverage_rendered_markdown(hidden), (
+        "an unterminated comment must hide trailing text"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        def hide_after_open_comment(text):
+            return text.replace(phrase, "<!-- unterminated\n" + phrase, 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              hide_after_open_comment) as rep:
+            expect_error(rep, "missing the required optionality phrase",
+                         "coverage map: unterminated-comment phrase rejected")
+
+
+def test_coverage_map_visible_only_totals_and_ids():
+    """T28: hidden totals rows/id sets must not satisfy the summary checks."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def comment_out_totals(text):
+            return text.replace("| Review pending | 172 |",
+                                "<!-- | Review pending | 172 | -->", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              comment_out_totals) as rep:
+            expect_error(rep, "summary total 'Review pending'",
+                         "coverage map: comment-hidden totals row rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def comment_out_gap_ids(text):
+            return text.replace("## GAP candidates (all 54 ids)",
+                                "<!-- ## GAP candidates (all 54 ids) -->", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              comment_out_gap_ids) as rep:
+            expect_error(rep, "summary GAP id set must equal",
+                         "coverage map: comment-hidden GAP id heading rejected")
+
+
+def test_coverage_map_overflowing_float_rejected():
+    """T29: parse_float rejects an overflowing literal such as 1e999."""
+    raised = False
+    try:
+        json.loads('{"x": 1e999}',
+                   parse_constant=validator._coverage_reject_json_constant,
+                   parse_float=validator._coverage_reject_json_float)
+    except ValueError:
+        raised = True
+    assert raised, "an overflowing float literal must be rejected at load"
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -2625,6 +2680,9 @@ TESTS = [
     test_coverage_map_triage_rows_254_278,
     test_coverage_map_rendered_visibility_edges,
     test_coverage_map_exact_int_totals,
+    test_coverage_map_unterminated_comment_hidden,
+    test_coverage_map_visible_only_totals_and_ids,
+    test_coverage_map_overflowing_float_rejected,
     test_skill_end_to_end,
     test_section_order,
     test_agents_schema,

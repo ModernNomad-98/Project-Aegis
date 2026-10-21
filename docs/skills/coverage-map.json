@@ -3502,7 +3502,7 @@
       "covering_skills": [
         "data-migration-runbook-author"
       ],
-      "evidence": "Triage adoption (2026-10-20): catalog decision L628-632/L1438-1441 and reconciliation R303/R3650-3652 record the D71 merge into `data-migration-runbook-author` (no separate skill), so the partial row is reconciled as COVERED; covering skill: data-migration-runbook-author; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
+      "evidence": "Triage adoption (2026-10-20): catalog L1445-1448 and reconciliation R303/R3650-3652 record the D71 merge of migration-deployment-runbook (#254) into `data-migration-runbook-author` (no separate skill), so the partial row is reconciled as COVERED; covering skill: data-migration-runbook-author; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
       "evidence_grade": "catalog-decision",
       "id": 254,
       "name": "Migration Deployment Runbook",
@@ -3842,7 +3842,7 @@
       "covering_skills": [
         "ai-sdlc-operating-model"
       ],
-      "evidence": "Triage adoption (2026-10-20): catalog L1354-1356 and reconciliation R3506-3508 record the candidate as covered by `ai-sdlc-operating-model` (and its stage-map skills where applicable), so the GAP row is reconciled as COVERED; covering skill: ai-sdlc-operating-model; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
+      "evidence": "Triage adoption (2026-10-20): catalog L1362-1364 and reconciliation R3506-3508 record #278 AI Pair Engineering Protocol as dropped/covered by `ai-sdlc-operating-model` and the stage-map skills it names, so the GAP row is reconciled as COVERED; covering skill: ai-sdlc-operating-model; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
       "evidence_grade": "catalog-decision",
       "id": 278,
       "name": "AI Pair Engineering Protocol",
