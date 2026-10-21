@@ -2400,6 +2400,32 @@ def test_coverage_map_basis_wrong_digest_or_junk():
                          "coverage map: digest-only junk basis key rejected")
 
 
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_repo_date(payload):
+            payload["basis"]["repo_date"] = "not-a-date"
+        with mutated_coverage(Path(tmp), wrong_repo_date) as rep:
+            expect_error(rep, "basis.repo_date must be the pinned audit date",
+                         "coverage map: wrong basis.repo_date rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_source_digest(payload):
+            payload["basis"]["source_files"]["docs/skills-catalog.md"] = (
+                "0" * 64)
+        with mutated_coverage(Path(tmp), wrong_source_digest) as rep:
+            expect_error(rep, "basis.source_files['docs/skills-catalog.md']",
+                         "coverage map: wrong source-file digest rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def non_string_digest(payload):
+            payload["basis"]["audit_artifacts"]["audit_report"]["sha256"] = 123
+        with mutated_coverage(Path(tmp), non_string_digest) as rep:
+            expect_error(rep, "basis.audit_artifacts.audit_report.sha256",
+                         "coverage map: non-string audit digest rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def missing_nested(payload):
+            del payload["basis"]["audit_artifacts"]["audit_report"]
+        with mutated_coverage(Path(tmp), missing_nested) as rep:
+            expect_error(rep, "basis.audit_artifacts is missing required key",
+                         "coverage map: missing nested audit artifact rejected")
+
 def test_coverage_map_optionality_comment_hidden():
     """T19: an optionality phrase hidden in an HTML comment does not count."""
     phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
@@ -2507,6 +2533,64 @@ def test_coverage_map_triage_rows_254_278():
     assert validator.COVERAGE_TOTALS["gap_by_priority"]["P1"] == 34, (
         "P1 gap count must be 34 after triage"
     )
+    covered_by_other = [
+        entry for entry in payload["entries"]
+        if "rollback-runbook-author" in entry["covering_skills"]
+        and entry["id"] != 254
+    ]
+    assert covered_by_other, (
+        "rollback-runbook-author must remain covered by another row so the "
+        "distinct/beyond totals stay 124/83"
+    )
+    assert payload["totals"]["distinct_covering_skills"] == 124, (
+        "distinct covering skills must remain 124 after triage"
+    )
+    assert payload["totals"]["beyond_roadmap_skills"] == 83, (
+        "beyond-roadmap count must remain 83 after triage"
+    )
+
+
+
+def test_coverage_map_rendered_visibility_edges():
+    """T25: non-rendered regions (fence-close text, blockquote, indent, HTML)."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    fence = chr(96) * 3
+    hidden = [
+        fence + "\n" + fence + "not-a-close\n" + phrase + "\n" + fence,
+        "> " + fence + "\n> " + phrase + "\n> " + fence,
+        "    " + phrase,
+        "<pre>\n" + phrase + "\n</pre>",
+    ]
+    for case in hidden:
+        assert phrase not in validator._coverage_rendered_markdown(case), (
+            "non-rendered region must not count as visible: " + repr(case[:40])
+        )
+    assert phrase in validator._coverage_rendered_markdown("Visible: " + phrase), (
+        "a plainly visible phrase must count"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        def hide_indented(text):
+            return text.replace(phrase, "    " + phrase, 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              hide_indented) as rep:
+            expect_error(rep, "missing the required optionality phrase",
+                         "coverage map: indented-code-hidden phrase rejected")
+
+
+def test_coverage_map_exact_int_totals():
+    """T26: boolean totals are rejected, never treated as integers."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def bool_total(payload):
+            payload["totals"]["manifest_skills"] = True
+        with mutated_coverage(Path(tmp), bool_total) as rep:
+            expect_error(rep, "must be an exact integer",
+                         "coverage map: bool totals.manifest_skills rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def bool_grouped_total(payload):
+            payload["totals"]["by_status"]["SHIPPED"] = True
+        with mutated_coverage(Path(tmp), bool_grouped_total) as rep:
+            expect_error(rep, "must be an exact integer",
+                         "coverage map: bool grouped total rejected")
 
 
 TESTS = [
@@ -2539,6 +2623,8 @@ TESTS = [
     test_coverage_map_infinity_rejected,
     test_coverage_map_triage_review_pending,
     test_coverage_map_triage_rows_254_278,
+    test_coverage_map_rendered_visibility_edges,
+    test_coverage_map_exact_int_totals,
     test_skill_end_to_end,
     test_section_order,
     test_agents_schema,

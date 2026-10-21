@@ -189,6 +189,11 @@ COVERAGE_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 COVERAGE_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 COVERAGE_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 COVERAGE_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
+COVERAGE_HTML_BLOCK_RE = re.compile(
+    r"<(?:pre|code|script|style)\b[^>]*>.*?</(?:pre|code|script|style)>",
+    re.DOTALL | re.IGNORECASE)
+COVERAGE_FENCE_RE = re.compile(
+    r"^(?:(?: {0,3}>[ \t]?)+)? {0,3}(\x60{3,}|~{3,})(.*)$")
 COVERAGE_AREA_RANGES = {
     "01": (1, 55), "02": (56, 90), "03": (91, 130), "04": (131, 160),
     "05": (161, 180), "06": (181, 235), "07": (236, 260), "08": (261, 280),
@@ -1850,29 +1855,56 @@ def _coverage_reject_json_constant(name: str):
 def _coverage_rendered_markdown(text: str) -> str:
     """Return the visible summary text only.
 
-    Optionality phrases must be READER-VISIBLE. HTML comments and fenced code
-    blocks are not rendered by GitHub, so a phrase hidden there must not count.
-    Inline code, emphasis and normal prose are rendered and are kept unchanged.
+    Optionality phrases must be READER-VISIBLE. Hidden regions are stripped
+    before the summary phrases are enforced, per the Codex-notes hardening:
+    multiline HTML comments; fenced code blocks (top-level or blockquoted,
+    with CommonMark closing-fence semantics: the closing line must contain
+    only the marker, never trailing text); indented code blocks; and
+    <pre>/<code>/<script>/<style> HTML blocks. Inline code, emphasis and
+    normal prose are rendered and are kept unchanged.
     """
-    visible = COVERAGE_HTML_COMMENT_RE.sub("", text)
+    # Remove HTML comments first, preserving line structure, so a hidden
+    # comment cannot open or close a fence in the parser below.
+    without_comments = COVERAGE_HTML_COMMENT_RE.sub(
+        lambda match: "\n" * match.group(0).count("\n"), text)
     out: list[str] = []
     fence = None  # (fence_char, fence_length) while inside a fenced block
-    for line in visible.splitlines():
-        match = re.match(r"^ {0,3}(\x60{3,}|~{3,})", line)
+    for line in without_comments.splitlines():
+        match = COVERAGE_FENCE_RE.match(line)
         if fence is None:
             if match:
                 marker = match.group(1)
                 fence = (marker[0], len(marker))
                 continue
+            if line.startswith("    ") or line.startswith("\t"):
+                continue  # indented code block is not rendered prose
             out.append(line)
         else:
             if match:
                 marker = match.group(1)
-                if marker[0] == fence[0] and len(marker) >= fence[1]:
+                remainder = match.group(2)
+                if marker[0] == fence[0] and len(marker) >= fence[1] \
+                        and remainder.strip() == "":
                     fence = None
             # every line inside the fence is non-rendered
-    return "\n".join(out).strip()
+    visible = "\n".join(out)
+    visible = COVERAGE_HTML_BLOCK_RE.sub(
+        lambda match: "\n" * match.group(0).count("\n"), visible)
+    return visible.strip()
 
+
+def _coverage_require_exact_ints(rep: Report, ctx: str, value, label: str) -> None:
+    """HARD: every numeric totals leaf must be a real int, never a bool."""
+    if isinstance(value, dict):
+        for key in sorted(value):
+            _coverage_require_exact_ints(rep, ctx, value[key],
+                                          label + "." + str(key))
+        return
+    if not _coverage_is_exact_int(value):
+        shown = "totals" + label
+        rep.error("[" + ctx + "] " + shown
+                  + " must be an exact integer (booleans and floats are "
+                  "rejected)")
 
 def _coverage_check_basis(rep: Report, ctx: str, basis) -> None:
     """HARD: the basis block must be the exact pinned audit provenance record."""
@@ -2216,6 +2248,7 @@ def check_coverage_map(rep: Report) -> None:
                            + by_grade.get("capability-review", 0)
                            + by_grade.get("none", 0)),
     }
+    _coverage_require_exact_ints(rep, ctx, totals, "")
     for key in sorted(COVERAGE_TOTALS):
         if totals.get(key) != computed[key]:
             rep.error("[" + ctx + "] totals." + key + " is "
