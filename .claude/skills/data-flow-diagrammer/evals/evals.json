@@ -19,7 +19,7 @@
     {
       "id": "E2",
       "type": "should_trigger",
-      "prompt": "We do not know where personal data is stored and who receives it - map the flows with evidence.",
+      "prompt": "We do not know where personal data is stored and who receives it - map the current flows with evidence (diagram only; do not decide retention or deletion policy).",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -57,12 +57,12 @@
     {
       "id": "E5",
       "type": "should_trigger",
-      "prompt": "Forget the diagram - decide retention periods and deletion rules for this personal data and write the policy.",
+      "prompt": "Draw the PII data-flow diagram for the checkout, then decide the retention period for each personal-data store.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to design retention/deletion/residency policy and routes that request to pii-lifecycle-designer.",
-          "Remains a documentation-only flow diagrammer and returns no lifecycle policy.",
+          "Returns the evidence-backed data-flow diagram for the current flows.",
+          "Refuses to decide retention/deletion policy and routes that part to pii-lifecycle-designer.",
           "Does not claim to have run any inspection it did not run."
         ]
       }

@@ -4,8 +4,8 @@ Reference for the production-safe-smoke-tester skill. It is method and record gu
 
 ## 1. Core model
 
-- Classification: read-only, reversible, seeded-fixture, unsafe/forbidden.
-- Preferred probes: health, version, read-only queries, seeded-tenant reads, dry-run rollback.
+- Classification: read-only, seeded-fixture (read-only probes only), unsafe/forbidden. Any mutating probe is OUT OF SCOPE for smoke.
+- Preferred probes: health, version, read-only queries, seeded-tenant reads. A dry-run/rollback plan is evidence about a future mutation, not a smoke probe.
 - Evidence per probe: command, response, timestamp, environment/version, verdict.
 - Stop conditions: unexpected status, data anomaly, permission denial, elevated latency.
 - Unexercised list: auth, payments, mutations, jobs, third parties.
@@ -14,9 +14,9 @@ Reference for the production-safe-smoke-tester skill. It is method and record gu
 ## 2. When this applies
 
 - A deploy needs a quick production check without writing unsafe data.
-- You must decide which probes are read-only/reversible and which are forbidden.
+- You must decide which probes are read-only and which are forbidden.
 - A smoke plan exists but does not state what it does not exercise.
-- The user asks whether production is healthy after a deploy.
+- The user asks how to design or validate a safe smoke plan or checklist for a deploy (a live production-health determination is an operational action for observability-operator, not a design task).
 
 ## 3. Output and evidence rules
 
@@ -36,7 +36,7 @@ Every claim in the returned record is backed by inspected evidence or explicitly
 
 ## 5. Validation before returning
 
-- Every probe classified as read-only, reversible, seeded-fixture or forbidden.
+- Every probe classified as read-only, seeded-fixture (read-only probes only) or forbidden; any mutating probe is OUT OF SCOPE for smoke.
 - No unsafe/destructive operation proposed as a smoke check.
 - Expected observables and evidence defined per probe.
 - Stop conditions, escalation and rollback owner stated.

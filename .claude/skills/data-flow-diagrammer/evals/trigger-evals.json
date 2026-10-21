@@ -84,7 +84,7 @@
     },
     {
       "id": "data-flow-diagrammer-positive-8",
-      "prompt": "Map the data flows for a privacy review, including retention and external recipients.",
+      "prompt": "Map the current data flows for a privacy review, including external recipients; retention and deletion policy stays out of scope.",
       "expected_skill": "data-flow-diagrammer",
       "should_not_trigger": [
         "schema-evolution-planner"
@@ -102,12 +102,12 @@
     },
     {
       "id": "data-flow-diagrammer-negative-2",
-      "prompt": "Map where personal data is stored, who receives it, and design the retention, deletion and residency rules it needs.",
-      "expected_skill": "pii-lifecycle-designer",
+      "prompt": "Design the telemetry contract for this service: logs, metrics, traces, correlation and redaction.",
+      "expected_skill": "observability-by-design",
       "should_not_trigger": [
         "data-flow-diagrammer"
       ],
-      "reason": "Generic PII location and lifecycle design is pii-lifecycle-designer's workflow; data-flow-diagrammer only diagrams evidence for flows."
+      "reason": "Telemetry/logging contract design is observability-by-design's workflow; data-flow-diagrammer only diagrams evidence for flows."
     },
     {
       "id": "data-flow-diagrammer-negative-3",

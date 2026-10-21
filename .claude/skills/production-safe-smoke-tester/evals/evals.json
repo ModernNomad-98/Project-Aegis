@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Enumerate candidate checks and classify each as read-only, reversible, seeded-fixture-only, or unsafe/forbidden.",
+          "Enumerate candidate checks and classify each as read-only, seeded-fixture-only (read-only) or unsafe/forbidden; any mutating probe is out of scope.",
           "Safe/unsafe operation inventory with classification.",
           "Returns the structured record above and does not edit code or claim unrun evidence."
         ]

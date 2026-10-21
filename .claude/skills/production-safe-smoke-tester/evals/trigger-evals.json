@@ -83,7 +83,7 @@
     },
     {
       "id": "production-safe-smoke-tester-positive-8",
-      "prompt": "Design reversible smoke probes and the evidence to record, with execution delegated to the host.",
+      "prompt": "Design read-only smoke probes and the evidence to record, with execution delegated to the host.",
       "expected_skill": "production-safe-smoke-tester",
       "should_not_trigger": [
         "clickthrough-test-engineer"

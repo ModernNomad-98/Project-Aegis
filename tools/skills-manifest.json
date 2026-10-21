@@ -696,7 +696,7 @@
     {
       "name": "production-safe-smoke-tester",
       "path": ".claude/skills/production-safe-smoke-tester/SKILL.md",
-      "sha256": "5c4321cac6964aa43901a0ec8541686c0c8a1eb692023bb49e939a8ad8a9472c"
+      "sha256": "c8a3083cce9244be6beac8cea4936d1def58ce3c77c0de0706dd9592d4c7d01c"
     },
     {
       "name": "profiling-methodology-designer",

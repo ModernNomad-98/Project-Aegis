@@ -9,14 +9,14 @@ Terms: **family 6** - the discipline family in README.md and docs/skills-catalog
 
 ## Purpose
 
-Design a production-safe smoke plan: enumerate safe and unsafe operations, choose read-only probes, dry-runs or seeded tenant checks, define stop conditions, and record exactly what the smoke did and did not exercise.
+Design a production-safe smoke plan: enumerate safe and unsafe operations, choose read-only probes or seeded-tenant read-only checks (any mutating probe is out of scope for smoke), define stop conditions, and record exactly what the smoke did and did not exercise.
 
 The skill is **advisory and auto-invocable**. It produces guidance, records and review structure only; it does not edit code, run commands, use the network or grant production authority. Any implementation, execution or approval is a delegated host/user action under existing authority. It composes the nearest owners rather than duplicating them.
 
 ## Use When
 
 - A deploy needs a quick production check without writing unsafe data.
-- You must decide which probes are read-only/reversible and which are forbidden.
+- You must decide which probes are read-only and which are forbidden.
 - A smoke plan exists but does not state what it does not exercise.
 - The user asks how to design or validate a safe smoke plan or checklist for a deploy (a live production-health determination is an operational action, not a design task).
 
@@ -52,7 +52,7 @@ Return, in this order:
 
 ## Validation Checklist
 
-- Every probe classified as read-only, reversible, seeded-fixture or forbidden.
+- Every probe classified as read-only, seeded-fixture (read-only probes only) or forbidden; any mutating probe is OUT OF SCOPE for smoke and is never classified as a smoke check.
 - No unsafe/destructive operation proposed as a smoke check.
 - Expected observables and evidence defined per probe.
 - Stop conditions, escalation and rollback owner stated.
@@ -61,7 +61,7 @@ Return, in this order:
 
 ## Gotchas
 
-- A smoke test that creates orders is a production transaction, not a smoke test; do not run write probes as smoke.
+- A smoke test that creates orders is a production transaction, not a smoke test; do not run write probes as smoke. Any mutating probe is OUT OF SCOPE, not merely risky.
 - Health endpoints can be cached or synthetic; state what each probe actually proves.
 - Reading secrets or PII during smoke is an unsafe side effect.
 - A green smoke does not prove background jobs or auth flows; list the gap.

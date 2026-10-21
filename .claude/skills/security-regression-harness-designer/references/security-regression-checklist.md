@@ -8,7 +8,7 @@ Reference for the security-regression-harness-designer skill. It is method and r
 - Case matrix: authorized positive control + one denial case per forbidden action + boundary/tenant variants.
 - Fixtures: two-tenant/two-role synthetic data, deterministic ids, no real secrets/PII.
 - Layer choice: cheapest reliable layer; API/service tests for authz, unit for policy, E2E only where necessary.
-- CI: deterministic runs, bounded retries, failure artifacts, no assertion weakening.
+- CI: deterministic runs for expected-denial security cases with ZERO pass-masking retries (a diagnostic rerun keeps the first failure as the verdict), failure artifacts, no assertion weakening.
 - Evidence: red-before/green-after, expected denial output, honest not-covered list.
 
 ## 2. When this applies
@@ -22,7 +22,7 @@ Reference for the security-regression-harness-designer skill. It is method and r
 
 1. Vulnerable-path and invariant statement.
 2. Positive/negative case matrix with fixtures and expected outcomes.
-3. Layer/CI placement and flake policy.
+3. Layer/CI placement and flake policy (zero pass-masking retries for expected-denial cases).
 4. Evidence and retest plan.
 5. Coverage limitations and residual risk.
 
@@ -39,6 +39,6 @@ Every claim in the returned record is backed by inspected evidence or explicitly
 - Pre-fix vulnerable path and invariant stated.
 - At least one expected-denial negative case per forbidden action; positive control included.
 - Fixtures are safe, synthetic and deterministic; no real secrets/production data.
-- CI placement and bounded retry policy defined; no weakened assertions.
+- CI placement and flake policy defined: expected-denial cases get zero pass-masking retries; diagnostic reruns preserve the first failure as the verdict; no weakened assertions.
 - Red-before/green-after or equivalent retest evidence required.
 - Coverage limitations and residual risk stated honestly.
