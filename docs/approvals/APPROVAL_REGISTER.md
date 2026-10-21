@@ -6708,3 +6708,69 @@ carry this append, as the register's naming rule requires.
 Stage C implementing agent of the transcription work item; the model is also named in
 the pull request body and the commit message that carry this append, as the register's
 naming rule requires.
+
+### AEGIS-APR-140: Standing gate-guard exception for protected paths under scripts/
+
+- **Event:** GRANT; narrow standing condition on the gate-guard protected-path
+  requirement for one protected-path root only. It changes no CI job, guard
+  pattern, required check or branch setting.
+- **Status at recording:** ACTIVE from the owner's 2026-10-21 decision,
+  recurring until the owner revokes or replaces it.
+- **Date / Grantor:** 2026-10-21 / Peter Nguyen.
+- **Reason:** Stop repeated one-time owner exceptions for ordinary authorized
+  Stage C work whose only protected paths are under `scripts/`, while keeping
+  the protected-file guard failed and recorded, the exact-head Stage F binding,
+  and a merge receipt.
+- **Owner decision (verbatim):** "Grant a STANDING gate-guard exception for
+  ModernNomad-98/Project-Aegis, recorded in the approval register, modeled on
+  AEGIS-APR-047. A pull request whose only protected paths are under scripts/
+  may be merged by administrator merge without a further owner decision,
+  provided all of the following hold at the exact head: (a) the Stage F verdict
+  states which validator checks the PR adds, removes or weakens, and re-derives
+  the protected-path pattern and the required-check list, and nothing is removed
+  or weakened; (b) gate-guard is the only failed check; (c) no .github/ file is
+  changed; (d) head and body match the Stage-F-accepted binding exactly; (e)
+  Codex is recorded as unavailable or triaged, never as a pass; (f) a merge
+  receipt records the disclosed administrator merge and any SKIPPED jobs as
+  never-a-pass. Any PR that removes or weakens a check, or touches a protected
+  path outside scripts/, still needs a one-time owner decision. Apply until I
+  revoke or replace this."
+- **Scope allowed:** Exactly the owner's grant quoted above: a deliberate
+  administrator merge of a pull request whose **only** changed protected paths
+  are under `scripts/`, when conditions (a)-(f) hold at the exact head. The
+  `gate-guard` check still fails and is recorded as failed with an authorized
+  disposition; this is not a workflow allowlist, a pass, a waiver or a
+  branch-protection change. Ordinary unprotected documentation may accompany a
+  qualifying repair, but does not change the protected-path test.
+- **Scope FORBIDDEN:** A pull request that removes or weakens a check; any
+  protected path outside `scripts/` (including `.github/`, `.claude/agents`,
+  `.claude/commands`, `.claude/hooks`, `.claude/settings`, root executables,
+  `tools/behavioral_eval_runner/` and every other non-`scripts/` protected
+  path); changing merge or review authority, the protected-path policy, the
+  guard or approval mechanism, or CI/branch settings; merging without the exact
+  Stage-F-accepted head and body; unattended auto-merge; treating Codex as a
+  pass; or a merge without the receipt condition (f). Conditions in AEGIS-APR-047
+  that conflict with this entry do not widen it; this entry is the narrow
+  standing route for `scripts/`-only protected paths.
+- **First use:** PR #878 (the introducing PR; PR #877 merged before this
+  recording). Its Stage F verdict at the exact head must state the validator
+  checks added, removed or weakened and re-derive the protected-path pattern
+  and required-check list, and satisfy conditions (a)-(f), before the
+  administrator merge and receipt. The owner's direct 2026-10-21 decision
+  quoted verbatim above is the authority and carve-out for this
+  register-introducing PR; applying the standing route here is the owner's
+  recorded decision, not self-application or self-grant.
+- **Evidence:** The direct owner decision in the Project Aegis session on
+  2026-10-21, quoted verbatim above and relayed by the coordinating agent. The
+  register baseline at the recording base (main
+  `f91351169280747a1d1a33abe652970c41b65dca`) is 454,400 B / 6,710 LF / sha256
+  `1e4ae1a6592cf5fe88d4fa750b1d0c72b8fa49d3e815c4681d081ed948bcbf82`; AEGIS-APR-140 was the next free ID. This entry is a pure
+  append: no existing line is edited.
+- **Expiry / use limit:** None stated; recurring until the owner revokes or
+  replaces it. Revocation returns protected merges to per-PR decisions and
+  cannot undo completed merges.
+
+**Written by: DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness).** Recorded as
+the Stage C implementing agent; the model is also named in the pull request body
+and the commit message that carry this append, as the register's naming rule
+requires.

@@ -3500,17 +3500,16 @@
     {
       "area": "07",
       "covering_skills": [
-        "data-migration-runbook-author",
-        "rollback-runbook-author"
+        "data-migration-runbook-author"
       ],
-      "evidence": "audit classification: PARTIAL — data-migration-runbook-author, rollback-runbook-author; runbooks exist; deployment runbook composition partial; covering skills: data-migration-runbook-author, rollback-runbook-author; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
-      "evidence_grade": "capability-review",
+      "evidence": "planning-gate decision Q2=A: catalog L630-631/L1447-1448 and reconciliation R303/R3650-R3652 record migration-deployment-runbook (#254) as merged into data-migration-runbook-author as an extension (D71, 2026-09-28; no separate skill); covering skill: data-migration-runbook-author; D107 (2026-10-21).",
+      "evidence_grade": "catalog-decision",
       "id": 254,
       "name": "Migration Deployment Runbook",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "planning-gate decision Q2=A; D107 (2026-10-21)",
       "priority": "P0",
-      "rationale": null,
-      "status": "PARTIAL"
+      "rationale": "D71 (2026-09-28): migration-deployment-runbook was merged into data-migration-runbook-author as an extension; no separate skill (catalog L630-631/L1447-1448; reconciliation R303/R3650-R3652).",
+      "status": "COVERED"
     },
     {
       "area": "07",
@@ -3840,15 +3839,34 @@
     },
     {
       "area": "08",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "agent-authorization-matrix",
+        "agent-failure-recovery",
+        "agent-governance-audit",
+        "agent-instruction-consolidator",
+        "agent-memory-governance",
+        "agent-startup-context-gate",
+        "ai-closeout-reporter",
+        "ai-sdlc-operating-model",
+        "ai-task-decomposer",
+        "change-classification-gate",
+        "code-reviewer",
+        "docs-first-implementer",
+        "human-approval-boundary",
+        "local-ci-mirror-preflight",
+        "reviewable-diff-discipline",
+        "security-pr-reviewer",
+        "source-of-truth-reconciler",
+        "tdd-engineer"
+      ],
+      "evidence": "planning-gate decision Q2=A: catalog L1362-1364 and reconciliation R3506-R3508 record #278 AI Pair Engineering Protocol as dropped as covered by the ai-sdlc-operating-model stage map; covering set (18 names): agent-authorization-matrix, agent-failure-recovery, agent-governance-audit, agent-instruction-consolidator, agent-memory-governance, agent-startup-context-gate, ai-closeout-reporter, ai-sdlc-operating-model, ai-task-decomposer, change-classification-gate, code-reviewer, docs-first-implementer, human-approval-boundary, local-ci-mirror-preflight, reviewable-diff-discipline, security-pr-reviewer, source-of-truth-reconciler, tdd-engineer; D107 (2026-10-21).",
+      "evidence_grade": "catalog-decision",
       "id": 278,
       "name": "AI Pair Engineering Protocol",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "planning-gate decision Q2=A; D107 (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": "Dropped as covered by ai-sdlc-operating-model and its 17 stage-gate-map enforcing skills (18-name set) (catalog L1362-1364; reconciliation R3506-R3508).",
+      "status": "COVERED"
     },
     {
       "area": "08",
@@ -4168,9 +4186,9 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 207 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 207 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
   "totals": {
-    "beyond_roadmap_skills": 83,
+    "beyond_roadmap_skills": 80,
     "by_area": {
       "01": 55,
       "02": 35,
@@ -4183,10 +4201,10 @@
       "09": 20
     },
     "by_grade": {
-      "capability-review": 103,
-      "catalog-decision": 14,
+      "capability-review": 102,
+      "catalog-decision": 16,
       "explicit-id": 128,
-      "none": 55
+      "none": 54
     },
     "by_priority": {
       "P0": 126,
@@ -4194,19 +4212,19 @@
       "P2": 25
     },
     "by_status": {
-      "COVERED": 54,
-      "GAP": 55,
-      "PARTIAL": 63,
+      "COVERED": 56,
+      "GAP": 54,
+      "PARTIAL": 62,
       "SHIPPED": 128
     },
-    "distinct_covering_skills": 124,
+    "distinct_covering_skills": 127,
     "entries": 300,
     "gap_by_priority": {
       "P0": 11,
-      "P1": 35,
+      "P1": 34,
       "P2": 9
     },
     "manifest_skills": 207,
-    "review_pending": 160
+    "review_pending": 170
   }
 }

@@ -2153,7 +2153,7 @@ def test_coverage_map_totals_mismatch():
     """Totals: a JSON totals field that disagrees with the entries is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["by_status"]["GAP"] = 54
+            payload["totals"]["by_status"]["GAP"] = 53
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.by_status",
                          "coverage map: JSON totals mismatch rejected")
@@ -2163,7 +2163,7 @@ def test_coverage_map_summary_totals_mismatch():
     """T9b: each seeded summary totals/per-area defect is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| GAP | 55 |", "| GAP | 54 |", 1)
+            return text.replace("| GAP | 54 |", "| GAP | 53 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'GAP'",
                          "coverage map: summary totals mismatch rejected")
@@ -2193,16 +2193,16 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| P0 / P1 / P2 gaps | 11 / 35 / 9 |",
-                                "| P0 / P1 / P2 gaps | 12 / 35 / 9 |", 1)
+            return text.replace("| P0 / P1 / P2 gaps | 11 / 34 / 9 |",
+                                "| P0 / P1 / P2 gaps | 12 / 34 / 9 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary gap-priority totals",
                          "coverage map: summary gap-priority totals mismatch "
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| Review pending | 160 |",
-                                "| Review pending | 161 |", 1)
+            return text.replace("| Review pending | 170 |",
+                                "| Review pending | 171 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'Review pending'",
                          "coverage map: summary review_pending mismatch "
@@ -2224,7 +2224,7 @@ def test_coverage_map_hygiene():
             expect_error(rep, "must not carry timestamps",
                          "coverage map: timestamp rejected")
     for key, bad_value, needle, label in (
-            ("beyond_roadmap_skills", 80, "totals.beyond_roadmap_skills",
+            ("beyond_roadmap_skills", 81, "totals.beyond_roadmap_skills",
              "coverage map: beyond-roadmap pinned total mismatch rejected"),
             ("manifest_skills", 204, "totals.manifest_skills",
              "coverage map: manifest pinned total mismatch rejected"),
@@ -2254,7 +2254,7 @@ def test_coverage_map_review_pending():
     """T12: an incorrect review_pending total is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["review_pending"] = 161
+            payload["totals"]["review_pending"] = 171
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.review_pending",
                          "coverage map: review_pending mismatch rejected")
@@ -2633,6 +2633,78 @@ def test_coverage_map_codex_visible_text_findings():
     )
 
 
+def test_coverage_map_planning_gate_resolved():
+    """T32: rows #254/#278 are planning-gate resolved; review_pending is 170."""
+    assert validator.COVERAGE_PLANNING_GATE_RESOLVED == frozenset({254, 278})
+    assert validator.COVERAGE_TOTALS["review_pending"] == 170
+    payload = json.loads(
+        validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    non_explicit = [entry for entry in payload["entries"]
+                    if entry.get("evidence_grade") != "explicit-id"]
+    assert len(non_explicit) == 172
+    resolved_present = {entry["id"] for entry in non_explicit
+                        if entry["id"] in validator.COVERAGE_PLANNING_GATE_RESOLVED}
+    assert resolved_present == {254, 278}
+    assert validator.COVERAGE_TOTALS["review_pending"] == (
+        len(non_explicit) - len(resolved_present)) == 170
+    with tempfile.TemporaryDirectory() as tmp:
+        def mutate(payload):
+            payload["totals"]["review_pending"] = 172
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            expect_error(rep, "totals.review_pending",
+                         "coverage map: unresolved-row review_pending rejected")
+
+
+def test_coverage_map_malformed_id_does_not_crash():
+    """T34: a malformed/unhashable entry id is reported, never a traceback."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def mutate(payload):
+            coverage_entry(payload, 14)["id"] = []
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            expect_error(rep, "non-integer id",
+                         "coverage map: malformed id reported without a crash")
+
+
+def test_coverage_map_triage_rows_and_phrase():
+    """T33: rows #254/#278 carry the owner decision; phrase is 80 of 207."""
+    payload = json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    rows = {entry["id"]: entry for entry in payload["entries"]}
+    r254 = rows[254]
+    assert (r254["status"], r254["evidence_grade"]) == (
+        "COVERED", "catalog-decision")
+    assert r254["covering_skills"] == ["data-migration-runbook-author"]
+    assert "D71" in (r254["rationale"] or "")
+    r278 = rows[278]
+    assert (r278["status"], r278["evidence_grade"]) == (
+        "COVERED", "catalog-decision")
+    assert r278["covering_skills"] == [
+        "agent-authorization-matrix", "agent-failure-recovery",
+        "agent-governance-audit", "agent-instruction-consolidator",
+        "agent-memory-governance", "agent-startup-context-gate",
+        "ai-closeout-reporter", "ai-sdlc-operating-model",
+        "ai-task-decomposer", "change-classification-gate",
+        "code-reviewer", "docs-first-implementer",
+        "human-approval-boundary", "local-ci-mirror-preflight",
+        "reviewable-diff-discipline", "security-pr-reviewer",
+        "source-of-truth-reconciler", "tdd-engineer",
+    ]
+    rollback_rows = [entry for entry in rows.values()
+                     if "rollback-runbook-author" in entry["covering_skills"]
+                     and entry["id"] != 254]
+    assert rollback_rows, (
+        "rollback-runbook-author must remain covered by another row so "
+        "distinct covering stays 127")
+    assert all(entry["status"] != "GAP" for entry in rollback_rows), (
+        "the surviving rollback coverage rows must be non-GAP")
+    assert "Dropped as covered by ai-sdlc-operating-model" in (
+        r278["rationale"] or "")
+    phrase = [item for item in validator.COVERAGE_REQUIRED_PHRASES
+              if "80 of 207" in item]
+    assert phrase, "an optionality phrase must carry 80 of 207"
+    mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
+    assert "80 of 207" in mmd and "83 of 207" not in mmd
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -2654,6 +2726,9 @@ TESTS = [
     test_coverage_map_summary_id_sets,
     test_coverage_map_anomaly_rules,
     test_coverage_map_optionality_framing,
+    test_coverage_map_planning_gate_resolved,
+    test_coverage_map_malformed_id_does_not_crash,
+    test_coverage_map_triage_rows_and_phrase,
     test_coverage_map_bool_id_rejected,
     test_coverage_map_basis_missing_key,
     test_coverage_map_basis_wrong_digest_or_junk,

@@ -215,21 +215,25 @@ COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 128, "COVERED": 54, "PARTIAL": 63, "GAP": 55},
-    "by_grade": {"explicit-id": 128, "catalog-decision": 14,
-                 "capability-review": 103, "none": 55},
+    "by_status": {"SHIPPED": 128, "COVERED": 56, "PARTIAL": 62, "GAP": 54},
+    "by_grade": {"explicit-id": 128, "catalog-decision": 16,
+                 "capability-review": 102, "none": 54},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 11, "P1": 35, "P2": 9},
+    "gap_by_priority": {"P0": 11, "P1": 34, "P2": 9},
     "manifest_skills": 207,
-    "distinct_covering_skills": 124,
-    "beyond_roadmap_skills": 83,
-    "review_pending": 160,
+    "distinct_covering_skills": 127,
+    "beyond_roadmap_skills": 80,
+    "review_pending": 170,
 }
+# Owner triage decision Q1=A/Q2=A/Q3=yes (D107, 2026-10-21): rows
+# #254/#278 received their planning-gate decisions and no longer count as
+# awaiting confirmation; review_pending subtracts these resolved rows.
+COVERAGE_PLANNING_GATE_RESOLVED = frozenset({254, 278})
 COVERAGE_GAP_IDS = (
     6, 7, 8, 14, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 39, 43, 44, 46, 47,
     49, 50, 54, 61, 67, 76, 80, 83, 86, 87, 110, 120, 125, 127, 135, 146, 151,
     155, 156, 158, 161, 162, 163, 164, 167, 168, 169, 176, 188, 224, 225, 231,
-    233, 234, 236, 278,
+    233, 234, 236,
 )
 COVERAGE_P0_GAP_IDS = (6, 7, 8, 49, 125, 127, 155, 161, 162, 164, 188)
 COVERAGE_ANOMALY_SKILLS = {
@@ -243,7 +247,7 @@ COVERAGE_REQUIRED_PHRASES = (
     "GAP rows are optional backlog candidates, not deficits or completion "
     "obligations.",
     "The shipped library deliberately exceeds and interleaves with the "
-    "roadmap: 83 of 207 shipped skills are beyond it.",
+    "roadmap: 80 of 207 shipped skills are beyond it.",
 )
 COVERAGE_ENTRY_KEYS = (
     "id", "area", "name", "priority", "status", "covering_skills",
@@ -2028,9 +2032,10 @@ def check_coverage_map(rep: Report) -> None:
     docs/skills tables; status/grade enums and pairing; covering skills in the
     manifest; non-GAP rows need >=1 skill and evidence; GAP rows need a
     rationale and no skills/evidence; the #186/#299 anomaly sets; totals
-    recomputed (incl. by_grade and review_pending = PARTIAL + GAP +
-    COVERED(capability-review) + 2 anomalies); manifest union (124 distinct
-    covering / 83 beyond / 207); the summary's totals and GAP/P0 id sets equal
+    recomputed (incl. by_grade and review_pending = every non-explicit-id
+    row minus the planning-gate-resolved rows #254/#278); manifest union
+    (127 distinct covering / 80 beyond / 207); the summary's totals and
+    GAP/P0 id sets equal
     the JSON; required optionality phrases; canonical deterministic JSON.
     """
     ctx = _rel(COVERAGE_MAP)
@@ -2261,6 +2266,11 @@ def check_coverage_map(rep: Report) -> None:
     if not isinstance(totals, dict):
         rep.error("[" + ctx + "] totals must be an object")
         totals = {}
+    # Rows #186/#299 are catalog-decision (non-explicit) rows and are
+    # therefore included in the planning-gate review_pending count below.
+    non_explicit_entries = [entry for entry in entries
+                            if isinstance(entry, dict)
+                            and entry.get("evidence_grade") != "explicit-id"]
     computed = {
         "entries": len(entries),
         "by_area": {key: by_area[key] for key in sorted(by_area)},
@@ -2273,14 +2283,11 @@ def check_coverage_map(rep: Report) -> None:
         "distinct_covering_skills": len(covering_union),
         "beyond_roadmap_skills": (len(manifest - covering_union)
                                   if manifest is not None else 0),
-        "review_pending": (by_status.get("PARTIAL", 0)
-                           + by_status.get("GAP", 0)
-                           + sum(1 for entry in entries
-                                 if isinstance(entry, dict)
-                                 and entry.get("status") == "COVERED"
-                                 and entry.get("evidence_grade")
-                                 == "capability-review")
-                           + len(COVERAGE_ANOMALY_SKILLS)),
+        "review_pending": (
+            len(non_explicit_entries)
+            - sum(1 for entry in non_explicit_entries
+                  if _coverage_is_exact_int(entry.get("id"))
+                  and entry.get("id") in COVERAGE_PLANNING_GATE_RESOLVED)),
     }
     _coverage_require_exact_ints(rep, ctx, totals, "")
     for key in sorted(COVERAGE_TOTALS):
