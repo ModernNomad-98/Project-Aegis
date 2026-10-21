@@ -430,7 +430,7 @@ discrimination against `security-pr-reviewer`, `multi-tenant-security-tester`,
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (the original nine sit in one of three overlap clusters;
-`feature-flag-architect`, added by D64, carries its own seams; the seven Batch 2 additions (D109) also ship standalone 22-case trigger-eval files). None has
+`feature-flag-architect`, added by D64, carries its own seams; the seven Batch 2 additions ship their own 22-case trigger-eval files). None has
 side effects, so all are model-invocable. Per [historical master prompt, section 5](prompts/claude-skills-master-generation-prompts-v4.md): tenant isolation is
 treated as cross-cutting (identity, data, API, storage, logs, analytics, support,
 exports, imports, jobs, search, AI retrieval, billing, flags, audit), every skill

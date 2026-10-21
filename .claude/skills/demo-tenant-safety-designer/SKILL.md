@@ -66,7 +66,6 @@ Return, in this order:
 
 - A demo tenant with copied production data is a data-leak and compliance incident waiting to happen.
 - Reusing production secrets in a demo environment removes the isolation boundary.
-- A demo that can send real emails, payments or webhooks creates real-world side effects.
 - Without an expiry/reset owner, demo tenants silently accumulate and become production-like.
 - A demo that can send real emails, payments or webhooks creates real side effects; guard the outbound boundary explicitly.
 

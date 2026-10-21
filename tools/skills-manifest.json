@@ -341,7 +341,7 @@
     {
       "name": "demo-tenant-safety-designer",
       "path": ".claude/skills/demo-tenant-safety-designer/SKILL.md",
-      "sha256": "d1ee9765864cd88b42800fa94fa2f1fee22af13b53d4cd53bdd90c5f6dfa4fc7"
+      "sha256": "ff90b5a551cb383344dec7fc74c9e817bd24f04d28a0843d42e7a768418205cc"
     },
     {
       "name": "dependency-direction-guard",
@@ -416,7 +416,7 @@
     {
       "name": "export-pipeline-architect",
       "path": ".claude/skills/export-pipeline-architect/SKILL.md",
-      "sha256": "213997b3247ed6e5fd53a54dba46050906e03d3962e80d0478b6087b9ced6836"
+      "sha256": "8b2fb6f2b63e0bfebbcbaefab6d35acb1314d753f19e8d52360ca2bf300930f9"
     },
     {
       "name": "feature-flag-architect",
@@ -826,7 +826,7 @@
     {
       "name": "saas-localization-architect",
       "path": ".claude/skills/saas-localization-architect/SKILL.md",
-      "sha256": "3df023db18c1669e4fabd25e9b7f1b0eca3b97824dd6dfeff7cb98ca7514b55c"
+      "sha256": "e2e46e6860a1cc7c96ce69e27bf5cd3296230094084058331d67f41f08e7546b"
     },
     {
       "name": "saas-offboarding-architect",
@@ -841,7 +841,7 @@
     {
       "name": "saas-timezone-architect",
       "path": ".claude/skills/saas-timezone-architect/SKILL.md",
-      "sha256": "a2ac88fd6f9dadd2cf9d07a7439535c27962f37f5551a8732a845b2d619a466b"
+      "sha256": "3b678568809384533b64ef90e7cafd84cbd08e0a8dc28a080840ce333f960f0e"
     },
     {
       "name": "sast-orchestration-designer",

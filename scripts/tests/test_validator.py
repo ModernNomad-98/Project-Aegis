@@ -2704,10 +2704,12 @@ def test_coverage_map_triage_rows_and_phrase():
     assert phrase, "an optionality phrase must carry 80 of 222"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     assert "80 of 222" in mmd and "80 of 215" not in mmd
+    assert "83 of 215" not in mmd, (
+        "the pre-Batch-1 stale optionality phrase must stay rejected")
 
 
 def test_coverage_map_batch1_deliveries():
-    """T35: the eight Batch 1 GAPs are SHIPPED/explicit-id on their new skills."""
+    """T35: the eight Batch 1 GAPs are SHIPPED/explicit-id; canonical totals tracked for the combined state (batch-specific delivery asserts live in T37)."""
     mapping = {
         6: "layered-architecture-enforcer",
         7: "dependency-direction-guard",

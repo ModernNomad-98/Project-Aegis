@@ -39,7 +39,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Define DST and ambiguous/imaginary local-time rules, including duplicate/repeated reminders.
 5. Define reporting cutoffs (tenant day vs UTC) and how aggregations are auditable.
 6. Define migration/backfill for existing timestamps and the verification plan.
-7. Require a named IANA time-zone identifier (e.g. America/New_York) for schedules and other future local intent; store an offset only as an observed/audit snapshot at event time.
+7. Require a named IANA timezone identifier (e.g. America/New_York) for schedules and other future local intent; store an offset only as an observed/audit snapshot at event time.
 8. Define tzdata version/update policy and re-evaluation of future schedules after a tzdata change.
 9. State that changing a tenant's timezone affects new events and display only; historical events retain their original zone/offset, with the backfill policy and residual ambiguity recorded.
 10. Return the timezone model, precedence rules, DST/edge test matrix and migration plan; do not implement code.

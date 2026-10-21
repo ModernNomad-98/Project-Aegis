@@ -26,8 +26,6 @@ Reference for the export-pipeline-architect skill. It is method and record guida
 4. Storage, delivery, expiry and cleanup controls.
 5. Audit evidence and failure/partial-export handling.
 
-- Delivery: short-lived single-use token, explicit reissue, access/download audit and cleanup evidence.
-- Notification boundary: delivery/notification UX routes to notification-webhook-ux-designer.
 
 The returned record must name the evidence source for each decision, separate verified facts from assumptions, and list what could not be inspected. The skill does not edit files or execute commands; delegated actions go to the host/user or the existing implementation owner under existing authority.
 

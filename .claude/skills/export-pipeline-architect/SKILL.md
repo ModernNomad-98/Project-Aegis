@@ -58,11 +58,9 @@ Return, in this order:
 - Requester authority and tenant scope are explicit and deny-by-default.
 - Job lifecycle covers status, notification, expiry and cleanup.
 - Every redacted/excluded field has a classification basis.
-- Delivery is bounded, single-use and expiring.
-- Audit evidence records request, scope, redaction and delivery.
+- Delivery is bounded, short-lived and single-use with an explicit reissue path.
+- Audit evidence records request, scope, redaction, delivery, access/download and cleanup proof.
 - Failure and partial exports are defined, not silently reported as complete.
-- Delivery is short-lived and single-use with an explicit reissue path.
-- Audit covers request, scope, redaction, delivery, access/download and cleanup proof.
 
 ## Gotchas
 

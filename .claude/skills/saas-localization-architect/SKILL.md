@@ -39,7 +39,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Define currency presentation vs settlement rules and where each is decided.
 5. Define storage/cache/CDN keys and invalidation so locale variants never bleed across tenants or locales.
 6. Define the localization test matrix: locale coverage, fallbacks, RTL/formatting, and leak checks.
-7. Define TWO separate algorithms: (1) locale preference resolution (user -> tenant -> product) and (2) translation-resource fallback (selected locale -> its parent-locale chain -> product default), so missing content never falls back to an unrelated tenant-default language.
+7. Define two separate algorithms: (1) locale preference resolution (user -> tenant -> product) and (2) translation-resource fallback (selected locale -> its parent-locale chain -> product default), so missing content never falls back to an unrelated tenant-default language.
 8. Define translation provenance (human/machine, tenant policy, review status) and how it is stored, cached and invalidated.
 9. Define currency presentation only; settlement remains with the billing/subscription owner and the boundary is recorded.
 10. Return the boundary model, fallback matrix, storage/cache contract and test plan; do not implement UI or translations.
