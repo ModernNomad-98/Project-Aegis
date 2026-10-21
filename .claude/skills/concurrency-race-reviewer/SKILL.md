@@ -61,7 +61,7 @@ Return, in this order:
 
 ## Gotchas
 
-- A transaction around the write does not fix check-then-act across requests.
+- A transaction alone, without appropriate isolation, locking or constraints, does not fix check-then-act across requests.
 - Retries with at-least-once delivery require idempotency, not just unique indexes.
 - Locks without timeout/deadlock policy create outages.
 - Tests that never interleave prove nothing about races.

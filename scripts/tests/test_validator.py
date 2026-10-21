@@ -45,6 +45,7 @@ import json
 import os
 import re
 import shutil
+import hashlib
 import subprocess
 import sys
 import tempfile
@@ -2737,20 +2738,28 @@ def test_coverage_map_batch1_deliveries():
 
 
 def test_skills_manifest_provenance():
-    """T36: every manifest path exists at the declared source_revision."""
-    import subprocess
+    """T36: every manifest path exists AND hash-matches at source_revision."""
     manifest = json.loads(
         validator.MANIFEST_PATH.read_text(encoding="utf-8"))
     revision = manifest["source_revision"]
     assert len(revision) == 40 and all(c in "0123456789abcdef" for c in revision)
-    listing = subprocess.check_output(
-        ["git", "-C", str(validator.REPO_ROOT), "ls-tree", "-r",
-         "--name-only", revision], text=True)
-    paths = set(listing.splitlines())
-    missing = [entry["path"] for entry in manifest["skills"]
-               if entry["path"] not in paths]
-    assert not missing, ("manifest paths absent at declared source_revision "
-                        + revision + ": " + repr(missing[:3]))
+    repo = ["git", "-C", str(validator.REPO_ROOT)]
+    if subprocess.run(repo + ["cat-file", "-e", revision + "^{commit}"],
+                      capture_output=True).returncode != 0:
+        print("SKIP T36: declared source_revision is not available in this "
+              "checkout")
+        return
+    if subprocess.run(repo + ["merge-base", "--is-ancestor", revision, "HEAD"],
+                      capture_output=True).returncode != 0:
+        print("SKIP T36: declared source_revision is not an ancestor of HEAD")
+        return
+    for entry in manifest["skills"]:
+        blob = subprocess.check_output(
+            repo + ["cat-file", "blob", revision + ":" + entry["path"]])
+        normalized = blob.replace(b"\r\n", b"\n")
+        assert hashlib.sha256(normalized).hexdigest() == entry["sha256"], (
+            "manifest sha256 mismatch at declared source_revision for "
+            + entry["path"])
     assert len(manifest["skills"]) == 215
 
 

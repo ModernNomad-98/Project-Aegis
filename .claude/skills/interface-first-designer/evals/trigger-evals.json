@@ -47,12 +47,13 @@
     },
     {
       "id": "interface-first-designer-positive-4",
-      "prompt": "What compatibility and versioning rules should this API contract carry so callers do not break?",
+      "prompt": "What compatibility and versioning rules should this internal ports/adapters interface carry so callers do not break?",
       "expected_skill": "interface-first-designer",
       "should_not_trigger": [
-        "tdd-engineer"
+        "tdd-engineer",
+        "api-event-architect"
       ],
-      "reason": "The request needs interface-first-designer's method; tdd-engineer owns a different task."
+      "reason": "The request concerns internal ports/adapters; api-event-architect owns external API/event contracts and tdd-engineer owns a different task."
     },
     {
       "id": "interface-first-designer-positive-5",

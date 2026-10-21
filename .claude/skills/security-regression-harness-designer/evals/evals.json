@@ -37,7 +37,7 @@
         "triggers": true,
         "assertions": [
           "Specify safe fixtures: two-tenant/two-role data, no real secrets or production records, deterministic identifiers.",
-          "Layer/CI placement and flake policy.",
+          "Expected-denial matrix: positive allowed-path cases and negative forbidden-path cases for both tenants.",
           "Returns the structured record above and does not edit code or claim unrun evidence."
         ]
       }

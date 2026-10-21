@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "2617183c7bb9489d6bc85627584d5702d99c1890",
+  "source_revision": "f46183f3a1e0e9801e6097619bee580c09d07c64",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -291,7 +291,7 @@
     {
       "name": "concurrency-race-reviewer",
       "path": ".claude/skills/concurrency-race-reviewer/SKILL.md",
-      "sha256": "57b9cb4e8478860e931745434e63206b3264bdd063f752ccdae772434c4ff605"
+      "sha256": "52a3efadf5877b3071044437f984611ce6b2fd2038468546f777177e0bbe6355"
     },
     {
       "name": "context-co-update-ci-gate",

@@ -24,7 +24,7 @@
         "triggers": true,
         "assertions": [
           "Derive the contract from use cases, not from the current implementation.",
-          "Adapter plan distinguishing ports from implementations.",
+          "Stable command/query shapes and error semantics specified from caller use cases.",
           "Returns the structured record above and does not edit code or claim unrun evidence."
         ]
       }
@@ -37,7 +37,7 @@
         "triggers": true,
         "assertions": [
           "Specify interface/adapters, command/query shapes, error semantics and invariants.",
-          "Compatibility/versioning and migration/rollback plan.",
+          "Test-double plan: ports vs implementations, fakes, and contract/negative tests.",
           "Returns the structured record above and does not edit code or claim unrun evidence."
         ]
       }
