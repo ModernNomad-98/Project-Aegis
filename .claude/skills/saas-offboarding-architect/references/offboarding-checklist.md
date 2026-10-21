@@ -39,7 +39,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Route tenant creation/provisioning and lifecycle handoff to `tenant-provisioning-designer`; this skill does not perform that owner's work.
 - Route membership/invitation identity flows to `membership-invitation-designer`; this skill does not perform that owner's work.
 - Route audit taxonomy and retention of records to `audit-log-architect`; this skill does not perform that owner's work.
-- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `tenant-provisioning-designer`, `membership-invitation-designer`, `audit-log-architect`, `pii-lifecycle-designer`, `tenant-modeler`, `authorization-matrix-designer`, `plan-entitlement-architect`, `data-migration-runbook-author`, `secure-migration-reviewer`, `sensitive-disclosure-guard`, `admin-console-architect`, `incident-response-runbook`, `secrets-identity-hardener`, `saas-cost-architect` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

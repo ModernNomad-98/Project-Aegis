@@ -37,7 +37,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Route the plan x entitlement matrix and one resolution point to `plan-entitlement-architect`; this skill does not perform that owner's work.
 - Route tenant semantics and lifecycle state machine to `tenant-modeler`; this skill does not perform that owner's work.
 - Route bill-grounded cost drivers and unit economics to `saas-cost-architect`; this skill does not perform that owner's work.
-- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `plan-entitlement-architect`, `tenant-modeler`, `saas-cost-architect`, `api-event-architect`, `audit-log-architect`, `authorization-matrix-designer`, `admin-console-architect`, `notification-webhook-ux-designer`, `data-migration-runbook-author`, `release-readiness-reviewer`, `secure-migration-reviewer`, `feature-flag-architect`, `incident-response-runbook`, `observability-by-design` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

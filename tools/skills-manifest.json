@@ -341,7 +341,7 @@
     {
       "name": "demo-tenant-safety-designer",
       "path": ".claude/skills/demo-tenant-safety-designer/SKILL.md",
-      "sha256": "29e6c0bd53e3ab772c0f3144f528f9421b648bef8703280d3c054d88857f12d7"
+      "sha256": "d1ee9765864cd88b42800fa94fa2f1fee22af13b53d4cd53bdd90c5f6dfa4fc7"
     },
     {
       "name": "dependency-direction-guard",
@@ -416,7 +416,7 @@
     {
       "name": "export-pipeline-architect",
       "path": ".claude/skills/export-pipeline-architect/SKILL.md",
-      "sha256": "12f04431fa5b1dee76a123aa86ebd2601c65c184f53f66b51af048f36cdd3290"
+      "sha256": "213997b3247ed6e5fd53a54dba46050906e03d3962e80d0478b6087b9ced6836"
     },
     {
       "name": "feature-flag-architect",
@@ -826,12 +826,12 @@
     {
       "name": "saas-localization-architect",
       "path": ".claude/skills/saas-localization-architect/SKILL.md",
-      "sha256": "0b4fde31ee0227509ebbc6c625a56f5a8a5b65054daf77850f1ad1516460c801"
+      "sha256": "3df023db18c1669e4fabd25e9b7f1b0eca3b97824dd6dfeff7cb98ca7514b55c"
     },
     {
       "name": "saas-offboarding-architect",
       "path": ".claude/skills/saas-offboarding-architect/SKILL.md",
-      "sha256": "e9321940f3e1598779638a45d8add4a884c8e61e675d629defd99c497667ca11"
+      "sha256": "7bb5d65ffda8c8a04b6f31fe2692aab8da216c968c27d86b64764b2547a70b14"
     },
     {
       "name": "saas-platform-architect",
@@ -841,7 +841,7 @@
     {
       "name": "saas-timezone-architect",
       "path": ".claude/skills/saas-timezone-architect/SKILL.md",
-      "sha256": "1812cbfaf94b7153fa8f8be986eee27e6f455656d7f71940ed13c9caa22fdb8f"
+      "sha256": "a2ac88fd6f9dadd2cf9d07a7439535c27962f37f5551a8732a845b2d619a466b"
     },
     {
       "name": "sast-orchestration-designer",
@@ -996,7 +996,7 @@
     {
       "name": "subscription-lifecycle-designer",
       "path": ".claude/skills/subscription-lifecycle-designer/SKILL.md",
-      "sha256": "9bedb27f548fb0f7ce3bd4a34eef108e6817ec2e8e2fb0beefffae38ac9b1737"
+      "sha256": "a1de524612665ad0df3d31a49581af334e4b1a5a2f253461452b6657c7b1904e"
     },
     {
       "name": "sunset-deprecation-communicator",
@@ -1081,7 +1081,7 @@
     {
       "name": "user-preference-architect",
       "path": ".claude/skills/user-preference-architect/SKILL.md",
-      "sha256": "8c1d3e4b50eb49bc0caaa10041098a43d69dfdf52df2fa3801b56e31d825aee7"
+      "sha256": "dd9bd2756172af583193409bb723bcf6ca156f8f7e64b5288bc4be94cb4506e8"
     },
     {
       "name": "ux-design-iteration",

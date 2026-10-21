@@ -39,11 +39,11 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Define legal-hold and retention exceptions with owners and expiry.
 5. Specify the records each step must leave and where they are retained.
 6. Define exception paths: partial offboarding, cancelled offboarding, failed deletion and idle tenants.
-7. Return the offboarding state machine, ordered checklist, evidence plan and exception paths; do not execute deletes.
-8. Define per-trigger branches (single user leaves / tenant cancels / merger-ownership change): which steps apply and which are skipped.
-9. For a sole-owner departure or ownership change, establish and verify a successor or separately authorized executor BEFORE revoking the last owner's authority; still revoke non-owner access promptly.
-10. Define the secure export delivery channel after revocation: who generates/delivers it, the short-lived access method and how it is verified.
-11. Cover backups, derived copies and sub-processor deletion verification with residual-risk evidence.
+7. Define per-trigger branches (single user leaves / tenant cancels / merger-ownership change): which steps apply and which are skipped.
+8. For a sole-owner departure or ownership change, establish and verify a successor or separately authorized executor BEFORE revoking the last owner's authority; still revoke non-owner access promptly.
+9. Define the secure export delivery channel after revocation: who generates/delivers it, the short-lived access method and how it is verified.
+10. Cover backups, derived copies and sub-processor deletion verification with residual-risk evidence.
+11. Return the offboarding state machine, ordered checklist, evidence plan and exception paths; do not execute deletes.
 
 ## Output Format
 
@@ -82,7 +82,7 @@ Return, in this order:
 - The request is tenant creation/provisioning and lifecycle handoff: route to `tenant-provisioning-designer`.
 - The request is membership/invitation identity flows: route to `membership-invitation-designer`.
 - The request is audit taxonomy and retention of records: route to `audit-log-architect`.
-- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
+- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

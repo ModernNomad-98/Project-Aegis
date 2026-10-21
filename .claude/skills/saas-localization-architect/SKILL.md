@@ -39,10 +39,10 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Define currency presentation vs settlement rules and where each is decided.
 5. Define storage/cache/CDN keys and invalidation so locale variants never bleed across tenants or locales.
 6. Define the localization test matrix: locale coverage, fallbacks, RTL/formatting, and leak checks.
-7. Return the boundary model, fallback matrix, storage/cache contract and test plan; do not implement UI or translations.
-8. Define TWO separate algorithms: (1) locale preference resolution (user -> tenant -> product) and (2) translation-resource fallback (selected locale -> its parent-locale chain -> product default), so missing content never falls back to an unrelated tenant-default language.
-9. Define translation provenance (human/machine, tenant policy, review status) and how it is stored, cached and invalidated.
-10. Define currency presentation only; settlement remains with the billing/subscription owner and the boundary is recorded.
+7. Define TWO separate algorithms: (1) locale preference resolution (user -> tenant -> product) and (2) translation-resource fallback (selected locale -> its parent-locale chain -> product default), so missing content never falls back to an unrelated tenant-default language.
+8. Define translation provenance (human/machine, tenant policy, review status) and how it is stored, cached and invalidated.
+9. Define currency presentation only; settlement remains with the billing/subscription owner and the boundary is recorded.
+10. Return the boundary model, fallback matrix, storage/cache contract and test plan; do not implement UI or translations.
 
 ## Output Format
 
@@ -80,7 +80,7 @@ Return, in this order:
 - The request is responsive layout and viewport behaviour: route to `mobile-viewport-craft`.
 - The request is accessibility verification for localized UI: route to `accessibility-test-harness`.
 - The request is frontend performance of localized bundles: route to `frontend-perf-engineer`.
-- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
+- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

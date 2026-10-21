@@ -36,7 +36,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Route cross-tenant leakage review of a real system to `tenant-isolation-reviewer`; this skill does not perform that owner's work.
 - Route tenant-creation workflow and seeding to `tenant-provisioning-designer`; this skill does not perform that owner's work.
 - Route executing non-production test-tenant creation to `test-tenant-provisioner`; this skill does not perform that owner's work.
-- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `tenant-isolation-reviewer`, `tenant-provisioning-designer`, `test-tenant-provisioner`, `multi-tenant-security-tester`, `tenant-modeler`, `secrets-identity-hardener`, `authorization-matrix-designer`, `audit-log-architect`, `saas-platform-architect`, `membership-invitation-designer`, `admin-console-architect`, `observability-operator`, `release-readiness-reviewer`, `secure-migration-reviewer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

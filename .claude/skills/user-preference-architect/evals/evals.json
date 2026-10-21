@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines how out-of-policy legacy user values are detected and clamped/migrated.",
-          "Keeps one resolution point and cache-invalidation rule across services.",
-          "Does not treat a preference as an entitlement."
+          "Separates lookup precedence (user -> tenant -> global) from tenant-policy enforcement with one resolution point.",
+          "Defines tenant-policy ceilings and what a user sees when capped.",
+          "Records the migration path for out-of-policy legacy values without treating a preference as an entitlement."
         ]
       }
     },

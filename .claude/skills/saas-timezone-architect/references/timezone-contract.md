@@ -38,7 +38,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Route notification channel/template and delivery UX to `notification-webhook-ux-designer`; this skill does not perform that owner's work.
 - Route telemetry contract and timestamps to `observability-by-design`; this skill does not perform that owner's work.
 - Route external API time fields and contract semantics to `api-event-architect`; this skill does not perform that owner's work.
-- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `notification-webhook-ux-designer`, `observability-by-design`, `api-event-architect`, `background-job-orchestration-architect`, `slo-reliability-architect`, `audit-log-architect`, `schema-evolution-planner`, `multi-tenant-data-architect`, `incident-response-runbook`, `data-quality-monitor-designer`, `caching-strategy-designer`, `saas-platform-architect`, `tenant-modeler`, `release-readiness-reviewer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

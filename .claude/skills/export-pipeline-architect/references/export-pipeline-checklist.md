@@ -37,7 +37,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Route per-store tenant scoping and context propagation to `multi-tenant-data-architect`; this skill does not perform that owner's work.
 - Route audit event taxonomy, record schema and integrity to `audit-log-architect`; this skill does not perform that owner's work.
 - Route external API/event contracts and delivery semantics to `api-event-architect`; this skill does not perform that owner's work.
-- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `multi-tenant-data-architect`, `audit-log-architect`, `api-event-architect`, `tenant-isolation-reviewer`, `data-partitioning-sharding-strategist`, `sensitive-disclosure-guard`, `secure-migration-reviewer`, `authorization-matrix-designer`, `admin-console-architect`, `background-job-orchestration-architect`, `notification-webhook-ux-designer`, `data-quality-monitor-designer`, `static-analysis-reviewer`, `security-pr-reviewer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

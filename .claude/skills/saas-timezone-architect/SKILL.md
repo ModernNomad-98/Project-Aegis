@@ -39,10 +39,10 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Define DST and ambiguous/imaginary local-time rules, including duplicate/repeated reminders.
 5. Define reporting cutoffs (tenant day vs UTC) and how aggregations are auditable.
 6. Define migration/backfill for existing timestamps and the verification plan.
-7. Return the timezone model, precedence rules, DST/edge test matrix and migration plan; do not implement code.
-8. Require a named IANA time-zone identifier (e.g. America/New_York) for schedules and other future local intent; store an offset only as an observed/audit snapshot at event time.
-9. Define tzdata version/update policy and re-evaluation of future schedules after a tzdata change.
-10. State that changing a tenant's timezone affects new events and display only; historical events retain their original zone/offset, with the backfill policy and residual ambiguity recorded.
+7. Require a named IANA time-zone identifier (e.g. America/New_York) for schedules and other future local intent; store an offset only as an observed/audit snapshot at event time.
+8. Define tzdata version/update policy and re-evaluation of future schedules after a tzdata change.
+9. State that changing a tenant's timezone affects new events and display only; historical events retain their original zone/offset, with the backfill policy and residual ambiguity recorded.
+10. Return the timezone model, precedence rules, DST/edge test matrix and migration plan; do not implement code.
 
 ## Output Format
 
@@ -80,7 +80,7 @@ Return, in this order:
 - The request is notification channel/template and delivery UX: route to `notification-webhook-ux-designer`.
 - The request is telemetry contract and timestamps: route to `observability-by-design`.
 - The request is external API time fields and contract semantics: route to `api-event-architect`.
-- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
+- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

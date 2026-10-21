@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines tenant vs user zone precedence for display and scheduling.",
-          "Specifies reminder uniqueness across DST and historical zone changes.",
-          "Records the audit trail for zone changes and the migration/backfill policy."
+          "Defines reporting cutoffs per tenant business day vs UTC with auditability.",
+          "States how historical data and zone changes affect cutoff reports.",
+          "Records assumptions and the residual DST/reporting ambiguity."
         ]
       }
     },
@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines reporting cutoffs and their auditability.",
-          "States that changing a tenant zone affects new events/display only while historical events retain their zone/offset.",
-          "Defines the tzdata update/re-evaluation policy."
+          "Defines DST/ambiguous/imaginary local-time handling for reminders.",
+          "Specifies reminder uniqueness and firing rules across transitions.",
+          "Does not claim the scheduler was implemented or verified."
         ]
       }
     },

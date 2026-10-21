@@ -36,7 +36,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Route tenant semantics and membership model to `tenant-modeler`; this skill does not perform that owner's work.
 - Route the feature-flag system and evaluation placement to `feature-flag-architect`; this skill does not perform that owner's work.
 - Route role/permission and object-level authorization to `authorization-matrix-designer`; this skill does not perform that owner's work.
-- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `tenant-modeler`, `feature-flag-architect`, `authorization-matrix-designer`, `saas-platform-architect`, `multi-tenant-data-architect`, `schema-evolution-planner`, `api-event-architect`, `audit-log-architect`, `admin-console-architect`, `frontend-perf-engineer`, `mobile-viewport-craft`, `accessibility-test-harness`, `product-spec-writer`, `validation-boundary-designer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

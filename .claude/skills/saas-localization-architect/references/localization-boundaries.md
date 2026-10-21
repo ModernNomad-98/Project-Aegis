@@ -38,7 +38,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Route responsive layout and viewport behaviour to `mobile-viewport-craft`; this skill does not perform that owner's work.
 - Route accessibility verification for localized UI to `accessibility-test-harness`; this skill does not perform that owner's work.
 - Route frontend performance of localized bundles to `frontend-perf-engineer`; this skill does not perform that owner's work.
-- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `mobile-viewport-craft`, `accessibility-test-harness`, `frontend-perf-engineer`, `api-event-architect`, `observability-by-design`, `sensitive-disclosure-guard`, `tech-spec-writer`, `product-spec-writer`, `saas-platform-architect`, `tenant-modeler`, `caching-strategy-designer`, `notification-webhook-ux-designer`, `domain-modeler`, `requirements-gathering-facilitator` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

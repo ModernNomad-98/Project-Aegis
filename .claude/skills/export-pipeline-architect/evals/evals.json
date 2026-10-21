@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines the export job lifecycle with status, notification and delivery/reissue path.",
-          "Audits request, scope, redaction, delivery and download/cleanup events.",
-          "Keeps the deliverable a design, not an implementation."
+          "Defines the async export job lifecycle and terminal statuses for a large-tenant export.",
+          "Covers failure/partial-export semantics, notification and the reissue path.",
+          "Does not claim an implementation."
         ]
       }
     },

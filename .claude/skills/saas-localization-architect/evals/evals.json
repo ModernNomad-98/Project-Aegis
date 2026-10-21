@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines locale negotiation precedence (user -> tenant -> product) with fallback chain.",
-          "Keeps tenant- and locale-safe cache keys with invalidation.",
-          "Does not claim UI implementation."
+          "Defines locale preference resolution separately from translation-resource fallback with an explicit chain.",
+          "States the fallback when a translation key is missing (locale parent chain, then product default).",
+          "Keeps tenant- and locale-safe cache keys with invalidation; does not claim UI implementation."
         ]
       }
     },
@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines translation provenance (human/machine, tenant policy, review status) and how it is cached/invalidated.",
-          "Records partial-translation gaps and the review path.",
-          "Defers currency settlement to the billing owner while defining presentation."
+          "Defines currency presentation vs settlement and defers settlement to the billing owner.",
+          "Defines date/number formatting rules and locale-safe storage keys.",
+          "Records translation-provenance interactions without conflating them with formatting."
         ]
       }
     },

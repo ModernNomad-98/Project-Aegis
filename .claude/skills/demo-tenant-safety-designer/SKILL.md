@@ -39,8 +39,8 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Define access and role limits for demo users, including support/broker access rules.
 5. Design reset and expiry: schedule, idempotent reseeding, teardown and evidence.
 6. Define monitoring for misuse/leak signals and the conversion-to-real rules and approvals.
-7. Return the demo-tenant design, isolation controls, reset/seed plan and safety checks; do not provision anything.
-8. Define concrete misuse signals: production DB or secret access, outbound email/payment/webhook attempts, data-volume anomalies, role escalation, export attempts, and the alert owner/escalation path.
+7. Define concrete misuse signals: production DB or secret access, outbound email/payment/webhook attempts, data-volume anomalies, role escalation, export attempts, and the alert owner/escalation path.
+8. Return the demo-tenant design, isolation controls, reset/seed plan and safety checks; do not provision anything.
 
 ## Output Format
 
@@ -75,7 +75,7 @@ Return, in this order:
 - The request is cross-tenant leakage review of a real system: route to `tenant-isolation-reviewer`.
 - The request is tenant-creation workflow and seeding: route to `tenant-provisioning-designer`.
 - The request is executing non-production test-tenant creation: route to `test-tenant-provisioner`.
-- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
+- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

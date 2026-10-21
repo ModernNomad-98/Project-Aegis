@@ -39,9 +39,9 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Choose typed storage and schema, including validation and unknown-key handling.
 5. Specify migration from legacy settings and rollback, preserving tenant policy.
 6. Define audit, privacy and access rules for preference data, plus cache invalidation on change.
-7. Return the preference schema, precedence table, policy guards and migration plan; do not implement storage.
-8. Separate lookup precedence from policy enforcement: state exactly where a tenant ceiling wins, and whether an out-of-policy user value is clamped, rejected or disabled (and what the user sees).
-9. Define detection of legacy out-of-policy values and the migration path.
+7. Separate lookup precedence from policy enforcement: state exactly where a tenant ceiling wins, and whether an out-of-policy user value is clamped, rejected or disabled (and what the user sees).
+8. Define detection of legacy out-of-policy values and the migration path.
+9. Return the preference schema, precedence table, policy guards and migration plan; do not implement storage.
 
 ## Output Format
 
@@ -77,7 +77,7 @@ Return, in this order:
 - The request is tenant semantics and membership model: route to `tenant-modeler`.
 - The request is the feature-flag system and evaluation placement: route to `feature-flag-architect`.
 - The request is role/permission and object-level authorization: route to `authorization-matrix-designer`.
-- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
+- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

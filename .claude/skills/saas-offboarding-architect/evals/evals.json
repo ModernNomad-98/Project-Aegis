@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Establishes a successor or separately authorized executor before revoking the last owner's authority.",
-          "Defines the secure export delivery channel after revocation and who verifies it.",
-          "Does not execute any deletion or revocation."
+          "Orders access revocation and export/retention/deletion for a leaving customer, including the post-revocation delivery channel.",
+          "Names approvals/actors per step and classifies reversible vs irreversible steps.",
+          "Does not execute any revocation or deletion."
         ]
       }
     },
@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Records legal-hold/retention exceptions with owner and expiry.",
-          "Covers backups, derived copies and sub-processor deletion verification.",
-          "Names residual exposures and the evidence required."
+          "Defines the ownership-transfer branch and which closure/deletion steps are skipped or reordered.",
+          "Verifies a successor/executor before the last owner's authority is revoked.",
+          "Records audit evidence and residual data exposure."
         ]
       }
     },

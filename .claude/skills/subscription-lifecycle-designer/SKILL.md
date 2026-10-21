@@ -39,9 +39,9 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Define payment-failure, dunning and grace behaviour, including access during grace and hard-stop rules.
 5. Define reactivation, grandfathering and cancellation-timing rules so reversibility is explicit.
 6. Specify idempotent transition handling, duplicate-event suppression and rollback for failed transitions.
-7. Return the state machine, transition matrix, edge cases and verification plan; do not implement billing code.
-8. Define late/out-of-order billing-event handling: ordering keys, deterministic winner and duplicate suppression.
-9. Use compensating transactions and reconciliation for external billing transitions that cannot be rolled back literally.
+7. Define late/out-of-order billing-event handling: ordering keys, deterministic winner and duplicate suppression.
+8. Use compensating transactions and reconciliation for external billing transitions that cannot be rolled back literally.
+9. Return the state machine, transition matrix, edge cases and verification plan; do not implement billing code.
 
 ## Output Format
 
@@ -77,7 +77,7 @@ Return, in this order:
 - The request is the plan x entitlement matrix and one resolution point: route to `plan-entitlement-architect`.
 - The request is tenant semantics and lifecycle state machine: route to `tenant-modeler`.
 - The request is bill-grounded cost drivers and unit economics: route to `saas-cost-architect`.
-- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
+- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

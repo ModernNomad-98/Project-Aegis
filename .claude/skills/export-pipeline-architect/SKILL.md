@@ -39,9 +39,9 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 4. Choose storage/delivery mechanics with bounded, single-use access and expiry.
 5. Define audit evidence: who requested, what scope, what was redacted and delivered, and when.
 6. Define failure handling, retry safety and partial-export semantics.
-7. Return the pipeline design, redaction map, security controls and audit plan; do not implement the job.
-8. Define short-lived single-use delivery tokens with an explicit reissue path for failed downloads.
-9. Audit every access/download event plus cleanup/deletion evidence for generated exports.
+7. Define short-lived single-use delivery tokens with an explicit reissue path for failed downloads.
+8. Audit every access/download event plus cleanup/deletion evidence for generated exports.
+9. Return the pipeline design, redaction map, security controls and audit plan; do not implement the job.
 
 ## Output Format
 
@@ -77,7 +77,7 @@ Return, in this order:
 - The request is per-store tenant scoping and context propagation: route to `multi-tenant-data-architect`.
 - The request is audit event taxonomy, record schema and integrity: route to `audit-log-architect`.
 - The request is external API/event contracts and delivery semantics: route to `api-event-architect`.
-- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
+- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 
