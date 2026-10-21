@@ -8,7 +8,7 @@ summary is hand-maintained with a validator cross-check.
 
 GAP rows are optional backlog candidates, not deficits or completion obligations.
 
-The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 207 shipped skills are beyond it.
+The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 207 shipped skills are beyond it.
 
 The map records status only. It is a maintained assertion, not ground
 truth, a completion target or a build authorization. Rows graded
@@ -29,19 +29,19 @@ review; nothing here silently asserts a classification.
 | --- | ---: |
 | Entries | 300 |
 | SHIPPED | 128 |
-| COVERED | 54 |
-| PARTIAL | 63 |
-| GAP | 55 |
+| COVERED | 56 |
+| PARTIAL | 62 |
+| GAP | 54 |
 | explicit-id | 128 |
-| catalog-decision | 14 |
-| capability-review | 103 |
-| none | 55 |
+| catalog-decision | 16 |
+| capability-review | 102 |
+| none | 54 |
 | P0 / P1 / P2 | 126 / 149 / 25 |
-| P0 / P1 / P2 gaps | 11 / 35 / 9 |
+| P0 / P1 / P2 gaps | 11 / 34 / 9 |
 | Manifest skills | 207 |
-| Distinct covering skills | 124 |
-| Beyond-roadmap shipped skills | 83 |
-| Review pending | 160 |
+| Distinct covering skills | 127 |
+| Beyond-roadmap shipped skills | 80 |
+| Review pending | 170 |
 
 ## Per-area status
 
@@ -53,11 +53,11 @@ review; nothing here silently asserts a classification.
 | 04 Backend, application programming interface (API), and data engineering | 30 | 3 | 11 | 10 | 6 |
 | 05 Frontend and user experience (UX) engineering | 20 | 3 | 5 | 4 | 8 |
 | 06 Quality assurance (QA), test architecture, and validation | 55 | 36 | 6 | 7 | 6 |
-| 07 Development and operations (DevOps), release, and reliability engineering | 25 | 19 | 1 | 4 | 1 |
-| 08 Artificial intelligence (AI) era software development life cycle (SDLC) and agent operating discipline | 20 | 17 | 2 | 0 | 1 |
+| 07 Development and operations (DevOps), release, and reliability engineering | 25 | 19 | 2 | 3 | 1 |
+| 08 Artificial intelligence (AI) era software development life cycle (SDLC) and agent operating discipline | 20 | 17 | 3 | 0 | 0 |
 | 09 Artificial intelligence (AI) software engineering and large language model (LLM) systems | 20 | 3 | 9 | 8 | 0 |
 
-## GAP candidates (all 55 ids)
+## GAP candidates (all 54 ids)
 
 - Area 01: 6, 7, 8, 14, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 39, 43, 44, 46, 47, 49, 50, 54
 - Area 02: 61, 67, 76, 80, 83, 86, 87
@@ -66,7 +66,6 @@ review; nothing here silently asserts a classification.
 - Area 05: 161, 162, 163, 164, 167, 168, 169, 176
 - Area 06: 188, 224, 225, 231, 233, 234
 - Area 07: 236
-- Area 08: 278
 
 ## P0 gap candidates (all 11 ids)
 
