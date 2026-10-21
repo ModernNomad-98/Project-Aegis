@@ -2341,6 +2341,298 @@ def test_coverage_map_optionality_framing():
 
 
 
+
+# --- coverage-map hardening (Codex notes 2026-10-20: bool ids, basis
+# schema, visible-only optionality, non-finite JSON) ------------------------
+
+
+def test_coverage_map_bool_id_rejected():
+    """T16: JSON true/false is not an integer id (exact int required)."""
+    assert validator._coverage_is_exact_int(True) is False, (
+        "bool must not pass an exact-int check"
+    )
+    for bad in (True, False):
+        with tempfile.TemporaryDirectory() as tmp:
+            def mutate(payload, bad=bad):
+                coverage_entry(payload, 1)["id"] = bad
+            with mutated_coverage(Path(tmp), mutate) as rep:
+                expect_error(rep, "exact integer is required",
+                             f"coverage map: bool id {bad!r} rejected")
+
+
+def test_coverage_map_basis_missing_key():
+    """T17: every required basis key must be present."""
+    for key in ("repo_commit", "repo_date", "audit_artifacts", "source_files"):
+        with tempfile.TemporaryDirectory() as tmp:
+            def mutate(payload, key=key):
+                del payload["basis"][key]
+            with mutated_coverage(Path(tmp), mutate) as rep:
+                expect_error(rep, "basis is missing required key",
+                             f"coverage map: missing basis.{key} rejected")
+
+
+def test_coverage_map_basis_wrong_digest_or_junk():
+    """T18: wrong/missing nested basis values and junk digests are rejected."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_commit(payload):
+            payload["basis"]["repo_commit"] = "0" * 40
+        with mutated_coverage(Path(tmp), wrong_commit) as rep:
+            expect_error(rep, "basis.repo_commit must be the pinned",
+                         "coverage map: wrong basis.repo_commit rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_audit_digest(payload):
+            payload["basis"]["audit_artifacts"]["audit_report"]["sha256"] = (
+                "0" * 64)
+        with mutated_coverage(Path(tmp), wrong_audit_digest) as rep:
+            expect_error(rep, "basis.audit_artifacts.audit_report.sha256",
+                         "coverage map: wrong audit-artifact digest rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def junk_source_key(payload):
+            payload["basis"]["source_files"]["not-a-real-source"] = "f" * 64
+        with mutated_coverage(Path(tmp), junk_source_key) as rep:
+            expect_error(rep, "basis.source_files has unexpected key",
+                         "coverage map: junk source_files key rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def junk_basis_key(payload):
+            payload["basis"]["sha256"] = validator.COVERAGE_AUDIT_REPORT_SHA
+        with mutated_coverage(Path(tmp), junk_basis_key) as rep:
+            expect_error(rep, "basis has unexpected key",
+                         "coverage map: digest-only junk basis key rejected")
+
+
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_repo_date(payload):
+            payload["basis"]["repo_date"] = "not-a-date"
+        with mutated_coverage(Path(tmp), wrong_repo_date) as rep:
+            expect_error(rep, "basis.repo_date must be the pinned audit date",
+                         "coverage map: wrong basis.repo_date rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_source_digest(payload):
+            payload["basis"]["source_files"]["docs/skills-catalog.md"] = (
+                "0" * 64)
+        with mutated_coverage(Path(tmp), wrong_source_digest) as rep:
+            expect_error(rep, "basis.source_files['docs/skills-catalog.md']",
+                         "coverage map: wrong source-file digest rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def non_string_digest(payload):
+            payload["basis"]["audit_artifacts"]["audit_report"]["sha256"] = 123
+        with mutated_coverage(Path(tmp), non_string_digest) as rep:
+            expect_error(rep, "basis.audit_artifacts.audit_report.sha256",
+                         "coverage map: non-string audit digest rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def missing_nested(payload):
+            del payload["basis"]["audit_artifacts"]["audit_report"]
+        with mutated_coverage(Path(tmp), missing_nested) as rep:
+            expect_error(rep, "basis.audit_artifacts is missing required key",
+                         "coverage map: missing nested audit artifact rejected")
+
+def test_coverage_map_optionality_comment_hidden():
+    """T19: an optionality phrase hidden in an HTML comment does not count."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    assert validator._coverage_rendered_markdown("<!-- hidden -->\nvisible") \
+        == "visible", "HTML comments must be stripped from rendered text"
+    with tempfile.TemporaryDirectory() as tmp:
+        def hide_in_comment(text):
+            return text.replace(phrase, "<!-- " + phrase + " -->", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              hide_in_comment) as rep:
+            expect_error(rep, "missing the required optionality phrase",
+                         "coverage map: comment-hidden phrase rejected")
+
+
+def test_coverage_map_optionality_fence_hidden():
+    """T20: an optionality phrase hidden in a fenced code block does not count."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    fence = chr(96) * 3
+    hidden = "\n" + fence + "\n" + phrase + "\n" + fence
+    assert phrase not in validator._coverage_rendered_markdown(hidden), (
+        "fenced code blocks must be stripped from rendered text"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        def hide_in_fence(text):
+            return text.replace(phrase, hidden, 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              hide_in_fence) as rep:
+            expect_error(rep, "missing the required optionality phrase",
+                         "coverage map: fence-hidden phrase rejected")
+
+
+def test_coverage_map_nan_rejected():
+    """T21: NaN in the JSON is rejected at load and never emitted canonically."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def mutate(payload):
+            coverage_entry(payload, 1)["notes"] = float("nan")
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            expect_error(rep, "non-finite JSON number",
+                         "coverage map: NaN rejected at load")
+    raised = False
+    try:
+        validator._coverage_canonical({"x": float("nan")})
+    except ValueError:
+        raised = True
+    assert raised, "canonical rendering must refuse to emit NaN"
+
+
+def test_coverage_map_infinity_rejected():
+    """T22: Infinity and -Infinity are rejected at load and on render."""
+    for bad in (float("inf"), float("-inf")):
+        with tempfile.TemporaryDirectory() as tmp:
+            def mutate(payload, bad=bad):
+                coverage_entry(payload, 1)["notes"] = bad
+            with mutated_coverage(Path(tmp), mutate) as rep:
+                expect_error(rep, "non-finite JSON number",
+                             f"coverage map: {bad!r} rejected at load")
+        raised = False
+        try:
+            validator._coverage_canonical({"x": bad})
+        except ValueError:
+            raised = True
+        assert raised, "canonical rendering must refuse to emit " + repr(bad)
+
+
+
+def test_coverage_map_rendered_visibility_edges():
+    """T25: non-rendered regions (Codex 4332227138 fence-close text, blockquote, indent, HTML)."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    fence = chr(96) * 3
+    hidden = [
+        fence + "\n" + fence + "not-a-close\n" + phrase + "\n" + fence,
+        "> " + fence + "\n> " + phrase + "\n> " + fence,
+        ">     " + phrase,
+        "    " + phrase,
+        "<pre>\n" + phrase + "\n</pre>",
+    ]
+    for case in hidden:
+        assert phrase not in validator._coverage_rendered_markdown(case), (
+            "non-rendered region must not count as visible: " + repr(case[:40])
+        )
+    assert phrase in validator._coverage_rendered_markdown("Visible: " + phrase), (
+        "a plainly visible phrase must count"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        def hide_indented(text):
+            return text.replace(phrase, "    " + phrase, 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              hide_indented) as rep:
+            expect_error(rep, "missing the required optionality phrase",
+                         "coverage map: indented-code-hidden phrase rejected")
+
+
+def test_coverage_map_exact_int_totals():
+    """T26: boolean totals are rejected, never treated as integers."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def bool_total(payload):
+            payload["totals"]["manifest_skills"] = True
+        with mutated_coverage(Path(tmp), bool_total) as rep:
+            expect_error(rep, "must be an exact integer",
+                         "coverage map: bool totals.manifest_skills rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def bool_grouped_total(payload):
+            payload["totals"]["by_status"]["SHIPPED"] = True
+        with mutated_coverage(Path(tmp), bool_grouped_total) as rep:
+            expect_error(rep, "must be an exact integer",
+                         "coverage map: bool grouped total rejected")
+
+
+
+def test_coverage_map_unterminated_comment_hidden():
+    """T27: unterminated HTML comment hides the summary (Codex 4332227123)."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    hidden = "<!-- unterminated\n" + phrase
+    assert phrase not in validator._coverage_rendered_markdown(hidden), (
+        "an unterminated comment must hide trailing text"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        def hide_after_open_comment(text):
+            return text.replace(phrase, "<!-- unterminated\n" + phrase, 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              hide_after_open_comment) as rep:
+            expect_error(rep, "missing the required optionality phrase",
+                         "coverage map: unterminated-comment phrase rejected")
+
+
+def test_coverage_map_visible_only_totals_and_ids():
+    """T28: hidden totals rows/id sets must not satisfy the summary checks."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def comment_out_totals(text):
+            row = "| Review pending | " + str(
+                validator.COVERAGE_TOTALS["review_pending"]) + " |"
+            return text.replace(row, "<!-- " + row + " -->", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              comment_out_totals) as rep:
+            expect_error(rep, "summary total 'Review pending'",
+                         "coverage map: comment-hidden totals row rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def comment_out_gap_ids(text):
+            heading = "## GAP candidates (all " + str(
+                len(validator.COVERAGE_GAP_IDS)) + " ids)"
+            return text.replace(heading, "<!-- " + heading + " -->", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              comment_out_gap_ids) as rep:
+            expect_error(rep, "summary GAP id set must equal",
+                         "coverage map: comment-hidden GAP id heading rejected")
+
+
+def test_coverage_map_overflowing_float_rejected():
+    """T29: parse_float rejects an overflowing literal such as 1e999."""
+    raised = False
+    try:
+        json.loads('{"x": 1e999}',
+                   parse_constant=validator._coverage_reject_json_constant,
+                   parse_float=validator._coverage_reject_json_float)
+    except ValueError:
+        raised = True
+    assert raised, "an overflowing float literal must be rejected at load"
+
+
+
+def test_coverage_map_fence_prefix_and_visible_pointer():
+    """T30: fence-prefix closure and the JSON pointer must be visible text."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    fence = chr(96) * 3
+    hidden = fence + "\n> " + fence + "\n" + phrase + "\n" + fence
+    assert phrase not in validator._coverage_rendered_markdown(hidden), (
+        "a blockquoted fence marker must not close a top-level fence"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        def comment_out_pointer(text):
+            return text.replace("[coverage-map.json](coverage-map.json)",
+                                "<!-- [coverage-map.json](coverage-map.json) -->", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              comment_out_pointer) as rep:
+            expect_error(rep, "must point at the authoritative",
+                         "coverage map: hidden JSON pointer rejected")
+
+
+def test_coverage_map_hidden_html_raw_text_blocks():
+    """T31: unterminated script/style/template blocks hide trailing text."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    for opener in ("<script>", "<style>", "<template>"):
+        hidden = opener + "\n" + phrase
+        assert phrase not in validator._coverage_rendered_markdown(hidden), (
+            "an unterminated hidden HTML block must hide trailing text: " + opener
+        )
+
+
+
+def test_coverage_map_codex_visible_text_findings():
+    """T32: pin both Codex visible-text bypass findings (4332227123/138)."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    fence = chr(96) * 3
+    # 4332227123: an unterminated HTML comment hides everything after it.
+    unterminated = "<!-- no closing marker\n" + phrase
+    assert phrase not in validator._coverage_rendered_markdown(unterminated), (
+        "Codex 4332227123: unterminated comment must hide trailing text"
+    )
+    # 4332227138: a fence line with trailing text is NOT a closing fence, so
+    # the phrase after it is still inside the fenced code block.
+    trailing_close = (fence + "\n" + fence + "python\n" + phrase + "\n"
+                      + fence)
+    assert phrase not in validator._coverage_rendered_markdown(trailing_close), (
+        "Codex 4332227138: fence line with trailing text must not close"
+    )
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -2362,6 +2654,21 @@ TESTS = [
     test_coverage_map_summary_id_sets,
     test_coverage_map_anomaly_rules,
     test_coverage_map_optionality_framing,
+    test_coverage_map_bool_id_rejected,
+    test_coverage_map_basis_missing_key,
+    test_coverage_map_basis_wrong_digest_or_junk,
+    test_coverage_map_optionality_comment_hidden,
+    test_coverage_map_optionality_fence_hidden,
+    test_coverage_map_nan_rejected,
+    test_coverage_map_infinity_rejected,
+    test_coverage_map_rendered_visibility_edges,
+    test_coverage_map_exact_int_totals,
+    test_coverage_map_unterminated_comment_hidden,
+    test_coverage_map_visible_only_totals_and_ids,
+    test_coverage_map_overflowing_float_rejected,
+    test_coverage_map_fence_prefix_and_visible_pointer,
+    test_coverage_map_hidden_html_raw_text_blocks,
+    test_coverage_map_codex_visible_text_findings,
     test_skill_end_to_end,
     test_section_order,
     test_agents_schema,
