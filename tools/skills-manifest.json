@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "a568333f3f23071f1197518113b9c00505f2a026",
+  "source_revision": "bbc1c658cacd1ab948fb32b60271cc238a581724",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -291,7 +291,7 @@
     {
       "name": "concurrency-race-reviewer",
       "path": ".claude/skills/concurrency-race-reviewer/SKILL.md",
-      "sha256": "716caef933982088407c3c5b025f1ff87fb5afd9628e013ec211777b29dd5b0e"
+      "sha256": "57b9cb4e8478860e931745434e63206b3264bdd063f752ccdae772434c4ff605"
     },
     {
       "name": "context-co-update-ci-gate",
@@ -856,7 +856,7 @@
     {
       "name": "security-impact-note-author",
       "path": ".claude/skills/security-impact-note-author/SKILL.md",
-      "sha256": "c55136e260aa067801cad36f803a43d90178bad82047a1ed8974af28ec389f3a"
+      "sha256": "81a086d602bb6abb90fb2fd1dbffe13dac3a38755fed34220e01fc4dbf44e902"
     },
     {
       "name": "security-logging-alerting-architect",
@@ -871,7 +871,7 @@
     {
       "name": "security-regression-harness-designer",
       "path": ".claude/skills/security-regression-harness-designer/SKILL.md",
-      "sha256": "f55d70ccc32ca7d0c462c04356d2ea9d9f97d8313172c3907b8340091edb6823"
+      "sha256": "cb7bad0264d05e69a0c2d70c8ab09ad8a8c67adeee21d0db9c327f6b9eebc826"
     },
     {
       "name": "security-scan-orchestrator",

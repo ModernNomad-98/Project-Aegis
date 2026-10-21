@@ -2735,6 +2735,25 @@ def test_coverage_map_batch1_deliveries():
     assert phrases, "an optionality phrase must carry 80 of 215"
 
 
+
+def test_skills_manifest_provenance():
+    """T36: every manifest path exists at the declared source_revision."""
+    import subprocess
+    manifest = json.loads(
+        validator.MANIFEST_PATH.read_text(encoding="utf-8"))
+    revision = manifest["source_revision"]
+    assert len(revision) == 40 and all(c in "0123456789abcdef" for c in revision)
+    listing = subprocess.check_output(
+        ["git", "-C", str(validator.REPO_ROOT), "ls-tree", "-r",
+         "--name-only", revision], text=True)
+    paths = set(listing.splitlines())
+    missing = [entry["path"] for entry in manifest["skills"]
+               if entry["path"] not in paths]
+    assert not missing, ("manifest paths absent at declared source_revision "
+                        + revision + ": " + repr(missing[:3]))
+    assert len(manifest["skills"]) == 215
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -2757,6 +2776,7 @@ TESTS = [
     test_coverage_map_anomaly_rules,
     test_coverage_map_optionality_framing,
     test_coverage_map_batch1_deliveries,
+    test_skills_manifest_provenance,
     test_coverage_map_planning_gate_resolved,
     test_coverage_map_malformed_id_does_not_crash,
     test_coverage_map_triage_rows_and_phrase,

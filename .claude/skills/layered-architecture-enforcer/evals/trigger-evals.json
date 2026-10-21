@@ -74,12 +74,13 @@
     },
     {
       "id": "layered-architecture-enforcer-positive-7",
-      "prompt": "We need an architecture test enforcing the allowed dependency direction - what should it assert?",
+      "prompt": "We need a layer-boundary architecture test - which cross-layer imports should it assert are rejected?",
       "expected_skill": "layered-architecture-enforcer",
       "should_not_trigger": [
-        "principal-code-analyst"
+        "principal-code-analyst",
+        "dependency-direction-guard"
       ],
-      "reason": "The request needs layered-architecture-enforcer's method; principal-code-analyst owns a different task."
+      "reason": "The request needs layered-architecture-enforcer's layer-boundary method; dependency-direction-guard owns dependency policy/CI enforcement and principal-code-analyst owns a different task."
     },
     {
       "id": "layered-architecture-enforcer-positive-8",

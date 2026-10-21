@@ -1,6 +1,6 @@
 ---
 name: security-impact-note-author
-description: 'Use when a security-sensitive change needs a reviewable impact note: document affected assets, risks, mitigations, tests, rollback and approval needs, separating verified facts from assumptions. Authoring-only; it does not review diffs, approve changes, or replace threat modeling.'
+description: 'Use when a security-sensitive change needs a reviewable impact note: document affected assets, risks, mitigations, tests, rollback and approval needs, separating verified facts from assumptions. Authoring-only; it does not perform the security review of the diff, approve changes, or replace threat modeling.'
 ---
 
 # Security Impact Note Author

@@ -1,6 +1,6 @@
 ---
 name: security-regression-harness-designer
-description: 'Use when a security or access-control bug is fixed: design a permanent regression harness with fixtures, expected-denial cases and CI placement so the vulnerability cannot silently return. Design-only; it does not review the fix diff, curate an existing suite, or implement code.'
+description: 'Use when a security or access-control bug is fixed: design a permanent regression harness with fixtures, expected-denial cases and CI placement so the vulnerability cannot silently return. Design-only; it does not perform the security review of the fix diff, replace security-pr-reviewer, curate an existing suite, or implement code.'
 ---
 
 # Security Regression Harness Designer

@@ -1,6 +1,6 @@
 ---
 name: concurrency-race-reviewer
-description: 'Use when creates, updates, approvals, imports, retries or jobs can interleave: identify races such as lost updates, double-create, check-then-act and retry duplicates, and propose serialization, idempotency, locking or transactional fixes with tests. Review-only; it does not classify flaky tests or design resilience strategy.'
+description: 'Use when create/update operations, approvals, imports, retries, or jobs can interleave: identify races such as lost updates, double-create, check-then-act and retry duplicates, and propose serialization, idempotency, locking or transactional fixes with tests. Review-only; it does not classify flaky tests or design resilience strategy.'
 ---
 
 # Concurrency Race Reviewer
