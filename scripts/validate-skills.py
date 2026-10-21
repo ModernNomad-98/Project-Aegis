@@ -211,29 +211,25 @@ COVERAGE_GRADE_BY_STATUS = {
     "GAP": ("none",),
 }
 COVERAGE_PRIORITIES = ("P0", "P1", "P2")
-# D107 (2026-10-20): the triage decision adopted by the Lead under the
-# owner's standing pre-approval (owner may override) reconciles rows #254 and
-# #278 to COVERED / catalog-decision and defines review_pending as every
-# non-explicit-id row (catalog-decision + capability-review + none).
 COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 128, "COVERED": 56, "PARTIAL": 62, "GAP": 54},
-    "by_grade": {"explicit-id": 128, "catalog-decision": 16,
-                 "capability-review": 102, "none": 54},
+    "by_status": {"SHIPPED": 128, "COVERED": 54, "PARTIAL": 63, "GAP": 55},
+    "by_grade": {"explicit-id": 128, "catalog-decision": 14,
+                 "capability-review": 103, "none": 55},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 11, "P1": 34, "P2": 9},
+    "gap_by_priority": {"P0": 11, "P1": 35, "P2": 9},
     "manifest_skills": 207,
     "distinct_covering_skills": 124,
     "beyond_roadmap_skills": 83,
-    "review_pending": 172,
+    "review_pending": 160,
 }
 COVERAGE_GAP_IDS = (
     6, 7, 8, 14, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 39, 43, 44, 46, 47,
     49, 50, 54, 61, 67, 76, 80, 83, 86, 87, 110, 120, 125, 127, 135, 146, 151,
     155, 156, 158, 161, 162, 163, 164, 167, 168, 169, 176, 188, 224, 225, 231,
-    233, 234, 236,
+    233, 234, 236, 278,
 )
 COVERAGE_P0_GAP_IDS = (6, 7, 8, 49, 125, 127, 155, 161, 162, 164, 188)
 COVERAGE_ANOMALY_SKILLS = {
@@ -1877,7 +1873,8 @@ def _coverage_rendered_markdown(text: str) -> str:
     # comment cannot open or close a fence in the parser below.
     without_comments = COVERAGE_HTML_COMMENT_RE.sub(
         lambda match: "\n" * match.group(0).count("\n"), text)
-    # CommonMark renders an unterminated <!-- as an HTML comment through EOF.
+    # CommonMark renders an unterminated <!-- as an HTML comment through EOF
+    # (Codex finding 4332227123; regression T27/T32).
     if "<!--" in without_comments:
         without_comments = without_comments.split("<!--", 1)[0]
     out: list[str] = []
@@ -1899,6 +1896,8 @@ def _coverage_rendered_markdown(text: str) -> str:
                 marker = match.group("marker")
                 remainder = match.group("rest")
                 depth = match.group("prefix").count(">")
+                # Codex finding 4332227138: a closing fence line may carry
+                # only the marker and whitespace (regression T25/T32).
                 if marker[0] == fence[0] and len(marker) >= fence[1] \
                         and depth == fence[2] \
                         and remainder.strip() == "":
@@ -2029,8 +2028,8 @@ def check_coverage_map(rep: Report) -> None:
     docs/skills tables; status/grade enums and pairing; covering skills in the
     manifest; non-GAP rows need >=1 skill and evidence; GAP rows need a
     rationale and no skills/evidence; the #186/#299 anomaly sets; totals
-    recomputed (incl. by_grade and review_pending = every non-explicit-id
-    row: catalog-decision + capability-review + none); manifest union (124 distinct
+    recomputed (incl. by_grade and review_pending = PARTIAL + GAP +
+    COVERED(capability-review) + 2 anomalies); manifest union (124 distinct
     covering / 83 beyond / 207); the summary's totals and GAP/P0 id sets equal
     the JSON; required optionality phrases; canonical deterministic JSON.
     """
@@ -2274,8 +2273,14 @@ def check_coverage_map(rep: Report) -> None:
         "distinct_covering_skills": len(covering_union),
         "beyond_roadmap_skills": (len(manifest - covering_union)
                                   if manifest is not None else 0),
-        "review_pending": sum(count for grade, count in by_grade.items()
-                              if grade != "explicit-id"),
+        "review_pending": (by_status.get("PARTIAL", 0)
+                           + by_status.get("GAP", 0)
+                           + sum(1 for entry in entries
+                                 if isinstance(entry, dict)
+                                 and entry.get("status") == "COVERED"
+                                 and entry.get("evidence_grade")
+                                 == "capability-review")
+                           + len(COVERAGE_ANOMALY_SKILLS)),
     }
     _coverage_require_exact_ints(rep, ctx, totals, "")
     for key in sorted(COVERAGE_TOTALS):

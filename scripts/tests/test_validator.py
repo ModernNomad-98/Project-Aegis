@@ -2153,7 +2153,7 @@ def test_coverage_map_totals_mismatch():
     """Totals: a JSON totals field that disagrees with the entries is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["by_status"]["GAP"] = 53
+            payload["totals"]["by_status"]["GAP"] = 54
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.by_status",
                          "coverage map: JSON totals mismatch rejected")
@@ -2163,7 +2163,7 @@ def test_coverage_map_summary_totals_mismatch():
     """T9b: each seeded summary totals/per-area defect is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| GAP | 54 |", "| GAP | 53 |", 1)
+            return text.replace("| GAP | 55 |", "| GAP | 54 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'GAP'",
                          "coverage map: summary totals mismatch rejected")
@@ -2193,16 +2193,16 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| P0 / P1 / P2 gaps | 11 / 34 / 9 |",
-                                "| P0 / P1 / P2 gaps | 12 / 34 / 9 |", 1)
+            return text.replace("| P0 / P1 / P2 gaps | 11 / 35 / 9 |",
+                                "| P0 / P1 / P2 gaps | 12 / 35 / 9 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary gap-priority totals",
                          "coverage map: summary gap-priority totals mismatch "
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| Review pending | 172 |",
-                                "| Review pending | 173 |", 1)
+            return text.replace("| Review pending | 160 |",
+                                "| Review pending | 161 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'Review pending'",
                          "coverage map: summary review_pending mismatch "
@@ -2491,73 +2491,8 @@ def test_coverage_map_infinity_rejected():
 
 
 
-# --- coverage-map triage adoption (D107) ------------------------------------
-
-
-def test_coverage_map_triage_review_pending():
-    """T23: review_pending counts every non-explicit-id row (172 after triage)."""
-    assert validator.COVERAGE_TOTALS["review_pending"] == 172, (
-        "triage-adjusted review_pending constant must be 172"
-    )
-    expected = (validator.COVERAGE_TOTALS["by_grade"]["catalog-decision"]
-                + validator.COVERAGE_TOTALS["by_grade"]["capability-review"]
-                + validator.COVERAGE_TOTALS["by_grade"]["none"])
-    assert expected == 172, "review_pending must be derived from non-explicit-id grades"
-    derived = sum(count for grade, count in validator.COVERAGE_TOTALS["by_grade"].items()
-                  if grade != "explicit-id")
-    assert derived == 172, (
-        "review_pending must derive from every non-explicit-id grade"
-    )
-    with tempfile.TemporaryDirectory() as tmp:
-        def mutate(payload):
-            payload["totals"]["review_pending"] = 160
-        with mutated_coverage(Path(tmp), mutate) as rep:
-            expect_error(rep, "totals.review_pending",
-                         "coverage map: old 160 review_pending rejected")
-
-
-def test_coverage_map_triage_rows_254_278():
-    """T24: rows #254/#278 are COVERED / catalog-decision; GAP set drops 278."""
-    payload = load_coverage()
-    r254 = coverage_entry(payload, 254)
-    assert (r254["status"], r254["evidence_grade"]) == ("COVERED", "catalog-decision"), (
-        "row #254 must be reconciled to COVERED / catalog-decision"
-    )
-    assert r254["covering_skills"] == ["data-migration-runbook-author"], (
-        "row #254 must cover data-migration-runbook-author only"
-    )
-    r278 = coverage_entry(payload, 278)
-    assert (r278["status"], r278["evidence_grade"]) == ("COVERED", "catalog-decision"), (
-        "row #278 must be reconciled to COVERED / catalog-decision"
-    )
-    assert r278["covering_skills"] == ["ai-sdlc-operating-model"], (
-        "row #278 must cover ai-sdlc-operating-model"
-    )
-    assert 278 not in validator.COVERAGE_GAP_IDS, "row 278 must leave the GAP id set"
-    assert len(validator.COVERAGE_GAP_IDS) == 54, "54 GAP ids after triage"
-    assert validator.COVERAGE_TOTALS["gap_by_priority"]["P1"] == 34, (
-        "P1 gap count must be 34 after triage"
-    )
-    covered_by_other = [
-        entry for entry in payload["entries"]
-        if "rollback-runbook-author" in entry["covering_skills"]
-        and entry["id"] != 254
-    ]
-    assert covered_by_other, (
-        "rollback-runbook-author must remain covered by another row so the "
-        "distinct/beyond totals stay 124/83"
-    )
-    assert payload["totals"]["distinct_covering_skills"] == 124, (
-        "distinct covering skills must remain 124 after triage"
-    )
-    assert payload["totals"]["beyond_roadmap_skills"] == 83, (
-        "beyond-roadmap count must remain 83 after triage"
-    )
-
-
-
 def test_coverage_map_rendered_visibility_edges():
-    """T25: non-rendered regions (fence-close text, blockquote, indent, HTML)."""
+    """T25: non-rendered regions (Codex 4332227138 fence-close text, blockquote, indent, HTML)."""
     phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
     fence = chr(96) * 3
     hidden = [
@@ -2601,7 +2536,7 @@ def test_coverage_map_exact_int_totals():
 
 
 def test_coverage_map_unterminated_comment_hidden():
-    """T27: an unterminated HTML comment hides the rest of the summary."""
+    """T27: unterminated HTML comment hides the summary (Codex 4332227123)."""
     phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
     hidden = "<!-- unterminated\n" + phrase
     assert phrase not in validator._coverage_rendered_markdown(hidden), (
@@ -2620,16 +2555,18 @@ def test_coverage_map_visible_only_totals_and_ids():
     """T28: hidden totals rows/id sets must not satisfy the summary checks."""
     with tempfile.TemporaryDirectory() as tmp:
         def comment_out_totals(text):
-            return text.replace("| Review pending | 172 |",
-                                "<!-- | Review pending | 172 | -->", 1)
+            row = "| Review pending | " + str(
+                validator.COVERAGE_TOTALS["review_pending"]) + " |"
+            return text.replace(row, "<!-- " + row + " -->", 1)
         with mutated_coverage(Path(tmp), lambda payload: None,
                               comment_out_totals) as rep:
             expect_error(rep, "summary total 'Review pending'",
                          "coverage map: comment-hidden totals row rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def comment_out_gap_ids(text):
-            return text.replace("## GAP candidates (all 54 ids)",
-                                "<!-- ## GAP candidates (all 54 ids) -->", 1)
+            heading = "## GAP candidates (all " + str(
+                len(validator.COVERAGE_GAP_IDS)) + " ids)"
+            return text.replace(heading, "<!-- " + heading + " -->", 1)
         with mutated_coverage(Path(tmp), lambda payload: None,
                               comment_out_gap_ids) as rep:
             expect_error(rep, "summary GAP id set must equal",
@@ -2677,6 +2614,25 @@ def test_coverage_map_hidden_html_raw_text_blocks():
         )
 
 
+
+def test_coverage_map_codex_visible_text_findings():
+    """T32: pin both Codex visible-text bypass findings (4332227123/138)."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    fence = chr(96) * 3
+    # 4332227123: an unterminated HTML comment hides everything after it.
+    unterminated = "<!-- no closing marker\n" + phrase
+    assert phrase not in validator._coverage_rendered_markdown(unterminated), (
+        "Codex 4332227123: unterminated comment must hide trailing text"
+    )
+    # 4332227138: a fence line with trailing text is NOT a closing fence, so
+    # the phrase after it is still inside the fenced code block.
+    trailing_close = (fence + "\n" + fence + "python\n" + phrase + "\n"
+                      + fence)
+    assert phrase not in validator._coverage_rendered_markdown(trailing_close), (
+        "Codex 4332227138: fence line with trailing text must not close"
+    )
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -2705,8 +2661,6 @@ TESTS = [
     test_coverage_map_optionality_fence_hidden,
     test_coverage_map_nan_rejected,
     test_coverage_map_infinity_rejected,
-    test_coverage_map_triage_review_pending,
-    test_coverage_map_triage_rows_254_278,
     test_coverage_map_rendered_visibility_edges,
     test_coverage_map_exact_int_totals,
     test_coverage_map_unterminated_comment_hidden,
@@ -2714,6 +2668,7 @@ TESTS = [
     test_coverage_map_overflowing_float_rejected,
     test_coverage_map_fence_prefix_and_visible_pointer,
     test_coverage_map_hidden_html_raw_text_blocks,
+    test_coverage_map_codex_visible_text_findings,
     test_skill_end_to_end,
     test_section_order,
     test_agents_schema,
