@@ -2668,7 +2668,23 @@ def test_coverage_map_triage_rows_and_phrase():
     r278 = rows[278]
     assert (r278["status"], r278["evidence_grade"]) == (
         "COVERED", "catalog-decision")
-    assert r278["covering_skills"] == ["agent-authorization-matrix","agent-failure-recovery","agent-governance-audit","agent-instruction-consolidator","agent-memory-governance","agent-startup-context-gate","ai-closeout-reporter","ai-sdlc-operating-model","ai-task-decomposer","change-classification-gate","code-reviewer","docs-first-implementer","human-approval-boundary","local-ci-mirror-preflight","reviewable-diff-discipline","security-pr-reviewer","source-of-truth-reconciler","tdd-engineer"]
+    assert r278["covering_skills"] == [
+        "agent-authorization-matrix", "agent-failure-recovery",
+        "agent-governance-audit", "agent-instruction-consolidator",
+        "agent-memory-governance", "agent-startup-context-gate",
+        "ai-closeout-reporter", "ai-sdlc-operating-model",
+        "ai-task-decomposer", "change-classification-gate",
+        "code-reviewer", "docs-first-implementer",
+        "human-approval-boundary", "local-ci-mirror-preflight",
+        "reviewable-diff-discipline", "security-pr-reviewer",
+        "source-of-truth-reconciler", "tdd-engineer",
+    ]
+    rollback_rows = [entry for entry in rows.values()
+                     if "rollback-runbook-author" in entry["covering_skills"]
+                     and entry["id"] != 254]
+    assert rollback_rows, (
+        "rollback-runbook-author must remain covered by another row so "
+        "distinct covering stays 127")
     assert "Dropped as covered by ai-sdlc-operating-model" in (
         r278["rationale"] or "")
     phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
