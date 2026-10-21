@@ -2153,7 +2153,7 @@ def test_coverage_map_totals_mismatch():
     """Totals: a JSON totals field that disagrees with the entries is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["by_status"]["GAP"] = 54
+            payload["totals"]["by_status"]["GAP"] = 53
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.by_status",
                          "coverage map: JSON totals mismatch rejected")
@@ -2163,7 +2163,7 @@ def test_coverage_map_summary_totals_mismatch():
     """T9b: each seeded summary totals/per-area defect is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| GAP | 55 |", "| GAP | 54 |", 1)
+            return text.replace("| GAP | 54 |", "| GAP | 53 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'GAP'",
                          "coverage map: summary totals mismatch rejected")
@@ -2193,16 +2193,16 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| P0 / P1 / P2 gaps | 11 / 35 / 9 |",
-                                "| P0 / P1 / P2 gaps | 12 / 35 / 9 |", 1)
+            return text.replace("| P0 / P1 / P2 gaps | 11 / 34 / 9 |",
+                                "| P0 / P1 / P2 gaps | 12 / 34 / 9 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary gap-priority totals",
                          "coverage map: summary gap-priority totals mismatch "
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| Review pending | 160 |",
-                                "| Review pending | 161 |", 1)
+            return text.replace("| Review pending | 172 |",
+                                "| Review pending | 173 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'Review pending'",
                          "coverage map: summary review_pending mismatch "
@@ -2341,6 +2341,174 @@ def test_coverage_map_optionality_framing():
 
 
 
+
+# --- coverage-map hardening (Codex notes 2026-10-20: bool ids, basis
+# schema, visible-only optionality, non-finite JSON) ------------------------
+
+
+def test_coverage_map_bool_id_rejected():
+    """T16: JSON true/false is not an integer id (exact int required)."""
+    assert validator._coverage_is_exact_int(True) is False, (
+        "bool must not pass an exact-int check"
+    )
+    for bad in (True, False):
+        with tempfile.TemporaryDirectory() as tmp:
+            def mutate(payload, bad=bad):
+                coverage_entry(payload, 1)["id"] = bad
+            with mutated_coverage(Path(tmp), mutate) as rep:
+                expect_error(rep, "exact integer is required",
+                             f"coverage map: bool id {bad!r} rejected")
+
+
+def test_coverage_map_basis_missing_key():
+    """T17: every required basis key must be present."""
+    for key in ("repo_commit", "repo_date", "audit_artifacts", "source_files"):
+        with tempfile.TemporaryDirectory() as tmp:
+            def mutate(payload, key=key):
+                del payload["basis"][key]
+            with mutated_coverage(Path(tmp), mutate) as rep:
+                expect_error(rep, "basis is missing required key",
+                             f"coverage map: missing basis.{key} rejected")
+
+
+def test_coverage_map_basis_wrong_digest_or_junk():
+    """T18: wrong/missing nested basis values and junk digests are rejected."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_commit(payload):
+            payload["basis"]["repo_commit"] = "0" * 40
+        with mutated_coverage(Path(tmp), wrong_commit) as rep:
+            expect_error(rep, "basis.repo_commit must be the pinned",
+                         "coverage map: wrong basis.repo_commit rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_audit_digest(payload):
+            payload["basis"]["audit_artifacts"]["audit_report"]["sha256"] = (
+                "0" * 64)
+        with mutated_coverage(Path(tmp), wrong_audit_digest) as rep:
+            expect_error(rep, "basis.audit_artifacts.audit_report.sha256",
+                         "coverage map: wrong audit-artifact digest rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def junk_source_key(payload):
+            payload["basis"]["source_files"]["not-a-real-source"] = "f" * 64
+        with mutated_coverage(Path(tmp), junk_source_key) as rep:
+            expect_error(rep, "basis.source_files has unexpected key",
+                         "coverage map: junk source_files key rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def junk_basis_key(payload):
+            payload["basis"]["sha256"] = validator.COVERAGE_AUDIT_REPORT_SHA
+        with mutated_coverage(Path(tmp), junk_basis_key) as rep:
+            expect_error(rep, "basis has unexpected key",
+                         "coverage map: digest-only junk basis key rejected")
+
+
+def test_coverage_map_optionality_comment_hidden():
+    """T19: an optionality phrase hidden in an HTML comment does not count."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    assert validator._coverage_rendered_markdown("<!-- hidden -->\nvisible") \
+        == "visible", "HTML comments must be stripped from rendered text"
+    with tempfile.TemporaryDirectory() as tmp:
+        def hide_in_comment(text):
+            return text.replace(phrase, "<!-- " + phrase + " -->", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              hide_in_comment) as rep:
+            expect_error(rep, "missing the required optionality phrase",
+                         "coverage map: comment-hidden phrase rejected")
+
+
+def test_coverage_map_optionality_fence_hidden():
+    """T20: an optionality phrase hidden in a fenced code block does not count."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    fence = chr(96) * 3
+    hidden = fence + "\n" + phrase + "\n" + fence
+    assert phrase not in validator._coverage_rendered_markdown(hidden), (
+        "fenced code blocks must be stripped from rendered text"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        def hide_in_fence(text):
+            return text.replace(phrase, hidden, 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              hide_in_fence) as rep:
+            expect_error(rep, "missing the required optionality phrase",
+                         "coverage map: fence-hidden phrase rejected")
+
+
+def test_coverage_map_nan_rejected():
+    """T21: NaN in the JSON is rejected at load and never emitted canonically."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def mutate(payload):
+            coverage_entry(payload, 1)["notes"] = float("nan")
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            expect_error(rep, "non-finite JSON number",
+                         "coverage map: NaN rejected at load")
+    raised = False
+    try:
+        validator._coverage_canonical({"x": float("nan")})
+    except ValueError:
+        raised = True
+    assert raised, "canonical rendering must refuse to emit NaN"
+
+
+def test_coverage_map_infinity_rejected():
+    """T22: Infinity and -Infinity are rejected at load and on render."""
+    for bad in (float("inf"), float("-inf")):
+        with tempfile.TemporaryDirectory() as tmp:
+            def mutate(payload, bad=bad):
+                coverage_entry(payload, 1)["notes"] = bad
+            with mutated_coverage(Path(tmp), mutate) as rep:
+                expect_error(rep, "non-finite JSON number",
+                             f"coverage map: {bad!r} rejected at load")
+        raised = False
+        try:
+            validator._coverage_canonical({"x": bad})
+        except ValueError:
+            raised = True
+        assert raised, "canonical rendering must refuse to emit " + repr(bad)
+
+
+
+# --- coverage-map triage adoption (D107) ------------------------------------
+
+
+def test_coverage_map_triage_review_pending():
+    """T23: review_pending counts every non-explicit-id row (172 after triage)."""
+    assert validator.COVERAGE_TOTALS["review_pending"] == 172, (
+        "triage-adjusted review_pending constant must be 172"
+    )
+    expected = (validator.COVERAGE_TOTALS["by_grade"]["catalog-decision"]
+                + validator.COVERAGE_TOTALS["by_grade"]["capability-review"]
+                + validator.COVERAGE_TOTALS["by_grade"]["none"])
+    assert expected == 172, "review_pending must be derived from non-explicit-id grades"
+    with tempfile.TemporaryDirectory() as tmp:
+        def mutate(payload):
+            payload["totals"]["review_pending"] = 160
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            expect_error(rep, "totals.review_pending",
+                         "coverage map: old 160 review_pending rejected")
+
+
+def test_coverage_map_triage_rows_254_278():
+    """T24: rows #254/#278 are COVERED / catalog-decision; GAP set drops 278."""
+    payload = load_coverage()
+    r254 = coverage_entry(payload, 254)
+    assert (r254["status"], r254["evidence_grade"]) == ("COVERED", "catalog-decision"), (
+        "row #254 must be reconciled to COVERED / catalog-decision"
+    )
+    assert r254["covering_skills"] == ["data-migration-runbook-author"], (
+        "row #254 must cover data-migration-runbook-author only"
+    )
+    r278 = coverage_entry(payload, 278)
+    assert (r278["status"], r278["evidence_grade"]) == ("COVERED", "catalog-decision"), (
+        "row #278 must be reconciled to COVERED / catalog-decision"
+    )
+    assert r278["covering_skills"] == ["ai-sdlc-operating-model"], (
+        "row #278 must cover ai-sdlc-operating-model"
+    )
+    assert 278 not in validator.COVERAGE_GAP_IDS, "row 278 must leave the GAP id set"
+    assert len(validator.COVERAGE_GAP_IDS) == 54, "54 GAP ids after triage"
+    assert validator.COVERAGE_TOTALS["gap_by_priority"]["P1"] == 34, (
+        "P1 gap count must be 34 after triage"
+    )
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -2362,6 +2530,15 @@ TESTS = [
     test_coverage_map_summary_id_sets,
     test_coverage_map_anomaly_rules,
     test_coverage_map_optionality_framing,
+    test_coverage_map_bool_id_rejected,
+    test_coverage_map_basis_missing_key,
+    test_coverage_map_basis_wrong_digest_or_junk,
+    test_coverage_map_optionality_comment_hidden,
+    test_coverage_map_optionality_fence_hidden,
+    test_coverage_map_nan_rejected,
+    test_coverage_map_infinity_rejected,
+    test_coverage_map_triage_review_pending,
+    test_coverage_map_triage_rows_254_278,
     test_skill_end_to_end,
     test_section_order,
     test_agents_schema,

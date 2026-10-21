@@ -146,6 +146,49 @@ COVERAGE_AUDIT_CLASSIFICATION_SHA = (
 COVERAGE_AUDIT_REPORT_SHA = (
     "792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301"
 )
+# The basis block is a provenance record, not free-form metadata: it names
+# the exact audit snapshot and source-file digests the map was built from.
+# A digest that merely floats anywhere in the JSON is not provenance (Codex
+# notes 2026-10-20 and the hardening plan revision).
+COVERAGE_BASIS_REPO_DATE = "2026-10-20"
+COVERAGE_AUDIT_REPORT_PATH = (
+    "_A/skills-audit/SKILLS-COVERAGE-AUDIT-2026-10-20.md"
+)
+COVERAGE_AUDIT_CLASSIFICATION_PATH = (
+    "_A/skills-audit/final-classification.json"
+)
+COVERAGE_BASIS_KEYS = ("repo_commit", "repo_date", "audit_artifacts",
+                       "source_files")
+COVERAGE_AUDIT_ARTIFACT_KEYS = ("audit_report", "final_classification")
+COVERAGE_ARTIFACT_KEYS = ("path", "sha256")
+COVERAGE_AUDIT_ARTIFACTS = {
+    "audit_report": {
+        "path": COVERAGE_AUDIT_REPORT_PATH,
+        "sha256": COVERAGE_AUDIT_REPORT_SHA,
+    },
+    "final_classification": {
+        "path": COVERAGE_AUDIT_CLASSIFICATION_PATH,
+        "sha256": COVERAGE_AUDIT_CLASSIFICATION_SHA,
+    },
+}
+COVERAGE_SOURCE_FILES = {
+    ".github/workflows/validate-skills.yml":
+        "de38d87a65226d6afdce038793868a6e57281eb1911631f045e4edc4a8cced3a",
+    "docs/300-repeatable-software-saas-skills-roadmap.md":
+        "fe3e9d13877eb43d17032b25f4e35948699dbfe327f0dce6f6b204aa24c25ead",
+    "docs/skills-catalog.md":
+        "d8d523d41d3bfb2bfefa857f7f11e6b1e773f2c1922f88bf352c250f2986b116",
+    "scripts/tests/test_validator.py":
+        "5fc7319d1f9037dcd3b9d522eb974a27deddd1b098ad2a3ab9457b966060de7b",
+    "scripts/validate-skills.py":
+        "8dc42350b4bd4b3c1ae69ecb98b52183e1e17053e3779061764c12e86ac7c809",
+    "tools/skills-manifest.json":
+        "9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832",
+}
+COVERAGE_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+COVERAGE_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
+COVERAGE_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+COVERAGE_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 COVERAGE_AREA_RANGES = {
     "01": (1, 55), "02": (56, 90), "03": (91, 130), "04": (131, 160),
     "05": (161, 180), "06": (181, 235), "07": (236, 260), "08": (261, 280),
@@ -161,25 +204,29 @@ COVERAGE_GRADE_BY_STATUS = {
     "GAP": ("none",),
 }
 COVERAGE_PRIORITIES = ("P0", "P1", "P2")
+# D107 (2026-10-20): the triage decision adopted by the Lead under the
+# owner's standing pre-approval (owner may override) reconciles rows #254 and
+# #278 to COVERED / catalog-decision and defines review_pending as every
+# non-explicit-id row (catalog-decision + capability-review + none).
 COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 128, "COVERED": 54, "PARTIAL": 63, "GAP": 55},
-    "by_grade": {"explicit-id": 128, "catalog-decision": 14,
-                 "capability-review": 103, "none": 55},
+    "by_status": {"SHIPPED": 128, "COVERED": 56, "PARTIAL": 62, "GAP": 54},
+    "by_grade": {"explicit-id": 128, "catalog-decision": 16,
+                 "capability-review": 102, "none": 54},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 11, "P1": 35, "P2": 9},
+    "gap_by_priority": {"P0": 11, "P1": 34, "P2": 9},
     "manifest_skills": 207,
     "distinct_covering_skills": 124,
     "beyond_roadmap_skills": 83,
-    "review_pending": 160,
+    "review_pending": 172,
 }
 COVERAGE_GAP_IDS = (
     6, 7, 8, 14, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 39, 43, 44, 46, 47,
     49, 50, 54, 61, 67, 76, 80, 83, 86, 87, 110, 120, 125, 127, 135, 146, 151,
     155, 156, 158, 161, 162, 163, 164, 167, 168, 169, 176, 188, 224, 225, 231,
-    233, 234, 236, 278,
+    233, 234, 236,
 )
 COVERAGE_P0_GAP_IDS = (6, 7, 8, 49, 125, 127, 155, 161, 162, 164, 188)
 COVERAGE_ANOMALY_SKILLS = {
@@ -1747,7 +1794,7 @@ def _coverage_manifest_names() -> set[str] | None:
 
 def _coverage_canonical(payload: dict) -> str:
     return json.dumps(payload, indent=2, sort_keys=True,
-                      ensure_ascii=False) + "\n"
+                      ensure_ascii=False, allow_nan=False) + "\n"
 
 
 def _coverage_phrase_present(text: str, phrase: str) -> bool:
@@ -1790,6 +1837,113 @@ def _coverage_summary_ids(text: str, heading: str,
     return {int(token) for token in re.findall(r"\d+", section)}
 
 
+def _coverage_is_exact_int(value) -> bool:
+    """True only for a real int: JSON true/false are bool, not ids/counts."""
+    return type(value) is int
+
+
+def _coverage_reject_json_constant(name: str):
+    """json.loads parse_constant hook: non-finite numbers are not JSON."""
+    raise ValueError("non-finite JSON number '" + name + "' is not permitted")
+
+
+def _coverage_rendered_markdown(text: str) -> str:
+    """Return the visible summary text only.
+
+    Optionality phrases must be READER-VISIBLE. HTML comments and fenced code
+    blocks are not rendered by GitHub, so a phrase hidden there must not count.
+    Inline code, emphasis and normal prose are rendered and are kept unchanged.
+    """
+    visible = COVERAGE_HTML_COMMENT_RE.sub("", text)
+    out: list[str] = []
+    fence = None  # (fence_char, fence_length) while inside a fenced block
+    for line in visible.splitlines():
+        match = re.match(r"^ {0,3}(\x60{3,}|~{3,})", line)
+        if fence is None:
+            if match:
+                marker = match.group(1)
+                fence = (marker[0], len(marker))
+                continue
+            out.append(line)
+        else:
+            if match:
+                marker = match.group(1)
+                if marker[0] == fence[0] and len(marker) >= fence[1]:
+                    fence = None
+            # every line inside the fence is non-rendered
+    return "\n".join(out).strip()
+
+
+def _coverage_check_basis(rep: Report, ctx: str, basis) -> None:
+    """HARD: the basis block must be the exact pinned audit provenance record."""
+    if not isinstance(basis, dict):
+        rep.error("[" + ctx + "] basis must be an object")
+        return
+    for key in COVERAGE_BASIS_KEYS:
+        if key not in basis:
+            rep.error("[" + ctx + "] basis is missing required key '" + key + "'")
+    for key in sorted(set(basis) - set(COVERAGE_BASIS_KEYS)):
+        rep.error("[" + ctx + "] basis has unexpected key '" + key + "'")
+    commit = basis.get("repo_commit")
+    if not isinstance(commit, str) or not COVERAGE_COMMIT_RE.match(commit) \
+            or commit != COVERAGE_BASIS_COMMIT:
+        rep.error("[" + ctx + "] basis.repo_commit must be the pinned 40-hex "
+                  "audit commit " + COVERAGE_BASIS_COMMIT)
+    date = basis.get("repo_date")
+    if not isinstance(date, str) or not COVERAGE_DATE_RE.match(date) \
+            or date != COVERAGE_BASIS_REPO_DATE:
+        rep.error("[" + ctx + "] basis.repo_date must be the pinned audit date "
+                  + COVERAGE_BASIS_REPO_DATE)
+    artifacts = basis.get("audit_artifacts")
+    if not isinstance(artifacts, dict):
+        rep.error("[" + ctx + "] basis.audit_artifacts must be an object")
+    else:
+        for name in COVERAGE_AUDIT_ARTIFACT_KEYS:
+            if name not in artifacts:
+                rep.error("[" + ctx + "] basis.audit_artifacts is missing "
+                          "required key '" + name + "'")
+        for name in sorted(set(artifacts) - set(COVERAGE_AUDIT_ARTIFACT_KEYS)):
+            rep.error("[" + ctx + "] basis.audit_artifacts has unexpected key '"
+                      + name + "'")
+        for name, expected in COVERAGE_AUDIT_ARTIFACTS.items():
+            artifact = artifacts.get(name)
+            label = "basis.audit_artifacts." + name
+            if not isinstance(artifact, dict):
+                rep.error("[" + ctx + "] " + label + " must be an object")
+                continue
+            for key in COVERAGE_ARTIFACT_KEYS:
+                if key not in artifact:
+                    rep.error("[" + ctx + "] " + label + " is missing required "
+                              "key '" + key + "'")
+            for key in sorted(set(artifact) - set(COVERAGE_ARTIFACT_KEYS)):
+                rep.error("[" + ctx + "] " + label + " has unexpected key '"
+                          + key + "'")
+            if artifact.get("path") != expected["path"]:
+                rep.error("[" + ctx + "] " + label + ".path must be '"
+                          + expected["path"] + "'")
+            digest = artifact.get("sha256")
+            if not isinstance(digest, str) or not COVERAGE_SHA256_RE.match(digest) \
+                    or digest != expected["sha256"]:
+                rep.error("[" + ctx + "] " + label + ".sha256 must be the "
+                          "pinned digest " + expected["sha256"])
+    sources = basis.get("source_files")
+    if not isinstance(sources, dict):
+        rep.error("[" + ctx + "] basis.source_files must be an object")
+    else:
+        for key in COVERAGE_SOURCE_FILES:
+            if key not in sources:
+                rep.error("[" + ctx + "] basis.source_files is missing required "
+                          "key '" + key + "'")
+        for key in sorted(set(sources) - set(COVERAGE_SOURCE_FILES)):
+            rep.error("[" + ctx + "] basis.source_files has unexpected key '"
+                      + key + "'")
+        for key, expected in COVERAGE_SOURCE_FILES.items():
+            digest = sources.get(key)
+            if not isinstance(digest, str) or not COVERAGE_SHA256_RE.match(digest) \
+                    or digest != expected:
+                rep.error("[" + ctx + "] basis.source_files['" + key
+                          + "'] must be the pinned digest " + expected)
+
 COVERAGE_AREA_ROW_RE = re.compile(
     r"^\| *(\d{2})(?: [^|]*?)? *\| *(\d+) *\| *(\d+) *\| *(\d+) *\|"
     r" *(\d+) *\| *(\d+) *\|$")
@@ -1815,9 +1969,9 @@ def check_coverage_map(rep: Report) -> None:
     docs/skills tables; status/grade enums and pairing; covering skills in the
     manifest; non-GAP rows need >=1 skill and evidence; GAP rows need a
     rationale and no skills/evidence; the #186/#299 anomaly sets; totals
-    recomputed (incl. by_grade and review_pending = PARTIAL + GAP +
-    COVERED(capability-review) + 2 anomalies); manifest union (124 distinct
-    covering / 81 beyond / 205); the summary's totals and GAP/P0 id sets equal
+    recomputed (incl. by_grade and review_pending = every non-explicit-id
+    row: catalog-decision + capability-review + none); manifest union (124 distinct
+    covering / 83 beyond / 207); the summary's totals and GAP/P0 id sets equal
     the JSON; required optionality phrases; canonical deterministic JSON.
     """
     ctx = _rel(COVERAGE_MAP)
@@ -1842,8 +1996,9 @@ def check_coverage_map(rep: Report) -> None:
                       + " has trailing whitespace")
             break
     try:
-        payload = json.loads(text)
-    except json.JSONDecodeError as exc:
+        payload = json.loads(text,
+                             parse_constant=_coverage_reject_json_constant)
+    except ValueError as exc:  # JSONDecodeError and the non-finite hook
         rep.error("[" + ctx + "] is not valid JSON: " + str(exc))
         return
     if not isinstance(payload, dict):
@@ -1855,9 +2010,11 @@ def check_coverage_map(rep: Report) -> None:
                       + key + "'")
     for key in sorted(set(payload) - set(COVERAGE_TOP_KEYS)):
         rep.error("[" + ctx + "] unexpected top-level key '" + key + "'")
-    if payload.get("schema_version") != COVERAGE_SCHEMA_VERSION:
-        rep.error("[" + ctx + "] schema_version must be "
-                  + str(COVERAGE_SCHEMA_VERSION))
+    schema_version = payload.get("schema_version")
+    if not _coverage_is_exact_int(schema_version) \
+            or schema_version != COVERAGE_SCHEMA_VERSION:
+        rep.error("[" + ctx + "] schema_version must be the exact integer "
+                  + str(COVERAGE_SCHEMA_VERSION) + " (booleans are rejected)")
     scope = payload.get("scope_note")
     if not isinstance(scope, str) or not scope.strip():
         rep.error("[" + ctx + "] missing the required non-empty scope_note "
@@ -1867,7 +2024,13 @@ def check_coverage_map(rep: Report) -> None:
             if not _coverage_phrase_present(scope, phrase):
                 rep.error("[" + ctx + "] scope_note is missing the required "
                           "optionality phrase: '" + phrase + "'")
-    if text != _coverage_canonical(payload):
+    try:
+        canonical = _coverage_canonical(payload)
+    except (TypeError, ValueError) as exc:
+        rep.error("[" + ctx + "] cannot be rendered canonically (non-finite "
+                  "number present): " + str(exc))
+        canonical = None
+    if canonical is not None and text != canonical:
         rep.error("[" + ctx + "] is not in canonical deterministic form "
                   "(sorted keys, indent=2, LF-only, single trailing LF)")
     docs = _coverage_docs_rows()
@@ -1897,9 +2060,10 @@ def check_coverage_map(rep: Report) -> None:
                       + "] must be a JSON object")
             continue
         row_id = entry.get("id")
-        if not isinstance(row_id, int):
+        if not _coverage_is_exact_int(row_id):
             rep.error("[" + ctx + "] entry[" + str(index) + "] has a "
-                      "non-integer id")
+                      "non-integer id (an exact integer is required; "
+                      "booleans are rejected)")
             continue
         entry_ctx = "[" + ctx + "] entry " + str(row_id) + ": "
         for key in COVERAGE_ENTRY_KEYS:
@@ -2048,14 +2212,9 @@ def check_coverage_map(rep: Report) -> None:
         "distinct_covering_skills": len(covering_union),
         "beyond_roadmap_skills": (len(manifest - covering_union)
                                   if manifest is not None else 0),
-        "review_pending": (by_status.get("PARTIAL", 0)
-                           + by_status.get("GAP", 0)
-                           + sum(1 for entry in entries
-                                 if isinstance(entry, dict)
-                                 and entry.get("status") == "COVERED"
-                                 and entry.get("evidence_grade")
-                                 == "capability-review")
-                           + len(COVERAGE_ANOMALY_SKILLS)),
+        "review_pending": (by_grade.get("catalog-decision", 0)
+                           + by_grade.get("capability-review", 0)
+                           + by_grade.get("none", 0)),
     }
     for key in sorted(COVERAGE_TOTALS):
         if totals.get(key) != computed[key]:
@@ -2089,20 +2248,7 @@ def check_coverage_map(rep: Report) -> None:
                        and entry.get("priority") == "P0")
     if p0_gap_ids != COVERAGE_P0_GAP_IDS:
         rep.error("[" + ctx + "] P0 GAP ids differ from the pinned audit set")
-    basis = payload.get("basis")
-    if not isinstance(basis, dict):
-        rep.error("[" + ctx + "] basis must be an object")
-    else:
-        if basis.get("repo_commit") != COVERAGE_BASIS_COMMIT:
-            rep.error("[" + ctx + "] basis.repo_commit must be "
-                      + COVERAGE_BASIS_COMMIT)
-        basis_text = json.dumps(basis, sort_keys=True)
-        for needle, label in (
-                (COVERAGE_AUDIT_CLASSIFICATION_SHA,
-                 "final-classification.json sha256"),
-                (COVERAGE_AUDIT_REPORT_SHA, "audit report sha256")):
-            if needle not in basis_text:
-                rep.error("[" + ctx + "] basis must record the " + label)
+    _coverage_check_basis(rep, ctx, payload.get("basis"))
     md_ctx = _rel(COVERAGE_MAP_MD)
     if not COVERAGE_MAP_MD.is_file():
         rep.error("[" + md_ctx + "] missing the human coverage-map summary "
@@ -2112,10 +2258,11 @@ def check_coverage_map(rep: Report) -> None:
     if "coverage-map.json" not in summary:
         rep.error("[" + md_ctx + "] must point at the authoritative "
                   "coverage-map.json")
+    summary_visible = _coverage_rendered_markdown(summary)
     for phrase in COVERAGE_REQUIRED_PHRASES:
-        if not _coverage_phrase_present(summary, phrase):
+        if not _coverage_phrase_present(summary_visible, phrase):
             rep.error("[" + md_ctx + "] missing the required optionality "
-                      "phrase: '" + phrase + "'")
+                      "phrase (visible rendered text only): '" + phrase + "'")
     summary_totals = _coverage_summary_totals(summary)
     expected_rows = {
         "Entries": computed["entries"],
