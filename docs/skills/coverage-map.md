@@ -13,7 +13,8 @@ The shipped library deliberately exceeds and interleaves with the roadmap: 80 of
 The map records status only. It is a maintained assertion, not ground
 truth, a completion target or a build authorization. Rows graded
 capability-review, catalog-decision or none are flagged for planning-gate
-review; nothing here silently asserts a classification.
+review unless they carry a recorded planning-gate decision (rows #254/#278,
+D107); `review_pending` counts the remaining non-explicit-id rows (170).
 
 ## Basis
 

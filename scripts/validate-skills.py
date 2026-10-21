@@ -2033,8 +2033,9 @@ def check_coverage_map(rep: Report) -> None:
     manifest; non-GAP rows need >=1 skill and evidence; GAP rows need a
     rationale and no skills/evidence; the #186/#299 anomaly sets; totals
     recomputed (incl. by_grade and review_pending = every non-explicit-id
-    row minus the planning-gate-resolved rows #254/#278); manifest union (127
-    distinct covering / 80 beyond / 207); the summary's totals and GAP/P0 id sets equal
+    row minus the planning-gate-resolved rows #254/#278); manifest union
+    (127 distinct covering / 80 beyond / 207); the summary's totals and
+    GAP/P0 id sets equal
     the JSON; required optionality phrases; canonical deterministic JSON.
     """
     ctx = _rel(COVERAGE_MAP)
@@ -2265,6 +2266,11 @@ def check_coverage_map(rep: Report) -> None:
     if not isinstance(totals, dict):
         rep.error("[" + ctx + "] totals must be an object")
         totals = {}
+    # Rows #186/#299 are catalog-decision (non-explicit) rows and are
+    # therefore included in the planning-gate review_pending count below.
+    non_explicit_entries = [entry for entry in entries
+                            if isinstance(entry, dict)
+                            and entry.get("evidence_grade") != "explicit-id"]
     computed = {
         "entries": len(entries),
         "by_area": {key: by_area[key] for key in sorted(by_area)},
@@ -2278,13 +2284,9 @@ def check_coverage_map(rep: Report) -> None:
         "beyond_roadmap_skills": (len(manifest - covering_union)
                                   if manifest is not None else 0),
         "review_pending": (
-            sum(1 for entry in entries
-                if isinstance(entry, dict)
-                and entry.get("evidence_grade") != "explicit-id")
-            - len({entry["id"] for entry in entries
-                   if isinstance(entry, dict)
-                   and entry.get("evidence_grade") != "explicit-id"
-                   and entry.get("id") in COVERAGE_PLANNING_GATE_RESOLVED})),
+            len(non_explicit_entries)
+            - len({entry["id"] for entry in non_explicit_entries
+                   if entry["id"] in COVERAGE_PLANNING_GATE_RESOLVED})),
     }
     _coverage_require_exact_ints(rep, ctx, totals, "")
     for key in sorted(COVERAGE_TOTALS):

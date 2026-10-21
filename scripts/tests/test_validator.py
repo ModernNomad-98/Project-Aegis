@@ -2633,7 +2633,6 @@ def test_coverage_map_codex_visible_text_findings():
     )
 
 
-
 def test_coverage_map_planning_gate_resolved():
     """T32: rows #254/#278 are planning-gate resolved; review_pending is 170."""
     assert validator.COVERAGE_PLANNING_GATE_RESOLVED == frozenset({254, 278})
@@ -2685,10 +2684,13 @@ def test_coverage_map_triage_rows_and_phrase():
     assert rollback_rows, (
         "rollback-runbook-author must remain covered by another row so "
         "distinct covering stays 127")
+    assert all(entry["status"] != "GAP" for entry in rollback_rows), (
+        "the surviving rollback coverage rows must be non-GAP")
     assert "Dropped as covered by ai-sdlc-operating-model" in (
         r278["rationale"] or "")
-    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
-    assert "80 of 207" in phrase
+    phrase = [item for item in validator.COVERAGE_REQUIRED_PHRASES
+              if "80 of 207" in item]
+    assert phrase, "an optionality phrase must carry 80 of 207"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     assert "80 of 207" in mmd and "83 of 207" not in mmd
 
