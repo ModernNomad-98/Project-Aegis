@@ -71,6 +71,7 @@ Return, in this order:
 
 - The request is greenfield system design: route to architecture-designer.
 - The request is an ordinary diff review: route to code-reviewer.
+- The request is feature coupling / import-cycle policy: route to dependency-direction-guard.
 - The request is whole-system style selection: route to architecture-advisor.
 - The caller wants code edited: return the minimal change plan and delegate implementation.
 - The tree cannot be inspected: state UNKNOWN and ask for evidence instead of inventing a layer map.

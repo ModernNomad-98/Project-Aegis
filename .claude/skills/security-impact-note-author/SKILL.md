@@ -72,6 +72,9 @@ Return, in this order:
 - The request is reviewing a security diff: route to security-pr-reviewer.
 - The request is threat modeling: route to threat-modeler.
 - The request is governance/process audit: route to agent-governance-audit.
+- The request is human approval/sign-off authority: route to human-approval-boundary.
+- The request is change classification: route to change-classification-gate.
+- Never reproduce secrets, tokens or PII in the note; use classification labels and compose with sensitive-disclosure-guard.
 - The caller asks this skill to approve the change: refuse and record that approval needs the recorded sign-off.
 - Impact cannot be classified from available evidence: state assumptions and required facts or UNRUN.
 

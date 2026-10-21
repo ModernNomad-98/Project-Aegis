@@ -71,6 +71,8 @@ Return, in this order:
 
 - The request is reviewing the security diff: route to security-pr-reviewer.
 - The request is curating an existing suite: route to regression-suite-curator.
+- The request is multi-tenant isolation testing: route to multi-tenant-security-tester.
+- The request is browser E2E: route to playwright-e2e-engineer.
 - The request is writing the implementation: route to tdd-engineer/appsec-implementer.
 - The fix or vulnerable path is unknown: ask for it instead of inventing a harness.
 - The caller wants CI weakened to pass: refuse and record the risk.

@@ -1,6 +1,6 @@
 ---
 name: production-safe-smoke-tester
-description: 'Use when checking a deployed system safely: design read-only or reversible smoke checks that avoid test-only endpoints, unsafe records and destructive side effects while allowing seeded fixtures on real production routes, and state exactly what is not exercised. Design/advisory only; execution is delegated to the host/user under production authority.'
+description: 'Use when checking a deployed system safely: design read-only or reversible smoke checks that avoid test-only endpoints, unsafe records and destructive side effects while allowing only pre-seeded isolated or disposable-tenant fixtures with no real customer data, and state exactly what is not exercised. Design/advisory only; execution is delegated to the host/user under production authority.'
 ---
 
 # Production Safe Smoke Tester
@@ -32,8 +32,8 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 
 ## Workflow
 
-1. Enumerate candidate checks and classify each as read-only, reversible, seeded-fixture-only, or unsafe/forbidden.
-2. Choose the smallest safe set that proves the deploy; prefer GET/health/version/read-only queries.
+1. Enumerate candidate checks and classify each as read-only, reversible, seeded-fixture-only, or unsafe/forbidden. Seeded-fixture-only means pre-seeded isolated or disposable tenants with no real customer data, explicit authority, cleanup and rollback; the default is read-only.
+2. Choose the smallest safe set that proves the deploy; prefer GET/health/version/read-only queries. Any write is a production transaction, never a smoke convenience.
 3. For each check define the probe, expected observable, evidence to record and stop condition.
 4. State permissions and production authority explicitly; never smuggle write operations into a smoke plan.
 5. Record what is not exercised (auth flows, payments, mutations, jobs) and the risk of that gap.
@@ -73,7 +73,7 @@ Return, in this order:
 - The request is writing E2E tests: route to playwright-e2e-engineer.
 - The request is a manual test case: route to manual-test-case-creator.
 - The caller asks this skill to execute production probes: refuse; return the plan for the authorized host/user.
-- Any probe would mutate irreversible data: stop and propose a read-only alternative or a seeded fixture under authority.
+- Any probe would mutate data: treat it as a production transaction. Permit only pre-seeded isolated/disposable-tenant fixtures (no real customer data) with explicit production authority, cleanup and rollback; otherwise stop and propose a read-only alternative.
 
 ## Supporting Files
 

@@ -1177,7 +1177,8 @@ Phase 4 — security, RLS & supply-chain pack:
 | `security-impact-note-author` | Authors a reviewable security impact note: assets/impact, threats, mitigations, tests, rollback, approvals and residual risk, separating verified from assumed; authoring-only. | auto + manual |
 
 Phase 5 — QA, E2E, manual QA & evidence pack (13 canonical + 3 pulled forward from the
-QA backlog, roadmap #184/#185/#204, plus QA Tier 1 builds under D68):
+QA backlog, roadmap #184/#185/#204, plus QA Tier 1 builds under D68 and the Batch 1
+production-safe smoke delivery #188):
 
 | Skill | What it does | Invocation |
 |---|---|---|

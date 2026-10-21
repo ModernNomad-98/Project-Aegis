@@ -291,7 +291,7 @@
     {
       "name": "concurrency-race-reviewer",
       "path": ".claude/skills/concurrency-race-reviewer/SKILL.md",
-      "sha256": "5155506fbcad4b1e9a25765e30fefeb7b802a4247f94adeb68785f5a042a4275"
+      "sha256": "3dae820b5dfd209508a94c7374e470b272f749f7d8debe7ecc54f9c99197398e"
     },
     {
       "name": "context-co-update-ci-gate",
@@ -316,7 +316,7 @@
     {
       "name": "data-flow-diagrammer",
       "path": ".claude/skills/data-flow-diagrammer/SKILL.md",
-      "sha256": "bf85150a5f2b155890ea5a08cb9abc61bae3a90cc91b09e55575a4e97034ce19"
+      "sha256": "5d3c4e23b492b88297196da335e63bc4b77ddc582e30c7a49e00166721118b50"
     },
     {
       "name": "data-migration-runbook-author",
@@ -531,7 +531,7 @@
     {
       "name": "layered-architecture-enforcer",
       "path": ".claude/skills/layered-architecture-enforcer/SKILL.md",
-      "sha256": "af5afe96e8d80d1480d0fa2cfa31b1502252a40a725ad83fe86d8dfe061064a3"
+      "sha256": "cffbe292197d670c6df6677f86ddbd76f241d598558858a94eedcd5283f8b90d"
     },
     {
       "name": "library-diff-reviewer",
@@ -696,7 +696,7 @@
     {
       "name": "production-safe-smoke-tester",
       "path": ".claude/skills/production-safe-smoke-tester/SKILL.md",
-      "sha256": "b0cc55601f58269e96969b082b74f44313f006aa765fcc190159fd15f57054b6"
+      "sha256": "1d7580215aada396f4a449222bb9b9f5beb800448ea49c7dac098d92c6ae68e1"
     },
     {
       "name": "profiling-methodology-designer",
@@ -856,7 +856,7 @@
     {
       "name": "security-impact-note-author",
       "path": ".claude/skills/security-impact-note-author/SKILL.md",
-      "sha256": "7aed35380808d3973a9345f2de4e10084fd7874c208c76d810717241b82813dd"
+      "sha256": "c55136e260aa067801cad36f803a43d90178bad82047a1ed8974af28ec389f3a"
     },
     {
       "name": "security-logging-alerting-architect",
@@ -871,7 +871,7 @@
     {
       "name": "security-regression-harness-designer",
       "path": ".claude/skills/security-regression-harness-designer/SKILL.md",
-      "sha256": "b0522b2506bde15705d872a4b0ffd9762b5f01c6d15c256955aed4e866cf79b3"
+      "sha256": "f55d70ccc32ca7d0c462c04356d2ea9d9f97d8313172c3907b8340091edb6823"
     },
     {
       "name": "security-scan-orchestrator",

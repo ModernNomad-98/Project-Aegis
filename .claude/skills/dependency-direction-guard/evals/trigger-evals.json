@@ -56,7 +56,7 @@
     },
     {
       "id": "dependency-direction-guard-positive-5",
-      "prompt": "Build a dependency direction policy for these packages and a CI check that enforces it.",
+      "prompt": "Design a dependency direction policy for these packages and specify the CI check that enforces it.",
       "expected_skill": "dependency-direction-guard",
       "should_not_trigger": [
         "domain-modeler"

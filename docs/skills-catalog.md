@@ -411,8 +411,8 @@ design (`domain-modeler`, `architecture-designer`, `adr-writer`), implementation
 (`docs-first-implementer`, `tdd-engineer`, `systematic-debugger`), and review/audit
 (`code-reviewer`, `code-simplifier`, `principal-code-analyst`, `full-codebase-auditor`).
 The Batch 1 Phase 2 additions (`layered-architecture-enforcer`,
-`dependency-direction-guard`, `interface-first-designer`, `data-flow-diagrammer`)
-also ship standalone 22-case trigger-eval files.
+`dependency-direction-guard`, `interface-first-designer`, `data-flow-diagrammer`,
+`concurrency-race-reviewer`) also ship standalone 22-case trigger-eval files.
 
 A fourth cluster was added by D77 (2026-10-10): **boundary & telemetry design**
 (`validation-boundary-designer`, `observability-by-design`) — with cross-phase
@@ -597,7 +597,8 @@ and **unit/build/flake/data** (`vite-build-qa-engineer`, `flaky-test-detective`,
 `test-data-architect`, `regression-suite-curator`) — with cross-phase discrimination
 against the shipped `code-reviewer`, `full-codebase-auditor`, `api-event-architect`,
 `multi-tenant-security-tester`, `tdd-engineer`, `systematic-debugger`,
-`secrets-identity-hardener`, and `ai-closeout-reporter`.
+`secrets-identity-hardener`, and `ai-closeout-reporter`. The Batch 1 Phase 5 addition
+(`production-safe-smoke-tester`) also ships a standalone 22-case trigger-eval file.
 
 A fifth cluster was added by D75 (2026-10-09): **visual/exploratory/mobile QA
 design** (`visual-regression-test-designer`, `exploratory-charter-designer`,
