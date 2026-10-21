@@ -1,0 +1,220 @@
+{
+  "skill": "pwa-boundary-reviewer",
+  "description": "Trigger discrimination for pwa-boundary-reviewer against the nearest shipped owners.",
+  "overlaps_with": [
+    "offline-first-sync-architect",
+    "notification-webhook-ux-designer",
+    "security-pr-reviewer",
+    "observability-by-design",
+    "caching-strategy-designer",
+    "frontend-perf-engineer",
+    "mobile-viewport-craft",
+    "accessibility-test-harness",
+    "edge-state-ux-designer",
+    "error-taxonomy-designer",
+    "vite-build-qa-engineer",
+    "synthetic-monitoring-architect",
+    "slo-reliability-architect",
+    "incident-response-runbook"
+  ],
+  "cases": [
+    {
+      "id": "pwa-boundary-reviewer-positive-1",
+      "prompt": "Review this PWA design: service-worker scope, cache strategy, update flow and offline fallback.",
+      "expected_skill": "pwa-boundary-reviewer",
+      "should_not_trigger": [
+        "offline-first-sync-architect"
+      ],
+      "reason": "The request needs pwa-boundary-reviewer's design method; offline-first-sync-architect owns a different task."
+    },
+    {
+      "id": "pwa-boundary-reviewer-positive-2",
+      "prompt": "Our service worker caches API responses - review the cached-data security and staleness risks.",
+      "expected_skill": "pwa-boundary-reviewer",
+      "should_not_trigger": [
+        "notification-webhook-ux-designer"
+      ],
+      "reason": "The request needs pwa-boundary-reviewer's design method; notification-webhook-ux-designer owns a different task."
+    },
+    {
+      "id": "pwa-boundary-reviewer-positive-3",
+      "prompt": "Review the update/activation flow for waiting workers and reload behavior.",
+      "expected_skill": "pwa-boundary-reviewer",
+      "should_not_trigger": [
+        "security-pr-reviewer"
+      ],
+      "reason": "The request needs pwa-boundary-reviewer's design method; security-pr-reviewer owns a different task."
+    },
+    {
+      "id": "pwa-boundary-reviewer-positive-4",
+      "prompt": "Review the offline fallback UX and how stale data is labeled.",
+      "expected_skill": "pwa-boundary-reviewer",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs pwa-boundary-reviewer's design method; observability-by-design owns a different task."
+    },
+    {
+      "id": "pwa-boundary-reviewer-positive-5",
+      "prompt": "Review the install-prompt and push-notification boundaries.",
+      "expected_skill": "pwa-boundary-reviewer",
+      "should_not_trigger": [
+        "caching-strategy-designer"
+      ],
+      "reason": "The request needs pwa-boundary-reviewer's design method; caching-strategy-designer owns a different task."
+    },
+    {
+      "id": "pwa-boundary-reviewer-positive-6",
+      "prompt": "Review service-worker registration and production-only gating before this release.",
+      "expected_skill": "pwa-boundary-reviewer",
+      "should_not_trigger": [
+        "frontend-perf-engineer"
+      ],
+      "reason": "The request needs pwa-boundary-reviewer's design method; frontend-perf-engineer owns a different task."
+    },
+    {
+      "id": "pwa-boundary-reviewer-positive-7",
+      "prompt": "Review the per-asset-class cache strategy for this app.",
+      "expected_skill": "pwa-boundary-reviewer",
+      "should_not_trigger": [
+        "mobile-viewport-craft"
+      ],
+      "reason": "The request needs pwa-boundary-reviewer's design method; mobile-viewport-craft owns a different task."
+    },
+    {
+      "id": "pwa-boundary-reviewer-positive-8",
+      "prompt": "Produce a PWA boundary review with ranked risks and a checklist.",
+      "expected_skill": "pwa-boundary-reviewer",
+      "should_not_trigger": [
+        "accessibility-test-harness"
+      ],
+      "reason": "The request needs pwa-boundary-reviewer's design method; accessibility-test-harness owns a different task."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-1",
+      "prompt": "Design the offline-first sync model: local persistence, conflict resolution and queue replay for the mobile app.",
+      "expected_skill": "offline-first-sync-architect",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is offline-first-sync-architect's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-2",
+      "prompt": "Design the notification and webhook UX: channels, templates, retry policy and user controls.",
+      "expected_skill": "notification-webhook-ux-designer",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is notification-webhook-ux-designer's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-3",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets, SSRF and control weakening.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is security-pr-reviewer's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-4",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-5",
+      "prompt": "Design the caching strategy: what to cache, keys, invalidation and stampede protection.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-6",
+      "prompt": "Improve this page's frontend performance: bundle size, rendering and Core Web Vitals.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-7",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is mobile-viewport-craft's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-8",
+      "prompt": "Design the WCAG-pinned accessibility harness: automated scans plus manual keyboard and screen-reader checks.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is accessibility-test-harness's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-9",
+      "prompt": "Design the empty, loading and error states for this dashboard view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is edge-state-ux-designer's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-10",
+      "prompt": "Design the error taxonomy and client envelope: stable machine codes, retryable split and actionable messages.",
+      "expected_skill": "error-taxonomy-designer",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is error-taxonomy-designer's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-11",
+      "prompt": "QA this Vite build: dist-level env classification, build/preview parity and bundle budgets.",
+      "expected_skill": "vite-build-qa-engineer",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is vite-build-qa-engineer's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-12",
+      "prompt": "Design synthetic monitoring and alerting for this user journey.",
+      "expected_skill": "synthetic-monitoring-architect",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is synthetic-monitoring-architect's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-13",
+      "prompt": "Design the SLIs, SLOs and burn-rate alerting for this service.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is slo-reliability-architect's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "pwa-boundary-reviewer-negative-14",
+      "prompt": "Write the incident-response runbook for this service: severities, escalation, communications and postmortem.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "pwa-boundary-reviewer"
+      ],
+      "reason": "This request is incident-response-runbook's deliverable end-to-end; pwa-boundary-reviewer owns a different design task and must not take it over."
+    }
+  ]
+}

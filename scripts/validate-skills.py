@@ -215,26 +215,27 @@ COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 143, "COVERED": 56, "PARTIAL": 62, "GAP": 39},
-    "by_grade": {"explicit-id": 143, "catalog-decision": 16,
-                 "capability-review": 102, "none": 39},
+    "by_status": {"SHIPPED": 151, "COVERED": 56, "PARTIAL": 62, "GAP": 31},
+    "by_grade": {"explicit-id": 151, "catalog-decision": 16,
+                 "capability-review": 102, "none": 31},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 3, "P1": 29, "P2": 7},
-    "manifest_skills": 222,
-    "distinct_covering_skills": 142,
+    "gap_by_priority": {"P1": 25, "P2": 6},
+    "manifest_skills": 230,
+    "distinct_covering_skills": 150,
     "beyond_roadmap_skills": 80,
-    "review_pending": 155,
+    "review_pending": 147,
 }
 # Owner triage decision Q1=A/Q2=A/Q3=yes (D107, 2026-10-21): rows
 # #254/#278 received their planning-gate decisions and no longer count as
 # awaiting confirmation; review_pending subtracts these resolved rows.
 COVERAGE_PLANNING_GATE_RESOLVED = frozenset({254, 278})
 COVERAGE_GAP_IDS = (
-    14, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 39, 43, 44, 46, 47, 50, 54,
-    110, 120, 135, 146, 151, 156, 158, 161, 162, 163, 164, 167, 168, 169, 176,
-    224, 225, 231, 233, 234, 236,
+    14, 19, 20, 28, 29, 30, 31, 32,
+    33, 34, 35, 39, 43, 44, 46, 47,
+    50, 54, 110, 120, 135, 146, 151, 156,
+    158, 224, 225, 231, 233, 234, 236,
 )
-COVERAGE_P0_GAP_IDS = (161, 162, 164)
+COVERAGE_P0_GAP_IDS = ()
 COVERAGE_ANOMALY_SKILLS = {
     186: frozenset({"multi-tenant-security-tester", "rls-policy-auditor"}),
     299: frozenset({"ai-router-architect", "ai-cost-guardrail-designer"}),
@@ -246,7 +247,7 @@ COVERAGE_REQUIRED_PHRASES = (
     "GAP rows are optional backlog candidates, not deficits or completion "
     "obligations.",
     "The shipped library deliberately exceeds and interleaves with the "
-    "roadmap: 80 of 222 shipped skills are beyond it.",
+    "roadmap: 80 of 230 shipped skills are beyond it.",
 )
 COVERAGE_ENTRY_KEYS = (
     "id", "area", "name", "priority", "status", "covering_skills",

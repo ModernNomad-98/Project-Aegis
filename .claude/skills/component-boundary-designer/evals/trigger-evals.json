@@ -1,0 +1,220 @@
+{
+  "skill": "component-boundary-designer",
+  "description": "Trigger discrimination for component-boundary-designer against the nearest shipped owners.",
+  "overlaps_with": [
+    "observability-by-design",
+    "architecture-designer",
+    "code-reviewer",
+    "domain-modeler",
+    "error-taxonomy-designer",
+    "edge-state-ux-designer",
+    "ux-design-iteration",
+    "mobile-viewport-craft",
+    "accessibility-test-harness",
+    "frontend-perf-engineer",
+    "validation-boundary-designer",
+    "tech-spec-writer",
+    "principal-code-analyst",
+    "performance-test-harness"
+  ],
+  "cases": [
+    {
+      "id": "component-boundary-designer-positive-1",
+      "prompt": "Decide the page/container/feature/shared/primitive layers for this frontend and who owns each concern.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs component-boundary-designer's design method; observability-by-design owns a different task."
+    },
+    {
+      "id": "component-boundary-designer-positive-2",
+      "prompt": "Our shared components import feature code - design the boundary rules and dependency direction.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs component-boundary-designer's design method; architecture-designer owns a different task."
+    },
+    {
+      "id": "component-boundary-designer-positive-3",
+      "prompt": "Design component contracts so data fetching stops leaking into primitives.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs component-boundary-designer's design method; code-reviewer owns a different task."
+    },
+    {
+      "id": "component-boundary-designer-positive-4",
+      "prompt": "We duplicate components across features - write the abstraction-vs-duplication rule and migration plan.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "domain-modeler"
+      ],
+      "reason": "The request needs component-boundary-designer's design method; domain-modeler owns a different task."
+    },
+    {
+      "id": "component-boundary-designer-positive-5",
+      "prompt": "Design one owner per concern across this component tree and list the current violations.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "error-taxonomy-designer"
+      ],
+      "reason": "The request needs component-boundary-designer's design method; error-taxonomy-designer owns a different task."
+    },
+    {
+      "id": "component-boundary-designer-positive-6",
+      "prompt": "Review this component tree for boundary violations and propose the minimal fix.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "edge-state-ux-designer"
+      ],
+      "reason": "The request needs component-boundary-designer's design method; edge-state-ux-designer owns a different task."
+    },
+    {
+      "id": "component-boundary-designer-positive-7",
+      "prompt": "Design the shared-component policy and the contracts for props/events/context.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "The request needs component-boundary-designer's design method; ux-design-iteration owns a different task."
+    },
+    {
+      "id": "component-boundary-designer-positive-8",
+      "prompt": "Our feature folders import each other - design the boundary rules and an ordered migration.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "mobile-viewport-craft"
+      ],
+      "reason": "The request needs component-boundary-designer's design method; mobile-viewport-craft owns a different task."
+    },
+    {
+      "id": "component-boundary-designer-negative-1",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-2",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-3",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-4",
+      "prompt": "Model the domain: bounded contexts, aggregates and invariants before implementation.",
+      "expected_skill": "domain-modeler",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is domain-modeler's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-5",
+      "prompt": "Design the error taxonomy and client envelope: stable machine codes, retryable split and actionable messages.",
+      "expected_skill": "error-taxonomy-designer",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is error-taxonomy-designer's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-6",
+      "prompt": "Design the empty, loading and error states for this dashboard view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is edge-state-ux-designer's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-7",
+      "prompt": "Run a design iteration for this checkout flow: critique the current UX, propose options and converge with the owner.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is ux-design-iteration's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-8",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is mobile-viewport-craft's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-9",
+      "prompt": "Design the WCAG-pinned accessibility harness: automated scans plus manual keyboard and screen-reader checks.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is accessibility-test-harness's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-10",
+      "prompt": "Improve this page's frontend performance: bundle size, rendering and Core Web Vitals.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-11",
+      "prompt": "Design where validation lives at each boundary, with per-boundary schemas and enforcement points.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-12",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-13",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expected_skill": "principal-code-analyst",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is principal-code-analyst's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "component-boundary-designer-negative-14",
+      "prompt": "Design the performance test set: measured surfaces, environment contract and variance-derived thresholds.",
+      "expected_skill": "performance-test-harness",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "This request is performance-test-harness's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+    }
+  ]
+}

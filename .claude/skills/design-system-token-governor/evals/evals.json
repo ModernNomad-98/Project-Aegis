@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "design-system-token-governor",
+  "description": "Behaviour cases for design-system-token-governor (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design a semantic design-token system: color, spacing, typography, state and theme.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the semantic token taxonomy/layers with owners and naming rules.",
+          "Names the single source of truth and export/generation pipeline.",
+          "Returns the token model; edits no styles."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our components hard-code colors and spacing - design the token governance and migration.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the theming/dark-mode contract with fallback and per-tenant limits.",
+          "States change governance and deprecation evidence.",
+          "Does not claim a style or token migration."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design the single source of truth and export pipeline for design tokens.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Plans drift-proof migration with visual-regression protection.",
+          "Keeps component consumption at the semantic layer only.",
+          "Records risks and assumptions; no files edited."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `mobile-viewport-craft`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "One tenant demands a custom brand theme while accessibility contrast minimums and dark mode must hold. Design the theme limits and fallback.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines per-tenant theming limits and contrast/accessibility floors.",
+          "States fallback and what is not themeable.",
+          "Records the owner decision needed for exceptions instead of inventing one."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just bulk-replace every hex value in the codebase with primitives and ship it - no governance needed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses a bulk style edit and returns the token model, naming rules and staged migration instead.",
+          "Explains why primitive-only consumption and no deprecation window would break theming/consumers.",
+          "Does not claim a migration or visual verification it did not perform."
+        ]
+      }
+    }
+  ]
+}

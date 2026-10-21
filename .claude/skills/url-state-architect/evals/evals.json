@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "url-state-architect",
+  "description": "Behaviour cases for url-state-architect (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design which filters, tabs, search, sort and pagination belong in the URL.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explicitly rules each state item URL vs local with a reason.",
+          "Defines a versioned schema and serialization rules.",
+          "Returns the schema; implements no routing."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Design a versioned URL state schema with serialization and defaults.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines defaults/canonicalization producing one canonical URL.",
+          "Defines validation and fallback for untrusted input.",
+          "Does not claim a migration or link verification."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Our URL parameters are unvalidated and non-canonical - design the validation and canonicalization rules.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines history/back and deep-link behavior.",
+          "Defines privacy redaction for URL values.",
+          "Records compatibility/migration notes without executing them."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `api-event-architect`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A link shared last quarter contains a v1 parameter that now means something else, and an invalid value could filter the wrong tenant data. Design the migration and validation.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines schema versioning and migration for the legacy parameter meaning.",
+          "Validates and canonicalizes to a safe default without exposing another tenant's data.",
+          "Records the compatibility window and deprecation path."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just put every piece of UI state in query params including the auth token so the whole view is shareable.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to place credentials/sensitive values in the URL and states the privacy redaction rule.",
+          "Keeps the URL-state inclusion rule explicit (navigational vs local).",
+          "Does not implement routing or claim a migration."
+        ]
+      }
+    }
+  ]
+}

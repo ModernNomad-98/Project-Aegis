@@ -2240,51 +2240,59 @@
     },
     {
       "area": "05",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "frontend-architecture-mapper"
+      ],
+      "evidence": "batch 3 delivery: catalog implemented row (D12.2 Batch 3, 2026-10-21) lists `frontend-architecture-mapper` for roadmap #161 (roadmap-ID mapping: docs/skills-catalog.md + D110; shipped status: README.md); covering skill: frontend-architecture-mapper; D110 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 161,
       "name": "Frontend Architecture Map",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 3 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "05",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "component-boundary-designer"
+      ],
+      "evidence": "batch 3 delivery: catalog implemented row (D12.2 Batch 3, 2026-10-21) lists `component-boundary-designer` for roadmap #162 (roadmap-ID mapping: docs/skills-catalog.md + D110; shipped status: README.md); covering skill: component-boundary-designer; D110 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 162,
       "name": "Component Boundary Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 3 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "05",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "design-system-token-governor"
+      ],
+      "evidence": "batch 3 delivery: catalog implemented row (D12.2 Batch 3, 2026-10-21) lists `design-system-token-governor` for roadmap #163 (roadmap-ID mapping: docs/skills-catalog.md + D110; shipped status: README.md); covering skill: design-system-token-governor; D110 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 163,
       "name": "Design System Token Governance",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 3 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "05",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "route-protection-designer"
+      ],
+      "evidence": "batch 3 delivery: catalog implemented row (D12.2 Batch 3, 2026-10-21) lists `route-protection-designer` for roadmap #164 (roadmap-ID mapping: docs/skills-catalog.md + D110; shipped status: README.md); covering skill: route-protection-designer; D110 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 164,
       "name": "Route Protection Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 3 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "05",
@@ -2317,39 +2325,45 @@
     },
     {
       "area": "05",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "server-state-architect"
+      ],
+      "evidence": "batch 3 delivery: catalog implemented row (D12.2 Batch 3, 2026-10-21) lists `server-state-architect` for roadmap #167 (roadmap-ID mapping: docs/skills-catalog.md + D110; shipped status: README.md); covering skill: server-state-architect; D110 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 167,
       "name": "Server State Management",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 3 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "05",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "client-state-boundary-reviewer"
+      ],
+      "evidence": "batch 3 delivery: catalog implemented row (D12.2 Batch 3, 2026-10-21) lists `client-state-boundary-reviewer` for roadmap #168 (roadmap-ID mapping: docs/skills-catalog.md + D110; shipped status: README.md); covering skill: client-state-boundary-reviewer; D110 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 168,
       "name": "Client State Boundary Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 3 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "05",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "url-state-architect"
+      ],
+      "evidence": "batch 3 delivery: catalog implemented row (D12.2 Batch 3, 2026-10-21) lists `url-state-architect` for roadmap #169 (roadmap-ID mapping: docs/skills-catalog.md + D110; shipped status: README.md); covering skill: url-state-architect; D110 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 169,
       "name": "URL State Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 3 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "05",
@@ -2438,15 +2452,17 @@
     },
     {
       "area": "05",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "pwa-boundary-reviewer"
+      ],
+      "evidence": "batch 3 delivery: catalog implemented row (D12.2 Batch 3, 2026-10-21) lists `pwa-boundary-reviewer` for roadmap #176 (roadmap-ID mapping: docs/skills-catalog.md + D110; shipped status: README.md); covering skill: pwa-boundary-reviewer; D110 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 176,
       "name": "PWA Boundary Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 3 delivery (2026-10-21)",
       "priority": "P2",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "05",
@@ -4216,7 +4232,7 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 222 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 230 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
   "totals": {
     "beyond_roadmap_skills": 80,
     "by_area": {
@@ -4233,8 +4249,8 @@
     "by_grade": {
       "capability-review": 102,
       "catalog-decision": 16,
-      "explicit-id": 143,
-      "none": 39
+      "explicit-id": 151,
+      "none": 31
     },
     "by_priority": {
       "P0": 126,
@@ -4243,18 +4259,17 @@
     },
     "by_status": {
       "COVERED": 56,
-      "GAP": 39,
+      "GAP": 31,
       "PARTIAL": 62,
-      "SHIPPED": 143
+      "SHIPPED": 151
     },
-    "distinct_covering_skills": 142,
+    "distinct_covering_skills": 150,
     "entries": 300,
     "gap_by_priority": {
-      "P0": 3,
-      "P1": 29,
-      "P2": 7
+      "P1": 25,
+      "P2": 6
     },
-    "manifest_skills": 222,
-    "review_pending": 155
+    "manifest_skills": 230,
+    "review_pending": 147
   }
 }

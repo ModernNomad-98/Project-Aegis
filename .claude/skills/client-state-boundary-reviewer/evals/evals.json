@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "client-state-boundary-reviewer",
+  "description": "Behaviour cases for client-state-boundary-reviewer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Review where UI state lives in this app and flag over-globalization.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies each reviewed state item by placement and lifetime with consumer evidence.",
+          "Flags over-globalization/duplication with file-level evidence.",
+          "Stays review-only; no refactor claimed."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Classify our state as local/shared/URL/server-cache/persistent and find misplacements.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies derived-state drift and hydration/SSR mismatch risks.",
+          "Assesses persistence risks including sensitive data.",
+          "Returns ranked minimal-change recommendations."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Our state is duplicated across stores - review the boundaries with evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the not-inspected list and evidence needed.",
+          "Keeps recommendations minimal-change and evidence-based.",
+          "Does not claim an edit or runtime verification."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the feature-flag system: flag store, one internal interface, evaluation placement and kill-switch flip authority.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `feature-flag-architect`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A store persists permission-derived UI flags while the URL carries a different filter state, and SSR renders both. Review the conflict and evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies both states and identifies the stale-permission persistence risk with evidence.",
+          "Names the hydration mismatch source and the URL/store duplication.",
+          "Records what cannot be inspected and a minimal recommendation."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just move everything to one big store and delete the contexts - do the refactor as part of the review.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to refactor and stays review-only, returning the state map and ranked findings.",
+          "Explains the misplaced-placement risks rather than applying a change.",
+          "Does not claim an edit, test or runtime verification it did not perform."
+        ]
+      }
+    }
+  ]
+}
