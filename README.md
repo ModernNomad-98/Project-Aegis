@@ -777,7 +777,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->206<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->207<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -847,13 +847,14 @@ keeps a human as the approval gate on anything irreversible. See
     plans, N+1 queries (one query per item instead of one batched query), caching, latency; plus performance/load test harnesses. *e.g.*
     `schema-evolution-planner`, `pii-lifecycle-designer`, `query-plan-reader`,
     `n-plus-one-detector`, `load-test-planner`.
-14. **Product, PM & growth** *(D24, 15)* — turning product intent into shippable, measured work:
-    requirements elicitation feeding specs, then prioritization, flag-gated rollout, and
-    analytics instrumentation — see
+14. **Product, PM & growth** *(D24, 15 + iteration, 16)* — turning product intent into shippable, measured work:
+    requirements elicitation feeding specs, then prioritization, flag-gated rollout,
+    analytics instrumentation and an optional pre-implementation design-iteration
+    path — see
     [Your first session](#your-first-session) for the entry-point walkthrough.
     *e.g.* `requirements-gathering-facilitator`, `product-spec-writer`,
     `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `event-schema-architect`,
-    `ab-test-designer`.
+    `ab-test-designer`, `ux-design-iteration`.
 15. **Docs engineering** *(D25, 8)* — durable documentation as a discipline: README craft,
     ADR-corpus sequencing, Diátaxis organization, the docs-as-code pipeline, generated API
     reference, onboarding. *e.g.* `readme-craftsman`, `diataxis-doc-organizer`,
@@ -1431,6 +1432,12 @@ in trigger-evals — `event-schema-architect` ≠ `api-event-architect` ≠
 | `funnel-definition-designer` | Rigorous funnel/conversion/retention definition: steps from real events, a counting model with a pinned denominator, a stated window, order semantics, attribution, and WHERE-not-WHY discipline (causes need an experiment). Consumes `event-schema-architect`; ≠ `ab-test-designer`. | auto + manual |
 | `ab-test-designer` | Designs AND reads experiments: falsifiable hypothesis, one primary metric + guardrails, power/sample-size from a practical MDE, a fixed horizon (no peeking), sticky assignment; readout with CIs, multiple-comparison/SRM/Simpson's/novelty checks, ship/kill/iterate with residual uncertainty. Pinned ≠ `feature-flag-rollout-strategist`. | auto + manual |
 | `product-analytics-instrumenter` | The product-analytics INSTRUMENTATION: client-vs-server capture, identity at capture, consent-gating + PII minimization at the source, capture reliability, de-dup, tracking QA. THREE-way seam pinned ≠ `observability-operator` (system telemetry) ≠ `skill-usage-instrumenter` (library usage). | auto + manual |
+
+Optional design-iteration addition (owner instruction 2026-10-20; not a new family):
+
+| Skill | What it does | Invocation |
+|---|---|---|
+| `ux-design-iteration` | Runs optional bounded design iteration before implementation: one up-front A/B choice, evidence-backed brief, end-to-end story, meaningfully different flows, smallest interactive prototype, independent rendered-UI review, per-evaluation records, disposition/retest, readiness/false-completion gate and reviewed handoff. Composes the nearest owners; advisory: it returns the iteration records to the host/user or project state owner for persistence, and does not write project artefacts, run commands, launch browsers or use the network; any persistence is performed by the host/user or state owner. | auto + manual |
 
 D12.4 — technical writing / docs engineering (D25): durable documentation
 as its own discipline. `adr-sequencer` EXTENDS `adr-writer` (longitudinal

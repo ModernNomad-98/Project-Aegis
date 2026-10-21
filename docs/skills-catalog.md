@@ -1090,6 +1090,14 @@ ship both eval files; all edit nothing → **model-invocable**.
 | `ab-test-designer` | reconciliation §3 D12.6 | yes | Designs AND reads experiments: falsifiable hypothesis, one primary metric + guardrails, power/sample-size from a practical MDE, a fixed horizon (no peeking), sticky assignment; readout with CIs, multiple-comparison/SRM/Simpson's/novelty checks, ship/kill/iterate with residual uncertainty. Pinned ≠ `feature-flag-rollout-strategist` (safety rollout). |
 | `product-analytics-instrumenter` | reconciliation §3 D12.6 | yes | The product-analytics INSTRUMENTATION: client-vs-server capture, identity at capture, consent-gating + PII minimization at the source, capture reliability, de-dup, tracking QA. THREE-way seam pinned ≠ `observability-operator` (system telemetry) ≠ `skill-usage-instrumenter` (library usage). |
 
+### Skills (D24 + iteration — optional UX design iteration addition)
+
+The optional pre-implementation design-iteration method (source: owner instruction 2026-10-20; no new family; one skill added to family 14's D24 roster, roster 207):
+
+| Skill | Source | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `ux-design-iteration` | owner instruction 2026-10-20 | yes | Optional bounded design iteration before implementation: one up-front A/B choice (standard vs explore-and-refine), evidence-backed brief, end-to-end story, at least two non-cosmetic flows, smallest interactive prototype with scope/fixtures, independent reviewer plus rendered-UI check matrix, per-evaluation records, disposition plus independent retest, readiness/false-completion declaration, budget ledger and reviewed handoff. Composes the nearest owners; advisory and auto-invocable: it returns the iteration records to the host/user or project state owner for persistence, and does not write project artefacts, run commands, launch browsers or use the network; any persistence is performed by the host/user or state owner. |
+
 ### Skills (D12.4 — technical writing / docs engineering pack)
 
 The 8-skill docs engineering pack (reconciliation §3 D12.4 table, built by

@@ -1,0 +1,238 @@
+{
+  "skill": "ux-design-iteration",
+  "description": "Trigger discrimination for optional pre-implementation design iteration against the nearest owners plus catalog navigation.",
+  "overlaps_with": [
+    "requirements-gathering-facilitator",
+    "product-spec-writer",
+    "edge-state-ux-designer",
+    "mobile-viewport-craft",
+    "accessibility-test-harness",
+    "visual-regression-test-designer",
+    "screenshot-evidence-planner",
+    "phased-work-handoff-designer",
+    "design-review-facilitator",
+    "project-orchestrator",
+    "skill-quality-reviewer",
+    "acceptance-criteria-reviewer",
+    "ab-test-designer",
+    "release-readiness-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "iteration-flow-compare",
+      "prompt": "Settings flow is unsettled: compare two or three meaningfully different approaches before building.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "requirements-gathering-facilitator"
+      ],
+      "reason": "Flow comparison before implementation is this skill's core."
+    },
+    {
+      "id": "iteration-explicit-b",
+      "prompt": "We choose B - explore and refine first; run the bounded loop with a prototype and independent critique.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "product-spec-writer"
+      ],
+      "reason": "Explicit explore-and-refine with prototype, review and budget."
+    },
+    {
+      "id": "iteration-rendered-critique",
+      "prompt": "During our recorded design iteration for checkout settings, have an independent reviewer exercise the prototype and check hierarchy, layout, typography, spacing, labels, responsive, focus and keyboard against the design system.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "design-review-facilitator"
+      ],
+      "reason": "An independent rendered-UI review inside an active iteration record is this skill's review step; design-review-facilitator facilitates a design review meeting instead."
+    },
+    {
+      "id": "iteration-budget",
+      "prompt": "Cap exploration at three concepts and three passes, then say whether it is ready to build.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "project-orchestrator"
+      ],
+      "reason": "Bounded concept/pass budget plus readiness is iteration work."
+    },
+    {
+      "id": "iteration-resume",
+      "prompt": "Resume the recorded design iteration for profile with the same mode, budget and evidence.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "phased-work-handoff-designer"
+      ],
+      "reason": "Resuming a recorded iteration belongs to this record."
+    },
+    {
+      "id": "iteration-prototype-scope",
+      "prompt": "Prototype just enough of the save-confirmation interaction, naming mocked and incomplete parts.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "visual-regression-test-designer"
+      ],
+      "reason": "Prototype scope plus smallest artifact plus rendered review."
+    },
+    {
+      "id": "iteration-retest",
+      "prompt": "Record dispositions for the review findings and independently retest the revised candidate.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "Disposition plus independent retest before advancing."
+    },
+    {
+      "id": "iteration-readiness",
+      "prompt": "Declare whether the settings prototype is READY to build across declared scenarios and checks.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "project-orchestrator"
+      ],
+      "reason": "Iteration readiness/false-completion declaration."
+    },
+    {
+      "id": "requirements-elicitation",
+      "prompt": "Interview me to turn a vague booking idea into clear requirements and a brief.",
+      "expected_skill": "requirements-gathering-facilitator",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Requirements elicitation owner."
+    },
+    {
+      "id": "product-spec-authoring",
+      "prompt": "Write the account-settings product spec with testable acceptance criteria.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Product spec authoring owner."
+    },
+    {
+      "id": "state-matrix-design",
+      "prompt": "Design empty, loading, error, offline and permission-denied states for settings.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Non-happy-path state design owner."
+    },
+    {
+      "id": "mobile-viewport-craft",
+      "prompt": "Make settings work on small phones: breakpoints, touch targets, keyboard occlusion.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Mobile/responsive craft owner."
+    },
+    {
+      "id": "accessibility-verification",
+      "prompt": "Run keyboard, screen-reader and contrast accessibility verification on settings.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Accessibility verification owner."
+    },
+    {
+      "id": "visual-regression-tests",
+      "prompt": "Set up visual regression snapshots and thresholds for settings in CI.",
+      "expected_skill": "visual-regression-test-designer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Visual regression test design owner."
+    },
+    {
+      "id": "screenshot-evidence",
+      "prompt": "Plan screenshot evidence naming, masking and metadata for the release review.",
+      "expected_skill": "screenshot-evidence-planner",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Screenshot evidence planning owner."
+    },
+    {
+      "id": "handoff-protocol-design",
+      "prompt": "Design a reusable handoff protocol/template for agent switches.",
+      "expected_skill": "phased-work-handoff-designer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Handoff protocol design owner."
+    },
+    {
+      "id": "design-review-facilitation",
+      "prompt": "Facilitate the design review of the proposed settings architecture.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Design review facilitation owner."
+    },
+    {
+      "id": "lifecycle-routing",
+      "prompt": "I have an app idea but I am not a developer - what do I do first and next?",
+      "expected_skill": "project-orchestrator",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Lifecycle routing belongs to the front door."
+    },
+    {
+      "id": "skill-quality-review",
+      "prompt": "Review this skill draft for trigger quality, collisions and eval coverage.",
+      "expected_skill": "skill-quality-reviewer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Skill quality review owner."
+    },
+    {
+      "id": "acceptance-criteria-review",
+      "prompt": "Check that these acceptance criteria are testable before the sprint.",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Acceptance criteria review owner."
+    },
+    {
+      "id": "catalog-navigation",
+      "prompt": "Which Aegis skill should I use for planning a product launch and rollout?",
+      "expected_skill": "project-orchestrator",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Catalog navigation route."
+    },
+    {
+      "id": "ordinary-settled-implementation",
+      "prompt": "Implement the settings screen exactly as specified - no exploration, just build it.",
+      "expected_skill": "project-orchestrator",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Settled build follows the standard lifecycle."
+    },
+    {
+      "id": "experiment-a-b-test",
+      "prompt": "Design and later read an A/B test to prove which of the two settings flows performs better - hypothesis, one primary metric, sample size and significance.",
+      "expected_skill": "ab-test-designer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "A measured experiment is ab-test-designer's scope; this skill's A/B names journey options, not randomized assignment."
+    },
+    {
+      "id": "release-ship-readiness",
+      "prompt": "Run the ship/no-ship readiness gate for next week's release: is the deploy ready and what evidence is missing?",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "Ship/deploy readiness is release-readiness-reviewer's gate; this skill's readiness is design-progress readiness."
+    }
+  ]
+}

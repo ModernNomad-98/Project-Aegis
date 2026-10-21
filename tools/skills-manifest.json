@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "40e24a3151b3aeac987f7f7c4e94550bbc511cb3",
+  "source_revision": "8210675409de13422342978bdccf8162c87c449e",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -1007,6 +1007,11 @@
       "name": "usage-metering-and-cost-attribution-pipeline-designer",
       "path": ".claude/skills/usage-metering-and-cost-attribution-pipeline-designer/SKILL.md",
       "sha256": "82dc82868105ba4e51383d6796326edde29e5d414551ac8c58e71fe9ffa1e278"
+    },
+    {
+      "name": "ux-design-iteration",
+      "path": ".claude/skills/ux-design-iteration/SKILL.md",
+      "sha256": "a7c257541a609e9a18fc17b778512d904e5bb9dbb894ad8255598a13469c5276"
     },
     {
       "name": "validation-boundary-designer",
