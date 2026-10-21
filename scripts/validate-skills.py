@@ -2285,8 +2285,9 @@ def check_coverage_map(rep: Report) -> None:
                                   if manifest is not None else 0),
         "review_pending": (
             len(non_explicit_entries)
-            - len({entry["id"] for entry in non_explicit_entries
-                   if entry["id"] in COVERAGE_PLANNING_GATE_RESOLVED})),
+            - sum(1 for entry in non_explicit_entries
+                  if _coverage_is_exact_int(entry.get("id"))
+                  and entry.get("id") in COVERAGE_PLANNING_GATE_RESOLVED)),
     }
     _coverage_require_exact_ints(rep, ctx, totals, "")
     for key in sorted(COVERAGE_TOTALS):

@@ -2655,6 +2655,15 @@ def test_coverage_map_planning_gate_resolved():
                          "coverage map: unresolved-row review_pending rejected")
 
 
+def test_coverage_map_malformed_id_does_not_crash():
+    """T34: a malformed/unhashable entry id is reported, never a traceback."""
+    with tempfile.TemporaryDirectory() as tmp:
+        def mutate(payload):
+            coverage_entry(payload, 14)["id"] = []
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            expect_error(rep, "non-integer id",
+                         "coverage map: malformed id reported without a crash")
+
 def test_coverage_map_triage_rows_and_phrase():
     """T33: rows #254/#278 carry the owner decision; phrase is 80 of 207."""
     payload = json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8"))
@@ -2717,6 +2726,7 @@ TESTS = [
     test_coverage_map_anomaly_rules,
     test_coverage_map_optionality_framing,
     test_coverage_map_planning_gate_resolved,
+    test_coverage_map_malformed_id_does_not_crash,
     test_coverage_map_triage_rows_and_phrase,
     test_coverage_map_bool_id_rejected,
     test_coverage_map_basis_missing_key,
