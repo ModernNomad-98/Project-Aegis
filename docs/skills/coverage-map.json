@@ -95,39 +95,45 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "layered-architecture-enforcer"
+      ],
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `layered-architecture-enforcer` for roadmap #6 (docs/skills-catalog.md, README.md); covering skill: layered-architecture-enforcer; D108 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 6,
       "name": "Layered Architecture Enforcement",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 1 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "dependency-direction-guard"
+      ],
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `dependency-direction-guard` for roadmap #7 (docs/skills-catalog.md, README.md); covering skill: dependency-direction-guard; D108 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 7,
       "name": "Dependency Direction Guard",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 1 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "reconciliation: reconciled into Phase 2 expansion backlog",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "interface-first-designer"
+      ],
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `interface-first-designer` for roadmap #8 (docs/skills-catalog.md, README.md); covering skill: interface-first-designer; D108 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 8,
       "name": "Interface-First Engineering",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 1 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -667,15 +673,17 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "data-flow-diagrammer"
+      ],
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `data-flow-diagrammer` for roadmap #49 (docs/skills-catalog.md, README.md); covering skill: data-flow-diagrammer; D108 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 49,
       "name": "Data Flow Diagramming",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 1 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -1719,15 +1727,17 @@
     },
     {
       "area": "03",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "security-regression-harness-designer"
+      ],
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `security-regression-harness-designer` for roadmap #125 (docs/skills-catalog.md, README.md); covering skill: security-regression-harness-designer; D108 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 125,
       "name": "Security Regression Harness",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 1 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "03",
@@ -1745,15 +1755,17 @@
     },
     {
       "area": "03",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "security-impact-note-author"
+      ],
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `security-impact-note-author` for roadmap #127 (docs/skills-catalog.md, README.md); covering skill: security-impact-note-author; D108 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 127,
       "name": "Security Impact Note Authoring",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 1 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "security-impact-note-author deferred to Phase 3 backlog",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "03",
@@ -2134,15 +2146,17 @@
     },
     {
       "area": "04",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "concurrency-race-reviewer"
+      ],
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `concurrency-race-reviewer` for roadmap #155 (docs/skills-catalog.md, README.md); covering skill: concurrency-race-reviewer; D108 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 155,
       "name": "Concurrency Race Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 1 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "no concurrency-race review skill",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "04",
@@ -2578,15 +2592,17 @@
     },
     {
       "area": "06",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "production-safe-smoke-tester"
+      ],
+      "evidence": "batch 1 delivery: catalog implemented row (Batch 1, 2026-10-21) lists `production-safe-smoke-tester` for roadmap #188 (docs/skills-catalog.md, README.md); covering skill: production-safe-smoke-tester; D108 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 188,
       "name": "Production-Safe Smoke Testing",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 1 delivery (2026-10-21)",
       "priority": "P0",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "06",
@@ -4186,7 +4202,7 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 207 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 215 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
   "totals": {
     "beyond_roadmap_skills": 80,
     "by_area": {
@@ -4203,8 +4219,8 @@
     "by_grade": {
       "capability-review": 102,
       "catalog-decision": 16,
-      "explicit-id": 128,
-      "none": 54
+      "explicit-id": 136,
+      "none": 46
     },
     "by_priority": {
       "P0": 126,
@@ -4213,18 +4229,18 @@
     },
     "by_status": {
       "COVERED": 56,
-      "GAP": 54,
+      "GAP": 46,
       "PARTIAL": 62,
-      "SHIPPED": 128
+      "SHIPPED": 136
     },
-    "distinct_covering_skills": 127,
+    "distinct_covering_skills": 135,
     "entries": 300,
     "gap_by_priority": {
-      "P0": 11,
+      "P0": 3,
       "P1": 34,
       "P2": 9
     },
-    "manifest_skills": 207,
-    "review_pending": 170
+    "manifest_skills": 215,
+    "review_pending": 162
   }
 }

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "concurrency-race-reviewer",
+  "description": "Behaviour cases for concurrency-race-reviewer (4 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Two admins can approve the same request at once - review the race and propose the fix.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Model actors, operations and the interleavings that matter; state assumptions about isolation and job delivery.",
+          "Actors/interleavings model and stated assumptions.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our import job retries on timeout and sometimes duplicates rows. Find the race and idempotency fix.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Build a race matrix: operation pair, shared state, interleaving, bad outcome.",
+          "Race matrix with bad outcomes and evidence.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "A request reads then writes a counter; can the update get lost? Review the interleavings.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identify lost updates, double-create, check-then-act, non-atomic multi-write and retry duplicates.",
+          "Ranked fix options with trade-offs and residual risk.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to code-reviewer; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    }
+  ]
+}

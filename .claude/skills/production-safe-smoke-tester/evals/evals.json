@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "production-safe-smoke-tester",
+  "description": "Behaviour cases for production-safe-smoke-tester (4 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design a production-safe smoke check for this deploy: read-only probes and what not to touch.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerate candidate checks and classify each as read-only, reversible, seeded-fixture-only, or unsafe/forbidden.",
+          "Safe/unsafe operation inventory with classification.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "What can we safely verify after deploy without creating real orders?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Choose the smallest safe set that proves the deploy; prefer GET/health/version/read-only queries.",
+          "Chosen probes with expected observables and evidence.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Our smoke test writes data - redesign it as read-only or seeded-fixture checks with evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "For each check define the probe, expected observable, evidence to record and stop condition.",
+          "Stop conditions and escalation/rollback path.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design synthetic monitoring and alerting for this user journey.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to synthetic-monitoring-architect; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    }
+  ]
+}

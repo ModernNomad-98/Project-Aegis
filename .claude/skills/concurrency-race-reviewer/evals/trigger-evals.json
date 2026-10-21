@@ -1,0 +1,220 @@
+{
+  "skill": "concurrency-race-reviewer",
+  "description": "Trigger discrimination for concurrency-race-reviewer against the nearest shipped owners.",
+  "overlaps_with": [
+    "code-reviewer",
+    "flaky-test-detective",
+    "resilience-architecture-reviewer",
+    "test-plan-designer",
+    "background-job-orchestration-architect",
+    "systematic-debugger",
+    "integration-test-designer",
+    "api-contract-test-designer",
+    "performance-test-harness",
+    "tdd-engineer",
+    "architecture-designer",
+    "production-safe-smoke-tester",
+    "release-readiness-reviewer",
+    "realtime-subscription-architect"
+  ],
+  "cases": [
+    {
+      "id": "concurrency-race-reviewer-positive-1",
+      "prompt": "Two admins can approve the same request at once - review the race and propose the fix.",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs concurrency-race-reviewer's method; code-reviewer owns a different task."
+    },
+    {
+      "id": "concurrency-race-reviewer-positive-2",
+      "prompt": "Our import job retries on timeout and sometimes duplicates rows. Find the race and idempotency fix.",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "flaky-test-detective"
+      ],
+      "reason": "The request needs concurrency-race-reviewer's method; flaky-test-detective owns a different task."
+    },
+    {
+      "id": "concurrency-race-reviewer-positive-3",
+      "prompt": "A request reads then writes a counter; can the update get lost? Review the interleavings.",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "The request needs concurrency-race-reviewer's method; resilience-architecture-reviewer owns a different task."
+    },
+    {
+      "id": "concurrency-race-reviewer-positive-4",
+      "prompt": "Design the concurrency tests and fix options for this double-create path.",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "test-plan-designer"
+      ],
+      "reason": "The request needs concurrency-race-reviewer's method; test-plan-designer owns a different task."
+    },
+    {
+      "id": "concurrency-race-reviewer-positive-5",
+      "prompt": "The job queue is at-least-once; review this consumer for duplicate processing races.",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "background-job-orchestration-architect"
+      ],
+      "reason": "The request needs concurrency-race-reviewer's method; background-job-orchestration-architect owns a different task."
+    },
+    {
+      "id": "concurrency-race-reviewer-positive-6",
+      "prompt": "Check-then-act on the same table across two endpoints - is this racy and what is the minimal fix?",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "systematic-debugger"
+      ],
+      "reason": "The request needs concurrency-race-reviewer's method; systematic-debugger owns a different task."
+    },
+    {
+      "id": "concurrency-race-reviewer-positive-7",
+      "prompt": "Build a race matrix for the create/update/retry operations in this service.",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "integration-test-designer"
+      ],
+      "reason": "The request needs concurrency-race-reviewer's method; integration-test-designer owns a different task."
+    },
+    {
+      "id": "concurrency-race-reviewer-positive-8",
+      "prompt": "What locking, idempotency or versioning should we add before shipping this workflow?",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "api-contract-test-designer"
+      ],
+      "reason": "The request needs concurrency-race-reviewer's method; api-contract-test-designer owns a different task."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-1",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "code-reviewer owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-2",
+      "prompt": "Classify and reproduce this flaky test, fix one cause and prove stability.",
+      "expected_skill": "flaky-test-detective",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "flaky-test-detective owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-3",
+      "prompt": "Review the resilience and failure-mode strategy for this service.",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "resilience-architecture-reviewer owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-4",
+      "prompt": "Write the per-change test plan with risk-traced items, layers, data and entry/exit criteria.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "test-plan-designer owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-5",
+      "prompt": "Design the job queue semantics for this worker: delivery, ordering, retries and dead letters.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "background-job-orchestration-architect owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-6",
+      "prompt": "Find the cause of this production 500 and fix it with a predicted, single-variable change.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "systematic-debugger owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-7",
+      "prompt": "Design the integration-test layer for these real service, database and auth boundaries.",
+      "expected_skill": "integration-test-designer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "integration-test-designer owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-8",
+      "prompt": "Design the provider/consumer contract tests and the breaking-additive CI gate.",
+      "expected_skill": "api-contract-test-designer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "api-contract-test-designer owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-9",
+      "prompt": "Design the performance-test harness and measurement set for this surface.",
+      "expected_skill": "performance-test-harness",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "performance-test-harness owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-10",
+      "prompt": "Implement this behavior strictly red-green-refactor and report the exact commands and results.",
+      "expected_skill": "tdd-engineer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "tdd-engineer owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-11",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "architecture-designer owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-12",
+      "prompt": "Design a production-safe smoke plan with read-only probes and unexercised areas stated.",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "production-safe-smoke-tester owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-13",
+      "prompt": "Decide whether this release is ready to ship against the release-readiness checks.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "release-readiness-reviewer owns this request; concurrency-race-reviewer would duplicate it."
+    },
+    {
+      "id": "concurrency-race-reviewer-negative-14",
+      "prompt": "Design the realtime subscription and fan-out architecture for live updates.",
+      "expected_skill": "realtime-subscription-architect",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "realtime-subscription-architect owns this request; concurrency-race-reviewer would duplicate it."
+    }
+  ]
+}

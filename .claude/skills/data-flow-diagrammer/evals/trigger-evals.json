@@ -1,0 +1,220 @@
+{
+  "skill": "data-flow-diagrammer",
+  "description": "Trigger discrimination for data-flow-diagrammer against the nearest shipped owners.",
+  "overlaps_with": [
+    "architecture-designer",
+    "observability-by-design",
+    "principal-code-analyst",
+    "code-reviewer",
+    "threat-modeler",
+    "api-event-architect",
+    "data-partitioning-sharding-strategist",
+    "schema-evolution-planner",
+    "saas-platform-architect",
+    "systematic-debugger",
+    "full-codebase-auditor",
+    "security-pr-reviewer",
+    "command-gateway-architect",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "data-flow-diagrammer-positive-1",
+      "prompt": "Draw the data-flow diagram for the checkout: inputs, stores, transforms, side effects and trust boundaries.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs data-flow-diagrammer's method; architecture-designer owns a different task."
+    },
+    {
+      "id": "data-flow-diagrammer-positive-2",
+      "prompt": "We do not know where personal data is stored and who receives it - map the flows with evidence.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs data-flow-diagrammer's method; observability-by-design owns a different task."
+    },
+    {
+      "id": "data-flow-diagrammer-positive-3",
+      "prompt": "The existing architecture diagram is stale; produce a trustworthy data-flow view with assumptions marked.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "principal-code-analyst"
+      ],
+      "reason": "The request needs data-flow-diagrammer's method; principal-code-analyst owns a different task."
+    },
+    {
+      "id": "data-flow-diagrammer-positive-4",
+      "prompt": "Show where data crosses trust boundaries in the ingestion pipeline.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs data-flow-diagrammer's method; code-reviewer owns a different task."
+    },
+    {
+      "id": "data-flow-diagrammer-positive-5",
+      "prompt": "Which side effects (emails, webhooks, payments) happen in this flow, and where?",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "threat-modeler"
+      ],
+      "reason": "The request needs data-flow-diagrammer's method; threat-modeler owns a different task."
+    },
+    {
+      "id": "data-flow-diagrammer-positive-6",
+      "prompt": "Trace this data item from source through transforms to every sink.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs data-flow-diagrammer's method; api-event-architect owns a different task."
+    },
+    {
+      "id": "data-flow-diagrammer-positive-7",
+      "prompt": "Produce a Mermaid data-flow with a legend and unverified elements labeled.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "data-partitioning-sharding-strategist"
+      ],
+      "reason": "The request needs data-flow-diagrammer's method; data-partitioning-sharding-strategist owns a different task."
+    },
+    {
+      "id": "data-flow-diagrammer-positive-8",
+      "prompt": "Map the data flows for a privacy review, including retention and external recipients.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "schema-evolution-planner"
+      ],
+      "reason": "The request needs data-flow-diagrammer's method; schema-evolution-planner owns a different task."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-1",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "architecture-designer owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-2",
+      "prompt": "Design the telemetry contract for this service: logs, metrics, traces, correlation and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "observability-by-design owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-3",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expected_skill": "principal-code-analyst",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "principal-code-analyst owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-4",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "code-reviewer owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-5",
+      "prompt": "Threat-model this design: assets, actors, trust boundaries, STRIDE and negative tests.",
+      "expected_skill": "threat-modeler",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "threat-modeler owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-6",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "api-event-architect owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-7",
+      "prompt": "Design the data partitioning and sharding strategy for this multi-tenant system.",
+      "expected_skill": "data-partitioning-sharding-strategist",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "data-partitioning-sharding-strategist owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-8",
+      "prompt": "Plan the schema evolution and expand-contract migration for this change without downtime.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "schema-evolution-planner owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-9",
+      "prompt": "Decide the multi-tenant structure: pooled, siloed or bridge per component, with isolation mechanisms.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "saas-platform-architect owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-10",
+      "prompt": "Find the cause of this production 500 and fix it with a predicted, single-variable change.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "systematic-debugger owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-11",
+      "prompt": "Audit the whole repository with an inventory-first coverage plan and file confirmed, likely and unknown findings.",
+      "expected_skill": "full-codebase-auditor",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "full-codebase-auditor owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-12",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets, SSRF and control weakening.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "security-pr-reviewer owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-13",
+      "prompt": "Design the command gateway and write-side flow for this aggregate.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "command-gateway-architect owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-14",
+      "prompt": "Write the full design tech spec and RFC for this feature, with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "tech-spec-writer owns this request; data-flow-diagrammer would duplicate it."
+    }
+  ]
+}

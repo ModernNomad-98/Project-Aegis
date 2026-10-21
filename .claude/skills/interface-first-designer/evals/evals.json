@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "interface-first-designer",
+  "description": "Behaviour cases for interface-first-designer (4 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Multiple teams will call this new export interface - design the contract before we implement anything.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventory callers and their expectations; state who is not yet known as UNKNOWN.",
+          "Contract specification: operations, inputs/outputs, errors and invariants.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "We need stable commands and error semantics before changing the internals.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Derive the contract from use cases, not from the current implementation.",
+          "Adapter plan distinguishing ports from implementations.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design the ports/adapters and test doubles for this integration first.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Specify interface/adapters, command/query shapes, error semantics and invariants.",
+          "Compatibility/versioning and migration/rollback plan.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to api-event-architect; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    }
+  ]
+}

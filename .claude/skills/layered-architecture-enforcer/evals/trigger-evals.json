@@ -1,0 +1,220 @@
+{
+  "skill": "layered-architecture-enforcer",
+  "description": "Trigger discrimination for layered-architecture-enforcer against the nearest shipped owners.",
+  "overlaps_with": [
+    "architecture-designer",
+    "code-reviewer",
+    "architecture-advisor",
+    "domain-modeler",
+    "adr-writer",
+    "systematic-debugger",
+    "principal-code-analyst",
+    "validation-boundary-designer",
+    "observability-by-design",
+    "saas-platform-architect",
+    "background-job-orchestration-architect",
+    "full-codebase-auditor",
+    "api-event-architect",
+    "dependency-direction-guard"
+  ],
+  "cases": [
+    {
+      "id": "layered-architecture-enforcer-positive-1",
+      "prompt": "Check whether our claimed hexagonal architecture still holds after the last feature.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs layered-architecture-enforcer's method; architecture-designer owns a different task."
+    },
+    {
+      "id": "layered-architecture-enforcer-positive-2",
+      "prompt": "Domain entities now import the ORM - is that a layer violation, and what is the smallest fix?",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs layered-architecture-enforcer's method; code-reviewer owns a different task."
+    },
+    {
+      "id": "layered-architecture-enforcer-positive-3",
+      "prompt": "Our controller contains pricing rules that belong to the use-case layer; find the violations and minimal compliant changes.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "architecture-advisor"
+      ],
+      "reason": "The request needs layered-architecture-enforcer's method; architecture-advisor owns a different task."
+    },
+    {
+      "id": "layered-architecture-enforcer-positive-4",
+      "prompt": "Application services call the concrete Postgres adapter instead of the port they own - flag and propose the fix.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "domain-modeler"
+      ],
+      "reason": "The request needs layered-architecture-enforcer's method; domain-modeler owns a different task."
+    },
+    {
+      "id": "layered-architecture-enforcer-positive-5",
+      "prompt": "Build a layer map for this module and tell me which dependencies point outward.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "adr-writer"
+      ],
+      "reason": "The request needs layered-architecture-enforcer's method; adr-writer owns a different task."
+    },
+    {
+      "id": "layered-architecture-enforcer-positive-6",
+      "prompt": "Is this change a cross-layer violation or an accepted exception? Review the imports.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "systematic-debugger"
+      ],
+      "reason": "The request needs layered-architecture-enforcer's method; systematic-debugger owns a different task."
+    },
+    {
+      "id": "layered-architecture-enforcer-positive-7",
+      "prompt": "We need an architecture test enforcing the allowed dependency direction - what should it assert?",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "principal-code-analyst"
+      ],
+      "reason": "The request needs layered-architecture-enforcer's method; principal-code-analyst owns a different task."
+    },
+    {
+      "id": "layered-architecture-enforcer-positive-8",
+      "prompt": "Before refactoring, give me the current layer map, violations and smallest compliant change.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "The request needs layered-architecture-enforcer's method; validation-boundary-designer owns a different task."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-1",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "architecture-designer owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-2",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "code-reviewer owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-3",
+      "prompt": "Advise whether this system should be a monolith, modular monolith, microservices, event-driven or serverless.",
+      "expected_skill": "architecture-advisor",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "architecture-advisor owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-4",
+      "prompt": "Model the domain concepts, bounded contexts and invariants before any code is written.",
+      "expected_skill": "domain-modeler",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "domain-modeler owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-5",
+      "prompt": "Write the architecture decision record for a decision that has already been made, including alternatives and rollback.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "adr-writer owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-6",
+      "prompt": "Find the cause of this production 500 and fix it with a predicted, single-variable change.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "systematic-debugger owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-7",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expected_skill": "principal-code-analyst",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "principal-code-analyst owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-8",
+      "prompt": "Decide where request validation belongs across API, command, form and database boundaries.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "validation-boundary-designer owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-9",
+      "prompt": "Design the telemetry contract for this service: logs, metrics, traces, correlation and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "observability-by-design owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-10",
+      "prompt": "Decide the multi-tenant structure: pooled, siloed or bridge per component, with isolation mechanisms.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "saas-platform-architect owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-11",
+      "prompt": "Design the job queue semantics for this worker: delivery, ordering, retries and dead letters.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "background-job-orchestration-architect owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-12",
+      "prompt": "Audit the whole repository with an inventory-first coverage plan and file confirmed, likely and unknown findings.",
+      "expected_skill": "full-codebase-auditor",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "full-codebase-auditor owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-13",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "api-event-architect owns this request; layered-architecture-enforcer would duplicate it."
+    },
+    {
+      "id": "layered-architecture-enforcer-negative-14",
+      "prompt": "Check whether these feature modules depend on each other unexpectedly and whether an import cycle exists.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "dependency-direction-guard owns this request; layered-architecture-enforcer would duplicate it."
+    }
+  ]
+}

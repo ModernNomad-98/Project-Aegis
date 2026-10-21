@@ -400,6 +400,11 @@ All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 | `full-codebase-auditor` | cat 06/08 #280 | yes | Whole-repo audit, inventory BEFORE findings; results filed as confirmed / likely / hypotheses / missing information; provable coverage. |
 | `validation-boundary-designer` | cat 01 **#37/#38** + cat 04 **#141/#157** | yes | Boundary-validation design: where validation lives at each boundary (API, command, form, database, integration), per-boundary schema choices, non-negotiable invariants with named enforcement points, and database constraint backstops. Designs; writes and reviews no code and no diff. |
 | `observability-by-design` | cat 01 **#22** | yes | Telemetry-contract design: per-component logs/metrics/traces, correlation-ID scheme, bounded metric sets, and redaction composed by reference to `sensitive-disclosure-guard` — never restated. Designs; instruments nothing. |
+| `layered-architecture-enforcer` | cat 01 **#6** (Batch 1) | yes | Enforces an existing layered/hexagonal architecture: real layer map, cross-layer violations, smallest compliant change and verification; read-only. |
+| `dependency-direction-guard` | cat 01 **#7** (Batch 1) | yes | Derives the real import graph, finds cycles/inversions/feature coupling/platform leaks, states allowed direction, ranks minimal fixes and records exceptions; read-only. |
+| `interface-first-designer` | cat 01 **#8** (Batch 1) | yes | Designs contracts before internals: callers/constraints, interfaces/adapters, compatibility/versioning, test doubles and ordered migration; stops before implementation. |
+| `data-flow-diagrammer` | cat 01 **#49** (Batch 1) | yes | Produces a trustworthy data-flow diagram: sources/sinks/stores/transforms/side effects, trust boundaries, assumptions and unverified elements labeled; documentation-only. |
+| `concurrency-race-reviewer` | cat 01 **#155** (Batch 1) | yes | Reviews interleaving operations for lost updates, double-create, check-then-act and retry duplicates; proposes serialization/idempotency/locking fixes with tests; review-only. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 2 clusters:
 design (`domain-modeler`, `architecture-designer`, `adr-writer`), implementation
@@ -491,6 +496,8 @@ per-command negative-test plan.
 | `security-pr-reviewer` | cat 03 #114/#111/#112/#113 + cat 08 #277 | yes | Security lens on an ACTUAL diff: authz/object-level/tenant-scope, injection, secrets, SSRF, control-weakening detection; exploit-path-gated findings; no diff, no review. |
 | `secure-migration-reviewer` | cat 03 #126 | yes | Whole-migration deploy safety: RLS/policy gaps, GRANT widening, unsafe defaults, destructive/irreversible ops, tenant-scoped backfills, lock risk, expand→contract deploy order, rollback; delegates policy text to `rls-policy-auditor`. |
 | `static-analysis-reviewer` | cat 03 #121 adjacent + cat 06/08 | yes | Triages SAST/CodeQL/SARIF on first-party code: dedup, confirm-against-code disposition (TP/FP/dup/accepted), five-axis ranking (reachability/exploitability/asset/tenant/business), written suppression policy. |
+| `security-regression-harness-designer` | cat 03 **#125** (Batch 1) | yes | Turns a fixed security/access-control bug into a permanent regression harness: safe fixtures, expected-denial cases, CI placement and retest evidence; design-only. |
+| `security-impact-note-author` | cat 03 **#127** (Batch 1) | yes | Authors a reviewable security impact note: assets/impact, threats, mitigations, tests, rollback, approvals and residual risk, separating verified from assumed; authoring-only. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the two Phase 4 clusters:
 the **threat & hardening** cluster (`threat-modeler`, `appsec-implementer`,
@@ -593,6 +600,7 @@ design** (`visual-regression-test-designer`, `exploratory-charter-designer`,
 `regression-suite-curator`, `manual-test-case-creator`,
 `clickthrough-test-engineer`, `qa-strategy-architect`, `mobile-viewport-craft`,
 `playwright-e2e-engineer`, and `test-plan-designer`.
+| `production-safe-smoke-tester` | cat 06 **#188** (Batch 1) | yes | Designs production-safe smoke checks: read-only/reversible probes, seeded fixtures, forbidden operations, stop/escalation and explicitly unexercised areas; execution delegated. |
 
 A sixth cluster was added by D76 (2026-10-10): **role coverage**
 (`role-coverage-test-designer`) — discriminated against

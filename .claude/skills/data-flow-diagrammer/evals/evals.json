@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "data-flow-diagrammer",
+  "description": "Behaviour cases for data-flow-diagrammer (3 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Draw the data-flow diagram for the checkout: inputs, stores, transforms, side effects and trust boundaries.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Define scope and the level of detail; exclude unrelated subsystems explicitly.",
+          "Data-flow diagram (Mermaid or plain text) with legend and numbered nodes.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "We do not know where personal data is stored and who receives it - map the flows with evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventory sources, sinks, stores, transforms and side effects from evidence.",
+          "Sources/sinks/stores/transforms/side-effects inventory with evidence.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_not_trigger",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to architecture-designer; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    }
+  ]
+}
