@@ -1,6 +1,6 @@
 ---
 name: production-safe-smoke-tester
-description: 'Use when checking a deployed system safely: design smoke checks that are read-only probes, state exactly what is not exercised, and never mutate production; seeded-fixture probes are read-only against pre-seeded isolated or disposable tenants with no real customer data, and any write is not a smoke check (it needs separate explicit authorization, verified cleanup/rollback and no real customer data). Design/advisory only; execution is delegated to the host/user under production authority.'
+description: 'Use when checking a deployed system safely: design smoke checks that are read-only probes, state exactly what is not exercised, and never mutate production; seeded-fixture probes are read-only against pre-seeded isolated or disposable tenants with no real customer data, and any write is not a smoke check (it needs separate explicit authorization, verified cleanup/rollback and no real customer data). Design/advisory only; execution is delegated to the host/user under production authority, and a live production-health determination is an operational action for the manual-only observability-operator, not this skill.'
 ---
 
 # Production Safe Smoke Tester
@@ -18,7 +18,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - A deploy needs a quick production check without writing unsafe data.
 - You must decide which probes are read-only/reversible and which are forbidden.
 - A smoke plan exists but does not state what it does not exercise.
-- The user asks whether production is healthy after a deploy.
+- The user asks how to design or validate a safe smoke plan or checklist for a deploy (a live production-health determination is an operational action, not a design task).
 
 **Do not use when:** the request belongs to a named neighbouring owner (see Stop Conditions), or when inspection evidence is unavailable and the question would have to be answered by guessing.
 
@@ -72,13 +72,14 @@ Return, in this order:
 - The request is monitoring/alert design: route to synthetic-monitoring-architect.
 - The request is writing E2E tests: route to playwright-e2e-engineer.
 - The request is a manual test case: route to manual-test-case-creator.
+- The user asks for a live post-deploy health determination (current status, dashboard queries): this skill is design-only and must not claim live status - route the live determination to `observability-operator` (manual-only operational owner that runs real queries) and live-failure diagnosis to `systematic-debugger`.
 - The caller asks this skill to execute production probes: refuse; return the plan for the authorized host/user.
 - Any probe would mutate data: it is not a smoke check. Require separate explicit authorization, verified cleanup/rollback and no real customer data (disposable isolated tenant only); otherwise stop and propose a read-only alternative.
 
 ## Supporting Files
 
 - [safe-smoke-checklist](references/safe-smoke-checklist.md) - Production-safe smoke checklist and evidence rules.
-- [evals/evals.json](evals/evals.json) - the 4 behaviour cases for this skill.
+- [evals/evals.json](evals/evals.json) - the 6 behaviour cases for this skill.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against the nearest owners.
 
 **Source:** docs/skills-catalog.md - cat 06 #188 (Production-Safe Smoke Testing); coverage roadmap #188. The trigger description is the frontmatter description above; keep it under 1,024 parsed characters, concrete and trigger-oriented.

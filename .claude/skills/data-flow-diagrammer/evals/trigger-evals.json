@@ -7,6 +7,7 @@
     "principal-code-analyst",
     "code-reviewer",
     "threat-modeler",
+    "pii-lifecycle-designer",
     "api-event-architect",
     "data-partitioning-sharding-strategist",
     "schema-evolution-planner",
@@ -29,12 +30,12 @@
     },
     {
       "id": "data-flow-diagrammer-positive-2",
-      "prompt": "We do not know where personal data is stored and who receives it - map the flows with evidence.",
+      "prompt": "We do not know where personal data is stored and who receives it - draw the evidence-backed data-flow diagram of the current flows; lifecycle and retention decisions are out of scope.",
       "expected_skill": "data-flow-diagrammer",
       "should_not_trigger": [
-        "observability-by-design"
+        "pii-lifecycle-designer"
       ],
-      "reason": "The request needs data-flow-diagrammer's method; observability-by-design owns a different task."
+      "reason": "The request is a diagram-only inventory of flows with evidence; generic PII location and lifecycle design (retention, deletion, residency, derived copies) belongs to pii-lifecycle-designer."
     },
     {
       "id": "data-flow-diagrammer-positive-3",
@@ -101,12 +102,12 @@
     },
     {
       "id": "data-flow-diagrammer-negative-2",
-      "prompt": "Design the telemetry contract for this service: logs, metrics, traces, correlation and redaction.",
-      "expected_skill": "observability-by-design",
+      "prompt": "Map where personal data is stored, who receives it, and design the retention, deletion and residency rules it needs.",
+      "expected_skill": "pii-lifecycle-designer",
       "should_not_trigger": [
         "data-flow-diagrammer"
       ],
-      "reason": "observability-by-design owns this request; data-flow-diagrammer would duplicate it."
+      "reason": "Generic PII location and lifecycle design is pii-lifecycle-designer's workflow; data-flow-diagrammer only diagrams evidence for flows."
     },
     {
       "id": "data-flow-diagrammer-negative-3",
@@ -173,7 +174,7 @@
     },
     {
       "id": "data-flow-diagrammer-negative-10",
-      "prompt": "Find the cause of this production 500 and fix it with a predicted, single-variable change.",
+      "prompt": "Explicitly invoke systematic-debugger. Find the cause of this production 500 and fix it with a predicted, single-variable change.",
       "expected_skill": "systematic-debugger",
       "should_not_trigger": [
         "data-flow-diagrammer"

@@ -138,7 +138,7 @@
     },
     {
       "id": "layered-architecture-enforcer-negative-6",
-      "prompt": "Find the cause of this production 500 and fix it with a predicted, single-variable change.",
+      "prompt": "Explicitly invoke systematic-debugger. Find the cause of this production 500 and fix it with a predicted, single-variable change.",
       "expected_skill": "systematic-debugger",
       "should_not_trigger": [
         "layered-architecture-enforcer"

@@ -384,7 +384,7 @@ request from a user who already knows the next step).
 ### Skills (Phase 2 — core architecture & engineering pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (all ten sit in one of three overlap clusters).
+`evals/trigger-evals.json` (the original ten sit in one of three overlap clusters; the five Batch 1 additions are covered below).
 
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
@@ -412,7 +412,7 @@ design (`domain-modeler`, `architecture-designer`, `adr-writer`), implementation
 (`code-reviewer`, `code-simplifier`, `principal-code-analyst`, `full-codebase-auditor`).
 The Batch 1 Phase 2 additions (`layered-architecture-enforcer`,
 `dependency-direction-guard`, `interface-first-designer`, `data-flow-diagrammer`,
-`concurrency-race-reviewer`) also ship standalone 22-case trigger-eval files.
+`concurrency-race-reviewer`) also ship standalone 22-case trigger-eval files: `layered-architecture-enforcer` and `dependency-direction-guard` discriminate each other (layer-specific rules vs package/feature direction policy) and both against `architecture-designer`; `interface-first-designer` discriminates `api-event-architect`, `tdd-engineer` and `docs-first-implementer`; `data-flow-diagrammer` discriminates `architecture-designer`, `observability-by-design`, `threat-modeler` and the PII lifecycle owner `pii-lifecycle-designer`; `concurrency-race-reviewer` discriminates `flaky-test-detective`, `systematic-debugger`, `background-job-orchestration-architect` and `test-plan-designer`.
 
 A fourth cluster was added by D77 (2026-10-10): **boundary & telemetry design**
 (`validation-boundary-designer`, `observability-by-design`) — with cross-phase
@@ -471,7 +471,7 @@ cross-phase discrimination against `tenant-modeler`, `saas-platform-architect`,
 ### Skills (Phase 4 — security, RLS & supply-chain pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (all nine sit in one of two overlap clusters). Per
+`evals/trigger-evals.json` (the original nine sit in one of two overlap clusters; the two Batch 1 additions ship standalone 22-case trigger-eval files). Per
 [historical master prompt, section 6](prompts/claude-skills-master-generation-prompts-v4.md): OWASP Application Security Verification Standard (ASVS)-style verification, NIST Secure Software Development Framework (SSDF)-style secure-SDLC, and Supply-chain Levels for Software Artifacts (SLSA)-style
 supply-chain thinking; scanner output is treated as input, not truth; high-severity
 claims require an exploit path or abuse scenario; tenant isolation and object-level
@@ -509,7 +509,10 @@ the **threat & hardening** cluster (`threat-modeler`, `appsec-implementer`,
 `static-analysis-reviewer`) — the latter with explicit discrimination against the
 shipped `code-reviewer` (general review vs security-specialized); the Batch 1 Phase 4 additions
 (`security-regression-harness-designer`, `security-impact-note-author`) also ship
-standalone 22-case trigger-eval files. The **tenant-security**
+standalone 22-case trigger-eval files: `security-regression-harness-designer` discriminates
+`security-pr-reviewer`, `multi-tenant-security-tester`, `tdd-engineer` and
+`playwright-e2e-engineer`; `security-impact-note-author` discriminates `security-pr-reviewer`,
+`threat-modeler`, `human-approval-boundary` and `change-classification-gate`. The **tenant-security**
 cluster (`multi-tenant-security-tester`, `rls-policy-auditor`) additionally discriminates
 against the shipped `tenant-isolation-reviewer` (inspection-based review vs executable
 tests vs database-policy audit).

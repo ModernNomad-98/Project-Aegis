@@ -291,7 +291,7 @@
     {
       "name": "concurrency-race-reviewer",
       "path": ".claude/skills/concurrency-race-reviewer/SKILL.md",
-      "sha256": "52a3efadf5877b3071044437f984611ce6b2fd2038468546f777177e0bbe6355"
+      "sha256": "f02ae9edfcd3bcd3d9f097b586f04d98d4260a1cdd6fe6410a4495b2afdaf45b"
     },
     {
       "name": "context-co-update-ci-gate",
@@ -316,7 +316,7 @@
     {
       "name": "data-flow-diagrammer",
       "path": ".claude/skills/data-flow-diagrammer/SKILL.md",
-      "sha256": "3c95cedc6f779ee71c61cfa8593278b48a27f3fabaee33f02ea19937a5dc8287"
+      "sha256": "56d2e5d573820e25b1b96c00793f2c8f0ea3540f8dcdb2183f4d5bd1456d2273"
     },
     {
       "name": "data-migration-runbook-author",
@@ -341,7 +341,7 @@
     {
       "name": "dependency-direction-guard",
       "path": ".claude/skills/dependency-direction-guard/SKILL.md",
-      "sha256": "c7fc22e49406f70f7fa450d2b37b1dcefe1299cbba03e120ae3f335c36bf54c2"
+      "sha256": "c1524ed26d686da92dc19dfbebfd4ca46c545b8421d7861e2f548f4e9f4d7547"
     },
     {
       "name": "design-review-facilitator",
@@ -501,7 +501,7 @@
     {
       "name": "interface-first-designer",
       "path": ".claude/skills/interface-first-designer/SKILL.md",
-      "sha256": "191247d44ef82f91927a785949279939844d7da6e31d8eb80936eab5c07e0946"
+      "sha256": "9d74614e25fc815a1ec0d38f9ff352ec1af1576f3aa576c42414484f4c2a87ce"
     },
     {
       "name": "intra-tenant-scope-architect",
@@ -531,7 +531,7 @@
     {
       "name": "layered-architecture-enforcer",
       "path": ".claude/skills/layered-architecture-enforcer/SKILL.md",
-      "sha256": "cffbe292197d670c6df6677f86ddbd76f241d598558858a94eedcd5283f8b90d"
+      "sha256": "f3550f03bf6d697dfe49bb93ef9dd59a27f6623ca0bddce0c00dac21032b5a8a"
     },
     {
       "name": "library-diff-reviewer",
@@ -696,7 +696,7 @@
     {
       "name": "production-safe-smoke-tester",
       "path": ".claude/skills/production-safe-smoke-tester/SKILL.md",
-      "sha256": "9b0dfa7fe234a3fc92896cafdf5eeddc8bdc04f5c4f6d212b55fb1ac8e943997"
+      "sha256": "5c4321cac6964aa43901a0ec8541686c0c8a1eb692023bb49e939a8ad8a9472c"
     },
     {
       "name": "profiling-methodology-designer",
@@ -856,7 +856,7 @@
     {
       "name": "security-impact-note-author",
       "path": ".claude/skills/security-impact-note-author/SKILL.md",
-      "sha256": "81a086d602bb6abb90fb2fd1dbffe13dac3a38755fed34220e01fc4dbf44e902"
+      "sha256": "055cefd3e1eca5043354bef6b95e96042e8977b51f316579526006cc7e6c0974"
     },
     {
       "name": "security-logging-alerting-architect",
@@ -871,7 +871,7 @@
     {
       "name": "security-regression-harness-designer",
       "path": ".claude/skills/security-regression-harness-designer/SKILL.md",
-      "sha256": "cb7bad0264d05e69a0c2d70c8ab09ad8a8c67adeee21d0db9c327f6b9eebc826"
+      "sha256": "e940253d9b3ca72073ba7f64ae9da6efbdde6016d81d5a68682dd1fc3ce51c7c"
     },
     {
       "name": "security-scan-orchestrator",

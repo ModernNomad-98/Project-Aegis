@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "interface-first-designer",
-  "description": "Behaviour cases for interface-first-designer (4 cases).",
+  "description": "Behaviour cases for interface-first-designer (6 cases).",
   "cases": [
     {
       "id": "E1",
@@ -51,6 +51,32 @@
         "assertions": [
           "Routes to api-event-architect; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "We cannot enumerate the callers of this stored command yet, but a producer and consumer both depend on it - design the contract with the unknown callers marked.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventory known callers and label unknown callers UNKNOWN instead of inventing them.",
+          "Specify compatibility/versioning and the stored-data/message impact for the contract.",
+          "Return the contract and ordered migration plan without implementing it."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "The contract can wait - just implement the interface and adapters so we can ship today.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Stops before implementation and hands the contract and ordered migration plan to the implementation owner.",
+          "Produces only the interface/adapter and test-double specification, not code.",
+          "States the migration order and rollback the implementation will need."
         ]
       }
     }

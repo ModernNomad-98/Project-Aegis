@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "concurrency-race-reviewer",
-  "description": "Behaviour cases for concurrency-race-reviewer (4 cases).",
+  "description": "Behaviour cases for concurrency-race-reviewer (6 cases).",
   "cases": [
     {
       "id": "E1",
@@ -51,6 +51,32 @@
         "assertions": [
           "Routes to code-reviewer; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "The isolation level and job delivery guarantees are undocumented; two workers can still process the same message - review what races you can prove and label the rest.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "State isolation/delivery/ordering assumptions and label undocumented ones explicitly.",
+          "Name each finding's interleaving and bad outcome; mark unproven races uncertain rather than asserting them.",
+          "Propose ordered fixes and tests without editing code or claiming runtime verification."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just add a transaction and call the double-create fixed - no tests needed, ship it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to call the race fixed without evidence and explains that a transaction alone, without appropriate isolation, locking or constraints, does not fix check-then-act.",
+          "Requests a constraint/idempotency-key proof and the deterministic interleaving evidence.",
+          "Does not claim a fix or runtime verification it did not perform."
         ]
       }
     }

@@ -120,7 +120,7 @@
     },
     {
       "id": "interface-first-designer-negative-4",
-      "prompt": "Implement this behavior strictly red-green-refactor and report the exact commands and results.",
+      "prompt": "Explicitly invoke tdd-engineer. Implement this behavior strictly red-green-refactor and report the exact commands and results.",
       "expected_skill": "tdd-engineer",
       "should_not_trigger": [
         "interface-first-designer"
@@ -138,7 +138,7 @@
     },
     {
       "id": "interface-first-designer-negative-6",
-      "prompt": "Implement this change after pinning the exact library version and reading version-matching docs.",
+      "prompt": "Explicitly invoke docs-first-implementer. Implement this change after pinning the exact library version and reading version-matching docs.",
       "expected_skill": "docs-first-implementer",
       "should_not_trigger": [
         "interface-first-designer"

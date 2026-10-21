@@ -101,7 +101,7 @@
     },
     {
       "id": "production-safe-smoke-tester-negative-2",
-      "prompt": "Write the Playwright end-to-end specs for this critical journey and run them.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write the Playwright end-to-end specs for this critical journey and run them.",
       "expected_skill": "playwright-e2e-engineer",
       "should_not_trigger": [
         "production-safe-smoke-tester"
@@ -146,16 +146,16 @@
     },
     {
       "id": "production-safe-smoke-tester-negative-7",
-      "prompt": "Operate the observability stack for this alert and determine what happened.",
+      "prompt": "Explicitly invoke observability-operator. Is production healthy after the deploy? Query the live dashboards and confirm the current status.",
       "expected_skill": "observability-operator",
       "should_not_trigger": [
         "production-safe-smoke-tester"
       ],
-      "reason": "observability-operator owns this request; production-safe-smoke-tester would duplicate it."
+      "reason": "A live post-deploy health determination is an operational action owned by the manual-only observability-operator; production-safe-smoke-tester is design/advisory and cannot run probes or claim live status."
     },
     {
       "id": "production-safe-smoke-tester-negative-8",
-      "prompt": "Pre-plan a manual clickthrough of this running app and record defects.",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Pre-plan a manual clickthrough of this running app and record defects.",
       "expected_skill": "clickthrough-test-engineer",
       "should_not_trigger": [
         "production-safe-smoke-tester"
@@ -173,7 +173,7 @@
     },
     {
       "id": "production-safe-smoke-tester-negative-10",
-      "prompt": "Classify and reproduce this flaky test, fix one cause and prove stability.",
+      "prompt": "Explicitly invoke flaky-test-detective. Classify and reproduce this flaky test, fix one cause and prove stability.",
       "expected_skill": "flaky-test-detective",
       "should_not_trigger": [
         "production-safe-smoke-tester"

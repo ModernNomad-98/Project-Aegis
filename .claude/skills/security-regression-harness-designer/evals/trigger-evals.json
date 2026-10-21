@@ -119,7 +119,7 @@
     },
     {
       "id": "security-regression-harness-designer-negative-4",
-      "prompt": "Implement this behavior strictly red-green-refactor and report the exact commands and results.",
+      "prompt": "Explicitly invoke tdd-engineer. Implement this behavior strictly red-green-refactor and report the exact commands and results.",
       "expected_skill": "tdd-engineer",
       "should_not_trigger": [
         "security-regression-harness-designer"
@@ -137,7 +137,7 @@
     },
     {
       "id": "security-regression-harness-designer-negative-6",
-      "prompt": "Write and run the cross-tenant negative test suite for this authorization boundary.",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Write and run the cross-tenant negative test suite for this authorization boundary.",
       "expected_skill": "multi-tenant-security-tester",
       "should_not_trigger": [
         "security-regression-harness-designer"
@@ -164,7 +164,7 @@
     },
     {
       "id": "security-regression-harness-designer-negative-9",
-      "prompt": "Write the Playwright end-to-end specs for this critical journey and run them.",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write the Playwright end-to-end specs for this critical journey and run them.",
       "expected_skill": "playwright-e2e-engineer",
       "should_not_trigger": [
         "security-regression-harness-designer"

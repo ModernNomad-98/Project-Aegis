@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "layered-architecture-enforcer",
-  "description": "Behaviour cases for layered-architecture-enforcer (4 cases).",
+  "description": "Behaviour cases for layered-architecture-enforcer (6 cases).",
   "cases": [
     {
       "id": "E1",
@@ -51,6 +51,32 @@
         "assertions": [
           "Routes to architecture-designer; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Half our modules are generated and the build config is not readable here - still tell us what layer model holds and where you are unsure.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "State the claimed layer model and allowed dependency direction, marking unstated rules as assumptions.",
+          "Map only inspectable modules from imports/annotations; mark every uninspected module and uncertain edge UNKNOWN instead of guessing.",
+          "Return the layer map with uncertain edges clearly labeled; edit no code and claim no unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Forget the analysis - just rewrite our imports now so every layer rule is fixed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to edit code and returns the minimal compliant change plan instead.",
+          "Delegates implementation to the appropriate implementation owner rather than performing it.",
+          "Does not claim a fix, test run or verification it did not perform."
         ]
       }
     }

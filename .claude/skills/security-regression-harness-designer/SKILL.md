@@ -35,7 +35,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 1. Extract the pre-fix path that allowed the bad outcome; state the invariant that was violated.
 2. Define positive cases (authorized action succeeds) and negative cases (forbidden action is denied), one assertion each.
 3. Specify safe fixtures: two-tenant/two-role data, no real secrets or production records, deterministic identifiers.
-4. Choose the cheapest reliable layer(s) and CI placement; specify bounded retries/flake policy.
+4. Choose the cheapest reliable layer(s) and CI placement; specify a flake policy in which expected-denial cases get zero pass-masking retries and a diagnostic rerun keeps the first failure as the job verdict.
 5. Define evidence: expected denial assertions, logs/screenshots as applicable, and an honest not-covered list.
 6. Require a retest of the fixed vulnerability and a red-before/green-after check where feasible.
 7. Return the harness plan; do not weaken or skip existing security tests.
@@ -46,7 +46,7 @@ Return, in this order:
 
 1. Vulnerable-path and invariant statement.
 2. Positive/negative case matrix with fixtures and expected outcomes.
-3. Layer/CI placement and flake policy.
+3. Layer/CI placement and flake policy (zero pass-masking retries for expected-denial cases).
 4. Evidence and retest plan.
 5. Coverage limitations and residual risk.
 
@@ -55,7 +55,7 @@ Return, in this order:
 - Pre-fix vulnerable path and invariant stated.
 - At least one expected-denial negative case per forbidden action; positive control included.
 - Fixtures are safe, synthetic and deterministic; no real secrets/production data.
-- CI placement and bounded retry policy defined; no weakened assertions.
+- CI placement and flake policy defined: expected-denial cases get zero pass-masking retries; diagnostic reruns preserve the first failure as the verdict; no weakened assertions.
 - Red-before/green-after or equivalent retest evidence required.
 - Coverage limitations and residual risk stated honestly.
 
@@ -64,7 +64,7 @@ Return, in this order:
 - A test that passes before the fix is not a regression test.
 - Asserting only the happy path leaves the denial branch unprotected.
 - Real production-like fixtures introduce secrets and PII; use synthetic tenants.
-- Retries can mask a real security regression; bound them and inspect failures.
+- Retries can mask a real security regression: expected-denial failures are never retried into green, and a diagnostic rerun keeps the first failure as the verdict.
 - Weakening an existing security assertion to make CI green is a regression, not a fix.
 
 ## Stop Conditions
@@ -80,7 +80,7 @@ Return, in this order:
 ## Supporting Files
 
 - [security-regression-checklist](references/security-regression-checklist.md) - Security regression harness checklist and evidence rules.
-- [evals/evals.json](evals/evals.json) - the 4 behaviour cases for this skill.
+- [evals/evals.json](evals/evals.json) - the 6 behaviour cases for this skill.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against the nearest owners.
 
 **Source:** docs/skills-catalog.md - cat 03 #125 (Security Regression Harness); coverage roadmap #125. The trigger description is the frontmatter description above; keep it under 1,024 parsed characters, concrete and trigger-oriented.

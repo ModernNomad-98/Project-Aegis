@@ -79,7 +79,7 @@ Return, in this order:
 ## Supporting Files
 
 - [layer-rules](references/layer-rules.md) - Layer model, allowed edges and violation checklist.
-- [evals/evals.json](evals/evals.json) - the 4 behaviour cases for this skill.
+- [evals/evals.json](evals/evals.json) - the 6 behaviour cases for this skill.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against the nearest owners.
 
 **Source:** docs/skills-catalog.md - cat 01 #6 (Layered Architecture Enforcement); coverage roadmap #6. The trigger description is the frontmatter description above; keep it under 1,024 parsed characters, concrete and trigger-oriented.

@@ -20,7 +20,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - An existing diagram is stale and nobody trusts it.
 - You need to show where data crosses trust boundaries or where side effects occur.
 
-**Do not use when:** the request belongs to a named neighbouring owner (see Stop Conditions), or when inspection evidence is unavailable and the question would have to be answered by guessing.
+**Do not use when:** the request belongs to a named neighbouring owner (see Stop Conditions), or when inspection evidence is unavailable and the question would have to be answered by guessing. This skill diagrams flows only: generic PII location/lifecycle requests (retention, deletion, residency, derived copies) route to `pii-lifecycle-designer`.
 
 ## Inputs to Inspect
 
@@ -73,13 +73,14 @@ Return, in this order:
 - The request is component design or placement: route to architecture-designer.
 - The request is telemetry/logging design: route to observability-by-design.
 - The request is threat modeling rather than a diagram: route to threat-modeler.
+- The request is PII location or lifecycle design (retention, deletion, residency, derived copies): route to `pii-lifecycle-designer`; this skill only diagrams the current flows.
 - The caller wants runtime traces or measured behaviour: the diagram is static evidence; delegate execution.
 - Source code is unavailable and requirements too thin: state UNKNOWN and ask.
 
 ## Supporting Files
 
 - [data-flow-conventions](references/data-flow-conventions.md) - Data-flow notation, trust boundaries and evidence rules.
-- [evals/evals.json](evals/evals.json) - the 3 behaviour cases for this skill.
+- [evals/evals.json](evals/evals.json) - the 5 behaviour cases for this skill.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against the nearest owners.
 
 **Source:** docs/skills-catalog.md - cat 01 #49 (Data Flow Diagramming); coverage roadmap #49. The trigger description is the frontmatter description above; keep it under 1,024 parsed characters, concrete and trigger-oriented.

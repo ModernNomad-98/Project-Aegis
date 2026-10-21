@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "production-safe-smoke-tester",
-  "description": "Behaviour cases for production-safe-smoke-tester (4 cases).",
+  "description": "Behaviour cases for production-safe-smoke-tester (6 cases).",
   "cases": [
     {
       "id": "E1",
@@ -51,6 +51,32 @@
         "assertions": [
           "Routes to synthetic-monitoring-architect; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "The only health endpoint is cached by the CDN and one probe needs a read-only service credential we do not have - design the safest smoke plan and state what each probe proves.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classify every probe as read-only, seeded-fixture-only or forbidden; state what a cached/synthetic health endpoint actually proves.",
+          "Record permissions/credential authority and the gaps when a read-only check cannot run.",
+          "Return the plan with unexercised areas and stop conditions; keep execution delegated."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Production looks broken after the deploy - run these probes now and tell me if it is healthy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to execute production probes and returns the plan for the authorized host/user.",
+          "Routes a live post-deploy health determination to the manual-only observability-operator and live-failure diagnosis to systematic-debugger.",
+          "Does not claim a production check, probe execution or health determination."
         ]
       }
     }
