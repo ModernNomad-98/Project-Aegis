@@ -1,0 +1,220 @@
+{
+  "skill": "saas-timezone-architect",
+  "description": "Trigger discrimination for saas-timezone-architect against the nearest shipped owners.",
+  "overlaps_with": [
+    "notification-webhook-ux-designer",
+    "observability-by-design",
+    "api-event-architect",
+    "background-job-orchestration-architect",
+    "slo-reliability-architect",
+    "audit-log-architect",
+    "schema-evolution-planner",
+    "multi-tenant-data-architect",
+    "incident-response-runbook",
+    "data-quality-monitor-designer",
+    "caching-strategy-designer",
+    "saas-platform-architect",
+    "tenant-modeler",
+    "release-readiness-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "saas-timezone-architect-positive-1",
+      "prompt": "Design the timezone contract for a SaaS app with tenants in multiple zones.",
+      "expected_skill": "saas-timezone-architect",
+      "should_not_trigger": [
+        "notification-webhook-ux-designer"
+      ],
+      "reason": "The request needs saas-timezone-architect's method; notification-webhook-ux-designer owns a different task."
+    },
+    {
+      "id": "saas-timezone-architect-positive-2",
+      "prompt": "Our nightly reports cut over at UTC midnight but tenants expect their business day - design the cutoff rules.",
+      "expected_skill": "saas-timezone-architect",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs saas-timezone-architect's method; observability-by-design owns a different task."
+    },
+    {
+      "id": "saas-timezone-architect-positive-3",
+      "prompt": "Design reminder scheduling that stays correct across DST transitions.",
+      "expected_skill": "saas-timezone-architect",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs saas-timezone-architect's method; api-event-architect owns a different task."
+    },
+    {
+      "id": "saas-timezone-architect-positive-4",
+      "prompt": "Define storage for instants versus local dates in our multi-tenant system.",
+      "expected_skill": "saas-timezone-architect",
+      "should_not_trigger": [
+        "background-job-orchestration-architect"
+      ],
+      "reason": "The request needs saas-timezone-architect's method; background-job-orchestration-architect owns a different task."
+    },
+    {
+      "id": "saas-timezone-architect-positive-5",
+      "prompt": "Design tenant vs user timezone precedence for display and scheduling.",
+      "expected_skill": "saas-timezone-architect",
+      "should_not_trigger": [
+        "slo-reliability-architect"
+      ],
+      "reason": "The request needs saas-timezone-architect's method; slo-reliability-architect owns a different task."
+    },
+    {
+      "id": "saas-timezone-architect-positive-6",
+      "prompt": "Design the DST/ambiguous-time test matrix for our scheduler.",
+      "expected_skill": "saas-timezone-architect",
+      "should_not_trigger": [
+        "audit-log-architect"
+      ],
+      "reason": "The request needs saas-timezone-architect's method; audit-log-architect owns a different task."
+    },
+    {
+      "id": "saas-timezone-architect-positive-7",
+      "prompt": "Review this timezone design for duplicated or mis-timed jobs.",
+      "expected_skill": "saas-timezone-architect",
+      "should_not_trigger": [
+        "schema-evolution-planner"
+      ],
+      "reason": "The request needs saas-timezone-architect's method; schema-evolution-planner owns a different task."
+    },
+    {
+      "id": "saas-timezone-architect-positive-8",
+      "prompt": "Design migration of legacy timestamps to the new timezone contract.",
+      "expected_skill": "saas-timezone-architect",
+      "should_not_trigger": [
+        "multi-tenant-data-architect"
+      ],
+      "reason": "The request needs saas-timezone-architect's method; multi-tenant-data-architect owns a different task."
+    },
+    {
+      "id": "saas-timezone-architect-negative-1",
+      "prompt": "Design the notification and webhook UX: channels, templates, retry policy and user controls.",
+      "expected_skill": "notification-webhook-ux-designer",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to notification-webhook-ux-designer; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-2",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to observability-by-design; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-3",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to api-event-architect; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-4",
+      "prompt": "Design the queue semantics and background-job architecture: delivery, ordering, idempotency and dead letters.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to background-job-orchestration-architect; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-5",
+      "prompt": "Design the SLIs, SLOs and burn-rate alerting for this service.",
+      "expected_skill": "slo-reliability-architect",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to slo-reliability-architect; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-6",
+      "prompt": "Design the audit event taxonomy, versioned record schema and append-only integrity rules.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to audit-log-architect; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-7",
+      "prompt": "Plan the schema evolution and expand-contract migration for this change without downtime.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to schema-evolution-planner; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-8",
+      "prompt": "Decide per-store tenant scoping for caches, search and the vector store, and design the tenant-context propagation contract.",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to multi-tenant-data-architect; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-9",
+      "prompt": "Write the incident-response runbook for this service: severities, escalation, communications and postmortem.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to incident-response-runbook; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-10",
+      "prompt": "Design the data-quality monitors: rules, thresholds and alert routing.",
+      "expected_skill": "data-quality-monitor-designer",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to data-quality-monitor-designer; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-11",
+      "prompt": "Design the caching strategy: what to cache, keys, invalidation and stampede protection.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to caching-strategy-designer; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-12",
+      "prompt": "Decide the multi-tenant structure: pooled, siloed or bridge per component, with named isolation mechanisms.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to saas-platform-architect; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-13",
+      "prompt": "Define tenant semantics: definition, hierarchy, membership-as-entity, ownership and the lifecycle state machine with per-state posture.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to tenant-modeler; saas-timezone-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-timezone-architect-negative-14",
+      "prompt": "Decide whether this release is ready to ship against the release-readiness checks.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "saas-timezone-architect"
+      ],
+      "reason": "This request belongs to release-readiness-reviewer; saas-timezone-architect owns a different design task and must not take it over."
+    }
+  ]
+}

@@ -430,7 +430,7 @@ discrimination against `security-pr-reviewer`, `multi-tenant-security-tester`,
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 `evals/trigger-evals.json` (the original nine sit in one of three overlap clusters;
-`feature-flag-architect`, added by D64, carries its own seams). None has
+`feature-flag-architect`, added by D64, carries its own seams; the seven Batch 2 additions (D109) also ship standalone 22-case trigger-eval files). None has
 side effects, so all are model-invocable. Per [historical master prompt, section 5](prompts/claude-skills-master-generation-prompts-v4.md): tenant isolation is
 treated as cross-cutting (identity, data, API, storage, logs, analytics, support,
 exports, imports, jobs, search, AI retrieval, billing, flags, audit), every skill
@@ -451,6 +451,13 @@ negative tests.
 | `api-event-architect` | cat 04 (API/event contracts) + **#9 (D79)** | yes | Credential-derived tenant context, idempotency, per-operation request/response schemas, per-tenant/plan rate limits, versioning + deprecation with dual-run, tenant-scoped signed webhooks, contract migration + rollback. |
 | `tenant-provisioning-designer` | cat 02 **#57** (D81; tenant-lifecycle batch) | yes | Tenant-creation workflow design: entry paths (signup/sales-led/import), idempotent creation, first-owner assignment, seed data, failure rollback, lifecycle handoff. Composes the gateway's idempotency contract and the matrix's grant rules. Designs; creates nothing. |
 | `membership-invitation-designer` | cat 02 **#58** (D81; built after #59) | yes | Membership-invitation workflow design: single-use token semantics, identity binding, seat checks, invite-spam limits, re-invite/bulk paths, audit hooks. Composes the tenant-modeler state machine, the #59 grant ceiling, the plan seat pool and the rate-limit contract. Designs; sends nothing. |
+| `subscription-lifecycle-designer` | cat 02 **#61** (Batch 2) | yes | Designs the subscription lifecycle as an explicit state machine: states/transitions, entitlement per state, proration, dunning and grace, cancellation timing, reactivation, grandfathering and idempotent transitions with rollback; design-only. |
+| `user-preference-architect` | cat 02 **#67** (Batch 2) | yes | Designs per-user preferences with precedence: preference taxonomy and defaults, single user -> tenant -> global resolution, tenant-policy ceilings and non-overridable controls, typed storage, migration and rollback; never entitlements. |
+| `export-pipeline-architect` | cat 02 **#76** (Batch 2) | yes | Designs the tenant-data export pipeline: requester authority and tenant scope, async job/status model, field-level redaction, expiry and secure delivery, audit evidence and partial/failed export handling; designs, does not implement. |
+| `demo-tenant-safety-designer` | cat 02 **#80** (Batch 2) | yes | Designs demo-tenant safety: demo-vs-production separation of identity/data/secrets/infrastructure, synthetic seed policy, mutation guardrails, access limits, reset and expiry, misuse monitoring and conversion-to-real rules; designs only. |
+| `saas-offboarding-architect` | cat 02 **#83** (Batch 2) | yes | Designs ordered user/tenant offboarding: trigger/actor matrix, access revocation first, then export/retention/deletion, billing close and ownership transfer, with legal-hold exceptions, reversible vs irreversible steps and per-step audit evidence; designs only. |
+| `saas-localization-architect` | cat 02 **#86** (Batch 2) | yes | Defines localization system boundaries: localizable dimensions and their owners, locale negotiation and fallback precedence, translated content vs runtime formatting, currency/date/number rules, tenant- and locale-safe cache keys and a test matrix; no UI implementation. |
+| `saas-timezone-architect` | cat 02 **#87** (Batch 2) | yes | Defines the timezone contract: time-bearing data/job inventory, UTC instant vs local-intent storage, tenant/user zone precedence, DST and ambiguous-time handling, reminder uniqueness, reporting cutoffs, migration and audit trail; design-only. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 3 clusters:
 tenant (`tenant-modeler`, `tenant-isolation-reviewer`, `multi-tenant-data-architect`),
@@ -467,6 +474,16 @@ cross-phase discrimination against `tenant-modeler`, `saas-platform-architect`,
 `api-event-architect`, `notification-webhook-ux-designer`,
 `secrets-identity-hardener`, `multi-tenant-security-tester`, and
 `test-tenant-provisioner`.
+
+A fifth cluster was added by D109 (2026-10-21): **SaaS lifecycle**
+(`subscription-lifecycle-designer`, `user-preference-architect`, `export-pipeline-architect`,
+`demo-tenant-safety-designer`, `saas-offboarding-architect`, `saas-localization-architect`,
+`saas-timezone-architect`) - with cross-phase discrimination against
+`plan-entitlement-architect`, `tenant-modeler`, `saas-cost-architect`,
+`tenant-provisioning-designer`, `membership-invitation-designer`,
+`tenant-isolation-reviewer`, `multi-tenant-data-architect`, `audit-log-architect`,
+`api-event-architect`, `mobile-viewport-craft`, `accessibility-test-harness` and
+`notification-webhook-ux-designer`.
 
 ### Skills (Phase 4 — security, RLS & supply-chain pack)
 

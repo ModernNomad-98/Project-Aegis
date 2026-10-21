@@ -1,0 +1,220 @@
+{
+  "skill": "user-preference-architect",
+  "description": "Trigger discrimination for user-preference-architect against the nearest shipped owners.",
+  "overlaps_with": [
+    "tenant-modeler",
+    "feature-flag-architect",
+    "authorization-matrix-designer",
+    "saas-platform-architect",
+    "multi-tenant-data-architect",
+    "schema-evolution-planner",
+    "api-event-architect",
+    "audit-log-architect",
+    "admin-console-architect",
+    "frontend-perf-engineer",
+    "mobile-viewport-craft",
+    "accessibility-test-harness",
+    "product-spec-writer",
+    "validation-boundary-designer"
+  ],
+  "cases": [
+    {
+      "id": "user-preference-architect-positive-1",
+      "prompt": "Design per-user preferences that override defaults but respect tenant policy ceilings.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "tenant-modeler"
+      ],
+      "reason": "The request needs user-preference-architect's method; tenant-modeler owns a different task."
+    },
+    {
+      "id": "user-preference-architect-positive-2",
+      "prompt": "Our global/tenant/user settings precedence is ambiguous - define one resolution order and a precedence table.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "feature-flag-architect"
+      ],
+      "reason": "The request needs user-preference-architect's method; feature-flag-architect owns a different task."
+    },
+    {
+      "id": "user-preference-architect-positive-3",
+      "prompt": "Design the storage schema and migration for user settings without breaking tenant policy.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "authorization-matrix-designer"
+      ],
+      "reason": "The request needs user-preference-architect's method; authorization-matrix-designer owns a different task."
+    },
+    {
+      "id": "user-preference-architect-positive-4",
+      "prompt": "Users want to control notification frequency but the tenant caps it - design the ceiling and the UI-facing rule.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "saas-platform-architect"
+      ],
+      "reason": "The request needs user-preference-architect's method; saas-platform-architect owns a different task."
+    },
+    {
+      "id": "user-preference-architect-positive-5",
+      "prompt": "Review this settings design for preferences accidentally becoming entitlements.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "multi-tenant-data-architect"
+      ],
+      "reason": "The request needs user-preference-architect's method; multi-tenant-data-architect owns a different task."
+    },
+    {
+      "id": "user-preference-architect-positive-6",
+      "prompt": "Design a typed preference schema with defaults, validation and unknown-key handling.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "schema-evolution-planner"
+      ],
+      "reason": "The request needs user-preference-architect's method; schema-evolution-planner owns a different task."
+    },
+    {
+      "id": "user-preference-architect-positive-7",
+      "prompt": "We are migrating legacy settings - design the migration and rollback with tenant policy preserved.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs user-preference-architect's method; api-event-architect owns a different task."
+    },
+    {
+      "id": "user-preference-architect-positive-8",
+      "prompt": "Design cache invalidation and auditing for user preference changes across services.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "audit-log-architect"
+      ],
+      "reason": "The request needs user-preference-architect's method; audit-log-architect owns a different task."
+    },
+    {
+      "id": "user-preference-architect-negative-1",
+      "prompt": "Define tenant semantics: definition, hierarchy, membership-as-entity, ownership and the lifecycle state machine with per-state posture.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to tenant-modeler; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-2",
+      "prompt": "Design the feature-flag system: flag store, one internal interface, evaluation placement and kill-switch flip authority.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to feature-flag-architect; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-3",
+      "prompt": "Design the deny-by-default roles x permissions x resources matrix, object-level rules and enforcement points.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to authorization-matrix-designer; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-4",
+      "prompt": "Decide the multi-tenant structure: pooled, siloed or bridge per component, with named isolation mechanisms.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to saas-platform-architect; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-5",
+      "prompt": "Decide per-store tenant scoping for caches, search and the vector store, and design the tenant-context propagation contract.",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to multi-tenant-data-architect; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-6",
+      "prompt": "Plan the schema evolution and expand-contract migration for this change without downtime.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to schema-evolution-planner; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-7",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to api-event-architect; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-8",
+      "prompt": "Design the audit event taxonomy, versioned record schema and append-only integrity rules.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to audit-log-architect; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-9",
+      "prompt": "Design the internal admin/support console: least-privilege tiers, audited cross-tenant access and time-boxed impersonation.",
+      "expected_skill": "admin-console-architect",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to admin-console-architect; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-10",
+      "prompt": "Improve this page's frontend performance: bundle size, rendering and Core Web Vitals.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to frontend-perf-engineer; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-11",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to mobile-viewport-craft; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-12",
+      "prompt": "Design the WCAG-pinned accessibility harness: automated scans plus manual keyboard and screen-reader checks.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to accessibility-test-harness; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-13",
+      "prompt": "Write the product spec for this feature with acceptance criteria and scope boundaries.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to product-spec-writer; user-preference-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "user-preference-architect-negative-14",
+      "prompt": "Design where validation lives at each boundary, with per-boundary schemas and enforcement points.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "This request belongs to validation-boundary-designer; user-preference-architect owns a different design task and must not take it over."
+    }
+  ]
+}

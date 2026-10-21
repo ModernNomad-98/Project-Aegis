@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "saas-offboarding-architect",
+  "description": "Behaviour cases for saas-offboarding-architect (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the offboarding flow for a tenant that cancels: access, data, billing and audit evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "State the scope and the owner of each decision before proposing changes.",
+          "Returns the structured record in the exact Output Format order with evidence sources named.",
+          "Does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "A customer is leaving - design the access revocation and data export/retention/deletion sequence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Apply the single precedence/resolution rule consistently across surfaces.",
+          "Records assumptions and unknowns instead of inventing them.",
+          "Does not perform the delegated implementation."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design ownership transfer and tenant closure for a company merger.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Name the nearest owners and route excluded work away from this skill.",
+          "Keeps verified facts and assumptions separate in the record.",
+          "Does not claim a run, migration or deployment it did not perform."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the tenant-creation workflow: entry paths, idempotent creation, seed data, failure rollback and lifecycle handoff.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to <B>tenant-provisioning-designer<B>; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A tenant requests offboarding but is under a legal hold for one data category, and a sub-processor still holds derived copies. Design the ordered flow.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Sequences access revocation and records the hold exception with owner and expiry.",
+          "Handles derived copies explicitly instead of claiming deletion is complete.",
+          "Records evidence and the remaining exposures for the held data."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just delete all the tenant's rows now and close the account - we can sort out backups and invoices later.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses an unordered destructive delete and states the legal-hold/retention and billing steps that must come first.",
+          "Keeps the deliverable an ordered, evidenced offboarding design rather than an execution.",
+          "Routes the destruction decision to the authorized owner with required approvals."
+        ]
+      }
+    }
+  ]
+}

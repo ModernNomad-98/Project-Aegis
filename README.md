@@ -777,7 +777,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->215<!-- /SKILL-COUNT --> skills comprise **214 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->222<!-- /SKILL-COUNT --> skills comprise **221 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -802,7 +802,7 @@ keeps a human as the approval gate on anything irreversible. See
    domain models, architecture design, ADRs, docs-first + test-first implementation, debugging,
    code review. *e.g.* `domain-modeler`, `architecture-designer`, `adr-writer`, `tdd-engineer`,
    `systematic-debugger`.
-4. **SaaS & tenant isolation** *(Phase 3, 12)* — multi-tenant foundations: platform structure,
+4. **SaaS & tenant isolation** *(Phase 3, 19)* — multi-tenant foundations: platform structure,
    tenant semantics, per-store scoping, roles/permissions, plans, audit trail, cost, external
    API contracts, and the feature-flag system (added by D64). *e.g.* `saas-platform-architect`, `tenant-isolation-reviewer`,
    `authorization-matrix-designer`, `audit-log-architect`, `api-event-architect`.
@@ -1159,6 +1159,13 @@ Phase 3 — SaaS & tenant isolation pack:
 | `api-event-architect` | External API/event contracts: credential-derived tenant context, idempotency, per-operation request/response schemas, per-tenant/plan rate limits, versioning with dual-run deprecation, tenant-scoped signed webhooks. | auto + manual |
 | `tenant-provisioning-designer` | (G4, #57) Designs the tenant-creation workflow: entry paths, idempotent creation, first-owner assignment, seed data, failure rollback, lifecycle handoff. Designs; creates nothing. | auto + manual |
 | `membership-invitation-designer` | (G4, #58) Designs the membership-invitation workflow: single-use tokens, identity binding, seat checks, spam limits, re-invite/bulk paths, audit hooks. Designs; sends nothing. | auto + manual |
+| `subscription-lifecycle-designer` | (Batch 2, #61) Designs the subscription lifecycle as an explicit state machine: states/transitions, entitlement per state, proration, dunning and grace, cancellation timing, reactivation, grandfathering and idempotent transitions with rollback; design-only. | auto + manual |
+| `user-preference-architect` | (Batch 2, #67) Designs per-user preferences with precedence: preference taxonomy and defaults, single user -> tenant -> global resolution, tenant-policy ceilings and non-overridable controls, typed storage, migration and rollback; never entitlements. | auto + manual |
+| `export-pipeline-architect` | (Batch 2, #76) Designs the tenant-data export pipeline: requester authority and tenant scope, async job/status model, field-level redaction, expiry and secure delivery, audit evidence and partial/failed export handling; designs, does not implement. | auto + manual |
+| `demo-tenant-safety-designer` | (Batch 2, #80) Designs demo-tenant safety: demo-vs-production separation of identity/data/secrets/infrastructure, synthetic seed policy, mutation guardrails, access limits, reset and expiry, misuse monitoring and conversion-to-real rules; designs only. | auto + manual |
+| `saas-offboarding-architect` | (Batch 2, #83) Designs ordered user/tenant offboarding: trigger/actor matrix, access revocation first, then export/retention/deletion, billing close and ownership transfer, with legal-hold exceptions, reversible vs irreversible steps and per-step audit evidence; designs only. | auto + manual |
+| `saas-localization-architect` | (Batch 2, #86) Defines localization system boundaries: localizable dimensions and their owners, locale negotiation and fallback precedence, translated content vs runtime formatting, currency/date/number rules, tenant- and locale-safe cache keys and a test matrix; no UI implementation. | auto + manual |
+| `saas-timezone-architect` | (Batch 2, #87) Defines the timezone contract: time-bearing data/job inventory, UTC instant vs local-intent storage, tenant/user zone precedence, DST and ambiguous-time handling, reminder uniqueness, reporting cutoffs, migration and audit trail; design-only. | auto + manual |
 
 Phase 4 — security, RLS & supply-chain pack:
 
