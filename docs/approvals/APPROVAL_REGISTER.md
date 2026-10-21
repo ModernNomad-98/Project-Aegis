@@ -6752,10 +6752,14 @@ naming rule requires.
   pass; or a merge without the receipt condition (f). Conditions in AEGIS-APR-047
   that conflict with this entry do not widen it; this entry is the narrow
   standing route for `scripts/`-only protected paths.
-- **First use:** PR #877 (hardening-only validator change). Its Stage F verdict
-  at the exact head must state the validator checks added, removed or weakened
-  and re-derive the protected-path pattern and required-check list, and satisfy
-  conditions (a)-(f), before the administrator merge and receipt.
+- **First use:** PR #878 (the introducing PR; PR #877 merged before this
+  recording). Its Stage F verdict at the exact head must state the validator
+  checks added, removed or weakened and re-derive the protected-path pattern
+  and required-check list, and satisfy conditions (a)-(f), before the
+  administrator merge and receipt. The owner's direct 2026-10-21 decision
+  quoted verbatim above is the authority and carve-out for this
+  register-introducing PR; applying the standing route here is the owner's
+  recorded decision, not self-application or self-grant.
 - **Evidence:** The direct owner decision in the Project Aegis session on
   2026-10-21, quoted verbatim above and relayed by the coordinating agent. The
   register baseline at the recording base (main
