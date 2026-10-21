@@ -50,7 +50,7 @@
       "prompt": "Design the audit evidence and failure handling for tenant exports.",
       "expected_skill": "export-pipeline-architect",
       "should_not_trigger": [
-        "tenant-isolation-reviewer"
+        "audit-log-architect"
       ],
       "reason": "The request needs export-pipeline-architect's design method; tenant-isolation-reviewer owns a different task."
     },

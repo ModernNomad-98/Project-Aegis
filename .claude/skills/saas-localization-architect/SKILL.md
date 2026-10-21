@@ -36,7 +36,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 1. Enumerate localizable dimensions (language, locale, currency, dates/numbers, content) and assign an owner per dimension.
 2. Define locale negotiation and the fallback chain (user -> tenant -> product default) with explicit precedence.
 3. Separate translated content from runtime formatting (dates, numbers, currency) and state the formatting library/contract.
-4. Define currency presentation vs settlement rules and where each is decided.
+4. Define currency presentation rules and record the settlement boundary/owner (settlement design stays with the billing/subscription owner).
 5. Define storage/cache/CDN keys and invalidation so locale variants never bleed across tenants or locales.
 6. Define the localization test matrix: locale coverage, fallbacks, RTL/formatting, and leak checks.
 7. Define two separate algorithms: (1) locale preference resolution (user -> tenant -> product) and (2) translation-resource fallback (selected locale -> its parent-locale chain -> product default), so missing content never falls back to an unrelated tenant-default language.

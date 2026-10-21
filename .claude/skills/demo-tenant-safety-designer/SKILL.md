@@ -50,7 +50,7 @@ Return, in this order:
 2. Synthetic seed policy and generation rules.
 3. Mutation guardrails and sandbox boundaries.
 4. Access/role limits and reset/expiry plan.
-5. Monitoring signals and conversion-to-real rules.
+5. Monitoring signals, residual realism limits and the conversion-to-real approval path.
 
 ## Validation Checklist
 

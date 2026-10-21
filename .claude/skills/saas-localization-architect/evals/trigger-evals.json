@@ -50,7 +50,7 @@
       "prompt": "Design locale-safe caching and CDN keys so tenants never see another locale's content.",
       "expected_skill": "saas-localization-architect",
       "should_not_trigger": [
-        "api-event-architect"
+        "caching-strategy-designer"
       ],
       "reason": "The request needs saas-localization-architect's design method; api-event-architect owns a different task."
     },

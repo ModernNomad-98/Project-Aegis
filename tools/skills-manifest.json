@@ -341,7 +341,7 @@
     {
       "name": "demo-tenant-safety-designer",
       "path": ".claude/skills/demo-tenant-safety-designer/SKILL.md",
-      "sha256": "ff90b5a551cb383344dec7fc74c9e817bd24f04d28a0843d42e7a768418205cc"
+      "sha256": "472cd3196fdccc1e2213e2ccb199fb976762e94958b2c02fa748a93a5cffd4c1"
     },
     {
       "name": "dependency-direction-guard",
@@ -826,12 +826,12 @@
     {
       "name": "saas-localization-architect",
       "path": ".claude/skills/saas-localization-architect/SKILL.md",
-      "sha256": "e2e46e6860a1cc7c96ce69e27bf5cd3296230094084058331d67f41f08e7546b"
+      "sha256": "2183b95221519a6f7cd585d007bcc9c213a714cddfa9c0ac92810c202d013b0f"
     },
     {
       "name": "saas-offboarding-architect",
       "path": ".claude/skills/saas-offboarding-architect/SKILL.md",
-      "sha256": "7bb5d65ffda8c8a04b6f31fe2692aab8da216c968c27d86b64764b2547a70b14"
+      "sha256": "ce7f0a838b869129ec374662c15c5056d5e794822f0c2be4860cb5f8ad679c7a"
     },
     {
       "name": "saas-platform-architect",
@@ -841,7 +841,7 @@
     {
       "name": "saas-timezone-architect",
       "path": ".claude/skills/saas-timezone-architect/SKILL.md",
-      "sha256": "3b678568809384533b64ef90e7cafd84cbd08e0a8dc28a080840ce333f960f0e"
+      "sha256": "a35d9c1b5365fbc06c2b9a1b8492039a4ad22b7ebbdd3a92bd9803e47555323e"
     },
     {
       "name": "sast-orchestration-designer",
@@ -996,7 +996,7 @@
     {
       "name": "subscription-lifecycle-designer",
       "path": ".claude/skills/subscription-lifecycle-designer/SKILL.md",
-      "sha256": "a1de524612665ad0df3d31a49581af334e4b1a5a2f253461452b6657c7b1904e"
+      "sha256": "72e14499073b2e8ff8b6457a32bf1bad19d71866eb1ce175447a7bbb74d53039"
     },
     {
       "name": "sunset-deprecation-communicator",
@@ -1081,7 +1081,7 @@
     {
       "name": "user-preference-architect",
       "path": ".claude/skills/user-preference-architect/SKILL.md",
-      "sha256": "dd9bd2756172af583193409bb723bcf6ca156f8f7e64b5288bc4be94cb4506e8"
+      "sha256": "41138d11a2e160a185db4d6bb20628bd81da9c8e8dfdf90054015cdb4c0a768b"
     },
     {
       "name": "ux-design-iteration",

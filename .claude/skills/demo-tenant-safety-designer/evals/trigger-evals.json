@@ -68,7 +68,7 @@
       "prompt": "Design monitoring for demo-tenant misuse and data leakage.",
       "expected_skill": "demo-tenant-safety-designer",
       "should_not_trigger": [
-        "secrets-identity-hardener"
+        "observability-operator"
       ],
       "reason": "The request needs demo-tenant-safety-designer's design method; secrets-identity-hardener owns a different task."
     },

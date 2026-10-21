@@ -78,6 +78,7 @@ Return, in this order:
 - The request is the feature-flag system and evaluation placement: route to `feature-flag-architect`.
 - The request is role/permission and object-level authorization: route to `authorization-matrix-designer`.
 - The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
+- The request is cache-key/invalidation policy or notification channel/template UX: route to caching-strategy-designer / notification-webhook-ux-designer.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

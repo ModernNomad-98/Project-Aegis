@@ -4,7 +4,7 @@ Reference for the saas-timezone-architect skill. It is method and record guidanc
 
 ## 1. Core model
 
-- Every time-bearing field/job/report is classified and stored per the contract.
+- Every time-bearing field/job/report is classified and handled per the contract.
 - Zone precedence is explicit for display, scheduling and reporting.
 - DST/ambiguous/imaginary times are handled with defined outcomes.
 - Reminders cannot duplicate or fire at the wrong local time.
@@ -43,7 +43,7 @@ The returned record must name the evidence source for each decision, separate ve
 
 ## 5. Validation before returning
 
-- Every time-bearing field/job/report is classified and stored per the contract.
+- Every time-bearing field/job/report is classified and handled per the contract.
 - Zone precedence is explicit for display, scheduling and reporting.
 - DST/ambiguous/imaginary times are handled with defined outcomes.
 - Reminders cannot duplicate or fire at the wrong local time.

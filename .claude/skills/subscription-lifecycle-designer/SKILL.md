@@ -38,7 +38,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 3. Define proration and timing rules for upgrades, downgrades, cancellations and renewals.
 4. Define payment-failure, dunning and grace behaviour, including access during grace and hard-stop rules.
 5. Define reactivation, grandfathering and cancellation-timing rules so reversibility is explicit.
-6. Specify idempotent transition handling, duplicate-event suppression and rollback for failed transitions.
+6. Specify idempotent transition handling, duplicate-event suppression and compensation/reconciliation for failed external transitions, reserving rollback for reversible internal transitions.
 7. Define late/out-of-order billing-event handling: ordering keys, deterministic winner and duplicate suppression.
 8. Use compensating transactions and reconciliation for external billing transitions that cannot be rolled back literally.
 9. Return the state machine, transition matrix, edge cases and verification plan; do not implement billing code.
@@ -50,7 +50,7 @@ Return, in this order:
 1. Subscription state model with entry/exit conditions.
 2. Transition matrix (trigger, actor, idempotency, effects, entitlement per state).
 3. Proration, dunning/grace, cancellation/reactivation and grandfathering rules.
-4. Idempotency and rollback plan for transitions.
+4. Idempotency and compensation/reconciliation plan (rollback only for reversible internal transitions).
 5. Edge cases, open questions and verification plan.
 
 ## Validation Checklist

@@ -27,6 +27,7 @@ Reference for the demo-tenant-safety-designer skill. It is method and record gui
 5. Monitoring signals and conversion-to-real rules.
 
 - Misuse signals: production DB/secret access, outbound email/payment/webhook attempts, data-volume anomalies, role escalation, export attempts; each with an alert owner and escalation path.
+- Residual realism limits: state what the demo cannot mirror and the approval path if a closer mirror is needed.
 
 The returned record must name the evidence source for each decision, separate verified facts from assumptions, and list what could not be inspected. The skill does not edit files or execute commands; delegated actions go to the host/user or the existing implementation owner under existing authority.
 

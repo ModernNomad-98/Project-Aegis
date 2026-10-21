@@ -5,7 +5,7 @@ Reference for the saas-localization-architect skill. It is method and record gui
 ## 1. Core model
 
 - Every localizable dimension has an owner and a scope.
-- Fallback chain is explicit and single per surface.
+- Fallback algorithm is explicit and single per concern: locale preference resolution and translation-resource fallback are separate.
 - Translation and formatting are separated; currency settlement vs display is stated.
 - Cache/CDN keys are locale- and tenant-safe with invalidation rules.
 - Test matrix covers locales, fallbacks and cross-locale leakage.
@@ -44,7 +44,7 @@ The returned record must name the evidence source for each decision, separate ve
 ## 5. Validation before returning
 
 - Every localizable dimension has an owner and a scope.
-- Fallback chain is explicit and single per surface.
+- Fallback algorithm is explicit and single per concern: locale preference resolution and translation-resource fallback are separate.
 - Translation and formatting are separated; currency settlement vs display is stated.
 - Cache/CDN keys are locale- and tenant-safe with invalidation rules.
 - Test matrix covers locales, fallbacks and cross-locale leakage.

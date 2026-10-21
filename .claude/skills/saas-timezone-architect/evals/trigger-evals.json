@@ -68,7 +68,7 @@
       "prompt": "Design the DST/ambiguous-time test matrix for our scheduler.",
       "expected_skill": "saas-timezone-architect",
       "should_not_trigger": [
-        "audit-log-architect"
+        "background-job-orchestration-architect"
       ],
       "reason": "The request needs saas-timezone-architect's design method; audit-log-architect owns a different task."
     },

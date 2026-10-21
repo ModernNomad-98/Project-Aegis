@@ -15,7 +15,9 @@
     "mobile-viewport-craft",
     "accessibility-test-harness",
     "product-spec-writer",
-    "validation-boundary-designer"
+    "validation-boundary-designer",
+    "caching-strategy-designer",
+    "notification-webhook-ux-designer"
   ],
   "cases": [
     {
@@ -59,7 +61,7 @@
       "prompt": "Review this settings design for preferences accidentally becoming entitlements.",
       "expected_skill": "user-preference-architect",
       "should_not_trigger": [
-        "multi-tenant-data-architect"
+        "plan-entitlement-architect"
       ],
       "reason": "The request needs user-preference-architect's design method; multi-tenant-data-architect owns a different task."
     },

@@ -34,7 +34,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 ## Workflow
 
 1. Enumerate trigger events (user leaves, tenant cancels, contract ends) and their actors/approvals.
-2. Order the flow: access revocation first, then export, retention, deletion, billing close and ownership transfer.
+2. Order the flow: revoke non-owner access first; for the last owner, verify the successor or separately authorized executor before revocation; then export, retention, deletion, billing close and ownership transfer.
 3. Define what is reversible vs irreversible at each step and who decides.
 4. Define legal-hold and retention exceptions with owners and expiry.
 5. Specify the records each step must leave and where they are retained.
@@ -58,7 +58,7 @@ Return, in this order:
 ## Validation Checklist
 
 - Every trigger has an actor and approval requirement.
-- Access revocation precedes data operations and is verified.
+- Non-owner access revocation precedes data operations and is verified; the last owner's authority is revoked only after a successor or separately authorized executor is verified.
 - Retention/deletion/legal-hold rules are explicit and owner-approved.
 - Reversible vs irreversible steps are distinguished; no destructive step is implicit.
 - Billing close and ownership transfer are in the ordered flow.
