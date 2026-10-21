@@ -404,12 +404,15 @@ All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 | `dependency-direction-guard` | cat 01 **#7** (Batch 1) | yes | Derives the real import graph, finds cycles/inversions/feature coupling/platform leaks, states allowed direction, ranks minimal fixes and records exceptions; read-only. |
 | `interface-first-designer` | cat 01 **#8** (Batch 1) | yes | Designs contracts before internals: callers/constraints, interfaces/adapters, compatibility/versioning, test doubles and ordered migration; stops before implementation. |
 | `data-flow-diagrammer` | cat 01 **#49** (Batch 1) | yes | Produces a trustworthy data-flow diagram: sources/sinks/stores/transforms/side effects, trust boundaries, assumptions and unverified elements labeled; documentation-only. |
-| `concurrency-race-reviewer` | cat 01 **#155** (Batch 1) | yes | Reviews interleaving operations for lost updates, double-create, check-then-act and retry duplicates; proposes serialization/idempotency/locking fixes with tests; review-only. |
+| `concurrency-race-reviewer` | cat 04 **#155** (Batch 1) | yes | Reviews interleaving operations for lost updates, double-create, check-then-act and retry duplicates; proposes serialization/idempotency/locking fixes with tests; review-only. |
 
-Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 2 clusters:
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three original Phase 2 clusters:
 design (`domain-modeler`, `architecture-designer`, `adr-writer`), implementation
 (`docs-first-implementer`, `tdd-engineer`, `systematic-debugger`), and review/audit
 (`code-reviewer`, `code-simplifier`, `principal-code-analyst`, `full-codebase-auditor`).
+The Batch 1 Phase 2 additions (`layered-architecture-enforcer`,
+`dependency-direction-guard`, `interface-first-designer`, `data-flow-diagrammer`)
+also ship standalone 22-case trigger-eval files.
 
 A fourth cluster was added by D77 (2026-10-10): **boundary & telemetry design**
 (`validation-boundary-designer`, `observability-by-design`) — with cross-phase
@@ -499,12 +502,14 @@ per-command negative-test plan.
 | `security-regression-harness-designer` | cat 03 **#125** (Batch 1) | yes | Turns a fixed security/access-control bug into a permanent regression harness: safe fixtures, expected-denial cases, CI placement and retest evidence; design-only. |
 | `security-impact-note-author` | cat 03 **#127** (Batch 1) | yes | Authors a reviewable security impact note: assets/impact, threats, mitigations, tests, rollback, approvals and residual risk, separating verified from assumed; authoring-only. |
 
-Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the two Phase 4 clusters:
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the two original Phase 4 clusters:
 the **threat & hardening** cluster (`threat-modeler`, `appsec-implementer`,
 `secrets-identity-hardener`) and the **security-review** cluster
 (`supply-chain-security-reviewer`, `security-pr-reviewer`, `secure-migration-reviewer`,
 `static-analysis-reviewer`) — the latter with explicit discrimination against the
-shipped `code-reviewer` (general review vs security-specialized). The **tenant-security**
+shipped `code-reviewer` (general review vs security-specialized); the Batch 1 Phase 4 additions
+(`security-regression-harness-designer`, `security-impact-note-author`) also ship
+standalone 22-case trigger-eval files. The **tenant-security**
 cluster (`multi-tenant-security-tester`, `rls-policy-auditor`) additionally discriminates
 against the shipped `tenant-isolation-reviewer` (inspection-based review vs executable
 tests vs database-policy audit).
@@ -580,6 +585,7 @@ auto-invocable, no `disable-model-invocation` — and each ships both eval files
 | `mobile-journey-test-designer` | cat 06 **#230** | yes | Critical-journey mobile QA design: breakpoints, touch, dialogs, navigation, orientation, keyboard, safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. |
 | `role-coverage-test-designer` | cat 06 **#229** (D10 Tier 2, built by D76) | yes | Role-coverage QA design over the shipped authorization matrix: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Denials stay with `authorization-matrix-designer` step 7 / `multi-tenant-security-tester`; custom-role coverage composed from the #59 extension (built by D78). |
 | `property-based-test-designer` | cat 06 **#194** (D10 Tier 3, built by D77) | yes | Property-based test design: domain invariants per target, bounded generator domains with shrinking, counterexample triage, runner handoff. On-demand, specialized coverage. Designs; writes and runs no tests. |
+| `production-safe-smoke-tester` | cat 06 **#188** (Batch 1) | yes | Designs production-safe smoke checks: read-only/reversible probes, seeded fixtures, forbidden operations, stop/escalation and explicitly unexercised areas; execution delegated. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
@@ -600,7 +606,6 @@ design** (`visual-regression-test-designer`, `exploratory-charter-designer`,
 `regression-suite-curator`, `manual-test-case-creator`,
 `clickthrough-test-engineer`, `qa-strategy-architect`, `mobile-viewport-craft`,
 `playwright-e2e-engineer`, and `test-plan-designer`.
-| `production-safe-smoke-tester` | cat 06 **#188** (Batch 1) | yes | Designs production-safe smoke checks: read-only/reversible probes, seeded fixtures, forbidden operations, stop/escalation and explicitly unexercised areas; execution delegated. |
 
 A sixth cluster was added by D76 (2026-10-10): **role coverage**
 (`role-coverage-test-designer`) — discriminated against

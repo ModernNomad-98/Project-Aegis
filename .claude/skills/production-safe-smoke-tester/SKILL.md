@@ -1,6 +1,6 @@
 ---
 name: production-safe-smoke-tester
-description: 'Use when checking a deployed system safely: design read-only or reversible smoke checks that avoid unsafe records, fixture-only routes and destructive side effects, and state exactly what is not exercised. Design/advisory only; execution is delegated to the host/user under production authority.'
+description: 'Use when checking a deployed system safely: design read-only or reversible smoke checks that avoid test-only endpoints, unsafe records and destructive side effects while allowing seeded fixtures on real production routes, and state exactly what is not exercised. Design/advisory only; execution is delegated to the host/user under production authority.'
 ---
 
 # Production Safe Smoke Tester
