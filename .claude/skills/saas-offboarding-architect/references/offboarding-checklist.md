@@ -26,14 +26,20 @@ Reference for the saas-offboarding-architect skill. It is method and record guid
 4. Billing-close and ownership-transfer steps.
 5. Evidence plan and exception paths.
 
+- Per-trigger branches: user leaves / tenant cancels / ownership change; state which steps apply.
+- Last-owner authority: verify a successor or executor before revocation.
+- Post-revocation export: authorized generator/deliverer, short-lived access, verification.
+- Backups, derived copies and sub-processors: expiry, deletion verification, residual-risk evidence.
+
 The returned record must name the evidence source for each decision, separate verified facts from assumptions, and list what could not be inspected. The skill does not edit files or execute commands; delegated actions go to the host/user or the existing implementation owner under existing authority.
 
 ## 4. Boundaries
 
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
-- Tenant creation/provisioning and lifecycle handoff routes to `tenant-provisioning-designer`; this skill does not perform that owner's work.
-- Membership/invitation identity flows routes to `membership-invitation-designer`; this skill does not perform that owner's work.
-- Audit taxonomy and retention of records routes to `audit-log-architect`; this skill does not perform that owner's work.
+- Route tenant creation/provisioning and lifecycle handoff to `tenant-provisioning-designer`; this skill does not perform that owner's work.
+- Route membership/invitation identity flows to `membership-invitation-designer`; this skill does not perform that owner's work.
+- Route audit taxonomy and retention of records to `audit-log-architect`; this skill does not perform that owner's work.
+- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning
@@ -44,3 +50,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Reversible vs irreversible steps are distinguished; no destructive step is implicit.
 - Billing close and ownership transfer are in the ordered flow.
 - Each step leaves audit evidence; exceptions are defined.
+- Per-trigger branches state which steps apply (ownership transfer may skip deletion/closure).
+- A successor/executor is verified before the last owner's authority is revoked.
+- The post-revocation export delivery channel and verifier are defined.
+- Backups, derived copies and sub-processor deletion evidence are covered.

@@ -29,6 +29,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - Job scheduler semantics and how it stores schedule time.
 - Reporting/analytics cutoff requirements.
 - Storage model and existing timestamp columns.
+- tzdata version/update policy and historical zone/offset preservation requirements.
 
 ## Workflow
 
@@ -39,6 +40,9 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 5. Define reporting cutoffs (tenant day vs UTC) and how aggregations are auditable.
 6. Define migration/backfill for existing timestamps and the verification plan.
 7. Return the timezone model, precedence rules, DST/edge test matrix and migration plan; do not implement code.
+8. Require a named IANA time-zone identifier (e.g. America/New_York) for schedules and other future local intent; store an offset only as an observed/audit snapshot at event time.
+9. Define tzdata version/update policy and re-evaluation of future schedules after a tzdata change.
+10. State that changing a tenant's timezone affects new events and display only; historical events retain their original zone/offset, with the backfill policy and residual ambiguity recorded.
 
 ## Output Format
 
@@ -58,6 +62,9 @@ Return, in this order:
 - Reminders cannot duplicate or fire at the wrong local time.
 - Reporting cutoffs are defined and auditable.
 - Migration/backfill of existing timestamps is specified; no code claimed.
+- Scheduled/future local intent stores an IANA zone, not a fixed offset; offsets are audit snapshots only.
+- tzdata update/re-evaluation policy is defined.
+- Historical events retain their original zone/offset; a tenant zone change affects new events/display only.
 
 ## Gotchas
 
@@ -65,12 +72,15 @@ Return, in this order:
 - A reminder scheduled at 09:00 local must survive DST or it fires at the wrong hour.
 - Reporting by UTC day mismatches the tenant's business day every evening.
 - Backfilling zones without recording the assumption corrupts historical reports.
+- Storing a fixed offset instead of an IANA zone loses DST rules and historical zone changes.
+- A tzdata update can silently move future reminders; re-evaluate schedules on update.
 
 ## Stop Conditions
 
 - The request is notification channel/template and delivery UX: route to `notification-webhook-ux-designer`.
 - The request is telemetry contract and timestamps: route to `observability-by-design`.
 - The request is external API time fields and contract semantics: route to `api-event-architect`.
+- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

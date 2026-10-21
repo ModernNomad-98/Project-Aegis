@@ -26,14 +26,17 @@ Reference for the user-preference-architect skill. It is method and record guida
 4. Typed storage/schema and unknown-key handling.
 5. Migration, rollback and cache-invalidation plan.
 
+- Policy enforcement: tenant ceiling wins; out-of-policy values are clamped/rejected/disabled with a user-visible state and a migration.
+
 The returned record must name the evidence source for each decision, separate verified facts from assumptions, and list what could not be inspected. The skill does not edit files or execute commands; delegated actions go to the host/user or the existing implementation owner under existing authority.
 
 ## 4. Boundaries
 
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
-- Tenant semantics and membership model routes to `tenant-modeler`; this skill does not perform that owner's work.
-- The feature-flag system and evaluation placement routes to `feature-flag-architect`; this skill does not perform that owner's work.
-- Role/permission and object-level authorization routes to `authorization-matrix-designer`; this skill does not perform that owner's work.
+- Route tenant semantics and membership model to `tenant-modeler`; this skill does not perform that owner's work.
+- Route the feature-flag system and evaluation placement to `feature-flag-architect`; this skill does not perform that owner's work.
+- Route role/permission and object-level authorization to `authorization-matrix-designer`; this skill does not perform that owner's work.
+- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning
@@ -44,3 +47,5 @@ The returned record must name the evidence source for each decision, separate ve
 - Storage is typed; unknown/invalid keys are handled deterministically.
 - Migration and rollback preserve tenant policy; audit/privacy rules stated.
 - No preference is treated as an entitlement or authorization decision.
+- Lookup precedence and tenant-policy enforcement are distinct and both stated.
+- Out-of-policy legacy values have a defined outcome and migration.

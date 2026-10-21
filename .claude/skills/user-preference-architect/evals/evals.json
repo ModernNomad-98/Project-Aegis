@@ -10,9 +10,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "State the scope and the owner of each decision before proposing changes.",
-          "Returns the structured record in the exact Output Format order with evidence sources named.",
-          "Does not edit code or claim unrun evidence."
+          "Separates lookup precedence (user -> tenant -> global) from tenant-policy enforcement.",
+          "Defines typed storage, defaults and unknown-key handling.",
+          "States what a user sees when a tenant cap applies."
         ]
       }
     },
@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Apply the single precedence/resolution rule consistently across surfaces.",
-          "Records assumptions and unknowns instead of inventing them.",
-          "Does not perform the delegated implementation."
+          "Defines how out-of-policy legacy user values are detected and clamped/migrated.",
+          "Keeps one resolution point and cache-invalidation rule across services.",
+          "Does not treat a preference as an entitlement."
         ]
       }
     },
@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Name the nearest owners and route excluded work away from this skill.",
-          "Keeps verified facts and assumptions separate in the record.",
-          "Does not claim a run, migration or deployment it did not perform."
+          "Specifies typed storage/schema and migration/rollback preserving tenant policy.",
+          "Records audit/privacy rules and the single resolution point.",
+          "Does not implement the migration."
         ]
       }
     },
@@ -49,7 +49,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Routes to <B>tenant-modeler<B>; this skill does not perform that neighbouring owner's work.",
+          "Routes to `tenant-modeler`; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
         ]
       }

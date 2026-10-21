@@ -26,14 +26,19 @@ Reference for the saas-timezone-architect skill. It is method and record guidanc
 4. DST/ambiguous-time and reminder-uniqueness rules.
 5. Reporting cutoff rules and migration/verification plan.
 
+- Scheduling: IANA zone required; offset only as observed/audit snapshot.
+- tzdata: version pinning/update policy and schedule re-evaluation.
+- History: stored zone/offset retained on tenant zone change; backfill policy and residual ambiguity.
+
 The returned record must name the evidence source for each decision, separate verified facts from assumptions, and list what could not be inspected. The skill does not edit files or execute commands; delegated actions go to the host/user or the existing implementation owner under existing authority.
 
 ## 4. Boundaries
 
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
-- Notification channel/template and delivery ux routes to `notification-webhook-ux-designer`; this skill does not perform that owner's work.
-- Telemetry contract and timestamps routes to `observability-by-design`; this skill does not perform that owner's work.
-- External api time fields and contract semantics routes to `api-event-architect`; this skill does not perform that owner's work.
+- Route notification channel/template and delivery UX to `notification-webhook-ux-designer`; this skill does not perform that owner's work.
+- Route telemetry contract and timestamps to `observability-by-design`; this skill does not perform that owner's work.
+- Route external API time fields and contract semantics to `api-event-architect`; this skill does not perform that owner's work.
+- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning
@@ -44,3 +49,6 @@ The returned record must name the evidence source for each decision, separate ve
 - Reminders cannot duplicate or fire at the wrong local time.
 - Reporting cutoffs are defined and auditable.
 - Migration/backfill of existing timestamps is specified; no code claimed.
+- Scheduled/future local intent stores an IANA zone, not a fixed offset; offsets are audit snapshots only.
+- tzdata update/re-evaluation policy is defined.
+- Historical events retain their original zone/offset; a tenant zone change affects new events/display only.

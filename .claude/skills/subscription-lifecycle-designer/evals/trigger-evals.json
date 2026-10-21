@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "plan-entitlement-architect"
       ],
-      "reason": "The request needs subscription-lifecycle-designer's method; plan-entitlement-architect owns a different task."
+      "reason": "The request needs subscription-lifecycle-designer's design method; plan-entitlement-architect owns a different task."
     },
     {
       "id": "subscription-lifecycle-designer-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "tenant-modeler"
       ],
-      "reason": "The request needs subscription-lifecycle-designer's method; tenant-modeler owns a different task."
+      "reason": "The request needs subscription-lifecycle-designer's design method; tenant-modeler owns a different task."
     },
     {
       "id": "subscription-lifecycle-designer-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "saas-cost-architect"
       ],
-      "reason": "The request needs subscription-lifecycle-designer's method; saas-cost-architect owns a different task."
+      "reason": "The request needs subscription-lifecycle-designer's design method; saas-cost-architect owns a different task."
     },
     {
       "id": "subscription-lifecycle-designer-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "api-event-architect"
       ],
-      "reason": "The request needs subscription-lifecycle-designer's method; api-event-architect owns a different task."
+      "reason": "The request needs subscription-lifecycle-designer's design method; api-event-architect owns a different task."
     },
     {
       "id": "subscription-lifecycle-designer-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "audit-log-architect"
       ],
-      "reason": "The request needs subscription-lifecycle-designer's method; audit-log-architect owns a different task."
+      "reason": "The request needs subscription-lifecycle-designer's design method; audit-log-architect owns a different task."
     },
     {
       "id": "subscription-lifecycle-designer-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "authorization-matrix-designer"
       ],
-      "reason": "The request needs subscription-lifecycle-designer's method; authorization-matrix-designer owns a different task."
+      "reason": "The request needs subscription-lifecycle-designer's design method; authorization-matrix-designer owns a different task."
     },
     {
       "id": "subscription-lifecycle-designer-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "admin-console-architect"
       ],
-      "reason": "The request needs subscription-lifecycle-designer's method; admin-console-architect owns a different task."
+      "reason": "The request needs subscription-lifecycle-designer's design method; admin-console-architect owns a different task."
     },
     {
       "id": "subscription-lifecycle-designer-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "notification-webhook-ux-designer"
       ],
-      "reason": "The request needs subscription-lifecycle-designer's method; notification-webhook-ux-designer owns a different task."
+      "reason": "The request needs subscription-lifecycle-designer's design method; notification-webhook-ux-designer owns a different task."
     },
     {
       "id": "subscription-lifecycle-designer-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to plan-entitlement-architect; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is plan-entitlement-architect's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to tenant-modeler; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is tenant-modeler's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to saas-cost-architect; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is saas-cost-architect's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to api-event-architect; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is api-event-architect's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to audit-log-architect; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is audit-log-architect's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to authorization-matrix-designer; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to admin-console-architect; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is admin-console-architect's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to notification-webhook-ux-designer; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is notification-webhook-ux-designer's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to data-migration-runbook-author; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is data-migration-runbook-author's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to release-readiness-reviewer; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to secure-migration-reviewer; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is secure-migration-reviewer's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to feature-flag-architect; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is feature-flag-architect's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to incident-response-runbook; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is incident-response-runbook's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     },
     {
       "id": "subscription-lifecycle-designer-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "This request belongs to observability-by-design; subscription-lifecycle-designer owns a different design task and must not take it over."
+      "reason": "This request is observability-by-design's deliverable end-to-end; subscription-lifecycle-designer owns a different design task and must not take it over."
     }
   ]
 }

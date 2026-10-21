@@ -804,7 +804,8 @@ keeps a human as the approval gate on anything irreversible. See
    `systematic-debugger`.
 4. **SaaS & tenant isolation** *(Phase 3, 19)* — multi-tenant foundations: platform structure,
    tenant semantics, per-store scoping, roles/permissions, plans, audit trail, cost, external
-   API contracts, and the feature-flag system (added by D64). *e.g.* `saas-platform-architect`, `tenant-isolation-reviewer`,
+   API contracts, the feature-flag system (added by D64), and the Batch 2 SaaS lifecycle,
+   preference, export, demo-tenant, offboarding, localization and timezone skills. *e.g.* `saas-platform-architect`, `tenant-isolation-reviewer`,
    `authorization-matrix-designer`, `audit-log-architect`, `api-event-architect`.
 5. **Security, RLS & supply chain** *(Phase 4, 11)* — hands-on appsec: threat modeling, RLS
    policy audit, secrets hardening, supply-chain review, security PR review, migration safety,

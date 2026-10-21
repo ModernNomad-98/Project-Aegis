@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "tenant-modeler"
       ],
-      "reason": "The request needs user-preference-architect's method; tenant-modeler owns a different task."
+      "reason": "The request needs user-preference-architect's design method; tenant-modeler owns a different task."
     },
     {
       "id": "user-preference-architect-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "feature-flag-architect"
       ],
-      "reason": "The request needs user-preference-architect's method; feature-flag-architect owns a different task."
+      "reason": "The request needs user-preference-architect's design method; feature-flag-architect owns a different task."
     },
     {
       "id": "user-preference-architect-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "authorization-matrix-designer"
       ],
-      "reason": "The request needs user-preference-architect's method; authorization-matrix-designer owns a different task."
+      "reason": "The request needs user-preference-architect's design method; authorization-matrix-designer owns a different task."
     },
     {
       "id": "user-preference-architect-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "saas-platform-architect"
       ],
-      "reason": "The request needs user-preference-architect's method; saas-platform-architect owns a different task."
+      "reason": "The request needs user-preference-architect's design method; saas-platform-architect owns a different task."
     },
     {
       "id": "user-preference-architect-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "multi-tenant-data-architect"
       ],
-      "reason": "The request needs user-preference-architect's method; multi-tenant-data-architect owns a different task."
+      "reason": "The request needs user-preference-architect's design method; multi-tenant-data-architect owns a different task."
     },
     {
       "id": "user-preference-architect-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "schema-evolution-planner"
       ],
-      "reason": "The request needs user-preference-architect's method; schema-evolution-planner owns a different task."
+      "reason": "The request needs user-preference-architect's design method; schema-evolution-planner owns a different task."
     },
     {
       "id": "user-preference-architect-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "api-event-architect"
       ],
-      "reason": "The request needs user-preference-architect's method; api-event-architect owns a different task."
+      "reason": "The request needs user-preference-architect's design method; api-event-architect owns a different task."
     },
     {
       "id": "user-preference-architect-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "audit-log-architect"
       ],
-      "reason": "The request needs user-preference-architect's method; audit-log-architect owns a different task."
+      "reason": "The request needs user-preference-architect's design method; audit-log-architect owns a different task."
     },
     {
       "id": "user-preference-architect-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to tenant-modeler; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is tenant-modeler's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to feature-flag-architect; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is feature-flag-architect's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to authorization-matrix-designer; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to saas-platform-architect; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is saas-platform-architect's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to multi-tenant-data-architect; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is multi-tenant-data-architect's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to schema-evolution-planner; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is schema-evolution-planner's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to api-event-architect; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is api-event-architect's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to audit-log-architect; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is audit-log-architect's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to admin-console-architect; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is admin-console-architect's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to frontend-perf-engineer; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to mobile-viewport-craft; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is mobile-viewport-craft's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to accessibility-test-harness; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is accessibility-test-harness's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to product-spec-writer; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is product-spec-writer's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     },
     {
       "id": "user-preference-architect-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "This request belongs to validation-boundary-designer; user-preference-architect owns a different design task and must not take it over."
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; user-preference-architect owns a different design task and must not take it over."
     }
   ]
 }

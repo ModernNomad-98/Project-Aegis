@@ -26,14 +26,17 @@ Reference for the demo-tenant-safety-designer skill. It is method and record gui
 4. Access/role limits and reset/expiry plan.
 5. Monitoring signals and conversion-to-real rules.
 
+- Misuse signals: production DB/secret access, outbound email/payment/webhook attempts, data-volume anomalies, role escalation, export attempts; each with an alert owner and escalation path.
+
 The returned record must name the evidence source for each decision, separate verified facts from assumptions, and list what could not be inspected. The skill does not edit files or execute commands; delegated actions go to the host/user or the existing implementation owner under existing authority.
 
 ## 4. Boundaries
 
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
-- Cross-tenant leakage review of a real system routes to `tenant-isolation-reviewer`; this skill does not perform that owner's work.
-- Tenant-creation workflow and seeding routes to `tenant-provisioning-designer`; this skill does not perform that owner's work.
-- Executing non-production test-tenant creation routes to `test-tenant-provisioner`; this skill does not perform that owner's work.
+- Route cross-tenant leakage review of a real system to `tenant-isolation-reviewer`; this skill does not perform that owner's work.
+- Route tenant-creation workflow and seeding to `tenant-provisioning-designer`; this skill does not perform that owner's work.
+- Route executing non-production test-tenant creation to `test-tenant-provisioner`; this skill does not perform that owner's work.
+- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning
@@ -44,3 +47,4 @@ The returned record must name the evidence source for each decision, separate ve
 - Demo roles/access are limited and audited.
 - Reset/expiry is reliable and evidenced; conversion-to-real needs explicit approval.
 - No provisioning or live environment mutation is performed by the design.
+- Concrete misuse signals and their alert owner/escalation path are defined.

@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "tenant-provisioning-designer"
       ],
-      "reason": "The request needs saas-offboarding-architect's method; tenant-provisioning-designer owns a different task."
+      "reason": "The request needs saas-offboarding-architect's design method; tenant-provisioning-designer owns a different task."
     },
     {
       "id": "saas-offboarding-architect-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "membership-invitation-designer"
       ],
-      "reason": "The request needs saas-offboarding-architect's method; membership-invitation-designer owns a different task."
+      "reason": "The request needs saas-offboarding-architect's design method; membership-invitation-designer owns a different task."
     },
     {
       "id": "saas-offboarding-architect-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "audit-log-architect"
       ],
-      "reason": "The request needs saas-offboarding-architect's method; audit-log-architect owns a different task."
+      "reason": "The request needs saas-offboarding-architect's design method; audit-log-architect owns a different task."
     },
     {
       "id": "saas-offboarding-architect-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "pii-lifecycle-designer"
       ],
-      "reason": "The request needs saas-offboarding-architect's method; pii-lifecycle-designer owns a different task."
+      "reason": "The request needs saas-offboarding-architect's design method; pii-lifecycle-designer owns a different task."
     },
     {
       "id": "saas-offboarding-architect-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "tenant-modeler"
       ],
-      "reason": "The request needs saas-offboarding-architect's method; tenant-modeler owns a different task."
+      "reason": "The request needs saas-offboarding-architect's design method; tenant-modeler owns a different task."
     },
     {
       "id": "saas-offboarding-architect-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "authorization-matrix-designer"
       ],
-      "reason": "The request needs saas-offboarding-architect's method; authorization-matrix-designer owns a different task."
+      "reason": "The request needs saas-offboarding-architect's design method; authorization-matrix-designer owns a different task."
     },
     {
       "id": "saas-offboarding-architect-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "plan-entitlement-architect"
       ],
-      "reason": "The request needs saas-offboarding-architect's method; plan-entitlement-architect owns a different task."
+      "reason": "The request needs saas-offboarding-architect's design method; plan-entitlement-architect owns a different task."
     },
     {
       "id": "saas-offboarding-architect-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "data-migration-runbook-author"
       ],
-      "reason": "The request needs saas-offboarding-architect's method; data-migration-runbook-author owns a different task."
+      "reason": "The request needs saas-offboarding-architect's design method; data-migration-runbook-author owns a different task."
     },
     {
       "id": "saas-offboarding-architect-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to tenant-provisioning-designer; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is tenant-provisioning-designer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to membership-invitation-designer; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is membership-invitation-designer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to audit-log-architect; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is audit-log-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to pii-lifecycle-designer; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is pii-lifecycle-designer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to tenant-modeler; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is tenant-modeler's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to authorization-matrix-designer; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to plan-entitlement-architect; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is plan-entitlement-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to data-migration-runbook-author; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is data-migration-runbook-author's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to secure-migration-reviewer; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is secure-migration-reviewer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to sensitive-disclosure-guard; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is sensitive-disclosure-guard's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to admin-console-architect; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is admin-console-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to incident-response-runbook; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is incident-response-runbook's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to secrets-identity-hardener; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is secrets-identity-hardener's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-offboarding-architect-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "saas-offboarding-architect"
       ],
-      "reason": "This request belongs to saas-cost-architect; saas-offboarding-architect owns a different design task and must not take it over."
+      "reason": "This request is saas-cost-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
     }
   ]
 }

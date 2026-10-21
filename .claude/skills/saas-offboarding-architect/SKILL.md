@@ -29,6 +29,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - Billing model and the rules for final invoice/closure.
 - Ownership/transfer model and who may approve each step.
 - Audit requirements and evidence retention for offboarding.
+- Backup expiry, derived-copy inventory and sub-processor deletion evidence.
 
 ## Workflow
 
@@ -39,6 +40,10 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 5. Specify the records each step must leave and where they are retained.
 6. Define exception paths: partial offboarding, cancelled offboarding, failed deletion and idle tenants.
 7. Return the offboarding state machine, ordered checklist, evidence plan and exception paths; do not execute deletes.
+8. Define per-trigger branches (single user leaves / tenant cancels / merger-ownership change): which steps apply and which are skipped.
+9. For a sole-owner departure or ownership change, establish and verify a successor or separately authorized executor BEFORE revoking the last owner's authority; still revoke non-owner access promptly.
+10. Define the secure export delivery channel after revocation: who generates/delivers it, the short-lived access method and how it is verified.
+11. Cover backups, derived copies and sub-processor deletion verification with residual-risk evidence.
 
 ## Output Format
 
@@ -58,6 +63,10 @@ Return, in this order:
 - Reversible vs irreversible steps are distinguished; no destructive step is implicit.
 - Billing close and ownership transfer are in the ordered flow.
 - Each step leaves audit evidence; exceptions are defined.
+- Per-trigger branches state which steps apply (ownership transfer may skip deletion/closure).
+- A successor/executor is verified before the last owner's authority is revoked.
+- The post-revocation export delivery channel and verifier are defined.
+- Backups, derived copies and sub-processor deletion evidence are covered.
 
 ## Gotchas
 
@@ -65,12 +74,15 @@ Return, in this order:
 - Legal holds silently lost during dev work create compliance exposure.
 - A single 'delete tenant' action hides irreversible steps that need explicit approval.
 - Offboarding without billing close leaves invoices for a tenant that no longer exists.
+- Revoking the last owner before a successor is verified leaves nobody able to authorize the export or complete the transfer.
+- Derived copies, backups and sub-processors mean deletion is not complete until their evidence is recorded.
 
 ## Stop Conditions
 
 - The request is tenant creation/provisioning and lifecycle handoff: route to `tenant-provisioning-designer`.
 - The request is membership/invitation identity flows: route to `membership-invitation-designer`.
 - The request is audit taxonomy and retention of records: route to `audit-log-architect`.
+- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

@@ -478,7 +478,7 @@ cross-phase discrimination against `tenant-modeler`, `saas-platform-architect`,
 A fifth cluster was added by D109 (2026-10-21): **SaaS lifecycle**
 (`subscription-lifecycle-designer`, `user-preference-architect`, `export-pipeline-architect`,
 `demo-tenant-safety-designer`, `saas-offboarding-architect`, `saas-localization-architect`,
-`saas-timezone-architect`) - with cross-phase discrimination against
+`saas-timezone-architect`) - with representative cross-phase discrimination including
 `plan-entitlement-architect`, `tenant-modeler`, `saas-cost-architect`,
 `tenant-provisioning-designer`, `membership-invitation-designer`,
 `tenant-isolation-reviewer`, `multi-tenant-data-architect`, `audit-log-architect`,

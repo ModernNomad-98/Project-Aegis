@@ -29,6 +29,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - Environment model and identity/secret separation between demo and production.
 - Access paths and role assumptions for demo users.
 - Reset/expiry and conversion-to-real requirements.
+- Monitoring/alerting ownership for demo-environment misuse.
 
 ## Workflow
 
@@ -39,6 +40,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 5. Design reset and expiry: schedule, idempotent reseeding, teardown and evidence.
 6. Define monitoring for misuse/leak signals and the conversion-to-real rules and approvals.
 7. Return the demo-tenant design, isolation controls, reset/seed plan and safety checks; do not provision anything.
+8. Define concrete misuse signals: production DB or secret access, outbound email/payment/webhook attempts, data-volume anomalies, role escalation, export attempts, and the alert owner/escalation path.
 
 ## Output Format
 
@@ -58,6 +60,7 @@ Return, in this order:
 - Demo roles/access are limited and audited.
 - Reset/expiry is reliable and evidenced; conversion-to-real needs explicit approval.
 - No provisioning or live environment mutation is performed by the design.
+- Concrete misuse signals and their alert owner/escalation path are defined.
 
 ## Gotchas
 
@@ -65,12 +68,14 @@ Return, in this order:
 - Reusing production secrets in a demo environment removes the isolation boundary.
 - A demo that can send real emails, payments or webhooks creates real-world side effects.
 - Without an expiry/reset owner, demo tenants silently accumulate and become production-like.
+- A demo that can send real emails, payments or webhooks creates real side effects; guard the outbound boundary explicitly.
 
 ## Stop Conditions
 
 - The request is cross-tenant leakage review of a real system: route to `tenant-isolation-reviewer`.
 - The request is tenant-creation workflow and seeding: route to `tenant-provisioning-designer`.
 - The request is executing non-production test-tenant creation: route to `test-tenant-provisioner`.
+- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

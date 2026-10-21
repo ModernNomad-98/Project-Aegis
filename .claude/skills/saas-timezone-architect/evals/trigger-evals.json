@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "notification-webhook-ux-designer"
       ],
-      "reason": "The request needs saas-timezone-architect's method; notification-webhook-ux-designer owns a different task."
+      "reason": "The request needs saas-timezone-architect's design method; notification-webhook-ux-designer owns a different task."
     },
     {
       "id": "saas-timezone-architect-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "observability-by-design"
       ],
-      "reason": "The request needs saas-timezone-architect's method; observability-by-design owns a different task."
+      "reason": "The request needs saas-timezone-architect's design method; observability-by-design owns a different task."
     },
     {
       "id": "saas-timezone-architect-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "api-event-architect"
       ],
-      "reason": "The request needs saas-timezone-architect's method; api-event-architect owns a different task."
+      "reason": "The request needs saas-timezone-architect's design method; api-event-architect owns a different task."
     },
     {
       "id": "saas-timezone-architect-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "background-job-orchestration-architect"
       ],
-      "reason": "The request needs saas-timezone-architect's method; background-job-orchestration-architect owns a different task."
+      "reason": "The request needs saas-timezone-architect's design method; background-job-orchestration-architect owns a different task."
     },
     {
       "id": "saas-timezone-architect-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "slo-reliability-architect"
       ],
-      "reason": "The request needs saas-timezone-architect's method; slo-reliability-architect owns a different task."
+      "reason": "The request needs saas-timezone-architect's design method; slo-reliability-architect owns a different task."
     },
     {
       "id": "saas-timezone-architect-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "audit-log-architect"
       ],
-      "reason": "The request needs saas-timezone-architect's method; audit-log-architect owns a different task."
+      "reason": "The request needs saas-timezone-architect's design method; audit-log-architect owns a different task."
     },
     {
       "id": "saas-timezone-architect-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "schema-evolution-planner"
       ],
-      "reason": "The request needs saas-timezone-architect's method; schema-evolution-planner owns a different task."
+      "reason": "The request needs saas-timezone-architect's design method; schema-evolution-planner owns a different task."
     },
     {
       "id": "saas-timezone-architect-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "multi-tenant-data-architect"
       ],
-      "reason": "The request needs saas-timezone-architect's method; multi-tenant-data-architect owns a different task."
+      "reason": "The request needs saas-timezone-architect's design method; multi-tenant-data-architect owns a different task."
     },
     {
       "id": "saas-timezone-architect-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to notification-webhook-ux-designer; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is notification-webhook-ux-designer's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to observability-by-design; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is observability-by-design's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to api-event-architect; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is api-event-architect's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to background-job-orchestration-architect; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is background-job-orchestration-architect's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to slo-reliability-architect; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is slo-reliability-architect's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to audit-log-architect; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is audit-log-architect's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to schema-evolution-planner; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is schema-evolution-planner's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to multi-tenant-data-architect; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is multi-tenant-data-architect's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to incident-response-runbook; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is incident-response-runbook's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to data-quality-monitor-designer; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is data-quality-monitor-designer's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to caching-strategy-designer; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to saas-platform-architect; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is saas-platform-architect's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to tenant-modeler; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is tenant-modeler's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-timezone-architect-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "saas-timezone-architect"
       ],
-      "reason": "This request belongs to release-readiness-reviewer; saas-timezone-architect owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; saas-timezone-architect owns a different design task and must not take it over."
     }
   ]
 }

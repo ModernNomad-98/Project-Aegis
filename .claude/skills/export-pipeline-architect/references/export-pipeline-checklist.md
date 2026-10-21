@@ -26,14 +26,18 @@ Reference for the export-pipeline-architect skill. It is method and record guida
 4. Storage, delivery, expiry and cleanup controls.
 5. Audit evidence and failure/partial-export handling.
 
+- Delivery: short-lived single-use token, explicit reissue, access/download audit and cleanup evidence.
+- Notification boundary: delivery/notification UX routes to notification-webhook-ux-designer.
+
 The returned record must name the evidence source for each decision, separate verified facts from assumptions, and list what could not be inspected. The skill does not edit files or execute commands; delegated actions go to the host/user or the existing implementation owner under existing authority.
 
 ## 4. Boundaries
 
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
-- Per-store tenant scoping and context propagation routes to `multi-tenant-data-architect`; this skill does not perform that owner's work.
-- Audit event taxonomy, record schema and integrity routes to `audit-log-architect`; this skill does not perform that owner's work.
-- External api/event contracts and delivery semantics routes to `api-event-architect`; this skill does not perform that owner's work.
+- Route per-store tenant scoping and context propagation to `multi-tenant-data-architect`; this skill does not perform that owner's work.
+- Route audit event taxonomy, record schema and integrity to `audit-log-architect`; this skill does not perform that owner's work.
+- Route external API/event contracts and delivery semantics to `api-event-architect`; this skill does not perform that owner's work.
+- The trigger-evals discrimination set is broader than the three primary Stop Conditions; a request for any listed owner's deliverable routes out instead of being taken over.
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning
@@ -44,3 +48,5 @@ The returned record must name the evidence source for each decision, separate ve
 - Delivery is bounded, single-use and expiring.
 - Audit evidence records request, scope, redaction and delivery.
 - Failure and partial exports are defined, not silently reported as complete.
+- Delivery is short-lived and single-use with an explicit reissue path.
+- Audit covers request, scope, redaction, delivery, access/download and cleanup proof.

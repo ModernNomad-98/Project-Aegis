@@ -2635,7 +2635,7 @@ def test_coverage_map_codex_visible_text_findings():
 
 
 def test_coverage_map_planning_gate_resolved():
-    """T32: rows #254/#278 are planning-gate resolved; review_pending is 162."""
+    """T32: rows #254/#278 are planning-gate resolved; review_pending is 155."""
     assert validator.COVERAGE_PLANNING_GATE_RESOLVED == frozenset({254, 278})
     assert validator.COVERAGE_TOTALS["review_pending"] == 155
     payload = json.loads(

@@ -1,6 +1,6 @@
 ---
 name: subscription-lifecycle-designer
-description: 'Use when designing/reviewing a subscription lifecycle: trials, upgrades, downgrades, cancellations, renewals, payment failure, grace; no data-loss/entitlement drift.'
+description: 'Use when designing/reviewing a subscription lifecycle state machine: trials, upgrades, downgrades, cancellations, renewals, payment-failure grace and entitlement per state; the plan/entitlement matrix and cost modeling stay with plan-entitlement-architect and saas-cost-architect.'
 ---
 
 # Subscription Lifecycle Designer
@@ -29,6 +29,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - Billing events available (invoice, payment failure, dunning) and their timing.
 - Access-control and entitlement resolution points for each state.
 - Existing grandfathering, trial and reactivation decisions.
+- Billing-event ordering/retry behaviour (late, duplicate and out-of-order events) and any reconciliation job.
 
 ## Workflow
 
@@ -39,6 +40,8 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 5. Define reactivation, grandfathering and cancellation-timing rules so reversibility is explicit.
 6. Specify idempotent transition handling, duplicate-event suppression and rollback for failed transitions.
 7. Return the state machine, transition matrix, edge cases and verification plan; do not implement billing code.
+8. Define late/out-of-order billing-event handling: ordering keys, deterministic winner and duplicate suppression.
+9. Use compensating transactions and reconciliation for external billing transitions that cannot be rolled back literally.
 
 ## Output Format
 
@@ -58,6 +61,8 @@ Return, in this order:
 - Cancellation timing, reactivation and grandfathering are explicit and reversible where claimed.
 - Transitions are idempotent and duplicate events cannot double-apply.
 - No billing implementation or entitlement enforcement is claimed as done.
+- Out-of-order and duplicate events have a deterministic, idempotent outcome.
+- Irreversible external transitions have a compensating/reconciliation path, not a literal rollback claim.
 
 ## Gotchas
 
@@ -65,12 +70,14 @@ Return, in this order:
 - Cancellation timing is a data question, not just a billing question; access and retention can diverge.
 - Retries and webhook duplicates can double-apply a transition without an idempotency key.
 - Grandfathering rules without an end date become permanent accidental entitlements.
+- A literal rollback of an external billing charge is usually impossible; design compensation and reconciliation instead.
 
 ## Stop Conditions
 
 - The request is the plan x entitlement matrix and one resolution point: route to `plan-entitlement-architect`.
 - The request is tenant semantics and lifecycle state machine: route to `tenant-modeler`.
 - The request is bill-grounded cost drivers and unit economics: route to `saas-cost-architect`.
+- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

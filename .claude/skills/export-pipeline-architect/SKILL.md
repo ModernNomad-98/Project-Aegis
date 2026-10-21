@@ -29,6 +29,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - Storage and delivery options available (signed URLs, object storage, SFTP).
 - Redaction/field-policy rules and sensitive-data classification.
 - Audit, retention and expiry requirements for derived exports.
+- Delivery failure/reissue requirements and download-audit expectations.
 
 ## Workflow
 
@@ -39,6 +40,8 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 5. Define audit evidence: who requested, what scope, what was redacted and delivered, and when.
 6. Define failure handling, retry safety and partial-export semantics.
 7. Return the pipeline design, redaction map, security controls and audit plan; do not implement the job.
+8. Define short-lived single-use delivery tokens with an explicit reissue path for failed downloads.
+9. Audit every access/download event plus cleanup/deletion evidence for generated exports.
 
 ## Output Format
 
@@ -58,6 +61,8 @@ Return, in this order:
 - Delivery is bounded, single-use and expiring.
 - Audit evidence records request, scope, redaction and delivery.
 - Failure and partial exports are defined, not silently reported as complete.
+- Delivery is short-lived and single-use with an explicit reissue path.
+- Audit covers request, scope, redaction, delivery, access/download and cleanup proof.
 
 ## Gotchas
 
@@ -65,12 +70,14 @@ Return, in this order:
 - Unredacted internal fields in exports leak secrets and PII the requester never had access to.
 - Non-expiring download links turn one export into a permanent exposure.
 - A failed or partial export reported as complete corrupts compliance evidence.
+- A single-use link with no reissue path strands a legitimate requester after a failed download.
 
 ## Stop Conditions
 
 - The request is per-store tenant scoping and context propagation: route to `multi-tenant-data-architect`.
 - The request is audit event taxonomy, record schema and integrity: route to `audit-log-architect`.
 - The request is external API/event contracts and delivery semantics: route to `api-event-architect`.
+- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

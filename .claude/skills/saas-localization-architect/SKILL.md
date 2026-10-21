@@ -29,6 +29,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - Tenant and user locale preferences and precedence.
 - Storage, cache/CDN topology and keys.
 - Test environments and supported locale coverage.
+- Translation provenance: human vs machine translation, per-tenant policy and review/quality status.
 
 ## Workflow
 
@@ -39,6 +40,9 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 5. Define storage/cache/CDN keys and invalidation so locale variants never bleed across tenants or locales.
 6. Define the localization test matrix: locale coverage, fallbacks, RTL/formatting, and leak checks.
 7. Return the boundary model, fallback matrix, storage/cache contract and test plan; do not implement UI or translations.
+8. Define TWO separate algorithms: (1) locale preference resolution (user -> tenant -> product) and (2) translation-resource fallback (selected locale -> its parent-locale chain -> product default), so missing content never falls back to an unrelated tenant-default language.
+9. Define translation provenance (human/machine, tenant policy, review status) and how it is stored, cached and invalidated.
+10. Define currency presentation only; settlement remains with the billing/subscription owner and the boundary is recorded.
 
 ## Output Format
 
@@ -58,6 +62,9 @@ Return, in this order:
 - Cache/CDN keys are locale- and tenant-safe with invalidation rules.
 - Test matrix covers locales, fallbacks and cross-locale leakage.
 - No UI implementation or translation execution is claimed.
+- Locale preference resolution and translation-resource fallback are separate, explicit algorithms.
+- Translation provenance is defined in inputs, output and cache invalidation.
+- Currency presentation is in scope; settlement is deferred with the boundary recorded.
 
 ## Gotchas
 
@@ -65,12 +72,15 @@ Return, in this order:
 - Storing formatted dates/numbers in the database freezes one locale's format into data.
 - Fallback without an owner becomes 'English everywhere' after the first missing key.
 - Currency formatting and currency settlement are different problems; conflating them misprices customers.
+- Using one locale chain for both preference and translation fallback renders missing fr-CA strings in an unrelated tenant-default language.
+- Runtime machine translation without provenance hides quality/review status and tenant policy.
 
 ## Stop Conditions
 
 - The request is responsive layout and viewport behaviour: route to `mobile-viewport-craft`.
 - The request is accessibility verification for localized UI: route to `accessibility-test-harness`.
 - The request is frontend performance of localized bundles: route to `frontend-perf-engineer`.
+- The trigger-evals file lists a broader 14-owner discrimination set; the three routes above are the primary Stop Conditions, and every tested owner is documented in the reference Boundaries section.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

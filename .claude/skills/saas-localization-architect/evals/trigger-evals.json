@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "mobile-viewport-craft"
       ],
-      "reason": "The request needs saas-localization-architect's method; mobile-viewport-craft owns a different task."
+      "reason": "The request needs saas-localization-architect's design method; mobile-viewport-craft owns a different task."
     },
     {
       "id": "saas-localization-architect-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "accessibility-test-harness"
       ],
-      "reason": "The request needs saas-localization-architect's method; accessibility-test-harness owns a different task."
+      "reason": "The request needs saas-localization-architect's design method; accessibility-test-harness owns a different task."
     },
     {
       "id": "saas-localization-architect-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "frontend-perf-engineer"
       ],
-      "reason": "The request needs saas-localization-architect's method; frontend-perf-engineer owns a different task."
+      "reason": "The request needs saas-localization-architect's design method; frontend-perf-engineer owns a different task."
     },
     {
       "id": "saas-localization-architect-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "api-event-architect"
       ],
-      "reason": "The request needs saas-localization-architect's method; api-event-architect owns a different task."
+      "reason": "The request needs saas-localization-architect's design method; api-event-architect owns a different task."
     },
     {
       "id": "saas-localization-architect-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "observability-by-design"
       ],
-      "reason": "The request needs saas-localization-architect's method; observability-by-design owns a different task."
+      "reason": "The request needs saas-localization-architect's design method; observability-by-design owns a different task."
     },
     {
       "id": "saas-localization-architect-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "sensitive-disclosure-guard"
       ],
-      "reason": "The request needs saas-localization-architect's method; sensitive-disclosure-guard owns a different task."
+      "reason": "The request needs saas-localization-architect's design method; sensitive-disclosure-guard owns a different task."
     },
     {
       "id": "saas-localization-architect-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "tech-spec-writer"
       ],
-      "reason": "The request needs saas-localization-architect's method; tech-spec-writer owns a different task."
+      "reason": "The request needs saas-localization-architect's design method; tech-spec-writer owns a different task."
     },
     {
       "id": "saas-localization-architect-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "product-spec-writer"
       ],
-      "reason": "The request needs saas-localization-architect's method; product-spec-writer owns a different task."
+      "reason": "The request needs saas-localization-architect's design method; product-spec-writer owns a different task."
     },
     {
       "id": "saas-localization-architect-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to mobile-viewport-craft; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is mobile-viewport-craft's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to accessibility-test-harness; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is accessibility-test-harness's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to frontend-perf-engineer; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to api-event-architect; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is api-event-architect's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to observability-by-design; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is observability-by-design's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to sensitive-disclosure-guard; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is sensitive-disclosure-guard's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to tech-spec-writer; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to product-spec-writer; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is product-spec-writer's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to saas-platform-architect; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is saas-platform-architect's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to tenant-modeler; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is tenant-modeler's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to caching-strategy-designer; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to notification-webhook-ux-designer; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is notification-webhook-ux-designer's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to domain-modeler; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is domain-modeler's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     },
     {
       "id": "saas-localization-architect-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "saas-localization-architect"
       ],
-      "reason": "This request belongs to requirements-gathering-facilitator; saas-localization-architect owns a different design task and must not take it over."
+      "reason": "This request is requirements-gathering-facilitator's deliverable end-to-end; saas-localization-architect owns a different design task and must not take it over."
     }
   ]
 }

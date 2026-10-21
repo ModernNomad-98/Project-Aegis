@@ -10,9 +10,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "State the scope and the owner of each decision before proposing changes.",
-          "Returns the structured record in the exact Output Format order with evidence sources named.",
-          "Does not edit code or claim unrun evidence."
+          "Defines localizable dimensions and their owners; separates translation content from runtime formatting.",
+          "Defines locale preference resolution separately from translation-resource fallback.",
+          "Records the test matrix and cross-locale leak checks."
         ]
       }
     },
@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Apply the single precedence/resolution rule consistently across surfaces.",
-          "Records assumptions and unknowns instead of inventing them.",
-          "Does not perform the delegated implementation."
+          "Defines locale negotiation precedence (user -> tenant -> product) with fallback chain.",
+          "Keeps tenant- and locale-safe cache keys with invalidation.",
+          "Does not claim UI implementation."
         ]
       }
     },
@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Name the nearest owners and route excluded work away from this skill.",
-          "Keeps verified facts and assumptions separate in the record.",
-          "Does not claim a run, migration or deployment it did not perform."
+          "Defines translation provenance (human/machine, tenant policy, review status) and how it is cached/invalidated.",
+          "Records partial-translation gaps and the review path.",
+          "Defers currency settlement to the billing owner while defining presentation."
         ]
       }
     },
@@ -49,7 +49,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Routes to <B>mobile-viewport-craft<B>; this skill does not perform that neighbouring owner's work.",
+          "Routes to `mobile-viewport-craft`; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
         ]
       }

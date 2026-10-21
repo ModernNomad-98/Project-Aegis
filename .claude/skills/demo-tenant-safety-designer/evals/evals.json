@@ -10,9 +10,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "State the scope and the owner of each decision before proposing changes.",
-          "Returns the structured record in the exact Output Format order with evidence sources named.",
-          "Does not edit code or claim unrun evidence."
+          "Separates demo identity, data, secrets and infrastructure from production.",
+          "Defines the synthetic seed policy and prohibits real customer data.",
+          "Records conversion-to-real approvals and residual realism limits."
         ]
       }
     },
@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Apply the single precedence/resolution rule consistently across surfaces.",
-          "Records assumptions and unknowns instead of inventing them.",
-          "Does not perform the delegated implementation."
+          "Removes production credentials/data from the demo boundary and states the isolation controls.",
+          "Defines reset/expiry and guardrails that keep the demo non-production.",
+          "Does not plan a live production connection."
         ]
       }
     },
@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Name the nearest owners and route excluded work away from this skill.",
-          "Keeps verified facts and assumptions separate in the record.",
-          "Does not claim a run, migration or deployment it did not perform."
+          "Defines mutation guardrails and resettable-only writes for demo users.",
+          "Limits demo roles/access and audits support access.",
+          "Does not provision or mutate any environment."
         ]
       }
     },
@@ -49,7 +49,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Routes to <B>tenant-isolation-reviewer<B>; this skill does not perform that neighbouring owner's work.",
+          "Routes to `tenant-isolation-reviewer`; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
         ]
       }

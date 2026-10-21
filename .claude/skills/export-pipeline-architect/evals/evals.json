@@ -10,9 +10,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "State the scope and the owner of each decision before proposing changes.",
-          "Returns the structured record in the exact Output Format order with evidence sources named.",
-          "Does not edit code or claim unrun evidence."
+          "Defines requester authority/tenant scope deny-by-default and the async job/status model.",
+          "Specifies field-level redaction basis and short-lived single-use delivery with a reissue path.",
+          "Records audit evidence and failure/partial-export handling."
         ]
       }
     },
@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Apply the single precedence/resolution rule consistently across surfaces.",
-          "Records assumptions and unknowns instead of inventing them.",
-          "Does not perform the delegated implementation."
+          "Defines the export job lifecycle with status, notification and delivery/reissue path.",
+          "Audits request, scope, redaction, delivery and download/cleanup events.",
+          "Keeps the deliverable a design, not an implementation."
         ]
       }
     },
@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Name the nearest owners and route excluded work away from this skill.",
-          "Keeps verified facts and assumptions separate in the record.",
-          "Does not claim a run, migration or deployment it did not perform."
+          "Classifies and redacts fields from the data-sensitivity basis.",
+          "States expiry, cleanup and retention rules for generated exports.",
+          "Does not claim an export was generated or delivered."
         ]
       }
     },
@@ -49,7 +49,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Routes to <B>multi-tenant-data-architect<B>; this skill does not perform that neighbouring owner's work.",
+          "Routes to `multi-tenant-data-architect`; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
         ]
       }

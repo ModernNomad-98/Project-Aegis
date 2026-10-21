@@ -10,9 +10,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "State the scope and the owner of each decision before proposing changes.",
-          "Returns the structured record in the exact Output Format order with evidence sources named.",
-          "Does not edit code or claim unrun evidence."
+          "Classifies time-bearing fields/jobs/reports and the UTC-instant vs local-intent storage contract.",
+          "Requires IANA time-zone identifiers for scheduling with offsets only as audit snapshots.",
+          "Defines DST/ambiguous-time and reporting-cutoff rules."
         ]
       }
     },
@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Apply the single precedence/resolution rule consistently across surfaces.",
-          "Records assumptions and unknowns instead of inventing them.",
-          "Does not perform the delegated implementation."
+          "Defines tenant vs user zone precedence for display and scheduling.",
+          "Specifies reminder uniqueness across DST and historical zone changes.",
+          "Records the audit trail for zone changes and the migration/backfill policy."
         ]
       }
     },
@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Name the nearest owners and route excluded work away from this skill.",
-          "Keeps verified facts and assumptions separate in the record.",
-          "Does not claim a run, migration or deployment it did not perform."
+          "Defines reporting cutoffs and their auditability.",
+          "States that changing a tenant zone affects new events/display only while historical events retain their zone/offset.",
+          "Defines the tzdata update/re-evaluation policy."
         ]
       }
     },
@@ -49,7 +49,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Routes to <B>notification-webhook-ux-designer<B>; this skill does not perform that neighbouring owner's work.",
+          "Routes to `notification-webhook-ux-designer`; this skill does not perform that neighbouring owner's work.",
           "Does not claim to have run any inspection or execution it did not run."
         ]
       }
