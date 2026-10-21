@@ -2738,29 +2738,53 @@ def test_coverage_map_batch1_deliveries():
 
 
 def test_skills_manifest_provenance():
-    """T36: every manifest path exists AND hash-matches at source_revision."""
+    """T36: manifest paths exist AND hash-match at source_revision and tree."""
     manifest = json.loads(
         validator.MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert len(manifest["skills"]) == 215
     revision = manifest["source_revision"]
     assert len(revision) == 40 and all(c in "0123456789abcdef" for c in revision)
     repo = ["git", "-C", str(validator.REPO_ROOT)]
+    in_ci = bool(os.environ.get("GITHUB_ACTIONS") or os.environ.get("CI"))
+
+    def provenance_unavailable(message):
+        if in_ci:
+            raise AssertionError("T36 provenance: " + message)
+        print("SKIP T36 (local-only, provenance not verifiable): " + message)
+
     if subprocess.run(repo + ["cat-file", "-e", revision + "^{commit}"],
                       capture_output=True).returncode != 0:
-        print("SKIP T36: declared source_revision is not available in this "
-              "checkout")
-        return
+        return provenance_unavailable(
+            "declared source_revision is not available in this checkout")
     if subprocess.run(repo + ["merge-base", "--is-ancestor", revision, "HEAD"],
                       capture_output=True).returncode != 0:
-        print("SKIP T36: declared source_revision is not an ancestor of HEAD")
-        return
+        return provenance_unavailable(
+            "declared source_revision is not an ancestor of HEAD")
+    requests = "".join(
+        revision + ":" + entry["path"] + "\n" for entry in manifest["skills"]
+    ).encode()
+    batch = subprocess.run(repo + ["cat-file", "--batch"], input=requests,
+                           capture_output=True)
+    assert batch.returncode == 0, batch.stderr.decode(errors="replace")
+    data, pos = batch.stdout, 0
     for entry in manifest["skills"]:
-        blob = subprocess.check_output(
-            repo + ["cat-file", "blob", revision + ":" + entry["path"]])
+        header_end = data.index(b"\n", pos)
+        header = data[pos:header_end].split()
+        assert len(header) == 3 and header[1] == b"blob", (
+            "unexpected git cat-file --batch header: " + repr(header))
+        size = int(header[2])
+        pos = header_end + 1
+        blob = data[pos:pos + size]
+        pos += size + 1
         normalized = blob.replace(b"\r\n", b"\n")
         assert hashlib.sha256(normalized).hexdigest() == entry["sha256"], (
             "manifest sha256 mismatch at declared source_revision for "
             + entry["path"])
-    assert len(manifest["skills"]) == 215
+    for entry in manifest["skills"]:
+        current = (validator.REPO_ROOT / entry["path"]).read_bytes()
+        normalized = current.replace(b"\r\n", b"\n")
+        assert hashlib.sha256(normalized).hexdigest() == entry["sha256"], (
+            "current-tree sha256 mismatch for " + entry["path"])
 
 
 TESTS = [

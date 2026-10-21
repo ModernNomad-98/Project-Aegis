@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "a7cb48cff19b00a75d74904759de33345f2e1930",
+  "source_revision": "83d986288442cb3430f5248583b4d54cc0440513",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -696,7 +696,7 @@
     {
       "name": "production-safe-smoke-tester",
       "path": ".claude/skills/production-safe-smoke-tester/SKILL.md",
-      "sha256": "1d7580215aada396f4a449222bb9b9f5beb800448ea49c7dac098d92c6ae68e1"
+      "sha256": "9b0dfa7fe234a3fc92896cafdf5eeddc8bdc04f5c4f6d212b55fb1ac8e943997"
     },
     {
       "name": "profiling-methodology-designer",

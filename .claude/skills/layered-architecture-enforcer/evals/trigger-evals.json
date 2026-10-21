@@ -80,7 +80,7 @@
         "principal-code-analyst",
         "dependency-direction-guard"
       ],
-      "reason": "The request needs layered-architecture-enforcer's layer-boundary method; dependency-direction-guard owns dependency policy/CI enforcement and principal-code-analyst owns a different task."
+      "reason": "The request needs layered-architecture-enforcer's layer-specific rule verification; dependency-direction-guard owns package/feature direction policy and generic import-graph enforcement, and principal-code-analyst owns a different task."
     },
     {
       "id": "layered-architecture-enforcer-positive-8",
