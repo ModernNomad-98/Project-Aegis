@@ -1,0 +1,220 @@
+{
+  "skill": "security-impact-note-author",
+  "description": "Trigger discrimination for security-impact-note-author against the nearest shipped owners.",
+  "overlaps_with": [
+    "security-pr-reviewer",
+    "threat-modeler",
+    "human-approval-boundary",
+    "agent-governance-audit",
+    "ai-sdlc-operating-model",
+    "change-classification-gate",
+    "release-readiness-reviewer",
+    "security-regression-harness-designer",
+    "code-reviewer",
+    "compliance-gap-auditor",
+    "secure-migration-reviewer",
+    "supply-chain-security-reviewer",
+    "ai-closeout-reporter",
+    "risk-tiered-validation-selector"
+  ],
+  "cases": [
+    {
+      "id": "security-impact-note-author-positive-1",
+      "prompt": "This change touches tenant authorization - author the security impact note for the approvals path.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "security-pr-reviewer"
+      ],
+      "reason": "The request needs security-impact-note-author's method; security-pr-reviewer owns a different task."
+    },
+    {
+      "id": "security-impact-note-author-positive-2",
+      "prompt": "We need a reviewable impact note for a secrets-rotation change before deployment.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "threat-modeler"
+      ],
+      "reason": "The request needs security-impact-note-author's method; threat-modeler owns a different task."
+    },
+    {
+      "id": "security-impact-note-author-positive-3",
+      "prompt": "Write the security impact note for this payment-flow change: assets, risks, mitigations, tests and rollback.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "human-approval-boundary"
+      ],
+      "reason": "The request needs security-impact-note-author's method; human-approval-boundary owns a different task."
+    },
+    {
+      "id": "security-impact-note-author-positive-4",
+      "prompt": "The reviewer wants verified vs assumed facts and residual risk spelled out - produce the impact note.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "agent-governance-audit"
+      ],
+      "reason": "The request needs security-impact-note-author's method; agent-governance-audit owns a different task."
+    },
+    {
+      "id": "security-impact-note-author-positive-5",
+      "prompt": "A production-data migration needs security impact notes with rollback evidence.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "ai-sdlc-operating-model"
+      ],
+      "reason": "The request needs security-impact-note-author's method; ai-sdlc-operating-model owns a different task."
+    },
+    {
+      "id": "security-impact-note-author-positive-6",
+      "prompt": "Author the impact note and list which approvals and sign-offs are still required.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "change-classification-gate"
+      ],
+      "reason": "The request needs security-impact-note-author's method; change-classification-gate owns a different task."
+    },
+    {
+      "id": "security-impact-note-author-positive-7",
+      "prompt": "Mitigations exist but are scattered; consolidate them into a reviewable impact note with evidence.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "release-readiness-reviewer"
+      ],
+      "reason": "The request needs security-impact-note-author's method; release-readiness-reviewer owns a different task."
+    },
+    {
+      "id": "security-impact-note-author-positive-8",
+      "prompt": "What residual risk should the approver see for this authentication change?",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "The request needs security-impact-note-author's method; security-regression-harness-designer owns a different task."
+    },
+    {
+      "id": "security-impact-note-author-negative-1",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets, SSRF and control weakening.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "security-pr-reviewer owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-2",
+      "prompt": "Threat-model this design: assets, actors, trust boundaries, STRIDE and negative tests.",
+      "expected_skill": "threat-modeler",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "threat-modeler owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-3",
+      "prompt": "Decide whether this security-sensitive change needs explicit human approval before proceeding.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "human-approval-boundary owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-4",
+      "prompt": "Audit this change against the agent governance and authorization rules after the fact.",
+      "expected_skill": "agent-governance-audit",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "agent-governance-audit owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-5",
+      "prompt": "Route this work through the AI-SDLC lifecycle stages and gates.",
+      "expected_skill": "ai-sdlc-operating-model",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "ai-sdlc-operating-model owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-6",
+      "prompt": "Classify this change before work starts and lock the validation and approval path.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "change-classification-gate owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-7",
+      "prompt": "Decide whether this release is ready to ship against the release-readiness checks.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "release-readiness-reviewer owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-8",
+      "prompt": "Design the permanent regression harness for this fixed security bug.",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "security-regression-harness-designer owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-9",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "code-reviewer owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-10",
+      "prompt": "Audit the current controls against ISO 27001 and SOC 2 and list the gaps.",
+      "expected_skill": "compliance-gap-auditor",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "compliance-gap-auditor owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-11",
+      "prompt": "Review this whole migration for deploy safety, rollback and tenant-scoped backfills.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "secure-migration-reviewer owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-12",
+      "prompt": "Review the dependency and supply-chain risk for this build, including lockfile and CI paths.",
+      "expected_skill": "supply-chain-security-reviewer",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "supply-chain-security-reviewer owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-13",
+      "prompt": "Report the closeout of this task, including what was intentionally not done.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "ai-closeout-reporter owns this request; security-impact-note-author would duplicate it."
+    },
+    {
+      "id": "security-impact-note-author-negative-14",
+      "prompt": "Select the validation depth for this change by risk tier.",
+      "expected_skill": "risk-tiered-validation-selector",
+      "should_not_trigger": [
+        "security-impact-note-author"
+      ],
+      "reason": "risk-tiered-validation-selector owns this request; security-impact-note-author would duplicate it."
+    }
+  ]
+}

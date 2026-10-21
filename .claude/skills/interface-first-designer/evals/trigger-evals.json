@@ -1,0 +1,221 @@
+{
+  "skill": "interface-first-designer",
+  "description": "Trigger discrimination for interface-first-designer against the nearest shipped owners.",
+  "overlaps_with": [
+    "api-event-architect",
+    "architecture-designer",
+    "domain-modeler",
+    "tdd-engineer",
+    "tech-spec-writer",
+    "docs-first-implementer",
+    "code-reviewer",
+    "validation-boundary-designer",
+    "command-gateway-architect",
+    "saas-platform-architect",
+    "requirements-gathering-facilitator",
+    "product-spec-writer",
+    "architecture-advisor",
+    "principal-code-analyst"
+  ],
+  "cases": [
+    {
+      "id": "interface-first-designer-positive-1",
+      "prompt": "Multiple teams will call this new export interface - design the contract before we implement anything.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs interface-first-designer's method; api-event-architect owns a different task."
+    },
+    {
+      "id": "interface-first-designer-positive-2",
+      "prompt": "We need stable commands and error semantics before changing the internals.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs interface-first-designer's method; architecture-designer owns a different task."
+    },
+    {
+      "id": "interface-first-designer-positive-3",
+      "prompt": "Design the ports/adapters and test doubles for this integration first.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "domain-modeler"
+      ],
+      "reason": "The request needs interface-first-designer's method; domain-modeler owns a different task."
+    },
+    {
+      "id": "interface-first-designer-positive-4",
+      "prompt": "What compatibility and versioning rules should this internal ports/adapters interface carry so callers do not break?",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "tdd-engineer",
+        "api-event-architect"
+      ],
+      "reason": "The request concerns internal ports/adapters; api-event-architect owns external API/event contracts and tdd-engineer owns a different task."
+    },
+    {
+      "id": "interface-first-designer-positive-5",
+      "prompt": "Give me an ordered migration and rollback plan before the interface changes.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "tech-spec-writer"
+      ],
+      "reason": "The request needs interface-first-designer's method; tech-spec-writer owns a different task."
+    },
+    {
+      "id": "interface-first-designer-positive-6",
+      "prompt": "The contract must survive stored messages; design it with that compatibility constraint.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "docs-first-implementer"
+      ],
+      "reason": "The request needs interface-first-designer's method; docs-first-implementer owns a different task."
+    },
+    {
+      "id": "interface-first-designer-positive-7",
+      "prompt": "Draft the smallest first slice that proves this contract works end-to-end.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs interface-first-designer's method; code-reviewer owns a different task."
+    },
+    {
+      "id": "interface-first-designer-positive-8",
+      "prompt": "Elicit the callers and constraints and design the interface before implementation starts.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "The request needs interface-first-designer's method; validation-boundary-designer owns a different task."
+    },
+    {
+      "id": "interface-first-designer-negative-1",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "api-event-architect owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-2",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "architecture-designer owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-3",
+      "prompt": "Model the domain concepts, bounded contexts and invariants before any code is written.",
+      "expected_skill": "domain-modeler",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "domain-modeler owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-4",
+      "prompt": "Explicitly invoke tdd-engineer. Implement this behavior strictly red-green-refactor and report the exact commands and results.",
+      "expected_skill": "tdd-engineer",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "tdd-engineer owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-5",
+      "prompt": "Write the full design tech spec and RFC for this feature, with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "tech-spec-writer owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-6",
+      "prompt": "Explicitly invoke docs-first-implementer. Implement this change after pinning the exact library version and reading version-matching docs.",
+      "expected_skill": "docs-first-implementer",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "docs-first-implementer owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-7",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "code-reviewer owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-8",
+      "prompt": "Decide where request validation belongs across API, command, form and database boundaries.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "validation-boundary-designer owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-9",
+      "prompt": "Design the command gateway and write-side flow for this aggregate.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "command-gateway-architect owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-10",
+      "prompt": "Decide the multi-tenant structure: pooled, siloed or bridge per component, with isolation mechanisms.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "saas-platform-architect owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-11",
+      "prompt": "Interview me to turn a vague idea into clear requirements and a brief.",
+      "expected_skill": "requirements-gathering-facilitator",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "requirements-gathering-facilitator owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-12",
+      "prompt": "Write the product spec with testable acceptance criteria for this feature.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "product-spec-writer owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-13",
+      "prompt": "Advise whether this system should be a monolith, modular monolith, microservices, event-driven or serverless.",
+      "expected_skill": "architecture-advisor",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "architecture-advisor owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "interface-first-designer-negative-14",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expected_skill": "principal-code-analyst",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "principal-code-analyst owns this request; interface-first-designer would duplicate it."
+    }
+  ]
+}

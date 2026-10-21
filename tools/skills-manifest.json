@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "8210675409de13422342978bdccf8162c87c449e",
+  "source_revision": "f4a77765a53b4fa55d0aa7ac84edddfee78a8032",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -289,6 +289,11 @@
       "sha256": "3cd11c8c2c88cb53747bfc317785edcb53b75d285d3ee1abe65948f94fedcad3"
     },
     {
+      "name": "concurrency-race-reviewer",
+      "path": ".claude/skills/concurrency-race-reviewer/SKILL.md",
+      "sha256": "f02ae9edfcd3bcd3d9f097b586f04d98d4260a1cdd6fe6410a4495b2afdaf45b"
+    },
+    {
       "name": "context-co-update-ci-gate",
       "path": ".claude/skills/context-co-update-ci-gate/SKILL.md",
       "sha256": "688393a38ef9e40302400285253e40da9ff1e7607c7782f0fa8e1bce70720c50"
@@ -309,6 +314,11 @@
       "sha256": "101a3aa592bc0e1b1331ca92cecc07b5a5b404d0a37b04e2a9d70d4674098741"
     },
     {
+      "name": "data-flow-diagrammer",
+      "path": ".claude/skills/data-flow-diagrammer/SKILL.md",
+      "sha256": "751c217755846af495ddff6d585530790294a47c34f0faa6b756c7957e09d0f5"
+    },
+    {
       "name": "data-migration-runbook-author",
       "path": ".claude/skills/data-migration-runbook-author/SKILL.md",
       "sha256": "928f9559b9d6a1ed8e78011e92a003f64d3cb67df104f60307837ea151e37985"
@@ -327,6 +337,11 @@
       "name": "database-backup-verifier",
       "path": ".claude/skills/database-backup-verifier/SKILL.md",
       "sha256": "44233bbb9d3db3f2e70e8788b7e32d9dca2029ad602a645e5304ff3d55f82773"
+    },
+    {
+      "name": "dependency-direction-guard",
+      "path": ".claude/skills/dependency-direction-guard/SKILL.md",
+      "sha256": "c1524ed26d686da92dc19dfbebfd4ca46c545b8421d7861e2f548f4e9f4d7547"
     },
     {
       "name": "design-review-facilitator",
@@ -484,6 +499,11 @@
       "sha256": "735f5f01a47b8931b46e2e7c2dd744bf49ea63344537b2439b120cf9b77dbc65"
     },
     {
+      "name": "interface-first-designer",
+      "path": ".claude/skills/interface-first-designer/SKILL.md",
+      "sha256": "9d74614e25fc815a1ec0d38f9ff352ec1af1576f3aa576c42414484f4c2a87ce"
+    },
+    {
       "name": "intra-tenant-scope-architect",
       "path": ".claude/skills/intra-tenant-scope-architect/SKILL.md",
       "sha256": "a860850a3f13cb8ffb7396b60143a4fe3dd18b5938cf038e5b9830076b9cbd1a"
@@ -507,6 +527,11 @@
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
       "sha256": "c43a7b4a28a4001d9559a37d66070b9d655b279aeb066f2d2c6cb4c0327b14a2"
+    },
+    {
+      "name": "layered-architecture-enforcer",
+      "path": ".claude/skills/layered-architecture-enforcer/SKILL.md",
+      "sha256": "f3550f03bf6d697dfe49bb93ef9dd59a27f6623ca0bddce0c00dac21032b5a8a"
     },
     {
       "name": "library-diff-reviewer",
@@ -669,6 +694,11 @@
       "sha256": "a8fef31f8992436dd2fb75cf9575b293373dda45362fa950481573299d1185cc"
     },
     {
+      "name": "production-safe-smoke-tester",
+      "path": ".claude/skills/production-safe-smoke-tester/SKILL.md",
+      "sha256": "c8a3083cce9244be6beac8cea4936d1def58ce3c77c0de0706dd9592d4c7d01c"
+    },
+    {
       "name": "profiling-methodology-designer",
       "path": ".claude/skills/profiling-methodology-designer/SKILL.md",
       "sha256": "e15ffe8bf7ce5f725436dc82129578c3e2dfb85c823a6eaf623f4c03bfdd2918"
@@ -824,6 +854,11 @@
       "sha256": "4baad58efb00c0d4e0cc8d73c88139a742d1eee0f2b58c5c218dd83cec108322"
     },
     {
+      "name": "security-impact-note-author",
+      "path": ".claude/skills/security-impact-note-author/SKILL.md",
+      "sha256": "055cefd3e1eca5043354bef6b95e96042e8977b51f316579526006cc7e6c0974"
+    },
+    {
       "name": "security-logging-alerting-architect",
       "path": ".claude/skills/security-logging-alerting-architect/SKILL.md",
       "sha256": "4fa1a8d28bdd885fca394ed06ecb23f049da33411680eb4cb28a3e68f6bbc465"
@@ -832,6 +867,11 @@
       "name": "security-pr-reviewer",
       "path": ".claude/skills/security-pr-reviewer/SKILL.md",
       "sha256": "1bbc3ca6944341cb81e8575da26fd558b605bc8d55c94031d98094b3a90a6955"
+    },
+    {
+      "name": "security-regression-harness-designer",
+      "path": ".claude/skills/security-regression-harness-designer/SKILL.md",
+      "sha256": "e940253d9b3ca72073ba7f64ae9da6efbdde6016d81d5a68682dd1fc3ce51c7c"
     },
     {
       "name": "security-scan-orchestrator",

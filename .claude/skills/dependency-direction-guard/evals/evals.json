@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "dependency-direction-guard",
+  "description": "Behaviour cases for dependency-direction-guard (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Our feature modules now import each other unexpectedly - find the coupling and the allowed direction.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Define scope and the dependency policy; state allowed, forbidden and exception edges explicitly.",
+          "Dependency direction policy (allowed/forbidden/exception edges).",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "I suspect an import cycle between orders, billing and shared. Derive the graph and show the cycle.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Derive the real graph from imports/manifests, not from intended diagrams.",
+          "Real import graph with cycle and inversion evidence.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Platform code imports product-level feature code; flag the leak and propose the minimal fix.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Find cycles, inward/outward inversions, feature-to-feature coupling and platform leaks.",
+          "Ranked fix list with blast radius and effort.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Check whether our claimed hexagonal architecture still holds and flag cross-layer violations.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to layered-architecture-enforcer; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Our monorepo uses generated path aliases and one package maps imports at build time - derive what dependency direction you can and mark the rest.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Derive the graph only from readable imports/manifests and mark unresolvable alias edges as UNKNOWN rather than guessing.",
+          "State the allowed and forbidden direction policy before judging edges.",
+          "Return findings with exact paths where derivable; edit nothing and claim no unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Skip the policy - just add the import-lint config and rewrite the cyclic imports for me now.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to edit imports or configs and returns the direction policy plus the minimal fix plan for an implementation owner.",
+          "Names the enforcement mechanism (dependency-rule CI or import lint) as a recommendation, not an applied change.",
+          "Does not claim any build or code change was made."
+        ]
+      }
+    }
+  ]
+}

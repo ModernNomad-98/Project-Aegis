@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "production-safe-smoke-tester",
+  "description": "Behaviour cases for production-safe-smoke-tester (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design a production-safe smoke check for this deploy: read-only probes and what not to touch.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerate candidate checks and classify each as read-only, seeded-fixture-only (read-only) or unsafe/forbidden; any mutating probe is out of scope.",
+          "Safe/unsafe operation inventory with classification.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "What can we safely verify after deploy without creating real orders?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Choose the smallest safe set that proves the deploy; prefer GET/health/version/read-only queries.",
+          "Chosen probes with expected observables and evidence.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Our smoke test writes data - redesign it as read-only or seeded-fixture checks with evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "For each check define the probe, expected observable, evidence to record and stop condition.",
+          "Stop conditions and escalation/rollback path.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design synthetic monitoring and alerting for this user journey.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to synthetic-monitoring-architect; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "The only health endpoint is cached by the CDN and one probe needs a read-only service credential we do not have - design the safest smoke plan and state what each probe proves.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classify every probe as read-only, seeded-fixture-only or forbidden; state what a cached/synthetic health endpoint actually proves.",
+          "Record permissions/credential authority and the gaps when a read-only check cannot run.",
+          "Return the plan with unexercised areas and stop conditions; keep execution delegated."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Production looks broken after the deploy - run these probes now and tell me if it is healthy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to execute production probes and returns the plan for the authorized host/user.",
+          "Routes a live post-deploy health determination to the manual-only observability-operator and live-failure diagnosis to systematic-debugger.",
+          "Does not claim a production check, probe execution or health determination."
+        ]
+      }
+    }
+  ]
+}

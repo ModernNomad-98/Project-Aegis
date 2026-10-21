@@ -384,7 +384,7 @@ request from a user who already knows the next step).
 ### Skills (Phase 2 — core architecture & engineering pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (all ten sit in one of three overlap clusters).
+`evals/trigger-evals.json` (the original ten sit in one of three overlap clusters; the five Batch 1 additions are covered below).
 
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
@@ -400,11 +400,19 @@ All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
 | `full-codebase-auditor` | cat 06/08 #280 | yes | Whole-repo audit, inventory BEFORE findings; results filed as confirmed / likely / hypotheses / missing information; provable coverage. |
 | `validation-boundary-designer` | cat 01 **#37/#38** + cat 04 **#141/#157** | yes | Boundary-validation design: where validation lives at each boundary (API, command, form, database, integration), per-boundary schema choices, non-negotiable invariants with named enforcement points, and database constraint backstops. Designs; writes and reviews no code and no diff. |
 | `observability-by-design` | cat 01 **#22** | yes | Telemetry-contract design: per-component logs/metrics/traces, correlation-ID scheme, bounded metric sets, and redaction composed by reference to `sensitive-disclosure-guard` — never restated. Designs; instruments nothing. |
+| `layered-architecture-enforcer` | cat 01 **#6** (Batch 1) | yes | Enforces an existing layered/hexagonal architecture: real layer map, cross-layer violations, smallest compliant change and verification; read-only. |
+| `dependency-direction-guard` | cat 01 **#7** (Batch 1) | yes | Derives the real import graph, finds cycles/inversions/feature coupling/platform leaks, states allowed direction, ranks minimal fixes and records exceptions; read-only. |
+| `interface-first-designer` | cat 01 **#8** (Batch 1) | yes | Designs contracts before internals: callers/constraints, interfaces/adapters, compatibility/versioning, test doubles and ordered migration; stops before implementation. |
+| `data-flow-diagrammer` | cat 01 **#49** (Batch 1) | yes | Produces a trustworthy data-flow diagram: sources/sinks/stores/transforms/side effects, trust boundaries, assumptions and unverified elements labeled; documentation-only. |
+| `concurrency-race-reviewer` | cat 04 **#155** (Batch 1) | yes | Reviews interleaving operations for lost updates, double-create, check-then-act and retry duplicates; proposes serialization/idempotency/locking fixes with tests; review-only. |
 
-Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three Phase 2 clusters:
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the three original Phase 2 clusters:
 design (`domain-modeler`, `architecture-designer`, `adr-writer`), implementation
 (`docs-first-implementer`, `tdd-engineer`, `systematic-debugger`), and review/audit
 (`code-reviewer`, `code-simplifier`, `principal-code-analyst`, `full-codebase-auditor`).
+The Batch 1 Phase 2 additions (`layered-architecture-enforcer`,
+`dependency-direction-guard`, `interface-first-designer`, `data-flow-diagrammer`,
+`concurrency-race-reviewer`) also ship standalone 22-case trigger-eval files (data-flow-diagrammer is now 23 after its added PII-lifecycle negative case): `layered-architecture-enforcer` and `dependency-direction-guard` discriminate each other (layer-specific rules vs package/feature direction policy) and both against `architecture-designer`; `interface-first-designer` discriminates `api-event-architect`, `tdd-engineer` and `docs-first-implementer`; `data-flow-diagrammer` discriminates `architecture-designer`, `observability-by-design` and `threat-modeler`, and lists the PII lifecycle owner `pii-lifecycle-designer` as a near-miss owner; `concurrency-race-reviewer` discriminates `flaky-test-detective`, `systematic-debugger`, `background-job-orchestration-architect` and `test-plan-designer`.
 
 A fourth cluster was added by D77 (2026-10-10): **boundary & telemetry design**
 (`validation-boundary-designer`, `observability-by-design`) — with cross-phase
@@ -463,7 +471,7 @@ cross-phase discrimination against `tenant-modeler`, `saas-platform-architect`,
 ### Skills (Phase 4 — security, RLS & supply-chain pack)
 
 All under `.claude/skills/<name>/`; every one ships `evals/evals.json` **and**
-`evals/trigger-evals.json` (all nine sit in one of two overlap clusters). Per
+`evals/trigger-evals.json` (the original nine sit in one of two overlap clusters; the two Batch 1 additions ship standalone 22-case trigger-eval files). Per
 [historical master prompt, section 6](prompts/claude-skills-master-generation-prompts-v4.md): OWASP Application Security Verification Standard (ASVS)-style verification, NIST Secure Software Development Framework (SSDF)-style secure-SDLC, and Supply-chain Levels for Software Artifacts (SLSA)-style
 supply-chain thinking; scanner output is treated as input, not truth; high-severity
 claims require an exploit path or abuse scenario; tenant isolation and object-level
@@ -491,13 +499,20 @@ per-command negative-test plan.
 | `security-pr-reviewer` | cat 03 #114/#111/#112/#113 + cat 08 #277 | yes | Security lens on an ACTUAL diff: authz/object-level/tenant-scope, injection, secrets, SSRF, control-weakening detection; exploit-path-gated findings; no diff, no review. |
 | `secure-migration-reviewer` | cat 03 #126 | yes | Whole-migration deploy safety: RLS/policy gaps, GRANT widening, unsafe defaults, destructive/irreversible ops, tenant-scoped backfills, lock risk, expand→contract deploy order, rollback; delegates policy text to `rls-policy-auditor`. |
 | `static-analysis-reviewer` | cat 03 #121 adjacent + cat 06/08 | yes | Triages SAST/CodeQL/SARIF on first-party code: dedup, confirm-against-code disposition (TP/FP/dup/accepted), five-axis ranking (reachability/exploitability/asset/tenant/business), written suppression policy. |
+| `security-regression-harness-designer` | cat 03 **#125** (Batch 1) | yes | Turns a fixed security/access-control bug into a permanent regression harness: safe fixtures, expected-denial cases, CI placement and retest evidence; design-only. |
+| `security-impact-note-author` | cat 03 **#127** (Batch 1) | yes | Authors a reviewable security impact note: assets/impact, threats, mitigations, tests, rollback, approvals and residual risk, separating verified from assumed; authoring-only. |
 
-Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the two Phase 4 clusters:
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the two original Phase 4 clusters:
 the **threat & hardening** cluster (`threat-modeler`, `appsec-implementer`,
 `secrets-identity-hardener`) and the **security-review** cluster
 (`supply-chain-security-reviewer`, `security-pr-reviewer`, `secure-migration-reviewer`,
 `static-analysis-reviewer`) — the latter with explicit discrimination against the
-shipped `code-reviewer` (general review vs security-specialized). The **tenant-security**
+shipped `code-reviewer` (general review vs security-specialized); the Batch 1 Phase 4 additions
+(`security-regression-harness-designer`, `security-impact-note-author`) also ship
+standalone 22-case trigger-eval files: `security-regression-harness-designer` discriminates
+`security-pr-reviewer`, `multi-tenant-security-tester`, `tdd-engineer` and
+`playwright-e2e-engineer`; `security-impact-note-author` discriminates `security-pr-reviewer`,
+`threat-modeler`, `human-approval-boundary` and `change-classification-gate`. The **tenant-security**
 cluster (`multi-tenant-security-tester`, `rls-policy-auditor`) additionally discriminates
 against the shipped `tenant-isolation-reviewer` (inspection-based review vs executable
 tests vs database-policy audit).
@@ -573,6 +588,7 @@ auto-invocable, no `disable-model-invocation` — and each ships both eval files
 | `mobile-journey-test-designer` | cat 06 **#230** | yes | Critical-journey mobile QA design: breakpoints, touch, dialogs, navigation, orientation, keyboard, safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. |
 | `role-coverage-test-designer` | cat 06 **#229** (D10 Tier 2, built by D76) | yes | Role-coverage QA design over the shipped authorization matrix: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Denials stay with `authorization-matrix-designer` step 7 / `multi-tenant-security-tester`; custom-role coverage composed from the #59 extension (built by D78). |
 | `property-based-test-designer` | cat 06 **#194** (D10 Tier 3, built by D77) | yes | Property-based test design: domain invariants per target, bounded generator domains with shrinking, counterexample triage, runner handoff. On-demand, specialized coverage. Designs; writes and runs no tests. |
+| `production-safe-smoke-tester` | cat 06 **#188** (Batch 1) | yes | Designs production-safe smoke checks: read-only probes only, pre-seeded isolated/disposable-tenant fixtures only (no real customer data), forbidden operations, stop/escalation and explicitly unexercised areas; execution delegated, and any write is not a smoke check (separate explicit authorization required). |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the four Phase 5 clusters:
 **strategy/plan/coverage** (`qa-strategy-architect`, `test-plan-designer`,
@@ -584,7 +600,8 @@ and **unit/build/flake/data** (`vite-build-qa-engineer`, `flaky-test-detective`,
 `test-data-architect`, `regression-suite-curator`) — with cross-phase discrimination
 against the shipped `code-reviewer`, `full-codebase-auditor`, `api-event-architect`,
 `multi-tenant-security-tester`, `tdd-engineer`, `systematic-debugger`,
-`secrets-identity-hardener`, and `ai-closeout-reporter`.
+`secrets-identity-hardener`, and `ai-closeout-reporter`. The Batch 1 Phase 5 addition
+(`production-safe-smoke-tester`) also ships a standalone 22-case trigger-eval file.
 
 A fifth cluster was added by D75 (2026-10-09): **visual/exploratory/mobile QA
 design** (`visual-regression-test-designer`, `exploratory-charter-designer`,

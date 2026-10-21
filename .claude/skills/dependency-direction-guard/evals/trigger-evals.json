@@ -1,0 +1,220 @@
+{
+  "skill": "dependency-direction-guard",
+  "description": "Trigger discrimination for dependency-direction-guard against the nearest shipped owners.",
+  "overlaps_with": [
+    "layered-architecture-enforcer",
+    "architecture-designer",
+    "principal-code-analyst",
+    "code-reviewer",
+    "domain-modeler",
+    "api-event-architect",
+    "saas-platform-architect",
+    "command-gateway-architect",
+    "validation-boundary-designer",
+    "observability-by-design",
+    "tech-spec-writer",
+    "full-codebase-auditor",
+    "background-job-orchestration-architect",
+    "architecture-advisor"
+  ],
+  "cases": [
+    {
+      "id": "dependency-direction-guard-positive-1",
+      "prompt": "Our feature modules now import each other unexpectedly - find the coupling and the allowed direction.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "The request needs dependency-direction-guard's method; layered-architecture-enforcer owns a different task."
+    },
+    {
+      "id": "dependency-direction-guard-positive-2",
+      "prompt": "I suspect an import cycle between orders, billing and shared. Derive the graph and show the cycle.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs dependency-direction-guard's method; architecture-designer owns a different task."
+    },
+    {
+      "id": "dependency-direction-guard-positive-3",
+      "prompt": "Platform code imports product-level feature code; flag the leak and propose the minimal fix.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "principal-code-analyst"
+      ],
+      "reason": "The request needs dependency-direction-guard's method; principal-code-analyst owns a different task."
+    },
+    {
+      "id": "dependency-direction-guard-positive-4",
+      "prompt": "Before we add this dependency, tell me whether it points the wrong way and what the policy allows.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs dependency-direction-guard's method; code-reviewer owns a different task."
+    },
+    {
+      "id": "dependency-direction-guard-positive-5",
+      "prompt": "Design a dependency direction policy for these packages and specify the CI check that enforces it.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "domain-modeler"
+      ],
+      "reason": "The request needs dependency-direction-guard's method; domain-modeler owns a different task."
+    },
+    {
+      "id": "dependency-direction-guard-positive-6",
+      "prompt": "Someone added an exception to the dependency rule - evaluate whether it is still justified.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs dependency-direction-guard's method; api-event-architect owns a different task."
+    },
+    {
+      "id": "dependency-direction-guard-positive-7",
+      "prompt": "Rank the coupling problems in this module by blast radius and smallest fix.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "saas-platform-architect"
+      ],
+      "reason": "The request needs dependency-direction-guard's method; saas-platform-architect owns a different task."
+    },
+    {
+      "id": "dependency-direction-guard-positive-8",
+      "prompt": "Two features share a 'utils' package; is that a hidden coupling and how do we sever it minimally?",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "command-gateway-architect"
+      ],
+      "reason": "The request needs dependency-direction-guard's method; command-gateway-architect owns a different task."
+    },
+    {
+      "id": "dependency-direction-guard-negative-1",
+      "prompt": "Check whether our claimed hexagonal architecture still holds and flag cross-layer violations.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "layered-architecture-enforcer owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-2",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "architecture-designer owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-3",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expected_skill": "principal-code-analyst",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "principal-code-analyst owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-4",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "code-reviewer owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-5",
+      "prompt": "Model the domain concepts, bounded contexts and invariants before any code is written.",
+      "expected_skill": "domain-modeler",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "domain-modeler owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-6",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "api-event-architect owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-7",
+      "prompt": "Decide the multi-tenant structure: pooled, siloed or bridge per component, with isolation mechanisms.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "saas-platform-architect owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-8",
+      "prompt": "Design the command gateway and write-side flow for this aggregate.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "command-gateway-architect owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-9",
+      "prompt": "Decide where request validation belongs across API, command, form and database boundaries.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "validation-boundary-designer owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-10",
+      "prompt": "Design the telemetry contract for this service: logs, metrics, traces, correlation and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "observability-by-design owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-11",
+      "prompt": "Write the full design tech spec and RFC for this feature, with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "tech-spec-writer owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-12",
+      "prompt": "Audit the whole repository with an inventory-first coverage plan and file confirmed, likely and unknown findings.",
+      "expected_skill": "full-codebase-auditor",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "full-codebase-auditor owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-13",
+      "prompt": "Design the job queue semantics for this worker: delivery, ordering, retries and dead letters.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "background-job-orchestration-architect owns this request; dependency-direction-guard would duplicate it."
+    },
+    {
+      "id": "dependency-direction-guard-negative-14",
+      "prompt": "Advise whether this system should be a monolith, modular monolith, microservices, event-driven or serverless.",
+      "expected_skill": "architecture-advisor",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "architecture-advisor owns this request; dependency-direction-guard would duplicate it."
+    }
+  ]
+}

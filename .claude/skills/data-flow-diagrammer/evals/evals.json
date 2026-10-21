@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "data-flow-diagrammer",
+  "description": "Behaviour cases for data-flow-diagrammer (5 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Draw the data-flow diagram for the checkout: inputs, stores, transforms, side effects and trust boundaries.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Define scope and the level of detail; exclude unrelated subsystems explicitly.",
+          "Data-flow diagram (Mermaid or plain text) with legend and numbered nodes.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "We do not know where personal data is stored and who receives it - map the current flows with evidence (diagram only; do not decide retention or deletion policy).",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventory sources, sinks, stores, transforms and side effects from evidence.",
+          "Sources/sinks/stores/transforms/side-effects inventory with evidence.",
+          "Returns the structured record above and does not edit code or claim unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_not_trigger",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to architecture-designer; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_trigger",
+      "prompt": "Our scanner shows where personal data may be stored. The code paths for two sinks are unreadable - draw the diagram with what is proven and what is not.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventory sources, sinks, stores, transforms and side effects from available evidence.",
+          "Mark uninspectable paths and unverified elements as UNKNOWN/assumptions instead of inventing flows.",
+          "Returns the diagram with the gaps listed; edits nothing and claims no unrun evidence."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Draw the PII data-flow diagram for the checkout, then decide the retention period for each personal-data store.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the evidence-backed data-flow diagram for the current flows.",
+          "Refuses to decide retention/deletion policy and routes that part to pii-lifecycle-designer.",
+          "Does not claim to have run any inspection it did not run."
+        ]
+      }
+    }
+  ]
+}

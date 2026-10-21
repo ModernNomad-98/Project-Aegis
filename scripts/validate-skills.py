@@ -215,27 +215,26 @@ COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 128, "COVERED": 56, "PARTIAL": 62, "GAP": 54},
-    "by_grade": {"explicit-id": 128, "catalog-decision": 16,
-                 "capability-review": 102, "none": 54},
+    "by_status": {"SHIPPED": 136, "COVERED": 56, "PARTIAL": 62, "GAP": 46},
+    "by_grade": {"explicit-id": 136, "catalog-decision": 16,
+                 "capability-review": 102, "none": 46},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 11, "P1": 34, "P2": 9},
-    "manifest_skills": 207,
-    "distinct_covering_skills": 127,
+    "gap_by_priority": {"P0": 3, "P1": 34, "P2": 9},
+    "manifest_skills": 215,
+    "distinct_covering_skills": 135,
     "beyond_roadmap_skills": 80,
-    "review_pending": 170,
+    "review_pending": 162,
 }
 # Owner triage decision Q1=A/Q2=A/Q3=yes (D107, 2026-10-21): rows
 # #254/#278 received their planning-gate decisions and no longer count as
 # awaiting confirmation; review_pending subtracts these resolved rows.
 COVERAGE_PLANNING_GATE_RESOLVED = frozenset({254, 278})
 COVERAGE_GAP_IDS = (
-    6, 7, 8, 14, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 39, 43, 44, 46, 47,
-    49, 50, 54, 61, 67, 76, 80, 83, 86, 87, 110, 120, 125, 127, 135, 146, 151,
-    155, 156, 158, 161, 162, 163, 164, 167, 168, 169, 176, 188, 224, 225, 231,
-    233, 234, 236,
+    14, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 39, 43, 44, 46, 47, 50, 54,
+    61, 67, 76, 80, 83, 86, 87, 110, 120, 135, 146, 151, 156, 158, 161, 162,
+    163, 164, 167, 168, 169, 176, 224, 225, 231, 233, 234, 236,
 )
-COVERAGE_P0_GAP_IDS = (6, 7, 8, 49, 125, 127, 155, 161, 162, 164, 188)
+COVERAGE_P0_GAP_IDS = (161, 162, 164)
 COVERAGE_ANOMALY_SKILLS = {
     186: frozenset({"multi-tenant-security-tester", "rls-policy-auditor"}),
     299: frozenset({"ai-router-architect", "ai-cost-guardrail-designer"}),
@@ -247,7 +246,7 @@ COVERAGE_REQUIRED_PHRASES = (
     "GAP rows are optional backlog candidates, not deficits or completion "
     "obligations.",
     "The shipped library deliberately exceeds and interleaves with the "
-    "roadmap: 80 of 207 shipped skills are beyond it.",
+    "roadmap: 80 of 215 shipped skills are beyond it.",
 )
 COVERAGE_ENTRY_KEYS = (
     "id", "area", "name", "priority", "status", "covering_skills",
@@ -2034,7 +2033,7 @@ def check_coverage_map(rep: Report) -> None:
     rationale and no skills/evidence; the #186/#299 anomaly sets; totals
     recomputed (incl. by_grade and review_pending = every non-explicit-id
     row minus the planning-gate-resolved rows #254/#278); manifest union
-    (127 distinct covering / 80 beyond / 207); the summary's totals and
+    (135 distinct covering / 80 beyond / 215); the summary's totals and
     GAP/P0 id sets equal
     the JSON; required optionality phrases; canonical deterministic JSON.
     """

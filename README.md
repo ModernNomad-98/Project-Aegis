@@ -777,8 +777,8 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->207<!-- /SKILL-COUNT --> skills sit in **<!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
-build batch), fronted by one beginner-facing orchestrator. This is the scannable map of what
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->215<!-- /SKILL-COUNT --> skills comprise **214 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
 **Start here — `project-orchestrator` (the front door).** If you're a non-developer with an
@@ -798,7 +798,7 @@ keeps a human as the approval gate on anything irreversible. See
    process audit.
    *e.g.* `ai-sdlc-operating-model`, `agent-authorization-matrix`, `agent-memory-governance`,
    `agent-governance-audit`.
-3. **Core architecture & engineering** *(Phase 2, 12)* — modeling and building systems well:
+3. **Core architecture & engineering** *(Phase 2, 17)* — modeling and building systems well:
    domain models, architecture design, ADRs, docs-first + test-first implementation, debugging,
    code review. *e.g.* `domain-modeler`, `architecture-designer`, `adr-writer`, `tdd-engineer`,
    `systematic-debugger`.
@@ -806,11 +806,11 @@ keeps a human as the approval gate on anything irreversible. See
    tenant semantics, per-store scoping, roles/permissions, plans, audit trail, cost, external
    API contracts, and the feature-flag system (added by D64). *e.g.* `saas-platform-architect`, `tenant-isolation-reviewer`,
    `authorization-matrix-designer`, `audit-log-architect`, `api-event-architect`.
-5. **Security, RLS & supply chain** *(Phase 4, 9)* — hands-on appsec: threat modeling, RLS
+5. **Security, RLS & supply chain** *(Phase 4, 11)* — hands-on appsec: threat modeling, RLS
    policy audit, secrets hardening, supply-chain review, security PR review, migration safety,
    SAST triage. *e.g.* `threat-modeler`, `rls-policy-auditor`, `secrets-identity-hardener`,
    `supply-chain-security-reviewer`, `security-pr-reviewer`.
-6. **QA, E2E & evidence** *(Phase 5, 24)* — test strategy through execution and proof: QA
+6. **QA, E2E & evidence** *(Phase 5, 25)* — test strategy through execution and proof: QA
    strategy, test plans, coverage mapping, Playwright/unit/build QA, flake control, test data,
    evidence policy, and CI run failure classification (added by D68). *e.g.* `qa-strategy-architect`, `test-coverage-mapper`,
    `playwright-e2e-engineer`, `flaky-test-detective`, `screenshot-evidence-planner`.
@@ -1137,6 +1137,11 @@ Phase 2 — core architecture & engineering pack:
 | `full-codebase-auditor` | Whole-repo audit with inventory-first coverage; findings filed as confirmed / likely / hypotheses / missing information. (Skill = procedure; same-named subagent composes it.) | auto + manual |
 | `validation-boundary-designer` | (G3, #37/#38/#141/#157) Designs where validation lives at each boundary (API, command, form, database, integration): per-boundary schema choices, non-negotiable invariants with named enforcement points, database constraint backstops. Designs; writes and reviews no code. | auto + manual |
 | `observability-by-design` | (G3, #22) Designs the telemetry contract: per-component logs/metrics/traces, correlation-ID scheme, bounded metric sets, redaction composed by reference to `sensitive-disclosure-guard`. Designs; instruments nothing. | auto + manual |
+| `layered-architecture-enforcer` | Enforces an existing layered/hexagonal architecture: real layer map, cross-layer violations, smallest compliant change and verification; read-only. | auto + manual |
+| `dependency-direction-guard` | Derives the real import graph, finds cycles/inversions/feature coupling/platform leaks, states allowed direction, ranks minimal fixes and records exceptions; read-only. | auto + manual |
+| `interface-first-designer` | Designs contracts before internals: callers/constraints, interfaces/adapters, compatibility/versioning, test doubles and ordered migration; stops before implementation. | auto + manual |
+| `data-flow-diagrammer` | Produces a trustworthy data-flow diagram: sources/sinks/stores/transforms/side effects, trust boundaries, assumptions and unverified elements labeled; documentation-only. | auto + manual |
+| `concurrency-race-reviewer` | Reviews interleaving operations for lost updates, double-create, check-then-act and retry duplicates; proposes serialization/idempotency/locking fixes with tests; review-only. | auto + manual |
 
 Phase 3 — SaaS & tenant isolation pack:
 
@@ -1168,9 +1173,12 @@ Phase 4 — security, RLS & supply-chain pack:
 | `security-pr-reviewer` | Security lens on an actual diff: authz/object-level/tenant-scope, injection, secrets, SSRF, control-weakening detection; exploit-path-gated findings; no diff, no review. | auto + manual |
 | `secure-migration-reviewer` | Whole-migration deploy safety: RLS/policy gaps, GRANT widening, unsafe defaults, destructive/irreversible ops, tenant-scoped backfills, lock risk, expand→contract deploy order, rollback; delegates policy text to `rls-policy-auditor`. | auto + manual |
 | `static-analysis-reviewer` | Triages SAST/CodeQL/SARIF on first-party code: dedup, confirm-against-code disposition (TP/FP/dup/accepted), five-axis ranking (reachability/exploitability/asset/tenant/business), written suppression policy. | auto + manual |
+| `security-regression-harness-designer` | Turns a fixed security/access-control bug into a permanent regression harness: safe fixtures, expected-denial cases, CI placement and retest evidence; design-only. | auto + manual |
+| `security-impact-note-author` | Authors a reviewable security impact note: assets/impact, threats, mitigations, tests, rollback, approvals and residual risk, separating verified from assumed; authoring-only. | auto + manual |
 
 Phase 5 — QA, E2E, manual QA & evidence pack (13 canonical + 3 pulled forward from the
-QA backlog, roadmap #184/#185/#204, plus QA Tier 1 builds under D68):
+QA backlog, roadmap #184/#185/#204, plus QA Tier 1 builds under D68 and the Batch 1
+production-safe smoke delivery #188):
 
 | Skill | What it does | Invocation |
 |---|---|---|
@@ -1198,6 +1206,7 @@ QA backlog, roadmap #184/#185/#204, plus QA Tier 1 builds under D68):
 | `mobile-journey-test-designer` | (G1, #230) Designs mobile-journey QA: critical journeys × breakpoints/touch/dialogs/navigation/orientation/keyboard/safe area, device+data matrix, evidence composition. Layout stays with `mobile-viewport-craft`. | auto + manual |
 | `role-coverage-test-designer` | (G1, #229) Designs role-coverage QA: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Designs; executes nothing. | auto + manual |
 | `property-based-test-designer` | (G2, #194) Designs property-based test coverage: domain invariants per target, bounded generator domains with shrinking, counterexample triage, runner handoff. On-demand specialized coverage. Designs; writes and runs no tests. | auto + manual |
+| `production-safe-smoke-tester` | Designs production-safe smoke checks: read-only probes only, pre-seeded isolated/disposable-tenant fixtures only (no real customer data), forbidden operations, stop/escalation and explicitly unexercised areas; execution delegated, and any write is not a smoke check (separate explicit authorization required). | auto + manual |
 
 Phase 6 — cloud, DevOps, reliability & release pack (`rollback-strategy-designer`
 merged into `rollback-runbook-author` per reconciliation §3; expansion builds under D71):

@@ -1,0 +1,220 @@
+{
+  "skill": "security-regression-harness-designer",
+  "description": "Trigger discrimination for security-regression-harness-designer against the nearest shipped owners.",
+  "overlaps_with": [
+    "security-pr-reviewer",
+    "regression-suite-curator",
+    "test-plan-designer",
+    "tdd-engineer",
+    "threat-modeler",
+    "multi-tenant-security-tester",
+    "acceptance-criteria-reviewer",
+    "qa-strategy-architect",
+    "playwright-e2e-engineer",
+    "integration-test-designer",
+    "api-contract-test-designer",
+    "static-analysis-reviewer",
+    "code-reviewer",
+    "security-impact-note-author"
+  ],
+  "cases": [
+    {
+      "id": "security-regression-harness-designer-positive-1",
+      "prompt": "We fixed an IDOR in the invoices endpoint - design a permanent regression harness so it cannot return.",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "security-pr-reviewer"
+      ],
+      "reason": "The request needs security-regression-harness-designer's method; security-pr-reviewer owns a different task."
+    },
+    {
+      "id": "security-regression-harness-designer-positive-2",
+      "prompt": "The tenant-isolation bug is patched, but the current tests passed before the fix too. What regression tests should exist?",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "regression-suite-curator"
+      ],
+      "reason": "The request needs security-regression-harness-designer's method; regression-suite-curator owns a different task."
+    },
+    {
+      "id": "security-regression-harness-designer-positive-3",
+      "prompt": "Design safe two-tenant fixtures and expected-denial cases for this access-control fix.",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "test-plan-designer"
+      ],
+      "reason": "The request needs security-regression-harness-designer's method; test-plan-designer owns a different task."
+    },
+    {
+      "id": "security-regression-harness-designer-positive-4",
+      "prompt": "Where should this security regression live in CI, and how do we keep it deterministic?",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "tdd-engineer"
+      ],
+      "reason": "The request needs security-regression-harness-designer's method; tdd-engineer owns a different task."
+    },
+    {
+      "id": "security-regression-harness-designer-positive-5",
+      "prompt": "The security review found a missing authorization check; specify the red-before/green-after harness and evidence.",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "threat-modeler"
+      ],
+      "reason": "The request needs security-regression-harness-designer's method; threat-modeler owns a different task."
+    },
+    {
+      "id": "security-regression-harness-designer-positive-6",
+      "prompt": "Our regression tests only cover the happy path - design the negative security cases and fixtures.",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "multi-tenant-security-tester"
+      ],
+      "reason": "The request needs security-regression-harness-designer's method; multi-tenant-security-tester owns a different task."
+    },
+    {
+      "id": "security-regression-harness-designer-positive-7",
+      "prompt": "Design a harness for this fixed RLS policy gap without using production data.",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "The request needs security-regression-harness-designer's method; acceptance-criteria-reviewer owns a different task."
+    },
+    {
+      "id": "security-regression-harness-designer-positive-8",
+      "prompt": "What evidence should accompany the security regression so the fix is defensible?",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "qa-strategy-architect"
+      ],
+      "reason": "The request needs security-regression-harness-designer's method; qa-strategy-architect owns a different task."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-1",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets, SSRF and control weakening.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "security-pr-reviewer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-2",
+      "prompt": "Curate the existing regression suite: promote, retain, demote or retire tests with evidence.",
+      "expected_skill": "regression-suite-curator",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "regression-suite-curator owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-3",
+      "prompt": "Write the per-change test plan with risk-traced items, layers, data and entry/exit criteria.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "test-plan-designer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-4",
+      "prompt": "Explicitly invoke tdd-engineer. Implement this behavior strictly red-green-refactor and report the exact commands and results.",
+      "expected_skill": "tdd-engineer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "tdd-engineer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-5",
+      "prompt": "Threat-model this design: assets, actors, trust boundaries, STRIDE and negative tests.",
+      "expected_skill": "threat-modeler",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "threat-modeler owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-6",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Write and run the cross-tenant negative test suite for this authorization boundary.",
+      "expected_skill": "multi-tenant-security-tester",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "multi-tenant-security-tester owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-7",
+      "prompt": "Review these existing acceptance criteria for testability and rewrite the weak ones.",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "acceptance-criteria-reviewer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-8",
+      "prompt": "Design the product-level QA strategy with a risk inventory, automation split and CI gates.",
+      "expected_skill": "qa-strategy-architect",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "qa-strategy-architect owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-9",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write the Playwright end-to-end specs for this critical journey and run them.",
+      "expected_skill": "playwright-e2e-engineer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "playwright-e2e-engineer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-10",
+      "prompt": "Design the integration-test layer for these real service, database and auth boundaries.",
+      "expected_skill": "integration-test-designer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "integration-test-designer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-11",
+      "prompt": "Design the provider/consumer contract tests and the breaking-additive CI gate.",
+      "expected_skill": "api-contract-test-designer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "api-contract-test-designer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-12",
+      "prompt": "Triage this SAST/CodeQL report against the code and classify the findings.",
+      "expected_skill": "static-analysis-reviewer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "static-analysis-reviewer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-13",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "code-reviewer owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-regression-harness-designer-negative-14",
+      "prompt": "Author the security impact note for this sensitive change with risks, mitigations and approvals.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "security-impact-note-author owns this request; security-regression-harness-designer would duplicate it."
+    }
+  ]
+}

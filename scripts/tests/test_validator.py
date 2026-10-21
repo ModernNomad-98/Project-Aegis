@@ -39,6 +39,7 @@ IMPORT WRINKLE
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
@@ -2137,13 +2138,13 @@ def test_coverage_map_evidence_rules():
                          "coverage map: non-GAP row without evidence rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def gap_skill(payload):
-            coverage_entry(payload, 6)["covering_skills"] = ["adr-writer"]
+            coverage_entry(payload, 14)["covering_skills"] = ["adr-writer"]
         with mutated_coverage(Path(tmp), gap_skill) as rep:
             expect_error(rep, "GAP rows must not list covering skills",
                          "coverage map: GAP row with a skill rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def gap_rationale(payload):
-            coverage_entry(payload, 6)["rationale"] = ""
+            coverage_entry(payload, 14)["rationale"] = ""
         with mutated_coverage(Path(tmp), gap_rationale) as rep:
             expect_error(rep, "GAP rows require a non-empty rationale",
                          "coverage map: GAP row without rationale rejected")
@@ -2153,7 +2154,7 @@ def test_coverage_map_totals_mismatch():
     """Totals: a JSON totals field that disagrees with the entries is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["by_status"]["GAP"] = 53
+            payload["totals"]["by_status"]["GAP"] = 45
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.by_status",
                          "coverage map: JSON totals mismatch rejected")
@@ -2163,7 +2164,7 @@ def test_coverage_map_summary_totals_mismatch():
     """T9b: each seeded summary totals/per-area defect is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| GAP | 54 |", "| GAP | 53 |", 1)
+            return text.replace("| GAP | 46 |", "| GAP | 45 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'GAP'",
                          "coverage map: summary totals mismatch rejected")
@@ -2178,8 +2179,8 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected (area named)")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| explicit-id | 128 |",
-                                "| explicit-id | 127 |", 1)
+            return text.replace("| explicit-id | 136 |",
+                                "| explicit-id | 135 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'explicit-id'",
                          "coverage map: summary by_grade mismatch rejected")
@@ -2193,16 +2194,16 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| P0 / P1 / P2 gaps | 11 / 34 / 9 |",
-                                "| P0 / P1 / P2 gaps | 12 / 34 / 9 |", 1)
+            return text.replace("| P0 / P1 / P2 gaps | 3 / 34 / 9 |",
+                                "| P0 / P1 / P2 gaps | 4 / 34 / 9 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary gap-priority totals",
                          "coverage map: summary gap-priority totals mismatch "
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| Review pending | 170 |",
-                                "| Review pending | 171 |", 1)
+            return text.replace("| Review pending | 162 |",
+                                "| Review pending | 163 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'Review pending'",
                          "coverage map: summary review_pending mismatch "
@@ -2254,7 +2255,7 @@ def test_coverage_map_review_pending():
     """T12: an incorrect review_pending total is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["review_pending"] = 171
+            payload["totals"]["review_pending"] = 163
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.review_pending",
                          "coverage map: review_pending mismatch rejected")
@@ -2264,8 +2265,8 @@ def test_coverage_map_summary_id_sets():
     """T13: the summary GAP and P0-gap id sets must equal the JSON sets."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("- Area 01: 6, 7, 8, 14, 19, 20, 28, 29",
-                                "- Area 01: 7, 8, 14, 19, 20, 28, 29", 1)
+            return text.replace("- Area 01: 14, 19, 20, 28, 29",
+                                "- Area 01: 19, 20, 28, 29", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary GAP id set",
                          "coverage map: summary GAP id set mismatch rejected")
@@ -2634,22 +2635,22 @@ def test_coverage_map_codex_visible_text_findings():
 
 
 def test_coverage_map_planning_gate_resolved():
-    """T32: rows #254/#278 are planning-gate resolved; review_pending is 170."""
+    """T32: rows #254/#278 are planning-gate resolved; review_pending is 162."""
     assert validator.COVERAGE_PLANNING_GATE_RESOLVED == frozenset({254, 278})
-    assert validator.COVERAGE_TOTALS["review_pending"] == 170
+    assert validator.COVERAGE_TOTALS["review_pending"] == 162
     payload = json.loads(
         validator.COVERAGE_MAP.read_text(encoding="utf-8"))
     non_explicit = [entry for entry in payload["entries"]
                     if entry.get("evidence_grade") != "explicit-id"]
-    assert len(non_explicit) == 172
+    assert len(non_explicit) == 164
     resolved_present = {entry["id"] for entry in non_explicit
                         if entry["id"] in validator.COVERAGE_PLANNING_GATE_RESOLVED}
     assert resolved_present == {254, 278}
     assert validator.COVERAGE_TOTALS["review_pending"] == (
-        len(non_explicit) - len(resolved_present)) == 170
+        len(non_explicit) - len(resolved_present)) == 162
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["review_pending"] = 172
+            payload["totals"]["review_pending"] = 164
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.review_pending",
                          "coverage map: unresolved-row review_pending rejected")
@@ -2666,7 +2667,7 @@ def test_coverage_map_malformed_id_does_not_crash():
 
 
 def test_coverage_map_triage_rows_and_phrase():
-    """T33: rows #254/#278 carry the owner decision; phrase is 80 of 207."""
+    """T33: rows #254/#278 carry the owner decision; phrase is 80 of 215."""
     payload = json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8"))
     rows = {entry["id"]: entry for entry in payload["entries"]}
     r254 = rows[254]
@@ -2693,16 +2694,106 @@ def test_coverage_map_triage_rows_and_phrase():
                      and entry["id"] != 254]
     assert rollback_rows, (
         "rollback-runbook-author must remain covered by another row so "
-        "distinct covering stays 127")
+        "distinct covering stays 135")
     assert all(entry["status"] != "GAP" for entry in rollback_rows), (
         "the surviving rollback coverage rows must be non-GAP")
     assert "Dropped as covered by ai-sdlc-operating-model" in (
         r278["rationale"] or "")
     phrase = [item for item in validator.COVERAGE_REQUIRED_PHRASES
-              if "80 of 207" in item]
-    assert phrase, "an optionality phrase must carry 80 of 207"
+              if "80 of 215" in item]
+    assert phrase, "an optionality phrase must carry 80 of 215"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
-    assert "80 of 207" in mmd and "83 of 207" not in mmd
+    assert "80 of 215" in mmd and "83 of 215" not in mmd
+
+
+def test_coverage_map_batch1_deliveries():
+    """T35: the eight Batch 1 GAPs are SHIPPED/explicit-id on their new skills."""
+    mapping = {
+        6: "layered-architecture-enforcer",
+        7: "dependency-direction-guard",
+        8: "interface-first-designer",
+        49: "data-flow-diagrammer",
+        125: "security-regression-harness-designer",
+        127: "security-impact-note-author",
+        155: "concurrency-race-reviewer",
+        188: "production-safe-smoke-tester",
+    }
+    payload = json.loads(
+        validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    rows = {entry["id"]: entry for entry in payload["entries"]}
+    for row_id, skill in mapping.items():
+        row = rows[row_id]
+        assert (row["status"], row["evidence_grade"]) == (
+            "SHIPPED", "explicit-id")
+        assert row["covering_skills"] == [skill]
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 215
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 135
+    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
+    assert len(validator.COVERAGE_GAP_IDS) == 46
+    assert validator.COVERAGE_P0_GAP_IDS == (161, 162, 164)
+    phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
+               if "80 of 215" in item]
+    assert phrases, "an optionality phrase must carry 80 of 215"
+
+
+
+def test_skills_manifest_provenance():
+    """T36: manifest paths exist AND hash-match at source_revision and tree."""
+    manifest = json.loads(
+        validator.MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert len(manifest["skills"]) == 215
+    revision = manifest["source_revision"]
+    assert len(revision) == 40 and all(c in "0123456789abcdef" for c in revision)
+    repo = ["git", "-C", str(validator.REPO_ROOT)]
+    in_ci = bool(os.environ.get("GITHUB_ACTIONS") or os.environ.get("CI"))
+
+    def provenance_unavailable(message):
+        if in_ci:
+            raise AssertionError("T36 provenance: " + message)
+        print("SKIP T36 (local-only, provenance not verifiable): " + message)
+
+    # The current-tree hash check is always possible and must not be skipped by
+    # the local-only provenance-unavailable branch below.
+    for entry in manifest["skills"]:
+        current = (validator.REPO_ROOT / entry["path"]).read_bytes()
+        normalized = current.replace(b"\r\n", b"\n")
+        assert hashlib.sha256(normalized).hexdigest() == entry["sha256"], (
+            "current-tree sha256 mismatch for " + entry["path"])
+    try:
+        commit_present = subprocess.run(
+            repo + ["cat-file", "-e", revision + "^{commit}"],
+            capture_output=True).returncode == 0
+        ancestor = commit_present and subprocess.run(
+            repo + ["merge-base", "--is-ancestor", revision, "HEAD"],
+            capture_output=True).returncode == 0
+    except FileNotFoundError:
+        return provenance_unavailable("git binary is not available in this checkout")
+    if not commit_present:
+        return provenance_unavailable(
+            "declared source_revision is not available in this checkout")
+    if not ancestor:
+        return provenance_unavailable(
+            "declared source_revision is not an ancestor of HEAD")
+    requests = "".join(
+        revision + ":" + entry["path"] + "\n" for entry in manifest["skills"]
+    ).encode()
+    batch = subprocess.run(repo + ["cat-file", "--batch"], input=requests,
+                           capture_output=True)
+    assert batch.returncode == 0, batch.stderr.decode(errors="replace")
+    data, pos = batch.stdout, 0
+    for entry in manifest["skills"]:
+        header_end = data.index(b"\n", pos)
+        header = data[pos:header_end].split()
+        assert len(header) == 3 and header[1] == b"blob", (
+            "unexpected git cat-file --batch header: " + repr(header))
+        size = int(header[2])
+        pos = header_end + 1
+        blob = data[pos:pos + size]
+        pos += size + 1
+        normalized = blob.replace(b"\r\n", b"\n")
+        assert hashlib.sha256(normalized).hexdigest() == entry["sha256"], (
+            "manifest sha256 mismatch at declared source_revision for "
+            + entry["path"])
 
 
 TESTS = [
@@ -2726,6 +2817,8 @@ TESTS = [
     test_coverage_map_summary_id_sets,
     test_coverage_map_anomaly_rules,
     test_coverage_map_optionality_framing,
+    test_coverage_map_batch1_deliveries,
+    test_skills_manifest_provenance,
     test_coverage_map_planning_gate_resolved,
     test_coverage_map_malformed_id_does_not_crash,
     test_coverage_map_triage_rows_and_phrase,

@@ -1,0 +1,220 @@
+{
+  "skill": "production-safe-smoke-tester",
+  "description": "Trigger discrimination for production-safe-smoke-tester against the nearest shipped owners.",
+  "overlaps_with": [
+    "synthetic-monitoring-architect",
+    "playwright-e2e-engineer",
+    "test-plan-designer",
+    "manual-test-case-creator",
+    "qa-strategy-architect",
+    "release-readiness-reviewer",
+    "observability-operator",
+    "clickthrough-test-engineer",
+    "screenshot-evidence-planner",
+    "flaky-test-detective",
+    "load-test-planner",
+    "regression-suite-curator",
+    "concurrency-race-reviewer",
+    "security-pr-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "production-safe-smoke-tester-positive-1",
+      "prompt": "Design a production-safe smoke check for this deploy: read-only probes and what not to touch.",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "synthetic-monitoring-architect"
+      ],
+      "reason": "The request needs production-safe-smoke-tester's method; synthetic-monitoring-architect owns a different task."
+    },
+    {
+      "id": "production-safe-smoke-tester-positive-2",
+      "prompt": "What can we safely verify after deploy without creating real orders?",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "playwright-e2e-engineer"
+      ],
+      "reason": "The request needs production-safe-smoke-tester's method; playwright-e2e-engineer owns a different task."
+    },
+    {
+      "id": "production-safe-smoke-tester-positive-3",
+      "prompt": "Our smoke test writes data - redesign it as read-only or seeded-fixture checks with evidence.",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "test-plan-designer"
+      ],
+      "reason": "The request needs production-safe-smoke-tester's method; test-plan-designer owns a different task."
+    },
+    {
+      "id": "production-safe-smoke-tester-positive-4",
+      "prompt": "Give me a smoke plan that states what it does not exercise.",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "manual-test-case-creator"
+      ],
+      "reason": "The request needs production-safe-smoke-tester's method; manual-test-case-creator owns a different task."
+    },
+    {
+      "id": "production-safe-smoke-tester-positive-5",
+      "prompt": "Define stop conditions and rollback escalation for this production check.",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "qa-strategy-architect"
+      ],
+      "reason": "The request needs production-safe-smoke-tester's method; qa-strategy-architect owns a different task."
+    },
+    {
+      "id": "production-safe-smoke-tester-positive-6",
+      "prompt": "Which endpoints prove this deploy is healthy without mutating data?",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "release-readiness-reviewer"
+      ],
+      "reason": "The request needs production-safe-smoke-tester's method; release-readiness-reviewer owns a different task."
+    },
+    {
+      "id": "production-safe-smoke-tester-positive-7",
+      "prompt": "Build a safe smoke checklist for a tenant-isolated app, including forbidden operations.",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "observability-operator"
+      ],
+      "reason": "The request needs production-safe-smoke-tester's method; observability-operator owns a different task."
+    },
+    {
+      "id": "production-safe-smoke-tester-positive-8",
+      "prompt": "Design read-only smoke probes and the evidence to record, with execution delegated to the host.",
+      "expected_skill": "production-safe-smoke-tester",
+      "should_not_trigger": [
+        "clickthrough-test-engineer"
+      ],
+      "reason": "The request needs production-safe-smoke-tester's method; clickthrough-test-engineer owns a different task."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-1",
+      "prompt": "Design synthetic monitoring and alerting for this user journey.",
+      "expected_skill": "synthetic-monitoring-architect",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "synthetic-monitoring-architect owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-2",
+      "prompt": "Explicitly invoke playwright-e2e-engineer. Write the Playwright end-to-end specs for this critical journey and run them.",
+      "expected_skill": "playwright-e2e-engineer",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "playwright-e2e-engineer owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-3",
+      "prompt": "Write the per-change test plan with risk-traced items, layers, data and entry/exit criteria.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "test-plan-designer owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-4",
+      "prompt": "Write stranger-executable manual test cases with exact data and expected results.",
+      "expected_skill": "manual-test-case-creator",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "manual-test-case-creator owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-5",
+      "prompt": "Design the product-level QA strategy with a risk inventory, automation split and CI gates.",
+      "expected_skill": "qa-strategy-architect",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "qa-strategy-architect owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-6",
+      "prompt": "Decide whether this release is ready to ship against the release-readiness checks.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "release-readiness-reviewer owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-7",
+      "prompt": "Explicitly invoke observability-operator. Is production healthy after the deploy? Query the live dashboards and confirm the current status.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "A live post-deploy health determination is an operational action owned by the manual-only observability-operator; production-safe-smoke-tester is design/advisory and cannot run probes or claim live status."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-8",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Pre-plan a manual clickthrough of this running app and record defects.",
+      "expected_skill": "clickthrough-test-engineer",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "clickthrough-test-engineer owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-9",
+      "prompt": "Plan screenshot evidence: risk-justified checkpoints, masking, metadata and retention.",
+      "expected_skill": "screenshot-evidence-planner",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "screenshot-evidence-planner owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-10",
+      "prompt": "Explicitly invoke flaky-test-detective. Classify and reproduce this flaky test, fix one cause and prove stability.",
+      "expected_skill": "flaky-test-detective",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "flaky-test-detective owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-11",
+      "prompt": "Plan the load test with a workload model and arrival mode.",
+      "expected_skill": "load-test-planner",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "load-test-planner owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-12",
+      "prompt": "Curate the existing regression suite: promote, retain, demote or retire tests with evidence.",
+      "expected_skill": "regression-suite-curator",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "regression-suite-curator owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-13",
+      "prompt": "Review this create/update flow for concurrency races and propose serialization or idempotency fixes.",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "concurrency-race-reviewer owns this request; production-safe-smoke-tester would duplicate it."
+    },
+    {
+      "id": "production-safe-smoke-tester-negative-14",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets, SSRF and control weakening.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "production-safe-smoke-tester"
+      ],
+      "reason": "security-pr-reviewer owns this request; production-safe-smoke-tester would duplicate it."
+    }
+  ]
+}
