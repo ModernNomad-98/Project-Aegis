@@ -190,10 +190,12 @@ COVERAGE_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 COVERAGE_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 COVERAGE_HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 COVERAGE_HTML_BLOCK_RE = re.compile(
-    r"<(?P<tag>pre|code|script|style)\b[^>]*>.*?</(?P=tag)>",
+    r"<(?P<tag>pre|code|script|style|template)\b[^>]*>.*?"
+    r"</(?P=tag)\s*>",
     re.DOTALL | re.IGNORECASE)
 COVERAGE_FENCE_RE = re.compile(
-    r"^(?:(?: {0,3}>[ \t]?)+)? {0,3}(\x60{3,}|~{3,})(.*)$")
+    r"^(?P<prefix>(?:(?: {0,3}>[ \t]?)+)?) {0,3}"
+    r"(?P<marker>\x60{3,}|~{3,})(?P<rest>.*)$")
 COVERAGE_AREA_RANGES = {
     "01": (1, 55), "02": (56, 90), "03": (91, 130), "04": (131, 160),
     "05": (161, 180), "06": (181, 235), "07": (236, 260), "08": (261, 280),
@@ -1879,29 +1881,37 @@ def _coverage_rendered_markdown(text: str) -> str:
     if "<!--" in without_comments:
         without_comments = without_comments.split("<!--", 1)[0]
     out: list[str] = []
-    fence = None  # (fence_char, fence_length) while inside a fenced block
+    fence = None  # (fence_char, fence_length, blockquote_depth)
     for line in without_comments.splitlines():
         content = re.sub(r"^(?: {0,3}>[ \t]?)+", "", line)
         match = COVERAGE_FENCE_RE.match(line)
         if fence is None:
             if match:
-                marker = match.group(1)
-                fence = (marker[0], len(marker))
+                marker = match.group("marker")
+                depth = match.group("prefix").count(">")
+                fence = (marker[0], len(marker), depth)
                 continue
             if content.startswith("    ") or content.startswith("\t"):
                 continue  # indented code block (incl. blockquoted) is not prose
             out.append(line)
         else:
             if match:
-                marker = match.group(1)
-                remainder = match.group(2)
+                marker = match.group("marker")
+                remainder = match.group("rest")
+                depth = match.group("prefix").count(">")
                 if marker[0] == fence[0] and len(marker) >= fence[1] \
+                        and depth == fence[2] \
                         and remainder.strip() == "":
                     fence = None
             # every line inside the fence is non-rendered
     visible = "\n".join(out)
     visible = COVERAGE_HTML_BLOCK_RE.sub(
         lambda match: "\n" * match.group(0).count("\n"), visible)
+    # An unterminated raw-text/hidden block (script/style/template) hides EOF.
+    unterminated = re.search(r"<(script|style|template)\b", visible,
+                             re.IGNORECASE)
+    if unterminated:
+        visible = visible[:unterminated.start()]
     return visible.strip()
 
 
@@ -2307,10 +2317,10 @@ def check_coverage_map(rep: Report) -> None:
                   "(docs/skills/coverage-map.md is required)")
         return
     summary = COVERAGE_MAP_MD.read_text(encoding="utf-8")
-    if "coverage-map.json" not in summary:
+    summary_visible = _coverage_rendered_markdown(summary)
+    if "coverage-map.json" not in summary_visible:
         rep.error("[" + md_ctx + "] must point at the authoritative "
                   "coverage-map.json")
-    summary_visible = _coverage_rendered_markdown(summary)
     for phrase in COVERAGE_REQUIRED_PHRASES:
         if not _coverage_phrase_present(summary_visible, phrase):
             rep.error("[" + md_ctx + "] missing the required optionality "

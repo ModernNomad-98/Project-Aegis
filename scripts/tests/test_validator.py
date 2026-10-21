@@ -2648,6 +2648,35 @@ def test_coverage_map_overflowing_float_rejected():
     assert raised, "an overflowing float literal must be rejected at load"
 
 
+
+def test_coverage_map_fence_prefix_and_visible_pointer():
+    """T30: fence-prefix closure and the JSON pointer must be visible text."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    fence = chr(96) * 3
+    hidden = fence + "\n> " + fence + "\n" + phrase + "\n" + fence
+    assert phrase not in validator._coverage_rendered_markdown(hidden), (
+        "a blockquoted fence marker must not close a top-level fence"
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        def comment_out_pointer(text):
+            return text.replace("[coverage-map.json](coverage-map.json)",
+                                "<!-- [coverage-map.json](coverage-map.json) -->", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None,
+                              comment_out_pointer) as rep:
+            expect_error(rep, "must point at the authoritative",
+                         "coverage map: hidden JSON pointer rejected")
+
+
+def test_coverage_map_hidden_html_raw_text_blocks():
+    """T31: unterminated script/style/template blocks hide trailing text."""
+    phrase = validator.COVERAGE_REQUIRED_PHRASES[2]
+    for opener in ("<script>", "<style>", "<template>"):
+        hidden = opener + "\n" + phrase
+        assert phrase not in validator._coverage_rendered_markdown(hidden), (
+            "an unterminated hidden HTML block must hide trailing text: " + opener
+        )
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -2683,6 +2712,8 @@ TESTS = [
     test_coverage_map_unterminated_comment_hidden,
     test_coverage_map_visible_only_totals_and_ids,
     test_coverage_map_overflowing_float_rejected,
+    test_coverage_map_fence_prefix_and_visible_pointer,
+    test_coverage_map_hidden_html_raw_text_blocks,
     test_skill_end_to_end,
     test_section_order,
     test_agents_schema,
