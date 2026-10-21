@@ -2664,6 +2664,7 @@ def test_coverage_map_malformed_id_does_not_crash():
             expect_error(rep, "non-integer id",
                          "coverage map: malformed id reported without a crash")
 
+
 def test_coverage_map_triage_rows_and_phrase():
     """T33: rows #254/#278 carry the owner decision; phrase is 80 of 207."""
     payload = json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8"))
