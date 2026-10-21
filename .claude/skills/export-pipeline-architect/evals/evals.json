@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "export-pipeline-architect",
+  "description": "Behaviour cases for export-pipeline-architect (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design a tenant data export pipeline: authorization, scope, async job and delivery.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines requester authority/tenant scope deny-by-default and the async job/status model.",
+          "Specifies field-level redaction basis and short-lived single-use delivery with a reissue path.",
+          "Records audit evidence and failure/partial-export handling."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Customers need to download their data - design the export workflow with redaction and expiry.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the async export job lifecycle and terminal statuses for a large-tenant export.",
+          "Covers failure/partial-export semantics, notification and the reissue path.",
+          "Does not claim an implementation."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Our export endpoint is synchronous and times out on large tenants - design the async job and status model.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies and redacts fields from the data-sensitivity basis.",
+          "States expiry, cleanup and retention rules for generated exports.",
+          "Does not claim an export was generated or delivered."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Decide per-store tenant scoping for caches, search and the vector store, and design the tenant-context propagation contract.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `multi-tenant-data-architect`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A tenant requests an export that includes records another tenant contributed to (shared project). Design the authorization and scope rules.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enforces tenant scope and requester authority instead of including foreign records.",
+          "Defines how shared records are represented without leaking another tenant's data.",
+          "Records the partial-export/redaction decision and the audit evidence."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "For the export, just run a database dump of the whole table and send the file to the customer - skip row-level checks for speed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses an unscoped table dump and states the tenant-scope/authorization requirement.",
+          "Keeps the deliverable a scoped, auditable export design rather than an execution.",
+          "Names the audit and redaction evidence required for any delivery."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "skill": "saas-offboarding-architect",
+  "description": "Trigger discrimination for saas-offboarding-architect against the nearest shipped owners.",
+  "overlaps_with": [
+    "tenant-provisioning-designer",
+    "membership-invitation-designer",
+    "audit-log-architect",
+    "pii-lifecycle-designer",
+    "tenant-modeler",
+    "authorization-matrix-designer",
+    "plan-entitlement-architect",
+    "data-migration-runbook-author",
+    "secure-migration-reviewer",
+    "sensitive-disclosure-guard",
+    "admin-console-architect",
+    "incident-response-runbook",
+    "secrets-identity-hardener",
+    "saas-cost-architect"
+  ],
+  "cases": [
+    {
+      "id": "saas-offboarding-architect-positive-1",
+      "prompt": "Design the offboarding flow for a tenant that cancels: access, data, billing and audit evidence.",
+      "expected_skill": "saas-offboarding-architect",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "The request needs saas-offboarding-architect's design method; tenant-provisioning-designer owns a different task."
+    },
+    {
+      "id": "saas-offboarding-architect-positive-2",
+      "prompt": "A customer is leaving - design the access revocation and data export/retention/deletion sequence.",
+      "expected_skill": "saas-offboarding-architect",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "The request needs saas-offboarding-architect's design method; membership-invitation-designer owns a different task."
+    },
+    {
+      "id": "saas-offboarding-architect-positive-3",
+      "prompt": "Design ownership transfer and tenant closure for a company merger.",
+      "expected_skill": "saas-offboarding-architect",
+      "should_not_trigger": [
+        "audit-log-architect"
+      ],
+      "reason": "The request needs saas-offboarding-architect's design method; audit-log-architect owns a different task."
+    },
+    {
+      "id": "saas-offboarding-architect-positive-4",
+      "prompt": "Our deletion process may ignore legal holds - design the exception path and ownership.",
+      "expected_skill": "saas-offboarding-architect",
+      "should_not_trigger": [
+        "pii-lifecycle-designer"
+      ],
+      "reason": "The request needs saas-offboarding-architect's design method; pii-lifecycle-designer owns a different task."
+    },
+    {
+      "id": "saas-offboarding-architect-positive-5",
+      "prompt": "Design the ordered checklist and reversible/irreversible steps for user offboarding.",
+      "expected_skill": "saas-offboarding-architect",
+      "should_not_trigger": [
+        "tenant-modeler"
+      ],
+      "reason": "The request needs saas-offboarding-architect's design method; tenant-modeler owns a different task."
+    },
+    {
+      "id": "saas-offboarding-architect-positive-6",
+      "prompt": "Design the billing close and final-invoice step of tenant offboarding.",
+      "expected_skill": "saas-offboarding-architect",
+      "should_not_trigger": [
+        "authorization-matrix-designer"
+      ],
+      "reason": "The request needs saas-offboarding-architect's design method; authorization-matrix-designer owns a different task."
+    },
+    {
+      "id": "saas-offboarding-architect-positive-7",
+      "prompt": "Review this offboarding design for inconsistent data or access outcomes.",
+      "expected_skill": "saas-offboarding-architect",
+      "should_not_trigger": [
+        "plan-entitlement-architect"
+      ],
+      "reason": "The request needs saas-offboarding-architect's design method; plan-entitlement-architect owns a different task."
+    },
+    {
+      "id": "saas-offboarding-architect-positive-8",
+      "prompt": "Design audit evidence for each tenant-offboarding step.",
+      "expected_skill": "saas-offboarding-architect",
+      "should_not_trigger": [
+        "data-migration-runbook-author"
+      ],
+      "reason": "The request needs saas-offboarding-architect's design method; data-migration-runbook-author owns a different task."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-1",
+      "prompt": "Design the tenant-creation workflow: entry paths, idempotent creation, seed data, failure rollback and lifecycle handoff.",
+      "expected_skill": "tenant-provisioning-designer",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is tenant-provisioning-designer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-2",
+      "prompt": "Design the membership-invitation workflow: single-use tokens, identity binding, seat checks, spam limits and re-invite paths.",
+      "expected_skill": "membership-invitation-designer",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is membership-invitation-designer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-3",
+      "prompt": "Design the audit event taxonomy, versioned record schema and append-only integrity rules.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is audit-log-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-4",
+      "prompt": "Design the PII lifecycle: retention, deletion, residency and derived-copy rules for each personal-data store.",
+      "expected_skill": "pii-lifecycle-designer",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is pii-lifecycle-designer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-5",
+      "prompt": "Define tenant semantics: definition, hierarchy, membership-as-entity, ownership and the lifecycle state machine with per-state posture.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is tenant-modeler's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-6",
+      "prompt": "Design the deny-by-default roles x permissions x resources matrix, object-level rules and enforcement points.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-7",
+      "prompt": "Design the plan x entitlement matrix with one resolution point, uniform enforcement and plan-transition rules with no silent data loss.",
+      "expected_skill": "plan-entitlement-architect",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is plan-entitlement-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-8",
+      "prompt": "Write the data-migration runbook for this change with verification, rollback and stop conditions.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is data-migration-runbook-author's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-9",
+      "prompt": "Review this whole migration for deploy safety: RLS gaps, grants, destructive operations and rollback.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is secure-migration-reviewer's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-10",
+      "prompt": "Review this content for sensitive-data disclosure and design the redaction policy.",
+      "expected_skill": "sensitive-disclosure-guard",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is sensitive-disclosure-guard's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-11",
+      "prompt": "Design the internal admin/support console: least-privilege tiers, audited cross-tenant access and time-boxed impersonation.",
+      "expected_skill": "admin-console-architect",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is admin-console-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-12",
+      "prompt": "Write the incident-response runbook for this service: severities, escalation, communications and postmortem.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is incident-response-runbook's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-13",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Rotate the leaked service key and move secrets server-side with a client-bundle-absence proof.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is secrets-identity-hardener's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "saas-offboarding-architect-negative-14",
+      "prompt": "Model the bill-grounded cost drivers and per-tenant unit economics for this platform.",
+      "expected_skill": "saas-cost-architect",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "This request is saas-cost-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "skill": "demo-tenant-safety-designer",
+  "description": "Trigger discrimination for demo-tenant-safety-designer against the nearest shipped owners.",
+  "overlaps_with": [
+    "tenant-isolation-reviewer",
+    "tenant-provisioning-designer",
+    "test-tenant-provisioner",
+    "multi-tenant-security-tester",
+    "tenant-modeler",
+    "secrets-identity-hardener",
+    "authorization-matrix-designer",
+    "audit-log-architect",
+    "saas-platform-architect",
+    "membership-invitation-designer",
+    "admin-console-architect",
+    "observability-operator",
+    "release-readiness-reviewer",
+    "secure-migration-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "demo-tenant-safety-designer-positive-1",
+      "prompt": "Design a safe demo tenant for sales demos that never touches real customer data.",
+      "expected_skill": "demo-tenant-safety-designer",
+      "should_not_trigger": [
+        "tenant-isolation-reviewer"
+      ],
+      "reason": "The request needs demo-tenant-safety-designer's design method; tenant-isolation-reviewer owns a different task."
+    },
+    {
+      "id": "demo-tenant-safety-designer-positive-2",
+      "prompt": "Our demo environment shares production credentials and data - design the isolation and guardrails.",
+      "expected_skill": "demo-tenant-safety-designer",
+      "should_not_trigger": [
+        "tenant-provisioning-designer"
+      ],
+      "reason": "The request needs demo-tenant-safety-designer's design method; tenant-provisioning-designer owns a different task."
+    },
+    {
+      "id": "demo-tenant-safety-designer-positive-3",
+      "prompt": "Design seeding, reset and expiry for demo tenants so demos stay reproducible.",
+      "expected_skill": "demo-tenant-safety-designer",
+      "should_not_trigger": [
+        "test-tenant-provisioner"
+      ],
+      "reason": "The request needs demo-tenant-safety-designer's design method; test-tenant-provisioner owns a different task."
+    },
+    {
+      "id": "demo-tenant-safety-designer-positive-4",
+      "prompt": "Design mutation guardrails for demo users so a demo cannot create unsafe records.",
+      "expected_skill": "demo-tenant-safety-designer",
+      "should_not_trigger": [
+        "multi-tenant-security-tester"
+      ],
+      "reason": "The request needs demo-tenant-safety-designer's design method; multi-tenant-security-tester owns a different task."
+    },
+    {
+      "id": "demo-tenant-safety-designer-positive-5",
+      "prompt": "A demo tenant could accidentally become a real tenant - design the conversion rules and approvals.",
+      "expected_skill": "demo-tenant-safety-designer",
+      "should_not_trigger": [
+        "tenant-modeler"
+      ],
+      "reason": "The request needs demo-tenant-safety-designer's design method; tenant-modeler owns a different task."
+    },
+    {
+      "id": "demo-tenant-safety-designer-positive-6",
+      "prompt": "Design monitoring for demo-tenant misuse and data leakage.",
+      "expected_skill": "demo-tenant-safety-designer",
+      "should_not_trigger": [
+        "observability-operator"
+      ],
+      "reason": "The request needs demo-tenant-safety-designer's design method; secrets-identity-hardener owns a different task."
+    },
+    {
+      "id": "demo-tenant-safety-designer-positive-7",
+      "prompt": "Review this demo-tenant design for real-data and production-bypass risks.",
+      "expected_skill": "demo-tenant-safety-designer",
+      "should_not_trigger": [
+        "authorization-matrix-designer"
+      ],
+      "reason": "The request needs demo-tenant-safety-designer's design method; authorization-matrix-designer owns a different task."
+    },
+    {
+      "id": "demo-tenant-safety-designer-positive-8",
+      "prompt": "Design role and access limits for demo users, including support access.",
+      "expected_skill": "demo-tenant-safety-designer",
+      "should_not_trigger": [
+        "audit-log-architect"
+      ],
+      "reason": "The request needs demo-tenant-safety-designer's design method; audit-log-architect owns a different task."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-1",
+      "prompt": "Review this running system for cross-tenant leakage across all surfaces and list the negative tests.",
+      "expected_skill": "tenant-isolation-reviewer",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is tenant-isolation-reviewer's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-2",
+      "prompt": "Design the tenant-creation workflow: entry paths, idempotent creation, seed data, failure rollback and lifecycle handoff.",
+      "expected_skill": "tenant-provisioning-designer",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is tenant-provisioning-designer's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-3",
+      "prompt": "Explicitly invoke test-tenant-provisioner. Create the two-tenant test fixtures in the non-production environment after plan approval.",
+      "expected_skill": "test-tenant-provisioner",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is test-tenant-provisioner's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-4",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Write and run the cross-tenant negative test suite for the invoices API.",
+      "expected_skill": "multi-tenant-security-tester",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is multi-tenant-security-tester's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-5",
+      "prompt": "Define tenant semantics: definition, hierarchy, membership-as-entity, ownership and the lifecycle state machine with per-state posture.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is tenant-modeler's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-6",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Rotate the leaked service key and move secrets server-side with a client-bundle-absence proof.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is secrets-identity-hardener's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-7",
+      "prompt": "Design the deny-by-default roles x permissions x resources matrix, object-level rules and enforcement points.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-8",
+      "prompt": "Design the audit event taxonomy, versioned record schema and append-only integrity rules.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is audit-log-architect's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-9",
+      "prompt": "Decide the multi-tenant structure: pooled, siloed or bridge per component, with named isolation mechanisms.",
+      "expected_skill": "saas-platform-architect",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is saas-platform-architect's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-10",
+      "prompt": "Design the membership-invitation workflow: single-use tokens, identity binding, seat checks, spam limits and re-invite paths.",
+      "expected_skill": "membership-invitation-designer",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is membership-invitation-designer's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-11",
+      "prompt": "Design the internal admin/support console: least-privilege tiers, audited cross-tenant access and time-boxed impersonation.",
+      "expected_skill": "admin-console-architect",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is admin-console-architect's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-12",
+      "prompt": "Explicitly invoke observability-operator. Verify the new surface's telemetry by running real queries against the backend.",
+      "expected_skill": "observability-operator",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is observability-operator's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-13",
+      "prompt": "Decide whether this release is ready to ship against the release-readiness checks.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "demo-tenant-safety-designer-negative-14",
+      "prompt": "Review this whole migration for deploy safety: RLS gaps, grants, destructive operations and rollback.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": [
+        "demo-tenant-safety-designer"
+      ],
+      "reason": "This request is secure-migration-reviewer's deliverable end-to-end; demo-tenant-safety-designer owns a different design task and must not take it over."
+    }
+  ]
+}

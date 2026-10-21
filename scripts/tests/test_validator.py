@@ -2164,7 +2164,7 @@ def test_coverage_map_summary_totals_mismatch():
     """T9b: each seeded summary totals/per-area defect is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| GAP | 46 |", "| GAP | 45 |", 1)
+            return text.replace("| GAP | 39 |", "| GAP | 38 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'GAP'",
                          "coverage map: summary totals mismatch rejected")
@@ -2179,8 +2179,8 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected (area named)")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| explicit-id | 136 |",
-                                "| explicit-id | 135 |", 1)
+            return text.replace("| explicit-id | 143 |",
+                                "| explicit-id | 142 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'explicit-id'",
                          "coverage map: summary by_grade mismatch rejected")
@@ -2194,16 +2194,16 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| P0 / P1 / P2 gaps | 3 / 34 / 9 |",
-                                "| P0 / P1 / P2 gaps | 4 / 34 / 9 |", 1)
+            return text.replace("| P0 / P1 / P2 gaps | 3 / 29 / 7 |",
+                                "| P0 / P1 / P2 gaps | 4 / 29 / 7 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary gap-priority totals",
                          "coverage map: summary gap-priority totals mismatch "
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| Review pending | 162 |",
-                                "| Review pending | 163 |", 1)
+            return text.replace("| Review pending | 155 |",
+                                "| Review pending | 154 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'Review pending'",
                          "coverage map: summary review_pending mismatch "
@@ -2635,22 +2635,22 @@ def test_coverage_map_codex_visible_text_findings():
 
 
 def test_coverage_map_planning_gate_resolved():
-    """T32: rows #254/#278 are planning-gate resolved; review_pending is 162."""
+    """T32: rows #254/#278 are planning-gate resolved; review_pending is 155."""
     assert validator.COVERAGE_PLANNING_GATE_RESOLVED == frozenset({254, 278})
-    assert validator.COVERAGE_TOTALS["review_pending"] == 162
+    assert validator.COVERAGE_TOTALS["review_pending"] == 155
     payload = json.loads(
         validator.COVERAGE_MAP.read_text(encoding="utf-8"))
     non_explicit = [entry for entry in payload["entries"]
                     if entry.get("evidence_grade") != "explicit-id"]
-    assert len(non_explicit) == 164
+    assert len(non_explicit) == 157
     resolved_present = {entry["id"] for entry in non_explicit
                         if entry["id"] in validator.COVERAGE_PLANNING_GATE_RESOLVED}
     assert resolved_present == {254, 278}
     assert validator.COVERAGE_TOTALS["review_pending"] == (
-        len(non_explicit) - len(resolved_present)) == 162
+        len(non_explicit) - len(resolved_present)) == 155
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["review_pending"] = 164
+            payload["totals"]["review_pending"] = 156
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.review_pending",
                          "coverage map: unresolved-row review_pending rejected")
@@ -2694,20 +2694,22 @@ def test_coverage_map_triage_rows_and_phrase():
                      and entry["id"] != 254]
     assert rollback_rows, (
         "rollback-runbook-author must remain covered by another row so "
-        "distinct covering stays 135")
+        "distinct covering stays 142")
     assert all(entry["status"] != "GAP" for entry in rollback_rows), (
         "the surviving rollback coverage rows must be non-GAP")
     assert "Dropped as covered by ai-sdlc-operating-model" in (
         r278["rationale"] or "")
     phrase = [item for item in validator.COVERAGE_REQUIRED_PHRASES
-              if "80 of 215" in item]
-    assert phrase, "an optionality phrase must carry 80 of 215"
+              if "80 of 222" in item]
+    assert phrase, "an optionality phrase must carry 80 of 222"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
-    assert "80 of 215" in mmd and "83 of 215" not in mmd
+    assert "80 of 222" in mmd and "80 of 215" not in mmd
+    assert "83 of 215" not in mmd, (
+        "the pre-Batch-1 stale optionality phrase must stay rejected")
 
 
 def test_coverage_map_batch1_deliveries():
-    """T35: the eight Batch 1 GAPs are SHIPPED/explicit-id on their new skills."""
+    """T35: the eight Batch 1 GAPs are SHIPPED/explicit-id; canonical totals tracked for the combined state (batch-specific delivery asserts live in T37)."""
     mapping = {
         6: "layered-architecture-enforcer",
         7: "dependency-direction-guard",
@@ -2726,22 +2728,65 @@ def test_coverage_map_batch1_deliveries():
         assert (row["status"], row["evidence_grade"]) == (
             "SHIPPED", "explicit-id")
         assert row["covering_skills"] == [skill]
-    assert validator.COVERAGE_TOTALS["manifest_skills"] == 215
-    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 135
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 222
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 142
     assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
-    assert len(validator.COVERAGE_GAP_IDS) == 46
+    assert len(validator.COVERAGE_GAP_IDS) == 39
     assert validator.COVERAGE_P0_GAP_IDS == (161, 162, 164)
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
-               if "80 of 215" in item]
-    assert phrases, "an optionality phrase must carry 80 of 215"
+               if "80 of 222" in item]
+    assert phrases, "an optionality phrase must carry 80 of 222"
 
+
+
+def test_coverage_map_batch2_deliveries():
+    """T37: the seven Batch 2 GAPs are SHIPPED/explicit-id on their new skills."""
+    mapping = {
+        61: "subscription-lifecycle-designer",
+        67: "user-preference-architect",
+        76: "export-pipeline-architect",
+        80: "demo-tenant-safety-designer",
+        83: "saas-offboarding-architect",
+        86: "saas-localization-architect",
+        87: "saas-timezone-architect",
+    }
+    payload = json.loads(
+        validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    rows = {entry["id"]: entry for entry in payload["entries"]}
+    for row_id, skill in mapping.items():
+        row = rows[row_id]
+        assert (row["status"], row["evidence_grade"]) == (
+            "SHIPPED", "explicit-id")
+        assert row["covering_skills"] == [skill]
+        assert "D109" in (row["evidence"] or "")
+        assert row["rationale"] is None
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 222
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 142
+    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
+    assert validator.COVERAGE_TOTALS["review_pending"] == 155
+    assert len(validator.COVERAGE_GAP_IDS) == 39
+    assert validator.COVERAGE_P0_GAP_IDS == (161, 162, 164)
+    phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
+               if "80 of 222" in item]
+    assert phrases, "an optionality phrase must carry 80 of 222"
+    mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
+    area02 = [line for line in mmd.splitlines()
+              if line.startswith("| 02 ")]
+    assert area02 and area02[0].strip().endswith("| 35 | 21 | 4 | 10 | 0 |"), (
+        "coverage summary area 02 row must show 35 entries / 21 shipped / 4 "
+        "covered / 10 partial / 0 GAP")
+    reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
+                      / "step-0-reconciliation-v4.md").read_text(
+                          encoding="utf-8")
+    assert "D109 (2026-10-21)" in reconciliation, (
+        "D109 Batch 2 delivery record must be appended")
 
 
 def test_skills_manifest_provenance():
     """T36: manifest paths exist AND hash-match at source_revision and tree."""
     manifest = json.loads(
         validator.MANIFEST_PATH.read_text(encoding="utf-8"))
-    assert len(manifest["skills"]) == 215
+    assert len(manifest["skills"]) == 222
     revision = manifest["source_revision"]
     assert len(revision) == 40 and all(c in "0123456789abcdef" for c in revision)
     repo = ["git", "-C", str(validator.REPO_ROOT)]
@@ -2818,6 +2863,7 @@ TESTS = [
     test_coverage_map_anomaly_rules,
     test_coverage_map_optionality_framing,
     test_coverage_map_batch1_deliveries,
+    test_coverage_map_batch2_deliveries,
     test_skills_manifest_provenance,
     test_coverage_map_planning_gate_resolved,
     test_coverage_map_malformed_id_does_not_crash,

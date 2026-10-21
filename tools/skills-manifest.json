@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "f4a77765a53b4fa55d0aa7ac84edddfee78a8032",
+  "source_revision": "f40bc7027c7e2794fc8b88e86155e8668718d41d",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -339,6 +339,11 @@
       "sha256": "44233bbb9d3db3f2e70e8788b7e32d9dca2029ad602a645e5304ff3d55f82773"
     },
     {
+      "name": "demo-tenant-safety-designer",
+      "path": ".claude/skills/demo-tenant-safety-designer/SKILL.md",
+      "sha256": "472cd3196fdccc1e2213e2ccb199fb976762e94958b2c02fa748a93a5cffd4c1"
+    },
+    {
       "name": "dependency-direction-guard",
       "path": ".claude/skills/dependency-direction-guard/SKILL.md",
       "sha256": "c1524ed26d686da92dc19dfbebfd4ca46c545b8421d7861e2f548f4e9f4d7547"
@@ -407,6 +412,11 @@
       "name": "exploratory-charter-designer",
       "path": ".claude/skills/exploratory-charter-designer/SKILL.md",
       "sha256": "82418000c1b44f1079a16fe9a1036a3d7e17ae7aa4a8f8d0cfdb491407cc4946"
+    },
+    {
+      "name": "export-pipeline-architect",
+      "path": ".claude/skills/export-pipeline-architect/SKILL.md",
+      "sha256": "8b2fb6f2b63e0bfebbcbaefab6d35acb1314d753f19e8d52360ca2bf300930f9"
     },
     {
       "name": "feature-flag-architect",
@@ -814,9 +824,24 @@
       "sha256": "241c71c614d3ccc67e46036d54517a7d6012089d194f52bd0cc0ac76241bf18d"
     },
     {
+      "name": "saas-localization-architect",
+      "path": ".claude/skills/saas-localization-architect/SKILL.md",
+      "sha256": "2183b95221519a6f7cd585d007bcc9c213a714cddfa9c0ac92810c202d013b0f"
+    },
+    {
+      "name": "saas-offboarding-architect",
+      "path": ".claude/skills/saas-offboarding-architect/SKILL.md",
+      "sha256": "ce7f0a838b869129ec374662c15c5056d5e794822f0c2be4860cb5f8ad679c7a"
+    },
+    {
       "name": "saas-platform-architect",
       "path": ".claude/skills/saas-platform-architect/SKILL.md",
       "sha256": "910e24c734ba7e0253436c7aa75eb7bcd814c659e9f1533425c09885b8ab8be7"
+    },
+    {
+      "name": "saas-timezone-architect",
+      "path": ".claude/skills/saas-timezone-architect/SKILL.md",
+      "sha256": "a35d9c1b5365fbc06c2b9a1b8492039a4ad22b7ebbdd3a92bd9803e47555323e"
     },
     {
       "name": "sast-orchestration-designer",
@@ -969,6 +994,11 @@
       "sha256": "5bcc02dfa9814d2cbc84320abb06ba8d9f998098b8f745181ece4f88608825f3"
     },
     {
+      "name": "subscription-lifecycle-designer",
+      "path": ".claude/skills/subscription-lifecycle-designer/SKILL.md",
+      "sha256": "72e14499073b2e8ff8b6457a32bf1bad19d71866eb1ce175447a7bbb74d53039"
+    },
+    {
       "name": "sunset-deprecation-communicator",
       "path": ".claude/skills/sunset-deprecation-communicator/SKILL.md",
       "sha256": "ffaf6518ee7a7f4997bb02fc5ad7f69d9450624e38d7d989a34606c05627356f"
@@ -1047,6 +1077,11 @@
       "name": "usage-metering-and-cost-attribution-pipeline-designer",
       "path": ".claude/skills/usage-metering-and-cost-attribution-pipeline-designer/SKILL.md",
       "sha256": "82dc82868105ba4e51383d6796326edde29e5d414551ac8c58e71fe9ffa1e278"
+    },
+    {
+      "name": "user-preference-architect",
+      "path": ".claude/skills/user-preference-architect/SKILL.md",
+      "sha256": "41138d11a2e160a185db4d6bb20628bd81da9c8e8dfdf90054015cdb4c0a768b"
     },
     {
       "name": "ux-design-iteration",

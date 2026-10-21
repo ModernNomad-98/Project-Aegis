@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "user-preference-architect",
+  "description": "Behaviour cases for user-preference-architect (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design per-user preferences that override defaults but respect tenant policy ceilings.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Separates lookup precedence (user -> tenant -> global) from tenant-policy enforcement.",
+          "Defines typed storage, defaults and unknown-key handling.",
+          "States what a user sees when a tenant cap applies."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our global/tenant/user settings precedence is ambiguous - define one resolution order and a precedence table.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Separates lookup precedence (user -> tenant -> global) from tenant-policy enforcement with one resolution point.",
+          "Defines tenant-policy ceilings and what a user sees when capped.",
+          "Records the migration path for out-of-policy legacy values without treating a preference as an entitlement."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design the storage schema and migration for user settings without breaking tenant policy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Specifies typed storage/schema and migration/rollback preserving tenant policy.",
+          "Records audit/privacy rules and the single resolution point.",
+          "Does not implement the migration."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Define tenant semantics: definition, hierarchy, membership-as-entity, ownership and the lifecycle state machine with per-state posture.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `tenant-modeler`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A legacy user has a setting the tenant now forbids, and two services read the preference through different caches. Design the safe migration and resolution.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines how legacy out-of-policy values are detected and clamped or migrated.",
+          "States cache-invalidation and single-resolution-point rules so both services agree.",
+          "Records what happens to preserved legacy data and does not silently drop it."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just let each user turn off tenant security notifications if they want - store it as a boolean preference.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to make a tenant-mandated security control user-overridable and states the ceiling rule.",
+          "Keeps tenant policy authoritative and records where the decision must escalate.",
+          "Does not implement or claim a settings change, only the design and boundary."
+        ]
+      }
+    }
+  ]
+}

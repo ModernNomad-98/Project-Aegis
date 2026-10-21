@@ -841,15 +841,17 @@
     },
     {
       "area": "02",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "subscription-lifecycle-designer"
+      ],
+      "evidence": "batch 2 delivery: catalog implemented row (Batch 2, 2026-10-21) lists `subscription-lifecycle-designer` for roadmap #61 (roadmap-ID mapping: docs/skills-catalog.md + D109; shipped status: README.md); covering skill: subscription-lifecycle-designer; D109 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 61,
       "name": "Subscription Lifecycle Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 2 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "02",
@@ -923,15 +925,17 @@
     },
     {
       "area": "02",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "user-preference-architect"
+      ],
+      "evidence": "batch 2 delivery: catalog implemented row (Batch 2, 2026-10-21) lists `user-preference-architect` for roadmap #67 (roadmap-ID mapping: docs/skills-catalog.md + D109; shipped status: README.md); covering skill: user-preference-architect; D109 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 67,
       "name": "User Preference Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 2 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "02",
@@ -1049,15 +1053,17 @@
     },
     {
       "area": "02",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "export-pipeline-architect"
+      ],
+      "evidence": "batch 2 delivery: catalog implemented row (Batch 2, 2026-10-21) lists `export-pipeline-architect` for roadmap #76 (roadmap-ID mapping: docs/skills-catalog.md + D109; shipped status: README.md); covering skill: export-pipeline-architect; D109 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 76,
       "name": "Export Pipeline Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 2 delivery (2026-10-21)",
       "priority": "P2",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "02",
@@ -1103,15 +1109,17 @@
     },
     {
       "area": "02",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "demo-tenant-safety-designer"
+      ],
+      "evidence": "batch 2 delivery: catalog implemented row (Batch 2, 2026-10-21) lists `demo-tenant-safety-designer` for roadmap #80 (roadmap-ID mapping: docs/skills-catalog.md + D109; shipped status: README.md); covering skill: demo-tenant-safety-designer; D109 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 80,
       "name": "Demo Tenant Safety Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 2 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "02",
@@ -1143,15 +1151,17 @@
     },
     {
       "area": "02",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "saas-offboarding-architect"
+      ],
+      "evidence": "batch 2 delivery: catalog implemented row (Batch 2, 2026-10-21) lists `saas-offboarding-architect` for roadmap #83 (roadmap-ID mapping: docs/skills-catalog.md + D109; shipped status: README.md); covering skill: saas-offboarding-architect; D109 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 83,
       "name": "SaaS Offboarding Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 2 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "02",
@@ -1183,27 +1193,31 @@
     },
     {
       "area": "02",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "saas-localization-architect"
+      ],
+      "evidence": "batch 2 delivery: catalog implemented row (Batch 2, 2026-10-21) lists `saas-localization-architect` for roadmap #86 (roadmap-ID mapping: docs/skills-catalog.md + D109; shipped status: README.md); covering skill: saas-localization-architect; D109 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 86,
       "name": "SaaS Localization Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 2 delivery (2026-10-21)",
       "priority": "P2",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "02",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "saas-timezone-architect"
+      ],
+      "evidence": "batch 2 delivery: catalog implemented row (Batch 2, 2026-10-21) lists `saas-timezone-architect` for roadmap #87 (roadmap-ID mapping: docs/skills-catalog.md + D109; shipped status: README.md); covering skill: saas-timezone-architect; D109 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 87,
       "name": "SaaS Timezone Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "batch 2 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "02",
@@ -4202,7 +4216,7 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 215 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 222 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
   "totals": {
     "beyond_roadmap_skills": 80,
     "by_area": {
@@ -4219,8 +4233,8 @@
     "by_grade": {
       "capability-review": 102,
       "catalog-decision": 16,
-      "explicit-id": 136,
-      "none": 46
+      "explicit-id": 143,
+      "none": 39
     },
     "by_priority": {
       "P0": 126,
@@ -4229,18 +4243,18 @@
     },
     "by_status": {
       "COVERED": 56,
-      "GAP": 46,
+      "GAP": 39,
       "PARTIAL": 62,
-      "SHIPPED": 136
+      "SHIPPED": 143
     },
-    "distinct_covering_skills": 135,
+    "distinct_covering_skills": 142,
     "entries": 300,
     "gap_by_priority": {
       "P0": 3,
-      "P1": 34,
-      "P2": 9
+      "P1": 29,
+      "P2": 7
     },
-    "manifest_skills": 215,
-    "review_pending": 162
+    "manifest_skills": 222,
+    "review_pending": 155
   }
 }

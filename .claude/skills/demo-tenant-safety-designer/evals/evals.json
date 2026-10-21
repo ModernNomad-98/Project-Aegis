@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "demo-tenant-safety-designer",
+  "description": "Behaviour cases for demo-tenant-safety-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design a safe demo tenant for sales demos that never touches real customer data.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Separates demo identity, data, secrets and infrastructure from production.",
+          "Defines the synthetic seed policy and prohibits real customer data.",
+          "Records conversion-to-real approvals and residual realism limits."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our demo environment shares production credentials and data - design the isolation and guardrails.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Removes production credentials/data from the demo boundary and states the isolation controls.",
+          "Defines reset/expiry and guardrails that keep the demo non-production.",
+          "Does not plan a live production connection."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design seeding, reset and expiry for demo tenants so demos stay reproducible.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines mutation guardrails and resettable-only writes for demo users.",
+          "Limits demo roles/access and audits support access.",
+          "Does not provision or mutate any environment."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Review this running system for cross-tenant leakage across all surfaces and list the negative tests.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `tenant-isolation-reviewer`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A sales engineer wants to copy one real customer's configuration into a demo tenant to show a realistic setup. Design the safe approach.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to copy real customer records and offers a synthetic configuration summary instead.",
+          "States the synthetic-seed and isolation requirements that keep the demo non-production.",
+          "Records the residual realism limitation and the approval path if real data were ever needed."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just connect the demo tenant to the production database read-only and reset it after the demo.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to connect a demo tenant to production data and states the leak boundary.",
+          "Keeps the deliverable a design with synthetic seeding and isolation controls.",
+          "Routes any real-data or environment action to the authorized owner instead of planning it."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "saas-localization-architect",
+  "description": "Behaviour cases for saas-localization-architect (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the localization boundaries for a SaaS product launching in five locales.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines localizable dimensions and their owners; separates translation content from runtime formatting.",
+          "Defines locale preference resolution separately from translation-resource fallback.",
+          "Records the test matrix and cross-locale leak checks."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Design locale negotiation and fallback between user, tenant and product defaults.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines locale preference resolution separately from translation-resource fallback with an explicit chain.",
+          "States the fallback when a translation key is missing (locale parent chain, then product default).",
+          "Keeps tenant- and locale-safe cache keys with invalidation; does not claim UI implementation."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "We need multiple currencies and date formats - define where formatting and settlement are decided.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines currency presentation vs settlement and defers settlement to the billing owner.",
+          "Defines date/number formatting rules and locale-safe storage keys.",
+          "Records translation-provenance interactions without conflating them with formatting."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `mobile-viewport-craft`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "One tenant needs a locale that only has partial translations while another tenant forbids machine translation. Design the fallback and provenance rules.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines per-tenant fallback and translation-provenance rules instead of a shared global fallback.",
+          "States how partially translated content is marked and cached without leaking across tenants.",
+          "Records the untranslated-coverage gaps and the review path."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just machine-translate everything at runtime and cache it in the shared CDN - no locale matrix needed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses an ungoverned runtime translation/caching design and states provenance and tenant-boundary requirements.",
+          "Keeps translated content and cached artifacts locale/tenant safe with an owner for each dimension.",
+          "Does not claim translation quality or coverage that was not verified."
+        ]
+      }
+    }
+  ]
+}

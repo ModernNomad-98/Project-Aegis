@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "saas-timezone-architect",
+  "description": "Behaviour cases for saas-timezone-architect (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the timezone contract for a SaaS app with tenants in multiple zones.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies time-bearing fields/jobs/reports and the UTC-instant vs local-intent storage contract.",
+          "Requires IANA time-zone identifiers for scheduling with offsets only as audit snapshots.",
+          "Defines DST/ambiguous-time and reporting-cutoff rules."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our nightly reports cut over at UTC midnight but tenants expect their business day - design the cutoff rules.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines reporting cutoffs per tenant business day vs UTC with auditability.",
+          "States how historical data and zone changes affect cutoff reports.",
+          "Records assumptions and the residual DST/reporting ambiguity."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design reminder scheduling that stays correct across DST transitions.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines DST/ambiguous/imaginary local-time handling for reminders.",
+          "Specifies reminder uniqueness and firing rules across transitions.",
+          "Does not claim the scheduler was implemented or verified."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the notification and webhook UX: channels, templates, retry policy and user controls.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `notification-webhook-ux-designer`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A tenant changes its timezone after a year of data, and two DST transitions fall inside the reporting window. Design the handling.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Distinguishes historical stored instants from current display zone and states the backfill policy.",
+          "Defines DST handling for duplicate/missing local hours inside reports and jobs.",
+          "Records the audit trail for zone changes and the residual ambiguity."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just schedule every job in the server's local time and convert with the browser's clock when it fires.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses server-local scheduling as a contract and states instants-plus-zone storage requirements.",
+          "Keeps the deliverable a timezone contract with explicit precedence and DST rules.",
+          "Does not claim to have implemented or verified the scheduler."
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "subscription-lifecycle-designer",
+  "description": "Behaviour cases for subscription-lifecycle-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the subscription lifecycle for a SaaS app: trial, upgrade, downgrade, cancellation, renewal and payment failure with entitlement per state.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates subscription states and transitions with the entitlement posture per state.",
+          "Defines proration, dunning/grace and cancellation timing with data-loss risk stated.",
+          "Returns the transition matrix and verification plan; no billing implementation claimed."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our upgrade path is ambiguous: does the customer get the new plan immediately or at renewal? Define the state machine and proration rules.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Distinguishes upgrade effective time (immediate vs renewal) and states the proration rule for each.",
+          "Defines idempotency/ordering keys for the transition and duplicate-event suppression.",
+          "Returns the state machine/transition matrix rather than implementing billing."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Map the cancellation and reactivation lifecycle so access, data retention and billing stay consistent.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Orders access, data retention and billing so cancellation/reactivation stay consistent.",
+          "States grandfathering/grace behaviour and the reactivation path.",
+          "Names residual data-loss risk and the verification plan."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the plan x entitlement matrix with one resolution point, uniform enforcement and plan-transition rules with no silent data loss.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `plan-entitlement-architect`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A legacy annual plan must be grandfathered while new plans follow the new lifecycle, and two billing events for the same renewal arrive out of order. Design the handled path.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States the grandfathering boundary and how legacy subscriptions transition.",
+          "Defines out-of-order/duplicate event handling with an idempotency key and a deterministic winner.",
+          "Records residual risk for un-migrated legacy records without claiming a migration was run."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just make the downgrade take effect immediately and delete the extra tenant data now - no transition rules needed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to delete or mutate tenant data as part of a subscription design and states the retention/rollback requirement.",
+          "Keeps the deliverable a lifecycle design with an explicit transition and data-retention path.",
+          "Routes the data-deletion decision to the owning policy/owner instead of performing it."
+        ]
+      }
+    }
+  ]
+}
