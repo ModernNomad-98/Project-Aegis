@@ -20,7 +20,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 - An existing diagram is stale and nobody trusts it.
 - You need to show where data crosses trust boundaries or where side effects occur.
 
-**Do not use when:** the request belongs to a named neighbouring owner (see Stop Conditions), or when inspection evidence is unavailable and the question would have to be answered by guessing. This skill diagrams flows only: generic PII location/lifecycle requests (retention, deletion, residency, derived copies) route to `pii-lifecycle-designer`.
+**Do not use when:** the request belongs to a named neighbouring owner (see Stop Conditions), or when inspection evidence is unavailable and the question would have to be answered by guessing. Diagramming the current PII flows is in scope; retention, deletion, residency and other lifecycle decisions are out of scope and route to `pii-lifecycle-designer`.
 
 ## Inputs to Inspect
 
@@ -81,6 +81,6 @@ Return, in this order:
 
 - [data-flow-conventions](references/data-flow-conventions.md) - Data-flow notation, trust boundaries and evidence rules.
 - [evals/evals.json](evals/evals.json) - the 5 behaviour cases for this skill.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against the nearest owners.
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 15 negative trigger-discrimination cases against the nearest owners.
 
 **Source:** docs/skills-catalog.md - cat 01 #49 (Data Flow Diagramming); coverage roadmap #49. The trigger description is the frontmatter description above; keep it under 1,024 parsed characters, concrete and trigger-oriented.

@@ -39,13 +39,13 @@ IMPORT WRINKLE
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
 import os
 import re
 import shutil
-import hashlib
 import subprocess
 import sys
 import tempfile
@@ -2752,12 +2752,26 @@ def test_skills_manifest_provenance():
             raise AssertionError("T36 provenance: " + message)
         print("SKIP T36 (local-only, provenance not verifiable): " + message)
 
-    if subprocess.run(repo + ["cat-file", "-e", revision + "^{commit}"],
-                      capture_output=True).returncode != 0:
+    # The current-tree hash check is always possible and must not be skipped by
+    # the local-only provenance-unavailable branch below.
+    for entry in manifest["skills"]:
+        current = (validator.REPO_ROOT / entry["path"]).read_bytes()
+        normalized = current.replace(b"\r\n", b"\n")
+        assert hashlib.sha256(normalized).hexdigest() == entry["sha256"], (
+            "current-tree sha256 mismatch for " + entry["path"])
+    try:
+        commit_present = subprocess.run(
+            repo + ["cat-file", "-e", revision + "^{commit}"],
+            capture_output=True).returncode == 0
+        ancestor = commit_present and subprocess.run(
+            repo + ["merge-base", "--is-ancestor", revision, "HEAD"],
+            capture_output=True).returncode == 0
+    except FileNotFoundError:
+        return provenance_unavailable("git binary is not available in this checkout")
+    if not commit_present:
         return provenance_unavailable(
             "declared source_revision is not available in this checkout")
-    if subprocess.run(repo + ["merge-base", "--is-ancestor", revision, "HEAD"],
-                      capture_output=True).returncode != 0:
+    if not ancestor:
         return provenance_unavailable(
             "declared source_revision is not an ancestor of HEAD")
     requests = "".join(
@@ -2780,11 +2794,6 @@ def test_skills_manifest_provenance():
         assert hashlib.sha256(normalized).hexdigest() == entry["sha256"], (
             "manifest sha256 mismatch at declared source_revision for "
             + entry["path"])
-    for entry in manifest["skills"]:
-        current = (validator.REPO_ROOT / entry["path"]).read_bytes()
-        normalized = current.replace(b"\r\n", b"\n")
-        assert hashlib.sha256(normalized).hexdigest() == entry["sha256"], (
-            "current-tree sha256 mismatch for " + entry["path"])
 
 
 TESTS = [

@@ -216,6 +216,15 @@
         "data-flow-diagrammer"
       ],
       "reason": "tech-spec-writer owns this request; data-flow-diagrammer would duplicate it."
+    },
+    {
+      "id": "data-flow-diagrammer-negative-15",
+      "prompt": "Decide the retention periods, deletion rules and residency requirements for the personal data our checkout stores.",
+      "expected_skill": "pii-lifecycle-designer",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "Pure PII retention/deletion/residency lifecycle design is pii-lifecycle-designer's workflow; data-flow-diagrammer only diagrams the current flows and explicitly does not decide lifecycle policy."
     }
   ]
 }
