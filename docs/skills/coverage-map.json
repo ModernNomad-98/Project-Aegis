@@ -3500,17 +3500,16 @@
     {
       "area": "07",
       "covering_skills": [
-        "data-migration-runbook-author",
-        "rollback-runbook-author"
+        "data-migration-runbook-author"
       ],
-      "evidence": "audit classification: PARTIAL — data-migration-runbook-author, rollback-runbook-author; runbooks exist; deployment runbook composition partial; covering skills: data-migration-runbook-author, rollback-runbook-author; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
-      "evidence_grade": "capability-review",
+      "evidence": "Triage adoption (2026-10-20): catalog decision L628-632/L1438-1441 and reconciliation R303/R3650-3652 record the D71 merge into `data-migration-runbook-author` (no separate skill), so the partial row is reconciled as COVERED; covering skill: data-migration-runbook-author; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
+      "evidence_grade": "catalog-decision",
       "id": 254,
       "name": "Migration Deployment Runbook",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "triage-adopted; owner may override",
       "priority": "P0",
       "rationale": null,
-      "status": "PARTIAL"
+      "status": "COVERED"
     },
     {
       "area": "07",
@@ -3840,15 +3839,17 @@
     },
     {
       "area": "08",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "ai-sdlc-operating-model"
+      ],
+      "evidence": "Triage adoption (2026-10-20): catalog L1354-1356 and reconciliation R3506-3508 record the candidate as covered by `ai-sdlc-operating-model` (and its stage-map skills where applicable), so the GAP row is reconciled as COVERED; covering skill: ai-sdlc-operating-model; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
+      "evidence_grade": "catalog-decision",
       "id": 278,
       "name": "AI Pair Engineering Protocol",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "triage-adopted; owner may override",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "COVERED"
     },
     {
       "area": "08",
@@ -4183,10 +4184,10 @@
       "09": 20
     },
     "by_grade": {
-      "capability-review": 103,
-      "catalog-decision": 14,
+      "capability-review": 102,
+      "catalog-decision": 16,
       "explicit-id": 128,
-      "none": 55
+      "none": 54
     },
     "by_priority": {
       "P0": 126,
@@ -4194,19 +4195,19 @@
       "P2": 25
     },
     "by_status": {
-      "COVERED": 54,
-      "GAP": 55,
-      "PARTIAL": 63,
+      "COVERED": 56,
+      "GAP": 54,
+      "PARTIAL": 62,
       "SHIPPED": 128
     },
     "distinct_covering_skills": 124,
     "entries": 300,
     "gap_by_priority": {
       "P0": 11,
-      "P1": 35,
+      "P1": 34,
       "P2": 9
     },
     "manifest_skills": 207,
-    "review_pending": 160
+    "review_pending": 172
   }
 }
