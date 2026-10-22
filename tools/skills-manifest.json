@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "843cf7526e43ea6af9327f8cbcdf8a7bb1a81639",
+  "source_revision": "f5805a566cfc8ff688a943f06ad65dd2ebb5d18e",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "cc283719d4b60debefc5357b0789ac0228a92dff0c98ec5f402c11e6d216bafe"
+      "sha256": "5f8d0e777856ea19184403a4d09704c6ef1b60de112a4d472ff9b84a750682fb"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "04eb0223592e46bb5e4a9d00f204e0963e62782c117e4c81d17dc18666b020b5"
+      "sha256": "52db00085036ce2b67efee0d318f3a22c0420bc1b3e3237dbfa939206e22a79e"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -296,7 +296,7 @@
     {
       "name": "compliance-control-foundation",
       "path": ".claude/skills/compliance-control-foundation/SKILL.md",
-      "sha256": "f19df7831c85aa911232b901ce24daa14b264536668d34eccaa2474ff9e5194a"
+      "sha256": "fd6b09113000f5f74e4ca98a2f94393568b5e8a695a396c4ebdbaaa926e54b24"
     },
     {
       "name": "compliance-evidence-collector",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "64123334d82b1ffef50b11167b567ba45f50cef576902b2837dc60f0421b5f8f"
+      "sha256": "177efcf92355aaedce0bcf436574c2565e2c82c0ac99b0d9ff646f52adbc0686"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "dac168f0a47db5a7be0fa87b981725d8d3807edce1ae57b31bd717b2d1dccb85"
+      "sha256": "cac3859dddb0e4b855479e91acf8e933d64c2a1503f5a9bda2a25168db013e78"
     },
     {
       "name": "share-link-access-architect",
@@ -1056,7 +1056,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "5466e0876459cdd55d3aaa399737ab2c4693d40c9db792377f8137c47f92b676"
+      "sha256": "0329e8e34c18dae39a89759e674824ac350b14ed55e72dba09b06da34f331738"
     },
     {
       "name": "state-machine-modeler",

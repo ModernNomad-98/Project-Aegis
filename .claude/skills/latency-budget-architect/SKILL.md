@@ -166,9 +166,10 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <per hop: timeout = hop budget + tolerance; cascade check (unit-consistent, same ms):
-          downstream attempt deadline = (1+r) x downstream work + r x backoff + own work + epsilon;
-          upstream timeout must be strictly greater than that deadline (epsilon > 0)>
+Timeouts: <per hop: timeout = hop budget + tolerance; invariant: each upstream
+          timeout must exceed the downstream critical-path budget by epsilon
+          (record the budget and the epsilon used). Example: upstream 500ms >
+          (1+2) x 100ms + 2 x 50ms + 40ms + epsilon>
 
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
@@ -192,9 +193,9 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Every timeout derives from a budget and the cascade check passes
-      (unit-consistent deadline: (1+r) x work + r x backoff + own work + epsilon;
-      upstream timeout strictly greater).
+- [ ] Every timeout derives from a budget and the cascade check passes:
+      each upstream timeout exceeds the downstream critical-path budget by
+      epsilon (budget and epsilon recorded).
 - [ ] Retries are budgeted spend at one layer only; hedging is
       headroom-funded or absent.
 - [ ] Headroom is a named line item with an owner, 15–25%.
@@ -220,9 +221,10 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
   cost more than the service call it wraps — and it appears in no
   service's dashboard because it happens in the caller. The overhead
   rows exist because the unmeasured milliseconds are still spent.
-- Timeout inversion: an upstream 2s timeout over a downstream 3s-timeout x2-retries path means the upstream abandons work the downstream completes - wasted load AND a failed request.
-- **Attempts vs retries:** define r = retries so attempts = 1+r, all in the same unit (ms). The deadline-relevant critical path is (1+r) x downstream work + r x backoff + own work + epsilon, and the downstream timeout must be strictly greater than it.
-- **Shorthand warnings:** "4x load" is at best a single-layer retry-only shorthand for capacity planning, never a deadline formula; two layers with 2 retries each mean up to (1+2)(1+2)=9 attempts. Prefer one retry layer (usually innermost idempotent) and budget it explicitly.
+- **Cascade invariant:** each upstream timeout must exceed the downstream
+  critical-path budget by epsilon (record the budget and epsilon used).
+  "4x" and "9 attempts" are illustrative shorthand only, not formulas; keep
+  retries at ONE stated layer (usually innermost idempotent).
 - Queue wait is invisible until it isn't: async hops budgeted at
   processing time only will blow their budget under load exactly when
   it matters — queue wait at target load is a budget row.

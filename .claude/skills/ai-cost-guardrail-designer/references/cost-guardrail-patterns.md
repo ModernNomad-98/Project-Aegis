@@ -116,7 +116,7 @@ itself needs a backstop:
 - Honest scope: these are configuration actions the skill FLAGS as
   verify-at-design-time, not architecture the skill builds.
 
-Provider-specific verification preconditions: name provider, model, price source and date; without all four the figure is generic guidance, never measured data.
+Provider account-level controls (spend limits, quota, reservation) must be verified against the provider's current documentation only where it exposes them; where it does not, record the compensating control. Price/model figures require provider, model, source and date before a measured figure is shown.
 
 ## AI credential custody (LLMjacking)
 

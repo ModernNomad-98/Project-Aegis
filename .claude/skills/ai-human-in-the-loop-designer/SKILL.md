@@ -109,16 +109,15 @@ first workflow step.
    - **AUTONOMOUS** only when the tier allows it, the action is reversible,
      its blast radius is one record or one user, and the watch-and-undo
      controls in step 9 exist.
-   - **CONFIRM** only where policy requires a person to approve before the
-     action, and a person can judge from the evidence shown.
-   - **FORBIDDEN** for irreversible, cross-tenant or wide-blast-radius actions,
-     actions no single reviewer can judge, and anything explicit written policy
-     bars. State the reason.
-   **PRECEDENCE:** FORBIDDEN only from that enumerated list or explicit written
-   policy; reviewer availability never converts FORBIDDEN to CONFIRM; CONFIRM
-   only where policy requires approval; otherwise the normal AUTONOMOUS or
-   advisory-only path applies. Risk tier selects among these classes only and
-   never overrides FORBIDDEN.
+   - **CONFIRM** where a person must approve, or where the action is
+     irreversible/cross-tenant/high-impact and no written policy explicitly
+     permits autonomy; a person can judge from the evidence shown.
+   - **FORBIDDEN** only for the enumerated irreversible/cross-tenant/
+     wide-blast-radius classes or explicit written policy.
+   **FALLBACK:** if not FORBIDDEN and no written policy explicitly permits
+   autonomy, an irreversible/cross-tenant/high-impact action is CONFIRM (never
+   AUTONOMOUS); otherwise the normal AUTONOMOUS or advisory-only path applies.
+   Risk tier selects among these classes only and never overrides FORBIDDEN.
    The rubric and examples are in
    [references/hitl-design-sheet.md](references/hitl-design-sheet.md).
 3. **Design the advisory-only mode.** For actions left advisory-only, the
