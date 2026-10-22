@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "f5805a566cfc8ff688a943f06ad65dd2ebb5d18e",
+  "source_revision": "f811bec7d9c217a4fca288fa3bebe063266cfd1d",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -131,7 +131,7 @@
     {
       "name": "ai-misinformation-guard",
       "path": ".claude/skills/ai-misinformation-guard/SKILL.md",
-      "sha256": "f01787386cd120e648f656b9d477f8a5c8f237df30feb82b62c0822f45b97dc2"
+      "sha256": "60611c2d3d05f50a536641ad5e763d49b989457634dd6445cbcbe275bc7f3c22"
     },
     {
       "name": "ai-router-architect",
