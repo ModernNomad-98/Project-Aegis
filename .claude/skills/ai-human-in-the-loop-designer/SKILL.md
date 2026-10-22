@@ -103,23 +103,11 @@ first workflow step.
    target record, reversibility, blast radius and who can perform it today
    without AI. An action nobody may perform manually cannot become an AI
    action.
-2. **Sort each action into AUTONOMOUS, CONFIRM or FORBIDDEN.** Start every
-   action at advisory-only (the AI proposes, a person commits) and move it
-   only with a reason tied to the risk tier:
-   - **AUTONOMOUS** only when the tier allows it, the action is reversible,
-     its blast radius is one record or one user, and the watch-and-undo
-     controls in step 9 exist.
-   - **CONFIRM** where a person must approve, or where the action is
-     irreversible/cross-tenant/high-impact and no written policy explicitly
-     permits autonomy; a person can judge from the evidence shown.
-   - **FORBIDDEN** only for the enumerated irreversible/cross-tenant/
-     wide-blast-radius classes or explicit written policy.
-   **FALLBACK:** if not FORBIDDEN and no written policy explicitly permits
-   autonomy, an irreversible/cross-tenant/high-impact action is CONFIRM (never
-   AUTONOMOUS); otherwise the normal AUTONOMOUS or advisory-only path applies.
-   Risk tier selects among these classes only and never overrides FORBIDDEN.
-   The rubric and examples are in
-   [references/hitl-design-sheet.md](references/hitl-design-sheet.md).
+2. **Sort each action into AUTONOMOUS, CONFIRM or FORBIDDEN.** Start every action at advisory-only (the AI proposes, a person commits) and move it only with a reason tied to the risk tier. Apply these classes in order:
+   - **FORBIDDEN** for the enumerated classes in the design sheet: an action no person may perform, one that reaches another tenant, one beyond one record or one user with a wide blast radius, or one no single reviewer can judge (for example AI-initiated account deletion). Explicit written policy can add a class.
+   - **CONFIRM** for any action whose wrong result harms a person or the product and a reviewer can judge it from the evidence shown - including irreversible, cross-tenant or high-impact actions where the tier or policy requires approval.
+   - **AUTONOMOUS** only when every earlier class is excluded: the tier allows it, the action is reversible, its blast radius is one record or one user, and the watch-and-undo controls in step 9 exist.
+   **FALLBACK:** if not FORBIDDEN and no written policy explicitly permits autonomy, an irreversible/cross-tenant/high-impact action is CONFIRM (never AUTONOMOUS). Risk tier selects among these classes only and never overrides FORBIDDEN. The rubric and examples are in [references/hitl-design-sheet.md](references/hitl-design-sheet.md).
 3. **Design the advisory-only mode.** For actions left advisory-only, the
    AI output appears as a suggestion the user applies through the ordinary
    user interface with their own permissions. Nothing is written on the

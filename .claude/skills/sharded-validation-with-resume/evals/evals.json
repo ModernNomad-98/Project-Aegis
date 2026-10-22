@@ -11,8 +11,8 @@
         "triggers": true,
         "assertions": [
           "Builds a small set of NAMED functional shards from the measured full-tier inventory, every existing check assigned to exactly one shard, balanced by real durations.",
-          "Designs the persisted status file distinguishing failed (assertions) from interrupted (timeout/infra), bound to run-id + the resume fingerprint (tree + config + dependency lock/toolchain inputs), with mandatory tests_executed counts.",
-          "Resume mode reruns only interrupted/pending shards when the resume fingerprint matches; passes are kept; any fingerprint change (tree, config, dependency lock or toolchain) invalidates all prior status - a new commit alone is not the whole identity.",
+          "Designs the persisted status file distinguishing failed (assertions) from interrupted (timeout/infra), bound to the canonical resume fingerprint (tree + every dependency lockfile hash + the toolchain version list; run-id is audit metadata only), with mandatory tests_executed counts.",
+          "Resume mode reruns only interrupted/pending shards when the canonical fingerprint matches; passes are kept; any fingerprint change (tree, dependency lockfile or toolchain) invalidates all prior status, and a run-id alone never changes it.",
           "Adds the uncategorized catch-shard with the empty-or-fail contract, and the CI wiring spec funneling parallel shards into ONE aggregate gate as the sole required check.",
           "Delivers wiring as a handoff spec (reference YAML) to ci-pipeline-architect/human — edits no pipeline files."
         ]

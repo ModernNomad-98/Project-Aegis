@@ -189,7 +189,7 @@ Adoption:                     pending human approval → then recorded via scope
 - **The invisible standing approval:** a policy adopted months ago that no
   session restates is indistinguishable from no governance — restating is
   the difference between standing approval and folklore.
-- **Opt-in decay:** an opt-in merge profile selected once, then treated as eternal. Profile selection is a register entry; standing grants must be re-attested by their owner at the recorded review/attestation deadline (see references/standing-approval-policy.md), and if none is recorded the grant is expired for enforcement until re-attested. Never infer a default expiry; preserve recorded consumption/one-use semantics.
+- **Opt-in decay:** an opt-in merge profile selected once, then treated as eternal. Profile selection is a register entry; standing grants must be re-attested by their owner at the recorded review/attestation deadline (see references/standing-approval-policy.md). If none is recorded, auto-advance is blocked pending re-attestation (the grant is not expired); existing grants are grandfathered while re-attestation is requested. Never infer a default expiry; preserve recorded consumption/one-use semantics.
 - **Fatigue theater in reverse:** thinning approvals that were load-bearing.
   Only approvals whose evidence shows mechanical granting (instant yes,
   zero variance) are candidates; a slow, considered approval is a real gate

@@ -64,6 +64,7 @@ Cascade check, leaf → root:
 Violations to hunt:
   - 30s defaults inside sub-second paths (bug by inheritance)
   - upstream timeout < critical path (initial attempt + retries + backoff + downstream work); downstream x retries alone is not the deadline
+  - variables in ms: attempts = 1 + retries; critical path = attempts x downstream attempt budget + retries x backoff + terminal downstream work not already inside the attempt budget; epsilon = recorded tolerance in ms owned by the path owner, counted once and never inside an attempt budget (no double counting)
   - infinite/no timeout anywhere on a budgeted path (unbounded spend)
 ```
 

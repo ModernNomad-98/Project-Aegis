@@ -58,7 +58,7 @@ the work and no reviewer or gate block remains, recommend the granted profile
 to reduce repeated mechanical approvals; explain the exact grant and why it
 fits. A protected-file gate exception needs its own decision. An unanswered choice creates no new approval.
 
-Grant limits come from the register entry's ACTUAL recorded expiry/use limit (which may be none); never infer a default expiry, and preserve consumption/one-use semantics as recorded. Standing grants must be re-attested by their owner at the review/attestation deadline recorded with the grant (whichever deadline is sooner when several apply); if no deadline is recorded, the grant is expired for enforcement until re-attested. The reviewer-block halt path is unchanged.
+Grant limits come from the register entry's ACTUAL recorded expiry/use limit (which may be none); silence creates no expiry and never infer a default expiry, and preserve consumption/one-use semantics as recorded. Separately, standing grants must be re-attested by their owner at the review/attestation deadline recorded with the grant (whichever deadline is sooner when several apply). If no deadline is recorded, auto-advance is BLOCKED PENDING RE-ATTESTATION: the grant is NOT expired, but enforcement is disabled until the owner records a deadline and re-attests. Existing grants are grandfathered - they keep their recorded scope and expiry while re-attestation is requested, and no retroactive expiry applies. The reviewer-block halt path is unchanged.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,

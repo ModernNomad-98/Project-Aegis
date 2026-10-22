@@ -44,9 +44,10 @@ user (authority A0)
 
 A3 is the effective authority for the hop: the caller/sub-agent authority
 chain INTERSECTED with tool permission and resource/tenant policy, capped by
-the recorded approval scope when an approval applies. **If an action requires
-approval and no approval/scope is recorded, A3 is DENIED — stop.** "No
-additional cap" never means skipping a required approval. Where no approval is
+the recorded approval scope when an approval applies. The approval must be
+active, unexpired and in scope for this action; an expired or out-of-scope
+approval is no approval. If an action requires approval and no active,
+in-scope approval is recorded, A3 is DENIED - stop.
 required, the intersection stands and the parent-hop bound applies, so A3 ⊆ A2
 either way. A hop may only reduce authority, never amplify it.
 

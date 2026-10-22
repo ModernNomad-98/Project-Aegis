@@ -39,7 +39,7 @@ Schema rules:
 - `tests_executed` is mandatory: a non-empty shard with 0 executed tests is
   a FAILURE (bad glob / hidden skip), not a pass. Skipped execution is
   never a pass.
-- The status file binds to the resume fingerprint: tree + config + dependency lock/toolchain inputs (named exactly). Any change invalidates all prior passes; a new commit alone is not the whole identity. A mixed-state PR (docs-only skip predicate plus real code changes) fails the aggregate; skips never cover code changes.
+- The status file binds to the canonical resume fingerprint: tree + every dependency lockfile hash + the toolchain version list (config files are inside the tree hash and are not named separately). Any change invalidates all prior passes; a run-id is audit metadata only and never part of the identity key. A mixed-state PR (docs-only skip predicate plus real code changes) fails the aggregate; skips never cover code changes.
 
 ## Runner modes & the resume law
 

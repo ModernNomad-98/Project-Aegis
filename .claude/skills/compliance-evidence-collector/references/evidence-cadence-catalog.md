@@ -25,12 +25,12 @@ many storage.
 
 ## Cadence by operating frequency
 
-| Control operates | Evidence cadence | Window coverage rule |
-| --- | --- | --- |
-| Continuously (logging, RLS, encryption) | Periodic extracts at least quarterly (continuous controls), reviewed on a stated refresh trigger, with a named evidence owner + config snapshot at window start/end | Extracts must tile the window with no interval uncovered |
-| Per change (review, migration safety, release gate) | Per-occurrence artifact, enumerated by population | Population = ALL occurrences in window (e.g. all merged PRs) |
-| Periodically (access review, backup-restore test, vendor review, management review) | One artifact per scheduled occurrence | Missed occurrence = hole; reschedule forward, never backdate |
-| On event (incident, DR invocation) | Per-event bundle (timeline, postmortem) | Zero events is fine — prove the monitoring existed, not the event |
+| Control operates | Evidence cadence | Window coverage rule | Evidence owner | Refresh trigger |
+| --- | --- | --- | --- | --- |
+| Continuously (logging, RLS, encryption) | Periodic extracts at least quarterly (continuous controls) | Extracts must tile the window with no uncovered interval; config snapshot at window start/end | named evidence owner (control owner assigns) | quarterly cycle or a stated config/control change |
+| Per change (review, migration safety, release gate) | Per-occurrence artifact, enumerated by population | Population = ALL occurrences in window (e.g. all merged PRs) | named collector (control owner assigns) | each occurrence |
+| Periodically (access review, backup-restore test, vendor review, management review) | One artifact per scheduled occurrence | Missed occurrence = hole; reschedule forward, never backdate | control owner | the scheduled period |
+| On event (incident, DR invocation) | Per-event bundle (timeline, postmortem) | Zero events is fine - prove the monitoring existed, not the event | incident owner | each event |
 
 ## Population patterns
 

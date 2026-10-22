@@ -63,7 +63,7 @@ mutates a live evidence store.
    who can write there, and whether anything is immutable.
 5. Control operating frequency — continuous (logging), per-change (review),
    periodic (access review, backup restore test) — cadence derives from it.
-   ONE cadence definition per control: frequency matched to operating frequency, a review/refresh trigger, and a named evidence owner. Continuous controls keep continuous operation evidence with periodic extracts at least quarterly (plus window-start/end config snapshot); the SKILL, cadence catalog and catalog row state the same values.
+   ONE cadence definition per control: frequency matched to operating frequency, a review/refresh trigger, and a named evidence owner. Continuous controls keep continuous operation evidence with periodic extracts at least quarterly (plus window-start/end config snapshot); the cadence catalog records an evidence owner and refresh trigger per row, and the catalog row states the same values.
 
 ## Workflow
 

@@ -89,8 +89,8 @@ repo; running it is the preflight's and CI's job.
    state is `interrupted` or `pending`); single-shard (targeted rerun).
    **Resume law: a `failed` shard (real assertions) is NOT resumable-away —
    it reruns fully after a fix; only timeout/infra interruptions qualify
-   for resume.** Completed passes are never re-derived within a run-id;
-   a status record resumes only against the SAME resume fingerprint: tree hash + config files + dependency lock/toolchain inputs (name the exact inputs). Any change to any of those invalidates all prior status; a new commit alone is not the whole identity.
+   for resume.** Completed passes are never re-derived within a run-id.
+   A status record resumes only against the SAME canonical resume fingerprint: tree hash + every dependency lockfile hash + the toolchain version list. Config files are inside the tree hash and are not named separately; a run-id is audit metadata for correlating records and is never part of the identity key. Any change to any fingerprint input invalidates all prior status; a new commit alone is not the whole identity.
 5. **Spec the CI wiring:** shards as parallel jobs → ONE aggregate gate job
    (`needs:` all shards) that is the SOLE required status check. The
    aggregate evaluates shard results explicitly - including the platform's skipped semantics on docs-only paths: skipped-by-tier counts as satisfied only when the skip predicate was recorded and validated (docs-only tier selector); a skipped shard on a
@@ -126,8 +126,8 @@ Maintenance:     rebalance triggers; shard-map edits via reviewed PRs
       listed as assignment debts).
 - [ ] Status file schema distinguishes `failed` from `interrupted` — resume
       eligibility is derivable mechanically.
-- [ ] Resume reruns only unfinished/interrupted shards; a new commit/run-id
-      invalidates prior passes. After fixing a failed assertion, start a
+- [ ] Resume reruns only unfinished/interrupted shards; a new commit (tree
+      hash) invalidates prior passes, while a run-id alone is audit metadata. After fixing a failed assertion, start a
       fresh full run (or explicitly run that shard in a new run) rather than
       using `-Resume` to erase the failure.
 - [ ] The aggregate gate is the sole required check; skipped-shard
@@ -146,9 +146,7 @@ Maintenance:     rebalance triggers; shard-map edits via reviewed PRs
   aggregate goes green. The status file's failed-vs-interrupted distinction
   and the resume law exist to make this impossible; any runner that can't
   tell the two apart is unsafe to ship.
-- **Stale status across commits:** resuming a run whose passes were earned
-  on a different SHA is validating the wrong code — bind the status file to
-  run-id + commit.
+- **Stale status across commits:** resuming a run whose passes were earned on a different tree/config/dependency/toolchain fingerprint is validating the wrong code - bind the status file to the canonical resume fingerprint above, never to a run-id.
 - **Multiple required shard jobs:** registering each shard as a required
   check is exactly what breaks on conditional skips; the whole point of the
   aggregate is ONE stable required name. (In practice, a production repo's

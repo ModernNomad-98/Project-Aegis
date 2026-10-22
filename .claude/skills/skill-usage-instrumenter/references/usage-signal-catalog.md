@@ -5,27 +5,27 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 
 ## Signal schema
 
+Dataset metadata (stored once in the dataset header, NEVER as a per-record field): schema_epoch is an integer version of the whole dataset schema; bump it on any enum or field change; never compare records from different epochs without migration.
+
 ### Invocation event
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `skill` | name (enum: shipped list) | The activated skill |
-| `activation_mode` | `auto` \| `explicit` | Trigger-matched vs named by the user (invocation event only) |
-| `at` | date (day precision suffices) | Finer precision adds risk, not value |
-| dataset `schema_epoch` | integer (metadata, not per-record) | Version of the whole dataset schema; bump on any enum/field change, record once per dataset, and never compare records from different epochs without migration |
-| `task_class` | small fixed enum (e.g. `build`, `review`, `audit`, `design`, `debug`, `other`) | Never free text |
-| `session_ref` | opaque id | Correlation only; carries no content |
+| skill | name (enum: shipped list) | The activated skill |
+| activation_mode | auto \| explicit | Trigger-matched vs named by the user (invocation event only) |
+| at | date (day precision suffices) | Finer precision adds risk, not value |
+| task_class | small fixed enum (e.g. build, review, audit, design, debug, other) | Never free text |
+| session_ref | opaque id | Correlation only; carries no content |
 
 ### Correction (wrong-fire) event
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `fired` | skill name | What activated |
-| `redirected_to` | skill name \| `none` | What the user invoked instead |
-| `correction_outcome` | `overridden` \| `abandoned` | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
-| dataset `schema_epoch` | integer (metadata, not per-record) | Same dataset-level version as the invocation records; required to map legacy `mode` values into the correct domain |
+| fired | skill name | What activated |
+| redirected_to | skill name \| none | What the user invoked instead |
+| correction_outcome | overridden \| abandoned | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
 
-Migration note (schema epoch 2): the pre-rename single mode field is replaced by activation_mode (invocation events) and correction_outcome (correction/wrong-fire events). Consumers must record the schema epoch/version, migrate historical events to the correct domain, and never reinterpret an old mode value across domains.
+Migration note (schema epoch 2): the pre-rename single mode field is replaced by activation_mode (invocation events) and correction_outcome (correction/wrong-fire events). Legacy records carry no event-type marker, so migration MUST first identify the event type (invocation vs correction/wrong-fire) and only then map the old mode value into that event's domain; if the event type cannot be established, split the dataset or mark the record unmigrated rather than guessing. Consumers record the dataset schema epoch and never reinterpret an old mode value across domains.
 
 ### Completion hint
 

@@ -166,10 +166,8 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <per hop: timeout = hop budget + tolerance; invariant: each upstream
-          timeout must exceed the downstream critical-path budget by epsilon
-          (record the budget and the epsilon used). Example: upstream 500ms >
-          (1+2) x 100ms + 2 x 50ms + 40ms + epsilon>
+Timeouts: <per hop: timeout = hop budget + tolerance; invariant: each upstream timeout must exceed the downstream critical-path budget by epsilon (record budget and epsilon)>
+          Variables (all milliseconds, recorded with the design): attempts = 1 + retries; downstream critical path = attempts x downstream attempt budget + retries x backoff + terminal downstream work NOT already inside the attempt budget; upstream work is its own row. Epsilon is the tolerance in milliseconds, owned by the path owner, counted ONCE in the invariant and never inside an attempt budget. Example: downstream retries=2, downstream attempt budget=100ms (that hop's own work is inside this budget; list terminal downstream work as its own overhead row if it is not), backoff=50ms per retry, upstream work=40ms, epsilon=recorded tolerance => upstream timeout > (1+2) x 100ms + 2 x 50ms + 40ms + epsilon.
 
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
