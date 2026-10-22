@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "extensibility-boundary-designer",
+  "description": "Behaviour cases for extensibility-boundary-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the plugin boundary for tenant-provided extensions, including the contract and versioning.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the structured design/decision artifact for this skill and never claims an inspection or execution it did not perform.",
+          "Separates verified facts from assumptions and lists open questions.",
+          "Names the nearest boundary owners and does not take over their work."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our plugin interface leaks internals - design the extension boundary and capability model.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the primary artifact from inspected evidence rather than a template fill.",
+          "Calls out the conflicting constraints and states the trade-off explicitly.",
+          "Keeps UNKNOWN/UNVERIFIED items out of the decision record."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design hot-loaded extension points with lifecycle, isolation and failure containment.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates edge/failure cases with a chosen handling rather than hand-waving them.",
+          "Defines the validation/test plan that would prove the artifact.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the internal interfaces/contracts at the module boundary first.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes the request to the real neighbouring owner named in the prompt.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Define the extension contract, permissioned capability surface and deprecation path.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Handles the incomplete/conflicting input by stating explicit open questions.",
+          "Lists the evidence needed before the record can be treated as a decision.",
+          "Returns the artifact with UNKNOWN/UNVERIFIED labels instead of invented facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Design the webhook/plugin boundary for third-party integrations without exposing the domain model.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume facts or skip a required safety/evidence step.",
+          "States what is missing and what the authorized human owner must provide.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    }
+  ]
+}

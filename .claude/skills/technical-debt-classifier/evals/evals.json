@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "technical-debt-classifier",
+  "description": "Behaviour cases for technical-debt-classifier (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Classify and rank the technical debt in this service with evidence and business impact.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the structured design/decision artifact for this skill and never claims an inspection or execution it did not perform.",
+          "Separates verified facts from assumptions and lists open questions.",
+          "Names the nearest boundary owners and does not take over their work."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Build the debt ledger for the legacy billing module: types, interest, owner and priority.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the primary artifact from inspected evidence rather than a template fill.",
+          "Calls out the conflicting constraints and states the trade-off explicitly.",
+          "Keeps UNKNOWN/UNVERIFIED items out of the decision record."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Our backlog mixes defects and debt - classify each item and make the debt visible.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates edge/failure cases with a chosen handling rather than hand-waving them.",
+          "Defines the validation/test plan that would prove the artifact.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes the request to the real neighbouring owner named in the prompt.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Rank these 12 debt items by interest and payoff with the evidence behind each.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Handles the incomplete/conflicting input by stating explicit open questions.",
+          "Lists the evidence needed before the record can be treated as a decision.",
+          "Returns the artifact with UNKNOWN/UNVERIFIED labels instead of invented facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Design a debt ledger template and classification rubric for this codebase.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume facts or skip a required safety/evidence step.",
+          "States what is missing and what the authorized human owner must provide.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    }
+  ]
+}

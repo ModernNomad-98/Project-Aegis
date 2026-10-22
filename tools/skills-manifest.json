@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "711252b30993efbe881d500801a983edb9eecef1",
+  "source_revision": "67edd114d2c54c64a7f16294b8de5cb06d17ff59",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -169,6 +169,11 @@
       "sha256": "349edde4f7cba33ab56b8627c9cbd3f31640d5ddfb92395609b7906b4eb8abe7"
     },
     {
+      "name": "application-layer-pattern-advisor",
+      "path": ".claude/skills/application-layer-pattern-advisor/SKILL.md",
+      "sha256": "c082d085d6fdaf7d354c22515a28bf712f2abd5eaf55af94b730cbb1cb913563"
+    },
+    {
       "name": "appsec-implementer",
       "path": ".claude/skills/appsec-implementer/SKILL.md",
       "sha256": "19ae5c576a452cc29613c15a83a5f1ac52f6d5a25c22fe955c10a1cd2ddd4297"
@@ -182,6 +187,16 @@
       "name": "architecture-designer",
       "path": ".claude/skills/architecture-designer/SKILL.md",
       "sha256": "a6f56df1da1ed960d057290c905766fcd1a8266cd7cb13a0185d095ab342ec33"
+    },
+    {
+      "name": "architecture-fitness-function-designer",
+      "path": ".claude/skills/architecture-fitness-function-designer/SKILL.md",
+      "sha256": "386cff38fa9c1d3b2bd417ce65e097fafc10c8018452b7f93427ac551395b3d8"
+    },
+    {
+      "name": "architecture-spike-planner",
+      "path": ".claude/skills/architecture-spike-planner/SKILL.md",
+      "sha256": "f982f959e526ce2a665ea6c346bec232ddf8550c4023b8c19f822dc1eb87bf03"
     },
     {
       "name": "audit-log-architect",
@@ -304,6 +319,11 @@
       "sha256": "f02ae9edfcd3bcd3d9f097b586f04d98d4260a1cdd6fe6410a4495b2afdaf45b"
     },
     {
+      "name": "configuration-architect",
+      "path": ".claude/skills/configuration-architect/SKILL.md",
+      "sha256": "ffdd6f14c9517fcbb6ed08393a46104d39e6ad3f14358c288c3fd744bed94db8"
+    },
+    {
       "name": "context-co-update-ci-gate",
       "path": ".claude/skills/context-co-update-ci-gate/SKILL.md",
       "sha256": "688393a38ef9e40302400285253e40da9ff1e7607c7782f0fa8e1bce70720c50"
@@ -312,6 +332,11 @@
       "name": "contribution-guide-author",
       "path": ".claude/skills/contribution-guide-author/SKILL.md",
       "sha256": "16e5dd3740231db9ab84956e830012dfcc110d8f3bc4dc6d273d593c9ae6c0c3"
+    },
+    {
+      "name": "cqrs-read-model-designer",
+      "path": ".claude/skills/cqrs-read-model-designer/SKILL.md",
+      "sha256": "0cbee4446baac7239b2eea66800da1eaed2ea176c890cb8f2672d7de216582be"
     },
     {
       "name": "cross-team-dependency-negotiator",
@@ -394,6 +419,11 @@
       "sha256": "4001c1edff7ed32025f31e4d69c656ad2610a2fd0a12aade2fb25adc49e09c37"
     },
     {
+      "name": "edge-function-designer",
+      "path": ".claude/skills/edge-function-designer/SKILL.md",
+      "sha256": "a64a3d23a14b0d9ae0c25fa295b876512309fe43d9ec48ccad47233e92ca530a"
+    },
+    {
       "name": "edge-state-ux-designer",
       "path": ".claude/skills/edge-state-ux-designer/SKILL.md",
       "sha256": "cf72fe022a5769be8a8842e369d2177d0227ef5f084d4182425b331e4ea04abd"
@@ -432,6 +462,11 @@
       "name": "export-pipeline-architect",
       "path": ".claude/skills/export-pipeline-architect/SKILL.md",
       "sha256": "8b2fb6f2b63e0bfebbcbaefab6d35acb1314d753f19e8d52360ca2bf300930f9"
+    },
+    {
+      "name": "extensibility-boundary-designer",
+      "path": ".claude/skills/extensibility-boundary-designer/SKILL.md",
+      "sha256": "296c9108eb2599574b77dbfb82fd777f367a2a7a3b9148816b9e8f4a29362cca"
     },
     {
       "name": "feature-flag-architect",
@@ -487,6 +522,11 @@
       "name": "gated-deployment-prompt-template",
       "path": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
       "sha256": "77a44d5b014317022d2d7d886ce6eea84349c33e45e0ed98a36f61317e556ee2"
+    },
+    {
+      "name": "graphql-boundary-reviewer",
+      "path": ".claude/skills/graphql-boundary-reviewer/SKILL.md",
+      "sha256": "54c293825e272cd18e60c84b5696b015234d4248aa9458de79c163ee45d9122f"
     },
     {
       "name": "hidden-context-exposure-reviewer",
@@ -624,6 +664,11 @@
       "sha256": "66fd2aa6dd7998438bececfdb4272ee1a6b68c47962ec488b7558d323c3fab4c"
     },
     {
+      "name": "modernization-cutover-planner",
+      "path": ".claude/skills/modernization-cutover-planner/SKILL.md",
+      "sha256": "335c77dfb389ef5c856622a7397705da7da7da8dba3fc37be92d01c37ac155e5"
+    },
+    {
       "name": "multi-framework-crosswalk",
       "path": ".claude/skills/multi-framework-crosswalk/SKILL.md",
       "sha256": "9293b80a9a83c67e7d9af90ac600611ab6a2c1e474175e1140f69fb26c5540b1"
@@ -672,6 +717,11 @@
       "name": "operational-vs-analytical-splitter",
       "path": ".claude/skills/operational-vs-analytical-splitter/SKILL.md",
       "sha256": "f362a712be0a8d8171e49a703304bd85cfddf9618de1cc5c56776b08ca474edc"
+    },
+    {
+      "name": "outbound-integration-adapter-designer",
+      "path": ".claude/skills/outbound-integration-adapter-designer/SKILL.md",
+      "sha256": "1c5df0ba0b838a30fb8aef7d47b90be6a37b7cee4de3eac58af235be8071a0dc"
     },
     {
       "name": "pagination-cursor-designer",
@@ -1009,6 +1059,11 @@
       "sha256": "90149099d1415ba240566ef59196b85b2aba94cd8c6d5ed9444034d9ab5d3fbd"
     },
     {
+      "name": "state-machine-modeler",
+      "path": ".claude/skills/state-machine-modeler/SKILL.md",
+      "sha256": "1e1819e0b2b1a6b2501cc5135357a602762813baa19add25d7a32929dd6528de"
+    },
+    {
       "name": "statement-of-applicability-author",
       "path": ".claude/skills/statement-of-applicability-author/SKILL.md",
       "sha256": "40b62d3a355b45f97ea53b3e04121e30ae9e71d3046655af31619319111c318f"
@@ -1069,6 +1124,11 @@
       "sha256": "cd1ee59dc53452de93404ceb2c1afdea49f64d2a1576dd1ba3621d93da3806f5"
     },
     {
+      "name": "technical-debt-classifier",
+      "path": ".claude/skills/technical-debt-classifier/SKILL.md",
+      "sha256": "99911833ece156c1bcf301f7a01930cd85dee4d9fef5347f966fc21b7cb7e9d3"
+    },
+    {
       "name": "tenant-isolation-reviewer",
       "path": ".claude/skills/tenant-isolation-reviewer/SKILL.md",
       "sha256": "9904d87360685e21a179b246c05b5e0c951c8cec72b5ff6dc707c08573692f13"
@@ -1107,6 +1167,11 @@
       "name": "threat-modeler",
       "path": ".claude/skills/threat-modeler/SKILL.md",
       "sha256": "0809835df58474b4f355cf99108ee08faafe1a51c83ec4d086b32599baafe4e7"
+    },
+    {
+      "name": "transaction-scope-designer",
+      "path": ".claude/skills/transaction-scope-designer/SKILL.md",
+      "sha256": "0dfc0611f550866699cd917202e1e4fc958a3c58765925f572937ce307ee5854"
     },
     {
       "name": "url-state-architect",

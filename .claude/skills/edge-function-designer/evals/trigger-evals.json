@@ -1,0 +1,220 @@
+{
+  "skill": "edge-function-designer",
+  "description": "Trigger discrimination for edge-function-designer against the nearest shipped owners.",
+  "overlaps_with": [
+    "adr-writer",
+    "api-event-architect",
+    "architecture-designer",
+    "aws-saas-architect",
+    "azure-saas-architect",
+    "background-job-orchestration-architect",
+    "caching-strategy-designer",
+    "cloud-architecture-decider",
+    "code-reviewer",
+    "design-review-facilitator",
+    "human-approval-boundary",
+    "latency-budget-architect",
+    "observability-by-design",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "edge-function-designer-positive-1",
+      "prompt": "Design the edge function for webhook ingestion: auth, timeouts, concurrency and idempotency.",
+      "expected_skill": "edge-function-designer",
+      "should_not_trigger": [
+        "cloud-architecture-decider"
+      ],
+      "reason": "The request needs edge-function-designer's design method; cloud-architecture-decider owns a different task."
+    },
+    {
+      "id": "edge-function-designer-positive-2",
+      "prompt": "Our serverless function has no timeout or cold-start plan - design the runtime contract.",
+      "expected_skill": "edge-function-designer",
+      "should_not_trigger": [
+        "aws-saas-architect"
+      ],
+      "reason": "The request needs edge-function-designer's design method; aws-saas-architect owns a different task."
+    },
+    {
+      "id": "edge-function-designer-positive-3",
+      "prompt": "Design the edge function boundary: auth, environment validation, event-source policy and logging.",
+      "expected_skill": "edge-function-designer",
+      "should_not_trigger": [
+        "azure-saas-architect"
+      ],
+      "reason": "The request needs edge-function-designer's design method; azure-saas-architect owns a different task."
+    },
+    {
+      "id": "edge-function-designer-positive-4",
+      "prompt": "Design the retry and idempotency semantics for an edge function handling queued events.",
+      "expected_skill": "edge-function-designer",
+      "should_not_trigger": [
+        "background-job-orchestration-architect"
+      ],
+      "reason": "The request needs edge-function-designer's design method; background-job-orchestration-architect owns a different task."
+    },
+    {
+      "id": "edge-function-designer-positive-5",
+      "prompt": "Design a serverless function for image processing within platform limits.",
+      "expected_skill": "edge-function-designer",
+      "should_not_trigger": [
+        "latency-budget-architect"
+      ],
+      "reason": "The request needs edge-function-designer's design method; latency-budget-architect owns a different task."
+    },
+    {
+      "id": "edge-function-designer-positive-6",
+      "prompt": "Review this edge function design for auth, concurrency and platform-limit risks.",
+      "expected_skill": "edge-function-designer",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs edge-function-designer's design method; observability-by-design owns a different task."
+    },
+    {
+      "id": "edge-function-designer-positive-7",
+      "prompt": "Design the event-source policy and failure handling for an edge function.",
+      "expected_skill": "edge-function-designer",
+      "should_not_trigger": [
+        "caching-strategy-designer"
+      ],
+      "reason": "The request needs edge-function-designer's design method; caching-strategy-designer owns a different task."
+    },
+    {
+      "id": "edge-function-designer-positive-8",
+      "prompt": "Design the edge function inventory and platform-limit checklist for this service.",
+      "expected_skill": "edge-function-designer",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs edge-function-designer's design method; api-event-architect owns a different task."
+    },
+    {
+      "id": "edge-function-designer-negative-1",
+      "prompt": "Decide the cloud architecture and platform choice with cost and risk trade-offs.",
+      "expected_skill": "cloud-architecture-decider",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is cloud-architecture-decider's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-2",
+      "prompt": "Map this design onto AWS services with the SaaS constraints.",
+      "expected_skill": "aws-saas-architect",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is aws-saas-architect's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-3",
+      "prompt": "Map this design onto Azure services with the SaaS constraints.",
+      "expected_skill": "azure-saas-architect",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is azure-saas-architect's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-4",
+      "prompt": "Design the queue semantics and background-job architecture: delivery, ordering, idempotency and dead letters.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is background-job-orchestration-architect's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-5",
+      "prompt": "Design the latency budgets and trace the budget through the request path.",
+      "expected_skill": "latency-budget-architect",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is latency-budget-architect's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-6",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-7",
+      "prompt": "Design the caching strategy: what to cache, keys, invalidation and stampede protection.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-8",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is api-event-architect's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-9",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-10",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-11",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-12",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-13",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "edge-function-designer-negative-14",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "edge-function-designer"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; edge-function-designer owns a different design task and must not take it over."
+    }
+  ]
+}

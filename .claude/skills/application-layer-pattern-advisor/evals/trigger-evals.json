@@ -1,0 +1,220 @@
+{
+  "skill": "application-layer-pattern-advisor",
+  "description": "Trigger discrimination for application-layer-pattern-advisor against the nearest shipped owners.",
+  "overlaps_with": [
+    "adr-writer",
+    "architecture-designer",
+    "change-classification-gate",
+    "code-reviewer",
+    "code-simplifier",
+    "command-gateway-architect",
+    "dependency-direction-guard",
+    "design-review-facilitator",
+    "domain-modeler",
+    "human-approval-boundary",
+    "interface-first-designer",
+    "layered-architecture-enforcer",
+    "release-readiness-reviewer",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "application-layer-pattern-advisor-positive-1",
+      "prompt": "Decide whether our facades, repositories and service objects earn their cost or hide side effects.",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "The request needs application-layer-pattern-advisor's design method; layered-architecture-enforcer owns a different task."
+    },
+    {
+      "id": "application-layer-pattern-advisor-positive-2",
+      "prompt": "Our application layer mixes HTTP concerns and domain rules - recommend placement and a refactor plan.",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "The request needs application-layer-pattern-advisor's design method; interface-first-designer owns a different task."
+    },
+    {
+      "id": "application-layer-pattern-advisor-positive-3",
+      "prompt": "Design the use-case layer for this feature and say which patterns are justified.",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "code-simplifier"
+      ],
+      "reason": "The request needs application-layer-pattern-advisor's design method; code-simplifier owns a different task."
+    },
+    {
+      "id": "application-layer-pattern-advisor-positive-4",
+      "prompt": "Review whether this repository layer is over-abstraction or needed, with a removal plan.",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "command-gateway-architect"
+      ],
+      "reason": "The request needs application-layer-pattern-advisor's design method; command-gateway-architect owns a different task."
+    },
+    {
+      "id": "application-layer-pattern-advisor-positive-5",
+      "prompt": "Choose between an explicit use-case object and a service class for this workflow, with trade-offs.",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "domain-modeler"
+      ],
+      "reason": "The request needs application-layer-pattern-advisor's design method; domain-modeler owns a different task."
+    },
+    {
+      "id": "application-layer-pattern-advisor-positive-6",
+      "prompt": "Our adapters are thin and the domain leaks into handlers - recommend placement rules.",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs application-layer-pattern-advisor's design method; architecture-designer owns a different task."
+    },
+    {
+      "id": "application-layer-pattern-advisor-positive-7",
+      "prompt": "Produce the pattern decision table for this application layer and the side-effect visibility rules.",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "The request needs application-layer-pattern-advisor's design method; dependency-direction-guard owns a different task."
+    },
+    {
+      "id": "application-layer-pattern-advisor-positive-8",
+      "prompt": "Design the introduction or removal path for a facade in this module.",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "tech-spec-writer"
+      ],
+      "reason": "The request needs application-layer-pattern-advisor's design method; tech-spec-writer owns a different task."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-1",
+      "prompt": "Enforce the layered architecture: layers, dependency rules and violations.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-2",
+      "prompt": "Design the internal interfaces/contracts at the module boundary first.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is interface-first-designer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-3",
+      "prompt": "Explicitly invoke code-simplifier. Simplify this code change: reduce complexity, improve readability and preserve behaviour.",
+      "expected_skill": "code-simplifier",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is code-simplifier's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-4",
+      "prompt": "Design the mediated command gateway: one enforcement point, idempotent commands and replay.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is command-gateway-architect's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-5",
+      "prompt": "Model the domain: bounded contexts, aggregates and invariants before implementation.",
+      "expected_skill": "domain-modeler",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is domain-modeler's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-6",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-7",
+      "prompt": "Review the dependency direction and flag layering violations.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is dependency-direction-guard's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-8",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-9",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-10",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-11",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-12",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-13",
+      "prompt": "Classify this change and state the validation floor it requires.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is change-classification-gate's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-14",
+      "prompt": "Assess release readiness: rollout gates, rollback, comms and evidence.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+    }
+  ]
+}

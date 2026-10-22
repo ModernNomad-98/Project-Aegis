@@ -777,7 +777,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->230<!-- /SKILL-COUNT --> skills comprise **229 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->243<!-- /SKILL-COUNT --> skills comprise **242 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -798,7 +798,7 @@ keeps a human as the approval gate on anything irreversible. See
    process audit.
    *e.g.* `ai-sdlc-operating-model`, `agent-authorization-matrix`, `agent-memory-governance`,
    `agent-governance-audit`.
-3. **Core architecture & engineering** *(Phase 2, 17)* — modeling and building systems well:
+3. **Core architecture & engineering** *(Phase 2, 30)* — modeling and building systems well:
    domain models, architecture design, ADRs, docs-first + test-first implementation, debugging,
    code review. *e.g.* `domain-modeler`, `architecture-designer`, `adr-writer`, `tdd-engineer`,
    `systematic-debugger`.
@@ -1145,6 +1145,19 @@ Phase 2 — core architecture & engineering pack:
 | `interface-first-designer` | Designs contracts before internals: callers/constraints, interfaces/adapters, compatibility/versioning, test doubles and ordered migration; stops before implementation. | auto + manual |
 | `data-flow-diagrammer` | Produces a trustworthy data-flow diagram: sources/sinks/stores/transforms/side effects, trust boundaries, assumptions and unverified elements labeled; documentation-only. | auto + manual |
 | `concurrency-race-reviewer` | Reviews interleaving operations for lost updates, double-create, check-then-act and retry duplicates; proposes serialization/idempotency/locking fixes with tests; review-only. | auto + manual |
+| `state-machine-modeler` | (Batch 4, #14) Model the states, events, guards, side effects, terminal states, retry/compensation edges and invalid-transition handling for one domain object before code hardens the wrong lifecycle. | auto + manual |
+| `transaction-scope-designer` | (Batch 4, #19, #156) Choose transaction scope versus staged/eventual steps, pick the isolation level, order locks, keep long transactions out, and define retries/idempotency and cross-service compensation. | auto + manual |
+| `cqrs-read-model-designer` | (Batch 4, #20) Decide whether a separate read model earns its cost, then design projections, rebuild/backfill, versioning and their explicit consistency expectations against the write path. | auto + manual |
+| `configuration-architect` | (Batch 4, #28, #66) Separate build-time, runtime, environment, tenant and user settings, secrets references, defaults and validation into one typed configuration architecture with explicit precedence and ownership rules. | auto + manual |
+| `extensibility-boundary-designer` | (Batch 4, #29, #30) Define extension points and plugin contracts with isolation, permissions, versioning, compatibility and a safe load/enable/disable/uninstall lifecycle. | auto + manual |
+| `application-layer-pattern-advisor` | (Batch 4, #31, #32, #33, #34, #35) Decide whether adapters, facades, repositories, service objects or an explicit use-case layer earn their cost, where each belongs, and how to introduce or remove it without hiding side effects. | auto + manual |
+| `technical-debt-classifier` | (Batch 4, #43) Classify each item by risk, owner, impact, payoff and whether it blocks future architecture, with evidence and a maintained ledger rather than a wish list. | auto + manual |
+| `modernization-cutover-planner` | (Batch 4, #45, #46, #47) Plan strangler-fig seams, adapters and routing, slice order, cutover gates, retirement, and the ownership/data/operations/failure-mode readiness check. | auto + manual |
+| `architecture-fitness-function-designer` | (Batch 4, #50) Define objective fitness functions and thresholds (dependency direction, layer rules, size/coupling/latency budgets) as CI gates with owned exception registers and honest failure handling. | auto + manual |
+| `architecture-spike-planner` | (Batch 4, #54) Charter a time-boxed spike with question, hypothesis, success criteria, artifacts, decision output, abort conditions and what is deliberately thrown away. | auto + manual |
+| `graphql-boundary-reviewer` | (Batch 4, #135) Schema and resolver authorization, field-level and tenant-scoped access, depth/complexity/cost limits, batching and N+1, introspection/persisted queries, error-data leakage and mutation side effects. | auto + manual |
+| `outbound-integration-adapter-designer` | (Batch 4, #146) Design the adapter contract, timeouts/retries, idempotency, circuit breaking/bulkheads, credential and request-signing handling, response validation, version pinning and failure semantics. | auto + manual |
+| `edge-function-designer` | (Batch 4, #158) Define auth at the boundary, environment validation, timeouts, cold-start awareness, concurrency and retry semantics, event-source policy, logging and idempotency. | auto + manual |
 
 Phase 3 — SaaS & tenant isolation pack:
 

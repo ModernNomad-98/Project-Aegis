@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "outbound-integration-adapter-designer",
+  "description": "Behaviour cases for outbound-integration-adapter-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the outbound adapter for the payment provider: contract, retries, idempotency and circuit breaker.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the structured design/decision artifact for this skill and never claims an inspection or execution it did not perform.",
+          "Separates verified facts from assumptions and lists open questions.",
+          "Names the nearest boundary owners and does not take over their work."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our third-party call has no timeout or retry policy - design the adapter contract and failure modes.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the primary artifact from inspected evidence rather than a template fill.",
+          "Calls out the conflicting constraints and states the trade-off explicitly.",
+          "Keeps UNKNOWN/UNVERIFIED items out of the decision record."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design the adapter for the shipping provider with signing, validation and pinning.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates edge/failure cases with a chosen handling rather than hand-waving them.",
+          "Defines the validation/test plan that would prove the artifact.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Review the system resilience: failure domains, degradation, retries and bulkheads.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes the request to the real neighbouring owner named in the prompt.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Design the outbound integration boundary with bulkheads, circuit breaker and observability.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Handles the incomplete/conflicting input by stating explicit open questions.",
+          "Lists the evidence needed before the record can be treated as a decision.",
+          "Returns the artifact with UNKNOWN/UNVERIFIED labels instead of invented facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Map the provider failure modes and design the adapter retry/idempotency policy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume facts or skip a required safety/evidence step.",
+          "States what is missing and what the authorized human owner must provide.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    }
+  ]
+}
