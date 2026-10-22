@@ -2814,6 +2814,20 @@ def test_coverage_map_batch3_deliveries():
     gaps = (payload["totals"]["gap_by_priority"])
     assert gaps == {"P0": 0, "P1": 25, "P2": 6}, (
         "gap_by_priority keeps the P0 key at zero for schema stability")
+    with tempfile.TemporaryDirectory() as tmp:
+        def mutate(payload):
+            payload["totals"]["gap_by_priority"]["P3"] = 0
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            expect_error(rep, "totals.gap_by_priority keys must be exactly",
+                         "coverage map: unexpected gap-priority key rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            i = text.index("## GAP candidates")
+            j = text.index("\n## ", i + 5)
+            return text[:i] + text[j + 1:]
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "must keep the '## GAP candidates",
+                         "coverage map: deleted GAP summary section rejected")
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
                if "80 of 230" in item]
     assert phrases, "an optionality phrase must carry 80 of 230"

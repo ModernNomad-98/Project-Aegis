@@ -15,6 +15,7 @@
     "mobile-viewport-craft",
     "observability-by-design",
     "performance-test-harness",
+    "server-state-architect",
     "url-state-architect",
     "validation-boundary-designer"
   ],
@@ -217,5 +218,6 @@
       ],
       "reason": "This request is validation-boundary-designer's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
     }
-  ]
+  ],
+  "seam_note": "server-state-architect <-> client-state-boundary-reviewer: the two SKILL.md Stop Conditions route to each other for server-data contract/cache ownership vs UI state placement. The leg is intentionally Stop-Conditions-only in the behaviour/trigger evals (no extra case, keeping the 22-case = 8 positive / 14 negative convention); do not delete this note or the overlap."
 }

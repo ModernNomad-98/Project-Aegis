@@ -2277,8 +2277,12 @@ def check_coverage_map(rep: Report) -> None:
         "by_status": {key: by_status[key] for key in sorted(by_status)},
         "by_grade": {key: by_grade[key] for key in sorted(by_grade)},
         "by_priority": {key: by_priority[key] for key in sorted(by_priority)},
+        # Compare over the union of the computed and the pinned key sets so an
+        # unexpected/tomorrow's priority key is never silently dropped; the
+        # explicit key-set check below rejects it.
         "gap_by_priority": {key: gap_by_priority.get(key, 0)
-                            for key in ("P0", "P1", "P2")},
+                            for key in sorted(set(gap_by_priority)
+                                              | set(COVERAGE_TOTALS["gap_by_priority"]))},
         "manifest_skills": len(manifest) if manifest is not None else 0,
         "distinct_covering_skills": len(covering_union),
         "beyond_roadmap_skills": (len(manifest - covering_union)
@@ -2290,6 +2294,12 @@ def check_coverage_map(rep: Report) -> None:
                   and entry.get("id") in COVERAGE_PLANNING_GATE_RESOLVED)),
     }
     _coverage_require_exact_ints(rep, ctx, totals, "")
+    gap_totals = totals.get("gap_by_priority")
+    if not isinstance(gap_totals, dict) or set(gap_totals) != set(
+            COVERAGE_TOTALS["gap_by_priority"]):
+        rep.error("[" + ctx + "] totals.gap_by_priority keys must be exactly "
+                  + repr(sorted(COVERAGE_TOTALS["gap_by_priority"]))
+                  + " (unexpected or missing priority keys are rejected)")
     for key in sorted(COVERAGE_TOTALS):
         if totals.get(key) != computed[key]:
             rep.error("[" + ctx + "] totals." + key + " is "
@@ -2397,12 +2407,22 @@ def check_coverage_map(rep: Report) -> None:
                 rep.error("[" + md_ctx + "] summary per-area row " + area
                           + ": " + label + " is " + str(observed_count)
                           + ", expected " + str(expected_count))
+    gap_heading = ("## GAP candidates (all "
+                   + str(len(COVERAGE_GAP_IDS)) + " ids)")
+    if gap_heading not in summary_visible:
+        rep.error("[" + md_ctx + "] summary must keep the '"
+                  + gap_heading + "' section heading (a deleted section must "
+                  "not pass vacuously)")
     summary_gap_ids = _coverage_summary_ids(
-        summary_visible, "## GAP candidates (all " + str(len(COVERAGE_GAP_IDS))
-        + " ids)", after_colon=True)
+        summary_visible, gap_heading, after_colon=True)
     if summary_gap_ids != set(COVERAGE_GAP_IDS):
         rep.error("[" + md_ctx + "] summary GAP id set must equal the JSON "
                   "GAP set (all " + str(len(COVERAGE_GAP_IDS)) + " ids)")
+    if not COVERAGE_GAP_IDS:
+        gap_section = _coverage_section(summary_visible, gap_heading)
+        if "None." not in gap_section:
+            rep.error("[" + md_ctx + "] summary GAP section must state None "
+                      "when the pinned GAP set is empty")
     summary_p0_ids = _coverage_summary_ids(summary_visible, "## P0 gap candidates (all "
                                            + str(len(COVERAGE_P0_GAP_IDS))
                                            + " ids)")

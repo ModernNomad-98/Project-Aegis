@@ -216,5 +216,6 @@
       ],
       "reason": "Batch-3 sibling seam: this request is frontend-architecture-mapper's deliverable; component-boundary-designer must not take it over."
     }
-  ]
+  ],
+  "seam_note": "design-system-token-governor -> component-boundary-designer is a one-way Stop-Condition seam (token governance routes component-layer decisions here); intentionally not a trigger-eval case, keeping the 22-case convention. Do not delete this note."
 }

@@ -5,6 +5,7 @@
     "api-event-architect",
     "background-job-orchestration-architect",
     "caching-strategy-designer",
+    "client-state-boundary-reviewer",
     "data-flow-diagrammer",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
@@ -106,7 +107,7 @@
       "should_not_trigger": [
         "server-state-architect"
       ],
-      "reason": "This request is caching-strategy-designer's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+      "reason": "Client query-cache keys/invalidation/stale-time policy is server-state-architect's deliverable; backend cache storage policy and stampede protection are caching-strategy-designer's. This prompt asks for the latter."
     },
     {
       "id": "server-state-architect-negative-3",
@@ -216,5 +217,6 @@
       ],
       "reason": "This request is frontend-perf-engineer's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
     }
-  ]
+  ],
+  "seam_note": "client-state-boundary-reviewer <-> server-state-architect: reciprocal Stop Conditions for UI state placement review vs server-data contract/cache ownership; intentionally Stop-Conditions-only in the evals (22-case convention kept). Do not remove accidentally."
 }
