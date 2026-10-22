@@ -20,13 +20,13 @@ Reference for the route-protection-designer skill. It is method and record guida
 
 ## 3. Output and evidence rules
 
-- Deep-link return destinations must be parsed and validated as same-origin/relative (allowlist); absolute, protocol-relative (for example //evil.example) and malformed targets are rejected, so a post-login open redirect is designed out.
-
 1. Route x gate matrix with required capability and enforcement source.
 2. Redirect/denied/onboarding behavior per route class.
 3. Deep-link return contract.
 4. Trust-boundary note (client UX vs server truth).
 5. Negative-test plan and enforcement gaps.
+
+Deep-link return destinations must be parsed and validated as same-origin/relative (allowlist); absolute, protocol-relative (for example //evil.example) and malformed targets are rejected, so a post-login open redirect is designed out.
 
 The returned record must name the evidence source for each decision, separate verified facts from assumptions, and list what could not be inspected. The skill does not edit files or execute commands; delegated actions go to the host/user or the existing implementation owner under existing authority.
 

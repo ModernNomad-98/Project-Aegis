@@ -31,7 +31,7 @@ The returned record must name the evidence source for each decision, separate ve
 ## 4. Boundaries
 
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
-- External api/event contract semantics routes to `api-event-architect`; this skill does not perform that owner's work.
+- External API/event contract semantics routes to `api-event-architect`; this skill does not perform that owner's work.
 - Cache policy, keys and stampede protection routes to `caching-strategy-designer`; this skill does not perform that owner's work.
 - Telemetry contract for data-loading behavior routes to `observability-by-design`; this skill does not perform that owner's work.
 - UI state placement review (Batch-3 sibling seam) routes to `client-state-boundary-reviewer`; this skill does not perform that owner's work.

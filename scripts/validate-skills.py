@@ -2277,8 +2277,8 @@ def check_coverage_map(rep: Report) -> None:
         "by_status": {key: by_status[key] for key in sorted(by_status)},
         "by_grade": {key: by_grade[key] for key in sorted(by_grade)},
         "by_priority": {key: by_priority[key] for key in sorted(by_priority)},
-"gap_by_priority": {key: gap_by_priority.get(key, 0)
-                            for key in sorted(COVERAGE_TOTALS["gap_by_priority"])},
+        "gap_by_priority": {key: gap_by_priority.get(key, 0)
+                            for key in ("P0", "P1", "P2")},
         "manifest_skills": len(manifest) if manifest is not None else 0,
         "distinct_covering_skills": len(covering_union),
         "beyond_roadmap_skills": (len(manifest - covering_union)
@@ -2409,6 +2409,9 @@ def check_coverage_map(rep: Report) -> None:
     if summary_p0_ids != set(COVERAGE_P0_GAP_IDS):
         rep.error("[" + md_ctx + "] summary P0 gap id set must equal the "
                   "JSON P0 set (all " + str(len(COVERAGE_P0_GAP_IDS)) + " ids)")
+    # The heading must exist even when the pinned set is empty; the id-set
+    # equality check above is vacuously true on a missing section, so this
+    # plain rendered-text check is the anti-vacuous-pass guard.
     p0_heading = ("## P0 gap candidates (all "
                   + str(len(COVERAGE_P0_GAP_IDS)) + " ids)")
     if p0_heading not in summary_visible:

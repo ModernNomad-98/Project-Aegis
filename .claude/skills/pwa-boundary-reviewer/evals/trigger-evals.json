@@ -182,7 +182,7 @@
     },
     {
       "id": "pwa-boundary-reviewer-negative-11",
-      "prompt": "QA this Vite build: dist-level env classification, build/preview parity and bundle budgets.",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. QA this Vite build: dist-level env classification, build/preview parity and bundle budgets.",
       "expected_skill": "vite-build-qa-engineer",
       "should_not_trigger": [
         "pwa-boundary-reviewer"

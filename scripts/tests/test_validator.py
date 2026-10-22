@@ -2255,7 +2255,7 @@ def test_coverage_map_review_pending():
     """T12: an incorrect review_pending total is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["review_pending"] = 155
+            payload["totals"]["review_pending"] = 148
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.review_pending",
                          "coverage map: review_pending mismatch rejected")
@@ -2842,6 +2842,13 @@ def test_coverage_map_batch3_deliveries():
             expect_error(rep, "must keep the '## P0 gap candidates (all 0 ids)'",
                          "coverage map: deleted empty P0 summary section "
                          "rejected (no vacuous pass)")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            return text.replace("## P0 gap candidates (all 0 ids)\n\nNone.",
+                                "## P0 gap candidates (all 0 ids)\n\n161.", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "summary P0 gap id set must equal the",
+                         "coverage map: non-empty summary P0 id list rejected")
 
 
 def test_skills_manifest_provenance():
