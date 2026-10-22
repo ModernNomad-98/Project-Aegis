@@ -2812,8 +2812,8 @@ def test_coverage_map_batch3_deliveries():
     assert len(validator.COVERAGE_GAP_IDS) == 26
     assert validator.COVERAGE_P0_GAP_IDS == ()
     gaps = (payload["totals"]["gap_by_priority"])
-    assert gaps == {"P1": 21, "P2": 5}, (
-        "gap_by_priority has no P0 key and reflects the post-0-B sparse map")
+    assert gaps == {"P0": 0, "P1": 21, "P2": 5}, (
+        "gap_by_priority keeps the schema_version-1 P0 key at zero")
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
             payload["totals"]["gap_by_priority"]["P3"] = 0
@@ -2898,7 +2898,7 @@ def test_coverage_map_step0_hygiene():
         "explicit-id": 151, "catalog-decision": 16,
         "capability-review": 107, "none": 26}
     assert validator.COVERAGE_TOTALS["gap_by_priority"] == {
-        "P1": 21, "P2": 5}
+        "P0": 0, "P1": 21, "P2": 5}
     assert validator.COVERAGE_TOTALS["by_priority"] == {
         "P0": 126, "P1": 149, "P2": 25}
     assert validator.COVERAGE_TOTALS["manifest_skills"] == 230
@@ -2920,7 +2920,7 @@ def test_coverage_map_step0_hygiene():
     assert totals["by_grade"] == {
         "capability-review": 107, "catalog-decision": 16,
         "explicit-id": 151, "none": 26}
-    assert totals["gap_by_priority"] == {"P1": 21, "P2": 5}
+    assert totals["gap_by_priority"] == {"P0": 0, "P1": 21, "P2": 5}
     assert "## GAP candidates (all 26 ids)" in mmd
     for line in ("| 01 Software Architecture & Engineering | 55 | 15 | 8 | 17 | 15 |",
                  "| 04 Backend, application programming interface (API), and data engineering | 30 | 4 | 12 | 10 | 4 |",

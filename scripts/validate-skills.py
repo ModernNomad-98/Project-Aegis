@@ -219,7 +219,7 @@ COVERAGE_TOTALS = {
     "by_grade": {"explicit-id": 151, "catalog-decision": 16,
                  "capability-review": 107, "none": 26},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P1": 21, "P2": 5},
+    "gap_by_priority": {"P0": 0, "P1": 21, "P2": 5},
     "manifest_skills": 230,
     "distinct_covering_skills": 150,
     "beyond_roadmap_skills": 80,

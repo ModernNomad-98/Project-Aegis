@@ -219,7 +219,7 @@
     },
     {
       "id": "security-fix-implementation-goes-to-appsec-implementer",
-      "prompt": "Implement the authorization fix for this reviewed vulnerability and add the regression test that proves the exploit is closed.",
+      "prompt": "Explicitly invoke appsec-implementer. Implement the authorization fix for this reviewed vulnerability and add the regression test that proves the exploit is closed.",
       "expected_skill": "appsec-implementer",
       "should_not_trigger": [
         "security-regression-harness-designer"
