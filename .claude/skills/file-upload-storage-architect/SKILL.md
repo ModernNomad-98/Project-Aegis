@@ -243,5 +243,6 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 - `evals/trigger-evals.json` — discrimination against `pii-lifecycle-designer`
   (personal-data lifecycle of contents) and `rls-policy-auditor` (auditing
   supplied database RLS policies for object metadata/access).
-- No `references/` — the upload/tenancy/validation/retention procedure above
-  is complete; detail lives in the produced artifacts.
+- [references/storage-access-policy.md](references/storage-access-policy.md) —
+  private-by-default bucket policy baseline, signed-URL issuance/scoping and its
+  named revocation residual (extension for roadmap #115; status unchanged).

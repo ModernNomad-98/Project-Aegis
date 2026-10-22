@@ -1,0 +1,220 @@
+{
+  "skill": "retrieval-engineering-designer",
+  "description": "Trigger discrimination for retrieval-engineering-designer against the nearest shipped owners.",
+  "overlaps_with": [
+    "ai-cost-guardrail-designer",
+    "ai-evaluation-harness",
+    "ai-misinformation-guard",
+    "ai-router-architect",
+    "ai-threat-modeler",
+    "caching-strategy-designer",
+    "data-quality-monitor-designer",
+    "hidden-context-exposure-reviewer",
+    "model-context-designer",
+    "multi-tenant-data-architect",
+    "prompt-injection-defender",
+    "rag-security-architect",
+    "search-architecture-designer",
+    "sensitive-disclosure-guard"
+  ],
+  "cases": [
+    {
+      "id": "retrieval-engineering-designer-positive-1",
+      "prompt": "Design our semantic retrieval stack: chunking, embeddings, fusion and reranking.",
+      "expected_skill": "retrieval-engineering-designer",
+      "should_not_trigger": [
+        "rag-security-architect"
+      ],
+      "reason": "The request needs retrieval-engineering-designer's design method; rag-security-architect owns a different task."
+    },
+    {
+      "id": "retrieval-engineering-designer-positive-2",
+      "prompt": "Retrieval quality dropped - design the relevance evaluation plan and regression gate.",
+      "expected_skill": "retrieval-engineering-designer",
+      "should_not_trigger": [
+        "search-architecture-designer"
+      ],
+      "reason": "The request needs retrieval-engineering-designer's design method; search-architecture-designer owns a different task."
+    },
+    {
+      "id": "retrieval-engineering-designer-positive-3",
+      "prompt": "We have no golden set for relevance - design the retrieval evaluation approach.",
+      "expected_skill": "retrieval-engineering-designer",
+      "should_not_trigger": [
+        "ai-evaluation-harness"
+      ],
+      "reason": "The request needs retrieval-engineering-designer's design method; ai-evaluation-harness owns a different task."
+    },
+    {
+      "id": "retrieval-engineering-designer-positive-4",
+      "prompt": "Decide chunking and embedding strategy for our documentation corpus.",
+      "expected_skill": "retrieval-engineering-designer",
+      "should_not_trigger": [
+        "model-context-designer"
+      ],
+      "reason": "The request needs retrieval-engineering-designer's design method; model-context-designer owns a different task."
+    },
+    {
+      "id": "retrieval-engineering-designer-positive-5",
+      "prompt": "Design hybrid dense/lexical retrieval and reranking with failure-mode analysis.",
+      "expected_skill": "retrieval-engineering-designer",
+      "should_not_trigger": [
+        "ai-misinformation-guard"
+      ],
+      "reason": "The request needs retrieval-engineering-designer's design method; ai-misinformation-guard owns a different task."
+    },
+    {
+      "id": "retrieval-engineering-designer-positive-6",
+      "prompt": "Our search results need relevance tuning - produce the retrieval design and eval plan.",
+      "expected_skill": "retrieval-engineering-designer",
+      "should_not_trigger": [
+        "sensitive-disclosure-guard"
+      ],
+      "reason": "The request needs retrieval-engineering-designer's design method; sensitive-disclosure-guard owns a different task."
+    },
+    {
+      "id": "retrieval-engineering-designer-positive-7",
+      "prompt": "Compare reranking designs and record the trade-offs with an evaluation plan.",
+      "expected_skill": "retrieval-engineering-designer",
+      "should_not_trigger": [
+        "hidden-context-exposure-reviewer"
+      ],
+      "reason": "The request needs retrieval-engineering-designer's design method; hidden-context-exposure-reviewer owns a different task."
+    },
+    {
+      "id": "retrieval-engineering-designer-positive-8",
+      "prompt": "Characterize our corpus and query intents and design the retrieval pipeline.",
+      "expected_skill": "retrieval-engineering-designer",
+      "should_not_trigger": [
+        "prompt-injection-defender"
+      ],
+      "reason": "The request needs retrieval-engineering-designer's design method; prompt-injection-defender owns a different task."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-1",
+      "prompt": "Design the RAG and vector-store authorization and tenant isolation.",
+      "expected_skill": "rag-security-architect",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is rag-security-architect's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-2",
+      "prompt": "Design the lexical/faceted search architecture and ranking rules.",
+      "expected_skill": "search-architecture-designer",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is search-architecture-designer's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-3",
+      "prompt": "Explicitly invoke ai-evaluation-harness. Run the AI evaluation harness against the versioned dataset and graders.",
+      "expected_skill": "ai-evaluation-harness",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is ai-evaluation-harness's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-4",
+      "prompt": "Design the model context assembly and context-window policy.",
+      "expected_skill": "model-context-designer",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is model-context-designer's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-5",
+      "prompt": "Design the ground-truth and fabrication guards for the AI feature output.",
+      "expected_skill": "ai-misinformation-guard",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is ai-misinformation-guard's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-6",
+      "prompt": "Guard against sensitive-data disclosure in AI outputs and logs.",
+      "expected_skill": "sensitive-disclosure-guard",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is sensitive-disclosure-guard's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-7",
+      "prompt": "Review hidden-context exposure across prompts, tools and outputs.",
+      "expected_skill": "hidden-context-exposure-reviewer",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is hidden-context-exposure-reviewer's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-8",
+      "prompt": "Explicitly invoke prompt-injection-defender. Design the layered prompt-injection defense for all untrusted content.",
+      "expected_skill": "prompt-injection-defender",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is prompt-injection-defender's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-9",
+      "prompt": "Build the AI-specific threat model with LLM Top 10 threats per boundary.",
+      "expected_skill": "ai-threat-modeler",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is ai-threat-modeler's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-10",
+      "prompt": "Design the data-quality monitoring and alerting rules.",
+      "expected_skill": "data-quality-monitor-designer",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is data-quality-monitor-designer's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-11",
+      "prompt": "Design the caching strategy: keys, invalidation and stampede protection.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-12",
+      "prompt": "Decide the per-store tenant scoping and tenant-context propagation.",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is multi-tenant-data-architect's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-13",
+      "prompt": "Design the AI consumption guardrails and cost caps.",
+      "expected_skill": "ai-cost-guardrail-designer",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is ai-cost-guardrail-designer's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "retrieval-engineering-designer-negative-14",
+      "prompt": "Explicitly invoke ai-router-architect. Design the AI model routing, fallbacks and cost enforcement.",
+      "expected_skill": "ai-router-architect",
+      "should_not_trigger": [
+        "retrieval-engineering-designer"
+      ],
+      "reason": "This request is ai-router-architect's deliverable end-to-end; retrieval-engineering-designer owns a different design task and must not take it over."
+    }
+  ]
+}

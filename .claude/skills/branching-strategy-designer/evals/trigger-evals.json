@@ -1,0 +1,220 @@
+{
+  "skill": "branching-strategy-designer",
+  "description": "Trigger discrimination for branching-strategy-designer against the nearest shipped owners.",
+  "overlaps_with": [
+    "ai-sdlc-operating-model",
+    "change-classification-gate",
+    "ci-pipeline-architect",
+    "code-reviewer",
+    "contribution-guide-author",
+    "environment-parity-reviewer",
+    "human-approval-boundary",
+    "local-ci-mirror-preflight",
+    "merge-is-deploy-governance",
+    "phased-work-handoff-designer",
+    "release-readiness-reviewer",
+    "reviewable-diff-discipline",
+    "rollback-runbook-author",
+    "scoped-approval-register"
+  ],
+  "cases": [
+    {
+      "id": "branching-strategy-designer-positive-1",
+      "prompt": "Our branching and release flow is undefined - choose and record a strategy.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "ci-pipeline-architect"
+      ],
+      "reason": "The request needs branching-strategy-designer's design method; ci-pipeline-architect owns a different task."
+    },
+    {
+      "id": "branching-strategy-designer-positive-2",
+      "prompt": "Decide trunk-based versus release branching for our team and record the trade-offs.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "contribution-guide-author"
+      ],
+      "reason": "The request needs branching-strategy-designer's design method; contribution-guide-author owns a different task."
+    },
+    {
+      "id": "branching-strategy-designer-positive-3",
+      "prompt": "Design branch naming, protection and review rules with a migration path.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "merge-is-deploy-governance"
+      ],
+      "reason": "The request needs branching-strategy-designer's design method; merge-is-deploy-governance owns a different task."
+    },
+    {
+      "id": "branching-strategy-designer-positive-4",
+      "prompt": "Our hotfix flow during release freeze is unclear - design the branching decision record.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "release-readiness-reviewer"
+      ],
+      "reason": "The request needs branching-strategy-designer's design method; release-readiness-reviewer owns a different task."
+    },
+    {
+      "id": "branching-strategy-designer-positive-5",
+      "prompt": "We are moving to trunk-based - record the rules, merge strategy and migration risks.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "ai-sdlc-operating-model"
+      ],
+      "reason": "The request needs branching-strategy-designer's design method; ai-sdlc-operating-model owns a different task."
+    },
+    {
+      "id": "branching-strategy-designer-positive-6",
+      "prompt": "Review our current branch protection and release cadence and recommend a flow.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "local-ci-mirror-preflight"
+      ],
+      "reason": "The request needs branching-strategy-designer's design method; local-ci-mirror-preflight owns a different task."
+    },
+    {
+      "id": "branching-strategy-designer-positive-7",
+      "prompt": "Define the merge queue and review requirements for our multi-team repo.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "change-classification-gate"
+      ],
+      "reason": "The request needs branching-strategy-designer's design method; change-classification-gate owns a different task."
+    },
+    {
+      "id": "branching-strategy-designer-positive-8",
+      "prompt": "Produce a branching decision record with alternatives and safe defaults.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "reviewable-diff-discipline"
+      ],
+      "reason": "The request needs branching-strategy-designer's design method; reviewable-diff-discipline owns a different task."
+    },
+    {
+      "id": "branching-strategy-designer-negative-1",
+      "prompt": "Explicitly invoke ci-pipeline-architect. Design the pipeline stage graph, blocking semantics and CI secret governance.",
+      "expected_skill": "ci-pipeline-architect",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is ci-pipeline-architect's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-2",
+      "prompt": "Write the contributor guide: workflow, review rules and release expectations.",
+      "expected_skill": "contribution-guide-author",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is contribution-guide-author's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-3",
+      "prompt": "Define the merge-is-deploy governance and release gating.",
+      "expected_skill": "merge-is-deploy-governance",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is merge-is-deploy-governance's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-4",
+      "prompt": "Assess release readiness against the required evidence and gates.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-5",
+      "prompt": "Define the human+agent lifecycle stages, gates and authority.",
+      "expected_skill": "ai-sdlc-operating-model",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is ai-sdlc-operating-model's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-6",
+      "prompt": "Explicitly invoke local-ci-mirror-preflight. Run the local CI mirror preflight and report the result.",
+      "expected_skill": "local-ci-mirror-preflight",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is local-ci-mirror-preflight's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-7",
+      "prompt": "Classify this change and state the validation floor it requires.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is change-classification-gate's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-8",
+      "prompt": "Explicitly invoke reviewable-diff-discipline. Keep the diff small and intentional and stage the exact files.",
+      "expected_skill": "reviewable-diff-discipline",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is reviewable-diff-discipline's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-9",
+      "prompt": "Write the rollback strategy and stranger-executable runbook.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is rollback-runbook-author's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-10",
+      "prompt": "Design the phased work handoff between sessions and agents.",
+      "expected_skill": "phased-work-handoff-designer",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is phased-work-handoff-designer's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-11",
+      "prompt": "Review environment parity across local, CI, preview, staging and production.",
+      "expected_skill": "environment-parity-reviewer",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is environment-parity-reviewer's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-12",
+      "prompt": "Review this actual diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-13",
+      "prompt": "Define which agent actions require a recorded human approval.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    },
+    {
+      "id": "branching-strategy-designer-negative-14",
+      "prompt": "Record the scoped approval register entry for this action.",
+      "expected_skill": "scoped-approval-register",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "This request is scoped-approval-register's deliverable end-to-end; branching-strategy-designer owns a different design task and must not take it over."
+    }
+  ]
+}

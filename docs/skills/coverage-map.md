@@ -8,13 +8,13 @@ summary is hand-maintained with a validator cross-check.
 
 GAP rows are optional backlog candidates, not deficits or completion obligations.
 
-The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 243 shipped skills are beyond it.
+The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 250 shipped skills are beyond it.
 
 The map records status only. It is a maintained assertion, not ground
 truth, a completion target or a build authorization. Rows graded
 capability-review, catalog-decision or none are flagged for planning-gate
 review unless they carry a recorded planning-gate decision (rows #254/#278,
-D107); `review_pending` counts the remaining non-explicit-id rows (125).
+D107); `review_pending` counts the remaining non-explicit-id rows (116).
 
 Row-level evidence companion: [audit registers index](../audits/README.md) (read-only reference, not build authorization).
 
@@ -31,40 +31,38 @@ Row-level evidence companion: [audit registers index](../audits/README.md) (read
 | Measure | Value |
 | --- | ---: |
 | Entries | 300 |
-| SHIPPED | 173 |
+| SHIPPED | 182 |
 | COVERED | 57 |
-| PARTIAL | 63 |
-| GAP | 7 |
-| explicit-id | 173 |
+| PARTIAL | 59 |
+| GAP | 2 |
+| explicit-id | 182 |
 | catalog-decision | 16 |
-| capability-review | 104 |
-| none | 7 |
+| capability-review | 100 |
+| none | 2 |
 | P0 / P1 / P2 | 126 / 149 / 25 |
-| P0 / P1 / P2 gaps | 0 / 6 / 1 |
-| Manifest skills | 243 |
-| Distinct covering skills | 163 |
-| Beyond-roadmap shipped skills | 80 |
-| Review pending | 125 |
+| P0 / P1 / P2 gaps | 0 / 1 / 1 |
+| Manifest skills | 250 |
+| Distinct covering skills | 167 |
+| Beyond-roadmap shipped skills | 83 |
+| Review pending | 116 |
 
 ## Per-area status
 
 | Area | Entries | SHIPPED | COVERED | PARTIAL | GAP |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 01 Software Architecture & Engineering | 55 | 32 | 8 | 15 | 0 |
-| 02 Software as a service (SaaS) platform architecture | 35 | 22 | 4 | 9 | 0 |
-| 03 Software as a service (SaaS) security and row-level security (RLS) | 40 | 24 | 8 | 6 | 2 |
-| 04 Backend, application programming interface (API), and data engineering | 30 | 8 | 12 | 10 | 0 |
+| 02 Software as a service (SaaS) platform architecture | 35 | 23 | 4 | 8 | 0 |
+| 03 Software as a service (SaaS) security and row-level security (RLS) | 40 | 28 | 8 | 4 | 0 |
+| 04 Backend, application programming interface (API), and data engineering | 30 | 9 | 12 | 9 | 0 |
 | 05 Frontend and user experience (UX) engineering | 20 | 11 | 5 | 4 | 0 |
-| 06 Quality assurance (QA), test architecture, and validation | 55 | 37 | 6 | 8 | 4 |
-| 07 Development and operations (DevOps), release, and reliability engineering | 25 | 19 | 2 | 3 | 1 |
+| 06 Quality assurance (QA), test architecture, and validation | 55 | 39 | 6 | 8 | 2 |
+| 07 Development and operations (DevOps), release, and reliability engineering | 25 | 20 | 2 | 3 | 0 |
 | 08 Artificial intelligence (AI) era software development life cycle (SDLC) and agent operating discipline | 20 | 17 | 3 | 0 | 0 |
 | 09 Artificial intelligence (AI) software engineering and large language model (LLM) systems | 20 | 3 | 9 | 8 | 0 |
 
-## GAP candidates (all 7 ids)
+## GAP candidates (all 2 ids)
 
-- Area 03: 110, 120
-- Area 06: 224, 225, 233, 234
-- Area 07: 236
+- Area 06: 233, 234
 
 ## P0 gap candidates (all 0 ids)
 

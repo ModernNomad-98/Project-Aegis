@@ -1,0 +1,220 @@
+{
+  "skill": "defect-triage-facilitator",
+  "description": "Trigger discrimination for defect-triage-facilitator against the nearest shipped owners.",
+  "overlaps_with": [
+    "acceptance-criteria-reviewer",
+    "ai-closeout-reporter",
+    "ci-failure-classifier",
+    "clickthrough-test-engineer",
+    "exploratory-charter-designer",
+    "flaky-test-detective",
+    "manual-test-case-creator",
+    "qa-strategy-architect",
+    "regression-suite-curator",
+    "release-readiness-reviewer",
+    "screenshot-evidence-planner",
+    "systematic-debugger",
+    "test-coverage-mapper",
+    "test-plan-designer"
+  ],
+  "cases": [
+    {
+      "id": "defect-triage-facilitator-positive-1",
+      "prompt": "Turn this messy bug report into a complete report and triage it with the release team.",
+      "expected_skill": "defect-triage-facilitator",
+      "should_not_trigger": [
+        "ci-failure-classifier"
+      ],
+      "reason": "The request needs defect-triage-facilitator's design method; ci-failure-classifier owns a different task."
+    },
+    {
+      "id": "defect-triage-facilitator-positive-2",
+      "prompt": "Triage these ten defects by severity, frequency and release risk with one owner each.",
+      "expected_skill": "defect-triage-facilitator",
+      "should_not_trigger": [
+        "systematic-debugger"
+      ],
+      "reason": "The request needs defect-triage-facilitator's design method; systematic-debugger owns a different task."
+    },
+    {
+      "id": "defect-triage-facilitator-positive-3",
+      "prompt": "Our bug reports are inconsistent - author the template and a completed example.",
+      "expected_skill": "defect-triage-facilitator",
+      "should_not_trigger": [
+        "regression-suite-curator"
+      ],
+      "reason": "The request needs defect-triage-facilitator's design method; regression-suite-curator owns a different task."
+    },
+    {
+      "id": "defect-triage-facilitator-positive-4",
+      "prompt": "This defect has no reproduction steps - complete the report and flag what is missing.",
+      "expected_skill": "defect-triage-facilitator",
+      "should_not_trigger": [
+        "release-readiness-reviewer"
+      ],
+      "reason": "The request needs defect-triage-facilitator's design method; release-readiness-reviewer owns a different task."
+    },
+    {
+      "id": "defect-triage-facilitator-positive-5",
+      "prompt": "Run triage for the customer-reported batch and record assumptions and next actions.",
+      "expected_skill": "defect-triage-facilitator",
+      "should_not_trigger": [
+        "clickthrough-test-engineer"
+      ],
+      "reason": "The request needs defect-triage-facilitator's design method; clickthrough-test-engineer owns a different task."
+    },
+    {
+      "id": "defect-triage-facilitator-positive-6",
+      "prompt": "Prioritize these defects for the release and route the security-flagged ones.",
+      "expected_skill": "defect-triage-facilitator",
+      "should_not_trigger": [
+        "manual-test-case-creator"
+      ],
+      "reason": "The request needs defect-triage-facilitator's design method; manual-test-case-creator owns a different task."
+    },
+    {
+      "id": "defect-triage-facilitator-positive-7",
+      "prompt": "Triage this duplicate and security-flagged defect with the evidence we have.",
+      "expected_skill": "defect-triage-facilitator",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "The request needs defect-triage-facilitator's design method; acceptance-criteria-reviewer owns a different task."
+    },
+    {
+      "id": "defect-triage-facilitator-positive-8",
+      "prompt": "Produce a triage agenda and ranked decision list for the open defects.",
+      "expected_skill": "defect-triage-facilitator",
+      "should_not_trigger": [
+        "exploratory-charter-designer"
+      ],
+      "reason": "The request needs defect-triage-facilitator's design method; exploratory-charter-designer owns a different task."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-1",
+      "prompt": "Classify the failed CI run by cause from the logs it was given.",
+      "expected_skill": "ci-failure-classifier",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is ci-failure-classifier's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-2",
+      "prompt": "Explicitly invoke systematic-debugger. Debug this failing behaviour: reproduce, reduce, isolate, fix and verify.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is systematic-debugger's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-3",
+      "prompt": "Curate the regression suite: promote, retain, demote or retire tests with rationale.",
+      "expected_skill": "regression-suite-curator",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is regression-suite-curator's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-4",
+      "prompt": "Assess release readiness against the required evidence and gates.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-5",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Run the planned interactive clickthrough of the running app and record the evidence.",
+      "expected_skill": "clickthrough-test-engineer",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is clickthrough-test-engineer's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-6",
+      "prompt": "Create the stranger-executable manual test cases for this change.",
+      "expected_skill": "manual-test-case-creator",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is manual-test-case-creator's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-7",
+      "prompt": "Review the existing acceptance criteria for testability.",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is acceptance-criteria-reviewer's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-8",
+      "prompt": "Design the timeboxed exploratory-testing charter.",
+      "expected_skill": "exploratory-charter-designer",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is exploratory-charter-designer's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-9",
+      "prompt": "Design the per-change test plan with layers, data, entry/exit criteria and evidence.",
+      "expected_skill": "test-plan-designer",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is test-plan-designer's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-10",
+      "prompt": "Design the screenshot evidence policy and checkpoints.",
+      "expected_skill": "screenshot-evidence-planner",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is screenshot-evidence-planner's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-11",
+      "prompt": "Explicitly invoke flaky-test-detective. Investigate the flaky test, fix one cause and prove stability.",
+      "expected_skill": "flaky-test-detective",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is flaky-test-detective's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-12",
+      "prompt": "Design the product-level QA strategy and risk-ranked layers.",
+      "expected_skill": "qa-strategy-architect",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is qa-strategy-architect's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-13",
+      "prompt": "Map the test coverage by reading the assertions and report gaps.",
+      "expected_skill": "test-coverage-mapper",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is test-coverage-mapper's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    },
+    {
+      "id": "defect-triage-facilitator-negative-14",
+      "prompt": "Write the terminal closeout report with the intentionally-not-done section.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": [
+        "defect-triage-facilitator"
+      ],
+      "reason": "This request is ai-closeout-reporter's deliverable end-to-end; defect-triage-facilitator owns a different design task and must not take it over."
+    }
+  ]
+}

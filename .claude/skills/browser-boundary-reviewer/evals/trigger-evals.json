@@ -1,0 +1,220 @@
+{
+  "skill": "browser-boundary-reviewer",
+  "description": "Trigger discrimination for browser-boundary-reviewer against the nearest shipped owners.",
+  "overlaps_with": [
+    "appsec-implementer",
+    "authorization-matrix-designer",
+    "clickthrough-test-engineer",
+    "cloud-security-baseline-reviewer",
+    "code-reviewer",
+    "multi-tenant-security-tester",
+    "rls-policy-auditor",
+    "secrets-identity-hardener",
+    "secure-migration-reviewer",
+    "security-impact-note-author",
+    "security-pr-reviewer",
+    "security-regression-harness-designer",
+    "threat-modeler",
+    "vite-build-qa-engineer"
+  ],
+  "cases": [
+    {
+      "id": "browser-boundary-reviewer-positive-1",
+      "prompt": "Review our web app browser boundary and security headers before we ship the new login flow.",
+      "expected_skill": "browser-boundary-reviewer",
+      "should_not_trigger": [
+        "security-pr-reviewer"
+      ],
+      "reason": "The request needs browser-boundary-reviewer's design method; security-pr-reviewer owns a different task."
+    },
+    {
+      "id": "browser-boundary-reviewer-positive-2",
+      "prompt": "Our cookies and CSRF defenses were changed last week - review origin handling and SameSite posture.",
+      "expected_skill": "browser-boundary-reviewer",
+      "should_not_trigger": [
+        "appsec-implementer"
+      ],
+      "reason": "The request needs browser-boundary-reviewer's design method; appsec-implementer owns a different task."
+    },
+    {
+      "id": "browser-boundary-reviewer-positive-3",
+      "prompt": "Check every mutating endpoint, form and auth callback for CSRF bypass paths.",
+      "expected_skill": "browser-boundary-reviewer",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "reason": "The request needs browser-boundary-reviewer's design method; cloud-security-baseline-reviewer owns a different task."
+    },
+    {
+      "id": "browser-boundary-reviewer-positive-4",
+      "prompt": "Review the CSP/HSTS/frame/referrer/permissions/content-type header policy and where each header is enforced.",
+      "expected_skill": "browser-boundary-reviewer",
+      "should_not_trigger": [
+        "vite-build-qa-engineer"
+      ],
+      "reason": "The request needs browser-boundary-reviewer's design method; vite-build-qa-engineer owns a different task."
+    },
+    {
+      "id": "browser-boundary-reviewer-positive-5",
+      "prompt": "Our CDN and app server set conflicting headers - produce the header policy table and findings.",
+      "expected_skill": "browser-boundary-reviewer",
+      "should_not_trigger": [
+        "secrets-identity-hardener"
+      ],
+      "reason": "The request needs browser-boundary-reviewer's design method; secrets-identity-hardener owns a different task."
+    },
+    {
+      "id": "browser-boundary-reviewer-positive-6",
+      "prompt": "After the auth change, inventory the browser/origin boundary and show unverified gaps.",
+      "expected_skill": "browser-boundary-reviewer",
+      "should_not_trigger": [
+        "authorization-matrix-designer"
+      ],
+      "reason": "The request needs browser-boundary-reviewer's design method; authorization-matrix-designer owns a different task."
+    },
+    {
+      "id": "browser-boundary-reviewer-positive-7",
+      "prompt": "Review CORS origins and cookie attributes for the tenant settings page mutations.",
+      "expected_skill": "browser-boundary-reviewer",
+      "should_not_trigger": [
+        "clickthrough-test-engineer"
+      ],
+      "reason": "The request needs browser-boundary-reviewer's design method; clickthrough-test-engineer owns a different task."
+    },
+    {
+      "id": "browser-boundary-reviewer-positive-8",
+      "prompt": "Audit the browser boundary for the upload flow and rank the findings with evidence.",
+      "expected_skill": "browser-boundary-reviewer",
+      "should_not_trigger": [
+        "multi-tenant-security-tester"
+      ],
+      "reason": "The request needs browser-boundary-reviewer's design method; multi-tenant-security-tester owns a different task."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-1",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets and SSRF.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is security-pr-reviewer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-2",
+      "prompt": "Explicitly invoke appsec-implementer. Implement the named security control test-first and show the negative test.",
+      "expected_skill": "appsec-implementer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is appsec-implementer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-3",
+      "prompt": "Review our configured cloud account against the named security baseline.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is cloud-security-baseline-reviewer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-4",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. QA this Vite build: dist-level env classification, build/preview parity and bundle budgets.",
+      "expected_skill": "vite-build-qa-engineer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is vite-build-qa-engineer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-5",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Harden the secrets and identity handling for this service and plan the rotation.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is secrets-identity-hardener's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-6",
+      "prompt": "Design the deny-by-default roles x permissions x resources matrix and enforcement points.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-7",
+      "prompt": "Explicitly invoke clickthrough-test-engineer. Run the planned interactive clickthrough of the running app and record the evidence.",
+      "expected_skill": "clickthrough-test-engineer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is clickthrough-test-engineer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-8",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Design and run the two-tenant executable isolation negative suite.",
+      "expected_skill": "multi-tenant-security-tester",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is multi-tenant-security-tester's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-9",
+      "prompt": "Audit the row-level security policies for tenant scope, recursion and grants.",
+      "expected_skill": "rls-policy-auditor",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is rls-policy-auditor's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-10",
+      "prompt": "Build the design-time threat model for this feature: assets, actors, boundaries and STRIDE threats.",
+      "expected_skill": "threat-modeler",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is threat-modeler's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-11",
+      "prompt": "Author the security impact note for this change with threats, mitigations and residual risk.",
+      "expected_skill": "security-impact-note-author",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is security-impact-note-author's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-12",
+      "prompt": "Turn this fixed security bug into a permanent regression harness.",
+      "expected_skill": "security-regression-harness-designer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is security-regression-harness-designer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-13",
+      "prompt": "Review the whole database migration for deploy safety, RLS gaps and destructive operations.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is secure-migration-reviewer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "browser-boundary-reviewer-negative-14",
+      "prompt": "Review this actual diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "browser-boundary-reviewer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; browser-boundary-reviewer owns a different design task and must not take it over."
+    }
+  ]
+}

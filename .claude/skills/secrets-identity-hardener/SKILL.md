@@ -171,6 +171,9 @@ Handoff: security-pr-reviewer to verify; ops to complete rotations if pending.
 - [references/secret-classification-and-rotation.md](references/secret-classification-and-rotation.md)
   — the env-classification rubric, client-bundle exposure checks per bundler,
   rotation procedure, and least-privilege service-account patterns.
+- [references/credential-encryption.md](references/credential-encryption.md) —
+  stored-credential hash/KDF rules and the explicit migration residual
+  (extension for roadmap #104; status unchanged).
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `appsec-implementer`,
   `threat-modeler`, and `security-pr-reviewer`.
