@@ -1,38 +1,37 @@
-# Method record: retrieval engineering designer
+# Retrieval eval plan: retrieval-engineering-designer artifact
 
-Reference for the retrieval-engineering-designer skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+## 1. Retrieval design table
 
-## 1. Core model
+| Component | Decision | Alternatives | Metric/evidence |
+| --- | --- | --- | --- |
+| Chunking | semantic sections + 10% overlap, metadata retained | fixed-size, parent-child | chunk recall on golden queries |
+| Embedding | <model class rejected/accepted with cost> | dense-only, lexical-only | recall@k / cost per query |
+| Index | HNSW with tenant scoping | flat, IVF | latency at target load |
+| Fusion | RRF(dense, BM25) | weighted score, dense-only | nDCG@10 |
+| Reranking | cross-encoder top-50 (if budget) | no rerank, LLM rerank | precision@5, latency delta |
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+## 2. Relevance evaluation plan
 
-## 2. When this applies
+| Item | Specification |
+| --- | --- |
+| Golden set | source, size, strata (head/tail/ambiguous), labelling rule |
+| Metrics | recall@k, nDCG@10, MRR; per-tenant and global |
+| Baseline | current retrieval version + date |
+| Regression gate | no metric drop > <tolerance> vs baseline on PR/CI cadence |
+| Failure analysis | sample misses by cause (staleness, chunk boundary, lexical-only gap) |
 
-- Design semantic/hybrid retrieval quality: characterize corpus and query intents, choose a chunking and embedding plan, design dense/lexical fusion and reranking, build the relevance evaluation plan (golden sets, recall/precision, regression gate), analyze failure modes (staleness, ambiguity, poisoning surface) and hand authorization/leakage to the security owner; refuses live tuning or eval execution.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+## 3. Failure modes and handoffs
 
-## 3. Output and evidence rules
+| Failure mode | Detection | Mitigation | Owner |
+| --- | --- | --- | --- |
+| Stale index | freshness metric, update lag | reindex schedule, versioned docs | retrieval owner |
+| Ambiguous query | low-margin results | clarification/fallback rank | product/retrieval |
+| Poisoning surface | anomalous docs/ingest | ingest trust, provenance | rag-security-architect |
+| Authorization/leakage | cross-tenant results | retrieval-time authz | rag-security-architect |
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+## 4. Completion checklist
 
-## 4. Boundaries
-
-- rag security architect requests route to `rag-security-architect`; this skill does not perform that owner work.
-- search architecture designer requests route to `search-architecture-designer`; this skill does not perform that owner work.
-- ai evaluation harness requests route to `ai-evaluation-harness`; this skill does not perform that owner work.
-- model context designer requests route to `model-context-designer`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `ai-cost-guardrail-designer`, `ai-evaluation-harness`, `ai-misinformation-guard`, `ai-router-architect`, `ai-threat-modeler`, `caching-strategy-designer`, `data-quality-monitor-designer`, `hidden-context-exposure-reviewer`, `model-context-designer`, `multi-tenant-data-architect`, `prompt-injection-defender`, `rag-security-architect`, `search-architecture-designer`, `sensitive-disclosure-guard` (neighbours, not in-scope work).
-- No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.
+- [ ] Golden set exists or its construction plan does.
+- [ ] Metrics/thresholds/regression gate stated.
+- [ ] Security handoff to rag-security-architect recorded.
+- [ ] No live tuning/eval run claimed.

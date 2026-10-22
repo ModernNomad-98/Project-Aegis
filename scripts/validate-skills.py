@@ -225,6 +225,9 @@ COVERAGE_TOTALS = {
     "beyond_roadmap_skills": 83,
     "review_pending": 116,
 }
+# Owner triage decision Q1=A/Q2=A/Q3=yes (D107, 2026-10-21): rows
+# #254/#278 received their planning-gate decisions and no longer count as
+# awaiting confirmation; review_pending subtracts these resolved rows.
 COVERAGE_PLANNING_GATE_RESOLVED = frozenset({254, 278})
 COVERAGE_GAP_IDS = (
     233, 234,

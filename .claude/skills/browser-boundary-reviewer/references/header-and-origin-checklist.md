@@ -1,38 +1,37 @@
-# Method record: browser boundary reviewer
+# Header and origin checklist: browser-boundary-reviewer artifact
 
-Reference for the browser-boundary-reviewer skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+Use this checklist to produce the review. Every row records evidence (file/config line) or UNVERIFIED.
 
-## 1. Core model
+## 1. Header policy table
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+| Header | Required value for this app | Enforcement point | Observed | Status | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| Content-Security-Policy | default-src 'self'; frame-ancestors 'none'; object-src 'none' (tighten per asset inventory) | app middleware or CDN | <observed> | PASS/GAP/UNVERIFIED | <file:line> |
+| Strict-Transport-Security | max-age >= 15552000; includeSubDomains; preload only after audit | edge/CDN | <observed> | ... | ... |
+| X-Frame-Options / frame-ancestors | DENY or none (frame-ancestors preferred) | app or edge | <observed> | ... | ... |
+| Referrer-Policy | strict-origin-when-cross-origin or stricter | app or edge | <observed> | ... | ... |
+| Permissions-Policy | camera/microphone/geolocation disabled unless needed | app or edge | <observed> | ... | ... |
+| X-Content-Type-Options | nosniff | app or edge | <observed> | ... | ... |
 
-## 2. When this applies
+Conflicting enforcement points (app sets one value, CDN another) are a finding, not a pass.
 
-- Review a web application browser/origin boundary and security-header policy as one review: inventory every mutating endpoint, form and auth callback; assess cookie attributes and SameSite posture; build the CSRF defense matrix (token, origin check, custom header, SameSite) with bypass paths; produce a header policy table with enforcement point (application vs CDN/proxy) and required values; rank findings with evidence and list what could not be verified.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+## 2. CSRF defense matrix
 
-## 3. Output and evidence rules
+| Mutating endpoint | Method | Auth mechanism | Token | Origin/Referer check | Custom header | SameSite | Bypass paths noted |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| <form/route> | POST | session cookie | yes/no | yes/no | yes/no | Lax/Strict/None | <e.g. top-level GET form, JSON content-type, Origin absent> |
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+Every row with no defense is a finding. Token must be bound to the session, single-use where appropriate, and checked server-side.
 
-## 4. Boundaries
+## 3. Cookie/session posture
 
-- security pr reviewer requests route to `security-pr-reviewer`; this skill does not perform that owner work.
-- appsec implementer requests route to `appsec-implementer`; this skill does not perform that owner work.
-- cloud security baseline reviewer requests route to `cloud-security-baseline-reviewer`; this skill does not perform that owner work.
-- vite build qa engineer requests route to `vite-build-qa-engineer`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `appsec-implementer`, `authorization-matrix-designer`, `clickthrough-test-engineer`, `cloud-security-baseline-reviewer`, `code-reviewer`, `multi-tenant-security-tester`, `rls-policy-auditor`, `secrets-identity-hardener`, `secure-migration-reviewer`, `security-impact-note-author`, `security-pr-reviewer`, `security-regression-harness-designer`, `threat-modeler`, `vite-build-qa-engineer` (neighbours, not in-scope work).
-- No production, deployment, spending or approval authority is granted by this reference.
+| Cookie | Purpose | HttpOnly | Secure | SameSite | Domain/Path | Lifetime | Finding |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| <name> | session | yes/no | yes/no | Lax/Strict/None | <scope> | <duration> | <none/gap> |
 
-## 5. Validation before returning
+## 4. Review completion
 
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.
+- [ ] Every mutating endpoint, form and auth callback appears in sections 1-3 or is UNVERIFIED with the reason.
+- [ ] Header conflicts between app and CDN are called out with both sources.
+- [ ] Findings ranked by exploitability; unverified list is explicit.
+- [ ] No code changes are made by this review; implementation goes to the manual-only owner.

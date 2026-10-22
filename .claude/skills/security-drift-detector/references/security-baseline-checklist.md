@@ -1,38 +1,40 @@
-# Method record: security drift detector
+# Security baseline checklist: security-drift-detector artifact
 
-Reference for the security-drift-detector skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+## 1. Baseline record
 
-## 1. Core model
+| Item | Value |
+| --- | --- |
+| Baseline source | <audit/review/config snapshot path + hash> |
+| Baseline date | <YYYY-MM-DD> |
+| Scope | <areas and controls covered> |
+| Out of scope | <explicitly not covered; becomes UNVERIFIED> |
+| Baseline authority | <owner who can re-baseline> |
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+## 2. Control comparison
 
-## 2. When this applies
+| Control | Expected (baseline) | Current (evidence) | Classification | Criticality | Owner/action |
+| --- | --- | --- | --- | --- | --- |
+| Password KDF cost | Argon2id cost params recorded | <observed config/code> | SAME / REMOVED / NARROWED / DEFAULT-CHANGED / UNDOCUMENTED / EXPIRED | H/M/L | <owner + action> |
+| RLS tenant predicate | policy present on all tenant tables | <observed> | ... | ... | ... |
+| Auth session revocation | server-side revocation | <observed> | ... | ... | ... |
+| CI security job | SAST blocking on changed code | <observed> | ... | ... | ... |
 
-- Detect security drift against a recorded baseline: select and record the baseline, compare control by control, classify weakening (removed, narrowed, default-changed, unowned), detect undocumented changes and expiry/staleness, attach evidence and an owner/action per finding, and recommend re-baselining; read-only, no live probing.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+Rules: cite evidence for both columns; never mark SAME without current evidence; planned change must cite its change record.
 
-## 3. Output and evidence rules
+## 3. Weakening classes
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+| Class | Definition | Example |
+| --- | --- | --- |
+| REMOVED | control no longer exists | security job deleted |
+| NARROWED | control applies to fewer cases | RLS predicate missing on new table |
+| DEFAULT-CHANGED | framework/plan default weakened | debug mode enabled |
+| UNDOCUMENTED | change without a change record | policy edited silently |
+| EXPIRED | evidence or control past its review date | stale audit baseline |
 
-## 4. Boundaries
+## 4. Completion checklist
 
-- security pr reviewer requests route to `security-pr-reviewer`; this skill does not perform that owner work.
-- rls policy auditor requests route to `rls-policy-auditor`; this skill does not perform that owner work.
-- agent governance audit requests route to `agent-governance-audit`; this skill does not perform that owner work.
-- compliance evidence collector requests route to `compliance-evidence-collector`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `agent-governance-audit`, `agent-memory-governance`, `audit-log-architect`, `change-classification-gate`, `cloud-security-baseline-reviewer`, `code-reviewer`, `compliance-evidence-collector`, `iac-reviewer`, `local-ci-mirror-preflight`, `rls-policy-auditor`, `secure-migration-reviewer`, `security-pr-reviewer`, `source-of-truth-reconciler`, `threat-modeler` (neighbours, not in-scope work).
-- No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.
+- [ ] Baseline recorded with source/date/scope.
+- [ ] Every difference has both-sides evidence.
+- [ ] Planned changes cite their change record.
+- [ ] Unowned/expired controls are surfaced with owner/action.
+- [ ] Re-baseline recommendation is stated; no live probing performed.

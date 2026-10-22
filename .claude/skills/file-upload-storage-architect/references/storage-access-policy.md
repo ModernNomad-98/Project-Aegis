@@ -12,7 +12,9 @@ Reference for the `file-upload-storage-architect` skill (extension-only bundle; 
 ## Signed-URL residual (explicit)
 
 - A signed URL is a bearer capability for its lifetime: bound its TTL, scope it to one object and one method, and treat a leaked URL as an access event.
-- Residual, named rather than hidden: a signed URL cannot be un-issued, so revocation is TTL-bound; path/tenant scoping must be enforced at issuance.
+- Residual, named rather than hidden: **per-URL revocation is usually unavailable**, so normal expiry is TTL-bound; path/tenant scoping must be enforced at issuance.
+- **Emergency invalidation (required when a URL leaks):** use a provider-supported control before TTL expiry - delete or rename the object (breaks that URL), change the object/bucket access policy or public-access setting, rotate/disable the signing credential or CDN signing key, or purge the signed-cookie/key path. Record the collateral: other live links/usages that stop working, cache purge/replication lag, and the audit event that records who invalidated what and when. Test one emergency path in a non-production environment and state the measured time-to-invalidate.
+- Keep the TTL short (minutes, not hours) for high-sensitivity objects; a long TTL makes the emergency path the only real control.
 - PII/tenant content stored in objects follows the `pii-lifecycle-designer` masking and retention rules.
 
 ## Boundaries

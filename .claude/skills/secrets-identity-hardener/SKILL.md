@@ -44,6 +44,8 @@ changes through human approval.
 
 ## Inputs to Inspect
 
+- Stored-credential rows and their migration state (password hashes, API-key/token hashes or envelopes, active rotation versions) when the ask is stored-credential hardening or legacy-hash migration; inspect schema/config only, never the secret values.
+
 1. Where secrets currently live: source files, committed `.env`, config,
    CI/CD variables, IaC, container images. Find them before moving them.
 2. The client build config: bundler env-exposure rules (`VITE_`,
@@ -59,6 +61,8 @@ changes through human approval.
    still-valid committed secret needs rotation, not just deletion).
 
 ## Workflow
+
+1. When stored credentials are in scope, inventory hash/KDF algorithm, per-record salt, cost parameters, keyed-hash/envelope storage and legacy-row count; design the rehash-on-login or offline migration path and its completion check (zero legacy rows) before claiming completion. Treat an incomplete migration as a named residual with an owner.
 
 1. **Inventory and classify.** List every secret and env var; classify each:
    public (safe for client), server-only, CI-only, deploy-only. Anything
@@ -92,6 +96,8 @@ changes through human approval.
 
 ## Output Format
 
+- Stored-credential hardening report: algorithm/cost inventory, migration path and completion check, named residual rows, and rotation/envelope rules.
+
 ```
 SECRETS & IDENTITY HARDENING — <app/scope>
 Env classification: <var — public | server-only | CI-only | deploy-only>
@@ -108,6 +114,8 @@ Handoff: security-pr-reviewer to verify; ops to complete rotations if pending.
 ```
 
 ## Validation Checklist
+
+- [ ] Stored credentials (if in scope): KDF is Argon2id/scrypt or bcrypt-with-upgrade-plan; migration residual counted and owned; completion check defined.
 
 - [ ] Every secret and env var classified; client-reachable server secrets
       identified.

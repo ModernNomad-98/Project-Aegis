@@ -64,6 +64,20 @@
           "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names secrets-identity-hardener, not ai-router-architect, because moving and rotating a leaked key is remediation, not gateway or routing design."
         ]
       }
+    },
+    {
+      "id": "stored-credential-migration",
+      "type": "should_trigger",
+      "prompt": "Our legacy password hashes still use a weak algorithm and some API tokens are stored reversibly. Design the stored-credential hardening and migration plan safely.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inspects the stored-credential scheme (KDF/hash algorithm, salt, cost parameters, envelope usage) without reading or printing secret values.",
+          "Prefers Argon2id (or scrypt) as memory-hard and describes bcrypt only as legacy with cost factor and upgrade path; never calls bcrypt memory-hard.",
+          "Designs rehash-on-login and/or offline migration with an explicit completion check (zero legacy rows) and a named residual owner.",
+          "Covers keyed hashing/envelope rules for tokens and states rotation/versioning; claims no production change execution."
+        ]
+      }
     }
   ]
 }

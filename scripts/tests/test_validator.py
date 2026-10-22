@@ -2773,7 +2773,7 @@ def test_coverage_map_batch2_deliveries():
     area02 = [line for line in mmd.splitlines()
               if line.startswith("| 02 ")]
     assert area02 and area02[0].strip().endswith("| 35 | 23 | 4 | 8 | 0 |"), (
-        "coverage summary area 02 row must show 35 entries / 22 shipped / 4 "
+        "coverage summary area 02 row must show 35 entries / 23 shipped / 4 covered / 8 partial / 0 GAP"
         "covered / 9 partial / 0 GAP")
     reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
                       / "step-0-reconciliation-v4.md").read_text(
@@ -3065,7 +3065,7 @@ def test_coverage_map_batch4_deliveries():
 
 
 def test_coverage_map_batch5_deliveries():
-    """T41: the 7 Batch 5 skills deliver the 9 accepted rows and the 5 extension items."""
+    """T41: the 7 Batch 5 skills deliver 9 rows + 3 extension bundles covering five extension-only rows."""
     mapping = {
         110: "browser-boundary-reviewer",
         120: "browser-boundary-reviewer",
@@ -3169,6 +3169,107 @@ def test_coverage_map_batch5_deliveries():
         assert ref in skill_md, (skill, ref)
 
 
+    # The five extension-only roadmap rows keep their status/covering set; the
+    # three bundles (E1-E3) cover them without a coverage-map status change.
+    ext = {
+        231: ("PARTIAL", "capability-review", ["saas-timezone-architect"]),
+        232: ("PARTIAL", "capability-review",
+              ["notification-webhook-ux-designer"]),
+        233: ("GAP", "none", []),
+        234: ("GAP", "none", []),
+        115: ("PARTIAL", "capability-review",
+              ["file-upload-storage-architect", "rls-policy-auditor"]),
+    }
+    for row_id, (status, grade, covering) in ext.items():
+        row = rows[row_id]
+        assert (row["status"], row["evidence_grade"]) == (status, grade), (
+            row_id, row)
+        assert row["covering_skills"] == covering, (row_id, row)
+    e1 = (validator.REPO_ROOT / ".claude" / "skills" / "test-plan-designer"
+          / "references" / "qa-scenario-extensions.md").read_text(
+              encoding="utf-8")
+    for needle in ("#232 - Notification QA Strategy",
+                   "#234 - Export QA Strategy",
+                   "notification-webhook-ux-designer",
+                   "export-pipeline-architect"):
+        assert needle in e1, needle
+    e2 = (validator.REPO_ROOT / ".claude" / "skills"
+          / "file-upload-storage-architect" / "references"
+          / "storage-access-policy.md").read_text(encoding="utf-8")
+    assert "Emergency invalidation" in e2
+    assert "rotate/disable the signing credential" in e2
+    e3 = (validator.REPO_ROOT / ".claude" / "skills"
+          / "secrets-identity-hardener" / "references"
+          / "credential-encryption.md").read_text(encoding="utf-8")
+    assert "Argon2id" in e3
+    assert "bcrypt is CPU-hard, not memory-hard" in e3
+    secrets_skill = (validator.REPO_ROOT / ".claude" / "skills"
+                     / "secrets-identity-hardener" / "SKILL.md").read_text(
+                         encoding="utf-8")
+    assert "Stored-credential" in secrets_skill
+    assert "credential-encryption.md" in secrets_skill
+    secrets_evals = json.loads(
+        (validator.REPO_ROOT / ".claude" / "skills"
+         / "secrets-identity-hardener" / "evals" / "evals.json").read_text(
+             encoding="utf-8"))["cases"]
+    assert any(case.get("id") == "stored-credential-migration"
+               for case in secrets_evals)
+    # Complete registration descriptions (no mid-word truncation): the purpose
+    # sentence appears in full in both human-facing registration surfaces.
+    readme_text = (validator.REPO_ROOT / "README.md").read_text(
+        encoding="utf-8")
+    catalog_text = (validator.REPO_ROOT / "docs"
+                    / "skills-catalog.md").read_text(encoding="utf-8")
+    for name in sorted(expected_names):
+        skill_md = (validator.REPO_ROOT / ".claude" / "skills" / name
+                    / "SKILL.md").read_text(encoding="utf-8")
+        purpose = skill_md.split("## Purpose\n\n", 1)[1].split(
+            "\n\n", 1)[0].strip()
+        assert purpose in readme_text, (name, "README purpose incomplete")
+        assert purpose in catalog_text, (name, "catalog purpose incomplete")
+
+def test_coverage_map_batch5_covering_owner_assumptions():
+    """T42: distinct/beyond pins rest on the covering-owner set; no silent drift."""
+    payload = json.loads(
+        validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    rows = {entry["id"]: entry for entry in payload["entries"]}
+    mapping = {
+        110: "browser-boundary-reviewer",
+        120: "browser-boundary-reviewer",
+        108: "authentication-flow-reviewer",
+        130: "security-drift-detector",
+        224: "defect-triage-facilitator",
+        225: "defect-triage-facilitator",
+        236: "branching-strategy-designer",
+        75: "import-pipeline-architect",
+        150: "import-pipeline-architect",
+    }
+    for row_id, skill in mapping.items():
+        assert rows[row_id]["covering_skills"] == [skill], row_id
+    covering = set()
+    for entry in payload["entries"]:
+        covering.update(entry["covering_skills"])
+    assert "human-agent-trust-reviewer" not in covering
+    assert "docs-as-code-architect" not in covering
+    for name in ("browser-boundary-reviewer",
+                 "authentication-flow-reviewer", "security-drift-detector",
+                 "defect-triage-facilitator",
+                 "branching-strategy-designer", "import-pipeline-architect"):
+        assert name in covering, name
+    assert "retrieval-engineering-designer" not in covering
+    manifest = json.loads(
+        validator.MANIFEST_PATH.read_text(encoding="utf-8"))
+    manifest_names = {entry["name"] for entry in manifest["skills"]}
+    assert len(covering) == 167
+    assert len(manifest_names - covering) == 83
+    assert len(covering) == validator.COVERAGE_TOTALS[
+        "distinct_covering_skills"]
+    assert len(manifest_names - covering) == validator.COVERAGE_TOTALS[
+        "beyond_roadmap_skills"]
+
+
+
+
 def test_skills_manifest_provenance():
     """T36: manifest paths exist AND hash-match at source_revision and tree."""
     manifest = json.loads(
@@ -3255,6 +3356,7 @@ TESTS = [
     test_coverage_map_step0_hygiene,
     test_coverage_map_batch4_deliveries,
     test_coverage_map_batch5_deliveries,
+    test_coverage_map_batch5_covering_owner_assumptions,
     test_skills_manifest_provenance,
     test_coverage_map_planning_gate_resolved,
     test_coverage_map_malformed_id_does_not_crash,

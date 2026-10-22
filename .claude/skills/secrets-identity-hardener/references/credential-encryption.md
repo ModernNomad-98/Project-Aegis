@@ -4,7 +4,7 @@ Reference for the `secrets-identity-hardener` skill (extension-only bundle; #104
 
 ## Stored credentials
 
-- Passwords: memory-hard KDF (Argon2id or bcrypt-equivalent per platform) with per-record salt, stated cost parameters and a rehash-on-login upgrade path.
+- Passwords: **memory-hard KDF preferred - Argon2id** (or scrypt) with per-record salt, stated cost parameters and a rehash-on-login upgrade path. **bcrypt is CPU-hard, not memory-hard** (small fixed memory footprint); accept bcrypt only as a legacy/compatibility choice with an explicit cost factor and an upgrade plan, and never describe it as memory-hard.
 - API keys/tokens: store a keyed hash or encrypted envelope, never reversible plaintext; show only once at creation and keep a fingerprint for support.
 - Encryption at rest is a second layer, not a substitute for hashing secrets that should never be recoverable.
 - Rotation: keep two active versions with an expiry, record which records use which version, and re-wrap/rotate before disabling a version.

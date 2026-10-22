@@ -1,38 +1,37 @@
-# Method record: branching strategy designer
+# Branching decision model: branching-strategy-designer artifact
 
-Reference for the branching-strategy-designer skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+## 1. Decision record
 
-## 1. Core model
+| Item | Value |
+| --- | --- |
+| Context | team size, release cadence, hotfix needs, CI gates |
+| Chosen model | trunk-based with short-lived branches / release branches / hybrid |
+| Alternatives considered | <option + why rejected> |
+| Migration risk | <open branches, release freeze, queue changes> |
+| Decision owner | <named human owner> |
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+## 2. Rule table
 
-## 2. When this applies
+| Rule | Specification | Enforcement | Owner |
+| --- | --- | --- | --- |
+| Branch naming | type/issue-slug, short-lived | CI/name check | <owner> |
+| Protection | main requires PR + review + green aggregate | repo settings (owner action) | <owner> |
+| Review | 1-2 reviewers by change class | contribution guide | <owner> |
+| Merge method | squash for feature PRs; merge commits for release syncs | merge queue/policy | <owner> |
+| Hotfix | branch from release tag, cherry-pick to main, re-tag | release runbook | <owner> |
+| Release | tag from main or release branch by cadence | release readiness gate | <owner> |
 
-- Design and record a repository branching and release flow: choose trunk-based or branch/release branching with alternatives and rejected options, define branch naming/protection/review rules, merge method and queue, release and hotfix flow, migrate from the current model with safe defaults and risks; refuses to change repository settings or invent team constraints.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+## 3. Alternatives and rejected options
 
-## 3. Output and evidence rules
+| Option | Fit | Why rejected/accepted |
+| --- | --- | --- |
+| Trunk-based + short-lived branches | one deployable main, fast feedback | accepted when CI is fast and feature flags exist |
+| Release branches | regulated/versioned releases | rejected if no long support windows, adds sync overhead |
+| GitFlow | heavy release trains | rejected for small teams; merge burden |
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+## 4. Migration and completion
 
-## 4. Boundaries
-
-- ci pipeline architect requests route to `ci-pipeline-architect`; this skill does not perform that owner work.
-- contribution guide author requests route to `contribution-guide-author`; this skill does not perform that owner work.
-- merge is deploy governance requests route to `merge-is-deploy-governance`; this skill does not perform that owner work.
-- release readiness reviewer requests route to `release-readiness-reviewer`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `ai-sdlc-operating-model`, `change-classification-gate`, `ci-pipeline-architect`, `code-reviewer`, `contribution-guide-author`, `environment-parity-reviewer`, `human-approval-boundary`, `local-ci-mirror-preflight`, `merge-is-deploy-governance`, `phased-work-handoff-designer`, `release-readiness-reviewer`, `reviewable-diff-discipline`, `rollback-runbook-author`, `scoped-approval-register` (neighbours, not in-scope work).
-- No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.
+- [ ] Migration steps ordered (announce, adapt protection, migrate open branches, enable queue).
+- [ ] Rollback of the process change stated.
+- [ ] Risks/open constraints recorded.
+- [ ] No settings changed by this skill; owner executes.

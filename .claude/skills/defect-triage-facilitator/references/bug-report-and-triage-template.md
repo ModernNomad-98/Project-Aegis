@@ -1,38 +1,38 @@
-# Method record: defect triage facilitator
+# Bug report and triage template: defect-triage-facilitator artifact
 
-Reference for the defect-triage-facilitator skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+## 1. Bug report fields
 
-## 1. Core model
+| Field | Required content | Missing-field behaviour |
+| --- | --- | --- |
+| Summary | one-line observed vs expected | rewrite, mark assumptions |
+| Reproduction | ordered steps, data/role/environment | UNKNOWN if not supplied |
+| Expected vs actual | observable outcomes | UNKNOWN |
+| Environment | build/version, tenant, browser/device | UNKNOWN |
+| Evidence | logs, screenshots, trace ids | required for severity > S3 |
+| Suspected area | component/service if known | optional |
+| Impact | frequency, affected users/tenants | UNKNOWN if not supplied |
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+## 2. Triage axes
 
-## 2. When this applies
+| Axis | Levels | Rationale requirement |
+| --- | --- | --- |
+| Severity | S1 blocking/data-loss/security, S2 major, S3 minor, S4 cosmetic | cite consequence and evidence |
+| Frequency | always, common, intermittent, rare | cite observations |
+| Customer impact | all tenants, some tenants, single account, internal | cite affected scope |
+| Security | security-flagged, potential, not-security | route if flagged |
+| Release risk | must-fix, fix-in-next, defer with owner | cite release context |
 
-- Facilitate consistent defect reporting and triage: complete the bug report (repro steps, expected vs actual, environment, evidence, suspected area), rank defects by severity, frequency, customer impact, security and release risk with explicit rationale, assign one owner and next action per decision, and route security/release-risk findings; refuses invented facts and fixes.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+## 3. Decision record
 
-## 3. Output and evidence rules
+| Defect | Axes result | Owner | Next action | Assumptions/unknowns |
+| --- | --- | --- | --- | --- |
+| <id> | <S2 / common / some tenants / not-security / fix-in-next> | <name> | <reproduce, then fix in owner cycle> | <missing env> |
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+Rules: no invented facts, no fix promise, no release date the triage cannot authorize.
 
-## 4. Boundaries
+## 4. Completion checklist
 
-- ci failure classifier requests route to `ci-failure-classifier`; this skill does not perform that owner work.
-- systematic debugger requests route to `systematic-debugger`; this skill does not perform that owner work.
-- regression suite curator requests route to `regression-suite-curator`; this skill does not perform that owner work.
-- release readiness reviewer requests route to `release-readiness-reviewer`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `acceptance-criteria-reviewer`, `ai-closeout-reporter`, `ci-failure-classifier`, `clickthrough-test-engineer`, `exploratory-charter-designer`, `flaky-test-detective`, `manual-test-case-creator`, `qa-strategy-architect`, `regression-suite-curator`, `release-readiness-reviewer`, `screenshot-evidence-planner`, `systematic-debugger`, `test-coverage-mapper`, `test-plan-designer` (neighbours, not in-scope work).
-- No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.
+- [ ] Report complete or UNKNOWN-labelled.
+- [ ] Every decision cites axes + rationale.
+- [ ] One owner + one next action per defect.
+- [ ] Security/release-risk routed; duplicates recorded.
