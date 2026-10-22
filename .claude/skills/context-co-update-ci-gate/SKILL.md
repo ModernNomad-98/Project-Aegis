@@ -152,6 +152,7 @@ Wiring handoff:               <to ci-pipeline-architect/human; required-check
   conditional-skip logic can strand branch protection; prefer feeding an
   aggregate gate where that pattern exists (see
   `sharded-validation-with-resume`).
+   Skip semantics are defined once by sharded-validation-with-resume: the aggregate gate treats a skipped shard as satisfied only when the recorded docs-only skip predicate was validated; mixed states fail the aggregate and required job names never change.
 
 ## Stop Conditions
 

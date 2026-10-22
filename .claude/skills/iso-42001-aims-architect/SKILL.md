@@ -40,6 +40,7 @@ This skill's design routes were originally labelled by library build phase —
 **Phase 1.5** (the AI software development lifecycle governance skills) and
 **Phase 7** (the AI security and large language model systems pack). Those
 labels are catalog history; the Workflow and Inputs above now name the packs
+These packs are a starting-point mapping candidate, not complete coverage: the AIMS maps shipped mechanisms and the organisation supplies operating evidence; no fixture may assert complete control coverage.
 directly.
 
 ## Use When

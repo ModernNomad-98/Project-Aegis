@@ -113,7 +113,7 @@ person runs that skill by name; it is never invoked automatically.
    the terms (including input/output tokens, reservation, and true-up), show
    the reason for each viable option, its benefits and drawbacks, and its
    estimated per-call and monthly cost at the inspected call volume. Use
-   verified current prices or mark the dollar estimate unknown; do not invent
+verified current prices or mark the dollar estimate unknown (generic guardrails are provider-independent; any provider-specific verification must name provider, model, price source and date before a figure is presented as measured)
    prices or imply that a request-count cap bounds spend. Recommend a tier
    and limits with the workload evidence that supports them. Without verified
    provider unit prices, only provisional token/volume limits can be chosen;

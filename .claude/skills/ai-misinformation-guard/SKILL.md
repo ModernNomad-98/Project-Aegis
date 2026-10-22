@@ -87,6 +87,7 @@ high-impact outputs to human oversight.
 6. **Handle package/API hallucination.** For features that suggest
    dependencies, APIs, commands, or config: recommended packages/APIs are
    verified to exist (registry/allowlist) before being surfaced or installed —
+    Package identity/provenance rule: capture source/package identity, ownership and provenance before use; an unverified package/identity is downgraded to a hypothesis and never treated as a verified source. The reference and the package-hallucination fixture assert the same rule.
    an invented package name is a supply-chain foothold (slopsquatting). Route
    install-time trust to `supply-chain-security-reviewer`.
 7. **Design overreliance-aware UX.** Signal confidence, show sources, and mark

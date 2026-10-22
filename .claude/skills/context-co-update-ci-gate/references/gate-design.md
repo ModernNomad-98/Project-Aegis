@@ -58,6 +58,8 @@ Placement rule: where the repo runs a single **aggregate required check**
 of registering its own required name — one more required job name is one
 more thing conditional skips can strand.
 
+Skip semantics are defined once by sharded-validation-with-resume: a skipped shard satisfies the aggregate only when the recorded docs-only predicate was validated; mixed states fail and required names never change.
+
 ## Failure message template
 
 ```

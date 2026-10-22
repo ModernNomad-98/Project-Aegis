@@ -53,7 +53,8 @@
         "assertions": [
           "Diagnoses the anti-pattern: per-shard required checks break under conditional skips.",
           "Prescribes the aggregate-gate shape: one always()-running gate job as the sole required check, explicitly evaluating shard results — skipped satisfies only when the tier selector said docs-only; skipped on a full-tier run FAILS.",
-          "Keeps branch protection referencing only the stable aggregate name."
+          "Keeps branch protection referencing only the stable aggregate name.",
+          "Covers the mixed state: documented docs-only skips satisfy the aggregate only under the recorded docs-only predicate; a documented-plus-code mixed PR must fail the aggregate rather than inheriting the skip."
         ]
       }
     },

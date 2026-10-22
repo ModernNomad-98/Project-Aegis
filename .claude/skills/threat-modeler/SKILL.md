@@ -40,8 +40,8 @@ as a hypothesis without automatically reducing its potential impact.
   that is `tenant-isolation-reviewer`.
 - Do NOT use when: triaging SAST/scanner findings — `static-analysis-reviewer`.
 - Do NOT use when: the threats are AI/LLM-specific (prompt injection, RAG
-  authorization, excessive agency) — that is the Phase 7 pack; note the gap
-  rather than improvising coverage here.
+  authorization, excessive agency) - use ai-threat-modeler (the shipped AI
+  threat-model owner); note the boundary rather than improvising here.
 
 ## Inputs to Inspect
 

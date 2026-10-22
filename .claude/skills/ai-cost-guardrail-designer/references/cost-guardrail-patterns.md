@@ -105,6 +105,7 @@ denial-of-wallet vector (CWE-636, "Not Failing Securely").
 ## Provider-side backstop
 
 Application controls are not the last line of defense — the provider account
+Provider-specific verification preconditions: name provider, model, price source and date; without all four the figure is generic guidance, never measured data.
 itself needs a backstop:
 
 - **Account controls** — verify the chosen provider's current spend-limit,

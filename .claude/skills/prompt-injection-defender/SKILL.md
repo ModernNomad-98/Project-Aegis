@@ -109,9 +109,9 @@ and security-relevant.
    instruction-following-the-document signatures, and anomaly signals — each
    labeled as detection, not prevention.
 6. **Handle indirect injection specifically.** For retrieved/tool content,
-   treat EVERY document as hostile: no "trusted source" exemptions without a
-   provenance guarantee; consider content provenance labeling and per-source
-   trust levels. Cross-reference `rag-security-architect` for retrieval.
+   treat EVERY document as hostile: no trusted-source exemption is granted unless a provenance guarantee is established and recorded, and provenance never promotes content to instructions;
+   consider content provenance labeling and per-source trust levels consistently in this skill
+   and the reference. Cross-reference
 7. **Handle multimodal injection.** Every modality is untrusted data, the
    same as text from the same source; a visual or spoken instruction gets
    no more authority than a typed one. Apply, per ingestion path:

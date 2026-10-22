@@ -41,7 +41,7 @@ Memory is a lead, not truth. Before any action premised on remembered state:
 | Branch exists / current branch | `git branch -a`, `git branch --show-current` |
 | What merged to main / repo baseline | `git log --oneline -20 origin/main`, validator output |
 | File / flag / command still exists | direct check before recommending it |
-| Completion anchor ("X complete, PR #n, SHA") | `gh pr view <n> --json state,mergeCommit`; `git merge-base --is-ancestor <sha> origin/main`; not since reverted: `git log --oneline -i origin/main --grep="<sha>" --grep="revert.*#<n>"` returns nothing; each cited migration id shown as applied by the migration tool's read-only status |
+| Completion anchor ("X complete, PR #n, SHA") | gh pr view n --json state,mergeCommit; git merge-base --is-ancestor SHA origin/main; revert check: inspect the reverted paths with git show REVERT_SHA --stat and git log --oneline -i origin/main --grep=SHA --grep=revert, pass only when the reverted paths are absent from the current tree; evidence artifact = the two command outputs, owner = the checking agent. Commit-message search alone is not current-fact evidence. |
 | Auto-merge / protection posture | `gh pr view <n> --json autoMergeRequest`, repo settings |
 
 On divergence: live state wins, act on it, queue the memory correction. If the

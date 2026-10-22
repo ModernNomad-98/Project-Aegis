@@ -63,7 +63,7 @@ Cascade check, leaf → root:
   at each join; include allowed retries and backoff at their owning layer
 Violations to hunt:
   - 30s defaults inside sub-second paths (bug by inheritance)
-  - upstream < downstream×retries (abandons work that completes — waste + failure)
+  - upstream timeout < critical path (initial attempt + retries + backoff + downstream work); downstream x retries alone is not the deadline
   - infinite/no timeout anywhere on a budgeted path (unbounded spend)
 ```
 
@@ -74,6 +74,8 @@ retry_cost(hop) = P(retry) × (backoff + budget(hop))
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
 Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)
+
+Worked example: 2 retries at each of two layers = (1+2)(1+2) = 9 attempts on the critical path; the deadline must include the initial attempt and backoff, not just the retry count.
 attempts — the storm multiplier; the design names the single retry layer.
 ```
 

@@ -51,8 +51,9 @@ Turn this into an automated check (test or CI step) so it stays enforced.
    grant; obtain missing rotation scope before touching live systems.
 3. Issue a new credential in the provider/secret manager.
 4. Update the secret store / deploy config to the new value.
-5. Verify the app works on the new credential; verify the OLD credential is
-   rejected where testable.
+5. Verify the NEW credential works (this alone is never proof of revocation).
+6. Revoke the OLD credential under the applicable grant.
+7. Prove the OLD credential is rejected where testable, then capture residual consumers/failures and record them.
 6. Revoke the old credential.
 7. If the old secret is in git history, treat history purge (BFG/filter-repo)
    as a separate action whose scope must be covered by an applicable active

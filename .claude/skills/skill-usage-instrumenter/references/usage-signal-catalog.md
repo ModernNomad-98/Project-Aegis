@@ -10,7 +10,7 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 | Field | Type | Notes |
 | --- | --- | --- |
 | `skill` | name (enum: shipped list) | The activated skill |
-| `mode` | `auto` \| `explicit` | Trigger-matched vs named by the user |
+| activation_mode | auto \| explicit | Trigger-matched vs named by the user (invocation event only) |
 | `at` | date (day precision suffices) | Finer precision adds risk, not value |
 | `task_class` | small fixed enum (e.g. `build`, `review`, `audit`, `design`, `debug`, `other`) | Never free text |
 | `session_ref` | opaque id | Correlation only; carries no content |
@@ -21,7 +21,7 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 | --- | --- | --- |
 | `fired` | skill name | What activated |
 | `redirected_to` | skill name \| `none` | What the user invoked instead |
-| `mode` | `overridden` \| `abandoned` | Redirected vs simply stopped |
+| correction_outcome | overridden \| abandoned | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
 
 ### Completion hint
 
@@ -40,7 +40,7 @@ window or insufficient exposure; do not count pre-ship days as zero fires.
 | Captured | Never captured (any tier, any reason) |
 | --- | --- |
 | Skill names (shipped enum) | Prompt text or fragments |
-| Fixed enums (`mode`, `task_class`, `outcome`) | Response/output content |
+| Fixed enums (activation_mode, correction_outcome, task_class, outcome) | Response/output content |
 | Day-precision dates | User identifiers (names, emails, accounts) |
 | Opaque session ids | Live product, company, repo, or path names |
 | Counts and derived rates | Anything requiring redaction before commit |

@@ -60,6 +60,7 @@ creative tasks.
   repeatedly, which attackers pre-register (slopsquatting).
 - Before recommending or installing a package, API, or command, verify its
   identity, ownership and provenance against an approved allowlist and an
+  provenance captured; an unverified package/identity is downgraded to a hypothesis and never treated as a verified source.
   authoritative source. Registry existence alone is insufficient because
   an attacker may pre-register the hallucinated name.
 - Route install-time trust to `supply-chain-security-reviewer`.

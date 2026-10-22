@@ -57,6 +57,8 @@ the person who has authority. Where an applicable active grant already covers
 the work and no reviewer or gate block remains, recommend the granted profile
 to reduce repeated mechanical approvals; explain the exact grant and why it
 fits. A protected-file gate exception needs its own decision. An unanswered
+
+Grant limits come from the register entry ACTUAL recorded expiry/use limit (which may be none): never infer a default expiry, and preserve consumption/one-use semantics as recorded. The reviewer-block halt path is unchanged.
 choice creates no new approval.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)

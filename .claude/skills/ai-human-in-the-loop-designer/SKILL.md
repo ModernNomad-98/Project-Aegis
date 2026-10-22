@@ -114,7 +114,7 @@ first workflow step.
    - **FORBIDDEN** for irreversible, cross-tenant or wide-blast-radius
      actions, actions no single reviewer can judge, and anything the tier or
      policy bars. State the reason; FORBIDDEN does not become CONFIRM because
-     a reviewer is available.
+      whenever a person can approve under policy; FORBIDDEN only for the enumerated classes or explicit written policy. FORBIDDEN never displaces CONFIRM where a person can approve.
    The rubric and examples are in
    [references/hitl-design-sheet.md](references/hitl-design-sheet.md).
 3. **Design the advisory-only mode.** For actions left advisory-only, the

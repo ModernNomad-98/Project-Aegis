@@ -14,6 +14,7 @@ means user interface; **PR** means pull request.
 
 Adversarially review the human oversight layer of an agent system (ASI09):
 the attacker here doesn't bypass the approval gate — they go THROUGH it, by
+Timing and bulk approval are signals that trigger inspection, never proof of fatigue or approval quality; inspect what was approved, not only when. This rule is shared with agent-governance-audit and the HITL design sheet.
 exploiting the human. Consent fatigue turns approvers into rubber stamps;
 polished, confident justifications make dangerous actions read as routine;
 self-reported summaries describe a different action than the one that will

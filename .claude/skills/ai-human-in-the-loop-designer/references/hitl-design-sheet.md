@@ -76,6 +76,8 @@ Schema, storage and retention are designed by `audit-log-architect`.
 
 ## 5. Consent-fatigue signals
 
+Timing/bulk approval is a signal that triggers inspection, never proof of fatigue or approval quality (shared rule with agent-governance-audit and human-agent-trust-reviewer).
+
 - CONFIRM volume per reviewer per hour against the budget set in the design.
 - Approval rate per reviewer; near 100% over a long window is a warning.
 - Median time to decision; seconds-long decisions on complex items mean the

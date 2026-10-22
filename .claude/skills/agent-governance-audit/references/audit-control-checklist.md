@@ -44,6 +44,8 @@ whichever matches the repo's merge strategy — a squash-merge repo emits
   verdict at CONDITIONAL.
 - Overall: PASS only if all applicable controls PASS; any FAIL → FAIL.
 
+Timing and bulk approval are signals that trigger inspection, never proof of fatigue, rubber-stamping or approval quality (shared rule with human-agent-trust-reviewer and the HITL design sheet).
+
 ## Known evidence traps
 
 - `mergedBy` shows who (or what) executed the merge, not who DECIDED it — the

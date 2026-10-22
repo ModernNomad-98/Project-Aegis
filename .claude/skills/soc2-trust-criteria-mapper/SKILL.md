@@ -28,8 +28,8 @@ onto existing mechanisms via `compliance-control-foundation` and
 `multi-framework-crosswalk` (the premise of D9, the library's Compliance &
 Governance batch decision that shipped this compliance pack: for an org with
 the shipped Phase 3 (software-as-a-service and tenant isolation) and Phase 4
-(security, row-level security and supply-chain) packs, much of the Security
-category exists — the work is
+packs are a STARTING-POINT mapping candidate, not complete coverage; operating evidence decides, so the Security
+category is mapped, not asserted complete; the work is
 mapping, the system description, and the evidence window). Window
 evidence design hands to `compliance-evidence-collector`.
 
@@ -94,7 +94,7 @@ purchase.
    confidential-data commitments — `tenant-isolation-reviewer`,
    `secrets-identity-hardener` *(manual-only)*), Processing Integrity (processing
    completeness/accuracy commitments), Privacy (personal-information
-   commitments — `sensitive-disclosure-guard` surface). Record WHY each
+sensitive-disclosure-guard surface; pii-lifecycle-designer owns notice/choice/access/disposal lifecycle - names both owners with a scope boundary, no double ownership). Record WHY each
    category is in or out; "more categories looks better" is an
    anti-pattern that multiplies criteria and evidence.
 4. **Decide Type 1 vs Type 2.** Type 1: design as of a date — faster

@@ -14,7 +14,8 @@
           "States the minimization rules as invariants: no prompt text, no response content, no user identifiers, no live product/repo names; applies the publishable-in-repo test.",
           "Assigns evidence tiers to capture points and says honestly which tiers exist today rather than assuming host hooks.",
           "Defines thresholds where each row names its action AND consumer (skill-quality-reviewer re-review, trigger-evals fix, evidence package to skill-deprecation-planner).",
-          "Includes the rare-but-critical exemption list so low usage alone never condemns a safety-net skill, and hands implementation off — this design adds no hooks and edits nothing."
+          "Includes the rare-but-critical exemption list so low usage alone never condemns a safety-net skill, and hands implementation off — this design adds no hooks and edits nothing.",
+          "Declares the enum domain per event (activation_mode for invocations, correction_outcome for wrong-fire/corrections) and reads a sparse wrong-fire event correctly instead of confusing it with an activation value."
         ]
       }
     },
@@ -56,7 +57,8 @@
           "Explains in plain language that a tier-2 closeout self-report is a skill mention written after the task and a tier-1 host hook records invocation at its source, and why the wrong-fire question makes the tier difference matter.",
           "Compares starting with tier-2 self-reports against waiting for a host hook with why each path is viable, pros and cons (tier 2's low setup cost and self-report bias versus the hook's better coverage and its host-integration, privacy-review, and upkeep costs), and money, setup time, and ongoing care, marking the unscoped hook effort, host access, and costs as unknowns.",
           "Recommends a path with a reason: tier 2 for an immediate, labeled baseline while hooks are unavailable, and a hook when reliable wrong-fire or never-fired decisions need tier 1 and host ownership is available; notes that today's closeouts list only skills used, so the tier-2 path must add a correction record (fired skill, redirected_to, activation mode (auto or explicit)) before it can answer the wrong-fire question.",
-          "Asks exactly one capture-path question after the comparison; states that choosing a path does not authorize implementing a hook or starting collection, keeps minimization (skill names and coarse enums only, no prompt content or user identifiers), and names no deprecation candidates from data not yet collected."
+          "Asks exactly one capture-path question after the comparison; states that choosing a path does not authorize implementing a hook or starting collection, keeps minimization (skill names and coarse enums only, no prompt content or user identifiers), and names no deprecation candidates from data not yet collected.",
+          "Declares the enum domain per event (activation_mode for invocations, correction_outcome for wrong-fire/corrections) and reads a sparse wrong-fire event correctly instead of confusing it with an activation value."
         ]
       }
     },
@@ -70,7 +72,8 @@
           "Refuses, citing the Stop Condition: minimization is a design invariant, not a tunable — no prompt content, no user identifiers, at any tier, for any reason including debugging convenience.",
           "Explains the line with the publishable-in-repo test: a usage record that couldn't be committed openly captures too much.",
           "Offers the compliant alternative: coarse task-class enums and correction events, which serve trigger debugging without content capture.",
-          "Does not produce a schema containing prompt text or identifier fields anywhere in the response."
+          "Does not produce a schema containing prompt text or identifier fields anywhere in the response.",
+          "Declares the enum domain per event (activation_mode for invocations, correction_outcome for wrong-fire/corrections) and reads a sparse wrong-fire event correctly instead of confusing it with an activation value."
         ]
       }
     },

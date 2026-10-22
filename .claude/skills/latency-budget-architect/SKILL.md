@@ -166,7 +166,7 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <per hop: timeout ≈ budget + tolerance; cascade check upstream ≥ downstream×retries+ε>
+Timeouts: <per hop: timeout = hop budget + tolerance; cascade check: upstream timeout >= critical path (initial attempt + retries + backoff + downstream work)>
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
@@ -190,7 +190,7 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
 - [ ] Every timeout derives from a budget and the cascade check passes
-      (upstream ≥ downstream × retries + ε).
+      (critical path = initial attempt + retries + backoff + downstream work).
 - [ ] Retries are budgeted spend at one layer only; hedging is
       headroom-funded or absent.
 - [ ] Headroom is a named line item with an owner, 15–25%.
@@ -218,6 +218,7 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
   rows exist because the unmeasured milliseconds are still spent.
 - Timeout inversion: an upstream 2s timeout over a downstream
   3s-timeout×2-retries path means the upstream abandons work the
+- **Attempts vs retries:** a layer with r retries makes up to 1+r attempts; two layers with 2 retries each can produce (1+2)(1+2)=9 attempts. Deadline arithmetic always counts attempts (the initial attempt plus every retry), never downstream x retries.
   downstream completes — wasted load AND a failed request. The
   cascade check is mechanical; run it.
 - Two-layer retries compound: the gateway retries twice, the client

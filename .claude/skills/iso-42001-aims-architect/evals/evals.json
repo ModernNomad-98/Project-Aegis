@@ -11,7 +11,7 @@
         "triggers": true,
         "assertions": [
           "Designs the harmonized clause 4–10 AIMS with the three distinct assessments: AI risk (6.1.2/8.2), AI risk treatment (6.1.3/8.3 → SoA), and AI system impact assessment (6.1.4/8.4 on individuals and societies).",
-          "Maps the shipped Phase 1.5 governance pack and ai-governance-risk-reviewer outputs as operational mechanisms instead of re-deriving them; net-new lands in management-system artifacts.",
+          "Maps the shipped Phase 1.5 governance pack and ai-governance-risk-reviewer outputs as operational mechanisms instead of re-deriving them; net-new lands in management-system artifacts. The packs are a starting-point mapping candidate, not complete coverage; operating evidence decides.",
           "Builds the AI system inventory with the org's role per system (developer/provider/user) as the scope anchor.",
           "Delegates the SoA to statement-of-applicability-author, evidence to compliance-evidence-collector, and flags EU AI Act items for legal review rather than asserting conclusions."
         ]

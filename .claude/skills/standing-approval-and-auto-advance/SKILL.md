@@ -190,7 +190,7 @@ Adoption:                     pending human approval → then recorded via scope
   session restates is indistinguishable from no governance — restating is
   the difference between standing approval and folklore.
 - **Opt-in decay:** an opt-in merge profile selected once, then treated as
-  eternal. Profile selection is a register entry with an expiry like any
+eternal. Profile selection is a register entry carrying the grant.s ACTUAL recorded expiry/use limit (which may be none); never infer a default expiry, and preserve the grant.s recorded consumption/one-use semantics.
   grant.
 - **Fatigue theater in reverse:** thinning approvals that were load-bearing.
   Only approvals whose evidence shows mechanical granting (instant yes,

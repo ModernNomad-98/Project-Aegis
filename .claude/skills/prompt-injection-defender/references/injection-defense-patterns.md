@@ -20,6 +20,8 @@ Every element of assembled context is one of:
 
 The whole defense exists to keep untrusted content from acting as trusted.
 
+No trusted-source exemption is granted unless a provenance guarantee is established and recorded; provenance never promotes content to instructions. Per-source trust enumeration must match the SKILL sentence.
+
 ## Separation schemes (ordered best → worst)
 
 1. **Provider role/schema separation** — put untrusted content in a user/tool
