@@ -777,7 +777,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->243<!-- /SKILL-COUNT --> skills comprise **242 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->250<!-- /SKILL-COUNT --> skills comprise **249 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -802,25 +802,25 @@ keeps a human as the approval gate on anything irreversible. See
    domain models, architecture design, ADRs, docs-first + test-first implementation, debugging,
    code review. *e.g.* `domain-modeler`, `architecture-designer`, `adr-writer`, `tdd-engineer`,
    `systematic-debugger`.
-4. **SaaS & tenant isolation** *(Phase 3, 19)* — multi-tenant foundations: platform structure,
+4. **SaaS & tenant isolation** *(Phase 3, 20)* — multi-tenant foundations: platform structure,
    tenant semantics, per-store scoping, roles/permissions, plans, audit trail, cost, external
    API contracts, the feature-flag system (added by D64), and the Batch 2 SaaS lifecycle,
    preference, export, demo-tenant, offboarding, localization and timezone skills. *e.g.* `saas-platform-architect`, `tenant-isolation-reviewer`,
    `authorization-matrix-designer`, `audit-log-architect`, `api-event-architect`.
-5. **Security, RLS & supply chain** *(Phase 4, 11)* — hands-on appsec: threat modeling, RLS
+5. **Security, RLS & supply chain** *(Phase 4, 14)* — hands-on appsec: threat modeling, RLS
    policy audit, secrets hardening, supply-chain review, security PR review, migration safety,
    SAST triage. *e.g.* `threat-modeler`, `rls-policy-auditor`, `secrets-identity-hardener`,
    `supply-chain-security-reviewer`, `security-pr-reviewer`.
-6. **QA, E2E & evidence** *(Phase 5, 25)* — test strategy through execution and proof: QA
+6. **QA, E2E & evidence** *(Phase 5, 26)* — test strategy through execution and proof: QA
    strategy, test plans, coverage mapping, Playwright/unit/build QA, flake control, test data,
    evidence policy, and CI run failure classification (added by D68). *e.g.* `qa-strategy-architect`, `test-coverage-mapper`,
    `playwright-e2e-engineer`, `flaky-test-detective`, `screenshot-evidence-planner`.
-7. **Cloud, DevOps, reliability & release** *(Phase 6, 14)* — running it in production: cloud
+7. **Cloud, DevOps, reliability & release** *(Phase 6, 15)* — running it in production: cloud
    choice, Azure/AWS mapping, IaC review, cloud security baseline review, CI pipelines, release
    readiness, rollback, observability, SLOs, incidents, failure and disaster-recovery review, environment parity. *e.g.*
    `cloud-architecture-decider`, `iac-reviewer`,
    `release-readiness-reviewer`, `rollback-runbook-author`, `slo-reliability-architect`.
-8. **AI security & LLM systems** *(Phase 7, 15)* — securing LLM features against the OWASP LLM
+8. **AI security & LLM systems** *(Phase 7, 16)* — securing LLM features against the OWASP LLM
    Top 10: injection, RAG/tool safety, output handling, evals, cost guardrails, disclosure,
    routing. *e.g.* `ai-threat-modeler`, `prompt-injection-defender`, `rag-security-architect`,
    `ai-evaluation-harness`, `ai-cost-guardrail-designer`.
@@ -1048,7 +1048,7 @@ For current shipped skills, use the [catalog](docs/skills-catalog.md).
 | 4 | Security, RLS & supply chain (9) | P0/P1 | ✅ merged |
 | 5 | QA, E2E, manual QA & evidence (16 = 13 canonical + 3 pulled forward from the QA backlog: roadmap #184/#185/#204) | P0/P1 | ✅ merged |
 | 6 | Cloud, DevOps, reliability & release (10) | P1 | ✅ merged |
-| 7 | AI security & LLM systems (14 = v4's 10 + 4 OWASP LLM Top 10 additions, D6) | P1 | ✅ merged |
+| 7 | AI security & LLM systems (historical D6 row: 14 = v4's 10 + 4 OWASP LLM Top 10 additions; current family-8 count is 16 after D70 + Batch 5) | P1 | ✅ merged |
 | 7.5 | Agentic AI security (OWASP Agentic Top 10, D7: 6 new + 3 extensions) | P1 | ✅ merged |
 | D9 | Compliance & Governance batch (9 = 3 shared foundation + 3 framework projections + 3 cross-cutting; ISO 27001 + ISO 42001 + SOC 2, NIST AI RMF companion) | P1 | ✅ merged |
 | D13 | Library meta / self-application (5 = `skill-quality-reviewer`, D18, + the 4 completing the scope: `library-diff-reviewer`, `eval-runner-designer`, `skill-usage-instrumenter`, `skill-deprecation-planner`, D22) | P1 | ✅ shipped (D18 + D22) |
@@ -1182,6 +1182,7 @@ Phase 3 — SaaS & tenant isolation pack:
 | `saas-offboarding-architect` | (Batch 2, #83) Designs ordered user/tenant offboarding: trigger/actor matrix, revoke non-owner access first (the last owner's authority only after a verified successor/executor), then export/retention/deletion, billing close and ownership transfer, with legal-hold exceptions, reversible vs irreversible steps and per-step audit evidence; designs only. | auto + manual |
 | `saas-localization-architect` | (Batch 2, #86) Defines localization system boundaries: localizable dimensions and their owners, locale negotiation and fallback precedence, translated content vs runtime formatting, currency/date/number rules, tenant- and locale-safe cache keys and a test matrix; no UI implementation. | auto + manual |
 | `saas-timezone-architect` | (Batch 2, #87) Defines the timezone contract: time-bearing data/job inventory, UTC instant vs local-intent storage, tenant/user zone precedence, DST and ambiguous-time handling, reminder uniqueness, reporting cutoffs, migration and audit trail; design-only. | auto + manual |
+| `import-pipeline-architect` | (Batch 5, #75/#150) Design the tenant-data import pipeline as staged contracts: inspect source and target, map columns with validation, define preview/review/confirm semantics and authorization, handle partial failure with per-row recovery and reversal, dedupe/idempotency, status tracking and audit evidence, tenant isolation of imported rows, and a test plan mirroring the export pipeline. | auto + manual |
 
 Phase 4 — security, RLS & supply-chain pack:
 
@@ -1198,6 +1199,9 @@ Phase 4 — security, RLS & supply-chain pack:
 | `static-analysis-reviewer` | Triages SAST/CodeQL/SARIF on first-party code: dedup, confirm-against-code disposition (TP/FP/dup/accepted), five-axis ranking (reachability/exploitability/asset/tenant/business), written suppression policy. | auto + manual |
 | `security-regression-harness-designer` | Turns a fixed security/access-control bug into a permanent regression harness: safe fixtures, expected-denial cases, CI placement and retest evidence; design-only. | auto + manual |
 | `security-impact-note-author` | Authors a reviewable security impact note: assets/impact, threats, mitigations, tests, rollback, approvals and residual risk, separating verified from assumed; authoring-only. | auto + manual |
+| `browser-boundary-reviewer` | (Batch 5, #110, #120) Review a web application browser/origin boundary and security-header policy as one review: inventory every mutating endpoint, form and auth callback; assess cookie attributes and SameSite posture; build the CSRF defense matrix (token, origin check, custom header, SameSite) with bypass paths; produce a header policy table with enforcement point (application vs CDN/proxy) and required values; rank findings with evidence and list what could not be verified. | auto + manual |
+| `authentication-flow-reviewer` | (Batch 5, #108) Review authentication as one flow set rather than isolated endpoints: inventory flows and state map, token/session lifecycle and refresh semantics, logout/revocation and re-authentication paths, MFA enrollment/recovery edge cases, SSO/federation and account-linking boundaries, denial/error/audit expectations, and review-only findings with recovery/failure test plan. | auto + manual |
+| `security-drift-detector` | (Batch 5, #130) Detect security drift against a recorded baseline: select and record the baseline, compare control by control, classify weakening (removed, narrowed, default-changed), flag ownership findings (unowned), detect undocumented changes and expiry/staleness, attach evidence and an owner/action per finding, and recommend re-baselining; read-only, no live probing. | auto + manual |
 
 Phase 5 — QA, E2E, manual QA & evidence pack (13 canonical + 3 pulled forward from the
 QA backlog, roadmap #184/#185/#204, plus QA Tier 1 builds under D68 and the Batch 1
@@ -1230,6 +1234,7 @@ production-safe smoke delivery #188):
 | `role-coverage-test-designer` | (G1, #229) Designs role-coverage QA: role × surface allowed-path matrix, interface-consistency deltas across roles, layer-mapped coverage with persona data and execution handoffs. Designs; executes nothing. | auto + manual |
 | `property-based-test-designer` | (G2, #194) Designs property-based test coverage: domain invariants per target, bounded generator domains with shrinking, counterexample triage, runner handoff. On-demand specialized coverage. Designs; writes and runs no tests. | auto + manual |
 | `production-safe-smoke-tester` | Designs production-safe smoke checks: read-only probes only, pre-seeded isolated/disposable-tenant fixtures only (no real customer data), forbidden operations, stop/escalation and explicitly unexercised areas; execution delegated, and any write is not a smoke check (separate explicit authorization required). | auto + manual |
+| `defect-triage-facilitator` | (Batch 5, #224/#225) Facilitate consistent defect reporting and triage: complete the bug report (repro steps, expected vs actual, environment, evidence, suspected area), rank defects by severity, frequency, customer impact, security and release risk with explicit rationale, assign one owner and next action per decision, and route security/release-risk findings; refuses invented facts and fixes. | auto + manual |
 
 Phase 6 — cloud, DevOps, reliability & release pack (`rollback-strategy-designer`
 merged into `rollback-runbook-author` per reconciliation §3; expansion builds under D71):
@@ -1250,10 +1255,9 @@ merged into `rollback-runbook-author` per reconciliation §3; expansion builds u
 | `resilience-architecture-reviewer` | (D71) Reviews how a system survives failure: per-dependency timeouts, retry budgets, circuit breakers, bulkheads and graceful degradation; single points of failure and zone/region redundancy; failover tested only with a dated drill record; disaster-recovery (DR) fit of the backup design against recovery time and recovery point objectives (RTO/RPO); a game-day plan for a person to run. Runs no fault injection; backup evidence goes to `database-backup-verifier`. | auto + manual |
 | `cloud-security-baseline-reviewer` | (D71, Phase 6 expansion) Reviews a CONFIGURED cloud account, subscription or managed platform project (AWS, Azure, Google Cloud, Vercel, Supabase) against a named baseline, control by control: MET / GAP / UNVERIFIED from cited evidence the user exports; missing evidence is never MET. Reads only what it is given, calls no cloud interface, never prints a secret value, changes nothing. | auto + manual |
 | `environment-parity-reviewer` | (D71, #244 + #246) Parity matrix across local, CI, preview, staging and production: runtime and dependency versions, variable names and non-secret values, flag defaults, database version and extensions, sandbox versus live provider modes, auth callbacks, build mode, region, time zone, data shape. Each difference INTENDED (documented), ACCIDENTAL or UNKNOWN with evidence and a fix owner; drafts the required-configuration manifest and fail-fast startup validation. Never reads secret values; connects to nothing. | auto + manual |
+| `branching-strategy-designer` | (Batch 5, #236) Design and record a repository branching and release flow: choose trunk-based or branch/release branching with alternatives and rejected options, define branch naming/protection/review rules, merge method and queue, release and hotfix flow, migrate from the current model with safe defaults and risks; refuses to change repository settings or invent team constraints. | auto + manual |
 
-Phase 7 — AI security & LLM systems pack (14 = v4's 10 + 4 OWASP LLM Top 10 gap
-additions, D6; plus `ai-human-in-the-loop-designer` built from the expansion
-backlog under D70). Anchored to the OWASP Top 10 for LLM Applications (2026),
+Phase 7 — AI security & LLM systems pack (current family-8 count **16** = historical D6 row **14** [v4's 10 + 4 OWASP LLM Top 10 gap additions] + `ai-human-in-the-loop-designer` under D70 + Batch 5 `retrieval-engineering-designer`). Anchored to the OWASP Top 10 for LLM Applications (2026),
 re-anchored on 2026-09-26 from the 2025 edition D6 cited; IDs below are 2026
 IDs (the renumbering crosswalk is in `ai-threat-modeler`'s threat catalog). These
 skills **compose** the shipped tenant/security/cost/governance packs rather than
@@ -1279,6 +1283,7 @@ re-deriving them. **LLM04** is extend-existing (the shipped
 | `hidden-context-exposure-reviewer` | (NEW, LLM08 Hidden Context Exposure — full scope) Every hidden source the model sees — system prompt, developer instructions, retrieved policy text, tool/function schemas, other directives — reviewed on two axes: no secrets or attacker-useful logic in hidden context AND no security dependence on its secrecy — **hidden context is NOT a security control**; enforcement is deterministic and lives OUTSIDE the LLM; LLM08 severity scale; disclosure-is-harmless framing. | auto + manual |
 | `ai-misinformation-guard` | (NEW, LLM07) Grounding in retrieved sources (not memory), citation-to-claim verification, calibrated uncertainty/refusal, fact validation before action, package/API hallucination (slopsquatting) checks, overreliance-aware UX. | auto + manual |
 | `ai-human-in-the-loop-designer` | (D70, #285/#286 with #287) Designs how an AI feature's output becomes product state: every AI-originated action sorted AUTONOMOUS / CONFIRM / FORBIDDEN by risk tier, advisory-only by default; for CONFIRM, a pending proposal that is not yet state, a reviewer queue showing the exact change and its sources, approve/edit/reject/expiry, no self-approval, commit through the normal write path, an audit record per decision, consent-fatigue budgets and human-on-the-loop controls. Designs only. | auto + manual |
+| `retrieval-engineering-designer` | (Batch 5, GOV-02) Design semantic/hybrid retrieval quality: characterize corpus and query intents, choose a chunking and embedding plan, design dense/lexical fusion and reranking, build the relevance evaluation plan (golden sets, recall/precision, regression gate), analyze failure modes (staleness, ambiguity, poisoning surface) and hand authorization/leakage to the security owner; refuses live tuning or eval execution. | auto + manual |
 
 Edition anchors last checked 2026-09-26; re-check with `framework-edition-tracker`. Anchored to the [OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) (v1.0, 2026-08-03), re-anchored from the 2025 edition by owner decision 2026-09-26.
 

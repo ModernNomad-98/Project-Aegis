@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "d6db2fb3cfbc4c5cc0cf96a01e9893c9af9c988e",
+  "source_revision": "377c8dc592b8470d7a7d001914c8d0db13dc0ab0",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -204,6 +204,11 @@
       "sha256": "0b7a536aff1319bae4100fee8adab301f1d326e5e122db3fc7f35aac469415b2"
     },
     {
+      "name": "authentication-flow-reviewer",
+      "path": ".claude/skills/authentication-flow-reviewer/SKILL.md",
+      "sha256": "b32633ffe1e6e0b659ebac177330713c6a8d75a99f99563cc7d6ba4f8264378e"
+    },
+    {
       "name": "authority-invalidation-architect",
       "path": ".claude/skills/authority-invalidation-architect/SKILL.md",
       "sha256": "371c8ac3d3ce2ab2e95c4d35db409568a604ec65480c6a3c311232cfbabdb22f"
@@ -227,6 +232,16 @@
       "name": "background-job-orchestration-architect",
       "path": ".claude/skills/background-job-orchestration-architect/SKILL.md",
       "sha256": "ff08383df882175ef963115a5675ff91564e54055ea72caab7d2f0555b630fff"
+    },
+    {
+      "name": "branching-strategy-designer",
+      "path": ".claude/skills/branching-strategy-designer/SKILL.md",
+      "sha256": "4eb3a247c2cf6a69509828607a5d7d7e84059628da413b041770acce6d05294c"
+    },
+    {
+      "name": "browser-boundary-reviewer",
+      "path": ".claude/skills/browser-boundary-reviewer/SKILL.md",
+      "sha256": "e72ee91da1aca6016ecdfa1f85f381e0a1e8edf9be68173a0c922f70f2314cb5"
     },
     {
       "name": "caching-strategy-designer",
@@ -374,6 +389,11 @@
       "sha256": "44233bbb9d3db3f2e70e8788b7e32d9dca2029ad602a645e5304ff3d55f82773"
     },
     {
+      "name": "defect-triage-facilitator",
+      "path": ".claude/skills/defect-triage-facilitator/SKILL.md",
+      "sha256": "aa14e0866b0cdc5ec7e1c6315c46f83744e80dabe8b260464c6e4b96b6468b6d"
+    },
+    {
       "name": "demo-tenant-safety-designer",
       "path": ".claude/skills/demo-tenant-safety-designer/SKILL.md",
       "sha256": "472cd3196fdccc1e2213e2ccb199fb976762e94958b2c02fa748a93a5cffd4c1"
@@ -481,7 +501,7 @@
     {
       "name": "file-upload-storage-architect",
       "path": ".claude/skills/file-upload-storage-architect/SKILL.md",
-      "sha256": "eff3900cdb85273be6463e4d716b2bf58fe1f0c84afdfc3a60e30a094c277810"
+      "sha256": "d7ffb6732cec4cc0f7ffea87dcb9b3e08a2bf8b5a6603eeb30c11c3cd03c2113"
     },
     {
       "name": "flaky-test-detective",
@@ -552,6 +572,11 @@
       "name": "iac-reviewer",
       "path": ".claude/skills/iac-reviewer/SKILL.md",
       "sha256": "948fd875af0bc5cb7f777816d3311e02eb2692fddf68fb3543833930c9b82b85"
+    },
+    {
+      "name": "import-pipeline-architect",
+      "path": ".claude/skills/import-pipeline-architect/SKILL.md",
+      "sha256": "736815ed14e44abd732aaf0727ed49041318df849959274c7aada4c9b0c64f68"
     },
     {
       "name": "incident-response-runbook",
@@ -859,6 +884,11 @@
       "sha256": "a9abd21cf074e4ac40e5d229ec30cb3d7ba00e53d6fad22c415d1d4f0ad24384"
     },
     {
+      "name": "retrieval-engineering-designer",
+      "path": ".claude/skills/retrieval-engineering-designer/SKILL.md",
+      "sha256": "98efd92f4527ac7ae4d82a0dd3d98eb258fc17be83128c76e2eab7ed55a7e750"
+    },
+    {
       "name": "reviewable-diff-discipline",
       "path": ".claude/skills/reviewable-diff-discipline/SKILL.md",
       "sha256": "59b07ade2cd8a2aae3907c8d6c2609ae46641559f3b97dadc6019a4b4c8eab7b"
@@ -951,12 +981,17 @@
     {
       "name": "secrets-identity-hardener",
       "path": ".claude/skills/secrets-identity-hardener/SKILL.md",
-      "sha256": "d414e084bbe2b9b20d24bab28285d75f505cfe961e477a1ec90d926bf76be0c1"
+      "sha256": "a205ae643a74d86a4a0e35751980f455f0679d3027d2445412149f2597c0eed3"
     },
     {
       "name": "secure-migration-reviewer",
       "path": ".claude/skills/secure-migration-reviewer/SKILL.md",
       "sha256": "4baad58efb00c0d4e0cc8d73c88139a742d1eee0f2b58c5c218dd83cec108322"
+    },
+    {
+      "name": "security-drift-detector",
+      "path": ".claude/skills/security-drift-detector/SKILL.md",
+      "sha256": "ec24a32147a47b44aa5ca46b8ef16ff070b69d3c8ed41f3501d387786f809ed5"
     },
     {
       "name": "security-impact-note-author",
@@ -1156,7 +1191,7 @@
     {
       "name": "test-plan-designer",
       "path": ".claude/skills/test-plan-designer/SKILL.md",
-      "sha256": "a372ee3a922e34bcc3ccaaafe654bcb85062ef005a40538deae2f9f44aadfdc1"
+      "sha256": "beba751405cd1cccc7dd1a3c5c9f26a833dc192e4ca08a8eb163d8db333713ba"
     },
     {
       "name": "test-tenant-provisioner",

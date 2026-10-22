@@ -1,0 +1,220 @@
+{
+  "skill": "security-drift-detector",
+  "description": "Trigger discrimination for security-drift-detector against the nearest shipped owners.",
+  "overlaps_with": [
+    "agent-governance-audit",
+    "agent-memory-governance",
+    "audit-log-architect",
+    "change-classification-gate",
+    "cloud-security-baseline-reviewer",
+    "code-reviewer",
+    "compliance-evidence-collector",
+    "iac-reviewer",
+    "local-ci-mirror-preflight",
+    "rls-policy-auditor",
+    "secure-migration-reviewer",
+    "security-pr-reviewer",
+    "source-of-truth-reconciler",
+    "threat-modeler"
+  ],
+  "cases": [
+    {
+      "id": "security-drift-detector-positive-1",
+      "prompt": "Compare our current security controls against the last audit baseline and report drift.",
+      "expected_skill": "security-drift-detector",
+      "should_not_trigger": [
+        "security-pr-reviewer"
+      ],
+      "reason": "The request needs security-drift-detector's design method; security-pr-reviewer owns a different task."
+    },
+    {
+      "id": "security-drift-detector-positive-2",
+      "prompt": "I think security settings drifted from the policy - produce a control-by-control drift report.",
+      "expected_skill": "security-drift-detector",
+      "should_not_trigger": [
+        "rls-policy-auditor"
+      ],
+      "reason": "The request needs security-drift-detector's design method; rls-policy-auditor owns a different task."
+    },
+    {
+      "id": "security-drift-detector-positive-3",
+      "prompt": "Review code, tests and docs against the recorded baseline and classify any weakening.",
+      "expected_skill": "security-drift-detector",
+      "should_not_trigger": [
+        "agent-governance-audit"
+      ],
+      "reason": "The request needs security-drift-detector's design method; agent-governance-audit owns a different task."
+    },
+    {
+      "id": "security-drift-detector-positive-4",
+      "prompt": "The baseline is six months old - find undocumented and expired controls with owners.",
+      "expected_skill": "security-drift-detector",
+      "should_not_trigger": [
+        "compliance-evidence-collector"
+      ],
+      "reason": "The request needs security-drift-detector's design method; compliance-evidence-collector owns a different task."
+    },
+    {
+      "id": "security-drift-detector-positive-5",
+      "prompt": "Produce a drift report for our RLS and audit controls against the baseline.",
+      "expected_skill": "security-drift-detector",
+      "should_not_trigger": [
+        "iac-reviewer"
+      ],
+      "reason": "The request needs security-drift-detector's design method; iac-reviewer owns a different task."
+    },
+    {
+      "id": "security-drift-detector-positive-6",
+      "prompt": "Check for controls that were narrowed or had their defaults changed since the baseline.",
+      "expected_skill": "security-drift-detector",
+      "should_not_trigger": [
+        "cloud-security-baseline-reviewer"
+      ],
+      "reason": "The request needs security-drift-detector's design method; cloud-security-baseline-reviewer owns a different task."
+    },
+    {
+      "id": "security-drift-detector-positive-7",
+      "prompt": "We changed tenants last quarter - detect undocumented security changes and recommend re-baselining.",
+      "expected_skill": "security-drift-detector",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs security-drift-detector's design method; code-reviewer owns a different task."
+    },
+    {
+      "id": "security-drift-detector-positive-8",
+      "prompt": "Audit policy-versus-code drift for authentication and authorization controls with evidence.",
+      "expected_skill": "security-drift-detector",
+      "should_not_trigger": [
+        "change-classification-gate"
+      ],
+      "reason": "The request needs security-drift-detector's design method; change-classification-gate owns a different task."
+    },
+    {
+      "id": "security-drift-detector-negative-1",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets and SSRF.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is security-pr-reviewer's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-2",
+      "prompt": "Audit the row-level security policies for tenant scope, recursion and grants.",
+      "expected_skill": "rls-policy-auditor",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is rls-policy-auditor's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-3",
+      "prompt": "Audit the process compliance of this AI-assisted change from primary evidence.",
+      "expected_skill": "agent-governance-audit",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is agent-governance-audit's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-4",
+      "prompt": "Design the evidence collection plan over time for the compliance controls.",
+      "expected_skill": "compliance-evidence-collector",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is compliance-evidence-collector's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-5",
+      "prompt": "Review the infrastructure-as-code change for blast radius, exposure and secrets.",
+      "expected_skill": "iac-reviewer",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is iac-reviewer's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-6",
+      "prompt": "Review our configured cloud account against the named security baseline.",
+      "expected_skill": "cloud-security-baseline-reviewer",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is cloud-security-baseline-reviewer's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-7",
+      "prompt": "Review this actual diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-8",
+      "prompt": "Classify this change and state the validation floor it requires.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is change-classification-gate's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-9",
+      "prompt": "Reconcile the conflicting instructions and docs by evidence-cited precedence.",
+      "expected_skill": "source-of-truth-reconciler",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is source-of-truth-reconciler's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-10",
+      "prompt": "Design the audit event taxonomy, schema and append-only integrity rules.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is audit-log-architect's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-11",
+      "prompt": "Explicitly invoke agent-memory-governance. Govern the persistent memory write/trust/hygiene rules for this repository.",
+      "expected_skill": "agent-memory-governance",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is agent-memory-governance's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-12",
+      "prompt": "Explicitly invoke local-ci-mirror-preflight. Run the local CI mirror preflight and report the result.",
+      "expected_skill": "local-ci-mirror-preflight",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is local-ci-mirror-preflight's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-13",
+      "prompt": "Review the whole database migration for deploy safety, RLS gaps and destructive operations.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is secure-migration-reviewer's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    },
+    {
+      "id": "security-drift-detector-negative-14",
+      "prompt": "Build the design-time threat model for this feature: assets, actors, boundaries and STRIDE threats.",
+      "expected_skill": "threat-modeler",
+      "should_not_trigger": [
+        "security-drift-detector"
+      ],
+      "reason": "This request is threat-modeler's deliverable end-to-end; security-drift-detector owns a different design task and must not take it over."
+    }
+  ]
+}

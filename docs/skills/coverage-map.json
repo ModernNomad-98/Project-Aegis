@@ -1075,17 +1075,16 @@
     {
       "area": "02",
       "covering_skills": [
-        "data-migration-runbook-author",
-        "file-upload-storage-architect"
+        "import-pipeline-architect"
       ],
-      "evidence": "audit classification: PARTIAL — data-migration-runbook-author, file-upload-storage-architect; data-move/upload pieces; covering skills: data-migration-runbook-author, file-upload-storage-architect; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
-      "evidence_grade": "capability-review",
+      "evidence": "Batch 5 delivery (D113): `import-pipeline-architect` implements the accepted merged scope for roadmap row #75 (docs/skills-catalog.md phase table; README shipped rows); covering skill: import-pipeline-architect; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 75,
       "name": "Import Pipeline Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P1",
       "rationale": null,
-      "status": "PARTIAL"
+      "status": "SHIPPED"
     },
     {
       "area": "02",
@@ -1540,16 +1539,16 @@
     {
       "area": "03",
       "covering_skills": [
-        "human-agent-trust-reviewer"
+        "authentication-flow-reviewer"
       ],
-      "evidence": "audit classification: PARTIAL — human-agent-trust-reviewer; authn flows not covered end-to-end; covering skills: human-agent-trust-reviewer; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
-      "evidence_grade": "capability-review",
+      "evidence": "Batch 5 delivery (D113): `authentication-flow-reviewer` implements the accepted merged scope for roadmap row #108 (docs/skills-catalog.md phase table; README shipped rows); covering skill: authentication-flow-reviewer; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 108,
       "name": "Authentication Flow Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P0",
       "rationale": null,
-      "status": "PARTIAL"
+      "status": "SHIPPED"
     },
     {
       "area": "03",
@@ -1567,15 +1566,17 @@
     },
     {
       "area": "03",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "browser-boundary-reviewer"
+      ],
+      "evidence": "Batch 5 delivery (D113): `browser-boundary-reviewer` implements the accepted merged scope for roadmap row #110 (docs/skills-catalog.md phase table; README shipped rows); covering skill: browser-boundary-reviewer; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 110,
       "name": "CSRF and Browser Boundary Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "03",
@@ -1707,15 +1708,17 @@
     },
     {
       "area": "03",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "browser-boundary-reviewer"
+      ],
+      "evidence": "Batch 5 delivery (D113): `browser-boundary-reviewer` implements the accepted merged scope for roadmap row #120 (docs/skills-catalog.md phase table; README shipped rows); covering skill: browser-boundary-reviewer; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 120,
       "name": "Security Header Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "03",
@@ -1849,17 +1852,16 @@
     {
       "area": "03",
       "covering_skills": [
-        "agent-governance-audit",
-        "docs-as-code-architect"
+        "security-drift-detector"
       ],
-      "evidence": "audit classification: PARTIAL — docs-as-code-architect, agent-governance-audit; drift detection adjacent; covering skills: agent-governance-audit, docs-as-code-architect; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
-      "evidence_grade": "capability-review",
+      "evidence": "Batch 5 delivery (D113): `security-drift-detector` implements the accepted merged scope for roadmap row #130 (docs/skills-catalog.md phase table; README shipped rows); covering skill: security-drift-detector; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 130,
       "name": "Security Drift Detection",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P0",
       "rationale": null,
-      "status": "PARTIAL"
+      "status": "SHIPPED"
     },
     {
       "area": "04",
@@ -2132,16 +2134,16 @@
     {
       "area": "04",
       "covering_skills": [
-        "data-migration-runbook-author"
+        "import-pipeline-architect"
       ],
-      "evidence": "audit classification: PARTIAL — data-migration-runbook-author; import pipeline operations partially; covering skills: data-migration-runbook-author; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
-      "evidence_grade": "capability-review",
+      "evidence": "Batch 5 delivery (D113): `import-pipeline-architect` implements the accepted merged scope for roadmap row #150 (docs/skills-catalog.md phase table; README shipped rows); covering skill: import-pipeline-architect; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 150,
       "name": "Data Import Backend Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P1",
       "rationale": null,
-      "status": "PARTIAL"
+      "status": "SHIPPED"
     },
     {
       "area": "04",
@@ -3179,27 +3181,31 @@
     },
     {
       "area": "06",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "defect-triage-facilitator"
+      ],
+      "evidence": "Batch 5 delivery (D113): `defect-triage-facilitator` implements the accepted merged scope for roadmap row #224 (docs/skills-catalog.md phase table; README shipped rows); covering skill: defect-triage-facilitator; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 224,
       "name": "Bug Report Authoring",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "06",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "defect-triage-facilitator"
+      ],
+      "evidence": "Batch 5 delivery (D113): `defect-triage-facilitator` implements the accepted merged scope for roadmap row #225 (docs/skills-catalog.md phase table; README shipped rows); covering skill: defect-triage-facilitator; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 225,
       "name": "QA Triage Facilitation",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "06",
@@ -3340,15 +3346,17 @@
     },
     {
       "area": "07",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "branching-strategy-designer"
+      ],
+      "evidence": "Batch 5 delivery (D113): `branching-strategy-designer` implements the accepted merged scope for roadmap row #236 (docs/skills-catalog.md phase table; README shipped rows); covering skill: branching-strategy-designer; D113 (2026-10-22).",
+      "evidence_grade": "explicit-id",
       "id": 236,
       "name": "Branching Strategy Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 5 delivery (2026-10-22)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "07",
@@ -4280,9 +4288,9 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 243 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 250 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
   "totals": {
-    "beyond_roadmap_skills": 80,
+    "beyond_roadmap_skills": 83,
     "by_area": {
       "01": 55,
       "02": 35,
@@ -4295,10 +4303,10 @@
       "09": 20
     },
     "by_grade": {
-      "capability-review": 104,
+      "capability-review": 100,
       "catalog-decision": 16,
-      "explicit-id": 173,
-      "none": 7
+      "explicit-id": 182,
+      "none": 2
     },
     "by_priority": {
       "P0": 126,
@@ -4307,18 +4315,18 @@
     },
     "by_status": {
       "COVERED": 57,
-      "GAP": 7,
-      "PARTIAL": 63,
-      "SHIPPED": 173
+      "GAP": 2,
+      "PARTIAL": 59,
+      "SHIPPED": 182
     },
-    "distinct_covering_skills": 163,
+    "distinct_covering_skills": 167,
     "entries": 300,
     "gap_by_priority": {
       "P0": 0,
-      "P1": 6,
+      "P1": 1,
       "P2": 1
     },
-    "manifest_skills": 243,
-    "review_pending": 125
+    "manifest_skills": 250,
+    "review_pending": 116
   }
 }

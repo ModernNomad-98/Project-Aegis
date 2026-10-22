@@ -44,6 +44,8 @@ changes through human approval.
 
 ## Inputs to Inspect
 
+- Stored-credential rows and their migration state (password hashes, API-key/token hashes or envelopes, active rotation versions) when the ask is stored-credential hardening or legacy-hash migration; inspect schema/config plus aggregate counts/metadata needed to verify zero legacy rows - never read, print or output hashes or secret values.
+
 1. Where secrets currently live: source files, committed `.env`, config,
    CI/CD variables, IaC, container images. Find them before moving them.
 2. The client build config: bundler env-exposure rules (`VITE_`,
@@ -60,37 +62,41 @@ changes through human approval.
 
 ## Workflow
 
-1. **Inventory and classify.** List every secret and env var; classify each:
+1. When stored credentials are in scope, inventory hash/KDF algorithm, per-record salt, cost parameters, keyed-hash/envelope storage and legacy-row count; design the rehash-on-login or offline migration path and its completion check (zero legacy rows) before claiming completion. Treat an incomplete migration as a named residual with an owner.
+
+2. **Inventory and classify.** List every secret and env var; classify each:
    public (safe for client), server-only, CI-only, deploy-only. Anything
    server-only currently reachable by the client is a finding to fix.
-2. **Classify the change** (`change-classification-gate`); rotating live
+3. **Classify the change** (`change-classification-gate`); rotating live
    credentials, editing production config, or touching deploy secrets crosses
    `human-approval-boundary` — check the complete effective approval record
    for an applicable active grant and obtain any missing scope before those
    steps.
-3. **Write the proving check first** where feasible: a test or build assertion
+4. **Write the proving check first** where feasible: a test or build assertion
    that the server-only secret does NOT appear in the client bundle / is not
    readable from the browser. Confirm it FAILS against the current exposed
    state (the leak is real) before fixing.
-4. **Remediate storage:** move hardcoded/committed secrets into the secret
+5. **Remediate storage:** move hardcoded/committed secrets into the secret
    manager or server-only env; load at runtime server-side; replace client
    references to server secrets with a server-side proxy/endpoint.
-5. **Rotate what leaked.** A secret that was committed or client-exposed is
+6. **Rotate what leaked.** A secret that was committed or client-exposed is
    compromised — rotate it under an applicable grant, don't just relocate it. Deleting
    it from source without rotation leaves a live credential in git history.
-6. **Least-privilege service accounts:** narrow grants to what's needed;
+7. **Least-privilege service accounts:** narrow grants to what's needed;
    record what was removed and why.
-7. **Tighten sessions/tokens** if in scope: `HttpOnly`/`Secure`/`SameSite`
+8. **Tighten sessions/tokens** if in scope: `HttpOnly`/`Secure`/`SameSite`
    cookies, sane expiry, working refresh, server-side revocation; add tests.
-8. **Prove it.** Rerun the bundle/exposure check to green; verify a rotated
+9. **Prove it.** Rerun the bundle/exposure check to green; verify a rotated
    credential is honored and the old one rejected (where testable). Record
    real commands and output.
-9. **Stage exactly the intended files** (`reviewable-diff-discipline`) and
+10. **Stage exactly the intended files** (`reviewable-diff-discipline`) and
    report: what moved, what rotated, residual exposure (e.g. history needing
    BFG Repo-Cleaner/history rewrite and rotation), and follow-ups. Never
    print the secret values themselves.
 
 ## Output Format
+
+- Stored-credential hardening report: algorithm/cost inventory, migration path and completion check, named residual rows, and rotation/envelope rules.
 
 ```
 SECRETS & IDENTITY HARDENING — <app/scope>
@@ -108,6 +114,8 @@ Handoff: security-pr-reviewer to verify; ops to complete rotations if pending.
 ```
 
 ## Validation Checklist
+
+- [ ] Stored credentials (if in scope): KDF is Argon2id/scrypt or bcrypt-with-upgrade-plan; migration residual counted and owned; completion check defined.
 
 - [ ] Every secret and env var classified; client-reachable server secrets
       identified.
@@ -171,6 +179,9 @@ Handoff: security-pr-reviewer to verify; ops to complete rotations if pending.
 - [references/secret-classification-and-rotation.md](references/secret-classification-and-rotation.md)
   — the env-classification rubric, client-bundle exposure checks per bundler,
   rotation procedure, and least-privilege service-account patterns.
+- [references/credential-encryption.md](references/credential-encryption.md) —
+  stored-credential hash/KDF rules and the explicit migration residual
+  (extension for roadmap #104; status unchanged).
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination against `appsec-implementer`,
   `threat-modeler`, and `security-pr-reviewer`.

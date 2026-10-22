@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "defect-triage-facilitator",
+  "description": "Behaviour cases for defect-triage-facilitator (6 domain-specific cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Turn this messy bug report into a complete report and triage it with the release team.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the complete bug-report fields (or UNKNOWN labels) and a triage decision with axes, owner and next action.",
+          "Does not invent fixes, reproduction steps or release dates."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Triage these ten defects by severity, frequency and release risk with one owner each.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a ranked triage table with rationale per defect and exactly one owner/next action per row.",
+          "Uses the stated axes (severity/frequency/impact/security/release risk)."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Our bug reports are inconsistent - author the template and a completed example.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Provides the bug-report template with required fields and a completed example.",
+          "States that no live data or fixes were invented."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Ci failure classifier work: handle the deliverable end-to-end for our system.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes the request to the real neighbouring owner named in the prompt.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "This defect has no reproduction steps - complete the report and flag what is missing.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Marks reproduction and evidence as UNKNOWN, requests the missing data, and refuses to invent steps.",
+          "Keeps the ranking honest: no severity claim beyond available facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Run triage for the customer-reported batch and record assumptions and next actions.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Triages the customer-reported batch with assumptions and next actions recorded.",
+          "Routes security-flagged items without promising a fix or release date."
+        ]
+      }
+    }
+  ]
+}

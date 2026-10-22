@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "branching-strategy-designer",
+  "description": "Behaviour cases for branching-strategy-designer (6 domain-specific cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Our branching and release flow is undefined - choose and record a strategy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a decision record with context, a chosen model, alternatives and rules.",
+          "Does not claim to change repository settings."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Decide trunk-based versus release branching for our team and record the trade-offs.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Compares trunk-based versus release branching against the supplied team/release constraints and states a recommendation.",
+          "Lists rejected options with reasons."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design branch naming, protection and review rules with a migration path.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Provides the rule table (naming/protection/review/merge) and a migration plan that handles open branches.",
+          "States the rollback of the process change."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Ci pipeline architect work: handle the deliverable end-to-end for our system.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes the request to the real neighbouring owner named in the prompt.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Our hotfix flow during release freeze is unclear - design the branching decision record.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs the hotfix/release path explicitly during the freeze and records the decision.",
+          "No live settings edit is claimed."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "We are moving to trunk-based - record the rules, merge strategy and migration risks.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Designs the merge-queue/review requirements and states the risks/open constraints.",
+          "Does not change protection settings."
+        ]
+      }
+    }
+  ]
+}

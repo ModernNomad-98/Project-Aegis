@@ -1,0 +1,220 @@
+{
+  "skill": "authentication-flow-reviewer",
+  "description": "Trigger discrimination for authentication-flow-reviewer against the nearest shipped owners.",
+  "overlaps_with": [
+    "agent-authorization-matrix",
+    "appsec-implementer",
+    "audit-log-architect",
+    "authority-invalidation-architect",
+    "authorization-matrix-designer",
+    "code-reviewer",
+    "human-agent-trust-reviewer",
+    "incident-response-runbook",
+    "membership-invitation-designer",
+    "multi-tenant-security-tester",
+    "rls-policy-auditor",
+    "secrets-identity-hardener",
+    "security-pr-reviewer",
+    "tenant-isolation-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "authentication-flow-reviewer-positive-1",
+      "prompt": "Review our authentication as one flow set: login, logout, reset, MFA and session refresh.",
+      "expected_skill": "authentication-flow-reviewer",
+      "should_not_trigger": [
+        "human-agent-trust-reviewer"
+      ],
+      "reason": "The request needs authentication-flow-reviewer's design method; human-agent-trust-reviewer owns a different task."
+    },
+    {
+      "id": "authentication-flow-reviewer-positive-2",
+      "prompt": "Before SSO launch, review the federation and account-linking flows and their failure paths.",
+      "expected_skill": "authentication-flow-reviewer",
+      "should_not_trigger": [
+        "authority-invalidation-architect"
+      ],
+      "reason": "The request needs authentication-flow-reviewer's design method; authority-invalidation-architect owns a different task."
+    },
+    {
+      "id": "authentication-flow-reviewer-positive-3",
+      "prompt": "The password reset journey is inconsistent with login - review the full auth flow matrix.",
+      "expected_skill": "authentication-flow-reviewer",
+      "should_not_trigger": [
+        "secrets-identity-hardener"
+      ],
+      "reason": "The request needs authentication-flow-reviewer's design method; secrets-identity-hardener owns a different task."
+    },
+    {
+      "id": "authentication-flow-reviewer-positive-4",
+      "prompt": "Review MFA enrollment and recovery edge cases and the re-authentication paths.",
+      "expected_skill": "authentication-flow-reviewer",
+      "should_not_trigger": [
+        "membership-invitation-designer"
+      ],
+      "reason": "The request needs authentication-flow-reviewer's design method; membership-invitation-designer owns a different task."
+    },
+    {
+      "id": "authentication-flow-reviewer-positive-5",
+      "prompt": "Map token and session lifecycle across our login, refresh and logout flows and report gaps.",
+      "expected_skill": "authentication-flow-reviewer",
+      "should_not_trigger": [
+        "security-pr-reviewer"
+      ],
+      "reason": "The request needs authentication-flow-reviewer's design method; security-pr-reviewer owns a different task."
+    },
+    {
+      "id": "authentication-flow-reviewer-positive-6",
+      "prompt": "Review the device-trust and profile-resolution paths for our tenant users.",
+      "expected_skill": "authentication-flow-reviewer",
+      "should_not_trigger": [
+        "appsec-implementer"
+      ],
+      "reason": "The request needs authentication-flow-reviewer's design method; appsec-implementer owns a different task."
+    },
+    {
+      "id": "authentication-flow-reviewer-positive-7",
+      "prompt": "Audit the authentication failure, denial and audit expectations across all flows.",
+      "expected_skill": "authentication-flow-reviewer",
+      "should_not_trigger": [
+        "authorization-matrix-designer"
+      ],
+      "reason": "The request needs authentication-flow-reviewer's design method; authorization-matrix-designer owns a different task."
+    },
+    {
+      "id": "authentication-flow-reviewer-positive-8",
+      "prompt": "Our recovery paths differ from login - produce the auth flow matrix and risk-ranked findings.",
+      "expected_skill": "authentication-flow-reviewer",
+      "should_not_trigger": [
+        "tenant-isolation-reviewer"
+      ],
+      "reason": "The request needs authentication-flow-reviewer's design method; tenant-isolation-reviewer owns a different task."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-1",
+      "prompt": "Review the human approval flow for an agent system and how approvals can be gamed.",
+      "expected_skill": "human-agent-trust-reviewer",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is human-agent-trust-reviewer's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-2",
+      "prompt": "Design how authority changes propagate after a role or tenant change.",
+      "expected_skill": "authority-invalidation-architect",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is authority-invalidation-architect's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-3",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Harden the secrets and identity handling for this service and plan the rotation.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is secrets-identity-hardener's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-4",
+      "prompt": "Design the membership invitation workflow with token and seat rules.",
+      "expected_skill": "membership-invitation-designer",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is membership-invitation-designer's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-5",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets and SSRF.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is security-pr-reviewer's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-6",
+      "prompt": "Explicitly invoke appsec-implementer. Implement the named security control test-first and show the negative test.",
+      "expected_skill": "appsec-implementer",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is appsec-implementer's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-7",
+      "prompt": "Design the deny-by-default roles x permissions x resources matrix and enforcement points.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-8",
+      "prompt": "Review the real system for cross-tenant leakage across all surfaces.",
+      "expected_skill": "tenant-isolation-reviewer",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is tenant-isolation-reviewer's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-9",
+      "prompt": "Audit the row-level security policies for tenant scope, recursion and grants.",
+      "expected_skill": "rls-policy-auditor",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is rls-policy-auditor's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-10",
+      "prompt": "Design the audit event taxonomy, schema and append-only integrity rules.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is audit-log-architect's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-11",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Define the deny-by-default standing agent authority matrix.",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is agent-authorization-matrix's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-12",
+      "prompt": "Write the incident response machinery: severity ladder, roles and decision points.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is incident-response-runbook's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-13",
+      "prompt": "Explicitly invoke multi-tenant-security-tester. Design and run the two-tenant executable isolation negative suite.",
+      "expected_skill": "multi-tenant-security-tester",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is multi-tenant-security-tester's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "authentication-flow-reviewer-negative-14",
+      "prompt": "Review this actual diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "authentication-flow-reviewer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; authentication-flow-reviewer owns a different design task and must not take it over."
+    }
+  ]
+}

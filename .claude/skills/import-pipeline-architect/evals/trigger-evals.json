@@ -1,0 +1,220 @@
+{
+  "skill": "import-pipeline-architect",
+  "description": "Trigger discrimination for import-pipeline-architect against the nearest shipped owners.",
+  "overlaps_with": [
+    "api-contract-test-designer",
+    "audit-log-architect",
+    "background-job-orchestration-architect",
+    "command-gateway-architect",
+    "data-migration-runbook-author",
+    "data-quality-monitor-designer",
+    "export-pipeline-architect",
+    "file-upload-storage-architect",
+    "integration-test-designer",
+    "multi-tenant-data-architect",
+    "schema-evolution-planner",
+    "secure-migration-reviewer",
+    "test-data-architect",
+    "validation-boundary-designer"
+  ],
+  "cases": [
+    {
+      "id": "import-pipeline-architect-positive-1",
+      "prompt": "Design the tenant data import pipeline with inspect, map, preview, review and confirm stages.",
+      "expected_skill": "import-pipeline-architect",
+      "should_not_trigger": [
+        "export-pipeline-architect"
+      ],
+      "reason": "The request needs import-pipeline-architect's design method; export-pipeline-architect owns a different task."
+    },
+    {
+      "id": "import-pipeline-architect-positive-2",
+      "prompt": "Our CSV import needs per-row recovery and partial-commit reversal - design the pipeline.",
+      "expected_skill": "import-pipeline-architect",
+      "should_not_trigger": [
+        "data-migration-runbook-author"
+      ],
+      "reason": "The request needs import-pipeline-architect's design method; data-migration-runbook-author owns a different task."
+    },
+    {
+      "id": "import-pipeline-architect-positive-3",
+      "prompt": "Design the import contract: column mapping, validation, dedupe and audit evidence.",
+      "expected_skill": "import-pipeline-architect",
+      "should_not_trigger": [
+        "file-upload-storage-architect"
+      ],
+      "reason": "The request needs import-pipeline-architect's design method; file-upload-storage-architect owns a different task."
+    },
+    {
+      "id": "import-pipeline-architect-positive-4",
+      "prompt": "Import of customer data fails halfway - design the recovery matrix and confirm semantics.",
+      "expected_skill": "import-pipeline-architect",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "The request needs import-pipeline-architect's design method; validation-boundary-designer owns a different task."
+    },
+    {
+      "id": "import-pipeline-architect-positive-5",
+      "prompt": "Mirror the export pipeline contract for our import path with preview and review stages.",
+      "expected_skill": "import-pipeline-architect",
+      "should_not_trigger": [
+        "integration-test-designer"
+      ],
+      "reason": "The request needs import-pipeline-architect's design method; integration-test-designer owns a different task."
+    },
+    {
+      "id": "import-pipeline-architect-positive-6",
+      "prompt": "Design import authorization and tenant isolation for uploaded tenant rows.",
+      "expected_skill": "import-pipeline-architect",
+      "should_not_trigger": [
+        "schema-evolution-planner"
+      ],
+      "reason": "The request needs import-pipeline-architect's design method; schema-evolution-planner owns a different task."
+    },
+    {
+      "id": "import-pipeline-architect-positive-7",
+      "prompt": "Plan the import pipeline test strategy including partial-failure cases.",
+      "expected_skill": "import-pipeline-architect",
+      "should_not_trigger": [
+        "background-job-orchestration-architect"
+      ],
+      "reason": "The request needs import-pipeline-architect's design method; background-job-orchestration-architect owns a different task."
+    },
+    {
+      "id": "import-pipeline-architect-positive-8",
+      "prompt": "Review this import design for re-run safety, dedupe and audit evidence.",
+      "expected_skill": "import-pipeline-architect",
+      "should_not_trigger": [
+        "audit-log-architect"
+      ],
+      "reason": "The request needs import-pipeline-architect's design method; audit-log-architect owns a different task."
+    },
+    {
+      "id": "import-pipeline-architect-negative-1",
+      "prompt": "Design the tenant-data export pipeline with async status and redaction.",
+      "expected_skill": "export-pipeline-architect",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is export-pipeline-architect's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-2",
+      "prompt": "Write the data-migration runbook with verification and rollback.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is data-migration-runbook-author's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-3",
+      "prompt": "Design the file-upload and storage access architecture.",
+      "expected_skill": "file-upload-storage-architect",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is file-upload-storage-architect's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-4",
+      "prompt": "Design where validation lives at every boundary.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-5",
+      "prompt": "Design the integration tests at the real boundary layer.",
+      "expected_skill": "integration-test-designer",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is integration-test-designer's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-6",
+      "prompt": "Plan the schema evolution and migration with compatibility windows.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is schema-evolution-planner's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-7",
+      "prompt": "Design the queue semantics and background-job architecture.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is background-job-orchestration-architect's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-8",
+      "prompt": "Design the audit event taxonomy, schema and append-only integrity rules.",
+      "expected_skill": "audit-log-architect",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is audit-log-architect's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-9",
+      "prompt": "Design the mediated command gateway with idempotency and replay.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is command-gateway-architect's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-10",
+      "prompt": "Decide the per-store tenant scoping and tenant-context propagation.",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is multi-tenant-data-architect's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-11",
+      "prompt": "Design the test-data personas, sources and isolation.",
+      "expected_skill": "test-data-architect",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is test-data-architect's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-12",
+      "prompt": "Design the API contract tests and compatibility gates.",
+      "expected_skill": "api-contract-test-designer",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is api-contract-test-designer's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-13",
+      "prompt": "Design the data-quality monitoring and alerting rules.",
+      "expected_skill": "data-quality-monitor-designer",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is data-quality-monitor-designer's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "import-pipeline-architect-negative-14",
+      "prompt": "Review the whole database migration for deploy safety, RLS gaps and destructive operations.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": [
+        "import-pipeline-architect"
+      ],
+      "reason": "This request is secure-migration-reviewer's deliverable end-to-end; import-pipeline-architect owns a different design task and must not take it over."
+    }
+  ]
+}

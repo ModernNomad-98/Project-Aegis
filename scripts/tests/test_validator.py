@@ -2138,13 +2138,13 @@ def test_coverage_map_evidence_rules():
                          "coverage map: non-GAP row without evidence rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def gap_skill(payload):
-            coverage_entry(payload, 110)["covering_skills"] = ["adr-writer"]
+            coverage_entry(payload, 233)["covering_skills"] = ["adr-writer"]
         with mutated_coverage(Path(tmp), gap_skill) as rep:
             expect_error(rep, "GAP rows must not list covering skills",
                          "coverage map: GAP row with a skill rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def gap_rationale(payload):
-            coverage_entry(payload, 110)["rationale"] = ""
+            coverage_entry(payload, 233)["rationale"] = ""
         with mutated_coverage(Path(tmp), gap_rationale) as rep:
             expect_error(rep, "GAP rows require a non-empty rationale",
                          "coverage map: GAP row without rationale rejected")
@@ -2164,7 +2164,7 @@ def test_coverage_map_summary_totals_mismatch():
     """T9b: each seeded summary totals/per-area defect is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| GAP | 7 |", "| GAP | 6 |", 1)
+            return text.replace("| GAP | 2 |", "| GAP | 6 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'GAP'",
                          "coverage map: summary totals mismatch rejected")
@@ -2179,7 +2179,7 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected (area named)")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| explicit-id | 173 |",
+            return text.replace("| explicit-id | 182 |",
                                 "| explicit-id | 172 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'explicit-id'",
@@ -2194,7 +2194,7 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| P0 / P1 / P2 gaps | 0 / 6 / 1 |",
+            return text.replace("| P0 / P1 / P2 gaps | 0 / 1 / 1 |",
                                 "| P0 / P1 / P2 gaps | 1 / 6 / 1 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary gap-priority totals",
@@ -2202,7 +2202,7 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| Review pending | 125 |",
+            return text.replace("| Review pending | 116 |",
                                 "| Review pending | 124 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'Review pending'",
@@ -2265,14 +2265,14 @@ def test_coverage_map_summary_id_sets():
     """T13: the summary GAP and P0-gap id sets must equal the JSON sets."""
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("- Area 03: 110, 120", "- Area 03: 110", 1)
+            return text.replace("- Area 06: 233, 234", "- Area 06: 233", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary GAP id set",
                          "coverage map: summary GAP id set mismatch rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
             for entry in payload["entries"]:
-                if entry["id"] == 110:
+                if entry["id"] == 233:
                     entry["priority"] = "P0"
                     break
         with mutated_coverage(Path(tmp), mutate) as rep:
@@ -2633,19 +2633,19 @@ def test_coverage_map_codex_visible_text_findings():
 
 
 def test_coverage_map_planning_gate_resolved():
-    """T32: rows #254/#278 are planning-gate resolved; review_pending is 125."""
+    """T32: rows #254/#278 are planning-gate resolved; review_pending is 116."""
     assert validator.COVERAGE_PLANNING_GATE_RESOLVED == frozenset({254, 278})
-    assert validator.COVERAGE_TOTALS["review_pending"] == 125
+    assert validator.COVERAGE_TOTALS["review_pending"] == 116
     payload = json.loads(
         validator.COVERAGE_MAP.read_text(encoding="utf-8"))
     non_explicit = [entry for entry in payload["entries"]
                     if entry.get("evidence_grade") != "explicit-id"]
-    assert len(non_explicit) == 127
+    assert len(non_explicit) == 118
     resolved_present = {entry["id"] for entry in non_explicit
                         if entry["id"] in validator.COVERAGE_PLANNING_GATE_RESOLVED}
     assert resolved_present == {254, 278}
     assert validator.COVERAGE_TOTALS["review_pending"] == (
-        len(non_explicit) - len(resolved_present)) == 125
+        len(non_explicit) - len(resolved_present)) == 116
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
             payload["totals"]["review_pending"] = 126
@@ -2665,7 +2665,7 @@ def test_coverage_map_malformed_id_does_not_crash():
 
 
 def test_coverage_map_triage_rows_and_phrase():
-    """T33: rows #254/#278 carry the owner decision; phrase is 80 of 243."""
+    """T33: rows #254/#278 carry the owner decision; phrase is 83 of 250."""
     payload = json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8"))
     rows = {entry["id"]: entry for entry in payload["entries"]}
     r254 = rows[254]
@@ -2698,10 +2698,10 @@ def test_coverage_map_triage_rows_and_phrase():
     assert "Dropped as covered by ai-sdlc-operating-model" in (
         r278["rationale"] or "")
     phrase = [item for item in validator.COVERAGE_REQUIRED_PHRASES
-              if "80 of 243" in item]
-    assert phrase, "an optionality phrase must carry 80 of 243"
+              if "83 of 250" in item]
+    assert phrase, "an optionality phrase must carry 83 of 250"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
-    assert "80 of 243" in mmd and "80 of 215" not in mmd
+    assert "83 of 250" in mmd and "80 of 215" not in mmd and "80 of 243" not in mmd
     assert "80 of 222" not in mmd and "80 of 230" not in mmd, (
         "both stale optionality phrases (80 of 222 and 80 of 230) must stay rejected")
     assert "83 of 215" not in mmd, (
@@ -2728,14 +2728,14 @@ def test_coverage_map_batch1_deliveries():
         assert (row["status"], row["evidence_grade"]) == (
             "SHIPPED", "explicit-id")
         assert row["covering_skills"] == [skill]
-    assert validator.COVERAGE_TOTALS["manifest_skills"] == 243
-    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 163
-    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
-    assert len(validator.COVERAGE_GAP_IDS) == 7
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 250
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 167
+    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
+    assert len(validator.COVERAGE_GAP_IDS) == 2
     assert validator.COVERAGE_P0_GAP_IDS == ()
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
-               if "80 of 243" in item]
-    assert phrases, "an optionality phrase must carry 80 of 243"
+               if "83 of 250" in item]
+    assert phrases, "an optionality phrase must carry 83 of 250"
 
 
 
@@ -2760,21 +2760,20 @@ def test_coverage_map_batch2_deliveries():
         assert row["covering_skills"] == [skill]
         assert "D109" in (row["evidence"] or "")
         assert row["rationale"] is None
-    assert validator.COVERAGE_TOTALS["manifest_skills"] == 243
-    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 163
-    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
-    assert validator.COVERAGE_TOTALS["review_pending"] == 125
-    assert len(validator.COVERAGE_GAP_IDS) == 7
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 250
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 167
+    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
+    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert len(validator.COVERAGE_GAP_IDS) == 2
     assert validator.COVERAGE_P0_GAP_IDS == ()
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
-               if "80 of 243" in item]
-    assert phrases, "an optionality phrase must carry 80 of 243"
+               if "83 of 250" in item]
+    assert phrases, "an optionality phrase must carry 83 of 250"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     area02 = [line for line in mmd.splitlines()
               if line.startswith("| 02 ")]
-    assert area02 and area02[0].strip().endswith("| 35 | 22 | 4 | 9 | 0 |"), (
-        "coverage summary area 02 row must show 35 entries / 22 shipped / 4 "
-        "covered / 9 partial / 0 GAP")
+    assert area02 and area02[0].strip().endswith("| 35 | 23 | 4 | 8 | 0 |"), (
+        "coverage summary area 02 row must show 35 entries / 23 shipped / 4 covered / 8 partial / 0 GAP")
     reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
                       / "step-0-reconciliation-v4.md").read_text(
                           encoding="utf-8")
@@ -2804,14 +2803,14 @@ def test_coverage_map_batch3_deliveries():
         assert row["covering_skills"] == [skill]
         assert "D110" in (row["evidence"] or "")
         assert row["rationale"] is None
-    assert validator.COVERAGE_TOTALS["manifest_skills"] == 243
-    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 163
-    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
-    assert validator.COVERAGE_TOTALS["review_pending"] == 125
-    assert len(validator.COVERAGE_GAP_IDS) == 7
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 250
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 167
+    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
+    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert len(validator.COVERAGE_GAP_IDS) == 2
     assert validator.COVERAGE_P0_GAP_IDS == ()
     gaps = (payload["totals"]["gap_by_priority"])
-    assert gaps == {"P0": 0, "P1": 6, "P2": 1}, (
+    assert gaps == {"P0": 0, "P1": 1, "P2": 1}, (
         "gap_by_priority keeps the schema_version-1 P0 key at zero")
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
@@ -2828,8 +2827,8 @@ def test_coverage_map_batch3_deliveries():
             expect_error(rep, "must keep the '## GAP candidates",
                          "coverage map: deleted GAP summary section rejected")
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
-               if "80 of 243" in item]
-    assert phrases, "an optionality phrase must carry 80 of 243"
+               if "83 of 250" in item]
+    assert phrases, "an optionality phrase must carry 83 of 250"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     area05 = [line for line in mmd.splitlines()
               if line.startswith("| 05 ")]
@@ -2891,48 +2890,43 @@ def test_coverage_map_step0_hygiene():
         assert "0-B" in (row["notes"] or ""), (row_id, row)
         assert row["rationale"] is None, (row_id, row)
     assert validator.COVERAGE_TOTALS["by_status"] == {
-        "SHIPPED": 173, "COVERED": 57, "PARTIAL": 63, "GAP": 7}
+        "SHIPPED": 182, "COVERED": 57, "PARTIAL": 59, "GAP": 2}
     assert validator.COVERAGE_TOTALS["by_grade"] == {
-        "explicit-id": 173, "catalog-decision": 16,
-        "capability-review": 104, "none": 7}
+        "explicit-id": 182, "catalog-decision": 16,
+        "capability-review": 100, "none": 2}
     assert validator.COVERAGE_TOTALS["gap_by_priority"] == {
-        "P0": 0, "P1": 6, "P2": 1}
+        "P0": 0, "P1": 1, "P2": 1}
     assert validator.COVERAGE_TOTALS["by_priority"] == {
         "P0": 126, "P1": 149, "P2": 25}
-    assert validator.COVERAGE_TOTALS["manifest_skills"] == 243
-    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 163
-    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
-    assert validator.COVERAGE_TOTALS["review_pending"] == 125
-    assert validator.COVERAGE_GAP_IDS == (
-        110, 120, 224, 225, 233, 234, 236)
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 250
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 167
+    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
+    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_GAP_IDS == (233, 234)
     assert validator.COVERAGE_P0_GAP_IDS == ()
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
-               if "80 of 243" in item]
-    assert phrases, "the optionality phrase must stay 80 of 243"
+               if "83 of 250" in item]
+    assert phrases, "the optionality phrase must stay 83 of 250"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
-    assert "80 of 243" in mmd and "80 of 222" not in mmd and "80 of 230" not in mmd
+    assert "83 of 250" in mmd and "80 of 222" not in mmd and "80 of 230" not in mmd and "80 of 243" not in mmd
     totals = payload["totals"]
     assert totals["by_status"] == {
-        "COVERED": 57, "GAP": 7, "PARTIAL": 63, "SHIPPED": 173}
+        "COVERED": 57, "GAP": 2, "PARTIAL": 59, "SHIPPED": 182}
     assert totals["by_grade"] == {
-        "capability-review": 104, "catalog-decision": 16,
-        "explicit-id": 173, "none": 7}
-    assert totals["gap_by_priority"] == {"P0": 0, "P1": 6, "P2": 1}
-    assert "## GAP candidates (all 7 ids)" in mmd
+        "capability-review": 100, "catalog-decision": 16,
+        "explicit-id": 182, "none": 2}
+    assert totals["gap_by_priority"] == {"P0": 0, "P1": 1, "P2": 1}
+    assert "## GAP candidates (all 2 ids)" in mmd
     for line in ("| 01 Software Architecture & Engineering | 55 | 32 | 8 | 15 | 0 |",
-                 "| 02 Software as a service (SaaS) platform architecture | 35 | 22 | 4 | 9 | 0 |",
-                 "| 04 Backend, application programming interface (API), and data engineering | 30 | 8 | 12 | 10 | 0 |",
-                 "| 06 Quality assurance (QA), test architecture, and validation | 55 | 37 | 6 | 8 | 4 |"):
+                 "| 02 Software as a service (SaaS) platform architecture | 35 | 23 | 4 | 8 | 0 |",
+                 "| 04 Backend, application programming interface (API), and data engineering | 30 | 9 | 12 | 9 | 0 |",
+                 "| 06 Quality assurance (QA), test architecture, and validation | 55 | 39 | 6 | 8 | 2 |"):
         assert line in mmd, line
     gap_areas = sorted({line.split(":", 1)[0] for line in mmd.splitlines()
                         if line.startswith("- Area ")})
-    assert gap_areas == ["- Area 03", "- Area 06", "- Area 07"], gap_areas
-    area03 = [line for line in mmd.splitlines() if line.startswith("- Area 03:")]
-    assert area03 == ["- Area 03: 110, 120"], area03
+    assert gap_areas == ["- Area 06"], gap_areas
     area06 = [line for line in mmd.splitlines() if line.startswith("- Area 06:")]
-    assert area06 == ["- Area 06: 224, 225, 233, 234"], area06
-    area07 = [line for line in mmd.splitlines() if line.startswith("- Area 07:")]
-    assert area07 == ["- Area 07: 236"], area07
+    assert area06 == ["- Area 06: 233, 234"], area06
     assert "Row-level evidence companion: [audit registers index](../audits/README.md)" in mmd
     for name, size in (("Aegis-Audit-Register-2026-10-20.json", 5125392),
                        ("Aegis-Coverage-Register-2026-10-20.md", 399618)):
@@ -2998,19 +2992,19 @@ def test_coverage_map_batch4_deliveries():
         assert "D112" in (row["evidence"] or ""), (row_id, row)
         assert "Batch 4" in (row["notes"] or ""), (row_id, row)
         assert row["rationale"] is None, (row_id, row)
-    assert validator.COVERAGE_TOTALS["manifest_skills"] == 243
-    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 163
-    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 80
-    assert validator.COVERAGE_TOTALS["review_pending"] == 125
-    assert validator.COVERAGE_GAP_IDS == (110, 120, 224, 225, 233, 234, 236)
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 250
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 167
+    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
+    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_GAP_IDS == (233, 234)
     assert validator.COVERAGE_P0_GAP_IDS == ()
     assert validator.COVERAGE_TOTALS["by_status"] == {
-        "SHIPPED": 173, "COVERED": 57, "PARTIAL": 63, "GAP": 7}
+        "SHIPPED": 182, "COVERED": 57, "PARTIAL": 59, "GAP": 2}
     assert validator.COVERAGE_TOTALS["by_grade"] == {
-        "explicit-id": 173, "catalog-decision": 16,
-        "capability-review": 104, "none": 7}
+        "explicit-id": 182, "catalog-decision": 16,
+        "capability-review": 100, "none": 2}
     assert validator.COVERAGE_TOTALS["gap_by_priority"] == {
-        "P0": 0, "P1": 6, "P2": 1}
+        "P0": 0, "P1": 1, "P2": 1}
     reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
                       / "step-0-reconciliation-v4.md").read_text(
                           encoding="utf-8")
@@ -3018,9 +3012,9 @@ def test_coverage_map_batch4_deliveries():
     assert reconciliation.index("D112 (2026-10-21)") > reconciliation.index(
         "D111 (2026-10-21)")
     readme = (validator.REPO_ROOT / "README.md").read_text(encoding="utf-8")
-    assert "<!-- SKILL-COUNT -->243<!-- /SKILL-COUNT -->" in readme
+    assert "<!-- SKILL-COUNT -->250<!-- /SKILL-COUNT -->" in readme
     assert (
-        "**242 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> "
+        "**249 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> "
         "discipline families**" in readme)
     assert "3. **Core architecture & engineering** *(Phase 2, 30)*" in readme
     catalog = (validator.REPO_ROOT / "docs" / "skills-catalog.md").read_text(
@@ -3029,7 +3023,7 @@ def test_coverage_map_batch4_deliveries():
         assert (chr(96) + name + chr(96)) in catalog, name
     manifest = json.loads(
         validator.MANIFEST_PATH.read_text(encoding="utf-8"))
-    assert len(manifest["skills"]) == 243
+    assert len(manifest["skills"]) == 250
     expected_names = {
         "state-machine-modeler", "transaction-scope-designer",
         "cqrs-read-model-designer", "configuration-architect",
@@ -3069,11 +3063,235 @@ def test_coverage_map_batch4_deliveries():
         assert len(behaviours) == 6, (name, len(behaviours))
 
 
+def test_coverage_map_batch5_deliveries():
+    """T41: the 7 Batch 5 skills deliver 9 rows + 3 extension bundles covering six extension-only rows."""
+    mapping = {
+        110: "browser-boundary-reviewer",
+        120: "browser-boundary-reviewer",
+        108: "authentication-flow-reviewer",
+        130: "security-drift-detector",
+        224: "defect-triage-facilitator",
+        225: "defect-triage-facilitator",
+        236: "branching-strategy-designer",
+        75: "import-pipeline-architect",
+        150: "import-pipeline-architect",
+    }
+    payload = json.loads(
+        validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    rows = {entry["id"]: entry for entry in payload["entries"]}
+    for row_id, skill in mapping.items():
+        row = rows[row_id]
+        assert (row["status"], row["evidence_grade"]) == (
+            "SHIPPED", "explicit-id"), (row_id, row)
+        assert row["covering_skills"] == [skill], (row_id, row)
+        assert "D113" in (row["evidence"] or ""), (row_id, row)
+        assert "Batch 5" in (row["notes"] or ""), (row_id, row)
+        assert row["rationale"] is None, (row_id, row)
+    assert validator.COVERAGE_TOTALS["manifest_skills"] == 250
+    assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 167
+    assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
+    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_GAP_IDS == (233, 234)
+    assert validator.COVERAGE_P0_GAP_IDS == ()
+    assert validator.COVERAGE_TOTALS["by_status"] == {
+        "SHIPPED": 182, "COVERED": 57, "PARTIAL": 59, "GAP": 2}
+    assert validator.COVERAGE_TOTALS["by_grade"] == {
+        "explicit-id": 182, "catalog-decision": 16,
+        "capability-review": 100, "none": 2}
+    assert validator.COVERAGE_TOTALS["gap_by_priority"] == {
+        "P0": 0, "P1": 1, "P2": 1}
+    reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
+                      / "step-0-reconciliation-v4.md").read_text(
+                          encoding="utf-8")
+    assert "D113 (2026-10-22)" in reconciliation
+    assert reconciliation.index("D113 (2026-10-22)") > reconciliation.index(
+        "D112 (2026-10-21)")
+    readme = (validator.REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "<!-- SKILL-COUNT -->250<!-- /SKILL-COUNT -->" in readme
+    assert ("**249 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> "
+            "discipline families**" in readme)
+    for phase in ("*(Phase 3, 20)*", "*(Phase 4, 14)*", "*(Phase 5, 26)*",
+                  "*(Phase 6, 15)*", "*(Phase 7, 16)*"):
+        assert phase in readme, phase
+    catalog = (validator.REPO_ROOT / "docs" / "skills-catalog.md").read_text(
+        encoding="utf-8")
+    manifest = json.loads(
+        validator.MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert len(manifest["skills"]) == 250
+    manifest_names = {entry["name"] for entry in manifest["skills"]}
+    expected_names = {
+        "browser-boundary-reviewer", "authentication-flow-reviewer",
+        "security-drift-detector", "defect-triage-facilitator",
+        "branching-strategy-designer", "retrieval-engineering-designer",
+        "import-pipeline-architect"}
+    assert expected_names <= manifest_names, expected_names - manifest_names
+    for name in sorted(expected_names):
+        assert (chr(96) + name + chr(96)) in catalog, name
+        skill_md = (validator.REPO_ROOT / ".claude" / "skills" / name
+                    / "SKILL.md").read_text(encoding="utf-8")
+        assert "22 trigger-discrimination cases (8 positive / 14 negative)" in skill_md, name
+        cases = json.loads(
+            (validator.REPO_ROOT / ".claude" / "skills" / name / "evals"
+             / "trigger-evals.json").read_text(encoding="utf-8"))["cases"]
+        positives = [c for c in cases if c["expected_skill"] == name]
+        negatives = [c for c in cases if c["expected_skill"] != name]
+        assert len(cases) == 22 and len(positives) == 8 and len(negatives) == 14, name
+        for case in negatives:
+            owner = case["expected_skill"]
+            assert owner in manifest_names, (name, owner)
+            if owner in {
+                    "appsec-implementer", "vite-build-qa-engineer",
+                    "secrets-identity-hardener", "clickthrough-test-engineer",
+                    "multi-tenant-security-tester", "agent-authorization-matrix",
+                    "agent-memory-governance", "local-ci-mirror-preflight",
+                    "systematic-debugger", "flaky-test-detective",
+                    "ci-pipeline-architect", "reviewable-diff-discipline",
+                    "ai-evaluation-harness", "prompt-injection-defender",
+                    "ai-router-architect"}:
+                assert case["prompt"].startswith(
+                    "Explicitly invoke " + owner + ". "), (name, owner)
+        behaviours = json.loads(
+            (validator.REPO_ROOT / ".claude" / "skills" / name / "evals"
+             / "evals.json").read_text(encoding="utf-8"))["cases"]
+        assert len(behaviours) == 6, name
+        refs = list((validator.REPO_ROOT / ".claude" / "skills" / name
+                     / "references").glob("*.md"))
+        assert len(refs) == 1, (name, refs)
+    for skill, ref in (
+            ("test-plan-designer", "references/qa-scenario-extensions.md"),
+            ("file-upload-storage-architect", "references/storage-access-policy.md"),
+            ("secrets-identity-hardener", "references/credential-encryption.md")):
+        ref_path = validator.REPO_ROOT / ".claude" / "skills" / skill / ref
+        assert ref_path.is_file(), (skill, ref)
+        skill_md = (validator.REPO_ROOT / ".claude" / "skills" / skill
+                    / "SKILL.md").read_text(encoding="utf-8")
+        assert ref in skill_md, (skill, ref)
+
+
+    # The six extension-only roadmap rows keep their status/covering set; the
+    # three bundles (E1-E3) cover them without a coverage-map status change.
+    ext = {
+        231: ("PARTIAL", "capability-review", ["saas-timezone-architect"]),
+        232: ("PARTIAL", "capability-review",
+              ["notification-webhook-ux-designer"]),
+        233: ("GAP", "none", []),
+        234: ("GAP", "none", []),
+        115: ("PARTIAL", "capability-review",
+              ["file-upload-storage-architect", "rls-policy-auditor"]),
+        104: ("SHIPPED", "explicit-id", ["secrets-identity-hardener"]),
+    }
+    for row_id, (status, grade, covering) in ext.items():
+        row = rows[row_id]
+        assert (row["status"], row["evidence_grade"]) == (status, grade), (
+            row_id, row)
+        assert row["covering_skills"] == covering, (row_id, row)
+    e1 = (validator.REPO_ROOT / ".claude" / "skills" / "test-plan-designer"
+          / "references" / "qa-scenario-extensions.md").read_text(
+              encoding="utf-8")
+    for needle in ("#232 - Notification QA Strategy",
+                   "#234 - Export QA Strategy",
+                   "notification-webhook-ux-designer",
+                   "export-pipeline-architect"):
+        assert needle in e1, needle
+    plan_skill = (validator.REPO_ROOT / ".claude" / "skills"
+                  / "test-plan-designer" / "SKILL.md").read_text(
+                      encoding="utf-8")
+    assert "notification-webhook-ux-designer" in plan_skill
+    for regression in ("T41", "T42"):
+        assert regression in reconciliation, regression
+    for row_id in ("#231", "#232", "#233", "#234", "#115", "#104"):
+        assert row_id in reconciliation, row_id
+    e2 = (validator.REPO_ROOT / ".claude" / "skills"
+          / "file-upload-storage-architect" / "references"
+          / "storage-access-policy.md").read_text(encoding="utf-8")
+    assert "Emergency invalidation" in e2
+    assert "rotate/disable the signing credential" in e2
+    e3 = (validator.REPO_ROOT / ".claude" / "skills"
+          / "secrets-identity-hardener" / "references"
+          / "credential-encryption.md").read_text(encoding="utf-8")
+    assert "Argon2id" in e3
+    assert "bcrypt is CPU-hard, not memory-hard" in e3
+    secrets_skill = (validator.REPO_ROOT / ".claude" / "skills"
+                     / "secrets-identity-hardener" / "SKILL.md").read_text(
+                         encoding="utf-8")
+    assert "Stored-credential" in secrets_skill
+    assert "credential-encryption.md" in secrets_skill
+    secrets_evals = json.loads(
+        (validator.REPO_ROOT / ".claude" / "skills"
+         / "secrets-identity-hardener" / "evals" / "evals.json").read_text(
+             encoding="utf-8"))["cases"]
+    stored_case = [case for case in secrets_evals
+                   if case.get("id") == "stored-credential-migration"]
+    assert stored_case, "stored-credential-migration eval must exist"
+    assert stored_case[0]["prompt"].startswith(
+        "Explicitly invoke secrets-identity-hardener. "), (
+            "manual-only strict prefix required on the stored-credential eval")
+    # Complete registration descriptions (no mid-word truncation): the purpose
+    # sentence appears in full in both human-facing registration surfaces.
+    readme_text = (validator.REPO_ROOT / "README.md").read_text(
+        encoding="utf-8")
+    catalog_text = (validator.REPO_ROOT / "docs"
+                    / "skills-catalog.md").read_text(encoding="utf-8")
+    marker = chr(96)
+    for name in sorted(expected_names):
+        readme_row = [line for line in readme_text.splitlines()
+                      if line.startswith("| " + marker + name + marker + " |")]
+        catalog_row = [line for line in catalog_text.splitlines()
+                       if line.startswith("| " + marker + name + marker + " |")]
+        assert readme_row, (name, "README registration row missing")
+        assert catalog_row, (name, "catalog registration row missing")
+        for row in readme_row + catalog_row:
+            cells = [cell.strip() for cell in row.strip("|").split("|")]
+            assert any(len(cell) >= 80 and cell.endswith(".") for cell in cells), (
+                name, "registration description cell incomplete")
+
+def test_coverage_map_batch5_covering_owner_assumptions():
+    """T42: distinct/beyond pins rest on the covering-owner set; no silent drift."""
+    payload = json.loads(
+        validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    rows = {entry["id"]: entry for entry in payload["entries"]}
+    mapping = {
+        110: "browser-boundary-reviewer",
+        120: "browser-boundary-reviewer",
+        108: "authentication-flow-reviewer",
+        130: "security-drift-detector",
+        224: "defect-triage-facilitator",
+        225: "defect-triage-facilitator",
+        236: "branching-strategy-designer",
+        75: "import-pipeline-architect",
+        150: "import-pipeline-architect",
+    }
+    for row_id, skill in mapping.items():
+        assert rows[row_id]["covering_skills"] == [skill], row_id
+    covering = set()
+    for entry in payload["entries"]:
+        covering.update(entry["covering_skills"])
+    assert "human-agent-trust-reviewer" not in covering
+    assert "docs-as-code-architect" not in covering
+    for name in ("browser-boundary-reviewer",
+                 "authentication-flow-reviewer", "security-drift-detector",
+                 "defect-triage-facilitator",
+                 "branching-strategy-designer", "import-pipeline-architect"):
+        assert name in covering, name
+    assert "retrieval-engineering-designer" not in covering
+    manifest = json.loads(
+        validator.MANIFEST_PATH.read_text(encoding="utf-8"))
+    manifest_names = {entry["name"] for entry in manifest["skills"]}
+    assert len(covering) == 167
+    assert len(manifest_names - covering) == 83
+    assert len(covering) == validator.COVERAGE_TOTALS[
+        "distinct_covering_skills"]
+    assert len(manifest_names - covering) == validator.COVERAGE_TOTALS[
+        "beyond_roadmap_skills"]
+
+
+
+
 def test_skills_manifest_provenance():
     """T36: manifest paths exist AND hash-match at source_revision and tree."""
     manifest = json.loads(
         validator.MANIFEST_PATH.read_text(encoding="utf-8"))
-    assert len(manifest["skills"]) == 243
+    assert len(manifest["skills"]) == 250
     revision = manifest["source_revision"]
     assert len(revision) == 40 and all(c in "0123456789abcdef" for c in revision)
     repo = ["git", "-C", str(validator.REPO_ROOT)]
@@ -3154,6 +3372,8 @@ TESTS = [
     test_coverage_map_batch3_deliveries,
     test_coverage_map_step0_hygiene,
     test_coverage_map_batch4_deliveries,
+    test_coverage_map_batch5_deliveries,
+    test_coverage_map_batch5_covering_owner_assumptions,
     test_skills_manifest_provenance,
     test_coverage_map_planning_gate_resolved,
     test_coverage_map_malformed_id_does_not_crash,
