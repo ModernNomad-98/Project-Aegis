@@ -1062,7 +1062,7 @@ against production or live third parties without explicit human approval.
 | `performance-test-harness` | reconciliation §3 Phase 5 Tier 1 (#205) | yes | The measurement instrument: per-surface measured set, environment contract stamped on every result (volume, tenant shape, pinned hardware, declared cache state), baselines + variance-derived noise bands (single-run diffs banned), thresholds CONSUMED from budget/SLO owners, CI tiers with advisory→blocking promotion, UNRUN as a first-class status. |
 | `load-test-planner` | reconciliation §3 Phase 5 Tier 1 (#206) | yes | The traffic plan: workload model from production evidence (write share explicit, open-vs-closed arrival model chosen), whale + long-tail tenant mix with the NOISY-NEIGHBOR scenario judged per-tenant, volumes with skew, load/stress/soak/spike by question, ramps with abort criteria, pass/fail citing owner-set numbers. |
 
-### Skills (D12.2 - product engineering craft pack)
+### Skills (D12.2 — product engineering craft pack)
 
 This section holds **13 advisory design/review skills in two groups**. The **original five**
 (D24, 2026-07-07) are the API/UX craft INSIDE the contract that

@@ -46,4 +46,3 @@ The returned record must name the evidence source for each decision, separate ve
 - Optimistic updates have rollback and conflict handling.
 - Retry/backoff distinguishes retryable from terminal failures.
 - Loading/error boundaries and SSR/hydration behavior are defined; no code claimed.
-

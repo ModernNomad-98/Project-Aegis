@@ -46,4 +46,3 @@ The returned record must name the evidence source for each decision, separate ve
 - Violations have locations and evidence, not adjectives.
 - Abstraction-vs-duplication rule is stated; migration is ordered.
 - No component was edited or refactor claimed.
-

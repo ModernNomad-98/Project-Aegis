@@ -46,4 +46,3 @@ The returned record must name the evidence source for each decision, separate ve
 - Client guards are labeled UX-only; enforcement gaps are named.
 - Negative tests cover unauthorized and under-privileged access.
 - No route or server code was edited or enforcement claimed.
-

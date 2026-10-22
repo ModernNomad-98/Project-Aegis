@@ -45,4 +45,3 @@ The returned record must name the evidence source for each decision, separate ve
 - Invalid/untrusted inputs have defined fallback behavior.
 - History semantics and deep-link behavior are explicit.
 - Privacy rules exclude sensitive values; no routing code claimed.
-

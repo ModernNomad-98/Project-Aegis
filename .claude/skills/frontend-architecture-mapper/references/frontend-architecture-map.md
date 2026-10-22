@@ -45,4 +45,3 @@ The returned record must name the evidence source for each decision, separate ve
 - Gates name their enforcement source (client UX vs server truth).
 - Shared-UI boundaries and cross-feature imports are mapped.
 - Risks/assumptions are separated from facts; no code edit is claimed.
-
