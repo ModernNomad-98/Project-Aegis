@@ -1064,16 +1064,34 @@ against production or live third parties without explicit human approval.
 
 ### Skills (D12.2 — product engineering craft pack)
 
-The 5-skill product-engineering craft pack (reconciliation §3 D12.2 table,
-built by D24, 2026-07-07): the API/UX craft INSIDE the contract that
-`api-event-architect` owns — the craft details (pagination cursors, error
+This section holds **13 advisory design/review skills in two groups**. The **original five**
+(D24, 2026-07-07) are the API/UX craft INSIDE the contract that
+`api-event-architect` owns - the craft details (pagination cursors, error
 taxonomies, empty/loading/error states, notification/webhook UX, mobile
 viewport), never the contract itself. The `api-event-architect` seam is
-pinned in every skill's trigger-evals; `error-taxonomy-designer` (the error
+pinned in every original-five trigger-evals; `error-taxonomy-designer` (the error
 MODEL) and `edge-state-ux-designer` (rendering the error STATE) are pinned
-against each other both ways. All 5 ship `evals/evals.json` **and**
-`evals/trigger-evals.json`; all are design skills that edit nothing →
-**model-invocable**.
+against each other both ways. The **eight Batch-3 additions** (D110, 2026-10-21)
+are frontend architecture and client-state craft: architecture maps, component
+boundaries, route protection, design-token governance, server state, client-state
+review, URL state and PWA boundaries; they are NOT sub-details of the API contract
+and their trigger-evals pin the pre-existing owners plus the batch-internal sibling
+seams that are actually trigger-eval-exercised: frontend-architecture-mapper <->
+component-boundary-designer; design-system-token-governor <->
+component-boundary-designer (trigger case one-way: design-system-token-governor-negative-14,
+with reciprocal Stop Conditions); route-protection-designer <->
+url-state-architect; and client-state-boundary-reviewer <-> url-state-architect
+(trigger case one-way: client-state-boundary-reviewer-positive-7, with reciprocal
+Stop Conditions). **Terminology:** a Stop-Condition seam is reciprocal routing in
+the two SKILL.md files; a trigger-eval-pinned seam is a discrimination case in the
+eval files - the two are not the same and are recorded separately here and in each
+eval file's seam_note. server-state-architect <-> client-state-boundary-reviewer
+is a real reciprocal Stop-Condition seam with no trigger-eval case (accepted
+residual); no server-state-architect <-> url-state-architect seam is claimed.
+
+All 13 ship `evals/evals.json` **and** `evals/trigger-evals.json`. All are advisory:
+the original five are design-only, two of the Batch-3 additions are review-only, and
+none edits files (**model-invocable**).
 
 | Skill | Source (D12.2 / D24) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
@@ -1082,6 +1100,28 @@ against each other both ways. All 5 ship `evals/evals.json` **and**
 | `edge-state-ux-designer` | reconciliation §3 D12.2 | yes | The per-view non-happy-path state matrix: the three distinct empties (first-run/filtered/error), honest loading (skeleton vs spinner, delay threshold, optimistic rollback), error placement by blast radius, partial failure, refetch/offline, forbidden-not-empty. Renders `error-taxonomy-designer`'s codes; a11y verification is `accessibility-test-harness`. |
 | `notification-webhook-ux-designer` | reconciliation §3 D12.2 | yes | The human-facing UX of notifications (channels, per-category preferences, digest/dedup noise control, read-state, opt-out that works) and developer webhooks (delivery log, test-send, replay, secret rotation with an overlap window). The delivery CONTRACT (envelope/signing/retry/versioning/subscriptions) stays with `api-event-architect`. |
 | `mobile-viewport-craft` | reconciliation §3 D12.2 | yes | Mobile/responsive viewport correctness: content-driven breakpoints, touch-target sizing, safe-area/notch, the 100vh→dvh/svh/lvh fix, input/keyboard behavior, hover-absence and gestures, wide-table reflow. Page WEIGHT/network cost stays with `frontend-perf-engineer`; a11y verification with `accessibility-test-harness`. |
+| `frontend-architecture-mapper` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Maps an existing frontend before change: route/layout/provider tree, state owners, data hooks, permission gates and shared-UI boundaries, with risks, assumptions and a verification plan; design-only. |
+| `component-boundary-designer` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Designs component boundaries and ownership: page/container/feature/shared/primitive layers, props/events/context contracts, dependency direction, abstraction-vs-duplication rule, violations and migration; design-only. |
+| `route-protection-designer` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Designs consistent route protection: per-route auth/role/onboarding/admin gates, server enforcement as source of truth, explicit redirect/denied/deep-link behavior and negative tests; design-only. |
+| `design-system-token-governor` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Governs design tokens: semantic taxonomy (color, spacing, typography, state, theme), naming rules, one source of truth and export pipeline, theming/dark-mode contract, drift-proof migration and change governance; design-only. |
+| `server-state-architect` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Designs the client contract for server data: query-key taxonomy, cache/invalidation and stale-time policy, optimistic updates with rollback, retries, loading boundaries and SSR/hydration; design-only. |
+| `client-state-boundary-reviewer` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Reviews where UI state lives: classifies state as local/shared/URL/server-cache/persistent and flags over-globalization, duplication, derived-state drift, hydration and persistence risks with file evidence; review-only. |
+| `url-state-architect` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Designs URL state: which filters/tabs/search/sort/pagination/dialogs belong in the URL, a versioned schema, serialization, defaults/canonicalization, untrusted-input validation, history and privacy rules; design-only. |
+| `pwa-boundary-reviewer` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Reviews PWA boundaries: service-worker registration/scope, per-class cache strategy, update/activation flow, offline fallback, install prompt, push boundary, cached-data security and production-only behavior; review-only. |
+
+The eight Batch-3 additions (D110) form a **frontend architecture & client state** seam:
+they discriminate against the pre-existing owners across the library (architecture-designer,
+data-flow-diagrammer, observability-by-design, authorization-matrix-designer, security-pr-reviewer,
+caching-strategy-designer, feature-flag-architect, offline-first-sync-architect,
+notification-webhook-ux-designer, error-taxonomy-designer, edge-state-ux-designer,
+mobile-viewport-craft, accessibility-test-harness, frontend-perf-engineer,
+visual-regression-test-designer, vite-build-qa-engineer) and exercise the real batch-internal
+sibling seams named in the D12.2 intro (Stop-Condition seams and
+trigger-eval-pinned seams are recorded separately, see the terminology note). The
+server-state <-> client-state seam is a reciprocal Stop-Conditions pair with no
+trigger-eval case (accepted residual); no server-state <-> url-state seam is
+claimed. Each ships 6 behaviour cases and a
+22-case trigger-eval file (8 positive / 14 negative).
 
 ### Skills (D12.5 — PM / product-engineering interface pack)
 

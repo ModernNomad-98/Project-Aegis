@@ -1,0 +1,220 @@
+{
+  "skill": "design-system-token-governor",
+  "description": "Trigger discrimination for design-system-token-governor against the nearest shipped owners.",
+  "overlaps_with": [
+    "accessibility-test-harness",
+    "architecture-designer",
+    "code-reviewer",
+    "component-boundary-designer",
+    "edge-state-ux-designer",
+    "error-taxonomy-designer",
+    "frontend-perf-engineer",
+    "mobile-viewport-craft",
+    "notification-webhook-ux-designer",
+    "product-spec-writer",
+    "tech-spec-writer",
+    "ux-design-iteration",
+    "validation-boundary-designer",
+    "visual-regression-test-designer"
+  ],
+  "cases": [
+    {
+      "id": "design-system-token-governor-positive-1",
+      "prompt": "Design a semantic design-token system: color, spacing, typography, state and theme.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "mobile-viewport-craft"
+      ],
+      "reason": "The request needs design-system-token-governor's design method; mobile-viewport-craft owns a different task."
+    },
+    {
+      "id": "design-system-token-governor-positive-2",
+      "prompt": "Our components hard-code colors and spacing - design the token governance and migration.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "The request needs design-system-token-governor's design method; ux-design-iteration owns a different task."
+    },
+    {
+      "id": "design-system-token-governor-positive-3",
+      "prompt": "Design the single source of truth and export pipeline for design tokens.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "accessibility-test-harness"
+      ],
+      "reason": "The request needs design-system-token-governor's design method; accessibility-test-harness owns a different task."
+    },
+    {
+      "id": "design-system-token-governor-positive-4",
+      "prompt": "Design the theming and dark-mode contract with fallback and per-tenant limits.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "frontend-perf-engineer"
+      ],
+      "reason": "The request needs design-system-token-governor's design method; frontend-perf-engineer owns a different task."
+    },
+    {
+      "id": "design-system-token-governor-positive-5",
+      "prompt": "Define token naming rules and who may add or rename tokens.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "visual-regression-test-designer"
+      ],
+      "reason": "The request needs design-system-token-governor's design method; visual-regression-test-designer owns a different task."
+    },
+    {
+      "id": "design-system-token-governor-positive-6",
+      "prompt": "Design a drift audit and visual-regression protection for the token migration.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "edge-state-ux-designer"
+      ],
+      "reason": "The request needs design-system-token-governor's design method; edge-state-ux-designer owns a different task."
+    },
+    {
+      "id": "design-system-token-governor-positive-7",
+      "prompt": "Review this token set for duplication and drift risks.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "error-taxonomy-designer"
+      ],
+      "reason": "The request needs design-system-token-governor's design method; error-taxonomy-designer owns a different task."
+    },
+    {
+      "id": "design-system-token-governor-positive-8",
+      "prompt": "Design the token deprecation and migration plan so consumer builds do not break.",
+      "expected_skill": "design-system-token-governor",
+      "should_not_trigger": [
+        "notification-webhook-ux-designer"
+      ],
+      "reason": "The request needs design-system-token-governor's design method; notification-webhook-ux-designer owns a different task."
+    },
+    {
+      "id": "design-system-token-governor-negative-1",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is mobile-viewport-craft's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-2",
+      "prompt": "Run a design iteration for this checkout flow: critique the current UX, propose options and converge with the owner.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is ux-design-iteration's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-3",
+      "prompt": "Design the WCAG-pinned accessibility harness: automated scans plus manual keyboard and screen-reader checks.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is accessibility-test-harness's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-4",
+      "prompt": "Improve this page's frontend performance: bundle size, rendering and Core Web Vitals.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-5",
+      "prompt": "Design the visual-regression coverage: stable-state captures, baselines and diff review.",
+      "expected_skill": "visual-regression-test-designer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is visual-regression-test-designer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-6",
+      "prompt": "Design the empty, loading and error states for this dashboard view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is edge-state-ux-designer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-7",
+      "prompt": "Design the error taxonomy and client envelope: stable machine codes, retryable split and actionable messages.",
+      "expected_skill": "error-taxonomy-designer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is error-taxonomy-designer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-8",
+      "prompt": "Design the notification and webhook UX: channels, templates, retry policy and user controls.",
+      "expected_skill": "notification-webhook-ux-designer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is notification-webhook-ux-designer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-9",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-10",
+      "prompt": "Write the product spec for this feature with acceptance criteria and scope boundaries.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is product-spec-writer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-11",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-12",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-13",
+      "prompt": "Design where validation lives at each boundary, with per-boundary schemas and enforcement points.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+    },
+    {
+      "id": "design-system-token-governor-negative-14",
+      "prompt": "Decide the page/container/feature/shared/primitive layers for this frontend and who owns each concern.",
+      "expected_skill": "component-boundary-designer",
+      "should_not_trigger": [
+        "design-system-token-governor"
+      ],
+      "reason": "Batch-3 sibling seam: this request is component-boundary-designer's deliverable; design-system-token-governor must not take it over."
+    }
+  ]
+}

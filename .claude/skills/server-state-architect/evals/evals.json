@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "server-state-architect",
+  "description": "Behaviour cases for server-state-architect (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the server-state contract for this app: query keys, caching and invalidation.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Assigns one owner per server datum and states the no-duplication rule.",
+          "Defines the query-key taxonomy and serialization rules.",
+          "Returns the contract; writes no code."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our query keys and stale times are inconsistent - design a taxonomy and policy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines cache/invalidation and stale-time policy including cross-tab behavior.",
+          "States optimistic-update rollback and conflict handling.",
+          "Does not claim data-layer implementation."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design optimistic updates for this mutation with rollback and conflict handling.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines optimistic-update rollback and conflict handling.",
+          "Defines retry/backoff and distinguishes retryable from terminal failures.",
+          "No data-layer implementation is claimed."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `api-event-architect`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "The shell renders offline-capable cached data while a mutation from another tab conflicts. Design the invalidation, rollback and hydration behavior.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines cross-tab invalidation and the conflict winner/rollback rules.",
+          "Distinguishes cached-offline reads from server truth in the contract.",
+          "Records the residual stale-window risk and its evidence."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just mirror the whole API response in one global store and refetch on every render - skip the key taxonomy.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses a duplicated global store and refetch-everything design and states the single-owner/key-taxonomy requirement.",
+          "Explains the refetch-storm and drift risks instead of modeling them.",
+          "Does not claim a data-layer implementation."
+        ]
+      }
+    }
+  ]
+}

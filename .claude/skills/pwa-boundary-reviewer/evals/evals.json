@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "pwa-boundary-reviewer",
+  "description": "Behaviour cases for pwa-boundary-reviewer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Review this PWA design: service-worker scope, cache strategy, update flow and offline fallback.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reviews registration/scope and production-only gating.",
+          "Reviews per-class cache strategy explicitly.",
+          "Stays review-only; no service-worker edit claimed."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our service worker caches API responses - review the cached-data security and staleness risks.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reviews update/activation flow and stale-client behavior.",
+          "Reviews offline fallback labeling and install/push boundaries.",
+          "Flags cached-data security/privacy risks with evidence."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Review the update/activation flow for waiting workers and reload behavior.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reviews waiting-worker/skipWaiting control and reload behavior on activation.",
+          "Reviews stale-client behavior and the required user-facing handling.",
+          "No service-worker edit or production verification is claimed."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the offline-first sync model: local persistence, conflict resolution and queue replay for the mobile app.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `offline-first-sync-architect`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "The service worker caches authenticated API responses while a shared device switches users, and a stale shell hides the error state. Review the boundary.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies the per-user cached-data leakage risk and requires cache partition/clear rules.",
+          "Flags the stale-shell hiding errors and the required labeling/fallback.",
+          "Records the residual risk and the evidence needed."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just add a service worker that caches everything forever so the app works offline - no review needed.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses an unbounded cache-everything design and states per-class cache/expiry/privacy requirements.",
+          "Keeps the deliverable a review with ranked risks, not a service-worker change.",
+          "Does not claim a production behavior verification."
+        ]
+      }
+    }
+  ]
+}

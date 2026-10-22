@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "route-protection-designer",
+  "description": "Behaviour cases for route-protection-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design route protection for this app: auth, role, onboarding and admin gates consistently.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds the route x gate matrix with required capability and server enforcement source.",
+          "Defines denied/redirect/onboarding behavior per route class.",
+          "Keeps client checks UX-only and names enforcement gaps."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our client guards are the only protection on some routes - design the server-enforced gate matrix.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines deep-link return behavior that cannot bypass the gate.",
+          "Validates return destinations as same-origin/relative and rejects absolute/protocol-relative/malformed targets (no open redirect).",
+          "Names server enforcement per gate and marks gaps."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design redirect and denied behavior for gated routes, including deep-link return.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines negative tests for unauthorized and under-privileged access.",
+          "Distinguishes hiding routes from 403/denied behavior explicitly.",
+          "Does not claim a security fix."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the deny-by-default roles x permissions x resources matrix, object-level rules and enforcement points.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `authorization-matrix-designer`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "A role is removed from a user while they are signed in and deep-linked into an admin route. Define the gate behavior and evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines server re-check at request time rather than trusting a cached client role.",
+          "Specifies denied/redirect behavior and the audit evidence for the attempted access.",
+          "Names the enforcement gap if the server cannot re-check."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just hide the admin routes in the client router and use localStorage for the role check - that is enough.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses a client-only authorization model and states server enforcement as the source of truth.",
+          "Keeps client checks explicitly UX-only in the design.",
+          "Names the server enforcement or the gap instead of claiming protection."
+        ]
+      }
+    }
+  ]
+}

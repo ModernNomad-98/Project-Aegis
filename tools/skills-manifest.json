@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "f40bc7027c7e2794fc8b88e86155e8668718d41d",
+  "source_revision": "38d9467ae1f76da046f8a00148525cb3acd49a32",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -249,6 +249,11 @@
       "sha256": "00bb2e6ebaa759e0015ae6920439f2955df983569a38b0625ab68072ac8ea29c"
     },
     {
+      "name": "client-state-boundary-reviewer",
+      "path": ".claude/skills/client-state-boundary-reviewer/SKILL.md",
+      "sha256": "046e9c7ee0568e3d2f2b4b1ad1188b40c35cba7a0c0165750fe7797ef45f4075"
+    },
+    {
       "name": "cloud-architecture-decider",
       "path": ".claude/skills/cloud-architecture-decider/SKILL.md",
       "sha256": "76a3c4da1d6a339b2939caa399f985a8a18fc03382bc0c456e0a7069cb2b0662"
@@ -287,6 +292,11 @@
       "name": "compliance-gap-auditor",
       "path": ".claude/skills/compliance-gap-auditor/SKILL.md",
       "sha256": "3cd11c8c2c88cb53747bfc317785edcb53b75d285d3ee1abe65948f94fedcad3"
+    },
+    {
+      "name": "component-boundary-designer",
+      "path": ".claude/skills/component-boundary-designer/SKILL.md",
+      "sha256": "d88ba0ac1e264991de5df690e58ab33c4de9c89583cbf438c1e23ac3419090b3"
     },
     {
       "name": "concurrency-race-reviewer",
@@ -352,6 +362,11 @@
       "name": "design-review-facilitator",
       "path": ".claude/skills/design-review-facilitator/SKILL.md",
       "sha256": "ececc41b0c3963130a8d7f283598978db0c87eb135f068915645450612aefaa1"
+    },
+    {
+      "name": "design-system-token-governor",
+      "path": ".claude/skills/design-system-token-governor/SKILL.md",
+      "sha256": "8de25f715d08874ad52dbf0fe020d9e835942413c91efd9a4ee0c9c04de74075"
     },
     {
       "name": "diataxis-doc-organizer",
@@ -447,6 +462,11 @@
       "name": "framework-mapping-refresher",
       "path": ".claude/skills/framework-mapping-refresher/SKILL.md",
       "sha256": "66c157e5a3a3ecd0bcdddfd249cf836cdfa9ca206de8b375a335227617dcb434"
+    },
+    {
+      "name": "frontend-architecture-mapper",
+      "path": ".claude/skills/frontend-architecture-mapper/SKILL.md",
+      "sha256": "07118e34c4d59f13819800f628943d3e7fa72a4ff98612c02ebfaf96ef557403"
     },
     {
       "name": "frontend-perf-engineer",
@@ -734,6 +754,11 @@
       "sha256": "0c0c592598d382a576be7b21962e969041c069e1f06e19559e066bb4f0fcd9ad"
     },
     {
+      "name": "pwa-boundary-reviewer",
+      "path": ".claude/skills/pwa-boundary-reviewer/SKILL.md",
+      "sha256": "45c8f029742b37659142b792a7eaf934bf183cde3e7632332112737bad49d769"
+    },
+    {
       "name": "qa-automation-architect",
       "path": ".claude/skills/qa-automation-architect/SKILL.md",
       "sha256": "3790e36b85b90751b13b2ac10b186c70de5d4d477de7b117942106438f11f277"
@@ -817,6 +842,11 @@
       "name": "rollback-runbook-author",
       "path": ".claude/skills/rollback-runbook-author/SKILL.md",
       "sha256": "3f727f3cfc548633d76bcc4ad4e35f5c72f471f77b513c9d351cbc7df8641e9a"
+    },
+    {
+      "name": "route-protection-designer",
+      "path": ".claude/skills/route-protection-designer/SKILL.md",
+      "sha256": "4a2d3f2d46abf30ae32881b0967bfc42b0b0424ab6b91a7864844a4c9a727efe"
     },
     {
       "name": "saas-cost-architect",
@@ -907,6 +937,11 @@
       "name": "sensitive-disclosure-guard",
       "path": ".claude/skills/sensitive-disclosure-guard/SKILL.md",
       "sha256": "3b160409bcbd74a4cdf1deda5323ae2e610fb319f15c46f373215e04cb785b72"
+    },
+    {
+      "name": "server-state-architect",
+      "path": ".claude/skills/server-state-architect/SKILL.md",
+      "sha256": "ea065a4c6bcffb2139a3a04feef4d50ed72a493dd54b043f5a6856a95211aabc"
     },
     {
       "name": "sharded-validation-with-resume",
@@ -1072,6 +1107,11 @@
       "name": "threat-modeler",
       "path": ".claude/skills/threat-modeler/SKILL.md",
       "sha256": "0809835df58474b4f355cf99108ee08faafe1a51c83ec4d086b32599baafe4e7"
+    },
+    {
+      "name": "url-state-architect",
+      "path": ".claude/skills/url-state-architect/SKILL.md",
+      "sha256": "d7bef6328290c65ac6683059aef168d8439824738f1bf1bbd2fd93da74a2619e"
     },
     {
       "name": "usage-metering-and-cost-attribution-pipeline-designer",

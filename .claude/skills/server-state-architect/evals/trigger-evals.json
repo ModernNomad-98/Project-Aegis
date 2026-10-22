@@ -1,0 +1,222 @@
+{
+  "skill": "server-state-architect",
+  "description": "Trigger discrimination for server-state-architect against the nearest shipped owners.",
+  "overlaps_with": [
+    "api-event-architect",
+    "background-job-orchestration-architect",
+    "caching-strategy-designer",
+    "client-state-boundary-reviewer",
+    "data-flow-diagrammer",
+    "edge-state-ux-designer",
+    "error-taxonomy-designer",
+    "feature-flag-architect",
+    "frontend-perf-engineer",
+    "load-test-planner",
+    "multi-tenant-data-architect",
+    "notification-webhook-ux-designer",
+    "observability-by-design",
+    "performance-test-harness",
+    "validation-boundary-designer"
+  ],
+  "cases": [
+    {
+      "id": "server-state-architect-positive-1",
+      "prompt": "Design the server-state contract for this app: query keys, caching and invalidation.",
+      "expected_skill": "server-state-architect",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs server-state-architect's design method; api-event-architect owns a different task."
+    },
+    {
+      "id": "server-state-architect-positive-2",
+      "prompt": "Our query keys and stale times are inconsistent - design a taxonomy and policy.",
+      "expected_skill": "server-state-architect",
+      "should_not_trigger": [
+        "caching-strategy-designer"
+      ],
+      "reason": "The request needs server-state-architect's design method; caching-strategy-designer owns a different task."
+    },
+    {
+      "id": "server-state-architect-positive-3",
+      "prompt": "Design optimistic updates for this mutation with rollback and conflict handling.",
+      "expected_skill": "server-state-architect",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs server-state-architect's design method; observability-by-design owns a different task."
+    },
+    {
+      "id": "server-state-architect-positive-4",
+      "prompt": "Design retry/backoff and distinguish retryable from terminal failures for these queries.",
+      "expected_skill": "server-state-architect",
+      "should_not_trigger": [
+        "multi-tenant-data-architect"
+      ],
+      "reason": "The request needs server-state-architect's design method; multi-tenant-data-architect owns a different task."
+    },
+    {
+      "id": "server-state-architect-positive-5",
+      "prompt": "Design loading and error boundaries for server data across these routes.",
+      "expected_skill": "server-state-architect",
+      "should_not_trigger": [
+        "background-job-orchestration-architect"
+      ],
+      "reason": "The request needs server-state-architect's design method; background-job-orchestration-architect owns a different task."
+    },
+    {
+      "id": "server-state-architect-positive-6",
+      "prompt": "Design SSR/hydration behavior so server-rendered data does not mismatch on the client.",
+      "expected_skill": "server-state-architect",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "The request needs server-state-architect's design method; data-flow-diagrammer owns a different task."
+    },
+    {
+      "id": "server-state-architect-positive-7",
+      "prompt": "Review this data-fetching design for duplicated server data and invalidation gaps.",
+      "expected_skill": "server-state-architect",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "The request needs server-state-architect's design method; validation-boundary-designer owns a different task."
+    },
+    {
+      "id": "server-state-architect-positive-8",
+      "prompt": "Design the CLIENT query-cache invalidation table for these entities and mutations (backend cache policy/keys stay with the cache-strategy owner).",
+      "expected_skill": "server-state-architect",
+      "should_not_trigger": [
+        "caching-strategy-designer"
+      ],
+      "reason": "The request needs server-state-architect's design method; caching-strategy-designer owns a different task."
+    },
+    {
+      "id": "server-state-architect-negative-1",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is api-event-architect's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-2",
+      "prompt": "Design the caching strategy: what to cache, keys, invalidation and stampede protection.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "Client query-cache keys/invalidation/stale-time policy is server-state-architect's deliverable; backend cache storage policy and stampede protection are caching-strategy-designer's. This prompt asks for the latter."
+    },
+    {
+      "id": "server-state-architect-negative-3",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-4",
+      "prompt": "Decide per-store tenant scoping for caches, search and the vector store, and design the tenant-context propagation contract.",
+      "expected_skill": "multi-tenant-data-architect",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is multi-tenant-data-architect's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-5",
+      "prompt": "Design the queue semantics and background-job architecture: delivery, ordering, idempotency and dead letters.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is background-job-orchestration-architect's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-6",
+      "prompt": "Draw the data-flow diagram for the checkout: inputs, stores, transforms, side effects and trust boundaries.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is data-flow-diagrammer's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-7",
+      "prompt": "Design where validation lives at each boundary, with per-boundary schemas and enforcement points.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-8",
+      "prompt": "Design the feature-flag system: flag store, one internal interface, evaluation placement and kill-switch flip authority.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is feature-flag-architect's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-9",
+      "prompt": "Design the notification and webhook UX: channels, templates, retry policy and user controls.",
+      "expected_skill": "notification-webhook-ux-designer",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is notification-webhook-ux-designer's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-10",
+      "prompt": "Design the empty, loading and error states for this dashboard view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is edge-state-ux-designer's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-11",
+      "prompt": "Design the error taxonomy and client envelope: stable machine codes, retryable split and actionable messages.",
+      "expected_skill": "error-taxonomy-designer",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is error-taxonomy-designer's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-12",
+      "prompt": "Design the performance test set: measured surfaces, environment contract and variance-derived thresholds.",
+      "expected_skill": "performance-test-harness",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is performance-test-harness's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-13",
+      "prompt": "Plan the load test with a workload model and arrival mode.",
+      "expected_skill": "load-test-planner",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is load-test-planner's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "server-state-architect-negative-14",
+      "prompt": "Improve this page's frontend performance: bundle size, rendering and Core Web Vitals.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": [
+        "server-state-architect"
+      ],
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; server-state-architect owns a different design task and must not take it over."
+    }
+  ],
+  "seam_note": "client-state-boundary-reviewer <-> server-state-architect: reciprocal Stop Conditions for UI state placement review vs server-data contract/cache ownership; intentionally Stop-Conditions-only in the evals (22-case convention kept). Do not remove accidentally."
+}

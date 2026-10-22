@@ -1,0 +1,223 @@
+{
+  "skill": "client-state-boundary-reviewer",
+  "description": "Trigger discrimination for client-state-boundary-reviewer against the nearest shipped owners.",
+  "overlaps_with": [
+    "api-event-architect",
+    "architecture-designer",
+    "caching-strategy-designer",
+    "code-reviewer",
+    "edge-state-ux-designer",
+    "error-taxonomy-designer",
+    "feature-flag-architect",
+    "frontend-perf-engineer",
+    "full-codebase-auditor",
+    "load-test-planner",
+    "mobile-viewport-craft",
+    "observability-by-design",
+    "performance-test-harness",
+    "server-state-architect",
+    "url-state-architect",
+    "validation-boundary-designer"
+  ],
+  "cases": [
+    {
+      "id": "client-state-boundary-reviewer-positive-1",
+      "prompt": "Review where UI state lives in this app and flag over-globalization.",
+      "expected_skill": "client-state-boundary-reviewer",
+      "should_not_trigger": [
+        "feature-flag-architect"
+      ],
+      "reason": "The request needs client-state-boundary-reviewer's design method; feature-flag-architect owns a different task."
+    },
+    {
+      "id": "client-state-boundary-reviewer-positive-2",
+      "prompt": "Classify our state as local/shared/URL/server-cache/persistent and find misplacements.",
+      "expected_skill": "client-state-boundary-reviewer",
+      "should_not_trigger": [
+        "performance-test-harness"
+      ],
+      "reason": "The request needs client-state-boundary-reviewer's design method; performance-test-harness owns a different task."
+    },
+    {
+      "id": "client-state-boundary-reviewer-positive-3",
+      "prompt": "Our state is duplicated across stores - review the boundaries with evidence.",
+      "expected_skill": "client-state-boundary-reviewer",
+      "should_not_trigger": [
+        "load-test-planner"
+      ],
+      "reason": "The request needs client-state-boundary-reviewer's design method; load-test-planner owns a different task."
+    },
+    {
+      "id": "client-state-boundary-reviewer-positive-4",
+      "prompt": "Assess hydration and persistence risks in this frontend state design.",
+      "expected_skill": "client-state-boundary-reviewer",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs client-state-boundary-reviewer's design method; code-reviewer owns a different task."
+    },
+    {
+      "id": "client-state-boundary-reviewer-positive-5",
+      "prompt": "Review this store/context tree for derived-state drift and lifetime mismatches.",
+      "expected_skill": "client-state-boundary-reviewer",
+      "should_not_trigger": [
+        "full-codebase-auditor"
+      ],
+      "reason": "The request needs client-state-boundary-reviewer's design method; full-codebase-auditor owns a different task."
+    },
+    {
+      "id": "client-state-boundary-reviewer-positive-6",
+      "prompt": "Rank our state-placement issues by risk and propose minimal changes.",
+      "expected_skill": "client-state-boundary-reviewer",
+      "should_not_trigger": [
+        "caching-strategy-designer"
+      ],
+      "reason": "The request needs client-state-boundary-reviewer's design method; caching-strategy-designer owns a different task."
+    },
+    {
+      "id": "client-state-boundary-reviewer-positive-7",
+      "prompt": "Review where navigation state is duplicated between the URL schema and client stores (a boundary review; URL schema design stays with the URL-state owner).",
+      "expected_skill": "client-state-boundary-reviewer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "The request needs client-state-boundary-reviewer's design method; url-state-architect owns a different task."
+    },
+    {
+      "id": "client-state-boundary-reviewer-positive-8",
+      "prompt": "Produce a state map with file-evidenced findings and a not-inspected list.",
+      "expected_skill": "client-state-boundary-reviewer",
+      "should_not_trigger": [
+        "frontend-perf-engineer"
+      ],
+      "reason": "The request needs client-state-boundary-reviewer's design method; frontend-perf-engineer owns a different task."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-1",
+      "prompt": "Design the feature-flag system: flag store, one internal interface, evaluation placement and kill-switch flip authority.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is feature-flag-architect's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-2",
+      "prompt": "Design the performance test set: measured surfaces, environment contract and variance-derived thresholds.",
+      "expected_skill": "performance-test-harness",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is performance-test-harness's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-3",
+      "prompt": "Design a versioned URL state schema with serialization and validation for shareable filters.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "Batch-3 sibling seam: this request is url-state-architect's deliverable; client-state-boundary-reviewer must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-4",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-5",
+      "prompt": "Audit the whole repository with an inventory-first coverage plan and confirmed/likely/unknown findings.",
+      "expected_skill": "full-codebase-auditor",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is full-codebase-auditor's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-6",
+      "prompt": "Design the caching strategy: what to cache, keys, invalidation and stampede protection.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-7",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-8",
+      "prompt": "Improve this page's frontend performance: bundle size, rendering and Core Web Vitals.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-9",
+      "prompt": "Design the empty, loading and error states for this dashboard view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is edge-state-ux-designer's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-10",
+      "prompt": "Design the error taxonomy and client envelope: stable machine codes, retryable split and actionable messages.",
+      "expected_skill": "error-taxonomy-designer",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is error-taxonomy-designer's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-11",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is mobile-viewport-craft's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-12",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-13",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is api-event-architect's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    },
+    {
+      "id": "client-state-boundary-reviewer-negative-14",
+      "prompt": "Design where validation lives at each boundary, with per-boundary schemas and enforcement points.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "client-state-boundary-reviewer"
+      ],
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+    }
+  ],
+  "seam_note": "server-state-architect <-> client-state-boundary-reviewer: the two SKILL.md Stop Conditions route to each other for server-data contract/cache ownership vs UI state placement. The leg is intentionally Stop-Conditions-only in the behaviour/trigger evals (no extra case, keeping the 22-case = 8 positive / 14 negative convention); do not delete this note or the overlap."
+}

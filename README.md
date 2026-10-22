@@ -777,7 +777,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->222<!-- /SKILL-COUNT --> skills comprise **221 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->230<!-- /SKILL-COUNT --> skills comprise **229 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -848,10 +848,12 @@ keeps a human as the approval gate on anything irreversible. See
     plans, N+1 queries (one query per item instead of one batched query), caching, latency; plus performance/load test harnesses. *e.g.*
     `schema-evolution-planner`, `pii-lifecycle-designer`, `query-plan-reader`,
     `n-plus-one-detector`, `load-test-planner`.
-14. **Product, PM & growth** *(D24, 15 + iteration, 16)* — turning product intent into shippable, measured work:
+14. **Product, PM & growth** *(D24, 23 + iteration, 24)* — turning product intent into shippable, measured work:
     requirements elicitation feeding specs, then prioritization, flag-gated rollout,
-    analytics instrumentation and an optional pre-implementation design-iteration
-    path — see
+    analytics instrumentation, an optional pre-implementation design-iteration
+    path, and (Batch 3/D110) frontend architecture and client-state craft: maps,
+    component boundaries, route protection, design tokens, server/URL/client state
+    and PWA boundaries — see
     [Your first session](#your-first-session) for the entry-point walkthrough.
     *e.g.* `requirements-gathering-facilitator`, `product-spec-writer`,
     `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `event-schema-architect`,
@@ -1409,9 +1411,13 @@ production without explicit human approval:
 | `performance-test-harness` | The measurement instrument: per-surface measured set, environment contract stamped on every result, baselines + variance-derived noise bands (single-run diffs banned), thresholds CONSUMED from budget/SLO owners, CI tiers with advisory→blocking promotion, UNRUN as a first-class status. | auto + manual |
 | `load-test-planner` | The traffic plan: workload model from production evidence (write share explicit, arrival model chosen), whale + long-tail tenant mix with the noisy-neighbor scenario judged per-tenant, volumes with skew, load/stress/soak/spike by question, ramps with abort criteria, owner-cited pass/fail. | auto + manual |
 
-D12.2 — product engineering craft (D24): the API/UX craft INSIDE the
-contract that `api-event-architect` owns (the craft details, not the
-contract itself):
+D12.2 — product engineering craft (D24; plus the eight Batch-3 frontend
+architecture/client-state additions under D110): 13 advisory design/review
+skills in two groups — the original five are the API/UX craft INSIDE the
+contract that `api-event-architect` owns (craft details, not the contract
+itself), and the Batch-3 group covers frontend architecture maps, component
+boundaries, route protection, design-token governance, server/client/URL state
+and PWA boundaries; all advisory, edit nothing:
 
 | Skill | What it does | Invocation |
 |---|---|---|
@@ -1420,6 +1426,14 @@ contract itself):
 | `edge-state-ux-designer` | The per-view non-happy-path state matrix: the three distinct empties (first-run/filtered/error), honest loading (skeleton vs spinner, delay threshold, optimistic rollback), error placement by blast radius, partial failure, refetch/offline, forbidden-not-empty. Renders `error-taxonomy-designer`'s codes. | auto + manual |
 | `notification-webhook-ux-designer` | The human-facing UX of notifications (channels, per-category preferences, digest/dedup noise control, read-state, opt-out that works) and developer webhooks (delivery log, test-send, replay, secret rotation with an overlap window); the delivery CONTRACT stays with `api-event-architect`. | auto + manual |
 | `mobile-viewport-craft` | Mobile/responsive viewport correctness: content-driven breakpoints, touch-target sizing, safe-area/notch, the 100vh→dvh/svh/lvh fix, input/keyboard behavior, hover-absence and gestures, wide-table reflow; page WEIGHT stays with `frontend-perf-engineer`. | auto + manual |
+| `frontend-architecture-mapper` | (Batch 3, #161) Maps an existing frontend before change: route/layout/provider tree, state owners, data hooks, permission gates and shared-UI boundaries, with risks, assumptions and a verification plan; design-only. | auto + manual |
+| `component-boundary-designer` | (Batch 3, #162) Designs component boundaries and ownership: page/container/feature/shared/primitive layers, props/events/context contracts, dependency direction, abstraction-vs-duplication rule, violations and migration; design-only. | auto + manual |
+| `route-protection-designer` | (Batch 3, #164) Designs consistent route protection: per-route auth/role/onboarding/admin gates, server enforcement as source of truth, explicit redirect/denied/deep-link behavior and negative tests; design-only. | auto + manual |
+| `design-system-token-governor` | (Batch 3, #163) Governs design tokens: semantic taxonomy (color, spacing, typography, state, theme), naming rules, one source of truth and export pipeline, theming/dark-mode contract, drift-proof migration and change governance; design-only. | auto + manual |
+| `server-state-architect` | (Batch 3, #167) Designs the client contract for server data: query-key taxonomy, cache/invalidation and stale-time policy, optimistic updates with rollback, retries, loading boundaries and SSR/hydration; design-only. | auto + manual |
+| `client-state-boundary-reviewer` | (Batch 3, #168) Reviews where UI state lives: classifies state as local/shared/URL/server-cache/persistent and flags over-globalization, duplication, derived-state drift, hydration and persistence risks with file evidence; review-only. | auto + manual |
+| `url-state-architect` | (Batch 3, #169) Designs URL state: which filters/tabs/search/sort/pagination/dialogs belong in the URL, a versioned schema, serialization, defaults/canonicalization, untrusted-input validation, history and privacy rules; design-only. | auto + manual |
+| `pwa-boundary-reviewer` | (Batch 3, #176) Reviews PWA boundaries: service-worker registration/scope, per-class cache strategy, update/activation flow, offline fallback, install prompt, push boundary, cached-data security and production-only behavior; review-only. | auto + manual |
 
 D12.5 — PM / product-engineering interface (D24): the engineering/PM
 boundary. Two hard seams pinned both ways in trigger-evals —

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "component-boundary-designer",
+  "description": "Behaviour cases for component-boundary-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Decide the page/container/feature/shared/primitive layers for this frontend and who owns each concern.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines the page/container/feature/shared/primitive taxonomy with one owner per concern.",
+          "States props/events/context contracts and forbidden couplings.",
+          "Returns boundary rules and violations; edits nothing."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our shared components import feature code - design the boundary rules and dependency direction.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "States allowed dependency direction and shared-component policy.",
+          "Locates duplication and feature-to-feature imports with evidence.",
+          "Does not claim a component refactor."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design component contracts so data fetching stops leaking into primitives.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Applies an explicit abstraction-vs-duplication rule.",
+          "Orders the migration and names the owner for each decision.",
+          "Returns the boundary record, not edited components."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `observability-by-design`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Two teams already share a component with different contracts and neither will give it up. Propose boundaries without inventing an owner.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records both contracts as conflicting dependencies and states the decision needed.",
+          "Defines a compatibility seam or split with migration cost instead of forcing one owner silently.",
+          "Lists the assumptions and the owner who must decide."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just refactor the whole component tree into your boundary scheme now and skip the migration plan.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to edit components and returns the boundary rules plus ordered migration plan.",
+          "Keeps one-owner-per-concern explicit and delegates implementation.",
+          "Does not claim a refactor, test run or build fix it did not perform."
+        ]
+      }
+    }
+  ]
+}

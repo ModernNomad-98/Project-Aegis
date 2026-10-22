@@ -1,0 +1,222 @@
+{
+  "skill": "url-state-architect",
+  "description": "Trigger discrimination for url-state-architect against the nearest shipped owners.",
+  "overlaps_with": [
+    "accessibility-test-harness",
+    "api-event-architect",
+    "client-state-boundary-reviewer",
+    "code-reviewer",
+    "edge-state-ux-designer",
+    "error-taxonomy-designer",
+    "frontend-perf-engineer",
+    "mobile-viewport-craft",
+    "notification-webhook-ux-designer",
+    "product-spec-writer",
+    "route-protection-designer",
+    "tech-spec-writer",
+    "ux-design-iteration",
+    "validation-boundary-designer",
+    "visual-regression-test-designer"
+  ],
+  "cases": [
+    {
+      "id": "url-state-architect-positive-1",
+      "prompt": "Design which filters, tabs, search, sort and pagination belong in the URL.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs url-state-architect's design method; api-event-architect owns a different task."
+    },
+    {
+      "id": "url-state-architect-positive-2",
+      "prompt": "Design a versioned URL state schema with serialization and defaults.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "edge-state-ux-designer"
+      ],
+      "reason": "The request needs url-state-architect's design method; edge-state-ux-designer owns a different task."
+    },
+    {
+      "id": "url-state-architect-positive-3",
+      "prompt": "Our URL parameters are unvalidated and non-canonical - design the validation and canonicalization rules.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "error-taxonomy-designer"
+      ],
+      "reason": "The request needs url-state-architect's design method; error-taxonomy-designer owns a different task."
+    },
+    {
+      "id": "url-state-architect-positive-4",
+      "prompt": "Design the history/back behavior for URL-encoded tabs and dialogs.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "route-protection-designer"
+      ],
+      "reason": "The request needs url-state-architect's design method; route-protection-designer owns a different task."
+    },
+    {
+      "id": "url-state-architect-positive-5",
+      "prompt": "Define privacy rules for URL state so sensitive values never appear in links.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "The request needs url-state-architect's design method; ux-design-iteration owns a different task."
+    },
+    {
+      "id": "url-state-architect-positive-6",
+      "prompt": "Design the deep-link contract for shareable filtered views.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs url-state-architect's design method; code-reviewer owns a different task."
+    },
+    {
+      "id": "url-state-architect-positive-7",
+      "prompt": "Migrate our query-parameter scheme to a versioned schema without breaking links.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "frontend-perf-engineer"
+      ],
+      "reason": "The request needs url-state-architect's design method; frontend-perf-engineer owns a different task."
+    },
+    {
+      "id": "url-state-architect-positive-8",
+      "prompt": "Review this URL state design for cache/analytics duplication and unsafe inputs.",
+      "expected_skill": "url-state-architect",
+      "should_not_trigger": [
+        "accessibility-test-harness"
+      ],
+      "reason": "The request needs url-state-architect's design method; accessibility-test-harness owns a different task."
+    },
+    {
+      "id": "url-state-architect-negative-1",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is api-event-architect's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-2",
+      "prompt": "Design the empty, loading and error states for this dashboard view.",
+      "expected_skill": "edge-state-ux-designer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is edge-state-ux-designer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-3",
+      "prompt": "Design the error taxonomy and client envelope: stable machine codes, retryable split and actionable messages.",
+      "expected_skill": "error-taxonomy-designer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is error-taxonomy-designer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-4",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is mobile-viewport-craft's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-5",
+      "prompt": "Run a design iteration for this checkout flow: critique the current UX, propose options and converge with the owner.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is ux-design-iteration's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-6",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-7",
+      "prompt": "Improve this page's frontend performance: bundle size, rendering and Core Web Vitals.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-8",
+      "prompt": "Design the WCAG-pinned accessibility harness: automated scans plus manual keyboard and screen-reader checks.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is accessibility-test-harness's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-9",
+      "prompt": "Design the notification and webhook UX: channels, templates, retry policy and user controls.",
+      "expected_skill": "notification-webhook-ux-designer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is notification-webhook-ux-designer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-10",
+      "prompt": "Write the product spec for this feature with acceptance criteria and scope boundaries.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is product-spec-writer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-11",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-12",
+      "prompt": "Design the visual-regression coverage: stable-state captures, baselines and diff review.",
+      "expected_skill": "visual-regression-test-designer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is visual-regression-test-designer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-13",
+      "prompt": "Design where validation lives at each boundary, with per-boundary schemas and enforcement points.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "url-state-architect-negative-14",
+      "prompt": "Design route protection for this app: auth, role, onboarding and admin gates consistently.",
+      "expected_skill": "route-protection-designer",
+      "should_not_trigger": [
+        "url-state-architect"
+      ],
+      "reason": "Batch-3 sibling seam: this request is route-protection-designer's deliverable; url-state-architect must not take it over."
+    }
+  ],
+  "seam_note": "client-state-boundary-reviewer <-> url-state-architect: RECIPROCAL Stop-Condition seam (url-state routes UI state placement review to client-state; client-state routes URL schema design here). The trigger-eval pin is currently one-way: client-state-boundary-reviewer-positive-7 has should_not_trigger url-state-architect; this file keeps no extra case (22-case convention). Stop-Condition seam != trigger-eval-pinned seam. Do not remove this note or the overlap."
+}

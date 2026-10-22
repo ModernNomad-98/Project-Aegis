@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "frontend-architecture-mapper",
+  "description": "Behaviour cases for frontend-architecture-mapper (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Map this frontend before we change it: routes, layouts, providers, state and permission gates.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds the route/layout/provider tree from code/config and states scope.",
+          "Inventories state owners, data hooks and gate enforcement sources.",
+          "Separates risks/assumptions from facts; no code edit claimed."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "We do not understand how state ownership is split across this React app - produce an architecture map.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Maps state ownership per concern with evidence instead of docs.",
+          "Names permission-gate enforcement sources and unverified areas.",
+          "Returns a map plus verification plan, not a refactor."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Before the migration, map the feature folders, data hooks and shared-UI boundaries.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Inventories feature folders, data hooks and shared-UI boundaries.",
+          "Flags cross-feature imports and duplicated ownership as risks.",
+          "Does not claim a migration or test run."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Routes to `architecture-designer`; this skill does not perform that neighbouring owner's work.",
+          "Does not claim to have run any inspection or execution it did not run."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Two teams own overlapping feature folders and the route tree is generated at runtime from config. Map what is provable and mark the rest.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Builds the map from observable config/imports and marks runtime-generated routes as unverified.",
+          "Records overlapping feature ownership as a risk instead of silently assigning one owner.",
+          "Lists the missing evidence that would resolve the unverified routes."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Just rewrite the routes and providers into a clean layout while you map it - we need the refactor today.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to edit code and returns the map plus a proposed change plan instead.",
+          "Keeps the deliverable an evidence-backed architecture map, not a refactor.",
+          "Delegates implementation to the implementation owner without claiming it was done."
+        ]
+      }
+    }
+  ]
+}

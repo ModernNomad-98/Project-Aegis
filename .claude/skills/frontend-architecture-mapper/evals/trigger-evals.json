@@ -1,0 +1,221 @@
+{
+  "skill": "frontend-architecture-mapper",
+  "description": "Trigger discrimination for frontend-architecture-mapper against the nearest shipped owners.",
+  "overlaps_with": [
+    "accessibility-test-harness",
+    "api-event-architect",
+    "architecture-designer",
+    "code-reviewer",
+    "component-boundary-designer",
+    "data-flow-diagrammer",
+    "domain-modeler",
+    "full-codebase-auditor",
+    "mobile-viewport-craft",
+    "observability-by-design",
+    "principal-code-analyst",
+    "tech-spec-writer",
+    "ux-design-iteration",
+    "validation-boundary-designer",
+    "vite-build-qa-engineer"
+  ],
+  "cases": [
+    {
+      "id": "frontend-architecture-mapper-positive-1",
+      "prompt": "Map this frontend before we change it: routes, layouts, providers, state and permission gates.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "component-boundary-designer"
+      ],
+      "reason": "The request needs frontend-architecture-mapper's design method; component-boundary-designer owns a different task."
+    },
+    {
+      "id": "frontend-architecture-mapper-positive-2",
+      "prompt": "We do not understand how state ownership is split across this React app - produce an architecture map.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "The request needs frontend-architecture-mapper's design method; data-flow-diagrammer owns a different task."
+    },
+    {
+      "id": "frontend-architecture-mapper-positive-3",
+      "prompt": "Before the migration, map the feature folders, data hooks and shared-UI boundaries.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "principal-code-analyst"
+      ],
+      "reason": "The request needs frontend-architecture-mapper's design method; principal-code-analyst owns a different task."
+    },
+    {
+      "id": "frontend-architecture-mapper-positive-4",
+      "prompt": "Produce a trustworthy route/layout/provider tree with the state owners and gate enforcement sources.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs frontend-architecture-mapper's design method; code-reviewer owns a different task."
+    },
+    {
+      "id": "frontend-architecture-mapper-positive-5",
+      "prompt": "Our onboarding docs are stale - build a verified frontend architecture map from the code.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "domain-modeler"
+      ],
+      "reason": "The request needs frontend-architecture-mapper's design method; domain-modeler owns a different task."
+    },
+    {
+      "id": "frontend-architecture-mapper-positive-6",
+      "prompt": "Map permission gates and where identity/role decisions are consumed across this app.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs frontend-architecture-mapper's design method; api-event-architect owns a different task."
+    },
+    {
+      "id": "frontend-architecture-mapper-positive-7",
+      "prompt": "Inventory cross-feature imports and shared-UI boundaries before we refactor.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "tech-spec-writer"
+      ],
+      "reason": "The request needs frontend-architecture-mapper's design method; tech-spec-writer owns a different task."
+    },
+    {
+      "id": "frontend-architecture-mapper-positive-8",
+      "prompt": "Map the frontend architecture and list the risks, assumptions and unverified elements.",
+      "expected_skill": "frontend-architecture-mapper",
+      "should_not_trigger": [
+        "ux-design-iteration"
+      ],
+      "reason": "The request needs frontend-architecture-mapper's design method; ux-design-iteration owns a different task."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-1",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-2",
+      "prompt": "Draw the data-flow diagram for the checkout: inputs, stores, transforms, side effects and trust boundaries.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is data-flow-diagrammer's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-3",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expected_skill": "principal-code-analyst",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is principal-code-analyst's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-4",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-5",
+      "prompt": "Model the domain: bounded contexts, aggregates and invariants before implementation.",
+      "expected_skill": "domain-modeler",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is domain-modeler's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-6",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is api-event-architect's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-7",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-8",
+      "prompt": "Run a design iteration for this checkout flow: critique the current UX, propose options and converge with the owner.",
+      "expected_skill": "ux-design-iteration",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is ux-design-iteration's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-9",
+      "prompt": "Make this checkout layout work on mobile across breakpoints, touch targets and safe areas.",
+      "expected_skill": "mobile-viewport-craft",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is mobile-viewport-craft's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-10",
+      "prompt": "Design the WCAG-pinned accessibility harness: automated scans plus manual keyboard and screen-reader checks.",
+      "expected_skill": "accessibility-test-harness",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is accessibility-test-harness's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-11",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-12",
+      "prompt": "Design where validation lives at each boundary, with per-boundary schemas and enforcement points.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-13",
+      "prompt": "Audit the whole repository with an inventory-first coverage plan and confirmed/likely/unknown findings.",
+      "expected_skill": "full-codebase-auditor",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is full-codebase-auditor's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    },
+    {
+      "id": "frontend-architecture-mapper-negative-14",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. QA this Vite build: dist-level env classification, build/preview parity and bundle budgets.",
+      "expected_skill": "vite-build-qa-engineer",
+      "should_not_trigger": [
+        "frontend-architecture-mapper"
+      ],
+      "reason": "This request is vite-build-qa-engineer's deliverable end-to-end; frontend-architecture-mapper owns a different design task and must not take it over."
+    }
+  ]
+}
