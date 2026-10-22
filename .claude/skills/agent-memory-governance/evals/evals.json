@@ -73,9 +73,13 @@
       "expect": {
         "triggers": true,
         "assertions": [
+          "Proposes a completion-baseline anchor ('Phase 3 billing is complete; do not treat as pending') pinned to immutable evidence: merged PR number, merge commit SHA and applied-migration identifier, with an absolute date.",
           "(a) Checks that the claimed artifacts are present in the current tree.",
           "(b) Checks that ANCHOR_SHA is reachable from origin/main and contains the claimed artifacts.",
-          "(c) If a commit on origin/main reverts the anchor change set, the claim fails unless that revert was itself reverted; both SHAs recorded."
+          "(c) If a commit on origin/main reverts the anchor change set, the claim fails unless that revert was itself reverted; both SHAs recorded.",
+          "Checks each cited migration id is shown as applied by the migration tool's read-only status; does not record the migration as applied on 'I think'.",
+          "When a PR is cited, verifies with gh pr view <n> --json state,mergeCommit that it is merged and its merge commit is reachable from origin/main (live output).",
+          "Stops for approval before editing any memory file."
         ]
       }
     }

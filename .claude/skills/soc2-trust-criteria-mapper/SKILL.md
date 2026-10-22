@@ -24,14 +24,14 @@ engagement is Type 1 (control design as of a specified date) or Type 2
 **attestation** — an independent CPA examines and reports; nobody
 "certifies" — and the report's scope is driven by what the org has
 committed to customers, not by collecting categories. Criteria then map
-onto existing mechanisms via `compliance-control-foundation` and
-`multi-framework-crosswalk` (the premise of D9, the library's Compliance &
-Governance batch decision that shipped this compliance pack: for an org with
-the shipped Phase 3 (software-as-a-service and tenant isolation) and Phase 4
-(security, row-level security and supply-chain) packs, much of the Security
-category exists - the work is mapping, the system description and the evidence
-window; the packs are a starting-point mapping candidate, not complete
-coverage, and operating evidence decides). Window
+onto existing mechanisms via compliance-control-foundation and
+multi-framework-crosswalk. The premise of D9 (the library's Compliance and
+Governance batch decision that shipped this compliance pack) is that for an
+org with the shipped Phase 3 (software-as-a-service and tenant isolation) and
+Phase 4 (security, row-level security and supply-chain) packs, much of the
+Security category already exists; the work is mapping, the system description
+and the evidence window. The packs are a starting-point candidate map, not
+complete coverage, and operating evidence decides. Window
 evidence design hands to `compliance-evidence-collector`.
 
 ## Use When

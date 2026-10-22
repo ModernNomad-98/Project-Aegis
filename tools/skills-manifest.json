@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "f71607013f41df4f75940aeb09d44a069a78244f9cd5d62e78a21b90aa820100"
+      "sha256": "8317fe262f9546307050dec532252de0c408d158b5e7929d2c40ef1eabbae9fa"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "1d22333e6b98c4ce11f47400de60685b2d0a31d2068d1bd5a92085acf3831625"
+      "sha256": "ebf46079aa267a2ce41eeace26edf1dbbfdbd9ed9cedb4d5ca00ad3cb9e4faf9"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "ffc9c1d1ffe1bb5d6b22b9ed95cd2e125da3d0503c8a90a0e3ba2fe292ab0595"
+      "sha256": "14e460b2045e335ad52a7d66d69470f3115136956b1cfa21a4a20e912b83b52e"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "50d8ac3d1d821b255466fce794f44d538ee2bc255eb1bbd0f44667d68321bf01"
+      "sha256": "2b0a735a6c235853335f24a47b827643f2a74cb9631b9de06ac8cd4398f27b70"
     },
     {
       "name": "share-link-access-architect",
@@ -1021,7 +1021,7 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "9fcc6d5b54e1037c7183260b7f29c59f83fbf0fceae5ffd3ba59fb3c1a0d708a"
+      "sha256": "28e7353ae51d810f9ac07959abc5e2247900f1e99bd05cf57f801715792a8c13"
     },
     {
       "name": "skill-usage-ledger",
@@ -1036,7 +1036,7 @@
     {
       "name": "soc2-trust-criteria-mapper",
       "path": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md",
-      "sha256": "a7aee819d778c55fcea7303ffbab957c7e8e3a0a07650197ecff9bfccfa06553"
+      "sha256": "7f808b200fdab31b3d96bdd67b54fc786214eeabe1761567e782212b82ad538f"
     },
     {
       "name": "source-currency-auditor",
@@ -1056,7 +1056,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "9a73a80fc81df69ea3ace3fb6912e50c3383f6d3f540e7c9200c037c7c138252"
+      "sha256": "3cbe8a028d3e996e838856f34435b3d8d8b6fbab82956c66f0a0286c7416cea4"
     },
     {
       "name": "state-machine-modeler",

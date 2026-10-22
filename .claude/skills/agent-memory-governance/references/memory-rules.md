@@ -41,7 +41,7 @@ Memory is a lead, not truth. Before any action premised on remembered state:
 | Branch exists / current branch | `git branch -a`, `git branch --show-current` |
 | What merged to main / repo baseline | `git log --oneline -20 origin/main`, validator output |
 | File / flag / command still exists | direct check before recommending it |
-| Completion anchor ("X complete, PR #n, SHA") | A completion claim is verified by: (a) the claimed artifacts present in the current tree; (b) ANCHOR_SHA reachable from origin/main containing those artifacts; (c) if a commit on origin/main reverts the anchor change set, the claim fails unless the revert was itself reverted (record both SHAs). Record ANCHOR_SHA and the command output as evidence. |
+| Completion anchor ("X complete, PR #n, SHA") | A completion claim is verified by: (a) the claimed artifacts present in the current tree; (b) ANCHOR_SHA reachable from origin/main containing them; (c) if a commit on origin/main reverts the anchor change set, the claim fails unless the revert was itself reverted (record both SHAs); (d) each cited migration id shown as applied by the migration tool's read-only status; (e) when a PR is cited, gh pr view <n> --json state,mergeCommit shows merged and its merge commit is reachable from origin/main. Record ANCHOR_SHA and the command output as evidence; editing memory files stops for approval. |
 | Auto-merge / protection posture | `gh pr view <n> --json autoMergeRequest`, repo settings |
 
 On divergence: live state wins, act on it, queue the memory correction. If the

@@ -189,7 +189,22 @@ Adoption:                     pending human approval → then recorded via scope
 - **The invisible standing approval:** a policy adopted months ago that no
   session restates is indistinguishable from no governance — restating is
   the difference between standing approval and folklore.
-- **Opt-in decay:** an opt-in merge profile selected once, then treated as eternal. Profile selection is a register entry; standing grants must be re-attested at the recorded review/attestation deadline (see references/standing-approval-policy.md). States are mutually exclusive and evaluated in order BLOCKED -> GRANDFATHERED -> ACTIVE: BLOCKED first (reviewer block, passed attestation deadline, no recorded deadline, or transition trigger); else GRANDFATHERED only when not blocked and valid at adoption and recorded; else ACTIVE when a recorded attestation deadline exists or after a reviewer block (auto-advance disabled; grant not expired, manual actions remain); GRANDFATHERED only for grants valid at adoption and recorded as grandfathered (no retroactive expiry; auto-advance preserved only if recorded already armed, never revived); ACTIVE only when a recorded attestation deadline exists and the grant is not blocked. Transition BLOCKED -> ACTIVE requires recorded re-attestation. Never infer a default expiry; preserve recorded consumption/one-use semantics.
+- **Opt-in decay:** an opt-in merge profile selected once, then treated as
+  eternal. Profile selection is a register entry; standing grants must be
+  re-attested at the recorded review/attestation deadline (see
+  references/standing-approval-policy.md).
+  States are mutually exclusive; first matching row wins; BLOCKED -> ACTIVE
+  only on recorded re-attestation after the block clears; GRANDFATHERED never
+  bypasses a reviewer block; never infer a default expiry.
+  BLOCKED = a reviewer block is in force OR the recorded attestation deadline
+  has passed OR no recorded attestation deadline exists OR any transition trigger
+  fired (auto-advance disabled; grant not expired; in-scope manual actions remain).
+  GRANDFATHERED = valid at adoption AND not BLOCKED AND the recorded deadline
+  (if any) has not passed (auto-advance preserved only when the register records
+  the grant was already armed at adoption; otherwise disabled).
+  ACTIVE = not blocked AND a recorded attestation deadline is in the future
+  (auto-advance only when the register records the grant armed; an unarmed
+  active grant is ACTIVE without auto-advance).
 - **Fatigue theater in reverse:** thinning approvals that were load-bearing.
   Only approvals whose evidence shows mechanical granting (instant yes,
   zero variance) are candidates; a slow, considered approval is a real gate

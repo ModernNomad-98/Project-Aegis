@@ -12,7 +12,7 @@
         "assertions": [
           "Builds the budget table from measured per-hop reality with an owner per hop, and includes the overhead rows (serialization, connection setup on the tail, queue wait) as explicit line items.",
           "Holds 15–25% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
-          "Applies the one timeout rule: upstream timeout > upstream own work + downstream critical-path budget + recorded epsilon (all ms); critical path = serial work + longest parallel branch at each join; retries add attempt time + recorded backoff_total.",
+          "Defines budget(hop) as the hop's own work only (excluding downstream path); derives timeout(hop) = own-work budget + recorded epsilon; runs the one cascade rule: upstream timeout > upstream own work + downstream critical-path budget + recorded epsilon (all ms; critical path = serial + longest parallel branch; retries add attempt time + backoff_total; include the initial attempt).",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
           "Installs the budget-claim review rule for new dependencies on the path."
         ]
@@ -27,7 +27,7 @@
         "assertions": [
           "Rejects the 30-second defaults as bugs in a 500ms path: timeouts derive from hop budgets, since waiting longer than the budget means the promise already failed.",
           "Identifies the two-layer retry compounding (gateway × client = up to 9 attempts) as a storm multiplier and assigns retries to ONE stated layer, idempotent hops only.",
-          "Runs the one cascade rule so no upstream abandons work its downstream completes (parallel joins take the max branch; retries add attempt time + backoff_total).",
+          "Runs the cascade check so no upstream abandons work its downstream completes.",
           "Prices each permitted retry as spend from a named allocation rather than a free action."
         ]
       }

@@ -19,9 +19,14 @@ action through the normal user interface). Move it only with a reason.
 | Does it reach another tenant's data? | FORBIDDEN | continue |
 | Is it irreversible AND impossible to undo or compensate within policy, or can no single reviewer judge it? | FORBIDDEN | continue |
 | Does it reach beyond one record or one user? | FORBIDDEN | continue |
-| Is it irreversible or harmful within one record/one user and does a written policy permit it with approval (e.g. a refund under a set amount)? | CONFIRM | continue |
+| Is it a single-record action that is reversible AND compensable AND judgeable by one reviewer, and does written policy permit it with approval (e.g. a refund under a set amount)? | CONFIRM | continue |
 | Does a written policy require approval, or is there no written policy explicitly permitting autonomy? | CONFIRM | continue |
 | Does the risk tier allow autonomy AND is the action reversible AND compensable AND do the watch-and-undo controls exist? | AUTONOMOUS | CONFIRM or ADVISORY-ONLY |
+
+A single-record action that is reversible AND compensable AND judgeable by one
+reviewer, and that written policy permits with approval, is CONFIRM. Any action that
+is irreversible, non-compensable, cross-tenant, wide-blast-radius, or not judgeable by
+a single reviewer is FORBIDDEN regardless of approval or policy.
 
 Examples:
 

@@ -28,16 +28,16 @@ certification claims.
 
 | Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
-| Secret/key custody, rotation, exposure | `secrets-identity-hardener` |
-| Session/token security flags | `secrets-identity-hardener` |
-| Encryption in transit/at rest design and review | `appsec-implementer` (design ownership) |
-| Encryption key lifecycle and custody | `secrets-identity-hardener` |
-| Backup restore verification and retention | `database-backup-verifier` |
-| Audit trail schema and retention | `audit-log-architect` |
-| App-config hardening | `appsec-implementer` |
-| Backup restore verification and retention | `database-backup-verifier` |
-| Audit evidence capture and retention | `audit-log-architect` (trail schema/retention); evidence program: `compliance-evidence-collector` |
-| App-config hardening | `appsec-implementer` |
+| Secret/key custody, rotation, exposure | secrets-identity-hardener |
+| Session/token security flags | secrets-identity-hardener |
+| Encryption in transit/at rest design and review | appsec-implementer (design ownership; status: PARTIAL by design; design review is partial-by-design, key custody is implemented) |
+| Encryption key lifecycle and custody | secrets-identity-hardener |
+| Backup restore verification and retention | database-backup-verifier |
+| Audit trail schema and retention | audit-log-architect (single accountable owner; trail schema/retention and evidence capture are one control) |
+| Audit evidence capture and retention | audit-log-architect |
+| App-config hardening | appsec-implementer |
+
+One accountable owner per row; named skills may be evidence routes but do not co-own a control.
 
 ## Domain 3 — Change management
 

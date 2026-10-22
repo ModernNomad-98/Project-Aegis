@@ -56,16 +56,15 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 
 ```
-ONE rule, leaf → root (all values in ms):
-  upstream timeout > upstream own work + downstream critical-path budget + recorded ε
-  critical path = serial work + max of parallel branch durations at each join;
-  retries add attempt time + recorded backoff_total (sum of actual inter-attempt waits)
-  if no feasible timeout exists under the hop budget → escalate as a latency budget violation
-Violations to hunt:
-  - 30s defaults inside sub-second paths (bug by inheritance)
-  - upstream timeout not above upstream own work + critical path (abandons work that completes — waste + failure)
-  - infinite/no timeout anywhere on a budgeted path (unbounded spend)
-```
+Per hop: timeout(hop) = own-work budget(hop) + recorded epsilon.
+  budget(hop) is the hop's own work only and excludes downstream work; epsilon
+  is the ONE recorded tolerance term.
+Cascade check, leaf to root:
+  timeout(upstream) > upstream own work + critical-path downstream time +
+  recorded epsilon
+  critical path = sum of serial segments and the max of parallel branch
+  durations at each join; retries add attempt time + backoff_total; include
+  the initial attempt.
 
 ## Retry-spend accounting
 

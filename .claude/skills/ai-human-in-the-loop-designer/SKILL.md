@@ -103,10 +103,24 @@ first workflow step.
    target record, reversibility, blast radius and who can perform it today
    without AI. An action nobody may perform manually cannot become an AI
    action.
-2. **Sort each action into AUTONOMOUS, CONFIRM or FORBIDDEN.** Start every action at advisory-only (the AI proposes, a person commits) and move it only with a reason tied to the risk tier. Apply these classes in order:
-   - **FORBIDDEN** for these enumerated classes: an action no person may perform; one that reaches another tenant; one that is irreversible AND cannot be undone or compensated within policy; one that reaches beyond one record or one user; one no single reviewer can judge (for example AI-initiated account deletion); or anything the applicable written policy or risk tier bars. A bar cannot be downgraded by approval. A single-record irreversible action that policy permits with approval is CONFIRM, not FORBIDDEN (e.g. a refund under a set amount). No FORBIDDEN class can be downgraded by reviewer availability, risk tier or policy tolerance.
-   - **CONFIRM** when the action is not FORBIDDEN AND (a written policy requires a person to approve it OR no written policy explicitly permits autonomy, where the wrong result harms a person or the product). CONFIRM never contains an enumerated FORBIDDEN class.
-   - **AUTONOMOUS** only when every earlier gate is excluded: the tier allows autonomy, the action is reversible AND compensable, its blast radius is one record or one user, and the watch-and-undo controls in step 9 exist.
+2. **Sort each action into AUTONOMOUS, CONFIRM or FORBIDDEN.** Start every
+   action at advisory-only (the AI proposes, a person commits) and move it
+   only with a reason tied to the risk tier. Apply these classes in order:
+   - **FORBIDDEN** for these enumerated classes: an action no person may
+     perform; cross-tenant data; irreversible; non-compensable; wide blast
+     radius; not judgeable by a single reviewer; or barred by the applicable
+     written policy or risk tier. A bar cannot be downgraded by approval.
+   - **CONFIRM** for a single-record action that is reversible AND compensable
+     AND judgeable by one reviewer, and that written policy permits with
+     approval. CONFIRM never contains an enumerated FORBIDDEN class.
+   - **AUTONOMOUS** only when every earlier gate is excluded: the tier allows
+     autonomy, the action is reversible AND compensable, its blast radius is
+     one record or one user, and the watch-and-undo controls in step 9 exist.
+   A single-record action that is reversible AND compensable AND judgeable by
+   one reviewer, and that written policy permits with approval, is CONFIRM.
+   Any action that is irreversible, non-compensable, cross-tenant,
+   wide-blast-radius, or not judgeable by a single reviewer is FORBIDDEN
+   regardless of approval or policy.
 3. **Design the advisory-only mode.** For actions left advisory-only, the
    AI output appears as a suggestion the user applies through the ordinary
    user interface with their own permissions. Nothing is written on the

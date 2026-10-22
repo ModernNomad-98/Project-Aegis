@@ -108,7 +108,18 @@ authorize execution.
    unallocated — for growth, incident conditions, and the dependency
    nobody predicted. Headroom is a line item with an owner (the path
    owner), not slack silently absorbed by whoever asks first.
-5. **Derive timeouts from budgets.** A hop's timeout is its budget plus a stated tolerance, because a timeout longer than the budget means the caller has already failed the end-to-end promise while still waiting. Cascade with ONE rule: upstream timeout > upstream own work + downstream critical-path budget + recorded epsilon (all values in ms); critical path = serial work + the longest parallel branch at each join; retries add attempt time and recorded backoff_total (sum of actual inter-attempt waits). If no feasible timeout exists under the hop budget, escalate as a latency budget violation. The 30-second default is a bug in a 300ms path.
+5. **Derive timeouts from budgets.** Define budget(hop) as the hop's
+   OWN work only, explicitly excluding the downstream critical path. A
+   hop's timeout = its own-work budget + the recorded epsilon (one
+   tolerance term, never a second). Cascade with ONE rule: upstream
+   timeout > upstream own work + downstream critical-path budget +
+   recorded epsilon (all values in ms; critical path = serial work + the
+   longest parallel branch at each join; retries add attempt time and
+   recorded backoff_total (the sum of actual inter-attempt waits), and the
+   initial attempt is always included). If no feasible timeout exists under
+   the hop budget, escalate as a latency budget violation; never hide it.
+   The 30-second default is a bug in a 300ms path.
+
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
    SOMEONE's allocation. State which hops may retry (idempotent
@@ -159,7 +170,10 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <upstream timeout > upstream own work + downstream critical-path budget + recorded epsilon (all ms; critical path = serial work + longest parallel branch at each join; retries add attempt time + backoff_total)>
+Timeouts: <upstream timeout > upstream own work + downstream
+  critical-path budget + recorded epsilon (all ms; critical path = serial
+  work + longest parallel branch at each join; retries add attempt time +
+  backoff_total; initial attempt included)>
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
@@ -182,21 +196,27 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Every timeout follows the one rule: upstream timeout > upstream own work + downstream critical-path budget + recorded epsilon (all ms; record every term).
+- [ ] Every timeout follows the ONE rule: upstream timeout > upstream own
+      work + downstream critical-path budget + recorded epsilon (all ms; record
+      every term); budget(hop) excludes downstream work. If no feasible timeout
+      exists, the violation is escalated, not hidden.
 - [ ] Retries are budgeted spend at one layer only; hedging is
       headroom-funded or absent.
 - [ ] Headroom is a named line item with an owner, 15–25%.
 - [ ] Every hop has an owner; hops over budget today have their
       reduction work ROUTED, not absorbed into this design.
 - [ ] The budget-claim review rule is stated.
-- [ ] If no feasible timeout exists under a hop's budget, the violation is escalated, not hidden.
 - [ ] Any owner-facing claim choice explains terms, effects, costs or
       unknowns, pros/cons, and a reasoned recommendation before one
       question; no budget or SLO changes silently.
 
 ## Gotchas
 
-- Percentiles don't add: p99(A)+p99(B) is not p99(A+B). Multiplying per-hop p99 latency numbers does not produce the path p99; under independence the fan-out tail combines as 1-(0.99)^N (below), and the path's percentile depends on dependence and distribution. Budget per-hop using measured or bounded joint behavior, and state the assumptions.
+- Percentiles don't add: p99(A)+p99(B) is not p99(A+B). Adding per-hop
+  percentile latencies does not produce the path percentile; use the
+  joint/fan-out tail formula below (under independence 1-(0.99)^N), because
+  the path's percentile depends on dependence and distribution. Budget
+  per-hop using measured or bounded joint behavior, and state the assumptions.
 - The fan-out tail trap: with ten independent branches, each having a 1%
   chance of exceeding its threshold, 1-(0.99)^10 ≈ 9.6% of requests have
   at least one exceedance. Correlated branches can change that figure.

@@ -113,12 +113,19 @@ person runs that skill by name; it is never invoked automatically.
    the terms (including input/output tokens, reservation, and true-up), show
    the reason for each viable option, its benefits and drawbacks, and its
    estimated per-call and monthly cost at the inspected call volume. Use
-   verified current prices or mark the dollar estimate unknown. A price/model figure is stale when its recorded date is older than the effective date of the provider's current price sheet, or older than the recorded stale threshold (e.g. 30 days); stale figures are unverified. Price/model figures require provider, model, source and date before a measured figure is shown; provider account-level controls (spend limits, quota, reservation)
-   apply only where the provider exposes them - otherwise record the
-   compensating control. Design-pattern guardrails are provider-independent. Do
-   not invent prices or imply that a request-count cap bounds spend. Recommend a
-   tier and limits with the workload evidence that supports them; without
-   verified unit prices, defer a dollar budget. Then ask exactly
+   verified current prices or mark the dollar estimate unknown. Price/model
+   figures are stale when their recorded date is older than the effective date
+   of the provider's price sheet currently in effect (a future-effective sheet
+   does not make a figure stale until its effective date), or older than the
+   recorded stale threshold (e.g. 30 days); stale figures are unverified.
+   Price/model figures require provider, model, source and date before a
+   measured figure is shown; provider account-level controls (spend limits,
+   quota, reservation) apply only where the provider exposes them - otherwise
+   record the compensating control. Design-pattern guardrails are
+   provider-independent. Do not invent prices or imply that a request-count
+   cap bounds spend. Recommend a tier and limits with the workload evidence
+   that supports them; without verified unit prices, defer a dollar budget.
+   Then ask exactly
    one atomic owner question; the answer sets the design only and does not
    authorize enforcing limits or changing provider-account settings. If step
    10's budget, degraded-mode or backstop choice is also open, ask only the

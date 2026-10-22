@@ -58,15 +58,25 @@ the work and no reviewer or gate block remains, recommend the granted profile
 to reduce repeated mechanical approvals; explain the exact grant and why it
 fits. A protected-file gate exception needs its own decision. An unanswered choice creates no new approval.
 
-Grant limits come from the register entry's ACTUAL recorded expiry/use limit (which may be none); silence creates no expiry and never infer a default expiry, and preserve consumption/one-use semantics as recorded. Standing grants must be re-attested at the review/attestation deadline recorded with the grant (whichever deadline is sooner when several apply). **States are mutually exclusive; first matching row wins:**
+Grant limits come from the register entry's ACTUAL recorded expiry/use limit
+(which may be none); silence creates no expiry and never infer a default
+expiry; preserve consumption/one-use semantics as recorded. Standing grants
+must be re-attested at the review/attestation deadline recorded with the grant
+(whichever deadline is sooner when several apply).
+States are mutually exclusive; first matching row wins; BLOCKED -> ACTIVE only
+on recorded re-attestation after the block clears; GRANDFATHERED never bypasses
+a reviewer block; never infer a default expiry.
+BLOCKED = a reviewer block is in force OR the recorded attestation deadline has
+passed OR no recorded attestation deadline exists OR any transition trigger
+fired (auto-advance disabled; grant not expired; in-scope manual actions remain).
+GRANDFATHERED = valid at adoption AND not BLOCKED AND the recorded deadline (if
+any) has not passed (auto-advance preserved only when the register records the
+grant was already armed at adoption; otherwise disabled).
+ACTIVE = not blocked AND a recorded attestation deadline is in the future
+(auto-advance only when the register records the grant armed; an unarmed active
+grant is ACTIVE without auto-advance).
 
-| State | Entry condition | Auto-advance |
-| --- | --- | --- |
-| BLOCKED PENDING RE-ATTESTATION | a reviewer block is in force; OR the recorded attestation deadline has passed; OR no recorded attestation deadline exists; OR any transition trigger fired (e.g. reviewer halt, adoption without a deadline) | disabled (grant NOT expired; in-scope manual actions remain) |
-| GRANDFATHERED | not blocked AND grant valid at adoption AND register records grandfathered status AND its recorded deadline (if any) has not passed | preserved only when the register records it was already armed at adoption; otherwise disabled; never revives an expired grant or bypasses a reviewer block |
-| ACTIVE | not blocked AND recorded attestation deadline exists AND register records armed state | enabled only when armed |
-
-Transition BLOCKED -> ACTIVE only on recorded re-attestation after the block clears; GRANDFATHERED never bypasses a reviewer block. Never infer a default expiry; the reviewer-block halt path is unchanged.
+Never infer a default expiry; the reviewer-block halt path is unchanged.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,
