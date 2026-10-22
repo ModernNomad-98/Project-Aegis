@@ -56,20 +56,19 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 
 ```
-Per hop: timeout(hop) = own-work budget(hop) + recorded epsilon.
-  budget(hop) is the hop's own work only and excludes downstream work; epsilon
-  is the ONE recorded tolerance term.
 Cascade check, leaf to root:
-  timeout(upstream) > upstream own work + critical-path downstream time +
+  timeout(upstream) > own work(upstream) + downstream critical-path budget +
   recorded epsilon
-  critical path = sum of serial segments and the max of parallel branch
-  durations at each join; retries add attempt time + backoff_total; include
-  the initial attempt.
+  own work = what the hop itself spends (processing, serialization, queue and
+  connection waits it owns); downstream critical-path budget = serial
+  downstream hops + the longest parallel branch at each join, including the
+  initial attempt, retry attempt time and backoff_total. Epsilon is recorded
+  once.
 
 ## Retry-spend accounting
 
 ```
-retry_cost(hop) = P(retry) × (backoff + budget(hop))
+retry_cost(hop) = P(retry) × (backoff + own work(hop))
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
 Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)

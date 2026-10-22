@@ -43,8 +43,10 @@ Schema rules:
   uses the canonical fingerprint plus a trusted CI state store outside the
   repo which records shard ID/name, per-shard outcome, outcome classification
   (failed vs interrupted), tests_executed, the validated skip-predicate result
-  (or the predicate recomputed from the diff), schema version and the
-  fingerprint (all required). Inputs: tracked-file tree hash; every tracked
+  (or the docs-only predicate recomputed from the diff and recorded at resume
+  time), schema version and the fingerprint. The skip-predicate field is
+  required unless successfully recomputed and recorded; any other missing
+  required field blocks resume. Inputs: tracked-file tree hash; every tracked
   dependency lockfile as sorted path:sha256 tuples; toolchain list (runner OS +
   pinned image digest) sorted by name then version. Lookup key = repository +
   status-file path + status-schema version + fingerprint digest; a

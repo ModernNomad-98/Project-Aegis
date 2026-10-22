@@ -17,7 +17,7 @@ action through the normal user interface). Move it only with a reason.
 | Could a person perform this action today with their own permissions? | continue | FORBIDDEN (the AI cannot gain an action nobody has) |
 | Does the applicable written policy or the risk tier bar it? | FORBIDDEN | continue |
 | Does it reach another tenant's data? | FORBIDDEN | continue |
-| Is it irreversible AND impossible to undo or compensate within policy, or can no single reviewer judge it? | FORBIDDEN | continue |
+| Is it irreversible OR non-compensable OR not judgeable by one reviewer? | FORBIDDEN | continue |
 | Does it reach beyond one record or one user? | FORBIDDEN | continue |
 | Is it a single-record action that is reversible AND compensable AND judgeable by one reviewer, and does written policy permit it with approval (e.g. a refund under a set amount)? | CONFIRM | continue |
 | Does a written policy require approval, or is there no written policy explicitly permitting autonomy? | CONFIRM | continue |

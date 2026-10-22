@@ -32,6 +32,11 @@ many storage.
 | Periodically (access review, backup-restore test, vendor review, management review) | One artifact per scheduled occurrence | Missed occurrence = hole; reschedule forward, never backdate | control owner (named per control) | named evidence collector | the scheduled occurrence |
 | On event (incident, DR invocation) | Per-event bundle (timeline, postmortem) | Zero events is fine - prove the monitoring existed, not the event | incident owner (accountable) | incident evidence collector | each event |
 
+These rows are class-level defaults; the per-control accountable owner,
+evidence collector and collection trigger are recorded in the control
+catalog (compliance-control-foundation), not inferred from the frequency
+class.
+
 ## Population patterns
 
 - Changes: merged-PR list on protected branches for the window (`gh` query)

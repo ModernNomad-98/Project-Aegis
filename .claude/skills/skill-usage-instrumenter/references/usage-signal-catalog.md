@@ -25,7 +25,13 @@ Dataset metadata (stored once in the dataset header, NEVER as a per-record field
 | redirected_to | skill name \| none | What the user invoked instead |
 | correction_outcome | overridden \| abandoned | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
 
-Migration note (schema epoch 2): the pre-rename single mode field is replaced by activation_mode (invocation events) and correction_outcome (correction/wrong-fire events). Legacy records carry no event-type marker, so migration MUST first identify the event type (invocation vs correction/wrong-fire) and only then map the old mode value into that event's domain; if the event type cannot be established, split the dataset or mark the record unmigrated rather than guessing. Consumers record the dataset schema epoch and never reinterpret an old mode value across domains.
+Migration note (schema epoch 2): the pre-rename single mode field is replaced
+by activation_mode (invocation events) and correction_outcome
+(correction/wrong-fire events). Legacy exports may omit the event type (the
+source tables carry it): map by source table where available; if records were
+flattened and the event type is unknown, mark the record unmigrated rather than
+guessing. Consumers record the dataset schema epoch and never reinterpret an
+old mode value across domains.
 
 ### Completion hint
 

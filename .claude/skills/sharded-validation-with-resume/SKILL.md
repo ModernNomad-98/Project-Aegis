@@ -94,9 +94,11 @@ repo; running it is the preflight's and CI's job.
    resume decisions use the fingerprint below plus a trusted CI state store
    outside the repo (signed or CI-owned) that records the shard ID/name, the
    per-shard outcome, the outcome classification (failed vs interrupted),
-   tests_executed, the validated skip-predicate result (or the docs-only
-   predicate recomputed from the diff), the schema version and the fingerprint;
-   a store missing any of these fields cannot authorize resume. Fingerprint
+   tests_executed, the validated skip-predicate result (the docs-only predicate
+   may instead be recomputed from the diff and recorded at resume time), the
+   schema version and the fingerprint; the skip-predicate field is required
+   unless it is successfully recomputed and recorded, and a store missing any
+   other required field cannot authorize resume. Fingerprint
    inputs: tracked-file tree hash; every tracked dependency lockfile as sorted
    path:sha256 tuples; toolchain list (runner OS + pinned image DIGEST, never a
    mutable tag) sorted by name then version. The lookup key is repository +
@@ -171,8 +173,9 @@ Maintenance:     rebalance triggers; shard-map edits via reviewed PRs
   tell the two apart is unsafe to ship.
 - **Stale status across commits:** resuming a run whose passes were earned on
   a different tree/config/dependency/toolchain fingerprint is validating the
-  wrong code - bind the status file to the canonical resume fingerprint above,
-  never to a run-id.
+  wrong code - bind the trusted resume record/store to the canonical resume
+  fingerprint above; the tracked status file stays advisory-only, never a
+  resume authority.
 - **Multiple required shard jobs:** registering each shard as a required
   check is exactly what breaks on conditional skips; the whole point of the
   aggregate is ONE stable required name. (In practice, a production repo's

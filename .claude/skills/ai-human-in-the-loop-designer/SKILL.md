@@ -107,9 +107,9 @@ first workflow step.
    action at advisory-only (the AI proposes, a person commits) and move it
    only with a reason tied to the risk tier. Apply these classes in order:
    - **FORBIDDEN** for these enumerated classes: an action no person may
-     perform; cross-tenant data; irreversible; non-compensable; wide blast
-     radius; not judgeable by a single reviewer; or barred by the applicable
-     written policy or risk tier. A bar cannot be downgraded by approval.
+     perform; cross-tenant data; an action that is irreversible OR
+     non-compensable; wide blast radius; not judgeable by a single reviewer; or
+     barred by the applicable written policy or risk tier. A bar cannot be downgraded by approval.
    - **CONFIRM** for a single-record action that is reversible AND compensable
      AND judgeable by one reviewer, and that written policy permits with
      approval. CONFIRM never contains an enumerated FORBIDDEN class.

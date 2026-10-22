@@ -63,18 +63,18 @@ Grant limits come from the register entry's ACTUAL recorded expiry/use limit
 expiry; preserve consumption/one-use semantics as recorded. Standing grants
 must be re-attested at the review/attestation deadline recorded with the grant
 (whichever deadline is sooner when several apply).
-States are mutually exclusive; first matching row wins; BLOCKED -> ACTIVE only
-on recorded re-attestation after the block clears; GRANDFATHERED never bypasses
-a reviewer block; never infer a default expiry.
-BLOCKED = a reviewer block is in force OR the recorded attestation deadline has
-passed OR no recorded attestation deadline exists OR any transition trigger
-fired (auto-advance disabled; grant not expired; in-scope manual actions remain).
-GRANDFATHERED = valid at adoption AND not BLOCKED AND the recorded deadline (if
-any) has not passed (auto-advance preserved only when the register records the
-grant was already armed at adoption; otherwise disabled).
-ACTIVE = not blocked AND a recorded attestation deadline is in the future
-(auto-advance only when the register records the grant armed; an unarmed active
-grant is ACTIVE without auto-advance).
+Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
+
+| Precedence | State | Condition | Auto-advance |
+| --- | --- | --- | --- |
+| 1 | BLOCKED | reviewer block in force OR recorded attestation deadline passed OR no recorded attestation deadline exists OR a transition trigger fired | disabled; the grant does not expire; in-scope manual actions remain |
+| 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
+| 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
+BLOCKED > GRANDFATHERED > ACTIVE (first matching row wins). BLOCKED -> ACTIVE
+only on recorded re-attestation after the block clears; GRANDFATHERED never
+bypasses a reviewer block; never infer a default expiry. No recorded deadline
+means BLOCKED; GRANDFATHERED therefore only applies when a deadline is recorded
+and not passed.
 
 Never infer a default expiry; the reviewer-block halt path is unchanged.
 

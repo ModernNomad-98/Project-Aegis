@@ -108,17 +108,15 @@ authorize execution.
    unallocated — for growth, incident conditions, and the dependency
    nobody predicted. Headroom is a line item with an owner (the path
    owner), not slack silently absorbed by whoever asks first.
-5. **Derive timeouts from budgets.** Define budget(hop) as the hop's
-   OWN work only, explicitly excluding the downstream critical path. A
-   hop's timeout = its own-work budget + the recorded epsilon (one
-   tolerance term, never a second). Cascade with ONE rule: upstream
-   timeout > upstream own work + downstream critical-path budget +
-   recorded epsilon (all values in ms; critical path = serial work + the
-   longest parallel branch at each join; retries add attempt time and
-   recorded backoff_total (the sum of actual inter-attempt waits), and the
-   initial attempt is always included). If no feasible timeout exists under
-   the hop budget, escalate as a latency budget violation; never hide it.
-   The 30-second default is a bug in a 300ms path.
+5. **Derive timeouts from budgets.** Define own work as the time the hop
+   itself spends (processing, serialization, and the queue/connection waits
+   it owns); downstream critical-path budget is the sum of serial downstream
+   hops plus the longest parallel branch at each join, including the initial
+   attempt, retry attempt time and recorded backoff_total. Keep ONE rule:
+   upstream timeout > own work + downstream critical-path budget + recorded
+   epsilon (all ms; epsilon is recorded once, never doubled). If no feasible
+   timeout exists under these terms, escalate as a latency budget violation;
+   never hide it. The 30-second default is a bug in a 300ms path.
 
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
@@ -170,10 +168,9 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <upstream timeout > upstream own work + downstream
-  critical-path budget + recorded epsilon (all ms; critical path = serial
-  work + longest parallel branch at each join; retries add attempt time +
-  backoff_total; initial attempt included)>
+Timeouts: <upstream timeout > own work + downstream critical-path budget +
+  recorded epsilon (all ms; epsilon recorded once; define own work and
+  downstream critical-path budget)>
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
@@ -196,10 +193,10 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Every timeout follows the ONE rule: upstream timeout > upstream own
-      work + downstream critical-path budget + recorded epsilon (all ms; record
-      every term); budget(hop) excludes downstream work. If no feasible timeout
-      exists, the violation is escalated, not hidden.
+- [ ] Every timeout follows the ONE rule: upstream timeout > own work +
+      downstream critical-path budget + recorded epsilon (all ms; epsilon is
+      recorded once; own work and downstream critical-path budget are defined).
+      If no feasible timeout exists, the violation is escalated, not hidden.
 - [ ] Retries are budgeted spend at one layer only; hedging is
       headroom-funded or absent.
 - [ ] Headroom is a named line item with an owner, 15–25%.

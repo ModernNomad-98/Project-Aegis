@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "8317fe262f9546307050dec532252de0c408d158b5e7929d2c40ef1eabbae9fa"
+      "sha256": "dd69a76b44f8d5165f4e37a224c387495eebfbf26e672463a056640fc5883bcf"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "ebf46079aa267a2ce41eeace26edf1dbbfdbd9ed9cedb4d5ca00ad3cb9e4faf9"
+      "sha256": "9f9446f5902c0da9d8521c2ec6302047dd931c91734e0df49e95bfa712d3c921"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -301,7 +301,7 @@
     {
       "name": "compliance-evidence-collector",
       "path": ".claude/skills/compliance-evidence-collector/SKILL.md",
-      "sha256": "b1b2f9488391b30025dc3de0f4065a37ec83aa4176abe526b538b8665dac5787"
+      "sha256": "2fd5121c0f8a34192e62039e92b544092b481f53ca706144fa186d183b5ccbbf"
     },
     {
       "name": "compliance-gap-auditor",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "14e460b2045e335ad52a7d66d69470f3115136956b1cfa21a4a20e912b83b52e"
+      "sha256": "e713c9a114f6c4b6907b33564b407aa4da6f9ca58dde4d1671dbf0b16224dbc5"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "2b0a735a6c235853335f24a47b827643f2a74cb9631b9de06ac8cd4398f27b70"
+      "sha256": "e8c923765591d07cee8a59f0a55bb47c4cde33200c2471ce540e0e86183beaf6"
     },
     {
       "name": "share-link-access-architect",
@@ -1056,7 +1056,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "3cbe8a028d3e996e838856f34435b3d8d8b6fbab82956c66f0a0286c7416cea4"
+      "sha256": "03f3111a35f6b882ddcf5eb2cffdda22bddc96bfe428a946a783b20521f3ceaf"
     },
     {
       "name": "state-machine-modeler",

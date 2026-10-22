@@ -113,13 +113,12 @@ person runs that skill by name; it is never invoked automatically.
    the terms (including input/output tokens, reservation, and true-up), show
    the reason for each viable option, its benefits and drawbacks, and its
    estimated per-call and monthly cost at the inspected call volume. Use
-   verified current prices or mark the dollar estimate unknown. Price/model
-   figures are stale when their recorded date is older than the effective date
-   of the provider's price sheet currently in effect (a future-effective sheet
-   does not make a figure stale until its effective date), or older than the
-   recorded stale threshold (e.g. 30 days); stale figures are unverified.
-   Price/model figures require provider, model, source and date before a
-   measured figure is shown; provider account-level controls (spend limits,
+   verified current prices or mark the dollar estimate unknown. Record for
+   each price/model figure the provider, model, source, the source sheet's
+   publication/effective date and the retrieval date. The figure is stale when
+   the source sheet is no longer the sheet currently in effect, or when the
+   retrieval date is older than the recorded stale threshold (e.g. 30 days);
+   stale figures are unverified. Provider account-level controls (spend limits,
    quota, reservation) apply only where the provider exposes them - otherwise
    record the compensating control. Design-pattern guardrails are
    provider-independent. Do not invent prices or imply that a request-count
