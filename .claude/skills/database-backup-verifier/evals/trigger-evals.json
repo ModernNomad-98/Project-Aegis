@@ -104,7 +104,7 @@
     },
     {
       "id": "live-outage-diagnosis-goes-to-systematic-debugger",
-      "prompt": "The production orders database is corrupted and checkout is down. Help diagnose why checkout is failing while the human incident owner runs the incident.",
+      "prompt": "Explicitly invoke systematic-debugger. The production orders database is corrupted and checkout is down. Help diagnose why checkout is failing while the human incident owner runs the incident.",
       "expected_skill": "systematic-debugger",
       "should_not_trigger": [
         "database-backup-verifier",

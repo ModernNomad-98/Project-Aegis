@@ -55,12 +55,12 @@
     },
     {
       "id": "gate-placement-goes-to-approval-boundary",
-      "prompt": "Which agent actions must stop for explicit human approval — schema changes, production data, deploys, billing?",
+      "prompt": "Which of our coding agent's own actions must stop for explicit human approval — schema changes, production data, deploys and billing the engineering assistant performs?",
       "expected_skill": "human-approval-boundary",
       "should_not_trigger": [
         "human-agent-trust-reviewer"
       ],
-      "reason": "Defining the high-risk boundaries where work halts for approval is the Phase 1 gate skill; the trust reviewer assumes gates exist and tests whether they hold against manipulation."
+      "reason": "Defining the high-risk boundaries where the coding assistant own work halts for approval is human-approval-boundary; product AI review workflows are ai-human-in-the-loop-designer, and the trust reviewer assumes gates exist and tests whether they hold."
     },
     {
       "id": "retrospective-audit-goes-to-governance-audit",

@@ -62,9 +62,12 @@ PRODUCES the artifact those skills review.
   its caps are an INPUT this design consumes, and this skill owns the loop's
   semantics and stopping, not its price.
 - Do NOT use when: a run has already broken the working state (dirty tree,
-  interrupted operation, partial commit) — recovery is
-  `agent-failure-recovery` *(manual-only)*; this skill designs the loop structure
-  (checkpoints, typed failures, resumable state) that recovery plugs into.
+  interrupted operation, partial commit) — a coding agent's broken working state is
+  `agent-failure-recovery` *(manual-only)*, while product-runtime recovery composes
+  `background-job-orchestration-architect` (worker checkpoint/lease) +
+  `command-gateway-architect` (command idempotency) + `agent-containment-reviewer`
+  (containment revalidation); this skill designs the loop structure (checkpoints,
+  typed failures, resumable state) that recovery plugs into.
 - Do NOT use when: the subject is the operating environment's gating —
   mediation point, pre-flight ladder, registry, instruction custody — that
   is `agent-harness-architect`; the loop this skill designs runs INSIDE that
@@ -194,14 +197,16 @@ Terminal states: <success | policy-stop | deterministic-failure |
   — each distinguishable downstream;
   empty is never padded into output
 Checkpoints/resume: <per-iteration persisted state; what
-  worker checkpoint/lease recovery (`background-job-orchestration-architect`) can plug into>
+  worker checkpoint/lease recovery (`background-job-orchestration-architect`) can plug into;
+  coding-agent broken working state stays `agent-failure-recovery` (manual-only)>
 Stop proofs: <ceiling-fires; policy and permanent errors not retried;
   safe transient succeeds or exhausts one retry; changed input is a new
   attempt; uncertain side effect stops without idempotency; empty reaches caller>
 Handoffs: budget/caps → ai-cost-guardrail-designer; call gating →
-agent-harness-architect; broken-state recovery → background-job-orchestration-architect
+  agent-harness-architect; broken-state recovery → background-job-orchestration-architect
   (worker checkpoint/lease) + command-gateway-architect (idempotency) +
-  agent-containment-reviewer (containment revalidation);
+  agent-containment-reviewer (containment revalidation); coding-agent
+  broken-state recovery → agent-failure-recovery (manual-only);
   attack review → agent-goal-hijack-defender + ai-threat-modeler
 Open questions / risks: <each with risk-if-wrong / who answers>
 ```
@@ -228,7 +233,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       hash is not treated as proof of external state or deduplication.
 - [ ] The terminal states are enumerated and downstream-distinguishable,
       including the honest empty set; nothing pads empty into output.
-- [ ] Per-iteration checkpoints give `agent-failure-recovery` a socket.
+- [ ] Per-iteration checkpoints give the product-runtime recovery owners
+      (background-job-orchestration-architect / command-gateway-architect /
+      agent-containment-reviewer) and, for coding-agent runs, agent-failure-recovery a socket.
 - [ ] Every stop has a designed proof it can fire — ceiling, policy-stop,
       retry exhaustion, uncertain side effects, and empty-set delivery have
       must-fail/must-fire
@@ -296,7 +303,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   refusal, and the hijack-review should-not-trigger.
 - `evals/trigger-evals.json` — discrimination against
   `ai-cost-guardrail-designer` (budget authoring vs consumption),
-  `agent-failure-recovery` (broken-state recovery vs loop structure),
+  `agent-failure-recovery` (coding-agent broken-state recovery vs loop structure; product-runtime recovery composes the three owners above),
   `agent-harness-architect` (in-batch: call gating vs loop semantics),
   `agent-containment-reviewer` (multi-agent containment review vs one
   loop's design), and the design-vs-review seam against

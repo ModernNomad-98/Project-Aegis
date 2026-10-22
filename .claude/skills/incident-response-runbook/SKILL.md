@@ -192,7 +192,7 @@ Staleness triggers: <alert-spec changes, architecture changes, org
 
 - An incident is live NOW and the request is to handle it — stop authoring;
   report it to the human incident owner, who follows the approved response
-  runbook (`incident-response-runbook` only authors procedures), and route
+  runbook (this skill only authors procedures), and route
   diagnosis to `systematic-debugger`; afterwards, this skill turns the
   experience into procedure. If no approved runbook exists, the human owner
   handles the incident ad hoc and this skill captures the procedure afterwards;

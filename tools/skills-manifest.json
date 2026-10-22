@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "4decabf8aebe5b31cc6d95322c337890181a6364",
+  "source_revision": "d957cf5ce14287dd40db3c827a606f716ab90014",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -66,7 +66,7 @@
     {
       "name": "agent-harness-architect",
       "path": ".claude/skills/agent-harness-architect/SKILL.md",
-      "sha256": "9891432217504c22fffe0a1d4844b0619ec7928164903caecd5600200ce16a8d"
+      "sha256": "bc3d03d5353f6645487e9e1639c101a14adf515a74e2a02a1acd5f26379fd1ad"
     },
     {
       "name": "agent-identity-privilege-reviewer",
@@ -96,7 +96,7 @@
     {
       "name": "agentic-loop-designer",
       "path": ".claude/skills/agentic-loop-designer/SKILL.md",
-      "sha256": "ccc24a06092dcc70aa0185a2d68329aacd56ce24fa08ef64618ea0a2e3ade132"
+      "sha256": "a1638f869f71fdf1573fc3b7c86ff458235c6bb0e0887658235ea72ca7b85c19"
     },
     {
       "name": "ai-closeout-reporter",
@@ -126,7 +126,7 @@
     {
       "name": "ai-lifecycle-risk-manager",
       "path": ".claude/skills/ai-lifecycle-risk-manager/SKILL.md",
-      "sha256": "718d55d4e794269f9a90e110e07f6c1cd667e6dbcd23169f3218906faa6e73d9"
+      "sha256": "cc50404059d90010e649f89d93b3e3c90e95ba9b4f9cae3515bc3b3799a0971a"
     },
     {
       "name": "ai-misinformation-guard",
@@ -506,7 +506,7 @@
     {
       "name": "human-approval-boundary",
       "path": ".claude/skills/human-approval-boundary/SKILL.md",
-      "sha256": "2a81404fb9247048b2299585631a676aa3755db23b34ee67f983350ffe42ee26"
+      "sha256": "162c008e5ea7ea74d3b14c2d7fadadbf052eab6dd748d757a6927182f7be0a60"
     },
     {
       "name": "iac-reviewer",
@@ -516,7 +516,7 @@
     {
       "name": "incident-response-runbook",
       "path": ".claude/skills/incident-response-runbook/SKILL.md",
-      "sha256": "9864ff83f7877422e5bbd9ae0b599b097cab9e18e70916fe8773aba8689d4bc7"
+      "sha256": "9e8cbfa19e96fc809b53a8a064599355d7b787326c59953d5dc17322198a3d99"
     },
     {
       "name": "integration-test-designer",
@@ -526,7 +526,7 @@
     {
       "name": "inter-agent-comms-reviewer",
       "path": ".claude/skills/inter-agent-comms-reviewer/SKILL.md",
-      "sha256": "fa4cbbdec837bfed369e206c38f7d740a4ea60d0bd3b7e55075ae1a33a245d56"
+      "sha256": "eb421773e3fc70de1722784c56897e750c50399a8ce9fe379feb7b36c2c3d9c8"
     },
     {
       "name": "interface-first-designer",

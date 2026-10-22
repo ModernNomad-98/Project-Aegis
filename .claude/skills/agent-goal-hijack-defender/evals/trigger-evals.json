@@ -1,6 +1,6 @@
 {
   "skill": "agent-goal-hijack-defender",
-  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: goal/plan integrity (ASI01) vs the injection vector (LLM01), stored-memory corruption (ASI06), attacker-less drift (ASI10), tool scope (LLM03/ASI02), and hands-on probing (subagent).",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: goal/plan integrity (ASI01) vs the injection vector (LLM01), stored-memory corruption (ASI06), attacker-less drift (ASI10), tool scope (LLM03/ASI02), static attack-path review (ai-security-red-team-reviewer subagent) and explicitly authorized live execution (manual-only ai-evaluation-harness).",
   "overlaps_with": [
     "agent-containment-reviewer",
     "agent-tool-safety-guard",

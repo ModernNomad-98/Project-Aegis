@@ -1,6 +1,6 @@
 {
   "skill": "agent-containment-reviewer",
-  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: containment (ASI08 cascade + ASI10 rogue/drift) vs cost guardrails, incident execution, goal hijack, telemetry implementation, and the generated-code sandbox.",
+  "description": "Trigger discrimination for the Phase 7.5 agentic cluster: containment (ASI08 cascade + ASI10 rogue/drift) vs cost guardrails, live-incident execution routing (human incident owner; this skill authors containment design only), goal hijack, telemetry implementation, and the generated-code sandbox.",
   "overlaps_with": [
     "ai-cost-guardrail-designer",
     "incident-response-runbook",
@@ -29,7 +29,7 @@
       "reason": "Consumption/spend guardrails (LLM06) are the cost designer's; containment composes those budgets into cascade control but owns fault and drift, not the caps themselves."
     },
     {
-      "id": "live-incident-goes-to-runbook",
+      "id": "incident-procedure-authoring-goes-to-runbook",
       "prompt": "One of our agents could start spamming customers; write the incident-procedure section for severity, roles, containment and comms so an on-call responder can execute it.",
       "expected_skill": "incident-response-runbook",
       "should_not_trigger": [

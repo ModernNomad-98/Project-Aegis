@@ -1,6 +1,6 @@
 {
   "skill": "prompt-injection-defender",
-  "description": "Trigger discrimination for the Phase 7 threat & injection cluster: injection defense design vs whole-system threat modeling vs prompt-secrecy vs retrieval authz vs tool scope, and against the shipped security-pr-reviewer and the ai-security-red-team-reviewer subagent.",
+  "description": "Trigger discrimination for the Phase 7 threat & injection cluster: injection defense design vs whole-system threat modeling vs prompt-secrecy vs retrieval authz vs tool scope, and against the shipped security-pr-reviewer, the ai-security-red-team-reviewer subagent (static attack-path review only) and the manual-only ai-evaluation-harness (explicitly authorized live execution).",
   "overlaps_with": [
     "agent-tool-safety-guard",
     "ai-evaluation-harness",

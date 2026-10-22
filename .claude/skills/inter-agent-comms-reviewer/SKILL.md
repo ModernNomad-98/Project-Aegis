@@ -111,8 +111,10 @@ message exchange.
    (rogue peer / tampered message / replayed command / read payload →
    effect), severity gated on what the receiving agent would DO. Red-team
    cases (spoof, tamper, replay, cross-topology message → expected SAFE
-outcome: rejected/inert) hand to `ai-evaluation-harness`; active
-   compromise is reported to the human incident owner, who follows the approved
+   outcome: rejected/inert) hand to `ai-evaluation-harness`; active
+   compromise is reported to the human incident owner, who follows the
+   approved response runbook (the procedure-authoring skill is
+   `incident-response-runbook`, which only authors procedures).
    response runbook (`incident-response-runbook` only authors procedures).
 
 ## Output Format
