@@ -57,8 +57,9 @@ Match response to blast radius, decided per agent:
    state; quarantine the content that preceded the deviation; log it.
 3. **Degrade** — continue in no-side-effect (read/draft-only) mode.
 4. **Contain** — repeated/confirmed hijack: stop the run; fleet-level
-   response is `agent-containment-reviewer`'s kill-switch design; live
-   incident handling is report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures.
+   response is `agent-containment-reviewer`'s kill-switch design; live incident
+   handling is reported to the human incident owner, who follows the approved
+   response runbook (`incident-response-runbook` only authors procedures).
 
 ## 5. Mutation-channel rules
 

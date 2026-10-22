@@ -99,12 +99,11 @@ and security-relevant.
    that delimiting RAISES cost of injection but is not sufficient alone.
 4. **Design the deterministic action boundary** — the layer that actually
    holds. Every side-effecting action the model can request is authorized by
-   code OUTSIDE the model against the CALLING USER's real permissions, not by
-   `human-approval-boundary` for irreversible actions. Compose `agent-tool-safety-guard`
-   for tool scope; a product approval flow is designed by `ai-human-in-the-loop-designer`,
+   code OUTSIDE the model against the CALLING USER's real permissions — not by
+   the model's say-so. Compose `agent-tool-safety-guard` for tool scope;
+   product approval flows are designed by `ai-human-in-the-loop-designer`,
    while a coding agent's own irreversible steps stop at `human-approval-boundary`.
    A successful injection must still hit this wall.
-   must still hit this wall.
 5. **Add detection layers** (defense in depth, not the primary control):
    input heuristics for known injection patterns, output checks for
    instruction-following-the-document signatures, and anomaly signals — each
@@ -152,7 +151,9 @@ and security-relevant.
    to encode.
 9. **Design fallback/degraded mode.** What happens when an injection is
    detected: block, strip, downgrade to no-tools mode, or human review —
-   defined per action risk; confirmed exploitation is report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures.
+   defined per action risk; confirmed exploitation is reported to the human
+   incident owner, who follows the approved response runbook
+   (`incident-response-runbook` only authors procedures).
 
 ## Output Format
 

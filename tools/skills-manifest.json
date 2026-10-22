@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "1831ceee0eb77c77c058d02da262f389c00db911",
+  "source_revision": "d957cf5ce14287dd40db3c827a606f716ab90014",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -66,7 +66,7 @@
     {
       "name": "agent-harness-architect",
       "path": ".claude/skills/agent-harness-architect/SKILL.md",
-      "sha256": "b43d24aa032abd5cfb3c2c8e630ff68705af50a34f74c1591b2f6d30748a737e"
+      "sha256": "9891432217504c22fffe0a1d4844b0619ec7928164903caecd5600200ce16a8d"
     },
     {
       "name": "agent-identity-privilege-reviewer",
@@ -516,7 +516,7 @@
     {
       "name": "incident-response-runbook",
       "path": ".claude/skills/incident-response-runbook/SKILL.md",
-      "sha256": "65b6b60d61b3241922ec53e25dd6ff0d4d56603d7ff0b9819c2c00f36b5f7e2e"
+      "sha256": "9864ff83f7877422e5bbd9ae0b599b097cab9e18e70916fe8773aba8689d4bc7"
     },
     {
       "name": "integration-test-designer",
@@ -526,7 +526,7 @@
     {
       "name": "inter-agent-comms-reviewer",
       "path": ".claude/skills/inter-agent-comms-reviewer/SKILL.md",
-      "sha256": "990f41a765d99d69a4e168a17bbe4813909aa06029761d6db10a59236971efff"
+      "sha256": "fa4cbbdec837bfed369e206c38f7d740a4ea60d0bd3b7e55075ae1a33a245d56"
     },
     {
       "name": "interface-first-designer",
@@ -746,7 +746,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "6b3a3320e80eeff39017ca90d4b522271422df3e793134c155fea935a822bf92"
+      "sha256": "c80055e4933e3cb19199e64e94072034f0a06232d8877166bdbb9f9898da2247"
     },
     {
       "name": "property-based-test-designer",

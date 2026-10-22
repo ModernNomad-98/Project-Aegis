@@ -49,8 +49,9 @@ Internal review bands:
 
 Oversight is real only if the human sees the decision, has the information and
 time to intervene, and is not rubber-stamping (cross-ref
-for consent fatigue). Product approval-gate design → `ai-human-in-the-loop-designer`;
-a coding agent's own risky steps → `human-approval-boundary`.
+`human-agent-trust-reviewer` for consent fatigue). Product approval-gate design
+→ `ai-human-in-the-loop-designer`; a coding agent's own risky steps →
+`human-approval-boundary`.
 
 ## Model / feature card template
 

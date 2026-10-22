@@ -194,7 +194,9 @@ Staleness triggers: <alert-spec changes, architecture changes, org
   report it to the human incident owner, who follows the approved response
   runbook (`incident-response-runbook` only authors procedures), and route
   diagnosis to `systematic-debugger`; afterwards, this skill turns the
-  experience into procedure.
+  experience into procedure. If no approved runbook exists, the human owner
+  handles the incident ad hoc and this skill captures the procedure afterwards;
+  in a single-operator context the user is that owner.
 - No paging/alert design exists to answer → the runbook would be
   fiction; route to `slo-reliability-architect` first (or scope the
   runbook to the alerts that do exist, gap named).

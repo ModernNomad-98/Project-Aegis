@@ -76,11 +76,12 @@ artifact those skills review.
    request body, or prompt — and whether it is propagated or re-asserted
    downstream.
 3. The standing authority policy: for a product AI agent, compose
-   `authorization-matrix-designer` (roles/permissions),
-   `agent-identity-privilege-reviewer` (identity/privilege) and
-   `ai-human-in-the-loop-designer` (approval workflow); `agent-authorization-matrix`
-   is the coding-agent/SDLC artifact this ladder must enforce. Without a policy
-   source the ladder has no authorize rung to call.
+   `authorization-matrix-designer` (roles/permissions) and
+   `agent-identity-privilege-reviewer` (identity/privilege); `agent-authorization-matrix`
+   is the coding-agent/SDLC artifact this ladder must enforce. The approval-workflow
+   input for the human-approval rung is `ai-human-in-the-loop-designer` (it designs
+   the approval UX, not the authority policy). Without a policy source the ladder
+   has no authorize rung to call.
 4. Existing mediation infrastructure: a `command-gateway-architect`-style
    command bus or gateway the harness can extend rather than duplicate.
 5. The tool/provider surface: every tool, function, and model the agent can
@@ -108,9 +109,9 @@ artifact those skills review.
    identity. Flag every place identity is currently read from a payload.
 3. **Design the pre-flight ladder, deny-by-default, fail-closed.** Fixed
    order, all rungs BEFORE the model runs: **authenticate** (who is calling)
-   → **authorize** (may this identity perform this action — calls the
-   `authorization-matrix-designer` + `agent-identity-privilege-reviewer` +
-   `ai-human-in-the-loop-designer`, never re-authoring it) → **entitlement**
+   → **authorize** (may this identity perform this action → calls the
+   `authorization-matrix-designer` + `agent-identity-privilege-reviewer` policy,
+   never re-authoring it) → **entitlement**
    (does the plan/tenant include this capability) → **budget** (is there
    spend/quota left — caps consumed from `ai-cost-guardrail-designer`) →
    **input policy** (does the input pass the closed schema and content

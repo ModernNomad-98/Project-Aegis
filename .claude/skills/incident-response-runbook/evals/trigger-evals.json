@@ -57,7 +57,7 @@
     },
     {
       "id": "live-incident-goes-to-human-owner-and-debugger",
-      "prompt": "Production is down right now and customers are affected; tell me exactly what to do this minute to get service back.",
+      "prompt": "Production is down right now and customers are affected. Help diagnose why the service is failing; the human incident owner is running the incident.",
       "expected_skill": "systematic-debugger",
       "should_not_trigger": [
         "incident-response-runbook"

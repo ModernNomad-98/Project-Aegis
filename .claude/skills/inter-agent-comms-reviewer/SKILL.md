@@ -112,7 +112,8 @@ message exchange.
    effect), severity gated on what the receiving agent would DO. Red-team
    cases (spoof, tamper, replay, cross-topology message → expected SAFE
 outcome: rejected/inert) hand to `ai-evaluation-harness`; active
-   compromise is report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures.
+   compromise is reported to the human incident owner, who follows the approved
+   response runbook (`incident-response-runbook` only authors procedures).
 
 ## Output Format
 

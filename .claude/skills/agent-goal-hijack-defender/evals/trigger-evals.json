@@ -2,11 +2,12 @@
   "skill": "agent-goal-hijack-defender",
   "description": "Trigger discrimination for the Phase 7.5 agentic cluster: goal/plan integrity (ASI01) vs the injection vector (LLM01), stored-memory corruption (ASI06), attacker-less drift (ASI10), tool scope (LLM03/ASI02), and hands-on probing (subagent).",
   "overlaps_with": [
-    "prompt-injection-defender",
-    "memory-context-poisoning-reviewer",
     "agent-containment-reviewer",
     "agent-tool-safety-guard",
-    "ai-security-red-team-reviewer (subagent)"
+    "ai-evaluation-harness",
+    "ai-security-red-team-reviewer (subagent)",
+    "memory-context-poisoning-reviewer",
+    "prompt-injection-defender"
   ],
   "cases": [
     {
@@ -56,11 +57,12 @@
       "reason": "Per-tool least privilege and argument validation are the action boundary (LLM03/ASI02); goal integrity sits above it and composes it."
     },
     {
-      "id": "live-probing-goes-to-red-team-subagent",
+      "id": "live-probing-goes-to-evaluation-harness",
       "prompt": "Explicitly invoke ai-evaluation-harness. Run an authorized scoped adversarial suite that tries to hijack our deployed agent goal with hostile documents, with target and cost disclosed.",
       "expected_skill": "ai-evaluation-harness",
       "should_not_trigger": [
-        "agent-goal-hijack-defender"
+        "agent-goal-hijack-defender",
+        "ai-security-red-team-reviewer (subagent)"
       ],
       "reason": "Executing live adversarial probing requires an authorized, scoped suite run: ai-evaluation-harness (MANUAL-ONLY) with spec/target/run/cost; otherwise state the live-execution gap and offer the static attack-path review. This skill designs goal-integrity defenses, it does not execute attacks."
     }

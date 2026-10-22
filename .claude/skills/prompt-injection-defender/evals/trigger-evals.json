@@ -2,13 +2,14 @@
   "skill": "prompt-injection-defender",
   "description": "Trigger discrimination for the Phase 7 threat & injection cluster: injection defense design vs whole-system threat modeling vs prompt-secrecy vs retrieval authz vs tool scope, and against the shipped security-pr-reviewer and the ai-security-red-team-reviewer subagent.",
   "overlaps_with": [
+    "agent-tool-safety-guard",
+    "ai-evaluation-harness",
+    "ai-security-red-team-reviewer (subagent)",
     "ai-threat-modeler",
+    "file-upload-storage-architect",
     "hidden-context-exposure-reviewer",
     "rag-security-architect",
-    "agent-tool-safety-guard",
-    "file-upload-storage-architect",
-    "security-pr-reviewer",
-    "ai-security-red-team-reviewer (subagent)"
+    "security-pr-reviewer"
   ],
   "cases": [
     {
@@ -49,11 +50,12 @@
       "reason": "Per-tool authorization and argument validation is agent-tool-safety-guard; this skill composes that boundary but doesn't design the tool scopes."
     },
     {
-      "id": "live-probing-goes-to-red-team-subagent",
+      "id": "live-probing-goes-to-evaluation-harness",
       "prompt": "Explicitly invoke ai-evaluation-harness. Try authorized injection payloads against our deployed assistant as a scoped adversarial suite and tell me which ones succeed, with target and cost disclosed.",
       "expected_skill": "ai-evaluation-harness",
       "should_not_trigger": [
-        "prompt-injection-defender"
+        "prompt-injection-defender",
+        "ai-security-red-team-reviewer (subagent)"
       ],
       "reason": "Live probing of a deployed system is an execution action: ai-evaluation-harness (MANUAL-ONLY) runs it only as an explicitly authorized scoped suite with spec/target/run/cost; otherwise state the live-execution gap and design the static suite. This skill designs the defense and the suite, it does not execute attacks."
     },
