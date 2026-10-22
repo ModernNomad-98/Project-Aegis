@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "a4f84f7d8b52821d9bbde0797cf0a7d977048341",
+  "source_revision": "f5805a566cfc8ff688a943f06ad65dd2ebb5d18e",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -71,7 +71,7 @@
     {
       "name": "agent-identity-privilege-reviewer",
       "path": ".claude/skills/agent-identity-privilege-reviewer/SKILL.md",
-      "sha256": "5e13622ea5951ab4b629c0bdc6608456ea5a8b3ad141c04522d972de072a269f"
+      "sha256": "91365e930f361e150c603a8aa16117f5f2a5d368a1a303c4880ce62666a2493f"
     },
     {
       "name": "agent-instruction-consolidator",
@@ -91,7 +91,7 @@
     {
       "name": "agent-tool-safety-guard",
       "path": ".claude/skills/agent-tool-safety-guard/SKILL.md",
-      "sha256": "d917ae033e2383733bef41a5b62189ddf3256de1678ce09c00f17f1f5fdd9d22"
+      "sha256": "7c94e6cfe6f398df87eccba3bfdd4aad620d862fe46f430825d20854c0736b39"
     },
     {
       "name": "agentic-loop-designer",
@@ -581,7 +581,7 @@
     {
       "name": "iso-27001-isms-architect",
       "path": ".claude/skills/iso-27001-isms-architect/SKILL.md",
-      "sha256": "337bdad4e736a68f0d93e78aed3c2c60749340aff4158d4aab47813532e6bcda"
+      "sha256": "1845bea661a78a7b4ea4e7a91fe15bec1ddf117eddfa79bd22108e936f41e25d"
     },
     {
       "name": "iso-42001-aims-architect",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "5c7a3f1fca1c7da4f2d51bf081df3839d439e0672f6078b53030770930b02dde"
+      "sha256": "27479b890bfa0ed55d845c886e4a6389d2c230819fb404efe99996714c7035a7"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "0734dd8749c682622dd48b9e3d0710e0269a82bf0410e9b5c1184c20f30094f0"
+      "sha256": "6bdb9390813dc69230b12b0f80a9d2f42d89b9a063d2e7d5c633c94d233b2d3a"
     },
     {
       "name": "share-link-access-architect",
@@ -1021,7 +1021,7 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "44488a4c0186e632043e0cc1f46a8f01562750fe79340364315786a7a5ab761f"
+      "sha256": "d8c7760e2cdc9c5f111003ae893f9b512229818c80ae5462ccd57a7cf942a792"
     },
     {
       "name": "skill-usage-ledger",

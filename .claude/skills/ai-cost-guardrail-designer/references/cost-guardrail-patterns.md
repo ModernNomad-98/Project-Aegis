@@ -104,8 +104,7 @@ denial-of-wallet vector (CWE-636, "Not Failing Securely").
 
 ## Provider-side backstop
 
-Application controls are not the last line of defense — the provider account
-Provider-specific verification preconditions: name provider, model, price source and date; without all four the figure is generic guidance, never measured data.
+Application controls are not the last line of defense - the provider account
 itself needs a backstop:
 
 - **Account controls** — verify the chosen provider's current spend-limit,
@@ -116,6 +115,8 @@ itself needs a backstop:
   safe test before relying on it.
 - Honest scope: these are configuration actions the skill FLAGS as
   verify-at-design-time, not architecture the skill builds.
+
+Provider-specific verification preconditions: name provider, model, price source and date; without all four the figure is generic guidance, never measured data.
 
 ## AI credential custody (LLMjacking)
 

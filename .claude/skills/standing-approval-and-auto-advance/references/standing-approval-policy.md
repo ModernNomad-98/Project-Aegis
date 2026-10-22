@@ -56,10 +56,9 @@ grant or human review is required for this change: it keeps the decision with
 the person who has authority. Where an applicable active grant already covers
 the work and no reviewer or gate block remains, recommend the granted profile
 to reduce repeated mechanical approvals; explain the exact grant and why it
-fits. A protected-file gate exception needs its own decision. An unanswered
+fits. A protected-file gate exception needs its own decision. An unanswered choice creates no new approval.
 
-Grant limits come from the register entry ACTUAL recorded expiry/use limit (which may be none): never infer a default expiry, and preserve consumption/one-use semantics as recorded. The reviewer-block halt path is unchanged.
-choice creates no new approval.
+Grant limits come from the register entry's ACTUAL recorded expiry/use limit (which may be none): never infer a default expiry, and preserve consumption/one-use semantics as recorded. The reviewer-block halt path is unchanged.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,

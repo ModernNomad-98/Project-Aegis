@@ -217,11 +217,8 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
   service's dashboard because it happens in the caller. The overhead
   rows exist because the unmeasured milliseconds are still spent.
 - Timeout inversion: an upstream 2s timeout over a downstream 3s-timeout x2-retries path means the upstream abandons work the downstream completes - wasted load AND a failed request.
-- **Attempts vs retries:** a layer with r retries makes up to 1+r attempts; two layers with 2 retries each can produce (1+2)(1+2)=9 attempts. Deadline arithmetic always counts attempts (the initial attempt plus every retry), never downstream x retries.
-  cascade check is mechanical; run it.
-- Two-layer retries compound: the gateway retries twice, the client
-  library retries twice — one flaky hop becomes 4× load and a storm.
-  Retries live at ONE stated layer (usually innermost idempotent).
+- **Attempts vs retries:** a layer with r retries makes up to 1+r attempts; two layers with 2 retries each produce (1+2)(1+2)=9 attempts, so deadline arithmetic counts attempts (initial attempt + retries + backoff), never downstream x retries.
+- Two-layer retries compound: gateway retries twice and client library retries twice - the retry-only load shorthand is 4x, but the deadline-relevant attempt count is (1+2)(1+2)=9; retries live at ONE stated layer (usually innermost idempotent).
 - Queue wait is invisible until it isn't: async hops budgeted at
   processing time only will blow their budget under load exactly when
   it matters — queue wait at target load is a budget row.

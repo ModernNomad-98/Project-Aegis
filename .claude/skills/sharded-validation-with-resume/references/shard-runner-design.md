@@ -39,8 +39,7 @@ Schema rules:
 - `tests_executed` is mandatory: a non-empty shard with 0 executed tests is
   a FAILURE (bad glob / hidden skip), not a pass. Skipped execution is
   never a pass.
-- The status file binds to the resume fingerprint: tree + config + dependency lock/toolchain inputs (named exactly). Any change invalidates all prior passes; a new commit is one input, not the whole identity.
-  passes invalid.
+- The status file binds to the resume fingerprint: tree + config + dependency lock/toolchain inputs (named exactly). Any change invalidates all prior passes; a new commit alone is not the whole identity. A mixed-state PR (docs-only skip predicate plus real code changes) fails the aggregate; skips never cover code changes.
 
 ## Runner modes & the resume law
 

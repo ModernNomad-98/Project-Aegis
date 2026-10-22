@@ -41,7 +41,7 @@ Memory is a lead, not truth. Before any action premised on remembered state:
 | Branch exists / current branch | `git branch -a`, `git branch --show-current` |
 | What merged to main / repo baseline | `git log --oneline -20 origin/main`, validator output |
 | File / flag / command still exists | direct check before recommending it |
-| Completion anchor ("X complete, PR #n, SHA") | gh pr view n --json state,mergeCommit; git merge-base --is-ancestor SHA origin/main; revert check: git show REVERT_SHA --name-only --format= lists reverted paths; for each path pass only when git cat-file -e origin/main:PATH fails (absent) OR a later commit re-added it (git log --oneline origin/main -- PATH); evidence artifact = the show output plus the per-path cat-file results (one per path, count stated); owner = the checking agent. Commit-message search alone is not current-fact evidence. |
+| Completion anchor ("X complete, PR #n, SHA") | gh pr view n --json state,mergeCommit; git merge-base --is-ancestor SHA origin/main; revert check: (1) git show REVERT_SHA --name-only --format= lists the reverted paths; (2) for EACH path run git cat-file -e origin/main:PATH - pass only when it FAILS (path absent) OR git log --oneline --diff-filter=A origin/main -- PATH shows a later re-add commit (record the commit); (3) if any reverted path is still present without a re-add record, FAIL. Evidence artifact = git show output plus one cat-file result per listed path (state the command count); owner = the checking agent. Commit-message search alone is not current-fact evidence. |
 | Auto-merge / protection posture | `gh pr view <n> --json autoMergeRequest`, repo settings |
 
 On divergence: live state wins, act on it, queue the memory correction. If the

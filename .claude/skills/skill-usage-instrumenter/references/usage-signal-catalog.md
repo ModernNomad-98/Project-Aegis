@@ -23,6 +23,8 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 | `redirected_to` | skill name \| `none` | What the user invoked instead |
 | correction_outcome | overridden \| abandoned | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
 
+Migration note: the pre-rename single mode field is replaced by activation_mode (invocation events) and correction_outcome (correction/wrong-fire events). Consumers must version and migrate historical events to the correct domain; never reinterpret an old mode value across domains.
+
 ### Completion hint
 
 `skill`, `outcome ∈ {delivered, abandoned, unknown}` — coarse by design; this

@@ -93,10 +93,8 @@ repo; running it is the preflight's and CI's job.
    a status record resumes only against the SAME resume fingerprint: tree hash + config files + dependency lock/toolchain inputs (name the exact inputs). Any change to any of those invalidates all prior status; a new commit alone is not the whole identity.
 5. **Spec the CI wiring:** shards as parallel jobs → ONE aggregate gate job
    (`needs:` all shards) that is the SOLE required status check. The
-   aggregate evaluates shard results explicitly — including the platform's
-   skipped semantics on docs-only paths (skipped-by-tier counts as
-satisfied only when the skip predicate was recorded and validated (docs-only tier selector); a skipped shard on a
-   full-tier run fails the aggregate). Job names stay stable; branch
+   aggregate evaluates shard results explicitly - including the platform.s skipped semantics on docs-only paths: skipped-by-tier counts as satisfied only when the skip predicate was recorded and validated (docs-only tier selector); a skipped shard on a
+   full-tier run fails the aggregate. Mixed states never inherit a docs-only skip: a PR with both documentation-only skips and real code changes fails the aggregate. Job names stay stable; branch
    protection references only the aggregate.
 6. **Hand the wiring off** to `ci-pipeline-architect`/the human for
    installation (required-check registration, workflow edits) — this skill
