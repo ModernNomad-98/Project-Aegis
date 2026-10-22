@@ -24,7 +24,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Identifies package/API hallucination (slopsquatting): an invented package name an attacker can register becomes a supply-chain foothold.",
+          "Identifies package/API hallucination (slopsquatting): an invented package name an attacker can register becomes a supply-chain foothold. Captures source/package identity, ownership and provenance before use; unverified packages are hypotheses, never verified sources.",
           "Requires verifying recommended packages exist against the registry/allowlist before surfacing or installing.",
           "Routes install-time trust to supply-chain-security-reviewer."
         ]

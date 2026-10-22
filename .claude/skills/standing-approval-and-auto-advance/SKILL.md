@@ -190,12 +190,30 @@ Adoption:                     pending human approval → then recorded via scope
   session restates is indistinguishable from no governance — restating is
   the difference between standing approval and folklore.
 - **Opt-in decay:** an opt-in merge profile selected once, then treated as
-  eternal. Profile selection is a register entry with an expiry like any
-  grant.
+  eternal. Profile selection is a register entry; standing grants must be
+  re-attested at the recorded review/attestation deadline (see
+  references/standing-approval-policy.md). The grant expiry/use limit (if any)
+  is a separate field: it bounds consumption, not re-attestation; silence
+  records no inferred expiry. The attestation deadline is the re-attestation
+  field; no recorded attestation deadline means BLOCKED. A reviewer block wins
+  for every agent-initiated action and the loop halts and waits for the human.
+
+  Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
+
+  | Precedence | State | Condition | Auto-advance |
+  | --- | --- | --- | --- |
+  | 1 | BLOCKED | reviewer block in force (wins for every agent-initiated action: halt and wait) OR recorded attestation deadline passed OR no recorded attestation deadline exists OR a transition trigger fired | disabled; the grant does not expire; only in-scope human/manual actions remain; no agent-initiated action proceeds |
+  | 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
+  | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
+  BLOCKED > GRANDFATHERED > ACTIVE (first matching row wins). BLOCKED ->
+  ACTIVE only on recorded re-attestation after the block clears;
+  GRANDFATHERED never bypasses a reviewer block; never infer a default expiry.
+  No recorded deadline means BLOCKED; GRANDFATHERED therefore only applies when
+  a deadline is recorded and not passed.
 - **Fatigue theater in reverse:** thinning approvals that were load-bearing.
-  Only approvals whose evidence shows mechanical granting (instant yes,
-  zero variance) are candidates; a slow, considered approval is a real gate
-  — leave it.
+  Instant-yes and zero-variance approvals are signals that trigger
+  inspection, never proof of mechanical granting; a slow, considered approval
+  is a real gate - leave it.
 - **Armed auto-merge from a prior session** converts "green CI" into an
   unreviewed merge even when THIS session behaves. The loop must check for
   armed state (`gh pr view <n> --json autoMergeRequest`) rather than assume

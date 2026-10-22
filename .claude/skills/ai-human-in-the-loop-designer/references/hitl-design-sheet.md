@@ -15,11 +15,18 @@ action through the normal user interface). Move it only with a reason.
 | Question | If yes | If no |
 | --- | --- | --- |
 | Could a person perform this action today with their own permissions? | continue | FORBIDDEN (the AI cannot gain an action nobody has) |
-| Is it irreversible (money moved, message sent to someone outside the product, data destroyed)? | CONFIRM at most; FORBIDDEN if one reviewer cannot judge it | continue |
-| Does it touch another tenant's data? | FORBIDDEN | continue |
-| Does it reach beyond one record or one user (a whole tenant or many customers)? | FORBIDDEN, or CONFIRM with a second reviewer if the tier allows | continue |
-| Does the risk tier allow autonomy for this action? | AUTONOMOUS is possible | CONFIRM or ADVISORY-ONLY |
-| Do the watch-and-undo controls exist (monitoring, sampling, undo window, pause thresholds)? | AUTONOMOUS | CONFIRM until they exist |
+| Does the applicable written policy or the risk tier bar it? | FORBIDDEN | continue |
+| Does it reach another tenant's data? | FORBIDDEN | continue |
+| Is it irreversible OR non-compensable OR not judgeable by one reviewer? | FORBIDDEN | continue |
+| Does it reach beyond one record or one user? | FORBIDDEN | continue |
+| Is it a single-record action that is reversible AND compensable AND judgeable by one reviewer, and does written policy permit it with approval (e.g. a refund under a set amount)? | CONFIRM | continue |
+| Does a written policy require approval, or is there no written policy explicitly permitting autonomy? | CONFIRM | continue |
+| Does the risk tier allow autonomy AND is the action reversible AND compensable AND do the watch-and-undo controls exist AND does written policy explicitly permit autonomy? | AUTONOMOUS | CONFIRM or ADVISORY-ONLY |
+
+A single-record action that is reversible AND compensable AND judgeable by one
+reviewer, and that written policy permits with approval, is CONFIRM. Any action that
+is irreversible, non-compensable, cross-tenant, wide-blast-radius, or not judgeable by
+a single reviewer is FORBIDDEN regardless of approval or policy.
 
 Examples:
 
@@ -75,6 +82,8 @@ model and prompt version, and timestamps for creation, decision and commit.
 Schema, storage and retention are designed by `audit-log-architect`.
 
 ## 5. Consent-fatigue signals
+
+Timing/bulk approval is a signal that triggers inspection, never proof of fatigue or approval quality (shared rule with agent-governance-audit and human-agent-trust-reviewer).
 
 - CONFIRM volume per reviewer per hour against the budget set in the design.
 - Approval rate per reviewer; near 100% over a long window is a warning.

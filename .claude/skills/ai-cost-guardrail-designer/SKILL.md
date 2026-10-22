@@ -113,11 +113,19 @@ person runs that skill by name; it is never invoked automatically.
    the terms (including input/output tokens, reservation, and true-up), show
    the reason for each viable option, its benefits and drawbacks, and its
    estimated per-call and monthly cost at the inspected call volume. Use
-   verified current prices or mark the dollar estimate unknown; do not invent
-   prices or imply that a request-count cap bounds spend. Recommend a tier
-   and limits with the workload evidence that supports them. Without verified
-   provider unit prices, only provisional token/volume limits can be chosen;
-   defer a dollar budget until unit economics are available. Then ask exactly
+   verified current prices or mark the dollar estimate unknown. Record for
+   each price/model figure the provider, model, source, the source sheet's
+   publication/effective date and the retrieval date. The figure is stale when
+   the source sheet is no longer the sheet currently in effect, or when the
+   retrieval date is older than the recorded stale threshold (default 30 days
+   when none is recorded with the figure; record the threshold with the
+   figure); stale figures are unverified. Provider account-level controls (spend limits,
+   quota, reservation) apply only where the provider exposes them - otherwise
+   record the compensating control. Design-pattern guardrails are
+   provider-independent. Do not invent prices or imply that a request-count
+   cap bounds spend. Recommend a tier and limits with the workload evidence
+   that supports them; without verified unit prices, defer a dollar budget.
+   Then ask exactly
    one atomic owner question; the answer sets the design only and does not
    authorize enforcing limits or changing provider-account settings. If step
    10's budget, degraded-mode or backstop choice is also open, ask only the

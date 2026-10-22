@@ -190,3 +190,5 @@ Not reviewed: <areas + why>
 - `evals/trigger-evals.json` — discrimination within the agentic cluster and
   against `secrets-identity-hardener`, `agent-tool-safety-guard`,
   `agent-authorization-matrix`, and `authorization-matrix-designer`.
+
+A3 is defined once in references/agent-identity-patterns.md; agent-tool-safety-guard cites that definition.

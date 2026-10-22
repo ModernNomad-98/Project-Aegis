@@ -25,12 +25,17 @@ many storage.
 
 ## Cadence by operating frequency
 
-| Control operates | Evidence cadence | Window coverage rule |
-| --- | --- | --- |
-| Continuously (logging, RLS, encryption) | Periodic extracts (monthly/quarterly) + config snapshot at window start/end | Extracts must tile the window with no interval uncovered |
-| Per change (review, migration safety, release gate) | Per-occurrence artifact, enumerated by population | Population = ALL occurrences in window (e.g. all merged PRs) |
-| Periodically (access review, backup-restore test, vendor review, management review) | One artifact per scheduled occurrence | Missed occurrence = hole; reschedule forward, never backdate |
-| On event (incident, DR invocation) | Per-event bundle (timeline, postmortem) | Zero events is fine — prove the monitoring existed, not the event |
+| Control operates | Evidence cadence | Window coverage rule | Control owner (accountable) | Evidence owner/collector | Collection trigger |
+| --- | --- | --- | --- | --- |
+| Continuously (logging, RLS, encryption) | Periodic extracts at least quarterly (continuous controls) | Extracts must tile the window with no uncovered interval; config snapshot at window start/end | control owner (named per control) | named evidence collector | quarterly extract schedule, a control/config change, or window boundary |
+| Per change (review, migration safety, release gate) | Per-occurrence artifact, enumerated by population | Population = ALL occurrences in window (e.g. all merged PRs) | change owner (accountable) | named evidence collector per control | each merged change |
+| Periodically (access review, backup-restore test, vendor review, management review) | One artifact per scheduled occurrence | Missed occurrence = hole; reschedule forward, never backdate | control owner (named per control) | named evidence collector | the scheduled occurrence |
+| On event (incident, DR invocation) | Per-event bundle (timeline, postmortem) | Zero events is fine - prove the monitoring existed, not the event | incident owner (accountable) | incident evidence collector | each event |
+
+These rows are class-level defaults; the per-control accountable owner,
+evidence collector and collection trigger are recorded in the control
+catalog (compliance-control-foundation), not inferred from the frequency
+class.
 
 ## Population patterns
 

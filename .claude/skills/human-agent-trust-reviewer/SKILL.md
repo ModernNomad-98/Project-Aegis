@@ -26,6 +26,10 @@ and friction proportional to blast radius. `human-approval-boundary` places
 the gates and defines when to stop; this skill attacks whether the gates
 actually hold against a manipulative or manipulated agent.
 
+Timing and bulk approval are signals that trigger inspection, never proof of
+fatigue or approval quality (shared rule with agent-governance-audit and the
+HITL design sheet).
+
 ## Use When
 
 - Use when: reviewing the approval UX/flow for an agent system — what the

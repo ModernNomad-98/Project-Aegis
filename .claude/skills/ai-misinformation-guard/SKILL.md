@@ -88,7 +88,10 @@ high-impact outputs to human oversight.
    dependencies, APIs, commands, or config: recommended packages/APIs are
    verified to exist (registry/allowlist) before being surfaced or installed —
    an invented package name is a supply-chain foothold (slopsquatting). Route
-   install-time trust to `supply-chain-security-reviewer`.
+   install-time trust to `supply-chain-security-reviewer`. Capture source/package
+   identity, ownership and provenance before use; an unverified package or
+   identity is downgraded to a hypothesis and never treated as a verified
+   source.
 7. **Design overreliance-aware UX.** Signal confidence, show sources, and mark
    AI-generated content so users can verify rather than blindly trust; for
    high-impact tiers require human review (route oversight tiering to

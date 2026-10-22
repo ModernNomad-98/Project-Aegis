@@ -13,7 +13,8 @@
           "Flags the shared admin-scope service account as the headline finding: every agent is as powerful as the strongest one, a single compromise is fleet-wide, and attribution collapses to the service account.",
           "Prescribes identity-per-agent with least-privilege scopes derived from each agent's actual tasks, preferring short-lived task-scoped issuance over standing keys.",
           "Ranks findings by concrete escalation path (e.g. support-triage agent manipulated into admin actions or cross-tenant reach) rather than 'scope too broad' labels.",
-          "Routes credential storage/rotation mechanics to secrets-identity-hardener and per-tool authority enforcement to agent-tool-safety-guard instead of re-solving them."
+          "Routes credential storage/rotation mechanics to secrets-identity-hardener and per-tool authority enforcement to agent-tool-safety-guard instead of re-solving them.",
+          "States that an approval used to cap A3 must be active, unexpired and in scope for that action; an expired or out-of-scope approval is treated as no approval (A3 denied)."
         ]
       }
     },

@@ -24,13 +24,14 @@ engagement is Type 1 (control design as of a specified date) or Type 2
 **attestation** — an independent CPA examines and reports; nobody
 "certifies" — and the report's scope is driven by what the org has
 committed to customers, not by collecting categories. Criteria then map
-onto existing mechanisms via `compliance-control-foundation` and
-`multi-framework-crosswalk` (the premise of D9, the library's Compliance &
-Governance batch decision that shipped this compliance pack: for an org with
-the shipped Phase 3 (software-as-a-service and tenant isolation) and Phase 4
-(security, row-level security and supply-chain) packs, much of the Security
-category exists — the work is
-mapping, the system description, and the evidence window). Window
+onto existing mechanisms via compliance-control-foundation and
+multi-framework-crosswalk. The premise of D9 (the library's Compliance and
+Governance batch decision that shipped this compliance pack) is that for an
+org with the shipped Phase 3 (software-as-a-service and tenant isolation) and
+Phase 4 (security, row-level security and supply-chain) packs, much of the
+Security category already exists; the work is mapping, the system description
+and the evidence window. The packs are a starting-point candidate map, not
+complete coverage, and operating evidence decides. Window
 evidence design hands to `compliance-evidence-collector`.
 
 ## Use When
@@ -94,7 +95,9 @@ purchase.
    confidential-data commitments — `tenant-isolation-reviewer`,
    `secrets-identity-hardener` *(manual-only)*), Processing Integrity (processing
    completeness/accuracy commitments), Privacy (personal-information
-   commitments — `sensitive-disclosure-guard` surface). Record WHY each
+   commitments — `sensitive-disclosure-guard` surface; `pii-lifecycle-designer` owns the
+   notice/choice/access/disposal lifecycle — scope boundary: lifecycle vs
+   disclosure, no double ownership). Record WHY each
    category is in or out; "more categories looks better" is an
    anti-pattern that multiplies criteria and evidence.
 4. **Decide Type 1 vs Type 2.** Type 1: design as of a date — faster

@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "93a0270322ec17cef9c09b67a2f76b463d9f8b65",
+  "source_revision": "d6db2fb3cfbc4c5cc0cf96a01e9893c9af9c988e",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -61,7 +61,7 @@
     {
       "name": "agent-governance-audit",
       "path": ".claude/skills/agent-governance-audit/SKILL.md",
-      "sha256": "3dc82bb5177f326bbb6dedc76129783bb29f841cb773fe4474996acc5212ea27"
+      "sha256": "1e27920f52c61377d07be3d3a2ed8c13b9140fd1c82a94c1037c3b507da7d8ea"
     },
     {
       "name": "agent-harness-architect",
@@ -71,7 +71,7 @@
     {
       "name": "agent-identity-privilege-reviewer",
       "path": ".claude/skills/agent-identity-privilege-reviewer/SKILL.md",
-      "sha256": "a61d43550e59a3763ca4a1cda36d85a7a05da7d474638cac20b1c77812075b10"
+      "sha256": "8bcfcb530015c9c40be4b0a09079a1c59a611249fb1015941a3104944c426c44"
     },
     {
       "name": "agent-instruction-consolidator",
@@ -91,7 +91,7 @@
     {
       "name": "agent-tool-safety-guard",
       "path": ".claude/skills/agent-tool-safety-guard/SKILL.md",
-      "sha256": "767f83686ac07a91bd35149cfa55b4fa736221ab0d7f66e54f66129529666253"
+      "sha256": "34546233b4d25991a2a0d0bec232d573324250d07f51b990fd09fcae0e73fc6c"
     },
     {
       "name": "agentic-loop-designer",
@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "611c5baefabfa8de7ca5f5e992df8b945e15600e22c43c9348053d6b99b1af12"
+      "sha256": "9329d3a4bd9431253aec0db2175f43ef2f32e268895a7e79690780d1adb7aab7"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "b2ea03710a8628bff99511627ef58e52851c70f67dc8262b6ec11a8e0751d6fc"
+      "sha256": "8e7f870224c5e6664f72325a2cbcfcc54a69ec6552094c0f5211474db8b9737e"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -131,7 +131,7 @@
     {
       "name": "ai-misinformation-guard",
       "path": ".claude/skills/ai-misinformation-guard/SKILL.md",
-      "sha256": "415724cddeb4dda7078f1c55a3f001d3d4a55c9df5fe461e321db84bbd12fb9b"
+      "sha256": "ca282441c2c3912f9ee4c6b366f9835db1b62839a5ad34b8ea7a6f2a90aae119"
     },
     {
       "name": "ai-router-architect",
@@ -296,12 +296,12 @@
     {
       "name": "compliance-control-foundation",
       "path": ".claude/skills/compliance-control-foundation/SKILL.md",
-      "sha256": "ff7badaa9b47710924c706f3661664bfdf7de43454cdfb7ca3b40e6afd73eca8"
+      "sha256": "b4a65624684ee3316c8ee5f9317bf4deeff79ceda59b9139f948b39720056a8c"
     },
     {
       "name": "compliance-evidence-collector",
       "path": ".claude/skills/compliance-evidence-collector/SKILL.md",
-      "sha256": "382e8f1ce569832854f388161e6e4cb0fb4faa197573dec14f8fd8aa332c9e24"
+      "sha256": "2fd5121c0f8a34192e62039e92b544092b481f53ca706144fa186d183b5ccbbf"
     },
     {
       "name": "compliance-gap-auditor",
@@ -326,7 +326,7 @@
     {
       "name": "context-co-update-ci-gate",
       "path": ".claude/skills/context-co-update-ci-gate/SKILL.md",
-      "sha256": "688393a38ef9e40302400285253e40da9ff1e7607c7782f0fa8e1bce70720c50"
+      "sha256": "bf5b8ffd0e2eede2e6bd32ee1cfa24e5d3e29fc555e6933d63c204e7a273c5f3"
     },
     {
       "name": "contribution-guide-author",
@@ -541,7 +541,7 @@
     {
       "name": "human-agent-trust-reviewer",
       "path": ".claude/skills/human-agent-trust-reviewer/SKILL.md",
-      "sha256": "fff88c13dfd5e7a007b76743973c55cdbe65d5fd6b4027d9e36b77b318959a99"
+      "sha256": "2d0d32336c398038e7e3b091a5fcea23fca194cca8fdbb86991021ceb2744f90"
     },
     {
       "name": "human-approval-boundary",
@@ -581,12 +581,12 @@
     {
       "name": "iso-27001-isms-architect",
       "path": ".claude/skills/iso-27001-isms-architect/SKILL.md",
-      "sha256": "337bdad4e736a68f0d93e78aed3c2c60749340aff4158d4aab47813532e6bcda"
+      "sha256": "09d266619d11f4c86ea206d2cf0fc77a2b434d027b059ce645506e08adee2753"
     },
     {
       "name": "iso-42001-aims-architect",
       "path": ".claude/skills/iso-42001-aims-architect/SKILL.md",
-      "sha256": "2f924277a2ec9c1a39d845bcae8e371dcabe3235a97a8f26d2e34b26be729707"
+      "sha256": "0dd4f5f53c6e85a02ccf7f43fd6626c4138f4da74a1ac82dcc74231a5aeeac97"
     },
     {
       "name": "lane-authoring-guide",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "c43a7b4a28a4001d9559a37d66070b9d655b279aeb066f2d2c6cb4c0327b14a2"
+      "sha256": "6771589a0fb8557fdd7421407312ad61cf27ddbf60a2a5f0af735cbf8b7329cc"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -796,7 +796,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "c80055e4933e3cb19199e64e94072034f0a06232d8877166bdbb9f9898da2247"
+      "sha256": "01ab0e92dd73e9cdb26b40d2a19ad6e460664bdc6a95a13353eec43a6a52a43c"
     },
     {
       "name": "property-based-test-designer",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "723020119510023722c764d97cb130649b2ba0bf0763d08a0ad4651f3b5cfc96"
+      "sha256": "e8c923765591d07cee8a59f0a55bb47c4cde33200c2471ce540e0e86183beaf6"
     },
     {
       "name": "share-link-access-architect",
@@ -1021,7 +1021,7 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "b9cca91f3df385022bf36321b6d3aeb39bdd307f7a09bf2b02f77822eb2af8ca"
+      "sha256": "f157aa75e791184af88da82827e4aed4ff09de441a1a3c32358275783c24ebce"
     },
     {
       "name": "skill-usage-ledger",
@@ -1036,7 +1036,7 @@
     {
       "name": "soc2-trust-criteria-mapper",
       "path": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md",
-      "sha256": "38cd99022b196fd72af4df7786ece76540c5eaa190c6c7257fcb4e8f8bc5903f"
+      "sha256": "7f808b200fdab31b3d96bdd67b54fc786214eeabe1761567e782212b82ad538f"
     },
     {
       "name": "source-currency-auditor",
@@ -1056,7 +1056,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "90149099d1415ba240566ef59196b85b2aba94cd8c6d5ed9444034d9ab5d3fbd"
+      "sha256": "6ef0623943c482c7a009755cce162b5acbea9d82bd7ab766eadb4b476a2ff583"
     },
     {
       "name": "state-machine-modeler",
@@ -1166,7 +1166,7 @@
     {
       "name": "threat-modeler",
       "path": ".claude/skills/threat-modeler/SKILL.md",
-      "sha256": "0809835df58474b4f355cf99108ee08faafe1a51c83ec4d086b32599baafe4e7"
+      "sha256": "f1e9dea51bbf8cbdc29f6eb992037450e7e1a3e3835eb88daeeb630a36e62905"
     },
     {
       "name": "transaction-scope-designer",

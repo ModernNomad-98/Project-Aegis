@@ -28,9 +28,15 @@ certification claims.
 
 | Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
-| Secret/key custody, rotation, exposure | `secrets-identity-hardener` |
-| Session/token security flags | `secrets-identity-hardener` |
-| Encryption in transit / at rest design | PARTIAL by design (reconciliation D8/A04 residue) — carry as partial; design review is unowned |
+| Secret/key custody, rotation, exposure | secrets-identity-hardener |
+| Session/token security flags | secrets-identity-hardener |
+| Encryption in transit/at rest design and review | appsec-implementer (design ownership; status: PARTIAL by design; design review is partial-by-design, key custody is implemented) |
+| Encryption key lifecycle and custody | secrets-identity-hardener |
+| Backup restore verification and retention | database-backup-verifier |
+| Audit trail schema, retention, and evidence capture | audit-log-architect (single accountable owner; one control covering trail schema, retention and the evidence program; compliance-evidence-collector supplies evidence routes, not a second owner) |
+| App-config hardening | appsec-implementer |
+
+One accountable owner per row; named skills may be evidence routes but do not co-own a control.
 
 ## Domain 3 — Change management
 

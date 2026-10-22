@@ -39,8 +39,17 @@ For each chain, fill and verify hop-by-hop:
 user (authority A0)
   → agent (holds A1; A1 ⊆ A0 for user-driven actions? authorized by whom?)
     → sub-agent (A2 ⊆ A1? minted fresh or inherited?)
-      → tool (executes with A3 = calling user's authority per agent-tool-safety-guard)
+      → tool (executes under A3, subset-of A2)
 ```
+
+A3 is the effective authority for the hop: the caller/sub-agent authority
+chain INTERSECTED with tool permission and resource/tenant policy, capped by
+the recorded approval scope when an approval applies. The approval must be
+active, unexpired and in scope for this action; an expired or out-of-scope
+approval is no approval. If an action requires approval and no active,
+in-scope approval is recorded, A3 is DENIED - stop. If approval is not
+required, the intersection stands and the parent-hop bound applies, so A3 ⊆ A2
+either way. A hop may only reduce authority, never amplify it.
 
 - Any hop where Aₙ₊₁ ⊄ Aₙ is an amplification finding.
 - Agent authority beyond the user's (maintenance/system tasks) must trace to

@@ -71,8 +71,8 @@ is missing; it does not re-derive or re-implement them.
 4. Known control residue from the reconciliation doc (the repository's **D8**
    audit, the [OWASP Top 10:2025 coverage
    map](../../../docs/reconciliation/step-0-reconciliation-v4.md): encryption
-   and app-config hardening are partial) — the catalog must carry these as
-   honest status, not silence.
+   and app-config hardening are partial) - the catalog must carry these as honest status, not silence.
+   Encryption remains PARTIAL by design (D8/A04 residue), one owner per control: design/review `appsec-implementer`; key lifecycle/custody `secrets-identity-hardener`; backup restore `database-backup-verifier`; audit trail `audit-log-architect`; app-config hardening `appsec-implementer`.
 
 ## Workflow
 

@@ -40,8 +40,8 @@ as a hypothesis without automatically reducing its potential impact.
   that is `tenant-isolation-reviewer`.
 - Do NOT use when: triaging SAST/scanner findings — `static-analysis-reviewer`.
 - Do NOT use when: the threats are AI/LLM-specific (prompt injection, RAG
-  authorization, excessive agency) — that is the Phase 7 pack; note the gap
-  rather than improvising coverage here.
+  authorization, excessive agency) - use ai-threat-modeler (the shipped AI
+  threat-model owner); note the boundary rather than improvising here.
 
 ## Inputs to Inspect
 
@@ -82,7 +82,7 @@ as a hypothesis without automatically reducing its potential impact.
 6. **Rank risks.** State the proposed exploit path — who, from where, doing
    what, getting what — when evidence supports one. Rank potential consequence
    (including tenant blast radius) separately from confidence and path
-   confirmation; an unconfirmed path does not automatically cap severity.
+   confirmation; an unconfirmed path does not automatically cap severity. High-consequence/low-confidence items stay in the risk register with a named verification owner and a confirmation plan.
 7. **Map mitigations** one-to-one to ranked threats: the control, where it
    lives (which boundary), and who builds it. Unmitigated threats are
    explicitly accepted (needs the human's written rationale — route via
@@ -122,8 +122,9 @@ Not modeled: <explicitly out-of-scope areas + why>
       privileged insider — not just "hacker".
 - [ ] Every SaaS data-access boundary has tenant-isolation and object-level
       authorization threat rows.
-- [ ] Every HIGH risk states consequence and confidence; unconfirmed exploit
-      paths are labeled hypotheses and investigated, not silently downgraded.
+- [ ] Every HIGH risk states potential consequence and exploit-path
+      confidence separately; unconfirmed exploit paths are labeled hypotheses
+      and investigated, never silently downgraded.
 - [ ] Every credible threat maps to a mitigation, a written acceptance, or a
       deferral with an owner — none silently dropped.
 - [ ] Every mitigation has a suitable validation check; denial controls have

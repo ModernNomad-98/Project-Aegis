@@ -5,23 +5,35 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 
 ## Signal schema
 
+Dataset metadata (stored once in the dataset header, NEVER as a per-record field): schema_epoch is an integer version of the whole dataset schema; current schema_epoch = 2; bump it on any enum or field change; never compare records from different epochs without migration.
+
 ### Invocation event
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `skill` | name (enum: shipped list) | The activated skill |
-| `mode` | `auto` \| `explicit` | Trigger-matched vs named by the user |
-| `at` | date (day precision suffices) | Finer precision adds risk, not value |
-| `task_class` | small fixed enum (e.g. `build`, `review`, `audit`, `design`, `debug`, `other`) | Never free text |
-| `session_ref` | opaque id | Correlation only; carries no content |
+| skill | name (enum: shipped list) | The activated skill |
+| activation_mode | auto \| explicit | Trigger-matched vs named by the user (invocation event only) |
+| at | date (day precision suffices) | Finer precision adds risk, not value |
+| task_class | small fixed enum (e.g. build, review, audit, design, debug, other) | Never free text |
+| session_ref | opaque id | Correlation only; carries no content |
 
 ### Correction (wrong-fire) event
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `fired` | skill name | What activated |
-| `redirected_to` | skill name \| `none` | What the user invoked instead |
-| `mode` | `overridden` \| `abandoned` | Redirected vs simply stopped |
+| fired | skill name | What activated |
+| redirected_to | skill name \| none | What the user invoked instead |
+| correction_outcome | overridden \| abandoned | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
+
+Migration note (schema epoch 2): the pre-rename single mode field is replaced
+by activation_mode (invocation events) and correction_outcome
+(correction/wrong-fire events). Legacy exports may omit the event type (the
+source tables carry it): map by source table where available; if records were
+flattened and the event type is unknown, mark the record unmigrated rather than
+guessing. Consumers must update their readers to activation_mode (invocation)
+and correction_outcome (correction) and must honor schema_epoch = 2; a reader
+that still reads mode must not be treated as comparable. Consumers record the
+dataset schema epoch and never reinterpret an old mode value across domains.
 
 ### Completion hint
 
@@ -40,7 +52,7 @@ window or insufficient exposure; do not count pre-ship days as zero fires.
 | Captured | Never captured (any tier, any reason) |
 | --- | --- |
 | Skill names (shipped enum) | Prompt text or fragments |
-| Fixed enums (`mode`, `task_class`, `outcome`) | Response/output content |
+| Fixed enums (activation_mode, correction_outcome, task_class, outcome) | Response/output content |
 | Day-precision dates | User identifiers (names, emails, accounts) |
 | Opaque session ids | Live product, company, repo, or path names |
 | Counts and derived rates | Anything requiring redaction before commit |

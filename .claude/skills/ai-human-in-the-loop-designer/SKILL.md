@@ -105,18 +105,26 @@ first workflow step.
    action.
 2. **Sort each action into AUTONOMOUS, CONFIRM or FORBIDDEN.** Start every
    action at advisory-only (the AI proposes, a person commits) and move it
-   only with a reason tied to the risk tier:
-   - **AUTONOMOUS** only when the tier allows it, the action is reversible,
-     its blast radius is one record or one user, and the watch-and-undo
-     controls in step 9 exist.
-   - **CONFIRM** for anything a wrong result would harm and a person can
-     judge from the evidence shown.
-   - **FORBIDDEN** for irreversible, cross-tenant or wide-blast-radius
-     actions, actions no single reviewer can judge, and anything the tier or
-     policy bars. State the reason; FORBIDDEN does not become CONFIRM because
-     a reviewer is available.
-   The rubric and examples are in
-   [references/hitl-design-sheet.md](references/hitl-design-sheet.md).
+   only with a reason tied to the risk tier. Apply these classes in order:
+   - **FORBIDDEN** for these enumerated classes: an action no person may
+     perform; cross-tenant data; an action that is irreversible OR
+     non-compensable; wide blast radius; not judgeable by a single reviewer; or
+     barred by the applicable written policy or risk tier. A bar cannot be downgraded by approval.
+   - **CONFIRM** for a single-record action that is reversible AND compensable
+     AND judgeable by one reviewer, and that written policy permits with
+     approval, OR when no written policy explicitly permits autonomy and the
+     wrong result harms a person or product. CONFIRM never contains an
+     enumerated FORBIDDEN class.
+   - **AUTONOMOUS** only when every earlier gate is excluded: the tier allows
+     autonomy, the action is reversible AND compensable, its blast radius is
+     one record or one user, the watch-and-undo controls in step 9 exist, and a
+     written policy explicitly permits autonomy. Policy silence is CONFIRM,
+     never AUTONOMOUS.
+   A single-record action that is reversible AND compensable AND judgeable by
+   one reviewer, and that written policy permits with approval, is CONFIRM.
+   Any action that is irreversible, non-compensable, cross-tenant,
+   wide-blast-radius, or not judgeable by a single reviewer is FORBIDDEN
+   regardless of approval or policy.
 3. **Design the advisory-only mode.** For actions left advisory-only, the
    AI output appears as a suggestion the user applies through the ordinary
    user interface with their own permissions. Nothing is written on the
@@ -168,8 +176,9 @@ first workflow step.
 11. **Design against consent fatigue.** Keep CONFIRM volume within the
     reviewer budget; if the queue would exceed it, reclassify with the owner
     rather than add reviewers who will rubber-stamp. Track approval rate and
-    time-to-decision per reviewer, and flag near-100% approval with
-    seconds-long decisions. Hand the finished flow to
+    time-to-decision per reviewer; near-100% approval or very short decision
+    times are fatigue signals to inspect, never proof of rubber-stamping. Hand
+    the finished flow to
     `human-agent-trust-reviewer` for an adversarial review.
 12. **Present choices and deliver.** Where a classification or queue design
     is an owner choice (for example CONFIRM with sampling versus

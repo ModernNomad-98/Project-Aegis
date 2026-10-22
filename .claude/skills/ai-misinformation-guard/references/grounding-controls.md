@@ -58,10 +58,7 @@ creative tasks.
 - Features that recommend dependencies, APIs, commands, or config can invent
   names that don't exist — and models invent the SAME plausible names
   repeatedly, which attackers pre-register (slopsquatting).
-- Before recommending or installing a package, API, or command, verify its
-  identity, ownership and provenance against an approved allowlist and an
-  authoritative source. Registry existence alone is insufficient because
-  an attacker may pre-register the hallucinated name.
+- Before recommending or installing a package, API, or command, verify its identity, ownership and provenance against an approved allowlist and an authoritative source; capture provenance before use and treat an unverified package/identity as a hypothesis, never a verified source. Registry existence alone is insufficient because an attacker may pre-register the hallucinated name.
 - Route install-time trust to `supply-chain-security-reviewer`.
 
 ## Overreliance-aware UX

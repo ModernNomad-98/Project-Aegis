@@ -54,7 +54,7 @@ design error and an audit finding — the object of assessment differs.
 | Per-feature risk tier, oversight, disclosure, model card | `ai-governance-risk-reviewer` |
 | AI threat models | `ai-threat-modeler` |
 | Eval/red-team practice | `ai-evaluation-harness` |
-| Injection/output/tool/memory controls | Phase 7 + 7.5 packs (via `compliance-control-foundation` AI domain) |
+| Injection/output/tool/memory controls | Phase 7 + 7.5 packs (via compliance-control-foundation AI domain); starting-point mapping candidate, not complete coverage - operating evidence decides |
 | Lifecycle risk program (GOVERN/MAP/MEASURE/MANAGE) | `ai-lifecycle-risk-manager` |
 
 ## Impact assessment design pattern (6.1.4 / 8.4)

@@ -12,7 +12,8 @@
         "assertions": [
           "Maps assets, actors (including anonymous link holder and wrong-tenant authenticated user), trust boundaries, and data flows before enumerating threats.",
           "Enumerates STRIDE threats per boundary and includes mandatory tenant-isolation and object-level authorization rows on the data-access boundary.",
-          "Writes abuse cases as concrete attacker steps with a payoff, and ranks HIGH risks only when a concrete exploit path is stated.",
+          "Writes abuse cases as concrete attacker steps (who, from where, doing what, getting what payoff) before ranking; severity follows potential consequence with exploit-path confidence reported separately, and unconfirmed paths stay labelled hypotheses.",
+          "Records potential consequence and exploit-path confidence as separate fields; missing path evidence leaves consequence unchanged and lowers confidence, with the hypothesis owner and verification check named.",
           "Maps each threat to a mitigation and each mitigation to a suitable validation check, including negative tests where denial is the claim; hands test implementation to multi-tenant-security-tester and control build to appsec-implementer."
         ]
       }

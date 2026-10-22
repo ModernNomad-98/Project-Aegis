@@ -11,7 +11,7 @@
         "triggers": true,
         "assertions": [
           "Designs the clause 4–10 machinery — scope/context (incl. climate-relevance determination), policy and named roles, risk register + treatment, documented-information control, internal audit program, management review cadence, corrective action.",
-          "Maps Annex A selection to the compliance-control-foundation catalog so shipped technical controls are mapped, not rebuilt; net-new lands mostly in management-system artifacts.",
+          "Maps Annex A selection to the compliance-control-foundation catalog so shipped technical controls are mapped, not rebuilt; net-new lands mostly in management-system artifacts. The packs are a starting-point mapping candidate, not complete coverage; operating evidence decides.",
           "Delegates the SoA document to statement-of-applicability-author and the evidence program to compliance-evidence-collector.",
           "Produces a readiness plan with owners and dates and an explicit verification-items list for licensed-text specifics; makes no 'you will pass' claim."
         ]
