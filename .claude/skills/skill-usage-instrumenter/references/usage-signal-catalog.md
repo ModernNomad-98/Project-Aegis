@@ -30,8 +30,10 @@ by activation_mode (invocation events) and correction_outcome
 (correction/wrong-fire events). Legacy exports may omit the event type (the
 source tables carry it): map by source table where available; if records were
 flattened and the event type is unknown, mark the record unmigrated rather than
-guessing. Consumers record the dataset schema epoch and never reinterpret an
-old mode value across domains.
+guessing. Consumers must update their readers to activation_mode (invocation)
+and correction_outcome (correction) and must honor schema_epoch = 2; a reader
+that still reads mode must not be treated as comparable. Consumers record the
+dataset schema epoch and never reinterpret an old mode value across domains.
 
 ### Completion hint
 

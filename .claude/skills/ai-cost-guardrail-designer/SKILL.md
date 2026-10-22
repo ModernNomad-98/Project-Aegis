@@ -117,8 +117,9 @@ person runs that skill by name; it is never invoked automatically.
    each price/model figure the provider, model, source, the source sheet's
    publication/effective date and the retrieval date. The figure is stale when
    the source sheet is no longer the sheet currently in effect, or when the
-   retrieval date is older than the recorded stale threshold (e.g. 30 days);
-   stale figures are unverified. Provider account-level controls (spend limits,
+   retrieval date is older than the recorded stale threshold (default 30 days
+   when none is recorded with the figure; record the threshold with the
+   figure); stale figures are unverified. Provider account-level controls (spend limits,
    quota, reservation) apply only where the provider exposes them - otherwise
    record the compensating control. Design-pattern guardrails are
    provider-independent. Do not invent prices or imply that a request-count

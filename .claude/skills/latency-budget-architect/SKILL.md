@@ -197,8 +197,11 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       downstream critical-path budget + recorded epsilon (all ms; epsilon is
       recorded once; own work and downstream critical-path budget are defined).
       If no feasible timeout exists, the violation is escalated, not hidden.
+- [ ] Every budgeted path has a finite timeout; an infinite or missing timeout
+      is a violation, not a default.
 - [ ] Retries are budgeted spend at one layer only; hedging is
-      headroom-funded or absent.
+      headroom-funded or absent; retry cost includes the downstream critical-
+      path budget, not only the hop's own work.
 - [ ] Headroom is a named line item with an owner, 15–25%.
 - [ ] Every hop has an owner; hops over budget today have their
       reduction work ROUTED, not absorbed into this design.

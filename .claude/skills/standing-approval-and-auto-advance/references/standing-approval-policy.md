@@ -62,12 +62,17 @@ Grant limits come from the register entry's ACTUAL recorded expiry/use limit
 (which may be none); silence creates no expiry and never infer a default
 expiry; preserve consumption/one-use semantics as recorded. Standing grants
 must be re-attested at the review/attestation deadline recorded with the grant
-(whichever deadline is sooner when several apply).
+(whichever deadline is sooner when several apply). The grant expiry/use limit
+(if any) is a separate field from the attestation deadline: expiry bounds
+consumption; the attestation deadline is when re-attestation is required.
+Silence records no inferred expiry; no recorded attestation deadline means
+BLOCKED. A reviewer block wins for every agent-initiated action: halt and wait
+for the human.
 Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
 
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
-| 1 | BLOCKED | reviewer block in force OR recorded attestation deadline passed OR no recorded attestation deadline exists OR a transition trigger fired | disabled; the grant does not expire; in-scope manual actions remain |
+| 1 | BLOCKED | reviewer block in force (wins for every agent-initiated action: halt and wait) OR recorded attestation deadline passed OR no recorded attestation deadline exists OR a transition trigger fired | disabled; the grant does not expire; only in-scope human/manual actions remain; no agent-initiated action proceeds |
 | 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
 | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
 BLOCKED > GRANDFATHERED > ACTIVE (first matching row wins). BLOCKED -> ACTIVE

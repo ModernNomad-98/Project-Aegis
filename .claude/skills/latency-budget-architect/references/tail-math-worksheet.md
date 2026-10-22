@@ -68,7 +68,8 @@ Cascade check, leaf to root:
 ## Retry-spend accounting
 
 ```
-retry_cost(hop) = P(retry) × (backoff + own work(hop))
+retry_cost(hop) = P(retry) × (backoff_total + own work(hop) + downstream
+                  critical-path budget(hop))
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
 Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)

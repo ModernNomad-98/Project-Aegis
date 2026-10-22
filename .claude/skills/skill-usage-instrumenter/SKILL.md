@@ -72,7 +72,12 @@ it changes no skill, adds no hook, and collects nothing itself.
      discrimination case. Declare the enum domain per event: invocation events
      use activation_mode (auto/explicit); correction/wrong-fire events use
      correction_outcome (overridden/abandoned); never reuse one field name for
-     both domains.
+     both domains. The dataset schema_epoch and migration mapping are in
+     references/usage-signal-catalog.md (current schema_epoch = 2). Consumers
+     (for example skill-usage-ledger and downstream dashboards) must read
+     activation_mode/correction_outcome by event type and must not read the
+     legacy mode field after the epoch bump; map legacy records by source table
+     and mark flattened/unknown event types unmigrated.
    - *Completion hint:* the skill's workflow ran to its deliverable vs was
      abandoned — coarse (delivered / abandoned / unknown), not a quality
      score.

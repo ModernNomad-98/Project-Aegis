@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "dd69a76b44f8d5165f4e37a224c387495eebfbf26e672463a056640fc5883bcf"
+      "sha256": "9329d3a4bd9431253aec0db2175f43ef2f32e268895a7e79690780d1adb7aab7"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "9f9446f5902c0da9d8521c2ec6302047dd931c91734e0df49e95bfa712d3c921"
+      "sha256": "8e7f870224c5e6664f72325a2cbcfcc54a69ec6552094c0f5211474db8b9737e"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -326,7 +326,7 @@
     {
       "name": "context-co-update-ci-gate",
       "path": ".claude/skills/context-co-update-ci-gate/SKILL.md",
-      "sha256": "31e742939fc61f81b8d76acdd816da184e2d5e804a287617e2c8c0a700001053"
+      "sha256": "bf5b8ffd0e2eede2e6bd32ee1cfa24e5d3e29fc555e6933d63c204e7a273c5f3"
     },
     {
       "name": "contribution-guide-author",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "e713c9a114f6c4b6907b33564b407aa4da6f9ca58dde4d1671dbf0b16224dbc5"
+      "sha256": "6771589a0fb8557fdd7421407312ad61cf27ddbf60a2a5f0af735cbf8b7329cc"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -796,7 +796,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "d15651d3b397eef51fd7db3a1742b694a1f5e85ae50790cf4ab16e8927d1877d"
+      "sha256": "01ab0e92dd73e9cdb26b40d2a19ad6e460664bdc6a95a13353eec43a6a52a43c"
     },
     {
       "name": "property-based-test-designer",
@@ -1021,7 +1021,7 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "28e7353ae51d810f9ac07959abc5e2247900f1e99bd05cf57f801715792a8c13"
+      "sha256": "f157aa75e791184af88da82827e4aed4ff09de441a1a3c32358275783c24ebce"
     },
     {
       "name": "skill-usage-ledger",
@@ -1056,7 +1056,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "03f3111a35f6b882ddcf5eb2cffdda22bddc96bfe428a946a783b20521f3ceaf"
+      "sha256": "6ef0623943c482c7a009755cce162b5acbea9d82bd7ab766eadb4b476a2ff583"
     },
     {
       "name": "state-machine-modeler",

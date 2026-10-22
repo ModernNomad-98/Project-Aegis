@@ -112,10 +112,14 @@ first workflow step.
      barred by the applicable written policy or risk tier. A bar cannot be downgraded by approval.
    - **CONFIRM** for a single-record action that is reversible AND compensable
      AND judgeable by one reviewer, and that written policy permits with
-     approval. CONFIRM never contains an enumerated FORBIDDEN class.
+     approval, OR when no written policy explicitly permits autonomy and the
+     wrong result harms a person or product. CONFIRM never contains an
+     enumerated FORBIDDEN class.
    - **AUTONOMOUS** only when every earlier gate is excluded: the tier allows
      autonomy, the action is reversible AND compensable, its blast radius is
-     one record or one user, and the watch-and-undo controls in step 9 exist.
+     one record or one user, the watch-and-undo controls in step 9 exist, and a
+     written policy explicitly permits autonomy. Policy silence is CONFIRM,
+     never AUTONOMOUS.
    A single-record action that is reversible AND compensable AND judgeable by
    one reviewer, and that written policy permits with approval, is CONFIRM.
    Any action that is irreversible, non-compensable, cross-tenant,

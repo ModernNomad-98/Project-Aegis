@@ -33,8 +33,7 @@ certification claims.
 | Encryption in transit/at rest design and review | appsec-implementer (design ownership; status: PARTIAL by design; design review is partial-by-design, key custody is implemented) |
 | Encryption key lifecycle and custody | secrets-identity-hardener |
 | Backup restore verification and retention | database-backup-verifier |
-| Audit trail schema and retention | audit-log-architect (single accountable owner; trail schema/retention and evidence capture are one control) |
-| Audit evidence capture and retention | audit-log-architect |
+| Audit trail schema, retention, and evidence capture | audit-log-architect (single accountable owner; one control covering trail schema, retention and the evidence program; compliance-evidence-collector supplies evidence routes, not a second owner) |
 | App-config hardening | appsec-implementer |
 
 One accountable owner per row; named skills may be evidence routes but do not co-own a control.
