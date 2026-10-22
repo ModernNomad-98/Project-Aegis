@@ -62,8 +62,8 @@ Grant limits come from the register entry's ACTUAL recorded expiry/use limit (wh
 
 | State | Entry condition | Auto-advance |
 | --- | --- | --- |
-| BLOCKED PENDING RE-ATTESTATION | no recorded attestation deadline, or a reviewer block, or any transition trigger | disabled (grant NOT expired; in-scope manual actions remain) |
 | GRANDFATHERED | grant valid at adoption AND register records grandfathered status | preserved only when the register records it was already armed at adoption; otherwise disabled; never revives an expired grant |
+| BLOCKED PENDING RE-ATTESTATION | no recorded attestation deadline, or a reviewer block, or any transition trigger | disabled (grant NOT expired; in-scope manual actions remain) |
 | ACTIVE | recorded attestation deadline exists AND not blocked AND register records armed state | enabled only when armed |
 
 Transition BLOCKED -> ACTIVE only on recorded re-attestation. Never infer a default expiry; the reviewer-block halt path is unchanged.

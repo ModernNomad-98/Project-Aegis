@@ -90,7 +90,7 @@ repo; running it is the preflight's and CI's job.
    **Resume law: a `failed` shard (real assertions) is NOT resumable-away —
    it reruns fully after a fix; only timeout/infra interruptions qualify
    for resume.** Completed passes are never re-derived within a run-id.
-   A tracked status file is ADVISORY ONLY and is never trusted for resume; resume decisions use the fingerprint below plus a trusted CI state store outside the repo (signed or CI-owned). Fingerprint inputs: tracked-file tree hash; every tracked dependency lockfile as sorted path:sha256 tuples; toolchain list (runner OS + pinned image DIGEST, never a mutable tag) sorted by name then version. The status-file lookup key is repository + status-file path + status-schema version, and a schema-version mismatch invalidates prior status. The skip predicate is classified independently at classification time (docs-only tier selector validated per run), never inferred from the status file. A run-id is audit metadata only and never part of the identity key; any change to a fingerprint input invalidates all prior status.
+   A tracked status file is ADVISORY ONLY and is never trusted for resume; resume decisions use the fingerprint below plus a trusted CI state store outside the repo (signed or CI-owned). Fingerprint inputs: tracked-file tree hash; every tracked dependency lockfile as sorted path:sha256 tuples; toolchain list (runner OS + pinned image DIGEST, never a mutable tag) sorted by name then version. The lookup key is repository + status-file path + status-schema version + fingerprint digest, and a schema-version mismatch invalidates prior status. The skip predicate is classified independently at classification time (docs-only tier selector validated per run), never inferred from the status file. A run-id is audit metadata only and never part of the identity key; any change to a fingerprint input invalidates all prior status.
 5. **Spec the CI wiring:** shards as parallel jobs → ONE aggregate gate job
    (`needs:` all shards) that is the SOLE required status check. The
    aggregate evaluates shard results explicitly - including the platform's skipped semantics on docs-only paths: skipped-by-tier counts as satisfied only when the skip predicate was recorded and validated (docs-only tier selector); a skipped shard on a
@@ -124,7 +124,7 @@ Maintenance:     rebalance triggers; shard-map edits via reviewed PRs
 - [ ] Every existing test/check maps to exactly one named shard; the
       uncategorized shard is empty at design handoff (or its contents are
       listed as assignment debts).
-- [ ] Status file schema distinguishes `failed` from `interrupted` — resume
+- [ ] Resume eligibility derives from the trusted CI state store plus the canonical fingerprint (status file is advisory only); status schema records failed vs interrupted.
       eligibility is derivable mechanically.
 - [ ] Resume reruns only unfinished/interrupted shards; a new commit (tree
       hash) invalidates prior passes, while a run-id alone is audit metadata. After fixing a failed assertion, start a

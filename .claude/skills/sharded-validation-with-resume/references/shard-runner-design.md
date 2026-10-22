@@ -39,7 +39,7 @@ Schema rules:
 - `tests_executed` is mandatory: a non-empty shard with 0 executed tests is
   a FAILURE (bad glob / hidden skip), not a pass. Skipped execution is
   never a pass.
-- A tracked status file is ADVISORY ONLY, never trusted for resume; resume uses the canonical fingerprint plus a trusted CI state store outside the repo. Inputs: tracked-file tree hash; every tracked dependency lockfile as sorted path:sha256 tuples; toolchain list (runner OS + pinned image digest) sorted by name then version. Lookup key = repository + status-file path + status-schema version; a schema-version mismatch invalidates all prior status. The skip predicate is classified independently at classification time; run-id is audit metadata only and never part of the identity key. A mixed-state PR (docs-only skip predicate plus real code changes) fails the aggregate; skips never cover code changes.
+- A tracked status file is ADVISORY ONLY, never trusted for resume; resume uses the canonical fingerprint plus a trusted CI state store outside the repo. Inputs: tracked-file tree hash; every tracked dependency lockfile as sorted path:sha256 tuples; toolchain list (runner OS + pinned image digest) sorted by name then version. Lookup key = repository + status-file path + status-schema version + fingerprint digest; a schema-version mismatch invalidates all prior status. The skip predicate is classified independently at classification time; run-id is audit metadata only and never part of the identity key. A mixed-state PR (docs-only skip predicate plus real code changes) fails the aggregate; skips never cover code changes.
 
 ## Runner modes & the resume law
 

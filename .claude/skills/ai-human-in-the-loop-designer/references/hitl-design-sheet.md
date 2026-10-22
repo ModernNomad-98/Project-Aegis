@@ -16,13 +16,11 @@ action through the normal user interface). Move it only with a reason.
 | --- | --- | --- |
 | Could a person perform this action today with their own permissions? | continue | FORBIDDEN (the AI cannot gain an action nobody has) |
 | Does it reach another tenant's data? | FORBIDDEN | continue |
-| Is it irreversible AND impossible to undo or compensate within policy (data destroyed, an external message sent), or no single reviewer can judge it? | FORBIDDEN | continue |
+| Is it irreversible AND impossible to undo or compensate within policy, or can no single reviewer judge it? | FORBIDDEN | continue |
 | Does it reach beyond one record or one user? | FORBIDDEN | continue |
-| Is it irreversible or harmful within one record/one user but policy permits with approval (e.g. a refund under a set amount)? | CONFIRM | continue |
-| Does a written policy require a person to approve it, or does the risk tier not allow autonomy? | CONFIRM | continue |
-| Does the risk tier allow autonomy AND do the watch-and-undo controls exist? | AUTONOMOUS | CONFIRM or ADVISORY-ONLY |
-
-Fallback: if no written policy explicitly permits autonomy, an action whose wrong result harms a person or the product is CONFIRM, never AUTONOMOUS; the AUTONOMOUS row applies only after every earlier row is "no".
+| Is it irreversible or harmful within one record/one user and does a written policy permit it with approval (e.g. a refund under a set amount)? | CONFIRM | continue |
+| Does a written policy require approval, or is there no written policy explicitly permitting autonomy? | CONFIRM | continue |
+| Does the risk tier allow autonomy AND is the action reversible AND compensable AND do the watch-and-undo controls exist? | AUTONOMOUS | CONFIRM or ADVISORY-ONLY |
 
 Examples:
 

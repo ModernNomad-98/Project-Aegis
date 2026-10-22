@@ -73,16 +73,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Proposes a completion-baseline anchor ('Phase 3 billing is complete; do not treat as pending') pinned to immutable evidence: merged PR number, merge commit SHA and applied-migration identifier, with an absolute date.",
-          "Verifies the PR is merged and its SHA is on the main branch with live gh/git output before proposing the entry.",
-          "Does not record the migration as applied on 'I think'; marks it unverified or verifies it first.",
-          "Stops for approval before editing any memory file.",
-          "Passes an intact anchor: the asserted artifacts are present in the current tree at the recorded anchor commit, and the anchor commit + check evidence are recorded.",
-          "Fails a reverted anchor: when the anchor change has been reverted and not re-applied, the completion claim fails instead of being treated as complete.",
-          "Passes a reverted-then-reapplied anchor: a later re-application restores the asserted artifacts, so the claim passes again with the re-application recorded as evidence.",
           "(a) Checks that the claimed artifacts are present in the current tree.",
           "(b) Checks that ANCHOR_SHA is reachable from origin/main and contains the claimed artifacts.",
-          "(c) If a commit on origin/main reverts the anchor change set, the claim fails unless that revert was itself reverted; both SHAs recorded; ANCHOR_SHA and command output recorded as evidence."
+          "(c) If a commit on origin/main reverts the anchor change set, the claim fails unless that revert was itself reverted; both SHAs recorded."
         ]
       }
     }

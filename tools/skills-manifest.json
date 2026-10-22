@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "5e06a2a9b8266280dbf9f3c0ef9d5decd33724ebe6c3657b783ebb1bb0d2009d"
+      "sha256": "462bb0fdc8f76bee17d27dbbaadcd4c329d2b8ec016cd59c90f32ddf688b908e"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "e487b7279570c68a96e1e460f2f12e9901d210ef48e02f087740078f25d5b68a"
+      "sha256": "c70b9d64c5ba390725243c68472256bbdde991f000e4c3c5a59ef8734f834cf0"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "747f262c3ad0d7839dabff93981825ffacd9f07125f96bf3be5b7fb4d9bf4408"
+      "sha256": "62cd9612c430f81f50104659f4c9ed2b8dd728dc46df6167934e78ec4984c4d1"
     },
     {
       "name": "share-link-access-architect",
@@ -1056,7 +1056,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "ccd7b3bac5e6f7b6a2394c2270cc47bddd4d5b6c33514265357959b6da6546e7"
+      "sha256": "15e0d34a26754b58639689e28aaf4fd713ac8a0b863df9c97134d4488e8754aa"
     },
     {
       "name": "state-machine-modeler",

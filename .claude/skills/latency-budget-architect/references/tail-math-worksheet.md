@@ -56,7 +56,6 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 
 ```
-(One rule, see SKILL step 5: upstream timeout > downstream critical-path budget + recorded epsilon, all ms. Example: critical path 350ms + epsilon 25ms => upstream timeout > 375ms.)
 ```
 
 ## Retry-spend accounting

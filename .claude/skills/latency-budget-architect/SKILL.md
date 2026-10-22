@@ -26,8 +26,7 @@ that makes the target achievable by design rather than by hope.
 - Use when: an end-to-end latency target (from an SLO, a contract, or
   a product requirement) needs decomposing into component-level
   budgets that teams can own and be reviewed against.
-- Use when: timeouts and retry policies are folklore (30-second
-  defaults, retry-everything) and need deriving from an actual budget.
+- Use when: timeouts and retry policies are folklore and need deriving from an actual budget.
 - Use when: a new dependency is entering a latency-sensitive path and
   the question is what it may cost — the budget-claim review.
 - Use when: fan-out amplification (parallel calls to N shards or
@@ -108,7 +107,7 @@ authorize execution.
    unallocated — for growth, incident conditions, and the dependency
    nobody predicted. Headroom is a line item with an owner (the path
    owner), not slack silently absorbed by whoever asks first.
-5. **Derive timeouts from budgets.** Set each upstream timeout above the downstream critical-path budget by a recorded epsilon (all values in ms). Critical path = serial work + the longest parallel branch at each join; retries add recorded backoff_total (sum of actual inter-attempt waits). Example: critical path 350ms + epsilon 25ms => upstream timeout > 375ms.
+5. **Derive timeouts from budgets.** Set each upstream timeout above the downstream critical-path budget by a recorded epsilon (all values in ms). Critical path = serial work + the longest parallel branch at each join; retries add attempt time and recorded backoff_total (sum of actual inter-attempt waits).
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
    SOMEONE's allocation. State which hops may retry (idempotent
@@ -159,12 +158,7 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
-Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
-Owner claim choice (only if needed): <terms; viable paths and reasons;
-  user/hop effects, pros/cons, time/money/upkeep or unknowns;
-Reduction work routed: <hop over budget today → owning skill (query-plan-reader | caching-strategy-designer | frontend-perf-engineer | ...)>
 ```
 
 ## Validation Checklist
@@ -179,10 +173,6 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Retries are budgeted spend at one layer only; hedging is
-- [ ] Any owner-facing claim choice explains terms, effects, costs or
-      unknowns, pros/cons, and a reasoned recommendation before one
-      question; no budget or SLO changes silently.
 ## Gotchas
 
 - The pure-multiplication trap: multiplying per-hop p99s can
@@ -208,11 +198,7 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
 
 ## Stop Conditions
 
-- No end-to-end target exists and none can be assumed responsibly
-  (no SLO, no contract, no product number) → stop; route target-
-  setting to `slo-reliability-architect`. A budget without a target
-  `slo-reliability-architect`'s scope, and doing it here forks the
-  reliability source of truth.
+- No end-to-end target exists and none can be assumed responsibly (no SLO, no contract, no product number) → stop; route target-setting to slo-reliability-architect.
 - The measured reality exceeds the target before allocation begins
   (the path is already slower than the promise) → present the honest
   gap and stop for a decision: renegotiate the target (SLO loop) or
@@ -231,10 +217,8 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
 ## Supporting Files
 
 - [references/tail-math-worksheet.md](references/tail-math-worksheet.md)
-  — tail-composition math with worked fan-out examples, the
-  overhead-rows checklist, timeout-cascade worksheet, retry-spend
-  accounting, and the budget-claim review template.
-- `evals/evals.json` — behavior cases including the fan-out tail edge
+  — tail-composition math with worked fan-out examples, overhead rows,
+  timeout-cascade rule and retry spending.
   and the refuse-to-invent-the-SLO case.
 - `evals/trigger-evals.json` — discrimination against
   `slo-reliability-architect` (THE seam), `performance-test-harness`,
