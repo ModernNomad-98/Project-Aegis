@@ -11,7 +11,7 @@
         "triggers": true,
         "assertions": [
           "Classifies the feature as high-risk from impact/reversibility/autonomy (automated decisions affecting people with little oversight).",
-          "Flags the missing human oversight as a blocking gap and requires HITL/HOTL matched to the tier, composing human-approval-boundary for the gate.",
+          "Flags the missing human oversight as a blocking gap and requires HITL/HOTL matched to the tier, composing ai-human-in-the-loop-designer for the product approval workflow (coding-agent steps stay human-approval-boundary).",
           "Requires a named accountable owner, user-facing disclosure, a model/feature card, and maps obligations (EU AI Act tier / NIST AI RMF) to concrete controls or gaps.",
           "Flags regulatory tiering as needing legal review rather than asserting a compliance conclusion."
         ]

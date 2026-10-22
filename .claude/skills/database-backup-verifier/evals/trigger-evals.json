@@ -103,13 +103,14 @@
       "reason": "A reusable template for a recurring gated operation is the template author's; this skill produces the backup evidence one run of that gate needs."
     },
     {
-      "id": "production-outage-goes-to-incident-response",
-      "prompt": "The production orders database is corrupted and checkout is down. Who does what right now, and how do we get service back?",
-      "expected_skill": "incident-response-runbook",
+      "id": "live-outage-diagnosis-goes-to-systematic-debugger",
+      "prompt": "Explicitly invoke systematic-debugger. The production orders database is corrupted and checkout is down. Help diagnose why checkout is failing while the human incident owner runs the incident.",
+      "expected_skill": "systematic-debugger",
       "should_not_trigger": [
-        "database-backup-verifier"
+        "database-backup-verifier",
+        "incident-response-runbook"
       ],
-      "reason": "Recovering production during an outage is an incident; this skill never restores into production and only verifies backups outside an incident."
+      "reason": "A live production outage is reported to the human incident owner following the approved response runbook; diagnosis during the incident is systematic-debugger, and incident-response-runbook only authors procedures. This skill never restores into production and only verifies backups outside an incident."
     },
     {
       "id": "real-backups-restore-wins-here",

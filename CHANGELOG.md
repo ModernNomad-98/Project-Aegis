@@ -8,6 +8,10 @@ for shipped skills and the [backlog forecast](docs/roadmaps/aegis-backlog-foreca
 for remaining work and its dated checkpoints. Check the latest `main` revision
 when a current decision depends on either page.
 
+Current per-batch changes are recorded as append-only reconciliation D-entries in
+[the reconciliation record](docs/reconciliation/step-0-reconciliation-v4.md) (D108 onward;
+D111 (landing in PR-S0-2) records Step 0 and the two Batch-1 skill renames).
+
 Dated changes delivered to `main`, using Australia/Sydney dates; these entries
 do not imply a tagged release.
 For current setup and remaining work, see the [documentation index](docs/README.md).

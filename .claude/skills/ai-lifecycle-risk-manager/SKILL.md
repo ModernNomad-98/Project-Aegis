@@ -116,8 +116,9 @@ lifecycle-stage triggers, instead of an RMF poster on the wall.
 6. **Wire lifecycle triggers.** Per stage transition (design→dev,
    dev→deploy, deploy→operate, material change, decommission): which
    function activities re-run, who signs. Decommission gets real steps —
-   model retirement, data/memory disposition (`agent-memory-governance` *(manual-only)*
-   hygiene), dependent-system checks.
+   model retirement, product data/memory disposition (personal data via `pii-lifecycle-designer`, non-personal product state/model artifacts via the system owner plan;
+   a coding agent's own memory hygiene stays `agent-memory-governance`
+   *(manual-only)*), dependent-system checks.
 7. **Emit the profile and register the controls.** The org's RMF profile
    (functions → practices → owners → triggers), program-level controls
    into `compliance-control-foundation` (AI domain), crosswalk rows

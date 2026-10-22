@@ -864,7 +864,7 @@ as changes to the shipped Phase 4 list.
   strong skill over five weak ones.
 - **Add `evals/trigger-evals.json`** for any skill whose description overlaps an existing skill.
 - **Update README + catalog after each batch; run the validator after each batch.**
-- **Create a changelog entry** per batch.
+- **Create a changelog entry** per batch: the append-only reconciliation D-entry is the per-batch changelog (CHANGELOG.md points readers to it; do not duplicate batch notes in a second log).
 - **Stop** if generated skills become repetitive, too long, or weakly differentiated.
 
 ### 4.2 Pre-generation plan table (required before writing any skill)

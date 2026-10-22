@@ -128,7 +128,7 @@ Tool matrix:
 Least-privilege changes: <tools removed/narrowed + why>
 Identity model: <calling-user authority enforcement per tool>
 Argument validation: <schema/constraints per tool> (→ structured-output-validator)
-Approval gates: <tool → trigger → approver> (→ human-approval-boundary)
+Approval gates: <tool → trigger → approver> (product approval workflow → `ai-human-in-the-loop-designer`; coding-agent steps → `human-approval-boundary`)
 Tool-chain abuse: <chain → composed harm → break point>
 Containment: <rate/qty limits | kill switch | telemetry> (→ observability-operator)
 Red-team cases: <out-of-scope trigger attempt → SAFE outcome> (→ ai-evaluation-harness)

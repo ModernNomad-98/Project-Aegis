@@ -14,7 +14,11 @@
       "id": "loop-semantics-win-here",
       "prompt": "Decide whether this task needs an agentic loop, and if so design it: a hard iteration cap, policy denials never retried, safe transient operations retried at most once on identical input, a second transient reported as retry-exhausted with unresolved cause, and an empty result delivered honestly as empty.",
       "expected_skill": "agentic-loop-designer",
-      "should_not_trigger": ["ai-cost-guardrail-designer", "agent-containment-reviewer", "agent-goal-hijack-defender"],
+      "should_not_trigger": [
+        "ai-cost-guardrail-designer",
+        "agent-containment-reviewer",
+        "agent-goal-hijack-defender"
+      ],
       "note": "SEAM CASE (primary) — the single-shot decision, typed retryability, and honest terminal states are loop SEMANTICS. No budget authoring, no fleet containment, no attack review is requested.",
       "reason": "The subject is one loop's shape, bounds, and stopping. The caps it clamps to are consumed from the cost skill, not authored here; nothing asks whether an attacker can manipulate the loop."
     },
@@ -22,7 +26,9 @@
       "id": "budget-authoring-goes-to-cost-guardrail",
       "prompt": "Put loop and recursion cost bounds on our agents: per-run token budgets, tenant-level spend caps, cost-aware rate limits, and a kill switch when the burn rate spikes.",
       "expected_skill": "ai-cost-guardrail-designer",
-      "should_not_trigger": ["agentic-loop-designer"],
+      "should_not_trigger": [
+        "agentic-loop-designer"
+      ],
       "note": "SEAM CASE (pinned) — authoring the COST policy (budgets, caps, kill switch) vs designing the loop that consumes it. This prompt is entirely spend-side.",
       "reason": "Cost bounds as policy are ai-cost-guardrail-designer. agentic-loop-designer consumes those caps as an input and owns what the loop DOES at the ceiling — the semantics, not the price."
     },
@@ -30,14 +36,18 @@
       "id": "broken-state-goes-to-agent-failure-recovery",
       "prompt": "Explicitly invoke agent-failure-recovery. An agent run died mid-rebase and left the tree conflicted with a half-applied commit — get the working state back without losing work.",
       "expected_skill": "agent-failure-recovery",
-      "should_not_trigger": ["agentic-loop-designer"],
-      "reason": "Recovering a broken working state is agent-failure-recovery (manual-only). agentic-loop-designer designs the loop structure — checkpoints, typed failures, resumable state — that such recovery plugs into; it does not perform recovery."
+      "should_not_trigger": [
+        "agentic-loop-designer"
+      ],
+      "reason": "Recovering a coding agent's broken Git/worktree state is agent-failure-recovery (manual-only); this loop design provides the checkpoints/typed failures it consumes. Product-runtime recovery (worker checkpoint/lease, command idempotency, containment revalidation) composes background-job-orchestration-architect + command-gateway-architect + agent-containment-reviewer, not agent-failure-recovery."
     },
     {
       "id": "harness-gating-goes-to-agent-harness-architect",
       "prompt": "Design the environment our agent runs in: one server-side mediation point, identity from credentials, a deny-by-default pre-flight ladder before the model runs, a closed tool registry, and fail-closed audit.",
       "expected_skill": "agent-harness-architect",
-      "should_not_trigger": ["agentic-loop-designer"],
+      "should_not_trigger": [
+        "agentic-loop-designer"
+      ],
       "note": "IN-BATCH SEAM (pinned both ways) — the environment's gating is the harness; the loop runs INSIDE it and every iteration's calls still pass its ladder. Nothing here asks about iterations, retries, or stopping.",
       "reason": "Mediation, ladder, registry, and audit are agent-harness-architect. agentic-loop-designer owns the loop's shape and bounds within that environment."
     },
@@ -45,7 +55,9 @@
       "id": "fleet-containment-goes-to-agent-containment-reviewer",
       "prompt": "Review whether our multi-agent pipeline contains failure: blast-radius isolation between agents, circuit breakers on inter-agent calls, drift detection against a baseline, and kill switches that actually sever authority.",
       "expected_skill": "agent-containment-reviewer",
-      "should_not_trigger": ["agentic-loop-designer"],
+      "should_not_trigger": [
+        "agentic-loop-designer"
+      ],
       "note": "SEAM CASE — retry-storm and fan-out limits sound loop-adjacent, but this is the containment REVIEW of a multi-agent system, not the design of one loop's internal semantics.",
       "reason": "Cross-agent cascade isolation, drift baselines, and kill switches are agent-containment-reviewer's review lane. agentic-loop-designer designs a single loop's iterations, retries, and stops."
     },
@@ -53,9 +65,21 @@
       "id": "manipulation-review-goes-to-goal-hijack-defender",
       "prompt": "Explicitly invoke agent-goal-hijack-defender. Review our agent's multi-step runs for manipulation: can a poisoned tool output or injected document substitute the objective or expand the scope mid-loop?",
       "expected_skill": "agent-goal-hijack-defender",
-      "should_not_trigger": ["agentic-loop-designer"],
+      "should_not_trigger": [
+        "agentic-loop-designer"
+      ],
       "note": "DESIGN-vs-REVIEW SEAM (mandatory) — this is the attack review of loop/goal manipulation: agent-goal-hijack-defender owns the goal/plan layer, ai-threat-modeler the broader adversarial map. agentic-loop-designer PRODUCES the loop those skills review; it never runs the manipulation audit.",
       "reason": "Attack review of loop manipulation belongs to the security cluster. This skill designs the loop's honest shape and stopping in the first place."
+    },
+    {
+      "id": "product-runtime-recovery-is-not-git-recovery",
+      "prompt": "Our product runtime worker crashed mid-job and the queue shows the work half-done — design recovery from the worker checkpoint/lease and make the retried command idempotent.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "agentic-loop-designer",
+        "agent-failure-recovery"
+      ],
+      "reason": "Product-runtime recovery is worker checkpoint/lease + command idempotency + containment revalidation, not a coding-agent Git/worktree recovery (agent-failure-recovery owns the latter)."
     }
   ]
 }

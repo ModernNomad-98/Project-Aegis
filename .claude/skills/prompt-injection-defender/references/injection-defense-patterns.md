@@ -44,7 +44,8 @@ The layer that actually holds when injection succeeds:
   writes, external API calls, code execution, messages to others.
 - For each, authorization is decided by CODE outside the model, evaluating the
   CALLING USER's real permissions and policy — not the model's request text.
-- Irreversible/high-blast-radius actions are approval-gated
+- Product approval flows are designed by `ai-human-in-the-loop-designer`; a coding
+  agent's own irreversible/high-blast-radius steps are approval-gated
   (`human-approval-boundary`).
 - Tool scope and argument validation are owned by `agent-tool-safety-guard`;
   compose it, don't re-derive.

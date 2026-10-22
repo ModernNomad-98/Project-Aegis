@@ -198,8 +198,7 @@ Disclaimer: readiness assessment — not an audit opinion; CPAs examine SOC 2, a
 - Asked to upgrade UNVERIFIABLE/GAP verdicts on assurance ("it's
   basically done") — refuse; verdicts move on evidence.
 - The audit surfaces an actively exploited control failure (not just a
-  gap) — route to `incident-response-runbook`; compliance reporting
-  resumes after containment.
+  gap) — report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures; compliance reporting resumes after containment.
 
 ## Supporting Files
 

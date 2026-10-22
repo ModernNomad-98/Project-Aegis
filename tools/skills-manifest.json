@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "38d9467ae1f76da046f8a00148525cb3acd49a32",
+  "source_revision": "1291b93b2a87ca06d70ffe6515f05da4e7b97ada",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -66,7 +66,7 @@
     {
       "name": "agent-harness-architect",
       "path": ".claude/skills/agent-harness-architect/SKILL.md",
-      "sha256": "61350a042d0ad1a223359317afd2b6265ebccf05e86634998da4d20f7512252f"
+      "sha256": "bc3d03d5353f6645487e9e1639c101a14adf515a74e2a02a1acd5f26379fd1ad"
     },
     {
       "name": "agent-identity-privilege-reviewer",
@@ -91,12 +91,12 @@
     {
       "name": "agent-tool-safety-guard",
       "path": ".claude/skills/agent-tool-safety-guard/SKILL.md",
-      "sha256": "d183fe5f3c2f336984e1e99cc4be685ea1db10064761fed90dce8b45e18407df"
+      "sha256": "767f83686ac07a91bd35149cfa55b4fa736221ab0d7f66e54f66129529666253"
     },
     {
       "name": "agentic-loop-designer",
       "path": ".claude/skills/agentic-loop-designer/SKILL.md",
-      "sha256": "d8948d7bcc1e5feea62227eb922956e7b883c83d9e85d208cbdab384bd70e962"
+      "sha256": "a1638f869f71fdf1573fc3b7c86ff458235c6bb0e0887658235ea72ca7b85c19"
     },
     {
       "name": "ai-closeout-reporter",
@@ -126,7 +126,7 @@
     {
       "name": "ai-lifecycle-risk-manager",
       "path": ".claude/skills/ai-lifecycle-risk-manager/SKILL.md",
-      "sha256": "7e71215f4fae67d25e2081100230b2d0dc88c6a45966bf19218e5d2c8c13175a"
+      "sha256": "cc50404059d90010e649f89d93b3e3c90e95ba9b4f9cae3515bc3b3799a0971a"
     },
     {
       "name": "ai-misinformation-guard",
@@ -261,7 +261,7 @@
     {
       "name": "cloud-security-baseline-reviewer",
       "path": ".claude/skills/cloud-security-baseline-reviewer/SKILL.md",
-      "sha256": "ee4b354e73f23b8e7da0f20964f70fcb147f3954601a3a95e7afc652c72c4b10"
+      "sha256": "574ae393ba765394fb221f12a61942020c229caaa0bd48a726590875be238c3d"
     },
     {
       "name": "code-reviewer",
@@ -291,7 +291,7 @@
     {
       "name": "compliance-gap-auditor",
       "path": ".claude/skills/compliance-gap-auditor/SKILL.md",
-      "sha256": "3cd11c8c2c88cb53747bfc317785edcb53b75d285d3ee1abe65948f94fedcad3"
+      "sha256": "68930c65cb1afc777b01315fb95911d6fe10390db8204a3961819541c1656d31"
     },
     {
       "name": "component-boundary-designer",
@@ -486,12 +486,12 @@
     {
       "name": "gated-deployment-prompt-template",
       "path": ".claude/skills/gated-deployment-prompt-template/SKILL.md",
-      "sha256": "889a423e25311af494cbb5ecaaec2d091d9bde0f09128bec80b9f02c834388d2"
+      "sha256": "77a44d5b014317022d2d7d886ce6eea84349c33e45e0ed98a36f61317e556ee2"
     },
     {
       "name": "hidden-context-exposure-reviewer",
       "path": ".claude/skills/hidden-context-exposure-reviewer/SKILL.md",
-      "sha256": "036c619f92365af2fe44d6efa93c34f06d7fe530806450812e2f8fd3a2b3edcc"
+      "sha256": "4c7cb83c8418fa37e228ede67bdf72def02928e1d202d39dfd854b03f7b2c84c"
     },
     {
       "name": "horizontal-scalability-reviewer",
@@ -501,12 +501,12 @@
     {
       "name": "human-agent-trust-reviewer",
       "path": ".claude/skills/human-agent-trust-reviewer/SKILL.md",
-      "sha256": "77489e4579e72ed32000b6974b9abef63d800e6748cd0573eaa2288876214826"
+      "sha256": "fff88c13dfd5e7a007b76743973c55cdbe65d5fd6b4027d9e36b77b318959a99"
     },
     {
       "name": "human-approval-boundary",
       "path": ".claude/skills/human-approval-boundary/SKILL.md",
-      "sha256": "2a81404fb9247048b2299585631a676aa3755db23b34ee67f983350ffe42ee26"
+      "sha256": "162c008e5ea7ea74d3b14c2d7fadadbf052eab6dd748d757a6927182f7be0a60"
     },
     {
       "name": "iac-reviewer",
@@ -516,7 +516,7 @@
     {
       "name": "incident-response-runbook",
       "path": ".claude/skills/incident-response-runbook/SKILL.md",
-      "sha256": "00954c766c88d78b4e9d27a06b095cceb422bf1ddf7a32e370825908c66e61f7"
+      "sha256": "9e8cbfa19e96fc809b53a8a064599355d7b787326c59953d5dc17322198a3d99"
     },
     {
       "name": "integration-test-designer",
@@ -526,7 +526,7 @@
     {
       "name": "inter-agent-comms-reviewer",
       "path": ".claude/skills/inter-agent-comms-reviewer/SKILL.md",
-      "sha256": "735f5f01a47b8931b46e2e7c2dd744bf49ea63344537b2439b120cf9b77dbc65"
+      "sha256": "eb421773e3fc70de1722784c56897e750c50399a8ce9fe379feb7b36c2c3d9c8"
     },
     {
       "name": "interface-first-designer",
@@ -571,7 +571,7 @@
     {
       "name": "llm-output-safety-reviewer",
       "path": ".claude/skills/llm-output-safety-reviewer/SKILL.md",
-      "sha256": "376b27b89b8b1bbe5308179907893fdd70c23c33fc29524c5e99666b58255b7e"
+      "sha256": "566e1c8fbc203a46eded680611698783283320af4ddd3782505db4ef0ff0a62a"
     },
     {
       "name": "load-test-planner",
@@ -596,7 +596,7 @@
     {
       "name": "memory-context-poisoning-reviewer",
       "path": ".claude/skills/memory-context-poisoning-reviewer/SKILL.md",
-      "sha256": "b80e01e6eec97e2d3c0e01251fc4276b0e81802b862e3a56dd96659c9469fe92"
+      "sha256": "4d4a8732670ef65cf99b956ff704164e99b986de705e7fc942466356f981522a"
     },
     {
       "name": "merge-is-deploy-governance",
@@ -746,7 +746,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "f4c1a06085cef55c46b1701bc195155f1398e8d7c9414a705af7ace6f421fea8"
+      "sha256": "c80055e4933e3cb19199e64e94072034f0a06232d8877166bdbb9f9898da2247"
     },
     {
       "name": "property-based-test-designer",
@@ -936,7 +936,7 @@
     {
       "name": "sensitive-disclosure-guard",
       "path": ".claude/skills/sensitive-disclosure-guard/SKILL.md",
-      "sha256": "3b160409bcbd74a4cdf1deda5323ae2e610fb319f15c46f373215e04cb785b72"
+      "sha256": "63123238b45fd2a376a873d931cb623251c1b02a1efc4cf46ee43c064120ce9d"
     },
     {
       "name": "server-state-architect",

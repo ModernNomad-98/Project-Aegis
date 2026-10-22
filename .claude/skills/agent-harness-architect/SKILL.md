@@ -60,7 +60,9 @@ artifact those skills review.
   that is `model-context-designer` (the harness gates the call; the context
   designer curates what rides in it).
 - Do NOT use when: authoring the standing human-vs-agent authority POLICY —
-  that is `agent-authorization-matrix`; this environment ENFORCES that
+  that is the composed product authority policy (authorization-matrix-designer +
+  agent-identity-privilege-reviewer; a coding-agent harness uses
+  agent-authorization-matrix); this environment ENFORCES that
   matrix, it does not define it.
 - Do NOT use when: designing model/provider routing internals (selection,
   fallback, key custody) — that is `ai-router-architect`; the harness governs
@@ -75,8 +77,12 @@ artifact those skills review.
    verified credentials/session vs anything supplied in a model output,
    request body, or prompt — and whether it is propagated or re-asserted
    downstream.
-3. The standing authority policy: `agent-authorization-matrix` output if
-   present — the matrix this environment must enforce; without it the ladder
+3. The standing authority policy: for a product AI agent, compose
+   `authorization-matrix-designer` (roles/permissions) and
+   `agent-identity-privilege-reviewer` (identity/privilege); `agent-authorization-matrix`
+   is the coding-agent/SDLC artifact this ladder must enforce. The approval-workflow
+   input for the human-approval rung is `ai-human-in-the-loop-designer` (it designs
+   the approval UX, not the authority policy). Without a policy source the ladder
    has no authorize rung to call.
 4. Existing mediation infrastructure: a `command-gateway-architect`-style
    command bus or gateway the harness can extend rather than duplicate.
@@ -105,8 +111,9 @@ artifact those skills review.
    identity. Flag every place identity is currently read from a payload.
 3. **Design the pre-flight ladder, deny-by-default, fail-closed.** Fixed
    order, all rungs BEFORE the model runs: **authenticate** (who is calling)
-   → **authorize** (may this identity perform this action — calls the
-   `agent-authorization-matrix` policy, never re-authors it) → **entitlement**
+   → **authorize** (may this identity perform this action → calls the
+   `authorization-matrix-designer` + `agent-identity-privilege-reviewer` policy,
+   never re-authoring it) → **entitlement**
    (does the plan/tenant include this capability) → **budget** (is there
    spend/quota left — caps consumed from `ai-cost-guardrail-designer`) →
    **input policy** (does the input pass the closed schema and content
@@ -143,7 +150,7 @@ artifact those skills review.
 ```
 AGENT HARNESS DESIGN — <system/agent>
 Invariant: no model/tool call around the mediation point; authority is a
-  property of the environment (enforces agent-authorization-matrix), not of
+  property of the environment (enforces the composed product authority policy; coding-agent harness: agent-authorization-matrix), not of
   the agent's obedience.
 Mediation point: <the one server-side component; every around-path + its closure>
 Identity: <credential/session source → verification → propagation;
@@ -156,7 +163,8 @@ Instruction custody: <server-side versioned artifacts; version pinned per call;
   who may change them>
 Audit: <record fields; fail-closed rule: cannot-record ⇒ does-not-execute>
 Deny-path proofs: <per rung/registry/audit: the test that proves it can reject>
-Handoffs: authority policy → agent-authorization-matrix; mediated write-path
+Handoffs: authority policy → authorization-matrix-designer + agent-identity-privilege-reviewer
+  (coding-agent harness: agent-authorization-matrix); mediated write-path
   pattern → command-gateway-architect; routing → ai-router-architect;
   loop semantics → agentic-loop-designer; context content →
   model-context-designer; audit schema → audit-log-architect;
@@ -173,8 +181,9 @@ Open questions / risks: <each with risk-if-wrong / who answers>
       check anywhere accepts model-supplied or payload-supplied identity.
 - [ ] The ladder is deny-by-default, fixed-order, entirely pre-flight, and
       every rung fail-closed (an erroring rung denies).
-- [ ] The authorize rung CALLS the standing authority policy
-      (`agent-authorization-matrix`); it does not re-author it.
+- [ ] The authorize rung CALLS the standing authority policy (product:
+      `authorization-matrix-designer` + `agent-identity-privilege-reviewer`;
+      coding-agent harness: `agent-authorization-matrix`); it does not re-author it.
 - [ ] The registry is closed: an unknown capability fails; additions are
       governed changes, not runtime improvisation.
 - [ ] Instructions are server-side versioned artifacts; no untrusted party
@@ -212,8 +221,11 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 ## Stop Conditions
 
-- The standing authority policy does not exist or is ambiguous → obtain it
-  (from `agent-authorization-matrix` or a human) before designing the
+- The standing authority policy does not exist or is ambiguous — obtain it
+  (compose `authorization-matrix-designer` + `agent-identity-privilege-reviewer`;
+  `ai-human-in-the-loop-designer` designs the approval UX and is only the
+  human-approval-rung input, not the authority policy; `agent-authorization-matrix`
+  applies to a coding-agent harness/SDLC case; or a human) before designing the
   authorize rung; a harness enforcing an undefined policy is false assurance.
 - The requested design would BYPASS the human-authority matrix or
   auto-execute privileged actions without human approval — self-authorized

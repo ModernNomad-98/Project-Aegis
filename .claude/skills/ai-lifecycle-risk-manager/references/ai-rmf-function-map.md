@@ -14,10 +14,10 @@ text in hand.**
 | Stage | MAP | MEASURE | MANAGE | GOVERN thread |
 | --- | --- | --- | --- | --- |
 | Design | intake via `ai-governance-risk-reviewer` (tier, affected parties); `ai-threat-modeler` for the technical surface; provider/model provenance via `supply-chain-security-reviewer` | eval plan + thresholds designed (`ai-evaluation-harness`) | treatment decisions into the design; no-go escalation path | named owner assigned; appetite check |
-| Development | context updates on scope change | design and validate offline evaluation cases; run model/provider evals pre-merge only with separate execution authority | gaps fixed or accepted (named human, `human-approval-boundary`) | `ai-sdlc-operating-model` stage gates; `agent-authorization-matrix` authority |
+| Development | context updates on scope change | design and validate offline evaluation cases; run model/provider evals pre-merge only with separate execution authority | gaps fixed or accepted (named human, `a named human acceptor (human-approval-boundary for coding-agent steps; product residual-risk acceptance via ai-governance-risk-reviewer + accountable owner)`) | `ai-sdlc-operating-model` stage gates; `agent-authorization-matrix` authority |
 | Deployment | final categorization; disclosure posture | regression gate on release (`release-readiness-reviewer` evidence) | rollback/kill-switch wiring (`agent-containment-reviewer`, `rollback-runbook-author`) | deploy authority per matrix |
-| Operation | drift in context (new users, new data) re-maps | behavior/drift monitoring (`observability-operator`), eval re-runs on model/provider change | incidents via `incident-response-runbook`; containment authority severs credentials | periodic program review; register review cadence |
-| Decommission | dependent-system map | final-state verification | model retirement; data/memory disposition (`agent-memory-governance`); credential revocation | sign-off by system owner |
+| Operation | drift in context (new users, new data) re-maps | behavior/drift monitoring (`observability-operator`), eval re-runs on model/provider change | incidents are reported to the human incident owner following the approved response runbook (`incident-response-runbook` authors procedures); containment authority severs credentials (`agent-containment-reviewer`) | periodic program review; register review cadence |
+| Decommission | dependent-system map | final-state verification | model retirement; product data/memory disposition (personal data via `pii-lifecycle-designer`, non-personal product state/model artifacts via the system owner plan; coding-agent memory hygiene `agent-memory-governance`); credential revocation | sign-off by system owner |
 
 ## Owning-skill map (compose, never restate)
 
@@ -27,9 +27,11 @@ text in hand.**
 | Feature threat enumeration | `ai-threat-modeler` |
 | Eval datasets, graders, thresholds, CI gate | `ai-evaluation-harness` |
 | Stage/authority SDLC contract | `ai-sdlc-operating-model` |
-| Standing agent authority | `agent-authorization-matrix` |
-| Memory hygiene/disposition | `agent-memory-governance` |
-| Incident response | `incident-response-runbook` |
+| Product agent authority | `authorization-matrix-designer` + `agent-identity-privilege-reviewer` |
+| Coding-agent SDLC authority | `agent-authorization-matrix` |
+| Personal-data/memory disposal (product) | `pii-lifecycle-designer` |
+| Coding-agent memory hygiene | `agent-memory-governance` |
+| Incident response (live) | human incident owner following the approved runbook; authoring: `incident-response-runbook` |
 | Containment/kill switches | `agent-containment-reviewer` |
 | Model/data supply chain | `supply-chain-security-reviewer` |
 | Cost/consumption bounds | `ai-cost-guardrail-designer` |

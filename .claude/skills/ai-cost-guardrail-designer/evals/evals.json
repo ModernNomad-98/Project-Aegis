@@ -26,7 +26,7 @@
         "assertions": [
           "Treats the runaway loop as a denial-of-wallet risk (LLM06) and imposes hard caps on iterations, tool calls, and recursion depth.",
           "Bounds retries with backoff and a circuit breaker to avoid amplification.",
-          "Adds a kill switch and routes an active spike to incident-response-runbook before redesign."
+          "Adds a kill switch and reports an active spike to the human incident owner following the approved response runbook (incident-response-runbook only authors procedures) before redesign."
         ]
       }
     },
@@ -90,7 +90,7 @@
         "assertions": [
           "Does not assume the spike is an attack: a denial-of-wallet attacker, a looping agent, and an honest-but-expensive workload look identical on the invoice.",
           "Requires per-tenant/user/feature attribution to distinguish the three before labeling the spike malicious or benign or blocking a specific tenant.",
-          "Still bounds exposure immediately with fail-closed limits and the kill switch without mislabeling intent, and routes a confirmed incident to incident-response-runbook."
+          "Still bounds exposure immediately with fail-closed limits and the kill switch without mislabeling intent, and reports a confirmed incident to the human incident owner following the approved response runbook (incident-response-runbook only authors procedures)."
         ]
       }
     },

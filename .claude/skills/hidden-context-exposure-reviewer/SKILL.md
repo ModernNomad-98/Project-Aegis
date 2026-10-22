@@ -242,7 +242,7 @@ Residual risk: <what remains + named acceptor>
   surroundings, not a hypothetical.
 - A live secret (valid key/credential) is found in any hidden source — treat
   as active exposure: route rotation through `secrets-identity-hardener` and,
-  if it may already be leaked, `incident-response-runbook`.
+  if it may already be leaked, report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures.
 - The real issue is injection defense, regulated user-data disclosure,
   retrieval authorization, tool-permission design, or agent memory — hand to
   the owning skill.

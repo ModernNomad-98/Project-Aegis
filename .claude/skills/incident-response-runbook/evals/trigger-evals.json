@@ -54,6 +54,15 @@
         "incident-response-runbook"
       ],
       "reason": "Executing the promotion of incident findings into suite tiers is the curator's casework; the runbook's postmortem only mandates that handoff."
+    },
+    {
+      "id": "live-incident-goes-to-human-owner-and-debugger",
+      "prompt": "Explicitly invoke systematic-debugger. Production is down right now and customers are affected. Help diagnose why the service is failing; the human incident owner is running the incident.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": [
+        "incident-response-runbook"
+      ],
+      "reason": "A live incident is run by the human incident owner following the approved runbook and diagnosed with systematic-debugger; incident-response-runbook only authors procedures and turns the experience into procedure afterwards."
     }
   ]
 }

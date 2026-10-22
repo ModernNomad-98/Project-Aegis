@@ -239,8 +239,8 @@ Not done:   no cloud API or CLI was called; nothing was changed; no secret
   `secrets-identity-hardener` *(manual-only)*, which a person must invoke
   by name.
 - Evidence suggests an active compromise (unknown access keys in use,
-  unexplained resources, disabled logging after an alert) → stop the
-  baseline review and hand off to `incident-response-runbook`.
+  unexplained resources, disabled logging after an alert) — stop the
+  baseline review and report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures.
 - It is unclear which account, subscription, project or environment the
   evidence covers → ask one question before assigning verdicts.
 - The ask becomes designing posture, reviewing an IaC diff or drift, or a

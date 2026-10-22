@@ -35,8 +35,10 @@ of recall.
 - Use when: setting up or back-filling the deployment-history index that
   calibrates future ETAs.
 - Do NOT use when: an incident is live and needs a reactive playbook —
-  that is `incident-response-runbook` (severity ladder, roles, comms);
-  this skill is PROACTIVE templating for planned operations.
+  report it to the human incident owner, who follows the approved response
+  runbook (`incident-response-runbook` only authors procedures; severity
+  ladder, roles, comms); this skill is PROACTIVE templating for planned
+  operations.
 - Do NOT use when: authoring the rollback runbook for a change — that is
   `rollback-runbook-author`; this template REFERENCES the rollback artifact
   in its stop-condition paths, it does not write it.
