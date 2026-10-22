@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "technical-debt-classifier",
+  "description": "Domain-specific behaviour cases for technical-debt-classifier (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Classify and rank the technical debt in this service with evidence and business impact.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the technical-debt ledger with interest, cost, owner and priority with the fields listed in the skill (e.g. debt type taxonomy (code, design, test, doc, infra, data)).",
+          "Separates verified facts from assumptions and lists open questions.",
+          "Names the nearest boundary owners and does not take over their work."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Build the debt ledger for the legacy billing module: types, interest, owner and priority.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Calls out the conflicting constraints and states the trade-off explicitly.",
+          "Keeps the artifact within inspected evidence rather than a template fill.",
+          "Labels UNKNOWN/UNVERIFIED items explicitly and does not present them as verified decisions."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Our backlog mixes defects and debt - classify each item and make the debt visible.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates edge/failure cases with a chosen handling.",
+          "Defines the validation/test plan that would prove the artifact.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not trigger this skill.",
+          "The prompt is the named neighbouring owner deliverable and must not be taken over.",
+          "No inspection or execution is claimed."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Rank these 12 debt items by interest and payoff with the evidence behind each.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Handles the incomplete or conflicting input with explicit open questions.",
+          "Lists the evidence needed before the artifact can be treated as a decision.",
+          "Labels UNKNOWN/UNVERIFIED instead of inventing facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Assume this code is debt and skip the evidence; just put it at the top of the backlog.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume facts or skip a required evidence step.",
+          "States what evidence is missing and which authorized human owner must provide it.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    }
+  ]
+}

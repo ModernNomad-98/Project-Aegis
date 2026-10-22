@@ -209,15 +209,17 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "state-machine-modeler"
+      ],
+      "evidence": "Batch 4 delivery (D112): `state-machine-modeler` implements the accepted merged scope for roadmap row #14 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: state-machine-modeler; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 14,
       "name": "State Machine Modeling",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -280,27 +282,31 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "transaction-scope-designer"
+      ],
+      "evidence": "Batch 4 delivery (D112): `transaction-scope-designer` implements the accepted merged scope for roadmap row #19 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: transaction-scope-designer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 19,
       "name": "Transactional Boundary Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "cqrs-read-model-designer"
+      ],
+      "evidence": "Batch 4 delivery (D112): `cqrs-read-model-designer` implements the accepted merged scope for roadmap row #20 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: cqrs-read-model-designer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 20,
       "name": "CQRS Read/Write Separation",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -404,101 +410,115 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "configuration-architect"
+      ],
+      "evidence": "Batch 4 delivery (D112): `configuration-architect` implements the accepted merged scope for roadmap row #28 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: configuration-architect; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 28,
       "name": "Configuration Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
-    },
-    {
-      "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
-      "id": 29,
-      "name": "Extensibility Point Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
-      "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
-    },
-    {
-      "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
-      "id": 30,
-      "name": "Plugin Boundary Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
-      "priority": "P2",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
       "covering_skills": [
-        "interface-first-designer"
+        "extensibility-boundary-designer"
       ],
-      "evidence": "0-B coverage re-triage (D111): interface-first-designer SKILL.md:48 requires an adapter plan distinguishing ports from implementations, the core of plugin-boundary design; full plugin lifecycle/hot-swap ownership is not claimed, so PARTIAL extension.",
-      "evidence_grade": "capability-review",
-      "id": 31,
-      "name": "Adapter Pattern Application",
-      "notes": "0-B re-triage (D111)",
+      "evidence": "Batch 4 delivery (D112): `extensibility-boundary-designer` implements the accepted merged scope for roadmap row #29 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: extensibility-boundary-designer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
+      "id": 29,
+      "name": "Extensibility Point Design",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
       "rationale": null,
-      "status": "PARTIAL"
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "extensibility-boundary-designer"
+      ],
+      "evidence": "Batch 4 delivery (D112): `extensibility-boundary-designer` implements the accepted merged scope for roadmap row #30 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: extensibility-boundary-designer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
+      "id": 30,
+      "name": "Plugin Boundary Design",
+      "notes": "Batch 4 delivery (2026-10-21)",
+      "priority": "P2",
+      "rationale": null,
+      "status": "SHIPPED"
+    },
+    {
+      "area": "01",
+      "covering_skills": [
+        "application-layer-pattern-advisor"
+      ],
+      "evidence": "Batch 4 delivery (D112): `application-layer-pattern-advisor` implements the accepted merged scope for roadmap row #31 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: application-layer-pattern-advisor; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
+      "id": 31,
+      "name": "Adapter Pattern Application",
+      "notes": "Batch 4 delivery (2026-10-21)",
+      "priority": "P1",
+      "rationale": null,
+      "status": "SHIPPED"
+    },
+    {
+      "area": "01",
+      "covering_skills": [
+        "application-layer-pattern-advisor"
+      ],
+      "evidence": "Batch 4 delivery (D112): `application-layer-pattern-advisor` implements the accepted merged scope for roadmap row #32 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: application-layer-pattern-advisor; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 32,
       "name": "Facade Pattern Application",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "application-layer-pattern-advisor"
+      ],
+      "evidence": "Batch 4 delivery (D112): `application-layer-pattern-advisor` implements the accepted merged scope for roadmap row #33 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: application-layer-pattern-advisor; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 33,
       "name": "Repository Pattern Governance",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "application-layer-pattern-advisor"
+      ],
+      "evidence": "Batch 4 delivery (D112): `application-layer-pattern-advisor` implements the accepted merged scope for roadmap row #34 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: application-layer-pattern-advisor; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 34,
       "name": "Service Object Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "application-layer-pattern-advisor"
+      ],
+      "evidence": "Batch 4 delivery (D112): `application-layer-pattern-advisor` implements the accepted merged scope for roadmap row #35 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: application-layer-pattern-advisor; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 35,
       "name": "Use Case Layer Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -601,15 +621,17 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "technical-debt-classifier"
+      ],
+      "evidence": "Batch 4 delivery (D112): `technical-debt-classifier` implements the accepted merged scope for roadmap row #43 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: technical-debt-classifier; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 43,
       "name": "Technical Debt Classification",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -628,40 +650,44 @@
     {
       "area": "01",
       "covering_skills": [
-        "architecture-designer"
+        "modernization-cutover-planner"
       ],
-      "evidence": "audit classification: PARTIAL — architecture-designer; migration plan, not modernization programme; covering skills: architecture-designer; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
-      "evidence_grade": "capability-review",
+      "evidence": "Batch 4 delivery (D112): `modernization-cutover-planner` implements the accepted merged scope for roadmap row #45 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: modernization-cutover-planner; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 45,
       "name": "Incremental Modernization Planning",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
       "rationale": null,
-      "status": "PARTIAL"
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "modernization-cutover-planner"
+      ],
+      "evidence": "Batch 4 delivery (D112): `modernization-cutover-planner` implements the accepted merged scope for roadmap row #46 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: modernization-cutover-planner; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 46,
       "name": "Strangler Fig Planning",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P2",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "modernization-cutover-planner"
+      ],
+      "evidence": "Batch 4 delivery (D112): `modernization-cutover-planner` implements the accepted merged scope for roadmap row #47 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: modernization-cutover-planner; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 47,
       "name": "Monolith-to-Service Readiness Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P2",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -693,15 +719,17 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "architecture-fitness-function-designer"
+      ],
+      "evidence": "Batch 4 delivery (D112): `architecture-fitness-function-designer` implements the accepted merged scope for roadmap row #50 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: architecture-fitness-function-designer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 50,
       "name": "Architecture Fitness Function Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -750,15 +778,17 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "architecture-spike-planner"
+      ],
+      "evidence": "Batch 4 delivery (D112): `architecture-spike-planner` implements the accepted merged scope for roadmap row #54 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: architecture-spike-planner; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 54,
       "name": "Architecture Spike Planning",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "01",
@@ -918,16 +948,16 @@
     {
       "area": "02",
       "covering_skills": [
-        "tenant-modeler"
+        "configuration-architect"
       ],
-      "evidence": "audit classification: PARTIAL — tenant-modeler; tenant semantics only; covering skills: tenant-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
-      "evidence_grade": "capability-review",
+      "evidence": "Batch 4 delivery (D112): `configuration-architect` implements the accepted merged scope for roadmap row #66 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: configuration-architect; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 66,
       "name": "Tenant Settings Architecture",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
       "rationale": null,
-      "status": "PARTIAL"
+      "status": "SHIPPED"
     },
     {
       "area": "02",
@@ -1889,15 +1919,17 @@
     },
     {
       "area": "04",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "graphql-boundary-reviewer"
+      ],
+      "evidence": "Batch 4 delivery (D112): `graphql-boundary-reviewer` implements the accepted merged scope for roadmap row #135 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: graphql-boundary-reviewer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 135,
       "name": "GraphQL Boundary Review",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P2",
-      "rationale": "no GraphQL boundary skill",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "04",
@@ -2043,15 +2075,17 @@
     },
     {
       "area": "04",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "outbound-integration-adapter-designer"
+      ],
+      "evidence": "Batch 4 delivery (D112): `outbound-integration-adapter-designer` implements the accepted merged scope for roadmap row #146 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: outbound-integration-adapter-designer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 146,
       "name": "Outbound Integration Adapter",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "no outbound integration adapter skill",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "04",
@@ -2182,15 +2216,17 @@
     },
     {
       "area": "04",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "transaction-scope-designer"
+      ],
+      "evidence": "Batch 4 delivery (D112): `transaction-scope-designer` implements the accepted merged scope for roadmap row #156 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: transaction-scope-designer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 156,
       "name": "Transaction Scope Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "no transaction-scope design skill",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "04",
@@ -2208,15 +2244,17 @@
     },
     {
       "area": "04",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "edge-function-designer"
+      ],
+      "evidence": "Batch 4 delivery (D112): `edge-function-designer` implements the accepted merged scope for roadmap row #158 (docs/skills-catalog.md Phase 2 table; README shipped Phase 2 rows); covering skill: edge-function-designer; D112 (2026-10-21).",
+      "evidence_grade": "explicit-id",
       "id": 158,
       "name": "Edge Function Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "Batch 4 delivery (2026-10-21)",
       "priority": "P1",
-      "rationale": "no edge-function design skill",
-      "status": "GAP"
+      "rationale": null,
+      "status": "SHIPPED"
     },
     {
       "area": "04",
@@ -4242,7 +4280,7 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 230 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 80 of 243 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
   "totals": {
     "beyond_roadmap_skills": 80,
     "by_area": {
@@ -4257,10 +4295,10 @@
       "09": 20
     },
     "by_grade": {
-      "capability-review": 107,
+      "capability-review": 104,
       "catalog-decision": 16,
-      "explicit-id": 151,
-      "none": 26
+      "explicit-id": 173,
+      "none": 7
     },
     "by_priority": {
       "P0": 126,
@@ -4269,18 +4307,18 @@
     },
     "by_status": {
       "COVERED": 57,
-      "GAP": 26,
-      "PARTIAL": 66,
-      "SHIPPED": 151
+      "GAP": 7,
+      "PARTIAL": 63,
+      "SHIPPED": 173
     },
-    "distinct_covering_skills": 150,
+    "distinct_covering_skills": 163,
     "entries": 300,
     "gap_by_priority": {
       "P0": 0,
-      "P1": 21,
-      "P2": 5
+      "P1": 6,
+      "P2": 1
     },
-    "manifest_skills": 230,
-    "review_pending": 147
+    "manifest_skills": 243,
+    "review_pending": 125
   }
 }

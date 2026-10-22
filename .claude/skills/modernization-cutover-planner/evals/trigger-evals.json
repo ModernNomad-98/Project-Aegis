@@ -1,0 +1,220 @@
+{
+  "skill": "modernization-cutover-planner",
+  "description": "Trigger discrimination for modernization-cutover-planner against real shipped owners",
+  "overlaps_with": [
+    "adr-writer",
+    "architecture-advisor",
+    "architecture-designer",
+    "change-classification-gate",
+    "code-reviewer",
+    "design-review-facilitator",
+    "feature-flag-rollout-strategist",
+    "human-approval-boundary",
+    "observability-by-design",
+    "release-readiness-reviewer",
+    "resilience-architecture-reviewer",
+    "rollback-runbook-author",
+    "schema-evolution-planner",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "modernization-cutover-planner-positive-1",
+      "prompt": "Plan the incremental modernization and cutover for the legacy orders service.",
+      "expected_skill": "modernization-cutover-planner",
+      "should_not_trigger": [
+        "architecture-advisor"
+      ],
+      "reason": "The request needs modernization-cutover-planner's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "modernization-cutover-planner-positive-2",
+      "prompt": "Design the strangler-fig cutover with dual writes, feature flags and rollback points.",
+      "expected_skill": "modernization-cutover-planner",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs modernization-cutover-planner's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "modernization-cutover-planner-positive-3",
+      "prompt": "We need a phased migration plan with compatibility windows and a fallback path.",
+      "expected_skill": "modernization-cutover-planner",
+      "should_not_trigger": [
+        "schema-evolution-planner"
+      ],
+      "reason": "The request needs modernization-cutover-planner's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "modernization-cutover-planner-positive-4",
+      "prompt": "Plan the cutover for a schema plus service migration without a big-bang release.",
+      "expected_skill": "modernization-cutover-planner",
+      "should_not_trigger": [
+        "feature-flag-rollout-strategist"
+      ],
+      "reason": "The request needs modernization-cutover-planner's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "modernization-cutover-planner-positive-5",
+      "prompt": "Design the incremental migration sequence, data backfill and cutover gates.",
+      "expected_skill": "modernization-cutover-planner",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "The request needs modernization-cutover-planner's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "modernization-cutover-planner-positive-6",
+      "prompt": "Our modernization plan has no rollback - add cutover points and fallback criteria.",
+      "expected_skill": "modernization-cutover-planner",
+      "should_not_trigger": [
+        "release-readiness-reviewer"
+      ],
+      "reason": "The request needs modernization-cutover-planner's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "modernization-cutover-planner-positive-7",
+      "prompt": "Plan the legacy-to-new migration with staged traffic and reconciliation checks.",
+      "expected_skill": "modernization-cutover-planner",
+      "should_not_trigger": [
+        "rollback-runbook-author"
+      ],
+      "reason": "The request needs modernization-cutover-planner's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "modernization-cutover-planner-positive-8",
+      "prompt": "Design the adoption and decommission sequence for the old checkout path.",
+      "expected_skill": "modernization-cutover-planner",
+      "should_not_trigger": [
+        "tech-spec-writer"
+      ],
+      "reason": "The request needs modernization-cutover-planner's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-1",
+      "prompt": "Advise on the architecture options for our new billing platform with trade-offs and a recommendation.",
+      "expected_skill": "architecture-advisor",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is architecture-advisor's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-2",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-3",
+      "prompt": "Plan the schema evolution and migration with compatibility windows.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is schema-evolution-planner's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-4",
+      "prompt": "Plan the feature rollout: cohort, staged exposure, guardrails and abort criteria.",
+      "expected_skill": "feature-flag-rollout-strategist",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is feature-flag-rollout-strategist's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-5",
+      "prompt": "Review the system resilience: failure domains, degradation, retries and bulkheads.",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is resilience-architecture-reviewer's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-6",
+      "prompt": "Assess release readiness: rollout gates, rollback, comms and evidence.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-7",
+      "prompt": "Write the rollback runbook for this release: triggers, steps, verification and comms.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is rollback-runbook-author's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-8",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-9",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-10",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-11",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-12",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-13",
+      "prompt": "Classify this change and state the validation floor it requires.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is change-classification-gate's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    },
+    {
+      "id": "modernization-cutover-planner-negative-14",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "modernization-cutover-planner"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; modernization-cutover-planner owns a different artifact and must not take it over."
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "skill": "graphql-boundary-reviewer",
+  "description": "Trigger discrimination for graphql-boundary-reviewer against real shipped owners",
+  "overlaps_with": [
+    "adr-writer",
+    "api-contract-test-designer",
+    "api-event-architect",
+    "architecture-designer",
+    "authorization-matrix-designer",
+    "caching-strategy-designer",
+    "code-reviewer",
+    "design-review-facilitator",
+    "human-approval-boundary",
+    "n-plus-one-detector",
+    "observability-by-design",
+    "query-plan-reader",
+    "security-pr-reviewer",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "graphql-boundary-reviewer-positive-1",
+      "prompt": "Review the GraphQL boundary for this app: schema ownership, resolvers, auth and query limits.",
+      "expected_skill": "graphql-boundary-reviewer",
+      "should_not_trigger": [
+        "n-plus-one-detector"
+      ],
+      "reason": "The request needs graphql-boundary-reviewer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "graphql-boundary-reviewer-positive-2",
+      "prompt": "Our GraphQL layer bypasses authorization - review the boundary and fix the model.",
+      "expected_skill": "graphql-boundary-reviewer",
+      "should_not_trigger": [
+        "authorization-matrix-designer"
+      ],
+      "reason": "The request needs graphql-boundary-reviewer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "graphql-boundary-reviewer-positive-3",
+      "prompt": "Review pagination, depth limits, batching and N+1 risks at the GraphQL boundary.",
+      "expected_skill": "graphql-boundary-reviewer",
+      "should_not_trigger": [
+        "api-contract-test-designer"
+      ],
+      "reason": "The request needs graphql-boundary-reviewer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "graphql-boundary-reviewer-positive-4",
+      "prompt": "Review the GraphQL schema for over-fetching, mutation contracts and authorization gaps.",
+      "expected_skill": "graphql-boundary-reviewer",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs graphql-boundary-reviewer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "graphql-boundary-reviewer-positive-5",
+      "prompt": "Boundary review of the GraphQL gateway: schema, resolvers, auth and failure behaviour.",
+      "expected_skill": "graphql-boundary-reviewer",
+      "should_not_trigger": [
+        "security-pr-reviewer"
+      ],
+      "reason": "The request needs graphql-boundary-reviewer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "graphql-boundary-reviewer-positive-6",
+      "prompt": "Review whether the GraphQL layer duplicates domain rules and where the boundary should sit.",
+      "expected_skill": "graphql-boundary-reviewer",
+      "should_not_trigger": [
+        "query-plan-reader"
+      ],
+      "reason": "The request needs graphql-boundary-reviewer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "graphql-boundary-reviewer-positive-7",
+      "prompt": "Audit the resolver authorization model and query complexity controls.",
+      "expected_skill": "graphql-boundary-reviewer",
+      "should_not_trigger": [
+        "caching-strategy-designer"
+      ],
+      "reason": "The request needs graphql-boundary-reviewer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "graphql-boundary-reviewer-positive-8",
+      "prompt": "Review the GraphQL boundary for tenant scoping and data exposure.",
+      "expected_skill": "graphql-boundary-reviewer",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs graphql-boundary-reviewer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-1",
+      "prompt": "Explicitly invoke n-plus-one-detector. Detect and fix N+1 query patterns in this data-access path.",
+      "expected_skill": "n-plus-one-detector",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is n-plus-one-detector's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-2",
+      "prompt": "Design the deny-by-default roles x permissions x resources matrix and enforcement points.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-3",
+      "prompt": "Design the API contract tests: consumer/provider contract and compatibility gates.",
+      "expected_skill": "api-contract-test-designer",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is api-contract-test-designer's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-4",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is api-event-architect's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-5",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets and SSRF.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is security-pr-reviewer's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-6",
+      "prompt": "Explicitly invoke query-plan-reader. Read and fix the query plan for this slow query: indexes, scans and join order.",
+      "expected_skill": "query-plan-reader",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is query-plan-reader's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-7",
+      "prompt": "Design the caching strategy: what to cache, keys, invalidation and stampede protection.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-8",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-9",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-10",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-11",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-12",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-13",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "graphql-boundary-reviewer-negative-14",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "graphql-boundary-reviewer"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; graphql-boundary-reviewer owns a different artifact and must not take it over."
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "skill": "cqrs-read-model-designer",
+  "description": "Trigger discrimination for cqrs-read-model-designer against real shipped owners",
+  "overlaps_with": [
+    "adr-writer",
+    "architecture-designer",
+    "caching-strategy-designer",
+    "change-classification-gate",
+    "code-reviewer",
+    "command-gateway-architect",
+    "data-flow-diagrammer",
+    "design-review-facilitator",
+    "human-approval-boundary",
+    "operational-vs-analytical-splitter",
+    "release-readiness-reviewer",
+    "schema-evolution-planner",
+    "streaming-event-architect",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "cqrs-read-model-designer-positive-1",
+      "prompt": "Decide whether we need a separate read model for the dashboard queries, with the rebuild plan.",
+      "expected_skill": "cqrs-read-model-designer",
+      "should_not_trigger": [
+        "operational-vs-analytical-splitter"
+      ],
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "cqrs-read-model-designer-positive-2",
+      "prompt": "Design the projection lifecycle and backfill for an order-summary read model.",
+      "expected_skill": "cqrs-read-model-designer",
+      "should_not_trigger": [
+        "command-gateway-architect"
+      ],
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "cqrs-read-model-designer-positive-3",
+      "prompt": "Our read replica is overloaded by list views - design a CQRS read model and its consistency contract.",
+      "expected_skill": "cqrs-read-model-designer",
+      "should_not_trigger": [
+        "caching-strategy-designer"
+      ],
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "cqrs-read-model-designer-positive-4",
+      "prompt": "Design rebuild/backfill and staleness handling for a search read model fed from events.",
+      "expected_skill": "cqrs-read-model-designer",
+      "should_not_trigger": [
+        "schema-evolution-planner"
+      ],
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "cqrs-read-model-designer-positive-5",
+      "prompt": "Design the read-model projection for the reporting view without duplicating the write model.",
+      "expected_skill": "cqrs-read-model-designer",
+      "should_not_trigger": [
+        "streaming-event-architect"
+      ],
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "cqrs-read-model-designer-positive-6",
+      "prompt": "What consistency guarantee can we offer when the read model lags the write model?",
+      "expected_skill": "cqrs-read-model-designer",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "cqrs-read-model-designer-positive-7",
+      "prompt": "Design the projection upgrade path when the event schema changes.",
+      "expected_skill": "cqrs-read-model-designer",
+      "should_not_trigger": [
+        "data-flow-diagrammer"
+      ],
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "cqrs-read-model-designer-positive-8",
+      "prompt": "Split out the read model for account balances with explicit rebuild steps.",
+      "expected_skill": "cqrs-read-model-designer",
+      "should_not_trigger": [
+        "tech-spec-writer"
+      ],
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-1",
+      "prompt": "Decide whether the workload should be served operationally or analytically and state the split.",
+      "expected_skill": "operational-vs-analytical-splitter",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is operational-vs-analytical-splitter's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-2",
+      "prompt": "Design the mediated command gateway: one enforcement point, idempotent commands and replay.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is command-gateway-architect's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-3",
+      "prompt": "Design the caching strategy: what to cache, keys, invalidation and stampede protection.",
+      "expected_skill": "caching-strategy-designer",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-4",
+      "prompt": "Plan the schema evolution and migration with compatibility windows.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is schema-evolution-planner's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-5",
+      "prompt": "Design the streaming event topology: producers, ordering, delivery guarantees and replay.",
+      "expected_skill": "streaming-event-architect",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is streaming-event-architect's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-6",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-7",
+      "prompt": "Draw the data-flow diagram: inputs, stores, transforms, side effects and trust boundaries.",
+      "expected_skill": "data-flow-diagrammer",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is data-flow-diagrammer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-8",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-9",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-10",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-11",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-12",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-13",
+      "prompt": "Classify this change and state the validation floor it requires.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is change-classification-gate's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "cqrs-read-model-designer-negative-14",
+      "prompt": "Assess release readiness: rollout gates, rollback, comms and evidence.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "cqrs-read-model-designer"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
+    }
+  ]
+}

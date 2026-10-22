@@ -1,0 +1,220 @@
+{
+  "skill": "configuration-architect",
+  "description": "Trigger discrimination for configuration-architect against real shipped owners",
+  "overlaps_with": [
+    "adr-writer",
+    "architecture-designer",
+    "code-reviewer",
+    "design-review-facilitator",
+    "environment-parity-reviewer",
+    "feature-flag-architect",
+    "human-approval-boundary",
+    "observability-by-design",
+    "plan-entitlement-architect",
+    "secrets-identity-hardener",
+    "tech-spec-writer",
+    "tenant-modeler",
+    "user-preference-architect",
+    "vite-build-qa-engineer"
+  ],
+  "cases": [
+    {
+      "id": "configuration-architect-positive-1",
+      "prompt": "Design the configuration layers for this service: build-time, runtime, tenant and user settings, with precedence.",
+      "expected_skill": "configuration-architect",
+      "should_not_trigger": [
+        "environment-parity-reviewer"
+      ],
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "configuration-architect-positive-2",
+      "prompt": "Our env vars and tenant settings conflict - produce the precedence matrix and validation rules.",
+      "expected_skill": "configuration-architect",
+      "should_not_trigger": [
+        "secrets-identity-hardener"
+      ],
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "configuration-architect-positive-3",
+      "prompt": "Design the configuration validation, ownership and drift detection for a multi-tenant service.",
+      "expected_skill": "configuration-architect",
+      "should_not_trigger": [
+        "vite-build-qa-engineer"
+      ],
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "configuration-architect-positive-4",
+      "prompt": "Define the config layer matrix and migration path for moving feature settings into runtime config.",
+      "expected_skill": "configuration-architect",
+      "should_not_trigger": [
+        "user-preference-architect"
+      ],
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "configuration-architect-positive-5",
+      "prompt": "Design secrets references vs literal config and the precedence rules around overrides.",
+      "expected_skill": "configuration-architect",
+      "should_not_trigger": [
+        "tenant-modeler"
+      ],
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "configuration-architect-positive-6",
+      "prompt": "Audit the current config surface for hardcoded values and undocumented precedence.",
+      "expected_skill": "configuration-architect",
+      "should_not_trigger": [
+        "feature-flag-architect"
+      ],
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "configuration-architect-positive-7",
+      "prompt": "Design the tenant configuration override model with validation and audit.",
+      "expected_skill": "configuration-architect",
+      "should_not_trigger": [
+        "plan-entitlement-architect"
+      ],
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "configuration-architect-positive-8",
+      "prompt": "Produce the config ownership and precedence model for this platform.",
+      "expected_skill": "configuration-architect",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "configuration-architect-negative-1",
+      "prompt": "Review dev/staging/prod parity: what differs and which differences are risky.",
+      "expected_skill": "environment-parity-reviewer",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is environment-parity-reviewer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-2",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Harden the secrets and identity handling for this service and plan the rotation.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is secrets-identity-hardener's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-3",
+      "prompt": "Explicitly invoke vite-build-qa-engineer. QA this Vite build: dist-level env classification, build/preview parity and bundle budgets.",
+      "expected_skill": "vite-build-qa-engineer",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is vite-build-qa-engineer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-4",
+      "prompt": "Design user-preference storage and precedence across device and tenant.",
+      "expected_skill": "user-preference-architect",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is user-preference-architect's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-5",
+      "prompt": "Model the tenant model for our SaaS platform: tenant boundaries, isolation and lifecycle.",
+      "expected_skill": "tenant-modeler",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is tenant-modeler's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-6",
+      "prompt": "Design the feature-flag architecture: flag types, ownership, expiry and kill-switch semantics.",
+      "expected_skill": "feature-flag-architect",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is feature-flag-architect's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-7",
+      "prompt": "Design plan entitlements and limits for our SaaS plans and how they are enforced.",
+      "expected_skill": "plan-entitlement-architect",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is plan-entitlement-architect's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-8",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-9",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-10",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-11",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-12",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-13",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    },
+    {
+      "id": "configuration-architect-negative-14",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "configuration-architect"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
+    }
+  ]
+}

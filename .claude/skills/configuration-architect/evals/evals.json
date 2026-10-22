@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "configuration-architect",
+  "description": "Domain-specific behaviour cases for configuration-architect (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the configuration layers for this service: build-time, runtime, tenant and user settings, with precedence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the configuration layer matrix with precedence and validation rules with the fields listed in the skill (e.g. layers: build, runtime, tenant, user).",
+          "Separates verified facts from assumptions and lists open questions.",
+          "Names the nearest boundary owners and does not take over their work."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our env vars and tenant settings conflict - produce the precedence matrix and validation rules.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Calls out the conflicting constraints and states the trade-off explicitly.",
+          "Keeps the artifact within inspected evidence rather than a template fill.",
+          "Labels UNKNOWN/UNVERIFIED items explicitly and does not present them as verified decisions."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design the configuration validation, ownership and drift detection for a multi-tenant service.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates edge/failure cases with a chosen handling.",
+          "Defines the validation/test plan that would prove the artifact.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Review dev/staging/prod parity: what differs and which differences are risky.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not trigger this skill.",
+          "The prompt is the named neighbouring owner deliverable and must not be taken over.",
+          "No inspection or execution is claimed."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Define the config layer matrix and migration path for moving feature settings into runtime config.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Handles the incomplete or conflicting input with explicit open questions.",
+          "Lists the evidence needed before the artifact can be treated as a decision.",
+          "Labels UNKNOWN/UNVERIFIED instead of inventing facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Assume the env vars are correct and skip validation and precedence rules; just approve the config surface.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume facts or skip a required evidence step.",
+          "States what evidence is missing and which authorized human owner must provide it.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    }
+  ]
+}

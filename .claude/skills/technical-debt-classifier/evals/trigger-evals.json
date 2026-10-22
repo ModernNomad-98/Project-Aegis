@@ -1,0 +1,220 @@
+{
+  "skill": "technical-debt-classifier",
+  "description": "Trigger discrimination for technical-debt-classifier against real shipped owners",
+  "overlaps_with": [
+    "adr-writer",
+    "architecture-designer",
+    "change-classification-gate",
+    "code-reviewer",
+    "design-review-facilitator",
+    "full-codebase-auditor",
+    "human-approval-boundary",
+    "principal-code-analyst",
+    "prioritization-frame-picker",
+    "release-readiness-reviewer",
+    "roadmap-under-uncertainty-planner",
+    "rollback-runbook-author",
+    "staff-scope-selector",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "technical-debt-classifier-positive-1",
+      "prompt": "Classify and rank the technical debt in this service with evidence and business impact.",
+      "expected_skill": "technical-debt-classifier",
+      "should_not_trigger": [
+        "principal-code-analyst"
+      ],
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "technical-debt-classifier-positive-2",
+      "prompt": "Build the debt ledger for the legacy billing module: types, interest, owner and priority.",
+      "expected_skill": "technical-debt-classifier",
+      "should_not_trigger": [
+        "full-codebase-auditor"
+      ],
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "technical-debt-classifier-positive-3",
+      "prompt": "Our backlog mixes defects and debt - classify each item and make the debt visible.",
+      "expected_skill": "technical-debt-classifier",
+      "should_not_trigger": [
+        "staff-scope-selector"
+      ],
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "technical-debt-classifier-positive-4",
+      "prompt": "Rank these 12 debt items by interest and payoff with the evidence behind each.",
+      "expected_skill": "technical-debt-classifier",
+      "should_not_trigger": [
+        "prioritization-frame-picker"
+      ],
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "technical-debt-classifier-positive-5",
+      "prompt": "Design a debt ledger template and classification rubric for this codebase.",
+      "expected_skill": "technical-debt-classifier",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "technical-debt-classifier-positive-6",
+      "prompt": "Review the debt register for misclassified items and missing interest estimates.",
+      "expected_skill": "technical-debt-classifier",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "technical-debt-classifier-positive-7",
+      "prompt": "Classify the architectural, code, test and documentation debt in this subsystem.",
+      "expected_skill": "technical-debt-classifier",
+      "should_not_trigger": [
+        "roadmap-under-uncertainty-planner"
+      ],
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "technical-debt-classifier-positive-8",
+      "prompt": "Produce a prioritized debt ledger with named owners and reversal costs.",
+      "expected_skill": "technical-debt-classifier",
+      "should_not_trigger": [
+        "release-readiness-reviewer"
+      ],
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "technical-debt-classifier-negative-1",
+      "prompt": "Analyze this subsystem end to end and produce a risk-ranked remediation plan.",
+      "expected_skill": "principal-code-analyst",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is principal-code-analyst's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-2",
+      "prompt": "Audit the whole repository with an inventory-first coverage plan and confirmed/likely/unknown findings.",
+      "expected_skill": "full-codebase-auditor",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is full-codebase-auditor's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-3",
+      "prompt": "Select the staff-level scope and depth for this engineering problem.",
+      "expected_skill": "staff-scope-selector",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is staff-scope-selector's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-4",
+      "prompt": "Pick the prioritization frame for this roadmap decision and rank the options.",
+      "expected_skill": "prioritization-frame-picker",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is prioritization-frame-picker's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-5",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-6",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-7",
+      "prompt": "Plan the roadmap under uncertainty with options, bets and checkpoints.",
+      "expected_skill": "roadmap-under-uncertainty-planner",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is roadmap-under-uncertainty-planner's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-8",
+      "prompt": "Assess release readiness: rollout gates, rollback, comms and evidence.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-9",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-10",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-11",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-12",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-13",
+      "prompt": "Classify this change and state the validation floor it requires.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is change-classification-gate's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    },
+    {
+      "id": "technical-debt-classifier-negative-14",
+      "prompt": "Write the rollback runbook for this release: triggers, steps, verification and comms.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": [
+        "technical-debt-classifier"
+      ],
+      "reason": "This request is rollback-runbook-author's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
+    }
+  ]
+}

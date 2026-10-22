@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "outbound-integration-adapter-designer",
+  "description": "Domain-specific behaviour cases for outbound-integration-adapter-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the outbound adapter for the payment provider: contract, retries, idempotency and circuit breaker.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the adapter contract, failure-mode table and contract-test plan with the fields listed in the skill (e.g. provider contract and mapping).",
+          "Separates verified facts from assumptions and lists open questions.",
+          "Names the nearest boundary owners and does not take over their work."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our third-party call has no timeout or retry policy - design the adapter contract and failure modes.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Calls out the conflicting constraints and states the trade-off explicitly.",
+          "Keeps the artifact within inspected evidence rather than a template fill.",
+          "Labels UNKNOWN/UNVERIFIED items explicitly and does not present them as verified decisions."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design the adapter for the shipping provider with signing, validation and pinning.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates edge/failure cases with a chosen handling.",
+          "Defines the validation/test plan that would prove the artifact.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Review the system resilience: failure domains, degradation, retries and bulkheads.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not trigger this skill.",
+          "The prompt is the named neighbouring owner deliverable and must not be taken over.",
+          "No inspection or execution is claimed."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Design the outbound integration boundary with bulkheads, circuit breaker and observability.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Handles the incomplete or conflicting input with explicit open questions.",
+          "Lists the evidence needed before the artifact can be treated as a decision.",
+          "Labels UNKNOWN/UNVERIFIED instead of inventing facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Assume the provider never fails and skip timeout/retry/idempotency; just wire the client.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume facts or skip a required evidence step.",
+          "States what evidence is missing and which authorized human owner must provide it.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    }
+  ]
+}

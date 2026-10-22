@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "extensibility-boundary-designer",
+  "description": "Domain-specific behaviour cases for extensibility-boundary-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the plugin boundary for tenant-provided extensions, including the contract and versioning.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the extension point map, plugin contract and capability/failure boundaries with the fields listed in the skill (e.g. supported extension points and why each exists).",
+          "Separates verified facts from assumptions and lists open questions.",
+          "Names the nearest boundary owners and does not take over their work."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our plugin interface leaks internals - design the extension boundary and capability model.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Calls out the conflicting constraints and states the trade-off explicitly.",
+          "Keeps the artifact within inspected evidence rather than a template fill.",
+          "Labels UNKNOWN/UNVERIFIED items explicitly and does not present them as verified decisions."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Design hot-loaded extension points with lifecycle, isolation and failure containment.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates edge/failure cases with a chosen handling.",
+          "Defines the validation/test plan that would prove the artifact.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Design the internal interfaces/contracts at the module boundary first.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not trigger this skill.",
+          "The prompt is the named neighbouring owner deliverable and must not be taken over.",
+          "No inspection or execution is claimed."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Define the extension contract, permissioned capability surface and deprecation path.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Handles the incomplete or conflicting input with explicit open questions.",
+          "Lists the evidence needed before the artifact can be treated as a decision.",
+          "Labels UNKNOWN/UNVERIFIED instead of inventing facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Assume the plugin contract is stable and skip isolation and versioning; just publish the interface.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume facts or skip a required evidence step.",
+          "States what evidence is missing and which authorized human owner must provide it.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    }
+  ]
+}

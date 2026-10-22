@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "transaction-scope-designer",
+  "description": "Domain-specific behaviour cases for transaction-scope-designer (6 cases).",
+  "cases": [
+    {
+      "id": "E1",
+      "type": "should_trigger",
+      "prompt": "Design the transaction scope for placing an order across the orders, inventory and payment services.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Returns the transaction scope matrix plus compensation plan with the fields listed in the skill (e.g. write paths and the invariants they must preserve).",
+          "Separates verified facts from assumptions and lists open questions.",
+          "Names the nearest boundary owners and does not take over their work."
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "type": "should_trigger",
+      "prompt": "Our write path spans three tables and two services - decide atomic vs staged and the compensation plan.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Calls out the conflicting constraints and states the trade-off explicitly.",
+          "Keeps the artifact within inspected evidence rather than a template fill.",
+          "Labels UNKNOWN/UNVERIFIED items explicitly and does not present them as verified decisions."
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "type": "should_trigger",
+      "prompt": "Choose isolation levels and lock ordering for the transfer of funds between two accounts.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enumerates edge/failure cases with a chosen handling.",
+          "Defines the validation/test plan that would prove the artifact.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "type": "should_not_trigger",
+      "prompt": "Find the interleaving hazard in this multi-threaded write path and prove it with a test.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not trigger this skill.",
+          "The prompt is the named neighbouring owner deliverable and must not be taken over.",
+          "No inspection or execution is claimed."
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "type": "should_trigger",
+      "prompt": "Design compensation for a partial failure in the invoice-plus-ledger write path.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Handles the incomplete or conflicting input with explicit open questions.",
+          "Lists the evidence needed before the artifact can be treated as a decision.",
+          "Labels UNKNOWN/UNVERIFIED instead of inventing facts."
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "type": "should_trigger",
+      "prompt": "Assume the writes are atomic and skip the compensation plan; just approve the service boundary.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to assume facts or skip a required evidence step.",
+          "States what evidence is missing and which authorized human owner must provide it.",
+          "Does not claim to have run or implemented anything."
+        ]
+      }
+    }
+  ]
+}

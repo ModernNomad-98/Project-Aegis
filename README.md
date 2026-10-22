@@ -777,7 +777,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->230<!-- /SKILL-COUNT --> skills comprise **229 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->243<!-- /SKILL-COUNT --> skills comprise **242 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -798,7 +798,7 @@ keeps a human as the approval gate on anything irreversible. See
    process audit.
    *e.g.* `ai-sdlc-operating-model`, `agent-authorization-matrix`, `agent-memory-governance`,
    `agent-governance-audit`.
-3. **Core architecture & engineering** *(Phase 2, 17)* — modeling and building systems well:
+3. **Core architecture & engineering** *(Phase 2, 30)* — modeling and building systems well:
    domain models, architecture design, ADRs, docs-first + test-first implementation, debugging,
    code review. *e.g.* `domain-modeler`, `architecture-designer`, `adr-writer`, `tdd-engineer`,
    `systematic-debugger`.
@@ -1145,6 +1145,19 @@ Phase 2 — core architecture & engineering pack:
 | `interface-first-designer` | Designs contracts before internals: callers/constraints, interfaces/adapters, compatibility/versioning, test doubles and ordered migration; stops before implementation. | auto + manual |
 | `data-flow-diagrammer` | Produces a trustworthy data-flow diagram: sources/sinks/stores/transforms/side effects, trust boundaries, assumptions and unverified elements labeled; documentation-only. | auto + manual |
 | `concurrency-race-reviewer` | Reviews interleaving operations for lost updates, double-create, check-then-act and retry duplicates; proposes serialization/idempotency/locking fixes with tests; review-only. | auto + manual |
+| `state-machine-modeler` | Model state machines: states, events, guards, side effects, terminal states, retry/compensation edges and invalid-transition handling before code hardens the wrong lifecycle. | auto + manual |
+| `transaction-scope-designer` | Design transaction scope across tables and services: atomic vs staged writes, isolation, lock order, retries, idempotency and compensation. | auto + manual |
+| `cqrs-read-model-designer` | Design CQRS read models: split decision, projections, rebuild/backfill and the consistency contract between writes and reads. | auto + manual |
+| `configuration-architect` | Design config layers: build/runtime/tenant/user precedence, validation, ownership, secret references, drift detection and migration. | auto + manual |
+| `extensibility-boundary-designer` | Design extensibility boundaries: extension points, plugin contracts, capability limits, versioning, isolation and failure containment. | auto + manual |
+| `application-layer-pattern-advisor` | Decide application-layer patterns: when adapters, facades, repositories, service objects or use-case layers earn their cost, and where they belong. | auto + manual |
+| `technical-debt-classifier` | Classify technical debt with a ledger: type, evidence, interest, principal, owner, priority and reversal cost, ranked for decisions. | auto + manual |
+| `modernization-cutover-planner` | Plan incremental modernization cutover: migration sequence, dual writes/backfill, cutover gates, rollback points and decommission. | auto + manual |
+| `architecture-fitness-function-designer` | Design architecture fitness functions: measurable rules for dependency direction, coupling, layering and latency with budgets and owners. | auto + manual |
+| `architecture-spike-planner` | Plan timeboxed architecture spikes: question, hypotheses, timebox, evidence, exit criteria and the resulting decision. | auto + manual |
+| `graphql-boundary-reviewer` | Review GraphQL boundaries: schema ownership, resolvers, authorization, pagination/depth limits, batching, caching and tenant scoping. | auto + manual |
+| `outbound-integration-adapter-designer` | Design outbound integration adapters: provider contract, mapping, timeouts/retries, idempotency, circuit breakers, signing and pinning. | auto + manual |
+| `edge-function-designer` | Design edge functions: boundary auth, environment validation, timeouts, cold-start/concurrency, retry/idempotency, logging and platform limits. | auto + manual |
 
 Phase 3 — SaaS & tenant isolation pack:
 

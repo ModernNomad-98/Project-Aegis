@@ -215,25 +215,22 @@ COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 151, "COVERED": 57, "PARTIAL": 66, "GAP": 26},
-    "by_grade": {"explicit-id": 151, "catalog-decision": 16,
-                 "capability-review": 107, "none": 26},
+    "by_status": {"SHIPPED": 173, "COVERED": 57, "PARTIAL": 63, "GAP": 7},
+    "by_grade": {"explicit-id": 173, "catalog-decision": 16,
+                 "capability-review": 104, "none": 7},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 0, "P1": 21, "P2": 5},
-    "manifest_skills": 230,
-    "distinct_covering_skills": 150,
+    "gap_by_priority": {"P0": 0, "P1": 6, "P2": 1},
+    "manifest_skills": 243,
+    "distinct_covering_skills": 163,
     "beyond_roadmap_skills": 80,
-    "review_pending": 147,
+    "review_pending": 125,
 }
 # Owner triage decision Q1=A/Q2=A/Q3=yes (D107, 2026-10-21): rows
 # #254/#278 received their planning-gate decisions and no longer count as
 # awaiting confirmation; review_pending subtracts these resolved rows.
 COVERAGE_PLANNING_GATE_RESOLVED = frozenset({254, 278})
 COVERAGE_GAP_IDS = (
-    14, 19, 20, 28, 29, 30, 32, 33,
-    34, 35, 43, 46, 47, 50, 54, 110,
-    120, 135, 146, 156, 158, 224, 225, 233,
-    234, 236,
+    110, 120, 224, 225, 233, 234, 236,
 )
 COVERAGE_P0_GAP_IDS = ()
 COVERAGE_ANOMALY_SKILLS = {
@@ -247,7 +244,7 @@ COVERAGE_REQUIRED_PHRASES = (
     "GAP rows are optional backlog candidates, not deficits or completion "
     "obligations.",
     "The shipped library deliberately exceeds and interleaves with the "
-    "roadmap: 80 of 230 shipped skills are beyond it.",
+    "roadmap: 80 of 243 shipped skills are beyond it.",
 )
 COVERAGE_ENTRY_KEYS = (
     "id", "area", "name", "priority", "status", "covering_skills",

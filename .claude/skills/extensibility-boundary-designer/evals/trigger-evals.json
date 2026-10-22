@@ -1,0 +1,220 @@
+{
+  "skill": "extensibility-boundary-designer",
+  "description": "Trigger discrimination for extensibility-boundary-designer against real shipped owners",
+  "overlaps_with": [
+    "adr-writer",
+    "api-event-architect",
+    "architecture-designer",
+    "authorization-matrix-designer",
+    "change-classification-gate",
+    "code-reviewer",
+    "design-review-facilitator",
+    "human-approval-boundary",
+    "interface-first-designer",
+    "layered-architecture-enforcer",
+    "release-readiness-reviewer",
+    "security-pr-reviewer",
+    "supply-chain-security-reviewer",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "extensibility-boundary-designer-positive-1",
+      "prompt": "Design the plugin boundary for tenant-provided extensions, including the contract and versioning.",
+      "expected_skill": "extensibility-boundary-designer",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "extensibility-boundary-designer-positive-2",
+      "prompt": "Our plugin interface leaks internals - design the extension boundary and capability model.",
+      "expected_skill": "extensibility-boundary-designer",
+      "should_not_trigger": [
+        "supply-chain-security-reviewer"
+      ],
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "extensibility-boundary-designer-positive-3",
+      "prompt": "Design hot-loaded extension points with lifecycle, isolation and failure containment.",
+      "expected_skill": "extensibility-boundary-designer",
+      "should_not_trigger": [
+        "api-event-architect"
+      ],
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "extensibility-boundary-designer-positive-4",
+      "prompt": "Define the extension contract, permissioned capability surface and deprecation path.",
+      "expected_skill": "extensibility-boundary-designer",
+      "should_not_trigger": [
+        "authorization-matrix-designer"
+      ],
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "extensibility-boundary-designer-positive-5",
+      "prompt": "Design the webhook/plugin boundary for third-party integrations without exposing the domain model.",
+      "expected_skill": "extensibility-boundary-designer",
+      "should_not_trigger": [
+        "security-pr-reviewer"
+      ],
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "extensibility-boundary-designer-positive-6",
+      "prompt": "Decide where the extension surface sits and what may never cross it.",
+      "expected_skill": "extensibility-boundary-designer",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "extensibility-boundary-designer-positive-7",
+      "prompt": "Design an extension sandbox with timeouts, capability limits and failure isolation.",
+      "expected_skill": "extensibility-boundary-designer",
+      "should_not_trigger": [
+        "architecture-designer"
+      ],
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "extensibility-boundary-designer-positive-8",
+      "prompt": "Map the current extensibility points and define the supported extension boundary.",
+      "expected_skill": "extensibility-boundary-designer",
+      "should_not_trigger": [
+        "tech-spec-writer"
+      ],
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-1",
+      "prompt": "Design the internal interfaces/contracts at the module boundary first.",
+      "expected_skill": "interface-first-designer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is interface-first-designer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-2",
+      "prompt": "Review our dependency supply chain and artifact provenance controls.",
+      "expected_skill": "supply-chain-security-reviewer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is supply-chain-security-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-3",
+      "prompt": "Design the API and event contracts for order placement, including versioning and compatibility.",
+      "expected_skill": "api-event-architect",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is api-event-architect's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-4",
+      "prompt": "Design the deny-by-default roles x permissions x resources matrix and enforcement points.",
+      "expected_skill": "authorization-matrix-designer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-5",
+      "prompt": "Review this actual diff for security issues: authorization, injection, secrets and SSRF.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is security-pr-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-6",
+      "prompt": "Enforce the layered architecture: layers, dependency rules and violations.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-7",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-8",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-9",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-10",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-11",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-12",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-13",
+      "prompt": "Classify this change and state the validation floor it requires.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is change-classification-gate's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "extensibility-boundary-designer-negative-14",
+      "prompt": "Assess release readiness: rollout gates, rollback, comms and evidence.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "extensibility-boundary-designer"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
+    }
+  ]
+}

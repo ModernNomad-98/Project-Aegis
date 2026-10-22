@@ -1,0 +1,230 @@
+{
+  "skill": "architecture-fitness-function-designer",
+  "description": "Trigger discrimination for architecture-fitness-function-designer against real shipped owners",
+  "overlaps_with": [
+    "adr-writer",
+    "architecture-designer",
+    "change-classification-gate",
+    "code-reviewer",
+    "dependency-direction-guard",
+    "design-review-facilitator",
+    "frontend-perf-engineer",
+    "human-approval-boundary",
+    "latency-budget-architect",
+    "layered-architecture-enforcer",
+    "n-plus-one-detector",
+    "observability-by-design",
+    "performance-test-harness",
+    "release-readiness-reviewer",
+    "tech-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "architecture-fitness-function-designer-positive-1",
+      "prompt": "Design fitness functions for dependency direction and module boundaries in this codebase.",
+      "expected_skill": "architecture-fitness-function-designer",
+      "should_not_trigger": [
+        "dependency-direction-guard"
+      ],
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "architecture-fitness-function-designer-positive-2",
+      "prompt": "Turn our architecture rules into automated fitness checks with thresholds and owners.",
+      "expected_skill": "architecture-fitness-function-designer",
+      "should_not_trigger": [
+        "layered-architecture-enforcer"
+      ],
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "architecture-fitness-function-designer-positive-3",
+      "prompt": "Design fitness functions for latency budgets, coupling and layering.",
+      "expected_skill": "architecture-fitness-function-designer",
+      "should_not_trigger": [
+        "n-plus-one-detector"
+      ],
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "architecture-fitness-function-designer-positive-4",
+      "prompt": "Our architecture principles have no enforcement - design measurable fitness functions.",
+      "expected_skill": "architecture-fitness-function-designer",
+      "should_not_trigger": [
+        "performance-test-harness"
+      ],
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "architecture-fitness-function-designer-positive-5",
+      "prompt": "Design fitness checks for dependency cycles, forbidden imports and layer violations.",
+      "expected_skill": "architecture-fitness-function-designer",
+      "should_not_trigger": [
+        "frontend-perf-engineer"
+      ],
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "architecture-fitness-function-designer-positive-6",
+      "prompt": "Define fitness functions and escalation rules for the API boundary.",
+      "expected_skill": "architecture-fitness-function-designer",
+      "should_not_trigger": [
+        "observability-by-design"
+      ],
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "architecture-fitness-function-designer-positive-7",
+      "prompt": "Design fitness functions that catch architecture drift in CI without flaky failures.",
+      "expected_skill": "architecture-fitness-function-designer",
+      "should_not_trigger": [
+        "tech-spec-writer"
+      ],
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "architecture-fitness-function-designer-positive-8",
+      "prompt": "Map which architecture characteristics need fitness functions and their budgets.",
+      "expected_skill": "architecture-fitness-function-designer",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-1",
+      "prompt": "Review the dependency direction and flag layering violations.",
+      "expected_skill": "dependency-direction-guard",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is dependency-direction-guard's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-2",
+      "prompt": "Enforce the layered architecture: layers, dependency rules and violations.",
+      "expected_skill": "layered-architecture-enforcer",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-3",
+      "prompt": "Explicitly invoke n-plus-one-detector. Detect and fix N+1 query patterns in this data-access path.",
+      "expected_skill": "n-plus-one-detector",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is n-plus-one-detector's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-4",
+      "prompt": "Design the performance test set: measured surfaces, environment contract and variance-derived thresholds.",
+      "expected_skill": "performance-test-harness",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is performance-test-harness's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-5",
+      "prompt": "Improve this page frontend performance: bundle size, rendering and Core Web Vitals.",
+      "expected_skill": "frontend-perf-engineer",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-6",
+      "prompt": "Design the telemetry contract: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is observability-by-design's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-7",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-8",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-9",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-10",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-11",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-12",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-13",
+      "prompt": "Classify this change and state the validation floor it requires.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is change-classification-gate's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-negative-14",
+      "prompt": "Assess release readiness: rollout gates, rollback, comms and evidence.",
+      "expected_skill": "release-readiness-reviewer",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-seam-latency-budget",
+      "prompt": "Set the end-to-end latency budget for the checkout path and trace it through each service call.",
+      "expected_skill": "latency-budget-architect",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "Latency-budget definition and budget tracing are latency-budget-architect ownership; the fitness designer only turns an agreed budget into measurable fitness functions."
+    }
+  ]
+}

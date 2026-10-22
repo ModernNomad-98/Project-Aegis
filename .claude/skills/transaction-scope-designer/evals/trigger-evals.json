@@ -1,0 +1,230 @@
+{
+  "skill": "transaction-scope-designer",
+  "description": "Trigger discrimination for transaction-scope-designer against real shipped owners",
+  "overlaps_with": [
+    "adr-writer",
+    "application-layer-pattern-advisor",
+    "architecture-designer",
+    "background-job-orchestration-architect",
+    "code-reviewer",
+    "command-gateway-architect",
+    "concurrency-race-reviewer",
+    "data-migration-runbook-author",
+    "design-review-facilitator",
+    "human-approval-boundary",
+    "resilience-architecture-reviewer",
+    "schema-evolution-planner",
+    "secure-migration-reviewer",
+    "tech-spec-writer",
+    "validation-boundary-designer"
+  ],
+  "cases": [
+    {
+      "id": "transaction-scope-designer-positive-1",
+      "prompt": "Design the transaction scope for placing an order across the orders, inventory and payment services.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "concurrency-race-reviewer"
+      ],
+      "reason": "The request needs transaction-scope-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "transaction-scope-designer-positive-2",
+      "prompt": "Our write path spans three tables and two services - decide atomic vs staged and the compensation plan.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "command-gateway-architect"
+      ],
+      "reason": "The request needs transaction-scope-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "transaction-scope-designer-positive-3",
+      "prompt": "Choose isolation levels and lock ordering for the transfer of funds between two accounts.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "validation-boundary-designer"
+      ],
+      "reason": "The request needs transaction-scope-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "transaction-scope-designer-positive-4",
+      "prompt": "Design compensation for a partial failure in the invoice-plus-ledger write path.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "background-job-orchestration-architect"
+      ],
+      "reason": "The request needs transaction-scope-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "transaction-scope-designer-positive-5",
+      "prompt": "Our long transaction holds locks for seconds - design a shorter scope with staged effects.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "schema-evolution-planner"
+      ],
+      "reason": "The request needs transaction-scope-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "transaction-scope-designer-positive-6",
+      "prompt": "Design the retry and idempotency behaviour when a transaction commits but the acknowledgement is lost.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "data-migration-runbook-author"
+      ],
+      "reason": "The request needs transaction-scope-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "transaction-scope-designer-positive-7",
+      "prompt": "Review the lock order across these two write paths for a deadlock risk.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "secure-migration-reviewer"
+      ],
+      "reason": "The request needs transaction-scope-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "transaction-scope-designer-positive-8",
+      "prompt": "Design the transaction boundary between the API handler and the background worker.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "resilience-architecture-reviewer"
+      ],
+      "reason": "The request needs transaction-scope-designer's artifact; the named neighbour owns a different task."
+    },
+    {
+      "id": "transaction-scope-designer-negative-1",
+      "prompt": "Find the interleaving hazard in this multi-threaded write path and prove it with a test.",
+      "expected_skill": "concurrency-race-reviewer",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is concurrency-race-reviewer's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-2",
+      "prompt": "Design the mediated command gateway: one enforcement point, idempotent commands and replay.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is command-gateway-architect's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-3",
+      "prompt": "Design where validation lives at the API, command and database boundaries.",
+      "expected_skill": "validation-boundary-designer",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is validation-boundary-designer's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-4",
+      "prompt": "Design the queue semantics and background-job architecture: delivery, ordering, idempotency and dead letters.",
+      "expected_skill": "background-job-orchestration-architect",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is background-job-orchestration-architect's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-5",
+      "prompt": "Plan the schema evolution and migration with compatibility windows.",
+      "expected_skill": "schema-evolution-planner",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is schema-evolution-planner's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-6",
+      "prompt": "Write the data-migration runbook for the account table move: steps, verification and rollback.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is data-migration-runbook-author's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-7",
+      "prompt": "Review the database migration for security: RLS, secrets and privilege changes.",
+      "expected_skill": "secure-migration-reviewer",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is secure-migration-reviewer's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-8",
+      "prompt": "Review the system resilience: failure domains, degradation, retries and bulkheads.",
+      "expected_skill": "resilience-architecture-reviewer",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is resilience-architecture-reviewer's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-9",
+      "prompt": "Design the target architecture for a new service: components, boundaries, data ownership, options and a migration plan.",
+      "expected_skill": "architecture-designer",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is architecture-designer's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-10",
+      "prompt": "Write the full design tech spec and RFC for this feature with alternatives and sign-off sections.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-11",
+      "prompt": "Facilitate the design review: critique the current design, surface risks and record the decisions.",
+      "expected_skill": "design-review-facilitator",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-12",
+      "prompt": "Write the ADR for this decision with reversal plan and consequences.",
+      "expected_skill": "adr-writer",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is adr-writer's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-13",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is code-reviewer's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-negative-14",
+      "prompt": "Define which coding-agent actions require a recorded human approval and how the approval is evidenced.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-seam-application-layer",
+      "prompt": "Should we keep a repository facade and an explicit use-case layer, or is that over-abstraction hiding side effects?",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "Pattern cost/placement decisions inside the application layer are application-layer-pattern-advisor ownership; transaction scope design stays here."
+    }
+  ]
+}
