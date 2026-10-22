@@ -3,20 +3,19 @@
   "description": "Trigger discrimination for server-state-architect against the nearest shipped owners.",
   "overlaps_with": [
     "api-event-architect",
-    "caching-strategy-designer",
-    "observability-by-design",
-    "multi-tenant-data-architect",
     "background-job-orchestration-architect",
+    "caching-strategy-designer",
     "data-flow-diagrammer",
-    "validation-boundary-designer",
-    "feature-flag-architect",
-    "notification-webhook-ux-designer",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
-    "performance-test-harness",
-    "load-test-planner",
+    "feature-flag-architect",
     "frontend-perf-engineer",
-    "client-state-boundary-reviewer"
+    "load-test-planner",
+    "multi-tenant-data-architect",
+    "notification-webhook-ux-designer",
+    "observability-by-design",
+    "performance-test-harness",
+    "validation-boundary-designer"
   ],
   "cases": [
     {
@@ -84,12 +83,12 @@
     },
     {
       "id": "server-state-architect-positive-8",
-      "prompt": "Design the cache invalidation table for these entities and mutations.",
+      "prompt": "Design the CLIENT query-cache invalidation table for these entities and mutations (backend cache policy/keys stay with the cache-strategy owner).",
       "expected_skill": "server-state-architect",
       "should_not_trigger": [
         "caching-strategy-designer"
       ],
-      "reason": "The request needs server-state-architect's design method; feature-flag-architect owns a different task."
+      "reason": "The request needs server-state-architect's design method; caching-strategy-designer owns a different task."
     },
     {
       "id": "server-state-architect-negative-1",

@@ -2812,8 +2812,8 @@ def test_coverage_map_batch3_deliveries():
     assert len(validator.COVERAGE_GAP_IDS) == 31
     assert validator.COVERAGE_P0_GAP_IDS == ()
     gaps = (payload["totals"]["gap_by_priority"])
-    assert gaps == {"P1": 25, "P2": 6}, (
-        "gap_by_priority must carry only non-zero entries after Batch 3")
+    assert gaps == {"P0": 0, "P1": 25, "P2": 6}, (
+        "gap_by_priority keeps the P0 key at zero for schema stability")
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
                if "80 of 230" in item]
     assert phrases, "an optionality phrase must carry 80 of 230"
@@ -2827,6 +2827,8 @@ def test_coverage_map_batch3_deliveries():
                 if line.startswith("## P0 gap candidates")]
     assert p0_lines == ["## P0 gap candidates (all 0 ids)"], (
         "the summary P0 section must reflect the empty P0 GAP set")
+    assert "## P0 gap candidates (all 0 ids)\n\nNone." in mmd, (
+        "the empty P0 section must say None explicitly")
     reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
                       / "step-0-reconciliation-v4.md").read_text(
                           encoding="utf-8")

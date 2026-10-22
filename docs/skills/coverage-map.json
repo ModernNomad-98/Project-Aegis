@@ -4266,6 +4266,7 @@
     "distinct_covering_skills": 150,
     "entries": 300,
     "gap_by_priority": {
+      "P0": 0,
       "P1": 25,
       "P2": 6
     },

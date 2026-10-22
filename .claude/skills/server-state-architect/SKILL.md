@@ -72,7 +72,7 @@ Return, in this order:
 - The request is cache policy, keys and stampede protection: route to `caching-strategy-designer`.
 - The request is telemetry contract for data-loading behavior: route to `observability-by-design`.
 - The request is UI state placement review (Batch-3 sibling seam): route to `client-state-boundary-reviewer`.
-- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the routes above are the primary Stop Conditions.
+- The trigger-evals file lists a broader discrimination set (all named in the reference Boundaries); the routes above are the primary Stop Conditions.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (routes, state, cache config or policy) is unavailable: state UNKNOWN and ask instead of inventing it.
 

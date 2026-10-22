@@ -67,3 +67,5 @@ D107); `review_pending` counts the remaining non-explicit-id rows (147).
 - Area 07: 236
 
 ## P0 gap candidates (all 0 ids)
+
+None.

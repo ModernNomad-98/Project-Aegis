@@ -34,7 +34,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Flag system and targeting state (existing pre-Batch-3 owner) routes to `feature-flag-architect`; this skill does not perform that owner's work.
 - Server-data contract and cache ownership (batch-3 sibling) routes to `server-state-architect`; this skill does not perform that owner's work.
 - Url representation and schema ownership (batch-3 sibling) routes to `url-state-architect`; this skill does not perform that owner's work.
-- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `feature-flag-architect`, `performance-test-harness`, `load-test-planner`, `code-reviewer`, `full-codebase-auditor`, `caching-strategy-designer`, `observability-by-design`, `frontend-perf-engineer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `mobile-viewport-craft`, `architecture-designer`, `api-event-architect`, `validation-boundary-designer` (discrimination neighbours, not in-scope work).
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `api-event-architect`, `architecture-designer`, `caching-strategy-designer`, `code-reviewer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `feature-flag-architect`, `frontend-perf-engineer`, `full-codebase-auditor`, `load-test-planner`, `mobile-viewport-craft`, `observability-by-design`, `performance-test-harness`, `url-state-architect`, `validation-boundary-designer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

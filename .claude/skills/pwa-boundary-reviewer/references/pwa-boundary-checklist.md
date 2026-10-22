@@ -34,7 +34,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Offline persistence/sync architecture routes to `offline-first-sync-architect`; this skill does not perform that owner's work.
 - Notification/webhook ux and delivery behavior routes to `notification-webhook-ux-designer`; this skill does not perform that owner's work.
 - Security review of an actual diff routes to `security-pr-reviewer`; this skill does not perform that owner's work.
-- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `offline-first-sync-architect`, `notification-webhook-ux-designer`, `security-pr-reviewer`, `observability-by-design`, `caching-strategy-designer`, `frontend-perf-engineer`, `mobile-viewport-craft`, `accessibility-test-harness`, `edge-state-ux-designer`, `error-taxonomy-designer`, `vite-build-qa-engineer`, `synthetic-monitoring-architect`, `slo-reliability-architect`, `incident-response-runbook` (discrimination neighbours, not in-scope work).
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `accessibility-test-harness`, `caching-strategy-designer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `frontend-perf-engineer`, `incident-response-runbook`, `mobile-viewport-craft`, `notification-webhook-ux-designer`, `observability-by-design`, `offline-first-sync-architect`, `security-pr-reviewer`, `slo-reliability-architect`, `synthetic-monitoring-architect`, `vite-build-qa-engineer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

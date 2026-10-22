@@ -2,20 +2,19 @@
   "skill": "route-protection-designer",
   "description": "Trigger discrimination for route-protection-designer against the nearest shipped owners.",
   "overlaps_with": [
-    "authorization-matrix-designer",
-    "tenant-isolation-reviewer",
-    "security-pr-reviewer",
-    "human-approval-boundary",
-    "api-event-architect",
     "admin-console-architect",
-    "tenant-modeler",
-    "rls-policy-auditor",
-    "secure-migration-reviewer",
+    "api-event-architect",
+    "authorization-matrix-designer",
     "change-classification-gate",
-    "incident-response-runbook",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
-    "ux-design-iteration",
+    "human-approval-boundary",
+    "incident-response-runbook",
+    "rls-policy-auditor",
+    "secure-migration-reviewer",
+    "security-pr-reviewer",
+    "tenant-isolation-reviewer",
+    "tenant-modeler",
     "url-state-architect"
   ],
   "cases": [
@@ -75,12 +74,12 @@
     },
     {
       "id": "route-protection-designer-positive-7",
-      "prompt": "Design role and admin protection across the admin console routes.",
+      "prompt": "Design the route-level gate consistency across the admin console routes (the roles/permissions matrix stays with the authorization owner).",
       "expected_skill": "route-protection-designer",
       "should_not_trigger": [
         "admin-console-architect"
       ],
-      "reason": "The request needs route-protection-designer's design method; tenant-modeler owns a different task."
+      "reason": "The request needs route-protection-designer's design method; admin-console-architect owns a different task."
     },
     {
       "id": "route-protection-designer-positive-8",

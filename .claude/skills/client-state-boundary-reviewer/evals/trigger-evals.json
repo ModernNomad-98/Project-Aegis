@@ -2,22 +2,21 @@
   "skill": "client-state-boundary-reviewer",
   "description": "Trigger discrimination for client-state-boundary-reviewer against the nearest shipped owners.",
   "overlaps_with": [
-    "feature-flag-architect",
-    "performance-test-harness",
-    "load-test-planner",
-    "code-reviewer",
-    "full-codebase-auditor",
+    "api-event-architect",
+    "architecture-designer",
     "caching-strategy-designer",
-    "observability-by-design",
-    "frontend-perf-engineer",
+    "code-reviewer",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
+    "feature-flag-architect",
+    "frontend-perf-engineer",
+    "full-codebase-auditor",
+    "load-test-planner",
     "mobile-viewport-craft",
-    "architecture-designer",
-    "api-event-architect",
-    "validation-boundary-designer",
-    "server-state-architect",
-    "url-state-architect"
+    "observability-by-design",
+    "performance-test-harness",
+    "url-state-architect",
+    "validation-boundary-designer"
   ],
   "cases": [
     {
@@ -76,12 +75,12 @@
     },
     {
       "id": "client-state-boundary-reviewer-positive-7",
-      "prompt": "Review the URL schema versus store state for duplicated navigation state.",
+      "prompt": "Review where navigation state is duplicated between the URL schema and client stores (a boundary review; URL schema design stays with the URL-state owner).",
       "expected_skill": "client-state-boundary-reviewer",
       "should_not_trigger": [
         "url-state-architect"
       ],
-      "reason": "The request needs client-state-boundary-reviewer's design method; observability-by-design owns a different task."
+      "reason": "The request needs client-state-boundary-reviewer's design method; url-state-architect owns a different task."
     },
     {
       "id": "client-state-boundary-reviewer-positive-8",

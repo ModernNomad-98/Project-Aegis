@@ -72,7 +72,7 @@ Return, in this order:
 - The request is cross-tenant leakage review: route to `tenant-isolation-reviewer`.
 - The request is security review of an actual diff: route to `security-pr-reviewer`.
 - The request is URL-state schema, history or shareable-link design (Batch-3 sibling seam): route to `url-state-architect`.
-- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the routes above are the primary Stop Conditions.
+- The trigger-evals file lists a broader discrimination set (all named in the reference Boundaries); the routes above are the primary Stop Conditions.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (routes, state, cache config or policy) is unavailable: state UNKNOWN and ask instead of inventing it.
 

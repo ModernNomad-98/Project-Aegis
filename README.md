@@ -848,7 +848,7 @@ keeps a human as the approval gate on anything irreversible. See
     plans, N+1 queries (one query per item instead of one batched query), caching, latency; plus performance/load test harnesses. *e.g.*
     `schema-evolution-planner`, `pii-lifecycle-designer`, `query-plan-reader`,
     `n-plus-one-detector`, `load-test-planner`.
-14. **Product, PM & growth** *(D24, 15 + iteration, 24)* — turning product intent into shippable, measured work:
+14. **Product, PM & growth** *(D24, 23 + iteration, 24)* — turning product intent into shippable, measured work:
     requirements elicitation feeding specs, then prioritization, flag-gated rollout,
     analytics instrumentation, an optional pre-implementation design-iteration
     path, and (Batch 3/D110) frontend architecture and client-state craft: maps,

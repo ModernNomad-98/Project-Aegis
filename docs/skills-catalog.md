@@ -1102,14 +1102,15 @@ advisory design/review skills that edit nothing and are **model-invocable**.
 | `pwa-boundary-reviewer` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Reviews PWA boundaries: service-worker registration/scope, per-class cache strategy, update/activation flow, offline fallback, install prompt, push boundary, cached-data security and production-only behavior; review-only. |
 
 The eight Batch-3 additions (D110) form a **frontend architecture & client state** seam:
- they discriminate against the pre-existing owners above (architecture-designer, data-flow-diagrammer,
- observability-by-design, authorization-matrix-designer, security-pr-reviewer, caching-strategy-designer,
- feature-flag-architect, offline-first-sync-architect, notification-webhook-ux-designer,
- error-taxonomy-designer, edge-state-ux-designer, mobile-viewport-craft, accessibility-test-harness,
- frontend-perf-engineer, visual-regression-test-designer, vite-build-qa-engineer) and exercise the
- batch-internal sibling seams that are real (see the D12.2 intro matrix) in Stop Conditions, positive
- near-miss cases and negative cases; each ships 6 behaviour cases and a 22-case trigger-eval file
- (8 positive / 14 negative).
+they discriminate against the pre-existing owners across the library (architecture-designer,
+data-flow-diagrammer, observability-by-design, authorization-matrix-designer, security-pr-reviewer,
+caching-strategy-designer, feature-flag-architect, offline-first-sync-architect,
+notification-webhook-ux-designer, error-taxonomy-designer, edge-state-ux-designer,
+mobile-viewport-craft, accessibility-test-harness, frontend-perf-engineer,
+visual-regression-test-designer, vite-build-qa-engineer) and exercise the batch-internal sibling
+seams that are real (see the D12.2 intro matrix) in Stop Conditions, positive near-miss cases and
+negative cases; each ships 6 behaviour cases and a 22-case trigger-eval file (8 positive / 14
+negative).
 
 ### Skills (D12.5 — PM / product-engineering interface pack)
 

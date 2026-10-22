@@ -71,7 +71,7 @@ Return, in this order:
 - The request is offline persistence/sync architecture: route to `offline-first-sync-architect`.
 - The request is notification/webhook UX and delivery behavior: route to `notification-webhook-ux-designer`.
 - The request is security review of an actual diff: route to `security-pr-reviewer`.
-- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the routes above are the primary Stop Conditions.
+- The trigger-evals file lists a broader discrimination set (all named in the reference Boundaries); the routes above are the primary Stop Conditions.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (routes, state, cache config or policy) is unavailable: state UNKNOWN and ask instead of inventing it.
 

@@ -35,7 +35,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Cache policy, keys and stampede protection routes to `caching-strategy-designer`; this skill does not perform that owner's work.
 - Telemetry contract for data-loading behavior routes to `observability-by-design`; this skill does not perform that owner's work.
 - UI state placement review (Batch-3 sibling seam) routes to `client-state-boundary-reviewer`; this skill does not perform that owner's work.
-- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `api-event-architect`, `caching-strategy-designer`, `observability-by-design`, `multi-tenant-data-architect`, `background-job-orchestration-architect`, `data-flow-diagrammer`, `validation-boundary-designer`, `feature-flag-architect`, `notification-webhook-ux-designer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `performance-test-harness`, `load-test-planner`, `frontend-perf-engineer` (discrimination neighbours, not in-scope work).
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `api-event-architect`, `background-job-orchestration-architect`, `caching-strategy-designer`, `data-flow-diagrammer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `feature-flag-architect`, `frontend-perf-engineer`, `load-test-planner`, `multi-tenant-data-architect`, `notification-webhook-ux-designer`, `observability-by-design`, `performance-test-harness`, `validation-boundary-designer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

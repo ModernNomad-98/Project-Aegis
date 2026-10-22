@@ -2,21 +2,21 @@
   "skill": "frontend-architecture-mapper",
   "description": "Trigger discrimination for frontend-architecture-mapper against the nearest shipped owners.",
   "overlaps_with": [
-    "architecture-designer",
-    "data-flow-diagrammer",
-    "principal-code-analyst",
-    "code-reviewer",
-    "domain-modeler",
+    "accessibility-test-harness",
     "api-event-architect",
+    "architecture-designer",
+    "code-reviewer",
+    "component-boundary-designer",
+    "data-flow-diagrammer",
+    "domain-modeler",
+    "full-codebase-auditor",
+    "mobile-viewport-craft",
+    "observability-by-design",
+    "principal-code-analyst",
     "tech-spec-writer",
     "ux-design-iteration",
-    "mobile-viewport-craft",
-    "accessibility-test-harness",
-    "observability-by-design",
     "validation-boundary-designer",
-    "full-codebase-auditor",
-    "vite-build-qa-engineer",
-    "component-boundary-designer"
+    "vite-build-qa-engineer"
   ],
   "cases": [
     {
@@ -26,7 +26,7 @@
       "should_not_trigger": [
         "component-boundary-designer"
       ],
-      "reason": "The request needs frontend-architecture-mapper's design method; architecture-designer owns a different task."
+      "reason": "The request needs frontend-architecture-mapper's design method; component-boundary-designer owns a different task."
     },
     {
       "id": "frontend-architecture-mapper-positive-2",

@@ -2,20 +2,20 @@
   "skill": "pwa-boundary-reviewer",
   "description": "Trigger discrimination for pwa-boundary-reviewer against the nearest shipped owners.",
   "overlaps_with": [
-    "offline-first-sync-architect",
-    "notification-webhook-ux-designer",
-    "security-pr-reviewer",
-    "observability-by-design",
-    "caching-strategy-designer",
-    "frontend-perf-engineer",
-    "mobile-viewport-craft",
     "accessibility-test-harness",
+    "caching-strategy-designer",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
-    "vite-build-qa-engineer",
-    "synthetic-monitoring-architect",
+    "frontend-perf-engineer",
+    "incident-response-runbook",
+    "mobile-viewport-craft",
+    "notification-webhook-ux-designer",
+    "observability-by-design",
+    "offline-first-sync-architect",
+    "security-pr-reviewer",
     "slo-reliability-architect",
-    "incident-response-runbook"
+    "synthetic-monitoring-architect",
+    "vite-build-qa-engineer"
   ],
   "cases": [
     {

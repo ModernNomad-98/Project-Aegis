@@ -2,22 +2,20 @@
   "skill": "component-boundary-designer",
   "description": "Trigger discrimination for component-boundary-designer against the nearest shipped owners.",
   "overlaps_with": [
-    "observability-by-design",
+    "accessibility-test-harness",
     "architecture-designer",
     "code-reviewer",
     "domain-modeler",
-    "error-taxonomy-designer",
     "edge-state-ux-designer",
-    "ux-design-iteration",
-    "mobile-viewport-craft",
-    "accessibility-test-harness",
-    "frontend-perf-engineer",
-    "validation-boundary-designer",
-    "tech-spec-writer",
-    "principal-code-analyst",
-    "performance-test-harness",
+    "error-taxonomy-designer",
     "frontend-architecture-mapper",
-    "design-system-token-governor"
+    "frontend-perf-engineer",
+    "mobile-viewport-craft",
+    "observability-by-design",
+    "principal-code-analyst",
+    "tech-spec-writer",
+    "ux-design-iteration",
+    "validation-boundary-designer"
   ],
   "cases": [
     {
@@ -27,7 +25,7 @@
       "should_not_trigger": [
         "frontend-architecture-mapper"
       ],
-      "reason": "The request needs component-boundary-designer's design method; observability-by-design owns a different task."
+      "reason": "The request needs component-boundary-designer's design method; frontend-architecture-mapper owns a different task."
     },
     {
       "id": "component-boundary-designer-positive-2",

@@ -35,7 +35,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Actual-diff review routes to `code-reviewer`; this skill does not perform that owner's work.
 - Frontend app mapping (batch-3 sibling seam) routes to `frontend-architecture-mapper`; this skill does not perform that owner's work.
 - Design-token governance or theming (batch-3 sibling seam) routes to `design-system-token-governor`; this skill does not perform that owner's work.
-- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `observability-by-design`, `architecture-designer`, `code-reviewer`, `domain-modeler`, `error-taxonomy-designer`, `edge-state-ux-designer`, `ux-design-iteration`, `mobile-viewport-craft`, `accessibility-test-harness`, `frontend-perf-engineer`, `validation-boundary-designer`, `tech-spec-writer`, `principal-code-analyst`, `performance-test-harness` (discrimination neighbours, not in-scope work).
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `accessibility-test-harness`, `architecture-designer`, `code-reviewer`, `domain-modeler`, `edge-state-ux-designer`, `error-taxonomy-designer`, `frontend-architecture-mapper`, `frontend-perf-engineer`, `mobile-viewport-craft`, `observability-by-design`, `principal-code-analyst`, `tech-spec-writer`, `ux-design-iteration`, `validation-boundary-designer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

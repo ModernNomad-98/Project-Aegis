@@ -2,22 +2,20 @@
   "skill": "url-state-architect",
   "description": "Trigger discrimination for url-state-architect against the nearest shipped owners.",
   "overlaps_with": [
+    "accessibility-test-harness",
     "api-event-architect",
+    "code-reviewer",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
-    "mobile-viewport-craft",
-    "ux-design-iteration",
-    "code-reviewer",
     "frontend-perf-engineer",
-    "accessibility-test-harness",
+    "mobile-viewport-craft",
     "notification-webhook-ux-designer",
     "product-spec-writer",
+    "route-protection-designer",
     "tech-spec-writer",
-    "visual-regression-test-designer",
+    "ux-design-iteration",
     "validation-boundary-designer",
-    "caching-strategy-designer",
-    "client-state-boundary-reviewer",
-    "route-protection-designer"
+    "visual-regression-test-designer"
   ],
   "cases": [
     {
@@ -54,7 +52,7 @@
       "should_not_trigger": [
         "route-protection-designer"
       ],
-      "reason": "The request needs url-state-architect's design method; mobile-viewport-craft owns a different task."
+      "reason": "The request needs url-state-architect's design method; route-protection-designer owns a different task."
     },
     {
       "id": "url-state-architect-positive-5",

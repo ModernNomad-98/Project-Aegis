@@ -35,7 +35,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Cross-tenant leakage review routes to `tenant-isolation-reviewer`; this skill does not perform that owner's work.
 - Security review of an actual diff routes to `security-pr-reviewer`; this skill does not perform that owner's work.
 - URL-state schema, history or shareable-link design (Batch-3 sibling seam) routes to `url-state-architect`; this skill does not perform that owner's work.
-- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `authorization-matrix-designer`, `tenant-isolation-reviewer`, `security-pr-reviewer`, `human-approval-boundary`, `api-event-architect`, `admin-console-architect`, `tenant-modeler`, `rls-policy-auditor`, `secure-migration-reviewer`, `change-classification-gate`, `incident-response-runbook`, `edge-state-ux-designer`, `error-taxonomy-designer`, `ux-design-iteration` (discrimination neighbours, not in-scope work).
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `admin-console-architect`, `api-event-architect`, `authorization-matrix-designer`, `change-classification-gate`, `edge-state-ux-designer`, `error-taxonomy-designer`, `human-approval-boundary`, `incident-response-runbook`, `rls-policy-auditor`, `secure-migration-reviewer`, `security-pr-reviewer`, `tenant-isolation-reviewer`, `tenant-modeler`, `url-state-architect` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

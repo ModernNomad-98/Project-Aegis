@@ -34,7 +34,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Greenfield system/component design routes to `architecture-designer`; this skill does not perform that owner's work.
 - Data-flow inventory and diagramming routes to `data-flow-diagrammer`; this skill does not perform that owner's work.
 - Component layer/ownership decisions (batch-3 sibling) routes to `component-boundary-designer`; this skill does not perform that owner's work.
-- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `architecture-designer`, `data-flow-diagrammer`, `principal-code-analyst`, `code-reviewer`, `domain-modeler`, `api-event-architect`, `tech-spec-writer`, `ux-design-iteration`, `mobile-viewport-craft`, `accessibility-test-harness`, `observability-by-design`, `validation-boundary-designer`, `full-codebase-auditor`, `vite-build-qa-engineer` (discrimination neighbours, not in-scope work).
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `accessibility-test-harness`, `api-event-architect`, `architecture-designer`, `code-reviewer`, `component-boundary-designer`, `data-flow-diagrammer`, `domain-modeler`, `full-codebase-auditor`, `mobile-viewport-craft`, `observability-by-design`, `principal-code-analyst`, `tech-spec-writer`, `ux-design-iteration`, `validation-boundary-designer`, `vite-build-qa-engineer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

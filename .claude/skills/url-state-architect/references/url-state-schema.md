@@ -34,7 +34,7 @@ The returned record must name the evidence source for each decision, separate ve
 - External api contract semantics routes to `api-event-architect`; this skill does not perform that owner's work.
 - Route gates and denial behavior (batch-3 sibling) routes to `route-protection-designer`; this skill does not perform that owner's work.
 - UI state placement review (batch-3 sibling) routes to `client-state-boundary-reviewer`; this skill does not perform that owner's work.
-- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `api-event-architect`, `edge-state-ux-designer`, `error-taxonomy-designer`, `mobile-viewport-craft`, `ux-design-iteration`, `code-reviewer`, `frontend-perf-engineer`, `accessibility-test-harness`, `notification-webhook-ux-designer`, `product-spec-writer`, `tech-spec-writer`, `visual-regression-test-designer`, `validation-boundary-designer`, `caching-strategy-designer` (discrimination neighbours, not in-scope work).
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `accessibility-test-harness`, `api-event-architect`, `code-reviewer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `frontend-perf-engineer`, `mobile-viewport-craft`, `notification-webhook-ux-designer`, `product-spec-writer`, `route-protection-designer`, `tech-spec-writer`, `ux-design-iteration`, `validation-boundary-designer`, `visual-regression-test-designer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning

@@ -2,21 +2,20 @@
   "skill": "design-system-token-governor",
   "description": "Trigger discrimination for design-system-token-governor against the nearest shipped owners.",
   "overlaps_with": [
-    "mobile-viewport-craft",
-    "ux-design-iteration",
     "accessibility-test-harness",
-    "frontend-perf-engineer",
-    "visual-regression-test-designer",
-    "edge-state-ux-designer",
-    "error-taxonomy-designer",
-    "notification-webhook-ux-designer",
-    "tech-spec-writer",
-    "product-spec-writer",
     "architecture-designer",
     "code-reviewer",
+    "component-boundary-designer",
+    "edge-state-ux-designer",
+    "error-taxonomy-designer",
+    "frontend-perf-engineer",
+    "mobile-viewport-craft",
+    "notification-webhook-ux-designer",
+    "product-spec-writer",
+    "tech-spec-writer",
+    "ux-design-iteration",
     "validation-boundary-designer",
-    "requirements-gathering-facilitator",
-    "component-boundary-designer"
+    "visual-regression-test-designer"
   ],
   "cases": [
     {

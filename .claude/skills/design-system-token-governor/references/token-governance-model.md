@@ -34,7 +34,7 @@ The returned record must name the evidence source for each decision, separate ve
 - Responsive layout and viewport behaviour routes to `mobile-viewport-craft`; this skill does not perform that owner's work.
 - Design iteration and ux convergence routes to `ux-design-iteration`; this skill does not perform that owner's work.
 - Component layer/ownership decisions (batch-3 sibling) routes to `component-boundary-designer`; this skill does not perform that owner's work.
-- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `mobile-viewport-craft`, `ux-design-iteration`, `accessibility-test-harness`, `frontend-perf-engineer`, `visual-regression-test-designer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `notification-webhook-ux-designer`, `tech-spec-writer`, `product-spec-writer`, `architecture-designer`, `code-reviewer`, `validation-boundary-designer`, `requirements-gathering-facilitator` (discrimination neighbours, not in-scope work).
+- Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `accessibility-test-harness`, `architecture-designer`, `code-reviewer`, `component-boundary-designer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `frontend-perf-engineer`, `mobile-viewport-craft`, `notification-webhook-ux-designer`, `product-spec-writer`, `tech-spec-writer`, `ux-design-iteration`, `validation-boundary-designer`, `visual-regression-test-designer` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
 ## 5. Validation before returning
