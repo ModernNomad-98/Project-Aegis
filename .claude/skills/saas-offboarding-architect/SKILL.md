@@ -82,7 +82,7 @@ Return, in this order:
 - The request is tenant creation/provisioning and lifecycle handoff: route to `tenant-provisioning-designer`.
 - The request is membership/invitation identity flows: route to `membership-invitation-designer`.
 - The request is audit taxonomy and retention of records: route to `audit-log-architect`.
-- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
+- The trigger-evals file lists a broader owner-discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions and the broader set is discrimination guidance.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (state, data map, policy or configuration) is unavailable: state UNKNOWN and ask instead of inventing it.
 

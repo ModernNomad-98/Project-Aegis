@@ -2,20 +2,21 @@
   "skill": "security-regression-harness-designer",
   "description": "Trigger discrimination for security-regression-harness-designer against the nearest shipped owners.",
   "overlaps_with": [
-    "security-pr-reviewer",
-    "regression-suite-curator",
-    "test-plan-designer",
-    "tdd-engineer",
-    "threat-modeler",
-    "multi-tenant-security-tester",
     "acceptance-criteria-reviewer",
-    "qa-strategy-architect",
-    "playwright-e2e-engineer",
-    "integration-test-designer",
     "api-contract-test-designer",
-    "static-analysis-reviewer",
+    "appsec-implementer",
     "code-reviewer",
-    "security-impact-note-author"
+    "integration-test-designer",
+    "multi-tenant-security-tester",
+    "playwright-e2e-engineer",
+    "qa-strategy-architect",
+    "regression-suite-curator",
+    "security-impact-note-author",
+    "security-pr-reviewer",
+    "static-analysis-reviewer",
+    "tdd-engineer",
+    "test-plan-designer",
+    "threat-modeler"
   ],
   "cases": [
     {
@@ -215,6 +216,15 @@
         "security-regression-harness-designer"
       ],
       "reason": "security-impact-note-author owns this request; security-regression-harness-designer would duplicate it."
+    },
+    {
+      "id": "security-fix-implementation-goes-to-appsec-implementer",
+      "prompt": "Explicitly invoke appsec-implementer. Implement the authorization fix for this reviewed vulnerability and add the regression test that proves the exploit is closed.",
+      "expected_skill": "appsec-implementer",
+      "should_not_trigger": [
+        "security-regression-harness-designer"
+      ],
+      "reason": "Implementing the security fix and its proving regression is appsec-implementer craft; the harness designer designs the durable security regression suite, it does not implement the fix."
     }
   ]
 }

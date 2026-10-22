@@ -216,6 +216,15 @@
         "interface-first-designer"
       ],
       "reason": "principal-code-analyst owns this request; interface-first-designer would duplicate it."
+    },
+    {
+      "id": "plugin-gateway-design-goes-to-command-gateway",
+      "prompt": "Design the mediated command gateway our agent plugin calls cross: idempotent commands, replayable audit records and one enforcement point for every write.",
+      "expected_skill": "command-gateway-architect",
+      "should_not_trigger": [
+        "interface-first-designer"
+      ],
+      "reason": "The command gateway/mediator itself is command-gateway-architect; interface-first-designer owns the ports/adapters seams inside one boundary, not the gateway."
     }
   ]
 }

@@ -2,20 +2,21 @@
   "skill": "saas-offboarding-architect",
   "description": "Trigger discrimination for saas-offboarding-architect against the nearest shipped owners.",
   "overlaps_with": [
-    "tenant-provisioning-designer",
-    "membership-invitation-designer",
+    "admin-console-architect",
     "audit-log-architect",
-    "pii-lifecycle-designer",
-    "tenant-modeler",
+    "authority-invalidation-architect",
     "authorization-matrix-designer",
-    "plan-entitlement-architect",
     "data-migration-runbook-author",
+    "incident-response-runbook",
+    "membership-invitation-designer",
+    "pii-lifecycle-designer",
+    "plan-entitlement-architect",
+    "saas-cost-architect",
+    "secrets-identity-hardener",
     "secure-migration-reviewer",
     "sensitive-disclosure-guard",
-    "admin-console-architect",
-    "incident-response-runbook",
-    "secrets-identity-hardener",
-    "saas-cost-architect"
+    "tenant-modeler",
+    "tenant-provisioning-designer"
   ],
   "cases": [
     {
@@ -215,6 +216,15 @@
         "saas-offboarding-architect"
       ],
       "reason": "This request is saas-cost-architect's deliverable end-to-end; saas-offboarding-architect owns a different design task and must not take it over."
+    },
+    {
+      "id": "authority-invalidation-design-goes-to-authority-invalidation-architect",
+      "prompt": "Design which sessions, tokens, API keys and cached authorizations must be revoked and revalidated when a tenant leaves, including residual-access windows.",
+      "expected_skill": "authority-invalidation-architect",
+      "should_not_trigger": [
+        "saas-offboarding-architect"
+      ],
+      "reason": "Authority/session invalidation design is authority-invalidation-architect; offboarding owns the tenant exit plan and composes that invalidation design."
     }
   ]
 }

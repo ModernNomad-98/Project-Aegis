@@ -215,11 +215,11 @@ COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 151, "COVERED": 56, "PARTIAL": 62, "GAP": 31},
+    "by_status": {"SHIPPED": 151, "COVERED": 57, "PARTIAL": 66, "GAP": 26},
     "by_grade": {"explicit-id": 151, "catalog-decision": 16,
-                 "capability-review": 102, "none": 31},
+                 "capability-review": 107, "none": 26},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 0, "P1": 25, "P2": 6},
+    "gap_by_priority": {"P0": 0, "P1": 21, "P2": 5},
     "manifest_skills": 230,
     "distinct_covering_skills": 150,
     "beyond_roadmap_skills": 80,
@@ -230,10 +230,10 @@ COVERAGE_TOTALS = {
 # awaiting confirmation; review_pending subtracts these resolved rows.
 COVERAGE_PLANNING_GATE_RESOLVED = frozenset({254, 278})
 COVERAGE_GAP_IDS = (
-    14, 19, 20, 28, 29, 30, 31, 32,
-    33, 34, 35, 39, 43, 44, 46, 47,
-    50, 54, 110, 120, 135, 146, 151, 156,
-    158, 224, 225, 231, 233, 234, 236,
+    14, 19, 20, 28, 29, 30, 32, 33,
+    34, 35, 43, 46, 47, 50, 54, 110,
+    120, 135, 146, 156, 158, 224, 225, 233,
+    234, 236,
 )
 COVERAGE_P0_GAP_IDS = ()
 COVERAGE_ANOMALY_SKILLS = {

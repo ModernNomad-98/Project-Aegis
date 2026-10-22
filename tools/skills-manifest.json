@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "1291b93b2a87ca06d70ffe6515f05da4e7b97ada",
+  "source_revision": "711252b30993efbe881d500801a983edb9eecef1",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -861,7 +861,7 @@
     {
       "name": "saas-offboarding-architect",
       "path": ".claude/skills/saas-offboarding-architect/SKILL.md",
-      "sha256": "ce7f0a838b869129ec374662c15c5056d5e794822f0c2be4860cb5f8ad679c7a"
+      "sha256": "4a9eeb61861af543fef1dab8e17d3c5bb04cb3ee19938dadffb51907d4338633"
     },
     {
       "name": "saas-platform-architect",
