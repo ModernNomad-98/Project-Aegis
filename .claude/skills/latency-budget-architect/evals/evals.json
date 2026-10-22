@@ -15,7 +15,8 @@
           "Defines own work and downstream critical-path budget; runs the ONE cascade rule: upstream timeout > own work + downstream critical-path budget + recorded epsilon (all ms; epsilon recorded once; critical path = serial + longest parallel branch; initial attempt, retry attempt time and backoff_total included).",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
           "Installs the budget-claim review rule for new dependencies on the path.",
-          "Retry spend counts the downstream critical-path cost, not only the hop's own work."
+          "Retry spend counts the downstream critical-path cost, not only the hop's own work.",
+          "Computes retry_overhead from the expected-cost formula (per-attempt waits base×2^(k-1), initial attempt counted once outside retry_overhead) and reports total_expected_hop_cost separately (reference example: retry_overhead 5.692ms, total 245.692ms)."
         ]
       }
     },
@@ -30,7 +31,8 @@
           "Identifies the two-layer retry compounding (gateway × client = up to 9 attempts) as a storm multiplier and assigns retries to ONE stated layer, idempotent hops only.",
           "Runs the cascade check so no upstream abandons work its downstream completes.",
           "Prices each permitted retry as spend from a named allocation rather than a free action.",
-          "Requires a finite timeout on every budgeted path; an infinite or missing timeout is a violation, not a default."
+          "Requires a finite timeout on every budgeted path; an infinite or missing timeout is a violation, not a default.",
+          "States the local-only retry limitation: retry_overhead covers local retry work only; if a retry re-invokes downstream work, that re-executed downstream cost is added to the retry term (or the formula is explicitly limited to local retries and the limitation stated)."
         ]
       }
     },

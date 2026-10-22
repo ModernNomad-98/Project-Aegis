@@ -1,18 +1,6 @@
 ---
 name: ai-human-in-the-loop-designer
-description: 'Design how an artificial intelligence (AI) feature''s output becomes product state.
-Sort every AI-originated write or action into AUTONOMOUS,
-CONFIRM or FORBIDDEN by risk tier, defaulting to advisory-only (AI proposes, a person commits). For
-CONFIRM, design the review workflow: a pending proposal that
-is not yet state, a reviewer queue showing the exact change and its sources, approve, edit, reject
-and expiry, who may review (no self-approval), commit through
-the normal write path, and an audit record of each decision. Designs; writes nothing. Use when an AI
-feature drafts, suggests or changes records a person must
-check first, or when deciding what an AI feature may do alone. Do NOT use for the coding agent''s
-own approvals (human-approval-boundary), what agents building
-the product may do (agent-authorization-matrix), tool permission scope (agent-tool-safety-guard),
-the oversight level a risk tier needs
-(ai-governance-risk-reviewer), or attacking an approval flow (human-agent-trust-reviewer).'
+description: 'Design how an artificial intelligence (AI) feature''s output becomes product state. Sort every AI-originated write or action into AUTONOMOUS, CONFIRM or FORBIDDEN by risk tier, defaulting to advisory-only (AI proposes, a person commits). For CONFIRM, design the review workflow: a pending proposal that is not yet state, a reviewer queue showing the exact change and its sources, approve, edit, reject and expiry, who may review (no self-approval), commit through the normal write path, and an audit record of each decision. Designs; writes nothing. Use when an AI feature drafts, suggests or changes records a person must check first, or when deciding what an AI feature may do alone. Do NOT use for the coding agent''s own approvals (human-approval-boundary), what agents building the product may do (agent-authorization-matrix), tool permission scope (agent-tool-safety-guard), the oversight level a risk tier needs (ai-governance-risk-reviewer), or attacking an approval flow (human-agent-trust-reviewer).'
 ---
 
 # AI Human-in-the-Loop Designer

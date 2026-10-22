@@ -1,8 +1,6 @@
 ---
 name: skill-usage-ledger
-description: 'Produce the six-field record of which Aegis skills a task used, each bound to its
-skills-manifest SHA-256, for pasting into a PR description or
-ledger. Emits the record in conversation and writes nothing.'
+description: 'Produce the six-field record of which Aegis skills a task used, each bound to its skills-manifest SHA-256, for pasting into a PR description or ledger. Emits the record in conversation and writes nothing.'
 ---
 
 # Skill Usage Ledger

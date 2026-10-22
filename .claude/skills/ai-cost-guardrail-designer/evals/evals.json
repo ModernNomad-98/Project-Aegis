@@ -115,7 +115,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Does not activate for routing logic: names ai-router-architect as the owner and recommends explicit invocation instead of taking ownership.",
+          "Does not activate for routing logic; names ai-router-architect only as a manual-only suggestion (may name it, recommends explicit invocation) and takes no ownership.",
           "Does not auto-invoke ai-router-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer for it.",
           "Identifies model routing and provider fallback logic as router design; does not produce the routing implementation and at most notes that budget and model-tier intent are inputs the router enforces."
         ]
@@ -128,7 +128,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Does not activate for key custody: names secrets-identity-hardener as the owner and recommends explicit invocation instead of taking ownership.",
+          "Does not activate for key custody; names secrets-identity-hardener only as a manual-only suggestion (may name it, recommends explicit invocation) and takes no ownership.",
           "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer for it.",
           "Treats key custody, rotation, storage, and client-bundle exposure as secrets-custody work; does not design token caps, budgets, or rate limits in response, and mentions the leaked key's AI-spend blast radius at most as a follow-up note."
         ]

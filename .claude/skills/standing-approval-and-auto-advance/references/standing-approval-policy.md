@@ -82,7 +82,8 @@ human/manual actions remain; no agent-initiated action proceeds while BLOCKED. A
 transition trigger fired is a BLOCKED condition even when a deadline is recorded and
 not passed. Reviewer-block handling is the canonical halt rule immediately below the table.
 
-Canonical transitions (each matches a BLOCKED condition in the table above, and
+Canonical transitions (each starts from or targets a BLOCKED state; the four BLOCKED-entry
+conditions are the table above, and
 the transition rules sit next to the table):
 - ACTIVE -> BLOCKED on any of: reviewer block, attestation deadline passed, no
   recorded attestation deadline, or a transition trigger fired.
@@ -93,7 +94,6 @@ the transition rules sit next to the table):
   transition trigger is in force; the reviewer-block halt path is unchanged.
 - No transition may bypass BLOCKED; never infer a default expiry.
 
-Never infer a default expiry; the reviewer-block halt path is unchanged.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,

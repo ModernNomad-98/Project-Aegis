@@ -62,8 +62,13 @@ required; never substitute the tracked status file as a resume authority.
 
 The JSON example above is the ADVISORY status-file shape only; it is never a resume
 authority. Resume authority is the trusted CI state store: a per-shard query returning
-{state, run_id, attempt} for the CURRENT head commit (failed vs interrupted classified
-by the store, run_id must equal the head commit run). If no trusted CI state store is
+{state, run_id, attempt} for the CURRENT head commit. Definitions: run_id identifies the
+CI run being read (in this illustrative file the format is <commit-sha>-<timestamp>; in the
+trusted store it is the CI provider's run identifier); attempt is the provider attempt number
+within that run; the head-commit run is the trusted store run whose head SHA equals the commit
+being validated. Resume reads the store for the current head commit and the LATEST attempt of
+the head-commit run; results from other commits or earlier attempts are stale and never
+counted (a local run with no trusted CI state store cannot resume). If no trusted CI state store is
 available, resume is unavailable and the run reruns fully.
 
 ## Runner modes & the resume law
@@ -71,7 +76,7 @@ available, resume is unavailable and the run reruns fully.
 | Mode | Semantics |
 | --- | --- |
 | full | fresh status file; run every shard |
-| `-Resume <run_id>` | rerun ONLY shards whose state is `interrupted` or `pending` in that run, same commit. `passed` shards are not re-derived. **`failed` shards are NOT eligible** — a real failure reruns (fully, post-fix), it is never resumed around. |
+| `-Resume <run_id>` | rerun ONLY shards whose state is `interrupted` or `pending` in that run, same commit (run_id per the definitions above; earlier attempts stale). `passed` shards are not re-derived. **`failed` shards are NOT eligible** — a real failure reruns (fully, post-fix), it is never resumed around. |
 | `-Shard <name>` | targeted single-shard run (post-fix rerun, local debugging); updates only that shard's record |
 
 The resume law in one line: **resume exists to survive infrastructure, not

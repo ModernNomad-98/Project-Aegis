@@ -1,16 +1,6 @@
 ---
 name: standing-approval-and-auto-advance
-description: 'MANUAL-ONLY; never auto-invoke. Design the governed approval-fatigue layer: documented
-standing approval for named delivery steps, phase advance
-only through already-approved phases, per-session restatement, an opt-out phrase, and reviewer
-blocks. Protected-branch merge remains approval-required; an
-applicable explicit, active, scoped human grant can satisfy that requirement without another
-request. Never infer merge authority from green checks or this
-skill. Arming auto-merge remains forbidden to agents by default. Merge-after-green is never the
-default template. Use when repetitive mechanical approvals erode
-real gates. Do not use to record one grant (scoped-approval-register), define authority floors
-(agent-authorization-matrix), or stress-test approval experience
-(human-agent-trust-reviewer).'
+description: 'MANUAL-ONLY; never auto-invoke. Design the governed approval-fatigue layer: documented standing approval for named delivery steps, phase advance only through already-approved phases, per-session restatement, an opt-out phrase, and reviewer blocks. Protected-branch merge remains approval-required; an applicable explicit, active, scoped human grant can satisfy that requirement without another request. Never infer merge authority from green checks or this skill. Arming auto-merge remains forbidden to agents by default. Merge-after-green is never the default template. Use when repetitive mechanical approvals erode real gates. Do not use to record one grant (scoped-approval-register), define authority floors (agent-authorization-matrix), or stress-test approval experience (human-agent-trust-reviewer).'
 disable-model-invocation: true
 ---
 

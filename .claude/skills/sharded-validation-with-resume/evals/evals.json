@@ -40,7 +40,7 @@
         "triggers": true,
         "assertions": [
           "Refuses: resume covers timeout/infrastructure interruptions only — a failed shard is never resumed-away; that is failure laundering through the resume flag.",
-          "Points at the status-file semantics that make this mechanical: failed is not a resume-eligible state.",
+          "Points at the trusted CI state store's failed/interrupted classification that makes this mechanical: in the store, failed is not resume-eligible (a real failure reruns fully) while interrupted is resume-eligible; the tracked status file remains ADVISORY ONLY and is never the resume authority.",
           "The lawful path: fix, rerun the shard (or the tier on the new commit); the gate stays red until the failure is actually resolved."
         ]
       }
