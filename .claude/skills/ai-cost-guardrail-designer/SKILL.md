@@ -114,13 +114,13 @@ person runs that skill by name; it is never invoked automatically.
    the reason for each viable option, its benefits and drawbacks, and its
    estimated per-call and monthly cost at the inspected call volume. Use
    verified current prices or mark the dollar estimate unknown. Record for
-    each price/model figure the provider, model, source, the source sheet's
-    publication/effective date and the retrieval date; a figure without a
-    retrieval date is unverified. The figure is stale when
-    the source sheet is no longer the sheet currently in effect, or when the
-    retrieval date is older than the recorded stale threshold (default 30 days
-    when none is recorded with the figure; record the threshold with the
-    figure); stale figures are unverified. Provider account-level controls (spend limits,
+   each price/model figure the provider, model, source, the source sheet's
+   publication/effective date and the retrieval date; a figure without a
+   retrieval date is unverified. The figure is stale when
+   the source sheet is no longer the sheet currently in effect, or when the
+   retrieval date is older than the recorded stale threshold (default 30 days
+   when none is recorded with the figure; record the threshold with the
+   figure); stale figures are unverified. Provider account-level controls (spend limits,
    quota, reservation) apply only where the provider exposes them - otherwise
    record the compensating control. Design-pattern guardrails are
    provider-independent. Do not invent prices or imply that a request-count

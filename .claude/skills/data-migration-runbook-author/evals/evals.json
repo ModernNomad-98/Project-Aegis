@@ -35,14 +35,13 @@
     {
       "id": "edge-missing-backup-prerequisite",
       "type": "should_trigger",
-      "prompt": "Plan's approved, review passed — but honestly our last restore test was over a year ago and nobody's sure the backups restore. Write the runbook anyway, we're in a hurry. Fixture: the move touches 4.2M rows across 3 tables in one cutover window; the last measured restore took 90 minutes; no waiver or risk-acceptance has been granted yet.",
+      "prompt": "I want to migrate 4.2M rows across 3 tables to a new schema this weekend. The last documented restore test was over a year ago; nobody is sure the backups will restore. Fixture: the stale, unverified last result was 90 minutes; no waiver or risk-acceptance has been granted yet.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Stops at the prerequisite gate: 'backups are enabled' is not a verified backup — names the missing evidence (recent successful restore test appropriate to the blast radius).",
-          "Refuses to paper over the gap with a runbook that assumes restorability; states that doing so launders risk into procedure.",
-          "Offers the unblocking path: run the restore test first, or obtain an explicit recorded human decision accepting the risk (citing the 4.2M-row blast radius and 90-minute restore time) - and only then authors the runbook with that decision cited.",
-          "Surfaces that restore time bounds the abort options, so the runbook is materially different depending on the test's result."
+          "Treats the 90-minute restore result as stale/unverified, not a current bound, and says so explicitly.",
+          "Offers the unblocking path: run a fresh restore test first, or obtain an explicit recorded human decision accepting the risk against a conservative fresh bound - and only then authors the runbook with that decision cited.",
+          "Names the 4.2M-row blast radius and does not present the stale measurement as a guarantee."
         ]
       }
     },

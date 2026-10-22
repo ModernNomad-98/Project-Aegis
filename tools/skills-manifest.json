@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "656a05c8e2e925752664bcefc26a1a238573c7e4",
+  "source_revision": "a2aa266fe20f44f86d588b2db0dd9efe67879465",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "01398882fce2820bdc6f9b98ee469d2fff044642cd93cffe693698ed4c8308a1"
+      "sha256": "5ec8a3f6916540ec2c17018f69b868661ccc6abc633b28a43311a4fd06ff6edd"
     },
     {
       "name": "ai-evaluation-harness",
@@ -316,7 +316,7 @@
     {
       "name": "compliance-evidence-collector",
       "path": ".claude/skills/compliance-evidence-collector/SKILL.md",
-      "sha256": "8f0a5c197ced6af9a0ab53f5084a871709eb6bd9bbe13fc4d93f68fa9bdbaf15"
+      "sha256": "446f98c3001662b00d0f982658c9c2ee8525018ef54dd00fc0eda6d8081a2726"
     },
     {
       "name": "compliance-gap-auditor",
@@ -791,7 +791,7 @@
     {
       "name": "product-analytics-instrumenter",
       "path": ".claude/skills/product-analytics-instrumenter/SKILL.md",
-      "sha256": "c45a0442ff3f4be03b840fc5e60ecba82bb46edf0cc1eb4f47e157c537ff1471"
+      "sha256": "58c5b4057d9d709ce5ca0bcb1ac2ee3358d89a56e94c6bc09a5213417ffbcbb6"
     },
     {
       "name": "product-spec-writer",
@@ -1061,7 +1061,7 @@
     {
       "name": "skill-usage-ledger",
       "path": ".claude/skills/skill-usage-ledger/SKILL.md",
-      "sha256": "8bc52fff4eeefc5b2d99bb51691ec600348a17f667006df59969682324ccc913"
+      "sha256": "650bf16f50fd7d957957f7526f37b49c541a75eaaaa10afaac0310dd04080036"
     },
     {
       "name": "slo-reliability-architect",

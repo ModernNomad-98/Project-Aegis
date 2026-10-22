@@ -4,18 +4,15 @@
   "description": "Behavior cases for requirements elicitation: unpacking a solution-stated-as-requirement, eliciting users/jobs and non-goals, surfacing stakeholder conflict, and producing a confidence-marked brief that feeds product-spec-writer; plus the atomic one-target-per-turn regressions: decomposing the observed compound clinic question, a narrative process walkthrough that stays one atomic target, and same-target options remaining atomic.",
   "cases": [
     {
-      "id": "positive-interactive-turn-solution-as-requirement",
+      "id": "positive-solution-stated-as-requirement",
       "type": "should_trigger",
       "prompt": "A stakeholder wants us to 'add an export button' to the reports page. Help us figure out what we should actually build. (Multi-turn facilitation; this is the first discovery turn.)",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Restates 'add an export button' as a problem/job-to-be-done rather than accepting the solution verbatim, asking what the export would let them accomplish.",
-          "Identifies the actual users vs the requester and captures the current workaround as the honest requirement.",
-          "Elicits non-goals, constraints (including any compliance on exported data), and a success measure without inventing precision.",
-          "Keeps the brief and the product-spec-writer handoff out of this next-turn reply; they belong to a later turn once discovery is complete.",
-          "Does not jump to writing the specification or the UI design.",
-          "Returns an INTERACTIVE TURN (one next question plus explicit stop) rather than a completed brief this turn."
+          "Returns ONE interactive question plus an explicit stop this turn.",
+          "Does NOT produce the brief, handoff, or implementation approval this turn; unasked items are marked to-confirm, not invented.",
+          "Records nothing as confirmed this turn (RECORDING STATUS: NONE THIS TURN)."
         ]
       }
     },
@@ -190,11 +187,11 @@
     {
       "id": "positive-next-turn-brief-after-discovery",
       "type": "should_trigger",
-      "prompt": "Next-turn fixture: every spec-blocking discovery question has now been answered one at a time. Produce the requirements brief and hand off.",
+      "prompt": "Next-turn fixture - accumulated answers from the discovery turns: (1) users are operations managers; (2) the workaround is copy-pasting the reports table into email; (3) non-goals: no scheduled exports, no PDF; (4) constraints: CSV only, must respect tenant isolation; (5) success measure: export completes under 10 seconds for 50k rows. Produce the requirements brief and hand off.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces the final requirements brief now that no spec-blocking question remains.",
+          "Produces the final requirements brief now that the accumulated answers remove all spec-blocking questions.",
           "Separates confirmed / assumed / unknown items and hands off to product-spec-writer by name.",
           "Does NOT invoke product-spec-writer itself and does not authorize implementation."
         ]

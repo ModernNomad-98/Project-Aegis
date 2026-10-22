@@ -20,15 +20,13 @@
     {
       "id": "positive-drill-parity-and-deletion",
       "type": "should_trigger",
-      "prompt": "Explicitly invoke database-backup-verifier. Drill mode: restore last night's orders snapshot into a new instance called orders-drill-0928 in our sandbox account, which is not production. Check it and clean up afterwards. Fixture: the declared RTO is 2 hours; the last drill measured restore time 47 minutes; the source table holds 1,204,332 rows; row-count and checksum parity both matched.",
+      "prompt": "Run a new backup/restore drill for our primary database and verify parity and deletion safely. Fixture baseline from the LAST drill: restore measured 47 minutes against a 2-hour RTO; source table row count was 1,204,332; row-count and checksum parity matched. This is a NEW drill - treat those numbers as baseline only, not results.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Presents a drill plan naming the backup, the scratch target, the estimated cost with its basis, the parity checks and the deletion step, and waits for approval of that exact plan before restoring.",
-          "Proves the sandbox target is non-production by comparing its identifiers with the declared production list, and confirms it does not already exist.",
-          "Records the data origin: the scratch copy is production data from the named backup, with access limited while it exists.",
-          "Reports the measured restore time (47 minutes) against the 2-hour RTO and the row count (1,204,332) plus checksum parity result from the fixture, showing numbers but no row contents.",
-          "Deletes the scratch instance and its storage and shows a listing proving it is gone."
+          "Uses the prior-drill baseline (47 minutes, 1,204,332 rows, parity matched) as baseline only and specifies the NEW drill's expected current measurement, approval, and cleanup.",
+          "Does not claim the prior drill's 47 minutes/parity numbers as this drill's result; requires fresh measurement.",
+          "Specifies restore-time evidence against the 2-hour RTO, row-count and checksum parity checks, and deletion/cleanup confirmation for this drill."
         ]
       }
     },

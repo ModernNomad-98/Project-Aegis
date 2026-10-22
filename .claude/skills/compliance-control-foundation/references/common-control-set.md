@@ -18,8 +18,11 @@ certification claims.
 
 Every control row's canonical record also carries three accountability fields in the
 control catalog: the accountable owner, the evidence collector, and the collection
-trigger (cadence source). Domain tables below name the design/review route only; the
-accountability fields are maintained once per control in the catalog record.
+trigger (cadence source). Domain tables below name the design/review route only,
+except rows that explicitly name a single accountable owner (for example the audit-trail
+row naming audit-log-architect); in those rows the named owner is the accountable owner
+and the catalog record must match it. The three accountability fields are maintained
+once per control in the catalog record.
 
 | Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |

@@ -6,16 +6,16 @@
     {
       "id": "positive-design-powered-experiment",
       "type": "should_trigger",
-      "prompt": "We want to A/B test a new pricing page. Design the experiment. Fixture: the pre-set minimum detectable effect is a 1% relative lift, the baseline conversion rate is 20%, and the baseline Bernoulli variance p(1-p) is 0.16.",
+      "prompt": "We want to A/B test a new pricing page. Design the experiment. Fixture: the pre-set minimum detectable effect is a 1% relative lift, the baseline conversion rate is 20%, the baseline Bernoulli variance p(1-p) is 0.16, and weekly eligible traffic is 120,000 sessions.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Writes a falsifiable, directional hypothesis tied to a decision, and picks ONE primary metric plus guardrails (e.g. revenue, refund rate).",
           "Chooses the randomization unit for independence, sticky assignment, and notes contamination risk.",
-          "Computes required sample size from a practically-meaningful minimum detectable effect and baseline/variance, and derives duration over full weekly cycles.",
+          "Computes required sample size from the supplied MDE/baseline/variance and derives duration from the supplied 120,000 weekly sessions over full weekly cycles.",
           "Fixes the horizon up front and forbids peeking-to-significance (or specifies a sequential method with its correction).",
           "Grounds the primary metric in funnel-definition-designer / event-schema-architect definitions.",
-          "Uses the supplied pre-set MDE (1% relative), baseline conversion (20%) and variance (0.16) to compute the sample size and duration rather than inventing them."
+          "Uses the supplied pre-set MDE (1% relative), baseline conversion (20%), variance (0.16) and weekly traffic (120,000 sessions) to compute the sample size and duration rather than inventing them."
         ]
       }
     },

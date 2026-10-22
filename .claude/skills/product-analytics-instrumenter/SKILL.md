@@ -204,8 +204,10 @@ Boundaries:    schema → event-schema-architect; system telemetry → observabi
   them, and the number is quietly low forever. Money moves server-side.
 - Firing events before `identify` orphans them under an anonymous id that
   never joins the user — the funnel undercounts and no error is thrown.
-  Order of capture vs identity matters: resolve identity first, and treat
-  pre-identify events as orphaned (re-key or replay them, then fix capture order).
+  Order of capture vs identity matters: capture anonymous funnel events with an
+  anonymous ID, then call identify/alias at signup to merge the anonymous and user
+  IDs (re-key or replay historical events if needed); do not delay the event until
+  after identify, which loses events and misorders the funnel.
 - Capturing before consent (or ignoring opt-out/DNT) is a compliance
   violation, not a data-completeness win. Consent gates capture; minimize
   PII at the source, because scrubbing it downstream is unreliable and

@@ -38,7 +38,7 @@
         "triggers": false,
         "assertions": [
           "SLO/SLI derivation and the page-vs-ticket policy are slo-reliability-architect's design work; this skill implements the resulting spec.",
-          "Pins the routing: SLO/paging design comes from slo-reliability-architect, and this skill only implements the resulting spec."
+          "Keeps the paging-vs-ticket decision with slo-reliability-architect and does not redefine SLOs for that journey."
         ]
       }
     },

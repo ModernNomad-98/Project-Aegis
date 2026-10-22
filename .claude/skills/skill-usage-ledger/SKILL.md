@@ -87,7 +87,7 @@ manifest, no hash is invented, and `incomplete` is filled honestly.
 - **Recording from memory invents hashes.** Copy the hash from the manifest
   at record time; a hash from a previous task may name a different
   `SKILL.md` after an update.
-- **Signal-catalog epoch gate (consumer side).** When reading the instrumenter's
+- **Signal-catalog epoch gate (consumer contract; documented here for completeness - consumer code applies it, not the record skill).** When reading the instrumenter's
   signal catalog, read `activation_mode`/`correction_outcome` by event type and reject
   any record whose `schema_epoch` does not match the catalog epoch (current 2); map
   legacy records by source table and never read the legacy mode field.

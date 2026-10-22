@@ -15,7 +15,7 @@
           "Designs reliability (flush on unload, retry, offline) and de-duplication so events don't double-count.",
           "Builds a tracking-QA test that verifies events fire with the right name and typed properties, plus a regression guard.",
           "Gates capture on consent and minimizes PII at the source.",
-          "Uses the supplied event names and volumes plus the identify-order evidence (events fired before identify are orphaned) to prescribe capture-after-identify and server-side completion."
+          "Uses the supplied event names and volumes plus the identify-order evidence to prescribe anonymous-ID capture followed by identify/alias merge (re-keying the orphaned historical events) and server-side completion, rather than delaying events until after identify."
         ]
       }
     },
