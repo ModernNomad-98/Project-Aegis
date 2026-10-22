@@ -31,7 +31,10 @@
           "Records the data origin and access restrictions for the scratch copy (no production credentials/access).",
           "Shows the scratch instance is actually deleted after the drill and its credentials revoked.",
           "Estimates the scratch-instance cost with its basis and waits for approval of the exact drill plan before restoring anything.",
-          "Shows numbers (row counts, checksums) but no row contents - PII is not copied into the report or logs."
+          "Shows numbers (row counts, checksums) but no row contents - PII is not copied into the report or logs.",
+          "Compares the scratch target identifier against the declared production list to confirm it is not a production instance.",
+          "Deletes the scratch instance AND its storage, then shows a listing/verification proving it is gone.",
+          "Limits access to the scratch copy while it exists (no broad credentials; copy not exposed outside the drill)."
         ]
       }
     },

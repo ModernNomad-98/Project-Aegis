@@ -44,7 +44,8 @@
           "Names the 4.2M-row blast radius and does not present the stale measurement as a guarantee.",
           "Stops at the prerequisite gate and does not author a runnable cutover runbook until the restore prerequisite is satisfied OR a recorded human waiver/risk acceptance explicitly satisfies the gate; with the waiver, authoring proceeds and cites the decision.",
           "Refuses to paper over the missing prerequisite with the stale result or a verbal assurance.",
-          "States the restore time bound that would abort the cutover plan and the decision point for it, using the supplied 4-hour RTO and Saturday 02:00-05:00 UTC maintenance window (or marking it TBC and asking if not supplied)."
+          "States the restore time bound that would abort the cutover plan and the decision point for it, using the supplied 4-hour RTO and Saturday 02:00-05:00 UTC maintenance window (or marking it TBC and asking if not supplied).",
+          "Detects that the supplied 4-hour RTO does not fit the Saturday 02:00-05:00 UTC 3-hour maintenance window and resolves the mismatch explicitly (shorten the restore bound, extend the window, or record a waiver) before treating the cutover as viable."
         ]
       }
     },

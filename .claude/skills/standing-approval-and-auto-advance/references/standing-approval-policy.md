@@ -77,7 +77,7 @@ Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
 Halt rule (canonical, OR semantics immediately above): any ONE of the BLOCKED
 conditions wins for every agent-initiated action - halt and wait for the human; no
 agent-initiated action proceeds while BLOCKED.
-BLOCKED effect (canonical): blocking does not itself expire the grant; only in-scope
+BLOCKED effect (canonical): Blocking does not itself expire the grant; only in-scope
 human/manual actions remain; no agent-initiated action proceeds while BLOCKED. A
 transition trigger fired is a BLOCKED condition even when a deadline is recorded and
 not passed. Reviewer-block handling is the canonical halt rule immediately below the table.
@@ -181,7 +181,5 @@ Collect before designing, from recent sessions/PRs:
   matrix and any separate applicable human grants. The default matrix floor
   remains when no grant covers the action; later owner constraints also apply.
 
-Blocking does not itself expire the grant; a recorded grant expiry/use limit still applies
-on its own terms (expiry bounds consumption; blocking halts agent-initiated actions).
-The canonical transition rules are the block next to the precedence table above - this
-paragraph is a pointer only and does not restate them.
+The canonical transition and blocking rules are the blocks next to the precedence table
+above; this paragraph is a pointer only and does not restate them.

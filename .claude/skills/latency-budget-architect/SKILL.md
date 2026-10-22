@@ -111,8 +111,9 @@ authorize execution.
 5. **Derive timeouts from budgets.** Define own work as the time the hop
    itself spends (processing, serialization, and the queue/connection waits
    it owns); downstream critical-path budget is the sum of serial downstream
-   hops plus the longest parallel branch at each join, including the initial
-   attempt, retry attempt time and recorded backoff_total. Keep ONE rule:
+   hops plus the longest parallel branch at each join, including the initial attempt and downstream retry spend; retry math uses per-attempt
+    waits wait_k = base×2^(k-1), retry_overhead and total_expected_hop_cost from the
+    reference - never the aggregate backoff_total. Keep ONE rule:
    upstream timeout > own work + downstream critical-path budget + recorded
    epsilon (all ms; epsilon is recorded once, never doubled). If no feasible
    timeout exists under these terms, escalate as a latency budget violation;

@@ -69,9 +69,9 @@ mutates a live evidence store.
    carries those fields on every control record. Continuous controls keep
    continuous operation evidence with periodic extracts at least quarterly
    (plus window-start/end config snapshot); the cadence catalog records
-   class-level defaults and names the evidence owner per row; the control-catalog
+   class-level defaults and names the evidence collector per row; the control-catalog
    evidence-collector field is authoritative - where the cadence row also names an
-   evidence owner it must match that value (one role, single authority).
+   evidence collector it must match that value (one role, single authority).
 
 ## Workflow
 

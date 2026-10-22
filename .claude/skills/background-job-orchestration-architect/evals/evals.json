@@ -20,7 +20,7 @@
     {
       "id": "positive-per-tenant-fairness",
       "type": "should_trigger",
-      "prompt": "When one big customer kicks off a bulk operation with tens of thousands of jobs, every other customer's jobs stall behind them. Fix the worker design so one tenant can't starve the others. Fixture: queue-depth logs show tenant A at 40,000 pending jobs vs ~200 for every other tenant; retry counts show 12 retries per job; the visibility timeout is 30s while the average job runs 120s.",
+      "prompt": "When one big customer kicks off a bulk operation with tens of thousands of jobs, every other customer's jobs stall behind them. Fix the worker design so one tenant can't starve the others. Fixture: queue-depth logs show tenant A at 40,000 pending jobs vs ~200 for every other tenant; worker concurrency is currently unpartitioned (one shared pool).",
       "expect": {
         "triggers": true,
         "assertions": [

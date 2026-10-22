@@ -35,7 +35,7 @@
     {
       "id": "edge-duplicate-and-out-of-order-bug",
       "type": "should_trigger",
-      "prompt": "Two events with distinct event IDs (evt_7f3a and evt_7f3b) both represent the same payment and were both applied; create and update events were published with different partition keys; the consumer has no idempotency store. What is wrong and how do we fix the pipeline?",
+      "prompt": "Two events with distinct event IDs (evt_7f3a and evt_7f3b) both represent the same payment and were both applied; create and update events were published with different partition keys, and updates were observed applied before creates for the same payment; the consumer has no idempotency store. What is wrong and how do we fix the pipeline?",
       "expect": {
         "triggers": true,
         "assertions": [

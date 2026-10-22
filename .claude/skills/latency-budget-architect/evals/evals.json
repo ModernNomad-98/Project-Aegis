@@ -12,7 +12,7 @@
         "assertions": [
           "Builds the budget table from measured per-hop reality with an owner per hop, and includes the overhead rows (serialization, connection setup on the tail, queue wait) as explicit line items.",
           "Holds 15–25% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
-          "Defines own work and downstream critical-path budget; runs the ONE cascade rule: upstream timeout > own work + downstream critical-path budget + recorded epsilon (all ms; epsilon recorded once; critical path = serial + longest parallel branch; initial attempt, retry attempt time and backoff_total included).",
+          "Defines own work and downstream critical-path budget; runs the ONE cascade rule: upstream timeout > own work + downstream critical-path budget + recorded epsilon (all ms; epsilon recorded once; critical path = serial + longest parallel branch; initial attempt + downstream retry spend included once); retry math uses per-attempt waits wait_k = base×2^(k-1), retry_overhead and total_expected_hop_cost - never aggregate backoff_total.",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
           "Installs the budget-claim review rule for new dependencies on the path.",
           "Retry spend counts the downstream critical-path cost, not only the hop's own work.",

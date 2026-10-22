@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "ed05d42474307ca96791de6f608054e429c84c34",
+  "source_revision": "dc6ea1f7f0a02173bfe20310cde6057e45de03d0",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "cc5b92287aa14e94e0362a447341059015c7826275d1fb4a9b15b60977a2613c"
+      "sha256": "de59793780fbcdfda43fe0606a138649d3a71b602f079152cb0c4f9f2dad68af"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -316,7 +316,7 @@
     {
       "name": "compliance-evidence-collector",
       "path": ".claude/skills/compliance-evidence-collector/SKILL.md",
-      "sha256": "a75ea85d0c06cbe70fb614d0df258fc4b929f1023899dc667d0d3dda6b1df248"
+      "sha256": "43362aa614ebf24eda1f626d394fe1eb8a63b59c626ac8fa89bdec62d10bb0ee"
     },
     {
       "name": "compliance-gap-auditor",
@@ -621,7 +621,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "6771589a0fb8557fdd7421407312ad61cf27ddbf60a2a5f0af735cbf8b7329cc"
+      "sha256": "04f30e45fed9e6246851fcfa35be6f45db738b90340dc6ac55223c6697c24a48"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -1061,7 +1061,7 @@
     {
       "name": "skill-usage-ledger",
       "path": ".claude/skills/skill-usage-ledger/SKILL.md",
-      "sha256": "b37d92fded1bb3bfa61b760315bd3bd6691d8b8247158f984124dd82e0ff6c40"
+      "sha256": "7ae3518932c7ca2d4ef6951241c0ace2b9b0983835010275502961ee6c6cbd05"
     },
     {
       "name": "slo-reliability-architect",

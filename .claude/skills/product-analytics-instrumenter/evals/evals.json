@@ -6,7 +6,7 @@
     {
       "id": "positive-instrument-the-plan",
       "type": "should_trigger",
-      "prompt": "We have a tracking plan. Now instrument it — decide where each event fires, make sure it's reliable, and QA that it matches the plan. Fixture: last week 12,400 signup_started events fired before identify on the signup path (orphaned under anonymous ids), 3,900 signup_completed fired server-side; event names and volumes as stated.",
+      "prompt": "We have a tracking plan. Now instrument it - decide where each event fires, make sure it's reliable, and QA that it matches the plan. Fixture: last week 12,400 signup_started events fired before identify on the signup path (orphaned under anonymous ids); an alias mapping exists for 9,000 of the 12,400 (the remaining 3,400 have no mapping and are unrecoverable); 3,900 signup_completed fired server-side; event names and volumes as stated.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -15,7 +15,7 @@
           "Designs reliability (flush on unload, retry, offline) and de-duplication so events don't double-count.",
           "Builds a tracking-QA test that verifies events fire with the right name and typed properties, plus a regression guard.",
           "Gates capture on consent and minimizes PII at the source.",
-          "Uses the supplied event names and volumes plus the identify-order evidence to prescribe anonymous-ID capture followed by identify/alias merge (re-keying the orphaned historical events) and server-side completion, rather than delaying events until after identify."
+          "Uses the supplied event names/volumes plus the orphan evidence and alias mapping to prescribe anonymous-ID capture then identify/alias merge: re-keys only the 9,000 mapped orphaned events, reports the remaining 3,400 as unrecoverable/undercounted (no fabricated attribution), and keeps server-side completion."
         ]
       }
     },

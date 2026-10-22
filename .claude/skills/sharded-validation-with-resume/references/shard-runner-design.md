@@ -76,7 +76,7 @@ available, resume is unavailable and the run reruns fully.
 | Mode | Semantics |
 | --- | --- |
 | full | fresh status file; run every shard |
-| `-Resume <run_id>` | rerun ONLY shards whose state is `interrupted` or `pending` in that run, same commit (run_id per the definitions above; earlier attempts stale). `passed` shards are not re-derived. **`failed` shards are NOT eligible** — a real failure reruns (fully, post-fix), it is never resumed around. |
+| `-Resume <run_id>` | rerun ONLY shards whose state is `interrupted` or `pending` in that run, same commit (run_id per the definitions above; earlier attempts stale; a run whose head SHA differs from the current head commit is rejected as non-authoritative). `passed` shards are not re-derived. **`failed` shards are NOT eligible** — a real failure reruns (fully, post-fix), it is never resumed around. |
 | `-Shard <name>` | targeted single-shard run (post-fix rerun, local debugging); updates only that shard's record |
 
 The resume law in one line: **resume exists to survive infrastructure, not
