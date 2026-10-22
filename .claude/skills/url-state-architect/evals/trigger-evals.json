@@ -4,6 +4,7 @@
   "overlaps_with": [
     "accessibility-test-harness",
     "api-event-architect",
+    "client-state-boundary-reviewer",
     "code-reviewer",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
@@ -216,5 +217,6 @@
       ],
       "reason": "Batch-3 sibling seam: this request is route-protection-designer's deliverable; url-state-architect must not take it over."
     }
-  ]
+  ],
+  "seam_note": "client-state-boundary-reviewer <-> url-state-architect: RECIPROCAL Stop-Condition seam (url-state routes UI state placement review to client-state; client-state routes URL schema design here). The trigger-eval pin is currently one-way: client-state-boundary-reviewer-positive-7 has should_not_trigger url-state-architect; this file keeps no extra case (22-case convention). Stop-Condition seam != trigger-eval-pinned seam. Do not remove this note or the overlap."
 }

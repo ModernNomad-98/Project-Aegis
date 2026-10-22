@@ -5,6 +5,7 @@
     "accessibility-test-harness",
     "architecture-designer",
     "code-reviewer",
+    "design-system-token-governor",
     "domain-modeler",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
@@ -217,5 +218,5 @@
       "reason": "Batch-3 sibling seam: this request is frontend-architecture-mapper's deliverable; component-boundary-designer must not take it over."
     }
   ],
-  "seam_note": "design-system-token-governor -> component-boundary-designer is a one-way Stop-Condition seam (token governance routes component-layer decisions here); intentionally not a trigger-eval case, keeping the 22-case convention. Do not delete this note."
+  "seam_note": "design-system-token-governor <-> component-boundary-designer is a RECIPROCAL Stop-Condition seam (each SKILL.md routes to the other's deliverable). The trigger-eval pin is currently one-way: design-system-token-governor-negative-14 expects component-boundary-designer; this file intentionally keeps no extra case (22-case = 8 positive / 14 negative convention). Terminology: Stop-Condition seam != trigger-eval-pinned seam. Do not remove this note or the overlap."
 }

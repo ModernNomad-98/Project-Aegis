@@ -1076,15 +1076,18 @@ are frontend architecture and client-state craft: architecture maps, component
 boundaries, route protection, design-token governance, server state, client-state
 review, URL state and PWA boundaries; they are NOT sub-details of the API contract
 and their trigger-evals pin the pre-existing owners plus the batch-internal sibling
-seams that are actually exercised: frontend-architecture-mapper <->
-component-boundary-designer, design-system-token-governor ->
-component-boundary-designer, route-protection-designer <-> url-state-architect,
-and client-state-boundary-reviewer -> url-state-architect; these are one-way where
-only one direction is trigger-pinned. server-state-architect <->
-client-state-boundary-reviewer is a real reciprocal Stop-Condition seam (each
-routes to the other's deliverable; accepted SD-D residual from trigger-evals). No
-server-state-architect <-> url-state-architect seam is claimed (no such pin
-exists).
+seams that are actually trigger-eval-exercised: frontend-architecture-mapper <->
+component-boundary-designer; design-system-token-governor <->
+component-boundary-designer (trigger case one-way: design-system-token-governor-negative-14,
+with reciprocal Stop Conditions); route-protection-designer <->
+url-state-architect; and client-state-boundary-reviewer <-> url-state-architect
+(trigger case one-way: client-state-boundary-reviewer-positive-7, with reciprocal
+Stop Conditions). **Terminology:** a Stop-Condition seam is reciprocal routing in
+the two SKILL.md files; a trigger-eval-pinned seam is a discrimination case in the
+eval files - the two are not the same and are recorded separately here and in each
+eval file's seam_note. server-state-architect <-> client-state-boundary-reviewer
+is a real reciprocal Stop-Condition seam with no trigger-eval case (accepted
+residual); no server-state-architect <-> url-state-architect seam is claimed.
 
 All 13 ship `evals/evals.json` **and** `evals/trigger-evals.json`. All are advisory:
 the original five are design-only, two of the Batch-3 additions are review-only, and
@@ -1113,9 +1116,11 @@ caching-strategy-designer, feature-flag-architect, offline-first-sync-architect,
 notification-webhook-ux-designer, error-taxonomy-designer, edge-state-ux-designer,
 mobile-viewport-craft, accessibility-test-harness, frontend-perf-engineer,
 visual-regression-test-designer, vite-build-qa-engineer) and exercise the real batch-internal
-sibling seams named in the D12.2 intro; the server-state <-> client-state
-seam is a real reciprocal Stop-Conditions pair (accepted SD-D residual from
-trigger-evals). No server-state <-> url-state seam is claimed. Each ships 6 behaviour cases and a
+sibling seams named in the D12.2 intro (Stop-Condition seams and
+trigger-eval-pinned seams are recorded separately, see the terminology note). The
+server-state <-> client-state seam is a reciprocal Stop-Conditions pair with no
+trigger-eval case (accepted residual); no server-state <-> url-state seam is
+claimed. Each ships 6 behaviour cases and a
 22-case trigger-eval file (8 positive / 14 negative).
 
 ### Skills (D12.5 — PM / product-engineering interface pack)
