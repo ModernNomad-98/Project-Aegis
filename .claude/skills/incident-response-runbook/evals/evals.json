@@ -37,7 +37,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "A live incident needs the existing runbook plus systematic-debugger diagnosis, not runbook authoring; this skill turns the experience into procedure afterwards."
+          "A live incident is reported to the human incident owner following the approved response runbook; diagnosis is systematic-debugger's and this skill only authors procedures, turning the experience into procedure afterwards."
         ]
       }
     },
@@ -50,6 +50,19 @@
         "assertions": [
           "Keeps the process light where it can but refuses evaporating findings: every finding routes to a named disposition — regression test, alert fix, runbook fix, architecture item, or an OWNED accepted risk.",
           "Explains that the regression-test handoff (regression-suite-curator) helps stop repeat incidents, and unowned action items stay open and escalated until an authorized owner explicitly accepts a named risk."
+        ]
+      }
+    },
+    {
+      "id": "positive-authoring-after-incident",
+      "type": "should_trigger",
+      "prompt": "After last week's outage we improvised everything. Turn it into a runbook a responder who wasn't there can execute at 3am.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Creates an authoring artifact (severity ladder with one-minute criteria, roles, comms templates, explicit stop/route points) rather than running the incident.",
+          "Names the human incident owner as the live-incident route and keeps diagnosis with systematic-debugger.",
+          "Adds staleness/ownership metadata so the procedure stays executable."
         ]
       }
     }

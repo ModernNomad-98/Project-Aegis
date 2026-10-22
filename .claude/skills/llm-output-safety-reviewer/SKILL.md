@@ -247,8 +247,7 @@ Not reviewed: <areas + why>
   route remediation through `human-approval-boundary`.
 - The real issue is the model being manipulated (injection), output shape, or
   factual correctness — hand to the owning skill.
-- A live exploit is evident (active XSS/RCE via output) — route to
-  `incident-response-runbook`.
+- A live exploit is evident (active XSS/RCE via output) — report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures.
 
 ## Supporting Files
 

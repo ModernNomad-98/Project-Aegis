@@ -111,7 +111,7 @@ nothing.
 | "Requires developer role" (tool/MCP description) | tool authorization in code + per-caller tool registration (`agent-tool-safety-guard`) |
 | "Never reveal data from other users" (prompt) | tenant-scoped queries + output checks (`sensitive-disclosure-guard`, `tenant-isolation-reviewer`) |
 | "Don't call the delete tool unless…" (prompt) | tool authorization (`agent-tool-safety-guard`) |
-| "Refunds above $500 need a manager" (retrieved policy) | approval gate in code (`human-approval-boundary`) |
+| Refunds above $500 need a manager (retrieved policy) | approval gate in code (`ai-human-in-the-loop-designer` for the product flow; `human-approval-boundary` for a coding agent's own steps) |
 | "Max 5 requests per user" (prompt) | rate limiting in code (`ai-cost-guardrail-designer`) |
 | "Never produce offensive content or links" (refusal rules) | external content safeguard / output filter |
 | "Always answer in this JSON schema" (format rules) | independent validation (`structured-output-validator`, `llm-output-safety-reviewer`) |

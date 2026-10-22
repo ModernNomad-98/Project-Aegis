@@ -36,8 +36,9 @@ write this, did not ship the change, and is reading it at 3am.
 - Use when: an alert exists but its runbook link points at nothing
   (`observability-operator` requires runbook links; this skill writes
   them).
-- Do NOT use when: an incident is live and the need is diagnosis —
-  `systematic-debugger` (the runbook's diagnosis pointers route there).
+- Do NOT use when: an incident is live and the need is diagnosis — report to the human
+  incident owner, who follows the approved response runbook; `incident-response-runbook`
+  only authors procedures, and diagnosis routes to `systematic-debugger`.
 - Do NOT use when: authoring the rollback procedure itself —
   `rollback-runbook-author` (this runbook INVOKES that artifact as a
   containment action).
@@ -189,9 +190,11 @@ Staleness triggers: <alert-spec changes, architecture changes, org
 
 ## Stop Conditions
 
-- An incident is live NOW and the request is to handle it → stop
-  authoring; route to the existing runbook + `systematic-debugger`;
-  afterwards, this skill turns the experience into procedure.
+- An incident is live NOW and the request is to handle it — stop authoring;
+  report it to the human incident owner, who follows the approved response
+  runbook (`incident-response-runbook` only authors procedures), and route
+  diagnosis to `systematic-debugger`; afterwards, this skill turns the
+  experience into procedure.
 - No paging/alert design exists to answer → the runbook would be
   fiction; route to `slo-reliability-architect` first (or scope the
   runbook to the alerts that do exist, gap named).

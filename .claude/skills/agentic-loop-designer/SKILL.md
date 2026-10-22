@@ -150,9 +150,11 @@ PRODUCES the artifact those skills review.
    that looks like success. Downstream must be able to distinguish every
    terminal state.
 6. **Design the checkpoint/resume sockets.** Persist enough state per
-   iteration that a broken run can be diagnosed and resumed —
-   `agent-failure-recovery` *(manual-only)* handles the recovery; this design gives it
-   something to recover.
+   iteration that a broken run can be diagnosed and resumed — compose
+   `background-job-orchestration-architect` (worker checkpoint/lease),
+   `command-gateway-architect` (command idempotency) and
+   `agent-containment-reviewer` (containment revalidation); this design gives
+   them something to recover.
 7. **Prove the stops can fire.** Design the tests: the ceiling actually
    halts a run; a policy rejection and an evidenced permanent failure are
    demonstrably not retried; a safe transient succeeds
@@ -192,12 +194,14 @@ Terminal states: <success | policy-stop | deterministic-failure |
   — each distinguishable downstream;
   empty is never padded into output
 Checkpoints/resume: <per-iteration persisted state; what
-  agent-failure-recovery can plug into>
+  worker checkpoint/lease recovery (`background-job-orchestration-architect`) can plug into>
 Stop proofs: <ceiling-fires; policy and permanent errors not retried;
   safe transient succeeds or exhausts one retry; changed input is a new
   attempt; uncertain side effect stops without idempotency; empty reaches caller>
 Handoffs: budget/caps → ai-cost-guardrail-designer; call gating →
-  agent-harness-architect; broken-state recovery → agent-failure-recovery;
+agent-harness-architect; broken-state recovery → background-job-orchestration-architect
+  (worker checkpoint/lease) + command-gateway-architect (idempotency) +
+  agent-containment-reviewer (containment revalidation);
   attack review → agent-goal-hijack-defender + ai-threat-modeler
 Open questions / risks: <each with risk-if-wrong / who answers>
 ```

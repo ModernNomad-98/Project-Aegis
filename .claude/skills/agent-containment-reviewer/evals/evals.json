@@ -13,7 +13,7 @@
           "Traces the concrete propagation paths: bad output trusted by downstream agents (validation between agents missing) and retry amplification against the shared API (no bounds/bulkheads/backpressure).",
           "Prescribes bounded trust between agents (validate upstream outputs before acting), circuit breakers per edge, bounded retries, queue limits, and durable checkpoints so a contaminated run can roll back with side effects since the checkpoint enumerated.",
           "Covers the ASI10 half on the same inputs: inventory with owners and kill paths, behavioral baselines with drift signals, and kill switches that sever credentials/tool access rather than just killing processes.",
-          "Composes ai-cost-guardrail-designer for the cost amplification and routes live-incident execution to incident-response-runbook instead of running the incident from the review."
+          "Composes ai-cost-guardrail-designer for the cost amplification and routes live-incident execution to the human incident owner following the approved response runbook (incident-response-runbook only authors procedures) instead of running the incident from the review."
         ]
       }
     },

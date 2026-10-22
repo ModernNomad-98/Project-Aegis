@@ -111,8 +111,8 @@ message exchange.
    (rogue peer / tampered message / replayed command / read payload →
    effect), severity gated on what the receiving agent would DO. Red-team
    cases (spoof, tamper, replay, cross-topology message → expected SAFE
-   outcome: rejected/inert) hand to `ai-evaluation-harness`; active
-   compromise routes to `incident-response-runbook`.
+outcome: rejected/inert) hand to `ai-evaluation-harness`; active
+   compromise is report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures.
 
 ## Output Format
 
@@ -193,8 +193,8 @@ Not reviewed: <edges/areas + why>
 - No topology, transport, or protocol details are available — stop; this
   skill reviews a concrete message layer, not the idea of one.
 - Evidence of active compromise (rogue peer connected, spoofed messages in
-  logs) — route to `incident-response-runbook`; severing an edge is a
-  containment call (`agent-containment-reviewer` kill/isolation design).
+  logs) — report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures; severing an edge is a containment call
+  (`agent-containment-reviewer` kill/isolation design).
 - Fixes require wiring live transports, rotating broker credentials, or
   changing message schemas in production — propose the change; applying it
   is a classified, approved step (`human-approval-boundary`).

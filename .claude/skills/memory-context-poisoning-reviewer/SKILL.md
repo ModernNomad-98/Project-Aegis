@@ -184,8 +184,7 @@ Not applicable: <surface absent — reason> | Not reviewed: <+ why>
   state that ASI06 is mostly not applicable and route any in-context
   concern to `prompt-injection-defender`.
 - Confirmed live poisoning (an entry actively steering production behavior)
-  — route to `incident-response-runbook`; purging state is a side-effecting
-  human call.
+  — report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures; purging state is a side-effecting human call.
 - Fixes require changing memory schema/write paths or purging entries in a
   live store — propose them; applying is a classified, approved step
   (`human-approval-boundary`).

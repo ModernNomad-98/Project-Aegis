@@ -38,8 +38,9 @@ actually hold against a manipulative or manipulated agent.
   want it resilient to fatigue and deception from day one, or after an
   incident where a human approved something they didn't understand.
 - Do NOT use when: deciding WHICH actions need approval and where the stop
-  boundaries are — `human-approval-boundary` (this skill reviews whether
-  those gates resist exploitation).
+  boundaries are for a product AI feature → `ai-human-in-the-loop-designer`;
+  for a coding agent's own risky steps → `human-approval-boundary` (this skill
+  reviews whether those gates resist exploitation).
 - Do NOT use when: auditing retrospectively whether required approvals
   happened (`agent-governance-audit`), addressing users over-trusting AI
   CONTENT/answers (`ai-misinformation-guard`), or assigning oversight
@@ -126,7 +127,7 @@ Self-report vs verified: <per surface: agent narrative labeled? system facts sho
 Bundling/pacing posture: <batch rules, re-request behavior, deny-memory>
 Calibration controls: <spot-checks, forced-detail cadence, approver rotation, canaries>
 Red-team cases: <deceptive/bundled/urgent request → expected SAFE outcome> (→ ai-evaluation-harness)
-Handoffs: gate placement → human-approval-boundary | post-hoc audit → agent-governance-audit
+Handoffs: product approval-workflow design → ai-human-in-the-loop-designer | coding-agent gate placement → human-approval-boundary | post-hoc audit → agent-governance-audit
 Not reviewed: <surfaces + why>
 ```
 
@@ -191,9 +192,10 @@ Not reviewed: <surfaces + why>
   described — stop; this skill attacks a concrete oversight layer, not the
   idea of one.
 - Evidence that deception already succeeded (an approved action whose
-  verified effect diverges from what the approver was shown) — route to
-  `incident-response-runbook` and `agent-governance-audit`; treat as a
-  live trust incident, not a review finding.
+  verified effect diverges from what the approver was shown) — report it to
+  the human incident owner, who follows the approved response runbook
+  (`incident-response-runbook` only authors procedures), and route to
+  `agent-governance-audit`; treat as a live trust incident, not a review finding.
 - Fixes require changing approval UX, gate placement, or telemetry in a
   live system — propose them; applying is a classified, approved step
   (`human-approval-boundary`).

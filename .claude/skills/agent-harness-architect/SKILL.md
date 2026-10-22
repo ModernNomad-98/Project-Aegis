@@ -75,9 +75,12 @@ artifact those skills review.
    verified credentials/session vs anything supplied in a model output,
    request body, or prompt — and whether it is propagated or re-asserted
    downstream.
-3. The standing authority policy: `agent-authorization-matrix` output if
-   present — the matrix this environment must enforce; without it the ladder
-   has no authorize rung to call.
+3. The standing authority policy: for a product AI agent, compose
+   `authorization-matrix-designer` (roles/permissions),
+   `agent-identity-privilege-reviewer` (identity/privilege) and
+   `ai-human-in-the-loop-designer` (approval workflow); `agent-authorization-matrix`
+   is the coding-agent/SDLC artifact this ladder must enforce. Without a policy
+   source the ladder has no authorize rung to call.
 4. Existing mediation infrastructure: a `command-gateway-architect`-style
    command bus or gateway the harness can extend rather than duplicate.
 5. The tool/provider surface: every tool, function, and model the agent can
@@ -106,7 +109,8 @@ artifact those skills review.
 3. **Design the pre-flight ladder, deny-by-default, fail-closed.** Fixed
    order, all rungs BEFORE the model runs: **authenticate** (who is calling)
    → **authorize** (may this identity perform this action — calls the
-   `agent-authorization-matrix` policy, never re-authors it) → **entitlement**
+   `authorization-matrix-designer` + `agent-identity-privilege-reviewer` +
+   `ai-human-in-the-loop-designer`, never re-authoring it) → **entitlement**
    (does the plan/tenant include this capability) → **budget** (is there
    spend/quota left — caps consumed from `ai-cost-guardrail-designer`) →
    **input policy** (does the input pass the closed schema and content
@@ -212,9 +216,11 @@ Open questions / risks: <each with risk-if-wrong / who answers>
 
 ## Stop Conditions
 
-- The standing authority policy does not exist or is ambiguous → obtain it
-  (from `agent-authorization-matrix` or a human) before designing the
-  authorize rung; a harness enforcing an undefined policy is false assurance.
+- The standing authority policy does not exist or is ambiguous — obtain it
+  (compose `authorization-matrix-designer` + `agent-identity-privilege-reviewer` +
+  `ai-human-in-the-loop-designer`; `agent-authorization-matrix` for a coding-agent
+  SDLC case; or a human) before designing the authorize rung; a harness enforcing
+  an undefined policy is false assurance.
 - The requested design would BYPASS the human-authority matrix or
   auto-execute privileged actions without human approval — self-authorized
   escalation, agent-armed merges/deploys, unattended spend or destructive

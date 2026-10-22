@@ -763,8 +763,11 @@ def test_eval004_parser_parity_with_merged_runtime() -> None:
 
 
 def test_eval004_live_corpus_typed_targets_resolve() -> None:
-    # §5I — the four authored subagent EXPECTATIONS and the five annotated
+    # §5I — the authored subagent EXPECTATIONS and the five annotated
     # overlaps resolve on the real corpus, and EVAL-004 is silent there.
+    # Step 0 R3 replaced three live-probing expectations with ai-evaluation-harness
+    # (a manual-only skill) because a read-only reviewer cannot execute live probing;
+    # the remaining authored subagent expectation is release-readiness-reviewer.
     a = real_audit()
     hits = [f for f in a.findings if f.rule == "EVAL-004"]
     assert hits == [], f"live EVAL-004 must be zero, got {[f.evidence for f in hits]}"
@@ -779,9 +782,9 @@ def test_eval004_live_corpus_typed_targets_resolve() -> None:
         for c in d.get("cases") or []:
             if str(c.get("expected_skill", "")).strip().endswith("(subagent)"):
                 expectations += 1
-    assert expectations == 4, f"expected 4 authored subagent expectations, got {expectations}"
+    assert expectations == 1, f"expected 1 authored subagent expectation, got {expectations}"
     assert annotated == 5, f"expected 5 annotated overlaps entries, got {annotated}"
-    ok("EVAL-004: live corpus is silent with 4 typed subagent expectations and "
+    ok("EVAL-004: live corpus is silent with 1 typed subagent expectation and "
        "5 annotated overlaps intact")
 
 

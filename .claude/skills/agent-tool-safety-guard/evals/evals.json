@@ -12,7 +12,7 @@
         "assertions": [
           "Builds a per-tool matrix with side effect, reversibility, blast radius, and the identity each runs as.",
           "Requires tools to execute with the calling user's authority and tenant scope, flagging any shared privileged service account.",
-          "Approval-gates irreversible/high-impact actions (delete_account, issue_refund) via human-approval-boundary and validates arguments before execution.",
+          "Approval-gates irreversible/high-impact actions (delete_account, issue_refund) via the product approval workflow designed by ai-human-in-the-loop-designer (coding-agent steps stay human-approval-boundary) and validates arguments before execution.",
           "Maps tool-chain composition abuse (e.g. get_customer → issue_refund driven by model-chosen target) and specifies a kill switch and per-call telemetry."
         ]
       }

@@ -151,7 +151,7 @@ Not reviewed: <areas + why>
 - The real issue is retrieval authorization, an execution sink, or a
   system-prompt secret — hand to the owning skill.
 - A review finds an active leak in production (other-tenant data in responses/
-  logs) — route to `incident-response-runbook`.
+  logs) — report it to the human incident owner, who follows the approved response runbook; `incident-response-runbook` only authors procedures.
 
 ## Supporting Files
 

@@ -62,7 +62,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "A live incident needs the reactive playbook — incident-response-runbook; the deployment prompt template is proactive discipline for planned runs."
+          "A live incident is reported to the human incident owner following the approved response runbook (incident-response-runbook only authors procedures); the deployment prompt template is proactive discipline for planned runs."
         ]
       }
     },
