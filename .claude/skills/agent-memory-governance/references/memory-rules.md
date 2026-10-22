@@ -41,7 +41,7 @@ Memory is a lead, not truth. Before any action premised on remembered state:
 | Branch exists / current branch | `git branch -a`, `git branch --show-current` |
 | What merged to main / repo baseline | `git log --oneline -20 origin/main`, validator output |
 | File / flag / command still exists | direct check before recommending it |
-| Completion anchor ("X complete, PR #n, SHA") | Resolve REVERT_SHA and the anchor SHA explicitly; discovery scoped to main (git log -i --grep="^Revert" origin/main). Confirm both are ancestors of origin/main. Pass condition: the anchor's posted migration status is applied (or explicitly not required), AND the undo of the anchor's change set is present in the tree - compare the anchor PR's parent-diff inverse with REVERT_SHA's change set (exact match or documented subset; custom revert messages and squash/cherry-pick resolve by change-set/ancestry, never by message text). If a later commit re-applies the change, record that commit as evidence and do NOT claim the anchor was reverted. Evidence artifact and owner are stated. |
+| Completion anchor ("X complete, PR #n, SHA") | A completion claim passes only when the artifacts it asserts are present in the current tree at the recorded anchor commit; if the anchor change has been reverted, the claim fails; record the anchor commit and the check evidence. The claim is a lead until checked against live state. |
 | Auto-merge / protection posture | `gh pr view <n> --json autoMergeRequest`, repo settings |
 
 On divergence: live state wins, act on it, queue the memory correction. If the

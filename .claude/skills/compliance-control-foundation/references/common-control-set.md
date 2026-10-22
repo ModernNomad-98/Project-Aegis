@@ -30,7 +30,10 @@ certification claims.
 | --- | --- |
 | Secret/key custody, rotation, exposure | `secrets-identity-hardener` |
 | Session/token security flags | `secrets-identity-hardener` |
-| Encryption in transit / at rest design | Encryption remains PARTIAL by design (D8/A04 residue): key lifecycle/custody owns keys (secrets-identity-hardener); backups: database-backup-verifier; audit evidence: audit-log-architect; app-config hardening: appsec-implementer; encryption design review beyond key custody: owner TBD, tracked in the compliance backlog as an explicit gap (never an assumption). |
+| Encryption in transit / at rest design | `appsec-implementer` (design); key lifecycle/custody: `secrets-identity-hardener`; encryption design review beyond key custody: owner TBD tracked as an explicit backlog gap |
+| Backup restore and retention | `database-backup-verifier` |
+| Audit evidence capture and retention | `audit-log-architect` |
+| App-config hardening | `appsec-implementer` |
 
 ## Domain 3 — Change management
 

@@ -13,7 +13,8 @@
           "Scopes Security as the baseline and includes Availability via the uptime commitment trace; other categories included only with a commitment basis, exclusions recorded.",
           "Draws the system boundary (services, infrastructure, software, people, procedures, data) and dispositions the cloud provider as a subservice organization with complementary controls stated.",
           "Recommends a Type decision with rationale and window feasibility, flagged for confirmation with the CPA firm; hands the window to compliance-evidence-collector.",
-          "Uses attestation/examination language throughout — never 'certification'."
+          "Uses attestation/examination language throughout — never 'certification'.",
+          "Names the privacy row owners explicitly (pii-lifecycle-designer for personal-data lifecycle; sensitive-disclosure-guard for disclosure/exposure review) with their scope boundary, without double-owning the row."
         ]
       }
     },

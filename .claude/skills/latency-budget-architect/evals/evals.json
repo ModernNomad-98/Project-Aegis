@@ -12,7 +12,7 @@
         "assertions": [
           "Builds the budget table from measured per-hop reality with an owner per hop, and includes the overhead rows (serialization, connection setup on the tail, queue wait) as explicit line items.",
           "Holds 15–25% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
-          "Derives per-hop timeouts from hop budgets and runs the cascade check against the full critical path (initial attempt + retries + backoff + downstream work).",
+          "Derives per-hop timeouts from the full strict inequality (upstream timeout > upstream own work + downstream critical path + epsilon), including retries and backoff_total = sum of actual inter-attempt waits.",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
           "Installs the budget-claim review rule for new dependencies on the path."
         ]
@@ -27,7 +27,7 @@
         "assertions": [
           "Rejects the 30-second defaults as bugs in a 500ms path: timeouts derive from hop budgets, since waiting longer than the budget means the promise already failed.",
           "Identifies the two-layer retry compounding (gateway × client = up to 9 attempts) as a storm multiplier and assigns retries to ONE stated layer, idempotent hops only.",
-          "Runs the cascade check against the full critical path so no upstream abandons work its downstream completes.",
+          "Runs the cascade check against the full strict inequality including upstream own work and backoff_total, so no upstream abandons work its downstream completes.",
           "Prices each permitted retry as spend from a named allocation rather than a free action."
         ]
       }

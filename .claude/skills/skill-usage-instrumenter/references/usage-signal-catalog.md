@@ -5,7 +5,7 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 
 ## Signal schema
 
-Dataset metadata (stored once in the dataset header, NEVER as a per-record field): schema_epoch is an integer version of the whole dataset schema; bump it on any enum or field change; never compare records from different epochs without migration.
+Dataset metadata (stored once in the dataset header, NEVER as a per-record field): schema_epoch is an integer version of the whole dataset schema; current schema_epoch = 2; bump it on any enum or field change; never compare records from different epochs without migration.
 
 ### Invocation event
 

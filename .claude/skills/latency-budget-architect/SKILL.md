@@ -111,10 +111,10 @@ authorize execution.
 5. **Derive timeouts from budgets.** A hop's timeout ≈ its budget
    (plus a stated tolerance), because a timeout longer than the
    budget means the caller has already failed the end-to-end promise
-   while still waiting. Cascade correctly: an upstream timeout must
-   exceed the longest critical path through downstream calls, including
-   serial segments, parallel branch maximums, retries and backoff, or the
-   upstream gives up while the downstream still works. The 30-second
+   while still waiting. Cascade correctly: an upstream timeout must strict-exceed
+   upstream own work + the longest critical path through downstream calls
+   (including serial segments, parallel branch maximums, retries and
+   backoff_total), or the upstream gives up while the downstream still works.
    default is a bug in a 300ms path.
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
@@ -167,7 +167,7 @@ Budget table:
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
 Timeouts: <per hop: timeout = hop work + tolerance (tolerance = epsilon; use ONE strict operator: upstream timeout > upstream own work + downstream critical path + epsilon; record both terms)>
-          Variables (all milliseconds, recorded with the design): attempts = 1 + retries; downstream critical path = attempts x downstream attempt budget + retries x backoff + terminal downstream work NOT already inside the attempt budget; upstream own work is its own row and must not be counted again in the downstream critical path. Epsilon is the tolerance in milliseconds, owned by the path owner, counted ONCE in the strict inequality. Example: downstream retries=2, downstream attempt budget=100ms (that hop's own work is inside this budget; list terminal downstream work as its own overhead row if it is not), backoff=50ms per retry, upstream own work=40ms, epsilon=recorded tolerance => upstream timeout > 40ms + (1+2) x 100ms + 2 x 50ms + epsilon.
+          Variables (all milliseconds, recorded with the design): attempts = 1 + retries; downstream critical path = attempts x downstream attempt budget + backoff_total + terminal downstream work NOT already inside the attempt budget; backoff_total = sum of actual inter-attempt waits (state constant-backoff assumption if used); upstream own work is its own row and must not be counted again in the downstream critical path. Epsilon is the tolerance in milliseconds, owned by the path owner, counted once in the strict inequality. Example: downstream retries=2, downstream attempt budget=100ms (that hop's own work is inside this budget; list terminal downstream work as its own overhead row if it is not), actual inter-attempt waits 50ms + 50ms (backoff_total=100ms), upstream own work=40ms, epsilon=recorded tolerance => upstream timeout > 40ms + (1+2) x 100ms + 100ms + epsilon.
 
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
@@ -191,9 +191,9 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Every timeout derives from a budget and the cascade check passes:
-      each upstream timeout exceeds the downstream critical-path budget by
-      epsilon (budget and epsilon recorded).
+- [ ] Every timeout derives from the full strict inequality (upstream timeout >
+      upstream own work + downstream critical path + epsilon), where
+      backoff_total = sum of actual inter-attempt waits; record every term.
 - [ ] Retries are budgeted spend at one layer only; hedging is
       headroom-funded or absent.
 - [ ] Headroom is a named line item with an owner, 15–25%.
@@ -219,9 +219,9 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
   cost more than the service call it wraps — and it appears in no
   service's dashboard because it happens in the caller. The overhead
   rows exist because the unmeasured milliseconds are still spent.
-- **Cascade invariant:** each upstream timeout must exceed the downstream
-  critical-path budget by epsilon (record the budget and epsilon used).
-  "4x" and "9 attempts" are illustrative shorthand only, not formulas; keep
+- **Cascade invariant:** each upstream timeout must exceed upstream own work +
+  the downstream critical-path budget by epsilon (record every term;
+  backoff_total = sum of actual inter-attempt waits, not retries x one wait).
   retries at ONE stated layer (usually innermost idempotent).
 - Queue wait is invisible until it isn't: async hops budgeted at
   processing time only will blow their budget under load exactly when

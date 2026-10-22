@@ -22,6 +22,8 @@ action through the normal user interface). Move it only with a reason.
 | Does a written policy or risk tier require a person to approve it? | CONFIRM | continue |
 | Does the risk tier allow autonomy, and do the watch-and-undo controls exist? | AUTONOMOUS | CONFIRM or ADVISORY-ONLY |
 
+Fallback note: if no written policy explicitly permits autonomy, an action whose wrong result harms a person or the product is CONFIRM (never AUTONOMOUS); the AUTONOMOUS row applies only after every earlier row is answered "no".
+
 Examples:
 
 | Action | Typical class | Why |

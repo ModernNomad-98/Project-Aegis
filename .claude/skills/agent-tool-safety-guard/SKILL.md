@@ -26,8 +26,8 @@ actions, and a map of tool-chain composition abuse. Approval mechanics come
 from `human-approval-boundary`; standing agent authority from
 `agent-authorization-matrix` — this skill composes both.
 
-Tool hops execute under A3 as defined once in
-[agent-identity-privilege-reviewer/SKILL.md](../agent-identity-privilege-reviewer/SKILL.md); that skill's references/agent-identity-patterns.md carries the A3 definition. Skills reference each other through SKILL.md only - the validator forbids links into another skill's internals, so the definition is cited by skill name rather than by a non-followable internal path. A tool
+Tool hops execute under A3, defined in `agent-identity-privilege-reviewer`
+(references/agent-identity-patterns.md; cite the skill, not an internal path). A tool
 hop may only reduce authority, never amplify it; any approval it relies on must be active, unexpired and in scope.
 
 ## Use When
