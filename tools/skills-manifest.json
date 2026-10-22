@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "e263d6314c5459e6fb197656deee575b64af9e9b",
+  "source_revision": "656a05c8e2e925752664bcefc26a1a238573c7e4",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -821,7 +821,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "22a6cb68db1a8094c57fa840b14c30a7b9e32c093585be628db8bb60c69f1634"
+      "sha256": "6c1d86db455a2d18ae0b672aea1063d274d5473aee9eb8fe144fb83f692d1a0d"
     },
     {
       "name": "property-based-test-designer",
