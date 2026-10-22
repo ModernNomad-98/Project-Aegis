@@ -23,11 +23,11 @@
     {
       "id": "positive-read-results-honestly",
       "type": "should_trigger",
-      "prompt": "Our test finished. Variant B is +0.4% relative (0.08 percentage points absolute against the 20% baseline) on the primary metric with p=0.03. Should we ship it? Read the results. Fixture: the experiment was planned for a 1% relative minimum detectable effect against a 20% baseline conversion rate.",
+      "prompt": "Our test finished. Variant B is +0.4% relative (0.08 percentage points absolute against the 20% baseline) on the primary metric with p=0.03. Should we ship it? Read the results. Fixture: the experiment was planned for a 1% relative minimum detectable effect against a 20% baseline conversion rate; per-arm traffic was 62,000 sessions each, with 12,400 conversions in control and 12,700 in treatment (two-sided p=0.03).",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Reports the effect with a confidence interval, not just the p-value, and contrasts statistical vs practical significance against the pre-set MDE.",
+          "Reports the effect with a confidence interval computed from the supplied per-arm sample sizes/standard error (or states the CI is unavailable and requests the missing data), not just the p-value, and contrasts statistical vs practical significance against the pre-set MDE.",
           "Runs validity checks: sample-ratio mismatch, whether the horizon was respected, and guardrail status.",
           "Flags a statistically-significant-but-tiny lift as possibly not practically meaningful, and asks whether +0.4% clears the bar set for a reason.",
           "Gives a ship/kill/iterate recommendation with residual uncertainty stated rather than a bare 'it won'.",

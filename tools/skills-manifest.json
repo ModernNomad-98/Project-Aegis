@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "3e6cf0ce50c6189bfbbd5e21abe368f9042df8e2",
+  "source_revision": "3a726d4ac55a50b1abe9fb95b3c7384643828962",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "7cf369a6c30027920a0062ecea18819cb0cc898dfcc707b4695c171a8153cd16"
+      "sha256": "cc5b92287aa14e94e0362a447341059015c7826275d1fb4a9b15b60977a2613c"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -1031,7 +1031,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "d9082996478e7c75683bff26dac133ed16052e2e8303c61143eba01e3e6e1309"
+      "sha256": "a7571382b0d3b245b23f225b7309b1ec6fffcf6ecb2e66505e3e73aa2a504088"
     },
     {
       "name": "share-link-access-architect",
@@ -1056,7 +1056,7 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "db0c42ddde842b721d6c4284a96586a0d167f641802fe7ef5d7c6f2666e122a9"
+      "sha256": "cda99b518558c63515cd8e3b9f07477c9da5283320a8d8e7431db58a45d43904"
     },
     {
       "name": "skill-usage-ledger",

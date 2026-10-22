@@ -78,7 +78,7 @@ it changes no skill, adds no hook, and collects nothing itself.
      activation_mode/correction_outcome by event type and never read the legacy mode
      field. Handling order: (1) current-epoch records are usable as-is; (2) known
      legacy epochs are quarantined, mapped by source table and marked legacy/
-     unmigrated before use; (3) unknown epochs are rejected. The ledger documents this
+     unmigrated before use; (3) unknown epochs are rejected; (4) an unreadable or unavailable catalog/epoch is fail-closed - reject the record and do not migrate or resume from it. The ledger documents this
      consumer contract and the catalog is the single epoch authority.
    - *Completion hint:* the skill's workflow ran to its deliverable vs was
      abandoned — coarse (delivered / abandoned / unknown), not a quality

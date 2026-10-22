@@ -68,7 +68,7 @@ trusted store it is the CI provider's run identifier); attempt is the provider a
 within that run; the head-commit run is the trusted store run whose head SHA equals the commit
 being validated. Resume reads the store for the current head commit and the LATEST attempt of
 the head-commit run; results from other commits or earlier attempts are stale and never
-counted (a local run with no trusted CI state store cannot resume). If no trusted CI state store is
+counted (a local run with no trusted CI state store cannot resume). If multiple runs exist for the same head commit, the authoritative run is the latest trusted-store run for that head commit; older runs are stale and never counted. If no trusted CI state store is
 available, resume is unavailable and the run reruns fully.
 
 ## Runner modes & the resume law

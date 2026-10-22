@@ -20,7 +20,7 @@
     {
       "id": "positive-drill-parity-and-deletion",
       "type": "should_trigger",
-      "prompt": "Run a new backup/restore drill for our primary database and verify parity and deletion safely. Fixture baseline from the LAST drill: restore measured 47 minutes against a 2-hour RTO; source table row count was 1,204,332; row-count and checksum parity matched. This is a NEW drill - treat those numbers as baseline only, not results.",
+      "prompt": "Explicitly invoke database-backup-verifier. Run a new backup/restore drill by restoring into a NON-PRODUCTION scratch instance (propose and name one) for our primary database, and verify parity and deletion safely. Fixture baseline from the LAST drill: restore measured 47 minutes against a 2-hour RTO; source table row count was 1,204,332; row-count and checksum parity matched. This is a NEW drill - treat those numbers as baseline only, not results. Estimate the scratch cost and its basis; wait for approval of the exact drill plan before restoring; show numbers but no row contents (privacy guard).",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -29,7 +29,9 @@
           "Specifies restore-time evidence against the 2-hour RTO, row-count and checksum parity checks, and deletion/cleanup confirmation for this drill.",
           "Proves the target is a non-production scratch target and confirms it does not already exist before creating it.",
           "Records the data origin and access restrictions for the scratch copy (no production credentials/access).",
-          "Shows the scratch instance is actually deleted after the drill and its credentials revoked."
+          "Shows the scratch instance is actually deleted after the drill and its credentials revoked.",
+          "Estimates the scratch-instance cost with its basis and waits for approval of the exact drill plan before restoring anything.",
+          "Shows numbers (row counts, checksums) but no row contents - PII is not copied into the report or logs."
         ]
       }
     },

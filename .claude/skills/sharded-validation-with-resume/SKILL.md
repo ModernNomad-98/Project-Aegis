@@ -171,7 +171,7 @@ Maintenance:     rebalance triggers; shard-map edits via reviewed PRs
   aggregate goes green. The trusted CI state store's failed-vs-interrupted
   classification and the resume law exist to make this impossible on a trusted
   store; any runner that can't tell the two apart is unsafe to ship. If no
-  trusted CI state store exists, resume is unavailable — a full rerun is required.
+  trusted CI state store exists and is available, resume is unavailable — a full rerun is required.
 - **Stale status across commits:** resuming a run whose passes were earned on
   a different tree/config/dependency/toolchain fingerprint is validating the
   wrong code - bind the trusted resume record/store to the canonical resume

@@ -120,7 +120,7 @@ first workflow step.
      one record or one user, the watch-and-undo controls in step 9 exist, and a
      written policy explicitly permits autonomy. Policy silence is CONFIRM,
      never AUTONOMOUS.
-   A single-record action that is reversible AND compensable within policy AND
+   A single-record action that is reversible AND compensable, and either permitted with approval by written policy or policy-silent (CONFIRM), AND
     judgeable by one reviewer, and that written policy permits with approval, is
     CONFIRM; policy silence keeps an otherwise-eligible single-record action at
     CONFIRM, never AUTONOMOUS, and never promotes it to FORBIDDEN by the

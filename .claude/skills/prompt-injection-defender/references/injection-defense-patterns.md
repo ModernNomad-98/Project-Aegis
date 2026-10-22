@@ -7,7 +7,7 @@ does not invoke it. **OWASP** means Open Worldwide Application Security
 Project; **LLM01** is its 2026 large language model prompt-injection risk code
 (unchanged from 2025; 2026 adds cross-modal image and audio injection).
 **AI** means artificial intelligence, **API** means application programming
-interface, and **PDF** means Portable Document Format
+interface, and **PDF** means Portable Document Format.
 
 Trust levels affect handling and verification only and never grant instruction authority. Provenance never promotes content to instructions.
 

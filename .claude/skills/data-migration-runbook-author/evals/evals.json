@@ -35,16 +35,16 @@
     {
       "id": "edge-missing-backup-prerequisite",
       "type": "should_trigger",
-      "prompt": "I want to migrate 4.2M rows across 3 tables to a new schema this weekend. The last documented restore test was over a year ago; nobody is sure the backups will restore. Fixture: the stale, unverified last result was 90 minutes; no waiver or risk-acceptance has been granted yet.",
+      "prompt": "I want to migrate 4.2M rows across 3 tables to a new schema this weekend. The last documented restore test was over a year ago; nobody is sure the backups will restore. Fixture: the stale, unverified last result was 90 minutes; no waiver or risk-acceptance has been granted yet. The RTO is 4 hours and the maintenance window is Saturday 02:00-05:00 UTC.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Treats the 90-minute restore result as stale/unverified, not a current bound, and says so explicitly.",
-          "Offers the unblocking path: run a fresh restore test first, OR obtain an explicit recorded human waiver/risk acceptance that satisfies the prerequisite gate; the recorded decision states the restore-time bound used (a conservative fresh bound) and the accepted residual risk - then authors the runbook citing that decision.",
+          "Offers the unblocking path: run a fresh restore test first, OR obtain an explicit recorded human waiver/risk acceptance that satisfies the prerequisite gate; the recorded decision states the conservative bound used (from a fresh test, or an explicitly accepted conservative estimate/worst case) and the accepted residual risk - then authors the runbook citing that decision.",
           "Names the 4.2M-row blast radius and does not present the stale measurement as a guarantee.",
           "Stops at the prerequisite gate and does not author a runnable cutover runbook until the restore prerequisite is satisfied OR a recorded human waiver/risk acceptance explicitly satisfies the gate; with the waiver, authoring proceeds and cites the decision.",
           "Refuses to paper over the missing prerequisite with the stale result or a verbal assurance.",
-          "States the restore time bound that would abort the cutover plan and the decision point for it."
+          "States the restore time bound that would abort the cutover plan and the decision point for it, using the supplied 4-hour RTO and Saturday 02:00-05:00 UTC maintenance window (or marking it TBC and asking if not supplied)."
         ]
       }
     },

@@ -39,7 +39,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Diagnoses duplicates as at-least-once delivery meeting non-idempotent consumers, and designs the idempotency mechanism (business-key upsert or event-id dedup with stated retention) rather than chasing a no-duplicates transport.",
+          "Diagnoses duplicates as at-least-once delivery meeting non-idempotent consumers; states that event-ID dedup protects against transport redelivery of the SAME event ID, while distinct event IDs representing one business action require business-key idempotency, and designs that mechanism rather than chasing a no-duplicates transport.",
           "Diagnoses the ordering symptom as a key/partition problem: create and update events must share a partition key (the entity id) to be sequenced.",
           "Does not promise global ordering; states the guarantee scope honestly and designs consumers to tolerate what is not guaranteed.",
           "Adds lag/DLQ observability hooks with named owners, handing wiring to observability-operator.",
