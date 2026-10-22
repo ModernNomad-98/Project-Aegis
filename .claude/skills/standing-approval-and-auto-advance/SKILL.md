@@ -1,10 +1,15 @@
 ---
 name: standing-approval-and-auto-advance
-description: 'MANUAL-ONLY; never auto-invoke. Design the governed approval-fatigue layer: documented standing approval for named delivery steps, phase advance
-only through already-approved phases, per-session restatement, an opt-out phrase, and reviewer blocks. Protected-branch merge remains approval-required; an
-applicable explicit, active, scoped human grant can satisfy that requirement without another request. Never infer merge authority from green checks or this
-skill. Arming auto-merge remains forbidden to agents by default. Merge-after-green is never the default template. Use when repetitive mechanical approvals erode
-real gates. Do not use to record one grant (scoped-approval-register), define authority floors (agent-authorization-matrix), or stress-test approval experience
+description: 'MANUAL-ONLY; never auto-invoke. Design the governed approval-fatigue layer: documented
+standing approval for named delivery steps, phase advance
+only through already-approved phases, per-session restatement, an opt-out phrase, and reviewer
+blocks. Protected-branch merge remains approval-required; an
+applicable explicit, active, scoped human grant can satisfy that requirement without another
+request. Never infer merge authority from green checks or this
+skill. Arming auto-merge remains forbidden to agents by default. Merge-after-green is never the
+default template. Use when repetitive mechanical approvals erode
+real gates. Do not use to record one grant (scoped-approval-register), define authority floors
+(agent-authorization-matrix), or stress-test approval experience
 (human-agent-trust-reviewer).'
 disable-model-invocation: true
 ---
@@ -151,7 +156,8 @@ Standing scope (named):       <loop steps + branches + change classes covered>
 Phase-advance rule:           <auto-advance only into named+approved phases; exits on drift>
 Required prompt pattern:      <the restatement each session must open with>
 Opt-out phrase:               <exact phrase; where it may be said; always wins>
-Merge profile:                open-PR-and-STOP (default) | opt-in: <named profile backed by an applicable human decision>
+Merge profile:                open-PR-and-STOP (default) | opt-in: <named profile backed by an
+applicable human decision>
 Choice brief:                 <plain terms, purpose, reason, time/setup/upkeep/money costs or
                               unknowns, pros/cons, recommendation and why, then one owner
                               question, before adoption>

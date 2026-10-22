@@ -1,11 +1,17 @@
 ---
 name: skill-usage-instrumenter
-description: 'Design usage instrumentation for a skill library — the evidence layer answering which skills actually FIRE in practice. Covers per-invocation
-signals (skill name, auto-trigger vs explicit call, coarse task class — never prompt content or user identifiers), wrong-fire/correction signals, never-fires
-detection over a stated window, evidence tiers (host-recorded vs self-reported), and thresholds turning counts into action (fix a trigger, split, or hand an
-evidence package to skill-deprecation-planner) — plus a rare-but-critical exemption: low usage alone never condemns a safety-net skill. Advisory/design only:
-adds no hooks, edits nothing. Use when asked which skills are used or unused, to instrument/measure skill invocation, or to ground pruning in evidence not
-assumption. Do NOT use for product/system telemetry (observability-operator), a skill definition''s quality (skill-quality-reviewer), eval execution design
+description: 'Design usage instrumentation for a skill library — the evidence layer answering which
+skills actually FIRE in practice. Covers per-invocation
+signals (skill name, auto-trigger vs explicit call, coarse task class — never prompt content or user
+identifiers), wrong-fire/correction signals, never-fires
+detection over a stated window, evidence tiers (host-recorded vs self-reported), and thresholds
+turning counts into action (fix a trigger, split, or hand an
+evidence package to skill-deprecation-planner) — plus a rare-but-critical exemption: low usage alone
+never condemns a safety-net skill. Advisory/design only:
+adds no hooks, edits nothing. Use when asked which skills are used or unused, to instrument/measure
+skill invocation, or to ground pruning in evidence not
+assumption. Do NOT use for product/system telemetry (observability-operator), a skill definition''s
+quality (skill-quality-reviewer), eval execution design
 (eval-runner-designer), or the retirement plan itself (skill-deprecation-planner).'
 ---
 
@@ -82,10 +88,9 @@ it changes no skill, adds no hook, and collects nothing itself.
      references/usage-signal-catalog.md (current schema_epoch = 2). Consumers
      (for example skill-usage-ledger and downstream dashboards) must read
      activation_mode/correction_outcome by event type and must not read the
-     legacy mode field after the epoch bump; the ledger enforces the consumer-side
-    epoch gate (reject schema_epoch mismatches and map legacy records by source
-    table) before any record is used; map legacy records by source table
-     and mark flattened/unknown event types unmigrated.
+     legacy mode field after the epoch bump; the ledger instructs consumers to
+      reject schema_epoch mismatches and map legacy records by source table before
+      any record is used, and to mark flattened/unknown event types unmigrated.
    - *Completion hint:* the skill's workflow ran to its deliverable vs was
      abandoned — coarse (delivered / abandoned / unknown), not a quality
      score.
@@ -159,7 +164,8 @@ Capture choice:<if owner decision needed: terms, fit, costs, pros/cons,
                recommendation and why, one question>
 Aggregation:   <per-skill, per-cluster, library-wide views; window: <stated>>
 Cadence:       <review rhythm + who reviews>
-Thresholds:    <signal pattern → action → consumer (skill-quality-reviewer | trigger-evals fix | skill-deprecation-planner)>
+Thresholds:    <signal pattern → action → consumer (skill-quality-reviewer | trigger-evals fix |
+skill-deprecation-planner)>
 Exemptions:    rare-but-critical list: <skill → reason> (usage alone never condemns these)
 Evidence package: <format handed to skill-deprecation-planner>
 Not designed:  <what this design deliberately leaves out, and why>

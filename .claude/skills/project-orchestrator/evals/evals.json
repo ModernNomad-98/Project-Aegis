@@ -800,7 +800,7 @@
     {
       "id": "GOV-10-initial-selection-vs-delegated-activation",
       "type": "should_trigger",
-      "prompt": "GOV-10 fixture: the orchestrator itself selected requirements-gathering-facilitator for Stage 1. On a later turn that skill hands back a delegated candidate question. Record primary route selection separately from the authorized delegated invocation, give the interactive case explicit conversation and repository state, and preserve UNRUN/UNAVAILABLE where the host cannot expose activation evidence.",
+      "prompt": "GOV-10 fixture (multi-turn conversation and repository state supplied): the repo docs/project-state.md records requirements-gathering-facilitator as the orchestrator's Stage 1 selection; its STATE SNAPSHOT says Stage 1 discovery. On this later turn that skill hands back a delegated candidate question. Continue the conversation from the supplied state.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -813,7 +813,7 @@
     {
       "id": "GOV-11-explicit-authorization-vs-ambiguous-consent",
       "type": "should_trigger",
-      "prompt": "GOV-11 fixture: a refusal case must not discard an explicit user authorization clause. Here the user's consent is genuinely ambiguous (maybe do whatever is needed) and a separate test gives an explicit grant with a missing prerequisite plus a scope limit. Classify both correctly, and for an authorized documentary transcription that is already covered, proceed without repeat consent.",
+      "prompt": "GOV-11 fixture: the record contains an explicit user authorization clause ('you may update docs/project-state.md for this decision') and, separately, a genuinely ambiguous statement ('maybe do whatever is needed'). A second test gives an explicit grant for a deploy but its prerequisite (a recorded approval) is missing and a scope limit applies; the documentary transcription is already covered by the existing grant. Continue.",
       "expect": {
         "triggers": true,
         "assertions": [

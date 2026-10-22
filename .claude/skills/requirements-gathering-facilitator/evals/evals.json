@@ -4,9 +4,9 @@
   "description": "Behavior cases for requirements elicitation: unpacking a solution-stated-as-requirement, eliciting users/jobs and non-goals, surfacing stakeholder conflict, and producing a confidence-marked brief that feeds product-spec-writer; plus the atomic one-target-per-turn regressions: decomposing the observed compound clinic question, a narrative process walkthrough that stays one atomic target, and same-target options remaining atomic.",
   "cases": [
     {
-      "id": "positive-solution-stated-as-requirement",
+      "id": "positive-interactive-turn-solution-as-requirement",
       "type": "should_trigger",
-      "prompt": "A stakeholder wants us to 'add an export button' to the reports page. Help us figure out what we should actually build. This is a multi-turn facilitation session: for this next-turn reply produce only the one next question plus a one-line discovery status, and do not produce the brief yet.",
+      "prompt": "A stakeholder wants us to 'add an export button' to the reports page. Help us figure out what we should actually build. (Multi-turn facilitation; this is the first discovery turn.)",
       "expect": {
         "triggers": true,
         "assertions": [

@@ -16,13 +16,13 @@ certification claims.
 
 ## Domain 1 — Access control
 
-| Starter control | Design/review route or candidate artifact to verify |
-| --- | --- |
 Every control row's canonical record also carries three accountability fields in the
 control catalog: the accountable owner, the evidence collector, and the collection
 trigger (cadence source). Domain tables below name the design/review route only; the
 accountability fields are maintained once per control in the catalog record.
 
+| Starter control | Design/review route or candidate artifact to verify |
+| --- | --- |
 | Role/permission model, deny-by-default | `authorization-matrix-designer` matrix + enforcement-point map |
 | Object-level / tenant-scoped authorization | `rls-policy-auditor` audit + `multi-tenant-security-tester` negative suite |
 | Tenant isolation across all surfaces | `tenant-isolation-reviewer` review + isolation test matrix |

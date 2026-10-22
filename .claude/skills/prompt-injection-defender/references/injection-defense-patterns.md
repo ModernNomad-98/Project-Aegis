@@ -9,7 +9,8 @@ Project; **LLM01** is its 2026 large language model prompt-injection risk code
 **AI** means artificial intelligence, **API** means application programming
 interface, and **PDF** means Portable Document Format
 
-Trust levels affect handling and verification only and never grant instruction authority; provenance never promotes content to instructions.
+Trust levels affect handling and verification only and never grant instruction authority; provenance
+never promotes content to instructions.
 
 ## Trust-zone model
 

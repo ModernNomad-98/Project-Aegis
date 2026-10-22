@@ -21,11 +21,14 @@ One file per run (JSON keeps it diffable and machine-checkable):
   "commit": "<sha>",
   "tier": "full",
   "shards": {
-    "core-domain":     { "state": "passed",      "started": "…", "ended": "…", "duration_s": 412, "tests_executed": 238, "tests_failed": 0 },
-    "api-integration": { "state": "failed",      "duration_s": 388, "tests_executed": 154, "tests_failed": 3, "failure_class": "assertions" },
+    "core-domain":     { "state": "passed",      "started": "…", "ended": "…", "duration_s": 412,
+    "tests_executed": 238, "tests_failed": 0 },
+    "api-integration": { "state": "failed",      "duration_s": 388, "tests_executed": 154,
+    "tests_failed": 3, "failure_class": "assertions" },
     "ui-e2e":          { "state": "interrupted", "duration_s": 1800, "tests_executed": 41, "failure_class": "timeout" },
     "platform":        { "state": "pending" },
-    "uncategorized":   { "state": "passed", "tests_executed": 0, "policy": "empty-or-fail", "note": "0 matched = policy-pass ONLY because membership rules
+    "uncategorized":   { "state": "passed", "tests_executed": 0, "policy": "empty-or-fail", "note":
+    "0 matched = policy-pass ONLY because membership rules
     matched nothing" }
   }
 }
@@ -139,7 +142,8 @@ required checks.
 
 - **`local-ci-mirror-preflight`:** local full-tier = invoke this runner
   (same shard map, same status semantics) — the preflight never re-derives
-  its own bundle where shards exist.
+  its own bundle where shards exist. A local run with no trusted CI state
+  store cannot resume: it reruns fully.
 - **`risk-tiered-validation-selector`:** the classify job IS the selector's
   rules; the gate consumes its tier output. Docs-only skip semantics are
   legitimate only because the selector said docs-only.

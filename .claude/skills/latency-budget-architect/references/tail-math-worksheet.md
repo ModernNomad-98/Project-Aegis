@@ -68,12 +68,15 @@ Cascade check, leaf to root:
 ## Retry-spend accounting
 
 ```
-retry_cost(hop) = sum over all permitted retries of
-                  P(retry) × (attempt work(hop) + each inter-attempt wait
-                  + downstream critical-path budget(hop))
-Definitions: P(retry) is the recorded retry probability (or state the one-retry
-assumption explicitly); each inter-attempt wait uses the recorded backoff_total;
-count every permitted retry, not just the first.
+retry_cost(hop) = initial attempt(hop) + the sum over k=1..K of
+                  P(k-th retry) × (attempt work(hop) + wait_k + downstream
+                                   critical-path budget(hop))
+Definitions: P(retry) is the recorded per-attempt retry probability; P(k-th retry) =
+p^k under the stated independence assumption (or record a measured cumulative value);
+wait_k is the wait before the k-th retry from the per-attempt backoff (base × 2^(k-1));
+backoff_total is the aggregate wait across attempts and is NOT used as a per-attempt
+value; the initial attempt is counted once, outside the sum. Record p and the
+independence/one-retry assumption explicitly.
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
 Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)

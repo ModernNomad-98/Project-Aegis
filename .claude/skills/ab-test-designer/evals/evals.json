@@ -6,7 +6,7 @@
     {
       "id": "positive-design-powered-experiment",
       "type": "should_trigger",
-      "prompt": "We want to A/B test a new pricing page. Design the experiment. Fixture: the pre-set minimum detectable effect is a 1% relative lift, the baseline conversion rate is 20%, and approximate variance from a comparable period is supplied.",
+      "prompt": "We want to A/B test a new pricing page. Design the experiment. Fixture: the pre-set minimum detectable effect is a 1% relative lift, the baseline conversion rate is 20%, and the baseline Bernoulli variance p(1-p) is 0.16.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -15,14 +15,14 @@
           "Computes required sample size from a practically-meaningful minimum detectable effect and baseline/variance, and derives duration over full weekly cycles.",
           "Fixes the horizon up front and forbids peeking-to-significance (or specifies a sequential method with its correction).",
           "Grounds the primary metric in funnel-definition-designer / event-schema-architect definitions.",
-          "Uses the supplied pre-set MDE (1% relative), baseline conversion (20%) and variance to compute the sample size and duration rather than inventing them."
+          "Uses the supplied pre-set MDE (1% relative), baseline conversion (20%) and variance (0.16) to compute the sample size and duration rather than inventing them."
         ]
       }
     },
     {
       "id": "positive-read-results-honestly",
       "type": "should_trigger",
-      "prompt": "Our test finished. Variant B is +0.4% on the primary metric with p=0.03. Should we ship it? Read the results. Fixture: the experiment was planned for a 1% minimum detectable effect against a 20% baseline conversion rate.",
+      "prompt": "Our test finished. Variant B is +0.4% relative (0.08 percentage points absolute against the 20% baseline) on the primary metric with p=0.03. Should we ship it? Read the results. Fixture: the experiment was planned for a 1% relative minimum detectable effect against a 20% baseline conversion rate.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -30,7 +30,7 @@
           "Runs validity checks: sample-ratio mismatch, whether the horizon was respected, and guardrail status.",
           "Flags a statistically-significant-but-tiny lift as possibly not practically meaningful, and asks whether +0.4% clears the bar set for a reason.",
           "Gives a ship/kill/iterate recommendation with residual uncertainty stated rather than a bare 'it won'.",
-          "Contrasts the +0.4% result with the pre-set 1% MDE and baseline 20% conversion supplied in the fixture."
+          "Contrasts the +0.4% relative (0.08 pp absolute) result with the pre-set 1% relative MDE and baseline 20% conversion supplied in the fixture."
         ]
       }
     },

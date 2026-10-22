@@ -15,7 +15,7 @@
           "De-risks critical dependencies (fallback, decoupling via stub/flag, parallel paths, SPOFs named).",
           "Accounts for the other teams' priorities and sets a visible status plus a pre-agreed escalation trigger.",
           "Leaves the interface contract to api-event-architect and the integration boundary to architecture-designer.",
-          "Records the supplied dates and both-side owners (Dana 2026-11-14, Luis 2026-11-21, Priya 2026-12-05) in the commitments."
+          "Records the supplied dates and named owners per deliverable (Dana 2026-11-14, Luis 2026-11-21, Priya 2026-12-05) and requires a named counterparty owner for each dependency before commitment."
         ]
       }
     },
