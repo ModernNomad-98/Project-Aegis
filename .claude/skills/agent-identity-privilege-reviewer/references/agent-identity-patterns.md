@@ -47,7 +47,7 @@ chain INTERSECTED with tool permission and resource/tenant policy, capped by
 the recorded approval scope when an approval applies. The approval must be
 active, unexpired and in scope for this action; an expired or out-of-scope
 approval is no approval. If an action requires approval and no active,
-in-scope approval is recorded, A3 is DENIED - stop.
+in-scope approval is recorded, A3 is DENIED - stop. If approval is not
 required, the intersection stands and the parent-hop bound applies, so A3 ⊆ A2
 either way. A hop may only reduce authority, never amplify it.
 

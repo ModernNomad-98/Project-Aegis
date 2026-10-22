@@ -56,15 +56,15 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 
 ```
-Per hop: timeout(hop) = budget(hop) + tolerance (state tolerance, e.g. +20%)
+Per hop: timeout(hop) = hop work + tolerance (tolerance = epsilon; state tolerance, e.g. +20%)
 Cascade check, leaf → root:
-  timeout(upstream) ≥ critical-path downstream time + upstream work + ε
+  timeout(upstream) > upstream own work + critical-path downstream time + ε (strict >; record both terms)
   critical path = sum of serial segments; max of parallel branch durations
   at each join; include allowed retries and backoff at their owning layer
 Violations to hunt:
   - 30s defaults inside sub-second paths (bug by inheritance)
-  - upstream timeout < critical path (initial attempt + retries + backoff + downstream work); downstream x retries alone is not the deadline
-  - variables in ms: attempts = 1 + retries; critical path = attempts x downstream attempt budget + retries x backoff + terminal downstream work not already inside the attempt budget; epsilon = recorded tolerance in ms owned by the path owner, counted once and never inside an attempt budget (no double counting)
+  - upstream timeout not greater than upstream own work + critical path (initial attempt + retries + backoff + remaining downstream work); downstream x retries alone is not the deadline
+  - variables in ms: attempts = 1 + retries; critical path = attempts x downstream attempt budget + retries x backoff + terminal downstream work not already inside the attempt budget; upstream own work is separate and never double counted; epsilon = recorded tolerance in ms owned by the path owner, counted once in the strict inequality
   - infinite/no timeout anywhere on a budgeted path (unbounded spend)
 ```
 

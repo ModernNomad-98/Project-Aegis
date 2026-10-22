@@ -15,11 +15,12 @@ action through the normal user interface). Move it only with a reason.
 | Question | If yes | If no |
 | --- | --- | --- |
 | Could a person perform this action today with their own permissions? | continue | FORBIDDEN (the AI cannot gain an action nobody has) |
-| Is it irreversible (money moved, message sent to someone outside the product, data destroyed)? | CONFIRM at most; FORBIDDEN if one reviewer cannot judge it | continue |
-| Does it touch another tenant's data? | FORBIDDEN | continue |
-| Does it reach beyond one record or one user (a whole tenant or many customers)? | FORBIDDEN, or CONFIRM with a second reviewer if the tier allows | continue |
-| Does the risk tier allow autonomy for this action? | AUTONOMOUS is possible | CONFIRM or ADVISORY-ONLY |
-| Do the watch-and-undo controls exist (monitoring, sampling, undo window, pause thresholds)? | AUTONOMOUS | CONFIRM until they exist |
+| Does it reach another tenant's data? | FORBIDDEN | continue |
+| Is it irreversible (money moved, a message sent outside the product, data destroyed)? | FORBIDDEN | continue |
+| Does it reach beyond one record or one user (a whole tenant or many customers)? | FORBIDDEN | continue |
+| Can no single reviewer judge the action (for example "delete inactive accounts")? | FORBIDDEN | continue |
+| Does a written policy or risk tier require a person to approve it? | CONFIRM | continue |
+| Does the risk tier allow autonomy, and do the watch-and-undo controls exist? | AUTONOMOUS | CONFIRM or ADVISORY-ONLY |
 
 Examples:
 
