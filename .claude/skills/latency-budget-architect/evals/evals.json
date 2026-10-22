@@ -12,8 +12,9 @@
         "assertions": [
           "Builds the budget table from measured per-hop reality with an owner per hop, and includes the overhead rows (serialization, connection setup on the tail, queue wait) as explicit line items.",
           "Holds 15–25% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
+          "Applies the one timeout rule: upstream timeout > upstream own work + downstream critical-path budget + recorded epsilon (all ms); critical path = serial work + longest parallel branch at each join; retries add attempt time + recorded backoff_total.",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
-          "Applies the one timeout rule: each upstream timeout is above the downstream critical-path budget by a recorded epsilon (all values in ms); critical path = serial work + the longest parallel branch at each join; retries add attempt time and recorded backoff_total."
+          "Installs the budget-claim review rule for new dependencies on the path."
         ]
       }
     },
@@ -24,9 +25,10 @@
       "expect": {
         "triggers": true,
         "assertions": [
+          "Rejects the 30-second defaults as bugs in a 500ms path: timeouts derive from hop budgets, since waiting longer than the budget means the promise already failed.",
           "Identifies the two-layer retry compounding (gateway × client = up to 9 attempts) as a storm multiplier and assigns retries to ONE stated layer, idempotent hops only.",
-          "Prices each permitted retry as spend from a named allocation rather than a free action.",
-          "Applies the one timeout rule: each upstream timeout is above the downstream critical-path budget by a recorded epsilon (all values in ms); critical path = serial work + the longest parallel branch at each join; retries add attempt time and recorded backoff_total."
+          "Runs the one cascade rule so no upstream abandons work its downstream completes (parallel joins take the max branch; retries add attempt time + backoff_total).",
+          "Prices each permitted retry as spend from a named allocation rather than a free action."
         ]
       }
     },
@@ -40,8 +42,7 @@
           "Does the tail math explicitly: with 12 parallel branches, 1-(0.99)^12 ≈ 11% of requests experience at least one branch's p99 — 'fine at p99' per branch is not fine at the join.",
           "Budgets branches at a stricter percentile than the end-to-end promise (p99.5-class), or funds hedging from headroom, or recommends narrowing the fan-out — with the tradeoffs stated.",
           "Shows that parallel composition takes the max of branches, so the slowest branch owns the join's budget.",
-          "Anchors the fix in the budget table rather than telling individual services to 'be faster'.",
-          "States the independence assumption for the fan-out tail estimate (independent branches: 1-(1-p)^N) and marks it measured or bounded when branches are correlated."
+          "Anchors the fix in the budget table rather than telling individual services to 'be faster'."
         ]
       }
     },

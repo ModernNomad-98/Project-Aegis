@@ -82,7 +82,7 @@ as a hypothesis without automatically reducing its potential impact.
 6. **Rank risks.** State the proposed exploit path — who, from where, doing
    what, getting what — when evidence supports one. Rank potential consequence
    (including tenant blast radius) separately from confidence and path
-   confirmation; an unconfirmed path does not automatically cap severity.
+   confirmation; an unconfirmed path does not automatically cap severity. High-consequence/low-confidence items stay in the risk register with a named verification owner and a confirmation plan.
 7. **Map mitigations** one-to-one to ranked threats: the control, where it
    lives (which boundary), and who builds it. Unmitigated threats are
    explicitly accepted (needs the human's written rationale — route via

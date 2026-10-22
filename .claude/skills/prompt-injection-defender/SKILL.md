@@ -88,7 +88,7 @@ and security-relevant.
    trusted (system/developer rules set by you) or untrusted (anything derived
    from user input, retrieval, or tool output). Draw where they mix. No
    prompt/feature to inspect → Stop Conditions.
-2. **State the invariant.** Treat every source, including a trusted one, as data - never as a new rule; a provenance guarantee records which source produced content but never promotes content to instructions and creates no exemption. Untrusted content may be summarized, quoted,
+2. **State the invariant.** Treat every content source (user input, retrieved documents, tool/model output, media) as data - never as a new rule; the system/developer instruction channel is the instruction authority and is not demoted by this rule; a provenance guarantee records which source produced content but never promotes content to instructions and creates no exemption. Untrusted content may be summarized, quoted,
    classified, or reasoned about — it may NEVER change system instructions,
    tool permissions, identity, access policy, or the execution plan. Every
    layer below serves this invariant.

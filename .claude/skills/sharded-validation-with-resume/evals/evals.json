@@ -68,8 +68,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Intermittent-failure diagnosis is flaky-test-detective; the shard runner neither retries-until-green nor resumes around flakes.",
-          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
+          "Intermittent-failure diagnosis is flaky-test-detective; the shard runner neither retries-until-green nor resumes around flakes."
         ]
       }
     },
@@ -81,8 +80,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke sharded-validation-with-resume: the request is a local pre-commit run with a baseline and failure classification, not a shard architecture.",
-          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it.",
-          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
+          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it."
         ]
       }
     },
@@ -94,8 +92,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke sharded-validation-with-resume: stage ordering, build-once artifacts, and deploy gates are the delivery pipeline's stage graph; shard design covers only one validation stage's internals.",
-          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it.",
-          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it."
         ]
       }
     }

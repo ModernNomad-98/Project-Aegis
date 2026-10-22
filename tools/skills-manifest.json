@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "0d592a094633762f835ef9d470dd5b46ebe69477298efcb65748f3ed7054cb3d"
+      "sha256": "f71607013f41df4f75940aeb09d44a069a78244f9cd5d62e78a21b90aa820100"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "462bb0fdc8f76bee17d27dbbaadcd4c329d2b8ec016cd59c90f32ddf688b908e"
+      "sha256": "1d22333e6b98c4ce11f47400de60685b2d0a31d2068d1bd5a92085acf3831625"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -296,7 +296,7 @@
     {
       "name": "compliance-control-foundation",
       "path": ".claude/skills/compliance-control-foundation/SKILL.md",
-      "sha256": "4e83656e61b557a5c35855a58e0eb951ff4b168d891eaf596f4df3681784ff69"
+      "sha256": "b4a65624684ee3316c8ee5f9317bf4deeff79ceda59b9139f948b39720056a8c"
     },
     {
       "name": "compliance-evidence-collector",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "c70b9d64c5ba390725243c68472256bbdde991f000e4c3c5a59ef8734f834cf0"
+      "sha256": "ffc9c1d1ffe1bb5d6b22b9ed95cd2e125da3d0503c8a90a0e3ba2fe292ab0595"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -796,7 +796,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "717c17afa319db23c93d9b9ffb5712fb70d579a855bfdce19a1f88e77b7b02e0"
+      "sha256": "d15651d3b397eef51fd7db3a1742b694a1f5e85ae50790cf4ab16e8927d1877d"
     },
     {
       "name": "property-based-test-designer",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "62cd9612c430f81f50104659f4c9ed2b8dd728dc46df6167934e78ec4984c4d1"
+      "sha256": "50d8ac3d1d821b255466fce794f44d538ee2bc255eb1bbd0f44667d68321bf01"
     },
     {
       "name": "share-link-access-architect",
@@ -1021,7 +1021,7 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "0a74812865e740bf24ce6104014f6c88fc766273bd71d0e607b9e3e67718e461"
+      "sha256": "9fcc6d5b54e1037c7183260b7f29c59f83fbf0fceae5ffd3ba59fb3c1a0d708a"
     },
     {
       "name": "skill-usage-ledger",
@@ -1056,7 +1056,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "15e0d34a26754b58639689e28aaf4fd713ac8a0b863df9c97134d4488e8754aa"
+      "sha256": "9a73a80fc81df69ea3ace3fb6912e50c3383f6d3f540e7c9200c037c7c138252"
     },
     {
       "name": "state-machine-modeler",
@@ -1166,7 +1166,7 @@
     {
       "name": "threat-modeler",
       "path": ".claude/skills/threat-modeler/SKILL.md",
-      "sha256": "850b5c38f6a1f4e9ddaddf73943cfb5ea02638644c36ba829600192e58ec32cc"
+      "sha256": "f1e9dea51bbf8cbdc29f6eb992037450e7e1a3e3835eb88daeeb630a36e62905"
     },
     {
       "name": "transaction-scope-designer",

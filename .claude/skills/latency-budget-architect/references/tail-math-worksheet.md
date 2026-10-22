@@ -56,6 +56,15 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 
 ```
+ONE rule, leaf → root (all values in ms):
+  upstream timeout > upstream own work + downstream critical-path budget + recorded ε
+  critical path = serial work + max of parallel branch durations at each join;
+  retries add attempt time + recorded backoff_total (sum of actual inter-attempt waits)
+  if no feasible timeout exists under the hop budget → escalate as a latency budget violation
+Violations to hunt:
+  - 30s defaults inside sub-second paths (bug by inheritance)
+  - upstream timeout not above upstream own work + critical path (abandons work that completes — waste + failure)
+  - infinite/no timeout anywhere on a budgeted path (unbounded spend)
 ```
 
 ## Retry-spend accounting
@@ -64,9 +73,8 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 retry_cost(hop) = P(retry) × (backoff + budget(hop))
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
-Two-layer retry compounding: layers L1-L2 retries give up to (1+r1)(1+r2) attempts - the storm multiplier; the design names the single retry layer.
-
-Worked example: 2 retries at each of two layers = (1+2)(1+2) = 9 attempts on the critical path; the deadline must include the initial attempt and backoff, not just the retry count.
+Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)
+attempts — the storm multiplier; the design names the single retry layer.
 ```
 
 ## Budget-claim review template (for PRs touching a budgeted path)

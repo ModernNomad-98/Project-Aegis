@@ -62,11 +62,11 @@ Grant limits come from the register entry's ACTUAL recorded expiry/use limit (wh
 
 | State | Entry condition | Auto-advance |
 | --- | --- | --- |
-| GRANDFATHERED | grant valid at adoption AND register records grandfathered status | preserved only when the register records it was already armed at adoption; otherwise disabled; never revives an expired grant |
-| BLOCKED PENDING RE-ATTESTATION | no recorded attestation deadline, or a reviewer block, or any transition trigger | disabled (grant NOT expired; in-scope manual actions remain) |
-| ACTIVE | recorded attestation deadline exists AND not blocked AND register records armed state | enabled only when armed |
+| BLOCKED PENDING RE-ATTESTATION | a reviewer block is in force; OR the recorded attestation deadline has passed; OR no recorded attestation deadline exists; OR any transition trigger fired (e.g. reviewer halt, adoption without a deadline) | disabled (grant NOT expired; in-scope manual actions remain) |
+| GRANDFATHERED | not blocked AND grant valid at adoption AND register records grandfathered status AND its recorded deadline (if any) has not passed | preserved only when the register records it was already armed at adoption; otherwise disabled; never revives an expired grant or bypasses a reviewer block |
+| ACTIVE | not blocked AND recorded attestation deadline exists AND register records armed state | enabled only when armed |
 
-Transition BLOCKED -> ACTIVE only on recorded re-attestation. Never infer a default expiry; the reviewer-block halt path is unchanged.
+Transition BLOCKED -> ACTIVE only on recorded re-attestation after the block clears; GRANDFATHERED never bypasses a reviewer block. Never infer a default expiry; the reviewer-block halt path is unchanged.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,
