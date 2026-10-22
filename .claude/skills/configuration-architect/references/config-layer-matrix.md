@@ -48,8 +48,8 @@ Concrete artifact guide for the `configuration-architect` skill. Method and reco
 - environment parity reviewer requests route to `environment-parity-reviewer`; this skill does not perform that owner work.
 - secrets identity hardener requests route to `secrets-identity-hardener`; this skill does not perform that owner work.
 - vite build qa engineer requests route to `vite-build-qa-engineer`; this skill does not perform that owner work.
-- user preference architect requests route to `user-preference-architect`; this skill does not perform that owner work.
-- tenant modeler requests route to `tenant-modeler`; this skill does not perform that owner work.
-- feature flag architect requests route to `feature-flag-architect`; this skill does not perform that owner work.
+- user-preference-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- tenant-modeler is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- feature-flag-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `code-reviewer`, `design-review-facilitator`, `environment-parity-reviewer`, `feature-flag-architect`, `human-approval-boundary`, `observability-by-design`, `plan-entitlement-architect`, `secrets-identity-hardener`, `tech-spec-writer`, `tenant-modeler`, `user-preference-architect`, `vite-build-qa-engineer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

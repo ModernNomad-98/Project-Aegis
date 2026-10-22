@@ -48,8 +48,8 @@ Concrete artifact guide for the `modernization-cutover-planner` skill. Method an
 - architecture advisor requests route to `architecture-advisor`; this skill does not perform that owner work.
 - architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
 - schema evolution planner requests route to `schema-evolution-planner`; this skill does not perform that owner work.
-- feature flag rollout strategist requests route to `feature-flag-rollout-strategist`; this skill does not perform that owner work.
-- resilience architecture reviewer requests route to `resilience-architecture-reviewer`; this skill does not perform that owner work.
-- release readiness reviewer requests route to `release-readiness-reviewer`; this skill does not perform that owner work.
+- feature-flag-rollout-strategist is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- resilience-architecture-reviewer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- release-readiness-reviewer is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-advisor`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `feature-flag-rollout-strategist`, `human-approval-boundary`, `observability-by-design`, `release-readiness-reviewer`, `resilience-architecture-reviewer`, `rollback-runbook-author`, `schema-evolution-planner`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

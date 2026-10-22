@@ -48,8 +48,8 @@ Concrete artifact guide for the `extensibility-boundary-designer` skill. Method 
 - interface first designer requests route to `interface-first-designer`; this skill does not perform that owner work.
 - supply chain security reviewer requests route to `supply-chain-security-reviewer`; this skill does not perform that owner work.
 - api event architect requests route to `api-event-architect`; this skill does not perform that owner work.
-- authorization matrix designer requests route to `authorization-matrix-designer`; this skill does not perform that owner work.
-- security pr reviewer requests route to `security-pr-reviewer`; this skill does not perform that owner work.
-- layered architecture enforcer requests route to `layered-architecture-enforcer`; this skill does not perform that owner work.
+- authorization-matrix-designer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- security-pr-reviewer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- layered-architecture-enforcer is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `api-event-architect`, `architecture-designer`, `authorization-matrix-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `security-pr-reviewer`, `supply-chain-security-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

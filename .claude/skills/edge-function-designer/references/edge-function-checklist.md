@@ -49,8 +49,8 @@ Concrete artifact guide for the `edge-function-designer` skill. Method and recor
 - cloud architecture decider requests route to `cloud-architecture-decider`; this skill does not perform that owner work.
 - aws saas architect requests route to `aws-saas-architect`; this skill does not perform that owner work.
 - azure saas architect requests route to `azure-saas-architect`; this skill does not perform that owner work.
-- background job orchestration architect requests route to `background-job-orchestration-architect`; this skill does not perform that owner work.
-- latency budget architect requests route to `latency-budget-architect`; this skill does not perform that owner work.
-- observability by design requests route to `observability-by-design`; this skill does not perform that owner work.
+- background-job-orchestration-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- latency-budget-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- observability-by-design is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `api-event-architect`, `architecture-designer`, `aws-saas-architect`, `azure-saas-architect`, `background-job-orchestration-architect`, `caching-strategy-designer`, `cloud-architecture-decider`, `code-reviewer`, `design-review-facilitator`, `human-approval-boundary`, `latency-budget-architect`, `observability-by-design`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

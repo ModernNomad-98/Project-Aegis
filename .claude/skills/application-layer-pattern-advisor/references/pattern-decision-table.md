@@ -48,9 +48,9 @@ Concrete artifact guide for the `application-layer-pattern-advisor` skill. Metho
 - layered architecture enforcer requests route to `layered-architecture-enforcer`; this skill does not perform that owner work.
 - interface first designer requests route to `interface-first-designer`; this skill does not perform that owner work.
 - code simplifier requests route to `code-simplifier`; this skill does not perform that owner work.
-- command gateway architect requests route to `command-gateway-architect`; this skill does not perform that owner work.
-- domain modeler requests route to `domain-modeler`; this skill does not perform that owner work.
-- architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
+- command-gateway-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- domain-modeler is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- architecture-designer is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - External-provider adapter contracts (timeouts, retries, idempotency, signing) route to `outbound-integration-adapter-designer`; pattern and placement decisions remain here.
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

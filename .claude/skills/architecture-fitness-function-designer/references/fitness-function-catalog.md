@@ -48,8 +48,8 @@ Concrete artifact guide for the `architecture-fitness-function-designer` skill. 
 - dependency direction guard requests route to `dependency-direction-guard`; this skill does not perform that owner work.
 - layered architecture enforcer requests route to `layered-architecture-enforcer`; this skill does not perform that owner work.
 - n plus one detector requests route to `n-plus-one-detector`; this skill does not perform that owner work.
-- performance test harness requests route to `performance-test-harness`; this skill does not perform that owner work.
-- frontend perf engineer requests route to `frontend-perf-engineer`; this skill does not perform that owner work.
-- observability by design requests route to `observability-by-design`; this skill does not perform that owner work.
+- performance-test-harness is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- frontend-perf-engineer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- observability-by-design is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `dependency-direction-guard`, `design-review-facilitator`, `frontend-perf-engineer`, `human-approval-boundary`, `layered-architecture-enforcer`, `n-plus-one-detector`, `observability-by-design`, `performance-test-harness`, `release-readiness-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

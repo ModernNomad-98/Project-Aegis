@@ -48,8 +48,8 @@ Concrete artifact guide for the `state-machine-modeler` skill. Method and record
 - tenant modeler requests route to `tenant-modeler`; this skill does not perform that owner work.
 - subscription lifecycle designer requests route to `subscription-lifecycle-designer`; this skill does not perform that owner work.
 - domain modeler requests route to `domain-modeler`; this skill does not perform that owner work.
-- property based test designer requests route to `property-based-test-designer`; this skill does not perform that owner work.
-- product spec writer requests route to `product-spec-writer`; this skill does not perform that owner work.
-- architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
+- property-based-test-designer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- product-spec-writer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- architecture-designer is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `product-spec-writer`, `property-based-test-designer`, `release-readiness-reviewer`, `rollback-runbook-author`, `subscription-lifecycle-designer`, `tech-spec-writer`, `tenant-modeler` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

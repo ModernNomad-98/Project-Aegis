@@ -48,8 +48,8 @@ Concrete artifact guide for the `cqrs-read-model-designer` skill. Method and rec
 - operational vs analytical splitter requests route to `operational-vs-analytical-splitter`; this skill does not perform that owner work.
 - command gateway architect requests route to `command-gateway-architect`; this skill does not perform that owner work.
 - caching strategy designer requests route to `caching-strategy-designer`; this skill does not perform that owner work.
-- schema evolution planner requests route to `schema-evolution-planner`; this skill does not perform that owner work.
-- streaming event architect requests route to `streaming-event-architect`; this skill does not perform that owner work.
-- architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
+- schema-evolution-planner is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- streaming-event-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- architecture-designer is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `caching-strategy-designer`, `change-classification-gate`, `code-reviewer`, `command-gateway-architect`, `data-flow-diagrammer`, `design-review-facilitator`, `human-approval-boundary`, `operational-vs-analytical-splitter`, `release-readiness-reviewer`, `schema-evolution-planner`, `streaming-event-architect`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

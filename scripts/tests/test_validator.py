@@ -3030,6 +3030,19 @@ def test_coverage_map_batch4_deliveries():
     manifest = json.loads(
         validator.MANIFEST_PATH.read_text(encoding="utf-8"))
     assert len(manifest["skills"]) == 243
+    expected_names = {
+        "state-machine-modeler", "transaction-scope-designer",
+        "cqrs-read-model-designer", "configuration-architect",
+        "extensibility-boundary-designer",
+        "application-layer-pattern-advisor", "technical-debt-classifier",
+        "modernization-cutover-planner",
+        "architecture-fitness-function-designer",
+        "architecture-spike-planner", "graphql-boundary-reviewer",
+        "outbound-integration-adapter-designer", "edge-function-designer",
+    }
+    assert len(expected_names) == 13
+    manifest_names = {entry["name"] for entry in manifest["skills"]}
+    assert expected_names <= manifest_names, expected_names - manifest_names
     for name in sorted(set(mapping.values())):
         cases = json.loads(
             (validator.REPO_ROOT / ".claude" / "skills" / name / "evals"

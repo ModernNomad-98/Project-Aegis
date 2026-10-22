@@ -49,8 +49,8 @@ Concrete artifact guide for the `architecture-spike-planner` skill. Method and r
 - roadmap under uncertainty planner requests route to `roadmap-under-uncertainty-planner`; this skill does not perform that owner work.
 - ai task decomposer requests route to `ai-task-decomposer`; this skill does not perform that owner work.
 - exploratory charter designer requests route to `exploratory-charter-designer`; this skill does not perform that owner work.
-- architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
-- tech spec writer requests route to `tech-spec-writer`; this skill does not perform that owner work.
-- design review facilitator requests route to `design-review-facilitator`; this skill does not perform that owner work.
+- architecture-designer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- tech-spec-writer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- design-review-facilitator is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `ai-task-decomposer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `exploratory-charter-designer`, `human-approval-boundary`, `observability-by-design`, `release-readiness-reviewer`, `roadmap-under-uncertainty-planner`, `rollback-runbook-author`, `security-pr-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

@@ -48,8 +48,8 @@ Concrete artifact guide for the `technical-debt-classifier` skill. Method and re
 - principal code analyst requests route to `principal-code-analyst`; this skill does not perform that owner work.
 - full codebase auditor requests route to `full-codebase-auditor`; this skill does not perform that owner work.
 - staff scope selector requests route to `staff-scope-selector`; this skill does not perform that owner work.
-- prioritization frame picker requests route to `prioritization-frame-picker`; this skill does not perform that owner work.
-- code reviewer requests route to `code-reviewer`; this skill does not perform that owner work.
-- architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
+- prioritization-frame-picker is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- code-reviewer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- architecture-designer is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `full-codebase-auditor`, `human-approval-boundary`, `principal-code-analyst`, `prioritization-frame-picker`, `release-readiness-reviewer`, `roadmap-under-uncertainty-planner`, `rollback-runbook-author`, `staff-scope-selector`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

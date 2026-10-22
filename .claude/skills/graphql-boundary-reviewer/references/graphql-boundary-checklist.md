@@ -48,8 +48,8 @@ Concrete artifact guide for the `graphql-boundary-reviewer` skill. Method and re
 - n plus one detector requests route to `n-plus-one-detector`; this skill does not perform that owner work.
 - authorization matrix designer requests route to `authorization-matrix-designer`; this skill does not perform that owner work.
 - api contract test designer requests route to `api-contract-test-designer`; this skill does not perform that owner work.
-- api event architect requests route to `api-event-architect`; this skill does not perform that owner work.
-- security pr reviewer requests route to `security-pr-reviewer`; this skill does not perform that owner work.
-- query plan reader requests route to `query-plan-reader`; this skill does not perform that owner work.
+- api-event-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- security-pr-reviewer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- query-plan-reader is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `api-contract-test-designer`, `api-event-architect`, `architecture-designer`, `authorization-matrix-designer`, `caching-strategy-designer`, `code-reviewer`, `design-review-facilitator`, `human-approval-boundary`, `n-plus-one-detector`, `observability-by-design`, `query-plan-reader`, `security-pr-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

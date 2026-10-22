@@ -48,8 +48,8 @@ Concrete artifact guide for the `transaction-scope-designer` skill. Method and r
 - concurrency race reviewer requests route to `concurrency-race-reviewer`; this skill does not perform that owner work.
 - command gateway architect requests route to `command-gateway-architect`; this skill does not perform that owner work.
 - validation boundary designer requests route to `validation-boundary-designer`; this skill does not perform that owner work.
-- background job orchestration architect requests route to `background-job-orchestration-architect`; this skill does not perform that owner work.
-- schema evolution planner requests route to `schema-evolution-planner`; this skill does not perform that owner work.
-- data migration runbook author requests route to `data-migration-runbook-author`; this skill does not perform that owner work.
+- background-job-orchestration-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- schema-evolution-planner is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- data-migration-runbook-author is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `command-gateway-architect`, `concurrency-race-reviewer`, `data-migration-runbook-author`, `design-review-facilitator`, `human-approval-boundary`, `resilience-architecture-reviewer`, `schema-evolution-planner`, `secure-migration-reviewer`, `tech-spec-writer`, `validation-boundary-designer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.

@@ -49,9 +49,9 @@ Concrete artifact guide for the `outbound-integration-adapter-designer` skill. M
 - resilience architecture reviewer requests route to `resilience-architecture-reviewer`; this skill does not perform that owner work.
 - latency budget architect requests route to `latency-budget-architect`; this skill does not perform that owner work.
 - api contract test designer requests route to `api-contract-test-designer`; this skill does not perform that owner work.
-- ai router architect requests route to `ai-router-architect`; this skill does not perform that owner work.
-- interface first designer requests route to `interface-first-designer`; this skill does not perform that owner work.
-- api event architect requests route to `api-event-architect`; this skill does not perform that owner work.
+- ai-router-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- interface-first-designer is an eval-only discrimination neighbour (not a routing boundary for this skill).
+- api-event-architect is an eval-only discrimination neighbour (not a routing boundary for this skill).
 - Pattern/placement decisions inside the application layer route to `application-layer-pattern-advisor`; external-provider adapter contracts remain here.
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `ai-router-architect`, `api-contract-test-designer`, `api-event-architect`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `design-review-facilitator`, `error-taxonomy-designer`, `human-approval-boundary`, `interface-first-designer`, `latency-budget-architect`, `resilience-architecture-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
