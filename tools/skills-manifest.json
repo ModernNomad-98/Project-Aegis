@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "e40f6877799351f789693f4a41b611971ae26b67",
+  "source_revision": "f5805a566cfc8ff688a943f06ad65dd2ebb5d18e",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -61,7 +61,7 @@
     {
       "name": "agent-governance-audit",
       "path": ".claude/skills/agent-governance-audit/SKILL.md",
-      "sha256": "ee41a87bf4302ab3d5220a2ad45a3a0784465163d54db0a781d3255ff3c97405"
+      "sha256": "1e27920f52c61377d07be3d3a2ed8c13b9140fd1c82a94c1037c3b507da7d8ea"
     },
     {
       "name": "agent-harness-architect",
@@ -71,7 +71,7 @@
     {
       "name": "agent-identity-privilege-reviewer",
       "path": ".claude/skills/agent-identity-privilege-reviewer/SKILL.md",
-      "sha256": "a61d43550e59a3763ca4a1cda36d85a7a05da7d474638cac20b1c77812075b10"
+      "sha256": "5e13622ea5951ab4b629c0bdc6608456ea5a8b3ad141c04522d972de072a269f"
     },
     {
       "name": "agent-instruction-consolidator",
@@ -91,7 +91,7 @@
     {
       "name": "agent-tool-safety-guard",
       "path": ".claude/skills/agent-tool-safety-guard/SKILL.md",
-      "sha256": "a789f85b1b73bcf2fa4acd47b652b4064761367544822cbbc917d1f600cf72aa"
+      "sha256": "d917ae033e2383733bef41a5b62189ddf3256de1678ce09c00f17f1f5fdd9d22"
     },
     {
       "name": "agentic-loop-designer",
@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "21c40cdad8d7a6bd003e2acee61c19e4bc12fc0a3bc8c622ad545af973a1e6dc"
+      "sha256": "5bd7825e5f953479728c5e2d5611accae4e71511ec8bdb547793c315992cdc58"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "51931f5aa85545d3a88d27f7a2c74013996ee416a1d3d2986759294fceca41ff"
+      "sha256": "fdd028b7bf9a745e6292374e8c35b44d17fe7713f5264128696c60a8d57c07a7"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -131,7 +131,7 @@
     {
       "name": "ai-misinformation-guard",
       "path": ".claude/skills/ai-misinformation-guard/SKILL.md",
-      "sha256": "69e30facb549174432cca4122c86ba5df794392ab9c856787c4e7e69d6e5e3b6"
+      "sha256": "f01787386cd120e648f656b9d477f8a5c8f237df30feb82b62c0822f45b97dc2"
     },
     {
       "name": "ai-router-architect",
@@ -296,7 +296,7 @@
     {
       "name": "compliance-control-foundation",
       "path": ".claude/skills/compliance-control-foundation/SKILL.md",
-      "sha256": "3994d27f83f3a4388d721c2942646ba90d98a2e4257af0c5ba62caaaf677b0e0"
+      "sha256": "c549ae754456ec629e6d61dc4a2c56df258a506e90cec627961d658b0dec106d"
     },
     {
       "name": "compliance-evidence-collector",
@@ -541,7 +541,7 @@
     {
       "name": "human-agent-trust-reviewer",
       "path": ".claude/skills/human-agent-trust-reviewer/SKILL.md",
-      "sha256": "e5d23e25a5759c7f4db998fa9571d32637360a06d1f08cd1b5c0a568975da9a8"
+      "sha256": "d90071f8751bf0d983247a2cba68369ccd12a5017db1e920e785388bfffe2fce"
     },
     {
       "name": "human-approval-boundary",
@@ -586,7 +586,7 @@
     {
       "name": "iso-42001-aims-architect",
       "path": ".claude/skills/iso-42001-aims-architect/SKILL.md",
-      "sha256": "2fe58fe2d552335cc66d3b43fb95b91df2ba7db20f6dc8cc164c4bf9a4330916"
+      "sha256": "0dd4f5f53c6e85a02ccf7f43fd6626c4138f4da74a1ac82dcc74231a5aeeac97"
     },
     {
       "name": "lane-authoring-guide",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "006537bbcde18f9348e900c32c49a8bc9f73dd13457c7624cdf2721ec3c2349e"
+      "sha256": "5c7a3f1fca1c7da4f2d51bf081df3839d439e0672f6078b53030770930b02dde"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -796,7 +796,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "2005db331e419d2fba0239a5e0486bcab48efd7425688c38dc3a19a27c8793fc"
+      "sha256": "0c951a3466976e5b92429ad53f7a8bb07afc114fdb7d98f35069c0a5b1e74613"
     },
     {
       "name": "property-based-test-designer",
@@ -1056,7 +1056,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "e6fb684fff3d5d4cf5a68ed8d1b3880d84d238e318ab9308f0dde1565d4e8fe8"
+      "sha256": "5466e0876459cdd55d3aaa399737ab2c4693d40c9db792377f8137c47f92b676"
     },
     {
       "name": "state-machine-modeler",

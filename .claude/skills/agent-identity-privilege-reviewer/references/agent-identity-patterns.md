@@ -39,7 +39,7 @@ For each chain, fill and verify hop-by-hop:
 user (authority A0)
   → agent (holds A1; A1 ⊆ A0 for user-driven actions? authorized by whom?)
     → sub-agent (A2 ⊆ A1? minted fresh or inherited?)
-A3 = the calling user.s AUTHORITY CHAIN plus the recorded approval owner (not a bare PERMISSIONS set). Delegation and tool hops must fit within that authority chain; any hop where A(n+1) exceeds A(n) is an amplification finding. agent-tool-safety-guard cites this definition.
+A3 = (caller/sub-agent authority chain) INTERSECTED with the recorded approval scope, and A3 must be a subset of the parent authority (A3 subset of A2); approval scope never adds authority beyond the parent. Raw PERMISSIONS alone are not the definition.
 ```
 
 - Any hop where Aₙ₊₁ ⊄ Aₙ is an amplification finding.

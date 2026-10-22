@@ -137,7 +137,6 @@ Not inspected: <what this audit did not look at, and why>
 - An approval that exists but covers a different scope ("yes to staging") is
   a FAIL for the production action, not a PASS with a footnote.
 - A review approval seconds after PR-open is a SIGNAL that triggers inspection, never proof of rubber-stamping or of approval quality; report the timing as a signal and inspect the content.
-  report the timing honestly without over-claiming intent.
 - Hindsight bias: auditing yesterday's change against today's rules produces
   unfair FAILs and teaches people to distrust audits.
 

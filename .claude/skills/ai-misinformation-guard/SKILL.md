@@ -35,6 +35,7 @@ high-impact outputs to human oversight.
 - Use when: an AI feature recommends code dependencies, APIs, or commands
   (package hallucination risk: an attacker can register a package name the
   model invents, called slopsquatting).
+   Package identity/provenance rule: capture source/package identity, ownership and provenance before use; an unverified package/identity is downgraded to a hypothesis and never treated as a verified source. The reference and the package-hallucination fixture assert the same rule.
 - Do NOT use when: the concern is unsafe HANDLING of output (XSS/exec) —
   `llm-output-safety-reviewer`; or output SHAPE — `structured-output-validator`
   (this skill is about whether the content is TRUE, not well-formed or safe to
@@ -87,7 +88,6 @@ high-impact outputs to human oversight.
 6. **Handle package/API hallucination.** For features that suggest
    dependencies, APIs, commands, or config: recommended packages/APIs are
    verified to exist (registry/allowlist) before being surfaced or installed —
-    Package identity/provenance rule: capture source/package identity, ownership and provenance before use; an unverified package/identity is downgraded to a hypothesis and never treated as a verified source. The reference and the package-hallucination fixture assert the same rule.
    an invented package name is a supply-chain foothold (slopsquatting). Route
    install-time trust to `supply-chain-security-reviewer`.
 7. **Design overreliance-aware UX.** Signal confidence, show sources, and mark

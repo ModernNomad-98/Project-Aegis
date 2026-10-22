@@ -54,8 +54,7 @@ Turn this into an automated check (test or CI step) so it stays enforced.
 5. Verify the NEW credential works (this alone is never proof of revocation).
 6. Revoke the OLD credential under the applicable grant.
 7. Prove the OLD credential is rejected where testable, then capture residual consumers/failures and record them.
-6. Revoke the old credential.
-7. If the old secret is in git history, treat history purge (BFG/filter-repo)
+8. If the old secret is in git history, treat history purge (BFG/filter-repo)
    as a separate action whose scope must be covered by an applicable active
    grant or a new owner decision. Rotation is what restores credential
    secrecy; purge is cleanup.

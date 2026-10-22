@@ -22,7 +22,7 @@ the user it acts for, and cannot cause irreversible harm without a human. The
 deliverable is a per-tool permission matrix (side effects, blast radius,
 identity), argument validation before execution, an identity/authority model
 that binds tool calls to the CALLING USER, approval gates on high-impact
-Tool hops execute under A3 as defined by agent-identity-privilege-reviewer: the calling user.s authority chain plus the recorded approval owner; a hop may only reduce that authority, never amplify it.
+Tool hops execute under A3 as defined by agent-identity-privilege-reviewer: A3 = (caller/sub-agent authority chain) INTERSECTED with the recorded approval scope, and A3 must be a subset of the parent authority (A3 subset of A2); a hop may only reduce authority, never amplify it.
 actions, and a map of tool-chain composition abuse. Approval mechanics come
 from `human-approval-boundary`; standing agent authority from
 `agent-authorization-matrix` — this skill composes both.

@@ -94,8 +94,6 @@ State **who** (persona), **from where** (surface/entry), **doing what**
 (steps), and **getting what** (asset + blast radius) when evidenced. Mark
 missing steps as hypotheses with an owner and named verification check.
 Rank potential consequence from plausible impact and exposure (consequence-plus-confidence), and report exploit-path confidence separately. Missing path evidence alone does not lower the consequence; update confidence as checks complete.
-exploit-path confidence separately. Missing path evidence alone does not
-lower the consequence; update confidence as checks complete.
 
 ## Mitigation → test mapping
 

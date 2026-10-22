@@ -73,10 +73,9 @@ Violations to hunt:
 retry_cost(hop) = P(retry) × (backoff + budget(hop))
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
-Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)
+Two-layer retry compounding: layers L1-L2 retries give up to (1+r1)(1+r2) attempts - the storm multiplier; the design names the single retry layer.
 
 Worked example: 2 retries at each of two layers = (1+2)(1+2) = 9 attempts on the critical path; the deadline must include the initial attempt and backoff, not just the retry count.
-attempts — the storm multiplier; the design names the single retry layer.
 ```
 
 ## Budget-claim review template (for PRs touching a budgeted path)
