@@ -15,7 +15,8 @@
           "Computes required sample size from the supplied MDE/baseline/variance and derives duration from the supplied 120,000 weekly sessions over full weekly cycles.",
           "Fixes the horizon up front and forbids peeking-to-significance (or specifies a sequential method with its correction).",
           "Grounds the primary metric in funnel-definition-designer / event-schema-architect definitions.",
-          "Uses the supplied pre-set MDE (1% relative), baseline conversion (20%), variance (0.16) and weekly traffic (120,000 sessions) to compute the sample size and duration rather than inventing them."
+          "Uses the supplied pre-set MDE (1% relative), baseline conversion (20%), variance (0.16) and weekly traffic (120,000 sessions) to compute the sample size and duration rather than inventing them.",
+          "Uses conversion rate as the primary metric because the supplied variance 0.16 is Bernoulli variance for the 20% conversion baseline; if another primary metric is chosen, states its variance/uncertainty (or marks it UNKNOWN and asks) before computing sample size."
         ]
       }
     },

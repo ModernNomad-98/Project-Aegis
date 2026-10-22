@@ -42,7 +42,7 @@
           "Adds a re-authorization trigger (on authority-change event / token refresh / periodic) and a tear-down of now-forbidden subscriptions.",
           "States that per-tenant isolation alone is insufficient — the per-user/per-resource boundary must be re-enforced when membership changes.",
           "Does not 'fix' it by shortening the token lifetime alone, which only narrows the leak window rather than closing it.",
-          "Uses the supplied membership-revoked event at T+0 and the 15-minute token TTL to bound the leak at 15 minutes; the observed 10 minutes falls within that window, and requires the re-auth tear-down."
+          "Identifies the observed 10-minute leak after the membership-revoked event at T+0 as a DEFECT (event-driven re-auth missing/broken), states the 15-minute token TTL is only the outer bound of at most remaining token lifetime, and requires immediate tear-down/re-auth on the revocation event."
         ]
       }
     },

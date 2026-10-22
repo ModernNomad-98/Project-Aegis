@@ -85,12 +85,13 @@ it changes no skill, adds no hook, and collects nothing itself.
      use activation_mode (auto/explicit); correction/wrong-fire events use
      correction_outcome (overridden/abandoned); never reuse one field name for
      both domains. The dataset schema_epoch and migration mapping are in
-     references/usage-signal-catalog.md (current schema_epoch = 2). Consumers
-     (for example skill-usage-ledger and downstream dashboards) must read
-     activation_mode/correction_outcome by event type and must not read the
-     legacy mode field after the epoch bump; the ledger instructs consumers to
-      reject schema_epoch mismatches and map legacy records by source table before
-      any record is used, and to mark flattened/unknown event types unmigrated.
+     references/usage-signal-catalog.md; treat the catalog-declared schema_epoch as
+     authoritative (do not hardcode an epoch in consumers). Consumers must read
+     activation_mode/correction_outcome by event type and never read the legacy mode
+     field. Handling order: (1) current-epoch records are usable as-is; (2) known
+     legacy epochs are quarantined, mapped by source table and marked legacy/
+     unmigrated before use; (3) unknown epochs are rejected. The ledger documents this
+     consumer contract and the catalog is the single epoch authority.
    - *Completion hint:* the skill's workflow ran to its deliverable vs was
      abandoned — coarse (delivered / abandoned / unknown), not a quality
      score.

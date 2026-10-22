@@ -15,7 +15,7 @@
           "Designs cost entries with idempotency keys (event_id + rate-card version) so replays/retries never double-bill, and additive rollups that are reconstructable projections of the entries.",
           "Designs a reconciliation loop comparing metered totals to the provider invoice with a tolerance and a defined action on drift, and defers unit-economics/profitability to saas-cost-architect.",
           "Excludes the legacy message-content and customer-email fields from the metered table and states the data-classification basis for excluding them.",
-          "Requires purging, redacting or migrating the existing historical sensitive records (message content and customer email) and preventing re-ingestion, not only excluding those fields from new metered rows."
+          "Requires purging, redacting or migrating the existing historical sensitive records and preventing re-ingestion, subject to legal/audit retention obligations, and requires an approved remediation decision (with residual retention documented) rather than an unconditional purge."
         ]
       }
     },

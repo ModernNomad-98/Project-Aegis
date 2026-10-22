@@ -193,7 +193,8 @@
         "assertions": [
           "Produces the final requirements brief now that the accumulated answers remove all spec-blocking questions.",
           "Separates confirmed / assumed / unknown items and hands off to product-spec-writer by name.",
-          "Does NOT invoke product-spec-writer itself and does not authorize implementation."
+          "Does NOT invoke product-spec-writer itself and does not authorize implementation.",
+          "Brief records the accumulated elicitation: restates the stated solution as a problem, identifies users and the current workaround, and captures non-goals, constraints and success measure from the supplied answers (confirmed), marking anything unanswered to-confirm."
         ]
       }
     }

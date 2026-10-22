@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "80811eb0997183541e8d506eff92fbd8fc7857b1",
+  "source_revision": "05b92af727d997018d6e13e519c8409a1100c683",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -791,7 +791,7 @@
     {
       "name": "product-analytics-instrumenter",
       "path": ".claude/skills/product-analytics-instrumenter/SKILL.md",
-      "sha256": "58c5b4057d9d709ce5ca0bcb1ac2ee3358d89a56e94c6bc09a5213417ffbcbb6"
+      "sha256": "d9abafdde7e09a993728bc3e01b3f5bc7ad3432c467b67e5fe2e1d051ea86cbf"
     },
     {
       "name": "product-spec-writer",
@@ -1056,12 +1056,12 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "3140073fdd054e0b2297ed8ba675a52d0f471b8e3dad2ae55ac52b08b026125d"
+      "sha256": "1bcd7c2b12ea6bac74b0dc89a1863ad4b5423110c3438369e5bd2b2c267014e4"
     },
     {
       "name": "skill-usage-ledger",
       "path": ".claude/skills/skill-usage-ledger/SKILL.md",
-      "sha256": "650bf16f50fd7d957957f7526f37b49c541a75eaaaa10afaac0310dd04080036"
+      "sha256": "815c38cd4c29b1c2d0026c41c10399a944c92aa748f22845d3ff7cb7a0afadb9"
     },
     {
       "name": "slo-reliability-architect",

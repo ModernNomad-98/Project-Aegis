@@ -73,15 +73,22 @@ total_expected_hop_cost(hop) = own attempt work(hop) + wait_0
                                + retry_overhead(hop)
 retry_overhead(hop) = the sum over k=1..K of
                       P(k-th retry) × (attempt work(hop) + wait_k)
-Definitions: the initial attempt is counted exactly once (first line) and is NOT
-inside retry_overhead; K is the permitted retries for this hop; P(k-th retry) = p^k
-under independent per-attempt retries (or record a measured cumulative value and
-state that assumption); wait_k is the wait before the k-th retry from the recorded
-per-attempt backoff (base × 2^(k-1)), not aggregate backoff_total; downstream
-critical-path budget(hop) covers only downstream hops and their retry spend once -
-it never includes this hop's own initial attempt or retry spend. Record p, the
-independence/one-retry-layer assumption, and which layer owns retries. Use
+Definitions: wait_0 is the pre-initial-attempt wait this hop owns (queue/dispatch
+before the first attempt; 0 when none); p is the per-attempt retry probability (P(k-th
+retry) = p^k under independent retries, or record a measured cumulative value and state
+that assumption); wait_k is the wait before the k-th retry from the recorded per-attempt
+backoff (base × 2^(k-1)), not aggregate backoff_total; K is the permitted retries for
+this hop. The initial attempt is counted exactly once (first line) and is NOT inside
+retry_overhead. retry_overhead is LOCAL retry work only (attempt work + wait_k).
+downstream critical-path budget(hop) covers downstream hops' initial work and retry spend
+once; it excludes this hop's own initial attempt/retry spend. If this hop's retry
+re-invokes downstream work, add that re-executed downstream cost to the retry term (or
+explicitly limit the formula to local-only retry work and state the limitation). Record p,
+wait_0, the independence/one-retry-layer assumption, and which layer owns retries. Use
 total_expected_hop_cost for budget claims; retry_overhead is reported separately.
+Worked example: p=0.1, K=4, attempt work=40ms, wait_k=10·2^(k-1)ms, wait_0=0ms,
+downstream critical-path budget=200ms -> retry_overhead = 0.1·50 + 0.01·70 + 0.001·110
++ 0.0001·190 = 5.92ms; total = 40 + 0 + 200 + 5.92 = 245.92ms.
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
 Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)

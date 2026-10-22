@@ -75,10 +75,10 @@ Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
 | 1 | BLOCKED | reviewer block; attestation deadline passed; no recorded deadline; transition trigger fired | disabled |
 | 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
 | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
-BLOCKED effect (canonical): the grant does not expire; only in-scope human/manual
-actions remain; no agent-initiated action proceeds. A reviewer block wins for every
-agent-initiated action: halt and wait for the human. A transition trigger fired is a
-BLOCKED condition even when a deadline is recorded and not passed.
+BLOCKED effect (canonical): blocking does not itself expire the grant; only in-scope
+human/manual actions remain; no agent-initiated action proceeds while BLOCKED. A
+transition trigger fired is a BLOCKED condition even when a deadline is recorded and
+not passed. Reviewer-block handling is the halt-and-wait rule stated above this table.
 
 Canonical transitions (each matches a BLOCKED condition in the table above, and
 the transition rules sit next to the table):
@@ -179,9 +179,7 @@ Collect before designing, from recent sessions/PRs:
   matrix and any separate applicable human grants. The default matrix floor
   remains when no grant covers the action; later owner constraints also apply.
 
-Blocking does not itself expire the grant; any recorded expiry/use limit still applies.
-
-Allowed transitions: BLOCKED → ACTIVE only on recorded re-attestation after the block
-clears; ACTIVE → BLOCKED on reviewer block or passed/missing attestation deadline;
-GRANDFATHERED → BLOCKED on a reviewer block or passed deadline; no transition may
-bypass BLOCKED, and no default expiry is ever inferred.
+Blocking does not itself expire the grant; a recorded grant expiry/use limit still applies
+on its own terms (expiry bounds consumption; blocking halts agent-initiated actions).
+The canonical transition rules are the block next to the precedence table above - this
+paragraph is a pointer only and does not restate them.

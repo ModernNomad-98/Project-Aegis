@@ -26,7 +26,10 @@
         "assertions": [
           "Uses the prior-drill baseline (47 minutes, 1,204,332 rows, parity matched) as baseline only and specifies the NEW drill's expected current measurement, approval, and cleanup.",
           "Does not claim the prior drill's 47 minutes/parity numbers as this drill's result; requires fresh measurement.",
-          "Specifies restore-time evidence against the 2-hour RTO, row-count and checksum parity checks, and deletion/cleanup confirmation for this drill."
+          "Specifies restore-time evidence against the 2-hour RTO, row-count and checksum parity checks, and deletion/cleanup confirmation for this drill.",
+          "Proves the target is a non-production scratch target and confirms it does not already exist before creating it.",
+          "Records the data origin and access restrictions for the scratch copy (no production credentials/access).",
+          "Shows the scratch instance is actually deleted after the drill and its credentials revoked."
         ]
       }
     },
