@@ -72,7 +72,7 @@ is missing; it does not re-derive or re-implement them.
    audit, the [OWASP Top 10:2025 coverage
    map](../../../docs/reconciliation/step-0-reconciliation-v4.md): encryption
    and app-config hardening are partial) - the catalog must carry these as honest status, not silence.
-   Encryption remains PARTIAL by design (D8/A04 residue): key lifecycle/custody owns keys (secrets-identity-hardener); backups: database-backup-verifier; audit evidence: audit-log-architect; app-config hardening: appsec-implementer; encryption design review beyond key custody: owner TBD, tracked in the compliance backlog as an explicit gap (never an assumption).
+   Encryption remains PARTIAL by design (D8/A04 residue): key custody: `secrets-identity-hardener`; backup restore verification: `database-backup-verifier`; audit trail schema/retention: `audit-log-architect`; app-config hardening: `appsec-implementer`; encryption design review: `appsec-implementer` (design ownership).
 
 ## Workflow
 

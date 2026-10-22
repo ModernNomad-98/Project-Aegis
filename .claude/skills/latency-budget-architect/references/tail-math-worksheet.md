@@ -56,16 +56,7 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 
 ```
-One canonical cascade formula (all terms in ms; epsilon = recorded tolerance in ms, one unit):
-  timeout(upstream) > upstream own work + critical-path downstream time + epsilon
-  critical path = sum of serial segments + MAX of parallel branch durations
-  at each join; include allowed retries and backoff_total at their owning layer
-Violations to hunt:
-  - 30s defaults inside sub-second paths (bug by inheritance)
-  - upstream timeout not greater than upstream own work + critical path (initial attempt + retries + backoff_total + remaining downstream work); downstream x retries alone is not the deadline
-  - variables in ms: attempts = 1 + retries; critical path = attempts x downstream attempt budget + backoff_total + terminal downstream work not already inside the attempt budget; backoff_total = sum of actual inter-attempt waits; upstream own work is separate and never double counted; epsilon = recorded tolerance in ms owned by the path owner, counted once
-  - infinite/no timeout anywhere on a budgeted path (unbounded spend)
-  - infinite/no timeout anywhere on a budgeted path (unbounded spend)
+(One rule, see SKILL step 5: upstream timeout > downstream critical-path budget + recorded epsilon, all ms. Example: critical path 350ms + epsilon 25ms => upstream timeout > 375ms.)
 ```
 
 ## Retry-spend accounting

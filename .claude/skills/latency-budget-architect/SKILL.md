@@ -108,8 +108,7 @@ authorize execution.
    unallocated — for growth, incident conditions, and the dependency
    nobody predicted. Headroom is a line item with an owner (the path
    owner), not slack silently absorbed by whoever asks first.
-5. **Derive timeouts from budgets.** A hop's timeout is its budget plus tolerance; the ONE canonical cascade inequality is: upstream timeout > upstream own work + downstream critical path + epsilon, with every term in milliseconds. The critical path is the sum of serial segments plus the MAXIMUM of parallel branch durations at each join, including retries and backoff_total at their owning layer; epsilon is the recorded tolerance in ms, one unit, owned by the path owner. Deriving from this inequality keeps the caller from abandoning work the downstream still completes.
-   default is a bug in a 300ms path.
+5. **Derive timeouts from budgets.** Set each upstream timeout above the downstream critical-path budget by a recorded epsilon (all values in ms). Critical path = serial work + the longest parallel branch at each join; retries add recorded backoff_total (sum of actual inter-attempt waits). Example: critical path 350ms + epsilon 25ms => upstream timeout > 375ms.
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
    SOMEONE's allocation. State which hops may retry (idempotent
@@ -160,16 +159,11 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <per hop: timeout = hop work + tolerance (tolerance = epsilon; use ONE strict operator: upstream timeout > upstream own work + downstream critical path + epsilon; record both terms)>
-          Variables (all milliseconds, recorded with the design): attempts = 1 + retries; downstream critical path = attempts x downstream attempt budget + backoff_total + terminal downstream work NOT already inside the attempt budget; backoff_total = sum of actual inter-attempt waits (state constant-backoff assumption if used); upstream own work is its own row and must not be counted again in the downstream critical path. Epsilon is the tolerance in milliseconds, owned by the path owner, counted once in the strict inequality. Example: downstream retries=2, downstream attempt budget=100ms (that hop's own work is inside this budget; list terminal downstream work as its own overhead row if it is not), actual inter-attempt waits 50ms + 50ms (backoff_total=100ms), upstream own work=40ms, epsilon=recorded tolerance => upstream timeout > 40ms + (1+2) x 100ms + 100ms + epsilon.
-
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
-Timeouts: <canonical cascade: upstream timeout > upstream own work + downstream critical path + epsilon (all terms in ms; epsilon = recorded tolerance in ms, one unit; record every term)>
 Owner claim choice (only if needed): <terms; viable paths and reasons;
   user/hop effects, pros/cons, time/money/upkeep or unknowns;
-  recommendation and why; one decision question; owners still sign>
 Reduction work routed: <hop over budget today → owning skill (query-plan-reader | caching-strategy-designer | frontend-perf-engineer | ...)>
 ```
 
@@ -185,23 +179,13 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Every timeout derives from the full strict inequality (upstream timeout >
-      upstream own work + downstream critical path + epsilon), where
-      backoff_total = sum of actual inter-attempt waits; record every term.
 - [ ] Retries are budgeted spend at one layer only; hedging is
-      headroom-funded or absent.
-- [ ] Headroom is a named line item with an owner, 15–25%.
-- [ ] Every timeout derives from the ONE canonical cascade inequality (upstream
-      timeout > upstream own work + downstream critical path + epsilon, all ms;
-      critical path = serial sum + max parallel branch at each join;
-      backoff_total = sum of actual inter-attempt waits; record every term).
 - [ ] Any owner-facing claim choice explains terms, effects, costs or
       unknowns, pros/cons, and a reasoned recommendation before one
       question; no budget or SLO changes silently.
-
 ## Gotchas
 
-- Percentiles don't add: p99(A)+p99(B) is not p99(A+B). The sum can
+- The pure-multiplication trap: multiplying per-hop p99s can
   overestimate or underestimate the path's p99 depending on dependence and
   distribution. Budget per-hop using measured or bounded joint behavior,
   and state the assumptions.
@@ -214,29 +198,19 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
   cost more than the service call it wraps — and it appears in no
   service's dashboard because it happens in the caller. The overhead
   rows exist because the unmeasured milliseconds are still spent.
-- **Cascade invariant:** each upstream timeout must exceed upstream own work +
-  the downstream critical-path budget by epsilon (record every term;
-  backoff_total = sum of actual inter-attempt waits, not retries x one wait).
-  retries at ONE stated layer (usually innermost idempotent).
-- Queue wait is invisible until it isn't: async hops budgeted at
-- **Cascade invariant:** each upstream timeout > upstream own work + the
-  downstream critical path + epsilon (all terms in ms; record every term;
-  backoff_total = sum of actual inter-attempt waits, not retries x one wait).
-  gap becomes ROUTED reduction work (the owning skill) or the
-  allocation is honest about today.
-- Cold connections on the tail: pool exhaustion and TLS setup land on
-  exactly the requests already unlucky — tail budgets include
-  connection establishment or the p99 promise excludes cold starts
-  explicitly.
+- Queue wait is invisible until it isn't: when a measured budget exposes
+  a gap, record it as ROUTED reduction work (owning skill) or state the
+  allocation honestly rather than absorbing it silently.
+- Cold connections on the tail: pool exhaustion, DNS and TLS setup land on
+  the slowest requests; budget connection establishment as its own
+  overhead row (and note that cold connections are not visible in the
+  steady-state p50).
 
 ## Stop Conditions
 
 - No end-to-end target exists and none can be assumed responsibly
   (no SLO, no contract, no product number) → stop; route target-
   setting to `slo-reliability-architect`. A budget without a target
-  is allocation theater.
-- Asked to SET the SLO, define error budgets, or design paging as
-  part of the budget work → decline that slice; that is
   `slo-reliability-architect`'s scope, and doing it here forks the
   reliability source of truth.
 - The measured reality exceeds the target before allocation begins

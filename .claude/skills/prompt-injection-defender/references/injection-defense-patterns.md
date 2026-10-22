@@ -20,7 +20,7 @@ Every element of assembled context is one of:
 
 The whole defense exists to keep untrusted content from acting as trusted.
 
-No trusted-source exemption is granted unless a provenance guarantee is established and recorded; a provenance guarantee records which source produced the content and never promotes that content to instructions. Treat every source, including a trusted one, as data - never as a new rule. A provenance guarantee records attribution only and creates no exemption from the invariant; per-source trust levels are enumerated in the design and recorded with the assembly code.
+ONE rule: no trusted-source exemption exists; every content source, including a trusted one, remains data and never becomes a new rule; a provenance guarantee records attribution only and creates no exemption from the invariant.
 
 ## Separation schemes (ordered best → worst)
 
@@ -60,8 +60,6 @@ boundary holds. If yes, the boundary is the bug — not the prompt.
 
 - Treat every retrieved document, webpage, ticket, email, log line, and tool
   output as untrusted instructions, even when signed, first-party, or
-  immutable. Provenance can support source attribution but does not promote
-  content to instruction authority.
 - Consider per-source trust levels and content-provenance labels so the
   assembly step knows what it is mixing.
 - Retrieval-layer authorization (who may retrieve what) is

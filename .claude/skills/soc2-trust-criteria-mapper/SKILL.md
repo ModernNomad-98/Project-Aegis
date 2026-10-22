@@ -95,7 +95,7 @@ purchase.
    confidential-data commitments — `tenant-isolation-reviewer`,
    `secrets-identity-hardener` *(manual-only)*), Processing Integrity (processing
    completeness/accuracy commitments), Privacy (personal-information
-   `sensitive-disclosure-guard` surface; `pii-lifecycle-designer` owns the
+   commitments — `sensitive-disclosure-guard` surface; `pii-lifecycle-designer` owns the
    notice/choice/access/disposal lifecycle — scope boundary: lifecycle vs
    disclosure, no double ownership). Record WHY each
    category is in or out; "more categories looks better" is an

@@ -11,11 +11,10 @@
         "triggers": true,
         "assertions": [
           "Builds a small set of NAMED functional shards from the measured full-tier inventory, every existing check assigned to exactly one shard, balanced by real durations.",
-          "Designs the persisted status file distinguishing failed (assertions) from interrupted (timeout/infra), bound to the canonical resume fingerprint (tree + every dependency lockfile hash + the toolchain version list; run-id is audit metadata only), with mandatory tests_executed counts.",
           "Resume mode reruns only interrupted/pending shards when the canonical fingerprint matches; passes are kept; any fingerprint change (tree, dependency lockfile or toolchain) invalidates all prior status, and a run-id alone never changes it.",
           "Adds the uncategorized catch-shard with the empty-or-fail contract, and the CI wiring spec funneling parallel shards into ONE aggregate gate as the sole required check.",
           "Delivers wiring as a handoff spec (reference YAML) to ci-pipeline-architect/human — edits no pipeline files.",
-          "Defines the fingerprint lookup key: repository + status-file path + status-schema version; inputs are the tracked-file Git tree hash, tracked lockfiles as sorted path:sha256 tuples, and the toolchain list with pinned runner image digest (never a mutable tag)."
+          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
         ]
       }
     },
@@ -28,7 +27,8 @@
         "assertions": [
           "The test lands in the uncategorized catch-shard, which RUNS it and reports failure-by-policy until the test is assigned to a functional shard.",
           "The fix is a reviewed shard-map change assigning the test — not widening uncategorized into a permanent misc bucket.",
-          "States why: the catch-shard's job is making unassigned tests a visible failure instead of silent coverage decay."
+          "States why: the catch-shard's job is making unassigned tests a visible failure instead of silent coverage decay.",
+          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
         ]
       }
     },
@@ -41,7 +41,8 @@
         "assertions": [
           "Refuses: resume covers timeout/infrastructure interruptions only — a failed shard is never resumed-away; that is failure laundering through the resume flag.",
           "Points at the status-file semantics that make this mechanical: failed is not a resume-eligible state.",
-          "The lawful path: fix, rerun the shard (or the tier on the new commit); the gate stays red until the failure is actually resolved."
+          "The lawful path: fix, rerun the shard (or the tier on the new commit); the gate stays red until the failure is actually resolved.",
+          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
         ]
       }
     },
@@ -55,7 +56,8 @@
           "Diagnoses the anti-pattern: per-shard required checks break under conditional skips.",
           "Prescribes the aggregate-gate shape: one always()-running gate job as the sole required check, explicitly evaluating shard results — skipped satisfies only when the tier selector said docs-only; skipped on a full-tier run FAILS.",
           "Keeps branch protection referencing only the stable aggregate name.",
-          "Covers the mixed state: documented docs-only skips satisfy the aggregate only under the recorded docs-only predicate; a documented-plus-code mixed PR must fail the aggregate rather than inheriting the skip."
+          "Covers the mixed state: documented docs-only skips satisfy the aggregate only under the recorded docs-only predicate; a documented-plus-code mixed PR must fail the aggregate rather than inheriting the skip.",
+          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
         ]
       }
     },
@@ -66,7 +68,8 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Intermittent-failure diagnosis is flaky-test-detective; the shard runner neither retries-until-green nor resumes around flakes."
+          "Intermittent-failure diagnosis is flaky-test-detective; the shard runner neither retries-until-green nor resumes around flakes.",
+          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
         ]
       }
     },
@@ -78,7 +81,8 @@
         "triggers": false,
         "assertions": [
           "Does not invoke sharded-validation-with-resume: the request is a local pre-commit run with a baseline and failure classification, not a shard architecture.",
-          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it."
+          "Does not auto-invoke local-ci-mirror-preflight (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it.",
+          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
         ]
       }
     },
@@ -90,7 +94,8 @@
         "triggers": false,
         "assertions": [
           "Does not invoke sharded-validation-with-resume: stage ordering, build-once artifacts, and deploy gates are the delivery pipeline's stage graph; shard design covers only one validation stage's internals.",
-          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it."
+          "Does not auto-invoke ci-pipeline-architect (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute sharded-validation-with-resume for it.",
+          "Treats a tracked status file as advisory only (never trusted for resume), resumes from the canonical fingerprint plus a trusted CI state store, and classifies the skip predicate independently at classification time."
         ]
       }
     }

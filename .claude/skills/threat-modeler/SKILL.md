@@ -122,9 +122,9 @@ Not modeled: <explicitly out-of-scope areas + why>
       privileged insider — not just "hacker".
 - [ ] Every SaaS data-access boundary has tenant-isolation and object-level
       authorization threat rows.
-- [ ] Every HIGH risk states severity from potential consequence, with
-      exploit-path confidence reported separately; unconfirmed exploit paths
-      are labeled hypotheses and investigated, not silently downgraded.
+- [ ] Every HIGH risk states potential consequence and exploit-path
+      confidence separately; unconfirmed exploit paths are labeled hypotheses
+      and investigated, never silently downgraded.
 - [ ] Every credible threat maps to a mitigation, a written acceptance, or a
       deferral with an owner — none silently dropped.
 - [ ] Every mitigation has a suitable validation check; denial controls have
