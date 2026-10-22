@@ -15,7 +15,9 @@
     "human-approval-boundary",
     "interface-first-designer",
     "latency-budget-architect",
+    "observability-by-design",
     "resilience-architecture-reviewer",
+    "secrets-identity-hardener",
     "tech-spec-writer"
   ],
   "cases": [
@@ -225,6 +227,24 @@
         "outbound-integration-adapter-designer"
       ],
       "reason": "Pattern cost/placement decisions inside the application layer are the pattern advisor deliverable; the outbound designer owns the provider adapter contract."
+    },
+    {
+      "id": "outbound-integration-adapter-designer-seam-secrets",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Design the provider secret storage and rotation model for third-party credentials.",
+      "expected_skill": "secrets-identity-hardener",
+      "should_not_trigger": [
+        "outbound-integration-adapter-designer"
+      ],
+      "reason": "Secret storage, rotation and identity hardening are secrets-identity-hardener ownership (manual-only, explicit invocation); the adapter designer only consumes credential references."
+    },
+    {
+      "id": "outbound-integration-adapter-designer-seam-observability",
+      "prompt": "Design the telemetry contract for the provider integration: logs, metrics, traces, correlation IDs and redaction.",
+      "expected_skill": "observability-by-design",
+      "should_not_trigger": [
+        "outbound-integration-adapter-designer"
+      ],
+      "reason": "The telemetry contract is observability-by-design ownership; the adapter designer only specifies its own failure/observability requirements."
     }
   ]
 }

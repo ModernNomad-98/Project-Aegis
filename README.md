@@ -1145,19 +1145,19 @@ Phase 2 — core architecture & engineering pack:
 | `interface-first-designer` | Designs contracts before internals: callers/constraints, interfaces/adapters, compatibility/versioning, test doubles and ordered migration; stops before implementation. | auto + manual |
 | `data-flow-diagrammer` | Produces a trustworthy data-flow diagram: sources/sinks/stores/transforms/side effects, trust boundaries, assumptions and unverified elements labeled; documentation-only. | auto + manual |
 | `concurrency-race-reviewer` | Reviews interleaving operations for lost updates, double-create, check-then-act and retry duplicates; proposes serialization/idempotency/locking fixes with tests; review-only. | auto + manual |
-| `state-machine-modeler` | (Batch 4, #14) Model state machines: states, events, guards, side effects, terminal states, retry/compensation edges and invalid-transition handling before code hardens the wrong lifecycle. | auto + manual |
-| `transaction-scope-designer` | (Batch 4, #19, #156) Design transaction scope across tables and services: atomic vs staged writes, isolation, lock order, retries, idempotency and compensation. | auto + manual |
-| `cqrs-read-model-designer` | (Batch 4, #20) Design CQRS read models: split decision, projections, rebuild/backfill and the consistency contract between writes and reads. | auto + manual |
-| `configuration-architect` | (Batch 4, #28, #66) Design config layers: build/runtime/tenant/user precedence, validation, ownership, secret references, drift detection and migration. | auto + manual |
-| `extensibility-boundary-designer` | (Batch 4, #29, #30) Design extensibility boundaries: extension points, plugin contracts, capability limits, versioning, isolation and failure containment. | auto + manual |
-| `application-layer-pattern-advisor` | (Batch 4, #31, #32, #33, #34, #35) Decide application-layer patterns: when adapters, facades, repositories, service objects or use-case layers earn their cost, and where they belong. | auto + manual |
-| `technical-debt-classifier` | (Batch 4, #43) Classify technical debt with a ledger: type, evidence, interest, principal, owner, priority and reversal cost, ranked for decisions. | auto + manual |
-| `modernization-cutover-planner` | (Batch 4, #45, #46, #47) Plan incremental modernization cutover: migration sequence, dual writes/backfill, cutover gates, rollback points and decommission. | auto + manual |
-| `architecture-fitness-function-designer` | (Batch 4, #50) Design architecture fitness functions: measurable rules for dependency direction, coupling, layering and latency with budgets and owners. | auto + manual |
-| `architecture-spike-planner` | (Batch 4, #54) Plan timeboxed architecture spikes: question, hypotheses, timebox, evidence, exit criteria and the resulting decision. | auto + manual |
-| `graphql-boundary-reviewer` | (Batch 4, #135) Review GraphQL boundaries: schema ownership, resolvers, authorization, pagination/depth limits, batching, caching and tenant scoping. | auto + manual |
-| `outbound-integration-adapter-designer` | (Batch 4, #146) Design outbound integration adapters: provider contract, mapping, timeouts/retries, idempotency, circuit breakers, signing and pinning. | auto + manual |
-| `edge-function-designer` | (Batch 4, #158) Design edge functions: boundary auth, environment validation, timeouts, cold-start/concurrency, retry/idempotency, logging and platform limits. | auto + manual |
+| `state-machine-modeler` | Model state machines: states, events, guards, side effects, terminal states, retry/compensation edges and invalid-transition handling before code hardens the wrong lifecycle. | auto + manual |
+| `transaction-scope-designer` | Design transaction scope across tables and services: atomic vs staged writes, isolation, lock order, retries, idempotency and compensation. | auto + manual |
+| `cqrs-read-model-designer` | Design CQRS read models: split decision, projections, rebuild/backfill and the consistency contract between writes and reads. | auto + manual |
+| `configuration-architect` | Design config layers: build/runtime/tenant/user precedence, validation, ownership, secret references, drift detection and migration. | auto + manual |
+| `extensibility-boundary-designer` | Design extensibility boundaries: extension points, plugin contracts, capability limits, versioning, isolation and failure containment. | auto + manual |
+| `application-layer-pattern-advisor` | Decide application-layer patterns: when adapters, facades, repositories, service objects or use-case layers earn their cost, and where they belong. | auto + manual |
+| `technical-debt-classifier` | Classify technical debt with a ledger: type, evidence, interest, principal, owner, priority and reversal cost, ranked for decisions. | auto + manual |
+| `modernization-cutover-planner` | Plan incremental modernization cutover: migration sequence, dual writes/backfill, cutover gates, rollback points and decommission. | auto + manual |
+| `architecture-fitness-function-designer` | Design architecture fitness functions: measurable rules for dependency direction, coupling, layering and latency with budgets and owners. | auto + manual |
+| `architecture-spike-planner` | Plan timeboxed architecture spikes: question, hypotheses, timebox, evidence, exit criteria and the resulting decision. | auto + manual |
+| `graphql-boundary-reviewer` | Review GraphQL boundaries: schema ownership, resolvers, authorization, pagination/depth limits, batching, caching and tenant scoping. | auto + manual |
+| `outbound-integration-adapter-designer` | Design outbound integration adapters: provider contract, mapping, timeouts/retries, idempotency, circuit breakers, signing and pinning. | auto + manual |
+| `edge-function-designer` | Design edge functions: boundary auth, environment validation, timeouts, cold-start/concurrency, retry/idempotency, logging and platform limits. | auto + manual |
 
 Phase 3 — SaaS & tenant isolation pack:
 

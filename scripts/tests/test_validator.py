@@ -2703,7 +2703,7 @@ def test_coverage_map_triage_rows_and_phrase():
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     assert "80 of 243" in mmd and "80 of 215" not in mmd
     assert "80 of 222" not in mmd and "80 of 230" not in mmd, (
-        "the immediately previous Batch-2 optionality phrase must stay rejected")
+        "both stale optionality phrases (80 of 222 and 80 of 230) must stay rejected")
     assert "83 of 215" not in mmd, (
         "the pre-Batch-1 stale optionality phrase must stay rejected")
 
@@ -3030,17 +3030,19 @@ def test_coverage_map_batch4_deliveries():
     manifest = json.loads(
         validator.MANIFEST_PATH.read_text(encoding="utf-8"))
     assert len(manifest["skills"]) == 243
-    pair = {
-        "application-layer-pattern-advisor",
-        "outbound-integration-adapter-designer",
-    }
     for name in sorted(set(mapping.values())):
         cases = json.loads(
             (validator.REPO_ROOT / ".claude" / "skills" / name / "evals"
              / "trigger-evals.json").read_text(encoding="utf-8"))["cases"]
         positives = [c for c in cases if c["expected_skill"] == name]
         negatives = [c for c in cases if c["expected_skill"] != name]
-        expected_negative = 15 if name in pair else 14
+        seam = {
+            "application-layer-pattern-advisor": 16,
+            "transaction-scope-designer": 15,
+            "architecture-fitness-function-designer": 15,
+            "outbound-integration-adapter-designer": 17,
+        }
+        expected_negative = seam.get(name, 14)
         assert len(positives) == 8, (name, len(positives))
         assert len(negatives) == expected_negative, (name, len(negatives))
         skill_md = (validator.REPO_ROOT / ".claude" / "skills" / name

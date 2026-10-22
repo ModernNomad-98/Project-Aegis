@@ -3,6 +3,7 @@
   "description": "Trigger discrimination for transaction-scope-designer against real shipped owners",
   "overlaps_with": [
     "adr-writer",
+    "application-layer-pattern-advisor",
     "architecture-designer",
     "background-job-orchestration-architect",
     "code-reviewer",
@@ -215,6 +216,15 @@
         "transaction-scope-designer"
       ],
       "reason": "This request is human-approval-boundary's deliverable end-to-end; transaction-scope-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "transaction-scope-designer-seam-application-layer",
+      "prompt": "Should we keep a repository facade and an explicit use-case layer, or is that over-abstraction hiding side effects?",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "transaction-scope-designer"
+      ],
+      "reason": "Pattern cost/placement decisions inside the application layer are application-layer-pattern-advisor ownership; transaction scope design stays here."
     }
   ]
 }

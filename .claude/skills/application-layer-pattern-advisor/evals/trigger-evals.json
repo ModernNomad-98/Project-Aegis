@@ -16,7 +16,8 @@
     "layered-architecture-enforcer",
     "outbound-integration-adapter-designer",
     "release-readiness-reviewer",
-    "tech-spec-writer"
+    "tech-spec-writer",
+    "transaction-scope-designer"
   ],
   "cases": [
     {
@@ -225,6 +226,15 @@
         "application-layer-pattern-advisor"
       ],
       "reason": "External-provider adapter contract (timeouts/retries/idempotency/signing) is the outbound sibling deliverable; the pattern advisor only owns placement/cost decisions."
+    },
+    {
+      "id": "application-layer-pattern-advisor-seam-transaction-scope",
+      "prompt": "Our write path spans orders, inventory and payment services - choose atomic vs staged and define the isolation, lock order and compensation plan.",
+      "expected_skill": "transaction-scope-designer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "Transaction boundary/scope, isolation, locking and compensation are transaction-scope-designer ownership; the pattern advisor only places patterns inside the application layer."
     }
   ]
 }

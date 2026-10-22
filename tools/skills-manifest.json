@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "a859bc09c342a56011ee6d74086e17cad9d4f475",
+  "source_revision": "67edd114d2c54c64a7f16294b8de5cb06d17ff59",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -171,7 +171,7 @@
     {
       "name": "application-layer-pattern-advisor",
       "path": ".claude/skills/application-layer-pattern-advisor/SKILL.md",
-      "sha256": "f9ab226c9b814f225073cf2ac02ab047ae6a71f13b3035229f11ff9c7d14fd78"
+      "sha256": "bd6147a97f895d59e33a21da1cb6c5768274a7fd3368a81b00020d6ff13b0162"
     },
     {
       "name": "appsec-implementer",
@@ -191,7 +191,7 @@
     {
       "name": "architecture-fitness-function-designer",
       "path": ".claude/skills/architecture-fitness-function-designer/SKILL.md",
-      "sha256": "b93862c1169a53de2c32d1a79db9490cc401683a31b4110e1eaba40b72011e10"
+      "sha256": "2e2625bd12cc28aaf5d115e7e99830b9678c601e11ce3c9f9aaca40217bf6360"
     },
     {
       "name": "architecture-spike-planner",
@@ -721,7 +721,7 @@
     {
       "name": "outbound-integration-adapter-designer",
       "path": ".claude/skills/outbound-integration-adapter-designer/SKILL.md",
-      "sha256": "e4d5db79742d9d381d95410bc0602cd75e9f17b638165c614d82b52b23cfdfc1"
+      "sha256": "41ce7c026739d6d709f7669a201eae282b576c9f8000cb7e22cea2661bb9c451"
     },
     {
       "name": "pagination-cursor-designer",
@@ -1171,7 +1171,7 @@
     {
       "name": "transaction-scope-designer",
       "path": ".claude/skills/transaction-scope-designer/SKILL.md",
-      "sha256": "fd2dadc26b422355354b0c5b96d1cac80935317d7b51cdfc8d98b53f3fc89aa9"
+      "sha256": "7efa3f03292b5e1f01cc3f6f43d50ec547f4dc2bea01d17d703feb45801d45e4"
     },
     {
       "name": "url-state-architect",

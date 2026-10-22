@@ -73,12 +73,13 @@ Return, in this order:
 - External-provider adapter contracts (timeouts, retries, idempotency, signing) yield to `outbound-integration-adapter-designer`; pattern/placement decisions stay with this skill.
 - The caller wants implementation, execution or approval: refuse; return the artifact for the authorized owner.
 - Required evidence is unavailable: mark the artifact UNVERIFIED and state what is missing instead of inventing facts.
-- **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `tech-spec-writer`.
+- Transaction boundary/scope, isolation, lock order and compensation design route to `transaction-scope-designer`; this skill may identify where a transaction boundary sits but does not design its scope.
+- **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `tech-spec-writer`, `transaction-scope-designer`.
 
 ## Supporting Files
 
 - [pattern-decision-table](references/pattern-decision-table.md) - the concrete pattern decision table with placement and side-effect visibility fields, construction method, checks and a worked table.
 - [evals/evals.json](evals/evals.json) - six domain-specific behaviour cases.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 23 trigger-discrimination cases (8 positive / 15 negative, including the reciprocal sibling case) against real manifest owners.
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 24 trigger-discrimination cases (8 positive / 16 negative) against real manifest owners.
 
 **Source:** docs/skills-catalog.md Phase 2 core architecture & engineering pack (Batch 4/D112); coverage cat 01 rows #31, #32, #33, #34, #35. Description is trigger-first (capability front-loaded for truncated listings).

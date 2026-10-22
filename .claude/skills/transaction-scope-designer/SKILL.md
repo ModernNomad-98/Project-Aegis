@@ -72,12 +72,13 @@ Return, in this order:
 - validation boundary designer requests route to `validation-boundary-designer`; this skill owns a different artifact.
 - The caller wants implementation, execution or approval: refuse; return the artifact for the authorized owner.
 - Required evidence is unavailable: mark the artifact UNVERIFIED and state what is missing instead of inventing facts.
-- **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `command-gateway-architect`, `concurrency-race-reviewer`, `data-migration-runbook-author`, `design-review-facilitator`, `human-approval-boundary`, `resilience-architecture-reviewer`, `schema-evolution-planner`, `secure-migration-reviewer`, `tech-spec-writer`, `validation-boundary-designer`.
+- Application-layer pattern/placement cost decisions (adapters, facades, repositories, use-case layers) route to `application-layer-pattern-advisor`; this skill owns transaction scope.
+- **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `command-gateway-architect`, `concurrency-race-reviewer`, `data-migration-runbook-author`, `design-review-facilitator`, `human-approval-boundary`, `resilience-architecture-reviewer`, `schema-evolution-planner`, `secure-migration-reviewer`, `tech-spec-writer`, `validation-boundary-designer`, `application-layer-pattern-advisor`.
 
 ## Supporting Files
 
 - [transaction-scope-checklist](references/transaction-scope-checklist.md) - the concrete transaction scope matrix plus compensation plan fields, construction method, checks and a worked table.
 - [evals/evals.json](evals/evals.json) - six domain-specific behaviour cases.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 22 trigger-discrimination cases (8 positive / 14 negative) against real manifest owners
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 23 trigger-discrimination cases (8 positive / 15 negative) against real manifest owners
 
 **Source:** docs/skills-catalog.md Phase 2 core architecture & engineering pack (Batch 4/D112); coverage cat 01, 04 rows #19, #156. Description is trigger-first (capability front-loaded for truncated listings).

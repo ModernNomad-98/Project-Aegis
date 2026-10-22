@@ -10,6 +10,7 @@
     "design-review-facilitator",
     "frontend-perf-engineer",
     "human-approval-boundary",
+    "latency-budget-architect",
     "layered-architecture-enforcer",
     "n-plus-one-detector",
     "observability-by-design",
@@ -215,6 +216,15 @@
         "architecture-fitness-function-designer"
       ],
       "reason": "This request is release-readiness-reviewer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "architecture-fitness-function-designer-seam-latency-budget",
+      "prompt": "Set the end-to-end latency budget for the checkout path and trace it through each service call.",
+      "expected_skill": "latency-budget-architect",
+      "should_not_trigger": [
+        "architecture-fitness-function-designer"
+      ],
+      "reason": "Latency-budget definition and budget tracing are latency-budget-architect ownership; the fitness designer only turns an agreed budget into measurable fitness functions."
     }
   ]
 }
