@@ -2849,6 +2849,13 @@ def test_coverage_map_batch3_deliveries():
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary P0 gap id set must equal the",
                          "coverage map: non-empty summary P0 id list rejected")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            return text.replace("## P0 gap candidates (all 0 ids)\n\nNone.\n",
+                                "## P0 gap candidates (all 0 ids)\n", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "summary P0 section must state None",
+                         "coverage map: empty P0 section body rejected")
 
 
 def test_skills_manifest_provenance():

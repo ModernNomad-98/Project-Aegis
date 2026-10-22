@@ -2418,6 +2418,12 @@ def check_coverage_map(rep: Report) -> None:
         rep.error("[" + md_ctx + "] summary must keep the '"
                   + p0_heading + "' section heading even when the P0 GAP set "
                   "is empty (a missing section must not pass vacuously)")
+    if not COVERAGE_P0_GAP_IDS:
+        p0_section = _coverage_section(summary_visible, p0_heading)
+        if "None." not in p0_section:
+            rep.error("[" + md_ctx + "] summary P0 section must state None "
+                      "when the pinned P0 GAP set is empty (an empty body "
+                      "must not pass vacuously)")
     if COVERAGE_TIMESTAMP_RE.search(text) or COVERAGE_TIMESTAMP_RE.search(
             summary):
         rep.error("[" + ctx + "] must not carry timestamps (deterministic "

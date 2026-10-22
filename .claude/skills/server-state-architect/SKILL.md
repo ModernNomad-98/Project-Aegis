@@ -69,7 +69,7 @@ Return, in this order:
 ## Stop Conditions
 
 - The request is external API/event contract semantics: route to `api-event-architect`.
-- The request is cache policy, keys and stampede protection: route to `caching-strategy-designer`.
+- The request is BACKEND/server-side cache storage policy, backend keys and stampede protection: route to `caching-strategy-designer`; client query-cache keys, invalidation and stale-time policy stay with this skill.
 - The request is telemetry contract for data-loading behavior: route to `observability-by-design`.
 - The request is UI state placement review (Batch-3 sibling seam): route to `client-state-boundary-reviewer`.
 - The trigger-evals file lists a broader discrimination set (all named in the reference Boundaries); the routes above are the primary Stop Conditions.

@@ -1077,12 +1077,12 @@ boundaries, route protection, design-token governance, server state, client-stat
 review, URL state and PWA boundaries; they are NOT sub-details of the API contract
 and their trigger-evals pin the pre-existing owners plus the batch-internal sibling
 seams that are actually exercised: frontend-architecture-mapper <->
-component-boundary-designer, component-boundary-designer <->
-design-system-token-governor, route-protection-designer <-> url-state-architect,
-and client-state-boundary-reviewer -> url-state-architect (one-way). The
-server-state-architect <-> client-state-boundary-reviewer <-> url-state-architect
-seam is pinned in the skills' Stop Conditions only (not in trigger-evals; recorded
-as an accepted residual from SD-D).
+component-boundary-designer, design-system-token-governor ->
+component-boundary-designer, route-protection-designer <-> url-state-architect,
+and client-state-boundary-reviewer -> url-state-architect; these are one-way where
+only one direction is trigger-pinned. The server-state-architect <->
+client-state-boundary-reviewer and server-state-architect <-> url-state-architect
+legs are pinned in the skills' Stop Conditions only (accepted residual from SD-D).
 
 All 13 ship `evals/evals.json` **and** `evals/trigger-evals.json`. All are advisory:
 the original five are design-only, two of the Batch-3 additions are review-only, and
@@ -1111,8 +1111,8 @@ caching-strategy-designer, feature-flag-architect, offline-first-sync-architect,
 notification-webhook-ux-designer, error-taxonomy-designer, edge-state-ux-designer,
 mobile-viewport-craft, accessibility-test-harness, frontend-perf-engineer,
 visual-regression-test-designer, vite-build-qa-engineer) and exercise the real batch-internal
-sibling seams named in the D12.2 intro; the server-state/client-state/url-state seam is
-Stop-Conditions-only (accepted residual from SD-D). Each ships 6 behaviour cases and a
+sibling seams named in the D12.2 intro; the server-state/client-state and
+server-state/url-state legs are Stop-Conditions-only (accepted residual from SD-D). Each ships 6 behaviour cases and a
 22-case trigger-eval file (8 positive / 14 negative).
 
 ### Skills (D12.5 — PM / product-engineering interface pack)

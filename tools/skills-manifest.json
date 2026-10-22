@@ -941,7 +941,7 @@
     {
       "name": "server-state-architect",
       "path": ".claude/skills/server-state-architect/SKILL.md",
-      "sha256": "2df5cde319faa89dc8d1beb5ce71900358f171df9e669a196dad042ddba63aef"
+      "sha256": "ea065a4c6bcffb2139a3a04feef4d50ed72a493dd54b043f5a6856a95211aabc"
     },
     {
       "name": "sharded-validation-with-resume",

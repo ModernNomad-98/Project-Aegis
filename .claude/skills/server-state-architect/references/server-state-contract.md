@@ -32,7 +32,7 @@ The returned record must name the evidence source for each decision, separate ve
 
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
 - External API/event contract semantics routes to `api-event-architect`; this skill does not perform that owner's work.
-- Cache policy, keys and stampede protection routes to `caching-strategy-designer`; this skill does not perform that owner's work.
+- BACKEND/server-side cache storage policy, backend keys and stampede protection route to `caching-strategy-designer`; this skill does not perform that owner's work. Client query-cache keys, invalidation and stale-time policy stay with this skill.
 - Telemetry contract for data-loading behavior routes to `observability-by-design`; this skill does not perform that owner's work.
 - UI state placement review (Batch-3 sibling seam) routes to `client-state-boundary-reviewer`; this skill does not perform that owner's work.
 - Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `api-event-architect`, `background-job-orchestration-architect`, `caching-strategy-designer`, `data-flow-diagrammer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `feature-flag-architect`, `frontend-perf-engineer`, `load-test-planner`, `multi-tenant-data-architect`, `notification-webhook-ux-designer`, `observability-by-design`, `performance-test-harness`, `validation-boundary-designer` (discrimination neighbours, not in-scope work).
