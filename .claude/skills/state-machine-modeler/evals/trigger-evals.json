@@ -1,6 +1,6 @@
 {
   "skill": "state-machine-modeler",
-  "description": "Trigger discrimination for state-machine-modeler against the nearest shipped owners.",
+  "description": "Trigger discrimination for state-machine-modeler against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",
@@ -25,70 +25,70 @@
       "should_not_trigger": [
         "tenant-modeler"
       ],
-      "reason": "The request needs state-machine-modeler's design method; tenant-modeler owns a different task."
+      "reason": "The request needs state-machine-modeler's artifact; the named neighbour owns a different task."
     },
     {
       "id": "state-machine-modeler-positive-2",
-      "prompt": "Our subscription states are disputed between teams - produce the state/event table and transition matrix.",
+      "prompt": "Design the retry and compensation edges for a payment intent state machine.",
       "expected_skill": "state-machine-modeler",
       "should_not_trigger": [
         "subscription-lifecycle-designer"
       ],
-      "reason": "The request needs state-machine-modeler's design method; subscription-lifecycle-designer owns a different task."
+      "reason": "The request needs state-machine-modeler's artifact; the named neighbour owns a different task."
     },
     {
       "id": "state-machine-modeler-positive-3",
-      "prompt": "Design the retry and compensation edges for a payment intent state machine.",
+      "prompt": "We need an explicit invalid-transition policy for an order that is already cancelled.",
       "expected_skill": "state-machine-modeler",
       "should_not_trigger": [
         "domain-modeler"
       ],
-      "reason": "The request needs state-machine-modeler's design method; domain-modeler owns a different task."
+      "reason": "The request needs state-machine-modeler's artifact; the named neighbour owns a different task."
     },
     {
       "id": "state-machine-modeler-positive-4",
-      "prompt": "We need an explicit invalid-transition policy for an order that is already cancelled.",
+      "prompt": "Model the device-provisioning lifecycle with its retry edges and invalid transitions.",
       "expected_skill": "state-machine-modeler",
       "should_not_trigger": [
         "property-based-test-designer"
       ],
-      "reason": "The request needs state-machine-modeler's design method; property-based-test-designer owns a different task."
+      "reason": "The request needs state-machine-modeler's artifact; the named neighbour owns a different task."
     },
     {
       "id": "state-machine-modeler-positive-5",
-      "prompt": "Model the fulfillment lifecycle and list the states that must never be reachable from a refund.",
+      "prompt": "The current status column has become an implicit state machine - make it explicit with guards and effects.",
       "expected_skill": "state-machine-modeler",
       "should_not_trigger": [
         "product-spec-writer"
       ],
-      "reason": "The request needs state-machine-modeler's design method; product-spec-writer owns a different task."
+      "reason": "The request needs state-machine-modeler's artifact; the named neighbour owns a different task."
     },
     {
       "id": "state-machine-modeler-positive-6",
-      "prompt": "The current status column has become an implicit state machine - make it explicit with guards and effects.",
+      "prompt": "Design terminal states and re-open rules for a support ticket lifecycle.",
       "expected_skill": "state-machine-modeler",
       "should_not_trigger": [
         "architecture-designer"
       ],
-      "reason": "The request needs state-machine-modeler's design method; architecture-designer owns a different task."
+      "reason": "The request needs state-machine-modeler's artifact; the named neighbour owns a different task."
     },
     {
       "id": "state-machine-modeler-positive-7",
-      "prompt": "Design terminal states and re-open rules for a support ticket lifecycle.",
+      "prompt": "Map the fulfillment lifecycle and list the states that must never be reachable from a refund.",
       "expected_skill": "state-machine-modeler",
       "should_not_trigger": [
         "code-reviewer"
       ],
-      "reason": "The request needs state-machine-modeler's design method; code-reviewer owns a different task."
+      "reason": "The request needs state-machine-modeler's artifact; the named neighbour owns a different task."
     },
     {
       "id": "state-machine-modeler-positive-8",
-      "prompt": "Map the device-provisioning lifecycle with its retry edges and invalid transitions.",
+      "prompt": "Model the document approval lifecycle with guard predicates and side effects.",
       "expected_skill": "state-machine-modeler",
       "should_not_trigger": [
         "tech-spec-writer"
       ],
-      "reason": "The request needs state-machine-modeler's design method; tech-spec-writer owns a different task."
+      "reason": "The request needs state-machine-modeler's artifact; the named neighbour owns a different task."
     },
     {
       "id": "state-machine-modeler-negative-1",
@@ -97,16 +97,16 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is tenant-modeler's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is tenant-modeler's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-2",
-      "prompt": "Design the subscription lifecycle: trials, upgrades, dunning, cancellation and win-back.",
+      "prompt": "Design the subscription lifecycle state machine: trial, upgrade, dunning, cancellation and win-back.",
       "expected_skill": "subscription-lifecycle-designer",
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is subscription-lifecycle-designer's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is subscription-lifecycle-designer's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is domain-modeler's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is domain-modeler's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is property-based-test-designer's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is property-based-test-designer's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is product-spec-writer's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is product-spec-writer's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is change-classification-gate's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is change-classification-gate's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     },
     {
       "id": "state-machine-modeler-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "state-machine-modeler"
       ],
-      "reason": "This request is rollback-runbook-author's deliverable end-to-end; state-machine-modeler owns a different design task and must not take it over."
+      "reason": "This request is rollback-runbook-author's deliverable end-to-end; state-machine-modeler owns a different artifact and must not take it over."
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "skill": "configuration-architect",
-  "description": "Trigger discrimination for configuration-architect against the nearest shipped owners.",
+  "description": "Trigger discrimination for configuration-architect against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",
@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "environment-parity-reviewer"
       ],
-      "reason": "The request needs configuration-architect's design method; environment-parity-reviewer owns a different task."
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
     },
     {
       "id": "configuration-architect-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "secrets-identity-hardener"
       ],
-      "reason": "The request needs configuration-architect's design method; secrets-identity-hardener owns a different task."
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
     },
     {
       "id": "configuration-architect-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "vite-build-qa-engineer"
       ],
-      "reason": "The request needs configuration-architect's design method; vite-build-qa-engineer owns a different task."
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
     },
     {
       "id": "configuration-architect-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "user-preference-architect"
       ],
-      "reason": "The request needs configuration-architect's design method; user-preference-architect owns a different task."
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
     },
     {
       "id": "configuration-architect-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "tenant-modeler"
       ],
-      "reason": "The request needs configuration-architect's design method; tenant-modeler owns a different task."
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
     },
     {
       "id": "configuration-architect-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "feature-flag-architect"
       ],
-      "reason": "The request needs configuration-architect's design method; feature-flag-architect owns a different task."
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
     },
     {
       "id": "configuration-architect-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "plan-entitlement-architect"
       ],
-      "reason": "The request needs configuration-architect's design method; plan-entitlement-architect owns a different task."
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
     },
     {
       "id": "configuration-architect-positive-8",
@@ -88,16 +88,16 @@
       "should_not_trigger": [
         "observability-by-design"
       ],
-      "reason": "The request needs configuration-architect's design method; observability-by-design owns a different task."
+      "reason": "The request needs configuration-architect's artifact; the named neighbour owns a different task."
     },
     {
       "id": "configuration-architect-negative-1",
-      "prompt": "Handle the environment parity reviewer deliverable end-to-end for our system: inspect the current state, make the design decisions and return the result.",
+      "prompt": "Review dev/staging/prod parity: what differs and which differences are risky.",
       "expected_skill": "environment-parity-reviewer",
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is environment-parity-reviewer's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is environment-parity-reviewer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is secrets-identity-hardener's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is secrets-identity-hardener's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-3",
@@ -115,16 +115,16 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is vite-build-qa-engineer's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is vite-build-qa-engineer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-4",
-      "prompt": "Handle the user preference architect deliverable end-to-end for our system: inspect the current state, make the design decisions and return the result.",
+      "prompt": "Design user-preference storage and precedence across device and tenant.",
       "expected_skill": "user-preference-architect",
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is user-preference-architect's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is user-preference-architect's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-5",
@@ -133,25 +133,25 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is tenant-modeler's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is tenant-modeler's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-6",
-      "prompt": "Handle the feature flag architect deliverable end-to-end for our system: inspect the current state, make the design decisions and return the result.",
+      "prompt": "Design the feature-flag architecture: flag types, ownership, expiry and kill-switch semantics.",
       "expected_skill": "feature-flag-architect",
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is feature-flag-architect's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is feature-flag-architect's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-7",
-      "prompt": "Handle the plan entitlement architect deliverable end-to-end for our system: inspect the current state, make the design decisions and return the result.",
+      "prompt": "Design plan entitlements and limits for our SaaS plans and how they are enforced.",
       "expected_skill": "plan-entitlement-architect",
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is plan-entitlement-architect's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is plan-entitlement-architect's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is observability-by-design's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is observability-by-design's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     },
     {
       "id": "configuration-architect-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "configuration-architect"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; configuration-architect owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; configuration-architect owns a different artifact and must not take it over."
     }
   ]
 }

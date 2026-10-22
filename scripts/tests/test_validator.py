@@ -2665,7 +2665,7 @@ def test_coverage_map_malformed_id_does_not_crash():
 
 
 def test_coverage_map_triage_rows_and_phrase():
-    """T33: rows #254/#278 carry the owner decision; phrase is 80 of 215."""
+    """T33: rows #254/#278 carry the owner decision; phrase is 80 of 243."""
     payload = json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8"))
     rows = {entry["id"]: entry for entry in payload["entries"]}
     r254 = rows[254]
@@ -2699,10 +2699,10 @@ def test_coverage_map_triage_rows_and_phrase():
         r278["rationale"] or "")
     phrase = [item for item in validator.COVERAGE_REQUIRED_PHRASES
               if "80 of 243" in item]
-    assert phrase, "an optionality phrase must carry 80 of 230"
+    assert phrase, "an optionality phrase must carry 80 of 243"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     assert "80 of 243" in mmd and "80 of 215" not in mmd
-    assert "80 of 222" not in mmd, (
+    assert "80 of 222" not in mmd and "80 of 230" not in mmd, (
         "the immediately previous Batch-2 optionality phrase must stay rejected")
     assert "83 of 215" not in mmd, (
         "the pre-Batch-1 stale optionality phrase must stay rejected")
@@ -2735,7 +2735,7 @@ def test_coverage_map_batch1_deliveries():
     assert validator.COVERAGE_P0_GAP_IDS == ()
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
                if "80 of 243" in item]
-    assert phrases, "an optionality phrase must carry 80 of 230"
+    assert phrases, "an optionality phrase must carry 80 of 243"
 
 
 
@@ -2768,7 +2768,7 @@ def test_coverage_map_batch2_deliveries():
     assert validator.COVERAGE_P0_GAP_IDS == ()
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
                if "80 of 243" in item]
-    assert phrases, "an optionality phrase must carry 80 of 230"
+    assert phrases, "an optionality phrase must carry 80 of 243"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     area02 = [line for line in mmd.splitlines()
               if line.startswith("| 02 ")]
@@ -2829,7 +2829,7 @@ def test_coverage_map_batch3_deliveries():
                          "coverage map: deleted GAP summary section rejected")
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
                if "80 of 243" in item]
-    assert phrases, "an optionality phrase must carry 80 of 230"
+    assert phrases, "an optionality phrase must carry 80 of 243"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     area05 = [line for line in mmd.splitlines()
               if line.startswith("| 05 ")]
@@ -2908,9 +2908,9 @@ def test_coverage_map_step0_hygiene():
     assert validator.COVERAGE_P0_GAP_IDS == ()
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
                if "80 of 243" in item]
-    assert phrases, "the optionality phrase must stay 80 of 230"
+    assert phrases, "the optionality phrase must stay 80 of 243"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
-    assert "80 of 243" in mmd and "80 of 222" not in mmd
+    assert "80 of 243" in mmd and "80 of 222" not in mmd and "80 of 230" not in mmd
     totals = payload["totals"]
     assert totals["by_status"] == {
         "COVERED": 57, "GAP": 7, "PARTIAL": 63, "SHIPPED": 173}
@@ -2924,9 +2924,15 @@ def test_coverage_map_step0_hygiene():
                  "| 04 Backend, application programming interface (API), and data engineering | 30 | 8 | 12 | 10 | 0 |",
                  "| 06 Quality assurance (QA), test architecture, and validation | 55 | 37 | 6 | 8 | 4 |"):
         assert line in mmd, line
-    assert "Area 04:" not in mmd
+    gap_areas = sorted({line.split(":", 1)[0] for line in mmd.splitlines()
+                        if line.startswith("- Area ")})
+    assert gap_areas == ["- Area 03", "- Area 06", "- Area 07"], gap_areas
+    area03 = [line for line in mmd.splitlines() if line.startswith("- Area 03:")]
+    assert area03 == ["- Area 03: 110, 120"], area03
     area06 = [line for line in mmd.splitlines() if line.startswith("- Area 06:")]
     assert area06 == ["- Area 06: 224, 225, 233, 234"], area06
+    area07 = [line for line in mmd.splitlines() if line.startswith("- Area 07:")]
+    assert area07 == ["- Area 07: 236"], area07
     assert "Row-level evidence companion: [audit registers index](../audits/README.md)" in mmd
     for name, size in (("Aegis-Audit-Register-2026-10-20.json", 5125392),
                        ("Aegis-Coverage-Register-2026-10-20.md", 399618)):

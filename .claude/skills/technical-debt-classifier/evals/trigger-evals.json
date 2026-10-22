@@ -1,6 +1,6 @@
 {
   "skill": "technical-debt-classifier",
-  "description": "Trigger discrimination for technical-debt-classifier against the nearest shipped owners.",
+  "description": "Trigger discrimination for technical-debt-classifier against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",
@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "principal-code-analyst"
       ],
-      "reason": "The request needs technical-debt-classifier's design method; principal-code-analyst owns a different task."
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
     },
     {
       "id": "technical-debt-classifier-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "full-codebase-auditor"
       ],
-      "reason": "The request needs technical-debt-classifier's design method; full-codebase-auditor owns a different task."
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
     },
     {
       "id": "technical-debt-classifier-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "staff-scope-selector"
       ],
-      "reason": "The request needs technical-debt-classifier's design method; staff-scope-selector owns a different task."
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
     },
     {
       "id": "technical-debt-classifier-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "prioritization-frame-picker"
       ],
-      "reason": "The request needs technical-debt-classifier's design method; prioritization-frame-picker owns a different task."
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
     },
     {
       "id": "technical-debt-classifier-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "code-reviewer"
       ],
-      "reason": "The request needs technical-debt-classifier's design method; code-reviewer owns a different task."
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
     },
     {
       "id": "technical-debt-classifier-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "architecture-designer"
       ],
-      "reason": "The request needs technical-debt-classifier's design method; architecture-designer owns a different task."
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
     },
     {
       "id": "technical-debt-classifier-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "roadmap-under-uncertainty-planner"
       ],
-      "reason": "The request needs technical-debt-classifier's design method; roadmap-under-uncertainty-planner owns a different task."
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
     },
     {
       "id": "technical-debt-classifier-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "release-readiness-reviewer"
       ],
-      "reason": "The request needs technical-debt-classifier's design method; release-readiness-reviewer owns a different task."
+      "reason": "The request needs technical-debt-classifier's artifact; the named neighbour owns a different task."
     },
     {
       "id": "technical-debt-classifier-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is principal-code-analyst's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is principal-code-analyst's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is full-codebase-auditor's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is full-codebase-auditor's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is staff-scope-selector's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is staff-scope-selector's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is prioritization-frame-picker's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is prioritization-frame-picker's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is roadmap-under-uncertainty-planner's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is roadmap-under-uncertainty-planner's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is change-classification-gate's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is change-classification-gate's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     },
     {
       "id": "technical-debt-classifier-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "technical-debt-classifier"
       ],
-      "reason": "This request is rollback-runbook-author's deliverable end-to-end; technical-debt-classifier owns a different design task and must not take it over."
+      "reason": "This request is rollback-runbook-author's deliverable end-to-end; technical-debt-classifier owns a different artifact and must not take it over."
     }
   ]
 }

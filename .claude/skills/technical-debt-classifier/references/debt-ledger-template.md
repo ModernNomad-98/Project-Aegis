@@ -1,38 +1,55 @@
-# Method record: technical debt classifier
+# Debt Ledger Template - technical-debt ledger with interest, cost, owner and priority
 
-Reference for the technical-debt-classifier skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+Concrete artifact guide for the `technical-debt-classifier` skill. Method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
 
-## 1. Core model
+## 1. Artifact fields
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+- **Debt type taxonomy (code, design, test, doc, infra, data)**
+- **Evidence per item with file/link**
+- **Interest: what worsens if deferred**
+- **Principal/reversal cost estimate**
+- **Owner and decision route**
+- **Priority ranking and rationale**
+- **Ledger update/review process**
 
-## 2. When this applies
+## 2. Worked table (technical-debt ledger with interest, cost, owner and priority)
 
-- Classify debt by risk, owner, impact, payoff and whether it blocks future architecture; produce a ledger, not a wish list.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+| ID | Type | Evidence | Interest | Reversal cost | Owner | Priority |
+| --- | --- | --- | --- | --- | --- | --- |
+| D-1 | design | duplicate order models | rising change cost | 3 sprints | platform | P1 |
+| D-2 | test | flaky payment suite | release delay | 1 sprint | payments | P1 |
 
-## 3. Output and evidence rules
+## 3. Construction steps
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+1. Collect candidate debt items from evidence, not opinion.
+2. Classify each item with the taxonomy.
+3. Attach evidence and affected components.
+4. Estimate interest and reversal cost.
+5. Assign owner and decision route.
+6. Rank with an explicit frame.
+7. Define ledger cadence and retirement rule.
 
-## 4. Boundaries
+## 4. Quality checks before returning
+
+- Every item has evidence and a type
+- Interest and cost estimates are separate
+- Owner and decision route are named
+- Ranking is explained not asserted
+- Retired items are removed or marked
+
+## 5. Failure/gotcha handling
+
+- Debt without evidence is a wish list
+- Interest and principal conflated produce wrong priorities
+- A ledger nobody reviews becomes stale in one quarter
+
+## 6. Boundaries
 
 - principal code analyst requests route to `principal-code-analyst`; this skill does not perform that owner work.
 - full codebase auditor requests route to `full-codebase-auditor`; this skill does not perform that owner work.
 - staff scope selector requests route to `staff-scope-selector`; this skill does not perform that owner work.
 - prioritization frame picker requests route to `prioritization-frame-picker`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `full-codebase-auditor`, `human-approval-boundary`, `principal-code-analyst`, `prioritization-frame-picker`, `release-readiness-reviewer`, `roadmap-under-uncertainty-planner`, `rollback-runbook-author`, `staff-scope-selector`, `tech-spec-writer` (neighbours, not in-scope work).
+- code reviewer requests route to `code-reviewer`; this skill does not perform that owner work.
+- architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
+- Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `full-codebase-auditor`, `human-approval-boundary`, `principal-code-analyst`, `prioritization-frame-picker`, `release-readiness-reviewer`, `roadmap-under-uncertainty-planner`, `rollback-runbook-author`, `staff-scope-selector`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.

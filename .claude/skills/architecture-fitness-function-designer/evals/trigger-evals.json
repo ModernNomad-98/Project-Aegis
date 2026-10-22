@@ -1,6 +1,6 @@
 {
   "skill": "architecture-fitness-function-designer",
-  "description": "Trigger discrimination for architecture-fitness-function-designer against the nearest shipped owners.",
+  "description": "Trigger discrimination for architecture-fitness-function-designer against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",
@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "dependency-direction-guard"
       ],
-      "reason": "The request needs architecture-fitness-function-designer's design method; dependency-direction-guard owns a different task."
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-fitness-function-designer-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "layered-architecture-enforcer"
       ],
-      "reason": "The request needs architecture-fitness-function-designer's design method; layered-architecture-enforcer owns a different task."
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-fitness-function-designer-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "n-plus-one-detector"
       ],
-      "reason": "The request needs architecture-fitness-function-designer's design method; n-plus-one-detector owns a different task."
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-fitness-function-designer-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "performance-test-harness"
       ],
-      "reason": "The request needs architecture-fitness-function-designer's design method; performance-test-harness owns a different task."
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-fitness-function-designer-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "frontend-perf-engineer"
       ],
-      "reason": "The request needs architecture-fitness-function-designer's design method; frontend-perf-engineer owns a different task."
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-fitness-function-designer-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "observability-by-design"
       ],
-      "reason": "The request needs architecture-fitness-function-designer's design method; observability-by-design owns a different task."
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-fitness-function-designer-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "tech-spec-writer"
       ],
-      "reason": "The request needs architecture-fitness-function-designer's design method; tech-spec-writer owns a different task."
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-fitness-function-designer-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "code-reviewer"
       ],
-      "reason": "The request needs architecture-fitness-function-designer's design method; code-reviewer owns a different task."
+      "reason": "The request needs architecture-fitness-function-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-fitness-function-designer-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is dependency-direction-guard's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is dependency-direction-guard's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is n-plus-one-detector's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is n-plus-one-detector's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is performance-test-harness's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is performance-test-harness's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is frontend-perf-engineer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is observability-by-design's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is observability-by-design's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is change-classification-gate's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is change-classification-gate's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-fitness-function-designer-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "architecture-fitness-function-designer"
       ],
-      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; architecture-fitness-function-designer owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; architecture-fitness-function-designer owns a different artifact and must not take it over."
     }
   ]
 }

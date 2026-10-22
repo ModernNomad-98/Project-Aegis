@@ -1,6 +1,6 @@
 {
   "skill": "cqrs-read-model-designer",
-  "description": "Trigger discrimination for cqrs-read-model-designer against the nearest shipped owners.",
+  "description": "Trigger discrimination for cqrs-read-model-designer against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",
@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "operational-vs-analytical-splitter"
       ],
-      "reason": "The request needs cqrs-read-model-designer's design method; operational-vs-analytical-splitter owns a different task."
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "cqrs-read-model-designer-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "command-gateway-architect"
       ],
-      "reason": "The request needs cqrs-read-model-designer's design method; command-gateway-architect owns a different task."
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "cqrs-read-model-designer-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "caching-strategy-designer"
       ],
-      "reason": "The request needs cqrs-read-model-designer's design method; caching-strategy-designer owns a different task."
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "cqrs-read-model-designer-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "schema-evolution-planner"
       ],
-      "reason": "The request needs cqrs-read-model-designer's design method; schema-evolution-planner owns a different task."
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "cqrs-read-model-designer-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "streaming-event-architect"
       ],
-      "reason": "The request needs cqrs-read-model-designer's design method; streaming-event-architect owns a different task."
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "cqrs-read-model-designer-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "architecture-designer"
       ],
-      "reason": "The request needs cqrs-read-model-designer's design method; architecture-designer owns a different task."
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "cqrs-read-model-designer-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "data-flow-diagrammer"
       ],
-      "reason": "The request needs cqrs-read-model-designer's design method; data-flow-diagrammer owns a different task."
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "cqrs-read-model-designer-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "tech-spec-writer"
       ],
-      "reason": "The request needs cqrs-read-model-designer's design method; tech-spec-writer owns a different task."
+      "reason": "The request needs cqrs-read-model-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "cqrs-read-model-designer-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is operational-vs-analytical-splitter's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is operational-vs-analytical-splitter's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is command-gateway-architect's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is command-gateway-architect's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is caching-strategy-designer's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is caching-strategy-designer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is schema-evolution-planner's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is schema-evolution-planner's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is streaming-event-architect's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is streaming-event-architect's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is data-flow-diagrammer's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is data-flow-diagrammer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is change-classification-gate's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is change-classification-gate's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     },
     {
       "id": "cqrs-read-model-designer-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "cqrs-read-model-designer"
       ],
-      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; cqrs-read-model-designer owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; cqrs-read-model-designer owns a different artifact and must not take it over."
     }
   ]
 }

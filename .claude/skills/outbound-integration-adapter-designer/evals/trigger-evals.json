@@ -1,11 +1,12 @@
 {
   "skill": "outbound-integration-adapter-designer",
-  "description": "Trigger discrimination for outbound-integration-adapter-designer against the nearest shipped owners.",
+  "description": "Trigger discrimination for outbound-integration-adapter-designer against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "ai-router-architect",
     "api-contract-test-designer",
     "api-event-architect",
+    "application-layer-pattern-advisor",
     "architecture-designer",
     "background-job-orchestration-architect",
     "code-reviewer",
@@ -25,7 +26,7 @@
       "should_not_trigger": [
         "resilience-architecture-reviewer"
       ],
-      "reason": "The request needs outbound-integration-adapter-designer's design method; resilience-architecture-reviewer owns a different task."
+      "reason": "The request needs outbound-integration-adapter-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "outbound-integration-adapter-designer-positive-2",
@@ -34,7 +35,7 @@
       "should_not_trigger": [
         "latency-budget-architect"
       ],
-      "reason": "The request needs outbound-integration-adapter-designer's design method; latency-budget-architect owns a different task."
+      "reason": "The request needs outbound-integration-adapter-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "outbound-integration-adapter-designer-positive-3",
@@ -43,7 +44,7 @@
       "should_not_trigger": [
         "api-contract-test-designer"
       ],
-      "reason": "The request needs outbound-integration-adapter-designer's design method; api-contract-test-designer owns a different task."
+      "reason": "The request needs outbound-integration-adapter-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "outbound-integration-adapter-designer-positive-4",
@@ -52,7 +53,7 @@
       "should_not_trigger": [
         "ai-router-architect"
       ],
-      "reason": "The request needs outbound-integration-adapter-designer's design method; ai-router-architect owns a different task."
+      "reason": "The request needs outbound-integration-adapter-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "outbound-integration-adapter-designer-positive-5",
@@ -61,7 +62,7 @@
       "should_not_trigger": [
         "interface-first-designer"
       ],
-      "reason": "The request needs outbound-integration-adapter-designer's design method; interface-first-designer owns a different task."
+      "reason": "The request needs outbound-integration-adapter-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "outbound-integration-adapter-designer-positive-6",
@@ -70,7 +71,7 @@
       "should_not_trigger": [
         "api-event-architect"
       ],
-      "reason": "The request needs outbound-integration-adapter-designer's design method; api-event-architect owns a different task."
+      "reason": "The request needs outbound-integration-adapter-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "outbound-integration-adapter-designer-positive-7",
@@ -79,7 +80,7 @@
       "should_not_trigger": [
         "background-job-orchestration-architect"
       ],
-      "reason": "The request needs outbound-integration-adapter-designer's design method; background-job-orchestration-architect owns a different task."
+      "reason": "The request needs outbound-integration-adapter-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "outbound-integration-adapter-designer-positive-8",
@@ -88,7 +89,7 @@
       "should_not_trigger": [
         "error-taxonomy-designer"
       ],
-      "reason": "The request needs outbound-integration-adapter-designer's design method; error-taxonomy-designer owns a different task."
+      "reason": "The request needs outbound-integration-adapter-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-1",
@@ -97,7 +98,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is resilience-architecture-reviewer's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is resilience-architecture-reviewer's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-2",
@@ -106,7 +107,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is latency-budget-architect's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is latency-budget-architect's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-3",
@@ -115,7 +116,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is api-contract-test-designer's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is api-contract-test-designer's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-4",
@@ -124,7 +125,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is ai-router-architect's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is ai-router-architect's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-5",
@@ -133,7 +134,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is interface-first-designer's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is interface-first-designer's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-6",
@@ -142,7 +143,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is api-event-architect's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is api-event-architect's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-7",
@@ -151,7 +152,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is background-job-orchestration-architect's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is background-job-orchestration-architect's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-8",
@@ -160,7 +161,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is error-taxonomy-designer's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is error-taxonomy-designer's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-9",
@@ -169,7 +170,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-10",
@@ -178,7 +179,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-11",
@@ -187,7 +188,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-12",
@@ -196,7 +197,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-13",
@@ -205,7 +206,7 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
     },
     {
       "id": "outbound-integration-adapter-designer-negative-14",
@@ -214,7 +215,16 @@
       "should_not_trigger": [
         "outbound-integration-adapter-designer"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; outbound-integration-adapter-designer owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; outbound-integration-adapter-designer owns a different artifact and must not take it over."
+    },
+    {
+      "id": "outbound-integration-adapter-designer-negative-sibling-application-layer",
+      "prompt": "Should we introduce a repository facade and an explicit use-case layer around our domain, or is that over-abstraction?",
+      "expected_skill": "application-layer-pattern-advisor",
+      "should_not_trigger": [
+        "outbound-integration-adapter-designer"
+      ],
+      "reason": "Pattern cost/placement decisions inside the application layer are the pattern advisor deliverable; the outbound designer owns the provider adapter contract."
     }
   ]
 }

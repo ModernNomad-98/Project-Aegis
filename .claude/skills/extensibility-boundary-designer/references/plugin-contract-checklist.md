@@ -1,38 +1,55 @@
-# Method record: extensibility boundary designer
+# Plugin Contract Checklist - extension point map, plugin contract and capability/failure boundaries
 
-Reference for the extensibility-boundary-designer skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+Concrete artifact guide for the `extensibility-boundary-designer` skill. Method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
 
-## 1. Core model
+## 1. Artifact fields
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+- **Supported extension points and why each exists**
+- **Plugin/extension contract and declared capabilities**
+- **Permission and capability scope**
+- **Lifecycle (install/upgrade/disable/remove)**
+- **Isolation: process/tenant/resource limits**
+- **Failure containment and timeout policy**
+- **Versioning, deprecation and compatibility**
 
-## 2. When this applies
+## 2. Worked table (extension point map, plugin contract and capability/failure boundaries)
 
-- Design extension points and plugin contracts: isolation, permissions, versioning, compatibility and safe lifecycle without exposing unstable internals.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+| Extension point | Contract | Capability scope | Isolation | Compatibility |
+| --- | --- | --- | --- | --- |
+| tenant webhook | signed event payload | read tenant data only | timeout + circuit breaker | additive v1 payload |
+| plugin executor | sandboxed RPC | declared permissions | per-tenant sandbox | contract version pin |
 
-## 3. Output and evidence rules
+## 3. Construction steps
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+1. Decide which extension points are justified by a real consumer need.
+2. Define the contract and capability vocabulary.
+3. Set lifecycle and compatibility rules.
+4. Design isolation and failure containment.
+5. Define permission model and review process.
+6. Plan deprecation and versioning.
+7. Write the extension acceptance tests.
 
-## 4. Boundaries
+## 4. Quality checks before returning
+
+- Every extension point has a consumer and a contract
+- Capabilities are explicit and least-privilege
+- Failures are contained with timeouts and limits
+- Versioning/deprecation is documented
+- Contract does not leak internal domain types
+
+## 5. Failure/gotcha handling
+
+- An extension point without a contract is an unstable API
+- Unbounded plugins can exhaust shared resources
+- Silent deprecation breaks tenant integrations
+
+## 6. Boundaries
 
 - interface first designer requests route to `interface-first-designer`; this skill does not perform that owner work.
 - supply chain security reviewer requests route to `supply-chain-security-reviewer`; this skill does not perform that owner work.
 - api event architect requests route to `api-event-architect`; this skill does not perform that owner work.
 - authorization matrix designer requests route to `authorization-matrix-designer`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `adr-writer`, `api-event-architect`, `architecture-designer`, `authorization-matrix-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `security-pr-reviewer`, `supply-chain-security-reviewer`, `tech-spec-writer` (neighbours, not in-scope work).
+- security pr reviewer requests route to `security-pr-reviewer`; this skill does not perform that owner work.
+- layered architecture enforcer requests route to `layered-architecture-enforcer`; this skill does not perform that owner work.
+- Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `api-event-architect`, `architecture-designer`, `authorization-matrix-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `security-pr-reviewer`, `supply-chain-security-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.

@@ -1,6 +1,6 @@
 {
   "skill": "application-layer-pattern-advisor",
-  "description": "Trigger discrimination for application-layer-pattern-advisor against the nearest shipped owners.",
+  "description": "Trigger discrimination for application-layer-pattern-advisor against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",
@@ -14,6 +14,7 @@
     "human-approval-boundary",
     "interface-first-designer",
     "layered-architecture-enforcer",
+    "outbound-integration-adapter-designer",
     "release-readiness-reviewer",
     "tech-spec-writer"
   ],
@@ -25,7 +26,7 @@
       "should_not_trigger": [
         "layered-architecture-enforcer"
       ],
-      "reason": "The request needs application-layer-pattern-advisor's design method; layered-architecture-enforcer owns a different task."
+      "reason": "The request needs application-layer-pattern-advisor's artifact; the named neighbour owns a different task."
     },
     {
       "id": "application-layer-pattern-advisor-positive-2",
@@ -34,7 +35,7 @@
       "should_not_trigger": [
         "interface-first-designer"
       ],
-      "reason": "The request needs application-layer-pattern-advisor's design method; interface-first-designer owns a different task."
+      "reason": "The request needs application-layer-pattern-advisor's artifact; the named neighbour owns a different task."
     },
     {
       "id": "application-layer-pattern-advisor-positive-3",
@@ -43,7 +44,7 @@
       "should_not_trigger": [
         "code-simplifier"
       ],
-      "reason": "The request needs application-layer-pattern-advisor's design method; code-simplifier owns a different task."
+      "reason": "The request needs application-layer-pattern-advisor's artifact; the named neighbour owns a different task."
     },
     {
       "id": "application-layer-pattern-advisor-positive-4",
@@ -52,7 +53,7 @@
       "should_not_trigger": [
         "command-gateway-architect"
       ],
-      "reason": "The request needs application-layer-pattern-advisor's design method; command-gateway-architect owns a different task."
+      "reason": "The request needs application-layer-pattern-advisor's artifact; the named neighbour owns a different task."
     },
     {
       "id": "application-layer-pattern-advisor-positive-5",
@@ -61,7 +62,7 @@
       "should_not_trigger": [
         "domain-modeler"
       ],
-      "reason": "The request needs application-layer-pattern-advisor's design method; domain-modeler owns a different task."
+      "reason": "The request needs application-layer-pattern-advisor's artifact; the named neighbour owns a different task."
     },
     {
       "id": "application-layer-pattern-advisor-positive-6",
@@ -70,7 +71,7 @@
       "should_not_trigger": [
         "architecture-designer"
       ],
-      "reason": "The request needs application-layer-pattern-advisor's design method; architecture-designer owns a different task."
+      "reason": "The request needs application-layer-pattern-advisor's artifact; the named neighbour owns a different task."
     },
     {
       "id": "application-layer-pattern-advisor-positive-7",
@@ -79,7 +80,7 @@
       "should_not_trigger": [
         "dependency-direction-guard"
       ],
-      "reason": "The request needs application-layer-pattern-advisor's design method; dependency-direction-guard owns a different task."
+      "reason": "The request needs application-layer-pattern-advisor's artifact; the named neighbour owns a different task."
     },
     {
       "id": "application-layer-pattern-advisor-positive-8",
@@ -88,7 +89,7 @@
       "should_not_trigger": [
         "tech-spec-writer"
       ],
-      "reason": "The request needs application-layer-pattern-advisor's design method; tech-spec-writer owns a different task."
+      "reason": "The request needs application-layer-pattern-advisor's artifact; the named neighbour owns a different task."
     },
     {
       "id": "application-layer-pattern-advisor-negative-1",
@@ -97,7 +98,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-2",
@@ -106,7 +107,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is interface-first-designer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is interface-first-designer's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-3",
@@ -115,7 +116,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is code-simplifier's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is code-simplifier's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-4",
@@ -124,7 +125,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is command-gateway-architect's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is command-gateway-architect's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-5",
@@ -133,7 +134,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is domain-modeler's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is domain-modeler's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-6",
@@ -142,7 +143,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-7",
@@ -151,7 +152,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is dependency-direction-guard's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is dependency-direction-guard's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-8",
@@ -160,7 +161,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-9",
@@ -169,7 +170,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-10",
@@ -178,7 +179,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-11",
@@ -187,7 +188,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-12",
@@ -196,7 +197,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-13",
@@ -205,7 +206,7 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is change-classification-gate's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is change-classification-gate's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
     },
     {
       "id": "application-layer-pattern-advisor-negative-14",
@@ -214,7 +215,16 @@
       "should_not_trigger": [
         "application-layer-pattern-advisor"
       ],
-      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; application-layer-pattern-advisor owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; application-layer-pattern-advisor owns a different artifact and must not take it over."
+    },
+    {
+      "id": "application-layer-pattern-advisor-negative-sibling-outbound",
+      "prompt": "Our Stripe client wrapper needs 2s timeouts, bounded retries, an idempotency key and signature verification for provider callbacks.",
+      "expected_skill": "outbound-integration-adapter-designer",
+      "should_not_trigger": [
+        "application-layer-pattern-advisor"
+      ],
+      "reason": "External-provider adapter contract (timeouts/retries/idempotency/signing) is the outbound sibling deliverable; the pattern advisor only owns placement/cost decisions."
     }
   ]
 }

@@ -1,38 +1,56 @@
-# Method record: edge function designer
+# Edge Function Checklist - edge-function contract with boundary auth, limits and retry policy
 
-Reference for the edge-function-designer skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+Concrete artifact guide for the `edge-function-designer` skill. Method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
 
-## 1. Core model
+## 1. Artifact fields
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+- **Function inventory and contract**
+- **Boundary authentication and tenant scope**
+- **Environment/config validation**
+- **Timeout and cold-start model**
+- **Concurrency and retry/idempotency semantics**
+- **Event-source policy and dead letters**
+- **Logging/observability and redaction**
+- **Platform-limit checklist**
 
-## 2. When this applies
+## 2. Worked table (edge-function contract with boundary auth, limits and retry policy)
 
-- Design serverless/edge functions: auth, environment validation, timeouts, cold-start awareness, concurrency/retry semantics, event-source policy and logging.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+| Function | Trigger | Auth | Timeout | Concurrency | Limits |
+| --- | --- | --- | --- | --- | --- |
+| webhook ingest | HTTP | signature verify | 5s | reserved 20 | body 256KB |
+| queue worker | event | message identity | 30s | scaled | memory 512MB |
 
-## 3. Output and evidence rules
+## 3. Construction steps
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+1. Inventory functions, triggers and contracts.
+2. Define boundary auth and tenant scoping.
+3. Validate environment/config at cold start.
+4. Set timeout and cold-start expectations.
+5. Design concurrency, retry and idempotency.
+6. Define event-source and dead-letter policy.
+7. Write the platform-limit checklist and logging contract.
 
-## 4. Boundaries
+## 4. Quality checks before returning
+
+- Every function has auth and tenant scope
+- Timeouts fit the event source and platform limits
+- Retries are bounded and idempotent
+- Cold start is budgeted
+- Logs are correlated and redacted
+
+## 5. Failure/gotcha handling
+
+- Serverless retries amplify non-idempotent side effects
+- Cold starts break latency assumptions
+- Platform limits discovered in production are outages
+
+## 6. Boundaries
 
 - cloud architecture decider requests route to `cloud-architecture-decider`; this skill does not perform that owner work.
 - aws saas architect requests route to `aws-saas-architect`; this skill does not perform that owner work.
 - azure saas architect requests route to `azure-saas-architect`; this skill does not perform that owner work.
 - background job orchestration architect requests route to `background-job-orchestration-architect`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `adr-writer`, `api-event-architect`, `architecture-designer`, `aws-saas-architect`, `azure-saas-architect`, `background-job-orchestration-architect`, `caching-strategy-designer`, `cloud-architecture-decider`, `code-reviewer`, `design-review-facilitator`, `human-approval-boundary`, `latency-budget-architect`, `observability-by-design`, `tech-spec-writer` (neighbours, not in-scope work).
+- latency budget architect requests route to `latency-budget-architect`; this skill does not perform that owner work.
+- observability by design requests route to `observability-by-design`; this skill does not perform that owner work.
+- Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `api-event-architect`, `architecture-designer`, `aws-saas-architect`, `azure-saas-architect`, `background-job-orchestration-architect`, `caching-strategy-designer`, `cloud-architecture-decider`, `code-reviewer`, `design-review-facilitator`, `human-approval-boundary`, `latency-budget-architect`, `observability-by-design`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.

@@ -1,38 +1,55 @@
-# Method record: application layer pattern advisor
+# Pattern Decision Table - pattern decision table with placement and side-effect visibility
 
-Reference for the application-layer-pattern-advisor skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+Concrete artifact guide for the `application-layer-pattern-advisor` skill. Method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
 
-## 1. Core model
+## 1. Artifact fields
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+- **Patterns considered: adapter, facade, repository, service object, use-case layer**
+- **Cost and benefit per pattern**
+- **Placement and allowed dependencies**
+- **Side-effect visibility and transaction boundary**
+- **Introduction/removal/refactor path**
+- **Over-abstraction stop rules**
+- **Where external integration adapters yield to outbound-integration-adapter-designer**
 
-## 2. When this applies
+## 2. Worked table (pattern decision table with placement and side-effect visibility)
 
-- Decide when adapters, facades, repositories, service objects and explicit use-case layers earn their cost; give placement and refactor guidance without hiding side effects.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+| Pattern | Cost | Benefit | Placement | Stop rule |
+| --- | --- | --- | --- | --- |
+| repository | mapping + indirection | isolate persistence | adapter layer | stop if it only forwards calls |
+| use-case layer | orchestration code | explicit side effects | application boundary | stop if it duplicates controllers |
 
-## 3. Output and evidence rules
+## 3. Construction steps
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+1. State the actual change pressure and coupling evidence.
+2. List candidate patterns with cost/benefit.
+3. Decide placement per layer and dependency direction.
+4. Make side effects and transaction boundaries visible.
+5. Define introduction or removal steps.
+6. Set the stop rules for over-abstraction.
+7. Yield external-provider adapter contracts to outbound-integration-adapter-designer.
 
-## 4. Boundaries
+## 4. Quality checks before returning
+
+- Each pattern has a concrete cost and benefit
+- Placement respects dependency direction
+- Side effects are visible at the application boundary
+- Removal/introduction path is incremental
+- External provider adapter details are not stolen from the sibling owner
+
+## 5. Failure/gotcha handling
+
+- An abstraction that only forwards calls is cost without benefit
+- Hiding side effects behind a facade makes retries unsafe
+- Pattern advice and external adapter design are different decisions
+
+## 6. Boundaries
 
 - layered architecture enforcer requests route to `layered-architecture-enforcer`; this skill does not perform that owner work.
 - interface first designer requests route to `interface-first-designer`; this skill does not perform that owner work.
 - code simplifier requests route to `code-simplifier`; this skill does not perform that owner work.
 - command gateway architect requests route to `command-gateway-architect`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `tech-spec-writer` (neighbours, not in-scope work).
+- domain modeler requests route to `domain-modeler`; this skill does not perform that owner work.
+- architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
+- Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.

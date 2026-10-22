@@ -1,38 +1,56 @@
-# Method record: outbound integration adapter designer
+# Adapter Checklist - adapter contract, failure-mode table and contract-test plan
 
-Reference for the outbound-integration-adapter-designer skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+Concrete artifact guide for the `outbound-integration-adapter-designer` skill. Method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
 
-## 1. Core model
+## 1. Artifact fields
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+- **Provider contract and mapping**
+- **Timeouts, retries and backoff**
+- **Idempotency and replay safety**
+- **Circuit breaker and bulkheads**
+- **Credentials/signing and rotation**
+- **Response validation and version pinning**
+- **Observability and error taxonomy**
+- **Where adapter-pattern decisions yield to application-layer-pattern-advisor**
 
-## 2. When this applies
+## 2. Worked table (adapter contract, failure-mode table and contract-test plan)
 
-- Design the wrapper for third-party calls: timeouts, retries, circuit breakers, logging, contract tests, version pinning.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+| Concern | Policy | Evidence |
+| --- | --- | --- |
+| timeout/retry | 2s timeout, bounded retries | metrics + tests |
+| idempotency | provider idempotency key | replay test |
 
-## 3. Output and evidence rules
+## 3. Construction steps
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+1. Read the provider contract and enumerate failure modes.
+2. Define the adapter interface and mapping.
+3. Set timeout/retry/backoff and idempotency policy.
+4. Design circuit breaker and bulkhead isolation.
+5. Handle credentials, signing and rotation.
+6. Validate responses and pin versions.
+7. Write the contract-test plan; yield pattern placement to application-layer-pattern-advisor.
 
-## 4. Boundaries
+## 4. Quality checks before returning
+
+- Every failure mode has a policy
+- Retries are bounded and idempotent
+- Provider outage cannot cascade
+- Credentials are references and rotatable
+- Version pinning and response validation exist
+
+## 5. Failure/gotcha handling
+
+- Retries without idempotency duplicate side effects
+- An unbounded adapter timeout becomes an outage
+- Provider contract changes without pinning break integrations silently
+
+## 6. Boundaries
 
 - resilience architecture reviewer requests route to `resilience-architecture-reviewer`; this skill does not perform that owner work.
 - latency budget architect requests route to `latency-budget-architect`; this skill does not perform that owner work.
 - api contract test designer requests route to `api-contract-test-designer`; this skill does not perform that owner work.
 - ai router architect requests route to `ai-router-architect`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `adr-writer`, `ai-router-architect`, `api-contract-test-designer`, `api-event-architect`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `design-review-facilitator`, `error-taxonomy-designer`, `human-approval-boundary`, `interface-first-designer`, `latency-budget-architect`, `resilience-architecture-reviewer`, `tech-spec-writer` (neighbours, not in-scope work).
+- interface first designer requests route to `interface-first-designer`; this skill does not perform that owner work.
+- api event architect requests route to `api-event-architect`; this skill does not perform that owner work.
+- Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `ai-router-architect`, `api-contract-test-designer`, `api-event-architect`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `design-review-facilitator`, `error-taxonomy-designer`, `human-approval-boundary`, `interface-first-designer`, `latency-budget-architect`, `resilience-architecture-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.

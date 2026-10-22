@@ -1,82 +1,83 @@
 ---
 name: modernization-cutover-planner
-description: 'Use when legacy behavior is replaced gradually or a boundary is proposed as a separate service: plan strangler-fig seams, adapters and routing, slice order, cutover gates, retirement, and the ownership/data/operations/failure-mode readiness check.'
+description: 'Plan incremental modernization cutover: migration sequence, dual writes/backfill, cutover gates, rollback points and decommission.'
 ---
 
 # Modernization Cutover Planner
 
-Terms: **family 3** - core architecture & engineering (README roster family 3 and docs/skills-catalog.md Phase 2 pack); **advisory/design-only** means this skill produces guidance and records and never edits code, runs commands or grants production authority.
+Terms: **family 3** - core architecture & engineering (README roster family 3; docs/skills-catalog.md Phase 2 pack). **Advisory/design-only:** produces the named artifact and records; never edits code, runs commands, uses the network or grants production authority.
 
 ## Purpose
 
 Plan strangler-fig replacement and monolith-to-service readiness: seams, adapters, routing, cutover gates, retirement, and ownership/data/ops/failure-mode readiness.
 
-The skill is **advisory and auto-invocable**. It produces a design/decision record with evidence and open questions; it does not edit code, run commands, use the network or grant production authority. Implementation and approval are delegated host/user actions. It composes the named neighbouring owners instead of duplicating them.
+**Output artifact:** incremental cutover plan with gates, rollback points and decommission. The skill is auto-invocable and advisory: it composes the named neighbouring owners instead of duplicating them, and it returns the artifact plus open questions for the authorized implementer.
 
 ## Use When
 
-- The request is to plan strangler-fig replacement and monolith-to-service readiness.
-- The current design or evidence is implicit, disputed or about to harden a wrong assumption.
-- A spec/review must record the decision, the edge/failure cases and the boundary owners explicitly.
-- An implementation is about to start and the ask is for the record it must build against.
+- The request needs incremental cutover plan with gates, rollback points and decommission for a real system.
+- The design is implicit/disputed or about to harden an assumption.
+- A spec or review must record the artifact fields and boundaries explicitly.
+- Implementation is about to start and the record it builds against is missing.
 
-**Do not use when:** the request belongs to a named neighbouring owner (see Stop Conditions) or when no evidence exists and the answer would be invention.
+**Do not use when** the request belongs to a named neighbouring owner in Stop Conditions, or when the evidence needed for the artifact is unavailable.
 
 ## Inputs to Inspect
 
-- The design/spec under discussion and the decision it must support.
-- Existing code/config/diagrams and the observed behaviour they encode.
-- Related standards, runbooks and recorded decisions (D-records, ADRs) that constrain the answer.
-- Known incidents, review findings and open questions attached to this area.
+- Current and target states and the compatibility window
+- Migration sequence and dependencies
+- Dual-write/backfill/reconciliation strategy
+- Feature flags and traffic stages
+- Cutover gates and rollback points
+- Data integrity checks and reconciliation
 
 ## Workflow
 
-1. State the question, scope and what will not be inspected; list evidence actually available.
-2. Build the primary artifact for modernization cutover planner from inspected evidence (not from assumptions).
-3. Enumerate the edge, failure and refusal cases the artifact must survive.
-4. Name the boundary owners from Stop Conditions and what each one owns.
-5. Separate verified facts, assumptions and open questions; mark unverified items explicitly.
-6. Define the validation/test plan that would prove the artifact correct.
-7. Return the artifact and records; do not edit code or claim an execution you did not perform.
+1. Define target state and the compatibility contract.
+2. Sequence the migration into reversible phases.
+3. Design dual-write/backfill with reconciliation.
+4. Set measurable cutover gates per phase.
+5. Define rollback triggers and owners.
+6. Plan decommission and old-path cleanup.
+7. Write the readiness checklist.
 
 ## Output Format
 
 Return, in this order:
 
-1. Scope/question and evidence inventory.
-2. Primary design/decision record for this skill.
-3. Edge/failure table and the chosen handling.
-4. Boundary/handoff note naming the neighbouring owners.
-5. Open questions, assumptions and unverified items, with the verification plan.
+1. Scope, evidence inventory and what could not be inspected.
+2. Incremental cutover plan with gates, rollback points and decommission, with the fields listed in Inputs to Inspect.
+3. Edge/failure cases and the chosen handling.
+4. Boundary/handoff note naming the neighbouring owners (including the eval-only list below).
+5. Verified facts, assumptions, UNKNOWN/UNVERIFIED items and the validation/test plan.
 
 ## Validation Checklist
 
-- Scope and inputs are stated; no claim of inspection or execution that did not happen.
-- The primary artifact is complete enough for another engineer to implement against.
-- Edge/failure cases are enumerated with a chosen handling, not hand-waved.
-- Boundary owners are named and this skill does not take over their work.
-- Facts, assumptions and open questions are separated; UNKNOWN is not presented as a decision.
-- A concrete validation/test plan is included.
+- Every phase has a gate and a rollback point
+- Dual-write reconciliation is measurable
+- Rollback is exercisable and owned
+- Decommission has explicit criteria
+- Cutover plan names the on-call decision maker
 
 ## Gotchas
 
-- A design record built on assumed evidence becomes a false contract.
-- Skipping the edge/failure table moves the surprise into implementation.
-- Taking over a neighbouring owner deliverable duplicates authority and hides the boundary.
-- An artifact with no open questions usually means the inspection was shallow.
+- A big-bang cutover has no rollback point
+- Backfill without reconciliation hides data loss
+- Decommissioning too early turns a temporary bridge into permanent debt
 
 ## Stop Conditions
 
-- The request is architecture advisor work: route to `architecture-advisor`; this skill owns a different deliverable.
-- The request is architecture designer work: route to `architecture-designer`; this skill owns a different deliverable.
-- The request is schema evolution planner work: route to `schema-evolution-planner`; this skill owns a different deliverable.
-- The caller wants this skill to implement, run or approve the change: refuse; return the design/record for the authorized owner.
-- Required evidence is unavailable: state what is missing and mark the artifact UNVERIFIED instead of inventing facts.
+- architecture advisor requests route to `architecture-advisor`; this skill owns a different artifact.
+- architecture designer requests route to `architecture-designer`; this skill owns a different artifact.
+- schema evolution planner requests route to `schema-evolution-planner`; this skill owns a different artifact.
+- The caller wants implementation, execution or approval: refuse; return the artifact for the authorized owner.
+- Required evidence is unavailable: mark the artifact UNVERIFIED and state what is missing instead of inventing facts.
+- **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `architecture-advisor`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `design-review-facilitator`, `feature-flag-rollout-strategist`, `human-approval-boundary`, `observability-by-design`, `release-readiness-reviewer`, `resilience-architecture-reviewer`, `rollback-runbook-author`, `schema-evolution-planner`, `tech-spec-writer`.
 
 ## Supporting Files
 
-- [readiness-checklist](references/readiness-checklist.md) - method and record guidance for this skill.
-- [evals/evals.json](evals/evals.json) - the 6 behaviour cases for this skill.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against real manifest owners.
+- [readiness-checklist](references/readiness-checklist.md) - the concrete incremental cutover plan with gates, rollback points and decommission fields, construction method, checks and a worked table.
+- [evals/evals.json](evals/evals.json) - six domain-specific behaviour cases.
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against real manifest owners (including the reciprocal sibling case).
 
-**Source:** docs/skills-catalog.md - Phase 2 core architecture & engineering pack (Batch 4/D112); coverage roadmap rows 45+46+47. The trigger description is the frontmatter description above; keep it under 1,024 parsed characters, concrete and trigger-oriented.
+**Source:** docs/skills-catalog.md Phase 2 core architecture & engineering pack (Batch 4/D112); coverage cat 01 rows #45, #46, #47. Description is trigger-first (capability front-loaded for truncated listings).

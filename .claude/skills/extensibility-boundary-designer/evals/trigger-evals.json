@@ -1,6 +1,6 @@
 {
   "skill": "extensibility-boundary-designer",
-  "description": "Trigger discrimination for extensibility-boundary-designer against the nearest shipped owners.",
+  "description": "Trigger discrimination for extensibility-boundary-designer against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "api-event-architect",
@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "interface-first-designer"
       ],
-      "reason": "The request needs extensibility-boundary-designer's design method; interface-first-designer owns a different task."
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "extensibility-boundary-designer-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "supply-chain-security-reviewer"
       ],
-      "reason": "The request needs extensibility-boundary-designer's design method; supply-chain-security-reviewer owns a different task."
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "extensibility-boundary-designer-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "api-event-architect"
       ],
-      "reason": "The request needs extensibility-boundary-designer's design method; api-event-architect owns a different task."
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "extensibility-boundary-designer-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "authorization-matrix-designer"
       ],
-      "reason": "The request needs extensibility-boundary-designer's design method; authorization-matrix-designer owns a different task."
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "extensibility-boundary-designer-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "security-pr-reviewer"
       ],
-      "reason": "The request needs extensibility-boundary-designer's design method; security-pr-reviewer owns a different task."
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "extensibility-boundary-designer-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "layered-architecture-enforcer"
       ],
-      "reason": "The request needs extensibility-boundary-designer's design method; layered-architecture-enforcer owns a different task."
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "extensibility-boundary-designer-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "architecture-designer"
       ],
-      "reason": "The request needs extensibility-boundary-designer's design method; architecture-designer owns a different task."
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "extensibility-boundary-designer-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "tech-spec-writer"
       ],
-      "reason": "The request needs extensibility-boundary-designer's design method; tech-spec-writer owns a different task."
+      "reason": "The request needs extensibility-boundary-designer's artifact; the named neighbour owns a different task."
     },
     {
       "id": "extensibility-boundary-designer-negative-1",
@@ -97,16 +97,16 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is interface-first-designer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is interface-first-designer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-2",
-      "prompt": "Handle the supply chain security reviewer deliverable end-to-end for our system: inspect the current state, make the design decisions and return the result.",
+      "prompt": "Review our dependency supply chain and artifact provenance controls.",
       "expected_skill": "supply-chain-security-reviewer",
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is supply-chain-security-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is supply-chain-security-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is api-event-architect's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is api-event-architect's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is authorization-matrix-designer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is security-pr-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is security-pr-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is layered-architecture-enforcer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is change-classification-gate's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is change-classification-gate's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     },
     {
       "id": "extensibility-boundary-designer-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "extensibility-boundary-designer"
       ],
-      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; extensibility-boundary-designer owns a different artifact and must not take it over."
     }
   ]
 }

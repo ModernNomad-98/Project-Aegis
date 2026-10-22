@@ -1,6 +1,6 @@
 {
   "skill": "architecture-spike-planner",
-  "description": "Trigger discrimination for architecture-spike-planner against the nearest shipped owners.",
+  "description": "Trigger discrimination for architecture-spike-planner against real shipped owners (incl. reciprocal sibling case).",
   "overlaps_with": [
     "adr-writer",
     "ai-task-decomposer",
@@ -25,7 +25,7 @@
       "should_not_trigger": [
         "roadmap-under-uncertainty-planner"
       ],
-      "reason": "The request needs architecture-spike-planner's design method; roadmap-under-uncertainty-planner owns a different task."
+      "reason": "The request needs architecture-spike-planner's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-spike-planner-positive-2",
@@ -34,7 +34,7 @@
       "should_not_trigger": [
         "ai-task-decomposer"
       ],
-      "reason": "The request needs architecture-spike-planner's design method; ai-task-decomposer owns a different task."
+      "reason": "The request needs architecture-spike-planner's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-spike-planner-positive-3",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "exploratory-charter-designer"
       ],
-      "reason": "The request needs architecture-spike-planner's design method; exploratory-charter-designer owns a different task."
+      "reason": "The request needs architecture-spike-planner's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-spike-planner-positive-4",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "architecture-designer"
       ],
-      "reason": "The request needs architecture-spike-planner's design method; architecture-designer owns a different task."
+      "reason": "The request needs architecture-spike-planner's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-spike-planner-positive-5",
@@ -61,7 +61,7 @@
       "should_not_trigger": [
         "tech-spec-writer"
       ],
-      "reason": "The request needs architecture-spike-planner's design method; tech-spec-writer owns a different task."
+      "reason": "The request needs architecture-spike-planner's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-spike-planner-positive-6",
@@ -70,7 +70,7 @@
       "should_not_trigger": [
         "design-review-facilitator"
       ],
-      "reason": "The request needs architecture-spike-planner's design method; design-review-facilitator owns a different task."
+      "reason": "The request needs architecture-spike-planner's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-spike-planner-positive-7",
@@ -79,7 +79,7 @@
       "should_not_trigger": [
         "adr-writer"
       ],
-      "reason": "The request needs architecture-spike-planner's design method; adr-writer owns a different task."
+      "reason": "The request needs architecture-spike-planner's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-spike-planner-positive-8",
@@ -88,7 +88,7 @@
       "should_not_trigger": [
         "code-reviewer"
       ],
-      "reason": "The request needs architecture-spike-planner's design method; code-reviewer owns a different task."
+      "reason": "The request needs architecture-spike-planner's artifact; the named neighbour owns a different task."
     },
     {
       "id": "architecture-spike-planner-negative-1",
@@ -97,7 +97,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is roadmap-under-uncertainty-planner's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is roadmap-under-uncertainty-planner's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-2",
@@ -106,7 +106,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is ai-task-decomposer's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is ai-task-decomposer's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-3",
@@ -115,7 +115,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is exploratory-charter-designer's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is exploratory-charter-designer's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-4",
@@ -124,7 +124,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is architecture-designer's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is architecture-designer's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-5",
@@ -133,7 +133,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is tech-spec-writer's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is tech-spec-writer's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-6",
@@ -142,7 +142,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is design-review-facilitator's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is design-review-facilitator's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-7",
@@ -151,7 +151,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is adr-writer's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is adr-writer's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-8",
@@ -160,7 +160,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is code-reviewer's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is code-reviewer's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-9",
@@ -169,7 +169,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is human-approval-boundary's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is human-approval-boundary's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-10",
@@ -178,7 +178,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is change-classification-gate's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is change-classification-gate's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-11",
@@ -187,7 +187,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is release-readiness-reviewer's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-12",
@@ -196,7 +196,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is rollback-runbook-author's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is rollback-runbook-author's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-13",
@@ -205,7 +205,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is observability-by-design's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is observability-by-design's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     },
     {
       "id": "architecture-spike-planner-negative-14",
@@ -214,7 +214,7 @@
       "should_not_trigger": [
         "architecture-spike-planner"
       ],
-      "reason": "This request is security-pr-reviewer's deliverable end-to-end; architecture-spike-planner owns a different design task and must not take it over."
+      "reason": "This request is security-pr-reviewer's deliverable end-to-end; architecture-spike-planner owns a different artifact and must not take it over."
     }
   ]
 }

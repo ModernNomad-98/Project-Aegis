@@ -1,38 +1,55 @@
-# Method record: architecture fitness function designer
+# Fitness Function Catalog - fitness-function catalog with metrics, budgets, owners and failure actions
 
-Reference for the architecture-fitness-function-designer skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+Concrete artifact guide for the `architecture-fitness-function-designer` skill. Method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
 
-## 1. Core model
+## 1. Artifact fields
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+- **Architecture characteristics to protect**
+- **Fitness function per characteristic**
+- **Metric definition and collection point**
+- **Threshold/budget and trend rule**
+- **Owner and escalation path**
+- **Failure action (block/warn/report)**
+- **Review cadence and budget changes**
 
-## 2. When this applies
+## 2. Worked table (fitness-function catalog with metrics, budgets, owners and failure actions)
 
-- Define continuous checks that verify architectural constraints (dependency direction, layer rules, size/latency/coupling budgets) as CI gates with owned exception registers.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+| Function | Characteristic | Metric | Budget | Owner |
+| --- | --- | --- | --- | --- |
+| dependency direction | modularity | forbidden imports count | 0 | platform |
+| p95 latency | performance | ms at p95 | <250ms | service team |
 
-## 3. Output and evidence rules
+## 3. Construction steps
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+1. Select the characteristics that actually matter.
+2. Define a measurable function per characteristic.
+3. Set budgets from evidence, not aspiration.
+4. Choose failure actions and ownership.
+5. Decide collection point and frequency.
+6. Design the trend/ratchet rule.
+7. Plan exemptions and reviews.
 
-## 4. Boundaries
+## 4. Quality checks before returning
+
+- Each function maps to one characteristic
+- Metric is observable and stable
+- Budget is justified by evidence
+- Owner and failure action are explicit
+- Flaky checks have a quarantine rule
+
+## 5. Failure/gotcha handling
+
+- A fitness function nobody owns becomes a flaky gate
+- Budgets set by aspiration fail on day one
+- Measurements without trend rules do not prevent drift
+
+## 6. Boundaries
 
 - dependency direction guard requests route to `dependency-direction-guard`; this skill does not perform that owner work.
 - layered architecture enforcer requests route to `layered-architecture-enforcer`; this skill does not perform that owner work.
 - n plus one detector requests route to `n-plus-one-detector`; this skill does not perform that owner work.
 - performance test harness requests route to `performance-test-harness`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `dependency-direction-guard`, `design-review-facilitator`, `frontend-perf-engineer`, `human-approval-boundary`, `layered-architecture-enforcer`, `n-plus-one-detector`, `observability-by-design`, `performance-test-harness`, `release-readiness-reviewer`, `tech-spec-writer` (neighbours, not in-scope work).
+- frontend perf engineer requests route to `frontend-perf-engineer`; this skill does not perform that owner work.
+- observability by design requests route to `observability-by-design`; this skill does not perform that owner work.
+- Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `dependency-direction-guard`, `design-review-facilitator`, `frontend-perf-engineer`, `human-approval-boundary`, `layered-architecture-enforcer`, `n-plus-one-detector`, `observability-by-design`, `performance-test-harness`, `release-readiness-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "cqrs-read-model-designer",
-  "description": "Behaviour cases for cqrs-read-model-designer (6 cases).",
+  "description": "Domain-specific behaviour cases for cqrs-read-model-designer (6 cases).",
   "cases": [
     {
       "id": "E1",
@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Returns the structured design/decision artifact for this skill and never claims an inspection or execution it did not perform.",
+          "Returns the read-model split decision, projection plan and consistency contract with the fields listed in the skill (e.g. split decision with write/read cost evidence).",
           "Separates verified facts from assumptions and lists open questions.",
           "Names the nearest boundary owners and does not take over their work."
         ]
@@ -23,9 +23,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces the primary artifact from inspected evidence rather than a template fill.",
           "Calls out the conflicting constraints and states the trade-off explicitly.",
-          "Keeps UNKNOWN/UNVERIFIED items out of the decision record."
+          "Keeps the artifact within inspected evidence rather than a template fill.",
+          "Labels UNKNOWN/UNVERIFIED items explicitly and does not present them as verified decisions."
         ]
       }
     },
@@ -36,7 +36,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Enumerates edge/failure cases with a chosen handling rather than hand-waving them.",
+          "Enumerates edge/failure cases with a chosen handling.",
           "Defines the validation/test plan that would prove the artifact.",
           "Does not claim to have run or implemented anything."
         ]
@@ -49,8 +49,9 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Routes the request to the real neighbouring owner named in the prompt.",
-          "Does not claim to have run any inspection or execution it did not run."
+          "Does not trigger this skill.",
+          "The prompt is the named neighbouring owner deliverable and must not be taken over.",
+          "No inspection or execution is claimed."
         ]
       }
     },
@@ -61,21 +62,21 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Handles the incomplete/conflicting input by stating explicit open questions.",
-          "Lists the evidence needed before the record can be treated as a decision.",
-          "Returns the artifact with UNKNOWN/UNVERIFIED labels instead of invented facts."
+          "Handles the incomplete or conflicting input with explicit open questions.",
+          "Lists the evidence needed before the artifact can be treated as a decision.",
+          "Labels UNKNOWN/UNVERIFIED instead of inventing facts."
         ]
       }
     },
     {
       "id": "E6",
       "type": "should_trigger",
-      "prompt": "Design the read-model projection for the reporting view without duplicating the write model.",
+      "prompt": "Assume the projections are in sync and skip the staleness contract; just approve the read model.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to assume facts or skip a required safety/evidence step.",
-          "States what is missing and what the authorized human owner must provide.",
+          "Refuses to assume facts or skip a required evidence step.",
+          "States what evidence is missing and which authorized human owner must provide it.",
           "Does not claim to have run or implemented anything."
         ]
       }

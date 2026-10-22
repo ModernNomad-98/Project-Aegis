@@ -1,38 +1,55 @@
-# Method record: transaction scope designer
+# Transaction Scope Checklist - transaction scope matrix plus compensation plan
 
-Reference for the transaction-scope-designer skill. It is method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
+Concrete artifact guide for the `transaction-scope-designer` skill. Method and record guidance only: it never directs the skill to edit code, run commands, use the network or claim production authority.
 
-## 1. Core model
+## 1. Artifact fields
 
-- Start from the question and the inspected evidence; mark UNKNOWN/UNVERIFIED explicitly.
-- Produce the primary design/decision artifact before discussing options.
-- Enumerate edge, failure and refusal cases with a chosen handling.
-- Name the boundary owners and hand off their deliverables instead of duplicating them.
+- **Write paths and the invariants they must preserve**
+- **Atomic vs staged decision per path**
+- **Isolation level and its anomaly budget**
+- **Lock order and deadlock avoidance**
+- **Idempotency key and acknowledgement handling**
+- **Compensation/rollback per staged step**
+- **Timeout and retry semantics**
 
-## 2. When this applies
+## 2. Worked table (transaction scope matrix plus compensation plan)
 
-- Decide which operations must be atomic vs staged; isolation level, lock ordering, long-transaction avoidance and cross-service compensation.
-- A review/spec needs the record and the boundaries, not an implementation.
-- The team needs explicit assumptions/open questions before building.
+| Write path | Atomic or staged | Isolation | Lock order | Compensation |
+| --- | --- | --- | --- | --- |
+| create order | staged | read committed | inventory then order | release reservation |
+| transfer funds | atomic | serializable | account id ascending | reverse posting |
 
-## 3. Output and evidence rules
+## 3. Construction steps
 
-- Every claim names its evidence source or is labelled assumption/UNKNOWN/UNRUN.
-- The artifact is complete enough for an authorized engineer to implement against.
-- The validation/test plan is concrete and tied to the artifact.
+1. Map every write path and its invariant.
+2. Decide atomic vs staged with a failure-cost argument.
+3. Choose isolation level and name the anomaly it permits.
+4. Define a global lock order or an optimistic strategy.
+5. Design idempotency and lost-acknowledgement behaviour.
+6. Write the compensation sequence for partial failure.
+7. Plan the concurrency tests that prove the bounds.
 
-## 4. Boundaries
+## 4. Quality checks before returning
+
+- Every write path has a decision and rationale
+- Lock order is global and documented
+- Retries are idempotent or deduplicated
+- Compensation leaves no partial invariant
+- Anomaly budget matches the isolation level
+
+## 5. Failure/gotcha handling
+
+- A long transaction holding locks is a latency incident waiting to happen
+- Idempotency added after the fact rarely covers replays
+- Compensation without reconciliation leaves silent partial state
+
+## 6. Boundaries
 
 - concurrency race reviewer requests route to `concurrency-race-reviewer`; this skill does not perform that owner work.
 - command gateway architect requests route to `command-gateway-architect`; this skill does not perform that owner work.
 - validation boundary designer requests route to `validation-boundary-designer`; this skill does not perform that owner work.
 - background job orchestration architect requests route to `background-job-orchestration-architect`; this skill does not perform that owner work.
-- Broader discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `command-gateway-architect`, `concurrency-race-reviewer`, `data-migration-runbook-author`, `design-review-facilitator`, `human-approval-boundary`, `resilience-architecture-reviewer`, `schema-evolution-planner`, `secure-migration-reviewer`, `tech-spec-writer`, `validation-boundary-designer` (neighbours, not in-scope work).
+- schema evolution planner requests route to `schema-evolution-planner`; this skill does not perform that owner work.
+- data migration runbook author requests route to `data-migration-runbook-author`; this skill does not perform that owner work.
+- Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `command-gateway-architect`, `concurrency-race-reviewer`, `data-migration-runbook-author`, `design-review-facilitator`, `human-approval-boundary`, `resilience-architecture-reviewer`, `schema-evolution-planner`, `secure-migration-reviewer`, `tech-spec-writer`, `validation-boundary-designer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
-
-## 5. Validation before returning
-
-- Scope/inputs stated; assumptions separated from facts.
-- Edge/failure cases enumerated with handling.
-- Boundary owners named; no neighbouring deliverable taken over.
-- No inspection/execution claimed that did not happen.
