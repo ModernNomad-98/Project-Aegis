@@ -66,19 +66,21 @@ must be re-attested at the review/attestation deadline recorded with the grant
 (if any) is a separate field from the attestation deadline: expiry bounds
 consumption; the attestation deadline is when re-attestation is required.
 Silence records no inferred expiry; no recorded attestation deadline means
-BLOCKED. A reviewer block wins for every agent-initiated action: halt and wait
-for the human.
+BLOCKED.
 Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
 
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
-| 1 | BLOCKED | reviewer block; attestation deadline passed; no recorded deadline; transition trigger fired | disabled |
+| 1 | BLOCKED | reviewer block OR attestation deadline passed OR no recorded deadline OR transition trigger fired | disabled |
 | 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
 | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
+Halt rule (canonical, OR semantics immediately above): any ONE of the BLOCKED
+conditions wins for every agent-initiated action - halt and wait for the human; no
+agent-initiated action proceeds while BLOCKED.
 BLOCKED effect (canonical): blocking does not itself expire the grant; only in-scope
 human/manual actions remain; no agent-initiated action proceeds while BLOCKED. A
 transition trigger fired is a BLOCKED condition even when a deadline is recorded and
-not passed. Reviewer-block handling is the halt-and-wait rule stated above this table.
+not passed. Reviewer-block handling is the canonical halt rule immediately below the table.
 
 Canonical transitions (each matches a BLOCKED condition in the table above, and
 the transition rules sit next to the table):

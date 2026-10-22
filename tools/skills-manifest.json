@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "7eb60beed79fdfffce565d4ad1a04cf2ed2816de",
+  "source_revision": "add934a4aa520c2470816978cb5c0edb67c91114",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -791,7 +791,7 @@
     {
       "name": "product-analytics-instrumenter",
       "path": ".claude/skills/product-analytics-instrumenter/SKILL.md",
-      "sha256": "d9abafdde7e09a993728bc3e01b3f5bc7ad3432c467b67e5fe2e1d051ea86cbf"
+      "sha256": "9df7fdf5400a8ba6f09694792f442e881c2398dc834981bf2c26abcb1b933e55"
     },
     {
       "name": "product-spec-writer",

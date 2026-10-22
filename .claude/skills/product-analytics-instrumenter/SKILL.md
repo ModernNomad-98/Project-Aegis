@@ -203,7 +203,7 @@ Boundaries:    schema → event-schema-architect; system telemetry → observabi
   a slow-motion data loss: ad blockers, crashes, and closed tabs eat
   them, and the number is quietly low forever. Money moves server-side.
 - Firing events before `identify` orphans them under an anonymous id that
-  never joins the user — the funnel undercounts and no error is thrown.
+  never joins the user ONLY IF no later alias/merge links it — the funnel undercounts and no error is thrown.
   Order of capture vs identity matters: capture anonymous funnel events with an
   anonymous ID, then call identify/alias at signup to merge the anonymous and user
   IDs. Prefer re-keying/aliasing in place; if replay is unavoidable, use an idempotent
