@@ -28,6 +28,7 @@ The skill is **auto-invocable and advisory/design-only**. It produces the named 
 - Session/token configuration: lifetime, rotation, refresh strategy, storage location and revocation mechanism.
 - Identity provider(s) and federation configuration (issuer, client, scopes, claims mapping) plus account-linking rules.
 - Reset/MFA recovery policy and audit/error responses for each failure path.
+- Device-trust evidence: device registry/enrolment state, trust levels, how a device is bound to the identity, lost-device revocation and the re-authentication policy.
 
 ## Workflow
 

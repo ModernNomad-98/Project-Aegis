@@ -28,6 +28,7 @@ The skill is **auto-invocable and advisory/design-only**. It produces the named 
 - Target schema, constraints, tenant/RLS model and required transformations/mappings.
 - Roles and authorization plan: who may inspect, map, preview, review and confirm; tenant isolation rules.
 - Existing pipeline/runbook, upload mechanism, job orchestration and audit requirements.
+- The export contract the import must mirror: request/authority, async status model, download/result semantics, field-level redaction and expiry behaviour.
 
 ## Workflow
 

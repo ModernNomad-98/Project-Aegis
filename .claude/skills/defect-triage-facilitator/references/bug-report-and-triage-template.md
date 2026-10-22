@@ -12,6 +12,19 @@
 | Suspected area | component/service if known | optional |
 | Impact | frequency, affected users/tenants | UNKNOWN if not supplied |
 
+### Completed example (fictional)
+
+| Field | Entry |
+| --- | --- |
+| Summary | Saved search returns results for the wrong tenant after the account switch |
+| Reproduction | 1) login as tenant A; 2) create a saved search; 3) switch to tenant B; 4) open the saved search |
+| Expected vs actual | Expected: tenant-B scoped results; actual: tenant-A result ids appear in the list |
+| Environment | build 2026.10.3, tenant A/B test accounts, Chrome 130 |
+| Evidence | trace id, screenshot, server log line (redacted) |
+| Suspected area | saved-search query builder tenant filter |
+| Impact | 1 of 3 tenants reported, intermittent |
+| Triage | S2 / intermittent / some tenants / potential security flag -> route to tenant-isolation-reviewer; owner = search team; next action = reproduce in staging |
+
 ## 2. Triage axes
 
 | Axis | Levels | Rationale requirement |

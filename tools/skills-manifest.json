@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "8a04840b7d61eb52fc1ecd008aa27e192cc62906",
+  "source_revision": "95967aef3cebd0f16060010a27128fb140859d68",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -206,7 +206,7 @@
     {
       "name": "authentication-flow-reviewer",
       "path": ".claude/skills/authentication-flow-reviewer/SKILL.md",
-      "sha256": "585073c5587c4d2bd4c76d820a037c4046f1b27159c0ff5e38ee8784ea6ae17f"
+      "sha256": "b32633ffe1e6e0b659ebac177330713c6a8d75a99f99563cc7d6ba4f8264378e"
     },
     {
       "name": "authority-invalidation-architect",
@@ -576,7 +576,7 @@
     {
       "name": "import-pipeline-architect",
       "path": ".claude/skills/import-pipeline-architect/SKILL.md",
-      "sha256": "e424a4eab71d785c43598b0dfdc3becd6f1fe91ab838e5be14b1de011bdd1b18"
+      "sha256": "736815ed14e44abd732aaf0727ed49041318df849959274c7aada4c9b0c64f68"
     },
     {
       "name": "incident-response-runbook",
@@ -981,7 +981,7 @@
     {
       "name": "secrets-identity-hardener",
       "path": ".claude/skills/secrets-identity-hardener/SKILL.md",
-      "sha256": "e8dfa17b7e392a1b1400830acb23defa04d093fdc6e9afa57c3bc55d0b9487b6"
+      "sha256": "a205ae643a74d86a4a0e35751980f455f0679d3027d2445412149f2597c0eed3"
     },
     {
       "name": "secure-migration-reviewer",
@@ -991,7 +991,7 @@
     {
       "name": "security-drift-detector",
       "path": ".claude/skills/security-drift-detector/SKILL.md",
-      "sha256": "aa70bfe78578fcc0dda6c7cb02d86d6b55dd3fafcc4bffadbfb668514442ac35"
+      "sha256": "ec24a32147a47b44aa5ca46b8ef16ff070b69d3c8ed41f3501d387786f809ed5"
     },
     {
       "name": "security-impact-note-author",

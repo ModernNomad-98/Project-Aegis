@@ -58,8 +58,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Specifies fusion/reranking design with metrics and failure modes.",
-          "Records the security handoff list."
+          "Recommends chunking and embedding choices for the documentation corpus with trade-offs (quality, cost, latency).",
+          "Names the index configuration and the evaluation needed to confirm the chunking/embedding choices."
         ]
       }
     },

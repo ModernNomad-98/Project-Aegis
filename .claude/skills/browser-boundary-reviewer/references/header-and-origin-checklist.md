@@ -7,7 +7,7 @@ Use this checklist to produce the review. Every row records evidence (file/confi
 | Header | Required value for this app | Enforcement point | Observed | Status | Evidence |
 | --- | --- | --- | --- | --- | --- |
 | Content-Security-Policy | default-src 'self'; frame-ancestors 'none'; object-src 'none' (tighten per asset inventory) | app middleware or CDN | <observed> | PASS/GAP/UNVERIFIED | <file:line> |
-| Strict-Transport-Security | max-age >= 15552000; includeSubDomains; preload only after audit | edge/CDN | <observed> | ... | ... |
+| Strict-Transport-Security | baseline max-age >= 15552000; includeSubDomains; preload requires max-age >= 31536000 + includeSubDomains + submission, only after audit | edge/CDN | <observed> | ... | ... |
 | X-Frame-Options / frame-ancestors | DENY or none (frame-ancestors preferred) | app or edge | <observed> | ... | ... |
 | Referrer-Policy | strict-origin-when-cross-origin or stricter | app or edge | <observed> | ... | ... |
 | Permissions-Policy | camera/microphone/geolocation disabled unless needed | app or edge | <observed> | ... | ... |

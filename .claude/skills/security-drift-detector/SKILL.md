@@ -79,6 +79,7 @@ Route a request to its real owner when it is that owner's deliverable (the compl
 - local-ci-mirror-preflight work -> `local-ci-mirror-preflight`.
 - secure-migration-reviewer work -> `secure-migration-reviewer`.
 - threat-modeler work -> `threat-modeler`.
+- Remediation of a finding routes to the owning implementer: `secrets-identity-hardener` for credential/key fixes and `appsec-implementer` (manual-only) for code/config control changes; this skill does not remediate.
 - The caller wants this skill to implement, run or approve the change: refuse; return the artifact for the authorized owner.
 - Required evidence is unavailable: state what is missing and mark the artifact UNVERIFIED instead of inventing facts.
 

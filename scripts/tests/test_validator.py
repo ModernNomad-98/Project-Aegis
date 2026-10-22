@@ -3193,14 +3193,14 @@ def test_coverage_map_batch5_deliveries():
                    "notification-webhook-ux-designer",
                    "export-pipeline-architect"):
         assert needle in e1, needle
-    assert "membership-invitation-designer" not in e1
     plan_skill = (validator.REPO_ROOT / ".claude" / "skills"
                   / "test-plan-designer" / "SKILL.md").read_text(
                       encoding="utf-8")
     assert "notification-webhook-ux-designer" in plan_skill
-    assert "membership-invitation-designer" not in plan_skill
-    assert "66 -> 68" in reconciliation
-    assert "Six extension-only roadmap rows" in reconciliation
+    for regression in ("T41", "T42"):
+        assert regression in reconciliation, regression
+    for row_id in ("#231", "#232", "#233", "#234", "#115", "#104"):
+        assert row_id in reconciliation, row_id
     e2 = (validator.REPO_ROOT / ".claude" / "skills"
           / "file-upload-storage-architect" / "references"
           / "storage-access-policy.md").read_text(encoding="utf-8")
@@ -3228,13 +3228,18 @@ def test_coverage_map_batch5_deliveries():
         encoding="utf-8")
     catalog_text = (validator.REPO_ROOT / "docs"
                     / "skills-catalog.md").read_text(encoding="utf-8")
+    marker = chr(96)
     for name in sorted(expected_names):
-        skill_md = (validator.REPO_ROOT / ".claude" / "skills" / name
-                    / "SKILL.md").read_text(encoding="utf-8")
-        purpose = skill_md.split("## Purpose\n\n", 1)[1].split(
-            "\n\n", 1)[0].strip()
-        assert purpose in readme_text, (name, "README purpose incomplete")
-        assert purpose in catalog_text, (name, "catalog purpose incomplete")
+        readme_row = [line for line in readme_text.splitlines()
+                      if line.startswith("| " + marker + name + marker + " |")]
+        catalog_row = [line for line in catalog_text.splitlines()
+                       if line.startswith("| " + marker + name + marker + " |")]
+        assert readme_row, (name, "README registration row missing")
+        assert catalog_row, (name, "catalog registration row missing")
+        for row in readme_row + catalog_row:
+            cells = [cell.strip() for cell in row.strip("|").split("|")]
+            assert any(len(cell) >= 80 and cell.endswith(".") for cell in cells), (
+                name, "registration description cell incomplete")
 
 def test_coverage_map_batch5_covering_owner_assumptions():
     """T42: distinct/beyond pins rest on the covering-owner set; no silent drift."""

@@ -11,6 +11,18 @@
 | Confirm | approved set | committed rows + status | tenant owner/authorized role | per-row commit/reversal |
 | Outcome | job record | status + audit evidence | support/owner | retry/resume |
 
+## 1b. Export-contract mirroring
+
+The import mirrors the shipped export pipeline contract dimension by dimension; a missing counterpart is a design gap.
+
+| Export dimension | Import counterpart | Where specified |
+| --- | --- | --- |
+| Request + requester authority/tenant scope | inspect stage authority + tenant scope | stage contract (section 1) |
+| Async job/status model | staged preview/review/confirm status transitions | stage contract (section 1) |
+| Download/result artifact | outcome artifact + per-row result/report | stage contract (section 1) |
+| Field-level redaction | masking/redaction of sensitive fields in preview/outcome | mapping/validation (section 2) |
+| Expiry/retention | retention of uploaded files and staged previews | recovery matrix/audit plan |
+
 ## 2. Mapping and validation
 
 | Source column | Target field | Transform | Validation | Required |

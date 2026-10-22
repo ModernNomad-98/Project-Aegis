@@ -6,7 +6,7 @@
 | --- | --- | --- | --- |
 | Chunking | semantic sections + 10% overlap, metadata retained | fixed-size, parent-child | chunk recall on golden queries |
 | Embedding | <model class rejected/accepted with cost> | dense-only, lexical-only | recall@k / cost per query |
-| Index | HNSW with tenant scoping | flat, IVF | latency at target load |
+| Index | HNSW approximate index; tenant scoping enforced by query-time authorization filter (security handoff), not index-level isolation | flat, IVF | latency at target load |
 | Fusion | RRF(dense, BM25) | weighted score, dense-only | nDCG@10 |
 | Reranking | cross-encoder top-50 (if budget) | no rerank, LLM rerank | precision@5, latency delta |
 
