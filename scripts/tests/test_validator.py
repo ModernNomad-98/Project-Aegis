@@ -2834,6 +2834,14 @@ def test_coverage_map_batch3_deliveries():
                           encoding="utf-8")
     assert "D110 (2026-10-21)" in reconciliation, (
         "D110 Batch 3 delivery record must be appended")
+    with tempfile.TemporaryDirectory() as tmp:
+        def md_mutate(text):
+            return text.replace("## P0 gap candidates (all 0 ids)\n\nNone.\n",
+                                "", 1)
+        with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
+            expect_error(rep, "must keep the '## P0 gap candidates (all 0 ids)'",
+                         "coverage map: deleted empty P0 summary section "
+                         "rejected (no vacuous pass)")
 
 
 def test_skills_manifest_provenance():

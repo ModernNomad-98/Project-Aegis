@@ -2409,6 +2409,12 @@ def check_coverage_map(rep: Report) -> None:
     if summary_p0_ids != set(COVERAGE_P0_GAP_IDS):
         rep.error("[" + md_ctx + "] summary P0 gap id set must equal the "
                   "JSON P0 set (all " + str(len(COVERAGE_P0_GAP_IDS)) + " ids)")
+    p0_heading = ("## P0 gap candidates (all "
+                  + str(len(COVERAGE_P0_GAP_IDS)) + " ids)")
+    if p0_heading not in summary_visible:
+        rep.error("[" + md_ctx + "] summary must keep the '"
+                  + p0_heading + "' section heading even when the P0 GAP set "
+                  "is empty (a missing section must not pass vacuously)")
     if COVERAGE_TIMESTAMP_RE.search(text) or COVERAGE_TIMESTAMP_RE.search(
             summary):
         rep.error("[" + ctx + "] must not carry timestamps (deterministic "

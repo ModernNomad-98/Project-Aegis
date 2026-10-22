@@ -24,8 +24,8 @@
         "triggers": true,
         "assertions": [
           "Defines deep-link return behavior that cannot bypass the gate.",
-          "Names server enforcement per gate and marks gaps.",
-          "Does not implement routes or claim enforcement."
+          "Validates return destinations as same-origin/relative and rejects absolute/protocol-relative/malformed targets (no open redirect).",
+          "Names server enforcement per gate and marks gaps."
         ]
       }
     },

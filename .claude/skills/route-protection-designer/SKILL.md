@@ -35,7 +35,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 1. Build the route x gate matrix: auth, role, onboarding, admin, and the required capability per route.
 2. Name the server enforcement for each gate and mark enforcement gaps explicitly.
 3. Define denied/redirect behavior: 401/403 vs onboarding redirect vs not-found hiding, per route class.
-4. Define deep-link return behavior so a gated link returns the user to the requested destination after auth.
+4. Define deep-link return behavior so a gated link returns the user to the requested destination after auth, validating the destination as a parsed same-origin/relative path (allowlist) and rejecting absolute, protocol-relative and malformed targets - no post-login open redirect.
 5. Confirm client guards are UX-only and cannot be the sole enforcement.
 6. Define negative tests for unauthorized/under-privileged access per gate class.
 7. Return the gate matrix, denial flows, trust-boundary note and test plan; do not implement routes.
@@ -55,6 +55,7 @@ Return, in this order:
 - Every gated route names its capability and server enforcement source.
 - Denied/redirect/onboarding behavior is explicit per route class.
 - Deep-link return is defined and cannot bypass the gate.
+- Deep-link return destinations are validated as same-origin/relative; absolute, protocol-relative and malformed targets are rejected (no open redirect).
 - Client guards are labeled UX-only; enforcement gaps are named.
 - Negative tests cover unauthorized and under-privileged access.
 - No route or server code was edited or enforcement claimed.
@@ -63,6 +64,7 @@ Return, in this order:
 
 - A client route guard that hides UI is not authorization; treat it as UX and name the server check.
 - A deep link that redirects to a generic home page loses the user's destination; define the return contract.
+- Returning to an unvalidated deep-link destination creates a post-login open redirect; parse and validate before redirecting.
 - Onboarding gates and role gates can conflict; state the precedence per route.
 - Hiding a route versus returning 403 is a product decision; make it explicit.
 
