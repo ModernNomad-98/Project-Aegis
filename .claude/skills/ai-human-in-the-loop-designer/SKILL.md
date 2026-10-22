@@ -120,10 +120,72 @@ first workflow step.
      one record or one user, the watch-and-undo controls in step 9 exist, and a
      written policy explicitly permits autonomy. Policy silence is CONFIRM,
      never AUTONOMOUS.
-   A single-record action that is reversible AND compensable AND judgeable by one reviewer is
-    CONFIRM when written policy permits it with approval OR when written policy is silent on it.
-    Policy silence keeps an otherwise-eligible single-record action at CONFIRM, never AUTONOMOUS,
-    and never by itself makes it FORBIDDEN.
+   A single-record action that is reversible AND compensable AND judgeable by
+   one reviewer, and that written policy permits with approval, is CONFIRM.
+   Any action that is irreversible, non-compensable, cross-tenant,
+   wide-blast-radius, or not judgeable by a single reviewer is FORBIDDEN
+   regardless of approval or policy.
+3. **Design the advisory-only mode.** For actions left advisory-only, the
+   AI output appears as a suggestion the user applies through the ordinary
+   user interface with their own permissions. Nothing is written on the
+   AI's behalf; the suggestion is labeled as AI-generated and can be
+   ignored at no cost.
+4. **Design the pending proposal.** A CONFIRM action creates a proposal, not
+   a state change. It stores the exact proposed change (field-level before
+   and after), the base version of the target record, the sources the AI
+   relied on, the model and prompt version, who or what triggered the run,
+   the tenant, and an expiry time. Proposals live apart from product state,
+   so nothing reads them as true.
+5. **Design the reviewer queue.** Each item shows the exact change as a
+   difference against current state, the cited sources, and what committing
+   will cause (emails sent, money moved). Define ordering, a response-time
+   target, who is notified, escalation when the target is missed, and a
+   volume budget per reviewer. High-blast-radius items are never approved
+   in bulk.
+6. **Design approve, edit, reject and expiry.**
+   - **Approve** commits the proposal exactly as shown.
+   - **Edit** commits the reviewer's version, records both versions, and
+     makes the reviewer the author of the change.
+   - **Reject** records a reason from a short list plus free text, commits
+     nothing, and feeds evaluation data.
+   - **Expiry** closes the proposal unanswered and commits nothing.
+   - **Staleness:** before commit, compare the base version with the
+     current record. If it changed, re-check the proposal or expire it;
+     never commit a stale proposal.
+7. **Decide who may review.** The reviewer must hold permission to perform
+   the action themselves, in that tenant. The identity that triggered the
+   AI run never approves its own proposal (no self-approval). A service
+   account or the AI never approves. For the highest-impact CONFIRM
+   actions, require a second reviewer.
+8. **Design the commit path.** An approved proposal commits through the
+   same write path a person would use, re-checking authorization as the
+   approving reviewer at commit time, with an idempotency key so a double
+   click commits once. No separate "AI write" path skips validation or
+   permissions.
+9. **Design human on the loop for AUTONOMOUS actions.** Define what is
+   monitored, a sampling rate for after-the-fact human review, an undo
+   window, thresholds that pause autonomy and fall back to CONFIRM, and who
+   can pause it. The kill switch mechanism itself belongs to
+   `ai-router-architect` *(manual-only)* or the feature-flag skills; this
+   step names when it must fire.
+10. **Design the audit record.** Every proposal, decision, edit, expiry,
+    autonomous action and undo records: proposal id, action, tenant,
+    trigger identity, reviewer identity, decision, reason, before and after
+    values, sources, model and prompt version, and timestamps. The log's
+    schema, storage and retention belong to `audit-log-architect`.
+11. **Design against consent fatigue.** Keep CONFIRM volume within the
+    reviewer budget; if the queue would exceed it, reclassify with the owner
+    rather than add reviewers who will rubber-stamp. Track approval rate and
+    time-to-decision per reviewer; near-100% approval or very short decision
+    times are fatigue signals to inspect, never proof of rubber-stamping. Hand
+    the finished flow to
+    `human-agent-trust-reviewer` for an adversarial review.
+12. **Present choices and deliver.** Where a classification or queue design
+    is an owner choice (for example CONFIRM with sampling versus
+    AUTONOMOUS with undo), define the terms, give each option's user
+    benefit, drawbacks and cost in reviewer time, recommend one with its
+    reason tied to the risk tier, and ask one question. Deliver in the
+    Output Format.
 
 ## Output Format
 
