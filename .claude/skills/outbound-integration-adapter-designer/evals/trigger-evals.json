@@ -1,6 +1,6 @@
 {
   "skill": "outbound-integration-adapter-designer",
-  "description": "Trigger discrimination for outbound-integration-adapter-designer against real shipped owners (incl. reciprocal sibling case).",
+  "description": "Trigger discrimination for outbound-integration-adapter-designer against real shipped owners (incl. reciprocal sibling case)",
   "overlaps_with": [
     "adr-writer",
     "ai-router-architect",

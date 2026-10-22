@@ -1,6 +1,6 @@
 {
   "skill": "edge-function-designer",
-  "description": "Trigger discrimination for edge-function-designer against real shipped owners (incl. reciprocal sibling case).",
+  "description": "Trigger discrimination for edge-function-designer against real shipped owners",
   "overlaps_with": [
     "adr-writer",
     "api-event-architect",

@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "46568d7270ad0cfea2a0ebda49720dfe18d328cb",
+  "source_revision": "67edd114d2c54c64a7f16294b8de5cb06d17ff59",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -171,7 +171,7 @@
     {
       "name": "application-layer-pattern-advisor",
       "path": ".claude/skills/application-layer-pattern-advisor/SKILL.md",
-      "sha256": "080629011cb4764f00c844bdbab28b43d3d56e9f589031a45466f35097a1539d"
+      "sha256": "f9ab226c9b814f225073cf2ac02ab047ae6a71f13b3035229f11ff9c7d14fd78"
     },
     {
       "name": "appsec-implementer",
@@ -191,12 +191,12 @@
     {
       "name": "architecture-fitness-function-designer",
       "path": ".claude/skills/architecture-fitness-function-designer/SKILL.md",
-      "sha256": "be7b39274a507b738a254cad35187940ee5a33d6e0dabc20e7f4f959d3b00a18"
+      "sha256": "b93862c1169a53de2c32d1a79db9490cc401683a31b4110e1eaba40b72011e10"
     },
     {
       "name": "architecture-spike-planner",
       "path": ".claude/skills/architecture-spike-planner/SKILL.md",
-      "sha256": "2ba64266a3164835a77d31e654805413ef6d68bfeb4250bb694072b8521e25d6"
+      "sha256": "b9127131d68672e0e8e0192b2b45e9be3dd7ef96dd5256a5803d2c31e8013ceb"
     },
     {
       "name": "audit-log-architect",
@@ -321,7 +321,7 @@
     {
       "name": "configuration-architect",
       "path": ".claude/skills/configuration-architect/SKILL.md",
-      "sha256": "e850d95574b1d6cc65430c042d76fc59b4e46385828186a2ee9ff86370d7f0bf"
+      "sha256": "212b3fca5cdb38f4422c36ab0fdf4277edfca3788a3a041e5059c4c3346f9010"
     },
     {
       "name": "context-co-update-ci-gate",
@@ -336,7 +336,7 @@
     {
       "name": "cqrs-read-model-designer",
       "path": ".claude/skills/cqrs-read-model-designer/SKILL.md",
-      "sha256": "232f70bfa6636cfe404d6f8c5b70b40be1ba0e63dcef43fefe21967f943aa0cf"
+      "sha256": "438ebe1701f051c41a4f566d23cdc05b933950b5dbc41810e8edecaa494c6d3c"
     },
     {
       "name": "cross-team-dependency-negotiator",
@@ -421,7 +421,7 @@
     {
       "name": "edge-function-designer",
       "path": ".claude/skills/edge-function-designer/SKILL.md",
-      "sha256": "17b2108b23cb1788f120fbd178b11f63817f22bcf7ec85e93f162e254bb38bd7"
+      "sha256": "63855d7931c0688e3a2d02025ccf432c182ad2d16e9564b3539b63ef2dbbe6f7"
     },
     {
       "name": "edge-state-ux-designer",
@@ -466,7 +466,7 @@
     {
       "name": "extensibility-boundary-designer",
       "path": ".claude/skills/extensibility-boundary-designer/SKILL.md",
-      "sha256": "90e0c1b040cf0d289965f82f4ad2c9da7377fd94b4d61d67650aafce5e0fcb30"
+      "sha256": "e112157ca12b05c76365f5aab4a1c096fe75e88aafe848a5c215d091f30c7b62"
     },
     {
       "name": "feature-flag-architect",
@@ -526,7 +526,7 @@
     {
       "name": "graphql-boundary-reviewer",
       "path": ".claude/skills/graphql-boundary-reviewer/SKILL.md",
-      "sha256": "2215de14dee9222ac505e40f1ee62140d0fa4c27cf6e07376fdea3ebd95f3852"
+      "sha256": "8ef8f10ce8090df60f0a1641c29108a9179eb4dc0464b94f6cb33bae23165e96"
     },
     {
       "name": "hidden-context-exposure-reviewer",
@@ -666,7 +666,7 @@
     {
       "name": "modernization-cutover-planner",
       "path": ".claude/skills/modernization-cutover-planner/SKILL.md",
-      "sha256": "1c71c34b5d094e47112285f86cace3d01427538403ddf1e3bfc1585cef55b3c4"
+      "sha256": "0a9420b9de96db513781a461676dbd9dccde640164cc334d48ebd34afa2e7767"
     },
     {
       "name": "multi-framework-crosswalk",
@@ -721,7 +721,7 @@
     {
       "name": "outbound-integration-adapter-designer",
       "path": ".claude/skills/outbound-integration-adapter-designer/SKILL.md",
-      "sha256": "881d55c9365ac9d7d81648165bd98ace6324893fc62d415ad02db7d6b61b4585"
+      "sha256": "e4d5db79742d9d381d95410bc0602cd75e9f17b638165c614d82b52b23cfdfc1"
     },
     {
       "name": "pagination-cursor-designer",
@@ -1061,7 +1061,7 @@
     {
       "name": "state-machine-modeler",
       "path": ".claude/skills/state-machine-modeler/SKILL.md",
-      "sha256": "c41995db47985479db4b725a940c9fda0e4cd348395d9b19e239f95e896243b6"
+      "sha256": "ca54a645ed4ff435d87fbce2a096d9e4ce898fee7632adc50937c97a94b1ac1d"
     },
     {
       "name": "statement-of-applicability-author",
@@ -1126,7 +1126,7 @@
     {
       "name": "technical-debt-classifier",
       "path": ".claude/skills/technical-debt-classifier/SKILL.md",
-      "sha256": "5cb0e4891c4331011ced21e6c9f89c8f28214c3ae10bdd9ef30e60576544bb28"
+      "sha256": "4f710ad5eeaccce2df5aba33d2da66f8076f019c1490a2968b3571c4701d9fae"
     },
     {
       "name": "tenant-isolation-reviewer",
@@ -1171,7 +1171,7 @@
     {
       "name": "transaction-scope-designer",
       "path": ".claude/skills/transaction-scope-designer/SKILL.md",
-      "sha256": "d35bf5c221941b18171da4873fcdfefa9a1d7b1d26f41eefa08816a479cbd31b"
+      "sha256": "fd2dadc26b422355354b0c5b96d1cac80935317d7b51cdfc8d98b53f3fc89aa9"
     },
     {
       "name": "url-state-architect",

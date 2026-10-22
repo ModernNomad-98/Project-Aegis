@@ -2964,17 +2964,28 @@ def test_coverage_map_step0_hygiene():
 def test_coverage_map_batch4_deliveries():
     """T40: the 13 Batch 4 skills deliver the 22 accepted merged rows."""
     mapping = {
-        14: "state-machine-modeler", 19: "transaction-scope-designer",
-        156: "transaction-scope-designer", 20: "cqrs-read-model-designer",
-        28: "configuration-architect", 66: "configuration-architect",
-        29: "extensibility-boundary-designer", 30: "extensibility-boundary-designer",
-        31: "application-layer-pattern-advisor", 32: "application-layer-pattern-advisor",
-        33: "application-layer-pattern-advisor", 34: "application-layer-pattern-advisor",
-        35: "application-layer-pattern-advisor", 43: "technical-debt-classifier",
-        45: "modernization-cutover-planner", 46: "modernization-cutover-planner",
-        47: "modernization-cutover-planner", 50: "architecture-fitness-function-designer",
-        54: "architecture-spike-planner", 135: "graphql-boundary-reviewer",
-        146: "outbound-integration-adapter-designer", 158: "edge-function-designer",
+        14: "state-machine-modeler",
+        19: "transaction-scope-designer",
+        156: "transaction-scope-designer",
+        20: "cqrs-read-model-designer",
+        28: "configuration-architect",
+        66: "configuration-architect",
+        29: "extensibility-boundary-designer",
+        30: "extensibility-boundary-designer",
+        31: "application-layer-pattern-advisor",
+        32: "application-layer-pattern-advisor",
+        33: "application-layer-pattern-advisor",
+        34: "application-layer-pattern-advisor",
+        35: "application-layer-pattern-advisor",
+        43: "technical-debt-classifier",
+        45: "modernization-cutover-planner",
+        46: "modernization-cutover-planner",
+        47: "modernization-cutover-planner",
+        50: "architecture-fitness-function-designer",
+        54: "architecture-spike-planner",
+        135: "graphql-boundary-reviewer",
+        146: "outbound-integration-adapter-designer",
+        158: "edge-function-designer",
     }
     payload = json.loads(
         validator.COVERAGE_MAP.read_text(encoding="utf-8"))
@@ -3008,7 +3019,9 @@ def test_coverage_map_batch4_deliveries():
         "D111 (2026-10-21)")
     readme = (validator.REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert "<!-- SKILL-COUNT -->243<!-- /SKILL-COUNT -->" in readme
-    assert "**242 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families**" in readme
+    assert (
+        "**242 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> "
+        "discipline families**" in readme)
     assert "3. **Core architecture & engineering** *(Phase 2, 30)*" in readme
     catalog = (validator.REPO_ROOT / "docs" / "skills-catalog.md").read_text(
         encoding="utf-8")
@@ -3017,6 +3030,28 @@ def test_coverage_map_batch4_deliveries():
     manifest = json.loads(
         validator.MANIFEST_PATH.read_text(encoding="utf-8"))
     assert len(manifest["skills"]) == 243
+    pair = {
+        "application-layer-pattern-advisor",
+        "outbound-integration-adapter-designer",
+    }
+    for name in sorted(set(mapping.values())):
+        cases = json.loads(
+            (validator.REPO_ROOT / ".claude" / "skills" / name / "evals"
+             / "trigger-evals.json").read_text(encoding="utf-8"))["cases"]
+        positives = [c for c in cases if c["expected_skill"] == name]
+        negatives = [c for c in cases if c["expected_skill"] != name]
+        expected_negative = 15 if name in pair else 14
+        assert len(positives) == 8, (name, len(positives))
+        assert len(negatives) == expected_negative, (name, len(negatives))
+        skill_md = (validator.REPO_ROOT / ".claude" / "skills" / name
+                    / "SKILL.md").read_text(encoding="utf-8")
+        documented = (str(len(cases)) + " trigger-discrimination cases (8 positive / "
+                      + str(expected_negative) + " negative")
+        assert documented in skill_md, (name, documented)
+        behaviours = json.loads(
+            (validator.REPO_ROOT / ".claude" / "skills" / name / "evals"
+             / "evals.json").read_text(encoding="utf-8"))["cases"]
+        assert len(behaviours) == 6, (name, len(behaviours))
 
 
 def test_skills_manifest_provenance():

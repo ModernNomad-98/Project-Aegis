@@ -79,6 +79,6 @@ Return, in this order:
 
 - [spike-charter](references/spike-charter.md) - the concrete spike charter with question, hypotheses, timebox, evidence and exit criteria fields, construction method, checks and a worked table.
 - [evals/evals.json](evals/evals.json) - six domain-specific behaviour cases.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against real manifest owners (including the reciprocal sibling case).
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 22 trigger-discrimination cases (8 positive / 14 negative) against real manifest owners
 
 **Source:** docs/skills-catalog.md Phase 2 core architecture & engineering pack (Batch 4/D112); coverage cat 01 rows #54. Description is trigger-first (capability front-loaded for truncated listings).

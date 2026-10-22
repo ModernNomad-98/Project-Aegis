@@ -1,6 +1,6 @@
 {
   "skill": "state-machine-modeler",
-  "description": "Trigger discrimination for state-machine-modeler against real shipped owners (incl. reciprocal sibling case).",
+  "description": "Trigger discrimination for state-machine-modeler against real shipped owners",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",

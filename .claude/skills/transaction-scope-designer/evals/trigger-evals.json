@@ -1,6 +1,6 @@
 {
   "skill": "transaction-scope-designer",
-  "description": "Trigger discrimination for transaction-scope-designer against real shipped owners (incl. reciprocal sibling case).",
+  "description": "Trigger discrimination for transaction-scope-designer against real shipped owners",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",

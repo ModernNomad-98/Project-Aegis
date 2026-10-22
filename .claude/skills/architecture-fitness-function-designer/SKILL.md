@@ -78,6 +78,6 @@ Return, in this order:
 
 - [fitness-function-catalog](references/fitness-function-catalog.md) - the concrete fitness-function catalog with metrics, budgets, owners and failure actions fields, construction method, checks and a worked table.
 - [evals/evals.json](evals/evals.json) - six domain-specific behaviour cases.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against real manifest owners (including the reciprocal sibling case).
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 22 trigger-discrimination cases (8 positive / 14 negative) against real manifest owners
 
 **Source:** docs/skills-catalog.md Phase 2 core architecture & engineering pack (Batch 4/D112); coverage cat 01 rows #50. Description is trigger-first (capability front-loaded for truncated listings).

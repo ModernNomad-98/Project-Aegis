@@ -1,6 +1,6 @@
 {
   "skill": "application-layer-pattern-advisor",
-  "description": "Trigger discrimination for application-layer-pattern-advisor against real shipped owners (incl. reciprocal sibling case).",
+  "description": "Trigger discrimination for application-layer-pattern-advisor against real shipped owners (incl. reciprocal sibling case)",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",

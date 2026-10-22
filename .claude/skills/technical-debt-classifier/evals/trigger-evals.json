@@ -1,6 +1,6 @@
 {
   "skill": "technical-debt-classifier",
-  "description": "Trigger discrimination for technical-debt-classifier against real shipped owners (incl. reciprocal sibling case).",
+  "description": "Trigger discrimination for technical-debt-classifier against real shipped owners",
   "overlaps_with": [
     "adr-writer",
     "architecture-designer",

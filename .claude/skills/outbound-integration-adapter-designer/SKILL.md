@@ -79,6 +79,6 @@ Return, in this order:
 
 - [adapter-checklist](references/adapter-checklist.md) - the concrete adapter contract, failure-mode table and contract-test plan fields, construction method, checks and a worked table.
 - [evals/evals.json](evals/evals.json) - six domain-specific behaviour cases.
-- [evals/trigger-evals.json](evals/trigger-evals.json) - 8 positive and 14 negative trigger-discrimination cases against real manifest owners (including the reciprocal sibling case).
+- [evals/trigger-evals.json](evals/trigger-evals.json) - 23 trigger-discrimination cases (8 positive / 15 negative, including the reciprocal sibling case) against real manifest owners.
 
 **Source:** docs/skills-catalog.md Phase 2 core architecture & engineering pack (Batch 4/D112); coverage cat 04 rows #146. Description is trigger-first (capability front-loaded for truncated listings).
