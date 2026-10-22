@@ -413,10 +413,10 @@ that skill's own answer keys into your workspace, where an agent working there c
 exclude them.
 
 **The rule covers every route that copies a skill folder, not only the commands further down.** Two
-other routes documented on this page carry the same `evals/` files. Zipping a whole skill folder for
+other routes documented on this page can carry the same `evals/` files. Zipping a whole skill folder for
 upload to the Claude apps (**Option 6**, above) puts them inside the uploaded zip; and native mode's copy step
-below assembles the `.agents/skills` destination from the same allow-list, so it excludes them by
-construction; only a hand-made recursive copy of the entire `.claude/skills` tree still puts them in
+below assembles the `.agents/skills` destination from the same allow-list, so it excludes them when
+you follow it; only a hand-made recursive copy of the entire `.claude/skills` tree still puts them in
 the agent-visible project tree. Build an upload zip from an allow-list copy rather than from the
 skill folder as it stands, and use the allow-list native-mode step below rather than a raw tree copy.
 Leaving either route as an unexcluded exception is a deliberate choice this page does not recommend.
@@ -665,7 +665,8 @@ Two ways in:
   `.agents/skills/` inside a project, or `~/.agents/skills/` for a user-level install (the locations
   in the official [Codex skills docs](https://developers.openai.com/codex/skills), checked
   2026-09-26; earlier versions of this README said `.codex/skills`). A selection-based copy also
-  keeps the manual-only operate-class skills out — it never copies the whole tree. Use real
+  leaves the manual-only operate-class skills out — but only when the selection excludes them
+  explicitly; choosing skills one at a time never copies the whole tree. Use real
   copies (git symlinks are unreliable on Windows checkouts; Codex itself supports symlinked
   skill folders, checked 2026-09-26). Verified caveats before you choose this path (the first
   is fixed, kept for the record):
@@ -693,8 +694,9 @@ Two ways in:
      documents and honors `disable-model-invocation: true` (per the
      [Cursor skills docs](https://cursor.com/docs/context/skills), checked 2026-09-26).
      Either way, do **not** copy the manual-only operate-class skills across — the selection-based
-     native-mode step above already omits them by choosing skills one at a time, never by copying
-     the whole tree — and do not rely on their leading "MANUAL-ONLY" description sentinels alone
+     native-mode step above leaves them out only when you exclude them explicitly on the allow-list;
+     choosing skills one at a time never copies the whole tree — and do not rely on their leading
+     "MANUAL-ONLY" description sentinels alone
      (they reduce auto-invocation risk; they are not enforcement).
 
   For those reasons, don't commit a `.agents/skills` copy to this repo — a committed copy

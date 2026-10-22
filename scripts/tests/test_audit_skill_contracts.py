@@ -1887,12 +1887,13 @@ def test_catalog_families_use_atx_headings_and_skill_tables() -> None:
     assert all(fams[name] in atx for name in names), "family values must be real ATX headings"
     assert all(not fams[name].startswith("Subagents") for name in names), "agent roster is not a skill family"
     assert all(not re.match(r"^\d", fams[name]) for name in names), "paragraph fragments must not become families"
-    # The three known misassignments named by the owner plan R7 acceptance.
+    # The three known misassignments named by the owner plan R7 acceptance, plus
+    # release-readiness-reviewer (the fourth family the same acceptance names).
     assert fams["ai-sdlc-operating-model"] == "Skills (Phase 1.5 — AI-SDLC governance completion)"
     assert fams["test-plan-designer"] == "Skills (Phase 5 — QA, E2E, manual QA & evidence pack)"
     assert fams["full-codebase-auditor"] == "Skills (Phase 2 — core architecture & engineering pack)"
     assert fams["release-readiness-reviewer"] == "Skills (Phase 6 — cloud, DevOps, reliability & release pack)"
-    ok("catalog family parsing uses ATX headings and skill tables (3 known misassignments resolved)")
+    ok("catalog family parsing uses ATX headings and skill tables (4 named family assignments resolved: 3 known misassignments + release-readiness-reviewer)")
 
 
 
