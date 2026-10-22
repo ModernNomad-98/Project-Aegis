@@ -15,7 +15,8 @@
     "error-taxonomy-designer",
     "performance-test-harness",
     "load-test-planner",
-    "frontend-perf-engineer"
+    "frontend-perf-engineer",
+    "client-state-boundary-reviewer"
   ],
   "cases": [
     {
@@ -86,7 +87,7 @@
       "prompt": "Design the cache invalidation table for these entities and mutations.",
       "expected_skill": "server-state-architect",
       "should_not_trigger": [
-        "feature-flag-architect"
+        "caching-strategy-designer"
       ],
       "reason": "The request needs server-state-architect's design method; feature-flag-architect owns a different task."
     },

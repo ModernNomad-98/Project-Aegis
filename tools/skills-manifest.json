@@ -251,7 +251,7 @@
     {
       "name": "client-state-boundary-reviewer",
       "path": ".claude/skills/client-state-boundary-reviewer/SKILL.md",
-      "sha256": "2f39da68e1523bee80aaa7a2a09a38c9bce4c66e3171a494ecd2c7d78d8958e1"
+      "sha256": "a9cccd0874747c7df3a92f45253b9d36e07fa43112c3777aab2ba2f39891910d"
     },
     {
       "name": "cloud-architecture-decider",
@@ -296,7 +296,7 @@
     {
       "name": "component-boundary-designer",
       "path": ".claude/skills/component-boundary-designer/SKILL.md",
-      "sha256": "37c6d13f0e8205b3e9df22d1eec5416b73c3e9539c8c072f94bf1333b0d4ceec"
+      "sha256": "869fbb4b241026b4cc76ec8ce84bb1cf712e5f5eb2e31d15a584ce177f467dcd"
     },
     {
       "name": "concurrency-race-reviewer",
@@ -366,7 +366,7 @@
     {
       "name": "design-system-token-governor",
       "path": ".claude/skills/design-system-token-governor/SKILL.md",
-      "sha256": "f0b57fadfcfb0665dc7a0558ee349140fef3904a6aee10f42f304935fee55c1a"
+      "sha256": "28c0f80cd6164331cdeea97cabf4509e6bc50d74a5db7b9e061ec1746d751389"
     },
     {
       "name": "diataxis-doc-organizer",
@@ -466,7 +466,7 @@
     {
       "name": "frontend-architecture-mapper",
       "path": ".claude/skills/frontend-architecture-mapper/SKILL.md",
-      "sha256": "0dbaba5140e46df82af82572b647734dbd23feef3882688db227fb59245cae36"
+      "sha256": "20d742ff1c20fea66627305eca7ebf8c8217feda8e5835910c35896005e56a36"
     },
     {
       "name": "frontend-perf-engineer",
@@ -756,7 +756,7 @@
     {
       "name": "pwa-boundary-reviewer",
       "path": ".claude/skills/pwa-boundary-reviewer/SKILL.md",
-      "sha256": "2ddb9430bc5d2f24bab543292506d31cc3de16558188b0eb2ce18c91b94a5054"
+      "sha256": "1ff1352bb2c71b96117f3291c0dc921ca41ee8f3138ba344a9c29e42b96a20ce"
     },
     {
       "name": "qa-automation-architect",
@@ -846,7 +846,7 @@
     {
       "name": "route-protection-designer",
       "path": ".claude/skills/route-protection-designer/SKILL.md",
-      "sha256": "100f7f786425cb98889a396f882d1c83b38302bc660373c9e42c18c9e006dc3f"
+      "sha256": "cb544040a8aa6b700a9526cae071ba5ee9d4905028ecd5a486cc3d9288e6e31c"
     },
     {
       "name": "saas-cost-architect",
@@ -941,7 +941,7 @@
     {
       "name": "server-state-architect",
       "path": ".claude/skills/server-state-architect/SKILL.md",
-      "sha256": "6b08d3155533d0064b73fd0cddd226fc45d53a68cce33d9d8aacf0438c7e09d1"
+      "sha256": "b400da2abfe152c68b5892c1beb43d24af0d98f86b13630e75e9a22fb42d0c5d"
     },
     {
       "name": "sharded-validation-with-resume",
@@ -1111,7 +1111,7 @@
     {
       "name": "url-state-architect",
       "path": ".claude/skills/url-state-architect/SKILL.md",
-      "sha256": "4fe01672452b660a4ff1af64b9a7757f30c25aa04240978b3f58ab13b501b99c"
+      "sha256": "04a8f94d80634096ca165fdd68c976e91637a63a89e0d04da368ef60a24c8004"
     },
     {
       "name": "usage-metering-and-cost-attribution-pipeline-designer",

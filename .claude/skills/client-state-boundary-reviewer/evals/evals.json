@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Records the not-inspected list and evidence needed.",
-          "Keeps recommendations minimal-change and evidence-based.",
-          "Does not claim an edit or runtime verification."
+          "Identifies duplicated state and derived-state drift with file-level evidence.",
+          "Assesses hydration/persistence risks including sensitive data.",
+          "Returns ranked minimal-change recommendations; no refactor claimed."
         ]
       }
     },

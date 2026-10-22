@@ -2703,6 +2703,8 @@ def test_coverage_map_triage_rows_and_phrase():
     assert phrase, "an optionality phrase must carry 80 of 230"
     mmd = validator.COVERAGE_MAP_MD.read_text(encoding="utf-8")
     assert "80 of 230" in mmd and "80 of 215" not in mmd
+    assert "80 of 222" not in mmd, (
+        "the immediately previous Batch-2 optionality phrase must stay rejected")
     assert "83 of 215" not in mmd, (
         "the pre-Batch-1 stale optionality phrase must stay rejected")
 

@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines history/back and deep-link behavior.",
-          "Defines privacy redaction for URL values.",
-          "Records compatibility/migration notes without executing them."
+          "Defines validation for untrusted URL input and the fallback behavior.",
+          "Defines defaults/canonicalization producing one canonical URL.",
+          "No routing implementation or link verification is claimed."
         ]
       }
     },

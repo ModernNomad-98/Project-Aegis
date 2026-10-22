@@ -31,7 +31,7 @@ The returned record must name the evidence source for each decision, separate ve
 ## 4. Boundaries
 
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
-- Flag system and targeting state (real 222-manifest owner) routes to `feature-flag-architect`; this skill does not perform that owner's work.
+- Flag system and targeting state (existing pre-Batch-3 owner) routes to `feature-flag-architect`; this skill does not perform that owner's work.
 - Server-data contract and cache ownership (batch-3 sibling) routes to `server-state-architect`; this skill does not perform that owner's work.
 - Url representation and schema ownership (batch-3 sibling) routes to `url-state-architect`; this skill does not perform that owner's work.
 - Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `feature-flag-architect`, `performance-test-harness`, `load-test-planner`, `code-reviewer`, `full-codebase-auditor`, `caching-strategy-designer`, `observability-by-design`, `frontend-perf-engineer`, `edge-state-ux-designer`, `error-taxonomy-designer`, `mobile-viewport-craft`, `architecture-designer`, `api-event-architect`, `validation-boundary-designer` (discrimination neighbours, not in-scope work).
@@ -45,3 +45,4 @@ The returned record must name the evidence source for each decision, separate ve
 - Hydration and persistence risks (incl. sensitive data) are assessed.
 - Recommendations are minimal-change and ranked.
 - The review is evidence-based and performs no refactor.
+

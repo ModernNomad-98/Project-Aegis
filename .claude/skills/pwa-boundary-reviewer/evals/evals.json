@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces a ranked risk checklist and residual-risk list.",
-          "Names what could not be inspected.",
-          "Does not claim a production behavior verification."
+          "Reviews waiting-worker/skipWaiting control and reload behavior on activation.",
+          "Reviews stale-client behavior and the required user-facing handling.",
+          "No service-worker edit or production verification is claimed."
         ]
       }
     },

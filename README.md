@@ -850,8 +850,10 @@ keeps a human as the approval gate on anything irreversible. See
     `n-plus-one-detector`, `load-test-planner`.
 14. **Product, PM & growth** *(D24, 15 + iteration, 24)* — turning product intent into shippable, measured work:
     requirements elicitation feeding specs, then prioritization, flag-gated rollout,
-    analytics instrumentation and an optional pre-implementation design-iteration
-    path — see
+    analytics instrumentation, an optional pre-implementation design-iteration
+    path, and (Batch 3/D110) frontend architecture and client-state craft: maps,
+    component boundaries, route protection, design tokens, server/URL/client state
+    and PWA boundaries — see
     [Your first session](#your-first-session) for the entry-point walkthrough.
     *e.g.* `requirements-gathering-facilitator`, `product-spec-writer`,
     `prioritization-frame-picker`, `feature-flag-rollout-strategist`, `event-schema-architect`,
@@ -1409,9 +1411,13 @@ production without explicit human approval:
 | `performance-test-harness` | The measurement instrument: per-surface measured set, environment contract stamped on every result, baselines + variance-derived noise bands (single-run diffs banned), thresholds CONSUMED from budget/SLO owners, CI tiers with advisory→blocking promotion, UNRUN as a first-class status. | auto + manual |
 | `load-test-planner` | The traffic plan: workload model from production evidence (write share explicit, arrival model chosen), whale + long-tail tenant mix with the noisy-neighbor scenario judged per-tenant, volumes with skew, load/stress/soak/spike by question, ramps with abort criteria, owner-cited pass/fail. | auto + manual |
 
-D12.2 — product engineering craft (D24): the API/UX craft INSIDE the
-contract that `api-event-architect` owns (the craft details, not the
-contract itself):
+D12.2 — product engineering craft (D24; plus the eight Batch-3 frontend
+architecture/client-state additions under D110): 13 advisory design/review
+skills in two groups — the original five are the API/UX craft INSIDE the
+contract that `api-event-architect` owns (craft details, not the contract
+itself), and the Batch-3 group covers frontend architecture maps, component
+boundaries, route protection, design-token governance, server/client/URL state
+and PWA boundaries; all advisory, edit nothing:
 
 | Skill | What it does | Invocation |
 |---|---|---|

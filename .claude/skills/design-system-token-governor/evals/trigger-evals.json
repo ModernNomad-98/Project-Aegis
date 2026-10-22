@@ -15,7 +15,8 @@
     "architecture-designer",
     "code-reviewer",
     "validation-boundary-designer",
-    "requirements-gathering-facilitator"
+    "requirements-gathering-facilitator",
+    "component-boundary-designer"
   ],
   "cases": [
     {
@@ -209,12 +210,12 @@
     },
     {
       "id": "design-system-token-governor-negative-14",
-      "prompt": "Facilitate the requirements for this product: goals, users, constraints and open questions.",
-      "expected_skill": "requirements-gathering-facilitator",
+      "prompt": "Decide the page/container/feature/shared/primitive layers for this frontend and who owns each concern.",
+      "expected_skill": "component-boundary-designer",
       "should_not_trigger": [
         "design-system-token-governor"
       ],
-      "reason": "This request is requirements-gathering-facilitator's deliverable end-to-end; design-system-token-governor owns a different design task and must not take it over."
+      "reason": "Batch-3 sibling seam: this request is component-boundary-designer's deliverable; design-system-token-governor must not take it over."
     }
   ]
 }

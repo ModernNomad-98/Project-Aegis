@@ -15,7 +15,8 @@
     "observability-by-design",
     "validation-boundary-designer",
     "full-codebase-auditor",
-    "vite-build-qa-engineer"
+    "vite-build-qa-engineer",
+    "component-boundary-designer"
   ],
   "cases": [
     {
@@ -23,7 +24,7 @@
       "prompt": "Map this frontend before we change it: routes, layouts, providers, state and permission gates.",
       "expected_skill": "frontend-architecture-mapper",
       "should_not_trigger": [
-        "architecture-designer"
+        "component-boundary-designer"
       ],
       "reason": "The request needs frontend-architecture-mapper's design method; architecture-designer owns a different task."
     },

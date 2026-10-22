@@ -15,7 +15,9 @@
     "validation-boundary-designer",
     "tech-spec-writer",
     "principal-code-analyst",
-    "performance-test-harness"
+    "performance-test-harness",
+    "frontend-architecture-mapper",
+    "design-system-token-governor"
   ],
   "cases": [
     {
@@ -23,7 +25,7 @@
       "prompt": "Decide the page/container/feature/shared/primitive layers for this frontend and who owns each concern.",
       "expected_skill": "component-boundary-designer",
       "should_not_trigger": [
-        "observability-by-design"
+        "frontend-architecture-mapper"
       ],
       "reason": "The request needs component-boundary-designer's design method; observability-by-design owns a different task."
     },
@@ -209,12 +211,12 @@
     },
     {
       "id": "component-boundary-designer-negative-14",
-      "prompt": "Design the performance test set: measured surfaces, environment contract and variance-derived thresholds.",
-      "expected_skill": "performance-test-harness",
+      "prompt": "Map this frontend before we change it: routes, layouts, providers, state and permission gates.",
+      "expected_skill": "frontend-architecture-mapper",
       "should_not_trigger": [
         "component-boundary-designer"
       ],
-      "reason": "This request is performance-test-harness's deliverable end-to-end; component-boundary-designer owns a different design task and must not take it over."
+      "reason": "Batch-3 sibling seam: this request is frontend-architecture-mapper's deliverable; component-boundary-designer must not take it over."
     }
   ]
 }

@@ -33,7 +33,8 @@ The returned record must name the evidence source for each decision, separate ve
 - Inputs inspected: see the SKILL.md Inputs to Inspect section.
 - Telemetry contract and instrumentation design (real owner, not a sibling) routes to `observability-by-design`; this skill does not perform that owner's work.
 - Actual-diff review routes to `code-reviewer`; this skill does not perform that owner's work.
-- Frontend architecture mapping (batch-3 sibling seam) routes to `component-boundary-designer`; this skill does not perform that owner's work.
+- Frontend app mapping (batch-3 sibling seam) routes to `frontend-architecture-mapper`; this skill does not perform that owner's work.
+- Design-token governance or theming (batch-3 sibling seam) routes to `design-system-token-governor`; this skill does not perform that owner's work.
 - Broader discrimination set from evals/trigger-evals.json: the following owners' requests route away from this skill - `observability-by-design`, `architecture-designer`, `code-reviewer`, `domain-modeler`, `error-taxonomy-designer`, `edge-state-ux-designer`, `ux-design-iteration`, `mobile-viewport-craft`, `accessibility-test-harness`, `frontend-perf-engineer`, `validation-boundary-designer`, `tech-spec-writer`, `principal-code-analyst`, `performance-test-harness` (discrimination neighbours, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
 
@@ -45,3 +46,4 @@ The returned record must name the evidence source for each decision, separate ve
 - Violations have locations and evidence, not adjectives.
 - Abstraction-vs-duplication rule is stated; migration is ordered.
 - No component was edited or refactor claimed.
+

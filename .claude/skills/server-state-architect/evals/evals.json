@@ -36,9 +36,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Distinguishes retryable from terminal failures with backoff rules.",
-          "Defines loading/error boundaries and SSR/hydration behavior.",
-          "Records unverified assumptions instead of inventing them."
+          "Defines optimistic-update rollback and conflict handling.",
+          "Defines retry/backoff and distinguishes retryable from terminal failures.",
+          "No data-layer implementation is claimed."
         ]
       }
     },

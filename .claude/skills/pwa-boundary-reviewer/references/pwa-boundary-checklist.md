@@ -45,3 +45,4 @@ The returned record must name the evidence source for each decision, separate ve
 - Offline fallback is defined and stale data is labeled.
 - Install prompt and push boundaries are reviewed.
 - Cached-data security/privacy risks are named; no service-worker edit claimed.
+

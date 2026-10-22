@@ -15,7 +15,9 @@
     "tech-spec-writer",
     "visual-regression-test-designer",
     "validation-boundary-designer",
-    "caching-strategy-designer"
+    "caching-strategy-designer",
+    "client-state-boundary-reviewer",
+    "route-protection-designer"
   ],
   "cases": [
     {
@@ -50,7 +52,7 @@
       "prompt": "Design the history/back behavior for URL-encoded tabs and dialogs.",
       "expected_skill": "url-state-architect",
       "should_not_trigger": [
-        "mobile-viewport-craft"
+        "route-protection-designer"
       ],
       "reason": "The request needs url-state-architect's design method; mobile-viewport-craft owns a different task."
     },
@@ -209,12 +211,12 @@
     },
     {
       "id": "url-state-architect-negative-14",
-      "prompt": "Design the caching strategy: what to cache, keys, invalidation and stampede protection.",
-      "expected_skill": "caching-strategy-designer",
+      "prompt": "Design route protection for this app: auth, role, onboarding and admin gates consistently.",
+      "expected_skill": "route-protection-designer",
       "should_not_trigger": [
         "url-state-architect"
       ],
-      "reason": "This request is caching-strategy-designer's deliverable end-to-end; url-state-architect owns a different design task and must not take it over."
+      "reason": "Batch-3 sibling seam: this request is route-protection-designer's deliverable; url-state-architect must not take it over."
     }
   ]
 }

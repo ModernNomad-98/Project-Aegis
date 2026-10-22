@@ -15,7 +15,9 @@
     "mobile-viewport-craft",
     "architecture-designer",
     "api-event-architect",
-    "validation-boundary-designer"
+    "validation-boundary-designer",
+    "server-state-architect",
+    "url-state-architect"
   ],
   "cases": [
     {
@@ -77,7 +79,7 @@
       "prompt": "Review the URL schema versus store state for duplicated navigation state.",
       "expected_skill": "client-state-boundary-reviewer",
       "should_not_trigger": [
-        "observability-by-design"
+        "url-state-architect"
       ],
       "reason": "The request needs client-state-boundary-reviewer's design method; observability-by-design owns a different task."
     },
@@ -110,12 +112,12 @@
     },
     {
       "id": "client-state-boundary-reviewer-negative-3",
-      "prompt": "Plan the load test with a workload model and arrival mode.",
-      "expected_skill": "load-test-planner",
+      "prompt": "Design a versioned URL state schema with serialization and validation for shareable filters.",
+      "expected_skill": "url-state-architect",
       "should_not_trigger": [
         "client-state-boundary-reviewer"
       ],
-      "reason": "This request is load-test-planner's deliverable end-to-end; client-state-boundary-reviewer owns a different design task and must not take it over."
+      "reason": "Batch-3 sibling seam: this request is url-state-architect's deliverable; client-state-boundary-reviewer must not take it over."
     },
     {
       "id": "client-state-boundary-reviewer-negative-4",

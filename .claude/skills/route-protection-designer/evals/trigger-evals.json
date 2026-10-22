@@ -15,7 +15,8 @@
     "incident-response-runbook",
     "edge-state-ux-designer",
     "error-taxonomy-designer",
-    "ux-design-iteration"
+    "ux-design-iteration",
+    "url-state-architect"
   ],
   "cases": [
     {
@@ -77,7 +78,7 @@
       "prompt": "Design role and admin protection across the admin console routes.",
       "expected_skill": "route-protection-designer",
       "should_not_trigger": [
-        "tenant-modeler"
+        "admin-console-architect"
       ],
       "reason": "The request needs route-protection-designer's design method; tenant-modeler owns a different task."
     },
@@ -209,12 +210,12 @@
     },
     {
       "id": "route-protection-designer-negative-14",
-      "prompt": "Run a design iteration for this checkout flow: critique the current UX, propose options and converge with the owner.",
-      "expected_skill": "ux-design-iteration",
+      "prompt": "Design a versioned URL state schema with serialization and validation for shareable filters.",
+      "expected_skill": "url-state-architect",
       "should_not_trigger": [
         "route-protection-designer"
       ],
-      "reason": "This request is ux-design-iteration's deliverable end-to-end; route-protection-designer owns a different design task and must not take it over."
+      "reason": "Batch-3 sibling seam: this request is url-state-architect's deliverable; route-protection-designer must not take it over."
     }
   ]
 }

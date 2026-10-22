@@ -1062,18 +1062,28 @@ against production or live third parties without explicit human approval.
 | `performance-test-harness` | reconciliation §3 Phase 5 Tier 1 (#205) | yes | The measurement instrument: per-surface measured set, environment contract stamped on every result (volume, tenant shape, pinned hardware, declared cache state), baselines + variance-derived noise bands (single-run diffs banned), thresholds CONSUMED from budget/SLO owners, CI tiers with advisory→blocking promotion, UNRUN as a first-class status. |
 | `load-test-planner` | reconciliation §3 Phase 5 Tier 1 (#206) | yes | The traffic plan: workload model from production evidence (write share explicit, open-vs-closed arrival model chosen), whale + long-tail tenant mix with the NOISY-NEIGHBOR scenario judged per-tenant, volumes with skew, load/stress/soak/spike by question, ramps with abort criteria, pass/fail citing owner-set numbers. |
 
-### Skills (D12.2 — product engineering craft pack)
+### Skills (D12.2 - product engineering craft pack)
 
-The 13-skill product-engineering craft pack (D24's original 5 plus the eight Batch-3
-frontend architecture and client-state additions delivered under D110, 2026-10-21; reconciliation §3 D12.2): the API/UX craft INSIDE the contract that
-`api-event-architect` owns — the craft details (pagination cursors, error
+This section holds **13 advisory design/review skills in two groups**. The **original five**
+(D24, 2026-07-07) are the API/UX craft INSIDE the contract that
+`api-event-architect` owns - the craft details (pagination cursors, error
 taxonomies, empty/loading/error states, notification/webhook UX, mobile
 viewport), never the contract itself. The `api-event-architect` seam is
-pinned in every skill's trigger-evals; `error-taxonomy-designer` (the error
+pinned in every original-five trigger-evals; `error-taxonomy-designer` (the error
 MODEL) and `edge-state-ux-designer` (rendering the error STATE) are pinned
-against each other both ways. All 13 ship `evals/evals.json` **and**
-`evals/trigger-evals.json`; all are design skills that edit nothing →
-**model-invocable**.
+against each other both ways. The **eight Batch-3 additions** (D110, 2026-10-21)
+are frontend architecture and client-state craft: architecture maps, component
+boundaries, route protection, design-token governance, server state, client-state
+review, URL state and PWA boundaries; they are NOT sub-details of the API contract
+and their trigger-evals pin the pre-existing owners plus the batch-internal sibling
+seams that are real (frontend-architecture-mapper <-> component-boundary-designer,
+component-boundary-designer <-> design-system-token-governor, server-state-architect
+<-> client-state-boundary-reviewer <-> url-state-architect, route-protection-designer
+<-> url-state-architect; partial by design where the overlap is one-way).
+
+All 13 ship `evals/evals.json` **and** `evals/trigger-evals.json`; the original five
+are design skills and two of the Batch-3 additions are review-only - together they are
+advisory design/review skills that edit nothing and are **model-invocable**.
 
 | Skill | Source (D12.2 / D24) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
@@ -1091,7 +1101,15 @@ against each other both ways. All 13 ship `evals/evals.json` **and**
 | `url-state-architect` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Designs URL state: which filters/tabs/search/sort/pagination/dialogs belong in the URL, a versioned schema, serialization, defaults/canonicalization, untrusted-input validation, history and privacy rules; design-only. |
 | `pwa-boundary-reviewer` | reconciliation §3 D12.2 (D110, Batch 3) | yes | Reviews PWA boundaries: service-worker registration/scope, per-class cache strategy, update/activation flow, offline fallback, install prompt, push boundary, cached-data security and production-only behavior; review-only. |
 
-The eight Batch-3 additions (D110) form a **frontend architecture & client state** seam: they discriminate against the pre-existing owners above (architecture-designer, data-flow-diagrammer, observability-by-design, authorization-matrix-designer, security-pr-reviewer, caching-strategy-designer, feature-flag-architect, offline-first-sync-architect, notification-webhook-ux-designer, error-taxonomy-designer, edge-state-ux-designer, mobile-viewport-craft, accessibility-test-harness, frontend-perf-engineer, visual-regression-test-designer, vite-build-qa-engineer) while declaring their own batch-internal sibling seams in the SKILL.md Stop Conditions and references; each ships 6 behaviour cases and a 22-case trigger-eval file (8 positive / 14 negative).
+The eight Batch-3 additions (D110) form a **frontend architecture & client state** seam:
+ they discriminate against the pre-existing owners above (architecture-designer, data-flow-diagrammer,
+ observability-by-design, authorization-matrix-designer, security-pr-reviewer, caching-strategy-designer,
+ feature-flag-architect, offline-first-sync-architect, notification-webhook-ux-designer,
+ error-taxonomy-designer, edge-state-ux-designer, mobile-viewport-craft, accessibility-test-harness,
+ frontend-perf-engineer, visual-regression-test-designer, vite-build-qa-engineer) and exercise the
+ batch-internal sibling seams that are real (see the D12.2 intro matrix) in Stop Conditions, positive
+ near-miss cases and negative cases; each ships 6 behaviour cases and a 22-case trigger-eval file
+ (8 positive / 14 negative).
 
 ### Skills (D12.5 — PM / product-engineering interface pack)
 

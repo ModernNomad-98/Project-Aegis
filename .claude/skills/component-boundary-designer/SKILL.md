@@ -70,8 +70,9 @@ Return, in this order:
 
 - The request is telemetry contract and instrumentation design (real owner, not a sibling): route to `observability-by-design`.
 - The request is actual-diff review: route to `code-reviewer`.
-- The request is frontend architecture mapping (Batch-3 sibling seam): route to `component-boundary-designer`.
-- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the three routes above are the primary Stop Conditions.
+- The request is frontend app mapping (Batch-3 sibling seam): route to `frontend-architecture-mapper`.
+- The request is design-token governance or theming (Batch-3 sibling seam): route to `design-system-token-governor`.
+- The trigger-evals file lists a broader 14-owner discrimination set (all named in the reference Boundaries); the routes above are the primary Stop Conditions.
 - The caller wants this skill to implement, provision or execute the design: refuse; return the design for the authorized host/user.
 - Required evidence (routes, state, cache config or policy) is unavailable: state UNKNOWN and ask instead of inventing it.
 
