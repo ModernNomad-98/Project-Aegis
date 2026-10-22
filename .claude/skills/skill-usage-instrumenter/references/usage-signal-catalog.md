@@ -10,7 +10,7 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 | Field | Type | Notes |
 | --- | --- | --- |
 | `skill` | name (enum: shipped list) | The activated skill |
-| activation_mode | auto \| explicit | Trigger-matched vs named by the user (invocation event only) |
+| `activation_mode` | `auto` \| `explicit` | Trigger-matched vs named by the user (invocation event only) |
 | `at` | date (day precision suffices) | Finer precision adds risk, not value |
 | `task_class` | small fixed enum (e.g. `build`, `review`, `audit`, `design`, `debug`, `other`) | Never free text |
 | `session_ref` | opaque id | Correlation only; carries no content |
@@ -21,9 +21,9 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 | --- | --- | --- |
 | `fired` | skill name | What activated |
 | `redirected_to` | skill name \| `none` | What the user invoked instead |
-| correction_outcome | overridden \| abandoned | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
+| `correction_outcome` | `overridden` \| `abandoned` | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
 
-Migration note: the pre-rename single mode field is replaced by activation_mode (invocation events) and correction_outcome (correction/wrong-fire events). Consumers must version and migrate historical events to the correct domain; never reinterpret an old mode value across domains.
+Migration note (schema epoch 2): the pre-rename single mode field is replaced by activation_mode (invocation events) and correction_outcome (correction/wrong-fire events). Consumers must record the schema epoch/version, migrate historical events to the correct domain, and never reinterpret an old mode value across domains.
 
 ### Completion hint
 

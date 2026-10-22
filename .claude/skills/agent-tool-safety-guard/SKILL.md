@@ -26,7 +26,9 @@ actions, and a map of tool-chain composition abuse. Approval mechanics come
 from `human-approval-boundary`; standing agent authority from
 `agent-authorization-matrix` — this skill composes both.
 
-Tool hops execute under A3 as defined once in agent-identity-privilege-reviewer/references/agent-identity-patterns.md; that canonical definition sets the authority intersection and approval cap. A tool hop may only reduce authority, never amplify it; this skill cites the definition rather than restating it.
+Tool hops execute under A3 as defined once in
+agent-identity-privilege-reviewer/references/agent-identity-patterns.md. A tool
+hop may only reduce authority, never amplify it.
 
 ## Use When
 

@@ -219,4 +219,4 @@ Readiness plan: <artifact → owner → date>; certification decision belongs to
   cluster (ISMS vs AIMS vs SOC 2 vs SoA vs gaps) and against
   `threat-modeler`.
 
-The shipped security packs are a starting-point mapping candidate, not complete coverage; operating evidence decides. This premise is the same one the ISMS eval fixtures assert.
+The shipped security packs are a starting-point mapping candidate, not complete coverage; operating evidence decides.

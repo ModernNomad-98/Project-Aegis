@@ -39,8 +39,15 @@ For each chain, fill and verify hop-by-hop:
 user (authority A0)
   → agent (holds A1; A1 ⊆ A0 for user-driven actions? authorized by whom?)
     → sub-agent (A2 ⊆ A1? minted fresh or inherited?)
-A3 = effective authority for the hop: (caller/sub-agent authority chain) INTERSECTED with tool permission and resource/tenant policy, with the recorded approval scope applied as an ADDITIONAL CAP when an approval applies. With no approval and no scope there is no additional cap (authority is not zero); with an approval the cap can only narrow. A3 must be a subset of the parent authority (A3 subset of A2) and a hop may only reduce authority, never amplify it. agent-tool-safety-guard cites this single definition.
+      → tool (executes under A3, subset-of A2)
 ```
+
+A3 is the effective authority for the hop: the caller/sub-agent authority chain
+INTERSECTED with tool permission and resource/tenant policy, with the recorded
+approval scope applied as an ADDITIONAL CAP when an approval applies. With no
+approval and no scope there is no additional cap (authority is not zero); the
+parent-hop bound still applies, so A3 ⊆ A2 either way. A hop may only reduce
+authority, never amplify it.
 
 - Any hop where Aₙ₊₁ ⊄ Aₙ is an amplification finding.
 - Agent authority beyond the user's (maintenance/system tasks) must trace to

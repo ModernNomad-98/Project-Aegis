@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "5eb0bb1b7c84462a18b387d7e6e30837d2b44bd4",
+  "source_revision": "f5805a566cfc8ff688a943f06ad65dd2ebb5d18e",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -71,7 +71,7 @@
     {
       "name": "agent-identity-privilege-reviewer",
       "path": ".claude/skills/agent-identity-privilege-reviewer/SKILL.md",
-      "sha256": "91365e930f361e150c603a8aa16117f5f2a5d368a1a303c4880ce62666a2493f"
+      "sha256": "8bcfcb530015c9c40be4b0a09079a1c59a611249fb1015941a3104944c426c44"
     },
     {
       "name": "agent-instruction-consolidator",
@@ -91,7 +91,7 @@
     {
       "name": "agent-tool-safety-guard",
       "path": ".claude/skills/agent-tool-safety-guard/SKILL.md",
-      "sha256": "7c94e6cfe6f398df87eccba3bfdd4aad620d862fe46f430825d20854c0736b39"
+      "sha256": "851a0923a1e20cff56a53abb66497bcbc165299e8c46de514f0944ef8987b3d6"
     },
     {
       "name": "agentic-loop-designer",
@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "5bd7825e5f953479728c5e2d5611accae4e71511ec8bdb547793c315992cdc58"
+      "sha256": "cc283719d4b60debefc5357b0789ac0228a92dff0c98ec5f402c11e6d216bafe"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "fdd028b7bf9a745e6292374e8c35b44d17fe7713f5264128696c60a8d57c07a7"
+      "sha256": "a8e58d066cbcc9f1d17e8e1f8f86cfd2885cd108cf48eedd086e895ef579091d"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -296,7 +296,7 @@
     {
       "name": "compliance-control-foundation",
       "path": ".claude/skills/compliance-control-foundation/SKILL.md",
-      "sha256": "c549ae754456ec629e6d61dc4a2c56df258a506e90cec627961d658b0dec106d"
+      "sha256": "fac603a148512421b8b82134cc7f32191f11c9ac721310a69e7325d9d2ab8b39"
     },
     {
       "name": "compliance-evidence-collector",
@@ -326,7 +326,7 @@
     {
       "name": "context-co-update-ci-gate",
       "path": ".claude/skills/context-co-update-ci-gate/SKILL.md",
-      "sha256": "a7e5da925d8c38f4f8975c765de2f08a1cefb9bccd9b9abaf7b5339ed16eef5c"
+      "sha256": "31e742939fc61f81b8d76acdd816da184e2d5e804a287617e2c8c0a700001053"
     },
     {
       "name": "contribution-guide-author",
@@ -541,7 +541,7 @@
     {
       "name": "human-agent-trust-reviewer",
       "path": ".claude/skills/human-agent-trust-reviewer/SKILL.md",
-      "sha256": "d90071f8751bf0d983247a2cba68369ccd12a5017db1e920e785388bfffe2fce"
+      "sha256": "2d0d32336c398038e7e3b091a5fcea23fca194cca8fdbb86991021ceb2744f90"
     },
     {
       "name": "human-approval-boundary",
@@ -581,7 +581,7 @@
     {
       "name": "iso-27001-isms-architect",
       "path": ".claude/skills/iso-27001-isms-architect/SKILL.md",
-      "sha256": "1845bea661a78a7b4ea4e7a91fe15bec1ddf117eddfa79bd22108e936f41e25d"
+      "sha256": "09d266619d11f4c86ea206d2cf0fc77a2b434d027b059ce645506e08adee2753"
     },
     {
       "name": "iso-42001-aims-architect",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "6bdb9390813dc69230b12b0f80a9d2f42d89b9a063d2e7d5c633c94d233b2d3a"
+      "sha256": "cac3859dddb0e4b855479e91acf8e933d64c2a1503f5a9bda2a25168db013e78"
     },
     {
       "name": "share-link-access-architect",
@@ -1036,7 +1036,7 @@
     {
       "name": "soc2-trust-criteria-mapper",
       "path": ".claude/skills/soc2-trust-criteria-mapper/SKILL.md",
-      "sha256": "b4e0a65bbba87c8cb92ed3ff6149c9594a7b07c511610d85e9a02c7428db7d5a"
+      "sha256": "e1e7d49a6912927ded5dd64bc0411738d7a8d8bc5b6b0996003aee6b25297938"
     },
     {
       "name": "source-currency-auditor",
@@ -1166,7 +1166,7 @@
     {
       "name": "threat-modeler",
       "path": ".claude/skills/threat-modeler/SKILL.md",
-      "sha256": "1f2c431f161e8104d25118955d7b095ad6df700ff86dacb72ad595fc29b1a712"
+      "sha256": "8e853c0939421aca43885650427761a7d8a4241eeff34171ddf4d562be71e756"
     },
     {
       "name": "transaction-scope-designer",

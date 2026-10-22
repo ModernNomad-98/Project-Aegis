@@ -112,7 +112,11 @@ first workflow step.
    - **CONFIRM** for anything a wrong result would harm and a person can
      judge from the evidence shown.
    - **FORBIDDEN** for irreversible, cross-tenant or wide-blast-radius actions, actions no single reviewer can judge, and anything explicit written policy bars. State the reason.
-   **PRECEDENCE RULE:** FORBIDDEN is limited to those enumerated classes or explicit written policy; reviewer availability alone never converts a forbidden action to CONFIRM. Otherwise, an action a person can approve under policy is CONFIRM.
+   **PRECEDENCE RULE:** risk tier only selects among these classes; it never
+   overrides FORBIDDEN. FORBIDDEN is limited to those enumerated classes or
+   explicit written policy; reviewer availability alone never converts a
+   forbidden action to CONFIRM. Otherwise, an action a person can approve under
+   policy is CONFIRM unless the feature's tier keeps it advisory-only.
    The rubric and examples are in
    [references/hitl-design-sheet.md](references/hitl-design-sheet.md).
 3. **Design the advisory-only mode.** For actions left advisory-only, the

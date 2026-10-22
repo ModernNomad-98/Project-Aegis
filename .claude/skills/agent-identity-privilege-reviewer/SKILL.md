@@ -191,4 +191,4 @@ Not reviewed: <areas + why>
   against `secrets-identity-hardener`, `agent-tool-safety-guard`,
   `agent-authorization-matrix`, and `authorization-matrix-designer`.
 
-A3 is defined once in references/agent-identity-patterns.md (authority intersection with tool/resource/tenant permissions and the approval cap, A3 subset of A2); agent-tool-safety-guard cites that definition rather than restating it.
+A3 is defined once in references/agent-identity-patterns.md; agent-tool-safety-guard cites that definition.
