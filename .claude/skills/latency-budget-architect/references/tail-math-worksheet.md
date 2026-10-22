@@ -62,38 +62,14 @@ Cascade check, leaf to root:
   own work = what the hop itself spends (processing, serialization, queue and
   connection waits it owns); downstream critical-path budget = serial
   downstream hops + the longest parallel branch at each join, including the
-  initial attempt, retry spend defined in the retry-spend accounting section. Epsilon is recorded
+  initial attempt, retry attempt time and backoff_total. Epsilon is recorded
   once.
 
 ## Retry-spend accounting
 
 ```
-total_expected_hop_cost(hop) = own attempt work(hop) + wait_0
-                               + downstream critical-path budget(hop)
-                               + retry_overhead(hop)
-retry_overhead(hop) = the sum over k=1..K of
-                      P(k-th retry) × (attempt work(hop) + wait_k)
-Definitions: wait_0 is the pre-initial-attempt wait this hop owns (queue/dispatch
-before the first attempt; 0 when none); p is the per-attempt retry probability (P(k-th
-retry) = p^k under independent retries, or record a measured cumulative value and state
-that assumption); wait_k is the wait before the k-th retry from the recorded per-attempt
-backoff (base × 2^(k-1)), not aggregate backoff_total; K is the permitted retries for
-this hop. The initial attempt is counted exactly once (first line) and is NOT inside
-retry_overhead. retry_overhead is LOCAL retry work only (attempt work + wait_k).
-downstream critical-path budget(hop) covers downstream hops' initial work and retry spend
-once; it excludes this hop's own initial attempt/retry spend. If this hop's retry
-re-invokes downstream work, add that re-executed downstream cost to the retry term (or
-explicitly limit the formula to local-only retry work and state the limitation). Record p,
-wait_0, the independence/one-retry-layer assumption, and which layer owns retries. Use
-total_expected_hop_cost for budget claims; retry_overhead is reported separately.
-Worked example: p=0.1, K=4, attempt work=40ms, wait_0=0ms, downstream
-critical-path budget=200ms, base backoff=10ms so the PER-ATTEMPT waits are
-10/20/40/80ms (wait_k = 10·2^(k-1); these are per-attempt waits, NOT cumulative
-time-to-attempt - cumulative time to attempt k would be base·(2^k - 1) and is not used
-here): retry_overhead = 0.1·(40+10) + 0.01·(40+20) + 0.001·(40+40) + 0.0001·(40+80)
-= 5.0 + 0.6 + 0.08 + 0.012 = 5.692ms.
-total_expected_hop_cost = own attempt work 40 + wait_0 0 + downstream budget 200 +
-retry_overhead 5.692 = 245.692ms.
+retry_cost(hop) = P(retry) × (backoff_total + own work(hop) + downstream
+                  critical-path budget(hop))
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
 Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)

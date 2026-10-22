@@ -66,34 +66,22 @@ must be re-attested at the review/attestation deadline recorded with the grant
 (if any) is a separate field from the attestation deadline: expiry bounds
 consumption; the attestation deadline is when re-attestation is required.
 Silence records no inferred expiry; no recorded attestation deadline means
-BLOCKED.
+BLOCKED. A reviewer block wins for every agent-initiated action: halt and wait
+for the human.
 Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
 
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
-| 1 | BLOCKED | reviewer block OR attestation deadline passed OR no recorded deadline OR transition trigger fired | disabled |
+| 1 | BLOCKED | reviewer block in force (wins for every agent-initiated action: halt and wait) OR recorded attestation deadline passed OR no recorded attestation deadline exists OR a transition trigger fired | disabled; the grant does not expire; only in-scope human/manual actions remain; no agent-initiated action proceeds |
 | 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
 | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
-Halt rule (canonical, OR semantics immediately above): any ONE of the BLOCKED
-conditions wins for every agent-initiated action - halt and wait for the human; no
-agent-initiated action proceeds while BLOCKED.
-BLOCKED effect (canonical): Blocking does not itself expire the grant; only in-scope
-human/manual actions remain; no agent-initiated action proceeds while BLOCKED. A
-transition trigger fired is a BLOCKED condition even when a deadline is recorded and
-not passed. Reviewer-block handling is the canonical halt rule immediately below the table.
+BLOCKED > GRANDFATHERED > ACTIVE (first matching row wins). BLOCKED -> ACTIVE
+only on recorded re-attestation after the block clears; GRANDFATHERED never
+bypasses a reviewer block; never infer a default expiry. No recorded deadline
+means BLOCKED; GRANDFATHERED therefore only applies when a deadline is recorded
+and not passed.
 
-Canonical transitions (each starts from or targets a BLOCKED state; the four BLOCKED-entry
-conditions are the table above, and
-the transition rules sit next to the table):
-- ACTIVE -> BLOCKED on any of: reviewer block, attestation deadline passed, no
-  recorded attestation deadline, or a transition trigger fired.
-- GRANDFATHERED -> BLOCKED on the same four conditions; GRANDFATHERED requires a
-  recorded unexpired attestation deadline, so a grant with no recorded deadline is
-  BLOCKED (never GRANDFATHERED).
-- BLOCKED -> ACTIVE only on recorded re-attestation after the block clears AND no
-  transition trigger is in force; the reviewer-block halt path is unchanged.
-- No transition may bypass BLOCKED; never infer a default expiry.
-
+Never infer a default expiry; the reviewer-block halt path is unchanged.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,
@@ -180,6 +168,3 @@ Collect before designing, from recent sessions/PRs:
 - **Treating this policy as the authority source** — it is downstream of the
   matrix and any separate applicable human grants. The default matrix floor
   remains when no grant covers the action; later owner constraints also apply.
-
-The canonical transition and blocking rules are the blocks next to the precedence table
-above; this paragraph is a pointer only and does not restate them.

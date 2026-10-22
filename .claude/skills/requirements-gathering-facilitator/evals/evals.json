@@ -6,13 +6,15 @@
     {
       "id": "positive-solution-stated-as-requirement",
       "type": "should_trigger",
-      "prompt": "A stakeholder wants us to 'add an export button' to the reports page. Help us figure out what we should actually build. (Multi-turn facilitation; this is the first discovery turn.)",
+      "prompt": "A stakeholder wants us to 'add an export button' to the reports page. Help us figure out what we should actually build.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Returns ONE interactive question plus an explicit stop this turn.",
-          "Does NOT produce the brief, handoff, or implementation approval this turn; unasked items are marked to-confirm, not invented.",
-          "Records nothing as confirmed this turn: status shows no confirmed items and all unresolved items marked to-confirm."
+          "Restates 'add an export button' as a problem/job-to-be-done rather than accepting the solution verbatim, asking what the export would let them accomplish.",
+          "Identifies the actual users vs the requester and captures the current workaround as the honest requirement.",
+          "Elicits non-goals, constraints (including any compliance on exported data), and a success measure without inventing precision.",
+          "Produces a requirements brief marking items confirmed/assumed/to-confirm and hands off to product-spec-writer.",
+          "Does not jump to writing the specification or the UI design."
         ]
       }
     },
