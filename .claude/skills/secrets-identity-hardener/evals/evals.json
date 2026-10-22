@@ -68,7 +68,7 @@
     {
       "id": "stored-credential-migration",
       "type": "should_trigger",
-      "prompt": "Our legacy password hashes still use a weak algorithm and some API tokens are stored reversibly. Design the stored-credential hardening and migration plan safely.",
+      "prompt": "Explicitly invoke secrets-identity-hardener. Our legacy password hashes still use a weak algorithm and some API tokens are stored reversibly. Design the stored-credential hardening and migration plan safely.",
       "expect": {
         "triggers": true,
         "assertions": [

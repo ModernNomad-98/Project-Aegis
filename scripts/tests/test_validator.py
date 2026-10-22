@@ -3220,8 +3220,12 @@ def test_coverage_map_batch5_deliveries():
         (validator.REPO_ROOT / ".claude" / "skills"
          / "secrets-identity-hardener" / "evals" / "evals.json").read_text(
              encoding="utf-8"))["cases"]
-    assert any(case.get("id") == "stored-credential-migration"
-               for case in secrets_evals)
+    stored_case = [case for case in secrets_evals
+                   if case.get("id") == "stored-credential-migration"]
+    assert stored_case, "stored-credential-migration eval must exist"
+    assert stored_case[0]["prompt"].startswith(
+        "Explicitly invoke secrets-identity-hardener. "), (
+            "manual-only strict prefix required on the stored-credential eval")
     # Complete registration descriptions (no mid-word truncation): the purpose
     # sentence appears in full in both human-facing registration surfaces.
     readme_text = (validator.REPO_ROOT / "README.md").read_text(
