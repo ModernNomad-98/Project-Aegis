@@ -20,14 +20,15 @@
     {
       "id": "positive-slow-stale-search",
       "type": "should_trigger",
-      "prompt": "Our search uses LIKE '%term%' across a growing table, it's slow, and users complain results are missing right after they create something. Redesign it.",
+      "prompt": "Our search uses LIKE '%term%' across a growing table, it's slow, and users complain results are missing right after they create something. Redesign it. Fixture: write rate is 50 writes/s, the creator freshness target is 1s, and the index serves 200 tenants on shared infrastructure.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Names LIKE '%term%' as an un-indexable full scan (debt, not a baseline) and moves to a proper index (full-text/trigram or an engine).",
           "Diagnoses the missing-just-created-record complaint as freshness lag and either indexes synchronously for that path or adds read-your-writes for the creator, stating the lag honestly.",
           "Designs the reindex/backfill procedure for the migration from LIKE to the indexed approach.",
-          "Preserves tenant isolation through the redesign rather than only fixing speed."
+          "Preserves tenant isolation through the redesign rather than only fixing speed.",
+          "Uses the supplied write rate (50/s), freshness target (1s) and 200-tenant model to constrain the index/engine choice and refresh design."
         ]
       }
     },

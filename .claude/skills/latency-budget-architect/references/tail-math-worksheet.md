@@ -62,14 +62,18 @@ Cascade check, leaf to root:
   own work = what the hop itself spends (processing, serialization, queue and
   connection waits it owns); downstream critical-path budget = serial
   downstream hops + the longest parallel branch at each join, including the
-  initial attempt, retry attempt time and backoff_total. Epsilon is recorded
+  initial attempt, retry spend defined in the retry-spend accounting section. Epsilon is recorded
   once.
 
 ## Retry-spend accounting
 
 ```
-retry_cost(hop) = P(retry) × (backoff_total + own work(hop) + downstream
-                  critical-path budget(hop))
+retry_cost(hop) = sum over all permitted retries of
+                  P(retry) × (attempt work(hop) + each inter-attempt wait
+                  + downstream critical-path budget(hop))
+Definitions: P(retry) is the recorded retry probability (or state the one-retry
+assumption explicitly); each inter-attempt wait uses the recorded backoff_total;
+count every permitted retry, not just the first.
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
 Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)

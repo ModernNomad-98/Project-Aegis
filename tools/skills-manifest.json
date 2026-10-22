@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "377c8dc592b8470d7a7d001914c8d0db13dc0ab0",
+  "source_revision": "5c2988ed320a2f12229b37117e8436a2f438a846",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -106,7 +106,7 @@
     {
       "name": "ai-cost-guardrail-designer",
       "path": ".claude/skills/ai-cost-guardrail-designer/SKILL.md",
-      "sha256": "9329d3a4bd9431253aec0db2175f43ef2f32e268895a7e79690780d1adb7aab7"
+      "sha256": "bdc654c35d360f254d91c1d2752a6e22dda9103d1db47197e7b019ab43a79e89"
     },
     {
       "name": "ai-evaluation-harness",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "8e7f870224c5e6664f72325a2cbcfcc54a69ec6552094c0f5211474db8b9737e"
+      "sha256": "d928e2da6038d5b18ab5851c1f5938f8b080e2bdab733a11f951f20bb2526a10"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -316,7 +316,7 @@
     {
       "name": "compliance-evidence-collector",
       "path": ".claude/skills/compliance-evidence-collector/SKILL.md",
-      "sha256": "2fd5121c0f8a34192e62039e92b544092b481f53ca706144fa186d183b5ccbbf"
+      "sha256": "ff3dab8b06072ec31534f7ae4653aa5152d245ef8c95e77d03ed16cbdf716ef2"
     },
     {
       "name": "compliance-gap-auditor",
@@ -791,7 +791,7 @@
     {
       "name": "product-analytics-instrumenter",
       "path": ".claude/skills/product-analytics-instrumenter/SKILL.md",
-      "sha256": "03586675ccd1f123444d71eb0f2fa5cfe7fc4543616872363a933d424a5ef8b0"
+      "sha256": "43380b23939b22e5e927f6785a5c33a02554d8bb8f649df97d32d8eea69d85f4"
     },
     {
       "name": "product-spec-writer",
@@ -821,7 +821,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "01ab0e92dd73e9cdb26b40d2a19ad6e460664bdc6a95a13353eec43a6a52a43c"
+      "sha256": "6c1d86db455a2d18ae0b672aea1063d274d5473aee9eb8fe144fb83f692d1a0d"
     },
     {
       "name": "property-based-test-designer",
@@ -1031,7 +1031,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "e8c923765591d07cee8a59f0a55bb47c4cde33200c2471ce540e0e86183beaf6"
+      "sha256": "20a6be2f92dc9e2f7d276634a8b8fd49fa46f6ee3253e1215425dd68f208d0e1"
     },
     {
       "name": "share-link-access-architect",
@@ -1056,12 +1056,12 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "f157aa75e791184af88da82827e4aed4ff09de441a1a3c32358275783c24ebce"
+      "sha256": "6065ad059f26107649926c85b6747604be83a7c0ae67f1ec6a30b421d2a11bd7"
     },
     {
       "name": "skill-usage-ledger",
       "path": ".claude/skills/skill-usage-ledger/SKILL.md",
-      "sha256": "6a27b5c8e690b605d7dca4b0e4c2ff1d67dfa6ac6c18469d5657b4ff093339a4"
+      "sha256": "3b3b0d29e080a8edfd10d9b0befbba3b659e1466705eb070e65c5b2c58c0543a"
     },
     {
       "name": "slo-reliability-architect",
@@ -1091,7 +1091,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "6ef0623943c482c7a009755cce162b5acbea9d82bd7ab766eadb4b476a2ff583"
+      "sha256": "44d446a7617677a98cbe71696700fd55c648efb4a03466c07f3ae3fd6ea5384c"
     },
     {
       "name": "state-machine-modeler",

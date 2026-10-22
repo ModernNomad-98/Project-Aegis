@@ -25,7 +25,8 @@ One file per run (JSON keeps it diffable and machine-checkable):
     "api-integration": { "state": "failed",      "duration_s": 388, "tests_executed": 154, "tests_failed": 3, "failure_class": "assertions" },
     "ui-e2e":          { "state": "interrupted", "duration_s": 1800, "tests_executed": 41, "failure_class": "timeout" },
     "platform":        { "state": "pending" },
-    "uncategorized":   { "state": "passed", "tests_executed": 0, "policy": "empty-or-fail", "note": "0 matched = policy-pass ONLY because membership rules matched nothing" }
+    "uncategorized":   { "state": "passed", "tests_executed": 0, "policy": "empty-or-fail", "note": "0 matched = policy-pass ONLY because membership rules
+    matched nothing" }
   }
 }
 ```
@@ -55,6 +56,8 @@ Schema rules:
   only and never part of the identity key. A mixed-state PR (docs-only skip
   predicate plus real code changes) fails the aggregate; skips never cover
   code changes.
+If no trusted CI state store exists, resume is unavailable and a full rerun is
+required; never substitute the tracked status file as a resume authority.
 
 ## Runner modes & the resume law
 

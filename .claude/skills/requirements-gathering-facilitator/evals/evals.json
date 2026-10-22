@@ -6,15 +6,16 @@
     {
       "id": "positive-solution-stated-as-requirement",
       "type": "should_trigger",
-      "prompt": "A stakeholder wants us to 'add an export button' to the reports page. Help us figure out what we should actually build.",
+      "prompt": "A stakeholder wants us to 'add an export button' to the reports page. Help us figure out what we should actually build. This is a multi-turn facilitation session: for this next-turn reply produce only the one next question plus a one-line discovery status, and do not produce the brief yet.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Restates 'add an export button' as a problem/job-to-be-done rather than accepting the solution verbatim, asking what the export would let them accomplish.",
           "Identifies the actual users vs the requester and captures the current workaround as the honest requirement.",
           "Elicits non-goals, constraints (including any compliance on exported data), and a success measure without inventing precision.",
-          "Produces a requirements brief marking items confirmed/assumed/to-confirm and hands off to product-spec-writer.",
-          "Does not jump to writing the specification or the UI design."
+          "Keeps the brief and the product-spec-writer handoff out of this next-turn reply; they belong to a later turn once discovery is complete.",
+          "Does not jump to writing the specification or the UI design.",
+          "Returns an INTERACTIVE TURN (one next question plus explicit stop) rather than a completed brief this turn."
         ]
       }
     },
@@ -183,6 +184,19 @@
           "Does NOT reject the question merely because it contains multiple options; a short option list that clarifies one target is allowed.",
           "Explains that adding a second question such as 'and how many therapists are there?' would introduce a DIFFERENT target and make the turn compound.",
           "Keeps the turn to one atomic question and stops for the answer."
+        ]
+      }
+    },
+    {
+      "id": "positive-next-turn-brief-after-discovery",
+      "type": "should_trigger",
+      "prompt": "Next-turn fixture: every spec-blocking discovery question has now been answered one at a time. Produce the requirements brief and hand off.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the final requirements brief now that no spec-blocking question remains.",
+          "Separates confirmed / assumed / unknown items and hands off to product-spec-writer by name.",
+          "Does NOT invoke product-spec-writer itself and does not authorize implementation."
         ]
       }
     }

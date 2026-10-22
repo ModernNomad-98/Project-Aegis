@@ -33,11 +33,12 @@
     {
       "id": "negative-slo-design",
       "type": "should_not_trigger",
-      "prompt": "What should our SLOs be for the checkout journey, and which conditions deserve to page versus ticket?",
+      "prompt": "What should our SLOs be for the checkout journey, and which conditions deserve to page versus ticket? Fixture: checkout SLO target 99.9%; 40 CPU pages last week; the paging-vs-ticket decision is not yet recorded.",
       "expect": {
         "triggers": false,
         "assertions": [
-          "SLO/SLI derivation and the page-vs-ticket policy are slo-reliability-architect's design work; this skill implements the resulting spec."
+          "SLO/SLI derivation and the page-vs-ticket policy are slo-reliability-architect's design work; this skill implements the resulting spec.",
+          "Pins the routing: SLO/paging design comes from slo-reliability-architect (using the supplied 99.9% target and alert history), and this skill only implements the resulting spec."
         ]
       }
     },

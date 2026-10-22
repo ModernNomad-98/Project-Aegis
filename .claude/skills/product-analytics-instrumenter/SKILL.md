@@ -1,6 +1,12 @@
 ---
 name: product-analytics-instrumenter
-description: 'Design the INSTRUMENTATION for product analytics — where/how the analytics events (defined by event-schema-architect) fire: client-side vs server-side capture and when server-side is more trustworthy, the capture points, identity/session, consent and privacy (opt-out, consent-gated capture, PII minimization at the source, regional rules), capture reliability, tracking QA (does the event fire with the right properties), avoiding double-counting, and the debug/verification workflow. This is USER-facing PRODUCT analytics — NOT system telemetry for engineers (observability-operator) and NOT the skill-library usage signal (skill-usage-instrumenter). Use when instrumenting product analytics events, deciding client vs server tracking, gating capture on consent, or QAing that tracking fires correctly. Do NOT use for system logs/metrics/traces and alerting (observability-operator), which library skills fire (skill-usage-instrumenter), or defining the event schema (event-schema-architect).'
+description: 'Design the INSTRUMENTATION for product analytics — where/how the analytics events (defined by event-schema-architect) fire: client-side vs
+server-side capture and when server-side is more trustworthy, the capture points, identity/session, consent and privacy (opt-out, consent-gated capture, PII
+minimization at the source, regional rules), capture reliability, tracking QA (does the event fire with the right properties), avoiding double-counting, and the
+debug/verification workflow. This is USER-facing PRODUCT analytics — NOT system telemetry for engineers (observability-operator) and NOT the skill-library usage
+signal (skill-usage-instrumenter). Use when instrumenting product analytics events, deciding client vs server tracking, gating capture on consent, or QAing that
+tracking fires correctly. Do NOT use for system logs/metrics/traces and alerting (observability-operator), which library skills fire (skill-usage-instrumenter),
+or defining the event schema (event-schema-architect).'
 ---
 
 # Product Analytics Instrumenter
@@ -192,7 +198,8 @@ Boundaries:    schema → event-schema-architect; system telemetry → observabi
   them, and the number is quietly low forever. Money moves server-side.
 - Firing events before `identify` orphans them under an anonymous id that
   never joins the user — the funnel undercounts and no error is thrown.
-  Order of capture vs identity matters.
+  Order of capture vs identity matters: resolve identity first, and treat
+  pre-identify events as orphaned (re-key or replay them, then fix capture order).
 - Capturing before consent (or ignoring opt-out/DNT) is a compliance
   violation, not a data-completeness win. Consent gates capture; minimize
   PII at the source, because scrubbing it downstream is unreliable and

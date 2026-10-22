@@ -1,6 +1,7 @@
 ---
 name: skill-usage-ledger
-description: 'Produce the six-field record of which Aegis skills a task used, each bound to its skills-manifest SHA-256, for pasting into a PR description or ledger. Emits the record in conversation and writes nothing.'
+description: 'Produce the six-field record of which Aegis skills a task used, each bound to its skills-manifest SHA-256, for pasting into a PR description or
+ledger. Emits the record in conversation and writes nothing.'
 ---
 
 # Skill Usage Ledger
@@ -85,6 +86,10 @@ manifest, no hash is invented, and `incomplete` is filled honestly.
 - **Recording from memory invents hashes.** Copy the hash from the manifest
   at record time; a hash from a previous task may name a different
   `SKILL.md` after an update.
+- **Signal-catalog epoch gate (consumer side).** When reading the instrumenter's
+  signal catalog, read `activation_mode`/`correction_outcome` by event type and reject
+  any record whose `schema_epoch` does not match the catalog epoch (current 2); map
+  legacy records by source table and never read the legacy mode field.
 - **A stale manifest fails the validator.** Refresh before resolving names,
   and note that any skill edit PR must carry the refreshed manifest.
 - **Compliance is the user's.** This skill produces the record and the

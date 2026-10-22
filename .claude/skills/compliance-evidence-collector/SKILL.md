@@ -1,6 +1,12 @@
 ---
 name: compliance-evidence-collector
-description: 'Design the operating-effectiveness evidence program SOC 2 Type 2 demands and ISO surveillance audits reuse — evidence OVER TIME, not point-in-time. Per control (from compliance-control-foundation): evidence type, cadence matched to control operating frequency, population for auditor sampling, named collector, retention, and audit-window coverage with a hole map. Formalizes the Phase 5 evidence pack (screenshot-evidence-planner, manual-test-case-creator), audit-log-architect trails, and agent-governance-audit reports into auditor-consumable registers. Design and coverage audit only — never mutates a live evidence store. Use when planning a Type 2 window or ISO surveillance cycle, asked how to collect and retain compliance evidence, or when evidence cannot cover a period. Do NOT use for QA evidence policy (screenshot-evidence-planner), audit-log design (audit-log-architect), one change''s process evidence (agent-governance-audit), or readiness gaps (compliance-gap-auditor).'
+description: 'Design the operating-effectiveness evidence program SOC 2 Type 2 demands and ISO surveillance audits reuse — evidence OVER TIME, not
+point-in-time. Per control (from compliance-control-foundation): evidence type, cadence matched to control operating frequency, population for auditor sampling,
+named collector, retention, and audit-window coverage with a hole map. Formalizes the Phase 5 evidence pack (screenshot-evidence-planner,
+manual-test-case-creator), audit-log-architect trails, and agent-governance-audit reports into auditor-consumable registers. Design and coverage audit only —
+never mutates a live evidence store. Use when planning a Type 2 window or ISO surveillance cycle, asked how to collect and retain compliance evidence, or when
+evidence cannot cover a period. Do NOT use for QA evidence policy (screenshot-evidence-planner), audit-log design (audit-log-architect), one change''s process
+evidence (agent-governance-audit), or readiness gaps (compliance-gap-auditor).'
 ---
 
 # Compliance Evidence Collector
@@ -64,8 +70,9 @@ mutates a live evidence store.
 5. Control operating frequency — continuous (logging), per-change (review),
    periodic (access review, backup restore test) — cadence derives from it.
    ONE cadence definition per control CLASS (frequency-matched default), with
-   the per-control accountable owner and collection trigger recorded in the
-   control catalog (compliance-control-foundation). Continuous controls keep
+   the per-control accountable owner and collection trigger recorded in the control catalog (compliance-control-foundation); the catalog
+    carries those three accountability fields (accountable owner, evidence collector,
+    collection trigger) on every control record. Continuous controls keep
    continuous operation evidence with periodic extracts at least quarterly
    (plus window-start/end config snapshot); the cadence catalog records
    class-level defaults and names the evidence owner per row.

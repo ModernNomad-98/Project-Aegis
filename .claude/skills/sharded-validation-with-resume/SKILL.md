@@ -1,6 +1,12 @@
 ---
 name: sharded-validation-with-resume
-description: 'Design full-tier validation as named functional shards with resume: a shard map assigning every test/check to exactly one shard, a persisted status file, resume that reruns ONLY unfinished shards after a timeout/infrastructure interruption (passes are kept; real FAILURES are never resumed-away), an "uncategorized" catch-shard that fails until new tests are assigned, and parallel shards funneling into ONE aggregate gate job as the sole required check — so docs-only conditional skips can''t strand branch protection. Deliverables: shard map, status schema, runner modes, aggregate-gate spec, wiring handoff. Use when full validation times out or reruns from scratch after interruptions, when new tests escape unassigned, or when required checks break on skipped jobs. Do NOT use to choose the tier (risk-tiered-validation-selector), for the per-commit local mirror (local-ci-mirror-preflight invokes this runner), to design the pipeline (ci-pipeline-architect), or to diagnose flakes (flaky-test-detective).'
+description: 'Design full-tier validation as named functional shards with resume: a shard map assigning every test/check to exactly one shard, a persisted
+status file, resume that reruns ONLY unfinished shards after a timeout/infrastructure interruption (passes are kept; real FAILURES are never resumed-away), an
+"uncategorized" catch-shard that fails until new tests are assigned, and parallel shards funneling into ONE aggregate gate job as the sole required check — so
+docs-only conditional skips can''t strand branch protection. Deliverables: shard map, status schema, runner modes, aggregate-gate spec, wiring handoff. Use when
+full validation times out or reruns from scratch after interruptions, when new tests escape unassigned, or when required checks break on skipped jobs. Do NOT
+use to choose the tier (risk-tiered-validation-selector), for the per-commit local mirror (local-ci-mirror-preflight invokes this runner), to design the
+pipeline (ci-pipeline-architect), or to diagnose flakes (flaky-test-detective).'
 ---
 
 # Sharded Validation With Resume
@@ -168,9 +174,10 @@ Maintenance:     rebalance triggers; shard-map edits via reviewed PRs
 
 - **Resume as failure laundering:** the seductive misuse — rerun with
   `-Resume` after a REAL failure so the red shard is skipped and the
-  aggregate goes green. The status file's failed-vs-interrupted distinction
-  and the resume law exist to make this impossible; any runner that can't
-  tell the two apart is unsafe to ship.
+  aggregate goes green. The trusted CI state store's failed-vs-interrupted
+  classification and the resume law exist to make this impossible on a trusted
+  store; any runner that can't tell the two apart is unsafe to ship. If no
+  trusted CI state store exists, resume is unavailable — a full rerun is required.
 - **Stale status across commits:** resuming a run whose passes were earned on
   a different tree/config/dependency/toolchain fingerprint is validating the
   wrong code - bind the trusted resume record/store to the canonical resume

@@ -72,7 +72,7 @@ Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
 
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
-| 1 | BLOCKED | reviewer block in force (wins for every agent-initiated action: halt and wait) OR recorded attestation deadline passed OR no recorded attestation deadline exists OR a transition trigger fired | disabled; the grant does not expire; only in-scope human/manual actions remain; no agent-initiated action proceeds |
+| 1 | BLOCKED | reviewer block in force for agent-initiated actions, or attestation deadline passed, or no recorded deadline | halted |
 | 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
 | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
 BLOCKED > GRANDFATHERED > ACTIVE (first matching row wins). BLOCKED -> ACTIVE
@@ -168,3 +168,10 @@ Collect before designing, from recent sessions/PRs:
 - **Treating this policy as the authority source** — it is downstream of the
   matrix and any separate applicable human grants. The default matrix floor
   remains when no grant covers the action; later owner constraints also apply.
+
+Blocking does not itself expire the grant; any recorded expiry/use limit still applies.
+
+Allowed transitions: BLOCKED -> ACTIVE only on recorded re-attestation after the block
+clears; ACTIVE -> BLOCKED on reviewer block or passed/missing attestation deadline;
+GRANDFATHERED -> BLOCKED on a reviewer block or passed deadline; no transition may
+bypass BLOCKED, and no default expiry is ever inferred.

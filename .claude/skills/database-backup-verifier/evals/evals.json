@@ -20,7 +20,7 @@
     {
       "id": "positive-drill-parity-and-deletion",
       "type": "should_trigger",
-      "prompt": "Explicitly invoke database-backup-verifier. Drill mode: restore last night's orders snapshot into a new instance called orders-drill-0928 in our sandbox account, which is not production. Check it and clean up afterwards.",
+      "prompt": "Explicitly invoke database-backup-verifier. Drill mode: restore last night's orders snapshot into a new instance called orders-drill-0928 in our sandbox account, which is not production. Check it and clean up afterwards. Fixture: the declared RTO is 2 hours; the last drill measured restore time 47 minutes; the source table holds 1,204,332 rows; row-count and checksum parity both matched.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -28,7 +28,8 @@
           "Proves the sandbox target is non-production by comparing its identifiers with the declared production list, and confirms it does not already exist.",
           "Records the data origin: the scratch copy is production data from the named backup, with access limited while it exists.",
           "Reports the measured restore time against the 2-hour RTO and row-count and checksum parity against the backup's source, showing numbers but no row contents.",
-          "Deletes the scratch instance and its storage and shows a listing proving it is gone."
+          "Deletes the scratch instance and its storage and shows a listing proving it is gone.",
+          "Reports the measured restore time (47 minutes) against the 2-hour RTO and the row count (1,204,332) plus checksum parity result from the fixture."
         ]
       }
     },

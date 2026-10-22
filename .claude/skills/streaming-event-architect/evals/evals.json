@@ -35,14 +35,15 @@
     {
       "id": "edge-duplicate-and-out-of-order-bug",
       "type": "should_trigger",
-      "prompt": "Payments sometimes apply twice and status updates occasionally arrive before the create event. Fix our event pipeline design.",
+      "prompt": "Payments sometimes apply twice and status updates occasionally arrive before the create event. Fix our event pipeline design. Fixture: two duplicate event ids (evt_7f3a and evt_7f3b) applied the same payment; create and update events were published with different partition keys; the consumer has no idempotency store.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Diagnoses duplicates as at-least-once delivery meeting non-idempotent consumers, and designs the idempotency mechanism (business-key upsert or event-id dedup with stated retention) rather than chasing a no-duplicates transport.",
           "Diagnoses the ordering symptom as a key/partition problem: create and update events must share a partition key (the entity id) to be sequenced.",
           "Does not promise global ordering; states the guarantee scope honestly and designs consumers to tolerate what is not guaranteed.",
-          "Adds lag/DLQ observability hooks with named owners, handing wiring to observability-operator."
+          "Adds lag/DLQ observability hooks with named owners, handing wiring to observability-operator.",
+          "Uses the supplied duplicate event ids, mismatched create/update partition keys and absent consumer idempotency store to diagnose and fix the pipeline."
         ]
       }
     },

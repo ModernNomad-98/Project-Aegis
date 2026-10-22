@@ -1,6 +1,11 @@
 ---
 name: standing-approval-and-auto-advance
-description: 'MANUAL-ONLY; never auto-invoke. Design the governed approval-fatigue layer: documented standing approval for named delivery steps, phase advance only through already-approved phases, per-session restatement, an opt-out phrase, and reviewer blocks. Protected-branch merge remains approval-required; an applicable explicit, active, scoped human grant can satisfy that requirement without another request. Never infer merge authority from green checks or this skill. Arming auto-merge remains forbidden to agents by default. Merge-after-green is never the default template. Use when repetitive mechanical approvals erode real gates. Do not use to record one grant (scoped-approval-register), define authority floors (agent-authorization-matrix), or stress-test approval experience (human-agent-trust-reviewer).'
+description: 'MANUAL-ONLY; never auto-invoke. Design the governed approval-fatigue layer: documented standing approval for named delivery steps, phase advance
+only through already-approved phases, per-session restatement, an opt-out phrase, and reviewer blocks. Protected-branch merge remains approval-required; an
+applicable explicit, active, scoped human grant can satisfy that requirement without another request. Never infer merge authority from green checks or this
+skill. Arming auto-merge remains forbidden to agents by default. Merge-after-green is never the default template. Use when repetitive mechanical approvals erode
+real gates. Do not use to record one grant (scoped-approval-register), define authority floors (agent-authorization-matrix), or stress-test approval experience
+(human-agent-trust-reviewer).'
 disable-model-invocation: true
 ---
 
@@ -198,18 +203,10 @@ Adoption:                     pending human approval → then recorded via scope
   field; no recorded attestation deadline means BLOCKED. A reviewer block wins
   for every agent-initiated action and the loop halts and waits for the human.
 
-  Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
-
-  | Precedence | State | Condition | Auto-advance |
-  | --- | --- | --- | --- |
-  | 1 | BLOCKED | reviewer block in force (wins for every agent-initiated action: halt and wait) OR recorded attestation deadline passed OR no recorded attestation deadline exists OR a transition trigger fired | disabled; the grant does not expire; only in-scope human/manual actions remain; no agent-initiated action proceeds |
-  | 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
-  | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
-  BLOCKED > GRANDFATHERED > ACTIVE (first matching row wins). BLOCKED ->
-  ACTIVE only on recorded re-attestation after the block clears;
-  GRANDFATHERED never bypasses a reviewer block; never infer a default expiry.
-  No recorded deadline means BLOCKED; GRANDFATHERED therefore only applies when
-  a deadline is recorded and not passed.
+  The canonical precedence table lives in
+  [references/standing-approval-policy.md](references/standing-approval-policy.md)
+  (one canonical copy; do not duplicate it here). Read BLOCKED > GRANDFATHERED
+  > ACTIVE there, including the transition rules.
 - **Fatigue theater in reverse:** thinning approvals that were load-bearing.
   Instant-yes and zero-variance approvals are signals that trigger
   inspection, never proof of mechanical granting; a slow, considered approval

@@ -52,8 +52,9 @@ Turn this into an automated check (test or CI step) so it stays enforced.
 3. Issue a new credential in the provider/secret manager.
 4. Update the secret store / deploy config to the new value.
 5. Migrate every known consumer from the inventory to the new credential and
-   verify each consumer works; record each verification. Do NOT revoke while
-   any known consumer still uses the old credential.
+   verify each consumer works; record each verification. Revocation requires the
+   credential owner's recorded authorization (or a recorded owner-approved
+   exception); never revoke while any known consumer still uses the old credential.
 6. Routine rotation runs a bounded overlap window (no longer than the
    provider's propagation window) and escalates to the credential owner if
    consumers cannot be verified within it, recording risk and residual-consumer

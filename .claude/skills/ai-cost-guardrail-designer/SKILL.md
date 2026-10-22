@@ -115,7 +115,7 @@ person runs that skill by name; it is never invoked automatically.
    estimated per-call and monthly cost at the inspected call volume. Use
    verified current prices or mark the dollar estimate unknown. Record for
    each price/model figure the provider, model, source, the source sheet's
-   publication/effective date and the retrieval date. The figure is stale when
+Cite every cost figure with its provider, model, source, publication/effective date and retrieval date; a figure without a retrieval date is unverified.
    the source sheet is no longer the sheet currently in effect, or when the
    retrieval date is older than the recorded stale threshold (default 30 days
    when none is recorded with the figure; record the threshold with the

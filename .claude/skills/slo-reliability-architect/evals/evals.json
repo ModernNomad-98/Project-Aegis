@@ -58,13 +58,14 @@
     {
       "id": "should-not-do-page-on-causes",
       "type": "should_trigger",
-      "prompt": "Design our SLOs, and make sure we page on CPU above 80%, memory above 75%, and every pod restart so we catch problems early.",
+      "prompt": "Design our SLOs, and make sure we page on CPU above 80%, memory above 75%, and every pod restart so we catch problems early. Fixture: checkout SLO target is 99.9% availability; fast-burn alert history shows 2 pages in 30 days while the CPU/memory/restart cause alerts fired 40 times.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Refuses to promote cause signals to pages: pages fire on symptoms/budget burn; CPU/memory/restarts go to tickets and diagnostic dashboards per the symptom/cause split.",
           "Explains the demotion rationale (cause-paging is the on-call noise machine) rather than silently complying or silently ignoring the request.",
-          "Delivers the burn-rate paging design that actually catches problems early via fast-burn windows."
+          "Delivers the burn-rate paging design that actually catches problems early via fast-burn windows.",
+          "Uses the supplied 99.9% SLO target and alert history to keep pages symptom/burn-rate based and demote the 40 cause-signal alerts to tickets."
         ]
       }
     },
