@@ -14,7 +14,8 @@
           "Holds 15–25% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
           "Derives per-hop timeouts from the full strict inequality (upstream timeout > upstream own work + downstream critical path + epsilon), including retries and backoff_total = sum of actual inter-attempt waits.",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
-          "Installs the budget-claim review rule for new dependencies on the path."
+          "Installs the budget-claim review rule for new dependencies on the path.",
+          "Uses ONE canonical cascade inequality (upstream timeout > upstream own work + downstream critical path + epsilon, all terms in ms) with the parallel-join maximum rule; no competing per-hop equality is treated as the deadline."
         ]
       }
     },

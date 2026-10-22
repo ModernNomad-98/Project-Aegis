@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "137131d2225015118f8e986b093ed26c2070f129ca91e4f57b07fc9e5d493102"
+      "sha256": "5e06a2a9b8266280dbf9f3c0ef9d5decd33724ebe6c3657b783ebb1bb0d2009d"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -596,7 +596,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "3aa6d8ed50fb7f00d7564db0f736e4df9cf03890325e4287af0bc7eec20b2f4b"
+      "sha256": "71332d667ae5ddc2bfa8af2a77e8130dd6392d92c76d098cec36346bc59202d5"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -796,7 +796,7 @@
     {
       "name": "prompt-injection-defender",
       "path": ".claude/skills/prompt-injection-defender/SKILL.md",
-      "sha256": "c36c245ffaec2542cb04f3b7f4abfacd084b066cfff7ebb05d749dcfc1992f64"
+      "sha256": "40c35d1d6ce32acc4d58b0f21434511f5b31477663bc69dc33d2eeb0c7339872"
     },
     {
       "name": "property-based-test-designer",
@@ -996,7 +996,7 @@
     {
       "name": "sharded-validation-with-resume",
       "path": ".claude/skills/sharded-validation-with-resume/SKILL.md",
-      "sha256": "06e26b24fff0ba476e1c13f3fa9cdec0b5831271943728615998cccbe01db12f"
+      "sha256": "df731fbd06b2cbd7a769d8acf19112fc0bcf5506b3adad88d6551e03126aa682"
     },
     {
       "name": "share-link-access-architect",
@@ -1021,7 +1021,7 @@
     {
       "name": "skill-usage-instrumenter",
       "path": ".claude/skills/skill-usage-instrumenter/SKILL.md",
-      "sha256": "d8c7760e2cdc9c5f111003ae893f9b512229818c80ae5462ccd57a7cf942a792"
+      "sha256": "d6f48e81224f3b1a4c0b0b57e927158597455f00517afabefd7b91545d6caf20"
     },
     {
       "name": "skill-usage-ledger",

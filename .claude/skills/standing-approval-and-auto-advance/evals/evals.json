@@ -16,7 +16,8 @@
           "Before asking for adoption, defines PR, green checks, protected branch, and auto-merge; compares review time, setup/upkeep, money costs or unknowns, benefits and risks of lawful profiles; recommends a case-fit choice and explains why.",
           "Rationale cites the ungoverned-auto-merge incident from agent-authorization-matrix's evals as why these elements are non-optional.",
           "Delivers a DRAFT for human adoption routed to scoped-approval-register — does not enact it.",
-          "Profile selection carries the grant's ACTUAL recorded expiry/use limit (may be none) and is never given an inferred default expiry; a grant with no recorded attestation deadline is not expired, but auto-advance is blocked pending re-attestation, and existing grants are grandfathered while re-attestation is requested. Consumption/one-use semantics stay as recorded; the reviewer-block halt path is unchanged."
+          "Profile selection carries the grant's ACTUAL recorded expiry/use limit (may be none) and is never given an inferred default expiry; a grant with no recorded attestation deadline is not expired, but auto-advance is blocked pending re-attestation, and existing grants are grandfathered while re-attestation is requested. Consumption/one-use semantics stay as recorded; the reviewer-block halt path is unchanged.",
+          "Names the state transitions: adoption with no recorded attestation deadline enters BLOCKED; recorded re-attestation returns the grant to ACTIVE; GRANDFATHERED applies only to grants valid at adoption and preserves auto-advance only when the register records the grant was already armed at adoption."
         ]
       }
     },

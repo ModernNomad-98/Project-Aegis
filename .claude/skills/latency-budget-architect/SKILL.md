@@ -108,13 +108,7 @@ authorize execution.
    unallocated — for growth, incident conditions, and the dependency
    nobody predicted. Headroom is a line item with an owner (the path
    owner), not slack silently absorbed by whoever asks first.
-5. **Derive timeouts from budgets.** A hop's timeout ≈ its budget
-   (plus a stated tolerance), because a timeout longer than the
-   budget means the caller has already failed the end-to-end promise
-   while still waiting. Cascade correctly: an upstream timeout must strict-exceed
-   upstream own work + the longest critical path through downstream calls
-   (including serial segments, parallel branch maximums, retries and
-   backoff_total), or the upstream gives up while the downstream still works.
+5. **Derive timeouts from budgets.** A hop's timeout is its budget plus tolerance; the ONE canonical cascade inequality is: upstream timeout > upstream own work + downstream critical path + epsilon, with every term in milliseconds. The critical path is the sum of serial segments plus the MAXIMUM of parallel branch durations at each join, including retries and backoff_total at their owning layer; epsilon is the recorded tolerance in ms, one unit, owned by the path owner. Deriving from this inequality keeps the caller from abandoning work the downstream still completes.
    default is a bug in a 300ms path.
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
@@ -172,7 +166,7 @@ Timeouts: <per hop: timeout = hop work + tolerance (tolerance = epsilon; use ONE
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
-Review rule: new dependency on this path claims budget (headroom | reallocation | renegotiate SLO)
+Timeouts: <canonical cascade: upstream timeout > upstream own work + downstream critical path + epsilon (all terms in ms; epsilon = recorded tolerance in ms, one unit; record every term)>
 Owner claim choice (only if needed): <terms; viable paths and reasons;
   user/hop effects, pros/cons, time/money/upkeep or unknowns;
   recommendation and why; one decision question; owners still sign>
@@ -197,9 +191,10 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
 - [ ] Retries are budgeted spend at one layer only; hedging is
       headroom-funded or absent.
 - [ ] Headroom is a named line item with an owner, 15–25%.
-- [ ] Every hop has an owner; hops over budget today have their
-      reduction work ROUTED, not absorbed into this design.
-- [ ] The budget-claim review rule is stated.
+- [ ] Every timeout derives from the ONE canonical cascade inequality (upstream
+      timeout > upstream own work + downstream critical path + epsilon, all ms;
+      critical path = serial sum + max parallel branch at each join;
+      backoff_total = sum of actual inter-attempt waits; record every term).
 - [ ] Any owner-facing claim choice explains terms, effects, costs or
       unknowns, pros/cons, and a reasoned recommendation before one
       question; no budget or SLO changes silently.
@@ -224,10 +219,9 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
   backoff_total = sum of actual inter-attempt waits, not retries x one wait).
   retries at ONE stated layer (usually innermost idempotent).
 - Queue wait is invisible until it isn't: async hops budgeted at
-  processing time only will blow their budget under load exactly when
-  it matters — queue wait at target load is a budget row.
-- The budget negotiated against wishes: allocating 20ms to a hop
-  currently measuring p95=80ms is not a budget, it's a hope — the
+- **Cascade invariant:** each upstream timeout > upstream own work + the
+  downstream critical path + epsilon (all terms in ms; record every term;
+  backoff_total = sum of actual inter-attempt waits, not retries x one wait).
   gap becomes ROUTED reduction work (the owning skill) or the
   allocation is honest about today.
 - Cold connections on the tail: pool exhaustion and TLS setup land on

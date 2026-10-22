@@ -27,10 +27,10 @@ many storage.
 
 | Control operates | Evidence cadence | Window coverage rule | Evidence owner | Refresh trigger |
 | --- | --- | --- | --- | --- |
-| Continuously (logging, RLS, encryption) | Periodic extracts at least quarterly (continuous controls) | Extracts must tile the window with no uncovered interval; config snapshot at window start/end | named evidence owner (control owner assigns) | quarterly cycle or a stated config/control change |
-| Per change (review, migration safety, release gate) | Per-occurrence artifact, enumerated by population | Population = ALL occurrences in window (e.g. all merged PRs) | named collector (control owner assigns) | each occurrence |
-| Periodically (access review, backup-restore test, vendor review, management review) | One artifact per scheduled occurrence | Missed occurrence = hole; reschedule forward, never backdate | control owner | the scheduled period |
-| On event (incident, DR invocation) | Per-event bundle (timeline, postmortem) | Zero events is fine - prove the monitoring existed, not the event | incident owner | each event |
+| Continuously (logging, RLS, encryption) | Periodic extracts at least quarterly (continuous controls) | Extracts must tile the window with no uncovered interval; config snapshot at window start/end | control owner (named per control) | collection trigger: quarterly extract schedule, a control/config change, or window boundary |
+| Per change (review, migration safety, release gate) | Per-occurrence artifact, enumerated by population | Population = ALL occurrences in window (e.g. all merged PRs) | change owner / named collector per control | collection trigger: each merged change |
+| Periodically (access review, backup-restore test, vendor review, management review) | One artifact per scheduled occurrence | Missed occurrence = hole; reschedule forward, never backdate | control owner (named per control) | collection trigger: the scheduled occurrence |
+| On event (incident, DR invocation) | Per-event bundle (timeline, postmortem) | Zero events is fine - prove the monitoring existed, not the event | incident owner | collection trigger: each event |
 
 ## Population patterns
 

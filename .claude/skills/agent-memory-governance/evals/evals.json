@@ -79,7 +79,8 @@
           "Stops for approval before editing any memory file.",
           "Passes an intact anchor: the asserted artifacts are present in the current tree at the recorded anchor commit, and the anchor commit + check evidence are recorded.",
           "Fails a reverted anchor: when the anchor change has been reverted and not re-applied, the completion claim fails instead of being treated as complete.",
-          "Passes a reverted-then-reapplied anchor: a later re-application restores the asserted artifacts, so the claim passes again with the re-application recorded as evidence."
+          "Passes a reverted-then-reapplied anchor: a later re-application restores the asserted artifacts, so the claim passes again with the re-application recorded as evidence.",
+          "Uses the concrete completion-anchor check: records ANCHOR_SHA; gh pr view <pr> --json state,mergeCommit shows merged; git merge-base --is-ancestor ANCHOR_SHA origin/main passes; artifacts checked in the current tree AND at the anchor commit; git log -i --grep=\"^Revert\" origin/main finds any revert (revert without later re-apply => FAIL); re-anchor only when recorded with justification + new ANCHOR_SHA + evidence."
         ]
       }
     }

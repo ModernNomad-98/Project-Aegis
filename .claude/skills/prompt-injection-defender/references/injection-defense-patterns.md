@@ -20,7 +20,7 @@ Every element of assembled context is one of:
 
 The whole defense exists to keep untrusted content from acting as trusted.
 
-No trusted-source exemption is granted unless a provenance guarantee is established and recorded; a provenance guarantee records which source produced the content and never promotes that content to instructions. Even a trusted source is data, never a new rule: per-source trust levels are enumerated in the design and recorded with the assembly code.
+No trusted-source exemption is granted unless a provenance guarantee is established and recorded; a provenance guarantee records which source produced the content and never promotes that content to instructions. Treat every source, including a trusted one, as data - never as a new rule. A provenance guarantee records attribution only and creates no exemption from the invariant; per-source trust levels are enumerated in the design and recorded with the assembly code.
 
 ## Separation schemes (ordered best → worst)
 

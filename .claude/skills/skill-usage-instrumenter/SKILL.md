@@ -69,6 +69,7 @@ it changes no skill, adds no hook, and collects nothing itself.
      enum, never free text).
    - *Correction (wrong-fire):* user overrode or redirected the skill choice; which skill won instead - the field counterpart of a trigger-evals discrimination case.
      Declare the enum domain per event: invocation events use activation_mode (auto/explicit); correction/wrong-fire events use correction_outcome (overridden/abandoned); never reuse one field name for both domains, and a sparse wrong-fire event must not be misread as an activation value.
+     Schema epoch and migration rules are in references/usage-signal-catalog.md; current schema_epoch = 2 and a version mismatch invalidates cross-epoch comparisons.
    - *Completion hint:* the skill's workflow ran to its deliverable vs was
      abandoned — coarse (delivered / abandoned / unknown), not a quality
      score.

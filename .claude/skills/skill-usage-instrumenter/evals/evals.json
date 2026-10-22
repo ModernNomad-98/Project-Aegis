@@ -15,7 +15,8 @@
           "Assigns evidence tiers to capture points and says honestly which tiers exist today rather than assuming host hooks.",
           "Defines thresholds where each row names its action AND consumer (skill-quality-reviewer re-review, trigger-evals fix, evidence package to skill-deprecation-planner).",
           "Includes the rare-but-critical exemption list so low usage alone never condemns a safety-net skill, and hands implementation off — this design adds no hooks and edits nothing.",
-          "Declares the enum domain per event (activation_mode for invocations, correction_outcome for wrong-fire/corrections) and reads a sparse wrong-fire event correctly instead of confusing it with an activation value."
+          "Declares the enum domain per event (activation_mode for invocations, correction_outcome for wrong-fire/corrections) and reads a sparse wrong-fire event correctly instead of confusing it with an activation value.",
+          "Points to the schema-epoch/migration reference (current schema_epoch = 2) and treats a status/schema epoch mismatch as invalidating cross-epoch comparisons."
         ]
       }
     },
