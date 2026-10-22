@@ -30,7 +30,7 @@ certification claims.
 | --- | --- |
 | Secret/key custody, rotation, exposure | `secrets-identity-hardener` |
 | Session/token security flags | `secrets-identity-hardener` |
-| Encryption in transit / at rest design | PARTIAL by design (reconciliation D8/A04 residue): key destruction, backups and audit evidence remain, owned by key lifecycle/custody (platform + IaC owners); design review is unowned |
+| Encryption in transit / at rest design | PARTIAL by design (reconciliation D8/A04 residue): key destruction, backups and audit evidence remain, owned by key lifecycle/custody (role-based platform and IaC owners); encryption design review beyond key custody is unowned (named residue) |
 
 ## Domain 3 — Change management
 

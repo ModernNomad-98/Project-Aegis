@@ -109,14 +109,16 @@ first workflow step.
    - **AUTONOMOUS** only when the tier allows it, the action is reversible,
      its blast radius is one record or one user, and the watch-and-undo
      controls in step 9 exist.
-   - **CONFIRM** for anything a wrong result would harm and a person can
-     judge from the evidence shown.
-   - **FORBIDDEN** for irreversible, cross-tenant or wide-blast-radius actions, actions no single reviewer can judge, and anything explicit written policy bars. State the reason.
-   **PRECEDENCE RULE:** risk tier only selects among these classes; it never
-   overrides FORBIDDEN. FORBIDDEN is limited to those enumerated classes or
-   explicit written policy; reviewer availability alone never converts a
-   forbidden action to CONFIRM. Otherwise, an action a person can approve under
-   policy is CONFIRM unless the feature's tier keeps it advisory-only.
+   - **CONFIRM** only where policy requires a person to approve before the
+     action, and a person can judge from the evidence shown.
+   - **FORBIDDEN** for irreversible, cross-tenant or wide-blast-radius actions,
+     actions no single reviewer can judge, and anything explicit written policy
+     bars. State the reason.
+   **PRECEDENCE:** FORBIDDEN only from that enumerated list or explicit written
+   policy; reviewer availability never converts FORBIDDEN to CONFIRM; CONFIRM
+   only where policy requires approval; otherwise the normal AUTONOMOUS or
+   advisory-only path applies. Risk tier selects among these classes only and
+   never overrides FORBIDDEN.
    The rubric and examples are in
    [references/hitl-design-sheet.md](references/hitl-design-sheet.md).
 3. **Design the advisory-only mode.** For actions left advisory-only, the
@@ -170,8 +172,9 @@ first workflow step.
 11. **Design against consent fatigue.** Keep CONFIRM volume within the
     reviewer budget; if the queue would exceed it, reclassify with the owner
     rather than add reviewers who will rubber-stamp. Track approval rate and
-    time-to-decision per reviewer, and flag near-100% approval with
-    seconds-long decisions. Hand the finished flow to
+    time-to-decision per reviewer; near-100% approval or very short decision
+    times are fatigue signals to inspect, never proof of rubber-stamping. Hand
+    the finished flow to
     `human-agent-trust-reviewer` for an adversarial review.
 12. **Present choices and deliver.** Where a classification or queue design
     is an owner choice (for example CONFIRM with sampling versus

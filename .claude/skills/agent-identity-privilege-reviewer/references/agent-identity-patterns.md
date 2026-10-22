@@ -42,12 +42,13 @@ user (authority A0)
       → tool (executes under A3, subset-of A2)
 ```
 
-A3 is the effective authority for the hop: the caller/sub-agent authority chain
-INTERSECTED with tool permission and resource/tenant policy, with the recorded
-approval scope applied as an ADDITIONAL CAP when an approval applies. With no
-approval and no scope there is no additional cap (authority is not zero); the
-parent-hop bound still applies, so A3 ⊆ A2 either way. A hop may only reduce
-authority, never amplify it.
+A3 is the effective authority for the hop: the caller/sub-agent authority
+chain INTERSECTED with tool permission and resource/tenant policy, capped by
+the recorded approval scope when an approval applies. **If an action requires
+approval and no approval/scope is recorded, A3 is DENIED — stop.** "No
+additional cap" never means skipping a required approval. Where no approval is
+required, the intersection stands and the parent-hop bound applies, so A3 ⊆ A2
+either way. A hop may only reduce authority, never amplify it.
 
 - Any hop where Aₙ₊₁ ⊄ Aₙ is an amplification finding.
 - Agent authority beyond the user's (maintenance/system tasks) must trace to

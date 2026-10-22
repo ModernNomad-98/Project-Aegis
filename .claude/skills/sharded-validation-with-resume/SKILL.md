@@ -90,7 +90,7 @@ repo; running it is the preflight's and CI's job.
    **Resume law: a `failed` shard (real assertions) is NOT resumable-away —
    it reruns fully after a fix; only timeout/infra interruptions qualify
    for resume.** Completed passes are never re-derived within a run-id;
-   a status record resumes only against the SAME resume fingerprint: tree hash + config files + dependency lock/toolchain inputs (name the exact inputs). Any change to any of those invalidates all prior status; a new commit alone is not the whole identity.
+   a status record resumes only against the SAME resume fingerprint: tree hash + config files + dependency lock/toolchain inputs + runner image/digest and environment (name the exact inputs). Any change to any of those invalidates all prior status; a new commit alone is not the whole identity.
 5. **Spec the CI wiring:** shards as parallel jobs → ONE aggregate gate job
    (`needs:` all shards) that is the SOLE required status check. The
    aggregate evaluates shard results explicitly - including the platform's skipped semantics on docs-only paths: skipped-by-tier counts as satisfied only when the skip predicate was recorded and validated (docs-only tier selector); a skipped shard on a

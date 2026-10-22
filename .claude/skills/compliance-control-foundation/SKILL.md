@@ -72,7 +72,7 @@ is missing; it does not re-derive or re-implement them.
    audit, the [OWASP Top 10:2025 coverage
    map](../../../docs/reconciliation/step-0-reconciliation-v4.md): encryption
    and app-config hardening are partial) - the catalog must carry these as honest status, not silence.
-   Encryption residue is explicit: what remains is key destruction, backups and audit evidence; the owning control is key lifecycle/custody, owned by the organisation's named platform and infrastructure-as-code owners (role-based, not org-specific); the evidence hook is the audit record.
+   Encryption residue is explicit: what remains is key destruction, backups and audit evidence; the owning control is key lifecycle/custody, owned by the organisation's named platform and infrastructure-as-code owners (role-based, not org-specific); encryption design review beyond key custody remains unowned (a named residue); the evidence hook is the audit record.
 
 ## Workflow
 

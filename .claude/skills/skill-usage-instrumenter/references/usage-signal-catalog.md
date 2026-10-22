@@ -12,6 +12,7 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 | `skill` | name (enum: shipped list) | The activated skill |
 | `activation_mode` | `auto` \| `explicit` | Trigger-matched vs named by the user (invocation event only) |
 | `at` | date (day precision suffices) | Finer precision adds risk, not value |
+| `schema_epoch` | integer (dataset-level) | Version of this record schema; bump on any enum/field change and record it once per dataset |
 | `task_class` | small fixed enum (e.g. `build`, `review`, `audit`, `design`, `debug`, `other`) | Never free text |
 | `session_ref` | opaque id | Correlation only; carries no content |
 
@@ -22,6 +23,7 @@ rules, tiers, and the threshold catalog for a skill-library usage design.
 | `fired` | skill name | What activated |
 | `redirected_to` | skill name \| `none` | What the user invoked instead |
 | `correction_outcome` | `overridden` \| `abandoned` | Redirected vs simply stopped (correction/wrong-fire event only; never reuse activation_mode) |
+| `schema_epoch` | integer (dataset-level) | Same dataset-level version as the invocation records; required to map legacy `mode` values into the correct domain |
 
 Migration note (schema epoch 2): the pre-rename single mode field is replaced by activation_mode (invocation events) and correction_outcome (correction/wrong-fire events). Consumers must record the schema epoch/version, migrate historical events to the correct domain, and never reinterpret an old mode value across domains.
 
