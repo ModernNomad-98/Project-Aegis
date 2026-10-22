@@ -1871,6 +1871,30 @@ def test_real_corpus_pinned() -> None:
     )
     ok("real project-state template still binds as an append-only contract surface")
 
+# --- catalog family parsing (R7/ROOT-05) ------------------------------------
+
+
+def test_catalog_families_use_atx_headings_and_skill_tables() -> None:
+    """ROOT-05: family metadata parses ATX headings + skill tables only."""
+    catalog = (REAL_REPO / "docs" / "skills-catalog.md").read_text(encoding="utf-8")
+    atx = {m.group(2).strip() for m in re.finditer(r"^(#{1,6})\s+(.+?)\s*$", catalog, re.M)}
+    fams = audit_mod.Audit(REAL_REPO).catalog_families()
+    skills_dir = REAL_REPO / ".claude" / "skills"
+    names = sorted(c.name for c in skills_dir.iterdir() if c.is_dir() and c.name not in audit_mod.IGNORED_DIRS)
+    # Canonical-roster validation: every shipped skill maps to a real ATX section;
+    # no value may be an agent-roster entry or a paragraph fragment.
+    assert all(name in fams for name in names), "every shipped skill must map to a catalog section"
+    assert all(fams[name] in atx for name in names), "family values must be real ATX headings"
+    assert all(not fams[name].startswith("Subagents") for name in names), "agent roster is not a skill family"
+    assert all(not re.match(r"^\d", fams[name]) for name in names), "paragraph fragments must not become families"
+    # The three known misassignments named by the owner plan R7 acceptance.
+    assert fams["ai-sdlc-operating-model"] == "Skills (Phase 1.5 — AI-SDLC governance completion)"
+    assert fams["test-plan-designer"] == "Skills (Phase 5 — QA, E2E, manual QA & evidence pack)"
+    assert fams["full-codebase-auditor"] == "Skills (Phase 2 — core architecture & engineering pack)"
+    assert fams["release-readiness-reviewer"] == "Skills (Phase 6 — cloud, DevOps, reliability & release pack)"
+    ok("catalog family parsing uses ATX headings and skill tables (3 known misassignments resolved)")
+
+
 
 # --- determinism ------------------------------------------------------------
 
@@ -1940,6 +1964,7 @@ def main() -> int:
     test_refuses_to_write_into_skills()
     test_write_refusal_resolves_symlink_escape()
     test_real_corpus_pinned()
+    test_catalog_families_use_atx_headings_and_skill_tables()
     test_deterministic(a)
     print(f"\nOK: {len(PASSES)} contract-audit self-test assertion(s) passed.")
     return 0

@@ -86,6 +86,13 @@ writing a plan (A), a plan-level ACCEPT/REVISE verdict (B), general implementati
 **procedurally enforced**. The requirement is recorded as **partially met, with
 the shortfall named** — it is not asserted as compliance.
 
+**Owner decision, 2026-10-21 (accepted plan defaults; owner plan section 6.7 item 6):**
+stages A, B, C and E **stay procedurally enforced** and receive **no installed owning
+skill** in this plan — the shortfall above is accepted as **intentional** until a
+demonstrated recurring need justifies extending an existing owner. The candidate list
+below therefore stays a set of **partial-fit neighbours**, each verified against its
+own scope, and must never be presented as a stage owner.
+
 The list below is **illustrative and non-exhaustive**. It records what appeared
 to own each stage when this page was written; it is **not** authority, and a
 nearest match is not an owner. Where **no** skill owns a stage, say so and record
