@@ -52,5 +52,21 @@ Concrete artifact guide for the `outbound-integration-adapter-designer` skill. M
 - ai router architect requests route to `ai-router-architect`; this skill does not perform that owner work.
 - interface first designer requests route to `interface-first-designer`; this skill does not perform that owner work.
 - api event architect requests route to `api-event-architect`; this skill does not perform that owner work.
+- Pattern/placement decisions inside the application layer route to `application-layer-pattern-advisor`; external-provider adapter contracts remain here.
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `ai-router-architect`, `api-contract-test-designer`, `api-event-architect`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `design-review-facilitator`, `error-taxonomy-designer`, `human-approval-boundary`, `interface-first-designer`, `latency-budget-architect`, `resilience-architecture-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
+
+## 7. Failure-mode table (example)
+
+| Failure mode | Detection | Policy | Test |
+| --- | --- | --- | --- |
+| provider 5xx | status/metric | bounded retry with backoff | injected 500 then success |
+| timeout | deadline exceeded | retry once, then circuit open | slow provider stub |
+| duplicate delivery | provider event id | idempotency key dedupe | replay same event |
+
+## 8. Contract-test plan (example)
+
+- Happy path mapping test with recorded provider fixture.
+- Failure injection: 4xx, 5xx, timeout, malformed response, signature mismatch.
+- Idempotency/replay test: same idempotency key returns one effect.
+- Version pin test: provider payload version mismatch fails closed.

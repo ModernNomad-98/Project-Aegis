@@ -70,7 +70,7 @@ Return, in this order:
 - layered architecture enforcer requests route to `layered-architecture-enforcer`; this skill owns a different artifact.
 - interface first designer requests route to `interface-first-designer`; this skill owns a different artifact.
 - code simplifier requests route to `code-simplifier`; this skill owns a different artifact.
-- Pattern/placement decisions inside the application layer yield to `application-layer-pattern-advisor`; external-provider adapter contracts (timeouts, retries, idempotency, signing) yield to `outbound-integration-adapter-designer`.
+- External-provider adapter contracts (timeouts, retries, idempotency, signing) yield to `outbound-integration-adapter-designer`; pattern/placement decisions stay with this skill.
 - The caller wants implementation, execution or approval: refuse; return the artifact for the authorized owner.
 - Required evidence is unavailable: mark the artifact UNVERIFIED and state what is missing instead of inventing facts.
 - **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `tech-spec-writer`.

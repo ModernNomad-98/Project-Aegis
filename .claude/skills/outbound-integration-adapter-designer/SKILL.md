@@ -70,7 +70,7 @@ Return, in this order:
 - resilience architecture reviewer requests route to `resilience-architecture-reviewer`; this skill owns a different artifact.
 - latency budget architect requests route to `latency-budget-architect`; this skill owns a different artifact.
 - api contract test designer requests route to `api-contract-test-designer`; this skill owns a different artifact.
-- Pattern/placement decisions inside the application layer yield to `application-layer-pattern-advisor`; external-provider adapter contracts (timeouts, retries, idempotency, signing) yield to `outbound-integration-adapter-designer`.
+- Pattern/placement decisions inside the application layer yield to `application-layer-pattern-advisor`; external-provider adapter contracts stay with this skill.
 - The caller wants implementation, execution or approval: refuse; return the artifact for the authorized owner.
 - Required evidence is unavailable: mark the artifact UNVERIFIED and state what is missing instead of inventing facts.
 - **Eval-only discrimination set** (from `evals/trigger-evals.json` overlaps_with; eval-only, not a routing contract): `adr-writer`, `ai-router-architect`, `api-contract-test-designer`, `api-event-architect`, `architecture-designer`, `background-job-orchestration-architect`, `code-reviewer`, `design-review-facilitator`, `error-taxonomy-designer`, `human-approval-boundary`, `interface-first-designer`, `latency-budget-architect`, `resilience-architecture-reviewer`, `tech-spec-writer`.

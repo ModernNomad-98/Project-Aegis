@@ -14,10 +14,10 @@ Concrete artifact guide for the `application-layer-pattern-advisor` skill. Metho
 
 ## 2. Worked table (pattern decision table with placement and side-effect visibility)
 
-| Pattern | Cost | Benefit | Placement | Stop rule |
-| --- | --- | --- | --- | --- |
-| repository | mapping + indirection | isolate persistence | adapter layer | stop if it only forwards calls |
-| use-case layer | orchestration code | explicit side effects | application boundary | stop if it duplicates controllers |
+| Pattern | Cost | Benefit | Placement | Side effects | Transaction boundary | Stop rule |
+| --- | --- | --- | --- | --- | --- | --- |
+| repository | mapping + indirection | isolate persistence | adapter layer | none (queries only) | outside the write transaction | stop if it only forwards calls |
+| use-case layer | orchestration code | explicit side effects | application boundary | names every effect (email, event, write) | opens/owns the transaction | stop if it duplicates controllers |
 
 ## 3. Construction steps
 
@@ -51,5 +51,6 @@ Concrete artifact guide for the `application-layer-pattern-advisor` skill. Metho
 - command gateway architect requests route to `command-gateway-architect`; this skill does not perform that owner work.
 - domain modeler requests route to `domain-modeler`; this skill does not perform that owner work.
 - architecture designer requests route to `architecture-designer`; this skill does not perform that owner work.
+- External-provider adapter contracts (timeouts, retries, idempotency, signing) route to `outbound-integration-adapter-designer`; pattern and placement decisions remain here.
 - Broader eval-only discrimination set from evals/trigger-evals.json: `adr-writer`, `architecture-designer`, `change-classification-gate`, `code-reviewer`, `code-simplifier`, `command-gateway-architect`, `dependency-direction-guard`, `design-review-facilitator`, `domain-modeler`, `human-approval-boundary`, `interface-first-designer`, `layered-architecture-enforcer`, `release-readiness-reviewer`, `tech-spec-writer` (neighbours for discrimination, not in-scope work).
 - No production, deployment, spending or approval authority is granted by this reference.
