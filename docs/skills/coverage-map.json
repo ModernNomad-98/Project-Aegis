@@ -440,15 +440,17 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "interface-first-designer"
+      ],
+      "evidence": "0-B coverage re-triage (D111): interface-first-designer SKILL.md:48 requires an adapter plan distinguishing ports from implementations, the core of plugin-boundary design; full plugin lifecycle/hot-swap ownership is not claimed, so PARTIAL extension.",
+      "evidence_grade": "capability-review",
       "id": 31,
       "name": "Adapter Pattern Application",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "0-B re-triage (D111)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "PARTIAL"
     },
     {
       "area": "01",
@@ -542,15 +544,17 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "concurrency-race-reviewer"
+      ],
+      "evidence": "0-B coverage re-triage (D111): concurrency-race-reviewer SKILL.md:38 carries the concurrency-mechanism selection list (locking, isolation levels, idempotency, ordering) for mechanism selection review; full mechanism implementation is not claimed, so PARTIAL extension.",
+      "evidence_grade": "capability-review",
       "id": 39,
       "name": "Concurrency Control Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "0-B re-triage (D111)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "PARTIAL"
     },
     {
       "area": "01",
@@ -609,15 +613,17 @@
     },
     {
       "area": "01",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "adr-writer"
+      ],
+      "evidence": "0-B coverage re-triage (D111): adr-writer SKILL.md:14-15,79-82,115 makes a reversal plan and its triggers mandatory in ADRs, materially covering decision-reversal planning; full reversal execution is not claimed, so PARTIAL extension.",
+      "evidence_grade": "capability-review",
       "id": 44,
       "name": "Decision Reversal Planning",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "0-B re-triage (D111)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "PARTIAL"
     },
     {
       "area": "01",
@@ -2105,15 +2111,17 @@
     },
     {
       "area": "04",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "export-pipeline-architect"
+      ],
+      "evidence": "0-B coverage re-triage (D111): the shipped #76 export-pipeline-architect (Batch 2, D109) implements the data-export backend design (durable job, resumable parts, signed download, expiry) that this capability asks for, so a shipped skill materially covers it; capability-review judgement, not an alias.",
+      "evidence_grade": "capability-review",
       "id": 151,
       "name": "Data Export Backend Design",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "0-B re-triage (D111)",
       "priority": "P2",
-      "rationale": "no data export backend skill",
-      "status": "GAP"
+      "rationale": null,
+      "status": "COVERED"
     },
     {
       "area": "04",
@@ -3227,15 +3235,17 @@
     },
     {
       "area": "06",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "saas-timezone-architect"
+      ],
+      "evidence": "0-B coverage re-triage (D111): saas-timezone-architect SKILL.md:45 requires a DST/edge test matrix (spring-forward/fall-back, ambiguous and skipped local times, UTC storage assertions), which materially covers the timezone QA strategy; residual scheduling/QA-program ownership is not claimed, so PARTIAL.",
+      "evidence_grade": "capability-review",
       "id": 231,
       "name": "Timezone QA Strategy",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "0-B re-triage (D111)",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "PARTIAL"
     },
     {
       "area": "06",
@@ -4247,10 +4257,10 @@
       "09": 20
     },
     "by_grade": {
-      "capability-review": 102,
+      "capability-review": 107,
       "catalog-decision": 16,
       "explicit-id": 151,
-      "none": 31
+      "none": 26
     },
     "by_priority": {
       "P0": 126,
@@ -4258,17 +4268,16 @@
       "P2": 25
     },
     "by_status": {
-      "COVERED": 56,
-      "GAP": 31,
-      "PARTIAL": 62,
+      "COVERED": 57,
+      "GAP": 26,
+      "PARTIAL": 66,
       "SHIPPED": 151
     },
     "distinct_covering_skills": 150,
     "entries": 300,
     "gap_by_priority": {
-      "P0": 0,
-      "P1": 25,
-      "P2": 6
+      "P1": 21,
+      "P2": 5
     },
     "manifest_skills": 230,
     "review_pending": 147

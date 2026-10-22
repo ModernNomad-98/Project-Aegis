@@ -16,6 +16,8 @@ capability-review, catalog-decision or none are flagged for planning-gate
 review unless they carry a recorded planning-gate decision (rows #254/#278,
 D107); `review_pending` counts the remaining non-explicit-id rows (147).
 
+Row-level evidence companion: [audit registers index](../audits/README.md) (read-only reference, not build authorization).
+
 ## Basis
 
 - Repository basis: `9ab6aeac252c2bf10e86d06b24fd9feacf55b024` (audit-derived initial population).
@@ -30,15 +32,15 @@ D107); `review_pending` counts the remaining non-explicit-id rows (147).
 | --- | ---: |
 | Entries | 300 |
 | SHIPPED | 151 |
-| COVERED | 56 |
-| PARTIAL | 62 |
-| GAP | 31 |
+| COVERED | 57 |
+| PARTIAL | 66 |
+| GAP | 26 |
 | explicit-id | 151 |
 | catalog-decision | 16 |
-| capability-review | 102 |
-| none | 31 |
+| capability-review | 107 |
+| none | 26 |
 | P0 / P1 / P2 | 126 / 149 / 25 |
-| P0 / P1 / P2 gaps | 0 / 25 / 6 |
+| P0 / P1 / P2 gaps | 0 / 21 / 5 |
 | Manifest skills | 230 |
 | Distinct covering skills | 150 |
 | Beyond-roadmap shipped skills | 80 |
@@ -48,22 +50,22 @@ D107); `review_pending` counts the remaining non-explicit-id rows (147).
 
 | Area | Entries | SHIPPED | COVERED | PARTIAL | GAP |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| 01 Software Architecture & Engineering | 55 | 15 | 8 | 14 | 18 |
+| 01 Software Architecture & Engineering | 55 | 15 | 8 | 17 | 15 |
 | 02 Software as a service (SaaS) platform architecture | 35 | 21 | 4 | 10 | 0 |
 | 03 Software as a service (SaaS) security and row-level security (RLS) | 40 | 24 | 8 | 6 | 2 |
-| 04 Backend, application programming interface (API), and data engineering | 30 | 4 | 11 | 10 | 5 |
+| 04 Backend, application programming interface (API), and data engineering | 30 | 4 | 12 | 10 | 4 |
 | 05 Frontend and user experience (UX) engineering | 20 | 11 | 5 | 4 | 0 |
-| 06 Quality assurance (QA), test architecture, and validation | 55 | 37 | 6 | 7 | 5 |
+| 06 Quality assurance (QA), test architecture, and validation | 55 | 37 | 6 | 8 | 4 |
 | 07 Development and operations (DevOps), release, and reliability engineering | 25 | 19 | 2 | 3 | 1 |
 | 08 Artificial intelligence (AI) era software development life cycle (SDLC) and agent operating discipline | 20 | 17 | 3 | 0 | 0 |
 | 09 Artificial intelligence (AI) software engineering and large language model (LLM) systems | 20 | 3 | 9 | 8 | 0 |
 
-## GAP candidates (all 31 ids)
+## GAP candidates (all 26 ids)
 
-- Area 01: 14, 19, 20, 28, 29, 30, 31, 32, 33, 34, 35, 39, 43, 44, 46, 47, 50, 54
+- Area 01: 14, 19, 20, 28, 29, 30, 32, 33, 34, 35, 43, 46, 47, 50, 54
 - Area 03: 110, 120
-- Area 04: 135, 146, 151, 156, 158
-- Area 06: 224, 225, 231, 233, 234
+- Area 04: 135, 146, 156, 158
+- Area 06: 224, 225, 233, 234
 - Area 07: 236
 
 ## P0 gap candidates (all 0 ids)

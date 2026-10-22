@@ -51,6 +51,8 @@ status; the dated proposals and evidence pages further down are history.
   Project Aegis grants, limits and lifecycle events; read the complete register
   before acting.
 - [Merge policy](reconciliation/auto-merge-policy.md): current authority and historical decisions.
+- [Audit evidence registers](audits/README.md): dated row-level audit and coverage
+  registers (read-only reference, not build authorization).
 - [Delivery workflow](delivery-workflow.md): the seven-stage delivery rule, each
   stage's evidence, and the exact-head invalidation rule.
 - [Aegis SCIF naming and the necessity/reuse check](aegis-scif-naming-and-necessity.md):
