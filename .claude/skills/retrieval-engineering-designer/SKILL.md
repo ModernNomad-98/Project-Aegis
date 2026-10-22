@@ -15,7 +15,7 @@ The skill is **auto-invocable and advisory/design-only**. It produces the named 
 
 ## Use When
 
-- The request is to design semantic/hybrid retrieval quality: characterize corpus and query intents, choose a chunking and embedding plan, design dense/lexical fusion and reranking, build the relevance evaluation plan (golden sets, recall/precision, regression gate), analyze failure modes (staleness, ambiguity, poisoning surface) and hand authorization/leakage to the security owner; refuses live tuning or eval execution..
+- A concrete request like: Design our semantic retrieval stack: chunking, embeddings, fusion and reranking.
 - The named artifact is missing, disputed or about to be built against a wrong assumption.
 - A review/spec must record the artifact, its edge cases and the boundary owners explicitly.
 - An implementation is about to start and the ask is for the artifact it must build against.

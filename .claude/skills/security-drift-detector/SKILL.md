@@ -9,13 +9,13 @@ Terms: **family 5** - Security, RLS & supply chain (README roster family 5; docs
 
 ## Purpose
 
-Detect security drift against a recorded baseline: select and record the baseline, compare control by control, classify weakening (removed, narrowed, default-changed, unowned), detect undocumented changes and expiry/staleness, attach evidence and an owner/action per finding, and recommend re-baselining; read-only, no live probing.
+Detect security drift against a recorded baseline: select and record the baseline, compare control by control, classify weakening (removed, narrowed, default-changed), flag ownership findings (unowned), detect undocumented changes and expiry/staleness, attach evidence and an owner/action per finding, and recommend re-baselining; read-only, no live probing.
 
 The skill is **auto-invocable and advisory/design-only**. It produces the named artifact below with evidence and open questions; it does not edit code, run commands, use the network or grant production authority. Implementation and approval are delegated host/user actions. It composes the named neighbouring owners instead of duplicating them.
 
 ## Use When
 
-- The request is to detect security drift against a recorded baseline: select and record the baseline, compare control by control, classify weakening (removed, narrowed, default-changed, unowned), detect undocumented changes and expiry/staleness, attach evidence and an owner/action per finding, and recommend re-baselining; read-only, no live probing..
+- A concrete request like: Compare our current security controls against the last audit baseline and report drift.
 - The named artifact is missing, disputed or about to be built against a wrong assumption.
 - A review/spec must record the artifact, its edge cases and the boundary owners explicitly.
 - An implementation is about to start and the ask is for the artifact it must build against.

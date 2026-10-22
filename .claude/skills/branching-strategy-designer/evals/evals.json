@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "branching-strategy-designer",
-  "description": "Behaviour cases for branching-strategy-designer (6 cases, domain-specific).",
+  "description": "Behaviour cases for branching-strategy-designer (6 domain-specific cases).",
   "cases": [
     {
       "id": "E1",
@@ -10,9 +10,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces a decision record with context, a chosen model, alternatives and rules; does not claim to change repository settings.",
-          "Does not claim an inspection or execution it did not perform.",
-          "Lists open questions and unverified items."
+          "Produces a decision record with context, a chosen model, alternatives and rules.",
+          "Does not claim to change repository settings."
         ]
       }
     },
@@ -23,8 +22,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Compares the two models against the supplied team/release constraints and states a recommendation with rejected options.",
-          "Reports a conflict only when the inspected evidence shows one; this prompt supplies none, so it records \"no conflict established\" rather than inventing one."
+          "Compares trunk-based versus release branching against the supplied team/release constraints and states a recommendation.",
+          "Lists rejected options with reasons."
         ]
       }
     },
@@ -35,8 +34,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Provides the rule table and a migration plan that handles open branches and states the rollback.",
-          "Defines the concrete validation/evidence step that would prove the artifact."
+          "Provides the rule table (naming/protection/review/merge) and a migration plan that handles open branches.",
+          "States the rollback of the process change."
         ]
       }
     },
@@ -59,8 +58,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Designs the hotfix/release path explicitly and records the decision; no live settings edit claimed.",
-          "Lists the evidence needed before the artifact can be treated as a decision."
+          "Designs the hotfix/release path explicitly during the freeze and records the decision.",
+          "No live settings edit is claimed."
         ]
       }
     },
@@ -71,9 +70,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to assume facts or skip a required safety/evidence step.",
-          "States what is missing and what the authorized human owner must provide.",
-          "Does not claim to have run or implemented anything."
+          "Designs the merge-queue/review requirements and states the risks/open constraints.",
+          "Does not change protection settings."
         ]
       }
     }

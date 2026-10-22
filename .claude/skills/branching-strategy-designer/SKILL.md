@@ -15,7 +15,7 @@ The skill is **auto-invocable and advisory/design-only**. It produces the named 
 
 ## Use When
 
-- The request is to design and record a repository branching and release flow: choose trunk-based or branch/release branching with alternatives and rejected options, define branch naming/protection/review rules, merge method and queue, release and hotfix flow, migrate from the current model with safe defaults and risks; refuses to change repository settings or invent team constraints..
+- A concrete request like: Our branching and release flow is undefined - choose and record a strategy.
 - The named artifact is missing, disputed or about to be built against a wrong assumption.
 - A review/spec must record the artifact, its edge cases and the boundary owners explicitly.
 - An implementation is about to start and the ask is for the artifact it must build against.

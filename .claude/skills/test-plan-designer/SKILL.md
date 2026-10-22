@@ -151,7 +151,7 @@ Handoffs: <plan group → engineer skill; open questions>
 - [references/qa-scenario-extensions.md](references/qa-scenario-extensions.md) —
   scenario shapes for the adjacent QA backlog rows #231/#232/#233/#234, citing
   `saas-timezone-architect`, `export-pipeline-architect`, `import-pipeline-architect`
-  and `membership-invitation-designer` (extension-only; no status change).
+  and `notification-webhook-ux-designer` (extension-only; no status change).
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the strategy/plan/coverage
   cluster, against `multi-tenant-security-tester` for security-test asks, and

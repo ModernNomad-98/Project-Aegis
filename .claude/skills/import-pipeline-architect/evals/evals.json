@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "import-pipeline-architect",
-  "description": "Behaviour cases for import-pipeline-architect (6 cases, domain-specific).",
+  "description": "Behaviour cases for import-pipeline-architect (6 domain-specific cases).",
   "cases": [
     {
       "id": "E1",
@@ -10,9 +10,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces a stage contract with inputs/outputs/authorization/failure handling and a recovery/reversal design; runs no import.",
-          "Does not claim an inspection or execution it did not perform.",
-          "Lists open questions and unverified items."
+          "Produces a stage contract with inputs/outputs/authorization/failure handling and a recovery/reversal design.",
+          "Runs no import."
         ]
       }
     },
@@ -24,7 +23,7 @@
         "triggers": true,
         "assertions": [
           "Specifies per-row status, idempotency keys, resume path and reversal with audit evidence.",
-          "Reports a conflict only when the inspected evidence shows one; this prompt supplies none, so it records \"no conflict established\" rather than inventing one."
+          "No import is executed."
         ]
       }
     },
@@ -36,7 +35,7 @@
         "triggers": true,
         "assertions": [
           "Provides mapping/validation rules, dedupe policy and the audit/status evidence plan.",
-          "Defines the concrete validation/evidence step that would prove the artifact."
+          "No execution is claimed."
         ]
       }
     },
@@ -59,8 +58,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces a failure-point recovery matrix with confirm/review authorization and no execution claim.",
-          "Lists the evidence needed before the artifact can be treated as a decision."
+          "Produces a failure-point recovery matrix with confirm/review authorization.",
+          "No execution is claimed."
         ]
       }
     },
@@ -71,9 +70,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to assume facts or skip a required safety/evidence step.",
-          "States what is missing and what the authorized human owner must provide.",
-          "Does not claim to have run or implemented anything."
+          "Mirrors the export contract (request/status/download/redaction) with tenant isolation.",
+          "No execution is claimed."
         ]
       }
     }

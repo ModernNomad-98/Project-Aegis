@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "authentication-flow-reviewer",
-  "description": "Behaviour cases for authentication-flow-reviewer (6 cases, domain-specific).",
+  "description": "Behaviour cases for authentication-flow-reviewer (6 domain-specific cases).",
   "cases": [
     {
       "id": "E1",
@@ -10,9 +10,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Maps all named flows and their failure/recovery branches, checks server-side revocation, and flags at least one cross-flow gap; no live test claimed.",
-          "Does not claim an inspection or execution it did not perform.",
-          "Lists open questions and unverified items."
+          "Maps all named flows with failure/recovery branches and checks server-side revocation.",
+          "Flags a cross-flow gap; no live test claimed."
         ]
       }
     },
@@ -23,8 +22,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Covers SSO callback and account-linking conflict resolution, and states whether IdP session logout is verified or unverified.",
-          "Reports a conflict only when the inspected evidence shows one; this prompt supplies none, so it records \"no conflict established\" rather than inventing one."
+          "Covers SSO callback and account-linking conflict handling, and states whether IdP session logout is verified or unverified.",
+          "Names the account-linking resolution and audit requirement."
         ]
       }
     },
@@ -35,8 +34,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Enumerates MFA enrol/verify/recovery edge cases and names the re-authentication requirement for sensitive actions.",
-          "Defines the concrete validation/evidence step that would prove the artifact."
+          "Reviews the reset journey against login (token binding, session revocation after reset, rate limits).",
+          "States the evidence required to prove reset behaviour."
         ]
       }
     },
@@ -59,8 +58,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces a token lifecycle table with rotation/reuse detection and logout revocation evidence; marks unknowns.",
-          "Lists the evidence needed before the artifact can be treated as a decision."
+          "Enumerates MFA enrolment/verification/recovery edge cases with expected behaviour.",
+          "Names the re-authentication requirement for sensitive actions."
         ]
       }
     },
@@ -71,9 +70,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to assume facts or skip a required safety/evidence step.",
-          "States what is missing and what the authorized human owner must provide.",
-          "Does not claim to have run or implemented anything."
+          "Produces the token/session lifecycle table with rotation and reuse-detection expectations.",
+          "Checks logout revocation server-side and marks unknowns."
         ]
       }
     }

@@ -15,7 +15,7 @@ The skill is **auto-invocable and advisory/design-only**. It produces the named 
 
 ## Use When
 
-- The request is to review a web application browser/origin boundary and security-header policy as one review: inventory every mutating endpoint, form and auth callback; assess cookie attributes and SameSite posture; build the CSRF defense matrix (token, origin check, custom header, SameSite) with bypass paths; produce a header policy table with enforcement point (application vs CDN/proxy) and required values; rank findings with evidence and list what could not be verified..
+- A concrete request like: Review our web app browser boundary and security headers before we ship the new login flow.
 - The named artifact is missing, disputed or about to be built against a wrong assumption.
 - A review/spec must record the artifact, its edge cases and the boundary owners explicitly.
 - An implementation is about to start and the ask is for the artifact it must build against.

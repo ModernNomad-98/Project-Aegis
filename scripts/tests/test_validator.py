@@ -2773,8 +2773,7 @@ def test_coverage_map_batch2_deliveries():
     area02 = [line for line in mmd.splitlines()
               if line.startswith("| 02 ")]
     assert area02 and area02[0].strip().endswith("| 35 | 23 | 4 | 8 | 0 |"), (
-        "coverage summary area 02 row must show 35 entries / 23 shipped / 4 covered / 8 partial / 0 GAP"
-        "covered / 9 partial / 0 GAP")
+        "coverage summary area 02 row must show 35 entries / 23 shipped / 4 covered / 8 partial / 0 GAP")
     reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
                       / "step-0-reconciliation-v4.md").read_text(
                           encoding="utf-8")
@@ -3065,7 +3064,7 @@ def test_coverage_map_batch4_deliveries():
 
 
 def test_coverage_map_batch5_deliveries():
-    """T41: the 7 Batch 5 skills deliver 9 rows + 3 extension bundles covering five extension-only rows."""
+    """T41: the 7 Batch 5 skills deliver 9 rows + 3 extension bundles covering six extension-only rows."""
     mapping = {
         110: "browser-boundary-reviewer",
         120: "browser-boundary-reviewer",
@@ -3169,7 +3168,7 @@ def test_coverage_map_batch5_deliveries():
         assert ref in skill_md, (skill, ref)
 
 
-    # The five extension-only roadmap rows keep their status/covering set; the
+    # The six extension-only roadmap rows keep their status/covering set; the
     # three bundles (E1-E3) cover them without a coverage-map status change.
     ext = {
         231: ("PARTIAL", "capability-review", ["saas-timezone-architect"]),
@@ -3179,6 +3178,7 @@ def test_coverage_map_batch5_deliveries():
         234: ("GAP", "none", []),
         115: ("PARTIAL", "capability-review",
               ["file-upload-storage-architect", "rls-policy-auditor"]),
+        104: ("SHIPPED", "explicit-id", ["secrets-identity-hardener"]),
     }
     for row_id, (status, grade, covering) in ext.items():
         row = rows[row_id]
@@ -3193,6 +3193,14 @@ def test_coverage_map_batch5_deliveries():
                    "notification-webhook-ux-designer",
                    "export-pipeline-architect"):
         assert needle in e1, needle
+    assert "membership-invitation-designer" not in e1
+    plan_skill = (validator.REPO_ROOT / ".claude" / "skills"
+                  / "test-plan-designer" / "SKILL.md").read_text(
+                      encoding="utf-8")
+    assert "notification-webhook-ux-designer" in plan_skill
+    assert "membership-invitation-designer" not in plan_skill
+    assert "66 -> 68" in reconciliation
+    assert "Six extension-only roadmap rows" in reconciliation
     e2 = (validator.REPO_ROOT / ".claude" / "skills"
           / "file-upload-storage-architect" / "references"
           / "storage-access-policy.md").read_text(encoding="utf-8")

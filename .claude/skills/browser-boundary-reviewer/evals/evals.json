@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "browser-boundary-reviewer",
-  "description": "Behaviour cases for browser-boundary-reviewer (6 cases, domain-specific).",
+  "description": "Behaviour cases for browser-boundary-reviewer (6 domain-specific cases).",
   "cases": [
     {
       "id": "E1",
@@ -10,9 +10,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Checks cookies/SameSite, builds a CSRF defense matrix for mutating endpoints, and produces a header policy table with enforcement points; labels unverified CDN config.",
-          "Does not claim an inspection or execution it did not perform.",
-          "Lists open questions and unverified items."
+          "Checks cookies/SameSite, builds the CSRF defense matrix for mutating endpoints, and produces the header policy table with enforcement points; labels unverified CDN config.",
+          "Does not claim a live test or code change."
         ]
       }
     },
@@ -23,8 +22,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Names both enforcement points, records the conflicting header values as a finding, and does not assume the app default wins.",
-          "Reports a conflict only when the inspected evidence shows one; this prompt supplies none, so it records \"no conflict established\" rather than inventing one."
+          "Focuses on the changed cookie/CSRF surface and reports origin handling and SameSite posture with evidence.",
+          "Lists at least one concrete bypass path to verify and does not invent conflicting-header evidence."
         ]
       }
     },
@@ -35,8 +34,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Focuses the review on the changed auth/cookie surface and lists at least one concrete bypass path to verify.",
-          "Defines the concrete validation/evidence step that would prove the artifact."
+          "Enumerates mutating endpoints, forms and auth callbacks and, for each, names its CSRF defense or marks a finding.",
+          "Separates observed configuration from unverified items."
         ]
       }
     },
@@ -59,8 +58,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Enumerates mutating endpoints and, for each, names its defense or marks it a finding; does not claim to have tested a live app.",
-          "Lists the evidence needed before the artifact can be treated as a decision."
+          "Produces the header policy table with header, required value and enforcement point (app vs CDN).",
+          "Flags missing or conflicting headers as findings with evidence."
         ]
       }
     },
@@ -71,9 +70,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to assume facts or skip a required safety/evidence step.",
-          "States what is missing and what the authorized human owner must provide.",
-          "Does not claim to have run or implemented anything."
+          "Names both enforcement points and records the conflicting header values as a finding.",
+          "Does not assume the app default wins; states which value is authoritative or unverified."
         ]
       }
     }

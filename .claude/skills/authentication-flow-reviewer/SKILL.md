@@ -15,7 +15,7 @@ The skill is **auto-invocable and advisory/design-only**. It produces the named 
 
 ## Use When
 
-- The request is to review authentication as one flow set rather than isolated endpoints: inventory flows and state map, token/session lifecycle and refresh semantics, logout/revocation and re-authentication paths, MFA enrollment/recovery edge cases, SSO/federation and account-linking boundaries, denial/error/audit expectations, and review-only findings with recovery/failure test plan..
+- A concrete request like: Review our authentication as one flow set: login, logout, reset, MFA and session refresh.
 - The named artifact is missing, disputed or about to be built against a wrong assumption.
 - A review/spec must record the artifact, its edge cases and the boundary owners explicitly.
 - An implementation is about to start and the ask is for the artifact it must build against.

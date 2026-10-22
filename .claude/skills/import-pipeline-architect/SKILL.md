@@ -15,7 +15,7 @@ The skill is **auto-invocable and advisory/design-only**. It produces the named 
 
 ## Use When
 
-- The request is to design the tenant-data import pipeline as staged contracts: inspect source and target, map columns with validation, define preview/review/confirm semantics and authorization, handle partial failure with per-row recovery and reversal, dedupe/idempotency, status tracking and audit evidence, tenant isolation of imported rows, and a test plan mirroring the export pipeline..
+- A concrete request like: Design the tenant data import pipeline with inspect, map, preview, review and confirm stages.
 - The named artifact is missing, disputed or about to be built against a wrong assumption.
 - A review/spec must record the artifact, its edge cases and the boundary owners explicitly.
 - An implementation is about to start and the ask is for the artifact it must build against.

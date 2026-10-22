@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "retrieval-engineering-designer",
-  "description": "Behaviour cases for retrieval-engineering-designer (6 cases, domain-specific).",
+  "description": "Behaviour cases for retrieval-engineering-designer (6 domain-specific cases).",
   "cases": [
     {
       "id": "E1",
@@ -10,9 +10,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces a retrieval design table with trade-offs and an evaluation plan; hands authorization/leakage to rag-security-architect.",
-          "Does not claim an inspection or execution it did not perform.",
-          "Lists open questions and unverified items."
+          "Produces a retrieval design table with trade-offs and an evaluation plan.",
+          "Hands authorization/leakage to rag-security-architect."
         ]
       }
     },
@@ -23,8 +22,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines golden-set source, metrics, thresholds and a regression gate, and states no live evaluation was run.",
-          "Reports a conflict only when the inspected evidence shows one; this prompt supplies none, so it records \"no conflict established\" rather than inventing one."
+          "Defines golden-set source, metrics, thresholds and a regression gate.",
+          "States no live evaluation was run."
         ]
       }
     },
@@ -35,8 +34,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Plans golden-set construction with strata and labelling rules; does not invent evaluation results.",
-          "Defines the concrete validation/evidence step that would prove the artifact."
+          "Plans golden-set construction with strata and labelling rules.",
+          "Does not invent evaluation results."
         ]
       }
     },
@@ -59,8 +58,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Specifies fusion/reranking with metrics and a failure-mode table incl. the security handoff.",
-          "Lists the evidence needed before the artifact can be treated as a decision."
+          "Specifies fusion/reranking design with metrics and failure modes.",
+          "Records the security handoff list."
         ]
       }
     },
@@ -71,9 +70,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to assume facts or skip a required safety/evidence step.",
-          "States what is missing and what the authorized human owner must provide.",
-          "Does not claim to have run or implemented anything."
+          "Characterizes corpus and query intents before choosing components.",
+          "States unknowns and the evaluation needed to confirm choices."
         ]
       }
     }

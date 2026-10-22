@@ -15,7 +15,7 @@ The skill is **auto-invocable and advisory/design-only**. It produces the named 
 
 ## Use When
 
-- The request is to facilitate consistent defect reporting and triage: complete the bug report (repro steps, expected vs actual, environment, evidence, suspected area), rank defects by severity, frequency, customer impact, security and release risk with explicit rationale, assign one owner and next action per decision, and route security/release-risk findings; refuses invented facts and fixes..
+- A concrete request like: Turn this messy bug report into a complete report and triage it with the release team.
 - The named artifact is missing, disputed or about to be built against a wrong assumption.
 - A review/spec must record the artifact, its edge cases and the boundary owners explicitly.
 - An implementation is about to start and the ask is for the artifact it must build against.

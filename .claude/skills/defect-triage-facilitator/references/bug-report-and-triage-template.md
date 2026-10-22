@@ -8,7 +8,7 @@
 | Reproduction | ordered steps, data/role/environment | UNKNOWN if not supplied |
 | Expected vs actual | observable outcomes | UNKNOWN |
 | Environment | build/version, tenant, browser/device | UNKNOWN |
-| Evidence | logs, screenshots, trace ids | required for severity > S3 |
+| Evidence | logs, screenshots, trace ids | required for S1/S2 |
 | Suspected area | component/service if known | optional |
 | Impact | frequency, affected users/tenants | UNKNOWN if not supplied |
 

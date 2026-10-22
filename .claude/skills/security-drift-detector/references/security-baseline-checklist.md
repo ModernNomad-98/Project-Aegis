@@ -14,7 +14,7 @@
 
 | Control | Expected (baseline) | Current (evidence) | Classification | Criticality | Owner/action |
 | --- | --- | --- | --- | --- | --- |
-| Password KDF cost | Argon2id cost params recorded | <observed config/code> | SAME / REMOVED / NARROWED / DEFAULT-CHANGED / UNDOCUMENTED / EXPIRED | H/M/L | <owner + action> |
+| Password KDF cost | Argon2id cost params recorded | <observed config/code> | SAME / REMOVED / NARROWED / DEFAULT-CHANGED / UNDOCUMENTED / EXPIRED / UNOWNED | H/M/L | <owner + action> |
 | RLS tenant predicate | policy present on all tenant tables | <observed> | ... | ... | ... |
 | Auth session revocation | server-side revocation | <observed> | ... | ... | ... |
 | CI security job | SAST blocking on changed code | <observed> | ... | ... | ... |
@@ -30,6 +30,7 @@ Rules: cite evidence for both columns; never mark SAME without current evidence;
 | DEFAULT-CHANGED | framework/plan default weakened | debug mode enabled |
 | UNDOCUMENTED | change without a change record | policy edited silently |
 | EXPIRED | evidence or control past its review date | stale audit baseline |
+| UNOWNED | a control has no named owner (ownership finding, not a weakening) | rotated key with no owner; policy with no accountable team |
 
 ## 4. Completion checklist
 
