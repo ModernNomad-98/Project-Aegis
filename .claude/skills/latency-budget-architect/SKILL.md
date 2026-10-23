@@ -151,6 +151,12 @@ authorize execution.
    arithmetic closes, timeout/retry derivations, attribution design,
    and the review rule — with per-hop owners named.
 
+## Canonical retry-spend and hard-mode formulas (R8-CONV-2)
+
+Expected mode: upstream_own_expected_cost = wait_0 + SUM(k=0..R) p^k*own_attempt_work + SUM(k=1..R) p^k*wait_k; total_expected_hop_cost = upstream_own_expected_cost + SUM(k=0..R) p^k*downstream_expected_critical_path; retry_overhead = total_expected_hop_cost - (wait_0+own_attempt_work+downstream_expected_critical_path); backoff_total = SUM(k=1..R) wait_k; downstream_expected_critical_path = serial sum of expected costs + EXPECTED MAXIMUM at joins (never MAX of means).
+
+Hard mode: downstream_hard_bound = serial SUM(branch_hard_bound + retry_allowance_bound), with each parallel join taking MAX of the branch serial hard bounds; retry_allowance_bound = R_down*own_attempt_work_hard_bound + backoff_total; hard cascade: upstream_timeout > upstream_own_hard_bound + downstream_hard_bound + epsilon. Every term states its bound/percentile source (recorded_percentile); a missing bound is UNVERIFIED, not a pass; never mix expected and hard terms in one comparison.
+
 Tail-composition math, the overhead-rows checklist, timeout-cascade
 worksheet, and the budget-claim review template:
 [references/tail-math-worksheet.md](references/tail-math-worksheet.md).

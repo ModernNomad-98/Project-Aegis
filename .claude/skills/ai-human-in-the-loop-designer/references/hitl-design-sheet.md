@@ -113,3 +113,7 @@ A support assistant reads a ticket and proposes a refund.
   re-checked or expired, never committed.
 - **Audit:** every proposal and decision recorded with the fields in
   section 4.
+## Canonical class/eligibility/blast/batch rules (R8-CONV-4)
+
+Class order: FORBIDDEN first, then the AUTONOMOUS gate, else CONFIRM default; a class is never downgraded by availability. eligible_reviewer = active, unexpired, in-scope authority in the tenant, not requester/triggerer/service account. If no eligible reviewer exists at evaluation time the action is FORBIDDEN (not judgeable) with named owner escalation; an ineligible reviewer leaves it at CONFIRM pending escalation. wide_blast_radius = more than one record/user OR aggregate/batch OR cross-tenant OR unrecorded/unbounded; wide is never AUTONOMOUS; inherently FORBIDDEN => FORBIDDEN; otherwise CONFIRM only after recorded reduction to one record/user. A multi-record batch is CONFIRM only: all four conditions plus one recorded aggregate confirmation; any FORBIDDEN action makes the batch FORBIDDEN (CONFIRM batch only when no action is FORBIDDEN).
+

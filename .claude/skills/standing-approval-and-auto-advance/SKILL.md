@@ -195,16 +195,7 @@ Adoption:                     pending human approval → then recorded via scope
   the difference between standing approval and folklore.
 - **Opt-in decay:** an opt-in merge profile selected once, then treated as
   eternal. Profile selection is a register entry; standing grants must be
-  re-attested at the recorded review/attestation deadline (see
-  references/standing-approval-policy.md). The grant expiry/use limit (if any)
-  is a separate field: it bounds consumption, not re-attestation; silence
-  records no inferred expiry. The attestation deadline is the re-attestation
-  field; no recorded attestation deadline means BLOCKED. A reviewer block wins
-  for every agent-initiated action and the loop halts and waits for the human.
-
-  The canonical precedence table lives in
-  [references/standing-approval-policy.md](references/standing-approval-policy.md)
-  (one canonical copy; do not duplicate it here). Read BLOCKED > GRANDFATHERED
+Standing grant state (canonical): effective_deadline = min(recorded attestation_deadline, recorded review_deadline) when both are recorded, otherwise the sole recorded deadline; no recorded deadline means BLOCKED with a named human remediation path, never impossible. recorded_consumption_or_one_use consumed => EXPIRED (terminal; no reset by re-attestation or use; new grant required). State order: EXPIRED terminal first, then BLOCKED > GRANDFATHERED > ACTIVE > INACTIVE; INACTIVE is valid unarmed (auto-advance disabled). P2-BLOCKED ordering: classify FORBIDDEN first, then the AUTONOMOUS gate, else CONFIRM default; the standing state gate applies after class and BLOCKED/EXPIRED halt all agent-initiated action without reclassifying.
   > ACTIVE there, including the transition rules.
 - **Fatigue theater in reverse:** thinning approvals that were load-bearing.
   Instant-yes and zero-variance approvals are signals that trigger

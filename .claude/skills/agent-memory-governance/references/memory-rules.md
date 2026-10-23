@@ -34,6 +34,10 @@ the owning skill.
    "PR #10 is open"; an anchor without that evidence fails WRITE 1 and 2. An
    anchor is still a lead: its TRUST check runs before it stops any work.
 
+## Canonical memory merge-base/content checks (R8-CONV-3)
+
+Use the canonical tested script and exit contract. Exit 0 = defined result, NOT passed; a gate passes only when ancestry_status=ancestor_or_equal AND content_match_status=same AND oid_match_status=same. Exit 2 empty TARGET_PATH and exit 3 other UNVERIFIED block the gate; any differs/UNVERIFIED blocks; never infer pass from exit 0 alone. Reachability is not content proof; record command, rc and stdout statuses; missing/empty TARGET_PATH is UNVERIFIED, never no. The gating-safe interpretation is normative (no pass from exit 0 alone).
+
 ## TRUST rules (before acting on memory)
 
 Memory is a lead, not truth. Before any action premised on remembered state:

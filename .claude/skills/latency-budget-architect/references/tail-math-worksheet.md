@@ -99,3 +99,9 @@ the tracing stack's equivalent). Violation query: spans where
 answer becomes a query, not a meeting. Wiring: observability-operator.
 Pre-release: performance-test-harness asserts hop budgets where gates
 exist (budgets are its thresholds — one number vocabulary across both).
+## Canonical composition and hard-mode formulas (R8-CONV-2)
+
+Expected mode: upstream_own_expected_cost = wait_0 + SUM(k=0..R) p^k*own_attempt_work + SUM(k=1..R) p^k*wait_k; total_expected_hop_cost = upstream_own_expected_cost + SUM(k=0..R) p^k*downstream_expected_critical_path; retry_overhead = total_expected_hop_cost - (wait_0+own_attempt_work+downstream_expected_critical_path); backoff_total = SUM(k=1..R) wait_k; downstream_expected_critical_path uses the EXPECTED MAXIMUM at joins (never MAX of means); expected_maximum_at_joins is the expected-mode join term.
+
+Hard mode: downstream_hard_bound = serial SUM(branch_hard_bound + retry_allowance_bound) with joins taking MAX of branch serial hard bounds; retry_allowance_bound = R_down*own_attempt_work_hard_bound + backoff_total (R_down=0 => 0); cascade upstream_timeout > upstream_own_hard_bound + downstream_hard_bound + epsilon. Every hard term states its recorded bound/percentile source; no mixed expected/hard comparison.
+

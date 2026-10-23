@@ -79,6 +79,10 @@ first workflow step.
   `ai-misinformation-guard`. This skill designs the review of AI output
   before it becomes state, not how answers are presented.
 
+## Canonical class, reviewer, blast-radius and batch rules (R8-CONV-4)
+
+FORBIDDEN first (inherently no person, cross-tenant, irreversible or non-compensable, inherently unjudgeable, policy/risk-tier barred, or an aggregate one reviewer cannot judge); then the AUTONOMOUS gate (risk tier allowed + reversible AND compensable + exactly one record/user + watch-and-undo controls + written policy explicitly permits autonomy + eligible_reviewer can judge it); else CONFIRM default. Reviewer: eligible_reviewer = active, unexpired, in-scope authority in the tenant, not the requester/triggerer/service account; no eligible reviewer at evaluation time => FORBIDDEN (not judgeable) with named owner escalation; an ineligible reviewer keeps the action at CONFIRM pending escalation, never AUTONOMOUS. wide_blast_radius = more than one record/user OR aggregate/batch OR cross-tenant OR unrecorded/unbounded; a wide action is never AUTONOMOUS; inherently FORBIDDEN conditions => FORBIDDEN; otherwise CONFIRM only after a recorded scope reduction to exactly one record/user. A multi-record batch is CONFIRM only with all four conditions and one recorded aggregate confirmation; any FORBIDDEN action makes the whole batch FORBIDDEN.
+
 ## Inputs to Inspect
 
 1. The AI feature: what it reads, what it produces, and every write or
