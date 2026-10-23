@@ -13,7 +13,8 @@
           "Offers the one-time choice between A (standard design and build, the default) and B (explore and refine first) before any implementation.",
           "Makes clear that B adds flow comparison, an interactive prototype, an independent review and a bounded budget, without inventing time or price.",
           "Records mode, scope, instruction source, delivery endpoint, budget and offer count before iteration work begins.",
-          "Records the selection record fields including where the record will be persisted (record_location)."
+          "Records the selection record fields including where the record will be persisted (record_location).",
+          "Distinguishes concepts from mockups and uses one to four non-cosmetic concepts with the 1.2 direction-conditional mockup count."
         ]
       },
       "host_evidence": true,
@@ -285,7 +286,7 @@
         "triggers": true,
         "assertions": [
           "Declares the unspecified spacing, states and interaction items as UNKNOWNs rather than inventing them.",
-          "Asks once for the missing decisions when the rule requires them (a rule-enforcement request outside the design-entry cap) and records the answer for reuse."
+          "Asks once for each specific rule-required missing decision as an atomic question (never a bundled broad question), records the answers, and treats the rest as UNKNOWNs."
         ]
       },
       "host_evidence": false,
