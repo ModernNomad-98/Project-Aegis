@@ -60,14 +60,14 @@ of those layers, with `accessibility-test-harness` owning their criteria.
 
 ## Layer assignment quick table
 
-| Behavior | Layer | Implementer skill |
-| --- | --- | --- |
-| pure logic/validation | unit | `vitest-unit-component-engineer` |
-| service/command through the database + auth | integration | `integration-test-designer` |
-| application programming interface (API)/webhook shape & compatibility | contract | `api-contract-test-designer` |
-| critical journey in the real user interface (UI) | E2E | `playwright-e2e-engineer` |
-| visual/user experience (UX) judgment | manual | `manual-test-case-creator` + evidence plan |
-| keyboard/focus/contrast/screen reader | integration, E2E, or manual | `accessibility-test-harness` |
+| Behavior | Layer | Design owner | Execution owner |
+| --- | --- | --- | --- |
+| pure logic/validation | unit | `vitest-unit-component-engineer` | authorized repository engineer or supported runner; ONLY property test FILES are the manual-only handoff (`vitest-unit-component-engineer`) and are never auto-executed; `property-based-test-designer` designs only |
+| service/command through the database + auth | integration | `integration-test-designer` | authorized repository engineer or supported runner |
+| application programming interface (API)/webhook shape & compatibility | contract | `api-contract-test-designer` | authorized repository engineer or supported runner |
+| critical journey in the real user interface (UI) | E2E | `playwright-e2e-engineer` | authorized repository engineer or supported runner |
+| visual/user experience (UX) judgment | manual | `manual-test-case-creator` + evidence plan | a human reviewer runs the judgment step |
+| keyboard/focus/contrast/screen reader | integration, E2E, or manual | `accessibility-test-harness` | authorized repository engineer or human reviewer |
 
 ## Release-plan extras
 

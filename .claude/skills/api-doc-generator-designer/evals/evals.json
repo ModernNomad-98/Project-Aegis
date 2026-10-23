@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Generates the exhaustive reference (endpoints, types, params, responses, error catalog) from the OpenAPI spec so it can't drift.",
+          "Generates the exhaustive reference (endpoints, types, params, responses, error catalog) from the OpenAPI spec and requires source-to-implementation validation plus generated-reference alignment.",
           "Splits generated reference from hand-authored guides/quickstart/overviews, mapping to Diátaxis (reference generated; tutorials/how-to authored).",
           "Puts descriptions/examples IN the schema so they're single-sourced and regenerate.",
           "Validates examples against the schema and slots generation into the docs pipeline (docs-as-code-architect).",

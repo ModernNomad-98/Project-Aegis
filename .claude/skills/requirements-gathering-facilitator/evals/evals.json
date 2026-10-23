@@ -14,7 +14,8 @@
           "Identifies the actual users vs the requester and captures the current workaround as the honest requirement.",
           "Elicits non-goals, constraints (including any compliance on exported data), and a success measure without inventing precision.",
           "Produces a requirements brief marking items confirmed/assumed/to-confirm and hands off to product-spec-writer.",
-          "Does not jump to writing the specification or the UI design."
+          "Does not jump to writing the specification or the UI design.",
+          "Returns exactly ONE interactive question plus an explicit stop, and that single question targets the stated solution/problem (what the export should accomplish), the actual users, or the current workaround; an unrelated single question would fail."
         ]
       }
     },

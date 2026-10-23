@@ -79,7 +79,7 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 
 - A property that restates the implementation (parse exactly what print emits, with the same code path) proves nothing; the invariant must come from the domain, not the code.
 - Unbounded generators produce slow runs and unreadable failures; bound the domain and name the shrink direction.
-- Flaky randomness: a property suite that fails intermittently is a property or generator bug, not a product race to paper over; root-causing stays with `flaky-test-detective`.
+- Intermittent failures: retain the failing seed and minimal counterexample, and allow the cause to be a target bug, property bug, generator bug or invalid assumption; classify only after evidence. Root-causing stays with `flaky-test-detective`.
 - Property tests replace neither example tests nor a per-change plan; they are on-demand, specialized coverage for domain-wide invariants.
 - Writing or running the files is `vitest-unit-component-engineer`'s (manual-only); this skill designs the suite and hands it off.
 

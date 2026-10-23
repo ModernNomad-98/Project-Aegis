@@ -62,6 +62,19 @@
           "States the handoff explicitly rather than silently dropping the implementation half of the ask."
         ]
       }
+    },
+    {
+      "id": "edge-invalid-assumption-vs-target-race",
+      "type": "should_trigger",
+      "prompt": "Our property suite for the pricing invariant fails only for a rare-but-valid input shape, and it also fails when the same input reaches the target service. Classify the cause before fixing anything.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Retains the failing seed and minimal counterexample before changing anything.",
+          "Allows the cause to be a target bug, a property bug, a generator bug or an invalid assumption, and does not classify it as one of these before evidence.",
+          "Handles the rare-valid-input case explicitly and, when the same input also fails in the target system, names a target bug/behaviour (including a possible race) as one possible cause pending evidence, rather than blaming the generator or presenting a race as established."
+        ]
+      }
     }
   ]
 }

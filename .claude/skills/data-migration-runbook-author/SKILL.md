@@ -83,10 +83,17 @@ re-derives neither.
    policy, and the throttling levers that exist (batch size, sleep,
    concurrency).
 4. Backup and restore reality: what backup exists, when it last
-   succeeded, how long a restore takes at this size — restore time bounds
-   the abort options. The evidence comes from `database-backup-verifier`
-   *(manual-only)* or an equivalent restore-test record, never from a
-   "backups are enabled" setting.
+   succeeded, and the observed restore evidence. Keep three terms distinct:
+   **RTO (recovery time objective)** is the tolerable-outage objective agreed
+   with the business (the maximum acceptable service interruption), not a
+   measured restore duration; **measured restore time** is the observed time to
+   recover service from a backup in a restore test; **tolerable outage** for a
+   maintenance window is the approved maximum interruption for that operation.
+   The runbook compares the worst-case abort recovery BOUND (fresh measured
+   restore time plus margin, or an explicitly accepted worst-case bound) with
+   the maintenance window; a 4-hour RTO does not imply a 4-hour restore. The
+   evidence comes from `database-backup-verifier` *(manual-only)* or an
+   equivalent restore-test record, never from a "backups are enabled" setting.
 5. The target's identity: the named environment and the EXPECTED values of
    its read-only fingerprint (for example the database name, the host, and a
    sentinel row that exists only in that environment), taken from the plan
@@ -288,19 +295,22 @@ Execution posture: THIS DOCUMENT EXECUTES NOTHING — every step is operator-run
   state what PASS looks like) → stop and send the gap back to
   `schema-evolution-planner`; verification cannot be invented at the
   runbook layer.
-- Restore time exceeds the tolerable outage for the worst-case abort
-  (backup exists but cannot restore service within the approved outage) →
-  halt. Before asking the owner, explain "restore time" (measured time to
-  recover service from backup) and "tolerable outage" (approved maximum
-  service interruption), cite both values and their evidence, and explain
-  why this gap matters. Compare viable choices: defer the move and redesign
-  or rehearse a faster recovery path; or request a longer maintenance window
-  only if the business can tolerate it. For each, state money cost, setup
-  time, ongoing upkeep cost (or what is unknown), benefit, risk, and
-  limitation. Recommend the safest
-  viable path and why, name the fact that would change the recommendation,
-  and ask exactly one owner question; keep execution stopped until the
-  owner decides; the answer does not authorize execution.
+- The restore bound exceeds the tolerable outage for the worst-case abort
+  (backup exists but the fresh measured restore time plus margin, or the
+  explicitly accepted worst-case bound, cannot restore service within the
+  approved outage window) → halt. Before asking the owner, explain **RTO**
+  (the tolerable-outage objective, not a measured duration), **measured
+  restore time** (observed time to recover service from backup) and
+  **tolerable outage** (approved maximum service interruption for the
+  maintenance window); cite the restore bound, the window and their evidence,
+  and explain why this gap matters. Compare viable choices: defer the move and
+  redesign or rehearse a faster recovery path; or request a longer maintenance
+  window only if the business can tolerate it. For each, state money cost,
+  setup time, ongoing upkeep cost (or what is unknown), benefit, risk, and
+  limitation. Recommend the safest viable path and why, name the fact that
+  would change the recommendation, and ask exactly one owner question; keep
+  execution stopped until the owner decides; the answer does not authorize
+  execution.
 - Asked to fold the runbook's approval gates into "auto-proceed if
   checks pass" for an agent to run end-to-end → refuse; destructive
   data-move steps stay human-gated per `human-approval-boundary` and

@@ -196,9 +196,14 @@ Boundaries:    delivery contract → api-event-architect; state rendering →
   all or nothing, and most pick nothing. Granularity is what keeps the
   channel alive.
 - An unsubscribe link that "processes within 10 days" or silently keeps
-  sending is a legal and trust failure. Opt-out is immediate and
-  per-category; only genuinely transactional/security notices are exempt,
-  and they must be labeled as such.
+  sending is a failure of the immediate-opt-out product target (a trust failure).
+  Opt-out is immediate and per-category; the legal conclusion depends on
+  jurisdiction, message classification and verified obligations, so route it to
+  the owning compliance/legal check rather than assuming one universal rule;
+  where an exemption applies it is typically limited to genuinely
+  transactional/security notices, but the final determination is
+  jurisdiction/classification-specific and must be verified; do not assume a
+  universal exemption.
 - A webhook with no delivery log is a black box: the integrator's only
   debugging tool becomes a support ticket asking you to grep your logs.
   The log is the feature.

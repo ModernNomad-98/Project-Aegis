@@ -17,8 +17,7 @@ incomplete, and who produced the record.
 Make skill usage recordable, verifiable, and expected. The repository's
 delivery workflow asks every stage agent to record which skills it used;
 external users copying the skills get the same practice. A record bound to
-the manifest hash says WHICH skill (the hash pins the exact instructions
-applied), and the remaining fields say WHY, WHAT, and HOW IT WENT. This
+the manifest hash says WHICH skill (the hash pins the normalized SKILL.md bytes only; referenced instruction files are not covered), and the remaining fields say WHY, WHAT, and HOW IT WENT. This
 skill EMITS that record in conversation — it performs no write: pasting the
 block into the PR description or the user's own ledger is the user's action
 outside the skill.
@@ -37,8 +36,9 @@ outside the skill.
 ## Inputs to Inspect
 
 1. `tools/skills-manifest.json` — the current manifest: every skill name and
-   its SHA-256. The validator refuses a stale manifest, so refresh before
-   reading (`python scripts/validate-skills.py --refresh-skills-manifest`).
+   its SHA-256. Validate read-only first with `python scripts/validate-skills.py`
+   (no refresh); refresh the manifest (`--refresh-skills-manifest`) only when the user authorizes a
+   write.
 2. The task's actual skill invocations — which skills were really applied
    and what each did, not which skills merely existed.
 3. The target the record will be pasted into (a PR description, a ledger,
@@ -85,9 +85,8 @@ manifest, no hash is invented, and `incomplete` is filled honestly.
 - **Recording from memory invents hashes.** Copy the hash from the manifest
   at record time; a hash from a previous task may name a different
   `SKILL.md` after an update.
-- **Signal-catalog epoch gate (consumer contract; documented here for completeness - consumer code applies it, not the record skill).** When reading the instrumenter's signal catalog, read `activation_mode`/`correction_outcome` by event type and never read the legacy mode field. Defer to the catalog-declared epoch (do not hardcode it) and handle records in this order: current-epoch -> usable; known legacy epoch -> quarantine, map by source table, mark legacy/unmigrated before use; unknown epoch -> reject. If the catalog or epoch is unreadable/unavailable, fail closed: reject the record and do not migrate or resume from it.
-- **A stale manifest fails the validator.** Refresh before resolving names,
-  and note that any skill edit PR must carry the refreshed manifest.
+- **Signal-catalog epoch gate:** the consumer contract is owned and defined by `skill-usage-instrumenter` (its catalog/epoch rules); this ledger records and validates the read-only/hash-identity view and points at that contract rather than restating it.
+- **A stale manifest fails the validator.** Read-only validation first; if the manifest is stale, stop and ask the user to authorize a refresh - do not refresh silently. State that any skill edit PR must carry the refreshed manifest.
 - **Compliance is the user's.** This skill produces the record and the
   honesty framing; it does not enforce that the user pastes it. The record
   is an aid to verifiability, not a replacement for the user's own
@@ -97,7 +96,7 @@ manifest, no hash is invented, and `incomplete` is filled honestly.
 
 - A named skill cannot be resolved in the manifest → refuse to invent its
   hash; say which name failed and point at
-  `python scripts/validate-skills.py --refresh-skills-manifest`.
+  `python scripts/validate-skills.py` (no refresh unless the user authorizes a write; a stale manifest is never refreshed silently).
 - The ask becomes authoring someone else's closeout or usage record → stop
   and route to the owning skill (`ai-closeout-reporter` owns the closeout;
   the stage-author owns its own skills rows).

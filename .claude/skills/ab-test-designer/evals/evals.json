@@ -6,13 +6,13 @@
     {
       "id": "positive-design-powered-experiment",
       "type": "should_trigger",
-      "prompt": "We want to A/B test a new pricing page. Design the experiment.",
+      "prompt": "We want to A/B test a new pricing page. Design the experiment. Fixture: baseline conversion 20.00%, alpha = 0.05 two-sided, power = 0.80, practical MDE 1% relative, randomization unit user, fixed horizon, no peeking; planned required sample is about 628,000 users per arm and weekly eligible users are 120,000 per arm per week (240,000 total across the two arms).",
       "expect": {
         "triggers": true,
         "assertions": [
           "Writes a falsifiable, directional hypothesis tied to a decision, and picks ONE primary metric plus guardrails (e.g. revenue, refund rate).",
           "Chooses the randomization unit for independence, sticky assignment, and notes contamination risk.",
-          "Computes required sample size from a practically-meaningful minimum detectable effect and baseline/variance, and derives duration over full weekly cycles.",
+          "Reports and correctly uses the supplied planned sample (~628,000 per arm; no recomputation required) with the supplied alpha = 0.05 two-sided, power = 0.80, baseline 20.00% and 1% relative MDE, and derives duration as per-arm accrual: 628,000 users/arm / 120,000 users per arm per week = 5.23 weeks of per-arm accrual, rounded up to 6 full weekly cycles; the calculation is per arm, and no total-split alternative is required (any alternative must not be confused with the per-arm fixture).",
           "Fixes the horizon up front and forbids peeking-to-significance (or specifies a sequential method with its correction).",
           "Grounds the primary metric in funnel-definition-designer / event-schema-architect definitions."
         ]
@@ -21,14 +21,14 @@
     {
       "id": "positive-read-results-honestly",
       "type": "should_trigger",
-      "prompt": "Our test finished. Variant B is +0.4% on the primary metric with p=0.03. Should we ship it? Read the results.",
+      "prompt": "Our test finished. Read the results. Fixture: design was baseline 20.00%, alpha = 0.05 two-sided, power = 0.80, practical MDE 1% relative, planned ~628,000 users per arm over full weekly cycles, fixed horizon. Observed: control 125,600 of 628,000 conversions (20.000%), treatment 126,102 of 628,000 (20.080%); absolute lift 0.08 pp; relative lift 0.40%; observed two-sided p approximately 0.26; the 95% CI for the absolute difference is approximately -0.06 to +0.22 pp; the pre-set MDE is 1% relative (0.20 pp at the 20% baseline). The analysis must interpret the interval, not assume its conclusion. Should we ship it?",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Reports the effect with a confidence interval, not just the p-value, and contrasts statistical vs practical significance against the pre-set MDE.",
-          "Runs validity checks: sample-ratio mismatch, whether the horizon was respected, and guardrail status.",
-          "Flags a statistically-significant-but-tiny lift as possibly not practically meaningful, and asks whether +0.4% clears the bar set for a reason.",
-          "Gives a ship/kill/iterate recommendation with residual uncertainty stated rather than a bare 'it won'."
+          "Reports the effect and confidence interval from the supplied per-arm counts (recomputation not required; supplied sample/p/CI may be used) and contrasts statistical vs practical significance against the pre-set 1% relative MDE.",
+          "States the correct read: the point estimate (0.08 pp absolute / 0.40% relative) is below the pre-set 1% relative MDE (0.20 pp absolute), but the 95% CI (approximately -0.06 to +0.22 pp) includes 0 and crosses above the MDE, so the result is INCONCLUSIVE - it is not statistically significant and not a win; do not claim the CI lies below the MDE.",
+          "Does not treat the result as a win: recommends not shipping on this evidence / iterate or collect more data, with residual uncertainty stated, rather than declaring +0.4% a significant win.",
+          "Runs validity checks: sample-ratio mismatch, whether the fixed horizon was respected, and guardrail status."
         ]
       }
     },

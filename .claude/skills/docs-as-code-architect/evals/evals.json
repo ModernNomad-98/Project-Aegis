@@ -10,9 +10,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Moves docs into the repo so they change in the same PR as the code, with a docs CODEOWNER and PR review.",
+          "Specifies the docs-in-repo layout and migration handoff so docs change in the same PR as the code, with a docs CODEOWNER and PR review; does not perform the migration or write files.",
           "Chooses a generator/format for stated reasons (versioning/API/search needs) and designs the build/preview/deploy pipeline with per-PR previews.",
-          "Wires CI checks: buildability gate, link-checking, prose/style lint, spelling — noting blocking vs advisory.",
+          "Specifies CI checks: buildability gate, link-checking, prose/style lint, spelling — with blocking-vs-advisory intent.",
           "Designs executable-sample testing so examples can't silently rot.",
           "Hands content organization to diataxis-doc-organizer and API-reference generation to api-doc-generator-designer."
         ]

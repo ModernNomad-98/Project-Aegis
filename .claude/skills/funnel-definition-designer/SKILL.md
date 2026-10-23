@@ -6,7 +6,7 @@ description: Define product funnels and conversion/retention measurement rigorou
 # Funnel Definition Designer
 
 Terms: **QA** means quality assurance. An **n-day** retention window counts
-returning users within a specified number of days after the starting event.
+a user as returned on exactly day N after the starting event (exact-day, not a range).
 
 ## Purpose
 

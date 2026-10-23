@@ -43,6 +43,14 @@ intended class without printing its value.
 
 Turn this into an automated check (test or CI step) so it stays enforced.
 
+**Role and scope (defined once, before the steps):** the credential owner is the recorded authorization role for
+routine rotation; the human incident owner is the accountable role for an incident and may
+authorize emergency revocation when the credential owner is unavailable. If both are present,
+the incident owner's recorded emergency decision governs the revocation while routine rotation
+still needs the credential owner's recorded authorization. BOTH confirmed and suspected
+compromise may use the emergency path; for suspected compromise record the basis for suspicion
+and complete post-hoc verification.
+
 ## Rotation procedure
 
 1. Identify every consumer of the credential before rotating (rotation can
@@ -70,14 +78,6 @@ Turn this into an automated check (test or CI step) so it stays enforced.
    as a separate action whose scope must be covered by an applicable active
    grant or a new owner decision. Rotation restores credential secrecy; purge
    is cleanup.
-
-Role and scope definition: the credential owner is the recorded authorization role for
-routine rotation; the human incident owner is the accountable role for an incident and may
-authorize emergency revocation when the credential owner is unavailable. If both are present,
-the incident owner's recorded emergency decision governs the revocation while routine rotation
-still needs the credential owner's recorded authorization. BOTH confirmed and suspected
-compromise may use the emergency path; for suspected compromise record the basis for suspicion
-and complete post-hoc verification.
 
 ## Least-privilege service accounts
 
