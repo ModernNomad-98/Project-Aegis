@@ -7,7 +7,6 @@ description: 'Design how an artificial intelligence (AI) feature''s output becom
 
 Canonical semantics: this skill's normative rules are resolved by [docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md) (R8-CONV-4); that file is authoritative for conflicts and this skill cites it without restating it.
 
-
 **Reading key:** An artificial intelligence (AI) feature is a product
 feature whose output comes from a model, for example a drafted reply, a
 suggested tag or a proposed refund. Product state is the data the product

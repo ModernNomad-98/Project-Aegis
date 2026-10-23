@@ -8,7 +8,6 @@ disable-model-invocation: true
 
 Canonical semantics: this skill's normative rules are resolved by [docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md) (R8-CONV-1, R8-CONV-5); that file is authoritative for conflicts and this skill cites it without restating it.
 
-
 **Reading key:** a pull request (PR) proposes a branch's changes for review;
 continuous integration (CI) runs the repository's automated checks on each
 push.

@@ -7,7 +7,6 @@ description: 'Decompose an end-to-end latency target into per-hop engineering bu
 
 Canonical semantics: this skill's normative rules are resolved by [docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md) (R8-CONV-2); that file is authoritative for conflicts and this skill cites it without restating it.
 
-
 ## Purpose
 
 Every service on the path believes it is fast enough, and the user

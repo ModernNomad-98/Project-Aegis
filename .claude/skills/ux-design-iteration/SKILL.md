@@ -7,7 +7,6 @@ description: 'Run optional, bounded design iteration before implementation - pro
 
 Canonical semantics: this skill's normative rules are resolved by [docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md) (R8-UX-1..8); that file is authoritative for conflicts and this skill cites it without restating it.
 
-
 Terms: **UX** means user experience; **UI** means user interface; **A/B** means the two offered approaches (standard design/build versus
 explore-and-refine) - not a measured experiment (that is ab-test-designer);
 ship/deploy readiness is release-readiness-reviewer's, not this skill's;

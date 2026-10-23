@@ -2,7 +2,6 @@
 
 Canonical semantics: the merge-base and content-proof rules in this reference are resolved by [canonical semantics](../../../../docs/semantics/canonical-semantics.md) (R8-CONV-3); that file is authoritative for conflicts and this reference cites it without restating it.
 
-
 Follow the owning [Agent Memory Governance skill](../SKILL.md) and its
 manual-only boundary. A pull request (PR) proposes a repository change;
 personally identifiable information (PII) can identify a person. This page
