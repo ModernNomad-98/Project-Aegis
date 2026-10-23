@@ -132,16 +132,19 @@ first workflow step.
      posture every action starts in, and a valid FINAL outcome only for features
      whose AI output never becomes product state; once output can become product
      state the action is classified and cannot remain unclassified-advisory-only.
-     CONFIRM covers only single-record/one-user blast radius; any action beyond one
-     record or one user is FORBIDDEN unless a written policy defines a BOUNDED
-     multi-record CONFIRM limit (for example max N records, recorded); otherwise
+     CONFIRM covers only single-record/one-user blast radius, or an explicitly
+     BOUNDED multi-record range when a written policy records that limit (for
+     example max N records, recorded). Any UNBOUNDED multi-record action is
      FORBIDDEN. Policy silence or explicit permission without an autonomy clause
-     keeps such an action at CONFIRM; it never makes it FORBIDDEN and never makes
-     it AUTONOMOUS.
+     keeps a single-record (or explicitly bounded) action at CONFIRM; it never
+     makes an unbounded multi-record action CONFIRM (the recorded bounded-policy
+     exception is the only route), never makes a single-record action FORBIDDEN,
+     and never makes any action AUTONOMOUS.
    - **AUTONOMOUS** only when the risk tier allows it, the action is reversible
      AND compensable, blast radius is one record or one user, the watch-and-undo
      controls in step 9 exist, and written policy explicitly permits autonomy.
-   - **Reviewer ineligible:** if an eligible reviewer EXISTS but the available
+   - **Reviewer ineligible (scope: CONFIRM-class actions; AUTONOMOUS is
+     unaffected except through the judgeability gate):** if an eligible reviewer EXISTS but the available
      reviewer is the requester, the AI/service account, or otherwise ineligible,
      hold at CONFIRM and escalate to a named eligible reviewer/owner. If NO
      eligible reviewer exists at all, the action is not judgeable by a single
@@ -149,7 +152,9 @@ first workflow step.
      Never downgrade a FORBIDDEN class and never let the requester or the AI approve.
    - **Fail-safe bounds:** if the undo window or the compensation bound is not
      recorded, treat the action as non-reversible/non-compensable (FORBIDDEN)
-     until both are recorded.
+     until both are recorded. Recording both is necessary evidence, not sufficient:
+     the recorded bounds must actually satisfy the reversible/compensable
+     definitions before the action can leave FORBIDDEN.
 
 3. **Design the advisory-only mode.** Advisory-only is the pre-classification
    posture for every action and a final posture only for features whose AI

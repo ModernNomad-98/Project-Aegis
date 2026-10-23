@@ -46,11 +46,11 @@ Memory is a lead, not truth. Before any action premised on remembered state:
 
 **Completion-anchor verification (every check preserved):**
 - (a) Claimed artifacts present in the current tree (direct check).
-- (b) ANCHOR_SHA reachable from origin/main and containing the claimed artifacts: `git merge-base --is-ancestor ANCHOR_SHA origin/main` (it emits NO output: exit 0 = yes, exit 1 = no, any other/non-zero = UNVERIFIED; record the echoed result), plus a content check such as `git ls-tree -r --name-only ANCHOR_SHA -- <paths>` or `git show ANCHOR_SHA:<path>`; command errors mean UNVERIFIED, not "no".
-- (c) If a commit on origin/main reverts the anchor change set, the claim fails unless the revert was itself reverted: name ANCHOR_SHA, REVERT_SHA and RE_REVERT_SHA; check `git merge-base --is-ancestor REVERT_SHA RE_REVERT_SHA` AND `git merge-base --is-ancestor RE_REVERT_SHA origin/main`; inspect full content proofs with `git show REVERT_SHA`, `git show RE_REVERT_SHA` and `git diff REVERT_SHA RE_REVERT_SHA`, and record the outputs.
+- (b) ANCHOR_SHA reachable from origin/main and containing the claimed artifacts: `git merge-base --is-ancestor ANCHOR_SHA origin/main` (it emits NO output; exit 0 = yes, exit 1 = no, exit >=2 = UNVERIFIED; record the exit status and an echoed yes/no), plus a content check such as `git ls-tree -r --name-only ANCHOR_SHA -- <paths>` or `git show ANCHOR_SHA:<path>`; command errors mean UNVERIFIED, not "no".
+- (c) If a commit on origin/main reverts the anchor change set, the claim fails unless the revert was itself reverted: name ANCHOR_SHA, REVERT_SHA and RE_REVERT_SHA; check `git merge-base --is-ancestor REVERT_SHA origin/main` (the direct revert-not-in-main test), `git merge-base --is-ancestor RE_REVERT_SHA origin/main`, and `git merge-base --is-ancestor REVERT_SHA RE_REVERT_SHA`; all emit no output, so record each exit status (0=yes, 1=no, >=2=UNVERIFIED); inspect full content proofs with `git show REVERT_SHA`, `git show RE_REVERT_SHA` and `git diff REVERT_SHA RE_REVERT_SHA`, and record the outputs.
 - (d) Each cited migration id shown as applied by the migration tool read-only status (`migrate status` or equivalent) and recorded.
 - (e) When a PR is cited, `gh pr view <n> --json state,mergeCommit` shows merged and its mergeCommit is reachable from origin/main (`git merge-base --is-ancestor <mergeCommit> origin/main`).
-- Fetch `origin` first; use SHA-based checks, never names; record ANCHOR_SHA/REVERT_SHA/RE_REVERT_SHA and the exact command output as evidence; editing memory files stops for approval.
+- Fetch `origin` first; use SHA-based checks, never names; record ANCHOR_SHA/REVERT_SHA/RE_REVERT_SHA and each check's exit status as evidence (merge-base --is-ancestor emits no output); editing memory files stops for approval.
 
 On divergence: live state wins, act on it, queue the memory correction. If the
 divergence changes what the CURRENT task should do, route that conflict to

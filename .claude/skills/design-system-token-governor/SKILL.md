@@ -1,6 +1,6 @@
 ---
 name: design-system-token-governor
-description: 'Use when design tokens need governing: semantic tokens for color, spacing, typography, state and theme, one source of truth, naming rules, theming/dark mode and migration-drift-resistant change.'
+description: 'Use when design tokens need governing: semantic tokens for color, spacing, typography, state and theme, one source of truth, naming rules, theming/dark mode and drift-resistant migration and change governance.'
 ---
 
 # Design System Token Governor
@@ -37,7 +37,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 3. Define the single source of truth and the export/generation pipeline to CSS/JS targets.
 4. Design the theming/dark-mode contract, including per-tenant theme limits and fallback.
 5. Define change governance: who may add/rename/remove tokens, deprecation and review evidence.
-6. Plan the migration-drift-resistant change: codemods/lint rules, visual-regression baselines and staged adoption.
+6. Plan the drift-resistant migration and change governance: codemods/lint rules, visual-regression baselines and staged adoption.
 7. Return the token model, naming rules, theme contract, drift audit and migration plan; do not edit styles.
 
 ## Output Format
@@ -48,7 +48,7 @@ Return, in this order:
 2. Naming rules and component consumption policy.
 3. Single source of truth and export/generation pipeline.
 4. Theme/dark-mode contract with per-tenant limits and fallback.
-5. Change governance and migration-drift-resistant change/audit plan.
+5. Change governance and drift-resistant migration and change governance/audit plan.
 
 ## Validation Checklist
 

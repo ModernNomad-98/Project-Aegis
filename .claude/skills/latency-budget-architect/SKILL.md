@@ -134,7 +134,8 @@ authorize execution.
      high-percentile bound (for example p99); at parallel joins use the MAX of
      the branch BOUNDS (a safe upper bound), never the MAX of expected values.
      Nested retries use a conservative joint bound. R is the maximum permitted
-     retries (formulas use R only; K means R when named); if the percentile is
+     retries; K is an accepted alias for R when a source names K (formulas use R);
+     if the percentile is
      not recorded the fail-safe is the conservative bound. Epsilon is recorded
      once, never doubled.
    Independence is assumed only for p^k; nested/correlated retries record their
