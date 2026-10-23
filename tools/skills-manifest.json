@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "735de28af72f0702edc266859c2035200d8be5a5",
+  "source_revision": "b3f43d320ffa206df98f02fafd942fdc28d53ff4",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -1246,7 +1246,7 @@
     {
       "name": "vitest-unit-component-engineer",
       "path": ".claude/skills/vitest-unit-component-engineer/SKILL.md",
-      "sha256": "250d6336821a57aeb51faabb02cdb554ad0952a90960d2383860c7a6432f5913"
+      "sha256": "e28e84833838c6ddbd9683480536a8349f7b17b42af881a0735d99e63e033540"
     },
     {
       "name": "warehouse-lake-architect",
