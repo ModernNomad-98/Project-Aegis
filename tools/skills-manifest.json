@@ -1,12 +1,12 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "19696e0eeb3d88f949ac7f05eabd9444cfbc66a1",
+  "source_revision": "0c4a9caab0b25482fad9f3c75b99cdec15c9d5c7",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
       "name": "ab-test-designer",
       "path": ".claude/skills/ab-test-designer/SKILL.md",
-      "sha256": "6604b6da14a0de631250d2e9ddaf5be48af94786710ef7e80270b8083f2be160"
+      "sha256": "df334a71f42b05d1f9b987ce59c6885568b8cb80bce3b01546734805e01589db"
     },
     {
       "name": "acceptance-criteria-reviewer",
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "8e7f870224c5e6664f72325a2cbcfcc54a69ec6552094c0f5211474db8b9737e"
+      "sha256": "2dc82713162eba86401cdc6f1fff37af051e3f827d59a1a607058e6a58a4109f"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -371,7 +371,7 @@
     {
       "name": "data-migration-runbook-author",
       "path": ".claude/skills/data-migration-runbook-author/SKILL.md",
-      "sha256": "928f9559b9d6a1ed8e78011e92a003f64d3cb67df104f60307837ea151e37985"
+      "sha256": "43a2afc761d5000cf0c3ef6dd0df89d36943b8517241f5a10f5a99961e7bba41"
     },
     {
       "name": "data-partitioning-sharding-strategist",
@@ -536,7 +536,7 @@
     {
       "name": "funnel-definition-designer",
       "path": ".claude/skills/funnel-definition-designer/SKILL.md",
-      "sha256": "414c59f192300353cc2bc7f1f237816f411ef9aa1ae6ce5b5fd41a8337ec6ae7"
+      "sha256": "124518c2861ba457038bb267bfe6a53cb39e734fa860a1fbfda734bdafe065de"
     },
     {
       "name": "gated-deployment-prompt-template",
@@ -621,7 +621,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "6771589a0fb8557fdd7421407312ad61cf27ddbf60a2a5f0af735cbf8b7329cc"
+      "sha256": "0a0e85dfe44968e274a60d64c594d1fd284cadeed593bd3d26cfa4e89e4073c6"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -716,7 +716,7 @@
     {
       "name": "notification-webhook-ux-designer",
       "path": ".claude/skills/notification-webhook-ux-designer/SKILL.md",
-      "sha256": "1c5755ca4585ac3a9c84e05f7be5e4f51dfcdef3a7773b104d5787e09d14af1d"
+      "sha256": "d3f8f5a135f7c6c3e07c37f941e54dbefb14adc24a1ea025dff4a55850e8c672"
     },
     {
       "name": "observability-by-design",
@@ -826,7 +826,7 @@
     {
       "name": "property-based-test-designer",
       "path": ".claude/skills/property-based-test-designer/SKILL.md",
-      "sha256": "0c0c592598d382a576be7b21962e969041c069e1f06e19559e066bb4f0fcd9ad"
+      "sha256": "834e40a04136dec3a2de08a5f05ec4f67a98ed7ef8f04681d93435873552137c"
     },
     {
       "name": "pwa-boundary-reviewer",
@@ -1061,7 +1061,7 @@
     {
       "name": "skill-usage-ledger",
       "path": ".claude/skills/skill-usage-ledger/SKILL.md",
-      "sha256": "7ae3518932c7ca2d4ef6951241c0ace2b9b0983835010275502961ee6c6cbd05"
+      "sha256": "0fd1aea25d7835d43f0a419f8a4604dac7d4263bca0de33c936234fe3e85741b"
     },
     {
       "name": "slo-reliability-architect",
@@ -1091,7 +1091,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "3098dbac6a3065b6b8095ca6fa12a2d727ae6561cb5d91ab4520b5eec6750902"
+      "sha256": "75470a987eb95ecf78a28c3d0a6515dfe000e762dc82af65d0fa2fb05a3da587"
     },
     {
       "name": "state-machine-modeler",
@@ -1246,7 +1246,7 @@
     {
       "name": "vitest-unit-component-engineer",
       "path": ".claude/skills/vitest-unit-component-engineer/SKILL.md",
-      "sha256": "591fc3393819d27fdacf7670ed8f30c68318f21b5d2e301397e1daa6ae21ce60"
+      "sha256": "55df3089adbe9a7590c4a112fe24057a9ed57db1a968a802fb2f44810aab3b86"
     },
     {
       "name": "warehouse-lake-architect",
