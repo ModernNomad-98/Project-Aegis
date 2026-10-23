@@ -60,15 +60,23 @@ fits. A protected-file gate exception needs its own decision. An unanswered choi
 
 Grant limits come from the register entry's ACTUAL recorded expiry/use limit
 (which may be none); silence creates no expiry and never infer a default
+expiry; preserve consumption/one-use semantics as recorded. Standing grants
+must be re-attested at the review/attestation deadline recorded with the grant
+(whichever deadline is sooner when several apply). The grant expiry/use limit
+(if any) is a separate field from the attestation deadline: expiry bounds
+consumption; the attestation deadline is when re-attestation is required.
+No recorded attestation deadline means BLOCKED. A reviewer block wins for
+every agent-initiated action: halt and wait for the human.
+Canonical precedence table (EXPIRED terminal checked before this table; then
+BLOCKED > GRANDFATHERED > ACTIVE > INACTIVE):
+
 | Precedence | State | Condition | Auto-advance |
+| --- | --- | --- | --- |
 | 1 | BLOCKED | reviewer block OR effective_deadline passed OR missing/corrupt deadline OR ambiguous one-use consumption OR trigger | disabled |
 | 2 | GRANDFATHERED | valid-at-adoption AND not BLOCKED AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired | preserved only if armed at adoption |
 | 3 | ACTIVE | not blocked AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired AND armed | enabled |
 | 4 | INACTIVE | not blocked AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired AND not armed | disabled |
-EXPIRED terminal is checked before this table when recorded_expiry passed OR the grant is consumed.
-and not passed.
-
-Never infer a default expiry; the reviewer-block halt path is unchanged.
+EXPIRED terminal is checked before this table when recorded_expiry passed OR the grant is consumed. A passed/absent deadline is never a source condition for ACTIVE/GRANDFATHERED. BLOCKED -> ACTIVE only on recorded re-attestation after the block clears; GRANDFATHERED never bypasses a reviewer block; never infer a default expiry; an unarmed valid grant is INACTIVE (never auto-advances), not ACTIVE-without-auto-advance.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,
