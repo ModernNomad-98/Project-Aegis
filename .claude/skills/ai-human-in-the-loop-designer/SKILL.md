@@ -5,6 +5,9 @@ description: 'Design how an artificial intelligence (AI) feature''s output becom
 
 # AI Human-in-the-Loop Designer
 
+Canonical semantics: the rules covered by R8-CONV-4 are resolved by
+[docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md); that file is authoritative for conflicts and this skill cites the covered ID.
+
 **Reading key:** An artificial intelligence (AI) feature is a product
 feature whose output comes from a model, for example a drafted reply, a
 suggested tag or a proposed refund. Product state is the data the product

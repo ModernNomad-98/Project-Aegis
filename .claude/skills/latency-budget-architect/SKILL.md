@@ -5,6 +5,9 @@ description: 'Decompose an end-to-end latency target into per-hop engineering bu
 
 # Latency Budget Architect
 
+Canonical semantics: the rules covered by R8-CONV-2 are resolved by
+[docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md); that file is authoritative for conflicts and this skill cites the covered ID.
+
 ## Purpose
 
 Every service on the path believes it is fast enough, and the user

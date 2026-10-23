@@ -1,5 +1,8 @@
 # Memory Governance — rule sets, entry format, live checks
 
+Canonical semantics: the merge-base and content-proof rules covered by R8-CONV-3 are resolved by
+[canonical semantics](../../../../docs/semantics/canonical-semantics.md); that file is authoritative for conflicts and this reference cites the covered ID.
+
 Follow the owning [Agent Memory Governance skill](../SKILL.md) and its
 manual-only boundary. A pull request (PR) proposes a repository change;
 personally identifiable information (PII) can identify a person. This page
