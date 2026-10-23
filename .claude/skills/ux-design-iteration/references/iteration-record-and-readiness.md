@@ -144,7 +144,7 @@ user validation that did not happen.
 
 ## 5b. Proof set (PR-2) and spoken demo script
 
-Normative proof-set rules are in the SKILL (sections 1.4 and 5): the proof set is offered once after the clickthrough decision, and the SKILL owns the decline rule, allowed contents, the readiness rule and the fixtures/UAT-only requirement. This section records the shape only. Folder layout: MANIFEST.json at the proof-set root with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside. The manifest lists every file with its size and sha256 and records captured-over-expected. proof_set status is offered, declined, UNRUN or collected (collected means artifacts were written and the manifest checked); production_data_reasons lists every production-data-only cause and is non-empty only for UNRUN. demo_script is coupled to proof_set: it is skipped whenever proof_set is declined or UNRUN. The composed owner is recorded as composed_owner: screenshot-evidence-planner and the demo-script priority as last_lowest - both constants, not per-record choices.
+The proof set is offered once after the clickthrough decision (normative rules in the SKILL sections 1.4 and 5; this section is schema, folder layout and template support only). Folder layout: MANIFEST.json at the proof-set root with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside. MANIFEST.json lists every artifact with its size and sha256 and records captured-over-expected; a manifest cannot list its own hash, so MANIFEST.json itself is the one exception and files records the artifacts from MANIFEST.json excluding MANIFEST.json. captured_over_expected entries have the shape {checkpoint, expected, captured}. proof_set status is offered, declined, UNRUN or collected; declined records decline_reason with manifest_path null and files []; UNRUN records production_data_reasons with manifest_path null and files []; collected has folder_layout and manifest_path present. Checkpoint keys are lowercase kebab-case with no path separators or traversal. composed_owner: screenshot-evidence-planner and demo priority last_lowest are constants recorded in the template; the demo_script readiness coupling is normative in SKILL section 5.
 
 ## 6. Worked record template
 
@@ -170,9 +170,10 @@ Normative proof-set rules are in the SKILL (sections 1.4 and 5): the proof set i
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
     proof_set: {status: offered|declined|UNRUN|collected, decline_reason: ...|null,
-      production_data_reasons: [...], folder_layout: ..., manifest_path: ...,
-      files: [{path, size, sha256}], captured_over_expected: [...], delegated_writer: ...}
-    demo_script: {status: skipped|drafted|narrated, checkpoints: [...], notes: ...}
+      production_data_reasons: [...], folder_layout: ...|null, manifest_path: ...|null,
+      files: [{path, size, sha256}], captured_over_expected: [{checkpoint, expected, captured}],
+      delegated_writer: ..., composed_owner: screenshot-evidence-planner}
+    demo_script: {status: skipped|drafted|narrated, checkpoints: [...], notes: ..., priority: last_lowest}
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]
     retest:

@@ -351,12 +351,12 @@
     {
       "id": "E30",
       "type": "should_trigger",
-      "prompt": "The iteration is READY. I don't want a proof set - just finish.",
+      "prompt": "After implementation the reviewer offered the proof set and I declined it. The iteration is READY - just finish.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Offers the proof set once, records the decline without re-offering, respects the offer-once budget, and treats a decline as not a defect.",
-          "Does not capture proof artifacts, does not claim proof evidence, and does not change readiness for the declined proof set."
+          "Records the proof-set decision as declined after the agent offers the proof set once; does not re-offer, respects the offer-once budget, and treats the decline as not a defect.",
+          "Captures no proof artifacts, claims no proof evidence, does not change readiness for the declined proof set, and leaves readiness unchanged."
         ]
       },
       "host_evidence": false,

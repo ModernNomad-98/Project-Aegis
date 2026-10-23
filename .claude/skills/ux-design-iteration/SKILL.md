@@ -156,7 +156,7 @@ path (standard design and build remains the default).
 
 ## Design direction, mockups, UI lock and live acceptance (owner rev 2)
 
-These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup-count detail and parts of the question-cap/clickthrough lifecycle remain deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artefacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup-count detail and parts of the question-cap/clickthrough lifecycle remain deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artefacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
 
 ### 1.1 Design direction (choose one, once)
 
@@ -206,11 +206,13 @@ A pre-design enters only as a user-provided artifact; this skill does not fetch,
 
 ## 5. Proof set and spoken demo (owner rev 2)
 
-Offer the proof set once, after the clickthrough decision. Declining it is recorded and is not a defect; a decline or an impossible run never changes readiness. The skill specifies the set, folder layout and manifest but delegates writing to the host/user or the project's state owner under existing authority. Compose screenshot-evidence-planner; do not restate its policy.
+(Owner rev 2 H2 section; not a Workflow step number.)
+
+Offer the proof set once, after the clickthrough decision. Declining it is recorded and is not a defect; a decline or an impossible run never changes readiness. The skill specifies the set, folder layout and manifest but delegates writing to the host/user or the project's state owner under existing authority. Compose screenshot-evidence-planner MANUAL-ONLY: name it and stop; run capture only on an explicit yes, never automatically; do not restate its policy.
 
 A proof set may include the approved mockup (bound by sha256 and byte size), screenshots at named checkpoints, a recording of the clickthrough if it ran, and a short spoken-demo script keyed to those checkpoints (last, lowest priority; not evidence of a check). The manifest lists every file with its size and sha256 and records captured-over-expected. Folder layout: MANIFEST.json at the proof-set root, with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside it; the record names the delegated writer and the captured-over-expected differences.
 
-Use test fixtures or a UAT project only - never production data. If only production data exists, record the proof set as **UNRUN** with that reason and capture nothing. A proof set is evidence of what was observed, never a substitute for a check, and never upgrades readiness; a production-data proof set and an unrun proof set are both never a pass.
+Use test fixtures or a UAT project only - never production data. If only production data exists, record the proof set as **UNRUN** with that reason and capture nothing. A proof set is evidence of what was observed, never a substitute for a check, and never upgrades readiness; a production-data proof set and an unrun proof set are both never a pass. The manifest lists every file with its size and sha256 except MANIFEST.json itself (a file cannot contain its own hash; MANIFEST.json records every other file). proof_set status is offered, declined, UNRUN or collected: when declined, decline_reason is recorded, manifest_path is null and files is empty; when UNRUN, production_data_reasons lists the production-data-only causes (non-empty only for UNRUN), manifest_path is null and files is empty; when collected, folder_layout and manifest_path are present. demo_script is skipped whenever proof_set is declined or UNRUN. Checkpoint keys are lowercase kebab-case with no path separators and no traversal.
 
 ## Output Format
 
@@ -220,7 +222,7 @@ Return, in this order:
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
 
-   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); ui_lock (ON/OFF plus any visual-refresh override reason); and pre_design_binding (name, version, byte size, sha256) when 1c. When a proof set is offered, the record also carries proof_set (status: offered, declined, UNRUN or collected) and demo_script (status: skipped, drafted or narrated) from the reference template; the proof-set rules themselves are normative in sections 1.4 and 5.
+   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); ui_lock (ON/OFF plus any visual-refresh override reason); and pre_design_binding (name, version, byte size, sha256) when 1c.
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.
@@ -228,6 +230,10 @@ Return, in this order:
 2. **Iteration record** - brief (with UNKNOWNs), story, at least two
    non-cosmetic flows with hypotheses, prototype scope/fixtures/incompleteness,
    per-evaluation records with all eight fields, findings and dispositions.
+   After implementation, the iteration/post-implementation record also carries
+   proof_set (offered, declined, UNRUN or collected) and demo_script (skipped,
+   drafted or narrated) from the reference template; post-implementation status
+   is never part of the pre-implementation selection record (1.3).
 3. **Review record** - reviewer identity and independence, what was inspected
    or exercised, the rendered-UI check matrix with PASS/FAIL and evidence, and
    any limitations.
