@@ -19,11 +19,10 @@ summary - keep both in sync.
 | `scope` | Feature/task boundary the choice applies to. | `account settings screens: profile, notifications, save confirmation` |
 | `instruction_source` | Where the choice came from (user turn, reused record, recovered context). | `user turn 2026-10-20, step-3 prompt` |
 | `endpoint` | The delivery endpoint the iteration feeds. | `reviewed handoff to the build stage` |
-| `budget` | ONE authoritative matrix: default 2 mockups before a direction is chosen; under 1a/1c exactly 1 mockup; under 1b 2-4 mockups; hard maximum 4 concepts and 4 mockups (never exceeded). A non-default count requires a recorded reason and must stay inside the direction's range; evaluation passes are counted per mockup up to the recorded maximum and every pass counts. | `2 before direction / 1 under 1a or 1c / 2-4 under 1b / max 4 concepts + 4 mockups` |
+| `budget` | Up to three concepts and up to three independent evaluation passes by default (at least two non-cosmetic flows); any override carries a recorded reason; every pass counts. | `up to 3 concepts / up to 3 passes` |
 | `selection_offer_count` | How many times the choice was offered for this feature; at most once per feature/selection context. | `1` |
 | `record_location` | Where the returned record will be persisted (host/user or the project state owner's existing artifact). | `docs/project-state.md decision log (owner to persist)` |
 | `design_direction` | One of the three owner directions: 1a guided premium, 1b creative options, 1c follow my existing design; not-applicable only when no design direction is needed. | `1a` |
-| `mockup_budget` | Uses the `budget` matrix: before a direction is chosen the default is 2; 1a/1c exactly 1; 1b 2-4; hard maximum 4 concepts and 4 mockups; a non-default count needs a recorded reason inside the direction's range. | `2 before direction / 1 under 1c / 2-4 under 1b` |
 | `ui_lock` | UI consistency lock state: ON for an existing application or in-code design system (default, not asked); OFF for greenfield, or when the user asks for a visual refresh and the override reason is recorded. | `ON (existing app; no override)` |
 | `pre_design_binding` | For 1c: file name, version, byte size and full 64-hex sha256 of the user-provided pre-design; a truncated/absent digest marks the binding UNKNOWN (not bindable); unspecified items are UNKNOWNs. | `brand-kit.fig v4, 128,344 B, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a` |
 | `authority_conflict` | Recorded source conflict and its resolution; the in-code design system keeps authority unless the user states the pre-design supersedes it for named elements. Uses the second design-entry question slot only when a user-provided pre-design creates a conflict, within the two-question cap. | `in-code tokens win for all elements` |
@@ -61,14 +60,11 @@ and honored.
    changed or unchanged candidate independently retested before advancing; no
    manufactured change; the handoff preserves flow, content, states, visual
    direction, authority, open items, evidence, budget state and next action.
-9. **Defaults, concepts, mockups and passes** - up to four concepts and up to
-   four mockups by default (at least two non-cosmetic flows) using the
-   authoritative matrix (default 2 before a direction; 1a/1c exactly 1; 1b 2-4;
-   hard maximum 4 concepts and 4 mockups); up to three independent evaluation
-   passes by default counted per mockup up to the recorded maximum, with a
-   recorded reason for any non-default count/deeper budget; every pass counts
-   including unchanged retests; no reset on tool/agent switch, resume or rename;
-   approved design preserved; effort scaled. The limits are caps/defaults, not
+9. **Defaults, concepts and passes** - up to three concepts and up to three
+   independent passes by default (at least two non-cosmetic flows), configurable
+   with a recorded reason; every pass counts including unchanged retests; no
+   reset on tool/agent switch, resume or rename; approved design preserved;
+   effort scaled. The three-concept and three-pass limits are caps/defaults, not
    floors: a small feature may need fewer, with the reason recorded. The
    at-least-two non-cosmetic flows requirement is a minimum, not a cap.
 
@@ -104,12 +100,6 @@ A readiness declaration is **READY** only when:
   production readiness, and production work waits until the criteria pass.
 - Prototype acceptance is live and enforced before READY: transitions named by the story are exercisable; state carries across steps with derived content and real counts; every named non-happy state (empty, invalid, permission-denied/viewer, loading, error, recovery) shows how the user continues; the artifact is fixtures-only with no backend/network/repo change; it is responsive at the declared viewports and keyboard-operable with visible focus. A static image, non-interactive comp or frame sequence whose transitions cannot be exercised is NOT READY with the unexercisable transitions named.
 - UI-lock inventory diff: when ui_lock is ON, every component/token/colour/type size/icon/motion in the mockup maps to an existing project element (compose frontend-architecture-mapper and design-system-token-governor); any unmapped element is a finding; an unapproved unmapped element is NOT READY with the element named; a genuinely needed new element is a PROPOSED UI ADDITION routed as a separate design-system-owner decision, never an approved mockup element.
-- Design-entry question discipline: at most TWO design-entry questions total (the direction/mockup choice only when context does not settle it, and the authority-conflict/pre-design resolution only when a user-provided pre-design creates one); each is one atomic question, the count/order is recorded, and context inferences are recorded instead of asked.
-- Direction/mockup matrix: the mockup count matches the chosen direction (1a/1c exactly one; 1b 2-4; before direction default 2), never above the hard maximum of 4 concepts and 4 mockups, with any non-default reason recorded.
-- Guided-premium heuristics: under 1a the HARD checks (exactly one primary action per screen; one dominant element per view) and the reviewer-checkable checks (token-scale-only spacing/type; at most one accent plus neutrals; system-native patterns; motion only on state change that it explains) are all recorded - the latter as findings, or as residuals when UI lock prevents meeting them.
-- Clickthrough status: post-implementation clickthrough_offer_decision is one of pending/offered/declined/not-applicable/ran-or-UNRUN; declined/not-applicable/UNRUN names the unobservable state-hydration/transition defect classes, readiness is unchanged, and it is never a pass.
-- Pre-design: bound by file name, version, byte size and full 64-hex sha256 (truncated/absent digest = UNKNOWN, not bindable); unspecified items are UNKNOWNs and an authority conflict is recorded rather than guessed.
-- Retro classification: every failure is classified as stale assertion, product bug or wrong metric before fixing; out-of-scope defects are named residuals; the approved mockup sha256/byte-size binding and committed-copy match are recorded.
 
 The iteration itself needs **no per-round owner approval**; present the reviewed
 prototype on request; after readiness, full delivery continues only under
@@ -122,11 +112,7 @@ budget yourself.
 
 ## 3a. Clickthrough status (post-implementation only)
 
-The clickthrough offer happens only after implementation, never in the pre-implementation selection record. One canonical status object is recorded then:
-
-| Field | Meaning | Example |
-| --- | --- | --- |
-| `clickthrough_offer_decision` | Post-implementation status: `pending` (not yet offered), `offered`, `declined`, `not-applicable`, or `ran-or-UNRUN` when offered and run or the run was impossible. A decline/not-applicable/UNRUN names the unobservable state-hydration/transition defect classes and never changes readiness to PASS. | `declined; UNRUN (state hydration/transition)` |
+One post-implementation status is recorded: `clickthrough_offer_decision` = offered, declined or UNRUN; a decline/UNRUN names the unobservable state-hydration/transition defect classes and never changes readiness to PASS. It is not part of the pre-implementation selection record.
 
 ## 4. Budget ledger and invalidation
 
@@ -155,12 +141,12 @@ user validation that did not happen.
 
 - When a check fails, classify it as a stale assertion, a product bug, or a wrong metric BEFORE fixing it; record the classification in the record.
 - A defect outside the surface under change is a named residual; never fix it by loosening a test or lowering a threshold.
-- The approved mockup is bound by sha256 and byte size; the implementation record states that the committed copy matches that binding.
+- The approved mockup is bound by sha256 and byte size when the host provides it; the skill writes nothing.
 
 ## 6. Worked record template
 
     feature: <feature/task scope>
-    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, mockup_budget: ..., ui_lock: ON|OFF, pre_design_binding: {...}|null, authority_conflict: ..., design_entry_questions: [...], instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
+    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, ui_lock: ON|OFF, pre_design_binding: {...}|null, authority_conflict: ..., instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
     brief:
       evidence: [<source, observation>]
       problem_job: ...
@@ -180,7 +166,7 @@ user validation that did not happen.
     ui_lock_inventory_diff: [{element: ..., mapped_to: ...}]
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
-    clickthrough: {clickthrough_offer_decision: pending|offered|declined|not-applicable|ran-or-UNRUN, unrun_reason: ...}
+    clickthrough: {clickthrough_offer_decision: offered|declined|UNRUN, unrun_reason: ...}
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]
     retest:
