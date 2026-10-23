@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "9177a9a975b5d3ccd74ad648fd97da8b6fa0629d",
+  "source_revision": "a12b7ed5527c49c1c9e1b480614b7eb745dd6e98",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "ca10146128557666ff6e9e8b4f1a246687ae4a10b0097c3b8e1b50b301278c1d"
+      "sha256": "173414914ca13ee59334a40f11f2463279cb2b39bf138f682e4bcf253d31d028"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -621,7 +621,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "e656035c9e715818664850e32adef185ff92baf5ff2d66d4cd675a0cb6ee5cd9"
+      "sha256": "20d709512e3e9b08acf5bd09a644f3206ecb82ae239e5aeb708ab6ae2f370d88"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -1091,7 +1091,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "3849642cc378c0b17b4d7ff87eb1103e5fd500dd1bb117a976de2c3d6c333771"
+      "sha256": "6ae18911bd1b1cb3040732aebc2147c428c355a803fc0f45ba22bff44634aa79"
     },
     {
       "name": "state-machine-modeler",
