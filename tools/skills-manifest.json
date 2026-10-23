@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "00a4d26e3267400b621481b7a468e90289d01119",
+  "source_revision": "3e2ea6379b6f11c4cd7e013ef4a7744cb09394df",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -621,7 +621,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "2ea655f36f3c57b0797e18c7173a56e12c6058ff3a5e8a0ca0325b31d651cccf"
+      "sha256": "942f678747d7b0db3c9d0201f76a83df32fedaa8a2c4a88400de844286e19626"
     },
     {
       "name": "layered-architecture-enforcer",
