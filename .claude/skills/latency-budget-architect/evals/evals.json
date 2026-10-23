@@ -65,7 +65,7 @@
           "Uses upstream_own_hard_bound + downstream_hard_bound + epsilon, epsilon recorded once.",
           "Computes retry_allowance_bound = 2*20 + 30 = 70ms and downstream_hard_bound = 100 + 70 = 170ms, so upstream_timeout > 290ms + epsilon.",
           "Uses MAX of branch BOUNDS at parallel joins, never an expected maximum or MAX of means in hard mode.",
-          "States every hard term's bound/percentile source; a missing bound is UNVERIFIED, not a pass."
+          "States every hard term's recorded bound/percentile source (recorded_percentile); a missing bound is UNVERIFIED, not a pass."
         ]
       }
     },
