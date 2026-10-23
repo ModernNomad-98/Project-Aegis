@@ -2,7 +2,12 @@
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "latency-budget-architect",
   "description": "Behavior cases for latency budgeting: closing arithmetic with overhead rows, honest tail math on fan-out, budget-derived timeouts/retries, the budget-claim review rule, and the refuse-to-invent-the-SLO case.",
-  "canonical_semantics": {"path": "docs/semantics/canonical-semantics.md", "covers": ["R8-CONV-2"]},
+  "canonical_semantics": {
+    "path": "docs/semantics/canonical-semantics.md",
+    "covers": [
+      "R8-CONV-2"
+    ]
+  },
   "cases": [
     {
       "id": "positive-decompose-journey-target",
@@ -16,7 +21,8 @@
           "Defines own work and downstream critical-path budget; runs the ONE cascade rule: upstream timeout > own work + downstream critical-path budget + recorded epsilon (all ms; epsilon recorded once; critical path = serial + longest parallel branch; initial attempt, retry attempt time and backoff_total included).",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
           "Installs the budget-claim review rule for new dependencies on the path.",
-          "Retry spend counts the downstream critical-path cost, not only the hop's own work."
+          "Retry spend counts the downstream critical-path cost, not only the hop's own work.",
+          "total_expected_hop_cost, retry_overhead, backoff_total, upstream_own_expected_cost and downstream_expected_critical_path are named explicitly."
         ]
       }
     },
@@ -46,6 +52,44 @@
           "Budgets branches at a stricter percentile than the end-to-end promise (p99.5-class), or funds hedging from headroom, or recommends narrowing the fan-out — with the tradeoffs stated.",
           "Shows that parallel composition takes the max of branches, so the slowest branch owns the join's budget.",
           "Anchors the fix in the budget table rather than telling individual services to 'be faster'."
+        ]
+      }
+    },
+    {
+      "id": "edge-hard-mode-downstream-retry",
+      "type": "should_trigger",
+      "prompt": "Design the hard-timeout bound: upstream_own_hard_bound=120ms, one downstream hop branch_hard_bound=100ms, own_attempt_work_hard_bound=20ms, R_down=2, backoff_total=30ms, one join branch. What must upstream_timeout exceed?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses upstream_own_hard_bound + downstream_hard_bound + epsilon, epsilon recorded once.",
+          "Computes retry_allowance_bound = 2*20 + 30 = 70ms using downstream_own_attempt_work_hard_bound=20ms and downstream_backoff_total=30ms, and downstream_hard_bound = 100 + 70 = 170ms, so upstream_timeout > 290ms + epsilon.",
+          "Uses MAX of branch BOUNDS at parallel joins, never an expected maximum or MAX of means in hard mode.",
+          "States every hard term's recorded bound/percentile source (recorded_percentile); retry allowance is per-hop and no additional repeated downstream execution is claimed beyond it; a missing bound is UNVERIFIED, not a pass."
+        ]
+      }
+    },
+    {
+      "id": "edge-hard-mode-no-downstream-retry",
+      "type": "should_trigger",
+      "prompt": "Hard mode: R_down=0 downstream, one downstream hop branch_hard_bound=100ms, upstream_own_hard_bound=120ms. What is retry_allowance_bound and downstream_hard_bound?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Sets retry_allowance_bound = 0 exactly when R_down = 0; no upstream backoff_total is charged to a hop with no downstream retry.",
+          "Computes downstream_hard_bound = 100ms and the hard cascade threshold 220ms + epsilon, with every term's bound source stated."
+        ]
+      }
+    },
+    {
+      "id": "edge-hard-mode-no-downstream-retry-with-upstream-retries",
+      "type": "should_trigger",
+      "prompt": "Hard mode: downstream R_down=0 but upstream R=3; must upstream retries increase the downstream hard bound?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps retry_allowance_bound = 0 when R_down = 0 even when upstream R>0; upstream retries do not create downstream retry allowance.",
+          "Uses downstream_own_attempt_work_hard_bound and downstream_backoff_total only for R_down>0; states the variables and bound sources explicitly."
         ]
       }
     },

@@ -151,6 +151,14 @@ authorize execution.
    arithmetic closes, timeout/retry derivations, attribution design,
    and the review rule — with per-hop owners named.
 
+## Canonical retry-spend and hard-mode formulas (R8-CONV-2)
+
+Definitions: p in [0,1] recorded retry probability; R >= 0 integer retry cap; wait_0 = pre-first-attempt queue/dispatch wait counted once; wait_k = inter-attempt wait before retry k (k=1..R); own_attempt_work = per-attempt own processing/serialization work excluding queue wait; epsilon = recorded one-time safety margin (ms); recorded_percentile = recorded percentile source for hard-mode bounds; R_down_i >= 0 per-hop downstream retry cap; downstream_own_attempt_work_hard_bound_i = one downstream re-execution's hard own-work bound for hop i; downstream_backoff_total_i = recorded downstream retry-wait schedule sum for hop i; branch_hard_bound_i = hard bound EXCLUDING retry allowance (no double count); downstream retry allowance is per hop as defined; no additional repeated-execution claim is made; all values ms unless stated.
+
+Expected mode: upstream_own_expected_cost = wait_0 + SUM(k=0..R) p^k*own_attempt_work + SUM(k=1..R) p^k*wait_k; total_expected_hop_cost = upstream_own_expected_cost + SUM(k=0..R) p^k*downstream_expected_critical_path; retry_overhead = total_expected_hop_cost - (wait_0+own_attempt_work+downstream_expected_critical_path); backoff_total = SUM(k=1..R) wait_k; downstream_expected_critical_path = serial sum of expected costs + EXPECTED MAXIMUM at joins (expected_maximum_at_joins, never MAX of means).
+
+Hard mode: downstream_hard_bound = serial SUM(branch_hard_bound + retry_allowance_bound), with each parallel join taking MAX of the branch serial hard bounds; retry_allowance_bound = R_down*downstream_own_attempt_work_hard_bound + (R_down>0 ? downstream_backoff_total : 0) (R_down=0 => 0; upstream backoff_total is never charged to a no-retry hop); hard cascade: upstream_timeout > upstream_own_hard_bound + downstream_hard_bound + epsilon. Every term states its bound/percentile source (recorded_percentile); a missing bound is UNVERIFIED, not a pass; never mix expected and hard terms in one comparison.
+
 Tail-composition math, the overhead-rows checklist, timeout-cascade
 worksheet, and the budget-claim review template:
 [references/tail-math-worksheet.md](references/tail-math-worksheet.md).

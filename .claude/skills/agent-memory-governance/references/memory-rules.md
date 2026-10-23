@@ -34,6 +34,10 @@ the owning skill.
    "PR #10 is open"; an anchor without that evidence fails WRITE 1 and 2. An
    anchor is still a lead: its TRUST check runs before it stops any work.
 
+## Canonical memory merge-base/content checks (R8-CONV-3)
+
+Canonical check invocation (no new repo file): run the R8-CONV-3 wrapper as TARGET_PATH=<repo-relative path> BASE=<sha> HEAD=<sha> sh -c '<canonical wrapper body from docs/semantics/canonical-semantics.md section 3>'. The wrapper emits ancestry_status/content_match_status/oid_match_status and exit codes: 0 = completed/defined (NOT passed), 2 = empty TARGET_PATH UNVERIFIED, 3 = any UNVERIFIED. Exact command-to-status mapping: merge-base rc0=ancestor_or_equal, rc1=not_ancestor, rc>=2=UNVERIFIED; content diff rc0=same, rc1=differs, rc>=2=UNVERIFIED (with GIT_LITERAL_PATHSPECS=1 and --no-textconv --no-ext-diff); blob-OID equal=same, different=differs, error/absent=UNVERIFIED. A gate passes only when ancestry_status=ancestor_or_equal AND content_match_status=same AND oid_match_status=same; raw git diff exit 0 is only same, and wrapper exit 0 is completed-only, never a pass. Exit 0 = defined result, NOT passed; a gate passes only when ancestry_status=ancestor_or_equal AND content_match_status=same AND oid_match_status=same. Exit 2 empty TARGET_PATH and exit 3 other UNVERIFIED block the gate; any differs/UNVERIFIED blocks; never infer pass from exit 0 alone. Reachability is not content proof; record command, rc and stdout statuses; missing/empty TARGET_PATH is UNVERIFIED, never no. The gating-safe interpretation is normative (no pass from exit 0 alone).
+
 ## TRUST rules (before acting on memory)
 
 Memory is a lead, not truth. Before any action premised on remembered state:

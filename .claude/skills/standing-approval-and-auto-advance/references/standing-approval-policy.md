@@ -65,23 +65,18 @@ must be re-attested at the review/attestation deadline recorded with the grant
 (whichever deadline is sooner when several apply). The grant expiry/use limit
 (if any) is a separate field from the attestation deadline: expiry bounds
 consumption; the attestation deadline is when re-attestation is required.
-Silence records no inferred expiry; no recorded attestation deadline means
-BLOCKED. A reviewer block wins for every agent-initiated action: halt and wait
-for the human.
-Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
+No recorded effective_deadline (neither attestation_deadline nor review_deadline recorded) means BLOCKED. A reviewer block wins for
+every agent-initiated action: halt and wait for the human.
+Canonical precedence table (EXPIRED terminal checked before this table; then
+BLOCKED > GRANDFATHERED > ACTIVE > INACTIVE):
 
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
-| 1 | BLOCKED | reviewer block OR attestation deadline passed OR no recorded deadline OR transition trigger fired | disabled |
-| 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
-| 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
-BLOCKED > GRANDFATHERED > ACTIVE (first matching row wins). BLOCKED -> ACTIVE
-only on recorded re-attestation after the block clears; GRANDFATHERED never
-bypasses a reviewer block; never infer a default expiry. No recorded deadline
-means BLOCKED; GRANDFATHERED therefore only applies when a deadline is recorded
-and not passed.
-
-Never infer a default expiry; the reviewer-block halt path is unchanged.
+| 1 | BLOCKED | reviewer block OR no reviewer_candidate exists OR effective_deadline passed/missing/corrupt OR recorded_expiry_or_use_limit absent/corrupt OR ambiguous or unrecorded one-use consumption OR malformed/missing armed or grandfathered flag (fail-safe) OR trigger | disabled |
+| 2 | GRANDFATHERED | grandfathered=true AND not BLOCKED AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired | disabled - only ACTIVE auto-advances |
+| 3 | ACTIVE | grandfathered=false AND not blocked AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired AND armed=true | enabled |
+| 4 | INACTIVE | grandfathered=false AND not blocked AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired AND armed=false | disabled |
+EXPIRED terminal is checked before this table when recorded_expiry_or_use_limit passed OR the grant is consumed. A passed/absent deadline is never a source condition for ACTIVE/GRANDFATHERED. BLOCKED -> ACTIVE only on recorded re-attestation after the block clears; GRANDFATHERED never bypasses a reviewer block; never infer a default expiry; an unarmed valid grant with grandfathered=false is INACTIVE (never auto-advances), not ACTIVE-without-auto-advance; a GRANDFATHERED grant remains GRANDFATHERED (armed or not) under its row.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,
