@@ -222,6 +222,76 @@
       "evidence_pointer": null
     },
     {
+      "id": "E15",
+      "type": "should_trigger",
+      "prompt": "Under guided premium, give me two different mockups of the checkout flow.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Permits exactly one mockup under guided premium (1a); refuses the second with the reason recorded.",
+          "Does not silently ignore the mockup-count rule."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E16",
+      "type": "should_trigger",
+      "prompt": "Under creative options, prototype one mockup for the onboarding redesign.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Requires at least two mockups under creative options (1b), each representing a distinct non-cosmetic concept or direction, and asks for the second rather than accepting one.",
+          "Keeps the two concepts/directions non-cosmetic and exercisable."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E17",
+      "type": "should_trigger",
+      "prompt": "I want six mockups for the dashboard alternatives.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Enforces the four-mockup hard maximum and refuses the requested six; no recorded reason may exceed four; does not silently accept six or reset the evaluation-pass ledger.",
+          "Does not treat a recorded reason as permission above four or convert it into a fifth or sixth mockup; the mockup count stays separate from the evaluation-pass ledger and no pass is reset."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E18",
+      "type": "should_trigger",
+      "prompt": "Here is our complete brand pre-design: brand-kit.fig v4, 128,344 bytes, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a; follow my existing design.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Binds the pre-design by file name, version, byte size and sha256 and uses it under 1c.",
+          "Invents no token, spacing, state or interaction the pre-design does not specify."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E19",
+      "type": "should_trigger",
+      "prompt": "Here is our pre-design, but it only has colours and no spacing, states or interaction details.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declares the unspecified spacing, states and interaction items as UNKNOWNs rather than inventing them.",
+          "Asks once for the missing decisions when the rule requires them (a rule-enforcement request outside the design-entry cap) and records the answer for reuse."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
       "id": "E20",
       "type": "should_trigger",
       "prompt": "The pre-design says rounded cards, but our in-code design system uses square cards everywhere.",
@@ -287,6 +357,20 @@
         "assertions": [
           "Records the clickthrough decision; a decline or impossible run is a named UNRUN with the unobservable state-hydration and transition defect classes.",
           "Leaves readiness unchanged and claims no pass; does not invoke the MANUAL-ONLY skill silently."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E25",
+      "type": "should_trigger",
+      "prompt": "Under guided premium, the dashboard mockup has two primary buttons per screen.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records a finding against the exactly-one-primary-action heuristic in SKILL 1.1(a) and, under UI lock, records it as a residual if the existing UI cannot meet it.",
+          "Does not declare READY while the conflict is unrecorded."
         ]
       },
       "host_evidence": false,
@@ -371,90 +455,6 @@
         "assertions": [
           "Refuses production data for the proof set and records the proof set as UNRUN with the production-data-only reason; captures nothing.",
           "Does not substitute production evidence for a check, does not upgrade readiness, and keeps the fixtures/UAT-only requirement."
-        ]
-      },
-      "host_evidence": false,
-      "evidence_pointer": null
-    },
-    {
-      "id": "E15",
-      "type": "should_trigger",
-      "prompt": "Under guided premium, give me two different mockups of the checkout flow.",
-      "expect": {
-        "triggers": true,
-        "assertions": [
-          "Permits exactly one mockup under guided premium (1a); refuses the second with the reason recorded.",
-          "Does not silently ignore the mockup-count rule."
-        ]
-      },
-      "host_evidence": false,
-      "evidence_pointer": null
-    },
-    {
-      "id": "E16",
-      "type": "should_trigger",
-      "prompt": "Under creative options, prototype one mockup for the onboarding redesign.",
-      "expect": {
-        "triggers": true,
-        "assertions": [
-          "Requires at least two mockups under creative options (1b), each representing a distinct non-cosmetic concept or direction, and asks for the second rather than accepting one.",
-          "Keeps the two concepts/directions non-cosmetic and exercisable."
-        ]
-      },
-      "host_evidence": false,
-      "evidence_pointer": null
-    },
-    {
-      "id": "E17",
-      "type": "should_trigger",
-      "prompt": "I want six mockups for the dashboard alternatives.",
-      "expect": {
-        "triggers": true,
-        "assertions": [
-          "Enforces the four-mockup hard maximum and refuses the requested six; no recorded reason may exceed four; does not silently accept six or reset the evaluation-pass ledger.",
-          "Does not treat a recorded reason as permission above four or convert it into a fifth or sixth mockup."
-        ]
-      },
-      "host_evidence": false,
-      "evidence_pointer": null
-    },
-    {
-      "id": "E18",
-      "type": "should_trigger",
-      "prompt": "Here is our complete brand pre-design: brand-kit.fig v4, 128,344 bytes, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a; follow my existing design.",
-      "expect": {
-        "triggers": true,
-        "assertions": [
-          "Binds the pre-design by file name, version, byte size and sha256 and uses it under 1c.",
-          "Invents no token, spacing, state or interaction the pre-design does not specify."
-        ]
-      },
-      "host_evidence": false,
-      "evidence_pointer": null
-    },
-    {
-      "id": "E19",
-      "type": "should_trigger",
-      "prompt": "Here is our pre-design, but it only has colours and no spacing, states or interaction details.",
-      "expect": {
-        "triggers": true,
-        "assertions": [
-          "Declares the unspecified spacing, states and interaction items as UNKNOWNs rather than inventing them.",
-          "Asks once for the missing decisions when the rule requires them (a rule-enforcement request outside the design-entry cap) and records the answer for reuse."
-        ]
-      },
-      "host_evidence": false,
-      "evidence_pointer": null
-    },
-    {
-      "id": "E25",
-      "type": "should_trigger",
-      "prompt": "Under guided premium, the dashboard mockup has two primary buttons per screen.",
-      "expect": {
-        "triggers": true,
-        "assertions": [
-          "Records a finding against the exactly-one-primary-action heuristic and, under UI lock, records it as a residual if the existing UI cannot meet it.",
-          "Does not declare READY while the conflict is unrecorded."
         ]
       },
       "host_evidence": false,

@@ -93,7 +93,7 @@ path (standard design and build remains the default).
    route it through change-classification-gate and docs/paths/design-and-build-ui.md
    and do not offer iteration.
 
-   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (section 5). Never ask a third design-entry question: if a decision is still unsettled, record it as an open item or UNKNOWN for later instead of asking. The cap excludes the post-implementation clickthrough question (1.3) and proof-set question (section 5). The cap covers design-entry choices only: later rule-enforcement requests for a missing fact, artifact or consent (for example the required second mockup under 1b, or missing pre-design details) are not design-entry questions and may be asked when their rule requires them.
+   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (section 5). Never ask a third design-entry question: if a decision is still unsettled, record it as an open item or UNKNOWN for later instead of asking. The cap excludes the post-implementation clickthrough question (1.3) and proof-set question (section 5). The cap covers design-entry choices only: later rule-enforcement requests for a missing fact, artifact or consent (for example the required second mockup under 1b, or missing pre-design details) are not design-entry questions and may be asked when their rule requires them. Each entry question is atomic (one decision); if the direction is still UNKNOWN after the cap, record it as an open item/UNKNOWN, never fabricate it, and do not claim readiness for work that depends on mockups until the direction is known.
 
 2. **Decide the mode; return the record.** Return the exact selection record
    (mode, feature/task scope, instruction source, delivery endpoint, iteration
@@ -158,7 +158,7 @@ path (standard design and build remains the default).
 
 ## Design direction, mockups, UI lock and live acceptance (owner rev 2)
 
-These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup count, the two-question entry cap (normative sentence in Workflow step 1) and the six tracked fields (five pre-implementation plus the post-implementation clickthrough status) are specified below; the remaining clickthrough-lifecycle detail outside the explicit two-question cap and E30 stay deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup count (concepts/mockups) and the two-question entry cap (normative sentence in Workflow step 1) and the five pre-implementation fields are specified below; the clickthrough schema field (the sixth tracked field) and E30 are deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
 
 ### 1.1 Design direction (choose one, once)
 
@@ -170,7 +170,7 @@ All three reuse the project's in-code design system and tokens as the authority 
 
 ### 1.2 Mockup count (1-4)
 
-Concepts are non-cosmetic candidate flows; mockups are exercisable artifacts of a chosen flow or direction. The budget default is up to four concepts and up to four mockups, configurable only with a recorded reason. Direction rules override the default: under guided premium (1a) and follow-my-existing-design (1c) exactly one mockup is permitted - one, never a second; under creative options (1b) at least two mockups are required, each representing a distinct non-cosmetic concept or direction. Four is the hard maximum and is never exceeded; cosmetic variants never count as concepts or mockups. A recorded reason may reduce counts within the direction's allowed range but may never contradict the direction rules or exceed four. Every evaluation pass still counts.
+Concepts are non-cosmetic candidate flows; mockups are exercisable artifacts of a chosen concept or direction; a prototype is the exercisable artifact used for acceptance/review of a chosen concept and may be the same artifact as a mockup - multiple prototypes of one concept do not count as multiple mockups. Concepts and mockups each have a hard maximum of four. Four is the hard maximum and is never exceeded; defaults are up to four concepts and up to four mockups, configurable only with a recorded reason. At least one concept is required whenever the iteration runs; zero concepts only when iteration is not-applicable/justified N/A with a recorded reason. Direction rules override the defaults: under guided premium (1a) and follow-my-existing-design (1c) exactly one mockup is permitted - one, never a second; under creative options (1b) at least two mockups are required, each for a distinct non-cosmetic concept or direction. A recorded reason may reduce counts within the direction's allowed range but never below a direction minimum, never above four, and never contrary to the direction rules. cosmetic variants never count as concepts or mockups. Every evaluation pass still counts.
 
 ### 1.3 Final clickthrough (offered, never required)
 
@@ -182,7 +182,7 @@ After implementation and the clickthrough decision, offer the proof set once (sp
 
 ### 1.5 UI consistency lock (default by context, not a question)
 
-Redesign the experience, keep the interface. UX (flow, step order, information architecture, what appears when, interaction within the existing component vocabulary, copy, state handling) may be redesigned. UI (components, tokens, colours, type scale, spacing scale, iconography, motion patterns, visual language) stays consistent with what is already in place. Default ON for an existing application or an in-code design system; OFF for greenfield. Do not ask it as a question: the user turns it off by asking for a visual refresh, and that override is recorded.
+Redesign the experience, keep the interface. UX (flow, step order, information architecture, what appears when, interaction within the existing component vocabulary, copy, state handling) may be redesigned. UI (components, tokens, colours, type scale, spacing scale, iconography, motion patterns, visual language) stays consistent with what is already in place. Default ON for an existing application or an in-code design system; OFF for greenfield. Do not ask it as a question: the user turns it off by asking for a visual refresh, and that override is recorded. An element/design conflict is recorded in authority_conflict (1c/3).
 
 Permitted under the lock: new screens, steps, dialogs, sheets and layouts composed only from existing components and tokens; new copy; new states built from existing patterns. Not permitted: a new component not in the library; a new token, colour, type size or spacing value; new iconography; a new motion pattern. A genuinely needed new element becomes a **PROPOSED UI ADDITION** with a justification routed to the design-system owner as a separate decision; it does not enter the mockup as approved.
 
@@ -202,7 +202,7 @@ TEETH: a static image or non-interactive comp whose named transitions cannot be 
 
 ### 3. Pre-design (1c)
 
-A pre-design enters only as a user-provided artifact; this skill does not fetch, open URLs or launch a browser. Bind it by file name, version, byte size and sha256. Unspecified items are declared UNKNOWNs - never invent a token, spacing, state or interaction. An authority conflict is recorded, not guessed: the in-code design system keeps authority per docs/paths/design-and-build-ui.md unless the user states the pre-design supersedes it for named elements. Ask once, record the answer, and reuse it without re-asking.
+A pre-design enters only as a user-provided artifact; this skill does not fetch, open URLs or launch a browser. Bind it by file name, version, byte size and sha256. Unspecified items are declared UNKNOWNs - never invent a token, spacing, state or interaction. An authority conflict is recorded, not guessed: the in-code design system keeps authority per docs/paths/design-and-build-ui.md unless the user states the pre-design supersedes it for named elements. Ask once, record the answer in the authority_conflict field (Output Format item 1), and reuse it without re-asking.
 
 ### 4. Retro rules
 
@@ -228,7 +228,7 @@ Return, in this order:
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
 
-   The selection record also carries the five pre-implementation fields: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (up to four concepts and up to four mockups by default; direction rules override: 1a/1c exactly one mockup, never a second; 1b at least two mockups, each a distinct non-cosmetic concept or direction; four hard maximum never exceeded; a recorded reason may reduce within the direction bounds but never contradict the direction rules); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; and authority_conflict (recorded source conflict and its resolution; in-code design system wins unless the user names elements the pre-design supersedes). These are five of the six tracked fields; the sixth, clickthrough_offer_decision, is post-implementation (item 2).
+   The selection record also carries the five pre-implementation fields: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (up to four concepts and up to four mockups by default; direction rules override: 1a/1c exactly one mockup, never a second; 1b at least two mockups, each a distinct non-cosmetic concept or direction; four hard maximum never exceeded; a recorded reason may reduce within the direction bounds but never contradict the direction rules); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; and authority_conflict (recorded source conflict and its resolution; in-code design system wins unless the user names elements the pre-design supersedes). pre_design_binding is always present: not-applicable when 1c is not used, and for 1c either the binding or a named UNKNOWN (not bindable). These five pre-implementation fields are the tracked selection fields; the clickthrough status remains post-implementation (1.3) and its dedicated schema field is deferred to the next wave.
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.
@@ -238,11 +238,10 @@ Return, in this order:
    prototype scope/fixtures/incompleteness,
    per-evaluation records with all eight fields, findings and dispositions.
    After implementation, the iteration/post-implementation record also carries
-    clickthrough_offer_decision (offered, accepted, declined or UNRUN, with a separate ran flag; accepted or ran = ran; declined/impossible = UNRUN with an unrun reason), proof_set (offered,
+    proof_set (offered,
     declined, UNRUN or collected) and demo_script (skipped, drafted or narrated)
-    from the reference template; clickthrough_offer_decision is post-implementation
-    placement and is never part of the pre-implementation selection record (1.3,
-    PR-2 B2').
+    from the reference template; post-implementation status is never part of the
+    pre-implementation selection record (1.3).
 3. **Review record** - reviewer identity and independence, what was inspected
    or exercised, the rendered-UI check matrix with PASS/FAIL and evidence, and
    any limitations.
@@ -275,7 +274,7 @@ The full record schema and readiness rules are in
   persona, quote, timing, rate or result was fabricated.
 - The story covers the defined start/success/failure/recovery/empty/permission/
   timing states with expected outcomes where the feature defines them.
-- Candidate concepts are meaningfully different beyond cosmetics and each has a hypothesis; the mockup count follows the 1.2 rule.
+- Candidate concepts are meaningfully different beyond cosmetics and each has a hypothesis; the mockup count follows the 1.2 rule: at least one concept when iteration runs, 1a/1c at most one mockup (never a second), 1b at least two distinct concepts/directions and two mockups each distinct, four hard maximum never exceeded, and a recorded reason never reduces below a direction minimum.
 - Prototype scope lists included/mocked/incomplete parts and fixtures, and the
   artifact is the smallest that exercises the named interaction.
 - The reviewer is independent of the author and actually inspected/exercised
