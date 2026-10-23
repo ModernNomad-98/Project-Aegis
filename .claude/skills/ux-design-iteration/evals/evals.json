@@ -1,8 +1,20 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ux-design-iteration",
-  "description": "Behaviour cases for the optional pre-implementation design iteration method (30 cases: the 13 original cases E1-E13, PR-1 extension cases E14-E18 and E20-E29, and PR-2 proof-set cases E31-E32; E19 is deferred to the next wave with the E4-B6/E5-B1 issue, and E30 remains deferred with the reference-restatement issue). The extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14-E18, E20-E29 and E31-E32. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
-  "canonical_semantics": {"path": "docs/semantics/canonical-semantics.md", "covers": ["R8-UX-1", "R8-UX-2", "R8-UX-3", "R8-UX-4", "R8-UX-5", "R8-UX-6", "R8-UX-7", "R8-UX-8"]},
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (32 cases: the 13 original cases E1-E13, PR-1 extension cases E14-E18 and E20-E29, the E19 clickthrough-decline case, the E30 proof-set/reference single-source case, and PR-2 proof-set cases E31-E32; E19 and E30 are delivered per canonical R8-UX-3/R8-UX-4). The extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14-E18, E19, E20-E30 and E31-E32. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
+  "canonical_semantics": {
+    "path": "docs/semantics/canonical-semantics.md",
+    "covers": [
+      "R8-UX-1",
+      "R8-UX-2",
+      "R8-UX-3",
+      "R8-UX-4",
+      "R8-UX-5",
+      "R8-UX-6",
+      "R8-UX-7",
+      "R8-UX-8"
+    ]
+  },
   "cases": [
     {
       "id": "E1",
@@ -445,6 +457,41 @@
         "assertions": [
           "Refuses production data for the proof set and records the proof set as UNRUN with the production-data-only reason; captures nothing.",
           "Does not substitute production evidence for a check, does not upgrade readiness, and keeps the fixtures/UAT-only requirement."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E19",
+      "type": "should_trigger",
+      "prompt": "Offer the final clickthrough for a finished account-resume flow; the user explicitly says no, then asks whether we are still ready to hand off.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the clickthrough status as declined: declined is a recorded user answer, not a run outcome, and it carries no defect classes for a decline.",
+          "States the clickthrough is never a pass and the decline is never converted into UNRUN; readiness may still be declared on other evidence.",
+          "Places clickthrough_offer_decision in the iteration/post-implementation record only and keeps exactly the five pre-implementation fields in the selection record; it is never part of the pre-implementation selection record.",
+          "Treats an attempted-but-impossible clickthrough as UNRUN naming unobservable state-hydration/transition classes; a malformed or missing status is the single fail-safe UNKNOWN diagnosis (not a fourth stored status, never defaulted to UNRUN, never a pass).",
+          "Cites canonical R8-UX-4 for lifecycle/placement; does not restate unrelated rules.",
+          "Does not convert the recorded decline into an UNKNOWN, FAIL or defect, and does not re-ask the clickthrough automatically."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E30",
+      "type": "should_trigger",
+      "prompt": "After implementation the user declines the proof set. The reference page also restates the proof-set rules. Record the proof-set decision and explain which text is authoritative.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the proof-set decline as a recorded decision that is not a defect and does not upgrade readiness.",
+          "States SKILL 1.4 and SKILL 5 remain the single normative source; the reference 5b is schema/folder/template support and does not restate normative rules.",
+          "Uses the unrun_reason enum (production_data_only|no_local_stack|missing_tooling|failed_capture) for UNRUN and names production-data-only input as a named UNRUN.",
+          "Cites canonical R8-UX-3 and canonical R8-UX-4 where lifecycle/schema overlap; no second normative copy is created.",
+          "States evidence never upgrades readiness and declined/UNRUN is never a pass."
         ]
       },
       "host_evidence": false,

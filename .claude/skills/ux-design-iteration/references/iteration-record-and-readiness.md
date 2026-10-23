@@ -28,7 +28,7 @@ summary - keep both in sync.
 | `mockup_budget` | One to four concepts and one to four mockups by default; concepts and mockups each have a hard maximum of four that is never exceeded; at least one concept is required whenever the iteration runs (zero only for a justified N/A with a recorded reason). Direction rules override the defaults: 1a/1c exactly one mockup is permitted - one required and permitted, never a second; 1b at least two mockups are required, each for a distinct non-cosmetic concept or direction. A recorded reason may reduce counts within the direction's allowed range but never below a direction minimum, never above four, and never contrary to the direction rules; a mockup and a prototype are exercisable artifacts of a chosen concept/direction and multiple prototypes of one concept do not count as multiple mockups; actual usage is recorded as concepts_used/mockups_used in the iteration record; mode A or no-direction cases record mockup_budget as not-applicable or zero with a recorded reason. | 1 concept / 1 mockup (1a; one required and permitted) |
 | `authority_conflict` | ONE mapping: not-applicable when no pre-design/1c is in use; none when 1c applies with no conflict; the recorded resolution when 1c conflicts; a named UNKNOWN/open item when unresolved. Scope is pre-design-vs-in-code authority only, never UI-lock element conflicts (those route to PROPOSED UI ADDITION or are named residuals); the in-code design system keeps authority unless the user states the pre-design supersedes it for named elements (1c/3). | none / not-applicable / UNKNOWN(<reason>) |
 
-The five pre-implementation fields are design_direction, mockup_budget, ui_lock, pre_design_binding and authority_conflict; pre_design_binding is always present: not-applicable when 1c is not used; under 1c the binding or a named UNKNOWN(<reason>) when not bindable; the clickthrough status remains post-implementation (SKILL 1.3) and its dedicated schema field is deferred to the next wave.
+The five pre-implementation fields are design_direction, mockup_budget, ui_lock, pre_design_binding and authority_conflict; pre_design_binding is always present: not-applicable when 1c is not used; under 1c the binding or a named UNKNOWN(<reason>) when not bindable; the post-implementation clickthrough_offer_decision field is post-implementation-record schema support only; its normative copy is SKILL 1.3 and canonical R8-UX-4, and it is never part of this five-field pre-implementation record. The five pre-implementation fields are fixed by canonical R8-UX-3. For the clickthrough field, absent/malformed/missing status follows ONE fail-safe rule: UNKNOWN within the field is fail-safe (a recorded not-run diagnosis, never a fourth stored status, never defaulted to UNRUN, never a pass) with a named reason and human remediation.
 
 Return the record to the host/user or the project's state owner for persistence
 in the project's existing step-3 design/state or handoff artifact (for example
@@ -106,9 +106,11 @@ make (extend budget, accept a recorded limitation, change scope, or stop).
 Never silently switch candidate, reset counters, lower criteria, or extend the
 budget yourself.
 
+Schema and readiness sync for the selection record is fixed by canonical R8-UX-3 and canonical R8-UX-4; this reference cites them and does not restate those rules.
+
 ## 3a. Clickthrough status (post-implementation only)
 
-After implementation the clickthrough is offered and either run or declined; a decline or impossible run is recorded as a named UNRUN naming the unobservable state-hydration/transition defect classes, never changes readiness to PASS, and is not part of the pre-implementation selection record.
+After implementation the clickthrough is offered and is never required. Post-implementation status is exactly one of offered, declined or UNRUN (canonical R8-UX-4). declined is a recorded user answer (the user explicitly declines at the offer) and is not a run outcome; it carries no defect classes, is never a pass, and is never converted into UNRUN. UNRUN is a run outcome used only when the clickthrough could not be run (an attempted/impossible run), naming the unobservable state-hydration/transition defect classes; readiness may still be declared but the record shows it was not run and the clickthrough is never a pass. The record field clickthrough_offer_decision is post-implementation and belongs in the iteration/post-implementation record, never part of the pre-implementation selection record. This 3a section is schema support only: the normative copy is SKILL 1.3 and canonical R8-UX-4. Absent, malformed or missing status follows the single fail-safe rule: UNKNOWN within the field is fail-safe (a recorded not-run diagnosis, never a fourth stored status, never defaulted to UNRUN, never a pass) with a named reason and human remediation.
 
 ## 4. Budget ledger and invalidation
 
@@ -163,6 +165,7 @@ This section is schema, folder layout and template support only; normative rules
       - id: E1 ; mockup_id: M1 ; question: ... ; candidate_version: ... ; scenario: ... ; observation: ... ;
         evidence: ... ; finding: ... ; disposition: ... ; uncertainty: ...
     prototype_acceptance: {exercisable: ..., stateful: ..., non_happy_states: [...], fixtures_only: ..., viewports: [...], keyboard: ...}
+    post_implementation: {clickthrough_offer_decision: {status: offered|declined|UNRUN, offer_turn: ..., decided_by: ..., decline_recorded: ..., unrun_reason: ..., defect_classes: [...], notes: ...}}  # schema support only; SKILL 1.3 + canonical R8-UX-4 normative; never in the five-field selection record
     ui_lock_inventory_diff: [{element: ..., mapped_to: ...}]
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
