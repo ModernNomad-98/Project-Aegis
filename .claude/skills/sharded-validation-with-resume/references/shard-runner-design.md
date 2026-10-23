@@ -21,8 +21,10 @@ One file per run (JSON keeps it diffable and machine-checkable):
   "commit": "<sha>",
   "tier": "full",
   "shards": {
-    "core-domain":     { "state": "passed",      "started": "…", "ended": "…", "duration_s": 412, "tests_executed": 238, "tests_failed": 0 },
-    "api-integration": { "state": "failed",      "duration_s": 388, "tests_executed": 154, "tests_failed": 3, "failure_class": "assertions" },
+    "core-domain":     { "state": "passed",      "started": "…", "ended": "…", "duration_s": 412,
+    "tests_executed": 238, "tests_failed": 0 },
+    "api-integration": { "state": "failed",      "duration_s": 388, "tests_executed": 154,
+    "tests_failed": 3, "failure_class": "assertions" },
     "ui-e2e":          { "state": "interrupted", "duration_s": 1800, "tests_executed": 41, "failure_class": "timeout" },
     "platform":        { "state": "pending" },
     "uncategorized":   { "state": "passed", "tests_executed": 0, "policy": "empty-or-fail", "note": "0 matched = policy-pass ONLY because membership rules matched nothing" }
@@ -55,13 +57,26 @@ Schema rules:
   only and never part of the identity key. A mixed-state PR (docs-only skip
   predicate plus real code changes) fails the aggregate; skips never cover
   code changes.
+If no trusted CI state store exists, resume is unavailable and a full rerun is
+required; never substitute the tracked status file as a resume authority.
+
+The JSON example above is the ADVISORY status-file shape only; it is never a resume
+authority. Resume authority is the trusted CI state store: a per-shard query returning
+{state, run_id, attempt} for the CURRENT head commit. Definitions: run_id identifies the
+CI run being read (in this illustrative file the format is <commit-sha>-<timestamp>; in the
+trusted store it is the CI provider's run identifier); attempt is the provider attempt number
+within that run; the head-commit run is the trusted store run whose head SHA equals the commit
+being validated. Resume reads the store for the current head commit and the LATEST attempt of
+the head-commit run; results from other commits or earlier attempts are stale and never
+counted (a local run with no trusted CI state store cannot resume). If multiple runs exist for the same head commit, the authoritative run is the latest trusted-store run for that head commit; older runs are stale and never counted. If no trusted CI state store is
+available, resume is unavailable and the run reruns fully.
 
 ## Runner modes & the resume law
 
 | Mode | Semantics |
 | --- | --- |
 | full | fresh status file; run every shard |
-| `-Resume <run_id>` | rerun ONLY shards whose state is `interrupted` or `pending` in that run, same commit. `passed` shards are not re-derived. **`failed` shards are NOT eligible** — a real failure reruns (fully, post-fix), it is never resumed around. |
+| `-Resume <run_id>` | rerun ONLY shards whose state is `interrupted` or `pending` in that run, same commit (run_id per the definitions above; earlier attempts stale; a run whose head SHA differs from the current head commit is rejected as non-authoritative). `passed` shards are not re-derived. **`failed` shards are NOT eligible** — a real failure reruns (fully, post-fix), it is never resumed around. |
 | `-Shard <name>` | targeted single-shard run (post-fix rerun, local debugging); updates only that shard's record |
 
 The resume law in one line: **resume exists to survive infrastructure, not
@@ -136,7 +151,8 @@ required checks.
 
 - **`local-ci-mirror-preflight`:** local full-tier = invoke this runner
   (same shard map, same status semantics) — the preflight never re-derives
-  its own bundle where shards exist.
+  its own bundle where shards exist. A local run with no trusted CI state
+  store cannot resume: it reruns fully.
 - **`risk-tiered-validation-selector`:** the classify job IS the selector's
   rules; the gate consumes its tier output. Docs-only skip semantics are
   legitimate only because the selector said docs-only.

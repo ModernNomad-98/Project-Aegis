@@ -16,6 +16,15 @@ certification claims.
 
 ## Domain 1 — Access control
 
+Every control row's canonical record also carries three accountability fields in the
+control catalog: the accountable owner, the evidence collector, and the collection
+trigger (cadence source). Domain tables below name the design/review route only,
+except rows that explicitly name a single accountable owner (specifically: the Audit trail
+schema, retention and evidence capture row names audit-log-architect as single accountable
+owner); in those rows the named owner is the accountable owner and the catalog record must
+match it. The three accountability fields are maintained
+once per control in the catalog record.
+
 | Starter control | Design/review route or candidate artifact to verify |
 | --- | --- |
 | Role/permission model, deny-by-default | `authorization-matrix-designer` matrix + enforcement-point map |
@@ -30,7 +39,7 @@ certification claims.
 | --- | --- |
 | Secret/key custody, rotation, exposure | secrets-identity-hardener |
 | Session/token security flags | secrets-identity-hardener |
-| Encryption in transit/at rest design and review | appsec-implementer (design ownership; status: PARTIAL by design; design review is partial-by-design, key custody is implemented) |
+| Encryption in transit/at rest design and review | appsec-implementer (design ownership; status: PARTIAL by design; design review is partial-by-design, key custody is a separate control row) |
 | Encryption key lifecycle and custody | secrets-identity-hardener |
 | Backup restore verification and retention | database-backup-verifier |
 | Audit trail schema, retention, and evidence capture | audit-log-architect (single accountable owner; one control covering trail schema, retention and the evidence program; compliance-evidence-collector supplies evidence routes, not a second owner) |

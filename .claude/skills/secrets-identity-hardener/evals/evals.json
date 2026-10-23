@@ -78,6 +78,20 @@
           "Covers keyed hashing/envelope rules for tokens and states rotation/versioning; claims no production change execution."
         ]
       }
+    },
+    {
+      "id": "edge-emergency-revocation-before-verification",
+      "type": "should_trigger",
+      "prompt": "Explicitly invoke secrets-identity-hardener. We have a confirmed live leak: a production API key is being actively abused right now. Normal rotation requires owner approval and full verification, but the incident is ongoing and the key is still working. What do we do about the key itself?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Applies the step-6 emergency/compromise carve-out: with a confirmed or suspected compromise the human incident owner may authorize immediate revocation BEFORE full verification (routine revocation still needs the credential owner's recorded authorization), recording the risk and any residual consumers.",
+          "Does not treat the emergency path as routine rotation: routine rotation still needs the recorded owner authorization and verification, and the emergency path is exceptional and recorded.",
+          "Revokes/rotates the leaked key immediately and records the risk plus residual consumers/uses that must be migrated, then follows with normal verification and cleanup.",
+          "Never prints or stores the secret; instructs using the secret manager and scrubbing any committed copies/history."
+        ]
+      }
     }
   ]
 }

@@ -85,6 +85,7 @@ manifest, no hash is invented, and `incomplete` is filled honestly.
 - **Recording from memory invents hashes.** Copy the hash from the manifest
   at record time; a hash from a previous task may name a different
   `SKILL.md` after an update.
+- **Signal-catalog epoch gate (consumer contract; documented here for completeness - consumer code applies it, not the record skill).** When reading the instrumenter's signal catalog, read `activation_mode`/`correction_outcome` by event type and never read the legacy mode field. Defer to the catalog-declared epoch (do not hardcode it) and handle records in this order: current-epoch -> usable; known legacy epoch -> quarantine, map by source table, mark legacy/unmigrated before use; unknown epoch -> reject. If the catalog or epoch is unreadable/unavailable, fail closed: reject the record and do not migrate or resume from it.
 - **A stale manifest fails the validator.** Refresh before resolving names,
   and note that any skill edit PR must carry the refreshed manifest.
 - **Compliance is the user's.** This skill produces the record and the

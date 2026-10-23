@@ -190,9 +190,15 @@ Boundaries:    schema → event-schema-architect; system telemetry → observabi
 - Tracking accuracy-critical events (purchases, upgrades) client-side is
   a slow-motion data loss: ad blockers, crashes, and closed tabs eat
   them, and the number is quietly low forever. Money moves server-side.
-- Firing events before `identify` orphans them under an anonymous id that
-  never joins the user — the funnel undercounts and no error is thrown.
-  Order of capture vs identity matters.
+- Firing events before `identify` WITHOUT a later alias/merge orphans them under an
+  anonymous id that never joins the user: the funnel undercounts and no error is thrown.
+  WITH a later alias/merge they link correctly - so capture anonymous events immediately and
+  merge at identify rather than delaying capture.
+  Order of capture vs identity matters: capture anonymous funnel events with an
+  anonymous ID, then call identify/alias at signup to merge the anonymous and user
+  IDs. Prefer re-keying/aliasing in place; if replay is unavoidable, use an idempotent
+  backfill with dedupe keys so events are never double-counted, and do not delay the event
+  until after identify (that loses events and misorders the funnel).
 - Capturing before consent (or ignoring opt-out/DNT) is a compliance
   violation, not a data-completeness win. Consent gates capture; minimize
   PII at the source, because scrubbing it downstream is unreliable and

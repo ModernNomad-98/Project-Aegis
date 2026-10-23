@@ -20,7 +20,7 @@
     {
       "id": "positive-per-tenant-fairness",
       "type": "should_trigger",
-      "prompt": "When one big customer kicks off a bulk operation with tens of thousands of jobs, every other customer's jobs stall behind them. Fix the worker design so one tenant can't starve the others.",
+      "prompt": "When one big customer kicks off a bulk operation with tens of thousands of jobs, every other customer's jobs stall behind them. Fix the worker design so one tenant can't starve the others. Fixture: queue-depth logs show tenant A at 40,000 pending jobs vs ~200 for every other tenant; worker concurrency is currently unpartitioned (one shared pool).",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -29,21 +29,23 @@
           "Compares tenant queue turns, per-tenant concurrency caps and interactive/bulk priority lanes in plain terms: caps alone do not isolate a shared waiting backlog, priority alone can starve bulk work, and the mechanisms may be combined.",
           "Recommends a mechanism from the stated tenant burst and job urgency, explaining worker/queue expense, setup and continuing scheduler/alert upkeep without inventing a price; if a user choice remains, asks one plain-language question after those trade-offs.",
           "Adds per-tenant queue-depth as a first-class observability signal with a threshold and owner.",
-          "Does not merely add more workers, which scales the starvation rather than removing the unfairness."
+          "Does not merely add more workers, which scales the starvation rather than removing the unfairness.",
+          "Cites the supplied per-tenant queue depth (tenant A 40,000 pending vs ~200 elsewhere) and the per-tenant concurrency plan as the fairness evidence; does not use retry counts as fairness evidence."
         ]
       }
     },
     {
       "id": "edge-poison-job-and-visibility-timeout",
       "type": "should_trigger",
-      "prompt": "Some jobs retry forever and hammer a third-party API, and separately a long job sometimes runs twice at the same time. What's wrong with our job handling?",
+      "prompt": "Some jobs retry forever and hammer a third-party API, and separately a long job sometimes runs twice at the same time. What's wrong with our job handling? Fixture: retry counts show 14 attempts on the poison job, visibility timeout 30s against a 120s job run, and no DLQ exists.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Identifies retry-forever as a missing poison classifier: permanent failures (bad input, 4xx) must be dead-lettered fast, not retried indefinitely with backoff.",
           "Identifies the double-run as a visibility timeout shorter than the job's real runtime — the queue redelivers while the first worker is still processing — and sizes the lease above runtime.",
           "Requires idempotency so any redelivery that does happen cannot double-apply.",
-          "Adds DLQ ownership and a fill alert so dead-lettered jobs are not lost silently."
+          "Adds DLQ ownership and a fill alert so dead-lettered jobs are not lost silently.",
+          "Uses the supplied 14 attempts (13 retries), visibility timeout 30s against a 120s job run, and missing DLQ to separate the poison and double-run causes."
         ]
       }
     },

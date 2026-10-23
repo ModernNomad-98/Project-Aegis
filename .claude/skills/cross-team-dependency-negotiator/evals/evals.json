@@ -6,7 +6,7 @@
     {
       "id": "positive-plan-cross-team-deps",
       "type": "should_trigger",
-      "prompt": "Our launch depends on three other teams delivering pieces. Plan and negotiate those dependencies.",
+      "prompt": "Our launch depends on three other teams delivering pieces. Plan and negotiate those dependencies. Fixture: platform-team owner Dana delivers API v2 by 2026-11-14; data-team owner Luis delivers the export schema by 2026-11-21; our own owner Priya must consume it by 2026-12-05.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -14,7 +14,8 @@
           "Turns each into a concrete commitment: deliverable, interface/contract, date, and owner on both sides, written down.",
           "De-risks critical dependencies (fallback, decoupling via stub/flag, parallel paths, SPOFs named).",
           "Accounts for the other teams' priorities and sets a visible status plus a pre-agreed escalation trigger.",
-          "Leaves the interface contract to api-event-architect and the integration boundary to architecture-designer."
+          "Leaves the interface contract to api-event-architect and the integration boundary to architecture-designer.",
+          "Records the supplied dates and named owners per deliverable (Dana 2026-11-14, Luis 2026-11-21, Priya 2026-12-05) and requires a named counterparty owner for each dependency before commitment."
         ]
       }
     },

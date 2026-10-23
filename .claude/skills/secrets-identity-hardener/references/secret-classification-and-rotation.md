@@ -52,8 +52,10 @@ Turn this into an automated check (test or CI step) so it stays enforced.
 3. Issue a new credential in the provider/secret manager.
 4. Update the secret store / deploy config to the new value.
 5. Migrate every known consumer from the inventory to the new credential and
-   verify each consumer works; record each verification. Do NOT revoke while
-   any known consumer still uses the old credential.
+   verify each consumer works; record each verification. Revocation requires the
+   credential owner's recorded authorization (or a recorded owner-approved
+   exception); never revoke while any known consumer still uses the old credential,
+   except under the emergency/compromise carve-out in step 6.
 6. Routine rotation runs a bounded overlap window (no longer than the
    provider's propagation window) and escalates to the credential owner if
    consumers cannot be verified within it, recording risk and residual-consumer
@@ -68,6 +70,14 @@ Turn this into an automated check (test or CI step) so it stays enforced.
    as a separate action whose scope must be covered by an applicable active
    grant or a new owner decision. Rotation restores credential secrecy; purge
    is cleanup.
+
+Role and scope definition: the credential owner is the recorded authorization role for
+routine rotation; the human incident owner is the accountable role for an incident and may
+authorize emergency revocation when the credential owner is unavailable. If both are present,
+the incident owner's recorded emergency decision governs the revocation while routine rotation
+still needs the credential owner's recorded authorization. BOTH confirmed and suspected
+compromise may use the emergency path; for suspected compromise record the basis for suspicion
+and complete post-hoc verification.
 
 ## Least-privilege service accounts
 

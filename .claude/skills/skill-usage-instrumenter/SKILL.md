@@ -73,11 +73,13 @@ it changes no skill, adds no hook, and collects nothing itself.
      use activation_mode (auto/explicit); correction/wrong-fire events use
      correction_outcome (overridden/abandoned); never reuse one field name for
      both domains. The dataset schema_epoch and migration mapping are in
-     references/usage-signal-catalog.md (current schema_epoch = 2). Consumers
-     (for example skill-usage-ledger and downstream dashboards) must read
-     activation_mode/correction_outcome by event type and must not read the
-     legacy mode field after the epoch bump; map legacy records by source table
-     and mark flattened/unknown event types unmigrated.
+     references/usage-signal-catalog.md; treat the catalog-declared schema_epoch as
+     authoritative (do not hardcode an epoch in consumers). Consumers must read
+     activation_mode/correction_outcome by event type and never read the legacy mode
+     field. Handling order: (1) current-epoch records are usable as-is; (2) known
+     legacy epochs are quarantined, mapped by source table and marked legacy/
+     unmigrated before use; (3) unknown epochs are rejected; (4) an unreadable or unavailable catalog/epoch is fail-closed - reject the record and do not migrate or resume from it. The ledger documents this
+     consumer contract and the catalog is the single epoch authority.
    - *Completion hint:* the skill's workflow ran to its deliverable vs was
      abandoned — coarse (delivered / abandoned / unknown), not a quality
      score.
@@ -151,7 +153,8 @@ Capture choice:<if owner decision needed: terms, fit, costs, pros/cons,
                recommendation and why, one question>
 Aggregation:   <per-skill, per-cluster, library-wide views; window: <stated>>
 Cadence:       <review rhythm + who reviews>
-Thresholds:    <signal pattern → action → consumer (skill-quality-reviewer | trigger-evals fix | skill-deprecation-planner)>
+Thresholds:    <signal pattern → action → consumer (skill-quality-reviewer | trigger-evals fix |
+skill-deprecation-planner)>
 Exemptions:    rare-but-critical list: <skill → reason> (usage alone never condemns these)
 Evidence package: <format handed to skill-deprecation-planner>
 Not designed:  <what this design deliberately leaves out, and why>

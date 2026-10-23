@@ -14,7 +14,8 @@
           "Adds per-user/tenant/plan budgets and rate limits that are tenant-scoped so one tenant can't exhaust another's capacity.",
           "Designs a kill switch and a fail-safe degraded mode (cached/smaller-model/refuse), never fail-open.",
           "Specifies attributable per-call cost telemetry with burn-rate alerts before exhaustion, composing observability-operator to implement.",
-          "For price/model figures, requires the provider, model, source and date of the figure, and treats an unsourced or stale figure as unverified rather than measured."
+          "For price/model figures, requires the provider, model, source, publication/effective date and retrieval date, and treats an unsourced or stale figure as unverified rather than measured.",
+          "Treats a price/model figure whose retrieval date is missing as unverified (not measured) and requires the retrieval date to re-verify it."
         ]
       }
     },
@@ -115,7 +116,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "ai-cost-guardrail-designer does not activate or take ownership of this request.",
+          "Does not activate for routing logic; names ai-router-architect only as a manual-only suggestion (may name it, recommends explicit invocation) and takes no ownership.",
           "Does not auto-invoke ai-router-architect (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer for it.",
           "Identifies model routing and provider fallback logic as router design; does not produce the routing implementation and at most notes that budget and model-tier intent are inputs the router enforces."
         ]
@@ -128,7 +129,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "ai-cost-guardrail-designer does not activate or take ownership of this request.",
+          "Does not activate for key custody; names secrets-identity-hardener only as a manual-only suggestion (may name it, recommends explicit invocation) and takes no ownership.",
           "Does not auto-invoke secrets-identity-hardener (MANUAL-ONLY); may name it and recommend explicit invocation, and does not silently substitute ai-cost-guardrail-designer for it.",
           "Treats key custody, rotation, storage, and client-bundle exposure as secrets-custody work; does not design token caps, budgets, or rate limits in response, and mentions the leaked key's AI-spend blast radius at most as a follow-up note."
         ]

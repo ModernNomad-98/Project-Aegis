@@ -12,6 +12,7 @@ must surface, not silently default.
 | Refusal case (typed `should_trigger`, `triggers: true` by convention) | Same | Target skill activates AND response satisfies the refusal assertions | Two-part pass; report each part |
 | `should_not_trigger` (`triggers: false`) | Same | Named skill does NOT activate | Record what fired instead — routing telemetry, not a verdict |
 | Trigger-evals discrimination case | Same | `expected_skill` activates AND every `should_not_trigger` entry stays silent | Score pairwise; partial wins visible |
+| initial-selection vs delegated activation | Fresh session per case; record the user/initial skill selection separately from an authorized delegated invocation | PASS requires the activation source to be classified: initial selection activates the skill directly; delegated activation activates it only when the invoking skill is authorized to delegate | Delegated activation without recorded authority is a FAIL, not a trigger pass |
 
 Isolation rule: one case = one fresh session. No shared context, no case
 ordering effects, no reuse of a session that has already routed a prompt.

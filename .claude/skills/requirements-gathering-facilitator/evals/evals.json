@@ -185,6 +185,20 @@
           "Keeps the turn to one atomic question and stops for the answer."
         ]
       }
+    },
+    {
+      "id": "positive-next-turn-brief-after-discovery",
+      "type": "should_trigger",
+      "prompt": "ORIGINAL USER REQUEST (turn 1): 'We want to add an export button to the reports page.' Next-turn fixture - accumulated answers from the discovery turns: (1) users are operations managers; (2) the workaround is copy-pasting the reports table into email; (3) non-goals: no scheduled exports, no PDF; (4) constraints: CSV only, must respect tenant isolation; (5) success measure: export completes under 10 seconds for 50k rows. Produce the requirements brief and hand off.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces the final requirements brief now that the accumulated answers remove all spec-blocking questions.",
+          "Separates confirmed / assumed / unknown items and hands off to product-spec-writer by name.",
+          "Does NOT invoke product-spec-writer itself and does not authorize implementation.",
+          "Brief records the accumulated elicitation: restates the stated solution as a problem, identifies users and the current workaround, and captures non-goals, constraints and success measure from the supplied answers (confirmed), marking anything unanswered to-confirm."
+        ]
+      }
     }
   ]
 }

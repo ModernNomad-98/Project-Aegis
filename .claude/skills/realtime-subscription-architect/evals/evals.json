@@ -34,14 +34,15 @@
     {
       "id": "edge-authority-changes-mid-connection",
       "type": "should_trigger",
-      "prompt": "A user was removed from a workspace but their open tab kept receiving the workspace's live events for another ten minutes. Fix the realtime authorization.",
+      "prompt": "A user was removed from a workspace but their open tab kept receiving the workspace's live events for another ten minutes. Fix the realtime authorization. Fixture: a membership-revoked event fired at T+0; the session token TTL is 15 minutes; the removed user had 3 active channel subscriptions at that moment.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Diagnoses connect-time-only authorization as the defect: authority changed mid-connection and the subscription was never re-checked.",
           "Adds a re-authorization trigger (on authority-change event / token refresh / periodic) and a tear-down of now-forbidden subscriptions.",
           "States that per-tenant isolation alone is insufficient — the per-user/per-resource boundary must be re-enforced when membership changes.",
-          "Does not 'fix' it by shortening the token lifetime alone, which only narrows the leak window rather than closing it."
+          "Does not 'fix' it by shortening the token lifetime alone, which only narrows the leak window rather than closing it.",
+          "Identifies the observed 10-minute leak after the membership-revoked event at T+0 as a DEFECT (event-driven re-auth missing/broken), states the 15-minute token TTL is only the outer bound of at most remaining token lifetime, and requires immediate tear-down/re-auth on the revocation event."
         ]
       }
     },

@@ -64,11 +64,14 @@ mutates a live evidence store.
 5. Control operating frequency — continuous (logging), per-change (review),
    periodic (access review, backup restore test) — cadence derives from it.
    ONE cadence definition per control CLASS (frequency-matched default), with
-   the per-control accountable owner and collection trigger recorded in the
-   control catalog (compliance-control-foundation). Continuous controls keep
+   the per-control accountable owner, evidence collector and collection trigger
+   recorded in the control catalog (compliance-control-foundation); the catalog
+   carries those fields on every control record. Continuous controls keep
    continuous operation evidence with periodic extracts at least quarterly
    (plus window-start/end config snapshot); the cadence catalog records
-   class-level defaults and names the evidence owner per row.
+   class-level defaults and names the evidence collector per row; the control-catalog
+   evidence-collector field is authoritative - where the cadence row also names an
+   evidence collector it must match that value (one role, single authority).
 
 ## Workflow
 

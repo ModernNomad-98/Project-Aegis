@@ -146,7 +146,8 @@ Standing scope (named):       <loop steps + branches + change classes covered>
 Phase-advance rule:           <auto-advance only into named+approved phases; exits on drift>
 Required prompt pattern:      <the restatement each session must open with>
 Opt-out phrase:               <exact phrase; where it may be said; always wins>
-Merge profile:                open-PR-and-STOP (default) | opt-in: <named profile backed by an applicable human decision>
+Merge profile:                open-PR-and-STOP (default) | opt-in: <named profile backed by an
+applicable human decision>
 Choice brief:                 <plain terms, purpose, reason, time/setup/upkeep/money costs or
                               unknowns, pros/cons, recommendation and why, then one owner
                               question, before adoption>
@@ -198,18 +199,10 @@ Adoption:                     pending human approval → then recorded via scope
   field; no recorded attestation deadline means BLOCKED. A reviewer block wins
   for every agent-initiated action and the loop halts and waits for the human.
 
-  Canonical precedence table (BLOCKED > GRANDFATHERED > ACTIVE):
-
-  | Precedence | State | Condition | Auto-advance |
-  | --- | --- | --- | --- |
-  | 1 | BLOCKED | reviewer block in force (wins for every agent-initiated action: halt and wait) OR recorded attestation deadline passed OR no recorded attestation deadline exists OR a transition trigger fired | disabled; the grant does not expire; only in-scope human/manual actions remain; no agent-initiated action proceeds |
-  | 2 | GRANDFATHERED | valid at adoption AND not BLOCKED AND a recorded deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
-  | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
-  BLOCKED > GRANDFATHERED > ACTIVE (first matching row wins). BLOCKED ->
-  ACTIVE only on recorded re-attestation after the block clears;
-  GRANDFATHERED never bypasses a reviewer block; never infer a default expiry.
-  No recorded deadline means BLOCKED; GRANDFATHERED therefore only applies when
-  a deadline is recorded and not passed.
+  The canonical precedence table lives in
+  [references/standing-approval-policy.md](references/standing-approval-policy.md)
+  (one canonical copy; do not duplicate it here). Read BLOCKED > GRANDFATHERED
+  > ACTIVE there, including the transition rules.
 - **Fatigue theater in reverse:** thinning approvals that were load-bearing.
   Instant-yes and zero-variance approvals are signals that trigger
   inspection, never proof of mechanical granting; a slow, considered approval
