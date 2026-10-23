@@ -1,6 +1,6 @@
 ---
 name: ux-design-iteration
-description: 'Run optional, bounded design iteration before implementation - prototype the smallest interactive artifact, get an independent rendered-UI review, revise/retest, and hand off a reviewed direction. Use when the experience direction is unsettled, the user chooses option B, asks to compare flows, or wants an independent critique within an active iteration. Owns only the iteration method, records and readiness protocol; composes the nearest owners; design authority stays with the project. Advisory: it does not write project artefacts, run commands, launch browsers or use the network; records are returned to the host/user or the project''s state owner for persistence, and prototype/implementation are delegated host/user actions. Do NOT use for ordinary settled design/build, requirements elicitation (requirements-gathering-facilitator), spec authoring (product-spec-writer), design review facilitation (design-review-facilitator) or verification execution (accessibility-test-harness, visual-regression-test-designer).'
+description: 'Run optional, bounded design iteration before implementation - prototype the smallest interactive artifact, get an independent rendered-UI review, revise/retest, and hand off a reviewed direction. Use when the experience direction is unsettled, the user chooses option B, asks to compare flows, or wants an independent critique within an active iteration. Owns only the iteration method, records and readiness protocol; composes the nearest owners; design authority stays with the project. Advisory: it does not write project artifacts, run commands, launch browsers or use the network; records are returned to the host/user or the project''s state owner for persistence, and prototype/implementation are delegated host/user actions. Do NOT use for ordinary settled design/build, requirements elicitation (requirements-gathering-facilitator), spec authoring (product-spec-writer), design review facilitation (design-review-facilitator) or verification execution (accessibility-test-harness, visual-regression-test-designer).'
 ---
 
 # UX Design Iteration
@@ -29,7 +29,7 @@ review structure only. It does not write files, run commands, launch browsers,
 use the network or create prototypes itself: a prototype, render or
 implementation is a **delegated host or user action** under existing authority.
 The records it produces are returned to the host/user or the project's state
-owner for persistence; the skill does not write the project artefact itself.
+owner for persistence; the skill does not write the project artifact itself.
 The recorded mode is a method choice, not a blanket grant of tool or
 production permission.
 
@@ -99,7 +99,7 @@ path (standard design and build remains the default).
    (mode, feature/task scope, instruction source, delivery endpoint, iteration
    budget, selection/offer count, record_location) to the host/user or the
    project's state owner
-   for persistence; do not write the project artefact yourself. The choice is
+   for persistence; do not write the project artifact yourself. The choice is
    reused across turns, resumes, and tool or agent changes; a missing record is
    recovered from context, not treated as an opt-out, and a later user change is
    honored. The host/user or state owner performs any persistence; the skill
@@ -156,7 +156,7 @@ path (standard design and build remains the default).
 
 ## Design direction, mockups, UI lock and live acceptance (owner rev 2)
 
-These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup-count detail and parts of the question-cap/clickthrough lifecycle remain deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artefacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup-count detail and parts of the question-cap/clickthrough lifecycle remain deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
 
 ### 1.1 Design direction (choose one, once)
 
@@ -192,7 +192,7 @@ The reviewer enforces this; a failing artifact is **NOT READY**.
 - **Self-contained:** fixtures only, no backend, no network, no repository change. Real tokens come from the project or a bound pre-design; under UI lock, the project's only.
 - **Responsive and keyboard-operable:** works at the declared viewports, is keyboard-operable with visible focus.
 
-TEETH: a static image or non-interactive comp whose named transitions cannot be exercised is **NOT READY** with the unexercisable transitions named; screenshots are not evidence; the PR-2 proof set does not upgrade it. Rationale: defects live in transitions.
+TEETH: a static image or non-interactive comp whose named transitions cannot be exercised is **NOT READY** with the unexercisable transitions named; screenshots are not evidence; the proof set does not upgrade it. Rationale: defects live in transitions.
 
 ### 3. Pre-design (1c)
 
@@ -212,7 +212,7 @@ Offer the proof set once, after the clickthrough decision. Declining it is recor
 
 A proof set may include the approved mockup (bound by sha256 and byte size), screenshots at named checkpoints, a recording of the clickthrough if it ran, and a short spoken-demo script keyed to those checkpoints (last, lowest priority; not evidence of a check). The manifest lists every file with its size and sha256 and records captured-over-expected. Folder layout: MANIFEST.json at the proof-set root, with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside it; the record names the delegated writer and the captured-over-expected differences.
 
-Use test fixtures or a UAT project only - never production data. If only production data exists, record the proof set as **UNRUN** with that reason and capture nothing. A proof set is evidence of what was observed, never a substitute for a check, and never upgrades readiness; a production-data proof set and an unrun proof set are both never a pass. The manifest lists every file with its size and sha256 except MANIFEST.json itself (a file cannot contain its own hash; MANIFEST.json records every other file). proof_set status is offered, declined, UNRUN or collected: when declined, decline_reason is recorded, manifest_path is null and files is empty; when UNRUN, production_data_reasons lists the production-data-only causes (non-empty only for UNRUN), manifest_path is null and files is empty; when collected, folder_layout and manifest_path are present. demo_script is skipped whenever proof_set is declined or UNRUN. Checkpoint keys are lowercase kebab-case with no path separators and no traversal.
+Use test fixtures or a UAT project only - never production data. If only production data exists, record the proof set as **UNRUN** with that reason and capture nothing. A proof set is evidence of what was observed, never a substitute for a check, and never upgrades readiness; a production-data proof set and an unrun proof set are both never a pass. The manifest lists every artifact in the set with its size and sha256; the one exception is MANIFEST.json itself, which cannot contain its own hash, so files[] records every artifact except MANIFEST.json. proof_set status is offered, declined, UNRUN or collected: when declined, decline_reason is recorded, manifest_path is null and files is empty; when UNRUN, unrun_reason names the single blocking cause from production_data_only, no_local_stack, missing_tooling or failed_capture (a non-production impossible run is recorded the same way and is never a defect), manifest_path is null and files is empty; when collected, folder_layout and manifest_path are present. demo_script is skipped whenever proof_set is declined or UNRUN. Checkpoint keys are lowercase kebab-case with no path separators. Every files[].path, manifest_path and folder_layout is project-relative: no absolute paths, no .. traversal and no symlinks. Screenshots and recordings are fixtures/UAT only; redact secrets, credentials and personal data before capture and never capture production screens.
 
 ## Output Format
 
@@ -381,7 +381,7 @@ The full record schema and readiness rules are in
   false-completion rules, budget ledger, invalidation rules, accepted-with-
   disclosure guidance, and a worked template.
   The SKILL carries the 1.1 direction rules, 1.3 clickthrough status rule, 1.4 proof set, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding, 4 retro rules and 5 proof set/spoken demo (owner rev 2); the reference carries the matching record schema/fields and the template support; the proof-set rules themselves are normative in sections 1.4 and 5 and are not restated in the reference. Mockup-count matrix detail (1.2), question-cap detail, clickthrough lifecycle detail and the deferred eval cases E15-E19/E25 move to the next wave.
-- [evals/evals.json](evals/evals.json) - the 26 behaviour cases (E1-E13, E14, E20-E24, E26-E29 and PR-2 E30-E32) that exercise the choice, loop, records, readiness, budget and proof set; E15-E19 and E25 are deferred to the next wave.
+- [evals/evals.json](evals/evals.json) - the 25 behaviour cases (E1-E13, E14, E20-E24, E26-E29 and PR-2 E31-E32) that exercise the choice, loop, records, readiness, budget and proof set; E30 is deferred to the next wave with the reference-restatement issue; E15-E19 and E25 remain deferred.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - trigger
   discrimination against the nearest owners and the catalog-navigation case.
 - **Normative copy / maintenance:** the reference is the detailed normative copy

@@ -29,7 +29,7 @@ summary - keep both in sync.
 Return the record to the host/user or the project's state owner for persistence
 in the project's existing step-3 design/state or handoff artifact (for example
 its project-state format, design document or prior iteration record); do not
-write the project artefact yourself; the host/user or state owner performs any
+write the project artifact yourself; the host/user or state owner performs any
 persistence after receiving the returned content. The record is task-level and survives turn,
 session, resume and tool/agent changes. A missing record is recovered from the
 surrounding evidence, not read as an opt-out; a later user change is recorded
@@ -142,9 +142,9 @@ user validation that did not happen.
 - A defect outside the surface under change is a named residual; never fix it by loosening a test or lowering a threshold.
 - The approved mockup is bound by sha256 and byte size when the host provides it; the skill writes nothing.
 
-## 5b. Proof set (PR-2) and spoken demo script
+## 5b. Proof set and spoken demo script
 
-The proof set is offered once after the clickthrough decision (normative rules in the SKILL sections 1.4 and 5; this section is schema, folder layout and template support only). Folder layout: MANIFEST.json at the proof-set root with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside. MANIFEST.json lists every artifact with its size and sha256 and records captured-over-expected; a manifest cannot list its own hash, so MANIFEST.json itself is the one exception and files records the artifacts from MANIFEST.json excluding MANIFEST.json. captured_over_expected entries have the shape {checkpoint, expected, captured}. proof_set status is offered, declined, UNRUN or collected; declined records decline_reason with manifest_path null and files []; UNRUN records production_data_reasons with manifest_path null and files []; collected has folder_layout and manifest_path present. Checkpoint keys are lowercase kebab-case with no path separators or traversal. composed_owner: screenshot-evidence-planner and demo priority last_lowest are constants recorded in the template; the demo_script readiness coupling is normative in SKILL section 5.
+This section is schema, folder layout and template support only; normative rules are in the SKILL sections 1.4 and 5. Folder layout: MANIFEST.json at the proof-set root with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside. MANIFEST.json lists every artifact with its size and sha256 and records captured-over-expected; MANIFEST.json itself cannot be listed with its own hash, so files records artifacts from MANIFEST.json excluding MANIFEST.json. captured_over_expected entries have the shape {checkpoint, expected, captured}. proof_set fields: status (offered|declined|UNRUN|collected), decline_reason (...|null), unrun_reason (production_data_only|no_local_stack|missing_tooling|failed_capture|null), folder_layout (...|null), manifest_path (...|null), files ([{path, size, sha256}]), captured_over_expected ([{checkpoint, expected, captured}]), delegated_writer (...). demo_script fields: status (skipped|drafted|narrated), checkpoints ([...]), notes (...).
 
 ## 6. Worked record template
 
@@ -170,9 +170,9 @@ The proof set is offered once after the clickthrough decision (normative rules i
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
     proof_set: {status: offered|declined|UNRUN|collected, decline_reason: ...|null,
-      production_data_reasons: [...], folder_layout: ...|null, manifest_path: ...|null,
-      files: [{path, size, sha256}], captured_over_expected: [{checkpoint, expected, captured}],
-      delegated_writer: ..., composed_owner: screenshot-evidence-planner}
+      unrun_reason: production_data_only|no_local_stack|missing_tooling|failed_capture|null,
+      folder_layout: ...|null, manifest_path: ...|null, files: [{path, size, sha256}],
+      captured_over_expected: [{checkpoint, expected, captured}], delegated_writer: ..., composed_owner: screenshot-evidence-planner}
     demo_script: {status: skipped|drafted|narrated, checkpoints: [...], notes: ..., priority: last_lowest}
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]
