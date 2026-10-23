@@ -72,7 +72,7 @@ BLOCKED > GRANDFATHERED > ACTIVE > INACTIVE):
 
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
-| 1 | BLOCKED | reviewer block OR effective_deadline passed OR missing/corrupt deadline OR ambiguous or unrecorded one-use consumption OR malformed/missing armed or grandfathered flag (fail-safe) OR trigger | disabled |
+| 1 | BLOCKED | reviewer block OR no reviewer_candidate exists OR effective_deadline passed/missing/corrupt OR recorded_expiry_or_use_limit absent/corrupt OR ambiguous or unrecorded one-use consumption OR malformed/missing armed or grandfathered flag (fail-safe) OR trigger | disabled |
 | 2 | GRANDFATHERED | grandfathered=true AND not BLOCKED AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired | disabled - only ACTIVE auto-advances |
 | 3 | ACTIVE | grandfathered=false AND not blocked AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired AND armed=true | enabled |
 | 4 | INACTIVE | grandfathered=false AND not blocked AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired AND armed=false | disabled |
