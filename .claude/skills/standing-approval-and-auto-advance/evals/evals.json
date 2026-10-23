@@ -165,7 +165,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "INACTIVE is the remaining valid NON-GRANDFATHERED unarmed state and sits below ACTIVE: BLOCKED > GRANDFATHERED > ACTIVE > INACTIVE exactly.",
+          "INACTIVE is the remaining valid state with grandfathered=false and armed=false and sits below ACTIVE: BLOCKED > GRANDFATHERED > ACTIVE > INACTIVE exactly.",
           "INACTIVE disables auto-advance but is not BLOCKED/EXPIRED; it never permits agent action by itself."
         ]
       }
