@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "3b753efa3a8232a226108a4067740c0d78af2037",
+  "source_revision": "735de28af72f0702edc266859c2035200d8be5a5",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "40f6f2032257a5f36d63df97627f885d80f9f1e05c2ed84f9c9500bf13e5d1be"
+      "sha256": "ab25e2fe683d3c36298fe46f4c4870ed6cf84df301ac14f3d9b60dd1fbac2b36"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -411,7 +411,7 @@
     {
       "name": "design-system-token-governor",
       "path": ".claude/skills/design-system-token-governor/SKILL.md",
-      "sha256": "8f2a124c62454ea9ca927febfcf15a89b3c36b091fd0dec879e18ae059e849b6"
+      "sha256": "6d94eaebe1531446dafb1671287599159af673516c70ce10214e4f3a99dd6f09"
     },
     {
       "name": "diataxis-doc-organizer",
@@ -621,7 +621,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "4cb30803a0be5077dad28cc0568b4813906e572401d42671576d9f34b67d5879"
+      "sha256": "f0e6c15fddd42e8b4fd99f9e5afe8089c135773a48d196c4919397fca25a7430"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -1246,7 +1246,7 @@
     {
       "name": "vitest-unit-component-engineer",
       "path": ".claude/skills/vitest-unit-component-engineer/SKILL.md",
-      "sha256": "906e362aebe6985ddb257b4d9e54a242912503df2f08a9d6a2e470674aa7bf20"
+      "sha256": "250d6336821a57aeb51faabb02cdb554ad0952a90960d2383860c7a6432f5913"
     },
     {
       "name": "warehouse-lake-architect",

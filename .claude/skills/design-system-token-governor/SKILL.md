@@ -9,7 +9,7 @@ Terms: **family 14** - the discipline family in README.md and docs/skills-catalo
 
 ## Purpose
 
-Govern design tokens as one source of truth: a semantic token taxonomy (color, spacing, typography, state, theme) with naming rules, export pipeline, component consumption rules, theming/dark-mode contract, change governance and a migration-drift-resistant change.
+Govern design tokens as one source of truth: a semantic token taxonomy (color, spacing, typography, state, theme) with naming rules, export pipeline, component consumption rules, theming/dark-mode contract, change governance and a drift-resistant migration.
 
 The skill is **advisory and auto-invocable**. It produces guidance, records and review structure only; it does not edit code, run commands, use the network or grant production authority. Any implementation, execution or approval is a delegated host/user action under existing authority. It composes the nearest owners rather than duplicating them.
 

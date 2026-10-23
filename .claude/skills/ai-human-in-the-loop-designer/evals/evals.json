@@ -136,14 +136,15 @@
     {
       "id": "edge-ineligible-reviewer-holds-confirm",
       "type": "should_trigger",
-      "prompt": "A reversible, compensable single-record action is classified CONFIRM. The only available reviewer triggered the AI run and does not hold authority to perform the action themselves in that tenant. Design the handling.",
+      "prompt": "A reversible, compensable single-record action is classified CONFIRM. An eligible reviewer EXISTS in the tenant but is currently unavailable. The only AVAILABLE reviewer triggered the AI run and does not hold authority to perform the action themselves in that tenant. Design the handling.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Holds the action at CONFIRM and escalates to a named eligible reviewer/owner; it does not let the requester or the AI approve.",
           "Never downgrades a FORBIDDEN class by reviewer availability and never lets an ineligible reviewer commit.",
           "Records the ineligible-reviewer reason in the audit trail and keeps the action as a pending proposal, not product state.",
-          "Distinguishes the two reviewer cases: an existing-but-ineligible available reviewer -> hold at CONFIRM and escalate; NO eligible reviewer at all -> the action is not judgeable by a single reviewer and is FORBIDDEN, recorded and never silently proceeded."
+          "Distinguishes the two reviewer cases: an existing-but-ineligible available reviewer -> hold at CONFIRM and escalate; NO eligible reviewer at all -> the action is not judgeable by a single reviewer and is FORBIDDEN, recorded and never silently proceeded.",
+          "States the boundary explicitly: because an eligible reviewer exists but is unavailable, hold at CONFIRM and escalate to them; if NO eligible reviewer existed at all, this same action would be the FORBIDDEN boundary, not CONFIRM."
         ]
       }
     }

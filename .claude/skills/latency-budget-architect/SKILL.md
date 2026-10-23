@@ -191,10 +191,11 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <upstream timeout > upstream total_expected_hop_cost + downstream
-  expected critical-path cost + recorded epsilon (all ms; wait_0 counted once
-  outside own_attempt_work; wait_k per attempt; epsilon recorded once; nested/
-  correlated retries state their expectation or bound)>
+Timeouts: <upstream HARD timeout > conservative upstream bound + conservative
+  downstream critical-path bound + recorded epsilon (all ms; EVERY term uses
+  p=1/worst-case or a recorded percentile; at joins MAX of branch BOUNDS; expected
+  total_expected_hop_cost/retry_overhead are for retry-spend/budget checks only
+  and are never used for the hard timeout)>
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
@@ -217,12 +218,14 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Every timeout follows the ONE rule: upstream timeout > upstream
-      total_expected_hop_cost + downstream expected critical-path cost +
-      recorded epsilon (all ms; wait_0 counted once outside own_attempt_work;
-      wait_k per attempt; epsilon recorded once; nested/correlated retries
-      state their expectation or bound). If no feasible timeout exists, the
-      violation is escalated, not hidden.
+- [ ] Every ACTUAL Timeouts line uses the conservative hard-timeout rule:
+      upstream HARD timeout > conservative upstream bound + conservative
+      downstream critical-path bound + recorded epsilon (all ms; every term
+      p=1/worst-case or a recorded percentile; joins use MAX of branch BOUNDS;
+      epsilon recorded once). The expected total_expected_hop_cost/retry_overhead
+      model is confined to retry-spend/budget checks and never used for the hard
+      timeout. If no feasible hard bound exists, the violation is escalated, not
+      hidden.
 - [ ] Every budgeted path has a finite timeout; an infinite or missing timeout
       is a violation, not a default.
 - [ ] Retries are budgeted spend at one layer only; hedging is

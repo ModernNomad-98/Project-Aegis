@@ -54,7 +54,7 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 ## Timeout-cascade worksheet
 
-Expected retry-spend budget (uses p):
+Expected retry-spend CHECK (NOT a timeout derivation; uses p):
 
 ```
 timeout(upstream) > upstream total_expected_hop_cost(upstream)

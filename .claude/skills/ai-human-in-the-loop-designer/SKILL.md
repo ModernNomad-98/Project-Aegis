@@ -104,7 +104,8 @@ first workflow step.
    without AI. An action nobody may perform manually cannot become an AI
    action.
 2. **Sort each action into AUTONOMOUS, CONFIRM or FORBIDDEN.** Start every
-   action at advisory-only (the AI proposes, a person commits) and move it
+   action at advisory-only as its pre-classification posture (the AI proposes, a
+   person commits) and move it
    only with a reason tied to the risk tier. Apply these classes in order,
    using exactly these definitions:
    - **Reversible:** the action can be undone by the ordinary product path
@@ -127,11 +128,16 @@ first workflow step.
      AND judgeable by one eligible reviewer, when written policy requires
      approval, explicitly permits the action without requiring approval, OR is
      silent. CONFIRM is the default for any non-FORBIDDEN action that does not
-     meet the AUTONOMOUS gate. CONFIRM covers only single-record/one-user blast
-     radius; any action that reaches beyond one record or one user is FORBIDDEN
-     unless written policy explicitly defines a narrower CONFIRM limit. Policy silence or explicit permission without an
-     autonomy clause keeps such an action at CONFIRM; it never makes it FORBIDDEN
-     and never makes it AUTONOMOUS.
+     meet the AUTONOMOUS gate. Advisory-only is the mandatory PRE-CLASSIFICATION
+     posture every action starts in, and a valid FINAL outcome only for features
+     whose AI output never becomes product state; once output can become product
+     state the action is classified and cannot remain unclassified-advisory-only.
+     CONFIRM covers only single-record/one-user blast radius; any action beyond one
+     record or one user is FORBIDDEN unless a written policy defines a BOUNDED
+     multi-record CONFIRM limit (for example max N records, recorded); otherwise
+     FORBIDDEN. Policy silence or explicit permission without an autonomy clause
+     keeps such an action at CONFIRM; it never makes it FORBIDDEN and never makes
+     it AUTONOMOUS.
    - **AUTONOMOUS** only when the risk tier allows it, the action is reversible
      AND compensable, blast radius is one record or one user, the watch-and-undo
      controls in step 9 exist, and written policy explicitly permits autonomy.
@@ -145,7 +151,11 @@ first workflow step.
      recorded, treat the action as non-reversible/non-compensable (FORBIDDEN)
      until both are recorded.
 
-3. **Design the advisory-only mode.** For actions left advisory-only, the
+3. **Design the advisory-only mode.** Advisory-only is the pre-classification
+   posture for every action and a final posture only for features whose AI
+   output never becomes product state; a classified non-FORBIDDEN action that
+   fails the AUTONOMOUS gate is CONFIRM, not advisory-only. For features where
+   the output never becomes product state (final advisory-only), the
    AI output appears as a suggestion the user applies through the ordinary
    user interface with their own permissions. Nothing is written on the
    AI's behalf; the suggestion is labeled as AI-generated and can be

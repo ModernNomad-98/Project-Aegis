@@ -94,7 +94,7 @@ Canonical precedence table (EXPIRED checked first; BLOCKED > GRANDFATHERED > ACT
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
 | 0 | EXPIRED | recorded expiry/use limit has passed (checked first; terminal) | none; a new grant is required |
-| 1 | BLOCKED | reviewer block OR attestation deadline passed OR transition trigger (or the initial no-recorded-deadline entry classification) | disabled; blocking does not itself expire the grant, but the recorded expiry/use limit keeps running; only in-scope human/manual actions remain and no agent-initiated action proceeds |
+| 1 | BLOCKED | reviewer block OR attestation deadline passed OR no recorded attestation deadline for a NON-EXPIRED grant OR transition trigger | disabled; blocking does not itself expire the grant, but the recorded expiry/use limit keeps running; only in-scope human/manual actions remain and no agent-initiated action proceeds |
 | 2 | GRANDFATHERED | valid at adoption AND recorded AND not BLOCKED AND a recorded attestation deadline exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
 | 3 | ACTIVE | not blocked AND a recorded attestation deadline is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
 

@@ -12,7 +12,7 @@
         "assertions": [
           "Writes a falsifiable, directional hypothesis tied to a decision, and picks ONE primary metric plus guardrails (e.g. revenue, refund rate).",
           "Chooses the randomization unit for independence, sticky assignment, and notes contamination risk.",
-          "Reports and correctly uses the supplied planned sample (~628,000 per arm; no recomputation required) with the supplied alpha = 0.05 two-sided, power = 0.80, baseline 20.00% and 1% relative MDE, and derives duration explicitly: 628,000 users/arm / 120,000 users per arm per week = 5.23 weeks per arm, rounded up to 6 full weekly cycles; if traffic were total split 50/50 across arms the duration would be ~11 weeks and that assumption must be stated.",
+          "Reports and correctly uses the supplied planned sample (~628,000 per arm; no recomputation required) with the supplied alpha = 0.05 two-sided, power = 0.80, baseline 20.00% and 1% relative MDE, and derives duration explicitly: 628,000 users/arm / 120,000 users per arm per week = 5.23 weeks per arm, rounded up to 6 full weekly cycles; if instead the 120,000 were TOTAL across arms split 50/50, each arm would get 60,000/week and the duration would be ~10.5-11 weeks; that alternative must be stated explicitly and not confused with the per-arm fixture.",
           "Fixes the horizon up front and forbids peeking-to-significance (or specifies a sequential method with its correction).",
           "Grounds the primary metric in funnel-definition-designer / event-schema-architect definitions."
         ]
