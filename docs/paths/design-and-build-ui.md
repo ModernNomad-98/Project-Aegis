@@ -207,7 +207,7 @@ for what materially blocks the next useful action.
    [`playwright-e2e-engineer`](../../.claude/skills/playwright-e2e-engineer/SKILL.md)
    *(manual-only — name it explicitly)*; *for a live walkthrough of the
    running app,* name
-   [clickthrough-test-engineer](../../.claude/skills/clickthrough-test-engineer/SKILL.md)
+   [`clickthrough-test-engineer`](../../.claude/skills/clickthrough-test-engineer/SKILL.md)
    *(manual-only — name it explicitly)*. The iteration method offers the
    clickthrough after implementation, never requires it, and records a decline
    or an impossible run as a named UNRUN with the unobservable state-hydration

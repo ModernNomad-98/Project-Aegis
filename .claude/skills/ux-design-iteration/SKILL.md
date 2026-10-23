@@ -156,7 +156,7 @@ path (standard design and build remains the default).
 
 ## Design direction, mockups, UI lock and live acceptance (owner rev 2)
 
-These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. The skill stays strictly advisory: it writes no artefacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.4 (the PR-2 proof set) is intentionally absent from PR-1, and the ### 2/3/4 headings below are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artefacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
 
 ### 1.1 Design direction (choose one, once)
 
@@ -168,7 +168,7 @@ All three reuse the project's in-code design system and tokens as the authority 
 
 ### 1.2 Mockup count 1-4
 
-Default 2, hard maximum 4. Under (a) and (c) exactly one mockup is permitted; under (b) at least two are required. Reconcile the budget: concepts are non-cosmetic flows; mockups are exercisable artifacts. Amend the recorded default from 'up to three concepts' to 'up to four concepts and up to four mockups', configurable only with a recorded reason; every evaluation pass still counts.
+Default 2, hard maximum 4 (the hard maximum of four is never exceeded). Under (a) and (c) exactly one mockup is permitted; under (b) at least two are required. Within the 1-4 range a non-default count is configurable only with a recorded reason; concepts are non-cosmetic flows and mockups are exercisable artifacts. Amend the recorded budget from 'up to three concepts' to 'up to four concepts and up to four mockups'; every evaluation pass still counts.
 
 ### 1.3 Final clickthrough (offered, never required)
 
@@ -212,7 +212,7 @@ Return, in this order:
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
 
-   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (default 2, hard max 4; one under 1a/1c, at least two under 1b; recorded override reason); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; and clickthrough_offer_decision (offered/declined/UNRUN) once implementation allows the offer.
+   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (default 2, hard max 4; one under 1a/1c, at least two under 1b; recorded override reason); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; authority_conflict (recorded source conflict and its resolution; the in-code design system keeps authority unless named elements are superseded); and clickthrough_offer_decision (offered/declined/UNRUN) once implementation allows the offer.
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.

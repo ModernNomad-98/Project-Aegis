@@ -19,7 +19,7 @@ summary - keep both in sync.
 | `scope` | Feature/task boundary the choice applies to. | `account settings screens: profile, notifications, save confirmation` |
 | `instruction_source` | Where the choice came from (user turn, reused record, recovered context). | `user turn 2026-10-20, step-3 prompt` |
 | `endpoint` | The delivery endpoint the iteration feeds. | `reviewed handoff to the build stage` |
-| `budget` | Up to three concepts and up to three independent evaluation passes by default (at least two non-cosmetic flows); any override carries a recorded reason; every pass counts. | `up to 3 concepts / up to 3 passes` |
+| `budget` | Up to four concepts and up to four mockups by default (at least two non-cosmetic flows), with up to three independent evaluation passes by default; any override carries a recorded reason and can only change a non-default count within 1-4, never exceed the hard maximum of four; every evaluation pass counts. | `up to 4 concepts / up to 4 mockups / up to 3 passes` |
 | `selection_offer_count` | How many times the choice was offered for this feature; at most once per feature/selection context. | `1` |
 | `record_location` | Where the returned record will be persisted (host/user or the project state owner's existing artifact). | `docs/project-state.md decision log (owner to persist)` |
 | design_direction | One of the three owner directions: 1a guided premium, 1b creative options, 1c follow my existing design; not-applicable only when no design direction is needed. | 1a |
@@ -126,12 +126,6 @@ budget yourself.
   smallest decision; if the final budgeted pass already establishes every
   required check, the readiness rules decide and the cap alone is not a blocker;
   never manufacture a pass or continue silently.
-## 5a. Retro rules (failure triage, scope, mockup binding)
-
-- When a check fails, classify it as a stale assertion, a product bug, or a wrong metric BEFORE fixing it; record the classification in the record.
-- A defect outside the surface under change is a named residual; never fix it by loosening a test or lowering a threshold.
-- The approved mockup is bound by sha256 and byte size; the implementation record states that the committed copy matches that binding.
-
 ## 5. Accepted-with-disclosure rules
 
 A limitation can be accepted explicitly instead of fixed only when all of the
@@ -140,6 +134,12 @@ accepted it and on what evidence, what would reopen it, and the residual risk
 visible in the readiness declaration. Accepted limitations never convert an
 UNRUN or FAIL check into PASS, never remove a required check, and never claim
 user validation that did not happen.
+
+## 5a. Retro rules (failure triage, scope, mockup binding)
+
+- When a check fails, classify it as a stale assertion, a product bug, or a wrong metric BEFORE fixing it; record the classification in the record.
+- A defect outside the surface under change is a named residual; never fix it by loosening a test or lowering a threshold.
+- The approved mockup is bound by sha256 and byte size; the implementation record states that the committed copy matches that binding.
 
 ## 6. Worked record template
 
@@ -158,11 +158,13 @@ user validation that did not happen.
     prototype:
       scope_included: [...] ; mocked: [...] ; incomplete: [...] ; fixtures: [...] ; smallest_artifact: ...
     evaluations:
-- id: E1 ; mockup_id: M1 ; question: ... ; candidate_version: ... ; scenario: ... ; observation: ... ;
-      prototype_acceptance: {exercisable: ..., stateful: ..., non_happy_states: [...], fixtures_only: ..., viewports: [...], keyboard: ...} ;
-      ui_lock_inventory_diff: [{element, mapped_to}] ; proposed_ui_additions: [...] ;
-      retro_classification: [{check, class: stale_assertion|product_bug|wrong_metric}] ; clickthrough: {offered, decision, unrun_reason} ;
+      - id: E1 ; mockup_id: M1 ; question: ... ; candidate_version: ... ; scenario: ... ; observation: ... ;
         evidence: ... ; finding: ... ; disposition: ... ; uncertainty: ...
+    prototype_acceptance: {exercisable: ..., stateful: ..., non_happy_states: [...], fixtures_only: ..., viewports: [...], keyboard: ...}
+    ui_lock_inventory_diff: [{element: ..., mapped_to: ...}]
+    proposed_ui_additions: [...]
+    retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
+    clickthrough: {offered: ..., decision: ..., unrun_reason: ...}
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]
     retest:

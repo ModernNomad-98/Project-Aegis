@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ux-design-iteration",
-  "description": "Behaviour cases for the optional pre-implementation design iteration method (29 cases E1-E29: the 13 original cases E1-E13 plus 16 PR-1 extension cases E14-E29). The 16 extension cases are structural assertion cases and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13 and E14-E29. Every case is a behavioural prompt/assertion case; none is a JSON/schema check.",
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (29 cases E1-E29: the 13 original cases E1-E13 plus 16 PR-1 extension cases E14-E29). The 16 extension cases are behavioural prompt/assertion cases whose assertions check the skill's rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13 and E14-E29. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
   "cases": [
     {
       "id": "E1",
@@ -256,7 +256,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Caps mockups at four, records any override reason, and refuses the excess.",
+          "Caps mockups at four (the hard maximum can never be exceeded), records an override reason only for a non-default count within 1-4, and refuses the excess.",
           "Does not silently accept six or reset the evaluation-pass ledger."
         ]
       },
@@ -266,11 +266,12 @@
     {
       "id": "E18",
       "type": "should_trigger",
-      "prompt": "Here is our complete brand pre-design: brand-kit.fig v4, 128,344 bytes, sha256 9f3c...; follow my existing design.",
+      "prompt": "Here is our complete brand pre-design: brand-kit.fig v4, 128,344 bytes, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a; follow my existing design.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Binds the pre-design by file name, version, byte size and sha256 and uses it under 1c.",
+          "Binds the pre-design by file name, version, byte size and the full 64-hex sha256 and uses it under 1c.",
+          "Rejects a truncated or absent digest by marking the binding UNKNOWN instead of binding it; a full 64-hex digest is required.",
           "Invents no token, spacing, state or interaction the pre-design does not specify."
         ]
       },
@@ -280,12 +281,12 @@
     {
       "id": "E19",
       "type": "should_trigger",
-      "prompt": "Here is our pre-design, but it only has colours and no spacing, states or interaction details.",
+      "prompt": "Here is our pre-design, but it only has colours and no spacing, states or interaction details. (The skill may ask one bounded combined question within its two-question design-entry cap.)",
       "expect": {
         "triggers": true,
         "assertions": [
           "Declares the unspecified spacing, states and interaction items as UNKNOWNs rather than inventing them.",
-          "Asks once for the missing decisions and records the answer for reuse."
+          "Asks once, with ONE bounded combined question for the missing decisions within the two-question design-entry cap, records the answer, and records any remaining gaps as UNKNOWNs."
         ]
       },
       "host_evidence": false,
@@ -336,12 +337,12 @@
     {
       "id": "E23",
       "type": "should_trigger",
-      "prompt": "The prototype covers the happy path and the empty state; skip permission-denied.",
+      "prompt": "The story names the viewer/permission-denied state in scope; the prototype covers only the happy path and the empty state and skips permission-denied.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Declares NOT READY because a named in-scope non-happy state is missing; names the permission-denied/viewer state and how the user continues.",
-          "Does not lower the readiness criteria."
+          "Does not lower the readiness criteria or claim the skipped state is out of scope."
         ]
       },
       "host_evidence": false,
