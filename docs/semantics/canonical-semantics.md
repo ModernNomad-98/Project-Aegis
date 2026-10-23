@@ -165,3 +165,11 @@ Implementation-wave checks:
 ```
 git grep -n effective_deadline -- .claude/skills/standing-approval-and-auto-advance   # expected: at least one hit
 git grep -n total_expected_hop_cost -- .claude/skills/latency-budget-architect   # expected: at least one hit; hard-mode terms also present
+git grep -n ancestry_status -- .claude/skills/agent-memory-governance   # expected: at least one hit
+git grep -n FORBIDDEN -- .claude/skills/ai-human-in-the-loop-designer   # expected: at least one hit
+python -P -c "import json; d=json.load(open('.claude/skills/standing-approval-and-auto-advance/evals/evals.json')); assert any('effective_deadline' in ' '.join(c['expect']['assertions']) for c in d['cases'])   # expected: exit 0 (assertion holds)
+```
+Expected results are stated per owning wave; a check that cannot run as written is deleted, not reworded.
+
+## 6. Citation, ownership and change control
+All affected SKILL.md files and evals cite this file as a pointer; the agent-memory-governance reference also cites it. Citations name the canonical IDs they cover and never restate a rule. Audits check operative text against this file. Changes to this file require the owner's recorded instruction; this file is merged before any skill-text change and R8 implementation waves implement each canonical ID once at its named canonical location. No advisory row (R8-ADV-*), review item, or old alias is authority in operative text.
