@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "0c4a9caab0b25482fad9f3c75b99cdec15c9d5c7",
+  "source_revision": "b32b39b301251a558f42099c7476ae9ed72c6998",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "2dc82713162eba86401cdc6f1fff37af051e3f827d59a1a607058e6a58a4109f"
+      "sha256": "3614f4f4e7cc0b5f29b974818cf16f0e67059bb42d4fa99be8e014ed34c8840b"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -161,7 +161,7 @@
     {
       "name": "api-doc-generator-designer",
       "path": ".claude/skills/api-doc-generator-designer/SKILL.md",
-      "sha256": "58eac2ed6db4dd10c30dfe90c702285ce660361054ebe389bebfa30d8273e8ab"
+      "sha256": "6f5f3081b74e57d249f9213a20a9ab1ed640d20e1517ca01880a65ac4e4391d6"
     },
     {
       "name": "api-event-architect",
@@ -621,7 +621,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "0a0e85dfe44968e274a60d64c594d1fd284cadeed593bd3d26cfa4e89e4073c6"
+      "sha256": "9ff0f7cc535958cd470febcf92a3f93f264b00240a7e6d5c8653f4b9444043b1"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -716,7 +716,7 @@
     {
       "name": "notification-webhook-ux-designer",
       "path": ".claude/skills/notification-webhook-ux-designer/SKILL.md",
-      "sha256": "d3f8f5a135f7c6c3e07c37f941e54dbefb14adc24a1ea025dff4a55850e8c672"
+      "sha256": "3d2cc6bcf1dcc16028419bf862d6f578e79bbfabe1e0642ff2ef5e850c82d5e0"
     },
     {
       "name": "observability-by-design",
@@ -1061,7 +1061,7 @@
     {
       "name": "skill-usage-ledger",
       "path": ".claude/skills/skill-usage-ledger/SKILL.md",
-      "sha256": "0fd1aea25d7835d43f0a419f8a4604dac7d4263bca0de33c936234fe3e85741b"
+      "sha256": "44fa29b72c0f93fe5c03920196ce7cd13a8b5c59795b688d586dda2d7c0f4355"
     },
     {
       "name": "slo-reliability-architect",
@@ -1246,7 +1246,7 @@
     {
       "name": "vitest-unit-component-engineer",
       "path": ".claude/skills/vitest-unit-component-engineer/SKILL.md",
-      "sha256": "55df3089adbe9a7590c4a112fe24057a9ed57db1a968a802fb2f44810aab3b86"
+      "sha256": "80d0722ad84c93fbc79bc5c41ccc042b65fb50e6c18102d13f20dd9a7b535b4d"
     },
     {
       "name": "warehouse-lake-architect",
