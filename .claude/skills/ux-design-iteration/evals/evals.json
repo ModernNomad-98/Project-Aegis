@@ -296,16 +296,16 @@
     {
       "id": "E19",
       "type": "should_trigger",
-      "prompt": "Offer the final clickthrough for a finished account-resume flow; the user explicitly says no, then asks whether we are still ready to hand off.",
+      "prompt": "Offer the final clickthrough for a finished account-resume flow; the user explicitly says no, then asks whether we are still ready to hand off, and also asks what happens if the clickthrough record itself is missing or malformed.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Records the clickthrough status as declined: declined is a recorded user answer, not a run outcome, and it carries no defect classes for a decline.",
           "States the clickthrough is never a pass and the decline is never converted into UNRUN; readiness may still be declared on other evidence.",
-          "Places clickthrough_offer_decision in the iteration/post-implementation record only and keeps exactly the five pre-implementation fields in the selection record; it is never part of the pre-implementation selection record.",
-          "Treats an attempted-but-impossible clickthrough as UNRUN naming unobservable state-hydration/transition classes; absent/malformed/missing status is the single fail-safe UNKNOWN DIAGNOSIS recorded in status_diagnosis (never a fourth stored status, never defaulted to UNRUN, never a pass).",
+          "Places clickthrough_offer_decision in the iteration/post-implementation record only and keeps it out of the five-field pre-implementation selection record; the other selection-record fields remain unchanged.",
+          "Treats an attempted-but-impossible clickthrough as UNRUN naming unobservable state-hydration/transition classes; absent/malformed/missing status is the single fail-safe UNKNOWN DIAGNOSIS recorded in status_diagnosis with a named reason and human remediation (no fourth status, never defaulted to UNRUN, never a pass).",
           "Cites canonical R8-UX-4 for lifecycle/placement; does not restate unrelated rules.",
-          "Does not convert the recorded decline into an UNKNOWN, FAIL or defect, and does not re-ask the clickthrough automatically."
+          "Does not convert the recorded decline into an UNKNOWN diagnosis, a defect or a negative result, and does not re-ask the clickthrough automatically."
         ]
       },
       "host_evidence": false,
@@ -455,14 +455,14 @@
     {
       "id": "E30",
       "type": "should_trigger",
-      "prompt": "After implementation the user declines the proof set. The reference page also restates the proof-set rules. Record the proof-set decision and explain which text is authoritative.",
+      "prompt": "After implementation the user declines the proof set. The reference page also appears to restate the proof-set rules. Record the proof-set decision and explain which text is authoritative, including what happens if the proof set cannot be run at all.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Records the proof-set decline as a recorded decision that is not a defect and does not upgrade readiness.",
           "States SKILL 1.4 and SKILL 5 remain the single normative source; the reference 5b is schema/folder/template support and does not restate normative rules.",
-          "When an attempted proof set cannot run (a different event from a decline), uses the unrun_reason enum (production_data_only|no_local_stack|missing_tooling|failed_capture) for UNRUN and names production-data-only input as a named UNRUN; a decline never carries unrun_reason.",
-          "Cites canonical R8-UX-3 and canonical R8-UX-4 where lifecycle/schema overlap; no second normative copy is created.",
+          "When an attempted proof set cannot run (a different event from a decline), uses the proof-set unrun_reason enum (production_data_only|no_local_stack|missing_tooling|failed_capture) for UNRUN and names production-data-only input as a named UNRUN; a decline never carries unrun_reason.",
+          "Cites canonical R8-UX-3 for record schema/placement (where it overlaps) and keeps SKILL 1.4 and SKILL 5 as the proof-set single source; does not claim canonical R8-UX-4 governs proof-set rules.",
           "States evidence never upgrades readiness and declined/UNRUN is never a pass."
         ]
       },
