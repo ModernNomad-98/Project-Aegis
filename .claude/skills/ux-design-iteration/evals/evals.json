@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ux-design-iteration",
-  "description": "Behaviour cases for the optional pre-implementation design iteration method (13 cases E1-E13). Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12 and E13. Every case is a behavioural prompt/assertion case; none is a JSON/schema check.",
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (23 cases: the 13 original cases E1-E13 plus kept PR-1 extension cases E14, E20-E24 and E26-E29; E15-E19, E25 and the mockup-count/question-cap/clickthrough-lifecycle detail are postponed to the next wave). The kept extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14, E20-E24 and E26-E29. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
   "cases": [
     {
       "id": "E1",
@@ -202,6 +202,147 @@
           "Does not invoke the optional iteration method or offer the A/B choice for a settled implementation.",
           "Routes the ordinary build request through the standard lifecycle/classification route.",
           "Does not claim iteration work was performed."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E14",
+      "type": "should_not_trigger",
+      "prompt": "We already know the flow and the design system - just build the settings page, do not ask me design questions.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not offer the A/B choice or any design-direction/mockup/UI-lock question for a settled implementation.",
+          "Routes the ordinary build through the standard design/build path and claims no iteration work."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E20",
+      "type": "should_trigger",
+      "prompt": "The pre-design says rounded cards, but our in-code design system uses square cards everywhere.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the authority conflict and keeps the in-code design system as authority unless the user names elements the pre-design supersedes.",
+          "Does not silently pick the easier source or invent a third style.",
+          "Records the authority conflict and keeps the in-code design system as authority unless the user names superseding elements."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E21",
+      "type": "should_trigger",
+      "prompt": "Here is a static screenshot of the proposed checkout - accept the prototype as ready.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declares NOT READY and names the unexercisable transitions; a static image or non-interactive comp is not evidence.",
+          "States screenshots and the PR-2 proof set do not upgrade readiness."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E22",
+      "type": "should_trigger",
+      "prompt": "The prototype shows the primary action as Send 3 items hard-coded on every step.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Fails acceptance: the count-carrying primary action must read the real count from state, not a hard-coded label.",
+          "Records the finding and does not declare READY."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E23",
+      "type": "should_trigger",
+      "prompt": "The story names the viewer/permission-denied state in scope; the prototype covers only the happy path and the empty state and skips permission-denied.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Declares NOT READY because a named in-scope non-happy state is missing; names the permission-denied/viewer state and how the user continues.",
+          "Does not lower the readiness criteria or claim the skipped state is out of scope."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E24",
+      "type": "should_trigger",
+      "prompt": "No clickthrough - just declare the iteration done.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the clickthrough decision; a decline or impossible run is a named UNRUN with the unobservable state-hydration and transition defect classes.",
+          "Leaves readiness unchanged and claims no pass; does not invoke the MANUAL-ONLY skill silently."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E26",
+      "type": "should_trigger",
+      "prompt": "Add a new settings section to our existing app; we already have a design system in code.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defaults UI consistency lock ON for the existing application without asking and keeps components/tokens/colour/type/spacing/icon/motion consistent.",
+          "Permits UX flow/copy/state redesign within the existing vocabulary, not a new component or token."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E27",
+      "type": "should_trigger",
+      "prompt": "Here is the mockup with a custom date-range component we do not have in the library.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Names the inventory-diff requirement and the unmapped component; an unapproved unmapped element makes the mockup NOT READY with the element named.",
+          "Routes the needed element to the design-system owner as a PROPOSED UI ADDITION, not as an approved mockup element."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E28",
+      "type": "should_trigger",
+      "prompt": "Under UI lock, the two creative directions differ only in accent colour - that is enough, right?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects cosmetic-only difference: under UI lock creative directions must differ in experience (flow, structure, interaction, states), not look.",
+          "Records the finding and does not count them as two distinct directions."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E29",
+      "type": "should_trigger",
+      "prompt": "We need a new multi-select chip component for the flow; put it in the mockup as approved.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the new element as a PROPOSED UI ADDITION with justification routed to the design-system owner as a separate decision; it does not enter the mockup as approved.",
+          "Does not declare the mockup READY with an unapproved new component."
         ]
       },
       "host_evidence": false,

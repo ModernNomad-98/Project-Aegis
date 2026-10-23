@@ -92,6 +92,9 @@ path (standard design and build remains the default).
    If the direction is already settled or the request is an ordinary implementation,
    route it through change-classification-gate and docs/paths/design-and-build-ui.md
    and do not offer iteration.
+
+   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (PR-2).
+
 2. **Decide the mode; return the record.** Return the exact selection record
    (mode, feature/task scope, instruction source, delivery endpoint, iteration
    budget, selection/offer count, record_location) to the host/user or the
@@ -151,6 +154,52 @@ path (standard design and build remains the default).
     verifies the integrated feature; merge/deploy/spending authority is
     unchanged.
 
+## Design direction, mockups, UI lock and live acceptance (owner rev 2)
+
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup-count detail and section 1.4 (the PR-2 proof set) are deferred to the next wave and intentionally absent from PR-1; the ### 2/3/4 headings below are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artefacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+
+### 1.1 Design direction (choose one, once)
+
+All three reuse the project's in-code design system and tokens as the authority (compose design-system-token-governor); none invents a parallel system.
+
+- **(a) Guided premium - clarity first.** Reviewer-checkable heuristics: exactly one primary action per screen; one dominant element per view; spacing and type only from the token scale; at most one accent plus neutrals per view unless the design system defines more; system-native patterns; motion only on state change and only where it explains the state. Under UI lock (1.5), a heuristic the existing UI cannot meet with its current vocabulary yields to the lock and is recorded as a residual, not forced.
+- **(b) Creative options.** Propose 2-4 distinct directions; each states its hypothesis and what would make it right or wrong. Cosmetic variants do not count as distinct. Under UI lock the directions must differ in experience (flow, structure, interaction, states), not in look.
+- **(c) Follow my existing design.** Use the user-provided pre-design or guideline under the pre-design rules (3).
+
+### 1.3 Final clickthrough (offered, never required)
+
+After implementation, offer an interactive clickthrough of the running app (compose clickthrough-test-engineer, MANUAL-ONLY: name it and stop; run it only on an explicit yes). Offer it immediately after implementation while the local stack is up. If declined or impossible, record a named UNRUN stating the defect classes that become unobservable - state hydration and transition bugs (for example a resume flow that opened the wrong step while every static suite was green). Readiness may still be declared; the record shows it was not run; clickthrough is never a pass. The post-implementation status is offered, declined or UNRUN; it is not part of the pre-implementation selection record.
+
+### 1.5 UI consistency lock (default by context, not a question)
+
+Redesign the experience, keep the interface. UX (flow, step order, information architecture, what appears when, interaction within the existing component vocabulary, copy, state handling) may be redesigned. UI (components, tokens, colours, type scale, spacing scale, iconography, motion patterns, visual language) stays consistent with what is already in place. Default ON for an existing application or an in-code design system; OFF for greenfield. Do not ask it as a question: the user turns it off by asking for a visual refresh, and that override is recorded.
+
+Permitted under the lock: new screens, steps, dialogs, sheets and layouts composed only from existing components and tokens; new copy; new states built from existing patterns. Not permitted: a new component not in the library; a new token, colour, type size or spacing value; new iconography; a new motion pattern. A genuinely needed new element becomes a **PROPOSED UI ADDITION** with a justification routed to the design-system owner as a separate decision; it does not enter the mockup as approved.
+
+ENFORCEMENT: the independent reviewer produces an inventory diff composing frontend-architecture-mapper for components and design-system-token-governor for tokens. Every component, token, colour, type size, icon and motion in the mockup is mapped to an existing project element; any unmapped element is a finding; an unapproved unmapped element makes the mockup **NOT READY** with the element named. Under 1c, a pre-design conflicting with the lock follows rule 3: the in-code UI wins unless the user states otherwise for named elements. State the rationale generally: an experience can be redesigned within existing tokens and kit recipes without a design-system change, which is the point of the lock.
+
+### 2. Prototype acceptance - live, not a picture
+
+The reviewer enforces this; a failing artifact is **NOT READY**.
+
+- **Exercisable:** the reviewer moves through the flow by clicking and typing; every transition named in the story is reachable.
+- **Stateful:** state carries across steps and derived content updates from it - a count-carrying primary action reads the real count, with no hard-coded labels.
+- **Non-happy states reachable:** for every state the story names in scope (empty, invalid input, permission-denied/viewer, loading, error, recovery), the prototype shows the state and how the user continues. Scope stays the named interaction; the prototype is not a parallel application.
+- **Self-contained:** fixtures only, no backend, no network, no repository change. Real tokens come from the project or a bound pre-design; under UI lock, the project's only.
+- **Responsive and keyboard-operable:** works at the declared viewports, is keyboard-operable with visible focus.
+
+TEETH: a static image or non-interactive comp whose named transitions cannot be exercised is **NOT READY** with the unexercisable transitions named; screenshots are not evidence; the PR-2 proof set does not upgrade it. Rationale: defects live in transitions.
+
+### 3. Pre-design (1c)
+
+A pre-design enters only as a user-provided artifact; this skill does not fetch, open URLs or launch a browser. Bind it by file name, version, byte size and sha256. Unspecified items are declared UNKNOWNs - never invent a token, spacing, state or interaction. An authority conflict is recorded, not guessed: the in-code design system keeps authority per docs/paths/design-and-build-ui.md unless the user states the pre-design supersedes it for named elements. Ask once, record the answer, and reuse it without re-asking.
+
+### 4. Retro rules
+
+- **Failure triage:** when a check fails, classify it as a stale assertion, a product bug, or a wrong metric before fixing it; record which.
+- **Scope discipline:** a defect outside the surface under change is named a residual, never fixed by loosening a test.
+- **Mockup binding:** the approved mockup is bound by sha256 and byte size when the host provides it; the skill writes nothing.
+
 ## Output Format
 
 Return, in this order:
@@ -158,6 +207,8 @@ Return, in this order:
 1. **Selection record** - mode (A or B), feature/task scope, instruction
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
+
+   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); ui_lock (ON/OFF plus any visual-refresh override reason); and pre_design_binding (name, version, byte size, sha256) when 1c.
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.
@@ -218,6 +269,14 @@ The full record schema and readiness rules are in
 - Nothing claims unexercised interaction, human-user validation or a host
   capability that did not run; unavailable checks are reported UNRUN with
   their exact prerequisite.
+- The design-entry questions followed the owner discipline: at most two questions at design entry, context inference used first (Figma export implies 1c, settled direction implies one mockup, existing application implies UI lock ON without asking), and no invented cost.
+- The chosen design direction is one of 1a/1b/1c, or not-applicable when no direction is needed.
+- Under guided premium, exactly one primary action per screen and one dominant element per view are checked; under UI lock, UI stays consistent and any inability to meet a heuristic is recorded as a residual, not forced.
+- The UI-lock inventory diff maps every component/token/colour/type size/icon/motion to an existing project element; an unapproved unmapped element is NOT READY with the element named, and a needed new element is a PROPOSED UI ADDITION, not an approved mockup element.
+- Prototype acceptance is live: transitions exercisable, state carries, real counts (no hard-coded labels), every named non-happy state reachable, fixtures only, declared viewports and keyboard focus; a static image or non-interactive comp whose transitions cannot be exercised is NOT READY with those transitions named.
+- The clickthrough was offered after implementation; when declined or impossible it is a named UNRUN naming the unobservable state-hydration/transition defects, readiness is unchanged, and no pass is claimed.
+- Pre-design is bound by name/version/byte size/sha256, gaps are UNKNOWNs, and an authority conflict is recorded (in-code wins unless the user names superseding elements).
+- Retro failures were classified before fixing; out-of-scope defects are named residuals; the approved mockup is bound by sha256 and byte size when the host provides it; the skill writes nothing.
 
 ## Gotchas
 
@@ -250,6 +309,10 @@ The full record schema and readiness rules are in
   phased-work-handoff-designer, review facilitation to
   design-review-facilitator, criteria review to acceptance-criteria-reviewer,
   and lifecycle routing to project-orchestrator.
+- A picture is not a prototype: a static image or non-interactive comp cannot exercise the transitions where defects live; it is NOT READY with the missing transitions named.
+- Cosmetic variants are not creative directions: under creative options they must differ in flow/experience, and under UI lock they must differ in experience, not look.
+- A new component under UI lock is not a mockup detail: it is a PROPOSED UI ADDITION routed to the design-system owner, and an unapproved unmapped element is a finding that makes the mockup NOT READY.
+- Hard-coded labels and missing permission-denied states are acceptance failures, not polish: the count must come from state and every named non-happy state must show how the user continues.
 
 ## Stop Conditions
 
@@ -288,6 +351,10 @@ The full record schema and readiness rules are in
 - The request is a measured A/B experiment (ab-test-designer) or a ship/deploy
   release-readiness gate (release-readiness-reviewer): route there; this skill's
   A/B names journey options and its readiness is design-progress readiness only.
+- A requested acceptance is a static image or non-interactive comp: refuse it as evidence, declare NOT READY, and name the unexercisable transitions; do not treat a screenshot or the PR-2 proof set as a pass.
+- The next check is the clickthrough: name clickthrough-test-engineer (MANUAL-ONLY) and stop for the human; never run it silently. If declined/impossible, record the named UNRUN and keep readiness unchanged.
+- UI lock blocks a needed element: propose a PROPOSED UI ADDITION to the design-system owner as a separate decision; never enter an unapproved new component/token into the mockup.
+- A pre-design would need fetching, opening a URL or a browser to read: stop; only a user-provided artifact can enter, bound by name/version/byte size/sha256.
 
 ## Supporting Files
 
@@ -295,8 +362,8 @@ The full record schema and readiness rules are in
   the full record schema fields, the 9 loop elements, readiness and
   false-completion rules, budget ledger, invalidation rules, accepted-with-
   disclosure guidance, and a worked template.
-- [evals/evals.json](evals/evals.json) - the 13 behaviour cases (E1-E13) that
-  exercise the choice, loop, records, readiness and budget.
+  The SKILL carries the 1.1 direction rules, 1.3 clickthrough status rule, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding and 4 retro rules (owner rev 2); the reference carries the matching record fields and partial readiness additions, not a second copy of those rules. Mockup-count matrix detail (1.2), question-cap detail, clickthrough lifecycle detail and the deferred eval cases E15-E19/E25 move to the next wave; the PR-2 proof set is not part of PR-1.
+- [evals/evals.json](evals/evals.json) - the 23 PR-1 behaviour cases (E1-E13, E14, E20-E24 and E26-E29) that exercise the choice, loop, records, readiness and budget; E15-E19 and E25 are deferred to the next wave.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - trigger
   discrimination against the nearest owners and the catalog-navigation case.
 - **Normative copy / maintenance:** the reference is the detailed normative copy
