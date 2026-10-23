@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "da6324d4212a8a74b82f76183d636ff9e0c49f79",
+  "source_revision": "1a3f78ccb4bed67dbed9a6b88197ed35e171c474",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
