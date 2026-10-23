@@ -254,7 +254,7 @@
     {
       "id": "E17",
       "type": "should_trigger",
-      "prompt": "I want six mockups for the dashboard alternatives.",
+      "prompt": "Under creative options, I want six mockups for the dashboard alternatives.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -289,7 +289,7 @@
         "assertions": [
           "Records the authority conflict and keeps the in-code design system as authority unless the user names elements the pre-design supersedes.",
           "Does not silently pick the easier source or invent a third style.",
-          "Records the authority_conflict field with none when there is no pre-design conflict or the recorded resolution when there is one."
+          "Uses the authority_conflict mapping: not-applicable when no pre-design/1c is in use; none when 1c applies with no conflict; the recorded resolution when 1c conflicts; a named UNKNOWN/open item when unresolved."
         ]
       },
       "host_evidence": false,
