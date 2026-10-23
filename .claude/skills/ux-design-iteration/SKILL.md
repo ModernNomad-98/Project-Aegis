@@ -220,7 +220,7 @@ Return, in this order:
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
 
-   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); ui_lock (ON/OFF plus any visual-refresh override reason); and pre_design_binding (name, version, byte size, sha256) when 1c.
+   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); ui_lock (ON/OFF plus any visual-refresh override reason); and pre_design_binding (name, version, byte size, sha256) when 1c. When a proof set is offered, the record also carries proof_set (status: offered, declined, UNRUN or collected) and demo_script (status: skipped, drafted or narrated) from the reference template; the proof-set rules themselves are normative in sections 1.4 and 5.
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.
@@ -374,12 +374,14 @@ The full record schema and readiness rules are in
   the full record schema fields, the 9 loop elements, readiness and
   false-completion rules, budget ledger, invalidation rules, accepted-with-
   disclosure guidance, and a worked template.
-  The SKILL carries the 1.1 direction rules, 1.3 clickthrough status rule, 1.4 proof set, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding, 4 retro rules and 5 proof set/spoken demo (owner rev 2); the reference carries the matching record fields and partial readiness additions, not a second copy of those rules. Mockup-count matrix detail (1.2), question-cap detail, clickthrough lifecycle detail and the deferred eval cases E15-E19/E25 move to the next wave.
+  The SKILL carries the 1.1 direction rules, 1.3 clickthrough status rule, 1.4 proof set, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding, 4 retro rules and 5 proof set/spoken demo (owner rev 2); the reference carries the matching record schema/fields and the template support; the proof-set rules themselves are normative in sections 1.4 and 5 and are not restated in the reference. Mockup-count matrix detail (1.2), question-cap detail, clickthrough lifecycle detail and the deferred eval cases E15-E19/E25 move to the next wave.
 - [evals/evals.json](evals/evals.json) - the 26 behaviour cases (E1-E13, E14, E20-E24, E26-E29 and PR-2 E30-E32) that exercise the choice, loop, records, readiness, budget and proof set; E15-E19 and E25 are deferred to the next wave.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - trigger
   discrimination against the nearest owners and the catalog-navigation case.
 - **Normative copy / maintenance:** the reference is the detailed normative copy
-  of the loop, readiness, ledger and acceptance rules; the workflow above is the
-  summary - keep both in sync. The path step, owner names and A/B wording are
+  of the loop, readiness, ledger and acceptance rules (exception: the proof-set
+  rules are normative only in this SKILL, sections 1.4 and 5, and the reference
+  records their schema/template support); the workflow above is the summary -
+  keep both in sync. The path step, owner names and A/B wording are
   pointers to docs/paths/design-and-build-ui.md and docs/skills-catalog.md;
   re-check them when those change.

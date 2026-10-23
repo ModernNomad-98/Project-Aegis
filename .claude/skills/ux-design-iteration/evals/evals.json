@@ -355,7 +355,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Offers the proof set once, after the clickthrough decision, and records the decline; a decline is not a defect.",
+          "Offers the proof set once, records the decline without re-offering, respects the offer-once budget, and treats a decline as not a defect.",
           "Does not capture proof artifacts, does not claim proof evidence, and does not change readiness for the declined proof set."
         ]
       },
@@ -369,8 +369,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Keeps the clickthrough decision as a named UNRUN; the proof set does not convert an unrun clickthrough into a pass.",
-          "Records proof-set capture as evidence of what was observed only and leaves readiness unchanged; the proof set never upgrades readiness."
+          "Declares READY only while recording the clickthrough decision as a named UNRUN; it does not treat the proof set as closing that unrun clickthrough.",
+          "Records the proof-set capture as evidence of what was observed only; the proof set never substitutes for the unrun clickthrough and never upgrades readiness."
         ]
       },
       "host_evidence": false,
