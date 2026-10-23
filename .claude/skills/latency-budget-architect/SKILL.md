@@ -5,7 +5,8 @@ description: 'Decompose an end-to-end latency target into per-hop engineering bu
 
 # Latency Budget Architect
 
-Canonical semantics: this skill's normative rules are resolved by [docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md) (R8-CONV-2); that file is authoritative for conflicts and this skill cites it without restating it.
+Canonical semantics: the rules covered by R8-CONV-2 are resolved by
+[docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md); that file is authoritative for conflicts and this skill cites the covered ID.
 
 ## Purpose
 

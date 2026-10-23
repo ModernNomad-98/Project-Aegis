@@ -6,7 +6,8 @@ disable-model-invocation: true
 
 # Standing Approval & Auto-Advance
 
-Canonical semantics: this skill's normative rules are resolved by [docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md) (R8-CONV-1, R8-CONV-5); that file is authoritative for conflicts and this skill cites it without restating it.
+Canonical semantics: the rules covered by R8-CONV-1 and R8-CONV-5 are resolved by
+[docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md); that file is authoritative for conflicts and this skill cites the covered IDs.
 
 **Reading key:** a pull request (PR) proposes a branch's changes for review;
 continuous integration (CI) runs the repository's automated checks on each

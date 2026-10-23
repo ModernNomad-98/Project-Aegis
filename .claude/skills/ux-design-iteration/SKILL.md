@@ -5,7 +5,8 @@ description: 'Run optional, bounded design iteration before implementation - pro
 
 # UX Design Iteration
 
-Canonical semantics: this skill's normative rules are resolved by [docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md) (R8-UX-1..8); that file is authoritative for conflicts and this skill cites it without restating it.
+Canonical semantics: the rules covered by R8-UX-1, R8-UX-2, R8-UX-3, R8-UX-4, R8-UX-5, R8-UX-6, R8-UX-7 and R8-UX-8 are resolved by
+[docs/semantics/canonical-semantics.md](../../../docs/semantics/canonical-semantics.md); that file is authoritative for conflicts and this skill cites the covered IDs.
 
 Terms: **UX** means user experience; **UI** means user interface; **A/B** means the two offered approaches (standard design/build versus
 explore-and-refine) - not a measured experiment (that is ab-test-designer);
