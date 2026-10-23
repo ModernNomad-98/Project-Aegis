@@ -96,7 +96,7 @@ manifest, no hash is invented, and `incomplete` is filled honestly.
 
 - A named skill cannot be resolved in the manifest → refuse to invent its
   hash; say which name failed and point at
-  `python scripts/validate-skills.py` (no refresh unless the user authorizes a write).
+  `python scripts/validate-skills.py` (no refresh unless the user authorizes a write; a stale manifest is never refreshed silently).
 - The ask becomes authoring someone else's closeout or usage record → stop
   and route to the owning skill (`ai-closeout-reporter` owns the closeout;
   the stage-author owns its own skills rows).

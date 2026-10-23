@@ -1,6 +1,6 @@
 ---
 name: design-system-token-governor
-description: 'Use when design tokens need governing: semantic tokens for color, spacing, typography, state and theme, one source of truth, naming rules, theming/dark mode and drift-proof migration.'
+description: 'Use when design tokens need governing: semantic tokens for color, spacing, typography, state and theme, one source of truth, naming rules, theming/dark mode and migration-drift-resistant change.'
 ---
 
 # Design System Token Governor
@@ -9,7 +9,7 @@ Terms: **family 14** - the discipline family in README.md and docs/skills-catalo
 
 ## Purpose
 
-Govern design tokens as one source of truth: a semantic token taxonomy (color, spacing, typography, state, theme) with naming rules, export pipeline, component consumption rules, theming/dark-mode contract, change governance and a drift-proof migration.
+Govern design tokens as one source of truth: a semantic token taxonomy (color, spacing, typography, state, theme) with naming rules, export pipeline, component consumption rules, theming/dark-mode contract, change governance and a migration-drift-resistant change.
 
 The skill is **advisory and auto-invocable**. It produces guidance, records and review structure only; it does not edit code, run commands, use the network or grant production authority. Any implementation, execution or approval is a delegated host/user action under existing authority. It composes the nearest owners rather than duplicating them.
 
@@ -37,7 +37,7 @@ The skill is **advisory and auto-invocable**. It produces guidance, records and 
 3. Define the single source of truth and the export/generation pipeline to CSS/JS targets.
 4. Design the theming/dark-mode contract, including per-tenant theme limits and fallback.
 5. Define change governance: who may add/rename/remove tokens, deprecation and review evidence.
-6. Plan the drift-proof migration: codemods/lint rules, visual-regression baselines and staged adoption.
+6. Plan the migration-drift-resistant change: codemods/lint rules, visual-regression baselines and staged adoption.
 7. Return the token model, naming rules, theme contract, drift audit and migration plan; do not edit styles.
 
 ## Output Format
@@ -48,7 +48,7 @@ Return, in this order:
 2. Naming rules and component consumption policy.
 3. Single source of truth and export/generation pipeline.
 4. Theme/dark-mode contract with per-tenant limits and fallback.
-5. Change governance and drift-proof migration/audit plan.
+5. Change governance and migration-drift-resistant change/audit plan.
 
 ## Validation Checklist
 

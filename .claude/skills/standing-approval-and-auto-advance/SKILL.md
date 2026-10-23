@@ -196,7 +196,7 @@ Adoption:                     pending human approval → then recorded via scope
   references/standing-approval-policy.md). The grant expiry/use limit (if any)
   is a separate field: it bounds consumption, not re-attestation; silence
   records no inferred expiry. The attestation deadline is the re-attestation
-  field; no recorded attestation deadline means BLOCKED. A reviewer block wins
+  field; any NON-EXPIRED grant with no recorded attestation deadline is BLOCKED, a consumed one-use grant is EXPIRED, and re-attestation uses the sooner of the recorded review/attestation deadlines. A reviewer block wins
   for every agent-initiated action and the loop halts and waits for the human.
 
   The canonical precedence table, EXPIRED-first check, effects, transition list and

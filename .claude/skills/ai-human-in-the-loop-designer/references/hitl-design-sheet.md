@@ -10,10 +10,12 @@ product keeps apart; blast radius is how much harm one wrong action can do.
 ## 1. Classification rubric
 
 The canonical classification rule is defined ONCE in
-[../SKILL.md](../SKILL.md) step 2: the FORBIDDEN classes, the CONFIRM rule for
-single-record reversible AND compensable AND judgeable actions under required or
-silent policy, the AUTONOMOUS gate, and reviewer eligibility (hold at CONFIRM
-and escalate when the reviewer is ineligible). This sheet applies that rule and
+[../SKILL.md](../SKILL.md) step 2: the FORBIDDEN classes (including beyond-one-record/one-user blast
+radius), the CONFIRM rule for single-record reversible AND compensable AND
+judgeable actions under required policy, explicit permission without requiring approval, or silent policy, the AUTONOMOUS gate, reviewer eligibility
+(existing-but-ineligible reviewer => hold at CONFIRM/escalate; NO eligible
+reviewer at all => FORBIDDEN boundary), and the unrecorded undo/compensation
+bounds fail-safe. This sheet applies that rule and
 does not restate it.
 
 Examples:

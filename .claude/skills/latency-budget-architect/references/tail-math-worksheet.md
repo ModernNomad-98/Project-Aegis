@@ -52,22 +52,40 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 - [ ] The frontend share when the target is user-perceived
       (render/hydration — frontend-perf-engineer's vocabulary)
 
-```
 ## Timeout-cascade worksheet
 
-Cascade check, leaf to root (hard timeout uses a conservative/percentile bound;
-  timeout(upstream) > upstream total_expected_hop_cost + downstream expected
-  critical-path cost + recorded epsilon
-  Terms (all ms): wait_0 = pre-first-attempt queue/dispatch wait owned by the hop,
-  counted once OUTSIDE own_attempt_work. own_attempt_work = the hop's normal
-  processing/serialization per attempt, EXCLUDING queue/dispatch waits.
-  wait_k (k=1..R) = the per-attempt inter-attempt wait before retry k, not an
-  aggregate bucket. p = recorded per-attempt retry probability; the initial
-  attempt is counted once (p^0 = 1). Downstream expected critical-path cost =
-  SUM over serial downstream hops plus MAX over parallel branches at each join
-  of their total_expected_hop_cost, including each hop's retry_overhead.
-  Epsilon is recorded once and never doubled. R = maximum permitted retries;
-  p = recorded per-attempt retry probability (p=1 is the conservative bound).
+Expected retry-spend budget (uses p):
+
+```
+timeout(upstream) > upstream total_expected_hop_cost(upstream)
+                   + downstream expected critical-path cost + recorded epsilon
+
+Total terms: wait_0, p^k*own_attempt_work, p^k*wait_k as in the retry-spend
+section. Downstream expected critical-path cost = SUM over serial hops plus the
+EXPECTED MAXIMUM at each parallel join; EXPECTED MAXIMUM is NOT the MAX of the
+per-branch expected values (that understates the mean) - if the distribution is
+unknown, record a measured expected-max bound or a conservative bound instead.
+Nested retries: when an upstream hop retries a downstream call, downstream cost
+is weighted by the upstream p^k too, or replaced by a recorded joint/nested
+expectation. R = maximum permitted retries (formulas use R only; K means R when a
+source names K). Epsilon is recorded once and never doubled.
+
+```
+
+Hard-timeout bound (a hard limit; NEVER derived from expected means):
+
+```
+timeout(upstream) > conservative upstream bound
+                   + conservative downstream critical-path bound + recorded epsilon
+
+Conservative bound = p=1 with worst-case per-attempt durations and worst-case
+waits, or a recorded high-percentile bound (for example p99); the SAME
+conservative mode applies to EVERY term. At parallel joins use the MAX of the
+branch BOUNDS (a safe upper bound) - do NOT use MAX of expected values. Nested
+retries use a conservative joint bound. R = maximum permitted retries; if the
+percentile is not recorded the fail-safe is the conservative bound. Epsilon is
+recorded once and never doubled.
+
 ```
 
 ## Retry-spend accounting

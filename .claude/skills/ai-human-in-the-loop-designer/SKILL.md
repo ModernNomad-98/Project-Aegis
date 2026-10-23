@@ -117,7 +117,7 @@ first workflow step.
      escalation or missing evidence. **Reviewer eligibility:** the reviewer
      holds authority to perform the action themselves in that tenant, is not
      the requesting/triggering identity, is not the AI/service account, and has
-     an active, unexpired, in-scope approval.
+     active, unexpired authorization/role to perform the action themselves in that tenant (authorization/role, not an approval record).
    - **FORBIDDEN** for these enumerated classes: an action no person may
      perform; cross-tenant data; an action that is irreversible OR
      non-compensable; wide blast radius; not judgeable by a single reviewer; or
@@ -127,7 +127,9 @@ first workflow step.
      AND judgeable by one eligible reviewer, when written policy requires
      approval, explicitly permits the action without requiring approval, OR is
      silent. CONFIRM is the default for any non-FORBIDDEN action that does not
-     meet the AUTONOMOUS gate. Policy silence or explicit permission without an
+     meet the AUTONOMOUS gate. CONFIRM covers only single-record/one-user blast
+     radius; any action that reaches beyond one record or one user is FORBIDDEN
+     unless written policy explicitly defines a narrower CONFIRM limit. Policy silence or explicit permission without an
      autonomy clause keeps such an action at CONFIRM; it never makes it FORBIDDEN
      and never makes it AUTONOMOUS.
    - **AUTONOMOUS** only when the risk tier allows it, the action is reversible

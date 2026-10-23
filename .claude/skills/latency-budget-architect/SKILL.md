@@ -119,21 +119,27 @@ authorize execution.
    p^k*(own_attempt_work+wait_k). The initial attempt is counted once (p^0 = 1);
    backoff_total = SUM(k=1..R) wait_k is the deterministic schedule sum and is
    NOT a flat additive expected cost. If p is unknown use the conservative p=1
-   bound and say so. Keep ONE cascade rule: upstream timeout > upstream own
-   total cost + downstream critical-path expected cost + epsilon, where the
-   downstream expected cost is the SUM over serial downstream hops plus the MAX
-   over parallel branches at each join of their total_expected_hop_cost
-   (including each hop's retry_overhead); epsilon is recorded once, never
-   doubled. Independence is assumed only for p^k; if retries are nested or
-   correlated, record the joint/nested expectation or a conservative bound.
-   A HARD timeout is derived from a conservative/worst-case or recorded
-   high-percentile bound (for example p=1 with worst-case per-attempt durations,
-   or the recorded p99 bound), not from the expected total_expected_hop_cost;
-   the expected model applies only to retry-spend budgeting unless the budget is
-   explicitly defined as a mean. R/K is the maximum permitted retries; fail-safe
-   is the conservative bound when the percentile is not recorded. If no feasible
-   timeout exists under these terms, escalate as a latency budget violation;
-   never hide it. The 30-second default is a bug in a 300ms path.
+   bound and say so. Use TWO explicit modes, never mixed:
+   - **Expected retry-spend budget (uses p):** total_expected_hop_cost as above;
+     downstream expected critical-path cost = SUM over serial downstream hops
+     plus the EXPECTED MAXIMUM at each parallel join - which is NOT the MAX of the
+     per-branch expected values (that understates the mean); if the distribution
+     is unknown, record a measured expected-max bound or a conservative bound.
+     Nested retries are weighted by the upstream p^k too, or replaced by a
+     recorded joint/nested expectation.
+   - **Hard-timeout bound (a hard limit; NEVER derived from expected means):**
+     timeout(upstream) > conservative upstream bound + conservative downstream
+     critical-path bound + recorded epsilon, where EVERY term uses p=1 with
+     worst-case per-attempt durations and worst-case waits, or a recorded
+     high-percentile bound (for example p99); at parallel joins use the MAX of
+     the branch BOUNDS (a safe upper bound), never the MAX of expected values.
+     Nested retries use a conservative joint bound. R is the maximum permitted
+     retries (formulas use R only; K means R when named); if the percentile is
+     not recorded the fail-safe is the conservative bound. Epsilon is recorded
+     once, never doubled.
+   Independence is assumed only for p^k; nested/correlated retries record their
+   joint/nested expectation or a conservative bound. If no feasible hard bound
+   exists, escalate as a latency budget violation; never hide it. The 30-second default is a bug in a 300ms path.
 
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
