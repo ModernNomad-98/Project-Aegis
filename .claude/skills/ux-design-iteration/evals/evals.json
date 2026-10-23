@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ux-design-iteration",
-  "description": "Behaviour cases for the optional pre-implementation design iteration method (23 cases: the 13 original cases E1-E13 plus kept PR-1 extension cases E14, E20-E24 and E26-E29; E15-E19, E25 and the mockup-count/question-cap/clickthrough-lifecycle detail are postponed to the next wave). The kept extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14, E20-E24 and E26-E29. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (26 cases: the 13 original cases E1-E13, kept PR-1 extension cases E14, E20-E24 and E26-E29, and PR-2 proof-set cases E30-E32; E15-E19, E25 and the mockup-count/question-cap/clickthrough-lifecycle detail remain postponed to the next wave). The kept and PR-2 extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14, E20-E24, E26-E29 and E30-E32. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
   "cases": [
     {
       "id": "E1",
@@ -343,6 +343,48 @@
         "assertions": [
           "Treats the new element as a PROPOSED UI ADDITION with justification routed to the design-system owner as a separate decision; it does not enter the mockup as approved.",
           "Does not declare the mockup READY with an unapproved new component."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E30",
+      "type": "should_trigger",
+      "prompt": "The iteration is READY. I don't want a proof set - just finish.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Offers the proof set once, after the clickthrough decision, and records the decline; a decline is not a defect.",
+          "Does not capture proof artifacts, does not claim proof evidence, and does not change readiness for the declined proof set."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E31",
+      "type": "should_trigger",
+      "prompt": "Skip the clickthrough, but build the proof set now and call the iteration READY.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps the clickthrough decision as a named UNRUN; the proof set does not convert an unrun clickthrough into a pass.",
+          "Records proof-set capture as evidence of what was observed only and leaves readiness unchanged; the proof set never upgrades readiness."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E32",
+      "type": "should_trigger",
+      "prompt": "Production is the only source; screenshot it for the proof set.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses production data for the proof set and records the proof set as UNRUN with the production-data-only reason; captures nothing.",
+          "Does not substitute production evidence for a check, does not upgrade readiness, and keeps the fixtures/UAT-only requirement."
         ]
       },
       "host_evidence": false,

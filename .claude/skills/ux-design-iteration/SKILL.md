@@ -156,7 +156,7 @@ path (standard design and build remains the default).
 
 ## Design direction, mockups, UI lock and live acceptance (owner rev 2)
 
-These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup-count detail and section 1.4 (the PR-2 proof set) are deferred to the next wave and intentionally absent from PR-1; the ### 2/3/4 headings below are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artefacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup-count detail and parts of the question-cap/clickthrough lifecycle remain deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artefacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
 
 ### 1.1 Design direction (choose one, once)
 
@@ -169,6 +169,10 @@ All three reuse the project's in-code design system and tokens as the authority 
 ### 1.3 Final clickthrough (offered, never required)
 
 After implementation, offer an interactive clickthrough of the running app (compose clickthrough-test-engineer, MANUAL-ONLY: name it and stop; run it only on an explicit yes). Offer it immediately after implementation while the local stack is up. If declined or impossible, record a named UNRUN stating the defect classes that become unobservable - state hydration and transition bugs (for example a resume flow that opened the wrong step while every static suite was green). Readiness may still be declared; the record shows it was not run; clickthrough is never a pass. The post-implementation status is offered, declined or UNRUN; it is not part of the pre-implementation selection record.
+
+### 1.4 Proof set (offered, never required)
+
+After implementation and the clickthrough decision, offer the proof set once (specification in section 5). Declining it is recorded and is not a defect. The proof set is evidence of what was observed, never a substitute for a check, and never upgrades readiness; production-data-only input means a named UNRUN with that reason.
 
 ### 1.5 UI consistency lock (default by context, not a question)
 
@@ -199,6 +203,14 @@ A pre-design enters only as a user-provided artifact; this skill does not fetch,
 - **Failure triage:** when a check fails, classify it as a stale assertion, a product bug, or a wrong metric before fixing it; record which.
 - **Scope discipline:** a defect outside the surface under change is named a residual, never fixed by loosening a test.
 - **Mockup binding:** the approved mockup is bound by sha256 and byte size when the host provides it; the skill writes nothing.
+
+## 5. Proof set and spoken demo (owner rev 2)
+
+Offer the proof set once, after the clickthrough decision. Declining it is recorded and is not a defect; a decline or an impossible run never changes readiness. The skill specifies the set, folder layout and manifest but delegates writing to the host/user or the project's state owner under existing authority. Compose screenshot-evidence-planner; do not restate its policy.
+
+A proof set may include the approved mockup (bound by sha256 and byte size), screenshots at named checkpoints, a recording of the clickthrough if it ran, and a short spoken-demo script keyed to those checkpoints (last, lowest priority; not evidence of a check). The manifest lists every file with its size and sha256 and records captured-over-expected. Folder layout: MANIFEST.json at the proof-set root, with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside it; the record names the delegated writer and the captured-over-expected differences.
+
+Use test fixtures or a UAT project only - never production data. If only production data exists, record the proof set as **UNRUN** with that reason and capture nothing. A proof set is evidence of what was observed, never a substitute for a check, and never upgrades readiness; a production-data proof set and an unrun proof set are both never a pass.
 
 ## Output Format
 
@@ -351,7 +363,7 @@ The full record schema and readiness rules are in
 - The request is a measured A/B experiment (ab-test-designer) or a ship/deploy
   release-readiness gate (release-readiness-reviewer): route there; this skill's
   A/B names journey options and its readiness is design-progress readiness only.
-- A requested acceptance is a static image or non-interactive comp: refuse it as evidence, declare NOT READY, and name the unexercisable transitions; do not treat a screenshot or the PR-2 proof set as a pass.
+- A requested acceptance is a static image or non-interactive comp: refuse it as evidence, declare NOT READY, and name the unexercisable transitions; do not treat a screenshot or the proof set as a pass.
 - The next check is the clickthrough: name clickthrough-test-engineer (MANUAL-ONLY) and stop for the human; never run it silently. If declined/impossible, record the named UNRUN and keep readiness unchanged.
 - UI lock blocks a needed element: propose a PROPOSED UI ADDITION to the design-system owner as a separate decision; never enter an unapproved new component/token into the mockup.
 - A pre-design would need fetching, opening a URL or a browser to read: stop; only a user-provided artifact can enter, bound by name/version/byte size/sha256.
@@ -362,8 +374,8 @@ The full record schema and readiness rules are in
   the full record schema fields, the 9 loop elements, readiness and
   false-completion rules, budget ledger, invalidation rules, accepted-with-
   disclosure guidance, and a worked template.
-  The SKILL carries the 1.1 direction rules, 1.3 clickthrough status rule, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding and 4 retro rules (owner rev 2); the reference carries the matching record fields and partial readiness additions, not a second copy of those rules. Mockup-count matrix detail (1.2), question-cap detail, clickthrough lifecycle detail and the deferred eval cases E15-E19/E25 move to the next wave; the PR-2 proof set is not part of PR-1.
-- [evals/evals.json](evals/evals.json) - the 23 PR-1 behaviour cases (E1-E13, E14, E20-E24 and E26-E29) that exercise the choice, loop, records, readiness and budget; E15-E19 and E25 are deferred to the next wave.
+  The SKILL carries the 1.1 direction rules, 1.3 clickthrough status rule, 1.4 proof set, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding, 4 retro rules and 5 proof set/spoken demo (owner rev 2); the reference carries the matching record fields and partial readiness additions, not a second copy of those rules. Mockup-count matrix detail (1.2), question-cap detail, clickthrough lifecycle detail and the deferred eval cases E15-E19/E25 move to the next wave.
+- [evals/evals.json](evals/evals.json) - the 26 behaviour cases (E1-E13, E14, E20-E24, E26-E29 and PR-2 E30-E32) that exercise the choice, loop, records, readiness, budget and proof set; E15-E19 and E25 are deferred to the next wave.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - trigger
   discrimination against the nearest owners and the catalog-navigation case.
 - **Normative copy / maintenance:** the reference is the detailed normative copy

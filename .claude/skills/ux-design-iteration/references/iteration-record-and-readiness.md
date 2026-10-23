@@ -142,6 +142,10 @@ user validation that did not happen.
 - A defect outside the surface under change is a named residual; never fix it by loosening a test or lowering a threshold.
 - The approved mockup is bound by sha256 and byte size when the host provides it; the skill writes nothing.
 
+## 5b. Proof set (PR-2) and spoken demo script
+
+The proof set is offered once after the clickthrough decision; a decline is recorded and is not a defect. The skill specifies the set, folder layout and manifest; the host/user or state owner writes it under existing authority, composing screenshot-evidence-planner without restating its policy. Contents may be the approved mockup (sha256 and byte size), screenshots at named checkpoints, a recording of the clickthrough if run, and a short spoken-demo script keyed to the checkpoints (last, lowest priority; not evidence of a check). The manifest lists every file with its size and sha256 and records captured-over-expected; the folder layout is MANIFEST.json at the proof-set root with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside. Fixtures or a UAT project only - never production data; if only production data exists, the proof set is UNRUN with that reason and nothing is captured. A proof set never changes readiness and is never a substitute for a check.
+
 ## 6. Worked record template
 
     feature: <feature/task scope>
@@ -165,6 +169,8 @@ user validation that did not happen.
     ui_lock_inventory_diff: [{element: ..., mapped_to: ...}]
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
+    proof_set: {status: offered|declined|UNRUN|collected, decline_reason: ...|null, production_data_reason: ...|null, folder_layout: ..., manifest_path: ..., files: [{path, size, sha256}], captured_over_expected: [...], delegated_writer: ..., composed_owner: screenshot-evidence-planner}
+    demo_script: {status: skipped|drafted|narrated, checkpoints: [...], notes: ..., priority: last_lowest}
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]
     retest:
