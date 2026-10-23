@@ -167,6 +167,8 @@ git grep -n 'recorded_expiry_or_use_limit' -- .claude/skills/standing-approval-a
 git grep -nE 'wait_k|upstream_timeout|expected_maximum_at_joins|retry_overhead' -- .claude/skills/latency-budget-architect   # expected: at least one hit for each named term AFTER the latency wave implements R8-CONV-2 (adds the missing hard/expected terms -> discriminating)
 git grep -n -- '--no-textconv --no-ext-diff' -- .claude/skills/agent-memory-governance   # expected: at least one hit AFTER the memory wave implements R8-CONV-3 (hardened executable content check -> discriminating)
 git grep -nE 'judgeable|eligible_reviewer' -- .claude/skills/ai-human-in-the-loop-designer   # expected: at least one hit for each term AFTER the HITL wave implements R8-CONV-4 (FORBIDDEN alone already matches base text and is not discriminating)
+git grep -n effective_deadline -- .claude/skills/standing-approval-and-auto-advance   # expected: at least one hit (term registered upstream; kept for registry coverage)
+git grep -n total_expected_hop_cost -- .claude/skills/latency-budget-architect   # expected: at least one hit; hard-mode terms also present (registry coverage)
 python -P -c "import json; d=json.load(open('.claude/skills/standing-approval-and-auto-advance/evals/evals.json')); assert any('effective_deadline' in ' '.join(c['expect']['assertions']) for c in d['cases'])   # expected: exit 0 (assertion holds)
 ```
 Expected results are stated per owning wave; a check that cannot run as written is deleted, not reworded.
