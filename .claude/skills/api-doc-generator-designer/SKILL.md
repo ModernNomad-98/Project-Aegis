@@ -25,6 +25,8 @@ schema so descriptions and examples are single-sourced, the toolchain and
 its place in the docs pipeline, and versioning the reference with the API.
 It documents an API that `api-event-architect` designed; its whole point
 is a reference checked against the implementation and generated, not typed.
+It requires source-to-implementation validation and keeps the generated
+reference aligned with that verified source.
 
 ## Use When
 

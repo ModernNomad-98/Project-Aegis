@@ -62,7 +62,7 @@ of those layers, with `accessibility-test-harness` owning their criteria.
 
 | Behavior | Layer | Design owner | Execution owner |
 | --- | --- | --- | --- |
-| pure logic/validation | unit | `vitest-unit-component-engineer` | authorized repository engineer (TDD) or supported runner |
+| pure logic/validation | unit | `vitest-unit-component-engineer` | authorized repository engineer or supported runner; property-file writing/running is a manual-only handoff (`property-based-test-designer`) and is never auto-executed |
 | service/command through the database + auth | integration | `integration-test-designer` | authorized repository engineer or supported runner |
 | application programming interface (API)/webhook shape & compatibility | contract | `api-contract-test-designer` | authorized repository engineer or supported runner |
 | critical journey in the real user interface (UI) | E2E | `playwright-e2e-engineer` | authorized repository engineer or supported runner |

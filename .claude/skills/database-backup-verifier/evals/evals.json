@@ -24,7 +24,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Specifies the NEW drill's plan: proves the target is a non-production scratch target and does not already exist, uses the prior-drill numbers only as baseline, and specifies the fresh measurement plan.",
+          "Specifies the NEW drill's plan: proves the target is a non-production scratch target by comparing its identifier against the declared production list, and confirms it does not already exist, uses the prior-drill numbers only as baseline, and specifies the fresh measurement plan.",
           "Requires fresh restore-time evidence against the 2-hour RTO plus row-count and checksum parity, showing numbers but no row contents (privacy).",
           "Records the data origin and access limits for the scratch copy (no production credentials; not exposed outside the drill).",
           "Deletes the scratch instance AND its storage, revokes its credentials, and shows a listing/verification proving it is gone.",

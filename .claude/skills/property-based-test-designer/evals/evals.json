@@ -72,7 +72,7 @@
         "assertions": [
           "Retains the failing seed and minimal counterexample before changing anything.",
           "Allows the cause to be a target bug, a property bug, a generator bug or an invalid assumption, and does not classify it as one of these before evidence.",
-          "Handles the rare-valid-input case explicitly and, when the same input also fails in the target system, names the target race as a possible cause rather than blaming the generator."
+          "Handles the rare-valid-input case explicitly and, when the same input also fails in the target system, names a target bug/behaviour (including a possible race) as one possible cause pending evidence, rather than blaming the generator or presenting a race as established."
         ]
       }
     }

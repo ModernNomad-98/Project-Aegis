@@ -125,15 +125,23 @@ first workflow step.
      downgraded by approval, reviewer availability or policy silence.
    - **CONFIRM** for a single-record action that is reversible AND compensable
      AND judgeable by one eligible reviewer, when written policy requires
-     approval OR written policy is silent. Policy silence keeps a compensable
-     single-record action at CONFIRM; it never makes it FORBIDDEN and never
-     makes it AUTONOMOUS.
+     approval, explicitly permits the action without requiring approval, OR is
+     silent. CONFIRM is the default for any non-FORBIDDEN action that does not
+     meet the AUTONOMOUS gate. Policy silence or explicit permission without an
+     autonomy clause keeps such an action at CONFIRM; it never makes it FORBIDDEN
+     and never makes it AUTONOMOUS.
    - **AUTONOMOUS** only when the risk tier allows it, the action is reversible
      AND compensable, blast radius is one record or one user, the watch-and-undo
      controls in step 9 exist, and written policy explicitly permits autonomy.
-   - **Reviewer ineligible:** hold at CONFIRM and escalate to a named eligible
-     reviewer/owner; never downgrade a FORBIDDEN class and never let the
-     requester or the AI approve.
+   - **Reviewer ineligible:** if an eligible reviewer EXISTS but the available
+     reviewer is the requester, the AI/service account, or otherwise ineligible,
+     hold at CONFIRM and escalate to a named eligible reviewer/owner. If NO
+     eligible reviewer exists at all, the action is not judgeable by a single
+     reviewer and is FORBIDDEN; record that boundary and never proceed silently.
+     Never downgrade a FORBIDDEN class and never let the requester or the AI approve.
+   - **Fail-safe bounds:** if the undo window or the compensation bound is not
+     recorded, treat the action as non-reversible/non-compensable (FORBIDDEN)
+     until both are recorded.
 
 3. **Design the advisory-only mode.** For actions left advisory-only, the
    AI output appears as a suggestion the user applies through the ordinary

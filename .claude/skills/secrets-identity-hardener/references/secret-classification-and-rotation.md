@@ -43,7 +43,7 @@ intended class without printing its value.
 
 Turn this into an automated check (test or CI step) so it stays enforced.
 
-**Role and scope (defined once, before the steps):** Role and scope definition: the credential owner is the recorded authorization role for
+**Role and scope (defined once, before the steps):** the credential owner is the recorded authorization role for
 routine rotation; the human incident owner is the accountable role for an incident and may
 authorize emergency revocation when the credential owner is unavailable. If both are present,
 the incident owner's recorded emergency decision governs the revocation while routine rotation

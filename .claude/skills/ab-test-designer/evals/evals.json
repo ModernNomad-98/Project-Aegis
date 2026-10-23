@@ -6,13 +6,13 @@
     {
       "id": "positive-design-powered-experiment",
       "type": "should_trigger",
-      "prompt": "We want to A/B test a new pricing page. Design the experiment. Fixture: baseline conversion 20.00%, alpha = 0.05 two-sided, power = 0.80, practical MDE 1% relative, randomization unit user, fixed horizon, no peeking; planned required sample is about 628,000 users per arm and weekly eligible traffic is 120,000 sessions.",
+      "prompt": "We want to A/B test a new pricing page. Design the experiment. Fixture: baseline conversion 20.00%, alpha = 0.05 two-sided, power = 0.80, practical MDE 1% relative, randomization unit user, fixed horizon, no peeking; planned required sample is about 628,000 users per arm and weekly eligible users are 120,000 (the same unit as the per-arm sample).",
       "expect": {
         "triggers": true,
         "assertions": [
           "Writes a falsifiable, directional hypothesis tied to a decision, and picks ONE primary metric plus guardrails (e.g. revenue, refund rate).",
           "Chooses the randomization unit for independence, sticky assignment, and notes contamination risk.",
-          "Computes required sample size from the supplied alpha = 0.05 two-sided, power = 0.80, baseline 20.00% and 1% relative MDE; states the planned ~628,000 per arm and derives duration from the supplied weekly traffic over full weekly cycles.",
+          "Computes required sample size from the supplied alpha = 0.05 two-sided, power = 0.80, baseline 20.00% and 1% relative MDE; states the planned ~628,000 per arm and derives duration from the supplied weekly eligible users over full weekly cycles (628,000 users/arm / 120,000 users/week).",
           "Fixes the horizon up front and forbids peeking-to-significance (or specifies a sequential method with its correction).",
           "Grounds the primary metric in funnel-definition-designer / event-schema-architect definitions."
         ]
@@ -26,7 +26,7 @@
         "triggers": true,
         "assertions": [
           "Reports the effect with a confidence interval computed from the supplied per-arm counts, not just the p-value, and contrasts statistical vs practical significance against the pre-set 1% relative MDE.",
-          "States the result is NOT statistically significant (observed two-sided p approximately 0.26) and that the CI includes 0 and lies below the pre-set 1% relative MDE.",
+          "States the correct read: the point estimate (0.08 pp absolute / 0.40% relative) is below the pre-set 1% relative MDE (0.20 pp absolute), but the 95% CI (approximately -0.06 to +0.22 pp) includes 0 and crosses above the MDE, so the result is INCONCLUSIVE - it is not statistically significant and not a win; do not claim the CI lies below the MDE.",
           "Does not treat the result as a win: recommends not shipping on this evidence / iterate or collect more data, with residual uncertainty stated, rather than declaring +0.4% a significant win.",
           "Runs validity checks: sample-ratio mismatch, whether the fixed horizon was respected, and guardrail status."
         ]

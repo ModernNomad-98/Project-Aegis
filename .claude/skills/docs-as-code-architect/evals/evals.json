@@ -10,7 +10,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Specifies the docs-in-repo layout and migration handoff so docs change in the same PR as the code, with a docs CODEOWNER and PR review; leaves the writes outside this design eval.",
+          "Specifies the docs-in-repo layout and migration handoff so docs change in the same PR as the code, with a docs CODEOWNER and PR review; does not perform the migration or write files.",
           "Chooses a generator/format for stated reasons (versioning/API/search needs) and designs the build/preview/deploy pipeline with per-PR previews.",
           "Specifies CI checks: buildability gate, link-checking, prose/style lint, spelling — with blocking-vs-advisory intent.",
           "Designs executable-sample testing so examples can't silently rot.",

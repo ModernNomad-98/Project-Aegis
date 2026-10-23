@@ -53,7 +53,9 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
       (render/hydration — frontend-perf-engineer's vocabulary)
 
 ```
-Cascade check, leaf to root:
+## Timeout-cascade worksheet
+
+Cascade check, leaf to root (hard timeout uses a conservative/percentile bound;
   timeout(upstream) > upstream total_expected_hop_cost + downstream expected
   critical-path cost + recorded epsilon
   Terms (all ms): wait_0 = pre-first-attempt queue/dispatch wait owned by the hop,
@@ -64,7 +66,8 @@ Cascade check, leaf to root:
   attempt is counted once (p^0 = 1). Downstream expected critical-path cost =
   SUM over serial downstream hops plus MAX over parallel branches at each join
   of their total_expected_hop_cost, including each hop's retry_overhead.
-  Epsilon is recorded once and never doubled.
+  Epsilon is recorded once and never doubled. R = maximum permitted retries;
+  p = recorded per-attempt retry probability (p=1 is the conservative bound).
 ```
 
 ## Retry-spend accounting

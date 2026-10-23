@@ -86,8 +86,7 @@ manifest, no hash is invented, and `incomplete` is filled honestly.
   at record time; a hash from a previous task may name a different
   `SKILL.md` after an update.
 - **Signal-catalog epoch gate:** the consumer contract is owned and defined by `skill-usage-instrumenter` (its catalog/epoch rules); this ledger records and validates the read-only/hash-identity view and points at that contract rather than restating it.
-- **A stale manifest fails the validator.** Refresh before resolving names,
-  and note that any skill edit PR must carry the refreshed manifest.
+- **A stale manifest fails the validator.** Read-only validation first; if the manifest is stale, stop and ask the user to authorize a refresh - do not refresh silently. State that any skill edit PR must carry the refreshed manifest.
 - **Compliance is the user's.** This skill produces the record and the
   honesty framing; it does not enforce that the user pastes it. The record
   is an aid to verifiability, not a replacement for the user's own

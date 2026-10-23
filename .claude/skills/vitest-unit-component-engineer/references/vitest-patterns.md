@@ -11,7 +11,7 @@ Detail file for [vitest-unit-component-engineer](../SKILL.md). Loaded on demand.
 | components (render + interact) | `jsdom` (default) / `happy-dom` (speed, check API gaps) | Testing Library needs a DOM |
 | anything needing layout, real navigation, downloads | none — wrong layer | Playwright territory |
 
-Declare per file with `// @vitest-environment jsdom`. On Vitest 3/<4 a bounded
+Declare per file with `// @vitest-environment jsdom`. On Vitest 3.x and earlier (any release that still supports environmentMatchGlobs) a bounded
 `environmentMatchGlobs` entry is also acceptable; Vitest 4+ removed environmentMatchGlobs, so use
 projects with per-environment config. Visible intent either way.
 

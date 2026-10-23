@@ -126,9 +126,14 @@ authorize execution.
    (including each hop's retry_overhead); epsilon is recorded once, never
    doubled. Independence is assumed only for p^k; if retries are nested or
    correlated, record the joint/nested expectation or a conservative bound.
-   If no feasible timeout exists under these terms, escalate as a latency
-   budget violation; never hide it. The 30-second default is a bug in a 300ms
-   path.
+   A HARD timeout is derived from a conservative/worst-case or recorded
+   high-percentile bound (for example p=1 with worst-case per-attempt durations,
+   or the recorded p99 bound), not from the expected total_expected_hop_cost;
+   the expected model applies only to retry-spend budgeting unless the budget is
+   explicitly defined as a mean. R/K is the maximum permitted retries; fail-safe
+   is the conservative bound when the percentile is not recorded. If no feasible
+   timeout exists under these terms, escalate as a latency budget violation;
+   never hide it. The 30-second default is a bug in a 300ms path.
 
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from

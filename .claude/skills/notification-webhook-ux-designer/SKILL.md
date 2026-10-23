@@ -200,8 +200,10 @@ Boundaries:    delivery contract → api-event-architect; state rendering →
   Opt-out is immediate and per-category; the legal conclusion depends on
   jurisdiction, message classification and verified obligations, so route it to
   the owning compliance/legal check rather than assuming one universal rule;
-  only genuinely transactional/security notices are exempt, and they must be
-  labeled as such.
+  where an exemption applies it is typically limited to genuinely
+  transactional/security notices, but the final determination is
+  jurisdiction/classification-specific and must be verified; do not assume a
+  universal exemption.
 - A webhook with no delivery log is a black box: the integrator's only
   debugging tool becomes a support ticket asking you to grep your logs.
   The log is the feature.

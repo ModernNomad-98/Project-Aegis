@@ -79,7 +79,9 @@ that has not passed. BLOCKED is a halt state for a non-EXPIRED grant, entered by
 a reviewer block, a passed attestation deadline, or a transition trigger; an
 absent attestation deadline is only the initial/entry classification for a grant
 that has no recorded deadline - it is not reachable from ACTIVE or GRANDFATHERED
-because both require a recorded deadline.
+because both require a recorded deadline. FAIL-SAFE: ANY grant with no recorded
+attestation deadline is BLOCKED regardless of how it entered that state; the
+entry classification is not an exemption.
 
 Canonical precedence table (EXPIRED checked first; BLOCKED > GRANDFATHERED > ACTIVE):
 
