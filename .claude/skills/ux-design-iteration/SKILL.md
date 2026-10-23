@@ -160,7 +160,7 @@ path (standard design and build remains the default).
 
 ## Design direction, mockups, UI lock and live acceptance (owner rev 2)
 
-These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup count (concepts/mockups) and the two-question entry cap (normative sentence in Workflow step 1) and the five pre-implementation fields are specified below; the clickthrough schema field (the sixth tracked field) and E30 are deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup count (concepts/mockups) and the two-question entry cap (normative sentence in Workflow step 1) and the five pre-implementation fields are specified below; the clickthrough schema field (the sixth tracked field), the deferred eval case E19 (E4-B6/E5-B1) and E30 are deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
 
 ### 1.1 Design direction (choose one, once)
 
@@ -172,7 +172,7 @@ All three reuse the project's in-code design system and tokens as the authority 
 
 ### 1.2 Mockup count (1-4)
 
-Concepts are non-cosmetic candidate flows (when more than one concept is produced they must be meaningfully different); mockups are exercisable artifacts of a chosen concept or direction; a prototype is the exercisable artifact used for acceptance/review of a chosen concept and may be the same artifact as a mockup - multiple prototypes of one concept do not count as multiple mockups. Concepts and mockups each have a hard maximum of four. Four is the hard maximum and is never exceeded; defaults are one to four concepts and one to four mockups, configurable only with a recorded reason. At least one concept is required whenever the iteration runs; zero concepts only when iteration is not-applicable/justified N/A with a recorded reason. Direction rules override the defaults: under guided premium (1a) and follow-my-existing-design (1c) exactly one mockup is permitted - one required and permitted, never a second; under creative options (1b) at least two mockups are required, each for a distinct non-cosmetic concept or direction. A recorded reason may reduce counts within the direction's allowed range but never below a direction minimum, never above four, and never contrary to the direction rules. mockup_budget records the allowed range; the actual usage is recorded as concepts_used and mockups_used in the iteration record. cosmetic variants never count as concepts or mockups. Every evaluation pass still counts.
+Concepts are non-cosmetic candidate flows (when more than one concept is produced they must be meaningfully different); mockups are exercisable artifacts of a chosen concept or direction; a prototype is the exercisable artifact used for acceptance/review of a chosen concept and may be the same artifact as a mockup - multiple prototypes of one concept do not count as multiple mockups. Concepts and mockups each have a hard maximum of four. Four is the hard maximum and is never exceeded; defaults are one to four concepts and one to four mockups; a recorded reason is required for a non-default count, never for staying within the default range. At least one concept is required whenever the iteration runs; zero concepts only when iteration is not-applicable/justified N/A with a recorded reason. Direction rules override the defaults: under guided premium (1a) and follow-my-existing-design (1c) exactly one mockup is permitted - one required and permitted, never a second; under creative options (1b) at least two mockups are required, each for a distinct non-cosmetic concept or direction. A recorded reason may reduce counts within the direction's allowed range but never below a direction minimum, never above four, and never contrary to the direction rules. mockup_budget records the allowed range; the actual usage is recorded as concepts_used and mockups_used in the iteration record. cosmetic variants never count as concepts or mockups. Every evaluation pass still counts.
 
 ### 1.3 Final clickthrough (offered, never required)
 
@@ -241,7 +241,7 @@ Return, in this order:
    per-evaluation records with all eight fields, findings and dispositions.
    After implementation, the iteration/post-implementation record also carries
     proof_set (offered,
-   declined, UNRUN or collected) and demo_script (skipped, drafted or narrated)
+    declined, UNRUN or collected) and demo_script (skipped, drafted or narrated)
     from the reference template; post-implementation status is never part of the
     pre-implementation selection record (1.3).
 3. **Review record** - reviewer identity and independence, what was inspected
@@ -390,7 +390,7 @@ The full record schema and readiness rules are in
   false-completion rules, budget ledger, invalidation rules, accepted-with-
   disclosure guidance, and a worked template.
   The SKILL carries the 1.1 direction rules, 1.2 mockup count, the two-question entry cap, 1.3 clickthrough status rule, 1.4 proof set, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding, 4 retro rules and 5 proof set/spoken demo (owner rev 2); the reference carries the matching record schema/fields and the template support; the proof-set rules themselves are normative in sections 1.4 and 5 and are not restated in the reference. E15-E19 and E25 are now in evals; only the remaining clickthrough-lifecycle detail and E30 (PR-2 reference-restatement issue) stay deferred to the next wave.
-- [evals/evals.json](evals/evals.json) - the 31 behaviour cases (E1-E13, E14-E29 and PR-2 E31-E32) that exercise the choice, loop, records, readiness, budget and proof set; E30 is deferred to the next wave with the reference-restatement issue.
+- [evals/evals.json](evals/evals.json) - the 30 behaviour cases (E1-E18, E20-E29 and PR-2 E31-E32) that exercise the choice, loop, records, readiness, budget and proof set; E19 is deferred to the next wave (E4-B6/E5-B1) and E30 remains deferred with the reference-restatement issue.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - trigger
   discrimination against the nearest owners and the catalog-navigation case.
 - **Normative copy / maintenance:** the reference is the detailed normative copy

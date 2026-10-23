@@ -28,8 +28,7 @@
         "triggers": false,
         "assertions": [
           "Does not offer or select iteration: the direction is settled, so standard design and build applies and the ordinary route to the project's standard design/build path is left in place.",
-          "Does not claim iteration ran, and does not ask a question already answered by the prompt.",
-          "Distinguishes concepts from mockups and uses one to four non-cosmetic concepts with the 1.2 direction-conditional mockup count."
+          "Does not claim iteration ran, and does not ask a question already answered by the prompt."
         ]
       },
       "host_evidence": true,
@@ -45,7 +44,9 @@
         "assertions": [
           "Invokes the iteration method and records mode B with its scope and budget.",
           "Defines the evidence-backed brief, end-to-end story, up to four non-cosmetic concepts with hypotheses and the direction-conditional mockup count from 1.2, and the scoped prototype (included/mocked/incomplete parts and fixtures), and explicitly delegates prototype creation to the host/user under existing authority.",
-          "Holds production/implementation until the readiness criteria pass on the advanced candidate."
+          "Holds production/implementation until the readiness criteria pass on the advanced candidate.",
+          "Distinguishes concepts from mockups and uses one to four non-cosmetic concepts with the 1.2 direction-conditional mockup count.",
+          "Never asks a third design-entry question; unsettled decisions are recorded as open items or UNKNOWNs."
         ]
       },
       "host_evidence": true,
@@ -216,8 +217,7 @@
         "triggers": false,
         "assertions": [
           "Does not offer the A/B choice or any design-direction/mockup/UI-lock question for a settled implementation.",
-          "Routes the ordinary build through the standard design/build path and claims no iteration work.",
-          "Never asks a third design-entry question; unsettled decisions are recorded as open items or UNKNOWNs."
+          "Routes the ordinary build through the standard design/build path and claims no iteration work."
         ]
       },
       "host_evidence": false,
@@ -274,7 +274,7 @@
         "assertions": [
           "Binds the pre-design by file name, version, byte size and sha256 and uses it under 1c.",
           "Invents no token, spacing, state or interaction the pre-design does not specify.",
-          "Treats the provided pre-design as implying 1c and records pre_design_binding as a named UNKNOWN when the metadata needed for the binding is missing."
+          "Uses the complete binding metadata (file name, version, byte size and full 64-hex sha256) and records no pre_design_binding UNKNOWN for this complete pre-design."
         ]
       },
       "host_evidence": false,
@@ -289,7 +289,6 @@
         "assertions": [
           "Records the authority conflict and keeps the in-code design system as authority unless the user names elements the pre-design supersedes.",
           "Does not silently pick the easier source or invent a third style.",
-          "Records the authority conflict and keeps the in-code design system as authority unless the user names superseding elements.",
           "Records the authority_conflict field with none when there is no pre-design conflict or the recorded resolution when there is one."
         ]
       },
