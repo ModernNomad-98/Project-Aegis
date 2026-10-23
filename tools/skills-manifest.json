@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "b32b39b301251a558f42099c7476ae9ed72c6998",
+  "source_revision": "3b753efa3a8232a226108a4067740c0d78af2037",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "3614f4f4e7cc0b5f29b974818cf16f0e67059bb42d4fa99be8e014ed34c8840b"
+      "sha256": "40f6f2032257a5f36d63df97627f885d80f9f1e05c2ed84f9c9500bf13e5d1be"
     },
     {
       "name": "ai-lifecycle-risk-manager",
@@ -411,7 +411,7 @@
     {
       "name": "design-system-token-governor",
       "path": ".claude/skills/design-system-token-governor/SKILL.md",
-      "sha256": "8de25f715d08874ad52dbf0fe020d9e835942413c91efd9a4ee0c9c04de74075"
+      "sha256": "8f2a124c62454ea9ca927febfcf15a89b3c36b091fd0dec879e18ae059e849b6"
     },
     {
       "name": "diataxis-doc-organizer",
@@ -621,7 +621,7 @@
     {
       "name": "latency-budget-architect",
       "path": ".claude/skills/latency-budget-architect/SKILL.md",
-      "sha256": "9ff0f7cc535958cd470febcf92a3f93f264b00240a7e6d5c8653f4b9444043b1"
+      "sha256": "4cb30803a0be5077dad28cc0568b4813906e572401d42671576d9f34b67d5879"
     },
     {
       "name": "layered-architecture-enforcer",
@@ -1061,7 +1061,7 @@
     {
       "name": "skill-usage-ledger",
       "path": ".claude/skills/skill-usage-ledger/SKILL.md",
-      "sha256": "44fa29b72c0f93fe5c03920196ce7cd13a8b5c59795b688d586dda2d7c0f4355"
+      "sha256": "43d57d1037c2b48f3853649d4ddf9c6b082ac23cddf58f990412cdc9bf4f7b41"
     },
     {
       "name": "slo-reliability-architect",
@@ -1091,7 +1091,7 @@
     {
       "name": "standing-approval-and-auto-advance",
       "path": ".claude/skills/standing-approval-and-auto-advance/SKILL.md",
-      "sha256": "75470a987eb95ecf78a28c3d0a6515dfe000e762dc82af65d0fa2fb05a3da587"
+      "sha256": "11d09ed7c3c223376ef29db1b8311d567e44743fcfed40b75f8c7e1ed0ab7d34"
     },
     {
       "name": "state-machine-modeler",
@@ -1246,7 +1246,7 @@
     {
       "name": "vitest-unit-component-engineer",
       "path": ".claude/skills/vitest-unit-component-engineer/SKILL.md",
-      "sha256": "80d0722ad84c93fbc79bc5c41ccc042b65fb50e6c18102d13f20dd9a7b535b4d"
+      "sha256": "906e362aebe6985ddb257b4d9e54a242912503df2f08a9d6a2e470674aa7bf20"
     },
     {
       "name": "warehouse-lake-architect",
