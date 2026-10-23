@@ -158,7 +158,7 @@ path (standard design and build remains the default).
 
 ## Design direction, mockups, UI lock and live acceptance (owner rev 2)
 
-These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup count, the two-question entry cap and the six selection-record fields are specified below; the remaining clickthrough-lifecycle detail outside the explicit two-question cap and E30 stay deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup count, the two-question entry cap (normative sentence in Workflow step 1) and the six tracked fields (five pre-implementation plus the post-implementation clickthrough status) are specified below; the remaining clickthrough-lifecycle detail outside the explicit two-question cap and E30 stay deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
 
 ### 1.1 Design direction (choose one, once)
 
@@ -228,7 +228,7 @@ Return, in this order:
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
 
-   The selection record also carries the five pre-implementation fields: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (up to four concepts and up to four mockups by default; 1a/1c exactly one mockup; 1b at least two; four hard maximum; recorded override reason); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; and authority_conflict (recorded source conflict and its resolution; in-code design system wins unless the user names elements the pre-design supersedes).
+   The selection record also carries the five pre-implementation fields: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (up to four concepts and up to four mockups by default; 1a/1c exactly one mockup; 1b at least two; four hard maximum; recorded override reason); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; and authority_conflict (recorded source conflict and its resolution; in-code design system wins unless the user names elements the pre-design supersedes). These are five of the six tracked fields; the sixth, clickthrough_offer_decision, is post-implementation (item 2).
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.

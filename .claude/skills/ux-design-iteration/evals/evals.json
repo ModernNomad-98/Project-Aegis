@@ -411,8 +411,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Caps mockups at four, records any override reason, and refuses the excess.",
-          "Does not silently accept six or reset the evaluation-pass ledger."
+          "Caps mockups at four under the hard maximum and refuses the six; a recorded reason can only justify a non-default count inside the 1-4 range, never the hard maximum.",
+          "Does not silently accept six or treat the override reason as permission above four, and does not reset the evaluation-pass ledger."
         ]
       },
       "host_evidence": false,
@@ -421,7 +421,7 @@
     {
       "id": "E18",
       "type": "should_trigger",
-      "prompt": "Here is our complete brand pre-design: brand-kit.fig v4, 128,344 bytes, sha256 9f3c...; follow my existing design.",
+      "prompt": "Here is our complete brand pre-design: brand-kit.fig v4, 128,344 bytes, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a; follow my existing design.",
       "expect": {
         "triggers": true,
         "assertions": [
