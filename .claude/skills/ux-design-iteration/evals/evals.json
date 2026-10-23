@@ -266,12 +266,12 @@
     {
       "id": "E18",
       "type": "should_trigger",
-      "prompt": "Here is our complete brand pre-design: brand-kit.fig v4, 128,344 bytes, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a; follow my existing design.",
+      "prompt": "Here is our pre-design: brand-kit.fig v4, 128,344 bytes, but the digest in the doc is truncated as sha256 9f3c...; a second export gives the full digest sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a. Follow my existing design.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Binds the pre-design by file name, version, byte size and the full 64-hex sha256 and uses it under 1c.",
-          "Rejects a truncated or absent digest by marking the binding UNKNOWN instead of binding it; a full 64-hex digest is required.",
+          "Rejects the truncated digest (marks the binding UNKNOWN and does not accept it as bound).",
+          "Binds the pre-design by file name, version, byte size and the full 64-hex sha256 once supplied; a truncated/absent digest is UNKNOWN, not bound.",
           "Invents no token, spacing, state or interaction the pre-design does not specify."
         ]
       },
@@ -281,12 +281,12 @@
     {
       "id": "E19",
       "type": "should_trigger",
-      "prompt": "Here is our pre-design, but it only has colours and no spacing, states or interaction details. (The skill may ask one bounded combined question within its two-question design-entry cap.)",
+      "prompt": "Here is our pre-design with only colours and no spacing, states or interaction details. The agent may ask ONE atomic combined question covering the missing decisions or record the inferences, within its two-question design-entry cap.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Declares the unspecified spacing, states and interaction items as UNKNOWNs rather than inventing them.",
-          "Asks once, with ONE bounded combined question for the missing decisions within the two-question design-entry cap, records the answer, and records any remaining gaps as UNKNOWNs."
+          "Asks once at most, as ONE atomic combined question within the two-question cap (or records the inferences instead), and records any remaining gaps as UNKNOWNs."
         ]
       },
       "host_evidence": false,
