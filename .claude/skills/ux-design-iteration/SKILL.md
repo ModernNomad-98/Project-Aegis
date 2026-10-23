@@ -93,7 +93,7 @@ path (standard design and build remains the default).
    route it through change-classification-gate and docs/paths/design-and-build-ui.md
    and do not offer iteration.
 
-   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (PR-2).
+   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (section 5). Never ask a third design-entry question: if a decision is still unsettled, record it as an open item or UNKNOWN for later instead of asking. The cap excludes the post-implementation clickthrough question (1.3) and proof-set question (section 5).
 
 2. **Decide the mode; return the record.** Return the exact selection record
    (mode, feature/task scope, instruction source, delivery endpoint, iteration
@@ -111,10 +111,11 @@ path (standard design and build remains the default).
 4. **Story.** Write the end-to-end experience story: start, success, failure
    and recovery, empty, permission-denied and timing states, each with its
    expected outcome and how the user continues.
-5. **Flows.** Produce at least two meaningfully different, non-cosmetic
-   candidate flows (default three, configurable); each states its hypothesis
-   and what would make it right or wrong. Cosmetic variants do not count as
-   alternatives.
+5. **Concepts.** Produce up to four meaningfully different, non-cosmetic
+   candidate flows by default, configurable with a recorded reason; each states
+   its hypothesis and what would make it right or wrong. Cosmetic variants never
+   count as alternatives; the mockup count and direction-conditional minimums
+   are in 1.2.
 6. **Prototype.** Declare the prototype scope: what is included, mocked or
    incomplete, which interaction it exercises, the fixtures used, and the
    smallest interactive artifact that can exercise the named interaction.
@@ -141,8 +142,9 @@ path (standard design and build remains the default).
    direction, authority, open items, evidence, budget state and next action, and
    composes
    the handoff owner rather than re-designing the protocol.
-10. **Budget and readiness.** Defaults are **up to three concepts and up to
-    three independent evaluation passes** (at least two non-cosmetic flows),
+10. **Budget and readiness.** Defaults are **up to four concepts and up to
+    four mockups** (the direction-conditional minimums and four-mockup hard
+    maximum are in 1.2) and **up to three independent evaluation passes**,
     configurable with a recorded reason; every pass counts; scale effort to the
     change. End by declaring readiness against the readiness rules in
     references/iteration-record-and-readiness.md. Budget expiry with unresolved
@@ -156,7 +158,7 @@ path (standard design and build remains the default).
 
 ## Design direction, mockups, UI lock and live acceptance (owner rev 2)
 
-These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup-count detail and parts of the question-cap/clickthrough lifecycle remain deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
+These sections extend the iteration method; they do not replace the A/B choice or the readiness rules below. Section 1.2 mockup count, the two-question entry cap and the six selection-record fields are specified below; the remaining clickthrough-lifecycle detail outside the explicit two-question cap and E30 stay deferred to the next wave; section 1.4 (proof set) and section 5 (proof set and spoken demo, owner rev 2) are specified below; the ### 2/3/4 headings below and the owner H2 section ## 5 are the owner brief's section names, not Workflow step numbers. The skill stays strictly advisory: it writes no artifacts, runs no commands, launches no browser, uses no network, and delegates prototypes, mockups and proofs to the host/user under existing authority.
 
 ### 1.1 Design direction (choose one, once)
 
@@ -165,6 +167,10 @@ All three reuse the project's in-code design system and tokens as the authority 
 - **(a) Guided premium - clarity first.** Reviewer-checkable heuristics: exactly one primary action per screen; one dominant element per view; spacing and type only from the token scale; at most one accent plus neutrals per view unless the design system defines more; system-native patterns; motion only on state change and only where it explains the state. Under UI lock (1.5), a heuristic the existing UI cannot meet with its current vocabulary yields to the lock and is recorded as a residual, not forced.
 - **(b) Creative options.** Propose 2-4 distinct directions; each states its hypothesis and what would make it right or wrong. Cosmetic variants do not count as distinct. Under UI lock the directions must differ in experience (flow, structure, interaction, states), not in look.
 - **(c) Follow my existing design.** Use the user-provided pre-design or guideline under the pre-design rules (3).
+
+### 1.2 Mockup count (1-4)
+
+Concepts are non-cosmetic candidate flows; mockups are exercisable artifacts of a chosen flow or direction. The budget default is up to four concepts and up to four mockups, configurable only with a recorded reason. Direction-conditional minimums: under guided premium (1a) and follow-my-existing-design (1c) exactly one mockup is permitted; under creative options (1b) at least two mockups are required. Four is the hard maximum; cosmetic variants never count as concepts or mockups. Every evaluation pass still counts.
 
 ### 1.3 Final clickthrough (offered, never required)
 
@@ -222,18 +228,21 @@ Return, in this order:
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
 
-   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); ui_lock (ON/OFF plus any visual-refresh override reason); and pre_design_binding (name, version, byte size, sha256) when 1c.
+   The selection record also carries the five pre-implementation fields: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (up to four concepts and up to four mockups by default; 1a/1c exactly one mockup; 1b at least two; four hard maximum; recorded override reason); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; and authority_conflict (recorded source conflict and its resolution; in-code design system wins unless the user names elements the pre-design supersedes).
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.
 
-2. **Iteration record** - brief (with UNKNOWNs), story, at least two
-   non-cosmetic flows with hypotheses, prototype scope/fixtures/incompleteness,
+2. **Iteration record** - brief (with UNKNOWNs), story, up to four non-cosmetic concepts (candidate flows)
+   with hypotheses and the direction-conditional mockup count from 1.2,
+   prototype scope/fixtures/incompleteness,
    per-evaluation records with all eight fields, findings and dispositions.
    After implementation, the iteration/post-implementation record also carries
-   proof_set (offered, declined, UNRUN or collected) and demo_script (skipped,
-   drafted or narrated) from the reference template; post-implementation status
-   is never part of the pre-implementation selection record (1.3).
+    clickthrough_offer_decision (offered, declined or UNRUN), proof_set (offered,
+    declined, UNRUN or collected) and demo_script (skipped, drafted or narrated)
+    from the reference template; clickthrough_offer_decision is post-implementation
+    placement and is never part of the pre-implementation selection record (1.3,
+    PR-2 B2').
 3. **Review record** - reviewer identity and independence, what was inspected
    or exercised, the rendered-UI check matrix with PASS/FAIL and evidence, and
    any limitations.
@@ -266,8 +275,7 @@ The full record schema and readiness rules are in
   persona, quote, timing, rate or result was fabricated.
 - The story covers the defined start/success/failure/recovery/empty/permission/
   timing states with expected outcomes where the feature defines them.
-- At least two candidate flows are meaningfully different beyond cosmetics and
-  each has a hypothesis.
+- Candidate concepts are meaningfully different beyond cosmetics and each has a hypothesis; the mockup count follows the 1.2 rule.
 - Prototype scope lists included/mocked/incomplete parts and fixtures, and the
   artifact is the smallest that exercises the named interaction.
 - The reviewer is independent of the author and actually inspected/exercised
@@ -380,8 +388,8 @@ The full record schema and readiness rules are in
   the full record schema fields, the 9 loop elements, readiness and
   false-completion rules, budget ledger, invalidation rules, accepted-with-
   disclosure guidance, and a worked template.
-  The SKILL carries the 1.1 direction rules, 1.3 clickthrough status rule, 1.4 proof set, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding, 4 retro rules and 5 proof set/spoken demo (owner rev 2); the reference carries the matching record schema/fields and the template support; the proof-set rules themselves are normative in sections 1.4 and 5 and are not restated in the reference. Mockup-count matrix detail (1.2), question-cap detail, clickthrough lifecycle detail and the deferred eval cases E15-E19/E25 move to the next wave.
-- [evals/evals.json](evals/evals.json) - the 25 behaviour cases (E1-E13, E14, E20-E24, E26-E29 and PR-2 E31-E32) that exercise the choice, loop, records, readiness, budget and proof set; E30 is deferred to the next wave with the reference-restatement issue; E15-E19 and E25 remain deferred.
+  The SKILL carries the 1.1 direction rules, 1.2 mockup count, the two-question entry cap, 1.3 clickthrough status rule, 1.4 proof set, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding, 4 retro rules and 5 proof set/spoken demo (owner rev 2); the reference carries the matching record schema/fields and the template support; the proof-set rules themselves are normative in sections 1.4 and 5 and are not restated in the reference. E15-E19 and E25 are now in evals; only the remaining clickthrough-lifecycle detail and E30 (PR-2 reference-restatement issue) stay deferred to the next wave.
+- [evals/evals.json](evals/evals.json) - the 31 behaviour cases (E1-E13, E14-E29 and PR-2 E31-E32) that exercise the choice, loop, records, readiness, budget and proof set; E30 is deferred to the next wave with the reference-restatement issue.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - trigger
   discrimination against the nearest owners and the catalog-navigation case.
 - **Normative copy / maintenance:** the reference is the detailed normative copy

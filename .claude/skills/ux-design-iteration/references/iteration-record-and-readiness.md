@@ -19,12 +19,17 @@ summary - keep both in sync.
 | `scope` | Feature/task boundary the choice applies to. | `account settings screens: profile, notifications, save confirmation` |
 | `instruction_source` | Where the choice came from (user turn, reused record, recovered context). | `user turn 2026-10-20, step-3 prompt` |
 | `endpoint` | The delivery endpoint the iteration feeds. | `reviewed handoff to the build stage` |
-| `budget` | Up to three concepts and up to three independent evaluation passes by default (at least two non-cosmetic flows); any override carries a recorded reason; every pass counts. | `up to 3 concepts / up to 3 passes` |
+| budget | Up to four concepts and up to four mockups by default, configurable with a recorded reason; the direction-conditional minimums and hard maximum are in SKILL 1.2; up to three independent evaluation passes by default; every pass counts. | up to 4 concepts / up to 4 mockups / up to 3 passes |
 | `selection_offer_count` | How many times the choice was offered for this feature; at most once per feature/selection context. | `1` |
 | `record_location` | Where the returned record will be persisted (host/user or the project state owner's existing artifact). | `docs/project-state.md decision log (owner to persist)` |
 | `design_direction` | One of the three owner directions: 1a guided premium, 1b creative options, 1c follow my existing design; not-applicable only when no design direction is needed. | `1a` |
 | `ui_lock` | UI consistency lock state: ON for an existing application or in-code design system (default, not asked); OFF for greenfield, or when the user asks for a visual refresh and the override reason is recorded. | `ON (existing app; no override)` |
 | `pre_design_binding` | For 1c: file name, version, byte size and full 64-hex sha256 of the user-provided pre-design; a truncated/absent digest marks the binding UNKNOWN (not bindable); unspecified items are UNKNOWNs. | `brand-kit.fig v4, 128,344 B, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a` |
+| mockup_budget | Budget: up to four concepts and up to four mockups by default; the direction minima and hard maximum are in SKILL 1.2; any override carries a recorded reason. | 1 mockup (1a; one permitted) |
+| authority_conflict | Recorded source conflict and its resolution; the in-code design system keeps authority unless the user states the pre-design supersedes it for named elements (1c/3). | in-code tokens win unless named elements superseded |
+| clickthrough_offer_decision | Post-implementation status: offered, declined or UNRUN; recorded in the iteration/post-implementation record, not in the pre-implementation selection record; a decline/UNRUN names the unobservable state-hydration/transition defect classes and never changes readiness to PASS (SKILL 1.3; B2'). | declined; UNRUN (state hydration/transition) |
+
+The five pre-implementation fields are design_direction, mockup_budget, ui_lock, pre_design_binding and authority_conflict; clickthrough_offer_decision is post-implementation status in the iteration record, never part of the pre-implementation selection record (SKILL 1.3; PR-2 B2').
 
 Return the record to the host/user or the project's state owner for persistence
 in the project's existing step-3 design/state or handoff artifact (for example
@@ -42,8 +47,7 @@ and honored.
 2. **End-to-end experience story** - start, success, failure/recovery, empty,
    permission-denied and timing states with expected outcomes where the feature
    defines them.
-3. **Meaningfully different flows** - at least two non-cosmetic candidates
-   (default three), each with a hypothesis and what would make it wrong.
+3. **Concepts and mockups** - up to four non-cosmetic candidate flows and up to four mockups by default; direction minima and hard maximum are in SKILL 1.2; each concept with a hypothesis and what would make it wrong.
 4. **Prototype scope and smallest interactive artifact** - included, mocked and
    incomplete parts named; the artifact is the smallest that exercises the
    named interaction; fixtures listed.
@@ -59,13 +63,7 @@ and honored.
    changed or unchanged candidate independently retested before advancing; no
    manufactured change; the handoff preserves flow, content, states, visual
    direction, authority, open items, evidence, budget state and next action.
-9. **Defaults, concepts and passes** - up to three concepts and up to three
-   independent passes by default (at least two non-cosmetic flows), configurable
-   with a recorded reason; every pass counts including unchanged retests; no
-   reset on tool/agent switch, resume or rename; approved design preserved;
-   effort scaled. The three-concept and three-pass limits are caps/defaults, not
-   floors: a small feature may need fewer, with the reason recorded. The
-   at-least-two non-cosmetic flows requirement is a minimum, not a cap.
+9. **Defaults, concepts, mockups and passes** - up to four concepts and up to four mockups by default; direction minima and hard maximum are in SKILL 1.2; up to three independent passes by default, configurable with a recorded reason; every pass counts including unchanged retests; no reset on tool/agent switch, resume or rename; approved design preserved; effort scaled. The four-concept/four-mockup and three-pass limits are caps/defaults, not floors: a small feature may need fewer, with the reason recorded.
 
 ## 3. Readiness and false-completion rules
 
@@ -149,7 +147,7 @@ This section is schema, folder layout and template support only; normative rules
 ## 6. Worked record template
 
     feature: <feature/task scope>
-    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, ui_lock: ON|OFF, pre_design_binding: {...}|null, instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
+    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, mockup_budget: ..., ui_lock: ON|OFF, pre_design_binding: {...}|null, authority_conflict: ..., instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
     brief:
       evidence: [<source, observation>]
       problem_job: ...
@@ -174,6 +172,7 @@ This section is schema, folder layout and template support only; normative rules
       folder_layout: ...|null, manifest_path: ...|null, files: [{path, size, sha256}],
       captured_over_expected: [{checkpoint, expected, captured}], delegated_writer: ..., composed_owner: screenshot-evidence-planner}
     demo_script: {status: skipped|drafted|narrated, checkpoints: [...], notes: ..., priority: last_lowest}
+    post_implementation_status: {clickthrough_offer_decision: offered|declined|UNRUN}  # post-implementation record, not selection (SKILL 1.3; PR-2 B2')
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]
     retest:
