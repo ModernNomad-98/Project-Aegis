@@ -90,12 +90,16 @@ no recorded attestation deadline is BLOCKED regardless of how it entered that
 state; the entry classification is not an exemption (a grant whose recorded
 expiry has passed is EXPIRED first, never BLOCKED).
 
+**Effective deadline.** effective_deadline = min(recorded attestation deadline,
+recorded review deadline). Every rule below that requires a deadline to be
+future or unpassed means the effective_deadline.
+
 Canonical precedence table (EXPIRED checked first; BLOCKED > GRANDFATHERED > ACTIVE):
 
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
 | 0 | EXPIRED | recorded expiry/use limit has passed OR a recorded one-use grant is consumed (checked first; terminal) | none; a new grant is required |
-| 1 | BLOCKED | reviewer block OR attestation deadline passed OR no recorded attestation deadline for a NON-EXPIRED grant OR transition trigger | disabled; blocking does not itself expire the grant, but the recorded expiry/use limit keeps running; only in-scope human/manual actions remain and no agent-initiated action proceeds |
+| 1 | BLOCKED | reviewer block OR the effective deadline (sooner of attestation/review) has passed OR no recorded attestation deadline for a NON-EXPIRED grant OR transition trigger | disabled; blocking does not itself expire the grant, but the recorded expiry/use limit keeps running; only in-scope human/manual actions remain and no agent-initiated action proceeds |
 | 2 | GRANDFATHERED | valid at adoption AND recorded AND recorded grandfathered flag SET AND not BLOCKED AND a recorded attestation deadline (or sooner recorded review deadline) exists and has not passed | preserved only when the register records armed at adoption; otherwise disabled |
 | 3 | ACTIVE | not blocked AND a recorded attestation deadline (or sooner recorded review deadline) is in the future | enabled only if the register records armed; an unarmed active grant is ACTIVE without auto-advance |
 
@@ -113,14 +117,15 @@ grant; a new grant is required.
 Allowed transitions (EXPIRED is checked first and is terminal; no transition out
 of EXPIRED exists). Note: ACTIVE or GRANDFATHERED cannot enter BLOCKED on an absent attestation deadline because both require a recorded deadline, so that
 source condition is impossible and is not a numbered transition.
-1. ACTIVE -> BLOCKED on a reviewer block, a passed attestation deadline, or a transition trigger.
-2. GRANDFATHERED -> BLOCKED on a reviewer block, a passed attestation deadline, or a transition trigger.
-3. BLOCKED -> ACTIVE only on recorded re-attestation with a recorded FUTURE attestation deadline, the block cleared, and a recorded expiry/use limit that has NOT passed (grant not EXPIRED).
-4. BLOCKED -> GRANDFATHERED only when the grant is valid-at-adoption, the recorded grandfathered flag is SET, the block has cleared, a recorded attestation deadline exists and has not passed, and the recorded expiry/use limit has NOT passed (grant not EXPIRED).
-5. GRANDFATHERED -> ACTIVE on recorded re-attestation/upgrade with a recorded future attestation deadline, the recorded expiry/use limit not passed (grant not EXPIRED), AND the recorded grandfathered flag CLEARED by that recorded upgrade (otherwise it reclassifies as GRANDFATHERED).
+1. ACTIVE -> BLOCKED on a reviewer block, a passed effective_deadline, or a transition trigger.
+2. GRANDFATHERED -> BLOCKED on a reviewer block, a passed effective_deadline, or a transition trigger.
+3. BLOCKED -> ACTIVE only on recorded re-attestation with a recorded FUTURE effective_deadline (min of attestation and review deadlines), the block cleared, and a recorded expiry/use limit that has NOT passed (grant not EXPIRED).
+4. BLOCKED -> GRANDFATHERED only when the grant is valid-at-adoption, the recorded grandfathered flag is SET, the block has cleared, a recorded FUTURE effective_deadline exists, and the recorded expiry/use limit has NOT passed (grant not EXPIRED).
+5. GRANDFATHERED -> ACTIVE on recorded re-attestation/upgrade with a recorded FUTURE effective_deadline, the recorded expiry/use limit not passed (grant not EXPIRED), AND the recorded grandfathered flag CLEARED by that recorded upgrade (otherwise it reclassifies as GRANDFATHERED).
 6. ACTIVE, GRANDFATHERED or BLOCKED -> EXPIRED when the recorded expiry/use limit passes OR when a recorded one-use grant is consumed; EXPIRED is terminal and a new grant is required.
-Transitions 3 and 4 are mutually exclusive for a BLOCKED grant: a grant whose recorded grandfathered flag is SET follows 4; otherwise it follows 3. When both conditions appear to match, 4 applies only if the recorded flag is SET (never inferred).
-8. Recorded expiry passing is EXPIRED, never a BLOCKED transition; 'expiry' must not be listed as a BLOCKED entry.
+Transitions 3 and 4 are mutually exclusive for a BLOCKED grant: a grant whose recorded grandfathered flag is SET follows 4; otherwise it follows 3. When both conditions appear to match, 4 applies only if the recorded flag is SET (never inferred). **Fallback:** if transition 4's other conditions fail while the recorded flag is SET, the grant STAYS BLOCKED and the flag/condition error is recorded; it does NOT fall through to transition 3.
+
+Rules: recorded expiry passing is EXPIRED, never a BLOCKED transition; 'expiry' must not be listed as a BLOCKED entry.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,

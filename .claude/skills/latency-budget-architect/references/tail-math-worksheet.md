@@ -54,11 +54,16 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 ## Timeout-cascade worksheet
 
-Expected retry-spend CHECK (NOT a timeout derivation; uses p):
+Expected retry-spend CHECK (budget-fit sanity check; NOT a timeout derivation; uses p):
 
 ```
-timeout(upstream) > upstream total_expected_hop_cost(upstream)
-                   + downstream expected critical-path cost + recorded epsilon
+expected_total_hop_spend = wait_0 + SUM(k=0..R) p^k * own_attempt_work
+                         + SUM(k=1..R) p^k * wait_k
+                         + downstream expected critical-path cost
+budget-fit CHECK: expected_total_hop_spend <= this hop's / this path's
+                  budgeted share (a SPEND sanity check only; the HARD-TIMEOUT
+                  derivation below is separate and uses conservative bounds,
+                  never this expected total)
 
 Total terms: wait_0, p^k*own_attempt_work, p^k*wait_k as in the retry-spend
 section. Downstream expected critical-path cost = SUM over serial hops plus the
