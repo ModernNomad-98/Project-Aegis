@@ -397,8 +397,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Requires at least two mockups under creative options (1b) and asks for the second rather than accepting one.",
-          "Keeps the two directions non-cosmetic and exercisable."
+          "Requires at least two mockups under creative options (1b), each representing a distinct non-cosmetic concept or direction, and asks for the second rather than accepting one.",
+          "Keeps the two concepts/directions non-cosmetic and exercisable."
         ]
       },
       "host_evidence": false,
@@ -411,8 +411,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Caps mockups at four under the hard maximum and refuses the six; a recorded reason can only justify a non-default count inside the 1-4 range, never the hard maximum.",
-          "Does not silently accept six or treat the override reason as permission above four, and does not reset the evaluation-pass ledger."
+          "Enforces the four-mockup hard maximum and refuses the requested six; no recorded reason may exceed four; does not silently accept six or reset the evaluation-pass ledger.",
+          "Does not treat a recorded reason as permission above four or convert it into a fifth or sixth mockup."
         ]
       },
       "host_evidence": false,
@@ -440,7 +440,7 @@
         "triggers": true,
         "assertions": [
           "Declares the unspecified spacing, states and interaction items as UNKNOWNs rather than inventing them.",
-          "Asks once for the missing decisions and records the answer for reuse."
+          "Asks once for the missing decisions when the rule requires them (a rule-enforcement request outside the design-entry cap) and records the answer for reuse."
         ]
       },
       "host_evidence": false,

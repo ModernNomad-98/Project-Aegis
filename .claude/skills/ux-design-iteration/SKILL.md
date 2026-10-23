@@ -93,7 +93,7 @@ path (standard design and build remains the default).
    route it through change-classification-gate and docs/paths/design-and-build-ui.md
    and do not offer iteration.
 
-   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (section 5). Never ask a third design-entry question: if a decision is still unsettled, record it as an open item or UNKNOWN for later instead of asking. The cap excludes the post-implementation clickthrough question (1.3) and proof-set question (section 5).
+   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (section 5). Never ask a third design-entry question: if a decision is still unsettled, record it as an open item or UNKNOWN for later instead of asking. The cap excludes the post-implementation clickthrough question (1.3) and proof-set question (section 5). The cap covers design-entry choices only: later rule-enforcement requests for a missing fact, artifact or consent (for example the required second mockup under 1b, or missing pre-design details) are not design-entry questions and may be asked when their rule requires them.
 
 2. **Decide the mode; return the record.** Return the exact selection record
    (mode, feature/task scope, instruction source, delivery endpoint, iteration
@@ -170,7 +170,7 @@ All three reuse the project's in-code design system and tokens as the authority 
 
 ### 1.2 Mockup count (1-4)
 
-Concepts are non-cosmetic candidate flows; mockups are exercisable artifacts of a chosen flow or direction. The budget default is up to four concepts and up to four mockups, configurable only with a recorded reason. Direction-conditional minimums: under guided premium (1a) and follow-my-existing-design (1c) exactly one mockup is permitted; under creative options (1b) at least two mockups are required. Four is the hard maximum; cosmetic variants never count as concepts or mockups. Every evaluation pass still counts.
+Concepts are non-cosmetic candidate flows; mockups are exercisable artifacts of a chosen flow or direction. The budget default is up to four concepts and up to four mockups, configurable only with a recorded reason. Direction rules override the default: under guided premium (1a) and follow-my-existing-design (1c) exactly one mockup is permitted - one, never a second; under creative options (1b) at least two mockups are required, each representing a distinct non-cosmetic concept or direction. Four is the hard maximum and is never exceeded; cosmetic variants never count as concepts or mockups. A recorded reason may reduce counts within the direction's allowed range but may never contradict the direction rules or exceed four. Every evaluation pass still counts.
 
 ### 1.3 Final clickthrough (offered, never required)
 
@@ -228,7 +228,7 @@ Return, in this order:
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
 
-   The selection record also carries the five pre-implementation fields: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (up to four concepts and up to four mockups by default; 1a/1c exactly one mockup; 1b at least two; four hard maximum; recorded override reason); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; and authority_conflict (recorded source conflict and its resolution; in-code design system wins unless the user names elements the pre-design supersedes). These are five of the six tracked fields; the sixth, clickthrough_offer_decision, is post-implementation (item 2).
+   The selection record also carries the five pre-implementation fields: design_direction (1a, 1b, 1c, or not-applicable); mockup_budget (up to four concepts and up to four mockups by default; direction rules override: 1a/1c exactly one mockup, never a second; 1b at least two mockups, each a distinct non-cosmetic concept or direction; four hard maximum never exceeded; a recorded reason may reduce within the direction bounds but never contradict the direction rules); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; and authority_conflict (recorded source conflict and its resolution; in-code design system wins unless the user names elements the pre-design supersedes). These are five of the six tracked fields; the sixth, clickthrough_offer_decision, is post-implementation (item 2).
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.
@@ -238,7 +238,7 @@ Return, in this order:
    prototype scope/fixtures/incompleteness,
    per-evaluation records with all eight fields, findings and dispositions.
    After implementation, the iteration/post-implementation record also carries
-    clickthrough_offer_decision (offered, declined or UNRUN), proof_set (offered,
+    clickthrough_offer_decision (offered, accepted, declined or UNRUN, with a separate ran flag; accepted or ran = ran; declined/impossible = UNRUN with an unrun reason), proof_set (offered,
     declined, UNRUN or collected) and demo_script (skipped, drafted or narrated)
     from the reference template; clickthrough_offer_decision is post-implementation
     placement and is never part of the pre-implementation selection record (1.3,
