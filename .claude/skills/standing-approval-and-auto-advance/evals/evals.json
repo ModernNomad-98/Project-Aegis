@@ -2,6 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "standing-approval-and-auto-advance",
   "description": "Behavior cases for the governed standing-approval layer: named scope, no inferred merge authority, explicit scoped human grants, opt-in merge profile, reviewer blocks, and incident-anchored rationale.",
+  "canonical_semantics": {"path": "docs/semantics/canonical-semantics.md", "covers": ["R8-CONV-1, R8-CONV-5"]},
   "cases": [
     {
       "id": "positive-design-standing-approval-for-fatigued-loop",

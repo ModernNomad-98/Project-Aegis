@@ -2,6 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ai-human-in-the-loop-designer",
   "description": "Behavior cases for designing how an AI feature's output becomes product state (D70, catalog items #285 and #286 with #287 folded in): refunds held as CONFIRM proposals with a reviewer queue and audit, ticket tags kept advisory-only, account deletion classified FORBIDDEN, self-approval refused, a stale proposal re-checked or expired, a missing risk tier handed to ai-governance-risk-reviewer, and routing away from the coding assistant's own approvals, tool permission scope and adversarial approval-flow review.",
+  "canonical_semantics": {"path": "docs/semantics/canonical-semantics.md", "covers": ["R8-CONV-4"]},
   "cases": [
     {
       "id": "refund-confirm-happy-path",
