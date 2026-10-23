@@ -93,7 +93,7 @@ path (standard design and build remains the default).
    route it through change-classification-gate and docs/paths/design-and-build-ui.md
    and do not offer iteration.
 
-   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c and mockup count 1.2) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (PR-2).
+   **Design-entry questions and context inference (owner rev 2).** Existing A/B choices are unchanged. New choices (design direction 1.1a/b/c) are offered once, recorded in the selection record, and reused across turns, resumes and agent changes; the user can change them later. Infer what context settles and do not ask it: a provided Figma export or styleguide implies follow-my-existing-design (1c); a settled direction implies one mockup; an existing application implies UI consistency lock ON (1.5) without asking. At design entry ask at most TWO questions in total (the A/B method and, only when context does not settle it, the direction/mockup choice); before each question explain benefits, drawbacks and unknown costs plainly, never invent time or price, recommend one with a reason, and ask one atomic question. Ask the final-clickthrough question only after implementation (1.3) and the proof-set question only after that (PR-2).
 
 2. **Decide the mode; return the record.** Return the exact selection record
    (mode, feature/task scope, instruction source, delivery endpoint, iteration
@@ -208,7 +208,7 @@ Return, in this order:
    source, delivery endpoint, iteration budget, selection/offer count, and
    where the record lives.
 
-   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); ui_lock (ON/OFF plus any visual-refresh override reason); pre_design_binding (name, version, byte size, sha256) when 1c; authority_conflict (recorded source conflict and its resolution; the in-code design system keeps authority unless named elements are superseded); and clickthrough_offer_decision (offered/declined/UNRUN) as a post-implementation status, not part of this pre-implementation selection record.
+   The selection record also carries: design_direction (1a, 1b, 1c, or not-applicable); ui_lock (ON/OFF plus any visual-refresh override reason); and pre_design_binding (name, version, byte size, sha256) when 1c.
 
    **Mode A:** if mode A was selected, stop after the selection record and route
    to the standard design/build path; items 2-6 below apply only to mode B.
@@ -270,13 +270,13 @@ The full record schema and readiness rules are in
   capability that did not run; unavailable checks are reported UNRUN with
   their exact prerequisite.
 - The design-entry questions followed the owner discipline: at most two questions at design entry, context inference used first (Figma export implies 1c, settled direction implies one mockup, existing application implies UI lock ON without asking), and no invented cost.
-- The chosen design direction is one of 1a/1b/1c and the mockup count matches it (one under 1a/1c; at least two under 1b; never more than four, with any override recorded).
+- The chosen design direction is one of 1a/1b/1c, or not-applicable when no direction is needed.
 - Under guided premium, exactly one primary action per screen and one dominant element per view are checked; under UI lock, UI stays consistent and any inability to meet a heuristic is recorded as a residual, not forced.
 - The UI-lock inventory diff maps every component/token/colour/type size/icon/motion to an existing project element; an unapproved unmapped element is NOT READY with the element named, and a needed new element is a PROPOSED UI ADDITION, not an approved mockup element.
 - Prototype acceptance is live: transitions exercisable, state carries, real counts (no hard-coded labels), every named non-happy state reachable, fixtures only, declared viewports and keyboard focus; a static image or non-interactive comp whose transitions cannot be exercised is NOT READY with those transitions named.
 - The clickthrough was offered after implementation; when declined or impossible it is a named UNRUN naming the unobservable state-hydration/transition defects, readiness is unchanged, and no pass is claimed.
 - Pre-design is bound by name/version/byte size/sha256, gaps are UNKNOWNs, and an authority conflict is recorded (in-code wins unless the user names superseding elements).
-- Retro failures were classified before fixing; out-of-scope defects are named residuals; the approved mockup is bound by sha256 and byte size and the committed copy match is recorded.
+- Retro failures were classified before fixing; out-of-scope defects are named residuals; the approved mockup is bound by sha256 and byte size when the host provides it; the skill writes nothing.
 
 ## Gotchas
 
@@ -363,7 +363,7 @@ The full record schema and readiness rules are in
   false-completion rules, budget ledger, invalidation rules, accepted-with-
   disclosure guidance, and a worked template.
   The SKILL carries the 1.1 direction rules, 1.3 clickthrough status rule, 1.5 UI consistency lock, 2 live-prototype acceptance teeth, 3 pre-design binding and 4 retro rules (owner rev 2); the reference carries the matching record fields and partial readiness additions, not a second copy of those rules. Mockup-count matrix detail (1.2), question-cap detail, clickthrough lifecycle detail and the deferred eval cases E15-E19/E25 move to the next wave; the PR-2 proof set is not part of PR-1.
-- [evals/evals.json](evals/evals.json) - the 24 PR-1 behaviour cases (E1-E13, E14 and E20-E24, E26-E29) that exercise the choice, loop, records, readiness and budget; E15-E19 and E25 are deferred to the next wave.
+- [evals/evals.json](evals/evals.json) - the 23 PR-1 behaviour cases (E1-E13, E14, E20-E24 and E26-E29) that exercise the choice, loop, records, readiness and budget; E15-E19 and E25 are deferred to the next wave.
 - [evals/trigger-evals.json](evals/trigger-evals.json) - trigger
   discrimination against the nearest owners and the catalog-navigation case.
 - **Normative copy / maintenance:** the reference is the detailed normative copy

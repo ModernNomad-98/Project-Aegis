@@ -133,10 +133,8 @@ for what materially blocks the next useful action.
    offers one up-front choice between the standard journey and explore-and-refine.
    Under that method the same up-front discipline applies: ask at most two
    questions at design entry, infer what context settles, and offer the design
-   direction (guided premium, creative options, or follow my existing design),
-   the mockup count (default two, hard maximum four; one under guided
-   premium/follow-existing, at least two under creative options) and the UI
-   consistency lock (default ON for an existing application or in-code design
+   direction (guided premium, creative options, or follow my existing design)
+   and the UI consistency lock (default ON for an existing application or in-code design
    system, OFF greenfield; not asked as a question). It owns only the iteration
    method, composes the owners above, keeps step 3's design authority unchanged,
    and never makes iteration mandatory; details/record template live in the skill.

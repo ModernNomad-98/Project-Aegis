@@ -25,7 +25,6 @@ summary - keep both in sync.
 | `design_direction` | One of the three owner directions: 1a guided premium, 1b creative options, 1c follow my existing design; not-applicable only when no design direction is needed. | `1a` |
 | `ui_lock` | UI consistency lock state: ON for an existing application or in-code design system (default, not asked); OFF for greenfield, or when the user asks for a visual refresh and the override reason is recorded. | `ON (existing app; no override)` |
 | `pre_design_binding` | For 1c: file name, version, byte size and full 64-hex sha256 of the user-provided pre-design; a truncated/absent digest marks the binding UNKNOWN (not bindable); unspecified items are UNKNOWNs. | `brand-kit.fig v4, 128,344 B, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a` |
-| `authority_conflict` | Recorded source conflict and its resolution; the in-code design system keeps authority unless the user states the pre-design supersedes it for named elements. Uses the second design-entry question slot only when a user-provided pre-design creates a conflict, within the two-question cap. | `in-code tokens win for all elements` |
 
 Return the record to the host/user or the project's state owner for persistence
 in the project's existing step-3 design/state or handoff artifact (for example
@@ -112,7 +111,7 @@ budget yourself.
 
 ## 3a. Clickthrough status (post-implementation only)
 
-One post-implementation status is recorded: `clickthrough_offer_decision` = offered, declined or UNRUN; a decline/UNRUN names the unobservable state-hydration/transition defect classes and never changes readiness to PASS. It is not part of the pre-implementation selection record.
+After implementation the clickthrough is offered and either run or declined; a decline or impossible run is recorded as a named UNRUN naming the unobservable state-hydration/transition defect classes, never changes readiness to PASS, and is not part of the pre-implementation selection record.
 
 ## 4. Budget ledger and invalidation
 
@@ -146,7 +145,7 @@ user validation that did not happen.
 ## 6. Worked record template
 
     feature: <feature/task scope>
-    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, ui_lock: ON|OFF, pre_design_binding: {...}|null, authority_conflict: ..., instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
+    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, ui_lock: ON|OFF, pre_design_binding: {...}|null, instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
     brief:
       evidence: [<source, observation>]
       problem_job: ...
@@ -166,7 +165,6 @@ user validation that did not happen.
     ui_lock_inventory_diff: [{element: ..., mapped_to: ...}]
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
-    clickthrough: {clickthrough_offer_decision: offered|declined|UNRUN, unrun_reason: ...}
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]
     retest:

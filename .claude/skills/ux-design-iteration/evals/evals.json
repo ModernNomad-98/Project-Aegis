@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ux-design-iteration",
-  "description": "Behaviour cases for the optional pre-implementation design iteration method (24 cases: the 13 original cases E1-E13 plus kept PR-1 extension cases E14, E20-E24 and E26-E29; E15-E19 and E25 are postponed with the mockup-count/question-cap/clickthrough-lifecycle detail to the next wave). The kept extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14, E20-E24 and E26-E29. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (23 cases: the 13 original cases E1-E13 plus kept PR-1 extension cases E14, E20-E24 and E26-E29; E15-E19, E25 and the mockup-count/question-cap/clickthrough-lifecycle detail are postponed to the next wave). The kept extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14, E20-E24 and E26-E29. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
   "cases": [
     {
       "id": "E1",
@@ -287,20 +287,6 @@
         "assertions": [
           "Records the clickthrough decision; a decline or impossible run is a named UNRUN with the unobservable state-hydration and transition defect classes.",
           "Leaves readiness unchanged and claims no pass; does not invoke the MANUAL-ONLY skill silently."
-        ]
-      },
-      "host_evidence": false,
-      "evidence_pointer": null
-    },
-    {
-      "id": "E25",
-      "type": "should_trigger",
-      "prompt": "Under guided premium, the dashboard mockup has two primary buttons per screen.",
-      "expect": {
-        "triggers": true,
-        "assertions": [
-          "Records a finding against the exactly-one-primary-action heuristic.",
-          "Does not declare READY while the conflict is unrecorded."
         ]
       },
       "host_evidence": false,
