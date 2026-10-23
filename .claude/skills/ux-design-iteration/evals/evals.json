@@ -1,8 +1,20 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ux-design-iteration",
-  "description": "Behaviour cases for the optional pre-implementation design iteration method (30 cases: the 13 original cases E1-E13, PR-1 extension cases E14-E18 and E20-E29, and PR-2 proof-set cases E31-E32; E19 is deferred to the next wave with the E4-B6/E5-B1 issue, and E30 remains deferred with the reference-restatement issue). The extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14-E18, E20-E29 and E31-E32. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
-  "canonical_semantics": {"path": "docs/semantics/canonical-semantics.md", "covers": ["R8-UX-1", "R8-UX-2", "R8-UX-3", "R8-UX-4", "R8-UX-5", "R8-UX-6", "R8-UX-7", "R8-UX-8"]},
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (32 cases: the 13 original cases E1-E13, PR-1 extension cases E14-E18 and E20-E29, the E19 clickthrough-decline case, the E30 proof-set/reference single-source case, and PR-2 proof-set cases E31-E32; E19 and E30 are delivered per canonical R8-UX-3/R8-UX-4). The extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14-E18, E19, E20-E30 and E31-E32. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
+  "canonical_semantics": {
+    "path": "docs/semantics/canonical-semantics.md",
+    "covers": [
+      "R8-UX-1",
+      "R8-UX-2",
+      "R8-UX-3",
+      "R8-UX-4",
+      "R8-UX-5",
+      "R8-UX-6",
+      "R8-UX-7",
+      "R8-UX-8"
+    ]
+  },
   "cases": [
     {
       "id": "E1",
@@ -282,6 +294,24 @@
       "evidence_pointer": null
     },
     {
+      "id": "E19",
+      "type": "should_trigger",
+      "prompt": "Offer the final clickthrough for a finished account-resume flow; the user explicitly says no, then asks whether we are still ready to hand off, and also asks what happens if the clickthrough record itself is missing or malformed. Also cover a clickthrough that was attempted but could not be run, and whether an explicit yes can be re-offered.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the clickthrough status as declined: declined is a recorded user answer, not a run outcome, and it carries no defect classes for a decline.",
+          "States the clickthrough is never a pass and the decline is never converted into UNRUN; readiness may still be declared on other evidence.",
+          "Places clickthrough_offer_decision in the iteration/post-implementation record only and keeps it out of the five-field pre-implementation selection record; the other selection-record fields remain unchanged.",
+          "Treats an attempted-but-impossible clickthrough as UNRUN naming unobservable state-hydration/transition classes; absent/malformed/missing status is the single fail-safe UNKNOWN diagnosis recorded in status_diagnosis (status stored unset/null, no fourth status, never defaulted to UNRUN, never a pass) with a named reason and human remediation; absent = status field not present, malformed = present but invalid, missing = whole clickthrough_offer_decision object absent.",
+          "Cites canonical R8-UX-4 for lifecycle/status and canonical R8-UX-3 only for record placement; does not restate unrelated rules.",
+          "Does not convert the recorded decline into an UNKNOWN diagnosis, a defect or a negative result; records an explicit yes/execution and any explicit recorded re-offer in offer_turns/decided_by without inventing a fourth status and without re-asking automatically."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
       "id": "E20",
       "type": "should_trigger",
       "prompt": "The pre-design says rounded cards, but our in-code design system uses square cards everywhere.",
@@ -417,6 +447,23 @@
         "assertions": [
           "Treats the new element as a PROPOSED UI ADDITION with justification routed to the design-system owner as a separate decision; it does not enter the mockup as approved.",
           "Does not declare the mockup READY with an unapproved new component."
+        ]
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
+    },
+    {
+      "id": "E30",
+      "type": "should_trigger",
+      "prompt": "After implementation the user declines the proof set. The reference page also appears to restate the proof-set rules. Record the proof-set decision and explain which text is authoritative, including what happens if the proof set cannot be run at all and the only available input is production data.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the proof-set decline as a recorded decision that is not a defect and does not upgrade readiness.",
+          "States SKILL 1.4 and SKILL 5 remain the single normative source; the reference 5b is schema/folder/template support and does not restate normative rules.",
+          "When an attempted proof set cannot run (a different event from a decline), uses the proof-set schema in reference 5b (unrun_reason enum: production_data_only|no_local_stack|missing_tooling|failed_capture) for UNRUN and names production-data-only input as a named UNRUN; a decline never carries unrun_reason.",
+          "Cites canonical R8-UX-3 only where record schema/placement overlaps; keeps SKILL 1.4 and SKILL 5 as the proof-set single source; does not claim canonical R8-UX-4 governs proof-set rules.",
+          "States evidence never upgrades readiness and declined/UNRUN is never a pass."
         ]
       },
       "host_evidence": false,
