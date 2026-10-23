@@ -2001,8 +2001,15 @@ class Audit:
         heading = ""
         row = re.compile(r"^\|\s*`([a-z0-9-]+)`\s*\|")
         for line in catalog.read_text(encoding="utf-8").splitlines():
-            if line.startswith("#"):
+            # R7/ROOT-05: only a real ATX heading delimits a section; catalog
+            # paragraphs can begin with '#' (a historical citation), and those
+            # must never become a family value.
+            if re.match(r"^#{1,6}\s+\S", line):
                 heading = line.lstrip("#").strip()
+                continue
+            # The agent roster is not a skill family.
+            if heading.startswith("Subagents"):
+                continue
             m = row.match(line)
             if m:
                 out.setdefault(m.group(1), heading)
