@@ -65,7 +65,7 @@ must be re-attested at the review/attestation deadline recorded with the grant
 (whichever deadline is sooner when several apply). The grant expiry/use limit
 (if any) is a separate field from the attestation deadline: expiry bounds
 consumption; the attestation deadline is when re-attestation is required.
-No recorded attestation deadline means BLOCKED. A reviewer block wins for
+No recorded effective_deadline (neither attestation_deadline nor review_deadline recorded) means BLOCKED. A reviewer block wins for
 every agent-initiated action: halt and wait for the human.
 Canonical precedence table (EXPIRED terminal checked before this table; then
 BLOCKED > GRANDFATHERED > ACTIVE > INACTIVE):

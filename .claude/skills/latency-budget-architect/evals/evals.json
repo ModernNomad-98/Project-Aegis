@@ -63,9 +63,33 @@
         "triggers": true,
         "assertions": [
           "Uses upstream_own_hard_bound + downstream_hard_bound + epsilon, epsilon recorded once.",
-          "Computes retry_allowance_bound = 2*20 + 30 = 70ms and downstream_hard_bound = 100 + 70 = 170ms, so upstream_timeout > 290ms + epsilon.",
+          "Computes retry_allowance_bound = 2*20 + 30 = 70ms using downstream_own_attempt_work_hard_bound=20ms and downstream_backoff_total=30ms, and downstream_hard_bound = 100 + 70 = 170ms, so upstream_timeout > 290ms + epsilon.",
           "Uses MAX of branch BOUNDS at parallel joins, never an expected maximum or MAX of means in hard mode.",
           "States every hard term's recorded bound/percentile source (recorded_percentile); a missing bound is UNVERIFIED, not a pass."
+        ]
+      }
+    },
+    {
+      "id": "edge-hard-mode-no-downstream-retry",
+      "type": "should_trigger",
+      "prompt": "Hard mode: R_down=0 downstream, one downstream hop branch_hard_bound=100ms, upstream_own_hard_bound=120ms. What is retry_allowance_bound and downstream_hard_bound?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Sets retry_allowance_bound = 0 exactly when R_down = 0; no upstream backoff_total is charged to a hop with no downstream retry.",
+          "Computes downstream_hard_bound = 100ms and the hard cascade threshold 220ms + epsilon, with every term's bound source stated."
+        ]
+      }
+    },
+    {
+      "id": "edge-hard-mode-no-downstream-retry-with-upstream-retries",
+      "type": "should_trigger",
+      "prompt": "Hard mode: downstream R_down=0 but upstream R=3; must upstream retries increase the downstream hard bound?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps retry_allowance_bound = 0 when R_down = 0 even when upstream R>0; upstream retries do not create downstream retry allowance.",
+          "Uses downstream_own_attempt_work_hard_bound and downstream_backoff_total only for R_down>0; states the variables and bound sources explicitly."
         ]
       }
     },
