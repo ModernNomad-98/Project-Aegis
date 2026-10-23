@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ux-design-iteration",
-  "description": "Behaviour cases for the optional pre-implementation design iteration method (31 cases: the 13 original cases E1-E13, PR-1 extension cases E14-E29, and PR-2 proof-set cases E31-E32; E30 remains deferred to the next wave with the reference-restatement issue). The extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14-E29 and E31-E32. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (30 cases: the 13 original cases E1-E13, PR-1 extension cases E14-E18 and E20-E29, and PR-2 proof-set cases E31-E32; E19 is deferred to the next wave with the E4-B6/E5-B1 issue, and E30 remains deferred with the reference-restatement issue). The extension cases are behavioural prompt/assertion cases whose assertions check the skill rules structurally; they are not JSON/schema validators and are not host-executed. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14-E18, E20-E29 and E31-E32. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
   "cases": [
     {
       "id": "E1",
@@ -13,8 +13,7 @@
           "Offers the one-time choice between A (standard design and build, the default) and B (explore and refine first) before any implementation.",
           "Makes clear that B adds flow comparison, an interactive prototype, an independent review and a bounded budget, without inventing time or price.",
           "Records mode, scope, instruction source, delivery endpoint, budget and offer count before iteration work begins.",
-          "Records the selection record fields including where the record will be persisted (record_location).",
-          "Distinguishes concepts from mockups and uses one to four non-cosmetic concepts with the 1.2 direction-conditional mockup count."
+          "Records the selection record fields including where the record will be persisted (record_location)."
         ]
       },
       "host_evidence": true,
@@ -29,7 +28,8 @@
         "triggers": false,
         "assertions": [
           "Does not offer or select iteration: the direction is settled, so standard design and build applies and the ordinary route to the project's standard design/build path is left in place.",
-          "Does not claim iteration ran, and does not ask a question already answered by the prompt."
+          "Does not claim iteration ran, and does not ask a question already answered by the prompt.",
+          "Distinguishes concepts from mockups and uses one to four non-cosmetic concepts with the 1.2 direction-conditional mockup count."
         ]
       },
       "host_evidence": true,
@@ -216,7 +216,8 @@
         "triggers": false,
         "assertions": [
           "Does not offer the A/B choice or any design-direction/mockup/UI-lock question for a settled implementation.",
-          "Routes the ordinary build through the standard design/build path and claims no iteration work."
+          "Routes the ordinary build through the standard design/build path and claims no iteration work.",
+          "Never asks a third design-entry question; unsettled decisions are recorded as open items or UNKNOWNs."
         ]
       },
       "host_evidence": false,
@@ -272,21 +273,8 @@
         "triggers": true,
         "assertions": [
           "Binds the pre-design by file name, version, byte size and sha256 and uses it under 1c.",
-          "Invents no token, spacing, state or interaction the pre-design does not specify."
-        ]
-      },
-      "host_evidence": false,
-      "evidence_pointer": null
-    },
-    {
-      "id": "E19",
-      "type": "should_trigger",
-      "prompt": "Here is our pre-design, but it only has colours and no spacing, states or interaction details.",
-      "expect": {
-        "triggers": true,
-        "assertions": [
-          "Declares the unspecified spacing, states and interaction items as UNKNOWNs rather than inventing them.",
-          "Asks once for each specific rule-required missing decision as an atomic question (never a bundled broad question), records the answers, and treats the rest as UNKNOWNs."
+          "Invents no token, spacing, state or interaction the pre-design does not specify.",
+          "Treats the provided pre-design as implying 1c and records pre_design_binding as a named UNKNOWN when the metadata needed for the binding is missing."
         ]
       },
       "host_evidence": false,
@@ -301,7 +289,8 @@
         "assertions": [
           "Records the authority conflict and keeps the in-code design system as authority unless the user names elements the pre-design supersedes.",
           "Does not silently pick the easier source or invent a third style.",
-          "Records the authority conflict and keeps the in-code design system as authority unless the user names superseding elements."
+          "Records the authority conflict and keeps the in-code design system as authority unless the user names superseding elements.",
+          "Records the authority_conflict field with none when there is no pre-design conflict or the recorded resolution when there is one."
         ]
       },
       "host_evidence": false,
