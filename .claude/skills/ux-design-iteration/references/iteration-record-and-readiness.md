@@ -19,12 +19,16 @@ summary - keep both in sync.
 | `scope` | Feature/task boundary the choice applies to. | `account settings screens: profile, notifications, save confirmation` |
 | `instruction_source` | Where the choice came from (user turn, reused record, recovered context). | `user turn 2026-10-20, step-3 prompt` |
 | `endpoint` | The delivery endpoint the iteration feeds. | `reviewed handoff to the build stage` |
-| `budget` | Up to three concepts and up to three independent evaluation passes by default (at least two non-cosmetic flows); any override carries a recorded reason; every pass counts. | `up to 3 concepts / up to 3 passes` |
-| `selection_offer_count` | How many times the choice was offered for this feature; at most once per feature/selection context. | `1` |
+| `budget` | Evaluation-pass ledger only: up to three independent evaluation passes by default (passes_used/limit), configurable with a recorded reason; every pass counts; this row carries no concept/mockup counts; selection_offer_count is the single source for offer_count. | `up to 3 passes` |
+| `selection_offer_count` | How many times the choice was offered for this feature; at most once per feature/selection context; this is the single source for offer_count and it is not part of budget. | `1` |
 | `record_location` | Where the returned record will be persisted (host/user or the project state owner's existing artifact). | `docs/project-state.md decision log (owner to persist)` |
 | `design_direction` | One of the three owner directions: 1a guided premium, 1b creative options, 1c follow my existing design; not-applicable only when no design direction is needed. | `1a` |
 | `ui_lock` | UI consistency lock state: ON for an existing application or in-code design system (default, not asked); OFF for greenfield, or when the user asks for a visual refresh and the override reason is recorded. | `ON (existing app; no override)` |
-| `pre_design_binding` | For 1c: file name, version, byte size and full 64-hex sha256 of the user-provided pre-design; a truncated/absent digest marks the binding UNKNOWN (not bindable); unspecified items are UNKNOWNs. | `brand-kit.fig v4, 128,344 B, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a` |
+| `pre_design_binding` | Always present: not-applicable when 1c is not used; for 1c, file name, version, byte size and full 64-hex sha256 of the user-provided pre-design; a truncated/absent digest marks the binding UNKNOWN (not bindable); unspecified items are UNKNOWNs. | `brand-kit.fig v4, 128,344 B, sha256 9f3c2a7b5d1e4f8a6b0c9d2e5f7a1b3c4d6e8f0a2b4c6d8e0f1a3b5c7d9e2f4a` |
+| `mockup_budget` | One to four concepts and one to four mockups by default; concepts and mockups each have a hard maximum of four that is never exceeded; at least one concept is required whenever the iteration runs (zero only for a justified N/A with a recorded reason). Direction rules override the defaults: 1a/1c exactly one mockup is permitted - one required and permitted, never a second; 1b at least two mockups are required, each for a distinct non-cosmetic concept or direction. A recorded reason may reduce counts within the direction's allowed range but never below a direction minimum, never above four, and never contrary to the direction rules; a mockup and a prototype are exercisable artifacts of a chosen concept/direction and multiple prototypes of one concept do not count as multiple mockups; actual usage is recorded as concepts_used/mockups_used in the iteration record; mode A or no-direction cases record mockup_budget as not-applicable or zero with a recorded reason. | 1 concept / 1 mockup (1a; one required and permitted) |
+| `authority_conflict` | ONE mapping: not-applicable when no pre-design/1c is in use; none when 1c applies with no conflict; the recorded resolution when 1c conflicts; a named UNKNOWN/open item when unresolved. Scope is pre-design-vs-in-code authority only, never UI-lock element conflicts (those route to PROPOSED UI ADDITION or are named residuals); the in-code design system keeps authority unless the user states the pre-design supersedes it for named elements (1c/3). | none / not-applicable / UNKNOWN(<reason>) |
+
+The five pre-implementation fields are design_direction, mockup_budget, ui_lock, pre_design_binding and authority_conflict; pre_design_binding is always present: not-applicable when 1c is not used; under 1c the binding or a named UNKNOWN(<reason>) when not bindable; the clickthrough status remains post-implementation (SKILL 1.3) and its dedicated schema field is deferred to the next wave.
 
 Return the record to the host/user or the project's state owner for persistence
 in the project's existing step-3 design/state or handoff artifact (for example
@@ -42,8 +46,7 @@ and honored.
 2. **End-to-end experience story** - start, success, failure/recovery, empty,
    permission-denied and timing states with expected outcomes where the feature
    defines them.
-3. **Meaningfully different flows** - at least two non-cosmetic candidates
-   (default three), each with a hypothesis and what would make it wrong.
+3. **Concepts and mockups** - one to four non-cosmetic candidate flows and one to four mockups by default; when more than one concept is produced they must be meaningfully different; concepts and mockups each have a hard maximum of four never exceeded; direction minima and hard maximum are in SKILL 1.2; under 1b at least two mockups are required, each for a distinct non-cosmetic concept or direction; each concept with a hypothesis and what would make it wrong.
 4. **Prototype scope and smallest interactive artifact** - included, mocked and
    incomplete parts named; the artifact is the smallest that exercises the
    named interaction; fixtures listed.
@@ -59,13 +62,7 @@ and honored.
    changed or unchanged candidate independently retested before advancing; no
    manufactured change; the handoff preserves flow, content, states, visual
    direction, authority, open items, evidence, budget state and next action.
-9. **Defaults, concepts and passes** - up to three concepts and up to three
-   independent passes by default (at least two non-cosmetic flows), configurable
-   with a recorded reason; every pass counts including unchanged retests; no
-   reset on tool/agent switch, resume or rename; approved design preserved;
-   effort scaled. The three-concept and three-pass limits are caps/defaults, not
-   floors: a small feature may need fewer, with the reason recorded. The
-   at-least-two non-cosmetic flows requirement is a minimum, not a cap.
+9. **Defaults, concepts, mockups and passes** - concepts and mockups each have a hard maximum of four that is never exceeded; defaults are up to four concepts and up to four mockups; at least one concept is required whenever the iteration runs, and zero only for a justified N/A with a recorded reason; direction minima and hard maximum are in SKILL 1.2. Direction rules override the defaults: 1a/1c exactly one mockup is permitted - one required and permitted, never a second; 1b at least two mockups are required, each for a distinct non-cosmetic concept or direction. A recorded reason may reduce counts within the direction's allowed range but never below a direction minimum, never above four, and never contrary to the direction rules. Up to three independent passes by default, configurable with a recorded reason; every pass counts including unchanged retests; no reset on tool/agent switch, resume or rename; approved design preserved; effort scaled.
 
 ## 3. Readiness and false-completion rules
 
@@ -149,7 +146,7 @@ This section is schema, folder layout and template support only; normative rules
 ## 6. Worked record template
 
     feature: <feature/task scope>
-    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, ui_lock: ON|OFF, pre_design_binding: {...}|null, instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
+    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, mockup_budget: ..., ui_lock: ON|OFF, pre_design_binding: {...} | not-applicable | UNKNOWN(<reason>), authority_conflict: ..., instruction_source: ..., endpoint: ..., budget: {passes_used: ..., limit: ...}, selection_offer_count: 1, record_location: ...}  # budget = pass ledger; concept/mockup counts in mockup_budget; offer count = selection_offer_count
     brief:
       evidence: [<source, observation>]
       problem_job: ...
@@ -178,7 +175,8 @@ This section is schema, folder layout and template support only; normative rules
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]
     retest:
       candidate_version: ... ; scenario: ... ; result: ... ; invalidated: [...]
-    budget: {concepts_used: n, passes_used: m, limit: ...}
+    budget: {passes_used: m, limit: ...}  # pass ledger only; offer_count = selection_offer_count
+    usage: {concepts_used: n, mockups_used: k}  # actual counts; mockup_budget is the allowed range
     readiness:
       status: READY | NOT READY ; declared_scenarios: [...] ; coverage_or_na: [...] ;
       required_checks: [{check, result, evidence}] ; blocking: [...] ; production_boundary: ... ;
