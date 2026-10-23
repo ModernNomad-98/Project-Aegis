@@ -22,6 +22,12 @@ summary - keep both in sync.
 | `budget` | Up to three concepts and up to three independent evaluation passes by default (at least two non-cosmetic flows); any override carries a recorded reason; every pass counts. | `up to 3 concepts / up to 3 passes` |
 | `selection_offer_count` | How many times the choice was offered for this feature; at most once per feature/selection context. | `1` |
 | `record_location` | Where the returned record will be persisted (host/user or the project state owner's existing artifact). | `docs/project-state.md decision log (owner to persist)` |
+| design_direction | One of the three owner directions: 1a guided premium, 1b creative options, 1c follow my existing design; not-applicable only when no design direction is needed. | 1a |
+| mockup_budget | Default 2; hard maximum 4; exactly one under 1a/1c; at least two under 1b; overrides carry a recorded reason. | 2 (max 4; one under 1c) |
+| ui_lock | UI consistency lock state: ON for an existing application or in-code design system (default, not asked), OFF only when the user asks for a visual refresh and the override reason is recorded. | ON (existing app; no override) |
+| pre_design_binding | For 1c: file name, version, byte size and sha256 of the user-provided pre-design; unspecified items are UNKNOWNs. | brand-kit.fig v4, 128,344 B, sha256 9f... |
+| authority_conflict | Recorded source conflict and its resolution; the in-code design system keeps authority unless the user states the pre-design supersedes it for named elements. | in-code tokens win for all elements |
+| clickthrough_offer_decision | Offered after implementation: offered, declined or UNRUN; a decline/UNRUN names the unobservable state-hydration/transition defect classes and never changes readiness to PASS. | declined; UNRUN (state hydration/transition) |
 
 Return the record to the host/user or the project's state owner for persistence
 in the project's existing step-3 design/state or handoff artifact (for example
@@ -94,6 +100,8 @@ A readiness declaration is **READY** only when:
   results appear; actual-user evaluation is stated if not run.
 - The production boundary is respected: prototype work does not claim
   production readiness, and production work waits until the criteria pass.
+- Prototype acceptance is live and enforced before READY: transitions named by the story are exercisable; state carries across steps with derived content and real counts; every named non-happy state (empty, invalid, permission-denied/viewer, loading, error, recovery) shows how the user continues; the artifact is fixtures-only with no backend/network/repo change; it is responsive at the declared viewports and keyboard-operable with visible focus. A static image, non-interactive comp or frame sequence whose transitions cannot be exercised is NOT READY with the unexercisable transitions named.
+- UI-lock inventory diff: when ui_lock is ON, every component/token/colour/type size/icon/motion in the mockup maps to an existing project element (compose frontend-architecture-mapper and design-system-token-governor); any unmapped element is a finding; an unapproved unmapped element is NOT READY with the element named; a genuinely needed new element is a PROPOSED UI ADDITION routed as a separate design-system-owner decision, never an approved mockup element.
 
 The iteration itself needs **no per-round owner approval**; present the reviewed
 prototype on request; after readiness, full delivery continues only under
@@ -118,6 +126,11 @@ budget yourself.
   smallest decision; if the final budgeted pass already establishes every
   required check, the readiness rules decide and the cap alone is not a blocker;
   never manufacture a pass or continue silently.
+## 5a. Retro rules (failure triage, scope, mockup binding)
+
+- When a check fails, classify it as a stale assertion, a product bug, or a wrong metric BEFORE fixing it; record the classification in the record.
+- A defect outside the surface under change is a named residual; never fix it by loosening a test or lowering a threshold.
+- The approved mockup is bound by sha256 and byte size; the implementation record states that the committed copy matches that binding.
 
 ## 5. Accepted-with-disclosure rules
 
@@ -131,7 +144,7 @@ user validation that did not happen.
 ## 6. Worked record template
 
     feature: <feature/task scope>
-    selection: {mode: A|B, instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
+    selection: {mode: A|B, design_direction: 1a|1b|1c|not-applicable, mockup_budget: ..., ui_lock: ON|OFF, pre_design_binding: {...}|null, authority_conflict: ..., clickthrough_offer_decision: offered|declined|UNRUN, instruction_source: ..., endpoint: ..., budget: ..., offer_count: 1, record_location: ...}
     brief:
       evidence: [<source, observation>]
       problem_job: ...
@@ -145,7 +158,10 @@ user validation that did not happen.
     prototype:
       scope_included: [...] ; mocked: [...] ; incomplete: [...] ; fixtures: [...] ; smallest_artifact: ...
     evaluations:
-      - id: E1 ; question: ... ; candidate_version: ... ; scenario: ... ; observation: ... ;
+- id: E1 ; mockup_id: M1 ; question: ... ; candidate_version: ... ; scenario: ... ; observation: ... ;
+      prototype_acceptance: {exercisable: ..., stateful: ..., non_happy_states: [...], fixtures_only: ..., viewports: [...], keyboard: ...} ;
+      ui_lock_inventory_diff: [{element, mapped_to}] ; proposed_ui_additions: [...] ;
+      retro_classification: [{check, class: stale_assertion|product_bug|wrong_metric}] ; clickthrough: {offered, decision, unrun_reason} ;
         evidence: ... ; finding: ... ; disposition: ... ; uncertainty: ...
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]

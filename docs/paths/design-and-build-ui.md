@@ -131,9 +131,17 @@ for what materially blocks the next useful action.
    flows before building, the optional
    [`ux-design-iteration`](../../.claude/skills/ux-design-iteration/SKILL.md)
    offers one up-front choice between the standard journey and explore-and-refine.
-   It owns only the iteration method, composes the owners above, keeps step 3's
-   design authority unchanged, and never makes iteration mandatory;
-   details/record template live in the skill.
+   Under that method the same up-front discipline applies: ask at most two
+   questions at design entry, infer what context settles, and offer the design
+   direction (guided premium, creative options, or follow my existing design),
+   the mockup count (default two, hard maximum four; one under guided
+   premium/follow-existing, at least two under creative options) and the UI
+   consistency lock (default ON for an existing application or in-code design
+   system, OFF greenfield; not asked as a question). It owns only the iteration
+   method, composes the owners above, keeps step 3's design authority unchanged,
+   and never makes iteration mandatory; details/record template live in the skill.
+   The final clickthrough is offered after implementation, never required, and a
+   decline or impossible run is recorded as a named UNRUN rather than a pass.
 
 4. **Design the parts teams forget** — use the parts that match the change:
 
@@ -199,9 +207,12 @@ for what materially blocks the next useful action.
    [`playwright-e2e-engineer`](../../.claude/skills/playwright-e2e-engineer/SKILL.md)
    *(manual-only — name it explicitly)*; *for a live walkthrough of the
    running app,* name
-   [`clickthrough-test-engineer`](../../.claude/skills/clickthrough-test-engineer/SKILL.md)
-   *(manual-only — name it explicitly)*. Your agent explains why one is
-   needed and stops; it does not start either for you.
+   [clickthrough-test-engineer](../../.claude/skills/clickthrough-test-engineer/SKILL.md)
+   *(manual-only — name it explicitly)*. The iteration method offers the
+   clickthrough after implementation, never requires it, and records a decline
+   or an impossible run as a named UNRUN with the unobservable state-hydration
+   and transition defect classes; it is never a pass. Your agent explains why
+   one is needed and stops; it does not start either for you.
 
 7. **At every agent or tool switch —
    [`phased-work-handoff-designer`](../../.claude/skills/phased-work-handoff-designer/SKILL.md).**
