@@ -54,7 +54,7 @@ command and its result.
 
 1. **Classify each target: logic or component.** Logic → `node` environment
    (fastest, no DOM lies). Component → `jsdom`/`happy-dom`, declared per file
-   (`// @vitest-environment jsdom`) or via config `environmentMatchGlobs` —
+   (`// @vitest-environment jsdom`) or, on Vitest 3/<4 only, a bounded `environmentMatchGlobs` entry (Vitest 4+ removed environmentMatchGlobs in favour of projects; use projects for Vitest 4+) —
    an intentional, visible choice either way, never "jsdom everywhere because
    one test needed it."
 2. **Design cases from behavior:** happy path, negative/error paths,

@@ -20,7 +20,7 @@ Most systems are both — assign roles per surface, not per repo.
 
 | Change | Class |
 | --- | --- |
-| new endpoint, new OPTIONAL field, new enum value (open enums), widened input | additive — pass |
+| new endpoint, new OPTIONAL field, new enum value (open enums), widened input | additive candidate — pass only after actual consumer-tolerance checks and the version policy |
 | remove/rename field or endpoint, optional→required, type change, narrowed enum, semantics change of existing field, new required header/param | breaking — fail without new version + deprecation path |
 | error-envelope shape change | breaking (most-missed case) |
 

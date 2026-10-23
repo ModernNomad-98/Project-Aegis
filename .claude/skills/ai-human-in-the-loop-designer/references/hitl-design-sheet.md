@@ -9,24 +9,12 @@ product keeps apart; blast radius is how much harm one wrong action can do.
 
 ## 1. Classification rubric
 
-Start every action at ADVISORY-ONLY (the AI suggests; a person performs the
-action through the normal user interface). Move it only with a reason.
-
-| Question | If yes | If no |
-| --- | --- | --- |
-| Could a person perform this action today with their own permissions? | continue | FORBIDDEN (the AI cannot gain an action nobody has) |
-| Does the applicable written policy or the risk tier bar it? | FORBIDDEN | continue |
-| Does it reach another tenant's data? | FORBIDDEN | continue |
-| Is it irreversible OR non-compensable OR not judgeable by one reviewer? | FORBIDDEN | continue |
-| Does it reach beyond one record or one user? | FORBIDDEN | continue |
-| Is it a single-record action that is reversible AND compensable AND judgeable by one reviewer, and does written policy permit it with approval (e.g. a refund under a set amount)? | CONFIRM | continue |
-| Does a written policy require approval, or is there no written policy explicitly permitting autonomy? | CONFIRM | continue |
-| Does the risk tier allow autonomy AND is the action reversible AND compensable AND do the watch-and-undo controls exist AND does written policy explicitly permit autonomy? | AUTONOMOUS | CONFIRM or ADVISORY-ONLY |
-
-A single-record action that is reversible AND compensable AND judgeable by one
-reviewer, and that written policy permits with approval, is CONFIRM. Any action that
-is irreversible, non-compensable, cross-tenant, wide-blast-radius, or not judgeable by
-a single reviewer is FORBIDDEN regardless of approval or policy.
+The canonical classification rule is defined ONCE in
+[../SKILL.md](../SKILL.md) step 2: the FORBIDDEN classes, the CONFIRM rule for
+single-record reversible AND compensable AND judgeable actions under required or
+silent policy, the AUTONOMOUS gate, and reviewer eligibility (hold at CONFIRM
+and escalate when the reviewer is ineligible). This sheet applies that rule and
+does not restate it.
 
 Examples:
 

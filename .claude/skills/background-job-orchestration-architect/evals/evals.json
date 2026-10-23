@@ -30,7 +30,7 @@
           "Recommends a mechanism from the stated tenant burst and job urgency, explaining worker/queue expense, setup and continuing scheduler/alert upkeep without inventing a price; if a user choice remains, asks one plain-language question after those trade-offs.",
           "Adds per-tenant queue-depth as a first-class observability signal with a threshold and owner.",
           "Does not merely add more workers, which scales the starvation rather than removing the unfairness.",
-          "Cites the supplied per-tenant queue depth (tenant A 40,000 pending vs ~200 elsewhere) and the per-tenant concurrency plan as the fairness evidence; does not use retry counts as fairness evidence."
+          "Cites only the supplied per-tenant queue depth (tenant A 40,000 pending vs ~200 elsewhere) as the fairness evidence; does not invent a concurrency plan for tenants the fixture does not supply, and does not use retry counts as fairness evidence."
         ]
       }
     },

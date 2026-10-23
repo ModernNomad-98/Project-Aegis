@@ -56,7 +56,7 @@ State it — it changes the answer.
 
 | Curve | Definition |
 |---|---|
-| n-day retention | Returned on exactly day N |
+| n-day retention | Returned on exactly day N after the starting event (exact-day, not a range) |
 | Unbounded retention | Returned on day N or later |
 | Rolling retention | Active within a window around day N |
 

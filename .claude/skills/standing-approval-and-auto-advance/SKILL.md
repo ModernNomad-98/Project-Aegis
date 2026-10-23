@@ -199,10 +199,11 @@ Adoption:                     pending human approval → then recorded via scope
   field; no recorded attestation deadline means BLOCKED. A reviewer block wins
   for every agent-initiated action and the loop halts and waits for the human.
 
-  The canonical precedence table lives in
+  The canonical precedence table, EXPIRED-first check, effects, transition list and
+  expiry rule live in
   [references/standing-approval-policy.md](references/standing-approval-policy.md)
-  (one canonical copy; do not duplicate it here). Read BLOCKED > GRANDFATHERED
-  > ACTIVE there, including the transition rules.
+  (one canonical copy; do not duplicate it here). Read the EXPIRED terminal
+  check, then BLOCKED > GRANDFATHERED > ACTIVE, there, including the transitions.
 - **Fatigue theater in reverse:** thinning approvals that were load-bearing.
   Instant-yes and zero-variance approvals are signals that trigger
   inspection, never proof of mechanical granting; a slow, considered approval

@@ -52,28 +52,39 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 - [ ] The frontend share when the target is user-perceived
       (render/hydration — frontend-perf-engineer's vocabulary)
 
-## Timeout-cascade worksheet
-
-
 ```
 Cascade check, leaf to root:
-  timeout(upstream) > own work(upstream) + downstream critical-path budget +
-  recorded epsilon
-  own work = what the hop itself spends (processing, serialization, queue and
-  connection waits it owns); downstream critical-path budget = serial
-  downstream hops + the longest parallel branch at each join, including the
-  initial attempt, retry attempt time and backoff_total. Epsilon is recorded
-  once.
+  timeout(upstream) > upstream total_expected_hop_cost + downstream expected
+  critical-path cost + recorded epsilon
+  Terms (all ms): wait_0 = pre-first-attempt queue/dispatch wait owned by the hop,
+  counted once OUTSIDE own_attempt_work. own_attempt_work = the hop's normal
+  processing/serialization per attempt, EXCLUDING queue/dispatch waits.
+  wait_k (k=1..R) = the per-attempt inter-attempt wait before retry k, not an
+  aggregate bucket. p = recorded per-attempt retry probability; the initial
+  attempt is counted once (p^0 = 1). Downstream expected critical-path cost =
+  SUM over serial downstream hops plus MAX over parallel branches at each join
+  of their total_expected_hop_cost, including each hop's retry_overhead.
+  Epsilon is recorded once and never doubled.
+```
 
 ## Retry-spend accounting
 
 ```
-retry_cost(hop) = P(retry) × (backoff_total + own work(hop) + downstream
-                  critical-path budget(hop))
+total_expected_hop_cost(hop) = wait_0 + SUM(k=0..R) p^k * own_attempt_work
+                              + SUM(k=1..R) p^k * wait_k
+retry_overhead(hop) = total_expected_hop_cost - (wait_0 + own_attempt_work)
+                    = SUM(k=1..R) p^k * (own_attempt_work + wait_k)
+backoff_total = SUM(k=1..R) wait_k is the deterministic schedule sum; it is NOT
+a flat additive expected cost. The budget uses the probability-weighted sum; if
+p is unknown use the conservative p=1 bound and say so (then backoff_total and
+the weighted wait sum coincide).
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
-Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)
-attempts — the storm multiplier; the design names the single retry layer.
+Independence: p^k is valid only for independent attempts. If retries are nested
+or attempt outcomes correlate, record the joint/nested expectation or a
+conservative bound; never multiply marginal p across nested layers and call it
+exact. Two-layer retry compounding remains a storm multiplier; the design names
+the ONE retry layer.
 ```
 
 ## Budget-claim review template (for PRs touching a budgeted path)

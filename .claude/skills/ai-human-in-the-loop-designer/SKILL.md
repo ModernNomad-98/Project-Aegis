@@ -105,26 +105,36 @@ first workflow step.
    action.
 2. **Sort each action into AUTONOMOUS, CONFIRM or FORBIDDEN.** Start every
    action at advisory-only (the AI proposes, a person commits) and move it
-   only with a reason tied to the risk tier. Apply these classes in order:
+   only with a reason tied to the risk tier. Apply these classes in order,
+   using exactly these definitions:
+   - **Reversible:** the action can be undone by the ordinary product path
+     within the recorded undo window. **Compensable:** an authorized
+     compensating action defined by written policy restores the pre-action
+     state within a recorded bound (for money, the policy-defined
+     refund/reversal path); a loss with no policy-defined remedy is
+     non-compensable. **Judgeable:** one eligible reviewer can evaluate the
+     evidence and the consequence of the exact action without specialist
+     escalation or missing evidence. **Reviewer eligibility:** the reviewer
+     holds authority to perform the action themselves in that tenant, is not
+     the requesting/triggering identity, is not the AI/service account, and has
+     an active, unexpired, in-scope approval.
    - **FORBIDDEN** for these enumerated classes: an action no person may
      perform; cross-tenant data; an action that is irreversible OR
      non-compensable; wide blast radius; not judgeable by a single reviewer; or
-     barred by the applicable written policy or risk tier. A bar cannot be downgraded by approval.
+     barred by the applicable written policy or risk tier. A bar is never
+     downgraded by approval, reviewer availability or policy silence.
    - **CONFIRM** for a single-record action that is reversible AND compensable
-     AND judgeable by one reviewer, and that written policy permits with
-     approval, OR when no written policy explicitly permits autonomy and the
-     wrong result harms a person or product. CONFIRM never contains an
-     enumerated FORBIDDEN class.
-   - **AUTONOMOUS** only when every earlier gate is excluded: the tier allows
-     autonomy, the action is reversible AND compensable, its blast radius is
-     one record or one user, the watch-and-undo controls in step 9 exist, and a
-     written policy explicitly permits autonomy. Policy silence is CONFIRM,
-     never AUTONOMOUS.
-   A single-record action that is reversible AND compensable AND judgeable by
-   one reviewer, and that written policy permits with approval, is CONFIRM.
-   Any action that is irreversible, non-compensable, cross-tenant,
-   wide-blast-radius, or not judgeable by a single reviewer is FORBIDDEN
-   regardless of approval or policy.
+     AND judgeable by one eligible reviewer, when written policy requires
+     approval OR written policy is silent. Policy silence keeps a compensable
+     single-record action at CONFIRM; it never makes it FORBIDDEN and never
+     makes it AUTONOMOUS.
+   - **AUTONOMOUS** only when the risk tier allows it, the action is reversible
+     AND compensable, blast radius is one record or one user, the watch-and-undo
+     controls in step 9 exist, and written policy explicitly permits autonomy.
+   - **Reviewer ineligible:** hold at CONFIRM and escalate to a named eligible
+     reviewer/owner; never downgrade a FORBIDDEN class and never let the
+     requester or the AI approve.
+
 3. **Design the advisory-only mode.** For actions left advisory-only, the
    AI output appears as a suggestion the user applies through the ordinary
    user interface with their own permissions. Nothing is written on the

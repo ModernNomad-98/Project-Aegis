@@ -108,15 +108,27 @@ authorize execution.
    unallocated — for growth, incident conditions, and the dependency
    nobody predicted. Headroom is a line item with an owner (the path
    owner), not slack silently absorbed by whoever asks first.
-5. **Derive timeouts from budgets.** Define own work as the time the hop
-   itself spends (processing, serialization, and the queue/connection waits
-   it owns); downstream critical-path budget is the sum of serial downstream
-   hops plus the longest parallel branch at each join, including the initial
-   attempt, retry attempt time and recorded backoff_total. Keep ONE rule:
-   upstream timeout > own work + downstream critical-path budget + recorded
-   epsilon (all ms; epsilon is recorded once, never doubled). If no feasible
-   timeout exists under these terms, escalate as a latency budget violation;
-   never hide it. The 30-second default is a bug in a 300ms path.
+5. **Derive timeouts from budgets.** Define team terms once: wait_0 is the
+   pre-first-attempt queue/dispatch wait this hop owns (budgeted once, outside
+   own_attempt_work); own_attempt_work is the hop's own processing/serialization
+   work per attempt, excluding any queue/dispatch wait; wait_k (k = the k-th
+   retry) is the per-attempt inter-attempt wait, not a single aggregate bucket;
+   p is the recorded per-attempt retry probability. Compute
+   total_expected_hop_cost = wait_0 + SUM(k=0..R) p^k*own_attempt_work +
+   SUM(k=1..R) p^k*wait_k, and retry_overhead = SUM(k=1..R)
+   p^k*(own_attempt_work+wait_k). The initial attempt is counted once (p^0 = 1);
+   backoff_total = SUM(k=1..R) wait_k is the deterministic schedule sum and is
+   NOT a flat additive expected cost. If p is unknown use the conservative p=1
+   bound and say so. Keep ONE cascade rule: upstream timeout > upstream own
+   total cost + downstream critical-path expected cost + epsilon, where the
+   downstream expected cost is the SUM over serial downstream hops plus the MAX
+   over parallel branches at each join of their total_expected_hop_cost
+   (including each hop's retry_overhead); epsilon is recorded once, never
+   doubled. Independence is assumed only for p^k; if retries are nested or
+   correlated, record the joint/nested expectation or a conservative bound.
+   If no feasible timeout exists under these terms, escalate as a latency
+   budget violation; never hide it. The 30-second default is a bug in a 300ms
+   path.
 
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
@@ -168,9 +180,10 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <upstream timeout > own work + downstream critical-path budget +
-  recorded epsilon (all ms; epsilon recorded once; define own work and
-  downstream critical-path budget)>
+Timeouts: <upstream timeout > upstream total_expected_hop_cost + downstream
+  expected critical-path cost + recorded epsilon (all ms; wait_0 counted once
+  outside own_attempt_work; wait_k per attempt; epsilon recorded once; nested/
+  correlated retries state their expectation or bound)>
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
@@ -193,10 +206,12 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Every timeout follows the ONE rule: upstream timeout > own work +
-      downstream critical-path budget + recorded epsilon (all ms; epsilon is
-      recorded once; own work and downstream critical-path budget are defined).
-      If no feasible timeout exists, the violation is escalated, not hidden.
+- [ ] Every timeout follows the ONE rule: upstream timeout > upstream
+      total_expected_hop_cost + downstream expected critical-path cost +
+      recorded epsilon (all ms; wait_0 counted once outside own_attempt_work;
+      wait_k per attempt; epsilon recorded once; nested/correlated retries
+      state their expectation or bound). If no feasible timeout exists, the
+      violation is escalated, not hidden.
 - [ ] Every budgeted path has a finite timeout; an infinite or missing timeout
       is a violation, not a default.
 - [ ] Retries are budgeted spend at one layer only; hedging is

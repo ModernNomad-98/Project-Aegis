@@ -13,7 +13,7 @@
       "expected_skill": "api-doc-generator-designer",
       "should_not_trigger": ["api-event-architect", "docs-as-code-architect"],
       "note": "SEAM CASE (primary) — generating reference from the source of truth to prevent drift is API-doc generation. No contract is being designed and no general pipeline built.",
-      "reason": "Designing generated, drift-proof API reference is this skill's core scope; it documents a contract designed elsewhere."
+      "reason": "Designing generated API reference with source-to-implementation validation and generated-reference alignment is this skill's core scope; it documents a contract designed elsewhere."
     },
     {
       "id": "contract-goes-to-api-event-architect",

@@ -39,10 +39,11 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Requires the specifics: the return event, the cohort basis (signup date / first action), the interval, and n-day vs unbounded vs rolling retention.",
+          "Requires the specifics: the return event, the cohort basis (signup date / first action), the interval, and exact-day 'returned on exactly day N' vs unbounded vs rolling retention.",
           "Notes these are different curves and labels which one is being defined.",
           "Grounds the return event in the tracking plan and states the window/denominator.",
-          "Avoids an unlabeled 'retention' number that can't be compared across teams."
+          "Avoids an unlabeled 'retention' number that can't be compared across teams.",
+          "Defines n-day retention as returned on exactly day N after the starting event (exact-day), not within a range."
         ]
       }
     },

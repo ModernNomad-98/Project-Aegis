@@ -26,7 +26,8 @@ then a readout that respects the fixed horizon, reports effect size with
 uncertainty, and navigates the traps (peeking, multiple comparisons,
 Simpson's paradox, novelty, sample-ratio mismatch) to a ship/kill/iterate
 decision stated with its residual uncertainty. It covers BOTH the design
-and the analysis. It runs experiments; it does not plan safety rollouts
+and the analysis. It designs and analyzes experiments; execution is a separately
+ authorized implementation/operations handoff. It does not plan safety rollouts
 (`feature-flag-rollout-strategist`) or define the metrics it measures
 (`funnel-definition-designer`).
 
