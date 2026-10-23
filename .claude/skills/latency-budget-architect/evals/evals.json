@@ -12,11 +12,10 @@
         "assertions": [
           "Builds the budget table from measured per-hop reality with an owner per hop, and includes the overhead rows (serialization, connection setup on the tail, queue wait) as explicit line items.",
           "Holds 15–25% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
-          "Defines wait_0, wait_k, total_expected_hop_cost, retry_overhead and R (maximum permitted retries; K is an accepted alias when a source names K; formulas use R) in the expected retry-spend budget, and separates the TWO modes: (a) expected retry-spend budget using p, whose downstream expected critical-path cost is the EXPECTED MAXIMUM at each parallel join (not the MAX of per-branch expected values; unknown distribution => measured expected-max or conservative bound); nested retries weighted by upstream p^k or a recorded joint/nested expectation; (b) hard-timeout bound using conservative/worst-case p=1 or a recorded percentile for EVERY term, with MAX of branch BOUNDS at joins (never MAX of expected values), fail-safe conservative when the percentile is missing; backoff_total is the deterministic schedule sum, not a flat additive expected cost; initial attempt counted once.",
+          "Defines own work and downstream critical-path budget; runs the ONE cascade rule: upstream timeout > own work + downstream critical-path budget + recorded epsilon (all ms; epsilon recorded once; critical path = serial + longest parallel branch; initial attempt, retry attempt time and backoff_total included).",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
           "Installs the budget-claim review rule for new dependencies on the path.",
-          "Retry spend counts the downstream critical-path cost, not only the hop's own work.",
-          "States the independence assumption for p^k and that nested/correlated retries need a recorded joint/nested expectation or conservative bound; backoff_total is the deterministic schedule sum, not a flat additive expected cost."
+          "Retry spend counts the downstream critical-path cost, not only the hop's own work."
         ]
       }
     },
@@ -31,8 +30,7 @@
           "Identifies the two-layer retry compounding (gateway × client = up to 9 attempts) as a storm multiplier and assigns retries to ONE stated layer, idempotent hops only.",
           "Runs the cascade check so no upstream abandons work its downstream completes.",
           "Prices each permitted retry as spend from a named allocation rather than a free action.",
-          "Requires a finite timeout on every budgeted path; an infinite or missing timeout is a violation, not a default.",
-          "Prices retry spend with the probability-weighted total_expected_hop_cost/retry_overhead model (initial attempt once) rather than adding aggregate backoff_total as a flat expected cost."
+          "Requires a finite timeout on every budgeted path; an infinite or missing timeout is a violation, not a default."
         ]
       }
     },

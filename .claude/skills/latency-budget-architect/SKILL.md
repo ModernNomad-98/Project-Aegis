@@ -108,39 +108,15 @@ authorize execution.
    unallocated — for growth, incident conditions, and the dependency
    nobody predicted. Headroom is a line item with an owner (the path
    owner), not slack silently absorbed by whoever asks first.
-5. **Derive timeouts from budgets.** Define team terms once: wait_0 is the
-   pre-first-attempt queue/dispatch wait this hop owns (budgeted once, outside
-   own_attempt_work); own_attempt_work is the hop's own processing/serialization
-   work per attempt, excluding any queue/dispatch wait; wait_k (k = the k-th
-   retry) is the per-attempt inter-attempt wait, not a single aggregate bucket;
-   p is the recorded per-attempt retry probability. Compute
-   total_expected_hop_cost = wait_0 + SUM(k=0..R) p^k*own_attempt_work +
-   SUM(k=1..R) p^k*wait_k, and retry_overhead = SUM(k=1..R)
-   p^k*(own_attempt_work+wait_k). The initial attempt is counted once (p^0 = 1);
-   backoff_total = SUM(k=1..R) wait_k is the deterministic schedule sum and is
-   NOT a flat additive expected cost. If p is unknown use the conservative p=1
-   bound and say so. Use TWO explicit modes, never mixed:
-   - **Expected retry-spend budget (uses p):** total_expected_hop_cost as above;
-     downstream expected critical-path cost = SUM over serial downstream hops
-     plus the EXPECTED MAXIMUM at each parallel join - which is NOT the MAX of the
-     per-branch expected values (that understates the mean); if the distribution
-     is unknown, record a measured expected-max bound or a conservative bound.
-     Nested retries are weighted by the upstream p^k too, or replaced by a
-     recorded joint/nested expectation.
-   - **Hard-timeout bound (a hard limit; NEVER derived from expected means):**
-     timeout(upstream) > conservative upstream bound + conservative downstream
-     critical-path bound + recorded epsilon, where EVERY term uses p=1 with
-     worst-case per-attempt durations and worst-case waits, or a recorded
-     high-percentile bound (for example p99); at parallel joins use the MAX of
-     the branch BOUNDS (a safe upper bound), never the MAX of expected values.
-     Nested retries use a conservative joint bound. R is the maximum permitted
-     retries; K is an accepted alias for R when a source names K (formulas use R);
-     if the percentile is
-     not recorded the fail-safe is the conservative bound. Epsilon is recorded
-     once, never doubled.
-   Independence is assumed only for p^k; nested/correlated retries record their
-   joint/nested expectation or a conservative bound. If no feasible hard bound
-   exists, escalate as a latency budget violation; never hide it. The 30-second default is a bug in a 300ms path.
+5. **Derive timeouts from budgets.** Define own work as the time the hop
+   itself spends (processing, serialization, and the queue/connection waits
+   it owns); downstream critical-path budget is the sum of serial downstream
+   hops plus the longest parallel branch at each join, including the initial
+   attempt, retry attempt time and recorded backoff_total. Keep ONE rule:
+   upstream timeout > own work + downstream critical-path budget + recorded
+   epsilon (all ms; epsilon is recorded once, never doubled). If no feasible
+   timeout exists under these terms, escalate as a latency budget violation;
+   never hide it. The 30-second default is a bug in a 300ms path.
 
 6. **Derive retry policy from what the budget affords.** Retries
    spend budget: one retry of a 50ms hop costs 50ms+backoff from
@@ -192,11 +168,9 @@ Budget table:
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
-Timeouts: <upstream HARD timeout > conservative upstream bound + conservative
-  downstream critical-path bound + recorded epsilon (all ms; EVERY term uses
-  p=1/worst-case or a recorded percentile; at joins MAX of branch BOUNDS; expected
-  total_expected_hop_cost/retry_overhead are for retry-spend/budget checks only
-  and are never used for the hard timeout)>
+Timeouts: <upstream timeout > own work + downstream critical-path budget +
+  recorded epsilon (all ms; epsilon recorded once; define own work and
+  downstream critical-path budget)>
 Retries:  <which hops, innermost-layer-only rule, hedging iff headroom-funded>
 Attribution: <span/budget annotation convention → observability-operator;
               pre-release check → performance-test-harness>
@@ -219,14 +193,10 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       the budget that omits them is fiction by construction.
 - [ ] Fan-out sections carry the tail-exposure calculation and
       stricter per-branch percentiles.
-- [ ] Every ACTUAL Timeouts line uses the conservative hard-timeout rule:
-      upstream HARD timeout > conservative upstream bound + conservative
-      downstream critical-path bound + recorded epsilon (all ms; every term
-      p=1/worst-case or a recorded percentile; joins use MAX of branch BOUNDS;
-      epsilon recorded once). The expected total_expected_hop_cost/retry_overhead
-      model is confined to retry-spend/budget checks and never used for the hard
-      timeout. If no feasible hard bound exists, the violation is escalated, not
-      hidden.
+- [ ] Every timeout follows the ONE rule: upstream timeout > own work +
+      downstream critical-path budget + recorded epsilon (all ms; epsilon is
+      recorded once; own work and downstream critical-path budget are defined).
+      If no feasible timeout exists, the violation is escalated, not hidden.
 - [ ] Every budgeted path has a finite timeout; an infinite or missing timeout
       is a violation, not a default.
 - [ ] Retries are budgeted spend at one layer only; hedging is

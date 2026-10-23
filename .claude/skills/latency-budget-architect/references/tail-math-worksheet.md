@@ -54,63 +54,26 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 
 ## Timeout-cascade worksheet
 
-Expected retry-spend CHECK (budget-fit sanity check; NOT a timeout derivation; uses p):
 
 ```
-expected_total_hop_spend = wait_0 + SUM(k=0..R) p^k * own_attempt_work
-                         + SUM(k=1..R) p^k * wait_k
-                         + downstream expected critical-path cost
-budget-fit CHECK: expected_total_hop_spend <= this hop's / this path's
-                  budgeted share (a SPEND sanity check only; the HARD-TIMEOUT
-                  derivation below is separate and uses conservative bounds,
-                  never this expected total)
-
-Total terms: wait_0, p^k*own_attempt_work, p^k*wait_k as in the retry-spend
-section. Downstream expected critical-path cost = SUM over serial hops plus the
-EXPECTED MAXIMUM at each parallel join; EXPECTED MAXIMUM is NOT the MAX of the
-per-branch expected values (that understates the mean) - if the distribution is
-unknown, record a measured expected-max bound or a conservative bound instead.
-Nested retries: when an upstream hop retries a downstream call, downstream cost
-is weighted by the upstream p^k too, or replaced by a recorded joint/nested
-expectation. R = maximum permitted retries (formulas use R only; K means R when a
-source names K). Epsilon is recorded once and never doubled.
-
-```
-
-Hard-timeout bound (a hard limit; NEVER derived from expected means):
-
-```
-timeout(upstream) > conservative upstream bound
-                   + conservative downstream critical-path bound + recorded epsilon
-
-Conservative bound = p=1 with worst-case per-attempt durations and worst-case
-waits, or a recorded high-percentile bound (for example p99); the SAME
-conservative mode applies to EVERY term. At parallel joins use the MAX of the
-branch BOUNDS (a safe upper bound) - do NOT use MAX of expected values. Nested
-retries use a conservative joint bound. R = maximum permitted retries; if the
-percentile is not recorded the fail-safe is the conservative bound. Epsilon is
-recorded once and never doubled.
-
-```
+Cascade check, leaf to root:
+  timeout(upstream) > own work(upstream) + downstream critical-path budget +
+  recorded epsilon
+  own work = what the hop itself spends (processing, serialization, queue and
+  connection waits it owns); downstream critical-path budget = serial
+  downstream hops + the longest parallel branch at each join, including the
+  initial attempt, retry attempt time and backoff_total. Epsilon is recorded
+  once.
 
 ## Retry-spend accounting
 
 ```
-total_expected_hop_cost(hop) = wait_0 + SUM(k=0..R) p^k * own_attempt_work
-                              + SUM(k=1..R) p^k * wait_k
-retry_overhead(hop) = total_expected_hop_cost - (wait_0 + own_attempt_work)
-                    = SUM(k=1..R) p^k * (own_attempt_work + wait_k)
-backoff_total = SUM(k=1..R) wait_k is the deterministic schedule sum; it is NOT
-a flat additive expected cost. The budget uses the probability-weighted sum; if
-p is unknown use the conservative p=1 bound and say so (then backoff_total and
-the weighted wait sum coincide).
+retry_cost(hop) = P(retry) × (backoff_total + own work(hop) + downstream
+                  critical-path budget(hop))
 Rules: idempotent hops only; ONE layer owns retries (innermost viable);
        hedging = deliberate duplicate spend, listed as its own row.
-Independence: p^k is valid only for independent attempts. If retries are nested
-or attempt outcomes correlate, record the joint/nested expectation or a
-conservative bound; never multiply marginal p across nested layers and call it
-exact. Two-layer retry compounding remains a storm multiplier; the design names
-the ONE retry layer.
+Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)
+attempts — the storm multiplier; the design names the single retry layer.
 ```
 
 ## Budget-claim review template (for PRs touching a budgeted path)
