@@ -72,11 +72,11 @@ BLOCKED > GRANDFATHERED > ACTIVE > INACTIVE):
 
 | Precedence | State | Condition | Auto-advance |
 | --- | --- | --- | --- |
-| 1 | BLOCKED | reviewer block OR effective_deadline passed OR missing/corrupt deadline OR ambiguous one-use consumption OR trigger | disabled |
+| 1 | BLOCKED | reviewer block OR effective_deadline passed OR missing/corrupt deadline OR ambiguous OR unrecorded one-use consumption OR trigger | disabled |
 | 2 | GRANDFATHERED | valid-at-adoption AND not BLOCKED AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired | preserved only if armed at adoption |
 | 3 | ACTIVE | not blocked AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired AND armed | enabled |
 | 4 | INACTIVE | not blocked AND effective_deadline future AND not recorded_consumption_or_one_use consumed/expired AND not armed | disabled |
-EXPIRED terminal is checked before this table when recorded_expiry passed OR the grant is consumed. A passed/absent deadline is never a source condition for ACTIVE/GRANDFATHERED. BLOCKED -> ACTIVE only on recorded re-attestation after the block clears; GRANDFATHERED never bypasses a reviewer block; never infer a default expiry; an unarmed valid grant is INACTIVE (never auto-advances), not ACTIVE-without-auto-advance.
+EXPIRED terminal is checked before this table when recorded_expiry_or_use_limit passed OR the grant is consumed. A passed/absent deadline is never a source condition for ACTIVE/GRANDFATHERED. BLOCKED -> ACTIVE only on recorded re-attestation after the block clears; GRANDFATHERED never bypasses a reviewer block; never infer a default expiry; an unarmed valid NON-GRANDFATHERED grant is INACTIVE (never auto-advances), not ACTIVE-without-auto-advance; a GRANDFATHERED grant remains GRANDFATHERED (armed or not) under its row.
 
 [ ] open-PR-and-STOP (DEFAULT without an applicable merge grant)
 [ ] opt-in merge under a separate, explicit human decision: <grant ID, source,

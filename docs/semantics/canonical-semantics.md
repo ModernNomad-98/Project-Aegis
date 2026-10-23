@@ -195,13 +195,13 @@ All commands are run from the repository root. R8-IMPL implementation checks ver
 
 Canonical-file integrity (R8-A; falsifiable: required sections/terms present, no placeholder text):
 ```
-python -P -c "from pathlib import Path; t=Path('docs/semantics/canonical-semantics.md').read_text(encoding='utf-8'); required=['## 4. Formula term registry','## 5. Executable check registry','P1 Fail-safe','P5 Every claimed check','upstream_timeout','upstream_own_hard_bound','total_expected_hop_cost','effective_deadline']; ids=['R8-UX-'+str(i) for i in range(1,9)]+['R8-CONV-'+str(i) for i in range(1,6)]; assert all(x in t for x in required+ids) and 'PLACE'+'HOLDER' not in t and 'TO'+'DO' not in t"   # measured at this head: 0 hit(s), rc=0 (expect >=1 hit)
+python -P -c "from pathlib import Path; t=Path('docs/semantics/canonical-semantics.md').read_text(encoding='utf-8'); required=['## 4. Formula term registry','## 5. Executable check registry','P1 Fail-safe','P5 Every claimed check','upstream_timeout','upstream_own_hard_bound','total_expected_hop_cost','effective_deadline']; ids=['R8-UX-'+str(i) for i in range(1,9)]+['R8-CONV-'+str(i) for i in range(1,6)]; assert all(x in t for x in required+ids) and 'PLACE'+'HOLDER' not in t and 'TO'+'DO' not in t"   # measured at this head: rc=0 (expect rc0; Python label, no hit count)
 ```
 Implementation-wave checks (each term has its own line; no combined alternation; every line states its expected result). Classification (measured at this head): canonical-file integrity check PASSES rc0. Implementation-wave checks at this head: measured results are recorded per line; all previously expect-to-fail terms are now present after implementation and the integrity check exits 0. Each deferred subject is implemented once under its canonical ID; the resolved status is recorded in section 6.
 ```
-git grep -n 'recorded_expiry_or_use_limit' -- .claude/skills/standing-approval-and-auto-advance   # measured at this head: 1 hit(s), rc=0 (expect >=1 hit)
+git grep -n 'recorded_expiry_or_use_limit' -- .claude/skills/standing-approval-and-auto-advance   # measured at this head: 2 hit(s), rc=0 (expect >=1 hit)
 git grep -n effective_deadline -- .claude/skills/standing-approval-and-auto-advance   # measured at this head: 11 hit(s), rc=0 (expect >=1 hit)
-python -P -c "import json; d=json.load(open('.claude/skills/standing-approval-and-auto-advance/evals/evals.json',encoding='utf-8')); cs=[c for c in d.get('cases',[]) if c.get('id')=='positive-standing-grant-state-precedence']; assert len(cs)==1; a=cs[0].get('expect',{}).get('assertions',[]); assert any('consumed' in s and 'EXPIRED' in s for s in a) and any('effective_deadline' in s for s in a)"   # measured at this head: 0 hit(s), rc=0 (expect >=1 hit)
+python -P -c "import json; d=json.load(open('.claude/skills/standing-approval-and-auto-advance/evals/evals.json',encoding='utf-8')); cs=[c for c in d.get('cases',[]) if c.get('id')=='positive-standing-grant-state-precedence']; assert len(cs)==1; a=cs[0].get('expect',{}).get('assertions',[]); assert any('consumed' in s and 'EXPIRED' in s for s in a) and any('effective_deadline' in s for s in a)"   # measured at this head: rc=0 (expect rc0; Python label, no hit count)
 git grep -n 'wait_k' -- .claude/skills/latency-budget-architect   # measured at this head: 4 hit(s), rc=0 (expect >=1 hit)
 git grep -n 'upstream_timeout' -- .claude/skills/latency-budget-architect   # measured at this head: 4 hit(s), rc=0 (expect >=1 hit)
 git grep -n 'upstream_own_hard_bound' -- .claude/skills/latency-budget-architect   # measured at this head: 5 hit(s), rc=0 (expect >=1 hit)
@@ -209,7 +209,7 @@ git grep -n 'expected_maximum_at_joins' -- .claude/skills/latency-budget-archite
 git grep -n 'retry_overhead' -- .claude/skills/latency-budget-architect   # measured at this head: 3 hit(s), rc=0 (expect >=1 hit)
 git grep -n 'downstream_expected_critical_path' -- .claude/skills/latency-budget-architect   # measured at this head: 3 hit(s), rc=0 (expect >=1 hit)
 git grep -n 'downstream_hard_bound' -- .claude/skills/latency-budget-architect   # measured at this head: 6 hit(s), rc=0 (expect >=1 hit)
-git grep -n 'recorded_percentile' -- .claude/skills/latency-budget-architect   # measured at this head: 2 hit(s), rc=0 (expect >=1 hit)
+git grep -n 'recorded_percentile' -- .claude/skills/latency-budget-architect   # measured at this head: 4 hit(s), rc=0 (expect >=1 hit)
 git grep -n total_expected_hop_cost -- .claude/skills/latency-budget-architect   # measured at this head: 3 hit(s), rc=0 (expect >=1 hit)
 git grep -n 'ancestry_status' -- .claude/skills/agent-memory-governance   # measured at this head: 1 hit(s), rc=0 (expect >=1 hit)
 git grep -n -- '--no-textconv --no-ext-diff' -- .claude/skills/agent-memory-governance   # measured at this head: 1 hit(s), rc=0 (expect >=1 hit)
