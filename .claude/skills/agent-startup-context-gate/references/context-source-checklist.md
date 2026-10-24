@@ -17,6 +17,8 @@ or an automatic halt.
 | Landmark layout | `ls` top level | Expected directories exist (`src/`, `docs/`, `.claude/`, …). |
 | Manifest | `package.json` name, `pyproject.toml` name, `.sln` | Project name matches. |
 | Recent history | `git log --oneline -5` | Commit subjects are plausibly this project's work. |
+| Git identity | git config --get user.name / --get user.email; compare with recorded owner identity | agent's own identity set and verified; owner identity => stop |
+| Pre-commit hook | execute hook check against configured identity | non-owner identity required; owner refuses commit |
 
 Two signals from the SAME row (e.g. two README lines) count as one. Path
 existence and directory name alone count as zero signals — near-miss and
