@@ -81,7 +81,7 @@ coverage mapping audits against it, and automation architecture implements it.
    docs-only vs schema vs UI changes.
 6. **Place the CI gates:** which layers run on PR, on merge, nightly; what is
    allowed to be non-blocking and why; flake policy pointer
-   (`flaky-test-detective` *(manual-only)* owns diagnosis, `regression-suite-curator` owns
+   (`flaky-test-detective` owns diagnosis, `regression-suite-curator` owns
    suite membership). If merging automatically deploys, put every required
    release gate before merge; use post-merge checks to verify deployment.
 7. **Name ownership and exit criteria:** who owns each layer, who fixes red,

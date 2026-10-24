@@ -136,7 +136,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Does not invoke ci-failure-classifier; a cross-run intermittent test root cause belongs to flaky-test-detective (manual-only)."
+          "Does not invoke ci-failure-classifier; a cross-run intermittent test root cause belongs to flaky-test-detective, which is agent-applied when the intermittent-failure trigger fires."
         ]
       }
     },

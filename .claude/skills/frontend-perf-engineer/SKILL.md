@@ -56,7 +56,7 @@ about prescribing it.
   is the browser asset path (immutable hashed assets, service-worker
   strategies).
 - Do NOT use when: writing functional browser tests —
-  `playwright-e2e-engineer` *(manual-only)*.
+  `playwright-e2e-engineer`.
 
 ## Inputs to Inspect
 

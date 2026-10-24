@@ -68,28 +68,28 @@
       }
     },
     {
-      "id": "should-not-auto-invoke-execution-route",
-      "type": "should_not_trigger",
-      "prompt": "An agent selected this skill automatically from a general project request; the user has not named it. Start its implementation workflow now.",
+      "id": "auto-selects-execution-route",
+      "type": "should_trigger",
+      "prompt": "The invite test fails about one run in five on CI and passes on retry; the user has not named a skill. Start the casework.",
       "expect": {
-        "triggers": false,
+        "triggers": true,
         "assertions": [
-          "Does not execute the manual-only skill on an automatic match; may recommend its explicit invocation.",
-          "Does not confuse explicit invocation with a grant of additional files, network access, Git changes, database writes or other effects.",
-          "Once invoked, honors current applicable user grants without asking for the same authorization again."
+          "Activates on the intermittent-failure trigger without being named: the agent reads `SKILL.md` and starts CLASSIFY→REPRODUCE→FIX ONE CAUSE→MEASURE.",
+          "Selection grants no additional files, network access, Git changes, database writes or other effects — applicable user grants still govern.",
+          "Honors current applicable user grants without asking for the same authorization again."
         ]
       }
     },
     {
-      "id": "unnamed-random-ci-failures-stays-silent",
-      "type": "should_not_trigger",
+      "id": "auto-selects-unnamed-random-ci-failures",
+      "type": "should_trigger",
       "prompt": "CI builds fail intermittently on the test step with no code changes — figure out why.",
       "expect": {
-        "triggers": false,
+        "triggers": true,
         "assertions": [
-          "flaky-test-detective does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its flake diagnosis workflow as an invoked skill.",
-          "vite-build-qa-engineer (also MANUAL-ONLY) does not activate either.",
-          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names flaky-test-detective, not vite-build-qa-engineer, because intermittent test-step failures are flake diagnosis, not deterministic build verification."
+          "Activates because intermittent CI failures are its trigger, even unnamed.",
+          "vite-build-qa-engineer is still manual-only and does not activate — intermittent test-step failures are flake diagnosis, not deterministic build verification.",
+          "Starts with classification evidence and a refutable hypothesis, not a guess-fix."
         ]
       }
     }

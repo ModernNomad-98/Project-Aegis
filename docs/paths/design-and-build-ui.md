@@ -22,9 +22,10 @@ the existing task list, matching our design system. Classify the change first,
 reuse the components and tokens we already have, and tell me which Aegis skill
 you invoke and why."** Or, from nothing: **"I have a one-paragraph idea for a
 sign-up flow and no design. Draft the journey, the screens and a visual
-direction I can review, then build it."** Two verification skills named directly below are
-**manual-only — name them explicitly**: you start them by typing the skill's name,
-and your agent must never start them for you.
+direction I can review, then build it."** Of the two verification skills named directly below,
+playwright-e2e-engineer is **agent-applied** when E2E work triggers it, while
+clickthrough-test-engineer is **manual-only — name it explicitly**: you start them by typing the
+skill's name, and your agent must never start them for you.
 
 Steps marked *"If…"* are conditional — skip them honestly when they don't match
 your starting point.
@@ -166,9 +167,11 @@ for what materially blocks the next useful action.
    is the map, not the builder.** Its `references/stage-gate-map.md` names the
    enforcer to invoke at each stage (context → classify → plan → implement →
    validate → review → merge → close); route to them through that map and do
-   not re-derive the gates here. Some of those later stage enforcers (in addition
-   to the two verification skills named below in step 6) are manual-only, and
-   the map says which; your agent names them for you to type. Build in the
+   not re-derive the gates here. Some of those later stage enforcers are
+   manual-only, and the map says which; your agent names them for you to type.
+   The E2E spec skill in step 6 is not one of them: playwright-e2e-engineer is
+   agent-applied when E2E work triggers it, while clickthrough-test-engineer
+   remains manual-only. Build in the
    application environment you chose. Reuse an existing component where it
    meets the requirement; where one is missing, the agent names the gap and
    implements or proposes the smallest extension under your project's own
@@ -201,16 +204,18 @@ for what materially blocks the next useful action.
    inspection; a visual judgment names the observations behind it. This path
    does not create a separate human smoke-test campaign and does not ask you
    to approve each screen. A claim that needs a human-only check that was not
-   run stays labeled unverified. *To execute the journey checks,* name
+   run stays labeled unverified. *To execute the journey checks,* apply
    [`playwright-e2e-engineer`](../../.claude/skills/playwright-e2e-engineer/SKILL.md)
-   *(manual-only — name it explicitly)*; *for a live walkthrough of the
-   running app,* name
+   — the agent applies it when these checks are E2E work; *for a live
+   walkthrough of the running app,* name
    [`clickthrough-test-engineer`](../../.claude/skills/clickthrough-test-engineer/SKILL.md)
    *(manual-only — name it explicitly)*. The iteration method offers the
    clickthrough after implementation, never requires it, and records a decline
    or an impossible run as a named UNRUN with the unobservable state-hydration
-   and transition defect classes; it is never a pass. Your agent explains why
-   one is needed and stops; it does not start either for you.
+   and transition defect classes; it is never a pass. For the manual-only
+   clickthrough your agent explains why it is needed and stops; it does not
+   start it for you. The agent-applied E2E skill runs under your project's own
+   authority and approvals.
 
 7. **At every agent or tool switch —
    [`phased-work-handoff-designer`](../../.claude/skills/phased-work-handoff-designer/SKILL.md).**

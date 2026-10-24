@@ -29,7 +29,7 @@ where example tests suffice. It designs; it writes and runs no tests.
 - Do NOT use when: the ask is a per-change test plan across layers — that is `test-plan-designer`.
 - Do NOT use when: the ask is the test-data catalog design (personas, datasets, fixtures) — that is `test-data-architect`.
 - Do NOT use when: the ask is writing or running the actual test files — that is `vitest-unit-component-engineer` *(manual-only)*.
-- Do NOT use when: the ask is flake root-causing or stability repair — that is `flaky-test-detective` *(manual-only)*.
+- Do NOT use when: the ask is flake root-causing or stability repair — that is `flaky-test-detective`.
 
 ## Inputs to Inspect
 
@@ -88,7 +88,7 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 - No target unit is supplied or findable → stop and ask for it; a design cannot start from "add property tests".
 - The request becomes writing or running test files → hand off to `vitest-unit-component-engineer` *(manual-only)*.
 - The request becomes a per-change test plan → hand off to `test-plan-designer`.
-- The request becomes flake root-causing → hand off to `flaky-test-detective` *(manual-only)*.
+- The request becomes flake root-causing → hand off to `flaky-test-detective`.
 - The request involves destructive or live-state action → stop and refuse.
 
 ## Supporting Files

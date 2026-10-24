@@ -82,8 +82,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Applies the manual-only routing invariant: for each manual-only skill on the stage-8 chain (ci-pipeline-architect, observability-operator, and — where the feature calls for them — playwright-e2e-engineer, prompt-injection-defender), it EXPLAINS the boundary in plain business terms and STOPS that hop rather than invoking the skill.",
-          "Hands the invocation to the USER by name (the docs/paths convention — 'name it explicitly: you type the skill's name'); it does NOT auto-invoke a disable-model-invocation:true skill on the strength of its own auto-invocation.",
+          "Applies the manual-only routing invariant to the stage-8 chain's remaining manual-only skills (ci-pipeline-architect, observability-operator, prompt-injection-defender): for each it EXPLAINS the boundary in plain business terms and STOPS that hop rather than invoking it. playwright-e2e-engineer is not in that set any more: it is agent-applied when E2E work triggers it, so the chain routes the E2E hop instead of explaining-and-stopping.",
+          "Hands each remaining manual-only invocation to the USER by name (the docs/paths convention — 'name it explicitly: you type the skill's name'); it does NOT auto-invoke a disable-model-invocation: true skill on the strength of its own auto-invocation.",
           "Still auto-routes the model-invocable stage-8 owners itself (e.g. slo-reliability-architect, rollback-runbook-author, incident-response-runbook); the invariant gates only the manual-only targets, not the whole chain.",
           "Does not treat 'kick off each step for me' as authority to auto-chain the manual-only gates."
         ]

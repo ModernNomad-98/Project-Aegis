@@ -32,7 +32,7 @@ restate. It designs and executes nothing.
 - Do NOT use when: the ask is designing the authorization matrix itself (roles, grants, deny-by-default policy) — that is `authorization-matrix-designer`.
 - Do NOT use when: the ask is the product-wide QA strategy — that is `qa-strategy-architect`.
 - Do NOT use when: the ask is a per-change test plan — that is `test-plan-designer`.
-- Do NOT use when: the ask is writing or running E2E specs — that is `playwright-e2e-engineer` *(manual-only)*.
+- Do NOT use when: the ask is writing or running E2E specs — that is `playwright-e2e-engineer`.
 - Do NOT use when: the ask is step-by-step scripted manual cases — that is `manual-test-case-creator`.
 - Custom-role, grant-ceiling, and role/resource-inheritance coverage is designed by the #59 extension of `authorization-matrix-designer` (built by D78): this skill composes that output — never restates it.
 
@@ -52,7 +52,7 @@ restate. It designs and executes nothing.
 3. **Build the role × surface allowed-path table.** For each role and each surface, the behaviors that role MAY perform (allowed paths only); denials belong to `authorization-matrix-designer` step 7 and `multi-tenant-security-tester`.
 4. **Find interface-consistency deltas.** Where the same screen, form, list, or flow appears to two roles with different permitted actions, hidden fields, or menu items, name the delta and the check that would catch a wrong one.
 5. **Map layers and persona data.** For each allowed path choose the cheapest reliable layer (unit / API / E2E / manual) and the persona or test account that exercises it.
-6. **Name execution handoffs.** State who runs each layer's checks: `playwright-e2e-engineer` *(manual-only)* for permanent specs, `manual-test-case-creator` for scripted cases — handoffs, never executions here.
+6. **Name execution handoffs.** State who runs each layer's checks: `playwright-e2e-engineer` (agent-applied when E2E work triggers it) for permanent specs, `manual-test-case-creator` for scripted cases — handoffs, never executions here.
 7. **Emit the design** in the Output Format, stating what was chosen, why, and the main rejected alternative.
 
 ## Output Format
@@ -70,7 +70,7 @@ Per-role journeys: <the journeys each role can complete>
 Layer mapping + persona data:
   <allowed path> → unit | API | E2E | manual — persona <who>
 Execution handoffs:
-  permanent specs → playwright-e2e-engineer (manual-only); scripted cases →
+  permanent specs → playwright-e2e-engineer; scripted cases →
   manual-test-case-creator — named, never executed here
 Out of scope:
   denials / negative permissions → authorization-matrix-designer step 7 /
@@ -104,7 +104,7 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 - No authorization matrix or role inventory is supplied or findable → stop and ask for the `authorization-matrix-designer` output; a coverage design cannot start from role names alone.
 - The request drifts into designing the matrix itself (roles, grants, policy) → hand off to `authorization-matrix-designer`.
 - The request drifts into denial or negative-permission testing → hand off to `authorization-matrix-designer` step 7 and `multi-tenant-security-tester` *(manual-only)*.
-- The request becomes executing a pass, writing specs, or driving a browser → hand off to `playwright-e2e-engineer` *(manual-only)* or `manual-test-case-creator`; this skill designs only.
+- The request becomes executing a pass, writing specs, or driving a browser → hand off to `playwright-e2e-engineer` or `manual-test-case-creator`; this skill designs only.
 - The request covers custom roles, grant ceilings, or inheritance → stop; that coverage is deferred to the #59 extension (built by D78) — compose, never restate; not designed here.
 - The request involves destructive or live-state action → stop and refuse.
 

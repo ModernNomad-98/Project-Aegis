@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "5f0636e6e43a02446e47b40733a68350fc4b7969",
+  "source_revision": "22a6f057b2fcabdcbf0bc795876ae48a1d518485",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -266,7 +266,7 @@
     {
       "name": "ci-failure-classifier",
       "path": ".claude/skills/ci-failure-classifier/SKILL.md",
-      "sha256": "6ae34fa358ddece480e2e72b6de6e9965d269aa0dd5daab7ae55a9a946232ce7"
+      "sha256": "29f2e4fa8cfb1cc78207b988df38d6c22c96d28e7997658a93e54330e3e8d72a"
     },
     {
       "name": "ci-pipeline-architect",
@@ -511,7 +511,7 @@
     {
       "name": "flaky-test-detective",
       "path": ".claude/skills/flaky-test-detective/SKILL.md",
-      "sha256": "377028a6ad5ab440ea37def3b3bba82bce6f1b8eacaa14ec23ed3e32fc244ffe"
+      "sha256": "5cff483d75ceec5368b0177911dce63bddd174e9b2c5e7dd1e44472a5bba50d5"
     },
     {
       "name": "framework-edition-tracker",
@@ -531,7 +531,7 @@
     {
       "name": "frontend-perf-engineer",
       "path": ".claude/skills/frontend-perf-engineer/SKILL.md",
-      "sha256": "4e5722a8989a334779d66a67385d539b6fecc69b31eebf243750b2c1c3c2189d"
+      "sha256": "5adb15e8a3886c836e5b2a0b8362224c9e6a864cdb989ed3e50eaa8c255a419f"
     },
     {
       "name": "full-codebase-auditor",
@@ -596,7 +596,7 @@
     {
       "name": "integration-test-designer",
       "path": ".claude/skills/integration-test-designer/SKILL.md",
-      "sha256": "eb772d807d9144ba3988ceecacd0edbc047d4b024ddd0b405b90434f3514ac9e"
+      "sha256": "b2f09783ed020b953c09ab3aadc457cbb42f29eda91576a0ccfffa99cac40494"
     },
     {
       "name": "inter-agent-comms-reviewer",
@@ -681,7 +681,7 @@
     {
       "name": "mobile-journey-test-designer",
       "path": ".claude/skills/mobile-journey-test-designer/SKILL.md",
-      "sha256": "0cba3e154cc4efbe86b9c0be8ca67a40377bb6654a3ff90f8ed336121fe10af6"
+      "sha256": "164fb1d3a9529335890abf66fd0e97fcac73605a69fa7db1316e21267fb2d26e"
     },
     {
       "name": "mobile-viewport-craft",
@@ -786,7 +786,7 @@
     {
       "name": "playwright-e2e-engineer",
       "path": ".claude/skills/playwright-e2e-engineer/SKILL.md",
-      "sha256": "73672430848b54354baa0e7a419c538e77dd916a4d6efc21eec0f46db6d997be"
+      "sha256": "1581067f38eaa6d4697ddf6326c3e3916951dd4b2997447f799afa8de45e255f"
     },
     {
       "name": "principal-code-analyst",
@@ -821,7 +821,7 @@
     {
       "name": "project-orchestrator",
       "path": ".claude/skills/project-orchestrator/SKILL.md",
-      "sha256": "d3ad40ab4f232a54d57f9c43cc2c9027f15279b73320a9519f05f896be7b2bb0"
+      "sha256": "d9d8eea5f7f810758cb676be1276058ca40905e7654838c5b08ad8d919d49327"
     },
     {
       "name": "promotion-packet-writer",
@@ -836,7 +836,7 @@
     {
       "name": "property-based-test-designer",
       "path": ".claude/skills/property-based-test-designer/SKILL.md",
-      "sha256": "834e40a04136dec3a2de08a5f05ec4f67a98ed7ef8f04681d93435873552137c"
+      "sha256": "4ec167f141ab85e27692a28e6a9a57e97288978ae88efeb55cfcef8311af0352"
     },
     {
       "name": "pwa-boundary-reviewer",
@@ -846,12 +846,12 @@
     {
       "name": "qa-automation-architect",
       "path": ".claude/skills/qa-automation-architect/SKILL.md",
-      "sha256": "3790e36b85b90751b13b2ac10b186c70de5d4d477de7b117942106438f11f277"
+      "sha256": "b4c3ce60b70f44a265a1b146e6c04be856e0ca0837a57f501ddf0b88d1936053"
     },
     {
       "name": "qa-strategy-architect",
       "path": ".claude/skills/qa-strategy-architect/SKILL.md",
-      "sha256": "dce017df89349657f4f5c6d51bdd7a3c5976522cfa974e1f991086d5eabe981e"
+      "sha256": "6b3884890367cf82150f7281becec3b4eb755cfcc78b8dd00e3d14acf3a6e3a8"
     },
     {
       "name": "query-plan-reader",
@@ -876,7 +876,7 @@
     {
       "name": "regression-suite-curator",
       "path": ".claude/skills/regression-suite-curator/SKILL.md",
-      "sha256": "0fe9dcd1a0eed45b52ea2d7c6a52d31643d11d7d1fc1d7922ad9d53e3853b3ba"
+      "sha256": "fcc2806274d1c99449e5801f0f9909e0df920f4b4fb639e4675cc00122aa44c0"
     },
     {
       "name": "release-readiness-reviewer",
@@ -926,7 +926,7 @@
     {
       "name": "role-coverage-test-designer",
       "path": ".claude/skills/role-coverage-test-designer/SKILL.md",
-      "sha256": "23f752b157efa7baa6095d1c2960b7e53c909b384af8e63f103bf32f7d7345e0"
+      "sha256": "d42e7cb7de6c55e42abfeb00495a97a23a8f13220fb2027ca1767b7eb886eb1c"
     },
     {
       "name": "rollback-runbook-author",
@@ -1056,7 +1056,7 @@
     {
       "name": "skill-quality-reviewer",
       "path": ".claude/skills/skill-quality-reviewer/SKILL.md",
-      "sha256": "276975239752ea5be4b168fbc80900a5fb8effed00bb590d9be35589c3330dfb"
+      "sha256": "4205ed6f21265a0a24976dadfdee14c719e24aa9d03fcdb2a8ac0e87b79cda4d"
     },
     {
       "name": "skill-selection-advisor",
@@ -1151,7 +1151,7 @@
     {
       "name": "synthetic-monitoring-architect",
       "path": ".claude/skills/synthetic-monitoring-architect/SKILL.md",
-      "sha256": "8529eff6d6efe438101661ff59d36be64bf8bfd87311a4c516affe8148fb3e88"
+      "sha256": "376d3295a19f5c4972d5d572fbad95b0abd4cc676671e738c3b164de490434d6"
     },
     {
       "name": "systematic-debugger",
@@ -1201,7 +1201,7 @@
     {
       "name": "test-plan-designer",
       "path": ".claude/skills/test-plan-designer/SKILL.md",
-      "sha256": "beba751405cd1cccc7dd1a3c5c9f26a833dc192e4ca08a8eb163d8db333713ba"
+      "sha256": "2948d3d169fca4f209087fc3ee21bbbaa6f414c0d13fc7c5c5947d3da610b0c8"
     },
     {
       "name": "test-tenant-provisioner",
@@ -1246,12 +1246,12 @@
     {
       "name": "visual-regression-test-designer",
       "path": ".claude/skills/visual-regression-test-designer/SKILL.md",
-      "sha256": "75e0e03294f51618605bff87799a3c1fc57bd99432f0d5ad2ad0c737479c080b"
+      "sha256": "5f9c989aeb3b614c2eea5354c8ba84a58e9acd0d9665e6fbe1377278166cfa80"
     },
     {
       "name": "vite-build-qa-engineer",
       "path": ".claude/skills/vite-build-qa-engineer/SKILL.md",
-      "sha256": "cebbad27c5c915c5ab3e898ad484087a5c4ca6c40823f111c6f550adf7eb0477"
+      "sha256": "3770251091739c0f74abaac89fb1adfdff85b3e449accdbbc66e347c902e8301"
     },
     {
       "name": "vitest-unit-component-engineer",

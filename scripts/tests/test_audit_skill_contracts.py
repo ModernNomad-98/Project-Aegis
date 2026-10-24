@@ -240,9 +240,11 @@ def test_side004_fixture_classes(a) -> None:
 
 def test_side004_real_corpus_targets() -> None:
     """The Gate 2.5 blocker-1 regression: the KNOWN auto-invocable mutating
-    skills must never again be a silent scanned-zero. Nine were deliberately
+    skills must never again be a silent scanned-zero. Eight were deliberately
     reclassified manual-only during the 2026-09-12 shared-contract review;
-    remaining automatic authors retain semantic-candidate coverage."""
+    flaky-test-detective is agent-applied by the 2026-10-24 owner decision and
+    is asserted through the auto-invocable branch.
+    Remaining automatic authors retain semantic-candidate coverage."""
     targets = [
         "docs-first-implementer", "tdd-engineer", "systematic-debugger",
         "flaky-test-detective", "reviewable-diff-discipline",
@@ -254,7 +256,12 @@ def test_side004_real_corpus_targets() -> None:
     ra = real_audit()
     skills = {s.name: s for s in ra.skills}
     s4_owners = {f.owning_skill for f in ra.findings if f.rule == "SIDE-004"}
-    remediated_manual = set(targets[:9])
+    remediated_manual = {
+        "docs-first-implementer", "tdd-engineer", "systematic-debugger",
+        "reviewable-diff-discipline", "local-ci-mirror-preflight",
+        "multi-tenant-security-tester", "n-plus-one-detector",
+        "query-plan-reader",
+    }
     for t in targets:
         assert t in skills, f"target skill {t} missing from the corpus"
         if t in remediated_manual:

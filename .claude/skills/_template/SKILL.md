@@ -5,7 +5,7 @@ description: 'TEMPLATE ONLY — not a real skill and never invoked. Copy this di
 #   description must then START with the exact 32-char sentinel (trailing space included):
 #   MANUAL-ONLY; never auto-invoke.
 #   (validator-enforced; see the Portability contract in the standard)
-#   TWO bounded exceptions (standard §5). Exception 1 permits exact authorized
+#   THREE bounded exceptions (standard §5). Exception 1 permits exact authorized
 #   non-executable documentation/project-state create or append, immutable
 #   transcription of evidenced human decisions, and only six named state-
 #   projection refreshes. Show the exact path/content and honor applicable
@@ -15,7 +15,10 @@ description: 'TEMPLATE ONLY — not a real skill and never invoked. Copy this di
 #   route confined to ordinary approved source/test files; behavior-based, no skill is
 #   permanently eligible, and NO existing skill receives TALI authority by default — a
 #   side-effecting skill still needs disable-model-invocation: true unless a specific
-#   route is classified and activated under §5. This template activates neither.
+#   route is classified and activated under §5. Exception 3 — a consuming
+#   repository's committed rule makes exactly playwright-e2e-engineer or
+#   flaky-test-detective a mandatory agent-applied step, and no other
+#   side-effecting skill is eligible. This template activates none of the three.
 ---
 
 # _template (reference skill)

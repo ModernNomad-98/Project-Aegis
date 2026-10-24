@@ -1,7 +1,6 @@
 ---
 name: flaky-test-detective
-description: "MANUAL-ONLY; never auto-invoke. Drive a flaky (intermittently failing) test to its root cause and bounded stability evidence through the fixed sequence CLASSIFY (ordering, shared state, timing/race, environment, infrastructure, or real intermittent product bug) → REPRODUCE deterministically (repeat runs, order shuffling, parallel stress, seed/timezone control) → FIX ONE CAUSE → MEASURE stability with repeated runs and real counts. Never fixes by adding retries, sleeps, or looser assertions; distinguishes test bugs from product bugs (a race the test exposes may ship to users). Manages quarantine only with owner, ticket, and expiry. Use when a test fails intermittently, passes on retry, fails only in CI or only in parallel, or a suite's trust is eroding from random red. Do NOT use for tests that fail consistently (systematic-debugger for the product bug, or fix the test), for setting suite-wide retry/flake policy (qa-automation-architect), or for deciding suite membership (regression-suite-curator)."
-disable-model-invocation: true
+description: "Drive a flaky (intermittently failing) test to its root cause and bounded stability evidence through the fixed sequence CLASSIFY (ordering, shared state, timing/race, environment, infrastructure, or real intermittent product bug) → REPRODUCE deterministically (repeat runs, order shuffling, parallel stress, seed/timezone control) → FIX ONE CAUSE → MEASURE stability with repeated runs and real counts. Never fixes by adding retries, sleeps, or looser assertions; distinguishes test bugs from product bugs (a race the test exposes may ship to users). Manages quarantine only with owner, ticket, and expiry. Use when a test fails intermittently, passes on retry, fails only in CI or only in parallel, or a suite's trust is eroding from random red. Do NOT use for tests that fail consistently (systematic-debugger for the product bug, or fix the test), for setting suite-wide retry/flake policy (qa-automation-architect), or for deciding suite membership (regression-suite-curator)."
 ---
 
 # Flaky Test Detective
@@ -54,9 +53,9 @@ tests" are real intermittent product bugs wearing a test's name.
 
 ## Workflow
 
-Explicit human invocation selects this execution-capable skill; it does not
-expand the allowed target or activate TALI. Use applicable existing user grants
-without repeated consent. Before a state-changing command, confirm its actual
+This execution-capable skill is applied by the agent when the intermittent-failure
+trigger fires; its selection does not expand the allowed target or activate TALI.
+Use applicable existing user grants without repeated consent. Before a state-changing command, confirm its actual
 files, environment and effects fit those grants; if authority is absent, propose
 the operation and obtain it before proceeding.
 
@@ -158,8 +157,9 @@ Prevention: <pattern note; chronic-offender flag → regression-suite-curator>
 
 ## Stop Conditions
 
-- The skill was selected automatically rather than explicitly invoked by the
-  human: do not execute it. An agent may recommend the named manual skill.
+- The request is outside this skill's trigger (for example a consistently
+  failing test, or a suite-wide retry/quarantine policy): do not apply this
+  skill; route to the owning skill. An agent may recommend the correct skill.
 - A write, Git/network operation, database command or test side effect exceeds
   the applicable human grant: stop that operation and obtain the missing scope.
   Existing authorized operations do not need the same permission again.

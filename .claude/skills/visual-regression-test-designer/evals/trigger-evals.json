@@ -1,6 +1,6 @@
 {
   "skill": "visual-regression-test-designer",
-  "description": "Trigger discrimination for visual regression coverage design: which states to capture and how to baseline/diff them, versus the evidence policy (screenshot-evidence-planner), the per-change plan (test-plan-designer), tooling design (qa-automation-architect), suite curation (regression-suite-curator), and spec execution (playwright-e2e-engineer, manual-only).",
+  "description": "Trigger discrimination for visual regression coverage design: which states to capture and how to baseline/diff them, versus the evidence policy (screenshot-evidence-planner), the per-change plan (test-plan-designer), tooling design (qa-automation-architect), suite curation (regression-suite-curator), and spec execution (playwright-e2e-engineer).",
   "overlaps_with": [
     "screenshot-evidence-planner",
     "test-plan-designer",
@@ -71,7 +71,7 @@
       "should_not_trigger": [
         "visual-regression-test-designer"
       ],
-      "reason": "Writing and running the capture specs is playwright-e2e-engineer (manual-only); this skill designs the coverage and executes nothing."
+      "reason": "Writing and running the capture specs is playwright-e2e-engineer (agent-applied when E2E work triggers it); this skill designs the coverage and executes nothing."
     }
   ]
 }

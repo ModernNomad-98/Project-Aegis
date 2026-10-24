@@ -41,7 +41,7 @@ nothing.
   secret and the owner of the fix is unclear.
 - Do NOT use when: one test fails intermittently across runs ("fails one run
   in five") and the root cause is needed — that is
-  `flaky-test-detective` *(manual-only)*. This skill may say "the failure
+  `flaky-test-detective`. This skill may say "the failure
   pattern suggests flakiness"; it does not chase it.
 - Do NOT use when: the class is already known to be a product bug and the root
   cause is needed — that is `systematic-debugger` *(manual-only)*.
@@ -131,7 +131,7 @@ nothing.
 6. **Route each result to one next step and owner** (see Output Format):
    `PRODUCT-BUG` → the product owner, with `systematic-debugger`
    *(manual-only)* when the root cause is unknown; `TEST-BUG` → the test
-   owner, with `flaky-test-detective` *(manual-only)* when the failure is
+   owner, with `flaky-test-detective` when the failure is
    intermittent across runs; `MISSING-SECRET-OR-CONFIG` → the pipeline or
    secret owner, with `ci-pipeline-architect` *(manual-only)* when secret
    governance must change; `TIMEOUT-ONLY` → resume the unfinished work rather
@@ -233,7 +233,7 @@ Rules).
   failures; the human decides whether to rerun or resume.
 - **Flakiness is a pattern across runs.** One run cannot prove a test is
   flaky. With only one run, classify what the run shows and say that a
-  cross-run pattern needs `flaky-test-detective` *(manual-only)*.
+  cross-run pattern needs `flaky-test-detective`.
 
 ## Stop Conditions
 

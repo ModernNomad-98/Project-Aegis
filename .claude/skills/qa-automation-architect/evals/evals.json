@@ -62,7 +62,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Delivers the blueprint, then hands Playwright implementation to playwright-e2e-engineer (manual-only) instead of writing specs in the same pass.",
+          "Delivers the blueprint, then hands Playwright implementation to playwright-e2e-engineer (agent-applied when E2E work triggers it) instead of writing specs in the same pass.",
           "States the handoff explicitly."
         ]
       }
@@ -75,7 +75,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke qa-automation-architect: diagnosing one specific flaky spec is casework; the architect only sets the flake-management policy.",
-          "Does not auto-invoke flaky-test-detective (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute qa-automation-architect for it."
+          "Does not silently substitute qa-automation-architect for flaky-test-detective; when the consuming repository's trigger fires, flaky-test-detective is agent-applied and is named as the owning skill rather than as a human-only invocation."
         ]
       }
     },

@@ -33,7 +33,7 @@ executable by someone who didn't write it.
 - Do NOT use when: the ask is to write the step-by-step manual cases — the
   plan names WHICH manual cases exist; `manual-test-case-creator` writes them.
 - Do NOT use when: the ask is to implement tests — hand off to
-  `vitest-unit-component-engineer` *(manual-only)* or `playwright-e2e-engineer` *(manual-only)* where they
+  `vitest-unit-component-engineer` *(manual-only)* or `playwright-e2e-engineer` where they
   fit. `integration-test-designer` and `api-contract-test-designer` design
   boundary and contract specifications; name the implementing engineer for
   those plans according to the repository's toolchain.

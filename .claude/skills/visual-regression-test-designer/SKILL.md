@@ -30,7 +30,7 @@ what to do when a diff appears; this skill captures and compares nothing.
 - Do NOT use when: the ask is a per-change test plan across layers — that is `test-plan-designer`.
 - Do NOT use when: the ask is automation tooling or framework design (which runner, how fixtures are structured, CI tiers) — that is `qa-automation-architect`.
 - Do NOT use when: the ask is promoting, retaining, demoting, or retiring existing tests — that is `regression-suite-curator`.
-- Do NOT use when: the ask is writing or running Playwright/E2E specs — that is `playwright-e2e-engineer` *(manual-only)*.
+- Do NOT use when: the ask is writing or running Playwright/E2E specs — that is `playwright-e2e-engineer`.
 
 ## Inputs to Inspect
 
@@ -98,7 +98,7 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 
 - No UI surface or route inventory is supplied or findable → stop and ask for it; a coverage design cannot start from "our app".
 - The request is ambiguous about which states are "critical" → ask for the risk context instead of guessing.
-- The request drifts into executing captures, driving a browser, or writing specs → stop and hand off to `playwright-e2e-engineer` *(manual-only)* or `clickthrough-test-engineer` *(manual-only)*; this skill designs only.
+- The request drifts into executing captures, driving a browser, or writing specs → stop and hand off to `playwright-e2e-engineer` or `clickthrough-test-engineer` *(manual-only)*; this skill designs only.
 - The request is to write the evidence naming/masking/storage policy → hand off to `screenshot-evidence-planner`.
 - The request involves destructive or live-state action (deleting baselines, mutating production data to force a state) → stop and refuse.
 

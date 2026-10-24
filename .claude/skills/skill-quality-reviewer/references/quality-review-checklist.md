@@ -173,6 +173,7 @@ Present-but-empty detection, per section:
 |---|---|
 | Edits files/config outside its own report, runs state-changing commands, arms CI/deploys, calls external networks, spends money/tokens on execution | `disable-model-invocation: true` (manual-only) + irreversible step named in Stop Conditions |
 | The standard's §5 Exception 1: exact preview plus applicable explicit authorization for ordinary documentary create/append, immutable transcription of evidenced human decisions/lifecycle facts, or refresh of exactly six named project-state projections | stays auto-invocable within that boundary; preserve existing authorization without repeat consent. Consult the governing standard for exclusions, including executable authorization, permission configuration, governance policy, agent instructions, source/config, network and external actions. TALI remains a separately classified/activated route, never implied by policy adoption. |
+| The standard's §5 **Exception 3**: one of the two owner-named mandatory-trigger test skills (playwright-e2e-engineer, flaky-test-detective), and a consuming repository's committed governance rule makes it a mandatory agent-applied step | may omit disable-model-invocation: true and the MANUAL-ONLY sentinel; the consuming rule's stage duty, Stop Conditions and approvals still govern every write and run; no other skill is eligible |
 | Pure read/review/design/report — produces findings or a proposal artifact, changes nothing | auto-invocable: omit the field (or explicit `false`) |
 
 - Judge from the WORKFLOW TEXT, not the frontmatter claim: a "review" skill
@@ -182,6 +183,8 @@ Present-but-empty detection, per section:
 - Reference points from the shipped library: `code-reviewer` auto /
   `code-simplifier` manual; `rls-policy-auditor` auto (delivers migrations,
   never runs DDL) / `appsec-implementer` manual (edits code).
+- Exception 3 lapses if the consuming rule is absent; a missing flag without a
+  cited consuming rule is FAIL.
 
 ## Evidence discipline
 

@@ -72,7 +72,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces the plan, then stops at implementation: writing Playwright specs is playwright-e2e-engineer (manual-only) and is handed off, not executed in the same pass.",
+          "Produces the plan, then stops at implementation: writing Playwright specs is playwright-e2e-engineer (agent-applied when E2E work triggers it) and is handed off, not executed in the same pass.",
           "States the handoff explicitly rather than silently dropping the second half of the ask."
         ]
       }

@@ -33,7 +33,7 @@ the team applies between curation passes.
 - Use when: after an incident, ensuring the incident's regression tests are
   promoted to the right tier.
 - Do NOT use when: a test fails intermittently and needs diagnosis —
-  `flaky-test-detective` *(manual-only)* (its case reports are curation INPUT).
+  `flaky-test-detective` (its case reports are curation INPUT).
 - Do NOT use when: designing CI mechanics, sharding, retry policy —
   `qa-automation-architect` (it sets tier budgets; this skill fills tiers).
 - Do NOT use when: mapping what tests cover requirements —
@@ -86,7 +86,7 @@ that answer as approval to delete tests or weaken a security regression.
    never sufficient cause on its own.
 5. **Enforce the quarantine registry:** every quarantined test has owner +
    ticket + expiry; expired entries get a decision NOW (diagnose via
-   `flaky-test-detective` *(manual-only)*, fix, or retire with rationale) — quarantine is a
+   `flaky-test-detective`, fix, or retire with rationale) — quarantine is a
    queue, not a destination.
 6. **Fit tiers to budgets:** with the automation blueprint's budgets,
    assign/demote until tiers fit — by evidence (catch-rate per runtime),
