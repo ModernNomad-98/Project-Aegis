@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "export-qa-strategy-designer",
+  "description": "Behavior cases for export QA strategy: staged contracts, dataset/edge coverage, partial-failure recovery, idempotency, tenant isolation and expected-result evidence.",
+  "cases": [
+    {
+      "id": "positive-export-qa-strategy",
+      "type": "should_trigger",
+      "prompt": "Design the QA strategy for our tenant data export: users request an archive, we authorize and scope it, redact, build, deliver and expire the link.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines checks for every stage authorize/scope/build/redact/deliver/expire/audit with a stated expected result per check.",
+          "Builds a dataset/edge matrix including malformed, large-volume, tenant-boundary and expiry cases.",
+          "Defines partial-failure, idempotency/replay and delivery-expiry verification cases, and tenant-isolation checks for exported rows/links.",
+          "Hands implementation to export-pipeline-architect and claims no implementation or production execution."
+        ]
+      }
+    },
+    {
+      "id": "positive-export-evidence-plan",
+      "type": "should_trigger",
+      "prompt": "Our export has tests but no evidence for redaction, duplicate delivery or expiry. Define the export QA strategy and evidence.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces an expected-result evidence table naming an observable proof for every check.",
+          "Covers duplicate/replay, partial delivery and expired-link failure with expected outcomes.",
+          "States untested edges and limitations rather than claiming complete coverage."
+        ]
+      }
+    },
+    {
+      "id": "edge-partial-delivery-recovery",
+      "type": "should_trigger",
+      "prompt": "The export can deliver some files before a failure. What should QA verify about partial delivery and recovery?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Defines partial-delivery policy and verifies per-file recovery or documented retry/rollback.",
+          "Defines idempotent replay behavior and duplicate-delivery prevention with expected results.",
+          "Verifies interruption/failure leaves a recorded recoverable state, not silent partial export."
+        ]
+      }
+    },
+    {
+      "id": "negative-product-qa-strategy",
+      "type": "should_not_trigger",
+      "prompt": "Define the testing strategy for our whole product across all teams and release gates.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Product-wide QA strategy is qa-strategy-architect job; export QA strategy only covers export verification."
+        ]
+      }
+    }
+  ]
+}
