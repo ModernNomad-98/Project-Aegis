@@ -110,9 +110,13 @@ budget yourself.
 
 This section is type/placement support only; normative semantics are SKILL 1.3. Canonical R8-UX-4 fixes clickthrough status/lifecycle and the post-implementation placement of clickthrough_offer_decision; canonical R8-UX-3 fixes only the five pre-implementation fields and readiness/Supporting Files sync; it does not govern clickthrough status, fields or placement.
 
-Type: clickthrough_offer_decision = {status?: offered|declined|UNRUN, raw_status?: unknown, status_diagnosis?: {condition: record_missing|status_absent|status_invalid, diagnosis: UNKNOWN, reason: string, remediation: string}, offer_turns: [{turn: integer, decision: offered|declined|accepted, at: string}], decided_by?: user|host, execution_evidence?: string, decline_recorded: boolean, clickthrough_unrun_reason?: no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason, defect_classes?: [string], notes?: string}.
+Type: clickthrough_offer_decision = {status?: offered|declined|UNRUN, raw_status?: unknown, status_diagnosis?: {condition: record_missing|status_absent|status_invalid, diagnosis: UNKNOWN, reason: string, remediation: string}, offer_turns: [{turn: integer, decision: offered|declined|accepted, at: string}], decided_by?: user, execution_evidence?: string, decline_recorded: boolean, clickthrough_unrun_reason?: no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason, defect_classes?: [string], notes?: string}.
 
-Type invariants (not normative rule copies; all semantics are in SKILL 1.3): status is present only as one of the canonical three; raw_status is present only when status_invalid and preserves the exact original value losslessly, including null or a non-string value (type unknown); status_diagnosis is present only when status is omitted; clickthrough_unrun_reason only for UNRUN; defect_classes only for UNRUN; decline_recorded true iff any offer_turn declined; an accepted turn keeps status offered with decided_by/execution_evidence recorded (semantics in SKILL 1.3). This reference introduces no field beyond the names above.
+Type invariants (not normative rule copies; all semantics are in SKILL 1.3): status is present iff status is one of the canonical three; status omitted iff status_diagnosis is present; raw_status is present iff status_invalid and preserves the exact original value losslessly, including null or a non-string value (type unknown); status == UNRUN iff (for attempted runs) clickthrough_unrun_reason is present from the enum and defect_classes is non-empty; declined and offered carry no defect classes; clickthrough_unrun_reason is forbidden for declined/offered; decline_recorded is true iff any offer_turn declined; decided_by is user only (no host decision class); accepted means a user yes, not execution success, and never becomes a fourth stored status. This reference introduces no field beyond the names above. Parent iteration record support (R4): clickthrough_deferral = {reason: string, at: string, retry_condition: string} may be present on the parent iteration record only when no clickthrough_offer_decision object exists because no offer was made; it is required when the offer is deferred for an unavailable stack or safe environment, and absent once a clickthrough_offer_decision exists. It is not a clickthrough status and does not imply UNRUN; no_local_stack is not used for an un-attempted offer. This is parent-record schema support, not a decision-record field.
+## 3b. CI citation snapshot policy (R6)
+
+CI citations use an exact snapshot: cite the base/head commit SHA and the exact run id/conclusion read at evidence generation; in-progress and failed runs are never a pass, and no run-level CI-green claim is made. Review 5636513369 findings 1-12 are dispositioned in the plan/PR evidence (this reference states no CI-green claim).
+
 ## 4. Budget ledger and invalidation
 
 - The ledger records concepts used and passes used for this feature/selection.
@@ -170,28 +174,24 @@ Enum scope: clickthrough_unrun_reason (no_local_stack|missing_tooling|attempted_
     prototype_acceptance: {exercisable: ..., stateful: ..., non_happy_states: [...], fixtures_only: ..., viewports: [...], keyboard: ...}
     post_implementation:
       clickthrough_offer_decision:
-        # status is optional; when present it is exactly one of the canonical three
-        # status: "offered"            # "offered" | "declined" | "UNRUN"
-        # Optional condition-only fields are OMITTED from the default record; add exactly one
-        # of the two valid examples below instead of emitting key: null pairs.
-        # Valid status_invalid example (preserves the exact original value):
-        # raw_status: null             # any JSON value: null, number, string, object, etc.
-        # Valid omission example (status is omitted; diagnosis is a populated mapping):
-        # status_diagnosis:
-        #   condition: "record_missing"   # or "status_absent" | "status_invalid"
-        #   diagnosis: "UNKNOWN"
-        #   reason: "..."
-        #   remediation: "..."
+        status: "offered"             # exactly one canonical status; omit only for a diagnosis record
         offer_turns:
           - turn: 1
-            decision: "offered"      # "offered" | "declined" | "accepted"
+            decision: "offered"       # user answers only: offered | declined | accepted
             at: "2026-10-23T00:00:00Z"
-        decided_by: null             # "user" | "host"
-        execution_evidence: null
         decline_recorded: false
-        clickthrough_unrun_reason: null   # UNRUN only
-        defect_classes: []
-        notes: ""
+        # Optional fields are omitted for offered/declined; add only as the rules require.
+        # Valid record_missing example: whole decision object absent from post_implementation.
+        # Valid status_absent example (status omitted; diagnosis populated):
+        #   status_diagnosis: {condition: "status_absent", diagnosis: "UNKNOWN", reason: "...", remediation: "..."}
+        # Valid status_invalid example (status omitted; diagnosis populated; preserve exact original):
+        #   raw_status: null
+        #   status_diagnosis: {condition: "status_invalid", diagnosis: "UNKNOWN", reason: "...", remediation: "..."}
+        # Valid UNRUN example (attempted offer blocked):
+        #   status: "UNRUN"
+        #   clickthrough_unrun_reason: "attempted_but_blocked"
+        #   defect_classes: ["state-hydration"]
+        # Valid accepted-but-blocked example: status UNRUN, accepted turn retained, decided_by user.
     ui_lock_inventory_diff: [{element: ..., mapped_to: ...}]
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
