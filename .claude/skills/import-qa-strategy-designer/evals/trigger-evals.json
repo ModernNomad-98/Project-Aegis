@@ -1,0 +1,58 @@
+{
+ "skill": "import-qa-strategy-designer",
+ "description": "Trigger discrimination: import QA strategy vs import pipeline design, product QA strategy, test data and data-quality monitoring.",
+ "overlaps_with": [
+  "import-pipeline-architect",
+  "qa-strategy-architect",
+  "test-data-architect",
+  "data-quality-monitor-designer"
+ ],
+ "cases": [
+  {
+   "id": "import-qa-strategy-wins-here",
+   "prompt": "How should we verify data imports: stages, edge datasets, partial failures, duplicate handling and evidence?",
+   "expected_skill": "import-qa-strategy-designer",
+   "should_not_trigger": [
+    "import-pipeline-architect",
+    "qa-strategy-architect"
+   ],
+   "reason": "Import verification strategy, not pipeline design or product-wide QA strategy."
+  },
+  {
+   "id": "pipeline-design-goes-to-import-pipeline-architect",
+   "prompt": "Design the tenant-data import pipeline stages, mapping, preview/confirm and per-row recovery.",
+   "expected_skill": "import-pipeline-architect",
+   "should_not_trigger": [
+    "import-qa-strategy-designer"
+   ],
+   "reason": "Designing the import pipeline contract belongs to import-pipeline-architect; QA strategy reviews its verification."
+  },
+  {
+   "id": "product-strategy-goes-to-qa-strategy-architect",
+   "prompt": "What test layers and release gates should the whole product have?",
+   "expected_skill": "qa-strategy-architect",
+   "should_not_trigger": [
+    "import-qa-strategy-designer"
+   ],
+   "reason": "Product/repo QA strategy, not import-specific QA."
+  },
+  {
+   "id": "test-data-goes-to-test-data-architect",
+   "prompt": "Design fixtures, seeds and tenant personas for import tests.",
+   "expected_skill": "test-data-architect",
+   "should_not_trigger": [
+    "import-qa-strategy-designer"
+   ],
+   "reason": "Test-data design is test-data-architect; import QA strategy consumes data posture but does not design fixtures."
+  },
+  {
+   "id": "monitoring-goes-to-data-quality-monitor-designer",
+   "prompt": "Design production data-quality monitoring and quarantine for imported datasets.",
+   "expected_skill": "data-quality-monitor-designer",
+   "should_not_trigger": [
+    "import-qa-strategy-designer"
+   ],
+   "reason": "Production monitoring/quarantine is data-quality-monitor-designer; import QA strategy is pre-release verification."
+  }
+ ]
+}

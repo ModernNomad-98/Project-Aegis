@@ -1,0 +1,58 @@
+{
+ "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+ "skill": "import-qa-strategy-designer",
+ "description": "Behavior cases for import QA strategy: staged contracts, dataset/edge coverage, partial-failure recovery, idempotency, tenant isolation and expected-result evidence.",
+ "cases": [
+  {
+   "id": "positive-import-qa-strategy",
+   "type": "should_trigger",
+   "prompt": "Design the QA strategy for our onboarding CSV import: users upload a CSV, we validate and map rows, show a preview, then commit or roll back.",
+   "expect": {
+    "triggers": true,
+    "assertions": [
+     "Defines checks for every stage parse/map/validate/preview/commit/rollback with a stated expected result per check.",
+     "Builds a dataset/edge matrix including malformed, duplicate, boundary, large-volume and tenant-boundary cases.",
+     "Defines partial-failure, idempotency/replay and rollback verification cases, and tenant-isolation checks for imported rows.",
+     "Hands implementation to import-pipeline-architect and claims no implementation or production execution."
+    ]
+   }
+  },
+  {
+   "id": "positive-import-evidence-plan",
+   "type": "should_trigger",
+   "prompt": "Our migration import has tests but no evidence we can show for validation, duplicate handling or rollback. Define the import QA strategy and evidence.",
+   "expect": {
+    "triggers": true,
+    "assertions": [
+     "Produces an expected-result evidence table naming an observable proof for every check.",
+     "Covers duplicate/replay, partial failure and rollback failure with expected outcomes.",
+     "States untested edges and limitations rather than claiming complete coverage."
+    ]
+   }
+  },
+  {
+   "id": "edge-partial-commit-recovery",
+   "type": "should_trigger",
+   "prompt": "The import can commit some rows before a failure. What should QA verify about partial commits and recovery?",
+   "expect": {
+    "triggers": true,
+    "assertions": [
+     "Defines partial-commit policy and verifies per-row recovery or documented rollback.",
+     "Defines idempotent replay behavior and duplicate prevention with expected results.",
+     "Verifies interruption/failure leaves a recorded recoverable state, not silent partial data."
+    ]
+   }
+  },
+  {
+   "id": "negative-product-qa-strategy",
+   "type": "should_not_trigger",
+   "prompt": "Define the testing strategy for our whole product across all teams and release gates.",
+   "expect": {
+    "triggers": false,
+    "assertions": [
+     "Product-wide QA strategy is qa-strategy-architect's job; import QA strategy only covers import verification."
+    ]
+   }
+  }
+ ]
+}

@@ -783,7 +783,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->250<!-- /SKILL-COUNT --> skills comprise **249 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->251<!-- /SKILL-COUNT --> skills comprise **250 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -817,7 +817,7 @@ keeps a human as the approval gate on anything irreversible. See
    policy audit, secrets hardening, supply-chain review, security PR review, migration safety,
    SAST triage. *e.g.* `threat-modeler`, `rls-policy-auditor`, `secrets-identity-hardener`,
    `supply-chain-security-reviewer`, `security-pr-reviewer`.
-6. **QA, E2E & evidence** *(Phase 5, 26)* — test strategy through execution and proof: QA
+6. **QA, E2E & evidence** *(Phase 5, 27)* — test strategy through execution and proof: QA
    strategy, test plans, coverage mapping, Playwright/unit/build QA, flake control, test data,
    evidence policy, and CI run failure classification (added by D68). *e.g.* `qa-strategy-architect`, `test-coverage-mapper`,
    `playwright-e2e-engineer`, `flaky-test-detective`, `screenshot-evidence-planner`.
@@ -1215,6 +1215,7 @@ production-safe smoke delivery #188):
 
 | Skill | What it does | Invocation |
 |---|---|---|
+| `import-qa-strategy-designer` | Import QA strategy: staged contracts, dataset/edge coverage, partial-failure recovery, idempotency, tenant isolation, expected-result evidence; design-only. | auto + manual |
 | `qa-strategy-architect` | Product-level QA strategy: ranked risk inventory → cheapest-reliable-layer decisions, explicit automation/manual split, evidence per change class, CI gates, ownership. | auto + manual |
 | `test-plan-designer` | Per-change test plan: risk-traced items with layer/data/environment, objective entry/exit criteria, named artifacts and CI placement, explicit out-of-scope list. | auto + manual |
 | `test-coverage-mapper` | Coverage audit: surface inventory first, maps tests by reading assertions (theater ≠ coverage), risk-ranked gaps with cheapest fill layer, honest not-inspected list; reads mutation reports as gap evidence. | auto + manual |

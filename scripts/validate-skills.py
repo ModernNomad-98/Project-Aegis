@@ -215,13 +215,13 @@ COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 182, "COVERED": 57, "PARTIAL": 59, "GAP": 2},
-    "by_grade": {"explicit-id": 182, "catalog-decision": 16,
-                 "capability-review": 100, "none": 2},
+    "by_status": {"SHIPPED": 182, "COVERED": 58, "PARTIAL": 59, "GAP": 1},
+    "by_grade": {"explicit-id": 182, "catalog-decision": 17,
+                 "capability-review": 100, "none": 1},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 0, "P1": 1, "P2": 1},
-    "manifest_skills": 250,
-    "distinct_covering_skills": 167,
+    "gap_by_priority": {"P0": 0, "P1": 0, "P2": 1},
+    "manifest_skills": 251,
+    "distinct_covering_skills": 168,
     "beyond_roadmap_skills": 83,
     "review_pending": 116,
 }
@@ -229,9 +229,7 @@ COVERAGE_TOTALS = {
 # #254/#278 received their planning-gate decisions and no longer count as
 # awaiting confirmation; review_pending subtracts these resolved rows.
 COVERAGE_PLANNING_GATE_RESOLVED = frozenset({254, 278})
-COVERAGE_GAP_IDS = (
-    233, 234,
-)
+COVERAGE_GAP_IDS = (234,)
 COVERAGE_P0_GAP_IDS = ()
 COVERAGE_ANOMALY_SKILLS = {
     186: frozenset({"multi-tenant-security-tester", "rls-policy-auditor"}),
@@ -244,7 +242,7 @@ COVERAGE_REQUIRED_PHRASES = (
     "GAP rows are optional backlog candidates, not deficits or completion "
     "obligations.",
     "The shipped library deliberately exceeds and interleaves with the "
-    "roadmap: 83 of 250 shipped skills are beyond it.",
+    "roadmap: 83 of 251 shipped skills are beyond it.",
 )
 COVERAGE_ENTRY_KEYS = (
     "id", "area", "name", "priority", "status", "covering_skills",

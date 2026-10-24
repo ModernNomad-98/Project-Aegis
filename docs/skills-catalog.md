@@ -601,6 +601,7 @@ auto-invocable, no `disable-model-invocation` — and each ships both eval files
 
 | Skill | Source (category doc) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
+| `import-qa-strategy-designer` | cat 06 #233 | yes | Import QA strategy: staged contracts, dataset/edge coverage, partial-failure recovery, idempotency, tenant isolation, expected-result evidence; design-only, hands implementation to import-pipeline-architect. |
 | `qa-strategy-architect` | cat 06 #181/#182 | yes | Product-level QA strategy: ranked risk inventory → cheapest-reliable-layer decisions, explicit automation/manual split, evidence per change class, CI gates, ownership; delegates security negatives. |
 | `test-plan-designer` | cat 06 #181/#192 | yes | Per-change test plan: risk-traced items with layer/data/environment, objective entry/exit criteria, named artifacts + CI placement, engineer-skill handoffs, explicit out-of-scope list. |
 | `test-coverage-mapper` | cat 06 #191/#192 + **#195 (D78)** | yes | Surface-inventory-first coverage audit; maps by reading assertions (theater ≠ coverage); risk-ranked gap list with cheapest fill layer; honest covered/theater/uncovered/not-inspected statement; reads mutation reports (survived/killed/equivalent) as gap evidence. |
