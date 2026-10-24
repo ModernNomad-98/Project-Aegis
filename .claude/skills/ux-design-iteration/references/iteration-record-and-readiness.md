@@ -110,9 +110,9 @@ budget yourself.
 
 This section is type/placement support only; normative semantics are SKILL 1.3. Canonical R8-UX-4 fixes clickthrough status/lifecycle and the post-implementation placement of clickthrough_offer_decision; canonical R8-UX-3 fixes only the five pre-implementation fields and readiness/Supporting Files sync; it does not govern clickthrough status, fields or placement.
 
-Type: clickthrough_offer_decision = {status?: offered|declined|UNRUN, raw_status?: string, status_diagnosis?: {condition: record_missing|status_absent|status_invalid, diagnosis: UNKNOWN, reason: string, remediation: string}, offer_turns: [{turn: integer, decision: offered|declined|accepted, at: string}], decided_by?: user|host, execution_evidence?: string, decline_recorded: boolean, clickthrough_unrun_reason?: no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason, defect_classes?: [string], notes?: string}.
+Type: clickthrough_offer_decision = {status?: offered|declined|UNRUN, raw_status?: unknown, status_diagnosis?: {condition: record_missing|status_absent|status_invalid, diagnosis: UNKNOWN, reason: string, remediation: string}, offer_turns: [{turn: integer, decision: offered|declined|accepted, at: string}], decided_by?: user|host, execution_evidence?: string, decline_recorded: boolean, clickthrough_unrun_reason?: no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason, defect_classes?: [string], notes?: string}.
 
-Type invariants (not normative rule copies; all semantics are in SKILL 1.3): status is present only as one of the canonical three; raw_status is present only when status_invalid; status_diagnosis is present only when status is omitted; clickthrough_unrun_reason only for UNRUN; defect_classes only for UNRUN; decline_recorded true iff any offer_turn declined. This reference introduces no field beyond the names above.
+Type invariants (not normative rule copies; all semantics are in SKILL 1.3): status is present only as one of the canonical three; raw_status is present only when status_invalid and preserves the exact original value losslessly, including null or a non-string value (type unknown); status_diagnosis is present only when status is omitted; clickthrough_unrun_reason only for UNRUN; defect_classes only for UNRUN; decline_recorded true iff any offer_turn declined; an accepted turn keeps status offered with decided_by/execution_evidence recorded (semantics in SKILL 1.3). This reference introduces no field beyond the names above.
 ## 4. Budget ledger and invalidation
 
 - The ledger records concepts used and passes used for this feature/selection.
@@ -172,8 +172,11 @@ Enum scope: clickthrough_unrun_reason (no_local_stack|missing_tooling|attempted_
       clickthrough_offer_decision:
         # status is optional; when present it is exactly one of the canonical three
         # status: "offered"            # "offered" | "declined" | "UNRUN"
-        raw_status: null             # exact original value only when status_invalid
-        status_diagnosis: null       # mapping below when status is omitted
+        # Optional condition-only fields are OMITTED from the default record; add exactly one
+        # of the two valid examples below instead of emitting key: null pairs.
+        # Valid status_invalid example (preserves the exact original value):
+        # raw_status: null             # any JSON value: null, number, string, object, etc.
+        # Valid omission example (status is omitted; diagnosis is a populated mapping):
         # status_diagnosis:
         #   condition: "record_missing"   # or "status_absent" | "status_invalid"
         #   diagnosis: "UNKNOWN"
