@@ -24,7 +24,7 @@ Row-level evidence companion: [audit registers index](../audits/README.md) (read
 - `_A/skills-audit/final-classification.json` sha256 `2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213`.
 - `_A/skills-audit/SKILLS-COVERAGE-AUDIT-2026-10-20.md` sha256 `792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301`.
 - Source inputs: skills manifest, catalog, the nine `docs/skills/` tables, the 300-roadmap file and the validator
-  records listed in the JSON `basis`.
+  records listed in the JSON `basis`. Source-file provenance digests were re-pinned to the SHAs at the 2026-10-24 refresh base 08b96ec3; a file cannot embed its own final hash, so this PR's validator/test edits are covered by the prior-base pins disclosed here, not by live-file verification.
 
 ## Totals
 
