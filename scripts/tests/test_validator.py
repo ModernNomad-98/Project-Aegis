@@ -2805,7 +2805,7 @@ def test_coverage_map_planning_gate_resolved():
         len(non_explicit) - len(resolved_present)) == 114
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
-            payload["totals"]["review_pending"] = 126
+            payload["totals"]["review_pending"] = 124
         with mutated_coverage(Path(tmp), mutate) as rep:
             expect_error(rep, "totals.review_pending",
                          "coverage map: unresolved-row review_pending rejected")

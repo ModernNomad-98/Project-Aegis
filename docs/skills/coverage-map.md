@@ -16,7 +16,8 @@ The map records status only. It is a maintained assertion, not ground
 truth, a completion target or a build authorization. Rows graded
 capability-review, catalog-decision or none are flagged for planning-gate
 review unless they carry a recorded planning-gate decision (rows #254/#278,
-D107); `review_pending` counts the remaining non-explicit-id rows (114).
+D107); `review_pending` counts the 116 non-explicit-id rows minus the 2
+planning-gate-resolved rows (#254/#278) = 114.
 
 Row-level evidence companion: [audit registers index](../audits/README.md) (read-only reference, not build authorization).
 
