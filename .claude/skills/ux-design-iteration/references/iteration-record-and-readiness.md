@@ -106,10 +106,13 @@ make (extend budget, accept a recorded limitation, change scope, or stop).
 Never silently switch candidate, reset counters, lower criteria, or extend the
 budget yourself.
 
-## 3a. Clickthrough status (post-implementation only)
+## 3a. Clickthrough record types (post-implementation only)
 
-This 3a section is non-normative schema/folder/template support only: the normative copy is SKILL 1.3 (clickthrough) and SKILL 1.4/5 (proof set); canonical R8-UX-4 fixes clickthrough lifecycle/status, canonical R8-UX-3 fixes record schema/placement where it overlaps, and the SKILL wins on any difference. Field constraints: status is nullable (offered|declined|UNRUN|null) and offered/declined/UNRUN are the only stored statuses; declined is a recorded user answer, never converted into UNRUN, never a pass; UNKNOWN within the field is fail-safe (a recorded diagnosis in status_diagnosis, never a fourth stored status, never defaulted to UNRUN, never a pass) with a named reason and human remediation; clickthrough_unrun_reason is non-null only for an attempted/impossible UNRUN (null|no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason); defect_classes is non-empty only for UNRUN and empty for a decline; decline_recorded is true only for declined; decided_by records user|host; offer_turns records the original offer plus any explicitly requested re-offers; an explicit yes/execution is recorded as decided_by=user plus execution evidence and does not add a fourth status; status_diagnosis placement is nested inside clickthrough_offer_decision, where absent means the status field is not present, malformed means it is present but invalid, and missing means the whole clickthrough_offer_decision object is absent (the post-implementation container is created with status unset and the nested diagnosis); notes is free text.
+This section is type/placement support only; normative semantics are SKILL 1.3. Canonical R8-UX-4 fixes clickthrough status/lifecycle and the post-implementation placement of clickthrough_offer_decision; canonical R8-UX-3 fixes only the five pre-implementation fields and readiness/Supporting Files sync; it does not govern clickthrough status, fields or placement.
 
+Type: clickthrough_offer_decision = {status?: offered|declined|UNRUN, raw_status?: unknown, status_diagnosis?: {condition: record_missing|status_absent|status_invalid, diagnosis: UNKNOWN, reason: string, remediation: string}, offer_turns: [{turn: integer, decision: offered|declined|accepted, at: string}], decided_by?: user|host, execution_evidence?: string, decline_recorded: boolean, clickthrough_unrun_reason?: no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason, defect_classes?: [string], notes?: string}.
+
+Type invariants (not normative rule copies; all semantics are in SKILL 1.3): status is present only as one of the canonical three; raw_status is present only when status_invalid and preserves the exact original value losslessly, including null or a non-string value (type unknown); status_diagnosis is present only when status is omitted; clickthrough_unrun_reason only for UNRUN; defect_classes only for UNRUN; decline_recorded true iff any offer_turn declined; an accepted turn keeps status offered with decided_by/execution_evidence recorded (semantics in SKILL 1.3). This reference introduces no field beyond the names above.
 ## 4. Budget ledger and invalidation
 
 - The ledger records concepts used and passes used for this feature/selection.
@@ -143,6 +146,8 @@ user validation that did not happen.
 
 This section is schema, folder layout and template support only; normative rules are in the SKILL sections 1.4 and 5. Folder layout: MANIFEST.json at the proof-set root with mockup/, screenshots/<checkpoint>/, clickthrough/ and demo-script.md alongside. MANIFEST.json lists every artifact with its size and sha256 and records captured-over-expected; MANIFEST.json itself cannot be listed with its own hash, so files records artifacts from MANIFEST.json excluding MANIFEST.json. captured_over_expected entries have the shape {checkpoint, expected, captured}. proof_set fields: status (offered|declined|UNRUN|collected), decline_reason (...|null), unrun_reason (production_data_only|no_local_stack|missing_tooling|failed_capture|null), folder_layout (...|null), manifest_path (...|null), files ([{path, size, sha256}]), captured_over_expected ([{checkpoint, expected, captured}]), delegated_writer (...). demo_script fields: status (skipped|drafted|narrated), checkpoints ([...]), notes (...).
 
+Enum scope: clickthrough_unrun_reason (no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason) applies to clickthrough attempts only; proof_set.unrun_reason (production_data_only|no_local_stack|missing_tooling|failed_capture) applies to proof-set attempts only; the two are distinct scoped enums and never interchangeable.
+
 ## 6. Worked record template
 
     feature: <feature/task scope>
@@ -163,7 +168,30 @@ This section is schema, folder layout and template support only; normative rules
       - id: E1 ; mockup_id: M1 ; question: ... ; candidate_version: ... ; scenario: ... ; observation: ... ;
         evidence: ... ; finding: ... ; disposition: ... ; uncertainty: ...
     prototype_acceptance: {exercisable: ..., stateful: ..., non_happy_states: [...], fixtures_only: ..., viewports: [...], keyboard: ...}
-    post_implementation: {clickthrough_offer_decision: {status: offered|declined|UNRUN|null (null only with status_diagnosis UNKNOWN; not a fourth status), status_diagnosis: null|{condition: absent|malformed|missing, diagnosis: UNKNOWN, reason: ..., remediation: ...}, offer_turns: [...], decided_by: user|host, execution_evidence: ...|null, decline_recorded: true|false, clickthrough_unrun_reason: null|no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason (UNRUN only), defect_classes: [...], notes: ...}}  # non-normative schema support only; SKILL 1.3 + canonical R8-UX-4 normative; SKILL wins; never in the five-field selection record
+    post_implementation:
+      clickthrough_offer_decision:
+        # status is optional; when present it is exactly one of the canonical three
+        # status: "offered"            # "offered" | "declined" | "UNRUN"
+        # Optional condition-only fields are OMITTED from the default record; add exactly one
+        # of the two valid examples below instead of emitting key: null pairs.
+        # Valid status_invalid example (preserves the exact original value):
+        # raw_status: null             # any JSON value: null, number, string, object, etc.
+        # Valid omission example (status is omitted; diagnosis is a populated mapping):
+        # status_diagnosis:
+        #   condition: "record_missing"   # or "status_absent" | "status_invalid"
+        #   diagnosis: "UNKNOWN"
+        #   reason: "..."
+        #   remediation: "..."
+        offer_turns:
+          - turn: 1
+            decision: "offered"      # "offered" | "declined" | "accepted"
+            at: "2026-10-23T00:00:00Z"
+        decided_by: null             # "user" | "host"
+        execution_evidence: null
+        decline_recorded: false
+        clickthrough_unrun_reason: null   # UNRUN only
+        defect_classes: []
+        notes: ""
     ui_lock_inventory_diff: [{element: ..., mapped_to: ...}]
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
