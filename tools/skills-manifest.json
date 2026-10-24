@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "145c990f84704cea279538d02f9a652900afd80a",
+  "source_revision": "b41614067d46af024da8b234533d337ae64f81a3",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -577,6 +577,11 @@
       "name": "import-pipeline-architect",
       "path": ".claude/skills/import-pipeline-architect/SKILL.md",
       "sha256": "736815ed14e44abd732aaf0727ed49041318df849959274c7aada4c9b0c64f68"
+    },
+    {
+      "name": "import-qa-strategy-designer",
+      "path": ".claude/skills/import-qa-strategy-designer/SKILL.md",
+      "sha256": "c433e43428dff0ce9c664163c5d205ceb131c81726778efbffdf907b9220551e"
     },
     {
       "name": "incident-response-runbook",
