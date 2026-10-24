@@ -15,10 +15,10 @@
     "source_files": {
       ".github/workflows/validate-skills.yml": "de38d87a65226d6afdce038793868a6e57281eb1911631f045e4edc4a8cced3a",
       "docs/300-repeatable-software-saas-skills-roadmap.md": "fe3e9d13877eb43d17032b25f4e35948699dbfe327f0dce6f6b204aa24c25ead",
-      "docs/skills-catalog.md": "d8d523d41d3bfb2bfefa857f7f11e6b1e773f2c1922f88bf352c250f2986b116",
-      "scripts/tests/test_validator.py": "5fc7319d1f9037dcd3b9d522eb974a27deddd1b098ad2a3ab9457b966060de7b",
-      "scripts/validate-skills.py": "8dc42350b4bd4b3c1ae69ecb98b52183e1e17053e3779061764c12e86ac7c809",
-      "tools/skills-manifest.json": "9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832"
+      "docs/skills-catalog.md": "ed6c66f83fb2c9b4e71068e89984c7968b088ad70c91ae2330c66c843091793e",
+      "scripts/tests/test_validator.py": "5d6e1730dc9be45911f6698c9cf592b75cd64ba82895d95c3aaa52e5877da610",
+      "scripts/validate-skills.py": "c82d6c45648349926b75138094c43addd891ee394d540c665f7eee3c93fdce23",
+      "tools/skills-manifest.json": "d85084a42a9e85fcbe099692dc24dca7ab920671c7a0bad94c2d05ccdc9c02ae"
     }
   },
   "entries": [

@@ -2152,6 +2152,88 @@ def test_coverage_map_evidence_rules():
                          "coverage map: GAP row without rationale rejected")
 
 
+    # D114 shipped-by-skill convention: current map positive + synthetic
+    # negative. Direct asserts keep the 68 defs / 253 self-test line count.
+    payload = load_coverage()
+    for row_id in (233, 234):
+        row = coverage_entry(payload, row_id)
+        assert (row["status"], row["evidence_grade"]) == (
+            "SHIPPED", "explicit-id"), (row_id, row)
+        assert "shipped as" in (row["evidence"] or "").lower(), (row_id, row)
+    with tempfile.TemporaryDirectory() as tmp:
+        def shipped_as_but_covered(payload):
+            row = coverage_entry(payload, 233)
+            row["status"] = "COVERED"
+            row["evidence_grade"] = "catalog-decision"
+        with mutated_coverage(Path(tmp), shipped_as_but_covered) as rep:
+            assert any("shipped as" in err and "SHIPPED/explicit-id" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def shipped_skill_not_covering(payload):
+            row = coverage_entry(payload, 234)
+            row["evidence"] = "A skill shipped as import-qa-strategy-designer."
+        with mutated_coverage(Path(tmp), shipped_skill_not_covering) as rep:
+            assert any("not in covering_skills" in err for err in rep.errors), (
+                rep.errors)
+    with tempfile.TemporaryDirectory() as tmp:
+        def historical_bundle_phrase(payload):
+            row = coverage_entry(payload, 1)
+            row["evidence"] = (row["evidence"]
+                               + " Shipped as part of a historical bundle.")
+        with mutated_coverage(Path(tmp), historical_bundle_phrase) as rep:
+            assert not any("shipped as" in err for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def second_shipped_as_match(payload):
+            row = coverage_entry(payload, 233)
+            row["evidence"] = (row["evidence"]
+                               + " Later shipped as export-qa-strategy-designer.")
+        with mutated_coverage(Path(tmp), second_shipped_as_match) as rep:
+            assert any("export-qa-strategy-designer" in err
+                       and "not in covering_skills" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def case_variant_shipped_as(payload):
+            row = coverage_entry(payload, 234)
+            row["evidence"] = "SHIPPED AS Import-QA-Strategy-Designer"
+        with mutated_coverage(Path(tmp), case_variant_shipped_as) as rep:
+            assert any("import-qa-strategy-designer" in err
+                       and "not in covering_skills" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def markdown_wrapped_shipped_as(payload):
+            row = coverage_entry(payload, 234)
+            tick = chr(96)
+            row["evidence"] = ("shipped as **" + tick
+                               + "import-qa-strategy-designer" + tick + "**")
+        with mutated_coverage(Path(tmp), markdown_wrapped_shipped_as) as rep:
+            assert any("import-qa-strategy-designer" in err
+                       and "not in covering_skills" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def negated_shipped_as(payload):
+            row = coverage_entry(payload, 1)
+            row["evidence"] = (row["evidence"]
+                               + " not shipped as import-qa-strategy-designer.")
+        with mutated_coverage(Path(tmp), negated_shipped_as) as rep:
+            assert not any("D114 convention" in err for err in rep.errors), (
+                rep.errors)
+    with tempfile.TemporaryDirectory() as tmp:
+        def non_list_covering_skills(payload):
+            row = coverage_entry(payload, 233)
+            row["covering_skills"] = None
+        with mutated_coverage(Path(tmp), non_list_covering_skills) as rep:
+            assert any("covering_skills; cannot verify" in err
+                       for err in rep.errors), rep.errors
+    for bad_manifest in (None, set()):
+        try:
+            validator._coverage_shipped_claims(
+                "shipped as import-qa-strategy-designer", bad_manifest)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("empty/None manifest must fail closed")
+
+
 def test_coverage_map_totals_mismatch():
     """Totals: a JSON totals field that disagrees with the entries is rejected."""
     with tempfile.TemporaryDirectory() as tmp:

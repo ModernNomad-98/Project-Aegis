@@ -171,19 +171,23 @@ COVERAGE_AUDIT_ARTIFACTS = {
         "sha256": COVERAGE_AUDIT_CLASSIFICATION_SHA,
     },
 }
+# Provenance pins are the source-file SHAs at the 2026-10-24 full-map
+# refresh base 08b96ec3. A file cannot contain its own final hash, so the
+# validator/test edits in this refresh are pinned at their base snapshots;
+# these pins validate the JSON basis, not live source files.
 COVERAGE_SOURCE_FILES = {
     ".github/workflows/validate-skills.yml":
         "de38d87a65226d6afdce038793868a6e57281eb1911631f045e4edc4a8cced3a",
     "docs/300-repeatable-software-saas-skills-roadmap.md":
         "fe3e9d13877eb43d17032b25f4e35948699dbfe327f0dce6f6b204aa24c25ead",
     "docs/skills-catalog.md":
-        "d8d523d41d3bfb2bfefa857f7f11e6b1e773f2c1922f88bf352c250f2986b116",
+        "ed6c66f83fb2c9b4e71068e89984c7968b088ad70c91ae2330c66c843091793e",
     "scripts/tests/test_validator.py":
-        "5fc7319d1f9037dcd3b9d522eb974a27deddd1b098ad2a3ab9457b966060de7b",
+        "5d6e1730dc9be45911f6698c9cf592b75cd64ba82895d95c3aaa52e5877da610",
     "scripts/validate-skills.py":
-        "8dc42350b4bd4b3c1ae69ecb98b52183e1e17053e3779061764c12e86ac7c809",
+        "c82d6c45648349926b75138094c43addd891ee394d540c665f7eee3c93fdce23",
     "tools/skills-manifest.json":
-        "9497950a61202aa28284a0ae5d3683ce398805bffa56c54917b96b0f708f6832",
+        "d85084a42a9e85fcbe099692dc24dca7ab920671c7a0bad94c2d05ccdc9c02ae",
 }
 COVERAGE_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 COVERAGE_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
@@ -236,6 +240,33 @@ COVERAGE_ANOMALY_SKILLS = {
     299: frozenset({"ai-router-architect", "ai-cost-guardrail-designer"}),
 }
 COVERAGE_DROPPED_CANDIDATE = "ai-feature-kill-switch-designer"
+COVERAGE_SHIPPED_AS_RE = re.compile(
+    r"\bshipped\s+as\s*:?\s*([a-z0-9][a-z0-9-]{1,})\b", re.IGNORECASE)
+COVERAGE_SHIPPED_MARKDOWN_RE = re.compile("[" + chr(96) + "*_]+")
+COVERAGE_SHIPPED_NEGATION_RE = re.compile(r"\b(?:not|never)\s*$", re.IGNORECASE)
+
+
+def _coverage_shipped_claims(entry_text: str,
+                             manifest: "set[str] | None") -> "list[str]":
+    """Return known-manifest skills claimed by shipped-as evidence text.
+
+    Text-based evidence check (not semantic shipping proof). Strips Markdown
+    wrappers, normalizes tokens with casefold, skips negated phrases, and
+    fails closed when the manifest is unavailable/empty.
+    """
+    if not isinstance(manifest, set) or not manifest:
+        raise ValueError("manifest unavailable or empty")
+    known = {name.casefold() for name in manifest if isinstance(name, str)}
+    normalized = COVERAGE_SHIPPED_MARKDOWN_RE.sub("", entry_text)
+    claims = set()
+    for match in COVERAGE_SHIPPED_AS_RE.finditer(normalized):
+        prefix = normalized[max(0, match.start() - 16):match.start()]
+        if COVERAGE_SHIPPED_NEGATION_RE.search(prefix):
+            continue
+        token = match.group(1).casefold()
+        if token in known:
+            claims.add(token)
+    return sorted(claims)
 COVERAGE_REQUIRED_PHRASES = (
     "The 300-row roadmap is an OPTIONAL reference backlog, not a required "
     "target.",
@@ -2257,6 +2288,42 @@ def check_coverage_map(rep: Report) -> None:
                       + ": the dropped candidate '"
                       + COVERAGE_DROPPED_CANDIDATE + "' must never be a "
                       "covering skill (historical evidence note only)")
+    # D114 convention (text-based evidence check; disclosed limits): scan
+    # every shipped-as occurrence; normalize Markdown and casefold; only
+    # actual manifest skill names count as claims; negated phrases are not
+    # claims; a second shipped-as occurrence is checked too; malformed or
+    # unavailable manifest/covering data fails closed. This checks evidence
+    # text, not semantic shipping proof.
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        entry_text = " ".join(str(entry.get(key) or "")
+                              for key in ("evidence", "notes"))
+        try:
+            claimed = _coverage_shipped_claims(entry_text, manifest)
+        except ValueError:
+            rep.error("[" + ctx + "] manifest unavailable or empty; cannot "
+                      "enforce the D114 shipped-by-skill convention (fail closed)")
+            break
+        if not claimed:
+            continue
+        skills = entry.get("covering_skills")
+        if not isinstance(skills, list):
+            rep.error("[" + ctx + "] entry " + str(entry.get("id"))
+                      + " has unavailable/malformed covering_skills; cannot "
+                      "verify the D114 shipped-by-skill convention (fail closed)")
+            continue
+        skills_cf = {str(name).casefold() for name in skills}
+        for shipped_skill in claimed:
+            if entry.get("status") != "SHIPPED" \
+                    or entry.get("evidence_grade") != "explicit-id":
+                rep.error("[" + ctx + "] entry " + str(entry.get("id"))
+                          + " states a skill was shipped as " + shipped_skill
+                          + " and must be SHIPPED/explicit-id (D114 convention)")
+            elif shipped_skill not in skills_cf:
+                rep.error("[" + ctx + "] entry " + str(entry.get("id"))
+                          + " names shipped-as skill " + shipped_skill
+                          + " that is not in covering_skills")
     totals = payload.get("totals")
     if not isinstance(totals, dict):
         rep.error("[" + ctx + "] totals must be an object")
