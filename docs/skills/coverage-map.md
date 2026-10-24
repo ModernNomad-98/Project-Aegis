@@ -8,7 +8,7 @@ summary is hand-maintained with a validator cross-check.
 
 GAP rows are optional backlog candidates, not deficits or completion obligations.
 
-The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 250 shipped skills are beyond it.
+The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 251 shipped skills are beyond it.
 
 The map records status only. It is a maintained assertion, not ground
 truth, a completion target or a build authorization. Rows graded
@@ -32,17 +32,17 @@ Row-level evidence companion: [audit registers index](../audits/README.md) (read
 | --- | ---: |
 | Entries | 300 |
 | SHIPPED | 182 |
-| COVERED | 57 |
+| COVERED | 58 |
 | PARTIAL | 59 |
-| GAP | 2 |
+| GAP | 1 |
 | explicit-id | 182 |
-| catalog-decision | 16 |
+| catalog-decision | 17 |
 | capability-review | 100 |
-| none | 2 |
+| none | 1 |
 | P0 / P1 / P2 | 126 / 149 / 25 |
-| P0 / P1 / P2 gaps | 0 / 1 / 1 |
-| Manifest skills | 250 |
-| Distinct covering skills | 167 |
+| P0 / P1 / P2 gaps | 0 / 0 / 1 |
+| Manifest skills | 251 |
+| Distinct covering skills | 168 |
 | Beyond-roadmap shipped skills | 83 |
 | Review pending | 116 |
 
@@ -55,14 +55,14 @@ Row-level evidence companion: [audit registers index](../audits/README.md) (read
 | 03 Software as a service (SaaS) security and row-level security (RLS) | 40 | 28 | 8 | 4 | 0 |
 | 04 Backend, application programming interface (API), and data engineering | 30 | 9 | 12 | 9 | 0 |
 | 05 Frontend and user experience (UX) engineering | 20 | 11 | 5 | 4 | 0 |
-| 06 Quality assurance (QA), test architecture, and validation | 55 | 39 | 6 | 8 | 2 |
+| 06 Quality assurance (QA), test architecture, and validation | 55 | 39 | 7 | 8 | 1 |
 | 07 Development and operations (DevOps), release, and reliability engineering | 25 | 20 | 2 | 3 | 0 |
 | 08 Artificial intelligence (AI) era software development life cycle (SDLC) and agent operating discipline | 20 | 17 | 3 | 0 | 0 |
 | 09 Artificial intelligence (AI) software engineering and large language model (LLM) systems | 20 | 3 | 9 | 8 | 0 |
 
-## GAP candidates (all 2 ids)
+## GAP candidates (all 1 ids)
 
-- Area 06: 233, 234
+- Area 06: 234
 
 ## P0 gap candidates (all 0 ids)
 

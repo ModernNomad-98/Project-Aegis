@@ -3307,15 +3307,17 @@
     },
     {
       "area": "06",
-      "covering_skills": [],
-      "evidence": null,
-      "evidence_grade": "none",
+      "covering_skills": [
+        "import-qa-strategy-designer"
+      ],
+      "evidence": "Import QA Strategy closed by import-qa-strategy-designer under the 2026-10-23 owner decision; staged import QA strategy, dataset/edge coverage, partial-failure recovery, idempotency and tenant isolation are covered; design-only handoff to import-pipeline-architect.",
+      "evidence_grade": "catalog-decision",
       "id": 233,
       "name": "Import QA Strategy",
-      "notes": "audit-derived; planning-gate confirmation pending",
+      "notes": "owner decision 2026-10-23: path A authorized; GAP 233 closed",
       "priority": "P1",
-      "rationale": "No shipped skill materially covers this candidate capability (skills coverage audit 2026-10-20, final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213); optional backlog candidate.",
-      "status": "GAP"
+      "rationale": null,
+      "status": "COVERED"
     },
     {
       "area": "06",
@@ -4288,7 +4290,7 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 250 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 251 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization.",
   "totals": {
     "beyond_roadmap_skills": 83,
     "by_area": {
@@ -4304,9 +4306,9 @@
     },
     "by_grade": {
       "capability-review": 100,
-      "catalog-decision": 16,
+      "catalog-decision": 17,
       "explicit-id": 182,
-      "none": 2
+      "none": 1
     },
     "by_priority": {
       "P0": 126,
@@ -4314,19 +4316,19 @@
       "P2": 25
     },
     "by_status": {
-      "COVERED": 57,
-      "GAP": 2,
+      "COVERED": 58,
+      "GAP": 1,
       "PARTIAL": 59,
       "SHIPPED": 182
     },
-    "distinct_covering_skills": 167,
+    "distinct_covering_skills": 168,
     "entries": 300,
     "gap_by_priority": {
       "P0": 0,
-      "P1": 1,
+      "P1": 0,
       "P2": 1
     },
-    "manifest_skills": 250,
+    "manifest_skills": 251,
     "review_pending": 116
   }
 }
