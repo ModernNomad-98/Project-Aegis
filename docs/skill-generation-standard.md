@@ -113,7 +113,7 @@ This example does not create or authorize a shipped skill.
 | --- | --- | --- |
 | `name` | yes | Must exactly equal the containing directory name. This is the repo convention that keeps invocation, filesystem, and catalog in sync. Lowercase kebab-case (words joined by hyphens). |
 | `description` | yes | Specific and **trigger-oriented** — say *when* to use the skill and *what it does*, in terms a model can match against a user request. Under **1024 characters**, measured on the parsed value (see the Portability contract below). Avoid vague verbs ("helps with", "handles"). |
-| `disable-model-invocation` | conditional | Set to `true` for any skill that performs **side effects** (writes files outside scratch, calls networks, mutates external state, spends money, deploys). Such skills must be invoked explicitly by a human, never auto-triggered by the model — and their description must lead with the exact `MANUAL-ONLY; never auto-invoke. ` sentinel (see the Portability contract below). **Bounded documentary exception:** the governing definition is Exception 1 in §5 below. It permits authorized ordinary documentation create/append, immutable transcription of evidenced human approvals and lifecycle facts, and refresh of exactly six named project-state projection sections. Honor applicable existing authorization; obtain missing authority before writing. All excluded files and operations remain manual-only. **Second bounded exception (TALI, mirrors §5):** §5 also recognizes Task-Authorized Local Implementation — a separately classified, separately activated execution route whose mutations are confined to ordinary approved source/test files. It is behavior-based, names no skill as permanently eligible, and grants no existing shipped skill any authority merely by this policy's adoption; a side-effecting skill still needs `disable-model-invocation: true` unless a specific route is classified and activated under §5. |
+| `disable-model-invocation` | conditional | Set to `true` for any skill that performs **side effects** (writes files outside scratch, calls networks, mutates external state, spends money, deploys). Such skills must be invoked explicitly by a human, never auto-triggered by the model — and their description must lead with the exact `MANUAL-ONLY; never auto-invoke. ` sentinel (see the Portability contract below). **Bounded documentary exception:** the governing definition is Exception 1 in §5 below. It permits authorized ordinary documentation create/append, immutable transcription of evidenced human approvals and lifecycle facts, and refresh of exactly six named project-state projection sections. Honor applicable existing authorization; obtain missing authority before writing. All excluded files and operations remain manual-only. **Second bounded exception (TALI, mirrors §5):** §5 also recognizes Task-Authorized Local Implementation — a separately classified, separately activated execution route whose mutations are confined to ordinary approved source/test files. It is behavior-based, names no skill as permanently eligible, and grants no existing shipped skill any authority merely by this policy's adoption; a side-effecting skill still needs `disable-model-invocation: true` unless a specific route is classified and activated under §5. **Third bounded exception (Exception 3, mirrors §5):** a consuming repository's committed governance rule may make exactly playwright-e2e-engineer and flaky-test-detective mandatory agent-applied steps at a defined stage; only those two skills may then omit the field and the sentinel, and no other side-effecting skill is eligible. |
 | `license` | optional | License name or reference for the skill. |
 | `compatibility` | optional | Short note on the environments the skill targets. |
 | `metadata` | optional | A map of extra descriptive fields (for example owner or version). Claude Code reads only top-level keys, so nothing under it changes behavior. |
@@ -284,6 +284,7 @@ govern each operation.
 | Read and report only | Default rule above | Normal read-only skill path. |
 | Create or append approved non-executable documentation or project state | Exception 1 | Available only within the stated content, path and approval bounds. |
 | Edit ordinary source or tests through a classified, approved route | Exception 2 and its action table | Conditional policy only; no shipped route is activated here. |
+| Apply a governed mandatory-trigger test skill (owner decision 2026-10-24) | Exception 3 | Available only for playwright-e2e-engineer and flaky-test-detective, and only when the consuming repository's committed rule makes them mandatory agent-applied steps. |
 | Install, call a network, mutate external state, deploy or spend | Manual-only and owning policy | The exceptions here do not grant these actions. |
 
 ### EXCEPTION 1 — Approved documentation/state write (self-contained rule)
@@ -560,6 +561,24 @@ Legend (three states only):
     class -> reclassification per step 3 before any further execution.
 11. The acting agent produces the complete evidence closeout, which CITES the approval record.
 
+### EXCEPTION 3 — Governed mandatory-trigger test skills (owner decision 2026-10-24)
+
+A consuming repository may commit a governance rule that makes a named test skill a mandatory,
+agent-applied step at a defined stage (for example, E2E work must apply playwright-e2e-engineer
+and test-data-architect; an intermittent failure must apply flaky-test-detective before any fix).
+In that case, and only for the two skills named below, the skill may omit
+"disable-model-invocation: true" and the "MANUAL-ONLY; never auto-invoke. " sentinel, because the
+agent must be able to select and read the procedure the consuming rule requires.
+
+The two eligible skills are exactly playwright-e2e-engineer and flaky-test-detective. This
+exception is bounded to them and to that condition. It does not make any other side-effecting skill
+model-invocable, does not authorize an agent to write outside the approved test paths, and does not
+transfer the consuming repository's approvals. Each skill's Stop Conditions and the consuming
+repository's authority rules still govern every write, Git action, network call, database operation
+or live run. If the consuming rule does not exist or is removed, the skill returns to the ordinary
+side-effect rule. Re-adding the flag or sentinel to either skill is a new owner decision under the
+consuming rule, not a local skill edit.
+
 ---
 
 ## 6. Evaluations
@@ -607,6 +626,6 @@ when to build which.
 - [ ] `SKILL.md` < 500 lines; detail pushed to `references/`.
 - [ ] All nine required sections present and in order.
 - [ ] `evals/evals.json` present and well-formed; `trigger-evals.json` if trigger overlaps.
-- [ ] No `hooks`, `allowed-tools` or `shell` frontmatter and no `!` shell injection; `disable-model-invocation: true` if it has side effects (the §5 rule — its two bounded exceptions are the approved documentation/state write, which stays auto-invocable, and TALI, a separately classified and separately activated execution route that grants no shipped skill authority by default).
+- [ ] No `hooks`, `allowed-tools` or `shell` frontmatter and no `!` shell injection; `disable-model-invocation: true` if it has side effects (the §5 rule — its **three** bounded exceptions are the approved documentation/state write, which stays auto-invocable; TALI, a separately classified and separately activated execution route that grants no shipped skill authority by default; and Exception 3, which permits exactly playwright-e2e-engineer and flaky-test-detective to be agent-applied when a consuming repository's committed rule makes them mandatory).
 - [ ] Listed in [`docs/skills-catalog.md`](skills-catalog.md) and `README.md`.
 - [ ] `scripts/validate-skills.py` passes.

@@ -565,13 +565,14 @@ tester; screenshot evidence carries naming/masking/metadata/storage rules; Playw
 uses resilient locators and web-first assertions with no arbitrary sleeps; Vite skills
 prove `VITE_` secret non-exposure at the `dist/` level; Vitest skills choose the
 environment intentionally; flake work classifies, reproduces, fixes one cause, and
-proves stability. Five skills have side effects and are **manual-only**
-(`disable-model-invocation: true`): `playwright-e2e-engineer` (writes specs, drives a
-browser), `clickthrough-test-engineer` (drives a live app), `vitest-unit-component-engineer`
-(writes test files, runs suites), `vite-build-qa-engineer` (runs builds/preview),
-and `flaky-test-detective` (applies a test-layer fix and verifies stability).
-D68 added a sixth manual-only skill, `test-tenant-provisioner` (writes marked
-test accounts to a named non-production environment).
+proves stability. Six skills in this pack have side effects. Four are **manual-only**
+(`disable-model-invocation: true`): `clickthrough-test-engineer` (drives a live app),
+`vitest-unit-component-engineer` (writes test files, runs suites), `vite-build-qa-engineer`
+(runs builds/preview), and `test-tenant-provisioner` (writes marked test accounts to a named
+non-production environment; D68 added this fourth manual-only skill). `playwright-e2e-engineer`
+(writes specs, drives a browser) and `flaky-test-detective` (applies a test-layer fix and
+verifies stability) are **agent-applied by owner decision (2026-10-24)**: model-invocable,
+selected when their trigger fires, and still bound by their Stop Conditions.
 
 **Pulled forward from the QA backlog** (in addition to the 13 canonical Phase 5 skills):
 `integration-test-designer` (roadmap #184), `api-contract-test-designer` (roadmap #185),
@@ -607,13 +608,13 @@ auto-invocable, no `disable-model-invocation` — and each ships both eval files
 | `test-plan-designer` | cat 06 #181/#192 | yes | Per-change test plan: risk-traced items with layer/data/environment, objective entry/exit criteria, named artifacts + CI placement, engineer-skill handoffs, explicit out-of-scope list. |
 | `test-coverage-mapper` | cat 06 #191/#192 + **#195 (D78)** | yes | Surface-inventory-first coverage audit; maps by reading assertions (theater ≠ coverage); risk-ranked gap list with cheapest fill layer; honest covered/theater/uncovered/not-inspected statement; reads mutation reports (survived/killed/equivalent) as gap evidence. |
 | `qa-automation-architect` | cat 06 #200/#211/#212 + **#213 (D78)** | yes | Automation blueprint: tools per layer with rationale, structure/fixtures/auth-state, parallel-safe isolation, artifacts, CI tiers with bounded logged retries, per-layer timeout policy, flake policy, small-step migration. |
-| `playwright-e2e-engineer` | cat 06 #187/#189 | **no** (manual-only; writes specs, drives browser) | Critical-journey Playwright specs: role/label locators (testid = flagged semantics gap), web-first assertions, zero sleeps/networkidle, storageState per persona, failure traces, honest run reports incl. pass-on-retry. |
+| `playwright-e2e-engineer` | cat 06 #187/#189 | yes | Critical-journey Playwright specs: role/label locators (testid = flagged semantics gap), web-first assertions, zero sleeps/networkidle, storageState per persona, failure traces, honest run reports incl. pass-on-retry. |
 | `clickthrough-test-engineer` | cat 06 #222 | **no** (manual-only; drives a live app) | Pre-planned route-by-route interactive walkthrough (forms w/ invalid input, dialogs, permissions, states, console), severity-rated defects with masked evidence, honest executed/skipped coverage. |
 | `manual-test-case-creator` | cat 06 #221 | yes | Stranger-executable manual cases: exact data/roles/environment, one observable expected result per step, screenshot checkpoints, pass/fail/blocked verdict rules, cleanup, requirement traces. |
 | `screenshot-evidence-planner` | cat 06 #223 | yes | Evidence policy: risk-justified checkpoints, deterministic naming, mandatory pre-storage block-out masking, metadata (build/env/persona/viewport), storage/retention classes, case/PR/closeout linkage. |
 | `vitest-unit-component-engineer` | cat 06 #183 + cat 05 #180 | **no** (manual-only; writes test files, runs suites) | Vitest unit/component tests: intentional node-vs-DOM environment per file, owned-seam mocks only, Testing Library user-facing queries, determinism, real run output, regression spot-check. |
 | `vite-build-qa-engineer` | cat 05 #178 + cat 06 #217 | **no** (manual-only; runs builds/preview) | Build-artifact QA: `VITE_` env classification, dist-level secret value+pattern proof, build/preview parity (base, deep links, modes), bundle budgets + sourcemap policy; exposures → `secrets-identity-hardener`. |
-| `flaky-test-detective` | cat 06 #209/#210 | **no** (manual-only; executes state-changing operations) | Classify → reproduce with counts → fix ONE cause → prove stability with repeated runs; no retries/sleeps/weakened assertions; product races routed as product bugs; quarantine with owner/ticket/expiry. |
+| `flaky-test-detective` | cat 06 #209/#210 | yes | Classify → reproduce with counts → fix ONE cause → prove stability with repeated runs; no retries/sleeps/weakened assertions; product races routed as product bugs; quarantine with owner/ticket/expiry. |
 | `test-data-architect` | cat 06 #196–#199 | yes | Persona/baseline catalog (read-only), per-layer data sources, determinism, worker-scoped parallel isolation, synthetic-only PII posture, structural cleanup + traceability, schema-coupled seed evolution. |
 | `regression-suite-curator` | cat 06 #190/#210 | yes | Evidence-based promote/retain/demote/retire with written rationale (never silent deletion), protected security regressions (human-approval to retire), enforced quarantine registry, tier-budget fit. |
 | `integration-test-designer` | cat 06 **#184 (pulled forward)** | yes | The layer BETWEEN unit and E2E: real service/command/DB/auth/permission boundaries, named faked seams with rationale, real-path auth minting, persisted-state assertions, no browser; security matrices deferred to `multi-tenant-security-tester`. |

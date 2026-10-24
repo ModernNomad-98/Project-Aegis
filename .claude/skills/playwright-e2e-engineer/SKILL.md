@@ -1,14 +1,13 @@
 ---
 name: playwright-e2e-engineer
-description: MANUAL-ONLY; never auto-invoke. Implement and run Playwright E2E tests for CRITICAL user journeys — resilient user-facing locators (getByRole/getByLabel, testid last), web-first auto-retrying assertions, zero arbitrary sleeps or networkidle waits, project-level auth-state setup, deterministic test data, and trace/screenshot artifacts on failure wired for CI. Each journey names why a cheaper layer was insufficient; E2E stays a small, stable suite, not a UI-tree crawler. Use when asked to write, fix, or harden Playwright tests, automate a login/signup/checkout-style journey in a real browser, or set up Playwright config/fixtures/auth state. WRITES spec files and DRIVES a browser — manual invocation only. Do NOT use for real-boundary tests without a browser (integration-test-designer), isolated component tests (vitest-unit-component-engineer), one-off interactive walkthroughs (clickthrough-test-engineer), or a11y-specific harnesses (accessibility-test-harness).
-disable-model-invocation: true
+description: Implement and run Playwright E2E tests for CRITICAL user journeys — resilient user-facing locators (getByRole/getByLabel, testid last), web-first auto-retrying assertions, zero arbitrary sleeps or networkidle waits, project-level auth-state setup, deterministic test data, and trace/screenshot artifacts on failure wired for CI. Each journey names why a cheaper layer was insufficient; E2E stays a small, stable suite, not a UI-tree crawler. Use when asked to write, fix, or harden Playwright tests, automate a login/signup/checkout-style journey in a real browser, or set up Playwright config/fixtures/auth state. WRITES spec files and DRIVES a browser. Do NOT use for real-boundary tests without a browser (integration-test-designer), isolated component tests (vitest-unit-component-engineer), one-off interactive walkthroughs (clickthrough-test-engineer), or a11y-specific harnesses (accessibility-test-harness).
 ---
 
 # Playwright E2E Engineer
 
 **Reading key:** E2E means end-to-end; UI means user interface; API means
 application programming interface; CI means continuous integration; PR means
-pull request; CSS means Cascading Style Sheets. This manual-only skill writes
+pull request; CSS means Cascading Style Sheets. This skill writes
 spec files and drives a browser.
 
 ## Purpose
@@ -38,7 +37,7 @@ failure artifacts wiring, and the real run output.
   `accessibility-test-harness` (it may inject axe into E2E, but owns that
   design).
 - Do NOT use when: diagnosing why an existing test flakes —
-  `flaky-test-detective` *(manual-only)* first; this skill implements the proven fix.
+  `flaky-test-detective` first; this skill implements the proven fix.
 
 ## Inputs to Inspect
 
@@ -69,7 +68,7 @@ failure artifacts wiring, and the real run output.
    runtime and CI pricing where available; mark unknown money/setup/upkeep.
    Recommend critical paths within the PR budget and the remainder nightly,
    explain which named risks justify E2E, then ask one scope/budget question.
-   A scope answer does not expand this manual-only invocation or authorize
+   A scope answer does not expand this skill's scope or authorize
    new product test hooks.
 2. **Set up auth state once per persona:** project-dependency setup that logs
    in via the UI or API and saves `storageState`; tests reuse state, never
@@ -91,7 +90,7 @@ failure artifacts wiring, and the real run output.
    release evidence).
 7. **Run the suite and report honestly:** exact command, per-spec results,
    runtime, retry count (a pass-on-retry is reported as such and routed to
-   `flaky-test-detective` *(manual-only)*, not celebrated).
+   `flaky-test-detective`, not celebrated).
 8. **Place in CI** per the automation blueprint: required critical-journey
    smoke runs on the pull request before merge when it is a deployment gate.
    On auto-deploy-on-merge platforms, post-merge smoke is verification of

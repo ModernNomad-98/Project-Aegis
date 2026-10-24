@@ -1221,13 +1221,13 @@ production-safe smoke delivery #188):
 | `test-plan-designer` | Per-change test plan: risk-traced items with layer/data/environment, objective entry/exit criteria, named artifacts and CI placement, explicit out-of-scope list. | auto + manual |
 | `test-coverage-mapper` | Coverage audit: surface inventory first, maps tests by reading assertions (theater ≠ coverage), risk-ranked gaps with cheapest fill layer, honest not-inspected list; reads mutation reports as gap evidence. | auto + manual |
 | `qa-automation-architect` | Automation blueprint: tools per layer with rationale, structure/fixtures/auth-state, parallel-safe isolation, CI tiers with bounded logged retries, per-layer timeout policy, flake policy, migration steps. | auto + manual |
-| `playwright-e2e-engineer` | Critical-journey Playwright specs: role/label locators, web-first assertions, zero sleeps/networkidle, storageState per persona, failure traces, honest run reports. | **manual only** |
+| `playwright-e2e-engineer` | Critical-journey Playwright specs: role/label locators, web-first assertions, zero sleeps/networkidle, storageState per persona, failure traces, honest run reports. | auto + manual |
 | `clickthrough-test-engineer` | Pre-planned interactive walkthrough of a running app (forms with invalid input, dialogs, permissions, states, console), severity-rated defects with masked evidence, honest coverage. | **manual only** |
 | `manual-test-case-creator` | Stranger-executable manual cases: exact data/roles/environment, one observable expected result per step, screenshot checkpoints, verdict rules, cleanup. | auto + manual |
 | `screenshot-evidence-planner` | Evidence policy: risk-justified checkpoints, deterministic naming, mandatory pre-storage masking, metadata, storage/retention classes, case/PR/closeout linkage. | auto + manual |
 | `vitest-unit-component-engineer` | Vitest unit/component tests: intentional node-vs-DOM environment per file, owned-seam mocks, Testing Library queries, determinism, real run output. | **manual only** |
 | `vite-build-qa-engineer` | Build-artifact QA: `VITE_` env classification, dist-level secret proof, build/preview parity (base, deep links, modes), bundle budgets, sourcemap policy. | **manual only** |
-| `flaky-test-detective` | Classify → reproduce with counts → fix ONE cause → prove stability; no retries/sleeps/weakened assertions; product races routed as product bugs; quarantine with owner/ticket/expiry. | manual only |
+| `flaky-test-detective` | Classify → reproduce with counts → fix ONE cause → prove stability; no retries/sleeps/weakened assertions; product races routed as product bugs; quarantine with owner/ticket/expiry. | auto + manual |
 | `test-data-architect` | Test-data design: read-only persona/baseline catalog, per-layer sources, determinism, worker-scoped isolation, synthetic-only PII posture, cleanup + seed evolution. | auto + manual |
 | `regression-suite-curator` | Evidence-based promote/retain/demote/retire with written rationale, protected security regressions, enforced quarantine registry, tier-budget fit. | auto + manual |
 | `integration-test-designer` | (pulled forward, #184) The layer between unit and E2E: real service/command/DB/auth/permission boundaries, named faked seams, persisted-state assertions, no browser. | auto + manual |
@@ -1652,10 +1652,12 @@ choices, but nothing is saved until a person invokes `aegis-setup` by name:
 7. Run the validator until it passes.
 
 Side-effecting skills (writes, network, deploy, spend) MUST set `disable-model-invocation: true`
-and document the irreversible step under **Stop Conditions** (the standard's §5 rule — its
-approved documentation/state exception and separate, explicitly activated Task-Authorized
-Local Implementation (TALI) exception
-are defined in the [current standard](docs/skill-generation-standard.md)).
+and document the irreversible step under **Stop Conditions** — except under the standard's
+**three** bounded exceptions: the approved documentation/state write, the separately classified
+and activated TALI route, and **Exception 3** for the two owner-named mandatory-trigger test
+skills (playwright-e2e-engineer, flaky-test-detective) when a consuming repository's committed
+rule makes them agent-applied. All three are defined in the
+[current standard](docs/skill-generation-standard.md); no other skill is eligible **for Exception 3**.
 
 ## Validation
 

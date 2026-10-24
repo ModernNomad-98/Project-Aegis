@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "playwright-e2e-engineer",
-  "description": "Trigger and behavior cases for Playwright E2E implementation: critical journeys only, resilient locators, web-first assertions, no sleeps, auth-state reuse, honest run reporting. Manual-only (writes specs, drives a browser).",
+  "description": "Trigger and behavior cases for Playwright E2E implementation: critical journeys only, resilient locators, web-first assertions, no sleeps, auth-state reuse, honest run reporting. Writes specs and drives a browser.",
   "cases": [
     {
       "id": "positive-critical-journey",
@@ -40,7 +40,7 @@
           "Explains a critical-journey smoke tier (few full-browser paths on each pull request) and a broader nightly tier (more paths off the pull-request gate) in plain language, and requires each journey to name the risk that makes E2E necessary.",
           "Compares the options with each one's reason and pros and cons: the smoke tier gives fast deployment evidence but misses lower-priority paths, while nightly adds coverage at the cost of runner minutes, fixture upkeep, and later feedback; uses the 25-minute estimate against the 10-minute budget and marks runner-minute cost and other unknown money, setup, or upkeep as unknown.",
           "Recommends a smoke tier of the highest-risk journeys that fits the 10-minute pull-request budget with the remainder nightly, and requires each smoke journey to name the risk that justifies E2E, and does not invent journey risks the inputs do not state.",
-          "Asks exactly one scope/budget question before writing specs; states that the answer does not expand this manual-only invocation or authorize new product test hooks, and routes breadth coverage to clickthrough-test-engineer or component layers rather than growing the suite."
+          "Asks exactly one scope/budget question before writing specs; states that the answer does not expand this skill's scope or authorize new product test hooks, and routes breadth coverage to clickthrough-test-engineer or component layers rather than growing the suite."
         ]
       }
     },
@@ -68,15 +68,15 @@
       }
     },
     {
-      "id": "unnamed-browser-journey-stays-silent",
-      "type": "should_not_trigger",
+      "id": "auto-selects-unnamed-browser-journey",
+      "type": "should_trigger",
       "prompt": "Automate the signup-to-first-project journey in a real browser.",
       "expect": {
-        "triggers": false,
+        "triggers": true,
         "assertions": [
-          "playwright-e2e-engineer does not activate: it is MANUAL-ONLY and the prompt neither names nor explicitly invokes it, so the reply does not announce or run its browser end-to-end spec authoring workflow as an invoked skill.",
-          "vitest-unit-component-engineer (also MANUAL-ONLY) does not activate either.",
-          "May help in ordinary conversation; if it recommends a skill for explicit invocation, it names playwright-e2e-engineer, not vitest-unit-component-engineer, because a full-stack browser journey is end-to-end work that a simulated DOM cannot fake."
+          "Activates on the unnamed browser journey: the agent reads `SKILL.md` and starts the E2E workflow (journey list → locators → web-first assertions → auth state → run/report) rather than asking the user to invoke the skill by name.",
+          "vitest-unit-component-engineer remains manual-only and does not activate — a simulated DOM cannot fake a full-stack browser journey.",
+          "Selection grants no extra authority: the agent confirms test-file writes and browser execution fit existing grants and does not authorize new product test hooks."
         ]
       }
     }

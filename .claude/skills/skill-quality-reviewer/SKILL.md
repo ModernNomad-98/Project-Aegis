@@ -108,9 +108,17 @@ skill.
    definition: authorized ordinary create/append, immutable human-decision
    transcription, or exactly six named projection refreshes. Preserve existing
    grants without repeat consent; excluded files/actions remain manual-only.
+   **Exception 3 (owner decision 2026-10-24):** the two named mandatory-trigger
+   test skills — playwright-e2e-engineer and flaky-test-detective — may omit
+   the field and the sentinel when a consuming repository's committed
+   governance rule makes them mandatory, agent-applied steps; no other
+   side-effecting skill is eligible. Report a missing flag on either skill as
+   an intentional posture only when that consuming rule is cited; otherwise it
+   remains a FAIL.
    Task-Authorized Local Implementation (TALI) adoption alone never
    activates an execution route.
-   Manual-only skills must name the irreversible step in Stop Conditions.
+   Manual-only skills must name the irreversible step in Stop Conditions (an
+   Exception 3 skill that loses its consuming rule returns to this rule).
 9. **Deliver the verdict.** Per check PASS / CONCERN / FAIL, each citing
    evidence (quoted description phrases, the named colliding skill, the
    hollow eval case id), then ONE overall recommendation: ship | revise |
