@@ -29,7 +29,7 @@ binding ones.
 | C | IMPLEMENT | [The chain rule](#the-seven-stages) — stage entry. | The changed files; local check output; [the handoff block](#stage-handoff) — **owed by every stage, not by C alone**; a rule-preservation inventory when the change edits governance text. | SD-C | The implementing agent. |
 | D | INDEPENDENT IMPLEMENTATION AUDIT | [The chain rule](#the-seven-stages) — stage entry. | A posted audit naming that head, checking the plan's acceptance criteria one by one. | SD-D | A different agent from the implementer. |
 | E | VALIDATE | [The chain rule](#the-seven-stages) — stage entry. | The repository's own checks at that head, with their commands and output; every check that could not be run named **UNRUN**. | SD-E | The validating agent. |
-| F | FINAL INDEPENDENT PR CODE REVIEW | [The chain rule](#the-seven-stages) — stage entry. | A posted verdict naming that 40-character head, which also checks the PR's "Aegis skills used" table against the work. | SD-F | A different agent from the author and from the merger. |
+| F | FINAL INDEPENDENT PR CODE REVIEW | [The chain rule](#the-seven-stages) — stage entry. | A posted PR issue comment carrying the verdict, naming that 40-character head and the bound-fields hash, which also checks the PR's "Aegis skills used" table against the work; a local file is not a posted verdict. | SD-F | A different agent from the author and from the merger. |
 | G | MERGE | [The chain rule](#the-seven-stages) — stage entry — **and `MG1`–`MG5`**, in [the normative list](#before-merging-stage-g-entry-conditions). **No merge-gate condition is restated in this cell.** | A merge receipt carrying the `MG`-keyed evidence in [the receipt list](#the-receipt-what-stage-g-must-be-able-to-show). | SD-G | A separate agent holding applicable authority. |
 
 **The exit column is split, and the split is the point.** A stage's **exit
@@ -186,7 +186,7 @@ column of the stage table. The maintenance rule is
 | `SD-C` | IMPLEMENT | **COMPLETE** or **INCOMPLETE**. **COMPLETE requires an immutable head: the commit SHA, the tree it resolves to (`git rev-parse <head>^{tree}`), and the base commit the change is against, all recorded** — so the next stage audits fixed objects rather than a moving branch, and "the diff at an exact head" is fully determined. The **tree** fixes content; the **base** fixes the diff. | COMPLETE |
 | `SD-D` | IMPL AUDIT | **ACCEPT** or **REVISE**, resolved **per acceptance criterion**: every criterion is `MET`, `NOT MET` or `UNRUN`. ACCEPT requires **no `NOT MET`**, and **every `UNRUN` must correspond to a criterion the plan at `SD-A` declared not verifiable at this head, with its reason recorded**. A criterion that becomes `UNRUN` at audit time and was **not** so declared forces **`REVISE`** — it is a finding about the implementation or the plan, not a gap to wave through. | ACCEPT |
 | `SD-E` | VALIDATE | **PASS**, **INCOMPLETE — UNRUN LISTED**, or **FAIL**. | PASS, and INCOMPLETE — UNRUN LISTED **only when its condition below is met** |
-| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran, each applicable row checked against its captured self-authored source under [the skills-row protocol](#authoring-and-publishing-skills-rows)**; **and the `## Reconciliation witness` block is present with one row per numbered site**; **and the verdict names a content hash over [the bound fields](#the-bound-fields), which void the verdict if they change.** **and the owner rule's "Aegis skills applied" section is present and complete** ([pointer](../AGENTS.md)). | ACCEPT |
+| `SD-F` | FINAL REVIEW | **ACCEPT** or **REVISE**, on the exact 40-character head; **and the PR template's *Security-relevant surface?* question is answered** — `No`, or `Yes` with the surfaces named; **and the PR's "Aegis skills used" table is present, with a row for every stage that ran, each applicable row checked against its captured self-authored source under [the skills-row protocol](#authoring-and-publishing-skills-rows)**; **and the `## Reconciliation witness` block is present with one row per numbered site**; **and the verdict names a content hash over [the bound fields](#the-bound-fields), which void the verdict if they change.** **and the owner rule's "Aegis skills applied" section is present and complete** ([pointer](../AGENTS.md)); **and the verdict is posted as a PR issue comment naming the exact 40-character head and the bound-fields hash** — a local F-AUDIT.md file is not a verdict and cannot satisfy SD-F or MG2. | ACCEPT |
 | `SD-G` | MERGE | **MERGED** or **NOT MERGED**, with [the receipt](#the-receipt-what-stage-g-must-be-able-to-show) recording a status per `MG` ID. | MERGED |
 
 > **`SD-E: INCOMPLETE — UNRUN LISTED`** is affirmative when every unrun
@@ -275,6 +275,7 @@ conditions — a receipt is a record, not a gate.
 | [`MG4`](#before-merging-stage-g-entry-conditions) | `present` / `absent` / `not applicable` |
 | [`MG5`](#before-merging-stage-g-entry-conditions) | `present` / `absent` / `not applicable` |
 | `SD-F` template answer | `answered` |
+| `SD-F` verdict comment ID | posted + comment ID; names the exact 40-character head and bound-fields hash |
 
 **The receipt carries IDs, statuses and pointers only** — the linked ID *is* the
 pointer, and no cell restates what a condition requires.
@@ -284,7 +285,7 @@ so, and the receipt records which clause by linking to the condition — it does
 restate the clause.** That is what makes the vocabulary truthful for every case,
 including the one that used to have no true option: a contribution that **owes no
 review under `MG5`'s own scope clause** takes `MG5: not applicable` on that
-clause's authority. **No fourth option was added to make that true.**
+clause's authority. **No fourth option was added to make that true.** No receipt may describe a Stage F result that is not present as a posted PR issue comment, and recording a verdict in the receipt after the fact does not satisfy the gate.
 
 **The general rule this receipt obeys, and which any future derived list must
 obey:**
@@ -359,8 +360,7 @@ a measurement with its command, kept where a measurement belongs.
   all-green absolutely would make that live grant unusable — standing policy
   overridden in the wrong direction, the same defect class as omitting a
   condition.
-- **`MG2` — final review.** The final PR review is **posted and accepted**, and
-  names that exact head.
+- **`MG2` — final review.** The final PR review is **posted as a PR issue comment and accepted**, and the posted comment names that exact head and the bound-fields hash. A local or unposted F-AUDIT.md file is not a posted review; a receipt written after the fact is not a gate and does not satisfy MG2.
 - **`MG3` — automated review.** The automated review has posted **a result for
   that exact head**, or is confirmed unavailable **for that exact head** (a
   usage-limit notice, for example); **and** every finding it raised at **P2 or
@@ -585,8 +585,7 @@ below is explicit about which parts of this page a machine actually holds.
 
 ## The merge prohibition
 
-**Do not merge before the final PR review is posted, accepted, and verified
-against the exact candidate head.**
+**Do not merge before the final PR review is posted as a PR issue comment, accepted, and verified against the exact candidate head; the posted verdict names the exact 40-character head and the bound-fields hash, and a local F-AUDIT.md file is not a verdict.**
 
 The conditions are **`MG1`–`MG5`**, stated in full once, in
 [Before merging: Stage G entry conditions](#before-merging-stage-g-entry-conditions).
@@ -826,7 +825,7 @@ says so.
 | [**the skill-selection duty**](#the-enforcing-skill-for-each-stage) — skill scope | **Nothing.** No check reads which skill an agent consulted, and nothing detects that a stage ran with no owning skill. |
 | That a plan was audited by a *different* agent before implementation | **Nothing.** Agent identity is not separable on GitHub — every agent posts as the same account. |
 | [**`MG1`**](#before-merging-stage-g-entry-conditions) — checks | **Nothing.** No check aggregates a head's results, and none validates a cited exception. |
-| [**`MG2`**](#before-merging-stage-g-entry-conditions) — final review | **Nothing.** Review records are issue comments, not review objects. |
+| [**`MG2`**](#before-merging-stage-g-entry-conditions) — final review | **Nothing.** Review records are posted PR issue comments, not review objects or local files; a local F-AUDIT.md is not a posted verdict. |
 | [**`MG3`**](#before-merging-stage-g-entry-conditions) — automated review | **Nothing.** No check reads the review or its findings. |
 | [**`MG4`**](#before-merging-stage-g-entry-conditions) — authority | **Nothing.** No check reads the register or the merge agent's brief. |
 | [**`MG5`**](#before-merging-stage-g-entry-conditions) — security review | **Nothing.** No check reads a conditional review, or knows that one was owed. |

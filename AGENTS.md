@@ -67,8 +67,11 @@ PLAN → INDEPENDENT PLAN AUDIT → IMPLEMENT → INDEPENDENT IMPLEMENTATION AUD
 → VALIDATE → FINAL INDEPENDENT PR CODE REVIEW → MERGE; the canonical rule, and
 the evidence each stage must leave behind, is
 [docs/delivery-workflow.md](docs/delivery-workflow.md). **Do not merge before
-the final PR review is posted, accepted, and verified against the exact
-candidate head.** A further security review is inserted where
+the final PR review is posted as a PR issue comment, accepted, and verified
+against the exact candidate head; the posted verdict names the exact
+40-character head and the bound-fields hash, and a local F-AUDIT.md file is
+not a verdict.** The final-merge receipt records the posted SD-F verdict
+comment ID. A further security review is inserted where
 **CONTRIBUTING.md's security-relevant-surface list (wider than `gate-guard`)**
 requires one — which is required for OUTSIDE contributions only and is not
 extended to the maintainer's or other agents' own PRs.
