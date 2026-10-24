@@ -2153,7 +2153,15 @@ def test_coverage_map_evidence_rules():
 
 
     # D114 shipped-by-skill convention: current map positive + synthetic
-    # negative. Direct asserts keep the 68 defs / 253 self-test line count.
+    # negatives, plus RESIDUAL fail-closed hardening (unknown tokens,
+    # quoted/link-wrapped/multi-skill forms, word-boundary/negation edges,
+    # malformed manifest sets). Direct asserts keep the 68 defs / 253
+    # self-test line count; no PASS line is added.
+    manifest = validator._coverage_manifest_names()
+    manifest_payload = json.loads(
+        (validator.REPO_ROOT / "tools/skills-manifest.json").read_text(
+            encoding="utf-8"))
+    assert manifest == {entry["name"] for entry in manifest_payload["skills"]}
     payload = load_coverage()
     for row_id in (233, 234):
         row = coverage_entry(payload, row_id)
@@ -2175,13 +2183,44 @@ def test_coverage_map_evidence_rules():
         with mutated_coverage(Path(tmp), shipped_skill_not_covering) as rep:
             assert any("not in covering_skills" in err for err in rep.errors), (
                 rep.errors)
+    # FP-6 (REV-3): the generic-term allowlist was dead code (token candidates
+    # require a hyphen/underscore) and is removed; plain English words end the
+    # token list and are never claims. The M-3 prose fixture below still must
+    # produce no D114/unknown error on a COVERED row.
     with tempfile.TemporaryDirectory() as tmp:
         def historical_bundle_phrase(payload):
-            row = coverage_entry(payload, 1)
+            row = coverage_entry(payload, 2)
             row["evidence"] = (row["evidence"]
                                + " Shipped as part of a historical bundle.")
         with mutated_coverage(Path(tmp), historical_bundle_phrase) as rep:
-            assert not any("shipped as" in err for err in rep.errors), rep.errors
+            assert not any(("shipped as" in err.lower())
+                           or ("shipped-as" in err.lower())
+                           or ("unknown shipped-as token" in err)
+                           or ("D114" in err) for err in rep.errors), rep.errors
+    assert validator._coverage_shipped_scan(
+        "shipped as part of a historical bundle", manifest) == {
+            "claims": [], "unknown": []}
+    # M-3 (strengthened): a negated claim on row 1 must produce no D114 error
+    # of any kind; if negation handling regressed the known token would be
+    # claimed and the row-1 membership error would contain 'shipped-as'.
+    with tempfile.TemporaryDirectory() as tmp:
+        def negated_shipped_as(payload):
+            row = coverage_entry(payload, 1)
+            row["evidence"] = (row["evidence"]
+                               + " not shipped as import-qa-strategy-designer.")
+        with mutated_coverage(Path(tmp), negated_shipped_as) as rep:
+            assert not any(("shipped as" in err.lower())
+                           or ("shipped-as" in err.lower())
+                           or ("D114" in err) for err in rep.errors), rep.errors
+    # M-3 positive control: a non-negated claim on the same non-SHIPPED row
+    # must fire the D114 convention error (proves the fixture row is armed).
+    with tempfile.TemporaryDirectory() as tmp:
+        def positive_control_row2(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = (row["evidence"]
+                               + " shipped as import-qa-strategy-designer.")
+        with mutated_coverage(Path(tmp), positive_control_row2) as rep:
+            assert any("D114 convention" in err for err in rep.errors), rep.errors
     with tempfile.TemporaryDirectory() as tmp:
         def second_shipped_as_match(payload):
             row = coverage_entry(payload, 233)
@@ -2209,14 +2248,218 @@ def test_coverage_map_evidence_rules():
             assert any("import-qa-strategy-designer" in err
                        and "not in covering_skills" in err
                        for err in rep.errors), rep.errors
+    # RESIDUAL (7): quoted / link-wrapped / parenthesized / underscore-wrapped
+    # forms are detected end-to-end on a row whose covering set differs.
+    for wrapped in (
+            'shipped as "import-qa-strategy-designer"',
+            "shipped as 'import-qa-strategy-designer'",
+            "shipped as (import-qa-strategy-designer)",
+            "shipped as [import-qa-strategy-designer](https://example.invalid/x)",
+            "shipped as _import-qa-strategy-designer_",
+            "shipped as " + chr(0x201C) + "import-qa-strategy-designer"
+            + chr(0x201D),
+            "shipped as " + chr(0x2018) + "import-qa-strategy-designer"
+            + chr(0x2019)):
+        with tempfile.TemporaryDirectory() as tmp:
+            def wrapped_shipped_as(payload, text=wrapped):
+                row = coverage_entry(payload, 234)
+                row["evidence"] = text
+            with mutated_coverage(Path(tmp), wrapped_shipped_as) as rep:
+                assert any("import-qa-strategy-designer" in err
+                           and "not in covering_skills" in err
+                           for err in rep.errors), (wrapped, rep.errors)
+    # D-F2 (REV-3): serial commas and mixed connectors classify every token.
+    for serial in (
+            "shipped as adr-writer, domain-modeler, and import-qa-strategy-designer",
+            "shipped as adr-writer, domain-modeler and import-qa-strategy-designer",
+            "shipped as adr-writer, and domain-modeler",
+            "shipped as adr-writer & domain-modeler",
+            "shipped as adr-writer / domain-modeler",
+            "shipped as adr-writer or domain-modeler"):
+        expected = ["adr-writer", "domain-modeler"]
+        if "import-qa-strategy-designer" in serial:
+            expected = ["adr-writer", "domain-modeler",
+                        "import-qa-strategy-designer"]
+        assert validator._coverage_shipped_scan(serial, manifest)["claims"] == (
+            sorted(expected)), (serial,
+                                validator._coverage_shipped_scan(serial, manifest))
     with tempfile.TemporaryDirectory() as tmp:
-        def negated_shipped_as(payload):
-            row = coverage_entry(payload, 1)
-            row["evidence"] = (row["evidence"]
-                               + " not shipped as import-qa-strategy-designer.")
-        with mutated_coverage(Path(tmp), negated_shipped_as) as rep:
-            assert not any("D114 convention" in err for err in rep.errors), (
+        def serial_comma_shipped_as(payload):
+            row = coverage_entry(payload, 234)
+            row["evidence"] = ("shipped as export-qa-strategy-designer, "
+                               "adr-writer, and domain-modeler")
+        with mutated_coverage(Path(tmp), serial_comma_shipped_as) as rep:
+            assert any("adr-writer" in err and "not in covering_skills" in err
+                       for err in rep.errors), rep.errors
+            assert any("domain-modeler" in err and "not in covering_skills" in err
+                       for err in rep.errors), rep.errors
+    # B3 F-01 (REV-4): Markdown-link normalization must not hide or fabricate
+    # the shipped-as phrase or its negation context. Links before/abutting the
+    # phrase are neutralised to same-length spaces for detection, and link
+    # labels are reduced only inside the post-phrase token list.
+    for link_case in (
+            "[not](https://example.invalid/x) shipped as adr-writer",
+            "[never](https://example.invalid/x) shipped as adr-writer",
+            "[foo](https://example.invalid/x)shipped as adr-writer"):
+        assert validator._coverage_shipped_scan(link_case, manifest)[
+            "claims"] == ["adr-writer"], link_case
+    for link_case in (
+            "[not](https://example.invalid/x) shipped as adr-writer",
+            "[never](https://example.invalid/x) shipped as adr-writer",
+            "[foo](https://example.invalid/x)shipped as adr-writer"):
+        with tempfile.TemporaryDirectory() as tmp:
+            def link_prefix_claim(payload, evidence=link_case):
+                row = coverage_entry(payload, 2)
+                row["evidence"] = evidence
+            with mutated_coverage(Path(tmp), link_prefix_claim) as rep:
+                assert any("D114 convention" in err for err in rep.errors), (
+                    link_case, rep.errors)
+    # RESIDUAL (7): multi-skill phrase -> every named skill is checked.
+    with tempfile.TemporaryDirectory() as tmp:
+        def multi_skill_shipped_as(payload):
+            row = coverage_entry(payload, 234)
+            row["evidence"] = ("shipped as export-qa-strategy-designer and "
+                               "adr-writer")
+        with mutated_coverage(Path(tmp), multi_skill_shipped_as) as rep:
+            assert any("adr-writer" in err and "not in covering_skills" in err
+                       for err in rep.errors), rep.errors
+            assert not any("export-qa-strategy-designer" in err
+                           for err in rep.errors), rep.errors
+    # RESIDUAL (8): an unknown/misspelled skill-shaped token fails closed.
+    scan = validator._coverage_shipped_scan(
+        "shipped as import-qa-strategy-designe", manifest)
+    assert scan["unknown"] == ["import-qa-strategy-designe"], scan
+    assert scan["claims"] == [], scan
+    with tempfile.TemporaryDirectory() as tmp:
+        def unknown_shipped_as(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = "shipped as import-qa-strategy-designe"
+        with mutated_coverage(Path(tmp), unknown_shipped_as) as rep:
+            assert any("unknown shipped-as token" in err
+                       and "import-qa-strategy-designe" in err
+                       for err in rep.errors), rep.errors
+    # RESIDUAL (9): word boundary and negation edges; 'not only' is a claim.
+    assert validator._coverage_shipped_scan(
+        "shipped aside from the historical bundle", manifest) == {
+            "claims": [], "unknown": []}
+    # REV-3 D-F1: negation is bound to each occurrence and is base-equivalent
+    # (only immediate not/never), so no claim the base predicate detects is
+    # suppressed; auxiliary/contraction forms and 'not just'/'not only' are
+    # claims, exactly as base. A later occurrence after 'but/however/and' is a
+    # claim unless it is individually negated.
+    for not_a_claim in (
+            "not shipped as import-qa-strategy-designer",
+            "never shipped as import-qa-strategy-designer",
+            "was not shipped as import-qa-strategy-designer"):
+        assert validator._coverage_shipped_scan(not_a_claim, manifest) == {
+            "claims": [], "unknown": []}, not_a_claim
+    for still_a_claim in (
+            "has not yet shipped as import-qa-strategy-designer",
+            "wasn't shipped as import-qa-strategy-designer",
+            "not just shipped as import-qa-strategy-designer",
+            "not only shipped as import-qa-strategy-designer"):
+        assert validator._coverage_shipped_scan(still_a_claim, manifest) == {
+            "claims": ["import-qa-strategy-designer"], "unknown": []}, still_a_claim
+    multi_occurrence = ("old was not shipped as adr-writer but later "
+                        "shipped as import-qa-strategy-designer")
+    assert validator._coverage_shipped_scan(multi_occurrence, manifest) == {
+        "claims": ["import-qa-strategy-designer"], "unknown": []}, multi_occurrence
+    inverse_negation = ("not only shipped as adr-writer but shipped as "
+                        "import-qa-strategy-designer")
+    assert validator._coverage_shipped_scan(inverse_negation, manifest) == {
+        "claims": ["adr-writer", "import-qa-strategy-designer"],
+        "unknown": []}, inverse_negation
+    with tempfile.TemporaryDirectory() as tmp:
+        def auxiliary_negation_unknown_shipped_as(payload):
+            row = coverage_entry(payload, 233)
+            row["evidence"] = "has not yet shipped as import-qa-strategy-designe"
+        with mutated_coverage(Path(tmp), auxiliary_negation_unknown_shipped_as) as rep:
+            # REV-3 D-F1: auxiliary negation is base-equivantly a claim, so the
+            # unknown token is still reported (fail closed; never suppressed).
+            assert any("unknown shipped-as token" in err for err in rep.errors), (
                 rep.errors)
+    # RESIDUAL (10): malformed / non-string manifest sets fail closed.
+    for bad_manifest in (None, set(), {1, 2}, {""}, {"   "}, {1, " "}):
+        try:
+            validator._coverage_shipped_scan(
+                "shipped as import-qa-strategy-designer", bad_manifest)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(
+                "unusable manifest must fail closed: " + repr(bad_manifest))
+    assert validator._coverage_shipped_scan(
+        "shipped as import-qa-strategy-designer",
+        {1, 2, "import-qa-strategy-designer"})["claims"] == [
+            "import-qa-strategy-designer"]
+    # RESIDUAL (11): underscore stripping is safe (inner underscore preserved
+    # and reported as unknown; paired wrapper underscores stripped).
+    assert validator._coverage_shipped_scan(
+        "shipped as _import-qa-strategy-designer_", manifest)["claims"] == [
+            "import-qa-strategy-designer"]
+    assert validator._coverage_shipped_scan(
+        "shipped as import_qa_strategy_designer", manifest)["unknown"] == [
+            "import_qa_strategy_designer"]
+    # FP-2 (REV-3): an underscore adjacent to a hyphen must never be stripped
+    # into the known token; the malformed token is reported unknown.
+    assert validator._coverage_shipped_scan(
+        "shipped as import-_qa-strategy-designer", manifest)["unknown"] == [
+            "import-_qa-strategy-designer"]
+    assert validator._coverage_shipped_scan(
+        "shipped as foo__bar-baz", manifest)["unknown"] == ["foo__bar-baz"]
+    for skill_name in manifest:
+        assert skill_name and skill_name == skill_name.lower(), skill_name
+        assert all(part for part in skill_name.split("-")), skill_name
+        assert "_" not in skill_name and " " not in skill_name, skill_name
+    # F-01 (REV-2): the base predicate accepted an optional colon after
+    # 'shipped as'; the hardened scanner must keep it (known claims are
+    # detected/enforced, unknown tokens fail closed, multi-skill checked).
+    for colon_text in (
+            "shipped as: import-qa-strategy-designer",
+            "shipped as: **import-qa-strategy-designer**",
+            "shipped as: " + chr(96) + "import-qa-strategy-designer" + chr(96),
+            "shipped as: (import-qa-strategy-designer)",
+            "shipped as: [import-qa-strategy-designer](https://example.invalid/x)"):
+        assert validator._coverage_shipped_scan(colon_text, manifest) == {
+            "claims": ["import-qa-strategy-designer"], "unknown": []}, colon_text
+    colon_unknown = validator._coverage_shipped_scan(
+        "shipped as: import-qa-strategy-designe", manifest)
+    assert colon_unknown["unknown"] == ["import-qa-strategy-designe"], colon_unknown
+    assert colon_unknown["claims"] == [], colon_unknown
+    assert validator._coverage_shipped_scan(
+        "shipped as: adr-writer and export-qa-strategy-designer", manifest
+    )["claims"] == ["adr-writer", "export-qa-strategy-designer"]
+    with tempfile.TemporaryDirectory() as tmp:
+        def colon_known_on_covered_row(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = "shipped as: import-qa-strategy-designer"
+        with mutated_coverage(Path(tmp), colon_known_on_covered_row) as rep:
+            assert any("D114 convention" in err for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def colon_known_not_covering(payload):
+            row = coverage_entry(payload, 233)
+            row["evidence"] = "shipped as: adr-writer"
+        with mutated_coverage(Path(tmp), colon_known_not_covering) as rep:
+            assert any("adr-writer" in err and "not in covering_skills" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def colon_unknown_fails_closed(payload):
+            row = coverage_entry(payload, 233)
+            row["evidence"] = "shipped as: import-qa-strategy-designe"
+        with mutated_coverage(Path(tmp), colon_unknown_fails_closed) as rep:
+            assert any("unknown shipped-as token" in err
+                       and "import-qa-strategy-designe" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def colon_multi_skill(payload):
+            row = coverage_entry(payload, 234)
+            row["evidence"] = ("shipped as: export-qa-strategy-designer and "
+                               "adr-writer")
+        with mutated_coverage(Path(tmp), colon_multi_skill) as rep:
+            assert any("adr-writer" in err and "not in covering_skills" in err
+                       for err in rep.errors), rep.errors
+            assert not any("export-qa-strategy-designer" in err
+                           for err in rep.errors), rep.errors
     with tempfile.TemporaryDirectory() as tmp:
         def non_list_covering_skills(payload):
             row = coverage_entry(payload, 233)
