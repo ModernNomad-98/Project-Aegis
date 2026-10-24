@@ -2181,7 +2181,7 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected (area named)")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| explicit-id | 182 |",
+            return text.replace("| explicit-id | 184 |",
                                 "| explicit-id | 172 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'explicit-id'",
@@ -2204,7 +2204,7 @@ def test_coverage_map_summary_totals_mismatch():
                          "rejected")
     with tempfile.TemporaryDirectory() as tmp:
         def md_mutate(text):
-            return text.replace("| Review pending | 116 |",
+            return text.replace("| Review pending | 114 |",
                                 "| Review pending | 124 |", 1)
         with mutated_coverage(Path(tmp), lambda payload: None, md_mutate) as rep:
             expect_error(rep, "summary total 'Review pending'",
@@ -2633,19 +2633,19 @@ def test_coverage_map_codex_visible_text_findings():
 
 
 def test_coverage_map_planning_gate_resolved():
-    """T32: rows #254/#278 are planning-gate resolved; review_pending is 116."""
+    """T32: rows #254/#278 are planning-gate resolved; review_pending is 114."""
     assert validator.COVERAGE_PLANNING_GATE_RESOLVED == frozenset({254, 278})
-    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_TOTALS["review_pending"] == 114
     payload = json.loads(
         validator.COVERAGE_MAP.read_text(encoding="utf-8"))
     non_explicit = [entry for entry in payload["entries"]
                     if entry.get("evidence_grade") != "explicit-id"]
-    assert len(non_explicit) == 118
+    assert len(non_explicit) == 116
     resolved_present = {entry["id"] for entry in non_explicit
                         if entry["id"] in validator.COVERAGE_PLANNING_GATE_RESOLVED}
     assert resolved_present == {254, 278}
     assert validator.COVERAGE_TOTALS["review_pending"] == (
-        len(non_explicit) - len(resolved_present)) == 116
+        len(non_explicit) - len(resolved_present)) == 114
     with tempfile.TemporaryDirectory() as tmp:
         def mutate(payload):
             payload["totals"]["review_pending"] = 126
@@ -2763,7 +2763,7 @@ def test_coverage_map_batch2_deliveries():
     assert validator.COVERAGE_TOTALS["manifest_skills"] == 252
     assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 169
     assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
-    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_TOTALS["review_pending"] == 114
     assert len(validator.COVERAGE_GAP_IDS) == 0
     assert validator.COVERAGE_P0_GAP_IDS == ()
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
@@ -2806,7 +2806,7 @@ def test_coverage_map_batch3_deliveries():
     assert validator.COVERAGE_TOTALS["manifest_skills"] == 252
     assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 169
     assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
-    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_TOTALS["review_pending"] == 114
     assert len(validator.COVERAGE_GAP_IDS) == 0
     assert validator.COVERAGE_P0_GAP_IDS == ()
     gaps = (payload["totals"]["gap_by_priority"])
@@ -2890,9 +2890,9 @@ def test_coverage_map_step0_hygiene():
         assert "0-B" in (row["notes"] or ""), (row_id, row)
         assert row["rationale"] is None, (row_id, row)
     assert validator.COVERAGE_TOTALS["by_status"] == {
-        "SHIPPED": 182, "COVERED": 59, "PARTIAL": 59}
+        "SHIPPED": 184, "COVERED": 57, "PARTIAL": 59}
     assert validator.COVERAGE_TOTALS["by_grade"] == {
-        "explicit-id": 182, "catalog-decision": 18,
+        "explicit-id": 184, "catalog-decision": 16,
         "capability-review": 100}
     assert validator.COVERAGE_TOTALS["gap_by_priority"] == {
         "P0": 0, "P1": 0, "P2": 0}
@@ -2901,7 +2901,7 @@ def test_coverage_map_step0_hygiene():
     assert validator.COVERAGE_TOTALS["manifest_skills"] == 252
     assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 169
     assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
-    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_TOTALS["review_pending"] == 114
     assert validator.COVERAGE_GAP_IDS == ()
     assert validator.COVERAGE_P0_GAP_IDS == ()
     phrases = [item for item in validator.COVERAGE_REQUIRED_PHRASES
@@ -2911,16 +2911,16 @@ def test_coverage_map_step0_hygiene():
     assert "83 of 252" in mmd and "80 of 222" not in mmd and "80 of 230" not in mmd and "80 of 243" not in mmd
     totals = payload["totals"]
     assert totals["by_status"] == {
-        "COVERED": 59, "PARTIAL": 59, "SHIPPED": 182}
+        "COVERED": 57, "PARTIAL": 59, "SHIPPED": 184}
     assert totals["by_grade"] == {
-        "capability-review": 100, "catalog-decision": 18,
-        "explicit-id": 182}
+        "capability-review": 100, "catalog-decision": 16,
+        "explicit-id": 184}
     assert totals["gap_by_priority"] == {"P0": 0, "P1": 0, "P2": 0}
     assert "## GAP candidates (all 0 ids)" in mmd
     for line in ("| 01 Software Architecture & Engineering | 55 | 32 | 8 | 15 | 0 |",
                  "| 02 Software as a service (SaaS) platform architecture | 35 | 23 | 4 | 8 | 0 |",
                  "| 04 Backend, application programming interface (API), and data engineering | 30 | 9 | 12 | 9 | 0 |",
-                 "| 06 Quality assurance (QA), test architecture, and validation | 55 | 39 | 8 | 8 | 0 |"):
+                 "| 06 Quality assurance (QA), test architecture, and validation | 55 | 41 | 6 | 8 | 0 |"):
         assert line in mmd, line
     gap_areas = sorted({line.split(":", 1)[0] for line in mmd.splitlines()
                         if line.startswith("- Area ")})
@@ -2995,13 +2995,13 @@ def test_coverage_map_batch4_deliveries():
     assert validator.COVERAGE_TOTALS["manifest_skills"] == 252
     assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 169
     assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
-    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_TOTALS["review_pending"] == 114
     assert validator.COVERAGE_GAP_IDS == ()
     assert validator.COVERAGE_P0_GAP_IDS == ()
     assert validator.COVERAGE_TOTALS["by_status"] == {
-        "SHIPPED": 182, "COVERED": 59, "PARTIAL": 59}
+        "SHIPPED": 184, "COVERED": 57, "PARTIAL": 59}
     assert validator.COVERAGE_TOTALS["by_grade"] == {
-        "explicit-id": 182, "catalog-decision": 18,
+        "explicit-id": 184, "catalog-decision": 16,
         "capability-review": 100}
     assert validator.COVERAGE_TOTALS["gap_by_priority"] == {
         "P0": 0, "P1": 0, "P2": 0}
@@ -3090,13 +3090,13 @@ def test_coverage_map_batch5_deliveries():
     assert validator.COVERAGE_TOTALS["manifest_skills"] == 252
     assert validator.COVERAGE_TOTALS["distinct_covering_skills"] == 169
     assert validator.COVERAGE_TOTALS["beyond_roadmap_skills"] == 83
-    assert validator.COVERAGE_TOTALS["review_pending"] == 116
+    assert validator.COVERAGE_TOTALS["review_pending"] == 114
     assert validator.COVERAGE_GAP_IDS == ()
     assert validator.COVERAGE_P0_GAP_IDS == ()
     assert validator.COVERAGE_TOTALS["by_status"] == {
-        "SHIPPED": 182, "COVERED": 59, "PARTIAL": 59}
+        "SHIPPED": 184, "COVERED": 57, "PARTIAL": 59}
     assert validator.COVERAGE_TOTALS["by_grade"] == {
-        "explicit-id": 182, "catalog-decision": 18,
+        "explicit-id": 184, "catalog-decision": 16,
         "capability-review": 100}
     assert validator.COVERAGE_TOTALS["gap_by_priority"] == {
         "P0": 0, "P1": 0, "P2": 0}
@@ -3174,8 +3174,8 @@ def test_coverage_map_batch5_deliveries():
         231: ("PARTIAL", "capability-review", ["saas-timezone-architect"]),
         232: ("PARTIAL", "capability-review",
               ["notification-webhook-ux-designer"]),
-        233: ("COVERED", "catalog-decision", ["import-qa-strategy-designer"]),
-        234: ("COVERED", "catalog-decision", ["export-qa-strategy-designer"]),
+        233: ("SHIPPED", "explicit-id", ["import-qa-strategy-designer"]),
+        234: ("SHIPPED", "explicit-id", ["export-qa-strategy-designer"]),
         115: ("PARTIAL", "capability-review",
               ["file-upload-storage-architect", "rls-policy-auditor"]),
         104: ("SHIPPED", "explicit-id", ["secrets-identity-hardener"]),

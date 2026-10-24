@@ -4,7 +4,7 @@ This page is the human summary of the authoritative machine map in
 [coverage-map.json](coverage-map.json); the JSON is authoritative, and this
 summary is hand-maintained with a validator cross-check.
 
-**Optionality.** The 300-row roadmap is an OPTIONAL reference backlog, not a required target.
+**Optionality.** The 300-row roadmap is an OPTIONAL reference backlog, not a required target. **Convention (D114, 2026-10-24).** A roadmap row closed by shipping a skill is always SHIPPED/explicit-id; an owner authorization is not evidence grade.
 
 GAP rows are optional backlog candidates, not deficits or completion obligations.
 
@@ -14,7 +14,7 @@ The map records status only. It is a maintained assertion, not ground
 truth, a completion target or a build authorization. Rows graded
 capability-review, catalog-decision or none are flagged for planning-gate
 review unless they carry a recorded planning-gate decision (rows #254/#278,
-D107); `review_pending` counts the remaining non-explicit-id rows (116).
+D107); `review_pending` counts the remaining non-explicit-id rows (114).
 
 Row-level evidence companion: [audit registers index](../audits/README.md) (read-only reference, not build authorization).
 
@@ -31,13 +31,13 @@ Row-level evidence companion: [audit registers index](../audits/README.md) (read
 | Measure | Value |
 | --- | ---: |
 | Entries | 300 |
-| SHIPPED | 182 |
-| COVERED | 59 |
+| SHIPPED | 184 |
+| COVERED | 57 |
 | GAP | 0 |
 | PARTIAL | 59 |
 
-| explicit-id | 182 |
-| catalog-decision | 18 |
+| explicit-id | 184 |
+| catalog-decision | 16 |
 | capability-review | 100 |
 | none | 0 |
 
@@ -46,7 +46,7 @@ Row-level evidence companion: [audit registers index](../audits/README.md) (read
 | Manifest skills | 252 |
 | Distinct covering skills | 169 |
 | Beyond-roadmap shipped skills | 83 |
-| Review pending | 116 |
+| Review pending | 114 |
 
 ## Per-area status
 
@@ -57,7 +57,7 @@ Row-level evidence companion: [audit registers index](../audits/README.md) (read
 | 03 Software as a service (SaaS) security and row-level security (RLS) | 40 | 28 | 8 | 4 | 0 |
 | 04 Backend, application programming interface (API), and data engineering | 30 | 9 | 12 | 9 | 0 |
 | 05 Frontend and user experience (UX) engineering | 20 | 11 | 5 | 4 | 0 |
-| 06 Quality assurance (QA), test architecture, and validation | 55 | 39 | 8 | 8 | 0 |
+| 06 Quality assurance (QA), test architecture, and validation | 55 | 41 | 6 | 8 | 0 |
 | 07 Development and operations (DevOps), release, and reliability engineering | 25 | 20 | 2 | 3 | 0 |
 | 08 Artificial intelligence (AI) era software development life cycle (SDLC) and agent operating discipline | 20 | 17 | 3 | 0 | 0 |
 | 09 Artificial intelligence (AI) software engineering and large language model (LLM) systems | 20 | 3 | 9 | 8 | 0 |
