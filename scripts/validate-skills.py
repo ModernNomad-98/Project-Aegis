@@ -267,6 +267,115 @@ def _coverage_shipped_claims(entry_text: str,
         if token in known:
             claims.add(token)
     return sorted(claims)
+
+
+# PTR-INTEGRITY (2026-10-24): coverage evidence pointers must resolve against
+# the current catalog/manifest. Three pointer forms are checked (text-based,
+# additive; no existing check is changed):
+#   "catalog line N" / "catalog lines N-M" -> a docs/skills-catalog.md line
+#       anchor that must be in range and name one of the row's covering skills;
+#   "skill row N[, N]" -> a docs/skills-catalog.md line that must be a table
+#       row naming one of the row's covering skills;
+#   a backticked skill-id token in evidence/notes/rationale -> must exist in
+#       the skills manifest or appear backticked in the catalog.
+COVERAGE_PTR_LINES_RE = re.compile(
+    r"catalog\s+lines?\s+(\d+)(?:\s*[-\u2013]\s*(\d+))?", re.IGNORECASE)
+COVERAGE_PTR_ROWS_RE = re.compile(
+    r"skill\s+rows?\s+(\d+(?:\s*,\s*\d+)*)", re.IGNORECASE)
+COVERAGE_PTR_BACKTICK_RE = re.compile("`([^`\n]+)`")
+COVERAGE_PTR_SKILL_TOKEN_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)+")
+
+
+def _coverage_catalog_lines() -> "list[str] | None":
+    """Return docs/skills-catalog.md lines, or None (unreadable; fail closed)."""
+    try:
+        return CATALOG.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return None
+
+
+def _coverage_catalog_tokens(catalog_lines: "list[str]") -> "set[str]":
+    """Return casefolded backticked tokens present anywhere in the catalog."""
+    return {token.casefold() for line in catalog_lines
+            for token in COVERAGE_PTR_BACKTICK_RE.findall(line)}
+
+
+def _coverage_pointer_errors(
+        entry_text: str, catalog_lines: "list[str]",
+        catalog_tokens: "set[str]", manifest: "set[str] | None",
+        covering_skills: "list[str] | None") -> "list[str]":
+    """Return PTR-INTEGRITY resolution errors for one coverage row's text.
+
+    Text-based evidence check, not semantic proof: it proves each pointer
+    resolves at this revision, not that the cited evidence is apt. A row with
+    pointer-shaped text and unavailable covering_skills fails closed. Skill-id
+    tokens are only resolved when the manifest is available (the caller
+    reports that failure once).
+    """
+    errors: "list[str]" = []
+    covering = None if covering_skills is None else {
+        name.casefold() for name in covering_skills if isinstance(name, str)}
+    manifest_cf = None if manifest is None else {
+        name.casefold() for name in manifest if isinstance(name, str)}
+    for match in COVERAGE_PTR_LINES_RE.finditer(entry_text):
+        start = int(match.group(1))
+        end = int(match.group(2)) if match.group(2) else start
+        if end < start:
+            errors.append("catalog line pointer '" + match.group(0)
+                          + "' has a reversed range")
+            continue
+        if start < 1 or end > len(catalog_lines):
+            errors.append("catalog line pointer '" + match.group(0)
+                          + "' does not resolve: docs/skills-catalog.md has "
+                          + str(len(catalog_lines)) + " lines")
+            continue
+        window = " ".join(catalog_lines[start - 1:end])
+        window_tokens = {token.casefold() for token in
+                         COVERAGE_PTR_BACKTICK_RE.findall(window)}
+        if covering is None:
+            errors.append("entry has a catalog line pointer and unavailable/"
+                          "malformed covering_skills; cannot resolve it "
+                          "(fail closed)")
+        elif not (window_tokens & covering):
+            errors.append("catalog line pointer '" + match.group(0)
+                          + "' names none of the row's covering skills")
+    for match in COVERAGE_PTR_ROWS_RE.finditer(entry_text):
+        for token in re.findall(r"\d+", match.group(1)):
+            row_line = int(token)
+            if row_line < 1 or row_line > len(catalog_lines):
+                errors.append("skill-row pointer 'skill row " + token
+                              + "' does not resolve: docs/skills-catalog.md "
+                              "has " + str(len(catalog_lines)) + " lines")
+                continue
+            line_text = catalog_lines[row_line - 1].strip()
+            if not line_text.startswith("|"):
+                errors.append("skill-row pointer 'skill row " + token
+                              + "' does not point at a docs/skills-catalog.md "
+                              "table row")
+                continue
+            line_tokens = {name.casefold() for name in
+                           COVERAGE_PTR_BACKTICK_RE.findall(line_text)}
+            if covering is None:
+                errors.append("entry has a skill-row pointer and unavailable/"
+                              "malformed covering_skills; cannot resolve it "
+                              "(fail closed)")
+            elif not (line_tokens & covering):
+                errors.append("skill-row pointer 'skill row " + token
+                              + "' does not name one of the row's covering "
+                              "skills")
+    if manifest_cf is not None:
+        for token in COVERAGE_PTR_BACKTICK_RE.findall(entry_text):
+            if not COVERAGE_PTR_SKILL_TOKEN_RE.fullmatch(token):
+                continue
+            token_cf = token.casefold()
+            if token_cf in manifest_cf or token_cf in catalog_tokens:
+                continue
+            errors.append("backticked skill id '" + token
+                          + "' resolves neither to tools/skills-manifest.json "
+                          "nor to a docs/skills-catalog.md backticked name")
+    return errors
+
+
 COVERAGE_REQUIRED_PHRASES = (
     "The 300-row roadmap is an OPTIONAL reference backlog, not a required "
     "target.",
@@ -2324,6 +2433,34 @@ def check_coverage_map(rep: Report) -> None:
                 rep.error("[" + ctx + "] entry " + str(entry.get("id"))
                           + " names shipped-as skill " + shipped_skill
                           + " that is not in covering_skills")
+    # PTR-INTEGRITY (2026-10-24, additive): resolve coverage evidence pointers
+    # against the current catalog/manifest; stale pointers fail validation.
+    # An unreadable catalog, or an unavailable/empty manifest while skill-id
+    # pointers exist, fails closed. No existing check is changed.
+    catalog_lines = _coverage_catalog_lines()
+    if catalog_lines is None:
+        rep.error("[" + ctx + "] docs/skills-catalog.md unavailable; cannot "
+                  "resolve coverage evidence pointers (fail closed)")
+    else:
+        catalog_tokens = _coverage_catalog_tokens(catalog_lines)
+        manifest_ready = manifest is not None and bool(manifest)
+        if not manifest_ready:
+            rep.error("[" + ctx + "] manifest unavailable or empty; cannot "
+                      "resolve backticked coverage skill ids (fail closed)")
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            row_id = entry.get("id")
+            entry_text = " ".join(
+                str(entry.get(key) or "")
+                for key in ("evidence", "notes", "rationale"))
+            skills = entry.get("covering_skills")
+            covering = skills if isinstance(skills, list) else None
+            for message in _coverage_pointer_errors(
+                    entry_text, catalog_lines, catalog_tokens,
+                    manifest if manifest_ready else None, covering):
+                rep.error("[" + ctx + "] entry " + str(row_id) + ": "
+                          + message)
     totals = payload.get("totals")
     if not isinstance(totals, dict):
         rep.error("[" + ctx + "] totals must be an object")

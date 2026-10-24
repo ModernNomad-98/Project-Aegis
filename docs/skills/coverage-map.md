@@ -6,6 +6,8 @@ summary is hand-maintained with a validator cross-check.
 
 **Optionality.** The 300-row roadmap is an OPTIONAL reference backlog, not a required target. **Convention (D114, 2026-10-24).** A roadmap row closed by shipping a skill is always SHIPPED/explicit-id; an owner authorization is not evidence grade.
 
+**Pointer integrity (validator, 2026-10-24).** Row evidence pointers are machine-resolved against the current skill catalog and skills manifest: a `catalog lines N[-M]` pointer must be in range and name one of the row's covering skills, a `skill rows N[, N]` pointer must point at catalog table rows naming covering skills, and every backticked skill id in a row's evidence, notes or rationale must exist in the manifest or the catalog. A stale pointer fails validation instead of being found late.
+
 GAP rows are optional backlog candidates, not deficits or completion obligations.
 
 The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 252 shipped skills are beyond it.
