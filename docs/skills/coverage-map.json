@@ -3310,7 +3310,7 @@
       "covering_skills": [
         "import-qa-strategy-designer"
       ],
-      "evidence": "Import QA Strategy shipped as import-qa-strategy-designer on 2026-10-23 under the standing owner work order; the shipped skill is the row's evidence (design-only handoff to import-pipeline-architect).",
+      "evidence": "Import QA Strategy shipped as import-qa-strategy-designer on 2026-10-23 under the standing owner work order (PR #897; content commit b41614067d46af024da8b234533d337ae64f81a3; merge 729a25a87797ceaf62cd78b247599e685d951040); the shipped skill is the row's evidence (design-only handoff to import-pipeline-architect). Pre-regrade coverage claims retained: staged import QA strategy, dataset/edge coverage, partial-failure recovery, idempotency and tenant isolation are covered.",
       "evidence_grade": "explicit-id",
       "id": 233,
       "name": "Import QA Strategy",
@@ -3324,7 +3324,7 @@
       "covering_skills": [
         "export-qa-strategy-designer"
       ],
-      "evidence": "Export QA Strategy shipped as export-qa-strategy-designer on 2026-10-23 under the standing owner work order; the shipped skill is the row's evidence (design-only handoff to export-pipeline-architect).",
+      "evidence": "Export QA Strategy shipped as export-qa-strategy-designer on 2026-10-23 under the standing owner work order (PR #899; content commit 4b4552e9a7d5b7031336a7756f7ec2371f4ea820; merge 417235eb85c1a0de388fd119b4ac809da35d77b2); the shipped skill is the row's evidence (design-only handoff to export-pipeline-architect). Pre-regrade coverage claims retained: staged export QA strategy, dataset/edge coverage, partial-failure recovery, idempotency and tenant isolation are covered.",
       "evidence_grade": "explicit-id",
       "id": 234,
       "name": "Export QA Strategy",
