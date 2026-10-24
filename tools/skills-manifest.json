@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "5f54e3fdfbdc11d07c978d9f9848f8266c4df43d",
+  "source_revision": "54f290e9a340f5787adc7d7b951f0b0559602835",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -86,7 +86,7 @@
     {
       "name": "agent-startup-context-gate",
       "path": ".claude/skills/agent-startup-context-gate/SKILL.md",
-      "sha256": "bb26064ce14dac0ea76b983eb05c83bfe809a720f9b01913f4d7a842942a4d42"
+      "sha256": "b08c67fdab71c3c7a7a07409341f7cdac331b2ab46406d20f26dcecef0041203"
     },
     {
       "name": "agent-tool-safety-guard",
@@ -101,7 +101,7 @@
     {
       "name": "ai-closeout-reporter",
       "path": ".claude/skills/ai-closeout-reporter/SKILL.md",
-      "sha256": "8c57b3607de52ffaa30beafcb1ff0c187cac48d85339f8c8b3abcc6c60279329"
+      "sha256": "5715f57e64581041e869ce8a96f42fad851a2d11dcb93e30ecebf93e614d8c9a"
     },
     {
       "name": "ai-cost-guardrail-designer",
