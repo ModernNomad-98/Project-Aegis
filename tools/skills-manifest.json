@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "4b4552e9a7d5b7031336a7756f7ec2371f4ea820",
+  "source_revision": "f1f55d195a845d0288696fde90dfcf3da3b9a72d",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -121,7 +121,7 @@
     {
       "name": "ai-human-in-the-loop-designer",
       "path": ".claude/skills/ai-human-in-the-loop-designer/SKILL.md",
-      "sha256": "173414914ca13ee59334a40f11f2463279cb2b39bf138f682e4bcf253d31d028"
+      "sha256": "ba8a947cb2b8359956a6cf6a3249d75456fb347845b0bc555ea8c83b80cfcc5f"
     },
     {
       "name": "ai-lifecycle-risk-manager",

@@ -12,12 +12,12 @@
     {
       "id": "positive-decompose-journey-target",
       "type": "should_trigger",
-      "prompt": "Our SLO says search results in 400ms at p95. The path is edge → gateway → auth → search service → database, plus a ranking call. Allocate the budget across the hops.",
+      "prompt": "Our SLO says search results in 400ms at p95. The path is edge \u2192 gateway \u2192 auth \u2192 search service \u2192 database, plus a ranking call. Allocate the budget across the hops.",
       "expect": {
         "triggers": true,
         "assertions": [
           "Builds the budget table from measured per-hop reality with an owner per hop, and includes the overhead rows (serialization, connection setup on the tail, queue wait) as explicit line items.",
-          "Holds 15–25% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
+          "Holds 15\u201325% headroom as a named line item with the path owner, and shows the sum check: allocations + headroom = 400ms.",
           "Defines own work and downstream critical-path budget; runs the ONE cascade rule: upstream timeout > own work + downstream critical-path budget + recorded epsilon (all ms; epsilon recorded once; critical path = serial + longest parallel branch; initial attempt, retry attempt time and backoff_total included).",
           "States the retry policy as budgeted spend at one layer only, and designs violation attribution (spans annotated with budget) handed to observability-operator.",
           "Installs the budget-claim review rule for new dependencies on the path.",
@@ -34,7 +34,7 @@
         "triggers": true,
         "assertions": [
           "Rejects the 30-second defaults as bugs in a 500ms path: timeouts derive from hop budgets, since waiting longer than the budget means the promise already failed.",
-          "Identifies the two-layer retry compounding (gateway × client = up to 9 attempts) as a storm multiplier and assigns retries to ONE stated layer, idempotent hops only.",
+          "Identifies the two-layer retry compounding (gateway \u00d7 client = up to 9 attempts) as a storm multiplier and assigns retries to ONE stated layer, idempotent hops only.",
           "Runs the cascade check so no upstream abandons work its downstream completes.",
           "Prices each permitted retry as spend from a named allocation rather than a free action.",
           "Requires a finite timeout on every budgeted path; an infinite or missing timeout is a violation, not a default."
@@ -48,8 +48,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Does the tail math explicitly: with 12 parallel branches, 1-(0.99)^12 ≈ 11% of requests experience at least one branch's p99 — 'fine at p99' per branch is not fine at the join.",
-          "Budgets branches at a stricter percentile than the end-to-end promise (p99.5-class), or funds hedging from headroom, or recommends narrowing the fan-out — with the tradeoffs stated.",
+          "Does the tail math explicitly: with 12 parallel branches, 1-(0.99)^12 \u2248 11% of requests experience at least one branch's p99 \u2014 'fine at p99' per branch is not fine at the join.",
+          "Budgets branches at a stricter percentile than the end-to-end promise (p99.5-class), or funds hedging from headroom, or recommends narrowing the fan-out \u2014 with the tradeoffs stated.",
           "Shows that parallel composition takes the max of branches, so the slowest branch owns the join's budget.",
           "Anchors the fix in the budget table rather than telling individual services to 'be faster'."
         ]
@@ -58,14 +58,15 @@
     {
       "id": "edge-hard-mode-downstream-retry",
       "type": "should_trigger",
-      "prompt": "Design the hard-timeout bound: upstream_own_hard_bound=120ms, one downstream hop branch_hard_bound=100ms, own_attempt_work_hard_bound=20ms, R_down=2, backoff_total=30ms, one join branch. What must upstream_timeout exceed?",
+      "prompt": "Design the hard-timeout bound: upstream_own_hard_bound=120ms, two parallel downstream join branches A branch_hard_bound=100ms and B branch_hard_bound=60ms, own_attempt_work_hard_bound=20ms, R_down=2, backoff_total=30ms. What must upstream_timeout exceed?",
       "expect": {
         "triggers": true,
         "assertions": [
           "Uses upstream_own_hard_bound + downstream_hard_bound + epsilon, epsilon recorded once.",
           "Computes retry_allowance_bound = 2*20 + 30 = 70ms using downstream_own_attempt_work_hard_bound=20ms and downstream_backoff_total=30ms, and downstream_hard_bound = 100 + 70 = 170ms, so upstream_timeout > 290ms + epsilon.",
           "Uses MAX of branch BOUNDS at parallel joins, never an expected maximum or MAX of means in hard mode.",
-          "States every hard term's recorded bound/percentile source (recorded_percentile); retry allowance is per-hop and no additional repeated downstream execution is claimed beyond it; a missing bound is UNVERIFIED, not a pass."
+          "States every hard term's recorded bound/percentile source (recorded_percentile); retry allowance is per-hop and no additional repeated downstream execution is claimed beyond it; a missing bound is UNVERIFIED, not a pass.",
+          "With two parallel join branches, take MAX of branch bounds: A 100+70=170ms vs B 60+70=130ms, so downstream_hard_bound=170ms and upstream_timeout > 290ms + epsilon; never an expected maximum or MAX of means in hard mode."
         ]
       }
     },
@@ -96,13 +97,13 @@
     {
       "id": "should-not-invent-the-slo",
       "type": "should_trigger",
-      "prompt": "We don't have any latency SLO yet. Just pick a good end-to-end number yourself — say whatever seems right — and while you're at it define the error budget and what should page, then split it into per-service budgets.",
+      "prompt": "We don't have any latency SLO yet. Just pick a good end-to-end number yourself \u2014 say whatever seems right \u2014 and while you're at it define the error budget and what should page, then split it into per-service budgets.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Declines to SET the SLO, error budget, and paging design — that is slo-reliability-architect's scope, and doing it here forks the reliability source of truth.",
+          "Declines to SET the SLO, error budget, and paging design \u2014 that is slo-reliability-architect's scope, and doing it here forks the reliability source of truth.",
           "Offers the legitimate paths: run slo-reliability-architect for the journey target, or proceed with an ASSUMED target flagged loudly in the budget header as requiring ratification.",
-          "If proceeding on the assumption, produces a real budget whose foundation is explicitly marked provisional — never silently authoritative.",
+          "If proceeding on the assumption, produces a real budget whose foundation is explicitly marked provisional \u2014 never silently authoritative.",
           "Does not design alerting or error-budget policy in any branch."
         ]
       }
@@ -124,7 +125,7 @@
     {
       "id": "should-not-trigger-slo-definition",
       "type": "should_not_trigger",
-      "prompt": "Define SLOs for our top user journeys — pick the SLIs, set targets with error budgets, and design the burn-rate alerting so the right things page.",
+      "prompt": "Define SLOs for our top user journeys \u2014 pick the SLIs, set targets with error budgets, and design the burn-rate alerting so the right things page.",
       "expect": {
         "triggers": false,
         "assertions": [
@@ -148,7 +149,7 @@
     {
       "id": "unnamed-hop-reduction-no-auto-query-plan-reader",
       "type": "should_not_trigger",
-      "prompt": "The database hop is spending 180ms of its 60ms allowance — here's the dominant query's plan. Get that hop back under its number.",
+      "prompt": "The database hop is spending 180ms of its 60ms allowance \u2014 here's the dominant query's plan. Get that hop back under its number.",
       "expect": {
         "triggers": false,
         "assertions": [
