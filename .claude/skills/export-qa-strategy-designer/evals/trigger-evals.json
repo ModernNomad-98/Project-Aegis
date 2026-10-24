@@ -1,0 +1,59 @@
+{
+  "skill": "export-qa-strategy-designer",
+  "description": "Trigger discrimination: export QA strategy vs export pipeline design, import QA, product QA strategy, test data and data-quality monitoring.",
+  "overlaps_with": [
+    "export-pipeline-architect",
+    "import-qa-strategy-designer",
+    "qa-strategy-architect",
+    "test-data-architect",
+    "data-quality-monitor-designer"
+  ],
+  "cases": [
+    {
+      "id": "export-qa-strategy-wins-here",
+      "prompt": "How should we verify data exports: stages, edge datasets, partial delivery, redaction, expiry and evidence?",
+      "expected_skill": "export-qa-strategy-designer",
+      "should_not_trigger": [
+        "export-pipeline-architect",
+        "qa-strategy-architect"
+      ],
+      "reason": "Export verification strategy, not pipeline design or product-wide QA strategy."
+    },
+    {
+      "id": "pipeline-design-goes-to-export-pipeline-architect",
+      "prompt": "Design the tenant-data export pipeline stages, authorization, delivery and audit.",
+      "expected_skill": "export-pipeline-architect",
+      "should_not_trigger": [
+        "export-qa-strategy-designer"
+      ],
+      "reason": "Designing the export pipeline contract belongs to export-pipeline-architect; QA strategy reviews its verification."
+    },
+    {
+      "id": "import-qa-goes-to-import-qa-strategy-designer",
+      "prompt": "How should we verify data imports?",
+      "expected_skill": "import-qa-strategy-designer",
+      "should_not_trigger": [
+        "export-qa-strategy-designer"
+      ],
+      "reason": "Import verification is import-qa-strategy-designer; export QA only covers exports."
+    },
+    {
+      "id": "product-strategy-goes-to-qa-strategy-architect",
+      "prompt": "What test layers and release gates should the whole product have?",
+      "expected_skill": "qa-strategy-architect",
+      "should_not_trigger": [
+        "export-qa-strategy-designer"
+      ],
+      "reason": "Product/repo QA strategy, not export-specific QA."
+    },
+    {
+      "id": "monitoring-goes-to-data-quality-monitor-designer",
+      "prompt": "Design production data-quality monitoring for exported datasets.",
+      "expected_skill": "data-quality-monitor-designer",
+      "should_not_trigger": [
+        "export-qa-strategy-designer"
+      ],
+      "reason": "Production monitoring is data-quality-monitor-designer; export QA strategy is pre-release verification."
+    }
+  ]
+}

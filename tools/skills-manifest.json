@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "444d90b61e5817949370ec53c55e26e02fd67ef2",
+  "source_revision": "4b4552e9a7d5b7031336a7756f7ec2371f4ea820",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -482,6 +482,11 @@
       "name": "export-pipeline-architect",
       "path": ".claude/skills/export-pipeline-architect/SKILL.md",
       "sha256": "8b2fb6f2b63e0bfebbcbaefab6d35acb1314d753f19e8d52360ca2bf300930f9"
+    },
+    {
+      "name": "export-qa-strategy-designer",
+      "path": ".claude/skills/export-qa-strategy-designer/SKILL.md",
+      "sha256": "6b571a3f6e5c89be9a744c9941b21893763d0defa280144bfc32eb29c3c9b1dc"
     },
     {
       "name": "extensibility-boundary-designer",
