@@ -73,7 +73,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke test-data-architect: one intermittently failing test is flake casework; shared-data design enters only if that diagnosis names it as the cause.",
-          "Does not auto-invoke flaky-test-detective (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute test-data-architect for it."
+          "Does not silently substitute test-data-architect for flaky-test-detective; when the consuming repository's trigger fires, flaky-test-detective is agent-applied and is named as the owning skill rather than as a human-only invocation."
         ]
       }
     }

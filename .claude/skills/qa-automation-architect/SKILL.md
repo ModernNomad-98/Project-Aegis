@@ -35,7 +35,7 @@ engineer skills.
 - Do NOT use when: deciding WHAT should be tested — `qa-strategy-architect`
   (product) or `test-plan-designer` (per change).
 - Do NOT use when: implementing tests — `vitest-unit-component-engineer`
-  *(manual-only)*, `playwright-e2e-engineer` *(manual-only)*, etc.
+  *(manual-only)*, `playwright-e2e-engineer`, etc.
 - Do NOT use when: diagnosing a specific flaky test — `flaky-test-detective`
   *(manual-only)*
   (this skill sets the flake POLICY; the detective works cases).
@@ -93,7 +93,7 @@ does not authorize purchases or migration execution.
    conventions from `screenshot-evidence-planner` plug in.
 6. **Place suites in CI:** PR / merge / nightly tiers with runtime budgets,
    sharding plan, cache strategy, retry policy (retries mask flakes —
-   bounded, logged, and always fed to `flaky-test-detective` *(manual-only)*), and the
+   bounded, logged, and always fed to `flaky-test-detective`), and the
    quarantine mechanism governed by `regression-suite-curator`. If a merge
    deploys automatically, any required release gate runs before merge;
    post-merge checks verify the deployment rather than decide whether to
@@ -101,7 +101,7 @@ does not authorize purchases or migration execution.
    budgets: per-suite execution limits per layer, timeout behavior
    (kill/fail/quarantine and the evidence the run emits), and the
    timeout↔retry interaction — a timeout is not by itself a retry reason.
-   TIMEOUT-ONLY evidence routes to `flaky-test-detective` *(manual-only)* and
+   TIMEOUT-ONLY evidence routes to `flaky-test-detective` and
    `ci-failure-classifier`. The policy never masks failures.
 7. **Write the migration plan:** ordered, small steps from current state to
    the blueprint, each independently shippable and verifiable.

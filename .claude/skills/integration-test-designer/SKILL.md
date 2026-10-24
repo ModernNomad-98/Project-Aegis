@@ -33,7 +33,7 @@ negative cases, and CI placement.
 - Do NOT use when: the subject is pure logic or an isolated component —
   `vitest-unit-component-engineer` *(manual-only)*.
 - Do NOT use when: the ask is a user journey through the real UI —
-  `playwright-e2e-engineer` *(manual-only)*.
+  `playwright-e2e-engineer`.
 - Do NOT use when: the ask is schema/shape/version compatibility of an API or
   webhook — `api-contract-test-designer` (contract ≠ flow).
 - Do NOT use when: the ask is PROVING tenant isolation or authorization as a

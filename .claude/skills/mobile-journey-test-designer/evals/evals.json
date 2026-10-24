@@ -59,7 +59,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Produces the coverage design, then stops at execution: running the pass is clickthrough-test-engineer (manual-only) or playwright-e2e-engineer (manual-only) and is handed off by name, not executed in the same pass.",
+          "Produces the coverage design, then stops at execution: running the pass is clickthrough-test-engineer (manual-only) or playwright-e2e-engineer (agent-applied when E2E work triggers it) and is handed off by name, not executed in the same pass.",
           "States the handoff explicitly rather than silently dropping the execution half of the ask."
         ]
       }

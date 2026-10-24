@@ -76,7 +76,7 @@
         "triggers": false,
         "assertions": [
           "Does not invoke integration-test-designer: a full-stack journey in a real browser is the E2E layer, which integration testing explicitly excludes.",
-          "Does not auto-invoke playwright-e2e-engineer (MANUAL-ONLY); may name it and recommend explicit invocation, but does not silently substitute integration-test-designer for it."
+          "Does not silently substitute integration-test-designer for playwright-e2e-engineer; when the consuming repository's trigger fires, playwright-e2e-engineer is agent-applied and is named as the owning skill rather than as a human-only invocation."
         ]
       }
     }

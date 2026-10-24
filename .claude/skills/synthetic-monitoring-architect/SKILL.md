@@ -42,7 +42,7 @@ not execute them against production.
   `load-test-planner` (traffic plan) measure before you ship; synthetic
   monitoring watches after you ship.
 - Do NOT use when: the goal is CI end-to-end tests gating a PR against a test
-  environment — that is `playwright-e2e-engineer` *(manual-only)*; those run in CI on
+  environment — that is `playwright-e2e-engineer`; those run in CI on
   ephemeral data, not as prod-safe scheduled probes against production.
 - Do NOT use when: the goal is defining the SLO/SLI TARGETS and error budgets
   — that is `slo-reliability-architect`; this skill produces a synthetic SLI
@@ -205,7 +205,7 @@ Open questions / risks: <each with risk-if-wrong / who answers>
   journey pre-release instead until it exists.
 - The real need is pre-release capacity/latency measurement or CI gating →
   route to `performance-test-harness`/`load-test-planner` or
-  `playwright-e2e-engineer` *(manual-only)*; synthetic monitoring is post-ship watching, not
+  `playwright-e2e-engineer`; synthetic monitoring is post-ship watching, not
   pre-ship testing.
 - The SLO targets the synthetic SLI should feed are undefined → obtain them
   from `slo-reliability-architect`; a synthetic signal with no target is a

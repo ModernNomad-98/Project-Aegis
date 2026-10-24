@@ -2,9 +2,9 @@
 
 Detail file for `playwright-e2e-engineer`. Loaded on demand.
 
-**Use:** This reference supports the [manual-only Playwright skill](../SKILL.md)
-when explicitly invoked; reading it does not authorize running browser tests
-or touching a real application. E2E means end-to-end; `a11y` means
+**Use:** This reference supports [playwright-e2e-engineer](../SKILL.md), which
+the agent applies when E2E work triggers it; reading it does not authorize
+running browser tests or touching a real application. E2E means end-to-end; `a11y` means
 accessibility; CSS means Cascading Style Sheets; XML means Extensible Markup
 Language, and XPath is an XML path query language; API means application
 programming interface; UI means user

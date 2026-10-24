@@ -18,14 +18,14 @@
       }
     },
     {
-      "id": "positive-manual-only-best-candidate-flagged",
+      "id": "positive-agent-applied-best-candidate",
       "type": "should_trigger",
-      "prompt": "Our critical checkout journey needs end-to-end browser tests executed against the built app. Which shipped Aegis skill fits best? I'll run it myself once you tell me.",
+      "prompt": "Our critical checkout journey needs end-to-end browser tests executed against the built app. Which shipped Aegis skill fits best?",
       "expect": {
         "triggers": true,
         "assertions": [
-          "The best-fit candidate is the shipped manual-only skill playwright-e2e-engineer (disable-model-invocation: true), recommended with the exact label 'MANUAL-ONLY — human must invoke' and the reason it is manual-only.",
-          "Does not auto-invoke, simulate invoking, or describe auto-invocation of the manual-only skill; the human is told to invoke it by name.",
+          "The best-fit candidate is the shipped playwright-e2e-engineer, recommended with its capability reason and its current posture: model-invocable and agent-applied when E2E work triggers it, with no human-invocation label and disable-model-invocation unset.",
+          "Does not auto-invoke, simulate invoking, or claim to have run it in this advisory pass; the recommendation names the skill and states that the consuming repository's agent applies it at the triggered stage. A genuinely manual-only candidate would still be labelled \"MANUAL-ONLY — human must invoke\".",
           "Names the source revision read from the manifest and any input that could not be read."
         ]
       }

@@ -27,7 +27,7 @@ executed and evidenced. It is the mobile counterpart that
 - Use when: desktop E2E exists and the team wants the mobile-specific gaps named and scoped.
 - Do NOT use when: the ask is layout or viewport correctness design (fitting the layout to phone screens) — that is `mobile-viewport-craft`.
 - Do NOT use when: the ask is executing a live clickthrough — that is `clickthrough-test-engineer` *(manual-only)*.
-- Do NOT use when: the ask is implementing permanent E2E specs — that is `playwright-e2e-engineer` *(manual-only)*.
+- Do NOT use when: the ask is implementing permanent E2E specs — that is `playwright-e2e-engineer`.
 - Do NOT use when: the ask is a general per-change test plan — that is `test-plan-designer`.
 
 ## Inputs to Inspect
@@ -84,14 +84,14 @@ Chosen / why / rejected: <the key choices, the reason for each, and the main
 
 - Journey QA is not layout correctness: touch, dialogs, and navigation checks are journey behavior; fitting the layout to a viewport is `mobile-viewport-craft`.
 - Touch, dialog, orientation, and keyboard behavior are exactly what desktop E2E misses; a design that only lists breakpoints is incomplete.
-- This skill must not execute: running the pass is `clickthrough-test-engineer` (live app) or `playwright-e2e-engineer` (permanent specs) — both manual-only.
+- This skill must not execute: running the pass is `clickthrough-test-engineer` (live app; remains manual-only) or `playwright-e2e-engineer` (permanent specs; agent-applied when E2E work triggers it) — both are separate execution skills that this design skill hands off.
 - Evidence rules come from `screenshot-evidence-planner` (naming, masking, metadata); do not invent parallel conventions.
 
 ## Stop Conditions
 
 - No journey or route inventory is supplied or findable → stop and ask for it; a design cannot start from "mobile testing".
 - The request becomes a layout redesign ("make the 100vh screen fit phones") → hand off to `mobile-viewport-craft`.
-- The request becomes executing a pass on a device or driving a browser → hand off to `clickthrough-test-engineer` *(manual-only)* or `playwright-e2e-engineer` *(manual-only)*.
+- The request becomes executing a pass on a device or driving a browser → hand off to `clickthrough-test-engineer` *(manual-only)* or `playwright-e2e-engineer`.
 - The request involves destructive or live-state action → stop and refuse.
 
 ## Supporting Files

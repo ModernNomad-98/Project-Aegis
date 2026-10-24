@@ -37,7 +37,7 @@ with real command output.
   then hands off.
 - Do NOT use when: testing app logic/components — 
   `vitest-unit-component-engineer` *(manual-only)*; or journeys —
-  `playwright-e2e-engineer` *(manual-only)*.
+  `playwright-e2e-engineer`.
 - Do NOT use when: designing the whole automation/CI architecture —
   `qa-automation-architect`.
 - Do NOT use when: comparing configuration across deployed environments

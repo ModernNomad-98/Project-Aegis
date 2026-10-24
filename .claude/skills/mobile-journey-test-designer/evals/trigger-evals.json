@@ -1,6 +1,6 @@
 {
   "skill": "mobile-journey-test-designer",
-  "description": "Trigger discrimination for mobile journey QA design: critical journeys with mobile-specific checks versus layout correctness (mobile-viewport-craft), live walkthrough execution (clickthrough-test-engineer, manual-only), permanent E2E spec implementation (playwright-e2e-engineer, manual-only), and the general per-change plan (test-plan-designer).",
+  "description": "Trigger discrimination for mobile journey QA design: critical journeys with mobile-specific checks versus layout correctness (mobile-viewport-craft), live walkthrough execution (clickthrough-test-engineer, manual-only), permanent E2E spec implementation (playwright-e2e-engineer, agent-applied when E2E work triggers it), and the general per-change plan (test-plan-designer).",
   "overlaps_with": [
     "mobile-viewport-craft",
     "clickthrough-test-engineer",
@@ -43,7 +43,7 @@
       "should_not_trigger": [
         "mobile-journey-test-designer"
       ],
-      "reason": "Implementing permanent E2E specs is playwright-e2e-engineer (manual-only); this skill designs which journeys and checks the specs must cover."
+      "reason": "Implementing permanent E2E specs is playwright-e2e-engineer (agent-applied when E2E work triggers it); this skill designs which journeys and checks the specs must cover."
     },
     {
       "id": "per-change-plan-goes-to-plan-designer",

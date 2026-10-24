@@ -1,6 +1,6 @@
 {
   "skill": "role-coverage-test-designer",
-  "description": "Trigger discrimination for role-coverage QA design: allowed-path matrices and cross-role interface deltas versus designing the authorization matrix (authorization-matrix-designer), denial suites (multi-tenant-security-tester, manual-only), product strategy (qa-strategy-architect), per-change plans (test-plan-designer), spec implementation (playwright-e2e-engineer, manual-only), and scripted manual cases (manual-test-case-creator).",
+  "description": "Trigger discrimination for role-coverage QA design: allowed-path matrices and cross-role interface deltas versus designing the authorization matrix (authorization-matrix-designer), denial suites (multi-tenant-security-tester, manual-only), product strategy (qa-strategy-architect), per-change plans (test-plan-designer), spec implementation (playwright-e2e-engineer), and scripted manual cases (manual-test-case-creator).",
   "overlaps_with": [
     "authorization-matrix-designer",
     "multi-tenant-security-tester",
@@ -63,7 +63,7 @@
       "should_not_trigger": [
         "role-coverage-test-designer"
       ],
-      "reason": "Implementing the E2E specs is playwright-e2e-engineer (manual-only); this skill names the coverage and hands the specs off."
+      "reason": "Implementing the E2E specs is playwright-e2e-engineer (agent-applied when E2E work triggers it); this skill names the coverage and hands the specs off."
     },
     {
       "id": "scripted-cases-go-to-creator",

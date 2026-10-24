@@ -1,6 +1,6 @@
 {
   "skill": "property-based-test-designer",
-  "description": "Trigger discrimination for property-based test design: domain invariants and generator/shrink specs versus per-change plans (test-plan-designer), test-data catalog design (test-data-architect), writing/running test files (vitest-unit-component-engineer, manual-only), and flake repair (flaky-test-detective, manual-only).",
+  "description": "Trigger discrimination for property-based test design: domain invariants and generator/shrink specs versus per-change plans (test-plan-designer), test-data catalog design (test-data-architect), writing/running test files (vitest-unit-component-engineer, manual-only), and flake repair (flaky-test-detective, agent-applied when the intermittent-failure trigger fires).",
   "overlaps_with": [
     "test-plan-designer",
     "test-data-architect",
@@ -52,7 +52,7 @@
       "should_not_trigger": [
         "property-based-test-designer"
       ],
-      "reason": "Intermittent-failure root-causing and repair is flaky-test-detective's (manual-only); this skill designs coverage and runs nothing."
+      "reason": "Intermittent-failure root-causing and repair is flaky-test-detective's (agent-applied when the intermittent-failure trigger fires); this skill designs coverage and runs nothing."
     },
     {
       "id": "state-machine-property-wins-here",
