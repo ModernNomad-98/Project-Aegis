@@ -215,15 +215,15 @@ COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
                 "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 182, "COVERED": 59, "PARTIAL": 59},
-    "by_grade": {"explicit-id": 182, "catalog-decision": 18,
+    "by_status": {"SHIPPED": 184, "COVERED": 57, "PARTIAL": 59},
+    "by_grade": {"explicit-id": 184, "catalog-decision": 16,
                  "capability-review": 100},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
     "gap_by_priority": {"P0": 0, "P1": 0, "P2": 0},
     "manifest_skills": 252,
     "distinct_covering_skills": 169,
     "beyond_roadmap_skills": 83,
-    "review_pending": 116,
+    "review_pending": 114,
 }
 # Owner triage decision Q1=A/Q2=A/Q3=yes (D107, 2026-10-21): rows
 # #254/#278 received their planning-gate decisions and no longer count as
