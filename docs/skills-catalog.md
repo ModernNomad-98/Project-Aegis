@@ -307,12 +307,12 @@ convention, decision D3 — present and well-formed, not "passing").
 
 | Skill | Roadmap ref (cat 08) | Model-invocable? | Trigger summary |
 | --- | --- | --- | --- |
-| `agent-startup-context-gate` | #262 | yes | Verify repo identity + load governing context before any work; halt when the location can't be verified. |
+| `agent-startup-context-gate` | #262 | yes | Verify repo identity + load governing context before any work; halt when the location can't be verified. Git identity set/verify + pre-commit identity hook stop owner-identity commits; shared local-resource coordination reference. |
 | `source-of-truth-reconciler` | #269 (+#270 assumption-surfacing) | yes | Resolve doc/code/instruction conflicts by evidence-cited precedence; surface all assumptions. |
 | `change-classification-gate` | #264 (+#263 scope lock) | yes | Classify a change → validation floor + approval path; lock scope to the approved class. |
 | `human-approval-boundary` | #265 (+#270 stop-when-unclear) | yes | Halt for explicit approval at high-risk boundaries with a structured approval request. |
 | `reviewable-diff-discipline` | #271 (+#272 exact-file staging) | **no** (manual-only; executes state-changing operations) | Small intentional diffs; exact-path staging; staged set must equal declared intent. |
-| `ai-closeout-reporter` | #274 | yes | Terminal closeout with a mandatory "intentionally not done / omitted" section. |
+| `ai-closeout-reporter` | #274 | yes | Terminal closeout with a mandatory "intentionally not done / omitted" section. live read-back for every GitHub/remote-change claim in ALL status reports (missing or negative read-back = UNVERIFIED). |
 | `skill-usage-ledger` | D91 | yes | Emits the six-field record of which Aegis skills a task used, each bound to its skills-manifest SHA-256; writes nothing itself (the user pastes). |
 | `agent-failure-recovery` | #275 | **no** (manual-only; mutates git state) | Preserve-first recovery of broken git/tree state; destructive cleanup needs backup + approval. |
 | `agent-instruction-consolidator` | #276 | **no** (manual-only; edits behavior-steering files) | Align agent instruction files to one canonical source with rule-preservation proof. |

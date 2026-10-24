@@ -23,8 +23,9 @@ visible, never discovered later by surprise.
 - Use when: finishing a task or a phase of work.
 - Use when: handing work off, opening a pull request (PR) for review, or closing one out.
 - Use when: asked "what did you actually do?" about completed work.
-- Do NOT use when: giving a mid-task progress update — that is a lighter status
-  note; closeout comes only at the end.
+- Do NOT use when: writing a full terminal closeout for a mid-task progress update —
+  that is a lighter status note; the live-read-back rule below still applies to ALL
+  status reports, including progress and handoff notes.
 - Do NOT use when: shaping a commit or staged diff — that is
   `reviewable-diff-discipline` *(manual-only)* (its parked items feed this report).
 - Do NOT use when: verifying a closeout's claims (`agent-governance-audit`),
@@ -84,6 +85,38 @@ visible, never discovered later by surprise.
 9. Run the Validation Checklist, then deliver the report as the final message
    (or as a file if asked), following
    [assets/closeout-template.md](assets/closeout-template.md).
+
+
+## Live read-back for every GitHub/remote-change claim
+
+This rule applies to ALL status reports - progress, handoff, PR body, closeout and
+chat status - not only terminal closeouts. Any claim that a GitHub or remote change was
+made (PR/comment/review/merge/label/check-run/commit push or ref update) must quote the
+live read-back: the exact command and the observed output, including the observed
+head/ref. A prior action, intention or cached memory is not evidence. When no successful
+read-back was performed, write UNVERIFIED and do not claim the change.
+
+Per-claim live-read-back inventory (quote command plus observed output):
+
+- PR claim: gh pr view <n> --json number,state,headRefOid,baseRefOid,isDraft,mergeCommit --jq '.' - quote observed number/state/headRefOid/mergeCommit.
+- PR comment claim: gh api repos/{owner}/{repo}/issues/<n>/comments --paginate --jq '.[] | {id,user:.user.login,created_at,body}' - quote the matching id/body excerpt.
+- Review claim: gh api repos/{owner}/{repo}/pulls/<n>/reviews --paginate --jq '.[] | {id,user:.user.login,state,commit_id,submitted_at}' - quote id/state/commit_id.
+- Merge claim: gh pr view <n> --json state,mergeCommit,mergedAt,headRefOid - quote exact mergeCommit/mergedAt/head.
+- Label claim: gh api repos/{owner}/{repo}/issues/<n>/labels --jq '.[].name' - quote observed labels.
+- Check-run claim: gh api repos/{owner}/{repo}/commits/<sha>/check-runs --jq '.check_runs[] | {name,status,conclusion,head_sha}' - quote name/status/conclusion/head_sha.
+- Push/ref claim: git ls-remote <remote> <ref> - quote the exact sha; or git rev-parse <ref> plus git log -1 --format=%H%x20%s.
+
+Rule: every claim quotes command and observed output; missing or negative read-back
+=> UNVERIFIED, never a claim.
+
+## Implementation-PR body requirement
+
+Every implementation PR body (M-2) carries exactly one five-column Aegis-skills-applied
+table: Skill and source revision | Actor / role | Purpose | How applied | Result, evidence,
+and limitations. The body also carries a PR-body review-evidence disposition record for
+every provider/page/cursor: provider, link, reviewed original_commit_id,
+concern/applicability, disposition, evidence, uncertainty. Missing reviews are not clean.
+This SKILL states the requirement; D/F stages verify the actual PR body.
 
 ## Output Format
 

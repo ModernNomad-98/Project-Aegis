@@ -80,6 +80,62 @@ confidently building in the wrong place or against stale context.
 7. **Emit the Startup Context Report** (see Output Format) and proceed only when
    location is verified and no blocking unknowns remain; otherwise ask.
 
+
+## Git Identity Gate (before the first commit)
+
+Set and verify the agent's own Git identity, never the repository owner's identity,
+before the first commit of a task. Run and record:
+
+```bash
+git config user.name "<agent-name>"
+git config user.email "<agent-email>"
+git config --get user.name
+git config --get user.email
+```
+
+Verify both values are the agent's own identity. If either equals the recorded owner
+identity for this repository, STOP: do not commit, report the mismatch, and ask the
+human to fix the identity. Never copy the owner identity from existing commits. The
+recorded owner identity comes from local-only config (never committed):
+
+```bash
+git config --local aegis.ownerName "<owner name>"
+git config --local aegis.ownerEmail "<owner email>"
+```
+
+The complete executable pre-commit hook below reads the recorded owner identity from
+git config --local aegis.ownerName / aegis.ownerEmail (no undefined variables) and
+exits nonzero for missing owner/agent identity or owner identity. Install locally as
+.git/hooks/pre-commit, executable, never committed:
+
+```sh
+#!/bin/sh
+set -u
+OWNER_NAME=$(git config --local --get aegis.ownerName || true)
+OWNER_EMAIL=$(git config --local --get aegis.ownerEmail || true)
+if [ -z "$OWNER_NAME" ] || [ -z "$OWNER_EMAIL" ]; then
+  echo "STOP: recorded owner identity missing; set git config --local aegis.ownerName and aegis.ownerEmail" >&2
+  exit 1
+fi
+AGENT_NAME=$(git config --get user.name || true)
+AGENT_EMAIL=$(git config --get user.email || true)
+if [ -z "$AGENT_NAME" ] || [ -z "$AGENT_EMAIL" ]; then
+  echo "STOP: agent git user.name/user.email is not set" >&2
+  exit 1
+fi
+if [ "$AGENT_NAME" = "$OWNER_NAME" ] || [ "$AGENT_EMAIL" = "$OWNER_EMAIL" ]; then
+  echo "Refusing commit: configured git identity is the repository owner identity" >&2
+  exit 1
+fi
+exit 0
+```
+
+Expected outputs: agent-owned identity -> exit 0 and the commit proceeds; missing owner
+or agent identity -> exit 1 with the exact STOP message; configured identity equal to the
+recorded owner identity -> exit 1 with "Refusing commit: configured git identity is the
+repository owner identity". Usable as .git/hooks/pre-commit after chmod +x; invoke it
+directly (.git/hooks/pre-commit) to prove the hook behavior.
+
 ## Output Format
 
 A Startup Context Report, delivered in the conversation (or as a file if the
@@ -138,6 +194,9 @@ Verdict: PROCEED | HALTED — <question for the human>
 - Uncommitted changes or an unexpected branch the task does not account for →
   stop and ask before touching the tree.
 - A file the task depends on does not exist → stop and surface it.
+- Configured Git identity equals the recorded owner identity, or owner/agent identity is
+  missing → STOP before committing; report the mismatch and ask the human to fix it,
+  never commit as the owner (see Git Identity Gate and the pre-commit hook).
 
 ## Supporting Files
 
