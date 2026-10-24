@@ -2234,6 +2234,81 @@ def test_coverage_map_evidence_rules():
             raise AssertionError("empty/None manifest must fail closed")
 
 
+    # PTR-INTEGRITY pointer resolution: live-map positive (the two map rows
+    # that carry catalog/row pointers) plus synthetic stale or mis-targeted
+    # pointer negatives. Direct asserts keep 68 defs / 253 PASS lines.
+    payload = load_coverage()
+    for row_id in (2, 4):
+        evidence = coverage_entry(payload, row_id)["evidence"]
+        assert "catalog lines " in evidence, (row_id, evidence)
+        assert "skill row" in evidence, (row_id, evidence)
+    with tempfile.TemporaryDirectory() as tmp:
+        def stale_catalog_line(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = (row["evidence"]
+                               + " catalog lines 999998-999999")
+        with mutated_coverage(Path(tmp), stale_catalog_line) as rep:
+            assert any("catalog line pointer" in err
+                       and "does not resolve" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def mis_targeted_catalog_line(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = row["evidence"] + " catalog lines 1-1"
+        with mutated_coverage(Path(tmp), mis_targeted_catalog_line) as rep:
+            assert any("names none of the row's covering skills" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def reversed_catalog_range(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = row["evidence"] + " catalog lines 1480-1478"
+        with mutated_coverage(Path(tmp), reversed_catalog_range) as rep:
+            assert any("has a reversed range" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def stale_skill_row(payload):
+            row = coverage_entry(payload, 4)
+            row["evidence"] = row["evidence"] + " skill row 999998"
+        with mutated_coverage(Path(tmp), stale_skill_row) as rep:
+            assert any("skill-row pointer" in err
+                       and "does not resolve" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def non_table_skill_row(payload):
+            row = coverage_entry(payload, 4)
+            row["evidence"] = row["evidence"] + " skill row 1"
+        with mutated_coverage(Path(tmp), non_table_skill_row) as rep:
+            assert any("does not point at a docs/skills-catalog.md table row"
+                       in err for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def wrong_skill_row(payload):
+            row = coverage_entry(payload, 4)
+            row["evidence"] = row["evidence"] + " skill row 392"
+        with mutated_coverage(Path(tmp), wrong_skill_row) as rep:
+            assert any("does not name one of the row's covering skills" in err
+                       for err in rep.errors), rep.errors
+    with tempfile.TemporaryDirectory() as tmp:
+        def unknown_skill_pointer(payload):
+            tick = chr(96)
+            row = coverage_entry(payload, 1)
+            row["evidence"] = (row["evidence"] + " See " + tick
+                               + "zzz-not-a-real-skill-id" + tick + ".")
+        with mutated_coverage(Path(tmp), unknown_skill_pointer) as rep:
+            assert any("resolves neither to tools/skills-manifest.json"
+                       in err for err in rep.errors), rep.errors
+    # Fail closed when the catalog cannot be read.
+    with tempfile.TemporaryDirectory() as tmp:
+        original_catalog = validator.CATALOG
+        validator.CATALOG = Path(tmp) / "missing-catalog.md"
+        try:
+            rep = validator.Report()
+            validator.check_coverage_map(rep)
+        finally:
+            validator.CATALOG = original_catalog
+        assert any("docs/skills-catalog.md unavailable" in err
+                   for err in rep.errors), rep.errors
+
+
 def test_coverage_map_totals_mismatch():
     """Totals: a JSON totals field that disagrees with the entries is rejected."""
     with tempfile.TemporaryDirectory() as tmp:
