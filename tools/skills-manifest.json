@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "b41614067d46af024da8b234533d337ae64f81a3",
+  "source_revision": "428d8a59ba99d2da132e04d1f6013acdae351588",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -1231,7 +1231,7 @@
     {
       "name": "ux-design-iteration",
       "path": ".claude/skills/ux-design-iteration/SKILL.md",
-      "sha256": "49819fc0e3d21bc02e8d05d3b61b8c524b159d9c71a69d9b4f616ece56f03a03"
+      "sha256": "f472e9977292c35837cc2078881af9e08c9bde87980dfbc69ecc85b6769056cc"
     },
     {
       "name": "validation-boundary-designer",
