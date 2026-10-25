@@ -124,11 +124,15 @@ authorize execution.
    below (downstream_expected_critical_path with expected_maximum_at_joins in
    expected mode; downstream_hard_bound in hard mode; every hard-mode term
    states its recorded bound/percentile source, expected-mode terms state
-   their probability/distribution source). Keep ONE rule:
-   upstream timeout > own work + downstream critical-path budget + recorded
-   epsilon (all ms; epsilon is recorded once, never doubled). If no feasible
-   timeout exists under these terms, escalate as a latency budget violation;
-   never hide it. The 30-second default is a bug in a 300ms path.
+   their probability/distribution source). Expected-mode cascade:
+   upstream_timeout > total_expected_hop_cost + epsilon (the canonical term
+   already includes upstream own work and the downstream expected critical
+   path; never add own work again). Hard-mode cascade: upstream_timeout >
+   upstream_own_hard_bound + downstream_hard_bound + epsilon. Epsilon is
+   recorded once, never doubled. If no feasible timeout exists under these
+   terms, escalate as a latency budget violation; never hide it. The
+   30-second default is a bug in a 300ms path; the exact expected/hard term
+   definitions are the canonical R8-CONV-2 ones.
 
 6. **Derive retry policy from what the budget affords.** Retries spend
    budget per the canonical R8-CONV-2 model below (probability-weighted
@@ -186,7 +190,7 @@ Path & shape: <hop chain; parallel sections marked; fan-out N noted>
 Budget table:
   <hop>: <ms> — owner=<team/role> — current=<measured pXX> — notes=<incl. overhead rows>
   serialization/connection/queue-wait rows: <ms each>
-  retry spend (R8-CONV-2 retry_overhead): <probability-weighted spend - funded from whose budget>
+  retry spend (R8-CONV-2): <expected-mode retry_overhead | hard-mode retry_allowance_bound - funded from whose budget>
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>

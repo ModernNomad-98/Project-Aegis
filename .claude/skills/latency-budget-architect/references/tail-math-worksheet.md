@@ -66,6 +66,7 @@ Cascade check, leaf to root:
   canonical R8-CONV-2 expected/hard cascade terms (downstream_expected_critical_path
   with expected_maximum_at_joins in expected mode; hard-mode
   downstream_hard_bound). Epsilon is recorded once.
+```
 
 ## Retry-spend accounting
 
