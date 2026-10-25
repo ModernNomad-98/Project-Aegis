@@ -14,7 +14,12 @@ contract, but no YAML reader is currently claimed. The ledger's append-only
 event lines have a separate historical format and are
 outside this version-field rule. A work package (WP) is a bounded delivery in
 the [BER backlog](roadmaps/behavioral-eval-runner-backlog.md). The current
-WP-2B-1 result and evidence version is `1.0.0-wp2b1`. The WP-2B-2 grading
+WP-2B-1 result and evidence version is `1.0.0-wp2b1`, produced by runner
+`0.1.0-wp2b1`. The implementation-corpus census record is its own registered
+record family within WP-2B-1 (PKG-04 REV-3: schema
+`1.1.0-census-wp2b1` / runner `0.2.0-census-wp2b1`; see
+[Registered additive shape](#registered-additive-shape-110-census-wp2b1-census-documented-route-cases)).
+Its earlier `1.0.0-wp2b1` bytes remain immutable historical evidence. The WP-2B-2 grading
 and WP-2B-3 calibration contracts have
 their own version families. A value from one family never substitutes for
 another, even if its numeric prefix matches.
@@ -38,8 +43,12 @@ those actions.
 Every external record in these versioned formats declares `schema_version`
 explicitly. Readers reject a
 missing, null, malformed or unsupported version before interpreting its fields.
-The WP-2B-1 readers currently support only `1.0.0-wp2b1`; they do not infer
-that version from absent data. The final report also declares a nonempty
+The WP-2B-1 result/evidence readers currently support only `1.0.0-wp2b1`;
+they do not infer that version from absent data. The census record is dispatched
+on its own registered family (below), and census records carrying the earlier
+`1.0.0-wp2b1` version are historical evidence kept under their own recorded
+version: they are not silently upgraded, reinterpreted under the new census
+shape, or rewritten in place. The final report also declares a nonempty
 `runner_version`, which identifies the producing runner independently from
 the result schema. Internal constructors may default to the current version
 when creating a new record; serialization writes it explicitly.
@@ -81,6 +90,66 @@ loading it. Deprecation or removal of an old reader requires impact evidence
 and owner review; preserve a separate archival reader when historical evidence
 must remain interpretable.
 
+## Registered additive shape: 1.1.0-census-wp2b1 (census documented-route cases)
+
+PKG-04 REV-3 adds an optional documented-route case kind to the implementation
+corpus census and an always-present additive census shape. Because an additive
+field changes the published serialized shape, the census record family is
+registered at **schema `1.1.0-census-wp2b1` (minor: additive compatible shape)
+/ runner `0.2.0-census-wp2b1` (new writer behavior)**. The WP-2B-1
+result/evidence family and the scheduling policy remain `1.0.0-wp2b1` /
+`0.1.0-wp2b1` because no other published record shape changed; this follows the
+same pattern as the separate WP-2B-2 grading and WP-2B-3 calibration families.
+The registration is:
+
+- Shape: the census record gains `documentation_route_cases` (top-level list),
+  `totals.documentation_route_cases` and a per-skill
+  `documentation_route_cases` counter; every other published census field and
+  its meaning are unchanged. The WP-2B-1 scheduling-policy version
+  (`1.0.0-wp2b1`) is not changed.
+- Pinned baseline: the comparator
+  (`census.EXPECTED_PINNED_BASELINE` / `verify_expected_baseline`) now also
+  expects `documentation_route_cases: 0`, because the pinned snapshot
+  (`fc98ee6b`) contains no route case; the pinned census reports the new
+  section as an empty list and verifies.
+- Tests: `tools/behavioral_eval_runner/tests/test_census.py`
+  `TestVersionRegistration` pins these exact version strings, pin-checks that
+  the other WP-2B-1 versions did not move, and pins the zero pinned route
+  count; `TestDocumentationRouteCases` and `TestTriggerCaseFailClosed` cover
+  the accepted and rejected case shapes.
+- Readers: `census.validate_census_record` accepts only this registered census
+  family; missing, old (`1.0.0-wp2b1`) or unknown versions fail closed before
+  any field is interpreted. No census-path reader uses the package-wide WP-2B-1
+  version constants: the only census record consumers in this package are the
+  generator/CLI writer and its tests (audited 2026-10-25). Older `1.0.0-wp2b1`
+  census artifacts keep their bytes, paths and recorded version; any conversion
+  or archival reader would be a separate reviewed operation under
+  [Historical evidence and conversion](#historical-evidence-and-conversion).
+- Counting: documented-route cases are non-activation negatives. They are
+  counted as discrimination cases and in `documentation_route_cases`, and are
+  explicitly excluded from
+  `proposed_empty_consumer_runnable_single_prompt_cases`; every pre-existing
+  census field keeps its meaning, so the "every other field unchanged"
+  statement remains truthful (the change adds fields plus the route counts
+  that follow from the new case kind).
+- Route shape: `expected_route` is a repository-relative document reference,
+  heuristically validated (no URL/URI scheme, no leading `/`, no empty, `.` or
+  `..` path segments, and a final segment containing `.`; a top-level
+  `README.md` is accepted and an anchor may follow the path). It is
+  deliberately not a filesystem or URL existence check; a route registry
+  would be separate reviewed work.
+- Normalization: `expected_skill` goes through the existing `parse_target`
+  contract, which trims surrounding whitespace before parsing; reverse-index
+  keys use the parsed (trimmed) target name. `expected_route` is recorded
+  exactly as authored apart from the blankness/shape checks.
+- Diagnostics and tests: malformed non-blank `expected_skill`, both/neither/
+  blank keys and route-shape violations all fail closed naming the owning
+  trigger-evals file and case id; `TestCensusRecordRoundTripAndVersionGating`
+  covers canonical round-trip serialization and missing/old/unknown version
+  rejection. The census exit path reports the census record versions
+  (`CENSUS_SCHEMA_VERSION` / `CENSUS_RUNNER_VERSION`) rather than the
+  package-wide WP-2B-1 constants.
+
 ## Historical evidence and conversion
 
 Keep each source artifact's original bytes, path, SHA-256 (the 256-bit Secure
@@ -90,6 +159,16 @@ add a missing version. First verify the source bundle under its recorded
 version-specific reader. If the version is absent or unsupported, quarantine
 it as uninterpreted evidence until a reviewed reader or forensic procedure is
 approved; a matching hash does not license guessing its schema.
+The superseded implementation-corpus census artifact
+`artifacts/evidence/behavioral-eval-runner-wp-2b-1-census.json` (740,727 bytes /
+1 line / SHA-256
+`28747cc1dc696b7758e9a8d5affe8cf58bd648a7ac235ef6ba7ccdabc02e38ab`, registered
+2026-10-25) keeps its bytes and recorded `1.0.0-wp2b1` version. It is
+**intentionally not loadable by current tooling**: the census record family
+moved to `1.1.0-census-wp2b1` and there is no archival reader for the old
+census shape in this package, so `validate_census_record` rejects it.
+Interpreting it would require the reviewed conversion/archival reader described
+in this section. No old census record is silently upgraded or rewritten.
 
 A proposed conversion is a separate, reviewed operation. Record the source
 version and hashes, target version, mapping for every changed field and enum,

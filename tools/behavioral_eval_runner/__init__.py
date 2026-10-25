@@ -30,6 +30,17 @@ RUNNER_VERSION = "0.1.0-wp2b1"
 SCHEMA_VERSION = "1.0.0-wp2b1"
 SCHEDULING_POLICY_VERSION = "1.0.0-wp2b1"
 
+# PKG-04 REV-3 registered census record versions. Only the implementation-corpus
+# census record shape changed (additive documented-route cases), so only that
+# published record family moves: schema 1.1.0-census-wp2b1 (minor: additive
+# compatible shape) and runner 0.2.0-census-wp2b1 (new writer behavior). The
+# WP-2B-1 result/evidence family above stays 1.0.0-wp2b1/0.1.0-wp2b1 because no
+# other published record shape changed. Registered by
+# docs/behavioral-eval-runner-schema-compatibility.md and pinned by
+# tools/behavioral_eval_runner/tests/test_census.py.
+CENSUS_SCHEMA_VERSION = "1.1.0-census-wp2b1"
+CENSUS_RUNNER_VERSION = "0.2.0-census-wp2b1"
+
 AUTHORIZATION_ID = "BER-DEC-006"
 WORK_PACKAGE = "WP-2B-1"
 AUTHORIZATION_MERGE_SHA = "fc98ee6bf59bb516064be62ed8c5dc8861c92697"
@@ -55,6 +66,8 @@ __all__ = [
     "RUNNER_VERSION",
     "SCHEMA_VERSION",
     "SCHEDULING_POLICY_VERSION",
+    "CENSUS_SCHEMA_VERSION",
+    "CENSUS_RUNNER_VERSION",
     "AUTHORIZATION_ID",
     "WORK_PACKAGE",
     "AUTHORIZATION_MERGE_SHA",

@@ -21,10 +21,10 @@ import json
 import re
 from typing import Any, Mapping
 
-from . import RUNNER_VERSION, SCHEMA_VERSION
+from . import CENSUS_RUNNER_VERSION, CENSUS_SCHEMA_VERSION
 from .canonical import sha256_hex_text
 from .enums import CaseType, EvalFileKind, RiskClass, RuntimeClassification, TargetKind
-from .errors import CensusBaselineMismatchError, CensusError
+from .errors import CensusBaselineMismatchError, CensusError, SchemaValidationError
 from .identity import build_assertion_uid, build_case_uid
 from .materialize import (
     AGENTS_PREFIX,
@@ -35,7 +35,7 @@ from .materialize import (
     _run_git,
     is_full_sha,
 )
-from .models import parse_target
+from .models import TypedTarget, parse_target
 from .runtime_surface import classify_skill_file
 
 #: Conservative revision charset for a CLI-supplied ref (SHAs, branch/tag
@@ -160,6 +160,10 @@ EXPECTED_PINNED_BASELINE: Mapping[str, int] = {
     "authored_single_prompt_cases": 1740,
     "conversation_suites": 1,
     "potential_units": 1741,
+    # PKG-04 REV-3: the pinned snapshot (fc98ee6b) has no documented-route
+    # cases, so the additive census shape must report exactly zero here. The
+    # comparator is extended rather than left silently blind to the new field.
+    "documentation_route_cases": 0,
 }
 
 
@@ -235,6 +239,101 @@ def _load_json(path: str, content: bytes) -> Any:
         raise CensusError(f"unparseable JSON at {path}: {exc}") from exc
 
 
+_DOC_ROUTE_SCHEME = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
+
+
+def _route_shape_error(route: str) -> "str | None":
+    """Return a diagnostic when an authored route is not a repo-relative document path.
+
+    Conservative, documented heuristic (no route registry or filesystem lookup
+    exists here): a route is a repository-relative document reference; URL/URI
+    schemes, leading slashes, empty/'.'/'..' path segments and a final segment
+    without a '.' are rejected. Legitimate top-level documents such as
+    README.md are accepted, and anchors may follow the document path. The
+    authored string itself is never normalized by this check.
+    """
+    stripped = route.strip()
+    if _DOC_ROUTE_SCHEME.match(stripped):
+        return ("expected_route must be a repository-relative document path, "
+                "not a URL/URI scheme")
+    if stripped.startswith("/"):
+        return "expected_route must be repository-relative (no leading '/')"
+    segments = stripped.split("/")
+    if any(segment in ("", ".", "..") for segment in segments):
+        return ("expected_route must not contain empty, '.' or '..' path "
+                "segments")
+    if "." not in segments[-1]:
+        return ("expected_route must name a document file (its last path "
+                "segment must contain '.')")
+    return None
+
+
+def resolve_trigger_case_target(
+    case: Mapping[str, Any], trigger_path: str
+) -> tuple[TypedTarget | None, str | None]:
+    """Resolve one trigger-eval case's expected target or documentation route.
+
+    A trigger-eval case must declare EXACTLY ONE of these keys, present and
+    non-blank:
+
+    - expected_skill: the installed skill/subagent activation target, or
+    - expected_route: an explicit documentation route (for example a
+      catalogue lookup) whose correct behavior is NOT to activate a skill.
+
+    Returns (target, route) with exactly one entry non-None. The authored
+    route string is returned exactly as authored - no trimming, case folding
+    or other normalization - and is the stable representation; no fake skill
+    is invented for it. Blankness is tested on a stripped copy only.
+    expected_skill is passed to the existing parse_target contract, which
+    trims surrounding whitespace before parsing; a malformed non-blank value
+    is re-raised through the owning-file/case-id diagnostic. A route must be a
+    repository-relative document path under the documented heuristic, so a
+    bare installed-skill name cannot masquerade as a route. Any violation -
+    both keys present, a present-but-blank counterpart, a non-string value, a
+    malformed expected_skill, a route that is not a document path, or neither
+    key - fails closed with a SchemaValidationError naming the owning
+    trigger-evals file and case id (and the received values), so a genuinely
+    invalid route is diagnosable instead of surfacing as an unexplained empty
+    target.
+    """
+    case_id = case.get("id", "<missing id>")
+    skill_present = "expected_skill" in case
+    route_present = "expected_route" in case
+    raw_skill = case.get("expected_skill")
+    raw_route = case.get("expected_route")
+
+    def _invalid(problem: str) -> SchemaValidationError:
+        return SchemaValidationError(
+            f"trigger-eval case {str(case_id)!r} in {trigger_path!r}: {problem}; "
+            "declare exactly one present non-blank 'expected_skill' (installed "
+            "activation target) or 'expected_route' (documentation route, not "
+            f"an installed skill); got expected_skill={raw_skill!r}, "
+            f"expected_route={raw_route!r}"
+        )
+
+    if skill_present and route_present:
+        raise _invalid("both expected_skill and expected_route keys are present")
+    if not skill_present and not route_present:
+        raise _invalid("neither expected_skill nor expected_route is present")
+    if skill_present:
+        if not isinstance(raw_skill, str):
+            raise _invalid("non-string expected_skill")
+        if not raw_skill.strip():
+            raise _invalid("blank expected_skill")
+        try:
+            return parse_target(raw_skill), None
+        except SchemaValidationError as exc:
+            raise _invalid("malformed expected_skill: " + str(exc)) from exc
+    if not isinstance(raw_route, str):
+        raise _invalid("non-string expected_route")
+    if not raw_route.strip():
+        raise _invalid("blank expected_route")
+    shape_error = _route_shape_error(raw_route)
+    if shape_error is not None:
+        raise _invalid(shape_error)
+    return None, raw_route
+
+
 def build_census(
     repo_path: str,
     ref: str,
@@ -306,6 +405,7 @@ def build_census(
     per_skill: list[dict[str, Any]] = []
     findings: list[dict[str, Any]] = []
     subagent_cases: list[dict[str, Any]] = []
+    documentation_route_cases: list[dict[str, Any]] = []
     empty_neighbor_cases: list[str] = []
     should_not_do_cases: list[str] = []
     fixture_dependent: list[dict[str, Any]] = []
@@ -380,6 +480,7 @@ def build_census(
             ),
             "behavior_cases": 0,
             "discrimination_cases": 0,
+            "documentation_route_cases": 0,
             "assertions": 0,
             "files": [
                 {
@@ -476,13 +577,20 @@ def build_census(
             for case in data.get("cases", []):
                 discrimination_cases += 1
                 entry["discrimination_cases"] += 1
-                case_id = str(case.get("id", ""))
+                case_id = str(case.get("id", "<missing id>"))
                 case_uid = build_case_uid(
                     skill, EvalFileKind.TRIGGER_EVAL, case_id, case
                 )
                 prompt = str(case.get("prompt", ""))
-                expected_raw = str(case.get("expected_skill", ""))
-                target = parse_target(expected_raw)
+                target, route = resolve_trigger_case_target(case, trigger_path)
+                if route is not None:
+                    # Documented-route negative: a non-skill case with the
+                    # authored route carried unchanged, never a fake skill and
+                    # never an activation-target edge.
+                    documentation_route_cases.append(
+                        {"case_uid": case_uid, "owner": skill, "route": route}
+                    )
+                    entry["documentation_route_cases"] += 1
                 neighbors = [str(n) for n in case.get("should_not_trigger", [])]
                 snt_key = str(len(neighbors))
                 snt_size_distribution[snt_key] = (
@@ -501,7 +609,7 @@ def build_census(
                             ),
                         }
                     )
-                if target.target_kind.value == "subagent":
+                if target is not None and target.target_kind.value == "subagent":
                     subagent_cases.append(
                         {
                             "case_uid": case_uid,
@@ -516,7 +624,7 @@ def build_census(
                 # Reverse negative-neighbor index: every edge inverted, keyed by
                 # the TYPED target (C3) so skill `X` and subagent `X` never
                 # collapse into one edge set.
-                edge_targets = [target]
+                edge_targets = [target] if target is not None else []
                 for raw in [*neighbors, *file_overlaps]:
                     edge_targets.append(parse_target(raw))
                 seen_keys: set[str] = set()
@@ -540,8 +648,12 @@ def build_census(
                 risk_distribution[_propose_risk_class(skill, case_type, [])] += 1
                 # Routing/discrimination cases measure activation, not artifact
                 # production, so only a live-service dependence in the prompt is
-                # proposed as blocking an empty-consumer run.
-                if not _scan(prompt, SERVICE_DEPENDENT_FRAGMENTS):
+                # proposed as blocking an empty-consumer run. Documented-route
+                # cases have no activation target at all, so they are excluded
+                # from the proposed-runnable denominator (PKG-04 REV-3): they
+                # are not candidates for an activation run and counting them
+                # would inflate the proposal with cases that cannot be dispatched.
+                if route is None and not _scan(prompt, SERVICE_DEPENDENT_FRAGMENTS):
                     proposed_empty_consumer_runnable += 1
 
         per_skill.append(entry)
@@ -554,8 +666,8 @@ def build_census(
 
     census: dict[str, Any] = {
         "census_kind": "wp-2b-1-implementation-corpus-census",
-        "schema_version": SCHEMA_VERSION,
-        "runner_version": RUNNER_VERSION,
+        "schema_version": CENSUS_SCHEMA_VERSION,
+        "runner_version": CENSUS_RUNNER_VERSION,
         "source_commit": snapshot.source_commit,
         "source_tree": snapshot.source_tree,
         "generated_at": generated_at,
@@ -579,6 +691,7 @@ def build_census(
             "behavior_case_types": dict(sorted(totals_types.items())),
             "trigger_eval_files": trigger_files,
             "discrimination_cases": discrimination_cases,
+            "documentation_route_cases": len(documentation_route_cases),
             "should_not_trigger_size_distribution": dict(
                 sorted(snt_size_distribution.items(), key=lambda kv: int(kv[0]))
             ),
@@ -608,12 +721,17 @@ def build_census(
             "note": (
                 "runnability figures are PROPOSED preflight candidates for the "
                 "OD-2 minimum-coverage decision; actual runnable_units are a "
-                "per-run §5b preflight output, never assumed"
+                "per-run §5b preflight output, never assumed. Documented-route "
+                "cases are non-activation negatives and are excluded from the "
+                "proposed-empty-consumer-runnable count (PKG-04 REV-3)."
             ),
         },
         "manual_only_skills": sorted(manual_only_skills),
         "subagent_target_cases": sorted(
             subagent_cases, key=lambda c: c["case_uid"]
+        ),
+        "documentation_route_cases": sorted(
+            documentation_route_cases, key=lambda c: c["case_uid"]
         ),
         "empty_neighbor_cases": sorted(empty_neighbor_cases),
         "should_not_do_cases": sorted(should_not_do_cases),
@@ -655,6 +773,7 @@ def verify_expected_baseline(census: Mapping[str, Any]) -> None:
         "authored_single_prompt_cases": totals.get("authored_single_prompt_cases"),
         "conversation_suites": totals.get("conversation_suites"),
         "potential_units": totals.get("potential_units"),
+        "documentation_route_cases": totals.get("documentation_route_cases"),
     }
     mismatches = {
         key: {"expected": EXPECTED_PINNED_BASELINE[key], "actual": actual[key]}
@@ -666,6 +785,33 @@ def verify_expected_baseline(census: Mapping[str, Any]) -> None:
             "pinned corpus differs from the expected baseline; surface to the "
             f"owner before proceeding: {json.dumps(mismatches, sort_keys=True)}"
         )
+
+
+def validate_census_record(census: Mapping[str, Any]) -> None:
+    """Validate a serialized implementation-corpus census record's versions.
+
+    The census record is its own registered version family: the current
+    schema/runner versions are CENSUS_SCHEMA_VERSION / CENSUS_RUNNER_VERSION.
+    A missing, old or unknown version fails closed before any field is
+    interpreted. The earlier 1.0.0-wp2b1 census shape deliberately has NO
+    archival reader here - those bytes remain historical evidence with their
+    recorded path/SHA-256 and are not silently upgraded (see
+    docs/behavioral-eval-runner-schema-compatibility.md).
+    """
+    if not isinstance(census, Mapping):
+        raise SchemaValidationError("census record must be a JSON object")
+    schema_version = census.get("schema_version")
+    if schema_version != CENSUS_SCHEMA_VERSION:
+        raise SchemaValidationError(
+            "census schema_version " + repr(schema_version) + " is not the "
+            "registered " + repr(CENSUS_SCHEMA_VERSION) + "; missing/old/"
+            "unknown census versions fail closed")
+    runner_version = census.get("runner_version")
+    if runner_version != CENSUS_RUNNER_VERSION:
+        raise SchemaValidationError(
+            "census runner_version " + repr(runner_version) + " is not the "
+            "registered " + repr(CENSUS_RUNNER_VERSION) + "; missing/old/"
+            "unknown census versions fail closed")
 
 
 def census_prompt_hash(prompt: str) -> str:
