@@ -74,10 +74,11 @@ that makes the target achievable by design rather than by hope.
    depends on the shape.
 5. Existing timeout/retry configuration per hop: what is set today,
    where the defaults came from, and where retries can multiply - model the
-   retry spend with the canonical R8-CONV-2 section cited at the top of this
-   skill (probability-weighted retry_overhead; nested or correlated layers
-   need a recorded joint expectation or conservative bound, never marginal
-   multiplication treated as exact).
+   retry spend with the canonical R8-CONV-2 model cited at the top of this
+   skill and set out in full in the canonical section below (probability-
+   weighted retry_overhead; nested or correlated layers need a recorded joint
+   expectation or conservative bound, never marginal multiplication treated
+   as exact).
 6. The frontend share, if the target is user-perceived: how much of
    the budget the browser consumes (render, hydration) — allocated
    with `frontend-perf-engineer`'s metrics vocabulary.
@@ -120,9 +121,10 @@ authorize execution.
    itself spends (processing, serialization, and the queue/connection waits
    it owns); downstream critical-path budget is the cumulative downstream
    latency defined by the canonical R8-CONV-2 expected/hard cascade terms
-   below (total_expected_hop_cost in expected mode; downstream_hard_bound in
-   hard mode; every term states its recorded bound/percentile source). Keep
-   ONE rule:
+   below (downstream_expected_critical_path with expected_maximum_at_joins in
+   expected mode; downstream_hard_bound in hard mode; every hard-mode term
+   states its recorded bound/percentile source, expected-mode terms state
+   their probability/distribution source). Keep ONE rule:
    upstream timeout > own work + downstream critical-path budget + recorded
    epsilon (all ms; epsilon is recorded once, never doubled). If no feasible
    timeout exists under these terms, escalate as a latency budget violation;
@@ -131,8 +133,9 @@ authorize execution.
 6. **Derive retry policy from what the budget affords.** Retries spend
    budget per the canonical R8-CONV-2 model below (probability-weighted
    retry_overhead, not a flat charge). State which hops may retry (idempotent
-   ones), how many times (one named layer only - usually the innermost), and
-   hedging only where the budget's headroom explicitly funds it. Nested or
+   ones), how many times (usually one) at one named layer only (usually the
+   innermost), and hedging only where the budget's headroom explicitly funds
+   it. Nested or
    correlated retry layers need a recorded joint expectation or conservative
    bound, never marginal multiplication treated as exact.
 7. **Design violation attribution.** Per-hop spans with the budget
@@ -222,7 +225,8 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       headroom-funded or absent; retry spend follows the canonical R8-CONV-2
       model (probability-weighted retry_overhead; nested or correlated layers
       use a recorded joint expectation or conservative bound, never marginal
-      multiplication treated as exact).
+      multiplication treated as exact); retry spend includes the downstream
+      critical-path cost per R8-CONV-2, not only the hop's own work.
 - [ ] Headroom is a named line item with an owner, 15–25%.
 - [ ] Every hop has an owner; hops over budget today have their
       reduction work ROUTED, not absorbed into this design.

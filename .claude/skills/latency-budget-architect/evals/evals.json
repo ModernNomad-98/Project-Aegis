@@ -34,7 +34,7 @@
         "triggers": true,
         "assertions": [
           "Rejects the 30-second defaults as bugs in a 500ms path: timeouts derive from hop budgets, since waiting longer than the budget means the promise already failed.",
-          "Assigns retries to ONE named layer, idempotent hops only, and prices retry spend with the canonical R8-CONV-2 model (probability-weighted retry_overhead over wait_k/own-attempt work; total_expected_hop_cost and expected_maximum_at_joins for the expected cascade); for nested or correlated retry layers requires a recorded joint expectation or conservative bound instead of marginal multiplication treated as exact.",
+          "Assigns retries to ONE named layer, idempotent hops only, and prices retry spend with the canonical R8-CONV-2 model (probability-weighted retry_overhead built from wait_k and per-attempt own work; total_expected_hop_cost and expected_maximum_at_joins for the expected cascade); for nested or correlated retry layers requires a recorded joint expectation or conservative bound instead of marginal multiplication treated as exact.",
           "Runs the cascade check so no upstream abandons work its downstream completes.",
           "Prices each permitted retry as spend from a named allocation rather than a free action.",
           "Requires a finite timeout on every budgeted path; an infinite or missing timeout is a violation, not a default."

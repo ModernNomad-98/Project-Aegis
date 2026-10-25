@@ -63,8 +63,9 @@ Cascade check, leaf to root:
   own work = what the hop itself spends (processing, serialization, queue and
   connection waits it owns); downstream critical-path budget = serial
   downstream hops + the longest parallel branch at each join, priced with the
-  canonical R8-CONV-2 expected/hard cascade terms (total_expected_hop_cost;
-  hard-mode downstream_hard_bound). Epsilon is recorded once.
+  canonical R8-CONV-2 expected/hard cascade terms (downstream_expected_critical_path
+  with expected_maximum_at_joins in expected mode; hard-mode
+  downstream_hard_bound). Epsilon is recorded once.
 
 ## Retry-spend accounting
 
