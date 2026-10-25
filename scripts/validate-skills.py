@@ -240,33 +240,138 @@ COVERAGE_ANOMALY_SKILLS = {
     299: frozenset({"ai-router-architect", "ai-cost-guardrail-designer"}),
 }
 COVERAGE_DROPPED_CANDIDATE = "ai-feature-kill-switch-designer"
-COVERAGE_SHIPPED_AS_RE = re.compile(
-    r"\bshipped\s+as\s*:?\s*([a-z0-9][a-z0-9-]{1,})\b", re.IGNORECASE)
-COVERAGE_SHIPPED_MARKDOWN_RE = re.compile("[" + chr(96) + "*_]+")
+COVERAGE_SHIPPED_AS_RE = re.compile(r"\bshipped\s+as", re.IGNORECASE)
+# Markdown links are neutralised to same-length spaces for phrase/negation
+# context only (so a link before/abutting the phrase cannot hide it or
+# fabricate a negation); link labels are reduced only inside the token
+# substring after the phrase (so a link-wrapped skill token still parses).
+COVERAGE_SHIPPED_LINK_MASK_RE = re.compile(r"\[([^\]\n]*)\]\([^)\n]*\)")
+COVERAGE_SHIPPED_COLON_RE = re.compile(r"\s*:?\s*")
+# Wrapper characters that may surround a skill token (ASCII and typographic
+# quotes, brackets, backticks, asterisks, emphasis underscores).  Only paired
+# emphasis underscores are stripped during normalization; an underscore inside
+# or adjacent to a token is preserved and reported as unknown.
+COVERAGE_SHIPPED_WRAPPER_CHARS = ("([{\"'`*_" + chr(0x201C) + chr(0x201D)
+                                  + chr(0x2018) + chr(0x2019))
+COVERAGE_SHIPPED_CLOSING_CHARS = (")]}\"'`*_" + chr(0x201C) + chr(0x201D)
+                                  + chr(0x2018) + chr(0x2019))
+# A candidate token is a letter followed by letters/digits/hyphens/underscores;
+# a token containing '-' or '_' is skill-shaped and must resolve to a manifest
+# skill (unknown -> fail closed); a plain English word ends the list (prose).
+COVERAGE_SHIPPED_TOKEN_RE = re.compile(
+    r"\s*[" + re.escape(COVERAGE_SHIPPED_WRAPPER_CHARS) + r"]*"
+    r"([A-Za-z](?:[A-Za-z0-9_-]*[A-Za-z0-9])?)"
+    r"[" + re.escape(COVERAGE_SHIPPED_CLOSING_CHARS) + r"]*")
+# List separators include a serial comma before a conjunction ("a, b, and c").
+COVERAGE_SHIPPED_SEPARATOR_RE = re.compile(
+    r"\s*(?:(?:,|&|/)\s*(?:\band\b|\bor\b)?|\band\b|\bor\b)\s*",
+    re.IGNORECASE)
+# Negation is deliberately base-equivalent: only 'not'/'never' immediately
+# before this occurrence's phrase (the base predicate's 16-character window).
+# Nothing the base predicate detects can therefore be suppressed; auxiliary and
+# contraction forms ('has not yet', "wasn't") are claims exactly as in base.
 COVERAGE_SHIPPED_NEGATION_RE = re.compile(r"\b(?:not|never)\s*$", re.IGNORECASE)
+COVERAGE_SHIPPED_NEGATION_WINDOW = 16
+COVERAGE_SHIPPED_MD_LINK_RE = re.compile(r"\[([^\]\n]*)\]\([^)\n]*\)")
+# Strip Markdown code ticks and asterisks (never valid in a manifest id) plus
+# paired emphasis underscores; underscores inside/next to a token or hyphen are
+# preserved so a corrupted token is reported as unknown, never normalized into
+# a known skill.
+COVERAGE_SHIPPED_WRAPPER_RE = re.compile(
+    r"[`*]|(?<![A-Za-z0-9_-])_{1,3}|_{1,3}(?![A-Za-z0-9_-])")
+
+
+def _coverage_shipped_normalize(text: str) -> str:
+    """Strip Markdown links/wrappers without corrupting token underscores."""
+    return COVERAGE_SHIPPED_WRAPPER_RE.sub(
+        "", COVERAGE_SHIPPED_MD_LINK_RE.sub(r"\1", text))
+
+
+def _coverage_shipped_link_mask(text: str) -> str:
+    """Replace Markdown links with same-length spaces (offset-preserving)."""
+    return COVERAGE_SHIPPED_LINK_MASK_RE.sub(
+        lambda match: " " * len(match.group(0)), text)
+
+
+def _coverage_shipped_scan(entry_text: str,
+                           manifest: "set[str] | None") -> dict:
+    """Classify every shipped-as occurrence in evidence text (text-based).
+
+    Returns {"claims": sorted known-manifest skill names, "unknown": sorted
+    skill-shaped tokens absent from the manifest}. Fails closed (ValueError)
+    when the manifest is unavailable, empty, or has no non-blank string names.
+    Negation is bound to each occurrence and is base-equivalent (only 'not' or
+    'never' immediately before that occurrence's phrase), so no claim the base
+    predicate detects is suppressed; 'not just'/'not only'/auxiliary and
+    contraction forms are claims, like base. The adjacent token list is read
+    through wrappers and comma/&/slash/and/or connectors including serial
+    commas, so every named token is classified; unknown skill-shaped tokens
+    fail closed; plain English words end the list (prose is not a claim).
+    Phrase detection and the negation window run on the raw text with Markdown
+    links neutralised to same-length spaces (offset-preserving), so a link
+    label 'not'/'never' or a link abutting the phrase cannot hide or fabricate
+    a claim; link labels are reduced only inside the post-phrase token list.
+    Text-based evidence check, not semantic shipping proof.
+    """
+    if not isinstance(manifest, set) or not manifest:
+        raise ValueError("manifest unavailable or empty")
+    known = {name.casefold() for name in manifest
+             if isinstance(name, str) and name.strip()}
+    if not known:
+        raise ValueError("manifest has no usable string skill names")
+    raw = entry_text
+    # Phrase detection and the per-occurrence negation window run on the base
+    # predicate's own normalization (markdown characters stripped globally), with
+    # an index map back to the raw text. This is parity-by-construction: every
+    # phrase the base predicate can detect is detected here, and a Markdown link
+    # label/abutment cannot hide or fabricate it. Link labels are reduced only
+    # inside the post-phrase token substring, so link-wrapped skill tokens still
+    # parse while an underscore-corrupted token is reported unknown, not claimed.
+    normalized_chars = []
+    index_map = []
+    for index, char in enumerate(raw):
+        if char in "`*_":
+            continue
+        normalized_chars.append(char)
+        index_map.append(index)
+    normalized = "".join(normalized_chars)
+    claims = set()
+    unknown = set()
+    for match in COVERAGE_SHIPPED_AS_RE.finditer(normalized):
+        prefix = normalized[max(0, match.start()
+                                - COVERAGE_SHIPPED_NEGATION_WINDOW):match.start()]
+        if COVERAGE_SHIPPED_NEGATION_RE.search(prefix):
+            continue
+        raw_position = index_map[match.end() - 1] + 1
+        tokens = _coverage_shipped_normalize(raw[raw_position:])
+        colon = COVERAGE_SHIPPED_COLON_RE.match(tokens, 0)
+        if colon is not None:
+            tokens = tokens[colon.end():]
+        position = 0
+        while True:
+            token_match = COVERAGE_SHIPPED_TOKEN_RE.match(tokens, position)
+            if token_match is None:
+                break
+            candidate = token_match.group(1)
+            candidate_cf = candidate.casefold()
+            if candidate_cf in known:
+                claims.add(candidate_cf)
+            elif "-" in candidate or "_" in candidate:
+                unknown.add(candidate_cf)
+            else:
+                break
+            position = token_match.end()
+            separator = COVERAGE_SHIPPED_SEPARATOR_RE.match(tokens, position)
+            if separator is None or separator.end() == position:
+                break
+            position = separator.end()
+    return {"claims": sorted(claims), "unknown": sorted(unknown)}
 
 
 def _coverage_shipped_claims(entry_text: str,
                              manifest: "set[str] | None") -> "list[str]":
-    """Return known-manifest skills claimed by shipped-as evidence text.
-
-    Text-based evidence check (not semantic shipping proof). Strips Markdown
-    wrappers, normalizes tokens with casefold, skips negated phrases, and
-    fails closed when the manifest is unavailable/empty.
-    """
-    if not isinstance(manifest, set) or not manifest:
-        raise ValueError("manifest unavailable or empty")
-    known = {name.casefold() for name in manifest if isinstance(name, str)}
-    normalized = COVERAGE_SHIPPED_MARKDOWN_RE.sub("", entry_text)
-    claims = set()
-    for match in COVERAGE_SHIPPED_AS_RE.finditer(normalized):
-        prefix = normalized[max(0, match.start() - 16):match.start()]
-        if COVERAGE_SHIPPED_NEGATION_RE.search(prefix):
-            continue
-        token = match.group(1).casefold()
-        if token in known:
-            claims.add(token)
-    return sorted(claims)
+    """Return known-manifest skills claimed by shipped-as evidence text."""
+    return _coverage_shipped_scan(entry_text, manifest)["claims"]
 
 
 # PTR-INTEGRITY (2026-10-24): coverage evidence pointers must resolve against
@@ -2397,23 +2502,34 @@ def check_coverage_map(rep: Report) -> None:
                       + ": the dropped candidate '"
                       + COVERAGE_DROPPED_CANDIDATE + "' must never be a "
                       "covering skill (historical evidence note only)")
-    # D114 convention (text-based evidence check; disclosed limits): scan
-    # every shipped-as occurrence; normalize Markdown and casefold; only
-    # actual manifest skill names count as claims; negated phrases are not
-    # claims; a second shipped-as occurrence is checked too; malformed or
-    # unavailable manifest/covering data fails closed. This checks evidence
-    # text, not semantic shipping proof.
+    # D114 convention (text-based evidence check; disclosed limits): every
+    # shipped-as occurrence is scanned; an optional colon and wrapper forms
+    # (ASCII/typographic quotes, brackets, backticks, asterisks, paired
+    # underscores) are accepted; the adjacent token list is read through
+    # comma/&/slash/and/or connectors including serial commas, so every named
+    # token is classified; negation is bound to each occurrence and is
+    # base-equivalent (only immediate not/never), so no base-detected claim is
+    # suppressed; unknown skill-shaped tokens fail closed; malformed/unavailable
+    # manifest/covering data fails closed. Skill ids are kebab-case; inner or
+    # adjacent underscores are preserved and reported unknown, never normalized
+    # into a known id. This checks evidence text, not semantic shipping proof.
     for entry in entries:
         if not isinstance(entry, dict):
             continue
         entry_text = " ".join(str(entry.get(key) or "")
                               for key in ("evidence", "notes"))
         try:
-            claimed = _coverage_shipped_claims(entry_text, manifest)
+            scan = _coverage_shipped_scan(entry_text, manifest)
         except ValueError:
             rep.error("[" + ctx + "] manifest unavailable or empty; cannot "
                       "enforce the D114 shipped-by-skill convention (fail closed)")
             break
+        for unknown_token in scan["unknown"]:
+            rep.error("[" + ctx + "] entry " + str(entry.get("id"))
+                      + " states a shipped-as token '" + unknown_token
+                      + "' that is not a skill in tools/skills-manifest.json "
+                      "(D114 fail-closed: unknown shipped-as token)")
+        claimed = scan["claims"]
         if not claimed:
             continue
         skills = entry.get("covering_skills")
