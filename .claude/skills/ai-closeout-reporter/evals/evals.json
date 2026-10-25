@@ -146,6 +146,32 @@
           "Adds no completion-baseline anchor, because the work is not complete."
         ]
       }
+    },
+    {
+      "id": "local-ref-claim-needs-remote-readback",
+      "type": "should_trigger",
+      "prompt": "Close out the task. I pushed the release branch; my local git rev-parse shows the new commit sha and git log shows it on top, so record the push as done.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Writes UNVERIFIED for the push/ref claim and does not claim the push or ref update from local state.",
+          "Names the missing remote read-back command(s) needed - git ls-remote of the exact remote ref (quoting ref + SHA), or the provider/API read-back - and the observed-output requirement.",
+          "States that local rev-parse/log/status is supplementary context only, because a local repository can be ahead, unpushed or stale."
+        ]
+      }
+    },
+    {
+      "id": "review-coverage-completeness",
+      "type": "should_trigger",
+      "prompt": "Close out the PR. I read the submitted-reviews page and there are no blocking reviews, so the review state is clean; note that all reviews are clean.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Refuses to call the review state clean from one page: enumerates every provider, page and cursor (submitted reviews, inline review comments/threads including resolved/outdated with original_commit_id where exposed, conversation comments, review-workflow/check annotations where exposed).",
+          "Records per-finding provider, link, reviewed original_commit_id, concern/applicability, disposition, evidence and uncertainty.",
+          "Reports any unread page/cursor/review as an access gap and as NOT clean; never claims a pass, clean or complete review state from a partial read."
+        ]
+      }
     }
   ]
 }
