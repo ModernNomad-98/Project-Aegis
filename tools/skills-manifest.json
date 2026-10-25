@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "52dd432e0397d90b65faefc59d2474fdd138169c",
+  "source_revision": "3c3365f4aa4740c98eb7f8bac58b834abe39442e",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -101,7 +101,7 @@
     {
       "name": "ai-closeout-reporter",
       "path": ".claude/skills/ai-closeout-reporter/SKILL.md",
-      "sha256": "5715f57e64581041e869ce8a96f42fad851a2d11dcb93e30ecebf93e614d8c9a"
+      "sha256": "c902828ab79fb94b4c8eae020834987c136002e05576844b643fe6d07a0bf765"
     },
     {
       "name": "ai-cost-guardrail-designer",
