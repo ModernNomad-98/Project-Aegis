@@ -46,8 +46,9 @@ Possible design: budget each shard at p99.5, or hedge at 60ms
 - [ ] Connection establishment on the tail (pool miss, TLS) — or the
       promise explicitly excludes cold connections
 - [ ] Queue wait AT TARGET LOAD for any async/queued hop
-- [ ] Retry allowance: (retry count × hop budget + backoff), funded
-      from a named allocation
+- [ ] Retry spend funded from a named allocation and priced with the
+      canonical R8-CONV-2 model (probability-weighted expected retry_overhead;
+      hard-mode retry_allowance_bound where bounds are recorded)
 - [ ] Middleware/filter chains (auth checks, logging interceptors)
 - [ ] The frontend share when the target is user-perceived
       (render/hydration — frontend-perf-engineer's vocabulary)
@@ -61,20 +62,20 @@ Cascade check, leaf to root:
   recorded epsilon
   own work = what the hop itself spends (processing, serialization, queue and
   connection waits it owns); downstream critical-path budget = serial
-  downstream hops + the longest parallel branch at each join, including the
-  initial attempt, retry attempt time and backoff_total. Epsilon is recorded
-  once.
+  downstream hops + the longest parallel branch at each join, priced with the
+  canonical R8-CONV-2 expected/hard cascade terms (total_expected_hop_cost;
+  hard-mode downstream_hard_bound). Epsilon is recorded once.
 
 ## Retry-spend accounting
 
-```
-retry_cost(hop) = P(retry) × (backoff_total + own work(hop) + downstream
-                  critical-path budget(hop))
-Rules: idempotent hops only; ONE layer owns retries (innermost viable);
-       hedging = deliberate duplicate spend, listed as its own row.
-Two-layer retry compounding: layers L1×L2 retries ⇒ up to (1+r1)(1+r2)
-attempts — the storm multiplier; the design names the single retry layer.
-```
+Retry spend is owned by the canonical R8-CONV-2 model
+([docs/semantics/canonical-semantics.md](../../../../docs/semantics/canonical-semantics.md),
+section R8-CONV-2): probability-weighted retry_overhead in expected mode and
+retry_allowance_bound in hard mode; nested or correlated retry layers require
+a recorded joint expectation or conservative bound, never marginal
+multiplication treated as exact. Rules kept here: idempotent hops only; ONE
+named layer owns retries (innermost viable); hedging is deliberate duplicate
+spend listed as its own row.
 
 ## Budget-claim review template (for PRs touching a budgeted path)
 
@@ -101,8 +102,8 @@ Pre-release: performance-test-harness asserts hop budgets where gates
 exist (budgets are its thresholds — one number vocabulary across both).
 ## Canonical composition and hard-mode formulas (R8-CONV-2)
 
-Definitions: p in [0,1] recorded retry probability; R >= 0 integer retry cap; wait_0 = pre-first-attempt wait counted once; wait_k = inter-attempt wait before retry k (k=1..R); own_attempt_work = per-attempt own work excluding queue wait; epsilon = recorded one-time safety margin; recorded_percentile = recorded percentile source for hard bounds; for each downstream hop i: R_down_i >= 0 per-hop retry cap, downstream_own_attempt_work_hard_bound_i, downstream_backoff_total_i; branch_hard_bound_i EXCLUDES retry allowance (no double count); downstream retry allowance is per hop; no additional repeated-execution claim; values ms unless stated.
-
-Expected mode: upstream_own_expected_cost = wait_0 + SUM(k=0..R) p^k*own_attempt_work + SUM(k=1..R) p^k*wait_k; total_expected_hop_cost = upstream_own_expected_cost + SUM(k=0..R) p^k*downstream_expected_critical_path; retry_overhead = total_expected_hop_cost - (wait_0+own_attempt_work+downstream_expected_critical_path); backoff_total = SUM(k=1..R) wait_k; downstream_expected_critical_path uses the EXPECTED MAXIMUM at joins (never MAX of means); expected_maximum_at_joins is the expected-mode join term.
-
-Hard mode: downstream_hard_bound = serial SUM(branch_hard_bound + retry_allowance_bound) with joins taking MAX of branch serial hard bounds; retry_allowance_bound = R_down*downstream_own_attempt_work_hard_bound + (R_down>0 ? downstream_backoff_total : 0) (R_down=0 => 0 exactly; upstream backoff_total never charged to a no-retry hop); cascade upstream_timeout > upstream_own_hard_bound + downstream_hard_bound + epsilon. Every hard term states its recorded bound/percentile source; no mixed expected/hard comparison.
+The canonical formulas are defined once, in
+[docs/semantics/canonical-semantics.md](../../../../docs/semantics/canonical-semantics.md)
+section R8-CONV-2, and restated for this skill only in the
+[SKILL.md canonical section](../SKILL.md#canonical-retry-spend-and-hard-mode-formulas-r8-conv-2).
+Cite them; do not copy, extend or re-derive the formulas here.

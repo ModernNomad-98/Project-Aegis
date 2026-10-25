@@ -73,8 +73,11 @@ that makes the target achievable by design rather than by hope.
    which serial, where responses assemble — the composition math
    depends on the shape.
 5. Existing timeout/retry configuration per hop: what is set today,
-   where the defaults came from, and where retries can multiply
-   (retry storms at two layers compound).
+   where the defaults came from, and where retries can multiply - model the
+   retry spend with the canonical R8-CONV-2 section cited at the top of this
+   skill (probability-weighted retry_overhead; nested or correlated layers
+   need a recorded joint expectation or conservative bound, never marginal
+   multiplication treated as exact).
 6. The frontend share, if the target is user-perceived: how much of
    the budget the browser consumes (render, hydration) — allocated
    with `frontend-perf-engineer`'s metrics vocabulary.
@@ -104,8 +107,10 @@ authorize execution.
 3. **Allocate the budget per hop.** Start from measured reality
    (input 3), assign each hop a number, and include the overhead rows
    folklore omits: serialization/deserialization, connection
-   establishment (cold pools, Transport Layer Security (TLS) handshakes), queue wait under load, and ONE
-   retry of the most-likely-to-retry hop. The sum of allocations plus
+   establishment (cold pools, Transport Layer Security (TLS) handshakes), queue wait under load, and the
+   probability-weighted retry spend derived from the canonical R8-CONV-2
+   model below (retry_overhead; nested or correlated layers need a recorded
+   joint expectation or conservative bound). The sum of allocations plus
    headroom equals the target — arithmetic that must visibly close.
 4. **Hold headroom explicitly.** 15–25% of the target stays
    unallocated — for growth, incident conditions, and the dependency
@@ -113,20 +118,23 @@ authorize execution.
    owner), not slack silently absorbed by whoever asks first.
 5. **Derive timeouts from budgets.** Define own work as the time the hop
    itself spends (processing, serialization, and the queue/connection waits
-   it owns); downstream critical-path budget is the sum of serial downstream
-   hops plus the longest parallel branch at each join, including the initial
-   attempt, retry attempt time and recorded backoff_total. Keep ONE rule:
+   it owns); downstream critical-path budget is the cumulative downstream
+   latency defined by the canonical R8-CONV-2 expected/hard cascade terms
+   below (total_expected_hop_cost in expected mode; downstream_hard_bound in
+   hard mode; every term states its recorded bound/percentile source). Keep
+   ONE rule:
    upstream timeout > own work + downstream critical-path budget + recorded
    epsilon (all ms; epsilon is recorded once, never doubled). If no feasible
    timeout exists under these terms, escalate as a latency budget violation;
    never hide it. The 30-second default is a bug in a 300ms path.
 
-6. **Derive retry policy from what the budget affords.** Retries
-   spend budget: one retry of a 50ms hop costs 50ms+backoff from
-   SOMEONE's allocation. State which hops may retry (idempotent
-   ones), how many times (usually one, at the innermost layer only —
-   two layers retrying compounds into storms), and hedging only where
-   the budget's headroom explicitly funds it.
+6. **Derive retry policy from what the budget affords.** Retries spend
+   budget per the canonical R8-CONV-2 model below (probability-weighted
+   retry_overhead, not a flat charge). State which hops may retry (idempotent
+   ones), how many times (one named layer only - usually the innermost), and
+   hedging only where the budget's headroom explicitly funds it. Nested or
+   correlated retry layers need a recorded joint expectation or conservative
+   bound, never marginal multiplication treated as exact.
 7. **Design violation attribution.** Per-hop spans with the budget
    annotated (trace attribute or naming convention), so "the p95
    regressed" decomposes into "hop X exceeded its 40ms by 60ms" —
@@ -175,7 +183,7 @@ Path & shape: <hop chain; parallel sections marked; fan-out N noted>
 Budget table:
   <hop>: <ms> — owner=<team/role> — current=<measured pXX> — notes=<incl. overhead rows>
   serialization/connection/queue-wait rows: <ms each>
-  retry allowance: <hop, count, backoff — funded from whose budget>
+  retry spend (R8-CONV-2 retry_overhead): <probability-weighted spend - funded from whose budget>
   HEADROOM: <ms (15–25%)> — owner=<path owner>
   SUM CHECK: allocations + headroom = target ✓
 Tail math: <branch dependence assumption; under independence 1-(0.99)^N = <exposure>; measured or bounded joint tail otherwise>
@@ -210,9 +218,11 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
       If no feasible timeout exists, the violation is escalated, not hidden.
 - [ ] Every budgeted path has a finite timeout; an infinite or missing timeout
       is a violation, not a default.
-- [ ] Retries are budgeted spend at one layer only; hedging is
-      headroom-funded or absent; retry cost includes the downstream critical-
-      path budget, not only the hop's own work.
+- [ ] Retries are budgeted spend at one named layer only; hedging is
+      headroom-funded or absent; retry spend follows the canonical R8-CONV-2
+      model (probability-weighted retry_overhead; nested or correlated layers
+      use a recorded joint expectation or conservative bound, never marginal
+      multiplication treated as exact).
 - [ ] Headroom is a named line item with an owner, 15–25%.
 - [ ] Every hop has an owner; hops over budget today have their
       reduction work ROUTED, not absorbed into this design.
@@ -237,13 +247,14 @@ Reduction work routed: <hop over budget today → owning skill (query-plan-reade
   cost more than the service call it wraps — and it appears in no
   service's dashboard because it happens in the caller. The overhead
   rows exist because the unmeasured milliseconds are still spent.
-- Timeout inversion: an upstream 2s timeout over a downstream
-  3s-timeout×2-retries path means the upstream abandons work the
-  downstream completes — wasted load AND a failed request. The
-  cascade check is mechanical; run it.
-- Two-layer retries compound: the gateway retries twice, the client
-  library retries twice — one flaky hop becomes 4× load and a storm.
-  Retries live at ONE stated layer (usually innermost idempotent).
+- Timeout inversion: an upstream timeout that does not price the downstream
+  retry policy means the upstream abandons work the downstream completes -
+  wasted load AND a failed request. Run the cascade check with the canonical
+  R8-CONV-2 terms above; it is mechanical.
+- Retries live at ONE named layer (usually the innermost idempotent one).
+  Price the spend with the canonical R8-CONV-2 model above; nested or
+  correlated layers need a recorded joint expectation or conservative bound,
+  never marginal multiplication across layers treated as exact.
 - Queue wait is invisible until it isn't: async hops budgeted at
   processing time only will blow their budget under load exactly when
   it matters — queue wait at target load is a budget row.
