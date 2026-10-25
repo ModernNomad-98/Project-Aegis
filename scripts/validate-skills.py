@@ -240,6 +240,12 @@ COVERAGE_ANOMALY_SKILLS = {
     299: frozenset({"ai-router-architect", "ai-cost-guardrail-designer"}),
 }
 COVERAGE_DROPPED_CANDIDATE = "ai-feature-kill-switch-designer"
+# Base-equivalent phrase match (no trailing boundary here): the analysis loop
+# checks the boundary per occurrence. Boundary-delimited occurrences are the
+# enforced form (O-1 malformed/no-token and unknown tokens apply); occurrences
+# glued to a following token ("shipped asadr-writer", "shipped as**adr-writer**")
+# are a claims-only base-parity fallback so no base-detected claim is lost
+# (Stage B F-01). "shipped aside"/"assembly-line" therefore yield no phrase.
 COVERAGE_SHIPPED_AS_RE = re.compile(r"\bshipped\s+as", re.IGNORECASE)
 # Markdown links are neutralised to same-length spaces for phrase/negation
 # context only (so a link before/abutting the phrase cannot hide it or
@@ -287,31 +293,57 @@ def _coverage_shipped_normalize(text: str) -> str:
         "", COVERAGE_SHIPPED_MD_LINK_RE.sub(r"\1", text))
 
 
+def _coverage_shipped_normalize_tail(text: str) -> str:
+    """Reduce link labels in the post-phrase token tail without merging tokens.
+
+    A link wrapped around a token ('[skill](url)') reduces to its label. A link
+    abutting a preceding token ('adr-writer[1](url)') is treated as a trailing
+    annotation and neutralised to spaces, so it cannot corrupt the adjacent
+    token (FD-4). Underscores are stripped only as paired emphasis wrappers.
+    """
+    def replace_link(match):
+        start = match.start()
+        previous = text[start - 1] if start else ""
+        if previous and (previous.isalnum() or previous in "-_"):
+            return " " * len(match.group(0))
+        return match.group(1)
+
+    reduced = COVERAGE_SHIPPED_MD_LINK_RE.sub(replace_link, text)
+    return COVERAGE_SHIPPED_WRAPPER_RE.sub("", reduced)
+
+
 def _coverage_shipped_link_mask(text: str) -> str:
     """Replace Markdown links with same-length spaces (offset-preserving)."""
     return COVERAGE_SHIPPED_LINK_MASK_RE.sub(
         lambda match: " " * len(match.group(0)), text)
 
 
-def _coverage_shipped_scan(entry_text: str,
-                           manifest: "set[str] | None") -> dict:
+def _coverage_shipped_analysis(entry_text: str,
+                               manifest: "set[str] | None") -> dict:
     """Classify every shipped-as occurrence in evidence text (text-based).
 
     Returns {"claims": sorted known-manifest skill names, "unknown": sorted
-    skill-shaped tokens absent from the manifest}. Fails closed (ValueError)
-    when the manifest is unavailable, empty, or has no non-blank string names.
-    Negation is bound to each occurrence and is base-equivalent (only 'not' or
-    'never' immediately before that occurrence's phrase), so no claim the base
-    predicate detects is suppressed; 'not just'/'not only'/auxiliary and
-    contraction forms are claims, like base. The adjacent token list is read
-    through wrappers and comma/&/slash/and/or connectors including serial
-    commas, so every named token is classified; unknown skill-shaped tokens
-    fail closed; plain English words end the list (prose is not a claim).
-    Phrase detection and the negation window run on the raw text with Markdown
-    links neutralised to same-length spaces (offset-preserving), so a link
-    label 'not'/'never' or a link abutting the phrase cannot hide or fabricate
-    a claim; link labels are reduced only inside the post-phrase token list.
-    Text-based evidence check, not semantic shipping proof.
+    skill-shaped tokens absent from the manifest, "malformed": sorted excerpts
+    of non-negated shipped-as phrases that carry no skill-shaped token at all}.
+
+    Fails closed (ValueError) when the manifest is unavailable, empty, or has no
+    non-blank string names. Negation is bound to each occurrence and is
+    base-equivalent (only 'not' or 'never' immediately before that occurrence's
+    phrase), so no claim the base predicate detects is suppressed. The phrase is
+    word-bounded on both sides for enforcement (FD-2), so ordinary words such as
+    "aside" and "assembly" are not enforced phrases; an occurrence glued to a
+    following token is handled by a claims-only base-parity fallback (known
+    tokens only, multi-skill lists included) so no base-detected claim is lost
+    (Stage B F-01), and it never emits unknown/malformed errors. The adjacent token list is read through wrappers
+    and comma/&/slash/and/or connectors including serial commas; unknown
+    skill-shaped tokens fail closed; a phrase with no skill-shaped token at all
+    (bare phrase, colon-only, punctuation-only, numeric-only or ordinary prose)
+    is reported malformed and fails closed (O-1 closure). A Markdown link
+    wrapped around a token still yields that token; a link abutting a preceding
+    token is treated as a trailing annotation and cannot merge tokens (FD-4).
+    Phrase detection and the negation window run on the base predicate's own
+    normalization with an index map to the raw text, so no base-detected claim
+    is hidden. Text-based evidence check, not semantic shipping proof.
     """
     if not isinstance(manifest, set) or not manifest:
         raise ValueError("manifest unavailable or empty")
@@ -320,34 +352,31 @@ def _coverage_shipped_scan(entry_text: str,
     if not known:
         raise ValueError("manifest has no usable string skill names")
     raw = entry_text
-    # Phrase detection and the per-occurrence negation window run on the base
-    # predicate's own normalization (markdown characters stripped globally), with
-    # an index map back to the raw text. This is parity-by-construction: every
-    # phrase the base predicate can detect is detected here, and a Markdown link
-    # label/abutment cannot hide or fabricate it. Link labels are reduced only
-    # inside the post-phrase token substring, so link-wrapped skill tokens still
-    # parse while an underscore-corrupted token is reported unknown, not claimed.
     normalized_chars = []
     index_map = []
     for index, char in enumerate(raw):
-        if char in "`*_":
+        if char in chr(96) + "*_":
             continue
         normalized_chars.append(char)
         index_map.append(index)
     normalized = "".join(normalized_chars)
     claims = set()
     unknown = set()
+    malformed = set()
     for match in COVERAGE_SHIPPED_AS_RE.finditer(normalized):
         prefix = normalized[max(0, match.start()
                                 - COVERAGE_SHIPPED_NEGATION_WINDOW):match.start()]
         if COVERAGE_SHIPPED_NEGATION_RE.search(prefix):
             continue
+        boundary = match.end() >= len(normalized) or not (
+            normalized[match.end()].isalnum() or normalized[match.end()] == "_")
         raw_position = index_map[match.end() - 1] + 1
-        tokens = _coverage_shipped_normalize(raw[raw_position:])
+        tokens = _coverage_shipped_normalize_tail(raw[raw_position:])
         colon = COVERAGE_SHIPPED_COLON_RE.match(tokens, 0)
         if colon is not None:
             tokens = tokens[colon.end():]
         position = 0
+        found = False
         while True:
             token_match = COVERAGE_SHIPPED_TOKEN_RE.match(tokens, position)
             if token_match is None:
@@ -356,8 +385,15 @@ def _coverage_shipped_scan(entry_text: str,
             candidate_cf = candidate.casefold()
             if candidate_cf in known:
                 claims.add(candidate_cf)
+                found = True
             elif "-" in candidate or "_" in candidate:
-                unknown.add(candidate_cf)
+                if boundary:
+                    unknown.add(candidate_cf)
+                    found = True
+                # merged (no trailing boundary) is a claims-only base-parity
+                # fallback: skip the compound but keep scanning the list so a
+                # later manifest-known token is not lost; never emit
+                # unknown/malformed for a merged occurrence.
             else:
                 break
             position = token_match.end()
@@ -365,7 +401,21 @@ def _coverage_shipped_scan(entry_text: str,
             if separator is None or separator.end() == position:
                 break
             position = separator.end()
-    return {"claims": sorted(claims), "unknown": sorted(unknown)}
+        if boundary and not found:
+            raw_start = index_map[match.start()] if match.start() < len(index_map) else 0
+            excerpt = " ".join(raw[raw_start:raw_start + 80].split())
+            if len(excerpt) > 64:
+                excerpt = excerpt[:61] + "..."
+            malformed.add(excerpt)
+    return {"claims": sorted(claims), "unknown": sorted(unknown),
+            "malformed": sorted(malformed)}
+
+
+def _coverage_shipped_scan(entry_text: str,
+                           manifest: "set[str] | None") -> dict:
+    """Return {"claims", "unknown"} for shipped-as evidence text (see analysis)."""
+    analysis = _coverage_shipped_analysis(entry_text, manifest)
+    return {"claims": analysis["claims"], "unknown": analysis["unknown"]}
 
 
 def _coverage_shipped_claims(entry_text: str,
@@ -2503,13 +2553,18 @@ def check_coverage_map(rep: Report) -> None:
                       + COVERAGE_DROPPED_CANDIDATE + "' must never be a "
                       "covering skill (historical evidence note only)")
     # D114 convention (text-based evidence check; disclosed limits): every
-    # shipped-as occurrence is scanned; an optional colon and wrapper forms
-    # (ASCII/typographic quotes, brackets, backticks, asterisks, paired
-    # underscores) are accepted; the adjacent token list is read through
-    # comma/&/slash/and/or connectors including serial commas, so every named
-    # token is classified; negation is bound to each occurrence and is
-    # base-equivalent (only immediate not/never), so no base-detected claim is
-    # suppressed; unknown skill-shaped tokens fail closed; malformed/unavailable
+    # shipped-as occurrence is scanned; the phrase is word-bounded on both
+    # sides (FD-2) so ordinary words such as "aside"/"assembly" are not
+    # phrases; an optional colon and wrapper forms (ASCII/typographic quotes,
+    # brackets, backticks, asterisks, paired underscores) are accepted; the
+    # adjacent token list is read through comma/&/slash/and/or connectors
+    # including serial commas, so every named token is classified; negation is
+    # bound to each occurrence and is base-equivalent (only immediate
+    # not/never), so no base-detected claim is suppressed; unknown skill-shaped
+    # tokens fail closed; a phrase carrying no skill-shaped token at all (bare,
+    # colon-only, punctuation-only, numeric-only, or ordinary prose) is reported
+    # as malformed/no-token and fails closed (O-1); a link abutting a token is a
+    # trailing annotation and cannot merge tokens (FD-4); malformed/unavailable
     # manifest/covering data fails closed. Skill ids are kebab-case; inner or
     # adjacent underscores are preserved and reported unknown, never normalized
     # into a known id. This checks evidence text, not semantic shipping proof.
@@ -2519,17 +2574,22 @@ def check_coverage_map(rep: Report) -> None:
         entry_text = " ".join(str(entry.get(key) or "")
                               for key in ("evidence", "notes"))
         try:
-            scan = _coverage_shipped_scan(entry_text, manifest)
+            analysis = _coverage_shipped_analysis(entry_text, manifest)
         except ValueError:
             rep.error("[" + ctx + "] manifest unavailable or empty; cannot "
                       "enforce the D114 shipped-by-skill convention (fail closed)")
             break
-        for unknown_token in scan["unknown"]:
+        for unknown_token in analysis["unknown"]:
             rep.error("[" + ctx + "] entry " + str(entry.get("id"))
                       + " states a shipped-as token '" + unknown_token
                       + "' that is not a skill in tools/skills-manifest.json "
                       "(D114 fail-closed: unknown shipped-as token)")
-        claimed = scan["claims"]
+        for excerpt in analysis["malformed"]:
+            rep.error("[" + ctx + "] entry " + str(entry.get("id"))
+                      + " contains a shipped-as phrase with no skill-shaped "
+                      "token ('" + excerpt + "') "
+                      "(D114 fail-closed: malformed/no-token shipped-as)")
+        claimed = analysis["claims"]
         if not claimed:
             continue
         skills = entry.get("covering_skills")

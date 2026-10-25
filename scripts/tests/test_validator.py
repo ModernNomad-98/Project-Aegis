@@ -2183,23 +2183,148 @@ def test_coverage_map_evidence_rules():
         with mutated_coverage(Path(tmp), shipped_skill_not_covering) as rep:
             assert any("not in covering_skills" in err for err in rep.errors), (
                 rep.errors)
-    # FP-6 (REV-3): the generic-term allowlist was dead code (token candidates
-    # require a hyphen/underscore) and is removed; plain English words end the
-    # token list and are never claims. The M-3 prose fixture below still must
-    # produce no D114/unknown error on a COVERED row.
+    # O-1 closure (RESIDUAL-2): a prose/no-token shipped-as phrase now fails
+    # closed as malformed/no-token instead of being silently ignored (this
+    # fixture previously asserted no error; the owner-directed O-1 closure
+    # changes that expectation deliberately).
     with tempfile.TemporaryDirectory() as tmp:
         def historical_bundle_phrase(payload):
             row = coverage_entry(payload, 2)
-            row["evidence"] = (row["evidence"]
-                               + " Shipped as part of a historical bundle.")
+            row["notes"] = ((row.get("notes") or "")
+                            + " Shipped as part of a historical bundle.")
         with mutated_coverage(Path(tmp), historical_bundle_phrase) as rep:
-            assert not any(("shipped as" in err.lower())
-                           or ("shipped-as" in err.lower())
-                           or ("unknown shipped-as token" in err)
-                           or ("D114" in err) for err in rep.errors), rep.errors
+            assert any("malformed/no-token shipped-as" in err
+                       for err in rep.errors), rep.errors
     assert validator._coverage_shipped_scan(
         "shipped as part of a historical bundle", manifest) == {
             "claims": [], "unknown": []}
+    # RESIDUAL-2 O-1: every malformed/no-token shipped-as form fails closed.
+    for bad_phrase in ("shipped as", "shipped as:", "shipped as !!!",
+                       "shipped as 123", "shipped as the historical bundle",
+                       "shipped as part of a historical bundle"):
+        analysis = validator._coverage_shipped_analysis(bad_phrase, manifest)
+        assert analysis["malformed"], (bad_phrase, analysis)
+        assert not analysis["claims"] and not analysis["unknown"], (
+            bad_phrase, analysis)
+    with tempfile.TemporaryDirectory() as tmp:
+        def malformed_shipped_as(payload):
+            row = coverage_entry(payload, 2)
+            row["notes"] = (row.get("notes") or "") + " shipped as:"
+        with mutated_coverage(Path(tmp), malformed_shipped_as) as rep:
+            assert any("malformed/no-token shipped-as" in err
+                       for err in rep.errors), rep.errors
+    # FD-2: the phrase is word-bounded on both sides; ordinary words such as
+    # "aside"/"assembly" are not phrases.
+    for not_a_phrase in ("shipped aside-from beta", "shipped assembly-line",
+                         "shipped aside"):
+        analysis = validator._coverage_shipped_analysis(not_a_phrase, manifest)
+        assert not analysis["malformed"] and not analysis["claims"] \
+            and not analysis["unknown"], (not_a_phrase, analysis)
+    assert validator._coverage_shipped_scan(
+        "shipped as adr-writer", manifest)["claims"] == ["adr-writer"]
+    assert validator._coverage_shipped_scan(
+        "shipped as: adr-writer", manifest)["claims"] == ["adr-writer"]
+    # Stage B F-01 (REV-2): a phrase glued to a following token has no trailing
+    # word boundary, so it is handled by a claims-only base-parity fallback -
+    # known tokens (including multi-skill lists) are claimed and no
+    # unknown/malformed error is emitted, so "aside"/"assembly" stay non-phrases
+    # while no base-detected claim is lost.
+    for merged, expected in (
+            ("shipped asadr-writer", ["adr-writer"]),
+            ("shipped as**adr-writer**", ["adr-writer"]),
+            ("shipped as_domain-modeler", ["domain-modeler"]),
+            ("shipped as__domain-modeler__", ["domain-modeler"]),
+            ("shipped as" + chr(96) + "adr-writer" + chr(96), ["adr-writer"]),
+            ("shipped as:adr-writer", ["adr-writer"])):
+        analysis = validator._coverage_shipped_analysis(merged, manifest)
+        assert analysis["claims"] == expected, (merged, analysis)
+        assert not analysis["unknown"] and not analysis["malformed"], (
+            merged, analysis)
+    assert validator._coverage_shipped_analysis(
+        "shipped asadr-writer and domain-modeler", manifest)["claims"] == [
+            "adr-writer", "domain-modeler"]
+    assert not validator._coverage_shipped_analysis(
+        "shipped asadr-writer", manifest)["unknown"]
+    # e2e: a merged known claim triggers the existing D114-convention check
+    with tempfile.TemporaryDirectory() as tmp:
+        def merged_shipped_as(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = "shipped asadr-writer"
+        with mutated_coverage(Path(tmp), merged_shipped_as) as rep:
+            assert any("D114 convention" in err for err in rep.errors), rep.errors
+    # Stage B F-02 (REV-2): executable no-suppression check - the base
+    # 4cdc86a8 predicate is loaded from git and its claims must be a subset of
+    # the head claims (the R2-09 A-ROWS closure runs this assertion).
+    base_src = subprocess.check_output(
+        ["git", "show",
+         "4cdc86a859be20080e1fd76ab65341337eb32e85:scripts/validate-skills.py"],
+        text=True, encoding="utf-8")
+    base_ns: dict = {"__file__": "base_validator.py",
+                      "__name__": "base_validator"}
+    exec(compile(base_src, "base_validator.py", "exec"), base_ns)
+    base_scan = base_ns["_coverage_shipped_scan"]
+    suppression_corpus = []
+    for name in sorted(manifest)[:25]:
+        suppression_corpus.extend([
+            "shipped as " + name, "shipped as" + name,
+            "shipped as**" + name + "**", "shipped as_" + name,
+            "shipped as[" + name + "](https://example.invalid/x)",
+            "shipped as: " + name,
+            "not shipped as " + name + ", but shipped as " + name])
+    suppression_corpus.extend([
+        "shipped aside-from beta", "shipped assembly-line",
+        "shipped as part of a historical bundle", "shipped as:**adr-writer**",
+        "shipped as adr-writer[1](https://example.invalid/x)",
+        "not just shipped as adr-writer",
+        "old was not shipped as adr-writer but later shipped as import-qa-strategy-designer",
+        "shipped asadr-writer and domain-modeler"])
+    unexplained = []
+    for text in suppression_corpus:
+        base_claims = base_scan(text, manifest)["claims"]
+        head = validator._coverage_shipped_analysis(text, manifest)
+        lost = [c for c in base_claims if c not in head["claims"]]
+        if lost and not head["unknown"]:
+            unexplained.append((text, lost))
+    assert not unexplained, unexplained
+    print("R2-09 no base-claim suppression: corpus="
+          + str(len(suppression_corpus)) + " unexplained=0")
+    # FD-3: an unknown hyphenated/underscored compound is the strict-by-design
+    # unknown-token class, with a message distinct from malformed/no-token.
+    hyphen_prose = validator._coverage_shipped_analysis(
+        "shipped as open-source", manifest)
+    assert hyphen_prose["unknown"] == ["open-source"] \
+        and not hyphen_prose["malformed"], hyphen_prose
+    with tempfile.TemporaryDirectory() as tmp:
+        def hyphen_unknown(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = "shipped as open-source"
+        with mutated_coverage(Path(tmp), hyphen_unknown) as rep:
+            assert any("unknown shipped-as token" in err
+                       for err in rep.errors), rep.errors
+            assert not any("malformed/no-token shipped-as" in err
+                           for err in rep.errors), rep.errors
+    # FD-4: a link abutting a token is a trailing annotation; the token is
+    # claimed and never merged into an unknown token.
+    abutting = validator._coverage_shipped_analysis(
+        "shipped as adr-writer[1](https://example.invalid/x)", manifest)
+    assert abutting["claims"] == ["adr-writer"] \
+        and not abutting["unknown"], abutting
+    multi_abutting = validator._coverage_shipped_analysis(
+        "shipped as adr-writer[1](https://example.invalid/x) and domain-modeler",
+        manifest)
+    assert multi_abutting["claims"] == ["adr-writer", "domain-modeler"], (
+        multi_abutting)
+    genuine_unknown_abutting = validator._coverage_shipped_analysis(
+        "shipped as zzz-not-a-real-skill[1](https://example.invalid/x)",
+        manifest)
+    assert genuine_unknown_abutting["unknown"] == ["zzz-not-a-real-skill"], (
+        genuine_unknown_abutting)
+    with tempfile.TemporaryDirectory() as tmp:
+        def abutting_link_claim(payload):
+            row = coverage_entry(payload, 2)
+            row["evidence"] = "shipped as adr-writer[1](https://example.invalid/x)"
+        with mutated_coverage(Path(tmp), abutting_link_claim) as rep:
+            assert any("D114 convention" in err for err in rep.errors), rep.errors
     # M-3 (strengthened): a negated claim on row 1 must produce no D114 error
     # of any kind; if negation handling regressed the known token would be
     # claimed and the row-1 membership error would contain 'shipped-as'.
