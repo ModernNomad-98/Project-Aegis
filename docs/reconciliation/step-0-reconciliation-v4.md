@@ -4981,3 +4981,5 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
     secrets or PII are recorded beyond the owner-authored decision/evidence pointers above; no implementation, merge authority, approval or CI-green
     claim is created by this record.
   - **Recording attribution:** produced by AI agent sd-b-fu, model route DeepSeek-V41-Flash (registered id deepseek-flash @ deepseek-account, DeepSeek Harness); not an approval/waiver; no merge authority.
+
+- **D118 (2026-10-26) - Owner standing instructions recorded (APR-146); APR-143 no-protected-path clarification verified.** Same content as Case A; follows D117 because #927 had not merged at this C; this entry records that the other wave (#927) must use D119 when it merges; no duplicate id; D113-D117 unchanged; append-only; no secrets/PII; no authority/approval/CI-green claim; attribution sd-a.
