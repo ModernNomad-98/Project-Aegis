@@ -4288,7 +4288,7 @@ def test_readiness_startup_authority_non_mutating():
         skip("startup-authority observation: POSIX sh not available on this host")
         return
     skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
-    inspection_match = re.search(r"Run and record the inspection:\s*```bash\n(.*?)```", skill, re.DOTALL)
+    inspection_match = re.search(r"Run and record the inspection[\s\S]*?```bash\n(.*?)```", skill, re.DOTALL)
     assert inspection_match, "SKILL.md must publish the read-only identity inspection commands"
     inspection = inspection_match.group(1)
     hook_blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", skill, re.DOTALL)
