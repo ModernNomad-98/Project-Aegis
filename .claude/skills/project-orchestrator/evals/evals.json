@@ -840,14 +840,14 @@
     {
       "id": "edge-stage2-existing-grant-reuse-and-stale-authority",
       "type": "should_trigger",
-      "prompt": "Your earlier approved grant covers appending Stage 2 decisions 1 and 2 only to docs/project-state.md and is still current. The four Stage 2 planning decisions are ready. One older grant was revoked yesterday; another grant's target was superseded; a separate grant conflicts with decision 2's scope. Record what the current grant actually covers, stop at the serial boundary, and do not append decisions 3 or 4.",
+      "prompt": "Your earlier approved grant covers appending Stage 2 decision 1 only to docs/project-state.md and is still current. All four Stage 2 planning decisions are ready. A revoked grant and a superseded grant relate only to decisions 2-3; a separate grant conflicts with decision 4's scope. Record only what the current grant actually covers, then stop at the serial boundary.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Uses the current valid grant that covers the actual action/content/scope of decisions 1-2 without demanding the same yes again, and names that grant in the DECISION entry.",
-          "Verifies grant validity fields (ID, issuer, action, path, content hash/scope, issue/expiry, revocation) against the authority matrix; a stale/superseded, revoked or conflicting grant stops the affected write for human remediation.",
-          "Records the covered decisions in serial Stage 2 order and STOPS before the uncovered decisions 3-4; does not treat a partial grant as covering all four.",
-          "Does not treat a business answer, scope acceptance or projection refresh as write approval; does not widen a grant by inference."
+          "Uses the current valid grant for decision 1 only, without demanding the same yes again, and names the grant ID plus the agent-authorization-matrix verification result in the DECISION entry.",
+          "Verifies grant validity fields (ID, issuer, action, path, content hash/scope, issue/expiry, revocation) and conflict state through agent-authorization-matrix; the orchestrator executing Capability 4 owns this verification.",
+          "Records decision 1 in serial Stage 2 order and STOPS before decision 2; decisions 2-4 remain unrecorded, with the revoked/superseded/conflicting authority named for human remediation.",
+          "Does not treat a partial grant as covering all four decisions, does not resolve the conflict by inference, and does not treat business acceptance/projection refresh as write approval."
         ]
       }
     },
