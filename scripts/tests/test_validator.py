@@ -4469,7 +4469,7 @@ def main() -> int:
     if SKIPS:
         print(f"SKIPPED: {len(SKIPS)} test(s) (UNRUN, not passes)")
     if REQUIRED_SKIPS:
-        print(f"UNRUN: {len(REQUIRED_SKIPS)} required readiness case(s) did not run on this platform; suite exits nonzero")
+        print(f"UNRUN: {len(REQUIRED_SKIPS)} required readiness case(s) did not run on this platform (non-Linux UNRUN; Linux gate remains nonzero on skip)")
     print(f"OK: {len(PASSES)} gate self-test assertion(s) passed.")
     if SKIPS and sys.platform.startswith("linux"):
         return 1
