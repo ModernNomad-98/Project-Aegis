@@ -31,6 +31,8 @@ child owned by this script (no descendant-tree guarantee); zombie checks use `ps
 #!/bin/sh
 set -u
 LOCK="${AEGIS_STACK_LOCK:-.local/stack.lock}"
+while [ "${LOCK%/}" != "$LOCK" ]; do LOCK="${LOCK%/}"; done
+if [ -z "$LOCK" ]; then echo "STOP: AEGIS_STACK_LOCK is empty" >&2; exit 2; fi
 WORKLOAD="${AEGIS_STACK_WORKLOAD:-}"
 if [ -z "$WORKLOAD" ]; then echo "STOP: AEGIS_STACK_WORKLOAD is required; refusing silent no-op" >&2; exit 2; fi
 TTL_MINUTES="${AEGIS_STACK_TTL_MINUTES:-120}"
@@ -99,7 +101,7 @@ cleanup() {
     fi
   fi
   if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
-  if ! stop_child; then return 1; fi
+  if ! stop_child; then CLEANING=0; return 1; fi
   if [ "$OWNED" -eq 1 ] && [ -f "$LOCK/workload.pid" ]; then rm -f "$LOCK/workload.pid" 2>/dev/null || true; fi
   if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then
     current="$(cat "$LOCK/token" 2>/dev/null || true)"
@@ -107,7 +109,7 @@ cleanup() {
       QUAR="$LOCK.quarantine.$RUN_ID"
       if ! mv "$LOCK" "$QUAR" 2>/dev/null; then
         echo "INCOMPLETE: cannot quarantine owned lock; evidence retained" >&2
-        return 1
+        CLEANING=0; return 1
       fi
       if ! rm -rf "$QUAR"; then
         if [ ! -e "$LOCK" ] && mv "$QUAR" "$LOCK" 2>/dev/null; then
@@ -115,14 +117,15 @@ cleanup() {
         else
           echo "OWNERSHIP LOST: quarantine $QUAR retained; lock path $LOCK unavailable" >&2
         fi
-        return 1
+        CLEANING=0; return 1
       fi
     fi
   fi
   CLEANED=1
+  CLEANING=0
   return 0
 }
-on_signal() { trap - INT TERM; echo "interrupted: stopping owned workload before release" >&2; exit 130; }
+on_signal() { trap '' INT TERM; echo "interrupted: stopping owned workload before release" >&2; exit 130; }
 trap 'cleanup' EXIT
 trap 'on_signal' INT TERM
 if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock parent directory" >&2; exit 2; fi
@@ -192,35 +195,25 @@ the result. The signal handler exits nonzero after cleanup; EXIT cleanup is idem
 set -u
 RUN_ID="${RUN_ID:?RUN_ID required}"
 case "$RUN_ID" in *[!A-Za-z0-9._-]*) echo "STOP: unsafe RUN_ID" >&2; exit 2 ;; esac
-UNIQUE_PREFIX="aegis-run-$RUN_ID"
 CLEANED=0
+RUN_BASE="${AEGIS_FIXTURE_BASE:-${TMPDIR:-/tmp}}"
+if [ -L "$RUN_BASE" ]; then echo "STOP: refusing symlinked fixture base" >&2; exit 2; fi
+if ! mkdir -p "$RUN_BASE" 2>/dev/null; then echo "FAILED: cannot create fixture base" >&2; exit 2; fi
+UNIQUE_DIR=$(mktemp -d "$RUN_BASE/aegis-run-$RUN_ID.XXXXXX") || { echo "FAILED: cannot create private fixture dir" >&2; exit 2; }
+if [ -L "$UNIQUE_DIR" ]; then echo "STOP: refusing symlinked fixture dir" >&2; exit 2; fi
+if ! chmod 700 "$UNIQUE_DIR"; then echo "FAILED: cannot set fixture dir mode" >&2; exit 2; fi
+case "$UNIQUE_DIR" in "$RUN_BASE"/aegis-run-*) ;; *) echo "STOP: fixture dir outside private base" >&2; exit 2 ;; esac
 cleanup_fixtures() {
   if [ "$CLEANED" -eq 1 ]; then return 0; fi
-  printf 'cleanup prefix %s\n' "$UNIQUE_PREFIX"
-  MATCHES="${TMPDIR:-/tmp}/aegis-fixtures.$$"
-  if ! find .local/fixtures -maxdepth 1 -name "$UNIQUE_PREFIX*" -print > "$MATCHES"; then
-    rm -f "$MATCHES" || true
-    echo "FAILED: fixture find failed" >&2
-    return 1
-  fi
-  while IFS= read -r path; do
-    base="$(basename "$path")"
-    case "$base" in
-      "$UNIQUE_PREFIX"*)
-        if ! rm -rf "$path"; then
-          rm -f "$MATCHES" || true
-          echo "FAILED: fixture removal failed: $path" >&2
-          return 1
-        fi
-        ;;
-      *) rm -f "$MATCHES" || true; echo "STOP: cleanup target outside literal unique prefix: $path" >&2; return 1 ;;
-    esac
-  done < "$MATCHES"
-  if ! rm -f "$MATCHES"; then echo "FAILED: cannot remove match list" >&2; return 1; fi
+  case "$UNIQUE_DIR" in
+    "$RUN_BASE"/aegis-run-*) ;;
+    *) echo "STOP: cleanup dir outside private fixture base" >&2; return 1 ;;
+  esac
+  if ! rm -rf "$UNIQUE_DIR"; then echo "FAILED: fixture removal failed: $UNIQUE_DIR" >&2; return 1; fi
   CLEANED=1
   return 0
 }
-on_signal() { trap - INT TERM; cleanup_fixtures; exit 130; }
+on_signal() { trap '' INT TERM; cleanup_fixtures; exit 130; }
 trap 'cleanup_fixtures' EXIT
 trap 'on_signal' INT TERM
 # stop if any target outside the unique prefix would be removed

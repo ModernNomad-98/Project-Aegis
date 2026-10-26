@@ -112,6 +112,8 @@ AUTHOR_NAME=${AUTHOR_PAIR%%|*}; AUTHOR_EMAIL=${AUTHOR_PAIR#*|}
 COMMITTER_NAME=${COMMITTER_PAIR%%|*}; COMMITTER_EMAIL=${COMMITTER_PAIR#*|}
 case "$AUTHOR_PAIR" in *"|"*) ;; *) echo "STARTUP: effective author identity malformed"; MISSING=1 ;; esac
 case "$COMMITTER_PAIR" in *"|"*) ;; *) echo "STARTUP: effective committer identity malformed"; MISSING=1 ;; esac
+case "$AUTHOR_EMAIL" in *"|"*) echo "STARTUP: effective author identity has extra separators"; MISSING=1 ;; esac
+case "$COMMITTER_EMAIL" in *"|"*) echo "STARTUP: effective committer identity has extra separators"; MISSING=1 ;; esac
 if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] || [ -z "$COMMITTER_EMAIL" ]; then echo "STARTUP: effective author/committer identity empty or malformed"; MISSING=1; fi
 if [ -n "$OWNER_NAME" ] || [ -n "$OWNER_EMAIL" ]; then
   if { [ -n "$AGENT_NAME" ] && [ "$AGENT_NAME" = "$OWNER_NAME" ]; } || { [ -n "$AGENT_EMAIL" ] && [ "$AGENT_EMAIL" = "$OWNER_EMAIL" ]; } || [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then
@@ -137,6 +139,8 @@ fi
 [ "$MISSING" -eq 0 ] || exit 1
 echo "STARTUP: effective author/committer identity available and distinct from the recorded owner"
 ```
+
+Identity policy: the effective `git var` identity is authoritative; configured values are also checked when present and must not be the owner. A command-level `git -c user.name=...` override intentionally changes the configured view (and is accepted only when the resulting effective identity is non-owner); the actual commit remains the oracle.
 
 Effective author AND committer identities matter, not only the configured defaults:
 environment (`GIT_AUTHOR_*`, `GIT_COMMITTER_*`) can change the identity that is

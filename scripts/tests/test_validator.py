@@ -4445,6 +4445,9 @@ def test_readiness_shared_lock_lifecycle():
         env_lock = subprocess.run(["sh", str(script)], cwd=root, env={**env_only_owner, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert env_lock.returncode == 0 and not lock.exists(), (env_lock.returncode, env_lock.stderr)
         ok("lock owner identity accepts effective env-only Git identity")
+        trailing = subprocess.run(["sh", str(script)], cwd=root, env={**env, "AEGIS_STACK_LOCK": str(lock) + "/", "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert trailing.returncode == 0 and not lock.exists(), (trailing.returncode, trailing.stderr)
+        ok("trailing slash in AEGIS_STACK_LOCK is normalized")
         holder = start("printf started > started; while :; do sleep 0.05; done")
         try:
             wait_paths(lock, lock / "ready", root / "started")
