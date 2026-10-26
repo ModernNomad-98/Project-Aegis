@@ -2650,8 +2650,7 @@ def test_coverage_map_evidence_rules():
     payload = load_coverage()
     for row_id in (2, 4):
         evidence = coverage_entry(payload, row_id)["evidence"]
-        assert "catalog lines " in evidence, (row_id, evidence)
-        assert "skill row" in evidence, (row_id, evidence)
+        assert "catalog row:" in evidence, (row_id, evidence)
     with tempfile.TemporaryDirectory() as tmp:
         def stale_catalog_line(payload):
             row = coverage_entry(payload, 2)

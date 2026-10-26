@@ -42,7 +42,7 @@
         "architecture-designer",
         "threat-modeler"
       ],
-      "evidence": "audit classification: COVERED(decision) — architecture-designer, threat-modeler; dropped D80; covered by architecture-designer + threat-modeler (reconciliation §3 Phase 2, catalog lines 1480-1481 / skill rows 394,529); covering skills: architecture-designer, threat-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
+      "evidence": "audit classification: COVERED(decision) — architecture-designer, threat-modeler; dropped by decision D80 (2026-10-10; candidate system-context-mapper); covered by architecture-designer + threat-modeler (reconciliation §3 Phase 2 D80 decision note, catalog row: architecture-designer; catalog row: threat-modeler); covering skills: architecture-designer, threat-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
       "evidence_grade": "catalog-decision",
       "id": 2,
       "name": "System Context Mapping",
@@ -70,7 +70,7 @@
       "covering_skills": [
         "domain-modeler"
       ],
-      "evidence": "audit classification: COVERED(decision) — domain-modeler; bounded-context-identifier (#4) dropped D80; covered by domain-modeler step 4 (reconciliation §3 Phase 2 / catalog lines 1482-1483 / skill row 393); covering skills: domain-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
+      "evidence": "audit classification: COVERED(decision) — domain-modeler; bounded-context-identifier (#4) dropped by decision D80 (2026-10-10; candidate bounded-context-identifier); covered by domain-modeler step 4 (reconciliation §3 Phase 2 D80 decision note, catalog row: domain-modeler); covering skills: domain-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
       "evidence_grade": "catalog-decision",
       "id": 4,
       "name": "Bounded Context Identification",
@@ -3608,13 +3608,13 @@
       "covering_skills": [
         "data-migration-runbook-author"
       ],
-      "evidence": "planning-gate decision Q2=A: catalog L630-631/L1447-1448 and reconciliation R303/R3650-R3652 record migration-deployment-runbook (#254) as merged into data-migration-runbook-author as an extension (D71, 2026-09-28; no separate skill); covering skill: data-migration-runbook-author; D107 (2026-10-21).",
+      "evidence": "planning-gate decision Q2=A: catalog row: data-migration-runbook-author (D71 merge/extension decision target) and reconciliation R303/R3650-R3652 record migration-deployment-runbook (#254) as merged into data-migration-runbook-author as an extension (D71, 2026-09-28; no separate skill); covering skill: data-migration-runbook-author; D107 (2026-10-21).",
       "evidence_grade": "catalog-decision",
       "id": 254,
       "name": "Migration Deployment Runbook",
       "notes": "planning-gate decision Q2=A; D107 (2026-10-21)",
       "priority": "P0",
-      "rationale": "D71 (2026-09-28): migration-deployment-runbook was merged into data-migration-runbook-author as an extension; no separate skill (catalog L630-631/L1447-1448; reconciliation R303/R3650-R3652).",
+      "rationale": "D71 (2026-09-28): migration-deployment-runbook was merged into data-migration-runbook-author as an extension; no separate skill (D71 decision target: catalog row: data-migration-runbook-author; reconciliation R303/R3650-R3652).",
       "status": "COVERED"
     },
     {
@@ -3965,13 +3965,13 @@
         "source-of-truth-reconciler",
         "tdd-engineer"
       ],
-      "evidence": "planning-gate decision Q2=A: catalog L1362-1364 and reconciliation R3506-R3508 record #278 AI Pair Engineering Protocol as dropped as covered by the ai-sdlc-operating-model stage map; covering set (18 names): agent-authorization-matrix, agent-failure-recovery, agent-governance-audit, agent-instruction-consolidator, agent-memory-governance, agent-startup-context-gate, ai-closeout-reporter, ai-sdlc-operating-model, ai-task-decomposer, change-classification-gate, code-reviewer, docs-first-implementer, human-approval-boundary, local-ci-mirror-preflight, reviewable-diff-discipline, security-pr-reviewer, source-of-truth-reconciler, tdd-engineer; D107 (2026-10-21).",
+      "evidence": "planning-gate decision Q2=A: catalog row: ai-sdlc-operating-model (D107 stage-map decision target) and reconciliation R3506-R3508 record #278 AI Pair Engineering Protocol as dropped as covered by the ai-sdlc-operating-model stage map; covering set (18 names): agent-authorization-matrix, agent-failure-recovery, agent-governance-audit, agent-instruction-consolidator, agent-memory-governance, agent-startup-context-gate, ai-closeout-reporter, ai-sdlc-operating-model, ai-task-decomposer, change-classification-gate, code-reviewer, docs-first-implementer, human-approval-boundary, local-ci-mirror-preflight, reviewable-diff-discipline, security-pr-reviewer, source-of-truth-reconciler, tdd-engineer; D107 (2026-10-21).",
       "evidence_grade": "catalog-decision",
       "id": 278,
       "name": "AI Pair Engineering Protocol",
       "notes": "planning-gate decision Q2=A; D107 (2026-10-21)",
       "priority": "P1",
-      "rationale": "Dropped as covered by ai-sdlc-operating-model and its 17 stage-gate-map enforcing skills (18-name set) (catalog L1362-1364; reconciliation R3506-R3508).",
+      "rationale": "Dropped as covered by ai-sdlc-operating-model and its 17 stage-gate-map enforcing skills (18-name set) (D107 stage-map decision target: catalog row: ai-sdlc-operating-model; reconciliation R3506-R3508).",
       "status": "COVERED"
     },
     {
