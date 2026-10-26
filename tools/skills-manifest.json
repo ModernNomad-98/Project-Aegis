@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "e0c5864ee290be4f04a975fc3d79091cf43b5be4",
+  "source_revision": "a967a8bfae3645496f836c78fc0a4de13ace4971",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -496,7 +496,7 @@
     {
       "name": "feature-flag-architect",
       "path": ".claude/skills/feature-flag-architect/SKILL.md",
-      "sha256": "ed3dbcec1b5e55af932783b4a571d16662994db95a017b96e07f1c41c7f6f4c0"
+      "sha256": "2a096adff8239e675ece16cde87c8534ea1e96cd344f427ea2f7c82d1d86689a"
     },
     {
       "name": "feature-flag-rollout-strategist",
