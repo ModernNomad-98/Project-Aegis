@@ -4258,8 +4258,8 @@ def test_readiness_effective_identity_hook():
         p = git("commit", "--allow-empty", "-m", "owner committer env", extra={"GIT_COMMITTER_NAME": "FixtureOwner", "GIT_COMMITTER_EMAIL": "owner@example.invalid"})
         assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
         ok("environment author/committer owner overrides rejected")
-        git("config", "--unset", "user.name")
-        git("config", "--unset", "user.email")
+        git("config", "user.name", "")
+        git("config", "user.email", "")
         env_only = hook_run({"GIT_AUTHOR_NAME": "FixtureAgent", "GIT_AUTHOR_EMAIL": "agent@example.invalid", "GIT_COMMITTER_NAME": "FixtureAgent", "GIT_COMMITTER_EMAIL": "agent@example.invalid"})
         assert env_only.returncode == 0, env_only.stderr
         git("config", "user.name", "FixtureOwner")
@@ -4366,8 +4366,8 @@ def test_readiness_startup_authority_non_mutating():
         assert empty.returncode != 0 and ("configured agent user.name absent" in empty.stdout or "effective author identity unavailable" in empty.stdout), (empty.returncode, empty.stdout)
         git("config", "user.name", "FixtureAgent")
         ok("inspection rejects effective identity matching the recorded owner and empty effective identity")
-        git("config", "--unset", "user.name")
-        git("config", "--unset", "user.email")
+        git("config", "user.name", "")
+        git("config", "user.email", "")
         env_only = dict(env); env_only.update({"GIT_AUTHOR_NAME": "FixtureAgent", "GIT_AUTHOR_EMAIL": "agent@example.invalid", "GIT_COMMITTER_NAME": "FixtureAgent", "GIT_COMMITTER_EMAIL": "agent@example.invalid"})
         env_only_run = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env_only, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert env_only_run.returncode == 0, (env_only_run.returncode, env_only_run.stdout, env_only_run.stderr)
