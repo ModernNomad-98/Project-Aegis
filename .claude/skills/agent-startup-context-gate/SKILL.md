@@ -103,10 +103,14 @@ git var GIT_COMMITTER_IDENT
 ```
 
 Effective author AND committer identities matter, not only the configured defaults:
-environment (`GIT_AUTHOR_*`, `GIT_COMMITTER_*`) and command overrides (for example
-`git commit --author`) can change the identity that is recorded. The resulting commit
-is the final oracle. If either effective identity is missing, empty or still the
-recorded owner identity, STOP before committing and report the mismatch.
+environment (`GIT_AUTHOR_*`, `GIT_COMMITTER_*`) can change the identity that is
+recorded. A command override such as `git commit --author` can also change the
+recorded author, but Git applies `--author` after the pre-commit hook, so the local
+hook cannot reliably catch it. The resulting ACTUAL commit is the final oracle:
+inspect `%an <%ae>` and `%cn <%ce>` on the resulting commit. If either effective
+identity is missing, empty or still the recorded owner identity, do not push or
+continue; STOP and remediate/report the mismatch (for an actual commit that already
+exists, remediation replaces the local commit before push).
 
 The owner identity comes from local-only config (never committed):
 
@@ -150,11 +154,14 @@ exit 0
 Expected behavior: valid agent author+committer -> exit 0 and the commit proceeds;
 missing owner/effective identity or effective owner identity in EITHER author or
 committer position -> exit 1 with the exact STOP/refusal message; environment overrides
-and command overrides are validated against the effective identity. Invoke the hook
-directly to prove the unit behavior, then inspect an ACTUAL resulting commit as the
-oracle. Local hooks are not a security boundary: `git commit --no-verify` can bypass
-a local pre-commit hook, and no global hook, host setting, remote identity service or
-unbypassable guarantee is promised. This is a local guard and disclosure boundary only.
+are validated against the effective identity. A command override such as
+`git commit --author` is **not reliably caught** by a pre-commit hook because Git
+applies it after the hook; inspect the ACTUAL resulting commit and do not push or
+remediate an owner-authored/owner-committed result. Invoke the hook directly to prove
+the unit behavior, then inspect the actual commit as the oracle. Local hooks are not a
+security boundary: `git commit --no-verify` can bypass a local pre-commit hook, and no
+global hook, host setting, remote identity service or unbypassable guarantee is
+promised. This is a local guard and disclosure boundary only.
 
 ## Output Format
 

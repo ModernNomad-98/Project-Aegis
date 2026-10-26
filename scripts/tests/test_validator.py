@@ -4200,14 +4200,15 @@ def test_readiness_effective_identity_hook():
         print("  SKIP  effective-identity hook: POSIX sh not available on this host")
         return
     skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
-    m = re.search(r"```sh\n(.*?)```", skill, re.DOTALL)
-    assert m, "SKILL.md must publish the executable effective-identity hook"
-    hook_text = m.group(1)
+    hook_blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", skill, re.DOTALL)
+    hook_text = next((b for b in hook_blocks if "GIT_AUTHOR_IDENT" in b), None)
+    assert hook_text, "SKILL.md must publish the executable effective-identity hook"
+    assert "GIT_COMMITTER_IDENT" in hook_text
     assert "GIT_AUTHOR_IDENT" in hook_text and "GIT_COMMITTER_IDENT" in hook_text
     with tempfile.TemporaryDirectory() as td:
         repo = Path(td)
         env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td})
+        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(Path(td) / "xdg"), "GIT_CONFIG_GLOBAL": str(Path(td) / "gitconfig")})
         def git(*args, extra=None):
             e = dict(env); e.update(extra or {})
             return subprocess.run(["git"] + list(args), cwd=repo, env=e, capture_output=True, text=True, encoding="utf-8", errors="replace")
@@ -4242,6 +4243,9 @@ def test_readiness_effective_identity_hook():
         p = git("commit", "--allow-empty", "-m", "owner committer env", extra={"GIT_COMMITTER_NAME": "FixtureOwner", "GIT_COMMITTER_EMAIL": "owner@example.invalid"})
         assert p.returncode != 0, "owner effective committer override must reject"
         ok("environment author/committer owner overrides rejected")
+        p = git("commit", "--allow-empty", "-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "-m", "config override")
+        assert p.returncode != 0, "command-level git -c owner override must reject"
+        ok("command-level git -c owner override rejected by the effective identity hook")
         p = git("commit", "--allow-empty", "-m", "author command override", "--author=FixtureOwner <owner@example.invalid>")
         if p.returncode == 0:
             ident = git("show", "-s", "--format=%an|%ae|%cn|%ce").stdout.strip()
@@ -4265,12 +4269,13 @@ def test_readiness_startup_authority_non_mutating():
     inspection_match = re.search(r"Run and record the inspection:\s*```bash\n(.*?)```", skill, re.DOTALL)
     assert inspection_match, "SKILL.md must publish the read-only identity inspection commands"
     inspection = inspection_match.group(1)
-    hook_match = re.search(r"```sh\n(.*?)```", skill, re.DOTALL)
-    assert hook_match, "SKILL.md must publish the effective-identity hook"
+    hook_blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", skill, re.DOTALL)
+    hook_text = next((b for b in hook_blocks if "GIT_AUTHOR_IDENT" in b), None)
+    assert hook_text, "SKILL.md must publish the effective-identity hook"
     with tempfile.TemporaryDirectory() as td:
         repo = Path(td)
         env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td})
+        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(Path(td) / "xdg"), "GIT_CONFIG_GLOBAL": str(Path(td) / "gitconfig")})
         def git(*args):
             return subprocess.run(["git"] + list(args), cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert git("init", "-q").returncode == 0
@@ -4291,7 +4296,7 @@ def test_readiness_startup_authority_non_mutating():
         assert after == before, "read-only identity inspection must not change config or hooks"
         ok("covered startup inspection is non-mutating (git config bytes and hook files unchanged)")
         hook = repo / ".git" / "hooks" / "pre-commit"
-        hook.write_text(hook_match.group(1), encoding="utf-8", newline="\n")
+        hook.write_text(hook_text, encoding="utf-8", newline="\n")
         hook.chmod(0o755)
         assert subprocess.run([str(hook)], cwd=repo, env=env, capture_output=True).returncode == 0
         assert git("commit", "--allow-empty", "-m", "covered setup").returncode == 0
@@ -4316,8 +4321,8 @@ def test_readiness_shared_lock_lifecycle():
         print("  SKIP  shared-lock lifecycle: POSIX sh not available on this host")
         return
     ref = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md").read_text(encoding="utf-8")
-    blocks = re.findall(r"```bash\n(.*?)```", ref, re.DOTALL)
-    assert len(blocks) >= 1, "shared-resource reference must publish the lock script"
+    blocks = [b for b in re.findall(r"```(?:bash|sh)\n(.*?)```", ref, re.DOTALL) if "AEGIS_STACK_LOCK" in b]
+    assert len(blocks) >= 1, "shared-resource reference must publish the lock script anchored on AEGIS_STACK_LOCK"
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         lock = root / "stack.lock"
@@ -4325,7 +4330,7 @@ def test_readiness_shared_lock_lifecycle():
         script.write_text(blocks[0], encoding="utf-8", newline="\n")
         script.chmod(0o755)
         env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-        env.update({"AEGIS_STACK_LOCK": str(lock), "GIT_CONFIG_NOSYSTEM": "1", "HOME": td})
+        env.update({"AEGIS_STACK_LOCK": str(lock), "GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(Path(td) / "xdg"), "GIT_CONFIG_GLOBAL": str(Path(td) / "gitconfig")})
         def start(workload):
             e = dict(env); e["AEGIS_STACK_WORKLOAD"] = workload
             return subprocess.Popen(["sh", str(script)], cwd=root, env=e, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -4334,6 +4339,9 @@ def test_readiness_shared_lock_lifecycle():
             deadline = time.time() + 10
             while not lock.exists() and time.time() < deadline: time.sleep(0.02)
             assert lock.exists(), "holder must acquire the lock"
+            token_text = lock.read_text(encoding="utf-8")
+            assert "acquired=" in token_text and "ttl_minutes=" in token_text, token_text
+            ok("lock token records owner/run/acquired/ttl_minutes consistently with the stale-lock rule")
             contender = start("true")
             cout, cerr = contender.communicate(timeout=10)
             assert contender.returncode != 0 and "held" in (cerr or ""), (contender.returncode, cerr)
@@ -4346,6 +4354,8 @@ def test_readiness_shared_lock_lifecycle():
             assert not lock.exists(), "owned workload stop must precede lock release"
             ok("TERM stops the owned workload, reaps it and releases only its own lock")
         finally:
+            try: (root / "release").write_text("release\n", encoding="utf-8")
+            except OSError: pass
             if holder.poll() is None: holder.kill(); holder.communicate(timeout=5)
             if lock.exists(): lock.unlink()
         normal = start("true"); no, ne = normal.communicate(timeout=10)
@@ -4371,6 +4381,8 @@ def test_readiness_shared_lock_lifecycle():
             assert not lock.exists(), "SIGINT must stop the owned workload before releasing the lock"
             ok("SIGINT stops the owned workload, reaps it and releases only its own lock")
         finally:
+            try: (root / "release").write_text("release\n", encoding="utf-8")
+            except OSError: pass
             if holder_int.poll() is None: holder_int.kill(); holder_int.communicate(timeout=5)
             if lock.exists(): lock.unlink()
         incomplete = subprocess.Popen(["sh", str(script)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "exec >/dev/null 2>&1; trap '' TERM; echo $$ > child.pid; while :; do sleep 0.05; done"}, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
@@ -4401,6 +4413,8 @@ def test_readiness_shared_lock_lifecycle():
             assert lock.exists(), "cleanup must not delete a replaced/successor lock"
             ok("replaced ownership is preserved by old-process cleanup")
         finally:
+            try: (root / "release").write_text("release\n", encoding="utf-8")
+            except OSError: pass
             if holder.poll() is None: holder.kill(); holder.communicate(timeout=5)
             if lock.exists(): lock.unlink()
 
@@ -4411,30 +4425,34 @@ def test_readiness_memory_canonical_tristate():
         print("  SKIP  canonical ancestry tri-state: POSIX sh not available on this host")
         return
     canon = (REPO_ROOT / "docs/semantics/canonical-semantics.md").read_text(encoding="utf-8")
-    sec = canon[canon.index("## 3."):]
-    blocks = re.findall(r"```[^\n]*\n(#!/bin/sh\n.*?)```", sec, re.DOTALL)
+    heading = re.search(r"^##\s+3\.\s+R8 core semantics", canon, re.MULTILINE)
+    assert heading, "canonical semantics must keep the R8 section 3 heading"
+    sec = canon[heading.start():]
+    blocks = [b for b in re.findall(r"```[^\n]*\n(#!/bin/sh\n.*?)```", sec, re.DOTALL) if "ancestry_status" in b and "TARGET_PATH" in b]
     assert blocks, "canonical semantics must publish the wrapper"
     wrapper = hashlib.sha256(blocks[0].encode()).hexdigest()[:12]
     with tempfile.TemporaryDirectory() as td:
-        repo = Path(td); env = {k:v for k,v in os.environ.items() if not k.startswith("GIT_")}; env.update({"GIT_CONFIG_NOSYSTEM":"1","HOME":td,"GIT_LITERAL_PATHSPECS":"1"})
+        repo = Path(td); env = {k:v for k,v in os.environ.items() if not k.startswith("GIT_")}; env.update({"GIT_CONFIG_NOSYSTEM":"1","HOME":td,"XDG_CONFIG_HOME":str(Path(td)/"xdg"),"GIT_CONFIG_GLOBAL":str(Path(td)/"gitconfig"),"GIT_LITERAL_PATHSPECS":"1"})
         w = repo/"wrapper.sh"; w.write_text(blocks[0], encoding="utf-8", newline="\n"); w.chmod(0o755)
         def git(*args): return subprocess.run(["git"]+list(args),cwd=repo,env=env,capture_output=True,text=True,encoding="utf-8",errors="replace")
-        assert git("init","-q").returncode==0
+        assert git("init","-q","-b","main").returncode==0
         git("config","user.name","Fixture"); git("config","user.email","fixture@example.invalid")
         (repo/"target").write_text("one\n",encoding="utf-8"); git("add","target"); assert git("commit","-qm","one").returncode==0
         a=git("rev-parse","HEAD").stdout.strip()
         (repo/"target").write_text("two\n",encoding="utf-8"); git("add","target"); assert git("commit","-qm","two").returncode==0
         b=git("rev-parse","HEAD").stdout.strip()
         git("checkout","-q","--orphan","stray"); (repo/"other").write_text("x\n",encoding="utf-8"); git("add","other"); assert git("commit","-qm","stray").returncode==0
-        stray=git("rev-parse","HEAD").stdout.strip(); git("checkout","-q","main")
+        stray=git("rev-parse","HEAD").stdout.strip()
+        assert git("checkout","-q","main").returncode==0, "canonical test must return to the main branch"
+        assert git("rev-parse","--abbrev-ref","HEAD").stdout.strip()=="main"
         def run(base,head,target="target"):
             e=dict(env); e.update({"BASE":base,"HEAD":head,"TARGET_PATH":target}); return subprocess.run(["sh",str(w)],cwd=repo,env=e,capture_output=True,text=True,encoding="utf-8",errors="replace")
-        same=run(b,b); assert same.returncode==0 and "ancestry_status=ancestor_or_equal" in same.stdout and "content_match_status=same" in same.stdout
+        same=run(b,b); assert same.returncode==0 and "ancestry_status=ancestor_or_equal" in same.stdout and "content_match_status=same" in same.stdout and "oid_match_status=same" in same.stdout
         changed=run(a,b); assert changed.returncode==0, "wrapper exit 0 means completed, not passed"
-        assert "ancestry_status=ancestor_or_equal" in changed.stdout and "content_match_status=differs" in changed.stdout
+        assert "ancestry_status=ancestor_or_equal" in changed.stdout and "content_match_status=differs" in changed.stdout and "oid_match_status=differs" in changed.stdout
         ok("wrapper exit 0 is completed-only: changed content record the gate must block, not a pass")
         non=run(stray,b); assert "ancestry_status=not_ancestor" in non.stdout
-        invalid=run("deadbeef"*5,b,"target"); assert invalid.returncode!=0 and "UNVERIFIED" in invalid.stdout
+        invalid=run("deadbeef"*5,b,"target"); assert invalid.returncode!=0 and "UNVERIFIED" in invalid.stdout and "oid_match_status=UNVERIFIED" in invalid.stdout
         empty=run(b,b,""); assert empty.returncode==2 and "UNVERIFIED" in empty.stdout
         memrules=(REPO_ROOT/".claude/skills/agent-memory-governance/references/memory-rules.md").read_text(encoding="utf-8")
         assert "Legacy boolean shortcut - removed" in memrules
