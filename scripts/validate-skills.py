@@ -270,7 +270,7 @@ COVERAGE_SHIPPED_TOKEN_RE = re.compile(
     r"[" + re.escape(COVERAGE_SHIPPED_CLOSING_CHARS) + r"]*")
 # List separators include a serial comma before a conjunction ("a, b, and c").
 COVERAGE_SHIPPED_SEPARATOR_RE = re.compile(
-    r"\s*(?:(?:,|&|/)\s*(?:\band\b|\bor\b)?|\band\b|\bor\b)\s*",
+    r"\s*(?:(?:,|;|&|/)\s*(?:\band\b|\bor\b)?|\band\b|\bor\b)\s*",
     re.IGNORECASE)
 # Negation is deliberately base-equivalent: only 'not'/'never' immediately
 # before this occurrence's phrase (the base predicate's 16-character window).
@@ -332,9 +332,11 @@ def _coverage_shipped_analysis(entry_text: str,
     phrase), so no claim the base predicate detects is suppressed. The phrase is
     word-bounded on both sides for enforcement (FD-2), so ordinary words such as
     "aside" and "assembly" are not enforced phrases; an occurrence glued to a
-    following token is handled by a claims-only base-parity fallback (known
-    tokens only, multi-skill lists included) so no base-detected claim is lost
-    (Stage B F-01), and it never emits unknown/malformed errors. The adjacent token list is read through wrappers
+    following token keeps base-parity claims for known tokens (multi-skill lists
+    included), resumes the independent per-token scan after any merged first
+    token, and reports a glued hyphen/underscore fragment as one unknown token;
+    an allowlisted downstream prose remainder stays silent and a merged
+    occurrence never emits malformed (Stage B F-01). The adjacent token list is read through wrappers
     and comma/&/slash/and/or connectors including serial commas; unknown
     skill-shaped tokens fail closed; a phrase with no skill-shaped token at all
     (bare phrase, colon-only, punctuation-only, numeric-only or ordinary prose)
@@ -377,6 +379,11 @@ def _coverage_shipped_analysis(entry_text: str,
             tokens = tokens[colon.end():]
         position = 0
         found = False
+        first_token = True
+        # Documented downstream prose remainders of a phrase glued to a following
+        # token ("shipped aside"/"assembly-line"); these are the only compound
+        # first tokens that are not enforced evidence.
+        merged_prose = {"ide", "sembly", "ide-from", "sembly-line"}
         while True:
             token_match = COVERAGE_SHIPPED_TOKEN_RE.match(tokens, position)
             if token_match is None:
@@ -387,16 +394,26 @@ def _coverage_shipped_analysis(entry_text: str,
                 claims.add(candidate_cf)
                 found = True
             elif "-" in candidate or "_" in candidate:
-                if boundary:
+                if not boundary and first_token and candidate_cf in merged_prose:
+                    # Documented allowlisted downstream prose, not evidence.
+                    pass
+                else:
+                    # F-04 narrow cut (i)/(ii): a glued hyphen/underscore fragment
+                    # after "shipped as" is one invalid token - report the whole
+                    # token as unknown, never claim a known prefix; later tokens
+                    # are checked independently (no early stop after a merged
+                    # first token).
                     unknown.add(candidate_cf)
                     found = True
-                # merged (no trailing boundary) is a claims-only base-parity
-                # fallback: skip the compound but keep scanning the list so a
-                # later manifest-known token is not lost; never emit
-                # unknown/malformed for a merged occurrence.
             else:
-                break
+                if not boundary and first_token:
+                    # Owner item (ii): a plain merged first token is prose; keep
+                    # scanning so a later separator-separated token is checked.
+                    pass
+                else:
+                    break
             position = token_match.end()
+            first_token = False
             separator = COVERAGE_SHIPPED_SEPARATOR_RE.match(tokens, position)
             if separator is None or separator.end() == position:
                 break

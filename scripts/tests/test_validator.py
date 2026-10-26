@@ -2245,6 +2245,40 @@ def test_coverage_map_evidence_rules():
             "adr-writer", "domain-modeler"]
     assert not validator._coverage_shipped_analysis(
         "shipped asadr-writer", manifest)["unknown"]
+    # Narrow C item (i)/(ii): a glued hyphen/underscore fragment after
+    # "shipped as" is reported as one unknown token (never a claimed prefix), and
+    # every later token is checked independently after a merged first token.
+    glued_fragment = validator._coverage_shipped_analysis(
+        "shipped asadr-writer-extra", manifest)
+    assert glued_fragment["claims"] == [], glued_fragment
+    assert glued_fragment["unknown"] == ["adr-writer-extra"], glued_fragment
+    for text, expected_unknown in (
+            ("shipped asadr-writer and fake-skill", ["fake-skill"]),
+            ("shipped asadr-writer, ide-plugin", ["ide-plugin"]),
+            ("shipped asadr-writer and not-a-real-skill",
+             ["not-a-real-skill"])):
+        analysis = validator._coverage_shipped_analysis(text, manifest)
+        assert analysis["unknown"] == expected_unknown, (text, analysis)
+        assert analysis["claims"] == ["adr-writer"], (text, analysis)
+    merged_list_claims = validator._coverage_shipped_analysis(
+        "shipped asadr-writer and domain-modeler", manifest)
+    assert merged_list_claims["claims"] == ["adr-writer", "domain-modeler"], (
+        merged_list_claims)
+    # Owner item (ii) after ANY merged first token: a plain merged prose first
+    # token resumes the post-phrase scan; a later invalid token fails closed and
+    # plain following prose stays silent.
+    plain_merged_invalid = validator._coverage_shipped_analysis(
+        "shipped asfoo and fake-skill", manifest)
+    assert plain_merged_invalid["claims"] == [], plain_merged_invalid
+    assert plain_merged_invalid["unknown"] == ["fake-skill"], plain_merged_invalid
+    plain_merged_prose = validator._coverage_shipped_analysis(
+        "shipped asfoo remains planned", manifest)
+    assert plain_merged_prose == {"claims": [], "unknown": [], "malformed": []}, (
+        plain_merged_prose)
+    aside_unknown = validator._coverage_shipped_analysis(
+        "shipped aside-from, fake-skill", manifest)
+    assert aside_unknown["claims"] == [], aside_unknown
+    assert aside_unknown["unknown"] == ["fake-skill"], aside_unknown
     # e2e: a merged known claim triggers the existing D114-convention check
     with tempfile.TemporaryDirectory() as tmp:
         def merged_shipped_as(payload):
@@ -2272,22 +2306,30 @@ def test_coverage_map_evidence_rules():
             "shipped as: " + name,
             "not shipped as " + name + ", but shipped as " + name])
     suppression_corpus.extend([
+        "shipped asadr-writer-extra", "shipped as adr-writer-extra",
+        "shipped asadr-writer and fake-skill",
+        "shipped asadr-writer, ide-plugin",
+        "shipped asfoo and fake-skill",
+        "shipped asfoo remains planned",
+        "shipped aside-from, fake-skill",
         "shipped aside-from beta", "shipped assembly-line",
         "shipped as part of a historical bundle", "shipped as:**adr-writer**",
         "shipped as adr-writer[1](https://example.invalid/x)",
         "not just shipped as adr-writer",
         "old was not shipped as adr-writer but later shipped as import-qa-strategy-designer",
         "shipped asadr-writer and domain-modeler"])
-    unexplained = []
+    lost_claims = []
     for text in suppression_corpus:
         base_claims = base_scan(text, manifest)["claims"]
         head = validator._coverage_shipped_analysis(text, manifest)
         lost = [c for c in base_claims if c not in head["claims"]]
-        if lost and not head["unknown"]:
-            unexplained.append((text, lost))
-    assert not unexplained, unexplained
-    print("R2-09 no base-claim suppression: corpus="
-          + str(len(suppression_corpus)) + " unexplained=0")
+        if lost:
+            lost_claims.append((text, lost))
+    # Narrow C item (iii): zero base-detected claims may be lost (the base
+    # predicate is loaded from pinned commit 4cdc86a8 over the repo corpus).
+    assert not lost_claims, lost_claims
+    print("R2-09 base-vs-head differential: corpus="
+          + str(len(suppression_corpus)) + " base_claims_lost=0")
     # FD-3: an unknown hyphenated/underscored compound is the strict-by-design
     # unknown-token class, with a message distinct from malformed/no-token.
     hyphen_prose = validator._coverage_shipped_analysis(
