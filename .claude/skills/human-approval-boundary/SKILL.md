@@ -138,5 +138,9 @@ This skill IS a stop condition. Additionally:
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the change-governance
   cluster (`change-classification-gate`, `reviewable-diff-discipline`).
+- `references/consumer-manual-only-policy.md` — consumer-copyable normative
+  manual-only override policy and one-page contract summary (OD-Q903-2=A,
+  OD-Q903-3=B, OD-Q903-4=A, OD-Q903-5=A; OD-Q903-1 docs-only, no machine
+  enforcement).
 - Self-contained otherwise — the boundary list must stay visible in this file,
   not buried in a reference.
