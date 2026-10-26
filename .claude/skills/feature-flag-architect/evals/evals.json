@@ -14,7 +14,7 @@
           "Designs on the recorded self-hosted store decision without re-asking the store question.",
           "Specifies one internal flag interface (adapter) so no call site imports the flag SDK directly, with typed flag definitions and server keys kept out of client code.",
           "Chooses an evaluation placement per flag class, keeping tenant-sensitive flags on the server per request and client evaluation presentation-only, and states the staleness, latency and flicker cost of each placement.",
-          "Designs the fail-safe mechanism: code-level defaults at every call site, a last-known-good cache or bootstrap snapshot, a non-blocking evaluation timeout, and cold-start behavior, while leaving each flag's safe value to feature-flag-rollout-strategist.",
+          "Designs the fail-safe mechanism as the skill's single ordered resolution: the offline-authorized override exception (EXACT code-level safe value only, actor/audited), LIVE only for a successful/valid response within the bounded timeout, FRESH_CACHE only after a live failure for a value exactly equal to the safe value, else UNKNOWN -> code default equal to the exact safe value; every non-LIVE path including an active override ends at the exact safe value.",
           "States what was chosen, why, and the main rejected alternative for placement and fail-safe, and ends with a hand-off list naming the owning skills."
         ]
       }
@@ -27,10 +27,30 @@
         "triggers": true,
         "assertions": [
           "Diagnoses the awaited network evaluation before first paint as the missing fail-safe mechanism, not a rollout-plan problem.",
-          "Specifies an evaluation timeout stated in milliseconds that never blocks render, falling back to a last-known-good cache or a server-rendered bootstrap snapshot, then to the code-level default.",
+          "States the first-paint policy: first paint does not block on the flag service and uses an async/precomputed exact-safe value; other paths may use a per-flag timeout within the stated total render budget, with parallel/batched evaluation where needed.",
+          "Resolves the value in the skill's single order: an offline-authorized override exception first (EXACT code-level safe value only, audited), then LIVE only when the service returned a successful/valid response (2xx + parseable/validated value) within the bounded timeout, then only after a live failure a FRESH_CACHE fallback serving a cache/bootstrap value only when its age is at or below the stated hard maximum serve age and its value equals the exact safe value (source=cache with the failure reason), else UNKNOWN -> code default equal to the exact safe value.",
+          "When neither LIVE nor FRESH_CACHE applies, state is UNKNOWN and every call site serves its code-level default equal to the flag's safe value; a cached or bootstrap value differing from the safe value is NEVER served as the safe answer.",
           "Defines cold-start behavior when there is no cache and the service is unreachable (serve the code default and emit a metric).",
           "Describes exercising the fallback in a non-production environment by making the flag service unreachable.",
           "States that the safe value each flag falls back to is chosen per flag by feature-flag-rollout-strategist; this design only guarantees the fallback reaches it."
+        ]
+      }
+    },
+    {
+      "id": "edge-outage-cached-enabled-is-not-served",
+      "type": "should_trigger",
+      "prompt": "A release flag has exact safe value false. The flag service is unreachable; the last-known-good cache entry is 40 minutes old while the per-flag hard maximum serve age is 5 minutes; integrity and the signed revocation snapshot are valid; the cached value says enabled=true. A page render asks for the flag. Design the outage behavior and the telemetry fields.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the cache as unusable: the live attempt failed (unreachable), integrity/revocation are valid so the entry is not untrusted, but the cached value (enabled=true) is not equal to the exact safe value false, so under first-match untrusted > rejected > stale > fresh the cache_state is deterministically rejected regardless of age.",
+          "Serves the call-site code-level default, which MUST equal the flag's safe value false.",
+          "States absolutely that a cache/bootstrap value not equal to the flag's exact safe value is NEVER served; a cached enabled=true cannot override a false safe default, and no silent fail-open.",
+          "States the exact-safe-value cache rule: FRESH_CACHE serves only a value equal to the exact code-level safe value (variant safe states enumerated by the design); no safe-direction or safe-set variant exists.",
+          "Requires fallback telemetry with source=default, live_failure_reason=unreachable, cache_state=rejected, environment/tenant and the served value; startup_state only if cold.",
+          "Demonstrates the first-match taxonomy: value not equal to the exact safe value is rejected, not stale, even when the entry is also old.",
+          "States that FRESH_CACHE telemetry carries live_failure_reason only when a live attempt failed (the no-live-attempt path omits it while source/cache_state/startup_state still apply).",
+          "Reports a served-value telemetry field that is size-bounded and redacted or digest-logged when it may contain PII; the MAC assertion tuple is domain-separated by flag/tenant/environment/schema version."
         ]
       }
     },
@@ -126,6 +146,122 @@
           "States that signing up and paying are human actions that go through the human approval path, and that this skill only designs.",
           "Offers what it can provide instead: the registry entries (owner, type, expiry date, safe value) and targeting rules for the three flags as a design the owner can apply after approval.",
           "Does not ask for payment details or account information."
+        ]
+      }
+    },
+    {
+      "id": "edge-outage-fresh-lkg-allowed",
+      "type": "should_trigger",
+      "prompt": "The flag service is unreachable. The last-known-good cache entry's age is 30 seconds, within the flag's per-flag hard maximum serve age of 5 minutes and past its refresh TTL of 10 seconds; its value equals the flag's exact safe value; integrity and the signed revocation snapshot are valid. Design the outage behavior and telemetry.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses FRESH_CACHE only after the live attempt failed and only because the cache value equals the exact safe value, the state is fresh, the age is within the per-flag hard maximum serve age, and integrity plus the signed revocation snapshot are valid.",
+          "Requires the cached value to agree with the flag's safe value before serving it and emits source=cache with reason unreachable.",
+          "Does not misreport the fresh cache as a LIVE known value; the cache path is a fallback after a live failure.",
+          "States the per-flag refresh TTL and hard maximum serve age once, records the timestamp, requires a keyed MAC/signature over value+timestamp (a plain checksum is insufficient), and treats unknown-age entries as untrusted.",
+          "Keeps the failure observable and keeps the fallback exercised in a non-production environment.",
+          "Notes FRESH_CACHE is behaviourally equal to the code default because both must equal the exact safe value; the MAC/signature and tenant-qualified keys protect source/provenance labeling and call-site drift.",
+          "Reports the async/precomputed no-live-attempt path semantics: a precomputed bootstrap is a cache-path value that must equal the exact safe value, live_failure_reason is omitted there, and source/cache_state/startup_state still apply.",
+          "States the threat-model rationale: FRESH_CACHE is behaviourally identical to the default, so the MAC/signature and tenant/flag/env bindings protect provenance labeling and call-site drift, and an outage reverts enabled features to safe.",
+          "Defines the PRECOMPUTED/NO_LIVE_ATTEMPT path: a precomputed bootstrap/cache value used before or without a live attempt must equal the exact safe value and satisfy the hard maximum serve age, integrity and revocation bounds, or the code default is served (no unbounded old precomputed value)."
+        ]
+      }
+    },
+    {
+      "id": "edge-outage-stale-agreeing-cache",
+      "type": "should_trigger",
+      "prompt": "The flag service is unreachable. The last-known-good cache value equals the flag's exact safe value, integrity and the signed revocation snapshot are valid, but the entry's age is 40 minutes while the per-flag hard maximum serve age is 5 minutes and the per-flag refresh TTL is 30 seconds. Design what the page render serves and which telemetry fields are reported.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Treats the cache as unusable because its age exceeds the per-flag hard maximum serve age even though the value equals the exact safe value and integrity/revocation are valid (the refresh TTL is only a trigger).",
+          "Serves the code-level default, which MUST equal the flag's safe value, as the UNKNOWN resolution.",
+          "Reports source=default with live_failure_reason=unreachable and cache_state=stale; stale-cache is NOT a live-failure reason.",
+          "Does not serve the stale cache merely because it agrees with the safe value.",
+          "Classifies cache state first-match (untrusted > rejected > stale > fresh) and reports startup_state only when the process started cold."
+        ]
+      }
+    },
+    {
+      "id": "edge-outage-non-boolean-safe-value",
+      "type": "should_trigger",
+      "prompt": "A variant/payload flag's exact safe value/state is enumerated by the design. The flag service is unreachable; the cached value is a different variant; the cache timestamp, integrity MAC and signed revocation snapshot are all valid. Design the outage behavior for this non-boolean flag.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses the exact enumerated safe value/state the design records for this variant/payload flag (no upstream safe-set/predicate dependency).",
+          "NEVER serves a cached or bootstrap value that is not exactly equal to the exact enumerated safe value/state (boolean/variant/payload); there is no safe-direction or safe-set allowance.",
+          "Serves the code-level default equal to the flag's safe value under UNKNOWN, emitting source=default and the reason.",
+          "Given valid timestamp/integrity/revocation checks (as stated), treats a cache value not equal to the exact enumerated safe value as rejected under first-match; if those trust checks fail the entry is untrusted instead.",
+          "Keeps the observation structured with the flag key, source, reason and served value.",
+          "Uses the exact enumerated safe value/state the design records for this variant/payload flag; a fresh cached value not equal to it is rejected (cache_state=rejected) and never served."
+        ]
+      }
+    },
+    {
+      "id": "edge-outage-multi-reason-precedence",
+      "type": "should_trigger",
+      "prompt": "During one flag-service call our retry budget makes two attempts for the same flag: one times out and one returns an invalid (malformed) 2xx response; the cache entry is stale. Design the reported reason mode, the bounded retry budget, and the ordered resolution with cache state.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Separates live_failure_reason from cache_state/startup_state; with two LIVE failures it reports ONE reason by the order timeout > invalid-response > error > unreachable, while the cache entry's staleness is reported as cache_state, not as a failure reason.",
+          "Reports the winning reason (timeout) plus source in one structured fallback event instead of duplicating events.",
+          "Resolves through the single step-6 order: authorized override > LIVE > FRESH_CACHE (exact safe value, fresh state) > UNKNOWN -> code default equal to the exact safe value.",
+          "Reports cache_state and startup_state as separate fields (stale/cold-start are never live-failure reasons) and includes environment, tenant and the served value; live_failure_reason is omitted only on the async/precomputed no-live-attempt path.",
+          "No silent fail-open.",
+          "Defines the reason mode: ONE aggregate live_failure_reason for the resolution using timeout > invalid-response > error > unreachable, with per-attempt diagnostics optional and retries bounded by the stated budget; cache staleness is cache_state, not a failure reason."
+        ]
+      }
+    },
+    {
+      "id": "edge-outage-kill-switch-latch",
+      "type": "should_trigger",
+      "prompt": "An operator-activated kill switch override is ACTIVE. Its TTL expires while the last-known LIVE value differs from the exact safe value, and a fresh valid LIVE value is reachable. State exactly what is served, which transition is taken, what telemetry is emitted, and what may release the latch.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "TTL expiry with a differing last-known LIVE enters the first-class EXPIRED_SAFE_LATCH state and serves the exact safe value; a fresh reachable LIVE is NOT served while latched.",
+          "Telemetry reports source=override and state=override_expired_safe_latch; live_failure_reason is not required; the path is not routed through FRESH_CACHE/UNKNOWN.",
+          "Only a fresh Path A or Path B authorization releases the latch; an acknowledgement/reconciliation alone does not."
+        ]
+      }
+    },
+    {
+      "id": "edge-outage-kill-switch-clear-guard",
+      "type": "should_trigger",
+      "prompt": "An operator asks to CLEAR an ACTIVE kill-switch override offline while the last-known LIVE value differs from the exact safe value. State whether the clear is allowed, what the override state becomes, and which authorization and guards apply.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Offline CLEAR is REFUSED while the last-known LIVE differs; the override stays EXPIRED_SAFE_LATCH (or ACTIVE) until a reconciled fresh Path A/B authorization.",
+          "The CLEAR->CLEARED transition requires Path A/B authorization AND the differing-LIVE guard; an unqualified offline clear is rejected.",
+          "The credential/consumption binding (flag, operation, exact safe value, actor, audience) is verified for the authorization attempt."
+        ]
+      }
+    },
+    {
+      "id": "edge-outage-first-paint-exact-safe",
+      "type": "should_trigger",
+      "prompt": "First paint is critical and the flag service may be unreachable. Design exactly what first paint serves and what is authoritative if a later evaluation succeeds.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "First paint serves only the exact-safe NON-LIVE value and never blocks on the flag service.",
+          "Any asynchronous or otherwise non-verified value is NOT authoritative and is treated as non-LIVE (exact safe value served)."
+        ]
+      }
+    },
+    {
+      "id": "edge-live-authoritative-only-when-verified",
+      "type": "should_trigger",
+      "prompt": "A flag service returns a value asynchronously (precomputed) and later a synchronous evaluation succeeds. Design which value is authoritative and how non-verified values are handled.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Only a successful, valid, synchronously verified LIVE evaluation is authoritative and may differ from the exact safe value.",
+          "Asynchronous/precomputed or otherwise non-verified values are not authoritative and serve as non-LIVE with the exact safe value."
         ]
       }
     }
