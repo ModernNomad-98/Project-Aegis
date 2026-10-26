@@ -4238,20 +4238,33 @@ def test_coverage_map_rerun_review_regressions():
                         + "- **2026-10-27 - D120: updated 2 entries.**")
     assert _check_ledger(legitimate_later) == [], (
         "finding 3: a legitimate unrelated later entry must pass")
+    for legit_extra in (
+            "- **2026-10-27 - D122: coverage: updated 2 skills.**",
+            "- **2026-10-27 - D123: coverage roadmap: 2 skills.**"):
+        assert _check_ledger(base_ledger + NL_JOIN + legit_extra) == [], (
+            "finding 3: a legitimate coverage-context non-total count must pass: "
+            + legit_extra)
     stale_later = (base_ledger + NL_JOIN
                    + "- **2026-10-27 - D121: coverage snapshot now "
                    + str(computed["entries"]) + " entries.**")
     assert any("coverage-total count copy" in error
                for error in _check_ledger(stale_later)), (
         "finding 3: a later coverage-specific stale count must be rejected")
+    stale_total = (base_ledger + NL_JOIN
+                   + "- **2026-10-27 - D124: coverage total now "
+                   + str(computed["entries"]) + " entries.**")
+    assert any("coverage-total count copy" in error
+               for error in _check_ledger(stale_total)), (
+        "finding 3: a later coverage-total count must be rejected")
 
     # 4. Count-copy regex catches hyphenated and space-separated forms
     #    consistently across casing and singular/plural.
     for phrase in ("300-row", "300 row", "300 rows", "300 Rows",
+                   "300-entry", "300 entry", "entry: 300",
                    "85-of-254", "totals 300", "Totals 300", "300 entries"):
         assert validator._coverage_count_copy_errors(phrase, computed), (
             "finding 4: count-copy regex must catch " + repr(phrase))
-    assert validator._coverage_count_copy_errors("9", computed) == [], (
+    assert not validator._coverage_count_copy_errors("9", computed), (
         "finding 4: an unrelated small number must stay allowed")
     assert validator._coverage_count_copy_errors("updated 2 entries", computed), (
         "finding 4: generic count-copy detector still catches 2 entries in a "
@@ -4291,7 +4304,7 @@ def test_coverage_map_rerun_review_regressions():
             row = target["entries"][0]
             row["priority"] = "P3"
         with mutated_coverage(Path(tmp), _nongap_p3) as rep:
-            assert any("priority must equal the docs/skills row" in error
+            assert any("unknown priority is rejected for all statuses" in error
                        for error in rep.errors), rep.errors
         assert sum(computed["by_priority"].values()) == computed["entries"], (
             "finding 6/review Medium3: by_priority must sum to the entry count")
