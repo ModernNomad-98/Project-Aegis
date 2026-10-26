@@ -3,21 +3,18 @@
     "tool": "audit-skill-contracts",
     "version": "1.13.4",
     "engine_sha256": "dbd5a4cf7659b47cc0d003c1e7ca4749c8028384851d93bac9026c3a07343819",
-    "repo_sha": "ed753df7fdc42c5f5a1de3a7bb89ae7771b5ac72",
+    "repo_sha": "41c5c2bf0fbab8b30661a0df28bcadfeffb2bea3",
     "branch": "feat/plan-stage-skills-pr1",
-    "working_tree_dirty": true,
-    "dirty_paths_in_scanned_surfaces": [
-      ".claude/skills/plan-audit-reviewer/",
-      ".claude/skills/plan-of-record-author/"
-    ],
+    "working_tree_dirty": false,
+    "dirty_paths_in_scanned_surfaces": [],
     "audited_file_count": 984,
-    "audited_byte_count": 6627189,
-    "corpus_content_hash": "4b03a26c8ae82cf0b030d87f7e011b401323e0ad38e28b0c7d0a5fe606d5bfde",
+    "audited_byte_count": 6629544,
+    "corpus_content_hash": "3be710d57fd6c9aeb0f6ff3a790f0a44c547dc7acd4cf62f61e2e4b93908d5a1",
     "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "e3ea2dbccfc39e27487ba21b28f6b3ec945e103ecb957bd0e2d8400ca12c8a24"
+        "sha256": "3cded794b525d7541d7d0c11f14b2112964bd55f4d22170c20b4046e7ac93191"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -44,16 +41,16 @@
     },
     "skill_count": 254,
     "rule_count": 27,
-    "finding_count": 467,
+    "finding_count": 462,
     "by_severity": {
       "P0": 2,
       "P1": 96,
-      "P2": 43,
+      "P2": 38,
       "info": 326
     },
     "by_rule": {
       "ARTF-001": 10,
-      "EVAL-002": 6,
+      "EVAL-002": 1,
       "EVAL-003": 3,
       "PARITY-001": 37,
       "REF-003": 1,
@@ -61,7 +58,7 @@
       "SIDE-004": 82,
       "STATE-001": 2
     },
-    "mechanical_count": 370,
+    "mechanical_count": 365,
     "semantic_review_candidates": 97
   },
   "rule_inventory": [
@@ -468,7 +465,7 @@
         "AEGIS-018"
       ],
       "limits": "field presence is not assertion quality; both schemas are repo conventions",
-      "hit_count": 6
+      "hit_count": 1
     },
     {
       "id": "EVAL-003",
@@ -4811,54 +4808,6 @@
       "mechanical": true
     },
     {
-      "rule": "EVAL-002",
-      "severity": "P2",
-      "file": ".claude/skills/plan-audit-reviewer/evals/trigger-evals.json",
-      "line": 0,
-      "owning_skill": "plan-audit-reviewer",
-      "related_skills": [],
-      "evidence": "trigger-evals case 'final-merge-receipt' names no expected_skill \u2014 unjudgeable as written",
-      "family": "eval-coverage",
-      "aegis_map": [
-        "AEGIS-018"
-      ],
-      "remediation_owner": "plan-audit-reviewer",
-      "confidence": "high",
-      "mechanical": true
-    },
-    {
-      "rule": "EVAL-002",
-      "severity": "P2",
-      "file": ".claude/skills/plan-audit-reviewer/evals/trigger-evals.json",
-      "line": 0,
-      "owning_skill": "plan-audit-reviewer",
-      "related_skills": [],
-      "evidence": "trigger-evals case 'implement-change' names no expected_skill \u2014 unjudgeable as written",
-      "family": "eval-coverage",
-      "aegis_map": [
-        "AEGIS-018"
-      ],
-      "remediation_owner": "plan-audit-reviewer",
-      "confidence": "high",
-      "mechanical": true
-    },
-    {
-      "rule": "EVAL-002",
-      "severity": "P2",
-      "file": ".claude/skills/plan-audit-reviewer/evals/trigger-evals.json",
-      "line": 0,
-      "owning_skill": "plan-audit-reviewer",
-      "related_skills": [],
-      "evidence": "trigger-evals case 'queue-order' names no expected_skill \u2014 unjudgeable as written",
-      "family": "eval-coverage",
-      "aegis_map": [
-        "AEGIS-018"
-      ],
-      "remediation_owner": "plan-audit-reviewer",
-      "confidence": "high",
-      "mechanical": true
-    },
-    {
       "rule": "ROUTE-002",
       "severity": "info",
       "file": ".claude/skills/plan-of-record-author/SKILL.md",
@@ -4904,38 +4853,6 @@
       "aegis_map": [],
       "remediation_owner": "plan-of-record-author",
       "confidence": "low",
-      "mechanical": true
-    },
-    {
-      "rule": "EVAL-002",
-      "severity": "P2",
-      "file": ".claude/skills/plan-of-record-author/evals/trigger-evals.json",
-      "line": 0,
-      "owning_skill": "plan-of-record-author",
-      "related_skills": [],
-      "evidence": "trigger-evals case 'implementation-now' names no expected_skill \u2014 unjudgeable as written",
-      "family": "eval-coverage",
-      "aegis_map": [
-        "AEGIS-018"
-      ],
-      "remediation_owner": "plan-of-record-author",
-      "confidence": "high",
-      "mechanical": true
-    },
-    {
-      "rule": "EVAL-002",
-      "severity": "P2",
-      "file": ".claude/skills/plan-of-record-author/evals/trigger-evals.json",
-      "line": 0,
-      "owning_skill": "plan-of-record-author",
-      "related_skills": [],
-      "evidence": "trigger-evals case 'queue-prioritization' names no expected_skill \u2014 unjudgeable as written",
-      "family": "eval-coverage",
-      "aegis_map": [
-        "AEGIS-018"
-      ],
-      "remediation_owner": "plan-of-record-author",
-      "confidence": "high",
       "mechanical": true
     },
     {
@@ -8740,7 +8657,7 @@
       "verified": 3
     },
     "plan-audit-reviewer": {
-      "verified": 3
+      "verified": 5
     },
     "plan-of-record-author": {
       "proposed": 1,
