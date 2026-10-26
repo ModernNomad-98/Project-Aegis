@@ -184,15 +184,18 @@ After implementation, offer an interactive clickthrough of the running app (comp
 clickthrough_offer_decision is post-implementation-record only, never one of the five pre-implementation selection fields.
 
 - Stored status domain is exactly the canonical three: offered | declined | UNRUN. When present, status is one of those three; there is no null stored status and no fourth stored status.
-- Absence/invalidity is represented outside the canonical status field: status is omitted (not null, not a fourth status) and the container carries status_diagnosis plus raw_status only when status_invalid. Fields (normative names): status, raw_status, status_diagnosis, offer_turns, decided_by, execution_evidence, decline_recorded, clickthrough_unrun_reason, defect_classes, notes; parent iteration record adds clickthrough_deferral.
+- Absence/invalidity is represented outside the canonical status field: status is omitted (not null, not a fourth status) and the container carries status_diagnosis plus raw_status only when status_invalid. Fields (normative names): status, raw_status, status_diagnosis, offer_events, offer_turns, run_attempts, decided_by, execution_evidence, decline_recorded, clickthrough_unrun_reason, defect_classes, notes; parent iteration record adds clickthrough_deferral.
+- offer_events is the ordered list of offers actually made {turn, at}; an offer is not a user answer. offer_turns is the ordered list of USER DECISIONS only {turn, decision: declined|accepted, at}; it never stores offered or UNRUN. decided_by: user is present only when an offer_turns decision exists; an unanswered offer has no decided_by and invents no user answer.
+- run_attempts is the ordered list of attempted accepted executions {turn, at, outcome: executed|blocked|impossible, clickthrough_unrun_reason?, defect_classes?, execution_evidence?}; it preserves prior UNRUN evidence after a later decline and never converts it to PASS.
 - Placement authority: canonical R8-UX-4 fixes clickthrough status/lifecycle and the post-implementation placement of clickthrough_offer_decision; canonical R8-UX-3 fixes only the five pre-implementation fields and readiness/Supporting Files sync, never this field.
 - Fail-safe precedence: record_missing = whole clickthrough_offer_decision object absent -> create the post-implementation container with status omitted, status_diagnosis.condition record_missing, raw_status omitted; status_absent = object present but status key absent -> status omitted, condition status_absent, raw_status omitted; status_invalid = status present but invalid -> preserve the exact original value in raw_status (including null), status omitted, condition status_invalid. status_diagnosis = {condition, diagnosis: UNKNOWN, reason, remediation}; reason and remediation required; diagnosis is outside the canonical status domain, never defaulted to UNRUN, never a pass.
 - Deferral (R4): if no offer was made because the stack or safe environment is unavailable, record clickthrough_deferral {reason, at, retry_condition} in the parent iteration record and create no clickthrough_offer_decision; this is not UNRUN and not a status. A deferral becomes UNRUN only if an offer is attempted and cannot run.
-- declined is a recorded user answer, not a run outcome; no defect classes; never converted to UNRUN; never a pass; does not block readiness on other evidence.
-- UNRUN is a run outcome only for an attempted/impossible run; it requires clickthrough_unrun_reason from no_local_stack | missing_tooling | attempted_but_blocked | other-recorded-reason and non-empty defect_classes; readiness may still be declared but not-run is recorded. UNRUN is never derived from offer_turns.
-- Status precedence (R3): record-state rules first (status_absent/status_invalid); then UNRUN if an offer was attempted and blocked/impossible; then declined if the latest user decision is declined; otherwise offered. offer_turns is an ordered list of user answers only {turn, decision: offered|declined|accepted, at}; it never contains UNRUN and never sets status by itself. accepted means the user said yes, not execution success: after accepted, execution_evidence and status offered mean executed; an accepted-but-blocked attempt is UNRUN attempted_but_blocked with the accepted turn and decided_by retained; accepted-not-yet-executed remains offered pending execution. accepted is never a fourth stored status.
-- decided_by is user only: every offered/declined/accepted decision is a user answer; there is no host decision class. A host may relay a user's answer but records decided_by: user.
-- Chronology: each offer/decision is appended to offer_turns; a later explicit user decision changes the current projection while preserving earlier history; an older execution attempt never overrides a newer decline; an unanswered offer invents no user answer (offered remains the current status).
+- declined is a recorded user answer, not a run outcome; the current declined status carries no defect classes/current clickthrough_unrun_reason; prior run_attempts stay archived; never converted to UNRUN; never a pass; does not block readiness on other evidence.
+- UNRUN is a run outcome only for an attempted/impossible run; the current status requires clickthrough_unrun_reason from no_local_stack | missing_tooling | attempted_but_blocked | other-recorded-reason and non-empty defect_classes taken from the latest accepted attempt whose latest run_attempt is blocked/impossible; readiness may still be declared but not-run is recorded and never promoted to PASS. UNRUN is never derived from offer_events or offer_turns.
+- Status precedence (R3): (1) record-state diagnosis first (status_absent/status_invalid); (2) the latest user decision by append order is declined -> declined; (3) otherwise the latest accepted attempt's latest run_attempt is blocked/impossible -> UNRUN with that attempt's reason and defect classes; (4) otherwise an offer exists with no later user decision -> offered (no invented answer); (5) otherwise no offer -> parent clickthrough_deferral. "Latest" means the last appended entry; turn order is authoritative and at is display/ordering evidence, never a re-ordering key.
+- accepted means the user said yes, not execution success: after accepted, a successful run_attempt with execution_evidence means executed while status remains offered unless a re-offer/decision changes it; an accepted-but-blocked attempt is UNRUN plus the accepted user decision in offer_turns; accepted is never a fourth stored status.
+- decided_by is user only: there is no host decision class. A host may relay a user's answer but records decided_by: user; it is absent for an unanswered offer.
+- Chronology: offer_events, offer_turns and run_attempts are append-only; a later explicit user decision changes the current status projection while preserving earlier offer history and run_attempts; an older execution attempt never overrides a newer decline; an unanswered offer invents no user answer; not-run evidence is never promoted to PASS.
 - Enum scopes: clickthrough_unrun_reason is clickthrough-only; proof_set.unrun_reason (production_data_only | no_local_stack | missing_tooling | failed_capture) is proof-set-only; distinct fields, never interchangeable.
 ### 1.4 Proof set (offered, never required)
 
@@ -349,9 +352,7 @@ The full record schema and readiness rules are in
   mobile-viewport-craft, accessibility verification to
   accessibility-test-harness, visual evidence to
   visual-regression-test-designer; screenshot policy planning to
-  screenshot-evidence-planner (policy only — actual capture/clickthrough
-  execution is manual-only clickthrough-test-engineer/Playwright under its own
-  authority), handoff to
+  screenshot-evidence-planner (policy only; it does not capture), handoff to
   phased-work-handoff-designer, review facilitation to
   design-review-facilitator, criteria review to acceptance-criteria-reviewer,
   and lifecycle routing to project-orchestrator.
@@ -371,11 +372,12 @@ The full record schema and readiness rules are in
   accessibility-test-harness.
 - The request is acceptance-criteria review, screenshot planning,
   handoff-protocol design or design review facilitation: route to the named owner;
-  this skill integrates the artifacts. screenshot-evidence-planner plans the
-  screenshot policy; it does not capture. For visual regression,
-  visual-regression-test-designer designs coverage, while capture/clickthrough
-  execution is the manual-only clickthrough-test-engineer/Playwright action and
-  requires its own applicable authority; this skill never performs it.
+  this skill integrates the artifacts. Three activities stay distinct:
+  screenshot-evidence-planner plans policy and does not capture;
+  visual-regression-test-designer designs visual-regression coverage; actual
+  capture/clickthrough execution is performed by the exact manual-only owner
+  clickthrough-test-engineer and/or playwright-e2e-engineer, each under its own
+  applicable authority. This skill never performs capture/execution.
 - The work would cross the production boundary (real app behavior, API/data/
   schema integration) before the criteria pass: stop, state NOT READY, and take
   the smallest decision back to the user under existing authority.

@@ -342,7 +342,11 @@
           "A re-offer happens only after an explicit recorded user request; prior declined turns remain recorded and decline_recorded stays true.",
           "A later explicit user decision changes the current projection without rewriting the earlier declined history.",
           "An older execution attempt never overrides a newer decline.",
-          "An unanswered offer invents no user answer."
+          "An unanswered offer invents no user answer.",
+          "Keeps offers in offer_events and user decisions only in offer_turns; an unanswered offer has no offer_turns entry and no decided_by, so no user answer is invented.",
+          "Uses run_attempts to retain an earlier blocked/impossible execution after a later explicit decline; the prior UNRUN reason/defect classes remain archived and are never promoted to PASS.",
+          "Applies R3 precedence: latest explicit decision declined wins over an older attempt; otherwise the latest accepted attempt's blocked/impossible run is UNRUN; otherwise an unanswered offer is offered; latest means last appended entry.",
+          "A current declined or offered status carries no current defect classes/current clickthrough_unrun_reason; archived run_attempts may carry them."
         ]
       },
       "host_evidence": false,
@@ -412,7 +416,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Records the clickthrough decision truthfully: an explicit decline is declined (not UNRUN); an attempted but impossible run is UNRUN; an unanswered offer invents no user answer.",
+          "Records the clickthrough decision truthfully: an explicit decline is declined (not UNRUN); an attempted but impossible run is UNRUN with its archived run_attempt evidence; an unanswered offer is offered with no invented user decision.",
           "Leaves readiness unchanged and claims no pass; does not invoke the MANUAL-ONLY skill silently."
         ]
       },
@@ -529,7 +533,7 @@
         "triggers": true,
         "assertions": [
           "Declares READY only while recording the clickthrough decision truthfully - a decline stays declined (never UNRUN), an attempted but impossible run is UNRUN, and an unanswered offer invents no answer; it does not treat the proof set as closing that declined/unrun clickthrough.",
-          "Records the proof-set capture as evidence of what was observed only; the proof set never substitutes for the clickthrough and never upgrades readiness."
+          "Records the proof-set capture as evidence of what was observed only; the proof set never substitutes for the clickthrough and preserves run_attempt evidence without upgrading it to PASS."
         ]
       },
       "host_evidence": false,

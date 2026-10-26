@@ -143,7 +143,7 @@ for what materially blocks the next useful action.
    outcome and never converted to UNRUN); an attempted but impossible run is
    **UNRUN** with the unobservable state-hydration/transition defect classes;
    an unanswered offer invents no answer; a later explicit decision changes the
-   current projection while preserving prior history. Neither outcome is a pass.
+   current status while preserving prior history. None of these outcomes is a pass.
 
 4. **Design the parts teams forget** — use the parts that match the change:
 
@@ -215,7 +215,7 @@ for what materially blocks the next useful action.
    recorded as **declined**, not as a run outcome and never converted to UNRUN;
    an attempted but impossible run is **UNRUN** with the unobservable
    state-hydration and transition defect classes; an unanswered offer invents no
-   answer; a later explicit decision changes the current projection while prior
+   answer; a later explicit decision changes the current status while prior
    history is preserved; it is never a pass. Your agent explains why
    one is needed and stops; it does not start either for you.
 
