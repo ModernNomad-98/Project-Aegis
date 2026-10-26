@@ -7133,3 +7133,34 @@ carry this append, as the register's naming rule requires.
   implementing agent sd-c — **DeepSeek V4 Flash (registered id deepseek-flash @
   deepseek-account; DeepSeek Harness)** — which names its exact model in the pull request
   body and the commit message that carry this append.
+
+### AEGIS-APR-142 / AEGIS-APR-143 verification status (purported owner decision; pending owner confirmation)
+
+- **Event:** VERIFICATION-STATUS NOTE - appended, not an approval and not a grant; records the
+  verification status of the decision transcribed as **AEGIS-APR-142** and
+  **AEGIS-APR-143**. **Recording-only; adds no authority and changes no existing entry.**
+- **Owner source (canonical):** the transcription quotes a **purported owner decision**, a
+  six-item session message transcribed verbatim by the lane and preserved in the workspace
+  file
+  _A/evidence/owner-decisions/OWNER-DECISION-2026-10-25T2051Z-SIX-ITEMS.md
+  (**4,183 B / 24 LF / sha256
+  7749905ec50c0ed04a05d0b9597d7e7352bab3653deadbd6fa84f8c0a97d846c**; workspace-local
+  evidence, not a repository file). The transcription is **PENDING OWNER CONFIRMATION** at
+  issue **#910** comment **6407991132** (the canonical verification request; it quotes the
+  six items and asks the owner to confirm or reject the text as the owner's words). No
+  owner confirmation is recorded; the transcription is **not** established as the owner's
+  decision.
+- **Authority:** **AEGIS-APR-142 and AEGIS-APR-143 MUST NOT be cited as authority for any
+  merge, gate, waiver or action until the owner confirms the transcription.** They are
+  recording-only; no authority is exercised from them, and they are not a grant, a waiver,
+  an approval, a merge authorization or a CI-green claim.
+- **Status:** **PENDING OWNER CONFIRMATION**. If the owner rejects or corrects any part of
+  the transcription, a **follow-up correction entry will be appended** to this register.
+  This note and any correction are pure appends: **no existing register line is edited.**
+- **Related entries:** **AEGIS-APR-142** and **AEGIS-APR-143** (the entries this note covers;
+  their own text is unchanged); the item-6 ratification claimed in APR-142 is recorded as
+  **pending owner confirmation**, not as an established ratification.
+- **Appended:** **2026-10-26T08:20:04Z** (**2026-10-26T01:20:04-07:00**) - instruction provenance: the lead's
+  instruction for this register-maintenance edit (this maintenance PR); recorded by the
+  Stage C implementing agent **sd-c**, which names its exact model in the pull request body
+  and the commit message that carry this append.
