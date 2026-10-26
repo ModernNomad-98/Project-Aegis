@@ -103,7 +103,6 @@ Override/latch/clear semantics: POINTER ONLY - see SKILL.md step 6 (1)/(1a); thi
       startup_state and served value; live_failure_reason is omitted on the
       override_denied_reason. Rejected cache = source=default +
       cache_state=rejected. Override events carry authority=override.
-      atomic persistent nonce ledger with retention; key rotation/revocation/
       a local on-box status during the outage, sync on reconnect, offline clear,
       and audited activation/deactivation.
 - [ ] The fallback is exercised in a non-production environment by making the
