@@ -7164,3 +7164,127 @@ carry this append, as the register's naming rule requires.
   instruction for this register-maintenance edit (this maintenance PR); recorded by the
   Stage C implementing agent **sd-c**, which names its exact model in the pull request body
   and the commit message that carry this append.
+
+### AEGIS-APR-144: Owner confirmation that the 2026-10-25 six-item transcription is authoritative
+
+- **Event:** OWNER CONFIRMATION (recording-only; no new grant beyond the confirmed transcription).
+- **Date / Grantor:** direct owner message 2026-10-26T07:29 PT (14:29Z) and second direct confirmation 2026-10-26T07:49 PT (14:49Z) / Peter Nguyen.
+  Evidence filenames use the owner's local PT clock with a Z suffix; the UTC equivalents are 14:29Z and 14:49Z. Owner evidence:
+  _A/evidence/owner-decisions/OWNER-DECISION-2026-10-26T0729Z-SEVEN-ITEMS.md (3,620 B / 36 LF / sha256
+  344f3cb73c484fa6ea9a65550459f4419e38996b875886cedc22050122fa9529) and _A/evidence/owner-decisions/OWNER-CONFIRMATION-2026-10-26T0749Z.md (1,310 B /
+  8 LF / sha256 c6acab68d156cb2f757b97fff372b37e3359b2d3bc5dbe24efe760e1037acaf5).
+- **Amended evidence arithmetic:** Amended file named _A/evidence/owner-decisions/OWNER-DECISION-2026-10-26T0729Z-SEVEN-ITEMS.md is 5,042 B / 44 LF / sha256
+  0362eccd2e1ed835ca9b77ae5e36a56ac22fb3db00bed71b95c4f46afc48f344. Original first 3,620 B / 36 LF / sha256 344f3cb73c484fa6ea9a65550459f4419e38996b875886cedc22050122fa9529 plus
+  amendment 1,420 B / 7 LF / sha256 6ff7e5bd0123a74dcd5292d180b75da08c794b7fe9ddd42ec98199da61ab040e = 5,040 B / 43 LF. The actual amended file is 5,042 B / 44 LF: the 2 extra
+  bytes / 1 LF are the separator blank line inserted between the original transcription block and the appended amendment, so both hashes and the amended identity reconcile exactly.
+- **Owner instruction source (seven-item decision):** Source: Peter, typed directly in my session at 7:29 AM PDT. Verbatim excerpt covering the
+  acted-on items: item 2 DEC-R1=B; item 3 OD-A grant with conditions (a)-(d); item 4 OD-Q903-2=A / OD-Q903-3=B trigger-scoped standing override /
+  OD-Q903-4=A / OD-Q903-5=A; item 5 OD-2 numeric-anchor enforcement deferred; item 6 PKG-09 Wave 2 NOT DERIVABLE/CLOSED and OD-02 resolved by item 1;
+  #919/#920 dependabot disposal; item 7 later WITHDRAWN by amendment. Full owner words:
+  _A/evidence/owner-decisions/OWNER-DECISION-2026-10-26T0729Z-SEVEN-ITEMS.md.
+- **Owner instruction source (second confirmation):** Source: Peter, typed directly in my session at 7:49 AM PDT. Verbatim: "CONFIRMED. All six items
+  quoted at #910 comment 6407991132 are my decision, issued by me in the Project Aegis chat on 2026-10-25 at 20:51 PT. The wording was drafted for me
+  by Claude, my auditor/planner, and I issued it as written. Every item is mine: (1) #913 narrow-C, (2) #915 covered by standing grants, (3) D7 = YES
+  with defaults D1-D4 and D6, D5 deferred, (4) AD-10 ratified, (5) AD-11/AD-12 ratified with the ladder amendment, (6) #912 OD-1 ratified. APR-142 and
+  APR-143 are authoritative as of this confirmation. The three administrator merges made under them (#913, #917, #918) stand."
+- **Owner evidence citation (amended):** Current amended owner evidence: 5,042 B / 44 LF / sha256
+  0362eccd2e1ed835ca9b77ae5e36a56ac22fb3db00bed71b95c4f46afc48f344; the original first 3,620 B / 36 LF / sha256
+  344f3cb73c484fa6ea9a65550459f4419e38996b875886cedc22050122fa9529 remains preserved as a byte prefix (appended amendment only).
+- **Owner instruction source (standing provenance rule):** Source: Peter, typed directly in my session at 8:27 AM PDT. Standing provenance rule: every
+  owner instruction acted on must state whether it was typed directly or relayed, with the exact session/time or relay doc/comment id and verbatim
+  words as required by the owner's two forms.
+- **Second direct confirmation:** owner evidence file _A/evidence/owner-decisions/OWNER-CONFIRMATION-2026-10-26T0749Z.md (1,310 B / 8 LF / sha256
+  c6acab68d156cb2f757b97fff372b37e3359b2d3bc5dbe24efe760e1037acaf5). Owner words (verbatim): "CONFIRMED. All six items quoted at #910 comment
+  6407991132 are my decision, issued by me in the Project Aegis chat on 2026-10-25 at 20:51 PT. The wording was drafted for me by Claude, my
+  auditor/planner, and I issued it as written. Every item is mine: (1) #913 narrow-C, (2) #915 covered by standing grants, (3) D7 = YES with defaults
+  D1-D4 and D6, D5 deferred, (4) AD-10 ratified, (5) AD-11/AD-12 ratified with the ladder amendment, (6) #912 OD-1 ratified. APR-142 and APR-143 are
+  authoritative as of this confirmation. The three administrator merges made under them (#913, #917, #918) stand." This second direct confirmation
+  makes the six-item decision definitively owner-issued; the original wording was drafted by the owner's auditor/planner Claude and issued by the
+  owner as written. The three administrator merges made under APR-142/APR-143 - #913 (f1bfe44d), #917 (fe638bce), #918 (f1bacf5b) - STAND. APR-142 and
+  APR-143 are AUTHORITATIVE as of this second confirmation.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- **Owner words (item 1, verbatim):** "#910 comment 6407991132 quotes my 2026-10-25T20:51 six-item decision verbatim. APR-142 and APR-143 are
+  authoritative from this confirmation."
+- **Effect:** the #921 verification-status note's pending-owner-confirmation limitation is SATISFIED by the 2026-10-26T07:49 PT second confirmation;
+  AEGIS-APR-142 and AEGIS-APR-143 are AUTHORITATIVE from that confirmation and in the owner's words APR-142 and AEGIS-APR-143 are authoritative from
+  this confirmation. The old #921 note remains in place unchanged as an append-only historical note; its pending limitation is satisfied in effect by
+  this entry, and no existing line is edited. APR-142/APR-143 entry text is unchanged; this is a pure append and does not retroactively validate
+  merges outside each grant's own conditions or add authority beyond the transcribed six-item decision.
+- **Evidence:** owner decision file identities above; #910 comment 6407991132; #910 comment 6418631997 is not part of this confirmation; #921
+  verification-status note (unchanged historical); register baseline identity at the recording base.
+- **Expiry / limits:** none beyond confirming APR-142/APR-143 authoritative from the owner confirmation; this recording-only confirmation creates no
+  grant, no new expiry, no grant consumption, and no merge authority. APR-142/APR-143 retain their existing limits.
+- **New authority:** none beyond making the recorded transcription authoritative from the owner confirmation.
+- **Recording attribution:** produced by AI agent sd-b-fu, model route DeepSeek-V41-Flash (registered id deepseek-flash @ deepseek-account, DeepSeek Harness); not an approval/waiver; no merge authority.
+
+### AEGIS-APR-145: OD-A one-time grant modeled on AEGIS-APR-119 - additive SIDE-005 audit rule, engine version bump and four-artifact baseline regeneration
+
+- **Event:** GRANT - one-time, modeled on AEGIS-APR-119; one separate implementation/regeneration pull request. Conditions (a)-(d) quoted verbatim
+  from owner item 3.
+- **Date / Grantor:** direct owner message 2026-10-26T07:29 PT (14:29Z) and second direct confirmation 2026-10-26T07:49 PT (14:49Z) / Peter Nguyen;
+  owner evidence _A/evidence/owner-decisions/OWNER-CONFIRMATION-2026-10-26T0749Z.md (1,310 B / 8 LF / sha256
+  c6acab68d156cb2f757b97fff372b37e3359b2d3bc5dbe24efe760e1037acaf5).
+- **Owner instruction source (OD-A grant item 3):** Source: Peter, typed directly in my session at 7:29 AM PDT. Verbatim excerpt covering the acted-on
+  items: item 2 DEC-R1=B; item 3 OD-A grant with conditions (a)-(d); item 4 OD-Q903-2=A / OD-Q903-3=B trigger-scoped standing override / OD-Q903-4=A /
+  OD-Q903-5=A; item 5 OD-2 numeric-anchor enforcement deferred; item 6 PKG-09 Wave 2 NOT DERIVABLE/CLOSED and OD-02 resolved by item 1; #919/#920
+  dependabot disposal; item 7 later WITHDRAWN by amendment. Full owner words:
+  _A/evidence/owner-decisions/OWNER-DECISION-2026-10-26T0729Z-SEVEN-ITEMS.md.
+- **Reason:** an additive SIDE-005 audit rule plus a TOOL_VERSION bump; the four baselines APR-119 named must be regenerated so the shipped audit
+  truth is current.
+- **Mapping (verified from APR-119):** APR-119 names exactly four artifacts: artifacts/audits/skill-contract-audit-baseline.json;
+  artifacts/audits/corpus-route-graph.json; artifacts/audits/corpus-manifest-baseline.json; and docs/audits/skill-contract-audit-baseline.md WITH its
+  hand-written preface. The preface is INSIDE the fourth markdown file, not a fifth path; the resolution is exactly four paths. The route-graph
+  artifact IS included and whether its bytes change must be verified and disclosed. APR-119's dated note in docs/audits/aegis-060-plus-register.md is
+  not one of the four and is outside this grant.
+- **Conditions (a)-(d), verbatim:** "(a) the engine change is additive - Stage F states no existing rule removed or weakened; (b) the regeneration PR body shows the finding delta
+  between old and new baselines (added, removed, changed) and dispositions each NEW finding individually - a blanket re-accept is a REVISE; (c) exactly the four artifacts APR-119
+  named, plus the docs preface, truth-preserving; (d) gate-guard via APR-140 where only scripts/ paths are protected. Record as a one-time grant modeled on APR-119."
+- **Implementation guidance (not an additional grant condition):** Removed findings should be justified as rule-scope changes rather than suppressions, and changed findings should
+  be individually dispositioned or certified semantically unchanged. This is process guidance only; the quoted owner condition (b) requires individual disposition of NEW findings,
+  and this guidance does not enlarge the grant.
+- **C5 provenance/arithmetic note:** the compressed seven-item excerpt is a SUMMARY/EXCERPT, NOT verbatim; item 7 was added later by the #915 amendment and was not part of the
+  original 2026-10-26T07:29 message. Exact item-1 owner words source: #910 comment 6418606020, owner typed 2026-10-26T07:29 AM PDT. Amended owner file
+  OWNER-DECISION-2026-10-26T0729Z-SEVEN-ITEMS.md is 5,042 B / 44 LF / sha256 0362eccd...; original prefix 3,620 B / 36 LF / sha256 344f3cb7... plus amendment 1,420 B / 7 LF /
+  sha256 6ff7e5bd... = 5,040 B / 43 LF; the extra 2 B/1 LF is the separator blank line between original block and appended amendment.
+- **Scope allowed:** one separate implementation/regeneration pull request only. This recording/maintenance PR is NOT the granted PR and is excluded
+  from the one-PR limit, modeled on APR-119's exclusion of its recording PR. The regeneration PR may change scripts/audit-skill-contracts.py
+  additively for SIDE-005 plus TOOL_VERSION bump, and regenerate exactly the four artifacts above with the docs preface truth-preserving; include
+  finding-delta and per-NEW-finding disposition material. This recording entry does not consume the grant and does not re-append it in the
+  regeneration PR. No other regeneration and no other path.
+- **Scope forbidden:** removing or weakening any existing rule; blanket re-acceptance of changed findings; regenerating anything beyond the four
+  artifacts; adding the APR-119 dated note under this grant; relying on any consumed grant (APR-119 was consumed by APR-124); bypassing gate-guard;
+  adding unrelated protected paths. Changes under tools/behavioral_eval_runner/ are OUTSIDE and FORBIDDEN under this grant - they are not
+  conditionally authorized; any such change would need its own separate grant.
+- **Gate route:** where the authorized scripts/ paths are protected, AEGIS-APR-140 (a)-(f) applies and Stage F must state which checks are added,
+  removed or weakened. This grant does not authorize any tools/behavioral_eval_runner/ change and therefore does not invoke an APR-142 route for such
+  a change; a tools change would need separate authority.
+- **Baseline evidence required:** old/new bytes, LF and sha256 for each of the four artifacts; finding delta (added/removed/changed); per-NEW-finding
+  dispositions; route-graph change/no-change disclosure; docs preface truth-preserved.
+- **Authority timing:** this grant takes effect on this recording append, after the 2026-10-26T07:49 PT second confirmation makes APR-142/APR-143
+  authoritative; it authorizes the separate regeneration PR, not this recording PR. The regeneration PR's merge consumes the one-time authority.
+- **Expiry / use limit:** one regeneration pull request only. The grant is consumed on merge of that separate regeneration PR, NOT on this
+  recording/maintenance PR; this recording PR does not consume it. A regeneration PR relying on a consumed grant is forbidden. No merge authority is
+  created by this recording entry; later lifecycle records consumption by the regeneration PR.
+- **Recording attribution:** produced by AI agent sd-b-fu, model route DeepSeek-V41-Flash (registered id deepseek-flash @ deepseek-account, DeepSeek Harness); recording agent
+  attribution only - the owner grant above remains in effect and creates no merge authority.
