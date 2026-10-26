@@ -96,16 +96,30 @@ without mutating configuration or hook files:
 
 ```bash
 MISSING=0
-if ! git config --get user.name >/dev/null; then echo "STARTUP: agent user.name missing"; MISSING=1; fi
-if ! git config --get user.email >/dev/null; then echo "STARTUP: agent user.email missing"; MISSING=1; fi
-if [ -z "$(git config --local --get aegis.ownerName 2>/dev/null || true)" ]; then echo "STARTUP: recorded owner name missing"; MISSING=1; fi
-if [ -z "$(git config --local --get aegis.ownerEmail 2>/dev/null || true)" ]; then echo "STARTUP: recorded owner email missing"; MISSING=1; fi
+AGENT_NAME=$(git config --get user.name 2>/dev/null || true)
+AGENT_EMAIL=$(git config --get user.email 2>/dev/null || true)
+[ -n "$AGENT_NAME" ] || { echo "STARTUP: agent user.name is empty/missing"; MISSING=1; }
+[ -n "$AGENT_EMAIL" ] || { echo "STARTUP: agent user.email is empty/missing"; MISSING=1; }
+OWNER_NAME=$(git config --local --get aegis.ownerName 2>/dev/null || true)
+OWNER_EMAIL=$(git config --local --get aegis.ownerEmail 2>/dev/null || true)
+[ -n "$OWNER_NAME" ] || { echo "STARTUP: recorded owner name missing"; MISSING=1; }
+[ -n "$OWNER_EMAIL" ] || { echo "STARTUP: recorded owner email missing"; MISSING=1; }
 AUTHOR_IDENT=$(git var GIT_AUTHOR_IDENT 2>/dev/null) || { echo "STARTUP: effective author identity unavailable"; MISSING=1; }
 COMMITTER_IDENT=$(git var GIT_COMMITTER_IDENT 2>/dev/null) || { echo "STARTUP: effective committer identity unavailable"; MISSING=1; }
-if [ -n "${AUTHOR_IDENT:-}" ] && [ -n "${COMMITTER_IDENT:-}" ]; then echo "STARTUP: effective author/committer identity available"; fi
+AUTHOR_PAIR=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1|\2/p")
+COMMITTER_PAIR=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1|\2/p")
+AUTHOR_NAME=${AUTHOR_PAIR%%|*}; AUTHOR_EMAIL=${AUTHOR_PAIR#*|}
+COMMITTER_NAME=${COMMITTER_PAIR%%|*}; COMMITTER_EMAIL=${COMMITTER_PAIR#*|}
+if [ -n "$OWNER_NAME" ] || [ -n "$OWNER_EMAIL" ]; then
+  if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then
+    echo "STARTUP: effective author/committer identity matches the recorded owner identity"; MISSING=1
+  fi
+fi
 HOOKS_PATH=$(git config --get core.hooksPath 2>/dev/null || true)
-if [ -n "$HOOKS_PATH" ]; then echo "STARTUP: core.hooksPath=$HOOKS_PATH; .git/hooks is not used"; else echo "STARTUP: local hook path .git/hooks/pre-commit"; fi
+if [ -n "$HOOKS_PATH" ]; then HOOK_PATH="$HOOKS_PATH/pre-commit"; else HOOK_PATH=$(git rev-parse --git-path hooks/pre-commit 2>/dev/null || true); fi
+if [ -n "$HOOK_PATH" ]; then echo "STARTUP: effective hook path=$HOOK_PATH"; if [ ! -x "$HOOK_PATH" ]; then echo "STARTUP: hook missing or not executable at effective path"; fi; else echo "STARTUP: effective hook path unavailable"; fi
 [ "$MISSING" -eq 0 ] || exit 1
+echo "STARTUP: effective author/committer identity available and distinct from the recorded owner"
 ```
 
 Effective author AND committer identities matter, not only the configured defaults:
@@ -133,9 +147,10 @@ git config --local aegis.ownerEmail "<owner email>"
 The complete executable pre-commit hook below reads the recorded owner identity and
 validates the EFFECTIVE author and committer through `git var GIT_AUTHOR_IDENT` /
 `git var GIT_COMMITTER_IDENT`. It exits nonzero for missing owner identity, missing/
-invalid effective identity, or effective owner identity in either position. Install
-locally as `.git/hooks/pre-commit`, executable, never committed; `.git/hooks` is used
-only when `core.hooksPath` is unset (the inspection reports the configured hook path):
+invalid effective identity, or effective owner identity in either position. Install at
+the EFFECTIVE hook path reported by inspection (resolved through `core.hooksPath` /
+`git rev-parse --git-path hooks/pre-commit`; normally `.git/hooks/pre-commit` only when
+`core.hooksPath` is unset), executable, never committed:
 
 ```sh
 #!/bin/sh

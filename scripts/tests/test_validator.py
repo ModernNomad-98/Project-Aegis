@@ -4314,10 +4314,18 @@ def test_readiness_startup_authority_non_mutating():
         before = state()
         inspected = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert inspected.returncode == 0, (inspected.returncode, inspected.stderr)
-        assert "STARTUP: local hook path" in inspected.stdout or "STARTUP: core.hooksPath" in inspected.stdout, inspected.stdout
+        assert "STARTUP: effective hook path" in inspected.stdout, inspected.stdout
         after = state()
         assert after == before, "read-only identity inspection must not change config or hooks"
         ok("covered startup inspection is non-mutating (git config bytes and hook files unchanged)")
+        git("config", "user.name", "FixtureOwner")
+        mismatch = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert mismatch.returncode != 0 and "matches the recorded owner identity" in mismatch.stdout, (mismatch.returncode, mismatch.stdout)
+        git("config", "user.name", "")
+        empty = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert empty.returncode != 0 and "user.name is empty/missing" in empty.stdout, (empty.returncode, empty.stdout)
+        git("config", "user.name", "FixtureAgent")
+        ok("inspection rejects empty agent identity and effective identity matching the recorded owner")
         hook = repo / ".git" / "hooks" / "pre-commit"
         hook.write_text(hook_text, encoding="utf-8", newline="\n")
         hook.chmod(0o755)
@@ -4339,13 +4347,13 @@ def test_readiness_startup_authority_non_mutating():
 
 
 def test_readiness_shared_lock_lifecycle():
-    """AI-R03: lock ownership, signal/child lifecycle, cleanup and successor safety."""
+    """AI-R03: atomic lock, ready/child lifecycle, signals, cleanup and successor safety."""
     if not _readiness_posix_ready():
         skip("shared-lock lifecycle: POSIX sh not available on this host")
         return
     ref = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md").read_text(encoding="utf-8")
     blocks = [b for b in re.findall(r"```(?:bash|sh)\n(.*?)```", ref, re.DOTALL) if "AEGIS_STACK_LOCK" in b]
-    assert len(blocks) >= 1, "shared-resource reference must publish the lock script anchored on AEGIS_STACK_LOCK"
+    assert len(blocks) == 1, "shared-resource reference must publish exactly one lock script"
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         lock = root / "stack.lock"
@@ -4358,129 +4366,106 @@ def test_readiness_shared_lock_lifecycle():
         def start(workload):
             e = dict(env); e["AEGIS_STACK_WORKLOAD"] = workload
             return subprocess.Popen(["sh", str(script)], cwd=root, env=e, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        holder = start("printf started > started; while [ ! -f release ]; do sleep 0.05; done")
+        def wait_paths(*paths, timeout=10):
+            deadline = time.time() + timeout
+            while not all(p.exists() for p in paths) and time.time() < deadline: time.sleep(0.02)
+            assert all(p.exists() for p in paths), [str(p) for p in paths]
+        def read_pid():
+            return int((lock / "workload.pid").read_text(encoding="utf-8").strip())
+        def assert_reaped(pid):
+            deadline = time.time() + 5
+            while time.time() < deadline:
+                try: os.kill(pid, 0)
+                except ProcessLookupError: return
+                time.sleep(0.05)
+            raise AssertionError("workload child was not reaped: " + str(pid))
+        def clean_lock():
+            if lock.exists(): shutil.rmtree(lock, ignore_errors=True)
+        holder = start("printf started > started; while :; do sleep 0.05; done")
         try:
-            deadline = time.time() + 10
-            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
-            assert lock.exists(), "holder must acquire the lock"
-            token_text = lock.read_text(encoding="utf-8")
-            assert "acquired=" in token_text and "ttl_minutes=" in token_text, token_text
-            ok("lock token records owner/run/acquired/ttl_minutes consistently with the stale-lock rule")
+            wait_paths(lock, lock / "ready", root / "started")
+            token = (lock / "token").read_text(encoding="utf-8")
+            assert "acquired=" in token and "ttl_minutes=" in token, token
+            pid = read_pid()
+            ok("lock and ready marker exist; workload started with recorded pid/token")
             contender = start("true")
             cout, cerr = contender.communicate(timeout=10)
-            assert contender.returncode != 0 and "held" in (cerr or ""), (contender.returncode, cerr)
+            assert contender.returncode == 1 and "held" in (cerr or ""), (contender.returncode, cerr)
             assert lock.exists(), "foreign lock must remain after contender stop"
-            ok("two interleaved processes: contention is rejected and foreign lock preserved")
-            holder.terminate()
-            try: holder.communicate(timeout=15)
-            except subprocess.TimeoutExpired:
-                holder.kill(); holder.communicate(timeout=5); raise AssertionError("holder did not stop after TERM")
-            assert not lock.exists(), "owned workload stop must precede lock release"
-            ok("TERM stops the owned workload, reaps it and releases only its own lock")
+            ok("contention exits 1 and preserves the foreign lock")
+            holder.terminate(); holder.communicate(timeout=15)
+            assert not lock.exists(), "TERM must release the owned lock after reaping"
+            assert_reaped(pid)
+            ok("TERM stops, reaps and releases only its own lock")
         finally:
-            try: (root / "release").write_text("release\n", encoding="utf-8")
-            except OSError: pass
             if holder.poll() is None: holder.kill(); holder.communicate(timeout=5)
-            if lock.exists(): lock.unlink()
+            clean_lock()
         normal = start("true"); no, ne = normal.communicate(timeout=10)
         assert normal.returncode == 0 and not lock.exists(), (normal.returncode, ne)
         failed = start("false"); fo, fe = failed.communicate(timeout=10)
         assert failed.returncode != 0 and not lock.exists(), (failed.returncode, fe)
         ok("normal and error exits release the lock after child reaping")
-        # Repeated cleanup: exercise the published cleanup function twice in one shell.
-        prefix = blocks[0].split('sh -c "$WORKLOAD" &', 1)[0]
+        prefix = blocks[0].split("sh -c '", 1)[0]
         cleanup_harness = root / "cleanup-twice.sh"
         cleanup_harness.write_text(prefix + "\ncleanup\nrc1=$?\ncleanup\nrc2=$?\nexit $((rc1 + rc2))\n", encoding="utf-8", newline="\n")
         cleanup_harness.chmod(0o755)
         twice = subprocess.run(["sh", str(cleanup_harness)], cwd=root, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert twice.returncode == 0 and not lock.exists(), (twice.returncode, twice.stderr)
-        ok("repeated cleanup is idempotent: the published cleanup removes the owned lock once and a second call is a no-op")
-        if (root / "release").exists(): (root / "release").unlink()
-        holder_int = start("while [ ! -f release ]; do sleep 0.05; done")
+        ok("repeated cleanup is idempotent")
+        sig_holder = start("printf started > started; while :; do sleep 0.05; done")
         try:
-            deadline = time.time() + 10
-            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
-            assert lock.exists(), "SIGINT holder must acquire the lock"
-            holder_int.send_signal(signal.SIGINT)
-            holder_int.communicate(timeout=15)
-            assert not lock.exists(), "SIGINT must stop the owned workload before releasing the lock"
-            ok("SIGINT stops the owned workload, reaps it and releases only its own lock")
+            wait_paths(lock, lock / "ready", root / "started")
+            sig_pid = read_pid()
+            sig_holder.send_signal(signal.SIGINT)
+            sig_holder.communicate(timeout=15)
+            assert not lock.exists(), "SIGINT must release the owned lock after reaping"
+            assert_reaped(sig_pid)
+            ok("SIGINT stops, reaps and releases only its own lock")
         finally:
-            try: (root / "release").write_text("release\n", encoding="utf-8")
-            except OSError: pass
-            if holder_int.poll() is None: holder_int.kill(); holder_int.communicate(timeout=5)
-            if lock.exists(): lock.unlink()
-        incomplete = subprocess.Popen(["sh", str(script)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "exec >/dev/null 2>&1; trap '' TERM; echo $$ > child.pid; while :; do sleep 0.05; done"}, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+            if sig_holder.poll() is None: sig_holder.kill(); sig_holder.communicate(timeout=5)
+            clean_lock()
+        incomplete = start("exec >/dev/null 2>&1; trap '' TERM; printf started > started; while :; do sleep 0.05; done")
         try:
-            deadline = time.time() + 10
-            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
-            assert lock.exists(), "incomplete-termination holder must acquire the lock"
+            wait_paths(lock, lock / "ready", root / "started")
+            inc_pid = read_pid()
             incomplete.terminate()
-            _, incomplete_err = incomplete.communicate(timeout=20)
-            assert "INCOMPLETE" in (incomplete_err or ""), incomplete_err
+            _, inc_err = incomplete.communicate(timeout=20)
+            assert "INCOMPLETE" in (inc_err or ""), inc_err
             assert lock.exists(), "incomplete termination must retain ownership"
-            child_pid = int((root / "child.pid").read_text(encoding="utf-8").strip())
-            os.kill(child_pid, signal.SIGKILL)
-            ok("incomplete termination retains ownership and reports INCOMPLETE cleanup (child killed by fixture)")
+            os.kill(inc_pid, signal.SIGKILL)
+            ok("incomplete termination retains ownership and reports INCOMPLETE (fixture kills child)")
         finally:
             if incomplete.poll() is None: incomplete.kill(); incomplete.communicate(timeout=5)
-            child_pid_path = root / "child.pid"
-            if child_pid_path.exists():
-                try: os.kill(int(child_pid_path.read_text(encoding="utf-8").strip()), signal.SIGKILL)
-                except (ProcessLookupError, ValueError): pass
-            if lock.exists(): lock.unlink()
-        if (root / "release").exists(): (root / "release").unlink()
-        holder = start("while [ ! -f release ]; do sleep 0.05; done")
+            clean_lock()
+        coll = start("printf started > started; while :; do sleep 0.05; done")
         try:
-            deadline = time.time() + 10
-            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
-            lock.write_text("foreign-owner run=successor\n", encoding="utf-8")
-            holder.terminate(); holder.communicate(timeout=15)
-            assert lock.exists(), "cleanup must not delete a replaced/successor lock"
-            ok("replaced ownership is preserved by old-process cleanup")
+            wait_paths(lock, lock / "ready", root / "started")
+            own = (lock / "token").read_text(encoding="utf-8")
+            prefix_token = re.sub(r"run=([^ ]+)", lambda m: "run=" + m.group(1) + "1", own)
+            assert prefix_token != own
+            (lock / "token").write_text(prefix_token, encoding="utf-8")
+            coll.terminate(); coll.communicate(timeout=15)
+            assert lock.exists() and (lock / "token").read_text(encoding="utf-8") == prefix_token
+            ok("successor run-id prefix collision is preserved by exact-token cleanup")
         finally:
-            try: (root / "release").write_text("release\n", encoding="utf-8")
-            except OSError: pass
-            if holder.poll() is None: holder.kill(); holder.communicate(timeout=5)
-            if lock.exists(): lock.unlink()
-        if (root / "release").exists(): (root / "release").unlink()
-        collision_holder = start("while [ ! -f release ]; do sleep 0.05; done")
-        try:
-            deadline = time.time() + 10
-            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
-            assert lock.exists(), "prefix-collision holder must acquire the lock"
-            own_token = lock.read_text(encoding="utf-8")
-            prefix_token = re.sub(r"run=([^ ]+)", lambda m: "run=" + m.group(1) + "1", own_token)
-            assert prefix_token != own_token
-            lock.write_text(prefix_token, encoding="utf-8")
-            collision_holder.terminate(); collision_holder.communicate(timeout=15)
-            assert lock.exists(), "cleanup must not delete a run-id-prefix successor lock"
-            ok("successor run-id prefix collision is preserved (cleanup uses exact token equality)")
-        finally:
-            try: (root / "release").write_text("release\n", encoding="utf-8")
-            except OSError: pass
-            if collision_holder.poll() is None: collision_holder.kill(); collision_holder.communicate(timeout=5)
-            if lock.exists(): lock.unlink()
-        if (root / "release").exists(): (root / "release").unlink()
-        rm_child_pid = root / "rm-child.pid"
-        if rm_child_pid.exists(): rm_child_pid.unlink()
-        rm_holder = start("echo $$ > rm-child.pid; trap 'exit 0' USR1; while :; do sleep 0.05; done")
-        try:
-            deadline = time.time() + 10
-            while (not lock.exists() or not rm_child_pid.exists()) and time.time() < deadline: time.sleep(0.02)
-            assert lock.exists() and rm_child_pid.exists(), "rm-failure holder must acquire the lock and child pid"
-            os.chmod(root, 0o555)
-            os.kill(int(rm_child_pid.read_text(encoding="utf-8").strip()), signal.SIGUSR1)
-            rm_out, rm_err = rm_holder.communicate(timeout=15)
-            assert rm_holder.returncode != 0, (rm_holder.returncode, rm_err)
-            assert lock.exists(), "failed lock removal must retain ownership and report nonzero"
-            ok("failed owned-lock removal exits nonzero and retains the lock")
-        finally:
-            os.chmod(root, 0o755)
-            try: (root / "release").write_text("release\n", encoding="utf-8")
-            except OSError: pass
-            if rm_holder.poll() is None: rm_holder.kill(); rm_holder.communicate(timeout=5)
-            if lock.exists(): lock.unlink()
+            if coll.poll() is None: coll.kill(); coll.communicate(timeout=5)
+            clean_lock()
+        if hasattr(os, "geteuid") and os.geteuid() == 0:
+            skip("failed owned-lock removal: running as root; removal-failure assertion UNRUN")
+        else:
+            rm_holder = start("printf started > started; echo $$ > rm-child.pid; trap 'exit 0' USR1; while :; do sleep 0.05; done")
+            try:
+                wait_paths(lock, lock / "ready", root / "started", root / "rm-child.pid")
+                os.chmod(root, 0o555)
+                os.kill(int((root / "rm-child.pid").read_text(encoding="utf-8").strip()), signal.SIGUSR1)
+                rm_out, rm_err = rm_holder.communicate(timeout=15)
+                assert rm_holder.returncode != 0, (rm_holder.returncode, rm_err)
+                assert lock.exists(), "failed lock removal must retain ownership and report nonzero"
+                ok("failed owned-lock removal exits nonzero and retains the lock")
+            finally:
+                os.chmod(root, 0o755)
+                if rm_holder.poll() is None: rm_holder.kill(); rm_holder.communicate(timeout=5)
+                clean_lock()
 
 
 def test_readiness_memory_canonical_tristate():

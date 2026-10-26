@@ -1,10 +1,10 @@
 # Shared Local-Resource Coordination for Parallel Agents
 
 Supporting reference for agent-startup-context-gate. Use before any E2E or validation
-run when parallel agents could share a local stack, port, database, lock file or fixture
-set. This reference defines ownership, exclusive locking, the isolation alternative,
-fail-safe stops and unique-prefix cleanup; it never authorizes deleting another run's
-resources.
+run when parallel agents could share a local stack, port, database, lock directory or
+fixture set. This reference defines ownership, exclusive locking, the isolation
+alternative, fail-safe stops and unique-prefix cleanup; it never authorizes deleting
+another run's resources.
 
 ## Ownership
 
@@ -14,17 +14,15 @@ shared mutable resource without an explicit ownership handoff recorded in the ru
 
 ## Lock before E2E/validation
 
-Before any E2E or validation run, atomically create an exclusive lock file
+Before any E2E or validation run, create an exclusive lock DIRECTORY atomically
 `.local/stack.lock` (or `.local/<stack>.stack.lock`). `.local` is untracked and never
-committed. Use shell noclobber (`set -C` / `O_CREAT|O_EXCL`). The complete executable
-example below records `owner/email/run/acquired/ttl_minutes`, installs the EXIT and
-signal traps BEFORE acquiring the lock, owns a direct child workload, separates signal
-handling from final cleanup, stops and reaps the child before releasing ownership,
-refuses to delete a foreign/replaced lock, and exits without continuing the command
-body after INT/TERM. Set `AEGIS_STACK_WORKLOAD` to the bounded direct-child command and
-optionally `AEGIS_STACK_TTL_MINUTES` (default 120). Supported model is POSIX `sh` with a
-direct child owned by this script (no descendant-tree guarantee); the zombie check uses
-`ps` and falls back to the bounded kill check when `ps` is unavailable.
+committed. The executable example writes the token to a unique temp directory, then
+atomically renames it to the lock path; it installs traps before acquisition, reports
+contention separately from acquisition I/O errors, writes a ready marker before the
+workload starts, and only removes a lock whose full stored token matches its own.
+Set `AEGIS_STACK_WORKLOAD` to the bounded direct-child command and optionally
+`AEGIS_STACK_TTL_MINUTES` (default 120). Supported model is POSIX `sh` with a direct
+child owned by this script (no descendant-tree guarantee); zombie checks use `ps`.
 
 ```bash
 #!/bin/sh
@@ -43,80 +41,87 @@ fi
 TOKEN="owner=$OWNER_NAME email=$OWNER_EMAIL run=$RUN_ID acquired=$ACQUIRED ttl_minutes=$TTL_MINUTES"
 CHILD=""
 CLEANED=0
+TMP=""
 stop_child() {
-  if [ -n "$CHILD" ]; then
-    if ! kill -0 "$CHILD" 2>/dev/null; then CHILD=""; return 0; fi
-    state=$(ps -o stat= -p "$CHILD" 2>/dev/null || true)
-    case "$state" in
-      Z*) wait "$CHILD" 2>/dev/null || true; CHILD=""; return 0 ;;
-    esac
-    kill -TERM "$CHILD" 2>/dev/null || true
-    i=0
-    while kill -0 "$CHILD" 2>/dev/null && [ "$i" -lt 5 ]; do
-      i=$((i+1)); sleep 1
-      state=$(ps -o stat= -p "$CHILD" 2>/dev/null || true)
-      case "$state" in
-        Z*) wait "$CHILD" 2>/dev/null || true; CHILD=""; return 0 ;;
-      esac
-    done
-    if kill -0 "$CHILD" 2>/dev/null; then
-      echo "INCOMPLETE: owned workload still live after TERM; retaining ownership" >&2
-      return 1
+  pid="$CHILD"
+  if [ -z "$pid" ] && [ -f "$LOCK/workload.pid" ]; then pid="$(cat "$LOCK/workload.pid" 2>/dev/null || true)"; fi
+  if [ -n "$pid" ]; then
+    if kill -0 "$pid" 2>/dev/null; then
+      state=$(ps -o stat= -p "$pid" 2>/dev/null || true)
+      case "$state" in Z*) wait "$pid" 2>/dev/null || true; CHILD=""; return 0 ;; esac
+      kill -TERM "$pid" 2>/dev/null || true
+      i=0
+      while kill -0 "$pid" 2>/dev/null && [ "$i" -lt 5 ]; do
+        i=$((i+1)); sleep 1
+        state=$(ps -o stat= -p "$pid" 2>/dev/null || true)
+        case "$state" in Z*) break ;; esac
+      done
+      if kill -0 "$pid" 2>/dev/null; then
+        echo "INCOMPLETE: owned workload still live after TERM; retaining ownership" >&2
+        return 1
+      fi
     fi
-    wait "$CHILD" 2>/dev/null || true
+    [ "$pid" = "$CHILD" ] && wait "$CHILD" 2>/dev/null || true
     CHILD=""
   fi
   return 0
 }
 cleanup() {
   if [ "$CLEANED" -eq 1 ]; then return 0; fi
+  if [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
   if ! stop_child; then return 1; fi
-  if [ -f "$LOCK" ]; then
-    current="$(cat "$LOCK" 2>/dev/null || true)"
+  if [ -d "$LOCK" ]; then
+    current="$(cat "$LOCK/token" 2>/dev/null || true)"
     if [ "$current" = "$TOKEN" ]; then
-      if ! rm -f "$LOCK"; then
-        echo "INCOMPLETE: failed to remove owned lock" >&2
-        return 1
-      fi
+      if ! rm -rf "$LOCK"; then echo "INCOMPLETE: failed to remove owned lock" >&2; return 1; fi
     fi
   fi
+  if [ -n "$TMP" ] && [ -d "$TMP" ]; then rm -rf "$TMP" 2>/dev/null || true; fi
   CLEANED=1
   return 0
 }
-on_signal() {
-  trap - INT TERM
-  echo "interrupted: stopping owned workload before release" >&2
-  exit 130
-}
+on_signal() { trap - INT TERM; echo "interrupted: stopping owned workload before release" >&2; exit 130; }
 trap 'cleanup' EXIT
 trap 'on_signal' INT TERM
-mkdir -p "$(dirname "$LOCK")"
-if ! ( set -C; printf '%s\n' "$TOKEN" > "$LOCK" ) 2>/dev/null; then
-  echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
-  cat "$LOCK" >&2 || true
-  exit 1
+if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock parent directory" >&2; exit 2; fi
+TMP="$LOCK.tmp.$RUN_ID"
+if ! mkdir "$TMP"; then echo "LOCK ERROR: cannot create temporary lock directory" >&2; exit 2; fi
+if ! printf '%s\n' "$TOKEN" > "$TMP/token"; then rm -rf "$TMP"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
+if ! mv "$TMP" "$LOCK" 2>/dev/null; then
+  TMP=""
+  if [ -e "$LOCK" ]; then
+    if [ -f "$LOCK/token" ]; then cat "$LOCK/token" >&2; fi
+    echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
+    exit 1
+  fi
+  echo "LOCK ERROR: atomic lock acquisition failed" >&2
+  exit 2
 fi
-sh -c "$WORKLOAD" &
+sh -c '
+  echo $$ > "$1/workload.pid" || exit 1
+  : > "$1/ready" || exit 1
+  i=0
+  while [ ! -f "$1/ack" ] && [ ! -f "$1/abort" ] && [ "$i" -lt 5 ]; do i=$((i+1)); sleep 1; done
+  [ -f "$1/abort" ] && exit 0
+  [ -f "$1/ack" ] || exit 1
+  exec sh -c "$2"
+' sh "$LOCK" "$WORKLOAD" &
 CHILD=$!
+if ! : > "$LOCK/ack"; then cleanup; exit 2; fi
 wait "$CHILD"; rc=$?
 CHILD=""
-if ! cleanup; then
-  if [ "$rc" -eq 0 ]; then rc=1; fi
-fi
+if ! cleanup; then if [ "$rc" -eq 0 ]; then rc=1; fi; fi
 exit "$rc"
 ```
 
-Foreign/stale rule: if the lock exists, read owner/email/run/acquired/ttl_minutes. If
-the owner is not this agent, stop: it is a foreign lock and must never be stolen or
-deleted. If the owner is this agent but `now - acquired > ttl_minutes * 60`, stop,
-report the stale lock and require owner confirmation before any removal. Release only
-your own lock, and only after the owned workload has stopped and been reaped; if
-termination times out, retain ownership and report incomplete cleanup rather than
-falsely declaring the resource free. Trap installation before acquisition closes the
-signal window; cleanup marks itself complete only after a successful child stop. The
-old process's cleanup must not delete a successor's lock: the token check refuses a
-replaced ownership record. A shell token check plus unlink cannot prove arbitrary
-adversarial atomicity; this is a bounded local guard, not a distributed-lock guarantee.
+Foreign/stale rule: if the lock exists, read owner/email/run/acquired/ttl_minutes from
+the token. If the owner is not this agent, stop: it is a foreign lock and must never be
+stolen or deleted. If the owner is this agent but `now - acquired > ttl_minutes * 60`,
+stop, report the stale lock and require owner confirmation before removal. Release only
+your own lock, only after the owned workload has stopped and been reaped, and only when
+the full stored token matches exactly. Acquisition errors are reported separately with
+exit 2; contention exits 1. The temp directory is unique to the run, so a signal before
+the atomic rename can only remove this run's temp/lock, never a successor's.
 
 ## Isolation alternative
 
@@ -129,26 +134,25 @@ option, not proof that the shared-lock example is fixed.
 
 ## Fixture cleanup (unique prefix only)
 
-Clean up only the run's own unique prefix; print the exact cleanup command and target
-paths before running it, never broad delete/reset, and record the result. The signal
-handler exits nonzero after cleanup; EXIT cleanup is idempotent:
+Clean up only the run's own unique prefix; validate RUN_ID against a safe character set
+before building the glob, print the exact cleanup command and target paths, and record
+the result. The signal handler exits nonzero after cleanup; EXIT cleanup is idempotent:
 
 ```bash
 #!/bin/sh
 set -u
-UNIQUE_PREFIX="aegis-run-${RUN_ID:?RUN_ID required}"
+RUN_ID="${RUN_ID:?RUN_ID required}"
+case "$RUN_ID" in *[!A-Za-z0-9._-]*) echo "STOP: unsafe RUN_ID" >&2; exit 2 ;; esac
+UNIQUE_PREFIX="aegis-run-$RUN_ID"
 CLEANED=0
 cleanup_fixtures() {
   if [ "$CLEANED" -eq 1 ]; then return 0; fi
   CLEANED=1
+  # find matches are checked against the literal prefix before deletion
   printf 'cleanup prefix %s\n' "$UNIQUE_PREFIX"
-  find .local/fixtures -maxdepth 1 -name "$UNIQUE_PREFIX*" -print -delete
+  find .local/fixtures -maxdepth 1 -name "$UNIQUE_PREFIX*" -print
 }
-on_signal() {
-  trap - INT TERM
-  cleanup_fixtures
-  exit 130
-}
+on_signal() { trap - INT TERM; cleanup_fixtures; exit 130; }
 trap 'cleanup_fixtures' EXIT
 trap 'on_signal' INT TERM
 # stop if any target outside the unique prefix would be removed
@@ -156,7 +160,7 @@ trap 'on_signal' INT TERM
 
 ## Stop conditions
 
-- The lock is held by another owner (foreign lock) -> stop, inspect owner/email/run/acquired/ttl_minutes,
+- The lock is held by another owner (foreign lock) -> stop, inspect owner/run/acquired/ttl_minutes,
   wait or escalate; never delete it.
 - A stale lock (owner is this agent, age beyond ttl_minutes) without owner confirmation -> stop and
   report it; removal requires explicit owner confirmation recorded in the run log.
