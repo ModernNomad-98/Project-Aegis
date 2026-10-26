@@ -81,92 +81,24 @@ confidently building in the wrong place or against stale context.
    location is verified and no blocking unknowns remain; otherwise ask.
 
 
-## Startup authority and effective Git identity
+## Git Identity Gate (before the first commit)
 
-Startup identity and hook inspection is READ-ONLY: inspect the current Git identity,
-effective author/committer values and hook state without mutating configuration or
-installing/replacing hooks. Configure the agent identity or install/replace a local
-hook only when an actual applicable authority covers that exact action; otherwise
-report the missing setup and stop. Do not copy the repository owner identity from
-existing commits, and do not invent a new approval when a valid grant already covers
-the action.
-
-Run and record the inspection. It reports missing setup and the effective hook path
-without mutating configuration or hook files:
+Set and verify the agent's own Git identity, never the repository owner's identity,
+before the first commit of a task. Run and record:
 
 ```bash
-MISSING=0
-AGENT_NAME=$(git config --get user.name 2>/dev/null || true)
-AGENT_EMAIL=$(git config --get user.email 2>/dev/null || true)
-LOCAL_NAME=$(git config --local --get user.name 2>/dev/null || true)
-LOCAL_EMAIL=$(git config --local --get user.email 2>/dev/null || true)
-EXPLICIT=0
-[ -n "$LOCAL_NAME" ] && [ -n "$LOCAL_EMAIL" ] && EXPLICIT=1
-[ -n "${GIT_AUTHOR_NAME:-}" ] && [ -n "${GIT_AUTHOR_EMAIL:-}" ] && [ -n "${GIT_COMMITTER_NAME:-}" ] && [ -n "${GIT_COMMITTER_EMAIL:-}" ] && EXPLICIT=1
-if [ "$EXPLICIT" -eq 0 ]; then echo "STARTUP: identity source not explicit (local config or env required)"; MISSING=1; fi
-[ -n "$AGENT_NAME" ] || echo "STARTUP: configured agent user.name absent; effective identity used"
-[ -n "$AGENT_EMAIL" ] || echo "STARTUP: configured agent user.email absent; effective identity used"
-OWNER_NAME=$(git config --local --get aegis.ownerName 2>/dev/null || true)
-OWNER_EMAIL=$(git config --local --get aegis.ownerEmail 2>/dev/null || true)
-[ -n "$OWNER_NAME" ] || { echo "STARTUP: recorded owner name missing"; MISSING=1; }
-[ -n "$OWNER_EMAIL" ] || { echo "STARTUP: recorded owner email missing"; MISSING=1; }
-AUTHOR_IDENT=$(git var GIT_AUTHOR_IDENT 2>/dev/null) || { echo "STARTUP: effective author identity unavailable"; MISSING=1; }
-COMMITTER_IDENT=$(git var GIT_COMMITTER_IDENT 2>/dev/null) || { echo "STARTUP: effective committer identity unavailable"; MISSING=1; }
-AUTHOR_NAME=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
-AUTHOR_EMAIL=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
-COMMITTER_NAME=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
-COMMITTER_EMAIL=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
-case "$AUTHOR_NAME" in *"|"*) echo "STARTUP: effective author name has extra separators"; MISSING=1 ;; esac
-case "$AUTHOR_EMAIL" in *"|"*) echo "STARTUP: effective author email has extra separators"; MISSING=1 ;; esac
-if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] || [ -z "$COMMITTER_EMAIL" ]; then echo "STARTUP: effective author/committer identity empty or malformed"; MISSING=1; fi
-if [ -n "$OWNER_NAME" ] || [ -n "$OWNER_EMAIL" ]; then
-  if { [ -n "$AGENT_NAME" ] && [ "$AGENT_NAME" = "$OWNER_NAME" ]; } || { [ -n "$AGENT_EMAIL" ] && [ "$AGENT_EMAIL" = "$OWNER_EMAIL" ]; } || [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then
-    echo "STARTUP: effective author/committer identity matches the recorded owner identity"; MISSING=1
-  fi
-fi
-HOOKS_PATH=$(git config --get core.hooksPath 2>/dev/null || true)
-if [ -n "$HOOKS_PATH" ]; then
-  case "$HOOKS_PATH" in
-    /*) HOOK_BASE="$HOOKS_PATH" ;;
-    "~/"*) HOOK_BASE="${HOME%/}/${HOOKS_PATH#~/}" ;;
-    *) HOOK_BASE="$(git rev-parse --show-toplevel 2>/dev/null || pwd)/$HOOKS_PATH" ;;
-  esac
-else
-  HOOK_BASE=$(git rev-parse --git-path hooks 2>/dev/null || true)
-fi
-if [ -n "$HOOK_BASE" ]; then
-  HOOK_PATH="${HOOK_BASE%/}/pre-commit"
-  echo "STARTUP: effective hook path=$HOOK_PATH"
-  if [ ! -f "$HOOK_PATH" ] || [ ! -x "$HOOK_PATH" ]; then echo "STARTUP: hook missing or not executable at effective path"; MISSING=1; fi
-else
-  echo "STARTUP: effective hook path unavailable"; MISSING=1
-fi
-[ "$MISSING" -eq 0 ] || exit 1
-echo "STARTUP: effective author/committer identity available and distinct from the recorded owner"
+git config user.name "<agent-name>"
+git config user.email "<agent-email>"
+git config --get user.name
+git config --get user.email
 ```
 
-Supported model: Linux with POSIX sh/coreutils. Windows and non-Linux POSIX lock/readiness scenarios are explicit SKIP/UNRUN, never PASS.
-
-Identity policy: the effective `git var` identity is authoritative; configured values are also checked when present and must not be the owner. A command-level `git -c user.name=...` override intentionally changes the configured view (and is accepted only when the resulting effective identity is non-owner); the actual commit remains the oracle. Minimum Git: 2.20 (git var/config behavior); command-level `-c` visibility in hooks depends on Git exporting GIT_CONFIG_PARAMETERS/GIT_CONFIG_COUNT, so set those explicitly on older Git; the effective `git var` check remains authoritative.
-
-Effective author AND committer identities matter, not only the configured defaults:
-environment (`GIT_AUTHOR_*`, `GIT_COMMITTER_*`) can change the identity that is
-recorded. A command override such as `git commit --author` can also change the
-recorded author, but Git applies `--author` after the pre-commit hook, so the local
-hook cannot reliably catch it. The resulting ACTUAL commit is the final oracle:
-inspect `%an <%ae>` and `%cn <%ce>` on the resulting commit. If either effective
-identity is missing, empty or still the recorded owner identity, do not push; amend
-or recreate the local commit before push, or STOP and report the mismatch. A pre-commit
-hook may have exited 0 because `--author` was applied after it, so the actual-commit
-inspection is mandatory.
-
-The owner identity is recorded by an explicitly authorized setup action below, not
-by the read-only startup inspection; perform it only when an applicable authority
-covers the action. It comes from local-only config (never committed):
+Verify both values are the agent's own identity. If either equals the recorded owner
+identity for this repository, STOP: do not commit, report the mismatch, and ask the
+human to fix the identity. Never copy the owner identity from existing commits. The
+recorded owner identity comes from local-only config (never committed):
 
 ```bash
-# AUTHORIZED SETUP (not read-only inspection): record the repository owner identity
-# only under the applicable authority.
 git config --local aegis.ownerName "<owner name>"
 git config --local aegis.ownerEmail "<owner email>"
 ```
