@@ -4291,44 +4291,48 @@
       "status": "PARTIAL"
     }
   ],
-  "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 85 of 254 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization. Convention (D114, 2026-10-24): a roadmap row closed by shipping a skill is always SHIPPED/explicit-id; an owner authorization is not evidence grade.",
-  "totals": {
-    "beyond_roadmap_skills": 85,
-    "by_area": {
-      "01": 55,
-      "02": 35,
-      "03": 40,
-      "04": 30,
-      "05": 20,
-      "06": 55,
-      "07": 25,
-      "08": 20,
-      "09": 20
-    },
-    "by_grade": {
-      "capability-review": 100,
-      "catalog-decision": 16,
-      "explicit-id": 184
-    },
-    "by_priority": {
-      "P0": 126,
-      "P1": 149,
-      "P2": 25
-    },
-    "by_status": {
-      "COVERED": 57,
-      "PARTIAL": 59,
-      "SHIPPED": 184
-    },
-    "distinct_covering_skills": 169,
-    "entries": 300,
-    "gap_by_priority": {
-      "P0": 0,
-      "P1": 0,
-      "P2": 0
-    },
-    "manifest_skills": 254,
-    "review_pending": 114
+  "schema_version": 2,
+  "scope_note": "The roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap. The generated summary carries the derived count. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization. Convention (D114, 2026-10-24): a roadmap row closed by shipping a skill is always SHIPPED/explicit-id; an owner authorization is not evidence grade.",
+  "snapshot": {
+    "d_entry": "D119",
+    "rows_sha256": "ff83421e963b05e6d9e8ff5711f288435c8105b3c382f81786b44e90b3ed0819",
+    "totals": {
+      "beyond_roadmap_skills": 85,
+      "by_area": {
+        "01": 55,
+        "02": 35,
+        "03": 40,
+        "04": 30,
+        "05": 20,
+        "06": 55,
+        "07": 25,
+        "08": 20,
+        "09": 20
+      },
+      "by_grade": {
+        "capability-review": 100,
+        "catalog-decision": 16,
+        "explicit-id": 184
+      },
+      "by_priority": {
+        "P0": 126,
+        "P1": 149,
+        "P2": 25
+      },
+      "by_status": {
+        "COVERED": 57,
+        "PARTIAL": 59,
+        "SHIPPED": 184
+      },
+      "distinct_covering_skills": 169,
+      "entries": 300,
+      "gap_by_priority": {
+        "P0": 0,
+        "P1": 0,
+        "P2": 0
+      },
+      "manifest_skills": 254,
+      "review_pending": 114
+    }
   }
 }

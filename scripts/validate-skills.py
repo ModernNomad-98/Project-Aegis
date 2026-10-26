@@ -138,7 +138,7 @@ CLAUDE_MD = REPO_ROOT / "CLAUDE.md"
 
 COVERAGE_MAP = REPO_ROOT / "docs" / "skills" / "coverage-map.json"
 COVERAGE_MAP_MD = REPO_ROOT / "docs" / "skills" / "coverage-map.md"
-COVERAGE_SCHEMA_VERSION = 1
+COVERAGE_SCHEMA_VERSION = 2
 COVERAGE_BASIS_COMMIT = "9ab6aeac252c2bf10e86d06b24fd9feacf55b024"
 COVERAGE_AUDIT_CLASSIFICATION_SHA = (
     "2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213"
@@ -214,26 +214,15 @@ COVERAGE_GRADE_BY_STATUS = {
     "PARTIAL": ("capability-review",),
     "GAP": ("none",),
 }
-COVERAGE_TOTALS = {
-    "entries": 300,
-    "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
-                "07": 25, "08": 20, "09": 20},
-    "by_status": {"SHIPPED": 184, "COVERED": 57, "PARTIAL": 59},
-    "by_grade": {"explicit-id": 184, "catalog-decision": 16,
-                 "capability-review": 100},
-    "by_priority": {"P0": 126, "P1": 149, "P2": 25},
-    "gap_by_priority": {"P0": 0, "P1": 0, "P2": 0},
-    "manifest_skills": 254,
-    "distinct_covering_skills": 169,
-    "beyond_roadmap_skills": 85,
-    "review_pending": 114,
-}
+COVERAGE_PRIORITY_KEYS = ("P0", "P1", "P2")
+
 # Owner triage decision Q1=A/Q2=A/Q3=yes (D107, 2026-10-21): rows
 # #254/#278 received their planning-gate decisions and no longer count as
 # awaiting confirmation; review_pending subtracts these resolved rows.
 COVERAGE_PLANNING_GATE_RESOLVED = frozenset({254, 278})
-COVERAGE_GAP_IDS = ()
-COVERAGE_P0_GAP_IDS = ()
+COVERAGE_ROADMAP_ROWS = 300
+COVERAGE_EXCERPT_CHARS = 80
+COVERAGE_SHIPPED_CONVENTION = "D114"
 COVERAGE_ANOMALY_SKILLS = {
     186: frozenset({"multi-tenant-security-tester", "rls-policy-auditor"}),
     299: frozenset({"ai-router-architect", "ai-cost-guardrail-designer"}),
@@ -333,7 +322,7 @@ def _coverage_shipped_analysis(entry_text: str,
     normalization with an index map to the raw text, so no base-detected claim
     is hidden. Text-based evidence check, not semantic shipping proof.
     """
-    if not isinstance(manifest, set) or not manifest:
+    if not manifest:
         raise ValueError("manifest unavailable or empty")
     known = {name.casefold() for name in manifest
              if isinstance(name, str) and name.strip()}
@@ -406,7 +395,7 @@ def _coverage_shipped_analysis(entry_text: str,
             position = separator.end()
         if boundary and not found:
             raw_start = index_map[match.start()] if match.start() < len(index_map) else 0
-            excerpt = " ".join(raw[raw_start:raw_start + 80].split())
+            excerpt = " ".join(raw[raw_start:raw_start + COVERAGE_EXCERPT_CHARS].split())
             if len(excerpt) > 64:
                 excerpt = excerpt[:61] + "..."
             malformed.add(excerpt)
@@ -448,7 +437,7 @@ def _coverage_catalog_lines() -> "list[str] | None":
     """Return docs/skills-catalog.md lines, or None (unreadable; fail closed)."""
     try:
         return CATALOG.read_text(encoding="utf-8").splitlines()
-    except OSError:
+    except (OSError, UnicodeDecodeError, ValueError):
         return None
 
 
@@ -535,19 +524,30 @@ def _coverage_pointer_errors(
 
 
 COVERAGE_REQUIRED_PHRASES = (
-    "The 300-row roadmap is an OPTIONAL reference backlog, not a required "
-    "target.",
+    "The roadmap is an OPTIONAL reference backlog, not a required target.",
     "GAP rows are optional backlog candidates, not deficits or completion "
     "obligations.",
     "The shipped library deliberately exceeds and interleaves with the "
-    "roadmap: 85 of 254 shipped skills are beyond it.",
+    "roadmap.",
 )
 COVERAGE_ENTRY_KEYS = (
     "id", "area", "name", "priority", "status", "covering_skills",
     "evidence_grade", "evidence", "rationale", "notes",
 )
-COVERAGE_TOP_KEYS = ("schema_version", "scope_note", "basis", "totals",
+COVERAGE_TOP_KEYS = ("schema_version", "scope_note", "basis", "snapshot",
                      "entries")
+COVERAGE_SNAPSHOT_KEYS = ("d_entry", "rows_sha256", "totals")
+COVERAGE_RECON_PATH = (REPO_ROOT / "docs" / "reconciliation"
+                       / "step-0-reconciliation-v4.md")
+COVERAGE_ROWS_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+COVERAGE_DIGEST_TOKEN_RE = re.compile(
+    r"(?<![A-Za-z0-9_])rows_sha256=([0-9a-f]{64})(?![A-Za-z0-9_])")
+
+# Historical-staleness list kept as a backstop; the dynamic check derived from
+# the current computed totals is the primary guard (see _coverage_check_snapshot).
+COVERAGE_LEDGER_ENTRY_RE = re.compile(
+    r"^-\s*\*\*(?:(?P<date1>\d{4}-\d{2}-\d{2})\s+-\s+(?P<id1>D\d+)"
+    r"|(?P<id2>D\d+)\s+\((?P<date2>\d{4}-\d{2}-\d{2})\))")
 COVERAGE_TIMESTAMP_RE = re.compile(
     r"\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}|\b\d{2}:\d{2}:\d{2}\b|timestamp")
 
@@ -2224,10 +2224,414 @@ def _coverage_require_exact_ints(rep: Report, ctx: str, value, label: str) -> No
                   + " must be an exact integer (booleans, floats, strings "
                   "rejected)")
 
+
+NL_JOIN = chr(10)
+
+
+def _coverage_area_titles():
+    titles = {}
+    for path in sorted((REPO_ROOT / "docs" / "skills").glob("[0-9][0-9]-*.md")):
+        area = path.name[:2]
+        try:
+            lines = path.read_text(encoding="utf-8").splitlines()
+        except (OSError, UnicodeDecodeError):
+            continue
+        for line in lines:
+            if line.startswith("# "):
+                titles[area] = line[2:].strip()
+                break
+    return titles
+
+
+def _coverage_compute_totals(entries, manifest):
+    if manifest is not None and not isinstance(manifest, (set, frozenset)):
+        raise ValueError("coverage totals require a skills manifest set of "
+                         "skill names (fail closed)")
+    by_area = {}
+    by_status = {}
+    by_grade = {}
+    by_priority = {}
+    gap_by_priority = {}
+    covering_union = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        area = str(entry.get("area"))
+        status = str(entry.get("status"))
+        grade = str(entry.get("evidence_grade"))
+        by_area[area] = by_area.get(area, 0) + 1
+        by_status[status] = by_status.get(status, 0) + 1
+        by_grade[grade] = by_grade.get(grade, 0) + 1
+        by_priority[str(entry.get("priority"))] = by_priority.get(
+            str(entry.get("priority")), 0) + 1
+        if status == "GAP":
+            prio = str(entry.get("priority"))
+            gap_by_priority[prio] = gap_by_priority.get(prio, 0) + 1
+        skills = entry.get("covering_skills")
+        if isinstance(skills, list):
+            covering_union.update(name for name in skills if isinstance(name, str))
+    non_explicit = [entry for entry in entries
+                    if isinstance(entry, dict)
+                    and entry.get("evidence_grade") != "explicit-id"]
+    manifest_set = manifest or set()
+    return {
+        "entries": len(entries),
+        "by_area": {key: by_area[key] for key in sorted(by_area)},
+        "by_status": {key: by_status[key] for key in sorted(by_status)},
+        "by_grade": {key: by_grade[key] for key in sorted(by_grade)},
+        "by_priority": {key: by_priority[key] for key in sorted(by_priority)},
+        "gap_by_priority": {key: gap_by_priority.get(key, 0)
+                            for key in sorted(set(gap_by_priority)
+                                              | set(COVERAGE_PRIORITY_KEYS))},
+        "manifest_skills": len(manifest_set),
+        "distinct_covering_skills": len(covering_union),
+        "beyond_roadmap_skills": len(manifest_set - covering_union),
+        "review_pending": (
+            len(non_explicit)
+            - sum(1 for entry in non_explicit
+                  if _coverage_is_exact_int(entry.get("id"))
+                  and entry.get("id") in COVERAGE_PLANNING_GATE_RESOLVED)),
+    }
+
+
+def _coverage_live_inputs():
+    payload = json.loads(COVERAGE_MAP.read_text(encoding="utf-8"))
+    manifest = _coverage_manifest_names() or set()
+    return payload, manifest
+
+def _coverage_live_totals():
+    payload, manifest = _coverage_live_inputs()
+    return _coverage_compute_totals(payload.get("entries") or [], manifest)
+
+def _coverage_live_gap_ids():
+    payload, _manifest = _coverage_live_inputs()
+    return tuple(entry.get("id") for entry in payload.get("entries") or []
+                 if isinstance(entry, dict) and entry.get("status") == "GAP")
+
+def _coverage_live_p0_gap_ids():
+    payload, _manifest = _coverage_live_inputs()
+    return tuple(entry.get("id") for entry in payload.get("entries") or []
+                 if isinstance(entry, dict) and entry.get("status") == "GAP"
+                 and entry.get("priority") == "P0")
+
+def _coverage_rows_sha256(entries, manifest):
+    canon = json.dumps({"entries": entries,
+                        "manifest_skills": sorted(manifest or set())},
+                       sort_keys=True, separators=(",", ":"),
+                       ensure_ascii=False)
+    return hashlib.sha256(canon.encode("utf-8")).hexdigest()
+
+
+def _coverage_ledger_entries():
+    """Parse every top-level D-entry bullet, date-first or legacy id-first."""
+    try:
+        text = COVERAGE_RECON_PATH.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
+    rows = []
+    current = None
+    for line in text.splitlines():
+        match = COVERAGE_LEDGER_ENTRY_RE.match(line)
+        if match:
+            if current is not None:
+                rows.append(current)
+            entry_date = match.group("date1") or match.group("date2")
+            entry_id = match.group("id1") or match.group("id2")
+            current = {"date": entry_date, "id": entry_id, "body": line}
+            continue
+        if current is not None:
+            current["body"] = current["body"] + "\n" + line
+    if current is not None:
+        rows.append(current)
+    return rows
+
+
+def _coverage_render_summary(payload, computed, area_titles):
+    basis = payload.get("basis")
+    if not isinstance(basis, dict):
+        basis = {}
+    audit_artifacts = basis.get("audit_artifacts")
+    if not isinstance(audit_artifacts, dict):
+        audit_artifacts = {}
+    final_classification = audit_artifacts.get("final_classification")
+    if not isinstance(final_classification, dict):
+        final_classification = {}
+    audit_report = audit_artifacts.get("audit_report")
+    if not isinstance(audit_report, dict):
+        audit_report = {}
+    entries = payload.get("entries")
+    if not isinstance(entries, list):
+        entries = []
+    gap_ids = [entry.get("id") for entry in entries
+               if isinstance(entry, dict) and entry.get("status") == "GAP"]
+    p0_gap_ids = [entry.get("id") for entry in entries
+                  if isinstance(entry, dict)
+                  and entry.get("status") == "GAP"
+                  and entry.get("priority") == "P0"]
+    manifest_total = computed["manifest_skills"]
+    beyond_total = computed["beyond_roadmap_skills"]
+    if manifest_total > 0:
+        beyond_sentence = (str(beyond_total) + " of " + str(manifest_total)
+                           + " shipped skills are beyond it.")
+    else:
+        beyond_sentence = "The live skills manifest is empty."
+    status = computed["by_status"]
+    grade = computed["by_grade"]
+    prio = computed["by_priority"]
+    gap = computed["gap_by_priority"]
+    lines = [
+        "# Skills coverage map - reference status for the roadmap candidates",
+        "",
+        "This page is the human summary of the authoritative machine map in",
+        "[coverage-map.json](coverage-map.json); the JSON is authoritative and",
+        "this summary is GENERATED from the JSON snapshot. Do not hand-edit;",
+        "regenerate with python -P scripts/validate-skills.py --write-coverage-map-md.",
+        "",
+        "**Optionality.** " + COVERAGE_REQUIRED_PHRASES[0] + " "
+        + COVERAGE_REQUIRED_PHRASES[1],
+        "**Pointer integrity (stable anchors, DS-4b migration).** The migrated",
+        "coverage evidence uses the stable catalog-row grammar: a catalog row",
+        "anchor names a covering skill whose docs/skills-catalog.md table row",
+        "carries that skill, and every backticked skill id in a row's evidence,",
+        "notes or rationale must exist in the manifest or the catalog. This",
+        "page policy is that catalog evidence should use stable anchors rather",
+        "than numeric catalog-line or skill-row positions: numeric line/row",
+        "anchors are LEGACY and must not be added. **Machine enforcement of the",
+        "numeric-anchor prohibition is DEFERRED** to a follow-up item; the",
+        "validator still resolves the older numeric pointer classes where they",
+        "exist and does not reject them, and it accepts the stable grammar on",
+        "the migrated rows. Open legacy cases include catalog L/630-631,",
+        "catalog lines..1480 and skill_rows 394: do not add such anchors.",
+        "",
+        "**Shipped-by-skill convention (" + COVERAGE_SHIPPED_CONVENTION + ").** A row is",
+        "SHIPPED only when a skill was shipped FOR that row; rows an existing skill",
+        "merely covers stay COVERED, and an owner authorization is not evidence grade.",
+        "The validator enforces the convention and fails closed on an unknown",
+        "skill-shaped shipped-as token, on a malformed/no-token shipped-as phrase,",
+        "and on an unusable manifest.",
+        "",
+        COVERAGE_REQUIRED_PHRASES[2] + " " + beyond_sentence,
+        "",
+        "Row-level evidence companion: [audit registers index](../audits/README.md) (read-only reference, not build authorization).",
+        "",
+        "The map records status only. It is a maintained assertion, not ground",
+        "truth, a completion target or a build authorization. review_pending",
+        "counts the " + str(computed["review_pending"]) + " rows awaiting a",
+        "planning-gate decision after the resolved rows are subtracted.",
+        "",
+        "## Basis",
+        "",
+        "- Repository basis: " + str(basis.get("repo_commit", ""))
+        + " (audit-derived initial population).",
+        "- " + str(final_classification.get("path", ""))
+        + " sha256 " + str(final_classification.get("sha256", "")) + ".",
+        "- " + str(audit_report.get("path", ""))
+        + " sha256 " + str(audit_report.get("sha256", "")) + ".",
+        "- Source inputs: the skills manifest, catalog, the nine docs/skills",
+        "  tables and the roadmap file listed in the JSON basis.",
+        "- Source-file provenance digests are prior-base pins: a file cannot embed",
+        "  its own final hash, so validator/test edits are covered by prior-base",
+        "  snapshots, not live-file verification.",
+        "",
+        "## Totals",
+        "",
+        "| Measure | Value |",
+        "| --- | ---: |",
+        "| Entries | " + str(computed["entries"]) + " |",
+        "| SHIPPED | " + str(status.get("SHIPPED", 0)) + " |",
+        "| COVERED | " + str(status.get("COVERED", 0)) + " |",
+        "| GAP | " + str(status.get("GAP", 0)) + " |",
+        "| PARTIAL | " + str(status.get("PARTIAL", 0)) + " |",
+        "| explicit-id | " + str(grade.get("explicit-id", 0)) + " |",
+        "| catalog-decision | " + str(grade.get("catalog-decision", 0)) + " |",
+        "| capability-review | " + str(grade.get("capability-review", 0)) + " |",
+        "| none | " + str(grade.get("none", 0)) + " |",
+        "| P0 / P1 / P2 | " + str(prio.get("P0", 0)) + " / "
+        + str(prio.get("P1", 0)) + " / " + str(prio.get("P2", 0)) + " |",
+        "| P0 / P1 / P2 gaps | " + str(gap.get("P0", 0)) + " / "
+        + str(gap.get("P1", 0)) + " / " + str(gap.get("P2", 0)) + " |",
+        "| Manifest skills | " + str(computed["manifest_skills"]) + " |",
+        "| Distinct covering skills | "
+        + str(computed["distinct_covering_skills"]) + " |",
+        "| Beyond-roadmap shipped skills | "
+        + str(computed["beyond_roadmap_skills"]) + " |",
+        "| Review pending | " + str(computed["review_pending"]) + " |",
+        "",
+        "## Per-area status",
+        "",
+        "| Area | Entries | SHIPPED | COVERED | PARTIAL | GAP |",
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    order = ["SHIPPED", "COVERED", "PARTIAL", "GAP"]
+    for area in sorted(COVERAGE_AREA_RANGES):
+        counts = [0, 0, 0, 0, 0]
+        for entry in entries:
+            if not isinstance(entry, dict) or str(entry.get("area")) != area:
+                continue
+            counts[0] += 1
+            key = str(entry.get("status"))
+            if key in order:
+                counts[1 + order.index(key)] += 1
+        title = area_titles.get(area, "Area " + area).replace("|", "\\\\|").replace("\\n", " ")
+        lines.append("| " + area + " " + title + " | "
+                     + " | ".join(str(value) for value in counts) + " |")
+    lines += [
+        "",
+        "## GAP candidates (all " + str(len(gap_ids)) + " ids)",
+        "",
+        "None." if not gap_ids else ", ".join("#" + str(i) for i in gap_ids),
+        "",
+        "## P0 gap candidates (all " + str(len(p0_gap_ids)) + " ids)",
+        "",
+        "None." if not p0_gap_ids else ", ".join("#" + str(i) for i in p0_gap_ids),
+        "",
+    ]
+    return NL_JOIN.join(lines)
+
+def _coverage_numbers(value):
+    """Yield every integer inside a nested totals object (for the ledger guard)."""
+    if isinstance(value, bool):
+        return
+    if isinstance(value, int):
+        yield value
+    elif isinstance(value, dict):
+        for item in value.values():
+            yield from _coverage_numbers(item)
+    elif isinstance(value, list):
+        for item in value:
+            yield from _coverage_numbers(item)
+
+
+def _coverage_all_exact_ints(value):
+    """True only for dicts/ints (no bool, float or string leaves)."""
+    if type(value) is int:
+        return True
+    if isinstance(value, dict):
+        return all(isinstance(key, str) and _coverage_all_exact_ints(item)
+                   for key, item in value.items())
+    return False
+
+
+def _coverage_validated_totals(totals, computed):
+    """Return validated exact-int totals only when they equal the derived ones."""
+    if not isinstance(totals, dict) or not _coverage_all_exact_ints(totals):
+        return None
+    if totals != computed:
+        return None
+    return dict(totals)
+
+
+def _coverage_scrub_for_counts(text):
+    scrubbed = re.sub(r"D[0-9]+", "", text)
+    scrubbed = re.sub(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", "", scrubbed)
+    scrubbed = re.sub(r"#[0-9]+", "", scrubbed)
+    return scrubbed
+
+
+def _coverage_count_copy_errors(text, computed):
+    scrubbed = _coverage_scrub_for_counts(text)
+    findings = set()
+    patterns = (
+        r"\b[0-9]+\s+of\s+[0-9]+\b",
+        r"(?i)\b(?:totals?|entries|counts?|review_pending|manifest_skills|"
+        r"distinct_covering_skills|beyond_roadmap_skills|by_status|by_grade|"
+        r"by_priority)\s*[:=]\s*[0-9]+",
+        r"\b[0-9]+\s+(?:rows|skills|entries|ids|count|counts|total|totals)\b",
+    )
+    for pattern in patterns:
+        for match in re.finditer(pattern, scrubbed):
+            findings.add(match.group(0))
+    return sorted(findings)
+
+
+def _coverage_check_snapshot(rep, ctx, payload, entries, manifest, computed):
+    snapshot = payload.get("snapshot")
+    if not isinstance(snapshot, dict):
+        rep.error("[" + ctx + "] snapshot must be an object (the one pinned copy)")
+        return
+    if set(snapshot) != set(COVERAGE_SNAPSHOT_KEYS):
+        rep.error("[" + ctx + "] snapshot keys must be exactly "
+                  + repr(sorted(COVERAGE_SNAPSHOT_KEYS)))
+    if not isinstance(manifest, (set, frozenset)) or not manifest:
+        rep.error("[" + ctx + "] skills manifest unavailable/empty; cannot "
+                  "verify the snapshot digest (fail closed)")
+        return
+    d_entry = snapshot.get("d_entry")
+    if not isinstance(d_entry, str) or not re.fullmatch(r"D[0-9]+", d_entry):
+        rep.error("[" + ctx + "] snapshot.d_entry must be a D<id> string")
+    digest = snapshot.get("rows_sha256")
+    if not isinstance(digest, str) or not COVERAGE_ROWS_SHA256_RE.fullmatch(digest):
+        rep.error("[" + ctx + "] snapshot.rows_sha256 must be lowercase sha256 hex")
+        return
+    expected = _coverage_rows_sha256(entries, manifest)
+    if digest != expected:
+        rep.error("[" + ctx + "] snapshot.rows_sha256 is stale: expected " + expected)
+    ledger = _coverage_ledger_entries()
+    if ledger is None:
+        rep.error("[" + ctx + "] reconciliation ledger unavailable (fail closed)")
+        return
+    matching = [row for row in ledger if row["id"] == d_entry]
+    if len(matching) != 1:
+        rep.error("[" + ctx + "] snapshot.d_entry must match exactly one ledger entry")
+        return
+    digest_entries = []
+    for row in ledger:
+        entry_matches = COVERAGE_DIGEST_TOKEN_RE.findall(row["body"])
+        raw_count = row["body"].count("rows_sha256=")
+        if raw_count and len(entry_matches) != raw_count:
+            rep.error("[" + ctx + "] ledger entry " + row["id"] + " carries a "
+                      "malformed/non-boundary-exact rows_sha256 token")
+        if entry_matches:
+            digest_entries.append((row, entry_matches))
+    if not digest_entries:
+        rep.error("[" + ctx + "] ledger carries no rows_sha256 snapshot entry (fail closed)")
+    else:
+        latest = max(digest_entries, key=lambda pair: int(pair[0]["id"][1:]))
+        if latest[0]["id"] != d_entry:
+            rep.error("[" + ctx + "] snapshot.d_entry must be the latest digest-carrying "
+                      "ledger entry (found " + latest[0]["id"] + ")")
+        bound_number = int(d_entry[1:])
+        for row, entry_matches in digest_entries:
+            if int(row["id"][1:]) > bound_number:
+                rep.error("[" + ctx + "] ledger entry " + row["id"]
+                          + " is later than the bound snapshot " + d_entry
+                          + " and carries a rows_sha256 token (fail closed)")
+    totals = snapshot.get("totals")
+    if not isinstance(totals, dict) or totals != computed:
+        rep.error("[" + ctx + "] snapshot.totals must equal the derived totals")
+    body = matching[0]["body"]
+    matches = COVERAGE_DIGEST_TOKEN_RE.findall(body)
+    raw = body.count("rows_sha256=")
+    if raw != 1 or len(matches) != 1 or matches[0] != digest:
+        rep.error("[" + ctx + "] snapshot entry must carry exactly one "
+                  "boundary-exact rows_sha256 token equal to the snapshot digest")
+    scrubbed = body
+    if len(matches) == 1:
+        scrubbed = scrubbed.replace("rows_sha256=" + matches[0], "")
+    count_copies = _coverage_count_copy_errors(scrubbed, computed)
+    if count_copies:
+        rep.error("[" + ctx + "] snapshot entry must NOT carry a coverage-total "
+                  "count copy; found " + repr(count_copies))
+
+
+def _coverage_check_generated_summary(rep, payload, computed):
+    md_ctx = _rel(COVERAGE_MAP_MD)
+    rendered_bytes = _coverage_render_summary(
+        payload, computed, _coverage_area_titles()).encode("utf-8")
+    try:
+        actual = COVERAGE_MAP_MD.read_bytes()
+    except OSError:
+        rep.error("[" + md_ctx + "] missing generated summary")
+        return
+    if actual != rendered_bytes:
+        rep.error("[" + md_ctx + "] is not the generated output (byte comparison); "
+                  "regenerate with --write-coverage-map-md")
+
+
 def _coverage_check_basis(rep: Report, ctx: str, basis) -> None:
     """HARD: the basis block must be the exact pinned audit provenance record."""
     if not isinstance(basis, dict):
-        rep.error("[" + ctx + "] basis must be an object")
+        rep.error("[" + ctx + "] basis must be an object (fail closed)")
         return
     for key in COVERAGE_BASIS_KEYS:
         if key not in basis:
@@ -2317,25 +2721,25 @@ def _coverage_summary_per_area(text: str) -> dict[str, tuple[int, ...]]:
     return rows
 
 
-def check_coverage_map(rep: Report) -> None:
+def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
     """HARD: docs/skills/coverage-map.json and its summary reconcile.
 
-    Rules (coverage-map reconciliation item): schema/scope_note; exactly 300
-    sorted unique ids 1..300; exact area ranges; names/priorities equal to the
+    Rules (coverage-map reconciliation item): schema/scope_note; the exact sorted
+    unique roadmap ids; exact area ranges; names/priorities equal to the
     docs/skills tables; status/grade enums and pairing; covering skills in the
-    manifest; non-GAP rows need >=1 skill and evidence; GAP rows need a
-    rationale and no skills/evidence; the #186/#299 anomaly sets; totals
-    recomputed (incl. by_grade and review_pending = every non-explicit-id
-    row minus the planning-gate-resolved rows #254/#278); manifest union
-    (135 distinct covering / 80 beyond / 215); the summary's totals and
-    GAP/P0 id sets equal
-    the JSON; required optionality phrases; canonical deterministic JSON.
+    manifest; non-GAP rows need at least one skill and evidence; GAP rows are
+    optional backlog candidates under the documented audit policy (the audited
+    map has none); anomaly row sets; totals recomputed
+    (incl. by_grade and review_pending, which subtracts the planning-gate
+    resolved rows); the derived manifest union counts; the summary totals and
+    GAP/P0 id sets equal the JSON; required optionality phrases; canonical
+    deterministic JSON.
     """
     ctx = _rel(COVERAGE_MAP)
     if not COVERAGE_MAP.is_file():
         rep.error(
             "[" + ctx + "] missing docs/skills/coverage-map.json (the "
-            "maintained reference map for the 300 roadmap candidates is "
+            "maintained reference map for the " + str(COVERAGE_ROADMAP_ROWS) + " roadmap candidates is "
             "required; the human summary is docs/skills/coverage-map.md)"
         )
         return
@@ -2393,17 +2797,17 @@ def check_coverage_map(rep: Report) -> None:
         rep.error("[" + ctx + "] is not in canonical deterministic form "
                   "(sorted keys, indent=2, LF-only, single trailing LF)")
     docs = _coverage_docs_rows()
-    if sorted(docs) != list(range(1, 301)):
+    if sorted(docs) != list(range(1, COVERAGE_ROADMAP_ROWS + 1)):
         rep.error("[" + ctx + "] docs/skills tables must cover exactly ids "
-                  "1..300 (found " + str(len(docs)) + " rows)")
+                  "1.." + str(COVERAGE_ROADMAP_ROWS) + " (found " + str(len(docs)) + " rows)")
         return
     manifest = _coverage_manifest_names()
     entries = payload.get("entries")
     if not isinstance(entries, list):
-        rep.error("[" + ctx + "] entries must be a list of 300 row objects")
+        rep.error("[" + ctx + "] entries must be a list of " + str(COVERAGE_ROADMAP_ROWS) + " row objects")
         return
-    if len(entries) != 300:
-        rep.error("[" + ctx + "] entries must contain exactly 300 rows "
+    if len(entries) != COVERAGE_ROADMAP_ROWS:
+        rep.error("[" + ctx + "] entries must contain exactly " + str(COVERAGE_ROADMAP_ROWS) + " rows "
                   "(found " + str(len(entries)) + ")")
     seen_ids: list[int] = []
     covering_union: set[str] = set()
@@ -2518,8 +2922,9 @@ def check_coverage_map(rep: Report) -> None:
         rep.error("[" + ctx + "] duplicate entry id(s) present")
     if seen_ids != sorted(seen_ids):
         rep.error("[" + ctx + "] entries must be sorted by id ascending")
-    if sorted(seen_ids) != list(range(1, 301)):
-        rep.error("[" + ctx + "] entry ids must be exactly 1..300 (found "
+    if sorted(seen_ids) != list(range(1, COVERAGE_ROADMAP_ROWS + 1)):
+        rep.error("[" + ctx + "] entry ids must be exactly 1.."
+                  + str(COVERAGE_ROADMAP_ROWS) + " (found "
                   + str(len(seen_ids)) + " ids)")
     for row_id, expected in sorted(COVERAGE_ANOMALY_SKILLS.items()):
         target = next((entry for entry in entries
@@ -2555,7 +2960,7 @@ def check_coverage_map(rep: Report) -> None:
                       + ": the dropped candidate '"
                       + COVERAGE_DROPPED_CANDIDATE + "' must never be a "
                       "covering skill (historical evidence note only)")
-    # D114 convention (text-based evidence check; disclosed limits): every
+    # Shipped-by-skill convention (text-based evidence check; disclosed limits): every
     # shipped-as occurrence is scanned; the phrase is word-bounded on both
     # sides (FD-2) so ordinary words such as "aside"/"assembly" are not
     # phrases; an optional colon and wrapper forms (ASCII/typographic quotes,
@@ -2580,18 +2985,18 @@ def check_coverage_map(rep: Report) -> None:
             analysis = _coverage_shipped_analysis(entry_text, manifest)
         except ValueError:
             rep.error("[" + ctx + "] manifest unavailable or empty; cannot "
-                      "enforce the D114 shipped-by-skill convention (fail closed)")
+                      "enforce the " + COVERAGE_SHIPPED_CONVENTION + " shipped-by-skill convention (fail closed)")
             break
         for unknown_token in analysis["unknown"]:
             rep.error("[" + ctx + "] entry " + str(entry.get("id"))
                       + " states a shipped-as token '" + unknown_token
                       + "' that is not a skill in tools/skills-manifest.json "
-                      "(D114 fail-closed: unknown shipped-as token)")
+                      "(" + COVERAGE_SHIPPED_CONVENTION + " fail-closed: unknown shipped-as token)")
         for excerpt in analysis["malformed"]:
             rep.error("[" + ctx + "] entry " + str(entry.get("id"))
                       + " contains a shipped-as phrase with no skill-shaped "
                       "token ('" + excerpt + "') "
-                      "(D114 fail-closed: malformed/no-token shipped-as)")
+                      "(" + COVERAGE_SHIPPED_CONVENTION + " fail-closed: malformed/no-token shipped-as)")
         claimed = analysis["claims"]
         if not claimed:
             continue
@@ -2599,7 +3004,7 @@ def check_coverage_map(rep: Report) -> None:
         if not isinstance(skills, list):
             rep.error("[" + ctx + "] entry " + str(entry.get("id"))
                       + " has unavailable/malformed covering_skills; cannot "
-                      "verify the D114 shipped-by-skill convention (fail closed)")
+                      "verify the " + COVERAGE_SHIPPED_CONVENTION + " shipped-by-skill convention (fail closed)")
             continue
         skills_cf = {str(name).casefold() for name in skills}
         for shipped_skill in claimed:
@@ -2607,7 +3012,7 @@ def check_coverage_map(rep: Report) -> None:
                     or entry.get("evidence_grade") != "explicit-id":
                 rep.error("[" + ctx + "] entry " + str(entry.get("id"))
                           + " states a skill was shipped as " + shipped_skill
-                          + " and must be SHIPPED/explicit-id (D114 convention)")
+                          + " and must be SHIPPED/explicit-id (" + COVERAGE_SHIPPED_CONVENTION + " convention)")
             elif shipped_skill not in skills_cf:
                 rep.error("[" + ctx + "] entry " + str(entry.get("id"))
                           + " names shipped-as skill " + shipped_skill
@@ -2640,77 +3045,59 @@ def check_coverage_map(rep: Report) -> None:
                     manifest if manifest_ready else None, covering):
                 rep.error("[" + ctx + "] entry " + str(row_id) + ": "
                           + message)
-    totals = payload.get("totals")
+    snapshot = payload.get("snapshot")
+    if not isinstance(snapshot, dict):
+        snapshot = {}
+    totals = snapshot.get("totals")
     if not isinstance(totals, dict):
-        rep.error("[" + ctx + "] totals must be an object")
+        rep.error("[" + ctx + "] snapshot.totals must be an object")
         totals = {}
-    # Rows #186/#299 are catalog-decision (non-explicit) rows and are
-    # therefore included in the planning-gate review_pending count below.
-    non_explicit_entries = [entry for entry in entries
-                            if isinstance(entry, dict)
-                            and entry.get("evidence_grade") != "explicit-id"]
-    computed = {
-        "entries": len(entries),
-        "by_area": {key: by_area[key] for key in sorted(by_area)},
-        "by_status": {key: by_status[key] for key in sorted(by_status)},
-        "by_grade": {key: by_grade[key] for key in sorted(by_grade)},
-        "by_priority": {key: by_priority[key] for key in sorted(by_priority)},
-        # Compare over the union of the computed and the pinned key sets so an
-        # unexpected/tomorrow's priority key is never silently dropped; the
-        # explicit key-set check below rejects it.
-        "gap_by_priority": {key: gap_by_priority.get(key, 0)
-                            for key in sorted(set(gap_by_priority)
-                                              | set(COVERAGE_TOTALS["gap_by_priority"]))},
-        "manifest_skills": len(manifest) if manifest is not None else 0,
-        "distinct_covering_skills": len(covering_union),
-        "beyond_roadmap_skills": (len(manifest - covering_union)
-                                  if manifest is not None else 0),
-        "review_pending": (
-            len(non_explicit_entries)
-            - sum(1 for entry in non_explicit_entries
-                  if _coverage_is_exact_int(entry.get("id"))
-                  and entry.get("id") in COVERAGE_PLANNING_GATE_RESOLVED)),
-    }
+    try:
+        computed = _coverage_compute_totals(entries, manifest)
+    except ValueError as exc:
+        rep.error("[" + ctx + "] " + str(exc))
+        return
+    scope_count_copies = _coverage_count_copy_errors(scope if isinstance(scope, str) else "", computed)
+    if scope_count_copies:
+        rep.error("[" + ctx + "] scope_note must NOT carry a coverage-total count copy; "
+                  "found " + repr(scope_count_copies))
+    by_area = computed["by_area"]
+    by_status = computed["by_status"]
+    by_grade = computed["by_grade"]
+    by_priority = computed["by_priority"]
+    gap_by_priority = computed["gap_by_priority"]
+    _coverage_check_snapshot(rep, ctx, payload, entries, manifest, computed)
     _coverage_require_exact_ints(rep, ctx, totals, "")
     gap_totals = totals.get("gap_by_priority")
     if not isinstance(gap_totals, dict) or set(gap_totals) != set(
-            COVERAGE_TOTALS["gap_by_priority"]):
+            computed["gap_by_priority"]):
         rep.error("[" + ctx + "] totals.gap_by_priority keys must be exactly "
-                  + repr(sorted(COVERAGE_TOTALS["gap_by_priority"]))
+                  + repr(sorted(computed["gap_by_priority"]))
                   + " (unexpected or missing priority keys are rejected)")
-    for key in sorted(COVERAGE_TOTALS):
+    for key in sorted(computed):
         if totals.get(key) != computed[key]:
             rep.error("[" + ctx + "] totals." + key + " is "
                       + repr(totals.get(key)) + ", expected "
                       + repr(computed[key])
                       + " (recomputed from the entries and the manifest)")
-    if computed["manifest_skills"] != COVERAGE_TOTALS["manifest_skills"]:
-        rep.error("[" + ctx + "] tools/skills-manifest.json must list "
-                  + str(COVERAGE_TOTALS["manifest_skills"]) + " skills (found "
-                  + str(computed["manifest_skills"]) + ")")
-    if computed["distinct_covering_skills"] \
-            != COVERAGE_TOTALS["distinct_covering_skills"]:
-        rep.error("[" + ctx + "] covering-skill union must be "
-                  + str(COVERAGE_TOTALS["distinct_covering_skills"])
-                  + " distinct skills (found "
-                  + str(computed["distinct_covering_skills"]) + ")")
-    if computed["beyond_roadmap_skills"] \
-            != COVERAGE_TOTALS["beyond_roadmap_skills"]:
-        rep.error("[" + ctx + "] manifest-minus-covering union must be "
-                  + str(COVERAGE_TOTALS["beyond_roadmap_skills"])
-                  + " beyond-roadmap skills (found "
-                  + str(computed["beyond_roadmap_skills"]) + ")")
+    unknown_gap_priorities = sorted({
+        str(entry.get("priority")) for entry in entries
+        if isinstance(entry, dict) and entry.get("status") == "GAP"
+        and str(entry.get("priority")) not in COVERAGE_PRIORITY_KEYS})
+    if unknown_gap_priorities:
+        rep.error("[" + ctx + "] GAP rows use unknown priority key(s) "
+                  + repr(unknown_gap_priorities) + " (only "
+                  + repr(list(COVERAGE_PRIORITY_KEYS)) + " are allowed)")
     gap_ids = tuple(entry["id"] for entry in entries
                     if isinstance(entry, dict) and entry.get("status") == "GAP")
-    if gap_ids != COVERAGE_GAP_IDS:
-        rep.error("[" + ctx + "] GAP ids differ from the pinned audit set")
     p0_gap_ids = tuple(entry["id"] for entry in entries
                        if isinstance(entry, dict)
                        and entry.get("status") == "GAP"
                        and entry.get("priority") == "P0")
-    if p0_gap_ids != COVERAGE_P0_GAP_IDS:
-        rep.error("[" + ctx + "] P0 GAP ids differ from the pinned audit set")
+
     _coverage_check_basis(rep, ctx, payload.get("basis"))
+    if skip_md:
+        return
     md_ctx = _rel(COVERAGE_MAP_MD)
     if not COVERAGE_MAP_MD.is_file():
         rep.error("[" + md_ctx + "] missing the human coverage-map summary "
@@ -2786,37 +3173,37 @@ def check_coverage_map(rep: Report) -> None:
                           + ": " + label + " is " + str(observed_count)
                           + ", expected " + str(expected_count))
     gap_heading = ("## GAP candidates (all "
-                   + str(len(COVERAGE_GAP_IDS)) + " ids)")
+                   + str(len(gap_ids)) + " ids)")
     if gap_heading not in summary_visible:
         rep.error("[" + md_ctx + "] summary must keep the '"
                   + gap_heading + "' section heading (a deleted section must "
                   "not pass vacuously)")
     summary_gap_ids = _coverage_summary_ids(
         summary_visible, gap_heading, after_colon=True)
-    if summary_gap_ids != set(COVERAGE_GAP_IDS):
+    if summary_gap_ids != set(gap_ids):
         rep.error("[" + md_ctx + "] summary GAP id set must equal the JSON "
-                  "GAP set (all " + str(len(COVERAGE_GAP_IDS)) + " ids)")
-    if not COVERAGE_GAP_IDS:
+                  "GAP set (all " + str(len(gap_ids)) + " ids)")
+    if not gap_ids:
         gap_section = _coverage_section(summary_visible, gap_heading)
         if "None." not in gap_section:
             rep.error("[" + md_ctx + "] summary GAP section must state None "
                       "when the pinned GAP set is empty")
     summary_p0_ids = _coverage_summary_ids(summary_visible, "## P0 gap candidates (all "
-                                           + str(len(COVERAGE_P0_GAP_IDS))
+                                           + str(len(p0_gap_ids))
                                            + " ids)")
-    if summary_p0_ids != set(COVERAGE_P0_GAP_IDS):
+    if summary_p0_ids != set(p0_gap_ids):
         rep.error("[" + md_ctx + "] summary P0 gap id set must equal the "
-                  "JSON P0 set (all " + str(len(COVERAGE_P0_GAP_IDS)) + " ids)")
+                  "JSON P0 set (all " + str(len(p0_gap_ids)) + " ids)")
     # The heading must exist even when the pinned set is empty; the id-set
     # equality check above is vacuously true on a missing section, so this
     # plain rendered-text check is the anti-vacuous-pass guard.
     p0_heading = ("## P0 gap candidates (all "
-                  + str(len(COVERAGE_P0_GAP_IDS)) + " ids)")
+                  + str(len(p0_gap_ids)) + " ids)")
     if p0_heading not in summary_visible:
         rep.error("[" + md_ctx + "] summary must keep the '"
                   + p0_heading + "' section heading even when the P0 GAP set "
                   "is empty (a missing section must not pass vacuously)")
-    if not COVERAGE_P0_GAP_IDS:
+    if not p0_gap_ids:
         p0_section = _coverage_section(summary_visible, p0_heading)
         if "None." not in p0_section:
             rep.error("[" + md_ctx + "] summary P0 section must state None "
@@ -2828,6 +3215,11 @@ def check_coverage_map(rep: Report) -> None:
                   "map and summary)")
 
 
+
+    display_totals = _coverage_validated_totals(totals, computed)
+    if display_totals is None:
+        display_totals = dict(computed)
+    _coverage_check_generated_summary(rep, payload, display_totals)
 
 def main() -> int:
     refresh_manifest = "--refresh-skills-manifest" in sys.argv
@@ -2842,6 +3234,46 @@ def main() -> int:
         )
         return 1
 
+    if "--write-coverage-map-md" in sys.argv:
+        try:
+            payload = json.loads(COVERAGE_MAP.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, ValueError) as exc:
+            print("ERROR writer: coverage-map.json is unreadable/not valid JSON:", exc)
+            return 1
+        if not isinstance(payload, dict):
+            print("ERROR writer: coverage-map.json root must be an object")
+            return 1
+        entries = payload.get("entries")
+        if not isinstance(entries, list):
+            print("ERROR writer: coverage-map.json must carry an entries list")
+            return 1
+        snapshot = payload.get("snapshot")
+        if not isinstance(snapshot, dict):
+            print("ERROR writer: snapshot must be an object (fail closed)")
+            return 1
+        manifest_names = _coverage_manifest_names() or set()
+        computed = _coverage_compute_totals(entries, manifest_names)
+        writer_rep = Report()
+        check_coverage_map(writer_rep, skip_md=True)
+        snapshot_totals = snapshot.get("totals")
+        _coverage_require_exact_ints(writer_rep, "writer", snapshot_totals, "")
+        if _coverage_validated_totals(snapshot_totals, computed) is None:
+            writer_rep.error("[writer] snapshot.totals must be exact ints equal "
+                             "to the derived totals")
+        _coverage_check_basis(writer_rep, "writer", payload.get("basis"))
+        if writer_rep.errors:
+            for error in writer_rep.errors:
+                print("ERROR", error)
+            print("ERROR writer refused to regenerate an invalid/stale snapshot")
+            return 1
+        try:
+            COVERAGE_MAP_MD.write_bytes(_coverage_render_summary(
+                payload, dict(computed), _coverage_area_titles()).encode("utf-8"))
+        except OSError as exc:
+            print("ERROR writer: cannot write coverage-map.md:", exc)
+            return 1
+        print("wrote", COVERAGE_MAP_MD)
+        return 0
     rep = Report()
     skills = discover_skills()
     # `_template` skips the structure checks but not V1/V2 (see docstring).
