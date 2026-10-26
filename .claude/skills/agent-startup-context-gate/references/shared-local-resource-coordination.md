@@ -88,7 +88,6 @@ cleanup() {
   if [ "$CLEANING" -eq 1 ]; then return 0; fi
   CLEANING=1
   trap '' INT TERM
-  if [ "$CREATED_LOCK" -eq 0 ]; then CLEANING=0; return 0; fi
   OWNED=0
   if [ -d "$LOCK" ]; then
     if [ -e "$LOCK/token" ]; then
@@ -100,6 +99,7 @@ cleanup() {
       OWNED=1
     fi
   fi
+  if [ "$CREATED_LOCK" -eq 0 ] && [ "$OWNED" -eq 0 ]; then CLEANING=0; return 0; fi
   if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
   if ! stop_child; then CLEANING=0; return 1; fi
   if [ "$OWNED" -eq 1 ] && [ -f "$LOCK/workload.pid" ]; then rm -f "$LOCK/workload.pid" 2>/dev/null || true; fi
@@ -129,25 +129,30 @@ on_signal() { trap '' INT TERM; echo "interrupted: stopping owned workload befor
 trap 'cleanup' EXIT
 trap 'on_signal' INT TERM
 if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock parent directory" >&2; exit 2; fi
-if ! mkdir "$LOCK"; then
-  if [ -f "$LOCK" ]; then
-    echo "LOCK MIGRATION: legacy lock file found at $LOCK; inspect and remove manually" >&2
-    exit 2
-  fi
-  if [ -d "$LOCK" ]; then
+if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock parent directory" >&2; exit 2; fi
+if [ -e "$LOCK" ] || [ -L "$LOCK" ]; then
+  if [ -f "$LOCK" ]; then echo "LOCK MIGRATION: legacy lock file found at $LOCK; inspect and remove manually" >&2; exit 2; fi
+  if [ -f "$LOCK/token" ]; then cat "$LOCK/token" >&2; fi
+  echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
+  exit 1
+fi
+TMP="$LOCK.tmp.$RUN_ID"
+if ! mkdir "$TMP"; then echo "LOCK ERROR: cannot create temporary lock directory" >&2; exit 2; fi
+MARKER="$TMP/owner.$RUN_ID"
+if ! : > "$MARKER" 2>/dev/null; then rm -rf "$TMP"; echo "LOCK ERROR: cannot create owner marker" >&2; exit 2; fi
+if ! printf '%s\n' "$TOKEN" > "$TMP/token"; then rm -rf "$TMP"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
+if ! mv -T "$TMP" "$LOCK" 2>/dev/null; then
+  if [ -e "$LOCK" ] || [ -L "$LOCK" ]; then
     if [ -f "$LOCK/token" ]; then cat "$LOCK/token" >&2; fi
     echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
+    rm -rf "$TMP"
     exit 1
   fi
-  echo "LOCK ERROR: atomic lock acquisition failed" >&2
+  rm -rf "$TMP"
+  echo "LOCK ERROR: atomic lock rename failed" >&2
   exit 2
 fi
 CREATED_LOCK=1
-MARKER="$LOCK/owner.$RUN_ID"
-if ! : > "$MARKER" 2>/dev/null; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot create owner marker; removed own lock" >&2; exit 2; fi
-TOKEN_TMP="$LOCK/token.tmp.$RUN_ID"
-if ! printf '%s\n' "$TOKEN" > "$TOKEN_TMP"; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
-if ! mv "$TOKEN_TMP" "$LOCK/token" 2>/dev/null; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot publish lock token" >&2; exit 2; fi
 # supervisor launch (stable test anchor)
 sh -c '
   echo $$ > "$1/workload.pid" || exit 1

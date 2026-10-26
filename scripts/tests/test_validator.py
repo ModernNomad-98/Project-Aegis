@@ -4360,7 +4360,7 @@ def test_readiness_startup_authority_non_mutating():
         git("config", "user.name", "")
         empty_env = dict(env); empty_env.update({"GIT_AUTHOR_NAME": "", "GIT_AUTHOR_EMAIL": "", "GIT_COMMITTER_NAME": "", "GIT_COMMITTER_EMAIL": ""})
         empty = subprocess.run(["sh", "-c", inspection], cwd=repo, env=empty_env, capture_output=True, text=True, encoding="utf-8", errors="replace")
-        assert empty.returncode != 0 and ("configured agent user.name absent" in empty.stdout or "effective author identity unavailable" in empty.stdout), (empty.returncode, empty.stdout)
+        assert empty.returncode != 0 and ("identity source not explicit" in empty.stdout or "configured agent user.name absent" in empty.stdout or "effective author identity unavailable" in empty.stdout), (empty.returncode, empty.stdout)
         git("config", "user.name", "FixtureAgent")
         ok("inspection rejects effective identity matching the recorded owner and empty effective identity")
         git("config", "user.name", "")
@@ -4371,6 +4371,16 @@ def test_readiness_startup_authority_non_mutating():
         git("config", "user.name", "FixtureAgent")
         git("config", "user.email", "agent@example.invalid")
         ok("effective env-only identity is accepted consistently with the hook")
+        global_cfg = root / "gitconfig"
+        global_cfg.write_text("[user]\n\tname = GlobalAgent\n\temail = global@example.invalid\n", encoding="utf-8")
+        git("config", "--unset", "user.name")
+        git("config", "--unset", "user.email")
+        inherited = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert inherited.returncode != 0 and "identity source not explicit" in inherited.stdout, (inherited.returncode, inherited.stdout)
+        global_cfg.write_text("", encoding="utf-8")
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        ok("inherited global non-owner identity is rejected because no explicit source exists")
         hook = repo / ".git" / "hooks" / "pre-commit"
         hook.write_text(hook_text, encoding="utf-8", newline="\n")
         hook.chmod(0o755)
@@ -4448,6 +4458,7 @@ def test_readiness_shared_lock_lifecycle():
         trailing = subprocess.run(["sh", str(script)], cwd=root, env={**env, "AEGIS_STACK_LOCK": str(lock) + "/", "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert trailing.returncode == 0 and not lock.exists(), (trailing.returncode, trailing.stderr)
         ok("trailing slash in AEGIS_STACK_LOCK is normalized")
+        if (root / "started").exists(): (root / "started").unlink()
         holder = start("printf started > started; while :; do sleep 0.05; done")
         try:
             wait_paths(lock, lock / "ready", root / "started")
@@ -4485,6 +4496,7 @@ def test_readiness_shared_lock_lifecycle():
         twice = subprocess.run(["sh", str(cleanup_harness)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert twice.returncode == 0 and not lock.exists(), (twice.returncode, twice.stderr)
         ok("repeated cleanup is idempotent")
+        if (root / "started").exists(): (root / "started").unlink()
         sig_holder = start("printf started > started; while :; do sleep 0.05; done")
         try:
             wait_paths(lock, lock / "ready", root / "started")
@@ -4497,6 +4509,7 @@ def test_readiness_shared_lock_lifecycle():
         finally:
             if sig_holder.poll() is None: sig_holder.kill(); sig_holder.communicate(timeout=5)
             clean_lock()
+        if (root / "started").exists(): (root / "started").unlink()
         incomplete = start("exec >/dev/null 2>&1; trap '' TERM; printf started > started; while :; do sleep 0.05; done")
         try:
             wait_paths(lock, lock / "ready", root / "started")
@@ -4510,6 +4523,7 @@ def test_readiness_shared_lock_lifecycle():
         finally:
             if incomplete.poll() is None: incomplete.kill(); incomplete.communicate(timeout=5)
             clean_lock()
+        if (root / "started").exists(): (root / "started").unlink()
         coll = start("printf started > started; while :; do sleep 0.05; done")
         try:
             wait_paths(lock, lock / "ready", root / "started")
@@ -4526,6 +4540,7 @@ def test_readiness_shared_lock_lifecycle():
         if hasattr(os, "geteuid") and os.geteuid() == 0:
             skip("failed owned-lock removal: running as root; removal-failure assertion UNRUN")
         else:
+            if (root / "started").exists(): (root / "started").unlink()
             rm_holder = start("printf started > started; echo $$ > rm-child.pid; trap 'exit 0' USR1; while :; do sleep 0.05; done")
             try:
                 wait_paths(lock, lock / "ready", root / "started", root / "rm-child.pid")

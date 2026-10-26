@@ -98,6 +98,12 @@ without mutating configuration or hook files:
 MISSING=0
 AGENT_NAME=$(git config --get user.name 2>/dev/null || true)
 AGENT_EMAIL=$(git config --get user.email 2>/dev/null || true)
+LOCAL_NAME=$(git config --local --get user.name 2>/dev/null || true)
+LOCAL_EMAIL=$(git config --local --get user.email 2>/dev/null || true)
+EXPLICIT=0
+[ -n "$LOCAL_NAME" ] && [ -n "$LOCAL_EMAIL" ] && EXPLICIT=1
+[ -n "${GIT_AUTHOR_NAME:-}" ] && [ -n "${GIT_AUTHOR_EMAIL:-}" ] && [ -n "${GIT_COMMITTER_NAME:-}" ] && [ -n "${GIT_COMMITTER_EMAIL:-}" ] && EXPLICIT=1
+if [ "$EXPLICIT" -eq 0 ]; then echo "STARTUP: identity source not explicit (local config or env required)"; MISSING=1; fi
 [ -n "$AGENT_NAME" ] || echo "STARTUP: configured agent user.name absent; effective identity used"
 [ -n "$AGENT_EMAIL" ] || echo "STARTUP: configured agent user.email absent; effective identity used"
 OWNER_NAME=$(git config --local --get aegis.ownerName 2>/dev/null || true)
@@ -124,6 +130,7 @@ HOOKS_PATH=$(git config --get core.hooksPath 2>/dev/null || true)
 if [ -n "$HOOKS_PATH" ]; then
   case "$HOOKS_PATH" in
     /*) HOOK_BASE="$HOOKS_PATH" ;;
+    "~/"*) HOOK_BASE="${HOME%/}/${HOOKS_PATH#~/}" ;;
     *) HOOK_BASE="$(git rev-parse --show-toplevel 2>/dev/null || pwd)/$HOOKS_PATH" ;;
   esac
 else
@@ -170,7 +177,7 @@ validates the EFFECTIVE author and committer through `git var GIT_AUTHOR_IDENT` 
 invalid effective identity, or effective owner identity in either position. Install at
 the EFFECTIVE hook path reported by inspection (resolved through `core.hooksPath` /
 `git rev-parse --git-path hooks/pre-commit`; normally `.git/hooks/pre-commit` only when
-`core.hooksPath` is unset), executable, never committed:
+`core.hooksPath` is unset), executable, never committed. Hook-file presence is not authenticity: inspect the file contents/owner/expected hash before trusting it:
 
 ```sh
 #!/bin/sh
@@ -181,6 +188,12 @@ if [ -z "$OWNER_NAME" ] || [ -z "$OWNER_EMAIL" ]; then
   echo "STOP: recorded owner identity missing; set git config --local aegis.ownerName and aegis.ownerEmail" >&2
   exit 1
 fi
+LOCAL_NAME=$(git config --local --get user.name || true)
+LOCAL_EMAIL=$(git config --local --get user.email || true)
+EXPLICIT=0
+[ -n "$LOCAL_NAME" ] && [ -n "$LOCAL_EMAIL" ] && EXPLICIT=1
+[ -n "${GIT_AUTHOR_NAME:-}" ] && [ -n "${GIT_AUTHOR_EMAIL:-}" ] && [ -n "${GIT_COMMITTER_NAME:-}" ] && [ -n "${GIT_COMMITTER_EMAIL:-}" ] && EXPLICIT=1
+if [ "$EXPLICIT" -eq 0 ]; then echo "STOP: identity source not explicit (local config or env required)" >&2; exit 1; fi
 CONFIG_NAME=$(git config --get user.name || true)
 CONFIG_EMAIL=$(git config --get user.email || true)
 if { [ -n "$CONFIG_NAME" ] && [ "$CONFIG_NAME" = "$OWNER_NAME" ]; } || { [ -n "$CONFIG_EMAIL" ] && [ "$CONFIG_EMAIL" = "$OWNER_EMAIL" ]; }; then
