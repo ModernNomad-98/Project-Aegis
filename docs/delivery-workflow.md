@@ -80,18 +80,7 @@ on the agent holding the stage:
 > library PRs elsewhere, or a selector told it must not execute what it selects,
 > both disqualify themselves.
 
-**Recorded deviation.** By this page's own map below, **no installed skill owns
-writing a plan (A), a plan-level ACCEPT/REVISE verdict (B), general implementation
-(C), or executing a selected validation tier (E).** Those four stages are
-**procedurally enforced**. The requirement is recorded as **partially met, with
-the shortfall named** — it is not asserted as compliance.
-
-**Owner decision, 2026-10-21 (accepted plan defaults; owner plan section 6.7 item 6):**
-stages A, B, C and E **stay procedurally enforced** and receive **no installed owning
-skill** in this plan — the shortfall above is accepted as **intentional** until a
-demonstrated recurring need justifies extending an existing owner. The candidate list
-below therefore stays a set of **partial-fit neighbours**, each verified against its
-own scope, and must never be presented as a stage owner.
+**Recorded status, superseded by the owner D7 decision (2026-10-25T20:51:26-07:00; OD-6 record _A/evidence/owner-decisions/OWNER-DECISION-2026-10-25T2051Z-SIX-ITEMS.md, sha256 7749905e...).** The earlier recorded deviation (2026-10-21) that kept stages A and B purely procedural is **superseded for stages A and B only**: plan-of-record-author now owns Stage A plan-of-record writing and plan-audit-reviewer owns the independent Stage B plan-level ACCEPT/REVISE audit with the captured-revision content-hash binding. Stages C and E remain procedural (C/E remain procedural). The owner's D7 wording is cited once here and governs: "D7 = YES - ratify the plan-stage skills wave (plan-of-record-author + plan-audit-reviewer), supersede the 2026-10-21 decision for stages A and B only (C and E stay procedural), and confirm defaults D1, D2, D3, D4, D6 with D5 deferred. The recurring need is demonstrated and the plan should cite it: batch-25 r1-r5, batch-26 r1-r4, pilot block B r1-r4, R4 fourteen rounds, R5 seven, R6 six, the UX extension plan r1-r4, and #913 at fifteen. PR-1's two protected scripts paths are routine count/registration edits under APR-140. Unblock Stage C now." No part of this page may reassert the superseded procedural-only claim for A or B.
 
 The list below is **illustrative and non-exhaustive**. It records what appeared
 to own each stage when this page was written; it is **not** authority, and a
@@ -101,13 +90,26 @@ the stage as **procedurally enforced** — consistent with
 
 | Stage | Candidate skill — verify its scope before relying on it |
 | --- | --- |
-| A PLAN | `ai-task-decomposer` covers breaking a broader goal into tasks that each carry an observable acceptance criterion. **No skill was found that owns writing a single change's plan**; treat that shape as procedural. |
-| B INDEPENDENT PLAN AUDIT | **No skill was found that owns a plan-level ACCEPT/REVISE audit.** `acceptance-criteria-reviewer` is a **partial** fit only: it returns one verdict per criterion (`TESTABLE` / `NEEDS-REWRITE` / `UNTESTABLE`) and by its own contract "**never decides whether work is done**". The plan-level verdict and the captured-revision binding are procedural. |
+| A PLAN | `ai-task-decomposer` covers breaking a broader goal into tasks that each carry an observable acceptance criterion. plan-of-record-author owns writing a single change's plan-of-record package (Stage A). |
+| B INDEPENDENT PLAN AUDIT | plan-audit-reviewer owns the plan-level ACCEPT/REVISE audit and the captured-revision binding (Stage B). `acceptance-criteria-reviewer` is a **partial** fit only: it returns one verdict per criterion (`TESTABLE` / `NEEDS-REWRITE` / `UNTESTABLE`) and by its own contract "**never decides whether work is done**". The plan-level verdict and the captured-revision binding are procedural. |
 | C IMPLEMENT | **No skill was found that owns general implementation.** `reviewable-diff-discipline` *(MANUAL-ONLY)* keeps a change small and reviewable when a person names it. |
 | D INDEPENDENT IMPLEMENTATION AUDIT | `code-reviewer` for product-code diffs; `library-diff-reviewer` where the PR changes the skill library — `code-reviewer`'s own contract routes library changes to it. |
 | E VALIDATE | `risk-tiered-validation-selector` **selects** a tier only; by its own contract it "only selects" and must not execute the tier it picks. **Executing** the selected checks is procedural, or belongs to whichever execution procedure the repository authorizes — not to this selector. |
 | F FINAL INDEPENDENT PR CODE REVIEW | `code-reviewer`, or `library-diff-reviewer` where the PR changes the skill library. See also `MG5`. |
 | G MERGE | `human-approval-boundary` checks for an active scoped grant before a risky action. Standing authority is `agent-authorization-matrix` *(MANUAL-ONLY)*; the merge decision itself stays procedural plus branch protection. |
+
+### Plan-of-record artifact (Stage A) and captured-revision handoff
+
+Stage A's plan-of-record artifact is a package under _A/evidence/<item>/ containing the plan, the specification annex, the acceptance-row matrix, the impact note and a binding record. The author answers the five questions owed at Stage A; the package records the exact content hashes of the plan revision that was audited (captured-revision content-hash binding), so the Stage B auditor audits a captured revision and the implementation can only later claim to follow that same captured revision. The handoff is author to independent auditor: the author never audits its own plan and the auditor never approves the implementation.
+
+### Audit findings are backlog input only
+
+Audit findings (Stage B or Stage D) are backlog input only: dedupe them against the existing backlog first, and record them only in the owner-ordered queue. They must never create a second queue or a second execution plan (backlog-input-only, never a second queue); a finding is not an instruction to widen scope.
+
+### No self-approval and rule preservation
+
+No agent may approve or audit its own work at any stage (A/B/D/F): an independent agent holds the audit and final review. Every supersession or deviation must preserve the existing machine-enforced rules unless a recorded owner decision changes them, and each change carries a rule-preservation inventory listing the rules it keeps, the rules it changes and the authority for any change.
+
 
 **One scope note this page must not widen: a selector is not an executor.**
 Naming `risk-tiered-validation-selector` as Stage E's enforcer would let an agent
