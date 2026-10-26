@@ -75,6 +75,20 @@ dco = _load_by_path(DCO_PATH, "aegis_check_dco")
 # Every satisfied expectation appends its label here, so the run ends with a
 # count rather than a bare "no news is good news".
 PASSES: list[str] = []
+SKIPS: list[str] = []
+REQUIRED_SKIPS: list[str] = []
+
+
+def ok(label: str) -> None:
+    """Record and print one satisfied readiness/hook expectation."""
+    PASSES.append(label)
+    print(f"  PASS  {label}")
+
+
+def skip(label: str) -> None:
+    """Record an explicit UNRUN/skip; skips are never passes."""
+    SKIPS.append(label)
+    print(f"  SKIP  {label}")
 
 
 def expect_error(rep, needle: str, label: str) -> None:
@@ -4439,6 +4453,206 @@ def test_coverage_map_rerun_review_regressions():
                       / "step-0-reconciliation-v4.md").read_text(encoding="utf-8")
     assert "test-only totals oracle" in reconciliation and "PINNED_ROW_TOTALS_ORACLE" in reconciliation, (
         "finding 9: D119 correction must acknowledge the test-only totals oracle")
+def _readiness_posix_ready() -> bool:
+    """The readiness process hooks are POSIX-shell proofs; other hosts skip."""
+    return sys.platform.startswith("linux") and shutil.which("sh") is not None
+
+
+def _readiness_skip(label: str) -> None:
+    """Required readiness is Linux-gated: unsupported platforms are UNRUN, not green."""
+    if sys.platform.startswith("linux"):
+        raise AssertionError("required readiness case skipped on Linux: " + label)
+    REQUIRED_SKIPS.append(label)
+    skip("UNRUN: required Linux readiness lane unavailable on " + sys.platform + ": " + label)
+
+
+def test_readiness_effective_identity_hook():
+    """AI-R01/R02: effective author+committer hook, actual commits as oracle."""
+    if not _readiness_posix_ready():
+        _readiness_skip("effective-identity hook: POSIX sh not available on this host")
+        return
+    skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
+    hook_blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", skill, re.DOTALL)
+    hook_matches = [b for b in hook_blocks if "AI-R02 effective-identity hook" in b]
+    assert len(hook_matches) == 1, "SKILL.md must publish exactly one anchored effective-identity hook"
+    hook_text = hook_matches[0]
+    assert "GIT_AUTHOR_IDENT" in hook_text and "GIT_COMMITTER_IDENT" in hook_text
+    with tempfile.TemporaryDirectory() as td:
+        repo = Path(td)
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(Path(td) / "xdg"), "GIT_CONFIG_GLOBAL": str(Path(td) / "gitconfig")})
+        def git(*args, extra=None):
+            e = dict(env); e.update(extra or {})
+            return subprocess.run(["git"] + list(args), cwd=repo, env=e, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert git("init", "-q").returncode == 0
+        hook = repo / ".git" / "hooks" / "pre-commit"
+        hook.write_text(hook_text, encoding="utf-8", newline="\n")
+        hook.chmod(0o755)
+        def hook_run(extra=None):
+            e = dict(env); e.update(extra or {})
+            return subprocess.run([str(hook)], cwd=repo, env=e, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert git("config", "user.name", "FixtureAgent").returncode == 0
+        assert git("config", "user.email", "agent@example.invalid").returncode == 0
+        assert hook_run().returncode != 0, "missing recorded owner identity must reject"
+        git("config", "--local", "aegis.ownerName", "FixtureOwner")
+        git("config", "--local", "aegis.ownerEmail", "owner@example.invalid")
+        assert hook_run().returncode == 0, "valid agent identity must pass the hook"
+        p = git("commit", "--allow-empty", "-m", "agent commit")
+        assert p.returncode == 0, p.stderr
+        ident = git("show", "-s", "--format=%an|%ae|%cn|%ce").stdout.strip()
+        assert ident == "FixtureAgent|agent@example.invalid|FixtureAgent|agent@example.invalid", ident
+        ok("actual commit uses the valid agent author and committer")
+        git("config", "user.name", "FixtureOwner")
+        git("config", "user.email", "owner@example.invalid")
+        owner_hook = hook_run()
+        assert owner_hook.returncode != 0 and "Refusing commit" in owner_hook.stderr, owner_hook.stderr
+        p = git("commit", "--allow-empty", "-m", "owner config commit")
+        assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
+        ok("owner configured identity rejected before commit")
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        p = git("commit", "--allow-empty", "-m", "owner author env", extra={"GIT_AUTHOR_NAME": "FixtureOwner", "GIT_AUTHOR_EMAIL": "owner@example.invalid"})
+        assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
+        p = git("commit", "--allow-empty", "-m", "owner committer env", extra={"GIT_COMMITTER_NAME": "FixtureOwner", "GIT_COMMITTER_EMAIL": "owner@example.invalid"})
+        assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
+        ok("environment author/committer owner overrides rejected")
+        git("config", "user.name", "FixtureOwner")
+        git("config", "user.email", "owner@example.invalid")
+        configured_owner = hook_run({"GIT_AUTHOR_NAME": "FixtureAgent", "GIT_AUTHOR_EMAIL": "agent@example.invalid", "GIT_COMMITTER_NAME": "FixtureAgent", "GIT_COMMITTER_EMAIL": "agent@example.invalid"})
+        assert configured_owner.returncode == 0, configured_owner.stderr
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        ok("configured owner plus valid env override is accepted under effective-identity policy")
+        global_cfg = repo / "gitconfig"
+        global_cfg.write_text("[user]\n\tname = GlobalAgent\n\temail = global@example.invalid\n", encoding="utf-8")
+        git("config", "--unset", "user.name")
+        git("config", "--unset", "user.email")
+        global_only = hook_run()
+        assert global_only.returncode == 0, global_only.stderr
+        env_only = hook_run({"GIT_AUTHOR_NAME": "EnvAgent", "GIT_AUTHOR_EMAIL": "env@example.invalid", "GIT_COMMITTER_NAME": "EnvAgent", "GIT_COMMITTER_EMAIL": "env@example.invalid"})
+        assert env_only.returncode == 0, env_only.stderr
+        git("config", "user.name", "FixtureOwner")
+        git("config", "user.email", "owner@example.invalid")
+        count_env = {"GIT_CONFIG_COUNT": "2", "GIT_CONFIG_KEY_0": "user.name", "GIT_CONFIG_VALUE_0": "CountAgent", "GIT_CONFIG_KEY_1": "user.email", "GIT_CONFIG_VALUE_1": "count@example.invalid"}
+        count_cfg = hook_run(count_env)
+        assert count_cfg.returncode == 0, count_cfg.stderr
+        counted = git("var", "GIT_AUTHOR_IDENT", extra=count_env)
+        assert "CountAgent" in counted.stdout and "count@example.invalid" in counted.stdout, counted.stdout
+        global_cfg.write_text("", encoding="utf-8")
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        ok("global-only, env-only and GIT_CONFIG_COUNT effective identities are accepted")
+        hooksdir = repo / ".githooks"
+        hooksdir.mkdir()
+        discovered = hooksdir / "pre-commit"
+        discovered.write_text(hook_text, encoding="utf-8", newline="\n")
+        discovered.chmod(0o755)
+        git("config", "core.hooksPath", ".githooks")
+        git("config", "user.name", "FixtureOwner")
+        git("config", "user.email", "owner@example.invalid")
+        rejected = git("commit", "--allow-empty", "-m", "core hooksPath owner must reject")
+        assert rejected.returncode != 0 and "Refusing commit" in rejected.stderr, rejected.stderr
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        p = git("commit", "--allow-empty", "-m", "core hooksPath valid agent")
+        assert p.returncode == 0, p.stderr
+        git("config", "--unset", "core.hooksPath")
+        ok("core.hooksPath discovery executes the hook: owner rejected, agent accepted")
+        p = git("-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "commit", "--allow-empty", "-m", "config override")
+        assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
+        mutated = hook_text.replace('if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then', 'if false; then')
+        assert mutated != hook_text
+        hook.write_text(mutated, encoding="utf-8", newline="\n")
+        p = git("-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "commit", "--allow-empty", "-m", "mutated config override")
+        assert p.returncode == 0, p.stderr
+        ident = git("show", "-s", "--format=%an|%ae|%cn|%ce").stdout.strip()
+        assert ident == "FixtureOwner|owner@example.invalid|FixtureOwner|owner@example.invalid", ident
+        hook.write_text(hook_text, encoding="utf-8", newline="\n")
+        ok("command-level -c override rejected; mutation removing the owner check lets it commit owner author+committer")
+        p = git("commit", "--allow-empty", "-m", "author command override", "--author=FixtureOwner <owner@example.invalid>")
+        if p.returncode == 0:
+            ident = git("show", "-s", "--format=%an|%ae|%cn|%ce").stdout.strip()
+            assert "owner@example.invalid" in ident, ident
+            ok("--author actual commit identity inspected; local hook cannot undo a post-hook --author override")
+        else:
+            assert "Refusing commit" in p.stderr or "STOP:" in p.stderr, p.stderr
+            ok("--author owner override rejected before commit with the hook message")
+        missing = hook_run({"GIT_AUTHOR_NAME": "", "GIT_AUTHOR_EMAIL": "", "GIT_COMMITTER_NAME": "", "GIT_COMMITTER_EMAIL": ""})
+        assert missing.returncode != 0 and ("effective Git author identity unavailable" in missing.stderr or "effective Git author/committer identity is missing" in missing.stderr), missing.stderr
+        ok("missing effective author/committer identity is reported and rejected")
+        git("config", "user.name", "FixtureOwner")
+        git("config", "user.email", "owner@example.invalid")
+        p = git("commit", "--allow-empty", "--no-verify", "-m", "bypass")
+        assert p.returncode == 0, "--no-verify is a documented local-hook boundary"
+        ok("--no-verify bypass recorded as a local-hook boundary, not a pass")
+
+
+def test_readiness_startup_inspection_valid():
+    """C14: valid setup inspection initializes MISSING and exits 0."""
+    if not _readiness_posix_ready():
+        _readiness_skip("startup inspection valid setup: Linux lane unavailable")
+        return
+    skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
+    match = re.search(r"```bash\n(MISSING=0\n.*?)\n```", skill, re.DOTALL)
+    assert match, "SKILL.md must publish the inspection block starting with MISSING=0"
+    inspection = match.group(1)
+    with tempfile.TemporaryDirectory() as td:
+        repo = Path(td)
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(Path(td) / "xdg"), "GIT_CONFIG_GLOBAL": str(Path(td) / "gitconfig")})
+        def git(*args):
+            return subprocess.run(["git"] + list(args), cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert git("init", "-q").returncode == 0
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        git("config", "--local", "aegis.ownerName", "FixtureOwner")
+        git("config", "--local", "aegis.ownerEmail", "owner@example.invalid")
+        run = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert run.returncode == 0, (run.returncode, run.stdout, run.stderr)
+        assert "STARTUP: effective author" in run.stdout, run.stdout
+    ok("valid setup inspection initializes MISSING and exits 0")
+
+
+def test_readiness_memory_canonical_tristate():
+    """AI-R08: ancestry/content tri-state, UNVERIFIED on errors, no boolean shortcut."""
+    if not _readiness_posix_ready():
+        _readiness_skip("canonical ancestry tri-state: POSIX sh not available on this host")
+        return
+    canon = (REPO_ROOT / "docs/semantics/canonical-semantics.md").read_text(encoding="utf-8")
+    heading = re.search(r"^##\s+3\.\s+R8 core semantics", canon, re.MULTILINE)
+    assert heading, "canonical semantics must keep the R8 section 3 heading"
+    sec = canon[heading.start():]
+    blocks = [b for b in re.findall(r"```[^\n]*\n(#!/bin/sh\n.*?)```", sec, re.DOTALL) if "ancestry_status" in b and "TARGET_PATH" in b]
+    assert blocks, "canonical semantics must publish the wrapper"
+    wrapper = hashlib.sha256(blocks[0].encode()).hexdigest()[:12]
+    assert "GIT_LITERAL_PATHSPECS=1" in blocks[0], "wrapper must set literal pathspecs"
+    assert "--no-textconv" in blocks[0] and "--no-ext-diff" in blocks[0], "wrapper must disable textconv/ext-diff"
+    with tempfile.TemporaryDirectory() as td:
+        repo = Path(td); env = {k:v for k,v in os.environ.items() if not k.startswith("GIT_")}; env.update({"GIT_CONFIG_NOSYSTEM":"1","HOME":td,"XDG_CONFIG_HOME":str(Path(td)/"xdg"),"GIT_CONFIG_GLOBAL":str(Path(td)/"gitconfig")})
+        w = repo/"wrapper.sh"; w.write_text(blocks[0], encoding="utf-8", newline="\n"); w.chmod(0o755)
+        def git(*args): return subprocess.run(["git"]+list(args),cwd=repo,env=env,capture_output=True,text=True,encoding="utf-8",errors="replace")
+        assert git("init","-q","-b","main").returncode==0
+        git("config","user.name","Fixture"); git("config","user.email","fixture@example.invalid")
+        (repo/"target").write_text("one\n",encoding="utf-8"); git("add","target"); assert git("commit","-qm","one").returncode==0
+        a=git("rev-parse","HEAD").stdout.strip()
+        (repo/"target").write_text("two\n",encoding="utf-8"); git("add","target"); assert git("commit","-qm","two").returncode==0
+        b=git("rev-parse","HEAD").stdout.strip()
+        git("checkout","-q","--orphan","stray"); (repo/"other").write_text("x\n",encoding="utf-8"); git("add","other"); assert git("commit","-qm","stray").returncode==0
+        stray=git("rev-parse","HEAD").stdout.strip()
+        assert git("checkout","-q","main").returncode==0, "canonical test must return to the main branch"
+        assert git("rev-parse","--abbrev-ref","HEAD").stdout.strip()=="main"
+        def run(base,head,target="target"):
+            e=dict(env); e.update({"BASE":base,"HEAD":head,"TARGET_PATH":target}); return subprocess.run(["sh",str(w)],cwd=repo,env=e,capture_output=True,text=True,encoding="utf-8",errors="replace")
+        same=run(b,b); assert same.returncode==0 and "ancestry_status=ancestor_or_equal" in same.stdout and "content_match_status=same" in same.stdout and "oid_match_status=same" in same.stdout
+        changed=run(a,b); assert changed.returncode==0, "wrapper exit 0 means completed, not passed"
+        assert "ancestry_status=ancestor_or_equal" in changed.stdout and "content_match_status=differs" in changed.stdout and "oid_match_status=differs" in changed.stdout
+        ok("wrapper exit 0 is completed-only: changed content record the gate must block, not a pass")
+        non=run(stray,b); assert "ancestry_status=not_ancestor" in non.stdout
+        invalid=run("deadbeef"*5,b,"target"); assert invalid.returncode!=0 and "UNVERIFIED" in invalid.stdout and "oid_match_status=UNVERIFIED" in invalid.stdout
+        empty=run(b,b,""); assert empty.returncode==2 and "UNVERIFIED" in empty.stdout
+        memrules=(REPO_ROOT/".claude/skills/agent-memory-governance/references/memory-rules.md").read_text(encoding="utf-8")
+        assert "Legacy boolean shortcut - forbidden" in memrules
+        ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut forbidden")
 
 
 TESTS = [
@@ -4511,6 +4725,9 @@ TESTS = [
     test_dco_record_parsing,
     test_startup_role_contract,
     test_atomic_stage1_question_contract,
+    test_readiness_effective_identity_hook,
+    test_readiness_startup_inspection_valid,
+    test_readiness_memory_canonical_tristate,
 ]
 
 
@@ -4534,8 +4751,15 @@ def main() -> int:
             return 1
         print()
 
+    if SKIPS:
+        print(f"SKIPPED: {len(SKIPS)} test(s) (UNRUN, not passes)")
+    if REQUIRED_SKIPS:
+        print(f"UNRUN: {len(REQUIRED_SKIPS)} required readiness case(s) did not run on this platform (non-Linux UNRUN; Linux gate remains nonzero on skip)")
     print(f"OK: {len(PASSES)} gate self-test assertion(s) passed.")
-    return 0
+    if SKIPS and sys.platform.startswith("linux"):
+        return 1
+    return 1 if (REQUIRED_SKIPS and sys.platform.startswith("linux")) else 0
+    # Non-Linux UNRUN is explicit and does not break unrelated local/Windows suites.
 
 
 if __name__ == "__main__":
