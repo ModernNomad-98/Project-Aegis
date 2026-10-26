@@ -55,10 +55,12 @@ stop_child() {
         state=$(ps -o stat= -p "$CHILD" 2>/dev/null || true)
         case "$state" in Z*) break ;; esac
       done
-      if kill -0 "$CHILD" 2>/dev/null; then
-        echo "INCOMPLETE: owned workload still live after TERM; retaining ownership" >&2
-        return 1
-      fi
+      state=$(ps -o stat= -p "$CHILD" 2>/dev/null || true)
+      case "$state" in
+        ""|Z*) wait "$CHILD" 2>/dev/null || true; CHILD=""; return 0 ;;
+      esac
+      echo "INCOMPLETE: owned workload still live after TERM; retaining ownership" >&2
+      return 1
     fi
     wait "$CHILD" 2>/dev/null || true
     CHILD=""
@@ -73,7 +75,7 @@ cleanup() {
     if [ -e "$LOCK/token" ]; then
       current="$(cat "$LOCK/token" 2>/dev/null || true)"
       if [ "$current" = "$TOKEN" ]; then OWNED=1; fi
-    else
+    elif [ -e "$LOCK/owner.$RUN_ID" ]; then
       OWNED=1
     fi
   fi
@@ -89,7 +91,11 @@ cleanup() {
         return 1
       fi
       if ! rm -rf "$QUAR"; then
-        echo "INCOMPLETE: failed to remove quarantined lock; evidence retained" >&2
+        if [ ! -e "$LOCK" ] && mv "$QUAR" "$LOCK" 2>/dev/null; then
+          echo "INCOMPLETE: quarantine removal failed; owned lock restored" >&2
+        else
+          echo "OWNERSHIP LOST: quarantine $QUAR retained; lock path $LOCK unavailable" >&2
+        fi
         return 1
       fi
     fi
@@ -111,6 +117,8 @@ if ! mkdir "$LOCK"; then
   exit 2
 fi
 CREATED_LOCK=1
+MARKER="$LOCK/owner.$RUN_ID"
+if ! : > "$MARKER" 2>/dev/null; then echo "LOCK ERROR: cannot create owner marker" >&2; exit 2; fi
 TOKEN_TMP="$LOCK/token.tmp.$RUN_ID"
 if ! printf '%s\n' "$TOKEN" > "$TOKEN_TMP"; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
 if ! mv "$TOKEN_TMP" "$LOCK/token" 2>/dev/null; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot publish lock token" >&2; exit 2; fi
