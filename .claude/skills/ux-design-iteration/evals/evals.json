@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "ux-design-iteration",
-  "description": "Behaviour cases for the optional pre-implementation design iteration method (33 cases: the 13 original cases E1-E13, PR-1 extension cases E14-E18 and E20-E29, the E19 clickthrough-decline case, the E30 proof-set/reference single-source case, and PR-2 proof-set cases E31-E33). E19 is delivered per canonical R8-UX-4, which fixes clickthrough status/lifecycle and the post-implementation placement; canonical R8-UX-3 fixes only the five pre-implementation fields and readiness/Supporting Files sync, never the clickthrough field. E30 is delivered via SKILL 1.4/5 proof-set single source, with canonical R8-UX-3 cited only for record-schema/readiness overlap. E19 and E30 are behavioural prompt/assertion cases, not JSON/schema validators and not host-executed. clickthrough_unrun_reason (clickthrough attempts) and proof_set.unrun_reason (proof-set attempts) are distinct scoped enums and are never interchangeable. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14-E18, E19, E20-E30 and E31-E33. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
+  "description": "Behaviour cases for the optional pre-implementation design iteration method (33 cases: the 13 original cases E1-E13, PR-1 extension cases E14-E18 and E20-E29, the E19 clickthrough-decline case, the E30 proof-set/reference single-source case, and PR-2 proof-set cases E31-E32 and the E33 clickthrough lifecycle/schema/migration case). E19 is delivered per canonical R8-UX-4, which fixes clickthrough status/lifecycle and the post-implementation placement; canonical R8-UX-3 fixes only the five pre-implementation fields and readiness/Supporting Files sync, never the clickthrough field. E30 is delivered via SKILL 1.4/5 proof-set single source, with canonical R8-UX-3 cited only for record-schema/readiness overlap. E19 and E30 are behavioural prompt/assertion cases, not JSON/schema validators and not host-executed. clickthrough_unrun_reason (clickthrough attempts) and proof_set.unrun_reason (proof-set attempts) are distinct scoped enums and are never interchangeable. Host-executed subset: E1-E8 and E10 (E3 is exercised by the main host journey; its evidence is in the same host-demo manifest); not executed (unrun): E9, E11, E12, E13, E14-E18, E19, E20-E30 and E31-E33. Every case is a behavioural prompt/assertion case; none is a JSON/schema validator.",
   "canonical_semantics": {
     "path": "docs/semantics/canonical-semantics.md",
     "covers": [
@@ -556,17 +556,19 @@
     {
       "id": "E33",
       "type": "should_trigger",
-      "prompt": "A clickthrough record has an accepted decision with no run attempt yet; later an attempt is executed with evidence; later still the user declines a re-offer, and a newer offer is then made and left unanswered. Separately, a legacy v1 record has a legacy offered turn and a top-level UNRUN reason, and you must place events in order. Record the current status truthfully and explain the ordering and migration rules.",
+      "prompt": "A clickthrough record has an accepted decision with no run attempt yet; later an attempt is executed with evidence; later still the user declines a re-offer, and a newer offer is then made and left unanswered. Separately, a legacy v1 record has a legacy offered turn and a top-level UNRUN reason but no accepted decision, and you must place events in order. Record the current status truthfully and explain the ordering and migration rules.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Defines every R3 branch: accepted-pending -> offered, accepted-executed -> offered (with execution evidence in run_attempts), later decline -> declined, and a newer unanswered offer after a decline/UNRUN -> offered with no invented answer.",
-          "Uses seq as the only cross-array ordering key; unique increasing seq covers offer_events, offer_turns and run_attempts; duplicate/non-increasing seq fails closed as an invalid record, not reordered by turn/at.",
-          "Treats run_attempts as the single execution authority: executed requires non-empty execution_evidence; current UNRUN requires top-level clickthrough_unrun_reason/defect_classes that exactly project the latest blocked/impossible attempt; no top-level execution_evidence.",
-          "Migrates a legacy v1 record at read time (legacy offered turn -> offer_events; declined/accepted -> offer_turns with decided_by user; legacy UNRUN -> one run_attempt carrying reason/defect classes/evidence; arrays initialized; idempotent save as schema_version 2) without rejecting it.",
-          "Keeps declined/offered current status free of current defect classes; archived run_attempt evidence is never promoted to PASS; accepted is never a fourth stored status."
+          "Defines every R3 branch after structural validation: accepted-pending -> offered, accepted-executed -> offered with execution evidence, later decline -> declined, and a newer unanswered offer after a decline/UNRUN -> offered with no invented answer.",
+          "Performs structural validation first: duplicate/non-increasing seq, decision without a preceding offer, orphan run_attempt, accepted-without-offer, re-offer followed by run without new acceptance, and stored-status/projection mismatch all fail closed as status_invalid, never as a valid declined/offered/deferral.",
+          "Uses seq as the only cross-array ordering key and the HIGHEST-seq run_attempt for accepted execution; every write recomputes or clears the top-level UNRUN projections and the stored status must equal the projection.",
+          "Migrates a legacy v1 record deterministically: offered turn -> offer_events; declined/accepted -> offer_turns with decided_by user; accepted + top-level execution_evidence/no-UNRUN -> executed run_attempt with the highest seq (evidence preserved); legacy UNRUN with accepted decision -> blocked/impossible attempt with the highest seq; legacy UNRUN without an accepted decision -> status_invalid migration_error with evidence preserved and remediation (no invented answer); unsupported schema_version fails closed.",
+          "Keeps declined/offered current status free of current defect classes; archived run_attempt evidence is never promoted to PASS; accepted is never a fourth stored status; consumers are told to consult offer_turns/run_attempts because the single status is overloaded."
         ]
-      }
+      },
+      "host_evidence": false,
+      "evidence_pointer": null
     }
   ]
 }
