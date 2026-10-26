@@ -6898,3 +6898,238 @@ Stage A planning agent, which did not write the owner decision and names no
 authority of its own. **Recorded by:** the Stage C implementing agent, which
 names its exact model in the pull request body and the commit message that
 carry this append, as the register's naming rule requires.
+
+### AEGIS-APR-142: AEGIS-APR-140 extension — pull requests whose only protected paths are under tools/behavioral_eval_runner/
+
+- **Event:** POLICY DECISION — records the owner's direct 2026-10-25 10:17:21 PDT
+  decision (OD-1) clause (2), extending **AEGIS-APR-140 (a)-(f)** to pull requests whose
+  only protected paths are under **tools/behavioral_eval_runner/**, with condition (a)
+  specialized as quoted below. **Effective as recorded:** the extension derives from the
+  owner decision; this entry adds no waiver, no check change and no other authority.
+- **Date / Grantor:** 2026-10-25 (decision received 2026-10-25T10:17:21-07:00 /
+  17:17:21Z) / **Peter Nguyen**, direct session instruction, preserved verbatim in the
+  workspace file
+  `_A/evidence/owner-decisions/OWNER-DECISION-2026-10-25T1017Z-912-TOOLS-EXTENSION.md`
+  (**2,101 B / 9 LF / sha256 3453d35a761c50bcf6baa42991b3d4dfde99770dae4285fcc2bb74673f71a7b4**).
+- **Filename note:** that workspace filename's leading timestamp uses local Pacific clock
+  digits (1017 = 10:17 PDT), **not UTC**; the decision time is 10:17:21-07:00 /
+  17:17:21Z. The `-912-` suffix ties the preserved file to the **#912** one-time
+  authorization that clause (1) authorized; the file's subject is the
+  tools/behavioral_eval_runner extension, not #912 alone.
+- **Owner decision clause (1), verbatim (the one-time #912 authority):** OD-1 file
+  clause (1) (line wrapping below is editorial; the authoritative byte strings are in the
+  OD-1 file, sha256 3453d35a..., and in the lane's transcription comment 6407991132):
+
+  > (1) Authorize merge of #912 at exact head bddedc69ff1a0e2f54ee095ff1726d0417cf2862
+  > / bound-fields hash afff1d94d3048c24, as a one-time gate-guard exception for its
+  > protected paths under tools/behavioral_eval_runner/, via disclosed administrator
+  > merge citing the posted SD-F 6394142116. Receipt quotes this decision verbatim with
+  > timestamp and source.
+- **Owner decision clause (2), verbatim (the extension recorded here):** OD-1 file
+  clause (2):
+
+  > (2) EXTEND the standing exception: AEGIS-APR-140's conditions (a)-(f) apply equally
+  > to pull requests whose only protected paths are under tools/behavioral_eval_runner/,
+  > with (a) read as "Stage F states which runner checks, schema validations or scoring
+  > rules the PR adds, removes or weakens, and nothing is removed or weakened." Record
+  > it in the register by PR as the next item after #913 merges, quoting this decision
+  > verbatim.
+- **OD-6 item 6 (ratification and ordering), verbatim:** owner's 2026-10-25T20:51:26-07:00
+  decision, file
+  `_A/evidence/owner-decisions/OWNER-DECISION-2026-10-25T2051Z-SIX-ITEMS.md`
+  (**4,183 B / 24 LF / sha256 7749905ec50c0ed04a05d0b9597d7e7352bab3653deadbd6fa84f8c0a97d846c**):
+
+  > 6. #912 one-time authority: RATIFIED. The 10:17 PDT decision (OD-1) was mine, issued
+  > in the chat and quoted verbatim in STATUS 6405202059. Transcribe it with the
+  > tools/behavioral_eval_runner extension as APR-142 and the R1 clarification as
+  > APR-143. Do NOT queue that docs-only register PR behind #913 — it shares no files
+  > with anything open; open it now.
+- **Ordering:** OD-6 item 6 supersedes OD-1's "next item after #913 merges" ordering for
+  this transcription; this register PR is opened now under OD-6 item 6, not queued behind
+  #913. OD-6 items 1-5 are recorded in the owner-decision file above and in the stage
+  records of the PRs they name (the #913 reset ladder, the #915 REV-12 ladder, the D7
+  plan-stage skills wave, the AD-10 ratification, and the AD-11/AD-12 ratification); they
+  are not transcribed into this register by this pair of entries.
+- **Effect / conditions:** for a pull request whose **only** protected paths are under
+  `tools/behavioral_eval_runner/`, **AEGIS-APR-140 conditions (a)-(f) apply equally**, with
+  **(a) specialized** to: *Stage F states which runner checks, schema validations or
+  scoring rules the PR adds, removes or weakens, and nothing is removed or weakened.* All
+  other APR-140 conditions, required checks, receipt obligations and the no-waiver rule
+  are unchanged. **Condition (a) is quoted verbatim above and is not expanded by this
+  entry**; it does not itself enumerate every changed path under the directory. This is
+  **not** a general protected-path exception and **not** a
+  gate-guard waiver; any other protected path remains outside it. **Exception vs
+  waiver:** an *exception* is the pre-authorized APR-140 route with its stated conditions;
+  a *waiver* — releasing a required check without those conditions — is never permitted by
+  this entry.
+- **Gate-pattern anchor and match semantics (verified from source at the recording base
+  ed753df7):** the guard pattern line is `.github/workflows/validate-skills.yml:576`; it
+  contains the alternative `tools/behavioral_eval_runner/`. The guard enables
+  `shopt -s nocasematch` (line 577) and tests each changed path with
+  `[[ "$path" =~ $gate_pattern ]]` (line 582) over `$RUNNER_TEMP/aegis-changed-files`
+  (lines 580/585); a matching path is added to gate_files and exits 1 as a
+  protected-path change (lines 586-591). Pattern excerpt, wrapped for readability:
+  `… | tools/behavioral_eval_runner/ | requirements(-ci)?\.txt$)` — the alternative ends
+  in `/`, so it matches a changed path **under** that directory, e.g.
+  `tools/behavioral_eval_runner/run.py`, and a changed-path entry equal to
+  `tools/behavioral_eval_runner/`; a bare `tools/behavioral_eval_runner` path with no
+  trailing slash does **not** match that alternative. Matching is the bash regex above
+  under `nocasematch`. The full pattern begins with `^(` (anchored at the start of the
+  changed path), so the alternative is a prefix rule for paths under that directory; the
+  match is case-insensitive because of `nocasematch`. A `.py` file under the directory also
+  matches the extension alternatives independently of the directory rule. No other
+  protected pattern is altered by this entry.
+- **Related entries:** **AEGIS-APR-140 (a)-(f)** (extended); **AEGIS-APR-002 / 013 / 048 /
+  049 / 050** (standing grants; not changed); **AEGIS-APR-141** (cited by entry heading,
+  not by line number; its point-3 sentence is clarified by **APR-143 below** — a forward
+  reference within this append).
+- **OD-1 one-time authorization recorded (#912):** the clause (1) authority was consumed
+  by the **#912** merge at exact head
+  **bddedc69ff1a0e2f54ee095ff1726d0417cf2862** / bound hash
+  **afff1d94d3048c24**, citing SD-F **6394142116**. It is recorded once, here; APR-143
+  cross-references this bullet, and it authorizes no other PR.
+- **Evidence:** OD-1 and OD-6 file identities above; the `_A/evidence/...` paths are
+  **workspace-local recording artifacts, not part of the repository** (not externally
+  reachable); the durable anchors are the quoted owner text in this entry and the recorded
+  identities, and the lane's OD-6 transcription comment **6407991132** is the public
+  confirmation request. Register baseline at the recording base
+  (main `ed753df7fdc42c5f5a1de3a7bb89ae7771b5ac72`):
+  **467,426 B / 6,900 LF / 0 CR / sha256
+  f4b1d85e2a461c8887bee60e12e4b4894547237a4d2497eba21b8c3ffe3f9da2** (blob
+  `4fff95ca215ace7ab663c150865ef0d447e58f49`). At that base **AEGIS-APR-142 was the next
+  free ID** (no `AEGIS-APR-142` existed), and this entry is a **pure append: no existing
+  line is edited**.
+- **Expiry / use limit:** none stated by the owner and none invented here; the recorded
+  extension stands until a later appended owner event revokes, replaces or supersedes it.
+- **New authority:** this entry adds no waiver, no check change and no authority beyond the
+  recorded extension of AEGIS-APR-140 (a)-(f) to the stated path set; it does not authorize
+  #913 (the open F-04 closure PR that OD-6 item 1 resets), #915 (the open ordered-outage
+  contract PR in review) or any other merge.
+- **Glosses for the labels this entry uses:** **POLICY DECISION** — register event type
+  that records a ruling and grants no work. **Recording-only / effective as recorded** —
+  the entry transcribes an owner decision; it creates no authority of its own. **Protected
+  path** — a changed path matched by the gate pattern above. **Gate-guard exception** —
+  the pre-authorized APR-140 route for protected-path PRs under its conditions.
+  **Exception vs waiver** — defined in the Effect bullet. **No-waiver rule** — a failed,
+  skipped or unrun required check is never a pass. **SD-F** — the Stage F final-review
+  verdict posted as a PR issue comment naming the exact 40-character head and a bound-fields
+  hash. **Bound hash / bound-fields hash** — the PROC-04 sha256 over the PR body's bound
+  fields (64 hex characters), cited by its 16-character short form; it is **not** a commit.
+  **Exact head** — the specific **40-character** commit the checks and verdicts bind to.
+  **Merge commit** — the separate commit created by the merge, not the PR head itself.
+  **Nemesis Reply Desk** — the relay channel that carries owner dashboard replies into
+  issue #910. **R1** — the owner merge-route confirmation item recorded in the AD-1 route
+  discussion; the relayed reply recorded in APR-143 is recorded as its clarification.
+  **STATUS 6405202059** — the hourly STATUS comment on issue #910 in which OD-1 was quoted
+  verbatim at the time of the decision.
+- **Text drafted by:** DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness), Stage A
+  lineage, which did not write the owner decision. **Recorded by:** the Stage C
+  implementing agent sd-c — **DeepSeek V4 Flash (registered id deepseek-flash @
+  deepseek-account; DeepSeek Harness)** — which names its exact model in the pull request
+  body and the commit message that carry this append.
+
+### AEGIS-APR-143: Clarification of AEGIS-APR-141 point 3 — standing administrator-merge grants remain valid for PRs touching no protected path
+
+- **Event:** POLICY DECISION — records the owner's relayed clarification of
+  **AEGIS-APR-141 point 3** (the sentence "Merge approvals come only from my dashboard,
+  bound to the exact head, and the existing register still governs"). **Effective as
+  recorded:** it revokes nothing and grants nothing new.
+- **Date / Grantor:** owner reply relayed **2026-10-25T16:20:31-07:00**
+  (2026-10-25T23:20:31Z) through the Nemesis Reply Desk, issue **#910** comment
+  [6404872533](https://github.com/ModernNomad-98/Project-Aegis/issues/910#issuecomment-6404872533)
+  / **Peter Nguyen**. 16:20:31 is the **relay receipt time**, not necessarily the owner's
+  utterance time.
+- **Owner's words (verbatim):**
+
+  > Standing admin merge remains valid
+
+  (Five words; quoted exactly as relayed in comment 6404872533; the relay names no grants, PRs
+  or protected-path status.)
+- **Relay identity:** relay id **u2q1waukdmzzy12ij513**; relay comment sha256
+  **d0fee0a4a951eb3fa6c05cd810e72977610d4dd640ead8aeb9a8f44a4d3e2854**; sha256 of the
+  owner's words alone **b78bc251f06fd6f6eaa538a19696abdddd05e3e4e8260138a54762b3275add27**
+  (over the exact quoted byte string, no trailing newline).
+- **R1 context (inference):** R1 is the owner merge-route confirmation item named in the
+  relay comment itself ("Item: aegis-docs-preapproval (R1, AD-1 route)"). The relay's
+  brief cites the register's `AEGIS-APR-141 point 3` (lines 6790-6840), so this entry
+  maps that reply to **AEGIS-APR-141 point 3 by inference from the relay comment text**
+  (comment 6404872533) — not by a separately recorded owner statement. The relay brief's
+  line reference is evidence only, not this entry's citation convention. OD-6 item 6
+  orders the transcription of "the R1 clarification as APR-143".
+- **Reading recorded:** for a pull request that touches **NO protected path**, the standing
+  administrator-merge grants in this register — **AEGIS-APR-002, AEGIS-APR-013,
+  AEGIS-APR-048, AEGIS-APR-049, AEGIS-APR-050** — remain valid and may be used, **subject
+  to each grant's own conditions (exact head, receipt, binding, check state)**; the
+  AEGIS-APR-141 point 3 sentence does not revoke them. This "no protected path" scope is
+  the **agent's interpretation pending owner confirmation**, like the mapping itself; the
+  relayed sentence names no grants, PRs or protected-path status. It is recorded here as
+  the owner's verbatim words, not as a specific grant-to-PR ruling.
+- **Use attribution — agent determination, owner confirmation pending:** the register
+  records **#914** and **#916** only as **uses claimed under these grants**, each subject
+  to its own entry's conditions and recorded identifiers, as determined by the agent (not
+  stated by the relayed sentence): **#914** — merge commit
+  **62bd461f808f29d523ca9684f494e2e756390384**, head
+  **d8f02b02cfd894f3b550561cf33f9cec25285f33**, SD-F **6401896475** bound to
+  **59c54bb1d060eed3**; **#916** — merge commit
+  **ed753df7fdc42c5f5a1de3a7bb89ae7771b5ac72**, head
+  **d61941315fff05ecc4f2fd64c960529bf20a10e7**, fresh SD-F **6405178163** bound to
+  **7db8fa27279883cd**. **No specific grant (APR-002/013/048/049/050) is identified per PR
+  here, and their protected-path status is not recorded in this entry** (it is subject to
+  each PR's own record). The direct owner confirmation of this mapping is **pending**: the lane's OD-6
+  transcription comment **6407991132** asks the owner to confirm or reject the quoted
+  text, and no confirmation is recorded. **No retroactive validation claim is made** by
+  this entry; if the owner confirms, corrects or rejects the mapping, a later appended
+  entry records that.
+- **OD-1 one-time authorization (#912) — cross-reference:** see APR-142's "OD-1 one-time
+  authorization recorded (#912)" bullet; it is not duplicated here.
+- **Does not cover:** a protected-path pull request; a gate-guard failure or waiver; the
+  #909 merge (**#909** — the closed residual token fail-closed PR, merged earlier under its
+  own route); **#913** (the open F-04 closure PR that OD-6 item 1 resets); **#915** while
+  it was in review (**#915** — the open ordered-outage contract PR; its protected-path
+  status is recorded in its own PR/stage records; this entry decides neither); or any merge
+  already made outside the quoted grants and conditions. **Recording-only clarification;
+  the underlying grant conditions are unchanged.**
+- **Related entries:** **AEGIS-APR-141 point 3** (clarified; text not edited; cited by
+  entry heading, not by line number); **AEGIS-APR-002 / 013 / 048 / 049 / 050** (grants
+  preserved with their own conditions); **AEGIS-APR-142** (related entry: the
+  tools/behavioral_eval_runner **extension**; this entry is the R1 **clarification**; both
+  are recorded under the OD-6 ratification).
+- **Evidence:** #910 comment 6404872533 permalink and relay ids/hashes above; the relay
+  brief cites APR-141 point 3 lines 6790-6840; OD-6 file identity above
+  (4,183/24/7749905e...); OD-6 transcription comment 6407991132 (owner confirmation
+  request). The `_A/evidence/...` paths are **workspace-local recording artifacts, not
+  part of the repository** (not externally reachable). Register baseline at main
+  `ed753df7...`: **467,426/6,900/0/f4b1d85e...** (blob
+  `4fff95ca215ace7ab663c150865ef0d447e58f49`). At that base, **AEGIS-APR-142 — not
+  APR-143 — was the next free ID**; APR-143 is the **next free ID after the APR-142
+  append in this PR** (no `AEGIS-APR-143` existed at that point). **No separate commit or
+  synthetic intermediate pre-image identity is claimed**: the intermediate post-APR-142
+  state is not committed on its own. The verifiable anchors are the un-appended main
+  baseline **467,426 B / 6,900 LF / 0 CR / sha256 f4b1d85e...** (blob
+  `4fff95ca215ace7ab663c150865ef0d447e58f49`) and the **register file at the pull
+  request's head commit** (the appended state; the head commit and its file identity are
+  recorded in the pull request's Stage C record). **Pure append: no existing line is
+  edited.**
+- **Expiry / use limit:** none stated by the owner and none invented; stands until a later
+  appended owner event revokes, replaces or supersedes it.
+- **New authority:** **None.** This clarification records the reading of existing grants
+  (subject to their own conditions); the grants' authority is the owner's, and this entry
+  only records it. It creates no grant, waiver, expiry or consumption, changes no other
+  entry's standing, and authorizes no merge by itself. **Residual risk note:** the
+  APR-142 exception covers executable runner code; existing review, code-owner and
+  secret-handling controls are unchanged and are not relaxed by this entry.
+- **Glosses for the labels this entry uses:** **POLICY DECISION** — register event type
+  that records a ruling and grants no work. **Standing administrator-merge grant** — the
+  pre-authorized owner route for merges once its conditions are met at the exact head.
+  **Exact head** — the specific 40-character commit the checks and verdicts bind to.
+  **Bound hash** — PROC-04 sha256 over the body's bound fields (64 hex, cited by its
+  16-character short form); not a commit. **Merge commit** — the separate commit created by
+  the merge, not the PR head. **Relay** — owner words conveyed by an agent (dashboard
+  reply), recorded with identities. **Recording-only / effective as recorded** — the entry
+  transcribes owner words and creates no authority of its own. **SD-F**, **Nemesis Reply
+  Desk**, **R1** and **STATUS 6405202059** are glossed in APR-142.
+- **Text drafted by:** DeepSeek V4 Flash (deepseek-flash, DeepSeek Harness), Stage A
+  lineage, which did not write the owner decision. **Recorded by:** the Stage C
+  implementing agent sd-c — **DeepSeek V4 Flash (registered id deepseek-flash @
+  deepseek-account; DeepSeek Harness)** — which names its exact model in the pull request
+  body and the commit message that carry this append.
