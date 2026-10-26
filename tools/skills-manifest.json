@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "a967a8bfae3645496f836c78fc0a4de13ace4971",
+  "source_revision": "4bd2eebde4c0c9ba25befb603103f96806bde791",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -571,7 +571,7 @@
     {
       "name": "human-approval-boundary",
       "path": ".claude/skills/human-approval-boundary/SKILL.md",
-      "sha256": "162c008e5ea7ea74d3b14c2d7fadadbf052eab6dd748d757a6927182f7be0a60"
+      "sha256": "4efcb7251333c9da12b1d1909c4a7e0d7c09de73220e230519cceadb6af648a8"
     },
     {
       "name": "iac-reviewer",
