@@ -3808,8 +3808,13 @@ def test_coverage_map_batch4_deliveries():
         live_payload, live_totals, validator._coverage_area_titles()), (
         "generated summary must be deterministic")
     md_lines = rendered.split(NL_JOIN)
-    assert md_lines.index("**Pointer integrity (stable anchors, DS-4b migration).** The migrated") == 8, (
-        "line 9 must carry the pointer-integrity paragraph")
+    optionality_index = next(index for index, line in enumerate(md_lines)
+                             if line.startswith("**Optionality.**"))
+    assert md_lines[optionality_index + 1] == "", (
+        "a blank line must separate the optionality and pointer-integrity paragraphs")
+    assert md_lines[optionality_index + 2].startswith(
+        "**Pointer integrity (stable anchors, DS-4b migration).**"), (
+        "the pointer-integrity paragraph must follow the blank line")
     totals_start = md_lines.index("| Measure | Value |")
     totals_end = next(index for index, line in enumerate(md_lines)
                      if line.startswith("| Review pending |"))
@@ -4182,6 +4187,124 @@ def test_skills_manifest_provenance():
             + entry["path"])
 
 
+def test_coverage_map_rerun_review_regressions():
+    """Nine HIGH merged-DS-7c re-run review findings: regressions for fixes 1-8 and D119 wording note."""
+    payload = json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    manifest = validator._coverage_manifest_names()
+    computed = validator._coverage_compute_totals(payload["entries"], manifest)
+
+    # 1. Generated summary keeps a blank line between Optionality and Pointer integrity.
+    rendered = validator._coverage_render_summary(
+        payload, computed, validator._coverage_area_titles())
+    md_lines = rendered.split(NL_JOIN)
+    optionality_index = next(index for index, line in enumerate(md_lines)
+                             if line.startswith("**Optionality.**"))
+    assert md_lines[optionality_index + 1] == "", (
+        "finding 1: a blank line must separate Optionality and Pointer integrity")
+    assert md_lines[optionality_index + 2].startswith(
+        "**Pointer integrity (stable anchors, DS-4b migration).**"), (
+        "finding 1: Pointer integrity must follow the blank line")
+
+    # 2. A pipe in an area title is escaped with exactly one backslash.
+    first_area = sorted(validator.COVERAGE_AREA_RANGES)[0]
+    pipe_titles = {area: "A|B" for area in validator.COVERAGE_AREA_RANGES}
+    piped = validator._coverage_render_summary(payload, computed, pipe_titles)
+    area_line = next(line for line in piped.split(NL_JOIN)
+                     if line.startswith("| " + first_area + " "))
+    assert "\\|" in area_line, (
+        "finding 2: pipe in an area title must be escaped with a single backslash: "
+        + area_line)
+    assert "\\\\|" not in area_line, (
+        "finding 2: pipe must not be double-escaped: " + area_line)
+
+    # 3. Count-copy guard scans every ledger entry at/after the bound entry.
+    base_ledger = validator.COVERAGE_RECON_PATH.read_text(encoding="utf-8")
+    def _check_ledger(text):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.md"
+            path.write_text(text, encoding="utf-8", newline=NL_JOIN)
+            original = validator.COVERAGE_RECON_PATH
+            validator.COVERAGE_RECON_PATH = path
+            try:
+                rep = validator.Report()
+                validator._coverage_check_snapshot(
+                    rep, "followup-ledger", payload, payload["entries"],
+                    manifest, computed)
+                return list(rep.errors)
+            finally:
+                validator.COVERAGE_RECON_PATH = original
+    assert _check_ledger(base_ledger) == [], "finding 3: clean ledger must pass"
+    later_count = (base_ledger + NL_JOIN + "- **2026-10-27 - D999: totals="
+                   + str(computed["entries"]) + ".**")
+    assert any("coverage-total count copy" in error
+               for error in _check_ledger(later_count)), (
+        "finding 3: a later ledger entry with a stale count must be rejected")
+
+    # 4. Count-copy regex catches hyphenated and space-separated forms.
+    for phrase in ("300-row", "85-of-254", "totals 300"):
+        assert validator._coverage_count_copy_errors(phrase, computed), (
+            "finding 4: count-copy regex must catch " + repr(phrase))
+    assert validator._coverage_count_copy_errors("9", computed) == [], (
+        "finding 4: an unrelated small number must stay allowed")
+
+    # 5. Shipped analysis and totals share the set/frozenset manifest guard.
+    for bad_manifest in (["a"], "a", {"a": 1}, 123):
+        for label, call in (
+                ("shipped", lambda m=bad_manifest: validator._coverage_shipped_analysis(
+                    "no shipped-as phrase here", m)),
+                ("totals", lambda m=bad_manifest: validator._coverage_compute_totals([], m))):
+            try:
+                call()
+            except ValueError:
+                pass
+            else:
+                raise AssertionError(
+                    "finding 5: " + label + " accepted a non-set manifest "
+                    + repr(bad_manifest))
+
+    # 6. Unknown GAP priority is filtered from computed totals so exactly one
+    #    clear unknown-priority error remains (no contradictory key-set error).
+    with tempfile.TemporaryDirectory() as tmp:
+        def _gap_p3(target):
+            row = target["entries"][0]
+            row["status"] = "GAP"
+            row["evidence_grade"] = "none"
+            row["priority"] = "P3"
+            row["covering_skills"] = []
+            row["evidence"] = None
+            row["rationale"] = "probe"
+        with mutated_coverage(Path(tmp), _gap_p3) as rep:
+            assert any("unknown priority key" in error for error in rep.errors), rep.errors
+            assert not any("gap_by_priority keys must be exactly" in error
+                           for error in rep.errors), rep.errors
+
+    # 7. Snapshot totals must be exact integers (True/float rejected).
+    for bad_total in (True, float(computed["entries"])):
+        bad_payload = json.loads(json.dumps(payload))
+        bad_payload["snapshot"]["totals"]["entries"] = bad_total
+        rep = validator.Report()
+        validator._coverage_check_snapshot(
+            rep, "followup-totals", bad_payload, bad_payload["entries"],
+            manifest, computed)
+        assert any("exact-integer" in error or "exact integer" in error
+                   for error in rep.errors), (bad_total, rep.errors)
+
+    # 8. Invalid d_entry returns immediately: one clear error, no cascade.
+    bad_d_entry = json.loads(json.dumps(payload))
+    bad_d_entry["snapshot"]["d_entry"] = "bad"
+    rep = validator.Report()
+    validator._coverage_check_snapshot(
+        rep, "followup-d-entry", bad_d_entry, bad_d_entry["entries"],
+        manifest, computed)
+    assert len(rep.errors) == 1 and "d_entry" in rep.errors[0], rep.errors
+
+    # 9. D119 wording acknowledges the intentional test-only totals oracle.
+    reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
+                      / "step-0-reconciliation-v4.md").read_text(encoding="utf-8")
+    assert "test-only totals oracle" in reconciliation and "PINNED_ROW_TOTALS_ORACLE" in reconciliation, (
+        "finding 9: D119 correction must acknowledge the test-only totals oracle")
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -4208,6 +4331,7 @@ TESTS = [
     test_coverage_map_batch3_deliveries,
     test_coverage_map_step0_hygiene,
     test_coverage_map_batch4_deliveries,
+    test_coverage_map_rerun_review_regressions,
     test_coverage_map_batch5_deliveries,
     test_coverage_map_batch5_covering_owner_assumptions,
     test_skills_manifest_provenance,
