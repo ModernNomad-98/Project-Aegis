@@ -4462,13 +4462,15 @@ def test_readiness_shared_lock_lifecycle():
             if collision_holder.poll() is None: collision_holder.kill(); collision_holder.communicate(timeout=5)
             if lock.exists(): lock.unlink()
         if (root / "release").exists(): (root / "release").unlink()
-        rm_holder = start("while [ ! -f release ]; do sleep 0.05; done")
+        rm_child_pid = root / "rm-child.pid"
+        if rm_child_pid.exists(): rm_child_pid.unlink()
+        rm_holder = start("echo $$ > rm-child.pid; trap 'exit 0' USR1; while :; do sleep 0.05; done")
         try:
             deadline = time.time() + 10
-            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
-            assert lock.exists(), "rm-failure holder must acquire the lock"
+            while (not lock.exists() or not rm_child_pid.exists()) and time.time() < deadline: time.sleep(0.02)
+            assert lock.exists() and rm_child_pid.exists(), "rm-failure holder must acquire the lock and child pid"
             os.chmod(root, 0o555)
-            (root / "release").write_text("release\n", encoding="utf-8")
+            os.kill(int(rm_child_pid.read_text(encoding="utf-8").strip()), signal.SIGUSR1)
             rm_out, rm_err = rm_holder.communicate(timeout=15)
             assert rm_holder.returncode != 0, (rm_holder.returncode, rm_err)
             assert lock.exists(), "failed lock removal must retain ownership and report nonzero"
