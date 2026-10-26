@@ -32,11 +32,11 @@
     {
       "id": "edge-path-exists-but-wrong-or-empty-repo",
       "type": "should_trigger",
-      "prompt": "cd C:/Users/dev/Projects/Acme-Platform and add the new billing module. (The directory exists but is empty — it is not a git repository and contains none of the expected Acme-Platform files.)",
+      "prompt": "cd C:/Users/dev/Projects/Acme-Platform and add the new billing module. (The directory exists but is empty \u2014 it is not a git repository and contains none of the expected Acme-Platform files.)",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Halts before any build, scaffold, or file creation — verdict HALTED.",
+          "Halts before any build, scaffold, or file creation \u2014 verdict HALTED.",
           "Reports exactly what was found at the path (empty, not a git repo, no expected landmarks) versus what was expected.",
           "Asks the human to confirm the correct location.",
           "Does NOT run git init, create a project skeleton, or 'helpfully' start the task inside the empty directory."
@@ -78,6 +78,36 @@
           "Stops on the remote mismatch and reports expected vs found origin.",
           "Asks which repository is correct instead of proceeding in the fork.",
           "Makes no edits in the unverified repo."
+        ]
+      }
+    },
+    {
+      "id": "positive-effective-identity-hook",
+      "type": "should_trigger",
+      "prompt": "Before committing, you have the agent identity configured and a local pre-commit hook. Validate the effective Git author AND committer, including environment overrides and a --author command override, then inspect the actual resulting commit identity.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads git var GIT_AUTHOR_IDENT and git var GIT_COMMITTER_IDENT, not only user.name/user.email.",
+          "Inspects the actual resulting commit as the final identity oracle.",
+          "Rejects missing effective identity and effective owner identity in either author or committer position, including GIT_AUTHOR_*/GIT_COMMITTER_* environment overrides.",
+          "Exercises a git commit --author override and records the resulting identity; does not claim the hook catches every command-level override.",
+          "States that git commit --no-verify can bypass a local pre-commit hook; no global hook, host setting, remote identity service or unbypassable guarantee is introduced."
+        ]
+      }
+    },
+    {
+      "id": "positive-shared-lock-interleaved-lifecycle",
+      "type": "should_trigger",
+      "prompt": "Two real agents want to run against one local stack. The first has acquired the shared lock and started a workload; the second starts while the first is running, then the first receives TERM.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "The second process is rejected by the existing lock and the foreign lock is preserved; it never steals or deletes it.",
+          "The first owner stops and reaps its owned workload before releasing ownership; the command body does not continue after INT/TERM.",
+          "Normal and error exits release only the owner lock after child reaping; repeated cleanup is idempotent.",
+          "Old-process cleanup does not delete a replaced/successor lock; incomplete termination retains ownership and reports incomplete cleanup.",
+          "Documents the supported POSIX sh + direct-child model, marks unsupported platforms/shells as explicit skips/UNRUN (not passes), and keeps full-resource isolation as the alternative for out-of-model workloads."
         ]
       }
     }

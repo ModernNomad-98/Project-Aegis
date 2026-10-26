@@ -81,32 +81,45 @@ confidently building in the wrong place or against stale context.
    location is verified and no blocking unknowns remain; otherwise ask.
 
 
-## Git Identity Gate (before the first commit)
+## Startup authority and effective Git identity
 
-Set and verify the agent's own Git identity, never the repository owner's identity,
-before the first commit of a task. Run and record:
+Startup identity and hook inspection is READ-ONLY: inspect the current Git identity,
+effective author/committer values and hook state without mutating configuration or
+installing/replacing hooks. Configure the agent identity or install/replace a local
+hook only when an actual applicable authority covers that exact action; otherwise
+report the missing setup and stop. Do not copy the repository owner identity from
+existing commits, and do not invent a new approval when a valid grant already covers
+the action.
+
+Run and record the inspection:
 
 ```bash
-git config user.name "<agent-name>"
-git config user.email "<agent-email>"
 git config --get user.name
 git config --get user.email
+git config --local --get aegis.ownerName
+git config --local --get aegis.ownerEmail
+git var GIT_AUTHOR_IDENT
+git var GIT_COMMITTER_IDENT
 ```
 
-Verify both values are the agent's own identity. If either equals the recorded owner
-identity for this repository, STOP: do not commit, report the mismatch, and ask the
-human to fix the identity. Never copy the owner identity from existing commits. The
-recorded owner identity comes from local-only config (never committed):
+Effective author AND committer identities matter, not only the configured defaults:
+environment (`GIT_AUTHOR_*`, `GIT_COMMITTER_*`) and command overrides (for example
+`git commit --author`) can change the identity that is recorded. The resulting commit
+is the final oracle. If either effective identity is missing, empty or still the
+recorded owner identity, STOP before committing and report the mismatch.
+
+The owner identity comes from local-only config (never committed):
 
 ```bash
 git config --local aegis.ownerName "<owner name>"
 git config --local aegis.ownerEmail "<owner email>"
 ```
 
-The complete executable pre-commit hook below reads the recorded owner identity from
-git config --local aegis.ownerName / aegis.ownerEmail (no undefined variables) and
-exits nonzero for missing owner/agent identity or owner identity. Install locally as
-.git/hooks/pre-commit, executable, never committed:
+The complete executable pre-commit hook below reads the recorded owner identity and
+validates the EFFECTIVE author and committer through `git var GIT_AUTHOR_IDENT` /
+`git var GIT_COMMITTER_IDENT`. It exits nonzero for missing owner identity, missing/
+invalid effective identity, or effective owner identity in either position. Install
+locally as `.git/hooks/pre-commit`, executable, never committed:
 
 ```sh
 #!/bin/sh
@@ -117,24 +130,31 @@ if [ -z "$OWNER_NAME" ] || [ -z "$OWNER_EMAIL" ]; then
   echo "STOP: recorded owner identity missing; set git config --local aegis.ownerName and aegis.ownerEmail" >&2
   exit 1
 fi
-AGENT_NAME=$(git config --get user.name || true)
-AGENT_EMAIL=$(git config --get user.email || true)
-if [ -z "$AGENT_NAME" ] || [ -z "$AGENT_EMAIL" ]; then
-  echo "STOP: agent git user.name/user.email is not set" >&2
+AUTHOR_IDENT=$(git var GIT_AUTHOR_IDENT) || { echo "STOP: effective Git author identity unavailable" >&2; exit 1; }
+COMMITTER_IDENT=$(git var GIT_COMMITTER_IDENT) || { echo "STOP: effective Git committer identity unavailable" >&2; exit 1; }
+AUTHOR_NAME=$(printf "%s\n" "$AUTHOR_IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
+AUTHOR_EMAIL=$(printf "%s\n" "$AUTHOR_IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
+COMMITTER_NAME=$(printf "%s\n" "$COMMITTER_IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
+COMMITTER_EMAIL=$(printf "%s\n" "$COMMITTER_IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
+if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] || [ -z "$COMMITTER_EMAIL" ]; then
+  echo "STOP: effective Git author/committer identity is missing, empty or malformed" >&2
   exit 1
 fi
-if [ "$AGENT_NAME" = "$OWNER_NAME" ] || [ "$AGENT_EMAIL" = "$OWNER_EMAIL" ]; then
-  echo "Refusing commit: configured git identity is the repository owner identity" >&2
+if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then
+  echo "Refusing commit: effective Git author/committer identity is the repository owner identity" >&2
   exit 1
 fi
 exit 0
 ```
 
-Expected outputs: agent-owned identity -> exit 0 and the commit proceeds; missing owner
-or agent identity -> exit 1 with the exact STOP message; configured identity equal to the
-recorded owner identity -> exit 1 with "Refusing commit: configured git identity is the
-repository owner identity". Usable as .git/hooks/pre-commit after chmod +x; invoke it
-directly (.git/hooks/pre-commit) to prove the hook behavior.
+Expected behavior: valid agent author+committer -> exit 0 and the commit proceeds;
+missing owner/effective identity or effective owner identity in EITHER author or
+committer position -> exit 1 with the exact STOP/refusal message; environment overrides
+and command overrides are validated against the effective identity. Invoke the hook
+directly to prove the unit behavior, then inspect an ACTUAL resulting commit as the
+oracle. Local hooks are not a security boundary: `git commit --no-verify` can bypass
+a local pre-commit hook, and no global hook, host setting, remote identity service or
+unbypassable guarantee is promised. This is a local guard and disclosure boundary only.
 
 ## Output Format
 
