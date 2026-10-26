@@ -86,7 +86,7 @@
     {
       "name": "agent-startup-context-gate",
       "path": ".claude/skills/agent-startup-context-gate/SKILL.md",
-      "sha256": "b08c67fdab71c3c7a7a07409341f7cdac331b2ab46406d20f26dcecef0041203"
+      "sha256": "4526b4ba0a35abf31a3a308f4a710dd42e61605dc51fb207311c3329e47cabe8"
     },
     {
       "name": "agent-tool-safety-guard",
