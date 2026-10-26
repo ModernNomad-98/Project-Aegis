@@ -9,6 +9,11 @@ product repository that copied the Aegis files into its own workspace.
 **MANUAL-ONLY** marks a skill that must never be applied unless a human names
 it explicitly.
 
+Consumer-facing manual-only override policy and one-page normative contract:
+[manual-only policy](manual-only-policy.md) and
+[consumer contract](consumer-contract-manual-only.md) (OD-Q903-2=A, OD-Q903-3=B,
+OD-Q903-4=A, OD-Q903-5=A; OD-Q903-1 docs-only, no machine enforcement).
+
 This page is the **canonical, normative** delivery rule for work on this source
 repository. It binds any coding agent, on any model, provider, editor or
 harness. `AGENTS.md` carries a binding summary — the stage order and the merge
