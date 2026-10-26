@@ -4893,3 +4893,91 @@ Both tracks require this; it is canonical. Before creating skills in any phase, 
 
 
 - **2026-10-26 - D116: PKG-18 reconciliation close-out (FD-1 cleanup; no parallel machinery).** Final owner-queue item: the external PKG-18 snapshot is stale and is not authority; re-derived from current main, the shipped work remains shipped and the only tracked remainder class is unused module-level validator names. This PR removes exactly four verified-dead module-level names from scripts/validate-skills.py: `COVERAGE_PRIORITIES`, `_coverage_shipped_normalize`, `_coverage_shipped_link_mask`, and the transitively dead regex `COVERAGE_SHIPPED_LINK_MASK_RE` (its only load was inside the removed helper); retained used names are `_coverage_shipped_normalize_tail` and `_coverage_shipped_claims` (plus `_coverage_shipped_scan`), and the adjacent comments now describe the live normalization. No behavior change; no test reference to the removed names; gates unchanged (validator 254/0, validator self-tests 253 exactly 68 defs, contract 71). Shipped statuses recorded: D114 fail-closed/PTR #908; FD-2/FD-3/FD-4 and O-1 #909; FP-10 linear link scanner and pinned scaling tests; FD-1 dead-name cleanup this PR. DS-4b stable anchors shipped (#924) with numeric-anchor MACHINE ENFORCEMENT DEFERRED - open cases: separator chains (e.g. `catalog L/630-631`, `catalog L--630-631`, `catalog lines..1480`) and keyword-internal separators (e.g. `catalog_lines 1480`, `catalog-lines 1480`, `skill_rows 394`) - per coverage-map.md:9 and the DS-4b Stage C reduction record; no rejection claim. DS-7c hands off to the frozen REV-6 plan; its Stage C is blocked on owner DEC-R1. FP-8 remains a disputed carry (D113 protected; no change). F-03/C-01 and the duplicate AC-14 label are evidence-only/process carries with no tracked target. F-to-G receipt consistency remains process/coordinator discipline (no tracked program change; no parallel machinery introduced). Explicit NO PARALLEL MACHINERY: one validator, one contract-audit engine, one Markdown link checker, one behavioral runner; duplicated parsing helpers stay by design and self-test-pinned. Append-only: D113/D114/D115 bytes are unchanged (this entry only appends to the latest D115 tail). No owner decision is required for the dead-name cleanup; OD-1 (DS-7c/DEC-R1) and OD-2 (optional DS-4b enforcement) remain owner choices. 0 human; no merge authority; no CI-green claim.**
+
+- **D117 (2026-10-26) - Owner seven-item decision recorded; transcription confirmation, OD-A one-time grant, and queue dispositions.** Recorded from
+  the owner's direct session message 2026-10-26T07:29 PT (14:29Z) and second direct confirmation 2026-10-26T07:49 PT (14:49Z); owner evidence files:
+  OWNER-DECISION-2026-10-26T0729Z-SEVEN-ITEMS.md (3,620 B / 36 LF / sha256 344f3cb73c484fa6ea9a65550459f4419e38996b875886cedc22050122fa9529) and
+  OWNER-CONFIRMATION-2026-10-26T0749Z.md (1,310 B / 8 LF / sha256 c6acab68d156cb2f757b97fff372b37e3359b2d3bc5dbe24efe760e1037acaf5).
+  - **Owner instruction source (seven-item decision):** Source: Peter, typed directly in my session at 7:29 AM PDT. Verbatim excerpt covering the
+    acted-on items: item 2 DEC-R1=B; item 3 OD-A grant with conditions (a)-(d); item 4 OD-Q903-2=A / OD-Q903-3=B trigger-scoped standing override /
+    OD-Q903-4=A / OD-Q903-5=A; item 5 OD-2 numeric-anchor enforcement deferred; item 6 PKG-09 Wave 2 NOT DERIVABLE/CLOSED and OD-02 resolved by item
+    1; #919/#920 dependabot disposal; item 7 later WITHDRAWN by amendment. Full owner words:
+    _A/evidence/owner-decisions/OWNER-DECISION-2026-10-26T0729Z-SEVEN-ITEMS.md.
+  - **Owner instruction source (second confirmation):** Source: Peter, typed directly in my session at 7:49 AM PDT. Verbatim: "CONFIRMED. All six
+    items quoted at #910 comment 6407991132 are my decision, issued by me in the Project Aegis chat on 2026-10-25 at 20:51 PT. The wording was drafted
+    for me by Claude, my auditor/planner, and I issued it as written. Every item is mine: (1) #913 narrow-C, (2) #915 covered by standing grants, (3)
+    D7 = YES with defaults D1-D4 and D6, D5 deferred, (4) AD-10 ratified, (5) AD-11/AD-12 ratified with the ladder amendment, (6) #912 OD-1 ratified.
+    APR-142 and APR-143 are authoritative as of this confirmation. The three administrator merges made under them (#913, #917, #918) stand."
+  - **Owner instruction source (item 7 withdrawal):** Source: relayed owner reply #8ld4jznkzn6114218ici in the inbox (comment 6419060793). Relayed
+    owner words: "OWNER DECISION: B. Keep the merged #915 text unchanged and WITHDRAW item 7 of my 2026-10-26 07:29 decision. The merged rule is
+    correct: a nonce counter stored inside the restorable instance rolls back with a snapshot or backup restore, which re-validates spent nonces and
+    allows replay. Anchoring it outside the restorable instance, with fail-closed when unverifiable, is the safe design, and it already admits a
+    hardware-backed monotonic counter as the local option. No follow-up PR. Record the withdrawal next to item 7 wherever my seven-item decision is
+    transcribed, with this reason. The rest of the seven-item decision stands." Acted on the relayed owner words as written; the brief was drafted by
+    Nemesis and approved by the owner at 2026-10-26T14:50:39.839Z.
+  - **Owner instruction source (standing provenance rule):** Source: Peter, typed directly in my session at 8:27 AM PDT. Standing provenance rule:
+    every owner instruction acted on must state whether it was typed directly or relayed, with the exact session/time or relay doc/comment id and
+    verbatim words as required by the owner's two forms.
+  - **Owner evidence citation (amended):** Current amended owner evidence: 5,042 B / 44 LF / sha256
+    0362eccd2e1ed835ca9b77ae5e36a56ac22fb3db00bed71b95c4f46afc48f344; the original first 3,620 B / 36 LF / sha256
+    344f3cb73c484fa6ea9a65550459f4419e38996b875886cedc22050122fa9529 remains preserved as a byte prefix (appended amendment only).
+  - **Amendment timestamp disclaimer:** 08:20 PT on 2026-10-26 equals 15:20Z. The amendment evidence filename
+    AMENDMENT-2026-10-26T0820Z-ITEM7-WITHDRAWN.md uses the owner's local PT clock with a Z suffix, not UTC; the file name is retained for evidence
+    identity, not as a UTC timestamp.
+  - **Amended evidence arithmetic:** Amended file named _A/evidence/owner-decisions/OWNER-DECISION-2026-10-26T07:29Z-SEVEN-ITEMS.md is 5,042 B / 44 LF / sha256
+    0362eccd2e1ed835ca9b77ae5e36a56ac22fb3db00bed71b95c4f46afc48f344. Original first 3,620 B / 36 LF / sha256 344f3cb7... plus amendment 1,420 B / 7 LF / sha256 6ff7e5bd... = 5,040
+    B / 43 LF; the actual amended file is 5,042 B / 44 LF, the 2 extra bytes / 1 LF being the separator blank line between the original transcription block and the appended
+    amendment.
+- **C5 provenance/arithmetic note:** the compressed seven-item excerpt is a SUMMARY/EXCERPT, NOT verbatim; item 7 was added later by the #915 amendment and was not part of the
+  - **Summary/excerpt of the seven-item decision** (not verbatim; item 7 was added later by the #915 amendment).
+  - **#919 merge_commit_sha:** GitHub merge_commit_sha field (closed-PR test-merge SHA; not an actual merge commit).
+    original 2026-10-26T07:29 message. Exact item-1 owner words source: #910 comment 6418606020, owner typed 2026-10-26T07:29 AM PDT. Amended owner file
+    OWNER-DECISION-2026-10-26T0729Z-SEVEN-ITEMS.md is 5,042 B / 44 LF / sha256 0362eccd...; original prefix 3,620 B / 36 LF / sha256 344f3cb7... plus amendment 1,420 B / 7 LF /
+    sha256 6ff7e5bd... = 5,040 B / 43 LF; the extra 2 B/1 LF is the separator blank line between original block and appended amendment.
+  - **Item 1 (transcription):** #910 comment 6407991132 quotes the 2026-10-25T20:51 six-item decision verbatim; the owner's second direct confirmation
+    (2026-10-26T07:49 PT; owner evidence file OWNER-CONFIRMATION-2026-10-26T0749Z.md 1,310/8/sha256
+    c6acab68d156cb2f757b97fff372b37e3359b2d3bc5dbe24efe760e1037acaf5) confirms every item is the owner's, with wording drafted by the owner's
+    auditor/planner Claude and issued as written; APR-142 and APR-143 are authoritative from this confirmation; the three administrator merges made
+    under them (#913 f1bfe44d, #917 fe638bce, #918 f1bacf5b) STAND. Recorded as AEGIS-APR-144; the #921 pending-owner-confirmation limitation is
+    satisfied and the old #921 note remains unchanged as historical; APR-142/143 entry text unchanged and no retroactive validation of
+    out-of-condition merges.
+  - **Item 2 (DEC-R1 = B):** keep DS-7c at 4+1 paths; README SKILL-COUNT/FAMILY-COUNT markers are a separate DS-7c-b follow-up; no README path is
+    authorized by this item; smaller diffs converged faster.
+  - **Item 3 (OD-A):** one-time grant modeled on APR-119 recorded as AEGIS-APR-145: additive SIDE-005 rule plus TOOL_VERSION bump; exactly the four
+    APR-119-named artifacts with the docs preface; conditions (a)-(d), one separate regeneration PR, finding-delta and per-NEW-finding disposition, no
+    other regeneration, no reliance on a consumed grant. This recording/maintenance PR is excluded from the one-PR grant and does not consume it;
+    consumption attaches to the regeneration PR's merge.
+  - **Item 4 (#903 item 1 choices):** OD-Q903-2 = A (any MANUAL-ONLY skill by exact name plus reason); OD-Q903-3 = B trigger-scoped standing override
+    bound to a named trigger in the consumer's recorded policy, revocable, re-pinned on every sync - NOT per-invocation; OD-Q903-4 = A (consumer-local
+    register; the Aegis register is for Aegis); OD-Q903-5 = A (normative; an advisory contract would not have prevented #903); plan must be revised
+    and re-audited before implementation.
+  - **Item 5 (OD-2/NFA-1):** numeric-anchor enforcement stays DEFERRED; three fail-open attempts show the predicate is not ready; the resolver detects
+    staleness but does not enforce. OD-2 (numeric-anchor enforcement) is KEPT DEFERRED by this owner decision, not carried open for action; NFA-1
+    remains deferred. OD-2 is not OD-02.
+  - **Item 6 (PKG-09 Wave 2; OD-01 and OD-02):** the external ENG-003/PKG-09 mapping could not be obtained; PKG-09 Wave 2 (OD-01) is recorded NOT
+    DERIVABLE and CLOSED and must not be reconstructed. OD-02 (the APR-142 pending-confirmation limitation) is a different item from OD-2 and is
+    RESOLVED by item 1 / APR-144. Do not conflate OD-2 with OD-02.
+  - **PKG-09 Wave 2 disposition:** NOT DERIVABLE and CLOSED; do not reconstruct.
+  - **Item 7 (#915 residuals - WITHDRAWN; owner approval 2026-10-26T14:50:39.839Z = 07:50 PT; amendment recorded 08:20 PT = 15:20Z):**
+    2026-10-26T07:29 seven-item decision and its #910 transcription 6418606020. The merged #915 feature-flag-architect text (SKILL.md:168, :260,
+    :321-322) STANDS UNCHANGED; NO follow-up PR is opened. Reason (owner verbatim): a nonce counter stored inside the restorable instance rolls back
+    with a snapshot or backup restore, which re-validates spent nonces and allows replay; anchoring it outside the restorable instance with
+    fail-closed when unverifiable is the safe design, and it already admits a hardware-backed monotonic counter as the local option. SD-VERIFY-915
+    (#910 comment 6418631997) is RESOLVED by owner decision B; the earlier contradiction report is superseded/resolved and retained as history only.
+    The nonce-anchor principle and offline-residual wording from the withdrawn item are NOT an active owner requirement. Items 1-6 stand unchanged.
+    Amendment evidence: _A/evidence/owner-decisions/AMENDMENT-2026-10-26T0820Z-ITEM7-WITHDRAWN.md 1,420 B / 7 LF / sha256
+    6ff7e5bd0123a74dcd5292d180b75da08c794b7fe9ddd42ec98199da61ab040e.
+    - **Item 7 wording note:** the withdrawn item 7 nonce anchor principle is not an active owner requirement; the merged #915 text stands unchanged.
+  - **Additional (#919/#920):** #919 CLOSED 2026-10-26T14:31:03Z (not merged; head 9a5fa680316e9d08bed9e7ef539361d493bb3e02; GitHub merge_commit_sha field (closed-PR test-merge
+    SHA; not an actual merge commit)
+    4c9bf040f7765adab817768f1e8447d879c8990d). It changes only the four pinned actions/setup-python bump lines in
+    .github/workflows/validate-skills.yml; under the standing dependabot rule it cannot merge because it touches a protected .github workflow path and
+    its required gate-guard check fails, needing a separate owner/APR route - NOT because its content went beyond pinned bumps. #920 MERGED
+    2026-10-26T14:31:49Z at merge commit a3b59f6dd76db8e700d5a2bb81d05d77abb6058b (head c2d6feeb266012a0baa30dfa49d3bfdc19f7934f) because checks were
+    green and its diff was only pinned dependency bumps. No authority changes from either disposition.
+  - **Second confirmation evidence:** OWNER-CONFIRMATION-2026-10-26T0749Z.md 1,310 B / 8 LF / sha256
+    c6acab68d156cb2f757b97fff372b37e3359b2d3bc5dbe24efe760e1037acaf5; the three administrator merges stand.
+  - **Append-only:** this entry follows D116 and appends to the latest tail; D113/D114/D115/D116 bytes are unchanged; no existing line is edited. No
+    secrets or PII are recorded beyond the owner-authored decision/evidence pointers above; no implementation, merge authority, approval or CI-green
+    claim is created by this record.
+  - **Recording attribution:** produced by AI agent sd-b-fu, model route DeepSeek-V41-Flash (registered id deepseek-flash @ deepseek-account, DeepSeek Harness); not an approval/waiver; no merge authority.
