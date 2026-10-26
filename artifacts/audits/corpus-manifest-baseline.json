@@ -1,19 +1,19 @@
 {
   "tool": "audit-skill-contracts",
-  "version": "1.13.4",
-  "engine_sha256": "dbd5a4cf7659b47cc0d003c1e7ca4749c8028384851d93bac9026c3a07343819",
-  "repo_sha": "717122dbb049a04048afe092e9d2c7ae95bae1cd",
-  "branch": "feat/plan-stage-skills-pr1",
+  "version": "1.14.0",
+  "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
+  "repo_sha": "f697aa3848cfb791c61d69321311f91fe4a5d4e0",
+  "branch": "",
   "working_tree_dirty": false,
   "dirty_paths_in_scanned_surfaces": [],
-  "audited_file_count": 984,
-  "audited_byte_count": 6630676,
-  "corpus_content_hash": "8876ac765b96e696229259b4f23ba1448210c3a5a0522202fd0f8ccd25f8ddb6",
+  "audited_file_count": 985,
+  "audited_byte_count": 6662770,
+  "corpus_content_hash": "7d1f3aee79539f0273df076d9746d2153dcaa57730aff4751891355c7c801212",
   "corpus_hash_byte_form": "sha256 over, for each audited file sorted by repo-relative POSIX path: path-bytes + NUL + the file's raw on-disk bytes + NUL. Reproducible only from an equivalent checkout \u2014 line endings are part of the hashed bytes. Covers the AUDITED SKILL CORPUS ONLY (each skill's SKILL.md + references + eval JSONs). It does NOT cover the AUXILIARY inputs that also affect output \u2014 docs/skills-catalog.md (content \u2192 manifest `family`), the `.claude/agents/` filenames (\u2192 known_names + manifest), and the `docs/paths/` filenames (\u2192 manifest); those are summarized separately under `auxiliary_inputs`. The engine that produced the scan is identified separately by engine_sha256.",
   "auxiliary_inputs": {
     "skills_catalog": {
       "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-      "sha256": "3cded794b525d7541d7d0c11f14b2112964bd55f4d22170c20b4046e7ac93191"
+      "sha256": "203ec348f2b05424fe7e48b5f82bf6dba9de92ff4b124020c2d0a0f3ad9f06f1"
     },
     "agent_names_enumerated": {
       "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
@@ -1794,7 +1794,7 @@
       ],
       "has_evals": true,
       "has_trigger_evals": true,
-      "eval_cases": 9,
+      "eval_cases": 18,
       "trigger_cases": 19,
       "manual_only": false,
       "declares_read_only": true,
@@ -2057,7 +2057,9 @@
       "skill_md": ".claude/skills/human-approval-boundary/SKILL.md",
       "family": "Skills (Phase 1 \u2014 operating-discipline pack)",
       "description_chars": 1013,
-      "references": [],
+      "references": [
+        ".claude/skills/human-approval-boundary/references/consumer-manual-only-policy.md"
+      ],
       "has_evals": true,
       "has_trigger_evals": true,
       "eval_cases": 9,
