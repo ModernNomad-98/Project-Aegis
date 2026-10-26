@@ -214,7 +214,6 @@ COVERAGE_GRADE_BY_STATUS = {
     "PARTIAL": ("capability-review",),
     "GAP": ("none",),
 }
-COVERAGE_PRIORITIES = ("P0", "P1", "P2")
 COVERAGE_TOTALS = {
     "entries": 300,
     "by_area": {"01": 55, "02": 35, "03": 40, "04": 30, "05": 20, "06": 55,
@@ -247,11 +246,10 @@ COVERAGE_DROPPED_CANDIDATE = "ai-feature-kill-switch-designer"
 # are a claims-only base-parity fallback so no base-detected claim is lost
 # (Stage B F-01). "shipped aside"/"assembly-line" therefore yield no phrase.
 COVERAGE_SHIPPED_AS_RE = re.compile(r"\bshipped\s+as", re.IGNORECASE)
-# Markdown links are neutralised to same-length spaces for phrase/negation
-# context only (so a link before/abutting the phrase cannot hide it or
-# fabricate a negation); link labels are reduced only inside the token
-# substring after the phrase (so a link-wrapped skill token still parses).
-COVERAGE_SHIPPED_LINK_MASK_RE = re.compile(r"\[([^\]\n]*)\]\([^)\n]*\)")
+# Markdown links in coverage evidence are handled only where they are used:
+# the post-phrase token tail reduces a link to its label
+# (_coverage_shipped_normalize_tail) and phrase detection runs on the base
+# predicate's normalization. No offset-preserving link mask is needed.
 COVERAGE_SHIPPED_COLON_RE = re.compile(r"\s*:?\s*")
 # Wrapper characters that may surround a skill token (ASCII and typographic
 # quotes, brackets, backticks, asterisks, emphasis underscores).  Only paired
@@ -287,12 +285,6 @@ COVERAGE_SHIPPED_WRAPPER_RE = re.compile(
     r"[`*]|(?<![A-Za-z0-9_-])_{1,3}|_{1,3}(?![A-Za-z0-9_-])")
 
 
-def _coverage_shipped_normalize(text: str) -> str:
-    """Strip Markdown links/wrappers without corrupting token underscores."""
-    return COVERAGE_SHIPPED_WRAPPER_RE.sub(
-        "", COVERAGE_SHIPPED_MD_LINK_RE.sub(r"\1", text))
-
-
 def _coverage_shipped_normalize_tail(text: str) -> str:
     """Reduce link labels in the post-phrase token tail without merging tokens.
 
@@ -310,12 +302,6 @@ def _coverage_shipped_normalize_tail(text: str) -> str:
 
     reduced = COVERAGE_SHIPPED_MD_LINK_RE.sub(replace_link, text)
     return COVERAGE_SHIPPED_WRAPPER_RE.sub("", reduced)
-
-
-def _coverage_shipped_link_mask(text: str) -> str:
-    """Replace Markdown links with same-length spaces (offset-preserving)."""
-    return COVERAGE_SHIPPED_LINK_MASK_RE.sub(
-        lambda match: " " * len(match.group(0)), text)
 
 
 def _coverage_shipped_analysis(entry_text: str,
