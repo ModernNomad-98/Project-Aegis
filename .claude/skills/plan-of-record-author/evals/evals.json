@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "plan-of-record-author",
+  "description": "Behavior cases for plan-of-record-author",
+  "cases": [
+    {
+      "id": "new-feature-plan",
+      "type": "should_trigger",
+      "prompt": "Plan the work to add an export-audit-log feature to our SaaS product. It touches the API, the database and the admin UI. Give me the plan of record before we start.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Produces a plan-of-record package (objective, scope/non-goals, blast radius and exact paths, five-question necessity/reuse, acceptance criteria, executable closures, owner decisions, verification/re-base).",
+          "Gives each acceptance criterion an observable result and a closure that must fail before the change and pass after it.",
+          "Surfaces owner decisions (for example retention period or export format) as questions with defaults rather than deciding them.",
+          "States that it will not implement and will hand the captured revision to an independent plan auditor; makes no self-approval claim."
+        ]
+      }
+    },
+    {
+      "id": "governance-change-protected-paths",
+      "type": "should_trigger",
+      "prompt": "We need to change docs/delivery-workflow.md and scripts/validate-skills.py for a governance wave. Write the plan of record.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies the protected-path status of scripts/validate-skills.py and names the approval/authority route without claiming a gate waiver.",
+          "Names the count and gate surfaces the change must keep coherent, with measured expectations.",
+          "Records the owner decision status for the governance change and does not invent ratification.",
+          "Provides a re-base rule and non-circular evidence bindings."
+        ]
+      }
+    },
+    {
+      "id": "unresolved-owner-decision",
+      "type": "should_trigger",
+      "prompt": "Plan the migration to a new flag vendor, but I haven't decided the budget or the vendor yet. Just write the plan.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Surfaces the owner decisions (budget, vendor) explicitly with options and consequences, and does not choose for the owner.",
+          "States what can be planned safely without the decision and what is blocked on it.",
+          "Still produces the plan-of-record structure and a handoff to an independent plan audit."
+        ]
+      }
+    },
+    {
+      "id": "base-advances-mid-plan",
+      "type": "should_trigger",
+      "prompt": "The default branch moved while we were writing the plan. What should the plan say about the base and the closures?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Records the re-base rule: re-read the then-current default branch, re-run the inventory anchors and closures, and record the actual application base.",
+          "Does not silently reuse stale head/tree or count values.",
+          "Re-froze artifacts and re-bound identities after the base change."
+        ]
+      }
+    },
+    {
+      "id": "asked-to-implement",
+      "type": "should_not_trigger",
+      "prompt": "Skip the plan. Just implement the export feature now.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Declines to implement and routes to the plan-of-record-author / human-approval-boundary flow; produces no code."
+        ]
+      }
+    },
+    {
+      "id": "asked-to-audit-own-plan",
+      "type": "should_not_trigger",
+      "prompt": "Review and approve the plan you just wrote.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Declines to audit or approve its own plan; requires an independent auditor (plan-audit-reviewer)."
+        ]
+      }
+    }
+  ]
+}

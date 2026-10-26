@@ -224,9 +224,9 @@ COVERAGE_TOTALS = {
                  "capability-review": 100},
     "by_priority": {"P0": 126, "P1": 149, "P2": 25},
     "gap_by_priority": {"P0": 0, "P1": 0, "P2": 0},
-    "manifest_skills": 252,
+    "manifest_skills": 254,
     "distinct_covering_skills": 169,
-    "beyond_roadmap_skills": 83,
+    "beyond_roadmap_skills": 85,
     "review_pending": 114,
 }
 # Owner triage decision Q1=A/Q2=A/Q3=yes (D107, 2026-10-21): rows
@@ -537,7 +537,7 @@ COVERAGE_REQUIRED_PHRASES = (
     "GAP rows are optional backlog candidates, not deficits or completion "
     "obligations.",
     "The shipped library deliberately exceeds and interleaves with the "
-    "roadmap: 83 of 252 shipped skills are beyond it.",
+    "roadmap: 85 of 254 shipped skills are beyond it.",
 )
 COVERAGE_ENTRY_KEYS = (
     "id", "area", "name", "priority", "status", "covering_skills",

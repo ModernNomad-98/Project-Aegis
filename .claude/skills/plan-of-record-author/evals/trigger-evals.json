@@ -1,0 +1,161 @@
+{
+  "skill": "plan-of-record-author",
+  "description": "Trigger discrimination for authoring a plan-of-record package.",
+  "overlaps_with": [
+    "ai-task-decomposer",
+    "acceptance-criteria-reviewer",
+    "change-classification-gate",
+    "human-approval-boundary",
+    "plan-audit-reviewer",
+    "tech-spec-writer",
+    "lane-authoring-guide",
+    "product-spec-writer"
+  ],
+  "cases": [
+    {
+      "id": "plan-of-record-package-request",
+      "prompt": "Write the plan of record for the governance wave before we implement it.",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "ai-task-decomposer",
+        "change-classification-gate"
+      ],
+      "reason": "Needs a plan package, not a task split or a single change class."
+    },
+    {
+      "id": "owner-directive-to-plan",
+      "prompt": "Turn this owner directive into a reviewable plan with closures and evidence bindings.",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "Plan-of-record authoring owns the artifact package."
+    },
+    {
+      "id": "base-rebase-plan-note",
+      "prompt": "The base moved; what does the plan need to say about re-running closures?",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "Plan maintenance/re-base, not code review."
+    },
+    {
+      "id": "protected-path-authority-map",
+      "prompt": "Plan a change to scripts/validate-skills.py and name the approval route.",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "human-approval-boundary"
+      ],
+      "reason": "The plan names the approval route; the boundary skill handles the request itself."
+    },
+    {
+      "id": "plan-evidence-binding",
+      "prompt": "How do we bind the plan artifacts non-circularly with hashes?",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "source-of-truth-reconciler"
+      ],
+      "reason": "Evidence-binding format belongs to the plan package."
+    },
+    {
+      "id": "plan-captured-revision-handoff",
+      "prompt": "Who audits the captured plan revision and how is it bound?",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "The author defines the handoff; the auditor performs the audit."
+    },
+    {
+      "id": "plan-with-owner-decisions-open",
+      "prompt": "Write the plan but leave budget as an owner question.",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "human-approval-boundary"
+      ],
+      "reason": "Owner decisions are surfaced in the plan, not requested as a risky-action approval."
+    },
+    {
+      "id": "plan-of-record-format",
+      "prompt": "What files make up the plan-of-record package?",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "ai-sdlc-operating-model"
+      ],
+      "reason": "Package format reference; the operating model defines stages."
+    },
+    {
+      "id": "parallel-lanes-not-a-plan",
+      "prompt": "Split this into parallel agent lanes with boundaries.",
+      "expected_skill": "lane-authoring-guide",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Parallel lanes belong to lane-authoring-guide."
+    },
+    {
+      "id": "single-change-class",
+      "prompt": "What class is this nullable-column change and what checks does it need?",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "One change classification, not a plan package."
+    },
+    {
+      "id": "product-criteria",
+      "prompt": "Write user-facing acceptance criteria for the export feature.",
+      "expected_skill": "product-spec-writer",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Product criteria authoring is a different job."
+    },
+    {
+      "id": "implementation-now",
+      "prompt": "Just implement the change; skip the plan.",
+      "expected_skill": "human-approval-boundary",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Human-approval-boundary/stop condition; the author never implements."
+    },
+    {
+      "id": "design-doc",
+      "prompt": "Write the technical design for the export pipeline.",
+      "expected_skill": "tech-spec-writer",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Design authoring is tech-spec-writer."
+    },
+    {
+      "id": "audit-a-plan",
+      "prompt": "Audit this captured plan revision and return a verdict.",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Plan audits belong to plan-audit-reviewer."
+    },
+    {
+      "id": "queue-prioritization",
+      "prompt": "Reorder the backlog to put this wave first.",
+      "expected_skill": "roadmap-to-commitments-translator",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Queue ordering is owner/coordinator work."
+    },
+    {
+      "id": "code-diff-review",
+      "prompt": "Review this diff for security issues.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Diff review is a code/security reviewer."
+    }
+  ]
+}

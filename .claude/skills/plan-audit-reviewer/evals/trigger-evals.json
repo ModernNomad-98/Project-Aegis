@@ -1,0 +1,160 @@
+{
+  "skill": "plan-audit-reviewer",
+  "description": "Trigger discrimination for independently auditing a captured plan revision.",
+  "overlaps_with": [
+    "acceptance-criteria-reviewer",
+    "code-reviewer",
+    "library-diff-reviewer",
+    "ai-sdlc-operating-model",
+    "plan-of-record-author",
+    "test-plan-designer",
+    "source-of-truth-reconciler",
+    "security-pr-reviewer"
+  ],
+  "cases": [
+    {
+      "id": "plan-verdict-request",
+      "prompt": "Audit the captured plan revision and return CONFIRM or REVISE.",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "acceptance-criteria-reviewer"
+      ],
+      "reason": "Plan-level verdict, not per-criterion review."
+    },
+    {
+      "id": "re-audit-after-revise",
+      "prompt": "The plan was revised; re-audit the new captured revision.",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "Re-audit bound to a plan hash."
+    },
+    {
+      "id": "closure-fail-before-check",
+      "prompt": "Do the plan closures really fail before the change?",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "test-plan-designer"
+      ],
+      "reason": "Audit verification of closures."
+    },
+    {
+      "id": "authority-check-plan",
+      "prompt": "The plan claims owner approval without a quote. Is it valid?",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Authority audit, not authoring."
+    },
+    {
+      "id": "captured-hash-validity",
+      "prompt": "Was the plan edited after capture? Is the verdict still valid?",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "plan-of-record-author"
+      ],
+      "reason": "Verdict binding is audit work."
+    },
+    {
+      "id": "plan-count-coherence",
+      "prompt": "Are the plan's count and gate expectations feasible at this base?",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "source-of-truth-reconciler"
+      ],
+      "reason": "Independent re-measurement of plan claims."
+    },
+    {
+      "id": "backlog-input-routing",
+      "prompt": "Where do audit findings go?",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "ai-task-decomposer"
+      ],
+      "reason": "Backlog-input-only routing is part of the audit contract."
+    },
+    {
+      "id": "plan-insufficiency",
+      "prompt": "The plan has missing closures; what should happen?",
+      "expected_skill": "plan-audit-reviewer",
+      "should_not_trigger": [
+        "test-plan-designer"
+      ],
+      "reason": "Material finding and minimal fix list."
+    },
+    {
+      "id": "write-plan",
+      "prompt": "Write the plan of record for this change.",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "Authoring the plan is the author's job."
+    },
+    {
+      "id": "implement-change",
+      "prompt": "Implement the planned change now.",
+      "expected_skill": "change-classification-gate",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "The auditor never implements."
+    },
+    {
+      "id": "fix-plan",
+      "prompt": "Fix the plan defects you found.",
+      "expected_skill": "plan-of-record-author",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "The auditor reports findings; the author revises."
+    },
+    {
+      "id": "review-diff",
+      "prompt": "Review this implementation diff.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "Implementation diff review is code review."
+    },
+    {
+      "id": "security-review",
+      "prompt": "Security-review this PR.",
+      "expected_skill": "security-pr-reviewer",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "Security review is a separate lens/stage."
+    },
+    {
+      "id": "queue-order",
+      "prompt": "Reorder the backlog and prioritize this wave.",
+      "expected_skill": "roadmap-to-commitments-translator",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "Queue ordering is owner/coordinator work."
+    },
+    {
+      "id": "acceptance-criteria-only",
+      "prompt": "Are these acceptance criteria testable?",
+      "expected_skill": "acceptance-criteria-reviewer",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "Criteria review is a different skill."
+    },
+    {
+      "id": "final-merge-receipt",
+      "prompt": "Post the final merge receipt.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": [
+        "plan-audit-reviewer"
+      ],
+      "reason": "Merge receipt is a separate stage with its own authority."
+    }
+  ]
+}

@@ -42,7 +42,7 @@
         "architecture-designer",
         "threat-modeler"
       ],
-      "evidence": "audit classification: COVERED(decision) — architecture-designer, threat-modeler; dropped D80; covered by architecture-designer + threat-modeler (reconciliation §3 Phase 2, catalog lines 1478-1479 / skill rows 392,527); covering skills: architecture-designer, threat-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
+      "evidence": "audit classification: COVERED(decision) — architecture-designer, threat-modeler; dropped D80; covered by architecture-designer + threat-modeler (reconciliation §3 Phase 2, catalog lines 1480-1481 / skill rows 394,529); covering skills: architecture-designer, threat-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
       "evidence_grade": "catalog-decision",
       "id": 2,
       "name": "System Context Mapping",
@@ -70,7 +70,7 @@
       "covering_skills": [
         "domain-modeler"
       ],
-      "evidence": "audit classification: COVERED(decision) — domain-modeler; bounded-context-identifier (#4) dropped D80; covered by domain-modeler step 4 (reconciliation §3 Phase 2 / catalog lines 1480-1481 / skill row 391); covering skills: domain-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
+      "evidence": "audit classification: COVERED(decision) — domain-modeler; bounded-context-identifier (#4) dropped D80; covered by domain-modeler step 4 (reconciliation §3 Phase 2 / catalog lines 1482-1483 / skill row 393); covering skills: domain-modeler; audit ref: SKILLS-COVERAGE-AUDIT-2026-10-20.md sha256 792c368a26b2686697bc802b97078d9d314f9bbf336a534b94c83a579741b301; final-classification.json sha256 2731c1eac7b379983432b64b4072e45426e534f7f2797bbf4f589f2d69cdf213",
       "evidence_grade": "catalog-decision",
       "id": 4,
       "name": "Bounded Context Identification",
@@ -4292,9 +4292,9 @@
     }
   ],
   "schema_version": 1,
-  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 252 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization. Convention (D114, 2026-10-24): a roadmap row closed by shipping a skill is always SHIPPED/explicit-id; an owner authorization is not evidence grade.",
+  "scope_note": "The 300-row roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations. The shipped library deliberately exceeds and interleaves with the roadmap: 85 of 254 shipped skills are beyond it. This coverage map is a maintained reference assertion recording status; it is not ground truth, a completion target or a build authorization. Convention (D114, 2026-10-24): a roadmap row closed by shipping a skill is always SHIPPED/explicit-id; an owner authorization is not evidence grade.",
   "totals": {
-    "beyond_roadmap_skills": 83,
+    "beyond_roadmap_skills": 85,
     "by_area": {
       "01": 55,
       "02": 35,
@@ -4328,7 +4328,7 @@
       "P1": 0,
       "P2": 0
     },
-    "manifest_skills": 252,
+    "manifest_skills": 254,
     "review_pending": 114
   }
 }

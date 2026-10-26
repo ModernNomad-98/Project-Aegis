@@ -326,7 +326,7 @@ terminal reporting against the later-phase skills that route toward it.
 ### Skills (Phase 1.5 — AI-SDLC governance completion)
 
 Completes the category-08 governance layer Phase 1 started (roadmap
-#261/#268/#279/#280, plus #266 under D69). These COMPOSE the Phase 1 skills — each stage or
+#261/#268/#279/#280, plus #266 under D69 and #281/#282 under D7). These COMPOSE the Phase 1 skills — each stage or
 control cites its enforcing skill by name, never restating its procedure. All
 ship `evals/evals.json` **and** `evals/trigger-evals.json` (the original four overlap
 each other and the Phase 1 pack). Two edit behavior-steering artifacts and are
@@ -340,8 +340,10 @@ each other and the Phase 1 pack). Two edit behavior-steering artifacts and are
 | `agent-memory-governance` | #279 | **no** (manual-only; edits memory files) | Memory WRITE/TRUST/HYGIENE rules: confirmed durable facts with provenance and absolute dates, never secrets; remembered repo/PR state verified against live git/gh before acting; per-entry disposition-approved cleanups. |
 | `agent-governance-audit` | #280 | yes | Per-control PASS/FAIL/UNVERIFIABLE compliance audit of one AI-assisted change from primary evidence (PR timeline incl. who armed auto-merge, commits, CI runs); closeout claims cross-checked, never trusted; missing evidence is never a PASS. |
 | `ai-task-decomposer` | #266 (D69) | yes | Splits a broad goal, epic or approved spec into ordered, PR-sized tasks, each with one intent, an observable done criterion and the evidence that proves it, likely files or layers, a provisional change class, risks, dependencies and human-approval flags; oversized tasks split again; unknowns become spike tasks or owner questions. Plans only; hands each task to `change-classification-gate` when work starts. |
+| `plan-of-record-author` | #281 (D7) | yes | Turns a request or owner directive into ONE plan-of-record artifact package before implementation: objective/why, blast radius and paths, five-question necessity/reuse, scope + protected-path/authority map, proportionate acceptance criteria, executable fail-before/pass-after closures, surfaced owner decisions, verification/re-base and non-circular evidence bindings; never implements and never approves its own plan. |
+| `plan-audit-reviewer` | #282 (D7) | yes | Independently audits a captured plan-of-record revision for completeness, feasibility, authority/boundary, count/protected-path coherence, acceptance observability, closure fail-before validity and owner-decision disclosure; returns CONFIRM or REVISE/REJECT with a minimal fix list bound to the exact captured revision hash; never authors or self-approves; findings are backlog input only. |
 
-Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all five. The
+Trigger-overlap coverage (`evals/trigger-evals.json`) ships for all seven. The
 original four discriminate internally (umbrella vs matrix vs memory vs audit)
 and against the Phase 1 pack (`human-approval-boundary`,
 `source-of-truth-reconciler`, `agent-startup-context-gate`,
