@@ -2246,8 +2246,8 @@ def _coverage_area_titles():
 
 def _coverage_require_manifest_set(manifest):
     """Shared fail-closed manifest guard: rejects None and every non-set/frozenset."""
-    if not isinstance(manifest, (set, frozenset)):
-        raise ValueError("coverage requires a skills manifest set of skill names (fail closed)")
+    if not isinstance(manifest, (set, frozenset)) or not manifest:
+        raise ValueError("coverage requires a non-empty skills manifest set of skill names (fail closed)")
     return manifest
 
 
@@ -2269,12 +2269,14 @@ def _coverage_compute_totals(entries, manifest):
         by_status[status] = by_status.get(status, 0) + 1
         by_grade[grade] = by_grade.get(grade, 0) + 1
         priority = str(entry.get("priority"))
-        if priority in COVERAGE_PRIORITY_KEYS:
-            by_priority[priority] = by_priority.get(priority, 0) + 1
+        if priority not in COVERAGE_PRIORITY_KEYS:
+            raise ValueError("coverage entries use unknown priority key "
+                             + repr(priority) + " (only P0/P1/P2 are allowed "
+                             "for all statuses; totals fail closed)")
+        by_priority[priority] = by_priority.get(priority, 0) + 1
         if status == "GAP":
             prio = priority
-            if prio in COVERAGE_PRIORITY_KEYS:
-                gap_by_priority[prio] = gap_by_priority.get(prio, 0) + 1
+            gap_by_priority[prio] = gap_by_priority.get(prio, 0) + 1
         skills = entry.get("covering_skills")
         if isinstance(skills, list):
             covering_union.update(name for name in skills if isinstance(name, str))
@@ -2537,9 +2539,22 @@ def _coverage_scrub_for_counts(text):
     return scrubbed
 
 
-COVERAGE_COUNT_CONTEXT_RE = re.compile(
-    r"(?i)\b(?:coverage\s+(?:totals?|snapshot|pins?|rows?|counts?)"
-    r"|coverage-map|snapshot|pinned|d_entry|rows_sha256)\b")
+COVERAGE_LATER_CONTEXT_RE = re.compile(r"(?i)\b(?:coverage|snapshot|pinned)\b")
+COVERAGE_LATER_TOTAL_PATTERNS = (
+    r"(?i)\b[0-9]+\s*[- ]\s*(?:rows?|entr(?:y|ies)|pins?|totals?)\b",
+    r"(?i)\b(?:rows?|entr(?:y|ies)|pins?|totals?|gap_by_priority|snapshot)"
+    r"\s*(?::|=|-)\s*[0-9]+",
+    r"(?i)\b(?:totals?|gap_by_priority)\b[^\n0-9]{0,40}[0-9]+",
+)
+
+
+def _coverage_later_total_count_errors(text):
+    """Return coverage-total/snapshot count copies in later ledger prose."""
+    findings = set()
+    for pattern in COVERAGE_LATER_TOTAL_PATTERNS:
+        for match in re.finditer(pattern, text):
+            findings.add(match.group(0))
+    return sorted(findings)
 
 
 def _coverage_count_copy_errors(text, computed):
@@ -2547,11 +2562,9 @@ def _coverage_count_copy_errors(text, computed):
     findings = set()
     patterns = (
         r"(?i)\b[0-9]+\s*(?:of|-of-)\s*[0-9]+\b",
-        r"(?i)\b[0-9]+-(?:rows?|skills?|entr(?:y|ies)|ids?|counts?|totals?)\b",
-        r"(?i)\b(?:totals?|entr(?:y|ies)|counts?|review_pending|manifest_skills|"
-        r"distinct_covering_skills|beyond_roadmap_skills|by_status|by_grade|"
-        r"by_priority)\s*(?::|=|\s)\s*[0-9]+",
-        r"(?i)\b[0-9]+\s+(?:rows?|skills?|entr(?:y|ies)|ids?|counts?|totals?)\b",
+        r"(?i)\b[0-9]+-(?:rows?|skills?|entr(?:y|ies)|ids?|pins?|counts?|totals?)\b",
+        r"(?i)\b[0-9]+\s+(?:rows?|skills?|entr(?:y|ies)|ids?|pins?|counts?|totals?)\b",
+        r"(?i)\b(?:totals?|entr(?:y|ies)|counts?|rows?|skills?|pins?|gap_by_priority|snapshot|review_pending|manifest_skills|distinct_covering_skills|beyond_roadmap_skills|by_status|by_grade|by_priority)\s*(?::|=|-|\s)\s*[0-9]+",
     )
     for pattern in patterns:
         for match in re.finditer(pattern, scrubbed):
@@ -2633,9 +2646,12 @@ def _coverage_check_snapshot(rep, ctx, payload, entries, manifest, computed):
         row_body = row["body"]
         for token in COVERAGE_DIGEST_TOKEN_RE.findall(row_body):
             row_body = row_body.replace("rows_sha256=" + token, "")
-        if row_number != bound_number and not COVERAGE_COUNT_CONTEXT_RE.search(row_body):
-            continue
-        count_copies = _coverage_count_copy_errors(row_body, computed)
+        if row_number != bound_number:
+            if not COVERAGE_LATER_CONTEXT_RE.search(row_body):
+                continue
+            count_copies = _coverage_later_total_count_errors(row_body)
+        else:
+            count_copies = _coverage_count_copy_errors(row_body, computed)
         if count_copies:
             label = ("snapshot entry " if row_number == bound_number
                      else "later coverage-specific ledger entry ")
@@ -2859,12 +2875,14 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
                       "booleans are rejected)")
             continue
         entry_ctx = "[" + ctx + "] entry " + str(row_id) + ": "
-        priority_value = str(entry.get("priority"))
-        if priority_value not in COVERAGE_PRIORITY_KEYS:
-            rep.error(entry_ctx + "priority must be one of "
+        priority_value = entry.get("priority")
+        if "priority" in entry and (
+                not isinstance(priority_value, str)
+                or priority_value not in COVERAGE_PRIORITY_KEYS):
+            rep.error(entry_ctx + "priority must be a string in "
                       + repr(list(COVERAGE_PRIORITY_KEYS))
-                      + " (unknown priority is rejected for all statuses, not "
-                      "silently filtered)")
+                      + " (got " + repr(priority_value) + "; unknown priority "
+                      "is rejected for all statuses, not silently filtered)")
         for key in COVERAGE_ENTRY_KEYS:
             if key not in entry:
                 rep.error(entry_ctx + "missing required field '" + key + "'")

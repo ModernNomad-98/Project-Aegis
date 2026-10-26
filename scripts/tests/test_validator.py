@@ -4240,7 +4240,8 @@ def test_coverage_map_rerun_review_regressions():
         "finding 3: a legitimate unrelated later entry must pass")
     for legit_extra in (
             "- **2026-10-27 - D122: coverage: updated 2 skills.**",
-            "- **2026-10-27 - D123: coverage roadmap: 2 skills.**"):
+            "- **2026-10-27 - D123: coverage roadmap: 2 skills.**",
+            "- **2026-10-27 - D126: snapshot tests cover 2 skills.**"):
         assert _check_ledger(base_ledger + NL_JOIN + legit_extra) == [], (
             "finding 3: a legitimate coverage-context non-total count must pass: "
             + legit_extra)
@@ -4256,11 +4257,19 @@ def test_coverage_map_rerun_review_regressions():
     assert any("coverage-total count copy" in error
                for error in _check_ledger(stale_total)), (
         "finding 3: a later coverage-total count must be rejected")
+    stale_bare = (base_ledger + NL_JOIN
+                  + "- **2026-10-27 - D125: coverage: "
+                  + str(computed["entries"]) + " entries.**")
+    assert any("coverage-total count copy" in error
+               for error in _check_ledger(stale_bare)), (
+        "finding 3: a later bare coverage entry count must be rejected")
 
     # 4. Count-copy regex catches hyphenated and space-separated forms
     #    consistently across casing and singular/plural.
     for phrase in ("300-row", "300 row", "300 rows", "300 Rows",
-                   "300-entry", "300 entry", "entry: 300",
+                   "300-entry", "300 entry", "entry: 300", "entry-300",
+                   "coverage rows: 300", "coverage snapshot: 300",
+                   "coverage pins: 300",
                    "85-of-254", "totals 300", "Totals 300", "300 entries"):
         assert validator._coverage_count_copy_errors(phrase, computed), (
             "finding 4: count-copy regex must catch " + repr(phrase))
@@ -4285,6 +4294,33 @@ def test_coverage_map_rerun_review_regressions():
                     "finding 5: " + label + " accepted a non-set manifest "
                     + repr(bad_manifest))
 
+    # 5b. Direct totals helper fails closed on invalid priorities and empty set.
+    for bad_priority in ("P3", None, 3):
+        try:
+            validator._coverage_compute_totals(
+                [{"priority": bad_priority, "status": "SHIPPED",
+                  "area": "01", "evidence_grade": "explicit-id"}], {"skill"})
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(
+                "finding 5/Medium3: direct totals helper accepted invalid priority "
+                + repr(bad_priority))
+    for empty_manifest in (set(), []):
+        try:
+            validator._coverage_compute_totals([], empty_manifest)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("finding 5/Low5: totals accepted empty manifest")
+        try:
+            validator._coverage_shipped_analysis("no phrase", empty_manifest)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(
+                "finding 5/Low5: shipped analysis accepted empty manifest")
+
     # 6. Unknown GAP priority is filtered from computed totals so exactly one
     #    clear unknown-priority error remains (no contradictory key-set error).
     with tempfile.TemporaryDirectory() as tmp:
@@ -4302,6 +4338,8 @@ def test_coverage_map_rerun_review_regressions():
                            for error in rep.errors), rep.errors
         def _nongap_p3(target):
             row = target["entries"][0]
+            assert row.get("status") != "GAP", "fixture entry 0 must be non-GAP"
+            row["status"] = "SHIPPED"
             row["priority"] = "P3"
         with mutated_coverage(Path(tmp), _nongap_p3) as rep:
             assert any("unknown priority is rejected for all statuses" in error
