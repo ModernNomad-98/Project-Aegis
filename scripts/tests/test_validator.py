@@ -4267,7 +4267,8 @@ def test_readiness_effective_identity_hook():
         ok("env-only effective identity accepted; configured owner plus env override rejected")
         p = git("-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "commit", "--allow-empty", "-m", "config override")
         assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
-        mutated = hook_text.replace('if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then', 'if false; then')
+        mutated = hook_text.replace('if { [ -n "$CONFIG_NAME" ] && [ "$CONFIG_NAME" = "$OWNER_NAME" ]; } || { [ -n "$CONFIG_EMAIL" ] && [ "$CONFIG_EMAIL" = "$OWNER_EMAIL" ]; }; then', 'if false; then')
+        mutated = mutated.replace('if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then', 'if false; then')
         assert mutated != hook_text
         hook.write_text(mutated, encoding="utf-8", newline="\n")
         p = git("-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "commit", "--allow-empty", "-m", "mutated config override")
