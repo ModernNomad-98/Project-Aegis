@@ -89,14 +89,27 @@ non-owner author AND committer exit 0 regardless of whether that identity comes 
 local config, global config, explicit environment (GIT_AUTHOR_* / GIT_COMMITTER_*),
 `GIT_CONFIG_COUNT`/GIT_CONFIG_KEY_* or a command-level `git -c`. Configured owner
 values are NOT separately rejected when the effective identity is a valid non-owner
-(the actual commit remains the oracle). A missing/empty effective identity, or an
+(the actual commit remains the oracle). Owner-match is intentionally strict: matching
+the owner on EITHER the name OR the email is treated as owner; an agent sharing
+only the owner name or only the owner email must change that field. A missing/empty
+effective identity, or an
 effective owner in EITHER author or committer position, exits nonzero. Inspect and
 record the effective values; never copy the repository owner identity.
 
 Record the owner identity from local-only config (never committed), and inspect the
 effective author and committer without mutating configuration or hooks:
 
+Record owner identity under the applicable authority (local-only, never committed):
+
 ```bash
+git config --local aegis.ownerName "<owner name>"
+git config --local aegis.ownerEmail "<owner email>"
+```
+
+Inspect effective identity; initialize MISSING before any check:
+
+```bash
+MISSING=0
 OWNER_NAME=$(git config --local --get aegis.ownerName 2>/dev/null || true)
 OWNER_EMAIL=$(git config --local --get aegis.ownerEmail 2>/dev/null || true)
 [ -n "$OWNER_NAME" ] || { echo "STARTUP: recorded owner name missing"; MISSING=1; }
@@ -111,6 +124,7 @@ if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] |
 if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then echo "STARTUP: effective author/committer identity matches the recorded owner"; MISSING=1; fi
 [ "$MISSING" -eq 0 ] || exit 1
 echo "STARTUP: effective author/committer identity present and distinct from the recorded owner"
+echo "STARTUP: effective author=$AUTHOR_NAME <$AUTHOR_EMAIL> committer=$COMMITTER_NAME <$COMMITTER_EMAIL>"
 ```
 
 The complete executable pre-commit hook below implements the same effective-identity

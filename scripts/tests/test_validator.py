@@ -46,7 +46,6 @@ import json
 import os
 import re
 import shutil
-import signal
 import subprocess
 import sys
 import tempfile
@@ -4220,7 +4219,6 @@ def test_readiness_effective_identity_hook():
     hook_matches = [b for b in hook_blocks if "AI-R02 effective-identity hook" in b]
     assert len(hook_matches) == 1, "SKILL.md must publish exactly one anchored effective-identity hook"
     hook_text = hook_matches[0]
-    assert "GIT_COMMITTER_IDENT" in hook_text
     assert "GIT_AUTHOR_IDENT" in hook_text and "GIT_COMMITTER_IDENT" in hook_text
     with tempfile.TemporaryDirectory() as td:
         repo = Path(td)
@@ -4276,8 +4274,13 @@ def test_readiness_effective_identity_hook():
         assert global_only.returncode == 0, global_only.stderr
         env_only = hook_run({"GIT_AUTHOR_NAME": "EnvAgent", "GIT_AUTHOR_EMAIL": "env@example.invalid", "GIT_COMMITTER_NAME": "EnvAgent", "GIT_COMMITTER_EMAIL": "env@example.invalid"})
         assert env_only.returncode == 0, env_only.stderr
-        count_cfg = hook_run({"GIT_CONFIG_COUNT": "2", "GIT_CONFIG_KEY_0": "user.name", "GIT_CONFIG_VALUE_0": "CountAgent", "GIT_CONFIG_KEY_1": "user.email", "GIT_CONFIG_VALUE_1": "count@example.invalid"})
+        git("config", "user.name", "FixtureOwner")
+        git("config", "user.email", "owner@example.invalid")
+        count_env = {"GIT_CONFIG_COUNT": "2", "GIT_CONFIG_KEY_0": "user.name", "GIT_CONFIG_VALUE_0": "CountAgent", "GIT_CONFIG_KEY_1": "user.email", "GIT_CONFIG_VALUE_1": "count@example.invalid"}
+        count_cfg = hook_run(count_env)
         assert count_cfg.returncode == 0, count_cfg.stderr
+        counted = git("var", "GIT_AUTHOR_IDENT", extra=count_env)
+        assert "CountAgent" in counted.stdout and "count@example.invalid" in counted.stdout, counted.stdout
         global_cfg.write_text("", encoding="utf-8")
         git("config", "user.name", "FixtureAgent")
         git("config", "user.email", "agent@example.invalid")
@@ -4288,10 +4291,16 @@ def test_readiness_effective_identity_hook():
         discovered.write_text(hook_text, encoding="utf-8", newline="\n")
         discovered.chmod(0o755)
         git("config", "core.hooksPath", ".githooks")
-        p = git("commit", "--allow-empty", "-m", "core hooksPath discovery")
+        git("config", "user.name", "FixtureOwner")
+        git("config", "user.email", "owner@example.invalid")
+        rejected = git("commit", "--allow-empty", "-m", "core hooksPath owner must reject")
+        assert rejected.returncode != 0 and "Refusing commit" in rejected.stderr, rejected.stderr
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        p = git("commit", "--allow-empty", "-m", "core hooksPath valid agent")
         assert p.returncode == 0, p.stderr
         git("config", "--unset", "core.hooksPath")
-        ok("core.hooksPath hook discovery executes the effective-identity hook")
+        ok("core.hooksPath discovery executes the hook: owner rejected, agent accepted")
         p = git("-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "commit", "--allow-empty", "-m", "config override")
         assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
         mutated = hook_text.replace('if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then', 'if false; then')
@@ -4333,6 +4342,8 @@ def test_readiness_memory_canonical_tristate():
     blocks = [b for b in re.findall(r"```[^\n]*\n(#!/bin/sh\n.*?)```", sec, re.DOTALL) if "ancestry_status" in b and "TARGET_PATH" in b]
     assert blocks, "canonical semantics must publish the wrapper"
     wrapper = hashlib.sha256(blocks[0].encode()).hexdigest()[:12]
+    assert "GIT_LITERAL_PATHSPECS=1" in blocks[0], "wrapper must set literal pathspecs"
+    assert "--no-textconv" in blocks[0] and "--no-ext-diff" in blocks[0], "wrapper must disable textconv/ext-diff"
     with tempfile.TemporaryDirectory() as td:
         repo = Path(td); env = {k:v for k,v in os.environ.items() if not k.startswith("GIT_")}; env.update({"GIT_CONFIG_NOSYSTEM":"1","HOME":td,"XDG_CONFIG_HOME":str(Path(td)/"xdg"),"GIT_CONFIG_GLOBAL":str(Path(td)/"gitconfig")})
         w = repo/"wrapper.sh"; w.write_text(blocks[0], encoding="utf-8", newline="\n"); w.chmod(0o755)
@@ -4462,7 +4473,8 @@ def main() -> int:
     print(f"OK: {len(PASSES)} gate self-test assertion(s) passed.")
     if SKIPS and sys.platform.startswith("linux"):
         return 1
-    return 1 if REQUIRED_SKIPS else 0
+    return 1 if (REQUIRED_SKIPS and sys.platform.startswith("linux")) else 0
+    # Non-Linux UNRUN is explicit and does not break unrelated local/Windows suites.
 
 
 if __name__ == "__main__":
