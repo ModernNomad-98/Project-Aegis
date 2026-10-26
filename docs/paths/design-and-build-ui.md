@@ -138,8 +138,12 @@ for what materially blocks the next useful action.
    system, OFF greenfield; not asked as a question). It owns only the iteration
    method, composes the owners above, keeps step 3's design authority unchanged,
    and never makes iteration mandatory; details/record template live in the skill.
-   The final clickthrough is offered after implementation, never required, and a
-   decline or impossible run is recorded as a named UNRUN rather than a pass.
+   The final clickthrough is offered after implementation, never required. An
+   explicit decline is recorded as **declined** (a user answer, not a run
+   outcome and never converted to UNRUN); an attempted but impossible run is
+   **UNRUN** with the unobservable state-hydration/transition defect classes;
+   an unanswered offer invents no answer; a later explicit decision changes the
+   current status while preserving prior history. None of these outcomes is a pass.
 
 4. **Design the parts teams forget** — use the parts that match the change:
 
@@ -207,9 +211,12 @@ for what materially blocks the next useful action.
    running app,* name
    [`clickthrough-test-engineer`](../../.claude/skills/clickthrough-test-engineer/SKILL.md)
    *(manual-only — name it explicitly)*. The iteration method offers the
-   clickthrough after implementation, never requires it, and records a decline
-   or an impossible run as a named UNRUN with the unobservable state-hydration
-   and transition defect classes; it is never a pass. Your agent explains why
+   clickthrough after implementation, never requires it. An explicit decline is
+   recorded as **declined**, not as a run outcome and never converted to UNRUN;
+   an attempted but impossible run is **UNRUN** with the unobservable
+   state-hydration and transition defect classes; an unanswered offer invents no
+   answer; a later explicit decision changes the current status while prior
+   history is preserved; it is never a pass. Your agent explains why
    one is needed and stops; it does not start either for you.
 
 7. **At every agent or tool switch —

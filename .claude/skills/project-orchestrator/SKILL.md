@@ -226,9 +226,10 @@ here.
   ledger state (Output Format). A terminal analytical result does NOT satisfy the
   gate: reaching `complete`, `n/a` (reason), or `NOT COMMIT-ABLE` first enters an
   `*-awaiting-record` state, because the outcome is only PROPOSED until Capability
-  4 runs — preview the exact DECISION entry, take the user's explicit yes to that
-  exact path and content, append, and confirm it landed. Only then is the owner
-  recorded. `product-spec-writer` runs `pending`, then `complete-awaiting-record`,
+  4 runs — preview the exact DECISION entry; use a current valid grant only if it records grant ID, issuer, action, exact path, EXACT content hash (a scope alone NEVER authorizes a content write), issue+expiry dates and revocation state, and is named in the DECISION entry; otherwise take the user's explicit content-specific yes to that exact path and content.
+  After approval/grant the previewed path and byte-for-byte content must remain unchanged — any change invalidates authorization and requires a new preview and approval. Missing/out-of-scope → stop and request a NEW explicit content-specific yes or corrected grant; stale/revoked/conflicting → HARD STOP with no explicit-yes or alternate-authority fallback (a new approval/corrected grant is required); never widen by inference. Verify grants through agent-authorization-matrix, but verification must be INDEPENDENT of the Capability-4 writing actor (a human or separate authorized agent); the DECISION entry records grant ID, the exact content hash compared with the preview, and that independent matrix verification result.
+  Append and confirm only after the unchanged-content check; keep Stage 2 serial. Only then is the owner recorded.
+  `product-spec-writer` runs `pending`, then `complete-awaiting-record`,
   then `complete-recorded` (reached only after the user's OWN acceptance of the spec — anchored to the accepted artifact by path + SHA-256 hash (a fingerprint of the file's exact contents) — is itself a recorded decision per the template; approving a row's wording is not accepting the spec's content); each conditional owner runs `unclassified`, `pending`,
   its `*-awaiting-record` result, then `*-recorded`. `unclassified`, `pending`,
   `blocked`, and every `*-awaiting-record` hold the gate BLOCKED; ONLY `complete-recorded`,
@@ -261,14 +262,11 @@ here.
   `api-contract-test-designer`, `playwright-e2e-engineer` *(manual-only)*,
   `manual-test-case-creator`,
   `accessibility-test-harness`, `performance-test-harness`.
-- **Stage 8 — Get it ready to run.** Start with `cloud-architecture-decider`,
-  then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect`; **Azure** →
-  `azure-saas-architect`; **modern managed tier** (container platform-as-a-service (PaaS), managed
-  Jamstack/server-side rendering (SSR), Postgres backend-as-a-service (BaaS), edge-serverless) → follow the tenancy, RLS,
-  cost, and deployment handoffs the decider itself names — no dedicated
+- **Stage 8 — Get it ready to run.** **First classify hosting applicability from actual approved requirements and artifacts — never from a folder label.** When they explicitly establish that no hosted service, account/tenant backend or infrastructure applies (single operator/browser, local artifact only), take the **local-only release branch before any provider routing**: keep local artifact integrity, persistence, recovery, validation and release verification proportionate, with rollback/recovery steps for the local artifact. This branch may not bypass a hosted requirement or a shared gate; if later approved requirements add hosting, return to the hosted branch below. The local route is explicitly **NOT a deployment, a production operation, or a CI-green claim**; when host applicability is unknown, silent or conflicting, PAUSE and ask the human rather than guessing from a folder/stack label. Minimum local release evidence (not left to 'proportionate'): actual artifact hash + opening command followed, persistence/recovery observation, validation results, rollback/recovery steps, and local data-at-rest security/privacy check, recorded through the applicable existing gates (change-classification-gate; release-readiness-reviewer at Stage 9; security-pr-reviewer where data sensitivity applies), with the shared gates still required. When hosting applies, start with `cloud-architecture-decider`,
+  then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect`; **Azure** → `azure-saas-architect`; **modern managed tier** (container platform-as-a-service (PaaS), managed
+  Jamstack/server-side rendering (SSR), Postgres backend-as-a-service (BaaS), edge-serverless) → follow the tenancy, RLS, cost, and deployment handoffs the decider itself names — no dedicated
   mapper exists by design; **GCP** (Google Cloud Platform) → state plainly that no dedicated GCP
-  mapping skill exists yet and PAUSE the provider-mapping hop for the
-  human's direction (never invent a mapper, never silently reroute to
+  mapping skill exists yet and PAUSE the provider-mapping hop for the human's direction (never invent a mapper, never silently reroute to
   AWS/Azure), continuing below once directed. Then `iac-reviewer` ONLY when
   an actual IaC or config-as-code artifact exists, and unconditionally:
   `ci-pipeline-architect` *(manual-only)* →
@@ -393,11 +391,8 @@ scope, users, success, open questions) refreshed at approved checkpoints.
 - [ ] Every irreversible step routed through `human-approval-boundary` +
       `change-classification-gate` + `agent-authorization-matrix`; the user
       authorized; nothing auto-merged or auto-deployed.
-- [ ] Recording followed propose → approve → append (approved-create at cold
-      start): exact path, ID, date, and byte-for-byte content shown BEFORE any
-      write; explicit content-specific yes; content/path unchanged after it; a
-      declined/ambiguous answer wrote nothing (nothing created at cold start); no
-      prior entry overwritten.
+- [ ] Recording followed propose → approve → append (approved-create at cold start): exact path, ID, date and byte-for-byte content shown BEFORE any write; a current valid grant (ID/issuer/action/path/EXACT content hash; scope never substitutes/issue+expiry/revocation, independently verified, named in the DECISION) is used without repeat consent, otherwise explicit content-specific yes; stale/revoked/conflicting is a hard stop with no explicit-yes fallback.
+      After approval the previewed path and byte-for-byte content are UNCHANGED (any change requires new preview/approval); declined/ambiguous or missing/out-of-scope/stale/revoked/conflicting authority wrote nothing; no prior entry overwritten; Stage 2 stayed serial.
 - [ ] **AR-A shared controls held:** product repo distinguished from the skills
       library; ONE question per turn; low-risk decisions batched to one checkpoint,
       high-risk/authority/irreversible never batched; acceptance never read as
