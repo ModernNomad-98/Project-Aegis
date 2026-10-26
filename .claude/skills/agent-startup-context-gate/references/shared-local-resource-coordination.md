@@ -68,6 +68,16 @@ stop_child() {
 }
 cleanup() {
   if [ "$CLEANED" -eq 1 ]; then return 0; fi
+  OWNED=0
+  if [ -d "$LOCK" ]; then
+    if [ -e "$LOCK/token" ]; then
+      current="$(cat "$LOCK/token" 2>/dev/null || true)"
+      if [ "$current" = "$TOKEN" ]; then OWNED=1; fi
+    else
+      OWNED=1
+    fi
+  fi
+  if [ "$OWNED" -eq 0 ]; then CLEANED=1; return 0; fi
   if [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
   if ! stop_child; then return 1; fi
   if [ -d "$LOCK" ]; then
@@ -78,7 +88,7 @@ cleanup() {
   fi
   CLEANED=1
   return 0
-}
+  }
 on_signal() { trap - INT TERM; echo "interrupted: stopping owned workload before release" >&2; exit 130; }
 trap 'cleanup' EXIT
 trap 'on_signal' INT TERM
