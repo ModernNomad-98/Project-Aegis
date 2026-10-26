@@ -159,6 +159,9 @@ EXPECTED = {
     "bad-stage-router": ["ROUTE-001", "ROUTE-001", "ROUTE-001", "ROUTE-001", "ROUTE-003"],
     "thin-contract": ["EVAL-002", "EVAL-002", "EVAL-004", "EVAL-004", "PARITY-001", "PARITY-002"],
     "stale-linker": ["REF-001", "REF-002", "REF-003", "ROUTE-002"],
+    "manual-only-annotation-only": ["SIDE-005"],
+    "manual-only-setting-only": ["SIDE-005"],
+    "manual-only-correct": [],
 }
 
 
@@ -168,6 +171,7 @@ EXPECTED = {
 # assertion removed or weakened, so the frozen contract self-test count stays
 # exactly OK:71 (see test_side004_fixture_classes).
 SIDE004_PINS = frozenset({"playwright-e2e-engineer", "flaky-test-detective"})
+SIDE005_PINS = frozenset({"manual-only-annotation-only", "manual-only-setting-only", "manual-only-correct"})
 
 
 def test_exact_rule_multisets(a) -> None:
@@ -175,7 +179,7 @@ def test_exact_rule_multisets(a) -> None:
     for skill, expected in EXPECTED.items():
         got = per.get(skill, [])
         assert got == expected, f"[{skill}] expected {expected}, got {got}"
-        if skill in SIDE004_PINS:
+        if skill in SIDE004_PINS or skill in SIDE005_PINS:
             continue  # direct-assert pin: no PASS line (keeps the frozen OK:71)
         ok(f"{skill} yields exactly {expected}")
     total = sum(len(v) for v in EXPECTED.values())
@@ -583,13 +587,14 @@ def test_audit_engine_version_marks_corrected_eval004_semantics() -> None:
     # type-collapsing 1.12.0 engine; a corrected live report has to be
     # distinguishable by VERSION, not only by engine source hash.
     # 1.13.2 adds whole-name skill matching (ROUTE-002 false positive fix).
-    # 1.13.3 changes only the Markdown report format; 1.13.4 extends its key.
-    assert audit_mod.TOOL_VERSION == "1.13.4", (
-        f"corrected EVAL-004 semantics require a minor bump; got "
+    # 1.13.3 changes only the Markdown report format; 1.13.4 extends its key;
+    # 1.14.0 adds SIDE-005 (manual-only annotation/setting/catalog posture).
+    assert audit_mod.TOOL_VERSION == "1.14.0", (
+        f"corrected EVAL-004 semantics + SIDE-005 require a minor bump; got "
         f"{audit_mod.TOOL_VERSION!r}"
     )
-    ok("audit engine reports v1.13.4 for corrected EVAL-004 semantics, raw ARTF-001 "
-       "anchors, whole-name skill matching and the extended report key")
+    ok("audit engine reports v1.14.0 for corrected EVAL-004 semantics and SIDE-005, "
+       "raw ARTF-001 anchors, whole-name skill matching and the extended report key")
 
 
 def test_mentions_skill_name_matches_whole_names_only() -> None:

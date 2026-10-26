@@ -104,7 +104,7 @@ TOOL_NAME = "audit-skill-contracts"
 # the report "freezes the state of the corpus BEFORE remediation" is reworded
 # (baselines are regenerated after remediation). Findings, census, inventory,
 # graph and manifest content are unchanged (owner decision 2026-09-28).
-TOOL_VERSION = "1.13.4"
+TOOL_VERSION = "1.14.0"
 
 
 class InputContainmentError(Exception):
@@ -613,6 +613,28 @@ def parse_typed_target(raw: object) -> TypedTarget | None:
 # never a proven defect. `limits` records the documented false-positive surface —
 # a lexical rule that cannot distinguish USE from MENTION says so here.
 
+# --- SIDE-005: MANUAL-ONLY annotation / disable-model-invocation / catalog
+
+MANUAL_ONLY_PREFIX = re.compile(r"(?i)^\s*manual-only\b")
+CATALOG_MODEL_HEADER = "model-invocable?"
+
+
+def _manual_only_catalog_check(cell: str, manual_only: bool) -> bool:
+    """True when a Model-invocable catalog cell contradicts the actual
+    manual-only posture. The only recognized expectations are a clear
+    'yes' cell and a 'no' cell that explicitly says 'manual only'. A
+    bare 'no' is NOT an expectation (soft no); unknown/missing cells are
+    silent.
+    """
+    text = re.sub(r"[*_`]", "", (cell or "").replace("\u2013", "-").replace("\u2014", "-")).lower()
+    text = re.sub(r"\s+", " ", text).strip()
+    if re.search(r"\byes\b", text):
+        return bool(manual_only)
+    if re.search(r"\bno\b", text) and "manual" in text and "only" in text:
+        return not bool(manual_only)
+    return False
+
+
 RULES: list[dict] = [
     {"id": "SIDE-001", "purpose": "read-only-declared skill instructs artifact writes",
      "authority": "skill-generation-standard.md §5 (default read-only); human-approval-boundary",
@@ -642,7 +664,13 @@ RULES: list[dict] = [
      "positive_fixture": "auto-deployer", "negative_fixture": "clean-skill",
      "aegis_map": ["AEGIS-020", "AEGIS-057"],
      "limits": "covers the §5 classes (source/test/config writes, VCS mutation, install, network, deploy/provision, data-store/live-state writes, spend, unbound doc/state writes) as lexical verb+noun patterns, at most ONE candidate per class per skill; fenced snippets INCLUDED by design (a fenced push is still an instruction); instruction-vs-teaching is the reviewer's call, hence semantic-candidate; the approved-write exception applies ONLY to the doc-state-write class and ONLY when exact-path + content-preview + approval markers sit within a few lines of the write — approval language elsewhere never suppresses anything (extra negative fixture: approved-doc-writer)"},
-    {"id": "APPR-001", "purpose": "bare generic status value with no approval class",
+    {"id": "SIDE-005", "purpose": "MANUAL-ONLY annotation, disable-model-invocation setting and catalog expectation disagree",
+     "authority": "skill-generation-standard.md §2/§5 (MANUAL-ONLY posture must agree across description, disable-model-invocation and the Model-invocable catalog expectation); AEGIS-020/-057",
+     "severity": "P1", "classification": "mechanical",
+     "surfaces": ["frontmatter.description", "frontmatter.disable-model-invocation", "docs/skills-catalog.md Model-invocable tables"],
+     "positive_fixture": "manual-only-annotation-only", "negative_fixture": "manual-only-correct",
+     "aegis_map": ["AEGIS-020", "AEGIS-057"],
+     "limits": "canonical description-prefix only; header-gated Model-invocable tables, special tables and missing rows are silent; malformed setting yields one C1c finding and never a duplicate C1a; catalog C2 recognizes only clear yes / no-manual-only cells (soft 'no' is not an expectation)"},    {"id": "APPR-001", "purpose": "bare generic status value with no approval class",
      "authority": "scoped-approval-register (Status / Scope allowed / FORBIDDEN / Evidence pattern)",
      "severity": "P1", "classification": "mechanical",
      "surfaces": ["skill-body", "references"],
@@ -889,6 +917,80 @@ class Audit:
                 self.skills.append(Skill(child, self.repo))
 
     # -- family A: side-effect & posture (AEGIS-020, -057) -------------------
+
+    def catalog_manual_expectations(self) -> dict[str, str]:
+        """Skill -> Model-invocable cell from header-gated catalog tables.
+        Only tables that actually carry a Model-invocable column participate;
+        special tables (no such column) and rows for skills absent from the
+        catalog are silent."""
+        catalog = self.repo / "docs" / "skills-catalog.md"
+        if not (catalog.exists() or catalog.is_symlink()):
+            return {}
+        self._check_input(catalog)
+        if not catalog.is_file():
+            return {}
+        lines = catalog.read_text(encoding="utf-8").splitlines()
+        out: dict[str, str] = {}
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            if line.startswith("|") and i + 1 < len(lines) and re.match(r"^\|\s*:?-{3,}", lines[i + 1]):
+                header = [c.strip() for c in line.strip().strip("|").split("|")]
+                col = next((j for j, c in enumerate(header)
+                            if re.sub(r"[*_`]", "", c).strip().lower() == CATALOG_MODEL_HEADER), None)
+                if col is None:
+                    i += 1
+                    continue
+                i += 2
+                while i < len(lines) and lines[i].startswith("|"):
+                    cells = [c.strip() for c in lines[i].strip().strip("|").split("|")]
+                    m = re.match(r"^`([a-z0-9-]+)`", cells[0]) if cells else None
+                    if m and len(cells) > col:
+                        out[m.group(1)] = cells[col]
+                    i += 1
+                continue
+            i += 1
+        return out
+
+    def audit_manual_only_posture(self, s: Skill, catalog_expectations: dict[str, str]) -> None:
+        """SIDE-005: description annotation, boolean setting and catalog
+        expectation must agree. C1a annotation-only, C1b setting-only, C1c
+        malformed setting (exactly one posture finding, never a duplicate
+        C1a), and C2 a header-gated catalog expectation contradiction."""
+        missing = object()
+        raw = s.frontmatter.get("disable-model-invocation", missing)
+        annotated = bool(MANUAL_ONLY_PREFIX.match(s.description))
+        malformed = raw is not missing and not isinstance(raw, bool)
+        setting_true = raw is True
+        if malformed:
+            self.findings.append(Finding(
+                "SIDE-005", "P1", s.rel(), 0, s.name,
+                "malformed disable-model-invocation setting: present but not a YAML boolean "
+                f"(value {raw!r}); use true/false",
+                "side-effect", ["AEGIS-020", "AEGIS-057"], s.name, "high", True,
+            ))
+        elif annotated and not setting_true:
+            self.findings.append(Finding(
+                "SIDE-005", "P1", s.rel(), 0, s.name,
+                "MANUAL-ONLY description annotation without disable-model-invocation: true",
+                "side-effect", ["AEGIS-020", "AEGIS-057"], s.name, "medium", True,
+            ))
+        elif setting_true and not annotated:
+            self.findings.append(Finding(
+                "SIDE-005", "P1", s.rel(), 0, s.name,
+                "disable-model-invocation: true without the MANUAL-ONLY description annotation",
+                "side-effect", ["AEGIS-020", "AEGIS-057"], s.name, "medium", True,
+            ))
+        if malformed:
+            return
+        cell = catalog_expectations.get(s.name)
+        if cell is not None and _manual_only_catalog_check(cell, setting_true):
+            self.findings.append(Finding(
+                "SIDE-005", "P1", s.rel(), 0, s.name,
+                f"Model-invocable catalog expectation {cell!r} contradicts actual "
+                f"manual-only={str(setting_true).lower()}",
+                "side-effect", ["AEGIS-020", "AEGIS-057"], s.name, "medium", True,
+            ))
 
     def audit_side_effects(self, s: Skill) -> None:
         flags = s.classify()
@@ -1615,8 +1717,10 @@ class Audit:
         # they are never unioned into one bag of "known names".
         skill_names = {s.name for s in self.skills}
         agent_names = self.agent_names()
+        catalog_expectations = self.catalog_manual_expectations()
         for s in self.skills:
             self.audit_side_effects(s)
+            self.audit_manual_only_posture(s, catalog_expectations)
             self.audit_approvals(s)
             self.audit_state(s)
             self.audit_artifacts(s)
