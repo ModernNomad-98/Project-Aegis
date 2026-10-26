@@ -77,6 +77,12 @@ dco = _load_by_path(DCO_PATH, "aegis_check_dco")
 PASSES: list[str] = []
 
 
+def ok(label: str) -> None:
+    """Record and print one satisfied readiness/hook expectation."""
+    PASSES.append(label)
+    print(f"  PASS  {label}")
+
+
 def expect_error(rep, needle: str, label: str) -> None:
     """Assert the report contains an error mentioning `needle`, and show it."""
     hits = [e for e in rep.errors if needle in e]
@@ -4268,7 +4274,7 @@ def test_readiness_shared_lock_lifecycle():
         def start(workload):
             e = dict(env); e["AEGIS_STACK_WORKLOAD"] = workload
             return subprocess.Popen(["sh", str(script)], cwd=root, env=e, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        holder = start("sh -c 'printf started > started; while [ ! -f release ]; do sleep 0.05; done'")
+        holder = start("printf started > started; while [ ! -f release ]; do sleep 0.05; done")
         try:
             deadline = time.time() + 10
             while not lock.exists() and time.time() < deadline: time.sleep(0.02)
@@ -4292,7 +4298,7 @@ def test_readiness_shared_lock_lifecycle():
         failed = start("false"); fo, fe = failed.communicate(timeout=10)
         assert failed.returncode != 0 and not lock.exists(), (failed.returncode, fe)
         ok("normal and error exits release the lock after child reaping")
-        holder = start("sh -c 'while [ ! -f release ]; do sleep 0.05; done'")
+        holder = start("while [ ! -f release ]; do sleep 0.05; done")
         try:
             deadline = time.time() + 10
             while not lock.exists() and time.time() < deadline: time.sleep(0.02)
@@ -4312,7 +4318,7 @@ def test_readiness_memory_canonical_tristate():
         return
     canon = (REPO_ROOT / "docs/semantics/canonical-semantics.md").read_text(encoding="utf-8")
     sec = canon[canon.index("## 3."):]
-    blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", sec, re.DOTALL)
+    blocks = re.findall(r"```[^\n]*\n(#!/bin/sh\n.*?)```", sec, re.DOTALL)
     assert blocks, "canonical semantics must publish the wrapper"
     wrapper = hashlib.sha256(blocks[0].encode()).hexdigest()[:12]
     with tempfile.TemporaryDirectory() as td:
