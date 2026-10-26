@@ -91,15 +91,21 @@ report the missing setup and stop. Do not copy the repository owner identity fro
 existing commits, and do not invent a new approval when a valid grant already covers
 the action.
 
-Run and record the inspection:
+Run and record the inspection. It reports missing setup and the effective hook path
+without mutating configuration or hook files:
 
 ```bash
-git config --get user.name
-git config --get user.email
-git config --local --get aegis.ownerName
-git config --local --get aegis.ownerEmail
-git var GIT_AUTHOR_IDENT
-git var GIT_COMMITTER_IDENT
+MISSING=0
+if ! git config --get user.name >/dev/null; then echo "STARTUP: agent user.name missing"; MISSING=1; fi
+if ! git config --get user.email >/dev/null; then echo "STARTUP: agent user.email missing"; MISSING=1; fi
+if [ -z "$(git config --local --get aegis.ownerName 2>/dev/null || true)" ]; then echo "STARTUP: recorded owner name missing"; MISSING=1; fi
+if [ -z "$(git config --local --get aegis.ownerEmail 2>/dev/null || true)" ]; then echo "STARTUP: recorded owner email missing"; MISSING=1; fi
+AUTHOR_IDENT=$(git var GIT_AUTHOR_IDENT 2>/dev/null) || { echo "STARTUP: effective author identity unavailable"; MISSING=1; }
+COMMITTER_IDENT=$(git var GIT_COMMITTER_IDENT 2>/dev/null) || { echo "STARTUP: effective committer identity unavailable"; MISSING=1; }
+if [ -n "${AUTHOR_IDENT:-}" ] && [ -n "${COMMITTER_IDENT:-}" ]; then echo "STARTUP: effective author/committer identity available"; fi
+HOOKS_PATH=$(git config --get core.hooksPath 2>/dev/null || true)
+if [ -n "$HOOKS_PATH" ]; then echo "STARTUP: core.hooksPath=$HOOKS_PATH; .git/hooks is not used"; else echo "STARTUP: local hook path .git/hooks/pre-commit"; fi
+[ "$MISSING" -eq 0 ] || exit 1
 ```
 
 Effective author AND committer identities matter, not only the configured defaults:
@@ -108,13 +114,18 @@ recorded. A command override such as `git commit --author` can also change the
 recorded author, but Git applies `--author` after the pre-commit hook, so the local
 hook cannot reliably catch it. The resulting ACTUAL commit is the final oracle:
 inspect `%an <%ae>` and `%cn <%ce>` on the resulting commit. If either effective
-identity is missing, empty or still the recorded owner identity, do not push or
-continue; STOP and remediate/report the mismatch (for an actual commit that already
-exists, remediation replaces the local commit before push).
+identity is missing, empty or still the recorded owner identity, do not push; amend
+or recreate the local commit before push, or STOP and report the mismatch. A pre-commit
+hook may have exited 0 because `--author` was applied after it, so the actual-commit
+inspection is mandatory.
 
-The owner identity comes from local-only config (never committed):
+The owner identity is recorded by an explicitly authorized setup action below, not
+by the read-only startup inspection; perform it only when an applicable authority
+covers the action. It comes from local-only config (never committed):
 
 ```bash
+# AUTHORIZED SETUP (not read-only inspection): record the repository owner identity
+# only under the applicable authority.
 git config --local aegis.ownerName "<owner name>"
 git config --local aegis.ownerEmail "<owner email>"
 ```
@@ -123,7 +134,8 @@ The complete executable pre-commit hook below reads the recorded owner identity 
 validates the EFFECTIVE author and committer through `git var GIT_AUTHOR_IDENT` /
 `git var GIT_COMMITTER_IDENT`. It exits nonzero for missing owner identity, missing/
 invalid effective identity, or effective owner identity in either position. Install
-locally as `.git/hooks/pre-commit`, executable, never committed:
+locally as `.git/hooks/pre-commit`, executable, never committed; `.git/hooks` is used
+only when `core.hooksPath` is unset (the inspection reports the configured hook path):
 
 ```sh
 #!/bin/sh

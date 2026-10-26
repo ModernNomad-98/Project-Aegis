@@ -34,7 +34,13 @@ WORKLOAD="${AEGIS_STACK_WORKLOAD:-true}"
 TTL_MINUTES="${AEGIS_STACK_TTL_MINUTES:-120}"
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$"
 ACQUIRED="$(date -u +%s)"
-TOKEN="owner=$(git config user.name) email=$(git config user.email) run=$RUN_ID acquired=$ACQUIRED ttl_minutes=$TTL_MINUTES"
+OWNER_NAME="$(git config user.name 2>/dev/null || true)"
+OWNER_EMAIL="$(git config user.email 2>/dev/null || true)"
+if [ -z "$OWNER_NAME" ] || [ -z "$OWNER_EMAIL" ]; then
+  echo "STOP: lock owner identity is missing; set git user.name/user.email before acquiring the lock" >&2
+  exit 1
+fi
+TOKEN="owner=$OWNER_NAME email=$OWNER_EMAIL run=$RUN_ID acquired=$ACQUIRED ttl_minutes=$TTL_MINUTES"
 CHILD=""
 CLEANED=0
 stop_child() {
@@ -65,10 +71,16 @@ stop_child() {
 cleanup() {
   if [ "$CLEANED" -eq 1 ]; then return 0; fi
   if ! stop_child; then return 1; fi
-  CLEANED=1
-  if [ -f "$LOCK" ] && grep -q "run=$RUN_ID" "$LOCK" 2>/dev/null; then
-    rm -f "$LOCK"
+  if [ -f "$LOCK" ]; then
+    current="$(cat "$LOCK" 2>/dev/null || true)"
+    if [ "$current" = "$TOKEN" ]; then
+      if ! rm -f "$LOCK"; then
+        echo "INCOMPLETE: failed to remove owned lock" >&2
+        return 1
+      fi
+    fi
   fi
+  CLEANED=1
   return 0
 }
 on_signal() {
@@ -88,7 +100,9 @@ sh -c "$WORKLOAD" &
 CHILD=$!
 wait "$CHILD"; rc=$?
 CHILD=""
-cleanup
+if ! cleanup; then
+  if [ "$rc" -eq 0 ]; then rc=1; fi
+fi
 exit "$rc"
 ```
 

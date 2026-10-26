@@ -76,12 +76,19 @@ dco = _load_by_path(DCO_PATH, "aegis_check_dco")
 # Every satisfied expectation appends its label here, so the run ends with a
 # count rather than a bare "no news is good news".
 PASSES: list[str] = []
+SKIPS: list[str] = []
 
 
 def ok(label: str) -> None:
     """Record and print one satisfied readiness/hook expectation."""
     PASSES.append(label)
     print(f"  PASS  {label}")
+
+
+def skip(label: str) -> None:
+    """Record an explicit UNRUN/skip; skips are never passes."""
+    SKIPS.append(label)
+    print(f"  SKIP  {label}")
 
 
 def expect_error(rep, needle: str, label: str) -> None:
@@ -4197,7 +4204,7 @@ def _readiness_posix_ready() -> bool:
 def test_readiness_effective_identity_hook():
     """AI-R01/R02: effective author+committer hook, actual commits as oracle."""
     if not _readiness_posix_ready():
-        print("  SKIP  effective-identity hook: POSIX sh not available on this host")
+        skip("effective-identity hook: POSIX sh not available on this host")
         return
     skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
     hook_blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", skill, re.DOTALL)
@@ -4232,27 +4239,42 @@ def test_readiness_effective_identity_hook():
         ok("actual commit uses the valid agent author and committer")
         git("config", "user.name", "FixtureOwner")
         git("config", "user.email", "owner@example.invalid")
-        assert hook_run().returncode != 0, "configured owner identity must reject"
+        owner_hook = hook_run()
+        assert owner_hook.returncode != 0 and "Refusing commit" in owner_hook.stderr, owner_hook.stderr
         p = git("commit", "--allow-empty", "-m", "owner config commit")
-        assert p.returncode != 0, "owner-configured commit must not proceed"
+        assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
         ok("owner configured identity rejected before commit")
         git("config", "user.name", "FixtureAgent")
         git("config", "user.email", "agent@example.invalid")
         p = git("commit", "--allow-empty", "-m", "owner author env", extra={"GIT_AUTHOR_NAME": "FixtureOwner", "GIT_AUTHOR_EMAIL": "owner@example.invalid"})
-        assert p.returncode != 0, "owner effective author override must reject"
+        assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
         p = git("commit", "--allow-empty", "-m", "owner committer env", extra={"GIT_COMMITTER_NAME": "FixtureOwner", "GIT_COMMITTER_EMAIL": "owner@example.invalid"})
-        assert p.returncode != 0, "owner effective committer override must reject"
+        assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
         ok("environment author/committer owner overrides rejected")
-        p = git("commit", "--allow-empty", "-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "-m", "config override")
-        assert p.returncode != 0, "command-level git -c owner override must reject"
-        ok("command-level git -c owner override rejected by the effective identity hook")
+        p = git("-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "commit", "--allow-empty", "-m", "config override")
+        assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
+        mutated = hook_text.replace('if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then', 'if false; then')
+        assert mutated != hook_text
+        hook.write_text(mutated, encoding="utf-8", newline="\n")
+        p = git("-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "commit", "--allow-empty", "-m", "mutated config override")
+        assert p.returncode == 0, p.stderr
+        ident = git("show", "-s", "--format=%an|%ae|%cn|%ce").stdout.strip()
+        assert ident == "FixtureOwner|owner@example.invalid|FixtureOwner|owner@example.invalid", ident
+        hook.write_text(hook_text, encoding="utf-8", newline="\n")
+        ok("command-level -c override rejected; mutation removing the owner check lets it commit owner author+committer")
         p = git("commit", "--allow-empty", "-m", "author command override", "--author=FixtureOwner <owner@example.invalid>")
         if p.returncode == 0:
             ident = git("show", "-s", "--format=%an|%ae|%cn|%ce").stdout.strip()
             assert "owner@example.invalid" in ident, ident
             ok("--author actual commit identity inspected; local hook cannot undo a post-hook --author override")
         else:
-            ok("--author owner override rejected before commit")
+            assert "Refusing commit" in p.stderr or "STOP:" in p.stderr, p.stderr
+            ok("--author owner override rejected before commit with the hook message")
+        git("config", "--unset", "user.name")
+        git("config", "--unset", "user.email")
+        missing = hook_run()
+        assert missing.returncode != 0 and ("effective Git author identity unavailable" in missing.stderr or "effective Git author/committer identity is missing" in missing.stderr), missing.stderr
+        ok("missing effective author/committer identity is reported and rejected")
         git("config", "user.name", "FixtureOwner")
         git("config", "user.email", "owner@example.invalid")
         p = git("commit", "--allow-empty", "--no-verify", "-m", "bypass")
@@ -4263,7 +4285,7 @@ def test_readiness_effective_identity_hook():
 def test_readiness_startup_authority_non_mutating():
     """AI-R01: covered/uncovered startup inspection is read-only and accurately reported."""
     if not _readiness_posix_ready():
-        print("  SKIP  startup-authority observation: POSIX sh not available on this host")
+        skip("startup-authority observation: POSIX sh not available on this host")
         return
     skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
     inspection_match = re.search(r"Run and record the inspection:\s*```bash\n(.*?)```", skill, re.DOTALL)
@@ -4292,6 +4314,7 @@ def test_readiness_startup_authority_non_mutating():
         before = state()
         inspected = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert inspected.returncode == 0, (inspected.returncode, inspected.stderr)
+        assert "STARTUP: local hook path" in inspected.stdout or "STARTUP: core.hooksPath" in inspected.stdout, inspected.stdout
         after = state()
         assert after == before, "read-only identity inspection must not change config or hooks"
         ok("covered startup inspection is non-mutating (git config bytes and hook files unchanged)")
@@ -4307,7 +4330,7 @@ def test_readiness_startup_authority_non_mutating():
         missing_owner = subprocess.run(["git", "config", "--local", "--get", "aegis.ownerName"], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert missing_owner.returncode != 0, "inspection must report the missing recorded owner identity"
         blocked = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
-        assert blocked.returncode == 0, "documented inspection commands complete; the missing value is reported separately"
+        assert blocked.returncode != 0 and "STARTUP: recorded owner" in blocked.stdout, (blocked.returncode, blocked.stdout)
         hook_blocked = subprocess.run([str(hook)], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert hook_blocked.returncode != 0 and "recorded owner identity missing" in hook_blocked.stderr
         assert git("commit", "--allow-empty", "-m", "uncovered setup").returncode != 0
@@ -4318,7 +4341,7 @@ def test_readiness_startup_authority_non_mutating():
 def test_readiness_shared_lock_lifecycle():
     """AI-R03: lock ownership, signal/child lifecycle, cleanup and successor safety."""
     if not _readiness_posix_ready():
-        print("  SKIP  shared-lock lifecycle: POSIX sh not available on this host")
+        skip("shared-lock lifecycle: POSIX sh not available on this host")
         return
     ref = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md").read_text(encoding="utf-8")
     blocks = [b for b in re.findall(r"```(?:bash|sh)\n(.*?)```", ref, re.DOTALL) if "AEGIS_STACK_LOCK" in b]
@@ -4331,6 +4354,7 @@ def test_readiness_shared_lock_lifecycle():
         script.chmod(0o755)
         env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
         env.update({"AEGIS_STACK_LOCK": str(lock), "GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(Path(td) / "xdg"), "GIT_CONFIG_GLOBAL": str(Path(td) / "gitconfig")})
+        (root / "gitconfig").write_text("[user]\n\tname = FixtureAgent\n\temail = agent@example.invalid\n", encoding="utf-8")
         def start(workload):
             e = dict(env); e["AEGIS_STACK_WORKLOAD"] = workload
             return subprocess.Popen(["sh", str(script)], cwd=root, env=e, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -4419,12 +4443,48 @@ def test_readiness_shared_lock_lifecycle():
             except OSError: pass
             if holder.poll() is None: holder.kill(); holder.communicate(timeout=5)
             if lock.exists(): lock.unlink()
+        if (root / "release").exists(): (root / "release").unlink()
+        collision_holder = start("while [ ! -f release ]; do sleep 0.05; done")
+        try:
+            deadline = time.time() + 10
+            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
+            assert lock.exists(), "prefix-collision holder must acquire the lock"
+            own_token = lock.read_text(encoding="utf-8")
+            prefix_token = re.sub(r"run=([^ ]+)", lambda m: "run=" + m.group(1) + "1", own_token)
+            assert prefix_token != own_token
+            lock.write_text(prefix_token, encoding="utf-8")
+            collision_holder.terminate(); collision_holder.communicate(timeout=15)
+            assert lock.exists(), "cleanup must not delete a run-id-prefix successor lock"
+            ok("successor run-id prefix collision is preserved (cleanup uses exact token equality)")
+        finally:
+            try: (root / "release").write_text("release\n", encoding="utf-8")
+            except OSError: pass
+            if collision_holder.poll() is None: collision_holder.kill(); collision_holder.communicate(timeout=5)
+            if lock.exists(): lock.unlink()
+        if (root / "release").exists(): (root / "release").unlink()
+        rm_holder = start("while [ ! -f release ]; do sleep 0.05; done")
+        try:
+            deadline = time.time() + 10
+            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
+            assert lock.exists(), "rm-failure holder must acquire the lock"
+            os.chmod(root, 0o555)
+            (root / "release").write_text("release\n", encoding="utf-8")
+            rm_out, rm_err = rm_holder.communicate(timeout=15)
+            assert rm_holder.returncode != 0, (rm_holder.returncode, rm_err)
+            assert lock.exists(), "failed lock removal must retain ownership and report nonzero"
+            ok("failed owned-lock removal exits nonzero and retains the lock")
+        finally:
+            os.chmod(root, 0o755)
+            try: (root / "release").write_text("release\n", encoding="utf-8")
+            except OSError: pass
+            if rm_holder.poll() is None: rm_holder.kill(); rm_holder.communicate(timeout=5)
+            if lock.exists(): lock.unlink()
 
 
 def test_readiness_memory_canonical_tristate():
     """AI-R08: ancestry/content tri-state, UNVERIFIED on errors, no boolean shortcut."""
     if not _readiness_posix_ready():
-        print("  SKIP  canonical ancestry tri-state: POSIX sh not available on this host")
+        skip("canonical ancestry tri-state: POSIX sh not available on this host")
         return
     canon = (REPO_ROOT / "docs/semantics/canonical-semantics.md").read_text(encoding="utf-8")
     heading = re.search(r"^##\s+3\.\s+R8 core semantics", canon, re.MULTILINE)
@@ -4457,8 +4517,8 @@ def test_readiness_memory_canonical_tristate():
         invalid=run("deadbeef"*5,b,"target"); assert invalid.returncode!=0 and "UNVERIFIED" in invalid.stdout and "oid_match_status=UNVERIFIED" in invalid.stdout
         empty=run(b,b,""); assert empty.returncode==2 and "UNVERIFIED" in empty.stdout
         memrules=(REPO_ROOT/".claude/skills/agent-memory-governance/references/memory-rules.md").read_text(encoding="utf-8")
-        assert "Legacy boolean shortcut - removed" in memrules
-        ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut removed")
+        assert "Legacy boolean shortcut - forbidden" in memrules
+        ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut forbidden")
 
 
 TESTS = [
@@ -4557,6 +4617,8 @@ def main() -> int:
             return 1
         print()
 
+    if SKIPS:
+        print(f"SKIPPED: {len(SKIPS)} test(s) (UNRUN, not passes)")
     print(f"OK: {len(PASSES)} gate self-test assertion(s) passed.")
     return 0
 
