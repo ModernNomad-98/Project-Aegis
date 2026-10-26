@@ -13,7 +13,7 @@
           "Verifies the captured revision hash and the clean base before auditing.",
           "Re-runs the executable closures on the base and confirms they fail; checks the after-state expectations.",
           "Independently re-measures counts/gate values and checks the protected-path/authority statements.",
-          "Returns CONFIRM or REVISE/REJECT with a minimal fix list bound to the captured hash and routes findings as backlog input only."
+          "Returns ACCEPT (the Stage-B exit-gate vocabulary) or REVISE/REJECT with a minimal fix list bound to the captured hash and routes findings as backlog input only."
         ]
       }
     },

@@ -61,7 +61,7 @@ A plan-of-record package under the evidence item directory: PLAN.md (concise, si
 
 ## Stop Conditions
 
-- Stop and ask the owner when a required decision is missing and no recorded default applies.
+- Surface a required owner decision as an OPEN owner decision (options, defaults, consequences) and keep drafting the rest of the package; stop only when the next step would require choosing without a recorded default, and never choose the owner's decision yourself.
 - Stop when the working base is dirty or cannot be verified.
 - Stop when a proposed closure cannot genuinely fail before the change (it proves nothing).
 - Never implement, push, merge or approve; hand off instead.

@@ -14,7 +14,7 @@
   "cases": [
     {
       "id": "plan-verdict-request",
-      "prompt": "Audit the captured plan revision and return CONFIRM or REVISE.",
+      "prompt": "Audit the captured plan revision and return ACCEPT or REVISE.",
       "expected_skill": "plan-audit-reviewer",
       "should_not_trigger": [
         "acceptance-criteria-reviewer"

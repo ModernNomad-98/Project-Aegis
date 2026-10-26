@@ -6,7 +6,7 @@
     {
       "id": "new-feature-plan",
       "type": "should_trigger",
-      "prompt": "Plan the work to add an export-audit-log feature to our SaaS product. It touches the API, the database and the admin UI. Give me the plan of record before we start.",
+      "prompt": "Plan the work inside the Project Aegis source library to add an export-audit-log skill surface. It touches our own SKILL.md/registry surfaces and documentation. Give me the plan of record before we start.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -64,7 +64,7 @@
       "expect": {
         "triggers": false,
         "assertions": [
-          "Declines to implement and routes to the plan-of-record-author / human-approval-boundary flow; produces no code."
+          "Declines to implement; routes to the implementation stage (change-classification-gate / code-writing flow) and to human-approval-boundary when the action is risky; produces no code and claims no approval."
         ]
       }
     },

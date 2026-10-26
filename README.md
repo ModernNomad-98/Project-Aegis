@@ -1119,7 +1119,7 @@ Phase 1 — AI engineering operating-discipline pack, under `.claude/skills/<nam
 | `agent-instruction-consolidator` | Aligns CLAUDE.md / AGENTS.md / Cursor / Copilot instruction files to one canonical source with rule-preservation proof. | **manual only** |
 
 Phase 1.5 — AI-SDLC governance completion (roadmap #261/#268/#279/#280, plus #266 under
-D69 and #281/#282 under D7; completes the category-08 layer Phase 1 started — composes the Phase 1 skills, never
+D69 plus the two plan-stage skills under the external owner decision OD-6 (beyond-roadmap, no repository D-number); completes the category-08 layer Phase 1 started — composes the Phase 1 skills, never
 restates them):
 
 | Skill | What it does | Invocation |
@@ -1129,8 +1129,8 @@ restates them):
 | `agent-memory-governance` | Persistent-memory WRITE/TRUST/HYGIENE rules: confirmed durable facts with provenance and absolute dates, never secrets; remembered repo/PR state verified against live git/gh before acting; disposition-approved cleanups. | **manual only** |
 | `agent-governance-audit` | Audits one AI-assisted change's process compliance from primary evidence (PR timeline incl. who armed auto-merge, commits, CI runs): per-control PASS/FAIL/UNVERIFIABLE verdicts; closeout claims cross-checked; missing evidence is never a PASS. | auto + manual |
 | `ai-task-decomposer` | (D69, #266) Splits a broad goal, epic or approved spec into ordered, PR-sized tasks: one intent each, an observable done criterion with its evidence, likely files or layers, a provisional change class, risks, dependencies and approval flags; unknowns become spikes or owner questions. Plans only; starts nothing and edits nothing. | auto + manual |
-| `plan-of-record-author` | (D7, #281) Turns a request or owner directive into ONE plan-of-record artifact package before implementation: objective/why, blast radius and paths, five-question necessity/reuse, scope + protected-path/authority map, acceptance criteria, executable fail-before/pass-after closures, surfaced owner decisions, verification/re-base and non-circular evidence bindings. Never implements and never approves its own plan; hands the captured revision to an independent plan auditor. | auto + manual |
-| `plan-audit-reviewer` | (D7, #282) Independently audits a captured plan-of-record revision: completeness, feasibility, authority/boundary, count/protected-path coherence, acceptance observability, closure fail-before validity and owner-decision disclosure. Returns CONFIRM or REVISE/REJECT with a minimal fix list bound to the exact captured revision hash; never authors or self-approves; findings are backlog input only. | auto + manual |
+| `plan-of-record-author` | (external owner decision OD-6, 2026-10-25; beyond-roadmap) Turns a request or owner directive into ONE plan-of-record artifact package before implementation: objective/why, blast radius and paths, five-question necessity/reuse, scope + protected-path/authority map, acceptance criteria, executable fail-before/pass-after closures, surfaced owner decisions, verification/re-base and non-circular evidence bindings. Never implements and never approves its own plan; hands the captured revision to an independent plan auditor. | auto + manual |
+| `plan-audit-reviewer` | (external owner decision OD-6, 2026-10-25; beyond-roadmap) Independently audits a captured plan-of-record revision: completeness, feasibility, authority/boundary, count/protected-path coherence, acceptance observability, closure fail-before validity and owner-decision disclosure. Returns ACCEPT or REVISE/REJECT (Stage-B vocabulary) with a minimal fix list bound to the exact captured revision hash; never authors or self-approves; findings are backlog input only. | auto + manual |
 
 Phase 2 — core architecture & engineering pack:
 
