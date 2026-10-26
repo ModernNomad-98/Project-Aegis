@@ -4201,10 +4201,17 @@ def _readiness_posix_ready() -> bool:
     return os.name != "nt" and shutil.which("sh") is not None
 
 
+def _readiness_skip(label: str) -> None:
+    """Skip only on Windows; an unexpected POSIX skip fails the suite."""
+    if os.name != "nt":
+        raise AssertionError("required readiness case skipped on POSIX host: " + label)
+    skip(label)
+
+
 def test_readiness_effective_identity_hook():
     """AI-R01/R02: effective author+committer hook, actual commits as oracle."""
     if not _readiness_posix_ready():
-        skip("effective-identity hook: POSIX sh not available on this host")
+        _readiness_skip("effective-identity hook: POSIX sh not available on this host")
         return
     skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
     hook_blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", skill, re.DOTALL)
@@ -4281,9 +4288,7 @@ def test_readiness_effective_identity_hook():
         else:
             assert "Refusing commit" in p.stderr or "STOP:" in p.stderr, p.stderr
             ok("--author owner override rejected before commit with the hook message")
-        git("config", "--unset", "user.name")
-        git("config", "--unset", "user.email")
-        missing = hook_run()
+        missing = hook_run({"GIT_AUTHOR_NAME": "", "GIT_AUTHOR_EMAIL": "", "GIT_COMMITTER_NAME": "", "GIT_COMMITTER_EMAIL": ""})
         assert missing.returncode != 0 and ("effective Git author identity unavailable" in missing.stderr or "effective Git author/committer identity is missing" in missing.stderr), missing.stderr
         ok("missing effective author/committer identity is reported and rejected")
         git("config", "user.name", "FixtureOwner")
@@ -4296,7 +4301,7 @@ def test_readiness_effective_identity_hook():
 def test_readiness_startup_authority_non_mutating():
     """AI-R01: covered/uncovered startup inspection is read-only and accurately reported."""
     if not _readiness_posix_ready():
-        skip("startup-authority observation: POSIX sh not available on this host")
+        _readiness_skip("startup-authority observation: POSIX sh not available on this host")
         return
     skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
     inspection_match = re.search(r"Run and record the inspection[\s\S]*?```bash\n(.*?)```", skill, re.DOTALL)
@@ -4356,7 +4361,8 @@ def test_readiness_startup_authority_non_mutating():
         mismatch = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert mismatch.returncode != 0 and "matches the recorded owner identity" in mismatch.stdout, (mismatch.returncode, mismatch.stdout)
         git("config", "user.name", "")
-        empty = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        empty_env = dict(env); empty_env.update({"GIT_AUTHOR_NAME": "", "GIT_AUTHOR_EMAIL": "", "GIT_COMMITTER_NAME": "", "GIT_COMMITTER_EMAIL": ""})
+        empty = subprocess.run(["sh", "-c", inspection], cwd=repo, env=empty_env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert empty.returncode != 0 and ("configured agent user.name absent" in empty.stdout or "effective author identity unavailable" in empty.stdout), (empty.returncode, empty.stdout)
         git("config", "user.name", "FixtureAgent")
         ok("inspection rejects effective identity matching the recorded owner and empty effective identity")
@@ -4391,7 +4397,7 @@ def test_readiness_startup_authority_non_mutating():
 def test_readiness_shared_lock_lifecycle():
     """AI-R03: atomic lock, ready/child lifecycle, signals, cleanup and successor safety."""
     if not _readiness_posix_ready():
-        skip("shared-lock lifecycle: POSIX sh not available on this host")
+        _readiness_skip("shared-lock lifecycle: POSIX sh not available on this host")
         return
     ref = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md").read_text(encoding="utf-8")
     blocks = [b for b in re.findall(r"```(?:bash|sh)\n(.*?)```", ref, re.DOTALL) if "AEGIS_STACK_LOCK" in b]
@@ -4531,7 +4537,7 @@ def test_readiness_shared_lock_lifecycle():
 def test_readiness_memory_canonical_tristate():
     """AI-R08: ancestry/content tri-state, UNVERIFIED on errors, no boolean shortcut."""
     if not _readiness_posix_ready():
-        skip("canonical ancestry tri-state: POSIX sh not available on this host")
+        _readiness_skip("canonical ancestry tri-state: POSIX sh not available on this host")
         return
     canon = (REPO_ROOT / "docs/semantics/canonical-semantics.md").read_text(encoding="utf-8")
     heading = re.search(r"^##\s+3\.\s+R8 core semantics", canon, re.MULTILINE)
