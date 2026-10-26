@@ -104,7 +104,14 @@ Per-claim live-read-back inventory (quote command plus observed output):
 - Merge claim: gh pr view <n> --json state,mergeCommit,mergedAt,headRefOid - quote exact mergeCommit/mergedAt/head.
 - Label claim: gh api repos/{owner}/{repo}/issues/<n>/labels --jq '.[].name' - quote observed labels.
 - Check-run claim: gh api repos/{owner}/{repo}/commits/<sha>/check-runs --jq '.check_runs[] | {name,status,conclusion,head_sha}' - quote name/status/conclusion/head_sha.
-- Push/ref claim: git ls-remote <remote> <ref> - quote the exact sha; or git rev-parse <ref> plus git log -1 --format=%H%x20%s.
+- Push/ref/tag/branch claim: re-read the remote and quote the exact ref and SHA - `git ls-remote <remote> <ref>` (quote the observed ref and SHA) or a provider/API read-back such as PR/check/ref JSON. Local `git rev-parse` / `git log` / `git status` output may be recorded as supplementary context only and is never proof of remote state. No remote read-back => UNVERIFIED, never a push/ref claim.
+
+**Local state is not remote evidence.** A local repository can be ahead of or behind the
+remote, contain unpushed commits, or be a stale clone, so `git rev-parse`, `git log`,
+`git status` or a local branch listing proves only local state. After any push/ref/tag/branch
+change, re-read the remote (or the provider API) and record the exact ref, SHA and observed
+path plus the read-back time; local read-back is supplementary context only. If no remote
+read-back was possible, write UNVERIFIED and do not claim the change.
 
 Rule: every claim quotes command and observed output; missing or negative read-back
 => UNVERIFIED, never a claim.
@@ -113,10 +120,24 @@ Rule: every claim quotes command and observed output; missing or negative read-b
 
 Every implementation PR body (M-2) carries exactly one five-column Aegis-skills-applied
 table: Skill and source revision | Actor / role | Purpose | How applied | Result, evidence,
-and limitations. The body also carries a PR-body review-evidence disposition record for
-every provider/page/cursor: provider, link, reviewed original_commit_id,
-concern/applicability, disposition, evidence, uncertainty. Missing reviews are not clean.
-This SKILL states the requirement; D/F stages verify the actual PR body.
+and limitations.
+
+It also carries a PR-body review-evidence disposition record covering **every provider, page and cursor** of
+review feedback: submitted reviews; **inline review comments** and review threads (including resolved and
+outdated threads, with `original_commit_id` where the provider exposes it); PR conversation comments;
+review-workflow runs and check annotations where the provider exposes them. For each substantive finding
+record: provider, link, reviewed `original_commit_id` (the commit the finding was written against -
+not the re-anchored `commit_id`), concern and applicability, disposition (fixed | accepted | disputed |
+duplicate | superseded | unresolved), evidence, uncertainty. Access gaps are explicit: **missing reviews are not clean** - a missing review,
+page or cursor is reported as an access gap; an unavailable review or a usage-limit
+response is never a clean review. **Never claim a pass, clean or complete review state** from a partial
+read; record what was read, what was not, and the OPEN items. This SKILL states the requirement; D/F
+stages verify the actual PR body. The authoritative owner rule is AGENTS.md "Source-library owner rule:
+Aegis skills applied and review evidence" section 4 (review feedback from every provider); the merge-gate
+requirement is docs/delivery-workflow.md MG2 (a posted SD-F verdict comment naming the exact head and
+bound-fields hash, accepted, and its comment ID recorded in the merge receipt). Pointers only - do not
+restate the owner rule. **Review read-back** means the per-object enumeration above, not only the
+submitted-reviews list.
 
 ## Output Format
 
@@ -157,6 +178,13 @@ CLOSEOUT REPORT
 - [ ] "Complete" is unqualified only when no recorded gap remains open.
 - [ ] Any completion-baseline anchor cites merged/applied evidence (PR, SHA,
       migration), not in-flight state.
+- [ ] Push/ref/tag/branch claims quote a **remote read-back** (the exact remote ref + SHA, or
+      provider/API JSON); local `git rev-parse`/`git log`/`git status` is supplementary only, and no
+      successful remote read-back means UNVERIFIED, never a claimed push/ref.
+- [ ] Review coverage enumerates every provider, page and cursor (submitted reviews, inline
+      review comments/threads with `original_commit_id` where exposed, conversation comments,
+      review-workflow/check annotations where exposed); a missing page/cursor/review is recorded as
+      NOT clean, and no pass/clean/complete review state is claimed from a partial read.
 
 ## Gotchas
 

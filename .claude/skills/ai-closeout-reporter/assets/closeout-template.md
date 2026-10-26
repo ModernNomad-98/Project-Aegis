@@ -63,6 +63,23 @@ no check that proves it reads "not verified" and also appears in section 7.
 Then any other outputs, links, screenshots and the PR URL — whatever lets a
 human verify without rerunning everything.
 
+**Remote-change evidence (required for push/ref/tag/branch/PR/comment/review/merge/check-run claims).**
+The evidence must be a **remote read-back**: the exact command and its observed output, quoting the
+remote ref and SHA (e.g. `git ls-remote <remote> <ref>`) or the provider/API JSON (PR/check/ref).
+Local `git rev-parse` / `git log` / `git status` is supplementary only and is not remote
+evidence; write UNVERIFIED when no remote read-back was performed.
+
+**Review-coverage record (required for PR closeouts).** For **every provider, page and cursor** list:
+provider; page/cursor link; reviewed `original_commit_id` (the commit the finding was written
+against, not the re-anchored `commit_id`); concern/applicability; disposition (fixed | accepted |
+disputed | duplicate | superseded | unresolved); evidence; uncertainty. Cover submitted reviews,
+**inline review comments**/threads (resolved/outdated too, where exposed), conversation comments and
+review-workflow/check annotations where exposed. A missing page, cursor or review is **not clean** -
+record the access gap; never claim a pass/clean/complete review state from a partial read.
+
+This section is the **review read-back** the closeout reports: enumerate the objects actually read
+and the gaps, and link each finding.
+
 ## 6. Risks & known gaps
 
 What could bite later; what is fragile; what depends on unverified assumptions.
