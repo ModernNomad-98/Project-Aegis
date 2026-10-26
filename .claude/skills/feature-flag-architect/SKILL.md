@@ -162,23 +162,61 @@ nothing.
    assignment stays consistent. Every cached per-tenant value is keyed by
    tenant as well as flag; a cache key without the tenant is a
    cross-tenant leak.
-6. **Fail-safe mechanism.** The strategist picks each flag's safe value;
-   this skill designs the mechanism that falls back to it. Specify: a
-   code-level default at every call site (set to the strategist's safe
-   value); a last-known-good cache or bootstrap snapshot served when the
-   flag service is unreachable; an evaluation timeout, stated in
-   milliseconds, that never blocks a request or a page render; cold-start
-   behavior with no cache (serve the code default and emit a metric, so
-   fallback use is visible); and how the fallback is
-   exercised in a non-production environment by making the flag service
-   unreachable. A flag that fails open into unfinished code is the defect
-   this step exists to prevent.
+6. **Fail-safe mechanism.** The strategist picks each flag's safe value; for kill switches that safe value
+IS the protective/old behavior by definition at design time, and for variant/payload flags the design
+enumerates the exact safe value/state. State ONE outage contract HERE as the single authoritative ordered
+resolution; step 7, this skill's reference, checklist and output sheet are normative pointers and never define a different order: (1) AUTHORIZED OVERRIDE and (1a) EXPIRED_SAFE_LATCH - the validated override/latch/clear contract for this skill (derived documents are reviewed pointers to this step). An override may act ahead of the resolution below ONLY after the offline authorization path succeeds: signed local role cache (max age <N s>, expiry, environment/tenant scope, instance binding, signature) and signed local revocation snapshot (max age <N s>, refresh on reconnect, monotonic signed epoch anchored outside restorable state; a replayed older epoch fails closed), with signing keys in the pinned root-of-trust hierarchy; a missing/expired/unsigned/unverifiable/revoked/scope-mismatched/replayed cache or snapshot leaves the override UNAVAILABLE - a fail-safe condition for the override path only, NOT a fail-closed suppression of LIVE: resolution continues to LIVE below and ends at UNKNOWN -> default when no applicable source exists; the owner-disclosed AD-11 decision is that failed override authorization never suppresses LIVE. A single-use break-glass credential is short-lived; its signed scope BINDS instance/environment/tenant AND the flag key, the operation, the exact safe value, actor and audience; it is consumed through an ATOMIC check-and-record against a persistent AUTHENTICATED append-only nonce ledger whose counter is anchored OUTSIDE the restorable instance (unverifiable/rolled-back/restored ledger fails CLOSED as serve-safe - single-use cannot be proven); the consumption record binds credential id, scope, flag key, operation and exact safe value. Override lifecycle (validated transitions only): ACTIVE from an authorized activation -> EXPIRING on TTL -> EXPIRED_SAFE_LATCH when TTL expires with the last-known LIVE differing from the exact safe value -> CLEARED only via a fresh Path A or Path B authorization AND a recorded reconciliation. Trust-refresh expiry enters/keeps EXPIRED_SAFE_LATCH with the exact safe value until fresh authorization. EXPIRED_SAFE_LATCH is a first-class NON-LIVE state entered before (2) LIVE: it serves the exact safe value, telemetry reports source=override and state=override_expired_safe_latch, live_failure_reason is not required, and it is not routed through FRESH_CACHE or UNKNOWN; it is released only by fresh Path A/B authorization (reconciliation is recorded evidence and never releases it alone). Auto-clear and any other branches are NOT part of the validated subset. Authorization decision table: Path A and Path B are alternatives, each with its own trust checks; a path failing disables only that path, both failing leaves the override UNAVAILABLE (fail-safe as above). Path A = signed role cache + signed revocation snapshot as above; Path B = single-use break-glass credential as above. Telemetry served-value rule: any served-value telemetry field is size-bounded and redacts or digest-logs payload/variant content that may contain PII or secrets; the telemetry state rows are:  fresh (FRESH_CACHE), stale/rejected/untrusted cache (not served, exact safe value), LIVE (valid synchronous evaluation), EXPIRED_SAFE_LATCH (source=override, exact safe value).
+   (2) LIVE   (2) LIVE - authoritative, and only a SUCCESSFUL, VALID evaluation response within the
+per-flag timeout <N ms>: a success/2xx status AND a parseable, schema-validated flag value. An error status
+(for example 500), a malformed/unparseable payload and a timeout are FAILURES, never live values. A valid
+live value is served as-is even when it differs from the safe value; that normal LIVE divergence is
+authoritative and only optionally aggregated. The total evaluation budget for one render (sum of per-flag
+First paint may therefore show the safe value until a later differing LIVE value is applied; that flip is
+allowed and observable. (3) FRESH_CACHE - only when the live attempt failed and a last-known-good cache or
+bootstrap snapshot's value EQUALS the flag's exact code-level safe value (variants: the exact value/state
+the design enumerated). Because the code default must also equal that exact safe value, FRESH_CACHE is
+behaviorally identical to the default: during an outage enabled features revert to their safe/old behavior.
+call-site drift, not a different served value (threat model: prevent a copied or tampered cache entry from
+untrusted (timestamp missing/future/integrity or revocation check fails, malformed/unclassified payload),
+rejected (value not equal to the exact safe value), stale (age > the per-flag HARD MAXIMUM SERVE AGE <N s>),
+fresh (integrity + revocation valid and age <= hard maximum serve age). Serve only when cache_state is
+fresh, with source=cache and, when a live attempt failed, live_failure_reason; the per-flag refresh TTL <N s> is a refresh trigger
+only. The cache MAC/signature covers a domain-separated tuple (domain tag, flag key, tenant, environment,
+canonical serialized value with schema version, timestamp); a plain checksum is NOT sufficient. Timestamps
+compare against the local wall clock with a bounded monotonic offset (persisted timestamps cannot be assumed
+site serves its code-level default, which MUST equal the flag's exact safe value; a CI or test check
+verifies every call-site default against the registry's recorded safe value. Scope is stated once in step 6 (single guarantee, all NON-LIVE paths); this section is a pointer.nd an active authorized override) serve the exact safe value; LIVE is authoritative and may legitimately differ. A cache or
+bootstrap value not equal to the exact safe value is NEVER served (any value type - boolean, variant,
+Bounded staleness is the per-flag HARD MAXIMUM SERVE AGE <N s> (the serve bound); the per-flag refresh TTL <N s> is a separate refresh trigger only (<N s> values required per flag; no global default invented). The evaluation is bounded by an explicit
+environment, tenant, the source (live | cache | default | override), the live_failure_reason when a live
+attempt failed (timeout | invalid-response | error | unreachable), the cache_state when a cache entry exists
+(fresh | stale | rejected | untrusted), the startup_state when the process started cold (cold-start), and
+the served value. When several LIVE failures apply, report ONE live_failure_reason in this order: timeout >
+invalid-response > error > unreachable. stale-cache and cold-start are NOT live-failure reasons: they are
+reported only through cache_state and startup_state. Denied override attempts report override_denied_reason.
+Override events carry source=override with authority=override (non-failure, excluded from the failure
+precedence) plus actor and authorization reference. A rejected cache is recorded as source=default,
+cache_state=rejected. A normal live value that merely differs from the safe value is not a per-request
+fallback event; it may be aggregated as an optional live-differs-from-safe counter. Exercise the fallback in
+a non-production environment by making the flag service unreachable. A flag that fails open into unfinished
+code is the defect this step exists to prevent.
 7. **Kill-switch propagation and authority.** Choose streaming or polling
    and state the upper bound, in seconds, for a flip to reach every
    instance and client. Name who may flip in each environment — the role
    definitions come from `authorization-matrix-designer`, and the flag
    console enforces them. Design a break-glass path for off-hours, and a
-   local override that still works when the flag service itself is down.
+   local override that still works when the flag service itself is down. An active authorized override follows the ordering, constraints and telemetry
+   defined in step 6 - this step never defines a second order or a second
+   override path; the local override here IS the step-6 authorized override
+   mechanism, and the one-time offline break-glass credential is distinct from
+   the off-hours console break-glass path (both are authorization mechanisms,
+   not a second outage contract). The override must keep working while the flag
+   service is down through the offline authorization path (signed role cache
+   with max age/expiry/instance/tenant scope plus the signed revocation
+   snapshot, or the short-lived scoped single-use offline break-glass with its
+   atomic persistent nonce ledger); it keeps a local on-box status record during
+   the outage, syncs visibility on reconnect and can be cleared offline. Its
+   activation, deactivation and clearing are audited with the actor.
 8. **Flag-change audit event.** Specify the event every new flag, flip,
    rule change and removal emits: actor, flag, environment, value before
    and after, targeting change, reason and timestamp. This skill defines
@@ -219,8 +257,28 @@ Evaluation:    per flag class → server | client (presentation only) | edge |
 Targeting:     attributes + server-side source of truth each; precedence;
                stable-ID bucketing shared with experiments;
                tenant-qualified cache keys
-Fail-safe:     code default (= strategist's safe value) | last-known-good /
-               bootstrap | timeout <N ms> | cold start | how it is exercised;
+Fail-safe:     ONE ordered resolution (single authority: step 6) LIFECYCLE/EXPIRED_SAFE_LATCH: defined once in step 6 (1)/(1a); first-class NON-LIVE state, exact safe value, telemetry state=override_expired_safe_latch, released only by fresh Path A/B authorization; nonce counter anchored OUTSIDE the restorable instance with fail-closed unverifiable state; throttling PER PRINCIPAL/CREDENTIAL with a separately protected break-glass activation route; break-glass credential binds flag/operation/exact safe value/actor/audience. - authorized
+               override (offline: signed role cache max age/expiry/instance+env+
+               tenant scope + signed revocation snapshot carrying key rotations,
+               both fail-closed; single-use offline break-glass with atomic
+               persistent nonce ledger retained >= lifetime+skew, distinct from
+               the off-hours console break-glass; denied attempts emit
+               override_denied_reason; exact code-level safe value ONLY; numeric
+               max TTL <N minutes>, divergence alert, mandatory reconcile before clearing when LIVE differs (CLEARED only via fresh Path A/B authorization and a recorded reconciliation (no auto-clear)); local on-box status during
+               outage, sync on reconnect, offline clear authorized like activation (same signed role cache or break-glass, actor/audience evidence, rate-limit/lockout); source=override +
+               non-failure authority=override + actor) > LIVE (authoritative;
+               successful/valid 2xx + parseable/validated within per-flag timeout
+               <N ms>; total render budget stated; error/malformed/timeout =
+               safe value; behaviourally identical to default - enabled features
+               revert to safe; cache_state first-match untrusted (incl malformed)
+               > rejected (value != exact safe) > stale (age > per-flag hard max
+               <N s>) > fresh (keyed MAC/signature over domain-separated
+               flag/tenant/env/value/schema/timestamp, revocation valid, age <=
+               hard max); refresh TTL <N s> trigger only; wall clock + bounded
+               monotonic offset) > UNKNOWN -> code default MUST equal exact safe
+               value (CI/test check); differing cache value NEVER served;
+               telemetry flag/tenant/env/source/live_failure_reason/cache_state/
+               startup_state/served value; live_failure_reason omitted on
                rejected alternative
 Kill switch:   streaming | polling, reach bound <N s>; who may flip per
                environment (roles ← authorization-matrix-designer);
@@ -257,9 +315,24 @@ Not decided:   <open owner questions, unverified prices, missing facts>
       evaluated on the server.
 - [ ] Targeting attributes come from server-side sources of truth; every
       per-tenant cached value has a tenant-qualified key.
-- [ ] The fail-safe mechanism covers code defaults, last-known-good
-      cache, a non-blocking timeout and cold start — and the safe value
-      itself is left to `feature-flag-rollout-strategist`.
+- [ ] The fail-safe mechanism states ONE ordered outage resolution as the single authority (step 6; derived
+normative pointers to this step, verified by review only (no executable consistency check is claimed)): authorized override (offline authorization path - signed role cache max age <N
+s>/expiry/instance+env+tenant scope + signed revocation snapshot carrying key rotations, both fail-closed;
+single-use offline break-glass with ATOMIC persistent nonce ledger, retention >= lifetime + skew <N s>,
+shared/replicated if global single-use, fail-closed when unavailable; denied attempts emit
+override_denied_reason; exact code-level safe value ONLY; numeric max TTL <N minutes>, divergence alert,
+mandatory reconciliation/acknowledgement before clearing when LIVE differs from the exact safe value; CLEARED only via fresh Path A/B authorization and a recorded reconciliation (no auto-clear); local on-box status during the outage, sync on reconnect, offline clear authorized like activation (same signed role cache or break-glass, actor/audience evidence, rate-limit/lockout); actor/flag/environment/tenant recorded; source=override + non-failure
+authority=override) > LIVE (authoritative; successful/valid 2xx + parseable/validated within per-flag
+timeout <N ms>; total render budget stated; error/malformed/timeout failures; may differ from safe value;
+FRESH_CACHE (live failed; value EQUALS the exact safe value; variants exact-enumerated; cache_state
+first-match untrusted > rejected > stale > fresh, fresh requires keyed MAC/signature over domain-separated
+flag+tenant+env+value+schema+timestamp, valid revocation snapshot and age <= per-flag hard maximum serve age
+<N s>; refresh TTL <N s> is a trigger only; wall clock + bounded monotonic offset; malformed payload is
+untrusted) > UNKNOWN -> code default MUST equal the exact safe value (CI/test check). The guarantee covers
+FRESH_CACHE and UNKNOWN only; LIVE is authoritative; FRESH_CACHE is behaviourally identical to the default
+cache/bootstrap value is NEVER served. Telemetry: flag, environment, tenant, source (live | cache | default
+| override), live_failure_reason for failed live attempts (timeout > invalid-response > error >
+unreachable), cache_state, startup_state and served value; live_failure_reason omitted on the
 - [ ] The kill switch has a stated reach bound in seconds, named flip
       authority per environment, and a path that works with the flag
       service down.
@@ -346,3 +419,5 @@ Not decided:   <open owner questions, unverified prices, missing facts>
   (flag-change propagation vs a revoked access change still honored), and
   `frontend-perf-engineer` (a render-blocking flag SDK vs general page
   performance).
+
+Guarantee (single statement): every NON-LIVE path - FRESH_CACHE, PRECOMPUTED/NO_LIVE_ATTEMPT, UNKNOWN, an authorized override and EXPIRED_SAFE_LATCH - serves the exact safe value; only a successful, valid, synchronously verified LIVE evaluation is authoritative. Any asynchronous or otherwise non-verified value is NOT authoritative and is treated as non-LIVE.

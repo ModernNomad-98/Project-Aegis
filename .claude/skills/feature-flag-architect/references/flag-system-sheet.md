@@ -58,22 +58,56 @@ variant.
 
 ## 3. Fail-safe mechanism checklist (step 6)
 
-The safe VALUE per flag comes from `feature-flag-rollout-strategist`. The
-mechanism guarantees the system reaches it.
+The safe VALUE per flag comes from `feature-flag-rollout-strategist`
+(for kill switches that value IS the protective/old behavior by definition; for
+variant/payload flags the design enumerates the exact safe value/state). The
+SINGLE canonical order is stated in SKILL.md step 6; this section is a derived
+citation that points to step 6; step 6 governs on any difference and no executable consistency check is claimed.
 
-- [ ] Every call site passes a code-level default equal to the flag's safe
-      value.
-- [ ] A last-known-good cache (in memory, optionally persisted) or a
-      bootstrap snapshot serves values when the flag service is unreachable.
-- [ ] Evaluation has a timeout stated in milliseconds and never blocks a
-      request or first paint; on timeout the cached or default value wins.
-- [ ] Cold start with no cache and no service returns the code default and
-      emits a metric.
-- [ ] The fallback is exercised in a non-production environment by making
-      the flag service unreachable, and the observed behavior matches the
-      design.
-- [ ] Fallback use is observable: a metric or log line when the system is
-      serving cached or default values.
+Override/latch/clear semantics: POINTER ONLY - see SKILL.md step 6 (1)/(1a); this sheet does not restate or extend them.
+
+2. LIVE
+2. LIVE - authoritative; only a successful/valid response within the per-flag
+   timeout <N ms> (2xx + parseable/validated); error/malformed/timeout are
+   failures. A valid live value is served as-is even when it differs from the
+   safe value (normal LIVE divergence). Total per-render evaluation budget is
+3. FRESH_CACHE - only after a live failure and only when the value EQUALS the
+   exact safe value. Because the default must equal the same exact safe value,
+   FRESH_CACHE is behaviourally identical to the default (outage reverts
+   labeling and call-site drift. Cache state first-match: untrusted (timestamp
+   missing/future/integrity/revocation fail, malformed payload) > rejected
+   (value != exact safe value) > stale (age > per-flag hard maximum serve age
+   <N s>) > fresh (integrity + revocation valid and age <= hard max). Serve only
+   fresh with source=cache and, when a live attempt failed, live_failure_reason; per-flag refresh TTL <N s> is
+   a trigger only. MAC/signature covers a domain-separated tuple (domain tag,
+   flag key, tenant, environment, canonical serialized value with schema
+   version, timestamp); plain checksum insufficient; wall clock with bounded
+   monotonic offset, future timestamps/skew violations rejected.
+4. UNKNOWN - otherwise the code-level default MUST equal the exact safe value;
+   a CI/test check verifies every call-site default.
+
+- [ ] Every call site passes the exact safe value as its default; UNKNOWN serves
+      it; a CI/test check enforces it.
+      and may differ; the authorized override is the explicit exception to LIVE
+      precedence; FRESH_CACHE is behaviourally identical to the default.
+- [ ] Cache serving requires exact equality, cache_state fresh under first-match
+      untrusted > rejected > stale > fresh, a keyed MAC/signature over the
+      domain-separated tuple (flag, tenant, env, value+schema, timestamp),
+      valid revocation snapshot and age <= per-flag hard maximum serve age;
+      refresh TTL is a trigger only; malformed payloads are untrusted.
+- [ ] Cache taxonomy is deterministic: a differing value is rejected regardless
+      of age; stale-cache/cold-start report via cache_state/startup_state, never
+      as live-failure reasons.
+- [ ] Telemetry carries flag, environment, tenant, source, live_failure_reason
+      (one of timeout > invalid-response > error > unreachable), cache_state,
+      startup_state and served value; live_failure_reason is omitted on the
+      override_denied_reason. Rejected cache = source=default +
+      cache_state=rejected. Override events carry authority=override.
+      atomic persistent nonce ledger with retention; key rotation/revocation/
+      a local on-box status during the outage, sync on reconnect, offline clear,
+      and audited activation/deactivation.
+- [ ] The fallback is exercised in a non-production environment by making the
+      flag service unreachable, and the observed behavior matches the design.
 
 ## 4. Kill-switch propagation (step 7)
 
