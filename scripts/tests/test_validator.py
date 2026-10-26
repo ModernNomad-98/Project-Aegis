@@ -46,6 +46,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -4255,6 +4256,60 @@ def test_readiness_effective_identity_hook():
         ok("--no-verify bypass recorded as a local-hook boundary, not a pass")
 
 
+def test_readiness_startup_authority_non_mutating():
+    """AI-R01: covered/uncovered startup inspection is read-only and accurately reported."""
+    if not _readiness_posix_ready():
+        print("  SKIP  startup-authority observation: POSIX sh not available on this host")
+        return
+    skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
+    inspection_match = re.search(r"Run and record the inspection:\s*```bash\n(.*?)```", skill, re.DOTALL)
+    assert inspection_match, "SKILL.md must publish the read-only identity inspection commands"
+    inspection = inspection_match.group(1)
+    hook_match = re.search(r"```sh\n(.*?)```", skill, re.DOTALL)
+    assert hook_match, "SKILL.md must publish the effective-identity hook"
+    with tempfile.TemporaryDirectory() as td:
+        repo = Path(td)
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td})
+        def git(*args):
+            return subprocess.run(["git"] + list(args), cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert git("init", "-q").returncode == 0
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        git("config", "--local", "aegis.ownerName", "FixtureOwner")
+        git("config", "--local", "aegis.ownerEmail", "owner@example.invalid")
+        sentinel = repo / ".git" / "hooks" / "sentinel"
+        sentinel.write_text("keep-me\n", encoding="utf-8")
+        def state():
+            config = (repo / ".git" / "config").read_bytes()
+            hooks = {p.name: p.read_bytes() for p in sorted((repo / ".git" / "hooks").iterdir()) if p.is_file()}
+            return config, hooks
+        before = state()
+        inspected = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert inspected.returncode == 0, (inspected.returncode, inspected.stderr)
+        after = state()
+        assert after == before, "read-only identity inspection must not change config or hooks"
+        ok("covered startup inspection is non-mutating (git config bytes and hook files unchanged)")
+        hook = repo / ".git" / "hooks" / "pre-commit"
+        hook.write_text(hook_match.group(1), encoding="utf-8", newline="\n")
+        hook.chmod(0o755)
+        assert subprocess.run([str(hook)], cwd=repo, env=env, capture_output=True).returncode == 0
+        assert git("commit", "--allow-empty", "-m", "covered setup").returncode == 0
+        ok("covered setup installs the hook and a valid actual commit works under the applicable authority")
+        git("config", "--local", "--unset", "aegis.ownerName")
+        git("config", "--local", "--unset", "aegis.ownerEmail")
+        before_uncovered = state()
+        missing_owner = subprocess.run(["git", "config", "--local", "--get", "aegis.ownerName"], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert missing_owner.returncode != 0, "inspection must report the missing recorded owner identity"
+        blocked = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert blocked.returncode == 0, "documented inspection commands complete; the missing value is reported separately"
+        hook_blocked = subprocess.run([str(hook)], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert hook_blocked.returncode != 0 and "recorded owner identity missing" in hook_blocked.stderr
+        assert git("commit", "--allow-empty", "-m", "uncovered setup").returncode != 0
+        assert state() == before_uncovered, "uncovered inspection/reporting must not mutate config or hooks"
+        ok("uncovered setup is accurately blocked/reported; non-mutating inspection leaves state unchanged")
+
+
 def test_readiness_shared_lock_lifecycle():
     """AI-R03: lock ownership, signal/child lifecycle, cleanup and successor safety."""
     if not _readiness_posix_ready():
@@ -4298,6 +4353,45 @@ def test_readiness_shared_lock_lifecycle():
         failed = start("false"); fo, fe = failed.communicate(timeout=10)
         assert failed.returncode != 0 and not lock.exists(), (failed.returncode, fe)
         ok("normal and error exits release the lock after child reaping")
+        # Repeated cleanup: exercise the published cleanup function twice in one shell.
+        prefix = blocks[0].split('sh -c "$WORKLOAD" &', 1)[0]
+        cleanup_harness = root / "cleanup-twice.sh"
+        cleanup_harness.write_text(prefix + "\ncleanup\nrc1=$?\ncleanup\nrc2=$?\nexit $((rc1 + rc2))\n", encoding="utf-8", newline="\n")
+        cleanup_harness.chmod(0o755)
+        twice = subprocess.run(["sh", str(cleanup_harness)], cwd=root, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert twice.returncode == 0 and not lock.exists(), (twice.returncode, twice.stderr)
+        ok("repeated cleanup is idempotent: the published cleanup removes the owned lock once and a second call is a no-op")
+        holder_int = start("while [ ! -f release ]; do sleep 0.05; done")
+        try:
+            deadline = time.time() + 10
+            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
+            assert lock.exists(), "SIGINT holder must acquire the lock"
+            holder_int.send_signal(signal.SIGINT)
+            holder_int.communicate(timeout=15)
+            assert not lock.exists(), "SIGINT must stop the owned workload before releasing the lock"
+            ok("SIGINT stops the owned workload, reaps it and releases only its own lock")
+        finally:
+            if holder_int.poll() is None: holder_int.kill(); holder_int.communicate(timeout=5)
+            if lock.exists(): lock.unlink()
+        incomplete = subprocess.Popen(["sh", str(script)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "exec >/dev/null 2>&1; trap '' TERM; echo $$ > child.pid; while :; do sleep 0.05; done"}, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True)
+        try:
+            deadline = time.time() + 10
+            while not lock.exists() and time.time() < deadline: time.sleep(0.02)
+            assert lock.exists(), "incomplete-termination holder must acquire the lock"
+            incomplete.terminate()
+            _, incomplete_err = incomplete.communicate(timeout=20)
+            assert "INCOMPLETE" in (incomplete_err or ""), incomplete_err
+            assert lock.exists(), "incomplete termination must retain ownership"
+            child_pid = int((root / "child.pid").read_text(encoding="utf-8").strip())
+            os.kill(child_pid, signal.SIGKILL)
+            ok("incomplete termination retains ownership and reports INCOMPLETE cleanup (child killed by fixture)")
+        finally:
+            if incomplete.poll() is None: incomplete.kill(); incomplete.communicate(timeout=5)
+            child_pid_path = root / "child.pid"
+            if child_pid_path.exists():
+                try: os.kill(int(child_pid_path.read_text(encoding="utf-8").strip()), signal.SIGKILL)
+                except (ProcessLookupError, ValueError): pass
+            if lock.exists(): lock.unlink()
         holder = start("while [ ! -f release ]; do sleep 0.05; done")
         try:
             deadline = time.time() + 10
@@ -4336,7 +4430,9 @@ def test_readiness_memory_canonical_tristate():
         def run(base,head,target="target"):
             e=dict(env); e.update({"BASE":base,"HEAD":head,"TARGET_PATH":target}); return subprocess.run(["sh",str(w)],cwd=repo,env=e,capture_output=True,text=True,encoding="utf-8",errors="replace")
         same=run(b,b); assert same.returncode==0 and "ancestry_status=ancestor_or_equal" in same.stdout and "content_match_status=same" in same.stdout
-        changed=run(a,b); assert "ancestry_status=ancestor_or_equal" in changed.stdout and "content_match_status=differs" in changed.stdout
+        changed=run(a,b); assert changed.returncode==0, "wrapper exit 0 means completed, not passed"
+        assert "ancestry_status=ancestor_or_equal" in changed.stdout and "content_match_status=differs" in changed.stdout
+        ok("wrapper exit 0 is completed-only: changed content record the gate must block, not a pass")
         non=run(stray,b); assert "ancestry_status=not_ancestor" in non.stdout
         invalid=run("deadbeef"*5,b,"target"); assert invalid.returncode!=0 and "UNVERIFIED" in invalid.stdout
         empty=run(b,b,""); assert empty.returncode==2 and "UNVERIFIED" in empty.stdout
@@ -4415,6 +4511,7 @@ TESTS = [
     test_startup_role_contract,
     test_atomic_stage1_question_contract,
     test_readiness_effective_identity_hook,
+    test_readiness_startup_authority_non_mutating,
     test_readiness_shared_lock_lifecycle,
     test_readiness_memory_canonical_tristate,
 ]
