@@ -26,10 +26,10 @@ NO PYTEST, DELIBERATELY
 
 FIXTURES
     scripts/tests/fixtures/contract-audit/repo/ is a miniature repository:
-    nine defective skills, each isolating one rule family, plus two that must
+    eleven defective skills, each isolating one rule family, plus two that must
     stay silent — `clean-skill` (every rule's negative) and
     `approved-doc-writer` (the SIDE-004 approved-write exception, protocol
-    markers NEXT TO the write). The per-skill rule multisets asserted below
+    markers NEXT TO the write). The two #903 item 3 SIDE-004 regression fixtures (`playwright-e2e-engineer`, `flaky-test-detective`) are pinned with direct asserts and no per-fixture PASS output, preserving the frozen OK:71 baseline. The per-skill rule multisets asserted below
     are EXACT — a new rule that fires on an old fixture is a deliberate
     decision to record here, not drift to absorb.
 """
@@ -150,6 +150,8 @@ def test_approved_doc_writer_is_silent(a) -> None:
 EXPECTED = {
     "readonly-scratch-writer": ["EVAL-001", "SIDE-001", "SIDE-002", "SIDE-003", "SIDE-004"],
     "auto-deployer": ["SIDE-004"],
+    "playwright-e2e-engineer": ["SIDE-004", "SIDE-004"],
+    "flaky-test-detective": ["SIDE-004"],
     "generic-approval": ["APPR-001", "APPR-002", "APPR-003", "EVAL-003"],
     "state-contradictor": ["STATE-001", "STATE-002", "STATE-003", "STATE-004", "STATE-005"],
     "committed-roadmap": ["VOCAB-002", "VOCAB-003"],
@@ -160,11 +162,21 @@ EXPECTED = {
 }
 
 
+# The #903 item 3 SIDE-004 regression fixtures are pinned with DIRECT asserts
+# (exact multiset, SIDE-004 classes, live-Workflow provenance). They deliberately
+# skip their per-fixture ok() PASS lines: zero PASS-line inflation, no existing
+# assertion removed or weakened, so the frozen contract self-test count stays
+# exactly OK:71 (see test_side004_fixture_classes).
+SIDE004_PINS = frozenset({"playwright-e2e-engineer", "flaky-test-detective"})
+
+
 def test_exact_rule_multisets(a) -> None:
     per = rules_by_skill(a)
     for skill, expected in EXPECTED.items():
         got = per.get(skill, [])
         assert got == expected, f"[{skill}] expected {expected}, got {got}"
+        if skill in SIDE004_PINS:
+            continue  # direct-assert pin: no PASS line (keeps the frozen OK:71)
         ok(f"{skill} yields exactly {expected}")
     total = sum(len(v) for v in EXPECTED.values())
     assert len(a.findings) == total, (
@@ -229,13 +241,60 @@ def test_route002_is_unmapped_census(a) -> None:
 def test_side004_fixture_classes(a) -> None:
     s4 = [f for f in a.findings if f.rule == "SIDE-004"]
     owners = {f.owning_skill for f in s4}
-    assert owners == {"auto-deployer", "readonly-scratch-writer"}, owners
+    assert owners == {"auto-deployer", "readonly-scratch-writer",
+                      "playwright-e2e-engineer", "flaky-test-detective"}, owners
     for f in s4:
         assert f.mechanical is False, "SIDE-004 is a SEMANTIC-REVIEW CANDIDATE, not mechanical"
-    by_owner = {f.owning_skill: f.evidence for f in s4}
-    assert "[deploy-provision]" in by_owner["auto-deployer"], by_owner
-    assert "[doc-state-write]" in by_owner["readonly-scratch-writer"], by_owner
-    ok("SIDE-004 fires per §5 class ([deploy-provision], [doc-state-write]) as candidates")
+    classes: dict[str, list[str]] = {}
+    for f in s4:
+        found = re.findall(r"\[([^\]]+)\]", f.evidence)
+        assert len(found) == 1, f"SIDE-004 evidence must carry exactly one [class]: {f.evidence!r}"
+        classes.setdefault(f.owning_skill, []).append(found[0])
+    assert "deploy-provision" in classes["auto-deployer"], classes
+    assert "doc-state-write" in classes["readonly-scratch-writer"], classes
+    # #903 item 3 regression pins (direct asserts, no extra PASS line): the two
+    # new fixture copies must yield exactly the planned per-class candidates.
+    assert sorted(classes["playwright-e2e-engineer"]) == [
+        "deploy-provision", "source-write"], classes
+    assert sorted(classes["flaky-test-detective"]) == ["source-write"], classes
+    # Provenance: each fixture Workflow excerpt is a whitespace/bold-normalized
+    # verbatim copy of the live Workflow. Drift on either side must be re-pinned
+    # deliberately rather than inherited as green.
+    def norm(text: str) -> str:
+        return re.sub(r"\s+", " ", text.replace("**", "")).strip()
+
+    def workflow_section(text: str) -> str:
+        match = re.search(r"^##\s+Workflow\s*$(.*?)(?=^##\s|\Z)", text, re.M | re.S)
+        assert match, "SKILL.md must carry a Workflow section"
+        return match.group(1)
+    excerpts = {
+        "playwright-e2e-engineer": [
+            "The smoke tier gives fast deployment evidence but misses lower-priority "
+            "paths; nightly adds coverage at the cost of runner minutes, fixture upkeep "
+            "and later feedback.",
+            "Write specs with resilient locators",
+        ],
+        "flaky-test-detective": [
+            "Fix that one cause at the test layer when it is a test bug",
+        ],
+    }
+    assert set(excerpts) == set(SIDE004_PINS), (
+        "every SIDE004_PINS fixture must carry a provenance pin, and no extra excerpt key"
+    )
+    for name, needles in excerpts.items():
+        fixture_path = _FIXTURE_SRC / "dot-claude" / "skills" / name / "SKILL.md"
+        live_path = REAL_REPO / ".claude" / "skills" / name / "SKILL.md"
+        assert fixture_path.is_file(), f"fixture source missing: {fixture_path}"
+        assert live_path.is_file(), f"live skill source missing: {live_path}"
+        fixture_wf = norm(workflow_section(fixture_path.read_text(encoding="utf-8")))
+        live_wf = norm(workflow_section(live_path.read_text(encoding="utf-8")))
+        for needle in needles:
+            want = norm(needle)
+            assert want in fixture_wf, f"{name} fixture Workflow lost the live excerpt: {needle!r}"
+            assert want in live_wf, f"{name} live Workflow excerpt drifted; re-pin deliberately: {needle!r}"
+    ok("SIDE-004 fires per §5 class ([deploy-provision], [doc-state-write]) as candidates; "
+       "#903 item 3 fixtures pin [deploy-provision]+[source-write] / [source-write] with "
+       "live-Workflow provenance")
 
 
 def test_side004_real_corpus_targets() -> None:
