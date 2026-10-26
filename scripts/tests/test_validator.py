@@ -4330,6 +4330,32 @@ def test_readiness_effective_identity_hook():
         ok("--no-verify bypass recorded as a local-hook boundary, not a pass")
 
 
+def test_readiness_startup_inspection_valid():
+    """C14: valid setup inspection initializes MISSING and exits 0."""
+    if not _readiness_posix_ready():
+        _readiness_skip("startup inspection valid setup: Linux lane unavailable")
+        return
+    skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
+    match = re.search(r"```bash\n(MISSING=0\n.*?)\n```", skill, re.DOTALL)
+    assert match, "SKILL.md must publish the inspection block starting with MISSING=0"
+    inspection = match.group(1)
+    with tempfile.TemporaryDirectory() as td:
+        repo = Path(td)
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(Path(td) / "xdg"), "GIT_CONFIG_GLOBAL": str(Path(td) / "gitconfig")})
+        def git(*args):
+            return subprocess.run(["git"] + list(args), cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert git("init", "-q").returncode == 0
+        git("config", "user.name", "FixtureAgent")
+        git("config", "user.email", "agent@example.invalid")
+        git("config", "--local", "aegis.ownerName", "FixtureOwner")
+        git("config", "--local", "aegis.ownerEmail", "owner@example.invalid")
+        run = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert run.returncode == 0, (run.returncode, run.stdout, run.stderr)
+        assert "STARTUP: effective author" in run.stdout, run.stdout
+    ok("valid setup inspection initializes MISSING and exits 0")
+
+
 def test_readiness_memory_canonical_tristate():
     """AI-R08: ancestry/content tri-state, UNVERIFIED on errors, no boolean shortcut."""
     if not _readiness_posix_ready():
@@ -4442,6 +4468,7 @@ TESTS = [
     test_startup_role_contract,
     test_atomic_stage1_question_contract,
     test_readiness_effective_identity_hook,
+    test_readiness_startup_inspection_valid,
     test_readiness_memory_canonical_tristate,
 ]
 
