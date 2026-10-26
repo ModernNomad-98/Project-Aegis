@@ -77,10 +77,10 @@ cleanup() {
       OWNED=1
     fi
   fi
-  if [ "$OWNED" -eq 0 ]; then CLEANED=1; return 0; fi
+  if [ "$OWNED" -eq 0 ] && [ -z "$CHILD" ]; then CLEANED=1; return 0; fi
   if [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
   if ! stop_child; then return 1; fi
-  if [ -d "$LOCK" ]; then
+  if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then
     current="$(cat "$LOCK/token" 2>/dev/null || true)"
     if [ "$current" = "$TOKEN" ] || [ ! -e "$LOCK/token" ]; then
       if ! rm -rf "$LOCK"; then echo "INCOMPLETE: failed to remove owned lock" >&2; return 1; fi
