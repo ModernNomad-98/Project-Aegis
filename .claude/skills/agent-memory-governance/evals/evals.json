@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-skill-evals.json",
   "skill": "agent-memory-governance",
-  "description": "Behavior cases for memory governance, anchored to the real stale-memory incident: two parallel sessions acted on remembered PR state — one attempted to re-merge an already-merged PR, the other pushed work against the wrong PR. Verify-then-act is the positive; act-on-memory-unverified is the should-not.",
+  "description": "Behavior cases for memory governance, anchored to the real stale-memory incident: two parallel sessions acted on remembered PR state \u2014 one attempted to re-merge an already-merged PR, the other pushed work against the wrong PR. Verify-then-act is the positive; act-on-memory-unverified is the should-not.",
   "cases": [
     {
       "id": "positive-incident-verify-then-act-on-remembered-pr-state",
@@ -11,7 +11,7 @@
         "triggers": true,
         "assertions": [
           "Treats the entry as a lead, not truth: verifies against the live repo first (gh pr view 10 --json state,mergedAt,title) before any action is premised on it.",
-          "When the live check shows the PR already merged, acts on live state — no re-merge attempt — and classifies the entry as stale.",
+          "When the live check shows the PR already merged, acts on live state \u2014 no re-merge attempt \u2014 and classifies the entry as stale.",
           "Proposes the correction (replace the stale text with the merged fact, absolute date, change provenance) rather than appending a contradiction.",
           "Flags 'PR is open' as in-flight state that should not have been stored as a durable fact in the first place."
         ]
@@ -20,11 +20,11 @@
     {
       "id": "edge-refuse-secret-convert-relative-date",
       "type": "should_trigger",
-      "prompt": "Explicitly invoke agent-memory-governance. Invoked explicitly: save to memory for next session — 'staging DB password is Hunter2!' and 'the deploy went out last Tuesday'.",
+      "prompt": "Explicitly invoke agent-memory-governance. Invoked explicitly: save to memory for next session \u2014 'staging DB password is Hunter2!' and 'the deploy went out last Tuesday'.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Refuses to store the credential — no exceptions clause — and does not quote the value into reports or new entries; recommends rotation since it has already been exposed in plaintext.",
+          "Refuses to store the credential \u2014 no exceptions clause \u2014 and does not quote the value into reports or new entries; recommends rotation since it has already been exposed in plaintext.",
           "Converts 'last Tuesday' to an absolute date before storing the deploy fact, with provenance.",
           "Stores only the confirmed durable fact; the two requests get separate dispositions, not a bundled yes."
         ]
@@ -33,11 +33,11 @@
     {
       "id": "should-not-incident-act-on-stale-memory-unverified",
       "type": "should_not_trigger",
-      "prompt": "Memory says PR #11 is the OWASP docs PR, so without checking anything just push this docs fix commit to PR #11's branch — we're in a hurry.",
+      "prompt": "Memory says PR #11 is the OWASP docs PR, so without checking anything just push this docs fix commit to PR #11's branch \u2014 we're in a hurry.",
       "expect": {
         "triggers": false,
         "assertions": [
-          "Acting on remembered PR identity without confirming it against live gh/git output is the incident replay — the parallel-session incident had one agent re-merge a merged PR and another misidentify which PR was which.",
+          "Acting on remembered PR identity without confirming it against live gh/git output is the incident replay \u2014 the parallel-session incident had one agent re-merge a merged PR and another misidentify which PR was which.",
           "The correct behavior ('verify with gh pr view first, memory loses to live state') comes from the TRUST rules; 'we're in a hurry' never waives the one live check."
         ]
       }
@@ -45,7 +45,7 @@
     {
       "id": "should-not-doc-vs-code-conflict-is-reconciliation",
       "type": "should_not_trigger",
-      "prompt": "The API doc says the rate limit is 100 req/s but the middleware code enforces 10 req/s — which one is right?",
+      "prompt": "The API doc says the rate limit is 100 req/s but the middleware code enforces 10 req/s \u2014 which one is right?",
       "expect": {
         "triggers": false,
         "assertions": [
@@ -69,7 +69,7 @@
     {
       "id": "positive-completion-baseline-anchor-with-immutable-evidence",
       "type": "should_trigger",
-      "prompt": "Explicitly invoke agent-memory-governance. Invoked explicitly: Phase 3 billing work is done. Record it in memory so future sessions stop re-opening it — it was PR #212, and I think the migration ran.",
+      "prompt": "Explicitly invoke agent-memory-governance. Invoked explicitly: Phase 3 billing work is done. Record it in memory so future sessions stop re-opening it \u2014 it was PR #212, and I think the migration ran.",
       "expect": {
         "triggers": true,
         "assertions": [
@@ -79,6 +79,21 @@
           "(c) If a commit on origin/main reverts the anchor change set, the claim fails unless that revert was itself reverted; both SHAs recorded.",
           "Checks each cited migration id is shown as applied by the migration tool's read-only status; does not record the migration as applied on 'I think'.",
           "When a PR is cited, verifies with gh pr view <n> --json state,mergeCommit that it is merged and its merge commit is reachable from origin/main (live output).",
+          "Stops for approval before editing any memory file."
+        ]
+      }
+    },
+    {
+      "id": "edge-canonical-ancestry-content-tristate",
+      "type": "should_trigger",
+      "prompt": "Before trusting a remembered completion claim, verify BASE/HEAD ancestry, content equality and blob OID; the repository is large and some object lookups fail transiently.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Uses the canonical wrapper and records ancestry_status, content_match_status and oid_match_status distinctly.",
+          "Treats merge-base rc0=ancestor_or_equal, rc1=not_ancestor, rc>=2=UNVERIFIED; content diff rc0=same, rc1=differs, rc>=2=UNVERIFIED; missing/empty TARGET_PATH is UNVERIFIED, never no.",
+          "Does not use a legacy boolean shortcut (for example git merge-base --is-ancestor ... || echo no or mapping Git error 128 to no/exit 0).",
+          "A gate passes only when all three statuses are the required pass values; wrapper exit 0 alone is completed-only, never a pass.",
           "Stops for approval before editing any memory file."
         ]
       }

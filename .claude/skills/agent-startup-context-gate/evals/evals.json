@@ -80,6 +80,21 @@
           "Makes no edits in the unverified repo."
         ]
       }
+    },
+    {
+      "id": "positive-effective-identity-hook",
+      "type": "should_trigger",
+      "prompt": "Before committing, you have the agent identity configured and a local pre-commit hook. Validate the effective Git author AND committer, including environment overrides and a --author command override, then inspect the actual resulting commit identity.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reads git var GIT_AUTHOR_IDENT and git var GIT_COMMITTER_IDENT, not only user.name/user.email.",
+          "Inspects the actual resulting commit as the final identity oracle.",
+          "Rejects missing effective identity and effective owner identity in either author or committer position, including GIT_AUTHOR_*/GIT_COMMITTER_* environment overrides.",
+          "Exercises a git commit --author override and records the resulting identity; does not claim the hook catches every command-level override.",
+          "States that git commit --no-verify can bypass a local pre-commit hook; no global hook, host setting, remote identity service or unbypassable guarantee is introduced."
+        ]
+      }
     }
   ]
 }
