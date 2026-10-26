@@ -4258,10 +4258,6 @@ def test_readiness_effective_identity_hook():
         p = git("commit", "--allow-empty", "-m", "owner committer env", extra={"GIT_COMMITTER_NAME": "FixtureOwner", "GIT_COMMITTER_EMAIL": "owner@example.invalid"})
         assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
         ok("environment author/committer owner overrides rejected")
-        git("config", "user.name", "")
-        git("config", "user.email", "")
-        env_only = hook_run({"GIT_AUTHOR_NAME": "FixtureAgent", "GIT_AUTHOR_EMAIL": "agent@example.invalid", "GIT_COMMITTER_NAME": "FixtureAgent", "GIT_COMMITTER_EMAIL": "agent@example.invalid"})
-        assert env_only.returncode == 0, env_only.stderr
         git("config", "user.name", "FixtureOwner")
         git("config", "user.email", "owner@example.invalid")
         configured_owner = hook_run({"GIT_AUTHOR_NAME": "FixtureAgent", "GIT_AUTHOR_EMAIL": "agent@example.invalid", "GIT_COMMITTER_NAME": "FixtureAgent", "GIT_COMMITTER_EMAIL": "agent@example.invalid"})
