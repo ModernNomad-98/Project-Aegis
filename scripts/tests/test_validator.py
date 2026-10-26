@@ -4371,7 +4371,7 @@ def test_readiness_startup_authority_non_mutating():
         git("config", "user.name", "FixtureAgent")
         git("config", "user.email", "agent@example.invalid")
         ok("effective env-only identity is accepted consistently with the hook")
-        global_cfg = root / "gitconfig"
+        global_cfg = repo / "gitconfig"
         global_cfg.write_text("[user]\n\tname = GlobalAgent\n\temail = global@example.invalid\n", encoding="utf-8")
         git("config", "--unset", "user.name")
         git("config", "--unset", "user.email")
