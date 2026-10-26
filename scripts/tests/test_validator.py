@@ -4201,7 +4201,7 @@ def test_readiness_effective_identity_hook():
         return
     skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
     hook_blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", skill, re.DOTALL)
-    hook_text = next((b for b in hook_blocks if "GIT_AUTHOR_IDENT" in b), None)
+    hook_text = next((b for b in hook_blocks if b.startswith("#!/bin/sh") and "GIT_AUTHOR_IDENT" in b), None)
     assert hook_text, "SKILL.md must publish the executable effective-identity hook"
     assert "GIT_COMMITTER_IDENT" in hook_text
     assert "GIT_AUTHOR_IDENT" in hook_text and "GIT_COMMITTER_IDENT" in hook_text
@@ -4270,7 +4270,7 @@ def test_readiness_startup_authority_non_mutating():
     assert inspection_match, "SKILL.md must publish the read-only identity inspection commands"
     inspection = inspection_match.group(1)
     hook_blocks = re.findall(r"```(?:sh|bash)\n(.*?)```", skill, re.DOTALL)
-    hook_text = next((b for b in hook_blocks if "GIT_AUTHOR_IDENT" in b), None)
+    hook_text = next((b for b in hook_blocks if b.startswith("#!/bin/sh") and "GIT_AUTHOR_IDENT" in b), None)
     assert hook_text, "SKILL.md must publish the effective-identity hook"
     with tempfile.TemporaryDirectory() as td:
         repo = Path(td)
@@ -4371,6 +4371,7 @@ def test_readiness_shared_lock_lifecycle():
         twice = subprocess.run(["sh", str(cleanup_harness)], cwd=root, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert twice.returncode == 0 and not lock.exists(), (twice.returncode, twice.stderr)
         ok("repeated cleanup is idempotent: the published cleanup removes the owned lock once and a second call is a no-op")
+        if (root / "release").exists(): (root / "release").unlink()
         holder_int = start("while [ ! -f release ]; do sleep 0.05; done")
         try:
             deadline = time.time() + 10
@@ -4404,6 +4405,7 @@ def test_readiness_shared_lock_lifecycle():
                 try: os.kill(int(child_pid_path.read_text(encoding="utf-8").strip()), signal.SIGKILL)
                 except (ProcessLookupError, ValueError): pass
             if lock.exists(): lock.unlink()
+        if (root / "release").exists(): (root / "release").unlink()
         holder = start("while [ ! -f release ]; do sleep 0.05; done")
         try:
             deadline = time.time() + 10
