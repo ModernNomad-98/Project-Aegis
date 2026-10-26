@@ -200,9 +200,10 @@ missing owner/effective identity or effective owner identity in EITHER author or
 committer position -> exit 1 with the exact STOP/refusal message; environment overrides
 are validated against the effective identity. A command override such as
 `git commit --author` is **not reliably caught** by a pre-commit hook because Git
-applies it after the hook; inspect the ACTUAL resulting commit and do not push or
-remediate an owner-authored/owner-committed result. Invoke the hook directly to prove
-the unit behavior, then inspect the actual commit as the oracle. Local hooks are not a
+applies it after the hook. A pre-commit hook cannot remediate this; after inspecting
+the ACTUAL resulting commit, amend/recreate it with a valid identity before push, or
+stop and report. Invoke the hook directly to prove the unit behavior, then inspect the
+actual commit as the oracle. Local hooks are not a
 security boundary: `git commit --no-verify` can bypass a local pre-commit hook, and no
 global hook, host setting, remote identity service or unbypassable guarantee is
 promised. This is a local guard and disclosure boundary only.

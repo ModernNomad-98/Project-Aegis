@@ -21,15 +21,18 @@ writes the token through a temp+rename inside it, installs traps before acquisit
 reports contention separately from acquisition I/O errors, writes a ready marker before
 the workload starts, and only removes a lock whose full stored token matches its own (or
 a partially-created own lock with no token).
-Set `AEGIS_STACK_WORKLOAD` to the bounded direct-child command and optionally
-`AEGIS_STACK_TTL_MINUTES` (default 120). Supported model is POSIX `sh` with a direct
+Set `AEGIS_STACK_WORKLOAD` to the bounded direct-child command (required; no silent
+no-op) and optionally `AEGIS_STACK_TTL_MINUTES` (default 120). Run from the repo root
+or set an absolute `AEGIS_STACK_LOCK`; the default lock path is caller-relative.
+Supported model is POSIX `sh` with a direct
 child owned by this script (no descendant-tree guarantee); zombie checks use `ps`.
 
 ```bash
 #!/bin/sh
 set -u
 LOCK="${AEGIS_STACK_LOCK:-.local/stack.lock}"
-WORKLOAD="${AEGIS_STACK_WORKLOAD:-true}"
+WORKLOAD="${AEGIS_STACK_WORKLOAD:-}"
+if [ -z "$WORKLOAD" ]; then echo "STOP: AEGIS_STACK_WORKLOAD is required; refusing silent no-op" >&2; exit 2; fi
 TTL_MINUTES="${AEGIS_STACK_TTL_MINUTES:-120}"
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$"
 ACQUIRED="$(date -u +%s)"
@@ -108,6 +111,10 @@ trap 'cleanup' EXIT
 trap 'on_signal' INT TERM
 if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock parent directory" >&2; exit 2; fi
 if ! mkdir "$LOCK"; then
+  if [ -f "$LOCK" ]; then
+    echo "LOCK MIGRATION: legacy lock file found at $LOCK; inspect and remove manually" >&2
+    exit 2
+  fi
   if [ -d "$LOCK" ]; then
     if [ -f "$LOCK/token" ]; then cat "$LOCK/token" >&2; fi
     echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
