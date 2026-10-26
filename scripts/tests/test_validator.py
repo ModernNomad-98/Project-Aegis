@@ -4472,7 +4472,7 @@ def test_readiness_shared_lock_lifecycle():
         cleanup_harness = root / "cleanup-twice.sh"
         cleanup_harness.write_text(prefix + "\ncleanup\nrc1=$?\ncleanup\nrc2=$?\nexit $((rc1 + rc2))\n", encoding="utf-8", newline="\n")
         cleanup_harness.chmod(0o755)
-        twice = subprocess.run(["sh", str(cleanup_harness)], cwd=root, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        twice = subprocess.run(["sh", str(cleanup_harness)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert twice.returncode == 0 and not lock.exists(), (twice.returncode, twice.stderr)
         ok("repeated cleanup is idempotent")
         sig_holder = start("printf started > started; while :; do sleep 0.05; done")
