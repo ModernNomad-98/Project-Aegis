@@ -395,6 +395,8 @@ Copy the `.claude/skills/<name>/` folders you want
 into your own repo's `.claude/skills/` — Claude Code discovers them there exactly the same
 way. If your repo has no `.claude/skills/` folder yet, create it first (it's just a folder). To also reproduce this repo's startup routing, copy the repo-root `CLAUDE.md` and `AGENTS.md` into your repo root — `CLAUDE.md` is Claude Code's startup file and imports `AGENTS.md`.
 
+**Complete consumer route (install, verify, then run).** The supported route this page documents is: select the skills you need and their actual runtime files (`references/`, `assets/`, `scripts/` where present); assemble the copy from the allow-list described below, staging it outside the product repository when you want the stronger guarantee; run the post-write verifier; then open your own product repository and work there under its startup routing. A worked, host-tested record for a complete selected route - with the exact installed-file inventory, commands, observed results and the precise readiness scope and limits - will be linked here only after that acceptance run produces its evidence. Until then this page makes **no consumer-readiness claim**, and the setup/control-plane warnings elsewhere on this page still apply.
+
 **Do not copy each skill's `evals/` folder.** Every shipped skill carries `evals/evals.json`
 and (usually) `evals/trigger-evals.json`. Those are the skill's **answer keys**: each case
 records its `id`, the exact `prompt`, and the `assertions` a good response must satisfy.

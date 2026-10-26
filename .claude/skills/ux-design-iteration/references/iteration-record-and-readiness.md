@@ -113,6 +113,8 @@ This section is type/placement support only; normative semantics are SKILL 1.3. 
 Type: clickthrough_offer_decision = {status?: offered|declined|UNRUN, raw_status?: unknown, status_diagnosis?: {condition: record_missing|status_absent|status_invalid, diagnosis: UNKNOWN, reason: string, remediation: string}, offer_turns: [{turn: integer, decision: offered|declined|accepted, at: string}], decided_by?: user, execution_evidence?: string, decline_recorded: boolean, clickthrough_unrun_reason?: no_local_stack|missing_tooling|attempted_but_blocked|other-recorded-reason, defect_classes?: [string], notes?: string}.
 
 Type invariants (not normative rule copies; all semantics are in SKILL 1.3): status is present iff status is one of the canonical three; status omitted iff status_diagnosis is present; raw_status is present iff status_invalid and preserves the exact original value losslessly, including null or a non-string value (type unknown); status == UNRUN iff (for attempted runs) clickthrough_unrun_reason is present from the enum and defect_classes is non-empty; declined and offered carry no defect classes; clickthrough_unrun_reason is forbidden for declined/offered; decline_recorded is true iff any offer_turn declined; decided_by is user only (no host decision class); accepted means a user yes, not execution success, and never becomes a fourth stored status. This reference introduces no field beyond the names above. Parent iteration record support (R4): clickthrough_deferral = {reason: string, at: string, retry_condition: string} may be present on the parent iteration record only when no clickthrough_offer_decision object exists because no offer was made; it is required when the offer is deferred for an unavailable stack or safe environment, and absent once a clickthrough_offer_decision exists. It is not a clickthrough status and does not imply UNRUN; no_local_stack is not used for an un-attempted offer. This is parent-record schema support, not a decision-record field.
+
+Chronology support (not a normative rule copy): offer_turns is append-only history; a later explicit user decision changes the current status projection without rewriting earlier turns, and an older execution attempt never overrides a newer decline. An unanswered offer is recorded as offered and invents no user answer. A required check that did not run remains UNRUN and is never promoted to PASS by a later offer, decline or proof set.
 ## 3b. CI citation snapshot policy (R6)
 
 CI citations use an exact snapshot: cite the base/head commit SHA and the exact run id/conclusion read at evidence generation; in-progress and failed runs are never a pass, and no run-level CI-green claim is made. Review 5636513369 findings 1-12 are dispositioned in the plan/PR evidence (this reference states no CI-green claim).
@@ -192,13 +194,14 @@ Enum scope: clickthrough_unrun_reason (no_local_stack|missing_tooling|attempted_
         #   clickthrough_unrun_reason: "attempted_but_blocked"
         #   defect_classes: ["state-hydration"]
         # Valid accepted-but-blocked example: status UNRUN, accepted turn retained, decided_by user.
+        # Chronology counterexample: an older blocked attempt stays in offer_turns; a LATER explicit user decline changes the current status to declined (never rewritten, never converted to UNRUN).
     ui_lock_inventory_diff: [{element: ..., mapped_to: ...}]
     proposed_ui_additions: [...]
     retro_classification: [{check: ..., class: stale_assertion|product_bug|wrong_metric}]
     proof_set: {status: offered|declined|UNRUN|collected, decline_reason: ...|null,
       unrun_reason: production_data_only|no_local_stack|missing_tooling|failed_capture|null,
       folder_layout: ...|null, manifest_path: ...|null, files: [{path, size, sha256}],
-      captured_over_expected: [{checkpoint, expected, captured}], delegated_writer: ..., composed_owner: screenshot-evidence-planner}
+      captured_over_expected: [{checkpoint, expected, captured}], delegated_writer: ..., composed_owner: screenshot-evidence-planner (policy only; actual capture/clickthrough execution is the manual-only clickthrough-test-engineer/Playwright action under its own authority)}
     demo_script: {status: skipped|drafted|narrated, checkpoints: [...], notes: ..., priority: last_lowest}
     review:
       reviewer: <independent identity> ; exercised: ... ; checks: [{check, result, evidence}]

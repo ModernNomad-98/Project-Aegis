@@ -339,7 +339,10 @@
           "Unavailable-stack deferral lives in the parent iteration record clickthrough_deferral; no clickthrough_offer_decision object and no UNRUN for an un-attempted offer.",
           "no_local_stack applies only to an offer that was attempted and could not run.",
           "An explicit yes/execution does not itself authorize a re-offer.",
-          "A re-offer happens only after an explicit recorded user request; prior declined turns remain recorded and decline_recorded stays true."
+          "A re-offer happens only after an explicit recorded user request; prior declined turns remain recorded and decline_recorded stays true.",
+          "A later explicit user decision changes the current projection without rewriting the earlier declined history.",
+          "An older execution attempt never overrides a newer decline.",
+          "An unanswered offer invents no user answer."
         ]
       },
       "host_evidence": false,
@@ -409,7 +412,7 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Records the clickthrough decision; a decline or impossible run is a named UNRUN with the unobservable state-hydration and transition defect classes.",
+          "Records the clickthrough decision truthfully: an explicit decline is declined (not UNRUN); an attempted but impossible run is UNRUN; an unanswered offer invents no user answer.",
           "Leaves readiness unchanged and claims no pass; does not invoke the MANUAL-ONLY skill silently."
         ]
       },
@@ -525,8 +528,8 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Declares READY only while recording the clickthrough decision as a named UNRUN; it does not treat the proof set as closing that unrun clickthrough.",
-          "Records the proof-set capture as evidence of what was observed only; the proof set never substitutes for the unrun clickthrough and never upgrades readiness."
+          "Declares READY only while recording the clickthrough decision truthfully - a decline stays declined (never UNRUN), an attempted but impossible run is UNRUN, and an unanswered offer invents no answer; it does not treat the proof set as closing that declined/unrun clickthrough.",
+          "Records the proof-set capture as evidence of what was observed only; the proof set never substitutes for the clickthrough and never upgrades readiness."
         ]
       },
       "host_evidence": false,

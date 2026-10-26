@@ -192,6 +192,7 @@ clickthrough_offer_decision is post-implementation-record only, never one of the
 - UNRUN is a run outcome only for an attempted/impossible run; it requires clickthrough_unrun_reason from no_local_stack | missing_tooling | attempted_but_blocked | other-recorded-reason and non-empty defect_classes; readiness may still be declared but not-run is recorded. UNRUN is never derived from offer_turns.
 - Status precedence (R3): record-state rules first (status_absent/status_invalid); then UNRUN if an offer was attempted and blocked/impossible; then declined if the latest user decision is declined; otherwise offered. offer_turns is an ordered list of user answers only {turn, decision: offered|declined|accepted, at}; it never contains UNRUN and never sets status by itself. accepted means the user said yes, not execution success: after accepted, execution_evidence and status offered mean executed; an accepted-but-blocked attempt is UNRUN attempted_but_blocked with the accepted turn and decided_by retained; accepted-not-yet-executed remains offered pending execution. accepted is never a fourth stored status.
 - decided_by is user only: every offered/declined/accepted decision is a user answer; there is no host decision class. A host may relay a user's answer but records decided_by: user.
+- Chronology: each offer/decision is appended to offer_turns; a later explicit user decision changes the current projection while preserving earlier history; an older execution attempt never overrides a newer decline; an unanswered offer invents no user answer (offered remains the current status).
 - Enum scopes: clickthrough_unrun_reason is clickthrough-only; proof_set.unrun_reason (production_data_only | no_local_stack | missing_tooling | failed_capture) is proof-set-only; distinct fields, never interchangeable.
 ### 1.4 Proof set (offered, never required)
 
@@ -316,7 +317,7 @@ The full record schema and readiness rules are in
 - Under guided premium, exactly one primary action per screen and one dominant element per view are checked; under UI lock, UI stays consistent and any inability to meet a heuristic is recorded as a residual, not forced.
 - The UI-lock inventory diff maps every component/token/colour/type size/icon/motion to an existing project element; an unapproved unmapped element is NOT READY with the element named, and a needed new element is a PROPOSED UI ADDITION, not an approved mockup element.
 - Prototype acceptance is live: transitions exercisable, state carries, real counts (no hard-coded labels), every named non-happy state reachable, fixtures only, declared viewports and keyboard focus; a static image or non-interactive comp whose transitions cannot be exercised is NOT READY with those transitions named.
-- The clickthrough was offered after implementation; when declined or impossible it is a named UNRUN naming the unobservable state-hydration/transition defects, readiness is unchanged, and no pass is claimed.
+- The clickthrough was offered after implementation; a decline remains **declined** (a recorded user answer, never a run outcome or UNRUN); an accepted-but-unavailable or otherwise attempted-but-impossible run is **UNRUN** naming the unobservable state-hydration/transition defects; an unanswered offer invents no user answer; readiness is unchanged and no pass is claimed.
 - Pre-design is bound by name/version/byte size/sha256, gaps are UNKNOWNs, and an authority conflict is recorded (in-code wins unless the user names superseding elements).
 - Retro failures were classified before fixing; out-of-scope defects are named residuals; the approved mockup is bound by sha256 and byte size when the host provides it; the skill writes nothing.
 
@@ -347,7 +348,10 @@ The full record schema and readiness rules are in
   state design to edge-state-ux-designer, responsive craft to
   mobile-viewport-craft, accessibility verification to
   accessibility-test-harness, visual evidence to
-  visual-regression-test-designer/screenshot-evidence-planner, handoff to
+  visual-regression-test-designer; screenshot policy planning to
+  screenshot-evidence-planner (policy only — actual capture/clickthrough
+  execution is manual-only clickthrough-test-engineer/Playwright under its own
+  authority), handoff to
   phased-work-handoff-designer, review facilitation to
   design-review-facilitator, criteria review to acceptance-criteria-reviewer,
   and lifecycle routing to project-orchestrator.
@@ -367,10 +371,11 @@ The full record schema and readiness rules are in
   accessibility-test-harness.
 - The request is acceptance-criteria review, screenshot planning,
   handoff-protocol design or design review facilitation: route to the named owner;
-  this skill integrates the artifacts. For visual regression,
-  visual-regression-test-designer designs coverage, while capture/execution is an
-  authorized host action (for example Playwright or a clickthrough host session),
-  never performed by this skill.
+  this skill integrates the artifacts. screenshot-evidence-planner plans the
+  screenshot policy; it does not capture. For visual regression,
+  visual-regression-test-designer designs coverage, while capture/clickthrough
+  execution is the manual-only clickthrough-test-engineer/Playwright action and
+  requires its own applicable authority; this skill never performs it.
 - The work would cross the production boundary (real app behavior, API/data/
   schema integration) before the criteria pass: stop, state NOT READY, and take
   the smallest decision back to the user under existing authority.
@@ -394,7 +399,7 @@ The full record schema and readiness rules are in
   release-readiness gate (release-readiness-reviewer): route there; this skill's
   A/B names journey options and its readiness is design-progress readiness only.
 - A requested acceptance is a static image or non-interactive comp: refuse it as evidence, declare NOT READY, and name the unexercisable transitions; do not treat a screenshot or the proof set as a pass.
-- The next check is the clickthrough: name clickthrough-test-engineer (MANUAL-ONLY) and stop for the human; never run it silently. If declined/impossible, record the named UNRUN and keep readiness unchanged.
+- The next check is the clickthrough: name clickthrough-test-engineer (MANUAL-ONLY) and stop for the human; never run it silently. If the user declines, record **declined**; if the attempt is impossible, record the named **UNRUN** with unobservable state-hydration/transition defect classes; never invent an answer from silence; keep readiness unchanged and claim no pass.
 - UI lock blocks a needed element: propose a PROPOSED UI ADDITION to the design-system owner as a separate decision; never enter an unapproved new component/token into the mockup.
 - A pre-design would need fetching, opening a URL or a browser to read: stop; only a user-provided artifact can enter, bound by name/version/byte size/sha256.
 
