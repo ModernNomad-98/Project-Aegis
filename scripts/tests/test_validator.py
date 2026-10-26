@@ -2607,7 +2607,8 @@ def test_coverage_map_evidence_rules():
             assert any("unknown shipped-as token" in err for err in rep.errors), (
                 rep.errors)
     # RESIDUAL (10): malformed / non-string manifest sets fail closed.
-    for bad_manifest in (None, set(), {1, 2}, {""}, {"   "}, {1, " "}):
+    for bad_manifest in (None, set(), {1, 2}, {""}, {"   "}, {1, " "},
+                         {1, 2, "import-qa-strategy-designer"}):
         try:
             validator._coverage_shipped_scan(
                 "shipped as import-qa-strategy-designer", bad_manifest)
@@ -2615,11 +2616,8 @@ def test_coverage_map_evidence_rules():
             pass
         else:
             raise AssertionError(
-                "unusable manifest must fail closed: " + repr(bad_manifest))
-    assert validator._coverage_shipped_scan(
-        "shipped as import-qa-strategy-designer",
-        {1, 2, "import-qa-strategy-designer"})["claims"] == [
-            "import-qa-strategy-designer"]
+                "unusable manifest must fail closed (non-string elements "
+                "included): " + repr(bad_manifest))
     # RESIDUAL (11): underscore stripping is safe (inner underscore preserved
     # and reported as unknown; paired wrapper underscores stripped).
     assert validator._coverage_shipped_scan(
@@ -3717,7 +3715,7 @@ def test_coverage_map_batch4_deliveries():
             row["evidence"] = None
             row["rationale"] = "probe"
         with mutated_coverage(Path(c5_tmp), _gap_p3) as rep:
-            assert any("unknown priority key" in error for error in rep.errors), rep.errors
+            assert any("is not allowed" in error for error in rep.errors), rep.errors
         bad_map = Path(c5_tmp) / "bad-map.json"
         bad_map.write_text(json.dumps({"snapshot": None, "entries": []}),
                             encoding="utf-8", newline="\n")
@@ -3822,8 +3820,13 @@ def test_coverage_map_batch4_deliveries():
         live_payload, live_totals, validator._coverage_area_titles()), (
         "generated summary must be deterministic")
     md_lines = rendered.split(NL_JOIN)
-    assert md_lines.index("**Pointer integrity (stable anchors, DS-4b migration).** The migrated") == 8, (
-        "line 9 must carry the pointer-integrity paragraph")
+    optionality_index = next(index for index, line in enumerate(md_lines)
+                             if line.startswith("**Optionality.**"))
+    assert md_lines[optionality_index + 1] == "", (
+        "a blank line must separate the optionality and pointer-integrity paragraphs")
+    assert md_lines[optionality_index + 2].startswith(
+        "**Pointer integrity (stable anchors, DS-4b migration).**"), (
+        "the pointer-integrity paragraph must follow the blank line")
     totals_start = md_lines.index("| Measure | Value |")
     totals_end = next(index for index, line in enumerate(md_lines)
                      if line.startswith("| Review pending |"))
@@ -4196,6 +4199,287 @@ def test_skills_manifest_provenance():
             + entry["path"])
 
 
+def test_coverage_map_rerun_review_regressions():
+    """Nine HIGH merged-DS-7c re-run review findings: regressions for fixes 1-8 and D119 wording note."""
+    payload = json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8"))
+    manifest = validator._coverage_manifest_names()
+    computed = validator._coverage_compute_totals(payload["entries"], manifest)
+
+    # 1. Generated summary keeps a blank line between Optionality and Pointer integrity.
+    rendered = validator._coverage_render_summary(
+        payload, computed, validator._coverage_area_titles())
+    md_lines = rendered.split(NL_JOIN)
+    optionality_index = next(index for index, line in enumerate(md_lines)
+                             if line.startswith("**Optionality.**"))
+    assert md_lines[optionality_index + 1] == "", (
+        "finding 1: a blank line must separate Optionality and Pointer integrity")
+    assert md_lines[optionality_index + 2].startswith(
+        "**Pointer integrity (stable anchors, DS-4b migration).**"), (
+        "finding 1: Pointer integrity must follow the blank line")
+
+    # 2. A pipe in an area title is escaped with exactly one backslash.
+    first_area = sorted(validator.COVERAGE_AREA_RANGES)[0]
+    pipe_titles = {area: "A|B" for area in validator.COVERAGE_AREA_RANGES}
+    piped = validator._coverage_render_summary(payload, computed, pipe_titles)
+    area_line = next(line for line in piped.split(NL_JOIN)
+                     if line.startswith("| " + first_area + " "))
+    assert "\\|" in area_line, (
+        "finding 2: pipe in an area title must be escaped with a single backslash: "
+        + area_line)
+    assert "\\\\|" not in area_line, (
+        "finding 2: pipe must not be double-escaped: " + area_line)
+    tricky_titles = {area: "A" + chr(92) + "B|C" + chr(10) + "D"
+                     for area in validator.COVERAGE_AREA_RANGES}
+    tricky = validator._coverage_render_summary(payload, computed, tricky_titles)
+    tricky_lines = tricky.split(NL_JOIN)
+    tricky_rows = [line for line in tricky_lines
+                   if line.startswith("| " + first_area + " ")]
+    assert len(tricky_rows) == 1, (
+        "review Medium5: an area title newline must not split the table row: "
+        + repr(tricky_rows))
+    assert tricky.count(NL_JOIN) == rendered.count(NL_JOIN), (
+        "review Medium5: an area title newline must not add a rendered line")
+    tricky_line = tricky_rows[0]
+    assert chr(92) * 2 in tricky_line, (
+        "review Medium5: a backslash in an area title must be escaped first")
+    assert chr(92) + "|" in tricky_line, (
+        "review Medium5: a pipe after a backslash must still be escaped")
+
+    # 3. Count-copy guard scans every ledger entry at/after the bound entry.
+    base_ledger = validator.COVERAGE_RECON_PATH.read_text(encoding="utf-8")
+    ledger_ids = [int(value) for value in re.findall(r"\bD([0-9]+)\b", base_ledger)]
+    next_later = [max(ledger_ids) + 1]
+    earlier_ledger_id = max(ledger_ids)
+    def _later_entry(text):
+        entry_id = next_later[0]
+        next_later[0] += 1
+        return (base_ledger + NL_JOIN + "- **2026-10-27 - D"
+                + str(entry_id) + ": " + text + ".**")
+    def _check_ledger(text):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ledger.md"
+            path.write_text(text, encoding="utf-8", newline=NL_JOIN)
+            original = validator.COVERAGE_RECON_PATH
+            validator.COVERAGE_RECON_PATH = path
+            try:
+                rep = validator.Report()
+                validator._coverage_check_snapshot(
+                    rep, "followup-ledger", payload, payload["entries"],
+                    manifest, computed)
+                return list(rep.errors)
+            finally:
+                validator.COVERAGE_RECON_PATH = original
+    assert _check_ledger(base_ledger) == [], "finding 3: clean ledger must pass"
+    n = str(computed["entries"])
+    legitimate_later = (
+        "updated 2 entries",
+        "coverage: updated 2 skills",
+        "coverage roadmap: 2 skills",
+        "snapshot tests cover 2 skills",
+        "snapshot tests cover 2 entries",
+        "snapshot: updated 2 entries",
+        "coverage: updated 2 entries",
+        "totals updated in D" + str(earlier_ledger_id),
+        "snapshot-2026",
+    )
+    for extra in legitimate_later:
+        assert _check_ledger(_later_entry(extra)) == [], (
+            "finding 3: a legitimate later entry must pass: " + extra)
+    stale_later = (
+        "coverage snapshot now " + n + " entries",
+        "coverage total now " + n + " entries",
+        "coverage: " + n + " entries",
+        "coverage: " + n + " skills",
+        "coverage by_area: " + n,
+        "coverage manifest_skills: " + n,
+        "coverage_map: " + n,
+        "snapshot_totals: " + n,
+        "totals: " + n,
+        "coverage snapshot updated to " + n + " entries",
+        "coverage now has " + n + " skills",
+        "coverage total is " + n,
+        "coverage totals: 2026",
+        "snapshot rows: 2024",
+        "coverage 85 of 254",
+        "coverage totals " + n,
+        "rows " + n,
+        "coverage " + n + " skills",
+        "snapshot now " + n + " skills",
+    )
+    for extra in stale_later:
+        errors = _check_ledger(_later_entry(extra))
+        assert any("coverage-total count copy" in error
+                   and "later derived-total ledger entry" in error
+                   for error in errors), (extra, errors)
+
+    # 4. Count-copy regex catches hyphenated and space-separated forms
+    #    consistently across casing and singular/plural.
+    for phrase in ("300-row", "300 row", "300 rows", "300 Rows",
+                   "300-entry", "300 entry", "entry: 300", "entry-300",
+                   "coverage rows: 300", "coverage snapshot: 300",
+                   "coverage pins: 300",
+                   "85-of-254", "totals 300", "Totals 300", "300 entries"):
+        assert validator._coverage_count_copy_errors(phrase, computed), (
+            "finding 4: count-copy regex must catch " + repr(phrase))
+    assert not validator._coverage_count_copy_errors("9", computed), (
+        "finding 4: an unrelated small number must stay allowed")
+    assert validator._coverage_count_copy_errors("updated 2 entries", computed), (
+        "finding 4: generic count-copy detector still catches 2 entries in a "
+        "coverage-specific context (caller narrows context)")
+
+    # 5. Shipped analysis and totals share the set/frozenset manifest guard.
+    for bad_manifest in (["a"], "a", {"a": 1}, 123, None, {1}, {"a", 1}, {""}):
+        for label, call in (
+                ("shipped", lambda m=bad_manifest: validator._coverage_shipped_analysis(
+                    "no shipped-as phrase here", m)),
+                ("totals", lambda m=bad_manifest: validator._coverage_compute_totals([], m))):
+            try:
+                call()
+            except ValueError:
+                pass
+            else:
+                raise AssertionError(
+                    "finding 5: " + label + " accepted a non-set manifest "
+                    + repr(bad_manifest))
+
+    # 5b. Direct totals helper fails closed on invalid priorities and empty set.
+    for bad_priority in ("P3", None, 3):
+        try:
+            validator._coverage_compute_totals(
+                [{"priority": bad_priority, "status": "SHIPPED",
+                  "area": "01", "evidence_grade": "explicit-id"}], {"skill"})
+        except ValueError as exc:
+            assert "priority" in str(exc), (bad_priority, str(exc))
+        else:
+            raise AssertionError(
+                "finding 5/Medium3: direct totals helper accepted invalid priority "
+                + repr(bad_priority))
+    for empty_manifest in (set(), []):
+        try:
+            validator._coverage_compute_totals([], empty_manifest)
+        except ValueError as exc:
+            assert "manifest" in str(exc), (empty_manifest, str(exc))
+        else:
+            raise AssertionError("finding 5/Low5: totals accepted empty manifest")
+        try:
+            validator._coverage_shipped_analysis("no phrase", empty_manifest)
+        except ValueError as exc:
+            assert "manifest" in str(exc), (empty_manifest, str(exc))
+        else:
+            raise AssertionError(
+                "finding 5/Low5: shipped analysis accepted empty manifest")
+
+    # 6. Unknown GAP priority is filtered from computed totals so exactly one
+    #    clear unknown-priority error remains (no contradictory key-set error).
+    with tempfile.TemporaryDirectory() as tmp:
+        def _gap_p3(target):
+            row = target["entries"][0]
+            row["status"] = "GAP"
+            row["evidence_grade"] = "none"
+            row["priority"] = "P3"
+            row["covering_skills"] = []
+            row["evidence"] = None
+            row["rationale"] = "probe"
+        with mutated_coverage(Path(tmp), _gap_p3) as rep:
+            assert any("is not allowed" in error for error in rep.errors), rep.errors
+            assert not any("gap_by_priority keys must be exactly" in error
+                           for error in rep.errors), rep.errors
+        def _missing_priority(target):
+            del target["entries"][0]["priority"]
+        def _nonstring_priority(target):
+            target["entries"][0]["priority"] = 3
+        def _unknown_priority(target):
+            target["entries"][0]["priority"] = "P3"
+        for mutation, expected in (
+                (_missing_priority, "priority is required"),
+                (_nonstring_priority, "priority must be a string"),
+                (_unknown_priority, "is not allowed")):
+            with tempfile.TemporaryDirectory() as priority_tmp:
+                with mutated_coverage(Path(priority_tmp), mutation) as rep:
+                    priority_errors = [error for error in rep.errors
+                                       if "priority" in error]
+                    assert len(priority_errors) == 1, (expected, rep.errors)
+                    assert expected in priority_errors[0], priority_errors
+                    assert any("independent snapshot/summary/gap checks "
+                               "intentionally skipped" in error
+                               for error in rep.errors), rep.errors
+        original_compute = validator._coverage_compute_totals
+        def _manifest_boom(entries, manifest):
+            raise ValueError("manifest validation boom")
+        validator._coverage_compute_totals = _manifest_boom
+        try:
+            with tempfile.TemporaryDirectory() as manifest_tmp:
+                def _p3_with_bad_manifest(target):
+                    target["entries"][0]["priority"] = "P3"
+                with mutated_coverage(
+                        Path(manifest_tmp), _p3_with_bad_manifest) as rep:
+                    assert any("manifest validation boom" in error
+                               for error in rep.errors), rep.errors
+        finally:
+            validator._coverage_compute_totals = original_compute
+        def _nongap_p3(target):
+            row = target["entries"][0]
+            assert row.get("status") != "GAP", "fixture entry 0 must be non-GAP"
+            row["status"] = "SHIPPED"
+            row["priority"] = "P3"
+        with mutated_coverage(Path(tmp), _nongap_p3) as rep:
+            assert any("is not allowed" in error for error in rep.errors), rep.errors
+        assert sum(computed["by_priority"].values()) == computed["entries"], (
+            "finding 6/review Medium3: by_priority must sum to the entry count")
+
+    # 7. Snapshot totals must be exact integers (True/float rejected).
+    for bad_total in (True, float(computed["entries"])):
+        bad_payload = json.loads(json.dumps(payload))
+        bad_payload["snapshot"]["totals"]["entries"] = bad_total
+        rep = validator.Report()
+        validator._coverage_check_snapshot(
+            rep, "followup-totals", bad_payload, bad_payload["entries"],
+            manifest, computed)
+        assert any("exact-integer" in error or "exact integer" in error
+                   for error in rep.errors), (bad_total, rep.errors)
+    by_status_key = sorted(computed["by_status"])[0]
+    by_priority_key = sorted(computed["by_priority"])[0]
+    for nested_key, nested_value in (
+            (("by_status", by_status_key), True),
+            (("by_priority", by_priority_key), 1.0)):
+        bad_payload = json.loads(json.dumps(payload))
+        bad_payload["snapshot"]["totals"][nested_key[0]][nested_key[1]] = nested_value
+        rep = validator.Report()
+        validator._coverage_check_snapshot(
+            rep, "followup-nested-totals", bad_payload, bad_payload["entries"],
+            manifest, computed)
+        assert any("exact-integer" in error or "exact integer" in error
+                   for error in rep.errors), (nested_key, nested_value, rep.errors)
+
+    # 8. Invalid d_entry returns immediately: one clear error, no cascade.
+    bad_d_entry = json.loads(json.dumps(payload))
+    bad_d_entry["snapshot"]["d_entry"] = "bad"
+    rep = validator.Report()
+    validator._coverage_check_snapshot(
+        rep, "followup-d-entry", bad_d_entry, bad_d_entry["entries"],
+        manifest, computed)
+    assert len(rep.errors) == 1 and "d_entry" in rep.errors[0], rep.errors
+
+    # 8b. A malformed digest-carrying ledger id is rejected before int().
+    original_ledger_entries = validator._coverage_ledger_entries
+    live_ledger = original_ledger_entries()
+    malformed_row = {"id": "D" + "9" * 13,
+                     "body": "rows_sha256=" + "a" * 64}
+    validator._coverage_ledger_entries = lambda: list(live_ledger) + [malformed_row]
+    try:
+        rep = validator.Report()
+        validator._coverage_check_snapshot(
+            rep, "followup-malformed-id", payload, payload["entries"],
+            manifest, computed)
+        assert any("malformed id" in error for error in rep.errors), rep.errors
+    finally:
+        validator._coverage_ledger_entries = original_ledger_entries
+
+    # 9. D119 wording acknowledges the intentional test-only totals oracle.
+    reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
+                      / "step-0-reconciliation-v4.md").read_text(encoding="utf-8")
+    assert "test-only totals oracle" in reconciliation and "PINNED_ROW_TOTALS_ORACLE" in reconciliation, (
+        "finding 9: D119 correction must acknowledge the test-only totals oracle")
 def _readiness_posix_ready() -> bool:
     """The readiness process hooks are POSIX-shell proofs; other hosts skip."""
     return sys.platform.startswith("linux") and shutil.which("sh") is not None
@@ -4424,6 +4708,7 @@ TESTS = [
     test_coverage_map_batch3_deliveries,
     test_coverage_map_step0_hygiene,
     test_coverage_map_batch4_deliveries,
+    test_coverage_map_rerun_review_regressions,
     test_coverage_map_batch5_deliveries,
     test_coverage_map_batch5_covering_owner_assumptions,
     test_skills_manifest_provenance,

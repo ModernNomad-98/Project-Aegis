@@ -6,6 +6,7 @@ this summary is GENERATED from the JSON snapshot. Do not hand-edit;
 regenerate with python -P scripts/validate-skills.py --write-coverage-map-md.
 
 **Optionality.** The roadmap is an OPTIONAL reference backlog, not a required target. GAP rows are optional backlog candidates, not deficits or completion obligations.
+
 **Pointer integrity (stable anchors, DS-4b migration).** The migrated
 coverage evidence uses the stable catalog-row grammar: a catalog row
 anchor names a covering skill whose docs/skills-catalog.md table row

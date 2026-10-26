@@ -322,8 +322,7 @@ def _coverage_shipped_analysis(entry_text: str,
     normalization with an index map to the raw text, so no base-detected claim
     is hidden. Text-based evidence check, not semantic shipping proof.
     """
-    if not manifest:
-        raise ValueError("manifest unavailable or empty")
+    _coverage_require_manifest_set(manifest)
     known = {name.casefold() for name in manifest
              if isinstance(name, str) and name.strip()}
     if not known:
@@ -2243,10 +2242,35 @@ def _coverage_area_titles():
     return titles
 
 
+class CoveragePriorityError(ValueError):
+    """Typed invalid-priority error so duplicate suppression stays narrow."""
+
+
+def _coverage_priority_error(entry):
+    """Return the single deterministic priority error for one coverage entry."""
+    if "priority" not in entry:
+        return "priority is required (one of P0/P1/P2)"
+    value = entry.get("priority")
+    if not isinstance(value, str):
+        return ("priority must be a string in P0/P1/P2 (got "
+                + repr(value) + ")")
+    if value not in COVERAGE_PRIORITY_KEYS:
+        return ("priority " + repr(value) + " is not allowed (only P0/P1/P2 "
+                "are allowed for all statuses)")
+    return None
+
+
+def _coverage_require_manifest_set(manifest):
+    """Fail closed unless manifest is a non-empty set/frozenset of non-empty strings."""
+    if not isinstance(manifest, (set, frozenset)) or not manifest:
+        raise ValueError("coverage requires a non-empty skills manifest set of skill names (fail closed)")
+    if any(not isinstance(name, str) or not name.strip() for name in manifest):
+        raise ValueError("coverage manifest must contain non-empty string skill names (fail closed)")
+    return manifest
+
+
 def _coverage_compute_totals(entries, manifest):
-    if manifest is not None and not isinstance(manifest, (set, frozenset)):
-        raise ValueError("coverage totals require a skills manifest set of "
-                         "skill names (fail closed)")
+    _coverage_require_manifest_set(manifest)
     by_area = {}
     by_status = {}
     by_grade = {}
@@ -2262,10 +2286,13 @@ def _coverage_compute_totals(entries, manifest):
         by_area[area] = by_area.get(area, 0) + 1
         by_status[status] = by_status.get(status, 0) + 1
         by_grade[grade] = by_grade.get(grade, 0) + 1
-        by_priority[str(entry.get("priority"))] = by_priority.get(
-            str(entry.get("priority")), 0) + 1
+        priority_error = _coverage_priority_error(entry)
+        if priority_error is not None:
+            raise CoveragePriorityError("coverage totals: " + priority_error)
+        priority = entry.get("priority")
+        by_priority[priority] = by_priority.get(priority, 0) + 1
         if status == "GAP":
-            prio = str(entry.get("priority"))
+            prio = priority
             gap_by_priority[prio] = gap_by_priority.get(prio, 0) + 1
         skills = entry.get("covering_skills")
         if isinstance(skills, list):
@@ -2389,6 +2416,7 @@ def _coverage_render_summary(payload, computed, area_titles):
         "",
         "**Optionality.** " + COVERAGE_REQUIRED_PHRASES[0] + " "
         + COVERAGE_REQUIRED_PHRASES[1],
+        "",
         "**Pointer integrity (stable anchors, DS-4b migration).** The migrated",
         "coverage evidence uses the stable catalog-row grammar: a catalog row",
         "anchor names a covering skill whose docs/skills-catalog.md table row",
@@ -2472,7 +2500,11 @@ def _coverage_render_summary(payload, computed, area_titles):
             key = str(entry.get("status"))
             if key in order:
                 counts[1 + order.index(key)] += 1
-        title = area_titles.get(area, "Area " + area).replace("|", "\\\\|").replace("\\n", " ")
+        title = (area_titles.get(area, "Area " + area)
+                 .replace('\\', '\\\\')
+                 .replace('|', '\\|')
+                 .replace('\n', " ")
+                 .replace('\r', " "))
         lines.append("| " + area + " " + title + " | "
                      + " | ".join(str(value) for value in counts) + " |")
     lines += [
@@ -2528,20 +2560,91 @@ def _coverage_scrub_for_counts(text):
     return scrubbed
 
 
+COVERAGE_DERIVED_TOTAL_KEY_RE = (
+    r"(?:rows?|entr(?:y|ies)|skills?|ids?|counts?|totals?|pins?|"
+    r"snapshot(?:_totals)?|by_area|by_status|by_grade|by_priority|"
+    r"gap_by_priority|manifest_skills|coverage_map|review_pending|"
+    r"distinct_covering_skills|beyond_roadmap_skills)"
+)
+COVERAGE_N_OF_M_RE = r"(?i)\b[0-9]+\s*(?:of|-of-)\s*[0-9]+\b"
+COVERAGE_NUMBER_KEY_RE = r"(?i)\b[0-9]+\s*[- ]\s*" + COVERAGE_DERIVED_TOTAL_KEY_RE + r"\b"
+COVERAGE_KEY_NUMBER_RE = (r"(?i)\b" + COVERAGE_DERIVED_TOTAL_KEY_RE
+                          + r"\s*(?::|=|-|\s)\s*[0-9]+\b")
+COVERAGE_LATER_CONTEXT_RE = re.compile(r"(?i)\b(?:coverage|snapshot|pinned)\b")
+COVERAGE_LATER_KEY_PATTERNS = (
+    COVERAGE_KEY_NUMBER_RE,
+    r"(?i)\btotals?\b[^\n0-9]{0,20}\b(?:is|are|now|at|of|equals?)\b"
+    r"[^\n0-9]{0,10}[0-9]+\b",
+    r"(?i)\bcoverage\b[^\n0-9]{0,30}\b(?:now\s+has|has|contains|"
+    r"total(?:s)?\s+(?:is|are|now|at)|pinned\s+(?:at|to))\b"
+    r"[^\n0-9]{0,20}[0-9]+\s+skills?\b",
+)
+COVERAGE_LATER_CONTEXT_PATTERNS = (
+    COVERAGE_N_OF_M_RE,
+    COVERAGE_NUMBER_KEY_RE,
+)
+_LEGIT_LATER_MASK_RE = re.compile(
+    r"(?i)(?:"
+    r"\bsnapshot\s+tests?\s+cover\s+[0-9]+\s+(?:entr(?:y|ies)|skills?)\b"
+    r"|\bsnapshot\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
+    r"(?:entr(?:y|ies)|skills?)\b"
+    r"|\bcoverage\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
+    r"(?:entr(?:y|ies)|skills?)\b"
+    r"|\bcoverage\s+roadmap\s*:\s*[0-9]+\s+skills?\b"
+    r"|\bsnapshot-(?:19|20)[0-9]{2}\b)"
+)
+_COVERAGE_UPDATE_EVENT_RE = re.compile(
+    r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
+    r"renamed|moved|progressed)(?:\s+(?:to|by|with))?\b")
+
+
+def _coverage_later_total_count_errors(text):
+    """Later-ledger derived-total counts under one explicit shared key policy.
+
+    Policy: derived-total keys are rows, entries, skills, ids, counts, totals,
+    pins, snapshot/snapshot_totals, by_area/by_status/by_grade/by_priority,
+    gap_by_priority, manifest_skills, coverage_map, review_pending,
+    distinct_covering_skills and beyond_roadmap_skills. Key-labelled totals
+    (key + colon/equal/hyphen/space + N) are always rejected; N-of-M and bare
+    number+key forms are rejected when coverage/snapshot/pinned context is
+    present; year-valued totals are ordinary numbers. Actual dates and D ids
+    are scrubbed, legitimate update-event/test prose and snapshot-YYYY labels
+    are masked first. No bare-year scrub.
+    """
+    scrubbed = _coverage_scrub_for_counts(text)
+    scrubbed = _LEGIT_LATER_MASK_RE.sub(" ", scrubbed)
+    scrubbed = _COVERAGE_UPDATE_EVENT_RE.sub(" ", scrubbed)
+    findings = set()
+    for pattern in COVERAGE_LATER_KEY_PATTERNS:
+        for match in re.finditer(pattern, scrubbed):
+            findings.add(match.group(0))
+    if COVERAGE_LATER_CONTEXT_RE.search(scrubbed):
+        for pattern in COVERAGE_LATER_CONTEXT_PATTERNS:
+            for match in re.finditer(pattern, scrubbed):
+                findings.add(match.group(0))
+    return sorted(findings)
+
+
 def _coverage_count_copy_errors(text, computed):
     scrubbed = _coverage_scrub_for_counts(text)
     findings = set()
     patterns = (
-        r"\b[0-9]+\s+of\s+[0-9]+\b",
-        r"(?i)\b(?:totals?|entries|counts?|review_pending|manifest_skills|"
-        r"distinct_covering_skills|beyond_roadmap_skills|by_status|by_grade|"
-        r"by_priority)\s*[:=]\s*[0-9]+",
-        r"\b[0-9]+\s+(?:rows|skills|entries|ids|count|counts|total|totals)\b",
+        COVERAGE_N_OF_M_RE,
+        r"(?i)\b[0-9]+-(?:rows?|skills?|entr(?:y|ies)|ids?|pins?|counts?|totals?)\b",
+        r"(?i)\b[0-9]+\s+(?:rows?|skills?|entr(?:y|ies)|ids?|pins?|counts?|totals?)\b",
+        COVERAGE_KEY_NUMBER_RE,
     )
     for pattern in patterns:
         for match in re.finditer(pattern, scrubbed):
             findings.add(match.group(0))
     return sorted(findings)
+
+
+def _coverage_ledger_id_number(row_id):
+    """Parse a bounded D<1-12 digits> ledger id; None before any int conversion."""
+    if not isinstance(row_id, str) or not re.fullmatch(r"D[0-9]{1,12}", row_id):
+        return None
+    return int(row_id[1:])
 
 
 def _coverage_check_snapshot(rep, ctx, payload, entries, manifest, computed):
@@ -2557,8 +2660,9 @@ def _coverage_check_snapshot(rep, ctx, payload, entries, manifest, computed):
                   "verify the snapshot digest (fail closed)")
         return
     d_entry = snapshot.get("d_entry")
-    if not isinstance(d_entry, str) or not re.fullmatch(r"D[0-9]+", d_entry):
-        rep.error("[" + ctx + "] snapshot.d_entry must be a D<id> string")
+    if not isinstance(d_entry, str) or not re.fullmatch(r"D[0-9]{1,12}", d_entry):
+        rep.error("[" + ctx + "] snapshot.d_entry must be a D<1-12 digits> string")
+        return
     digest = snapshot.get("rows_sha256")
     if not isinstance(digest, str) or not COVERAGE_ROWS_SHA256_RE.fullmatch(digest):
         rep.error("[" + ctx + "] snapshot.rows_sha256 must be lowercase sha256 hex")
@@ -2570,48 +2674,67 @@ def _coverage_check_snapshot(rep, ctx, payload, entries, manifest, computed):
     if ledger is None:
         rep.error("[" + ctx + "] reconciliation ledger unavailable (fail closed)")
         return
-    matching = [row for row in ledger if row["id"] == d_entry]
+    validated_ledger = []
+    for row in ledger:
+        row_number = _coverage_ledger_id_number(row.get("id"))
+        if row_number is None:
+            rep.error("[" + ctx + "] ledger entry has malformed id "
+                      + repr(row.get("id")) + " (expected D<1-12 digits>)")
+            continue
+        validated_ledger.append((row, row_number))
+    matching = [row for row, _row_number in validated_ledger
+                if row["id"] == d_entry]
     if len(matching) != 1:
         rep.error("[" + ctx + "] snapshot.d_entry must match exactly one ledger entry")
         return
+    bound_number = int(d_entry[1:])
     digest_entries = []
-    for row in ledger:
+    for row, row_number in validated_ledger:
         entry_matches = COVERAGE_DIGEST_TOKEN_RE.findall(row["body"])
         raw_count = row["body"].count("rows_sha256=")
         if raw_count and len(entry_matches) != raw_count:
             rep.error("[" + ctx + "] ledger entry " + row["id"] + " carries a "
                       "malformed/non-boundary-exact rows_sha256 token")
         if entry_matches:
-            digest_entries.append((row, entry_matches))
+            digest_entries.append((row, entry_matches, row_number))
     if not digest_entries:
         rep.error("[" + ctx + "] ledger carries no rows_sha256 snapshot entry (fail closed)")
     else:
-        latest = max(digest_entries, key=lambda pair: int(pair[0]["id"][1:]))
+        latest = max(digest_entries, key=lambda item: item[2])
         if latest[0]["id"] != d_entry:
             rep.error("[" + ctx + "] snapshot.d_entry must be the latest digest-carrying "
                       "ledger entry (found " + latest[0]["id"] + ")")
-        bound_number = int(d_entry[1:])
-        for row, entry_matches in digest_entries:
-            if int(row["id"][1:]) > bound_number:
+        for row, entry_matches, row_number in digest_entries:
+            if row_number > bound_number:
                 rep.error("[" + ctx + "] ledger entry " + row["id"]
                           + " is later than the bound snapshot " + d_entry
                           + " and carries a rows_sha256 token (fail closed)")
     totals = snapshot.get("totals")
-    if not isinstance(totals, dict) or totals != computed:
-        rep.error("[" + ctx + "] snapshot.totals must equal the derived totals")
+    if _coverage_validated_totals(totals, computed) is None:
+        rep.error("[" + ctx + "] snapshot.totals must be exactly the derived exact-integer totals")
     body = matching[0]["body"]
     matches = COVERAGE_DIGEST_TOKEN_RE.findall(body)
     raw = body.count("rows_sha256=")
     if raw != 1 or len(matches) != 1 or matches[0] != digest:
         rep.error("[" + ctx + "] snapshot entry must carry exactly one "
                   "boundary-exact rows_sha256 token equal to the snapshot digest")
-    scrubbed = body
-    if len(matches) == 1:
-        scrubbed = scrubbed.replace("rows_sha256=" + matches[0], "")
-    count_copies = _coverage_count_copy_errors(scrubbed, computed)
-    if count_copies:
-        rep.error("[" + ctx + "] snapshot entry must NOT carry a coverage-total "
-                  "count copy; found " + repr(count_copies))
+    for row, row_number in validated_ledger:
+        row_id = row["id"]
+        if row_number < bound_number:
+            continue
+        row_body = row["body"]
+        for token in COVERAGE_DIGEST_TOKEN_RE.findall(row_body):
+            row_body = row_body.replace("rows_sha256=" + token, "")
+        if row_number != bound_number:
+            count_copies = _coverage_later_total_count_errors(row_body)
+        else:
+            count_copies = _coverage_count_copy_errors(row_body, computed)
+        if count_copies:
+            label = ("snapshot entry " if row_number == bound_number
+                     else "later derived-total ledger entry ")
+            rep.error("[" + ctx + "] " + label + row_id
+                      + " must NOT carry a coverage-total count copy; found "
+                      + repr(count_copies))
 
 
 def _coverage_check_generated_summary(rep, payload, computed):
@@ -2817,6 +2940,7 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
     by_priority: dict[str, int] = {}
     gap_by_priority: dict[str, int] = {}
     area_status_counts: dict[str, dict[str, int]] = {}
+    priority_invalid = False
     for index, entry in enumerate(entries):
         if not isinstance(entry, dict):
             rep.error("[" + ctx + "] entry[" + str(index)
@@ -2829,7 +2953,13 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
                       "booleans are rejected)")
             continue
         entry_ctx = "[" + ctx + "] entry " + str(row_id) + ": "
+        priority_error = _coverage_priority_error(entry)
+        if priority_error is not None:
+            priority_invalid = True
+            rep.error(entry_ctx + priority_error)
         for key in COVERAGE_ENTRY_KEYS:
+            if key == "priority":
+                continue
             if key not in entry:
                 rep.error(entry_ctx + "missing required field '" + key + "'")
         for key in sorted(set(entry) - set(COVERAGE_ENTRY_KEYS)):
@@ -2855,7 +2985,7 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
         if entry.get("name") != doc["name"]:
             rep.error(entry_ctx + "name must equal the docs/skills row '"
                       + doc["name"] + "'")
-        if entry.get("priority") != doc["priority"]:
+        if priority_error is None and entry.get("priority") != doc["priority"]:
             rep.error(entry_ctx + "priority must equal the docs/skills row ("
                       + doc["priority"] + ")")
         status = entry.get("status")
@@ -3054,8 +3184,18 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
         totals = {}
     try:
         computed = _coverage_compute_totals(entries, manifest)
+    except CoveragePriorityError as exc:
+        if not priority_invalid:
+            rep.error("[" + ctx + "] " + str(exc))
+        rep.error("[" + ctx + "] independent snapshot/summary/gap checks "
+                  "intentionally skipped after invalid entry data (explicit "
+                  "skip, not a pass)")
+        return
     except ValueError as exc:
         rep.error("[" + ctx + "] " + str(exc))
+        rep.error("[" + ctx + "] independent snapshot/summary/gap checks "
+                  "intentionally skipped after invalid entry data (explicit "
+                  "skip, not a pass)")
         return
     scope_count_copies = _coverage_count_copy_errors(scope if isinstance(scope, str) else "", computed)
     if scope_count_copies:
@@ -3080,14 +3220,6 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
                       + repr(totals.get(key)) + ", expected "
                       + repr(computed[key])
                       + " (recomputed from the entries and the manifest)")
-    unknown_gap_priorities = sorted({
-        str(entry.get("priority")) for entry in entries
-        if isinstance(entry, dict) and entry.get("status") == "GAP"
-        and str(entry.get("priority")) not in COVERAGE_PRIORITY_KEYS})
-    if unknown_gap_priorities:
-        rep.error("[" + ctx + "] GAP rows use unknown priority key(s) "
-                  + repr(unknown_gap_priorities) + " (only "
-                  + repr(list(COVERAGE_PRIORITY_KEYS)) + " are allowed)")
     gap_ids = tuple(entry["id"] for entry in entries
                     if isinstance(entry, dict) and entry.get("status") == "GAP")
     p0_gap_ids = tuple(entry["id"] for entry in entries
@@ -3252,7 +3384,11 @@ def main() -> int:
             print("ERROR writer: snapshot must be an object (fail closed)")
             return 1
         manifest_names = _coverage_manifest_names() or set()
-        computed = _coverage_compute_totals(entries, manifest_names)
+        try:
+            computed = _coverage_compute_totals(entries, manifest_names)
+        except ValueError as exc:
+            print("ERROR writer: " + str(exc))
+            return 1
         writer_rep = Report()
         check_coverage_map(writer_rep, skip_md=True)
         snapshot_totals = snapshot.get("totals")
