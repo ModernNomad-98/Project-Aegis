@@ -16,10 +16,11 @@ shared mutable resource without an explicit ownership handoff recorded in the ru
 
 Before any E2E or validation run, create an exclusive lock DIRECTORY atomically
 `.local/stack.lock` (or `.local/<stack>.stack.lock`). `.local` is untracked and never
-committed. The executable example writes the token to a unique temp directory, then
-atomically renames it to the lock path; it installs traps before acquisition, reports
-contention separately from acquisition I/O errors, writes a ready marker before the
-workload starts, and only removes a lock whose full stored token matches its own.
+committed. The executable example atomically creates the lock directory with mkdir,
+writes the token through a temp+rename inside it, installs traps before acquisition,
+reports contention separately from acquisition I/O errors, writes a ready marker before
+the workload starts, and only removes a lock whose full stored token matches its own (or
+a partially-created own lock with no token).
 Set `AEGIS_STACK_WORKLOAD` to the bounded direct-child command and optionally
 `AEGIS_STACK_TTL_MINUTES` (default 120). Supported model is POSIX `sh` with a direct
 child owned by this script (no descendant-tree guarantee); zombie checks use `ps`.
@@ -41,7 +42,6 @@ fi
 TOKEN="owner=$OWNER_NAME email=$OWNER_EMAIL run=$RUN_ID acquired=$ACQUIRED ttl_minutes=$TTL_MINUTES"
 CHILD=""
 CLEANED=0
-TMP=""
 stop_child() {
   pid="$CHILD"
   if [ -z "$pid" ] && [ -f "$LOCK/workload.pid" ]; then pid="$(cat "$LOCK/workload.pid" 2>/dev/null || true)"; fi
@@ -72,11 +72,10 @@ cleanup() {
   if ! stop_child; then return 1; fi
   if [ -d "$LOCK" ]; then
     current="$(cat "$LOCK/token" 2>/dev/null || true)"
-    if [ "$current" = "$TOKEN" ]; then
-      if ! rm -f "$LOCK"; then echo "INCOMPLETE: failed to remove owned lock" >&2; return 1; fi
+    if [ "$current" = "$TOKEN" ] || [ ! -e "$LOCK/token" ]; then
+      if ! rm -rf "$LOCK"; then echo "INCOMPLETE: failed to remove owned lock" >&2; return 1; fi
     fi
   fi
-  if [ -n "$TMP" ] && [ -d "$TMP" ]; then rm -rf "$TMP" 2>/dev/null || true; fi
   CLEANED=1
   return 0
 }
@@ -84,20 +83,18 @@ on_signal() { trap - INT TERM; echo "interrupted: stopping owned workload before
 trap 'cleanup' EXIT
 trap 'on_signal' INT TERM
 if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock parent directory" >&2; exit 2; fi
-TMP="$LOCK.tmp.$RUN_ID"
-if ! mkdir "$TMP"; then echo "LOCK ERROR: cannot create temporary lock directory" >&2; exit 2; fi
-if ! printf '%s\n' "$TOKEN" > "$TMP/token"; then rm -rf "$TMP"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
-if ! ln -s "$TMP" "$LOCK" 2>/dev/null; then
-  if [ -L "$LOCK" ] || [ -e "$LOCK" ]; then
+if ! mkdir "$LOCK"; then
+  if [ -d "$LOCK" ]; then
     if [ -f "$LOCK/token" ]; then cat "$LOCK/token" >&2; fi
     echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
-    rm -rf "$TMP"; exit 1
+    exit 1
   fi
-  rm -rf "$TMP"
   echo "LOCK ERROR: atomic lock acquisition failed" >&2
   exit 2
 fi
-LOCK_LINK=1
+TOKEN_TMP="$LOCK/token.tmp.$RUN_ID"
+if ! printf '%s\n' "$TOKEN" > "$TOKEN_TMP"; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
+if ! mv "$TOKEN_TMP" "$LOCK/token" 2>/dev/null; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot publish lock token" >&2; exit 2; fi
 sh -c '
   echo $$ > "$1/workload.pid" || exit 1
   : > "$1/ready" || exit 1
