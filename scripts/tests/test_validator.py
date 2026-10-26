@@ -4276,6 +4276,8 @@ def test_coverage_map_rerun_review_regressions():
         "coverage: updated 2 skills",
         "coverage roadmap: 2 skills",
         "snapshot tests cover 2 skills",
+        "snapshot tests cover 2 entries",
+        "snapshot: updated 2 entries",
         "coverage: updated 2 entries",
         "totals updated in D" + str(earlier_ledger_id),
         "snapshot-2026",
@@ -4296,6 +4298,13 @@ def test_coverage_map_rerun_review_regressions():
         "coverage snapshot updated to " + n + " entries",
         "coverage now has " + n + " skills",
         "coverage total is " + n,
+        "coverage totals: 2026",
+        "snapshot rows: 2024",
+        "coverage 85 of 254",
+        "coverage totals " + n,
+        "rows " + n,
+        "coverage " + n + " skills",
+        "snapshot now " + n + " skills",
     )
     for extra in stale_later:
         errors = _check_ledger(_later_entry(extra))
@@ -4391,6 +4400,9 @@ def test_coverage_map_rerun_review_regressions():
                                        if "priority" in error]
                     assert len(priority_errors) == 1, (expected, rep.errors)
                     assert expected in priority_errors[0], priority_errors
+                    assert any("independent snapshot/summary/gap checks "
+                               "intentionally skipped" in error
+                               for error in rep.errors), rep.errors
         original_compute = validator._coverage_compute_totals
         def _manifest_boom(entries, manifest):
             raise ValueError("manifest validation boom")
@@ -4447,6 +4459,21 @@ def test_coverage_map_rerun_review_regressions():
         rep, "followup-d-entry", bad_d_entry, bad_d_entry["entries"],
         manifest, computed)
     assert len(rep.errors) == 1 and "d_entry" in rep.errors[0], rep.errors
+
+    # 8b. A malformed digest-carrying ledger id is rejected before int().
+    original_ledger_entries = validator._coverage_ledger_entries
+    live_ledger = original_ledger_entries()
+    malformed_row = {"id": "D" + "9" * 13,
+                     "body": "rows_sha256=" + "a" * 64}
+    validator._coverage_ledger_entries = lambda: list(live_ledger) + [malformed_row]
+    try:
+        rep = validator.Report()
+        validator._coverage_check_snapshot(
+            rep, "followup-malformed-id", payload, payload["entries"],
+            manifest, computed)
+        assert any("malformed id" in error for error in rep.errors), rep.errors
+    finally:
+        validator._coverage_ledger_entries = original_ledger_entries
 
     # 9. D119 wording acknowledges the intentional test-only totals oracle.
     reconciliation = (validator.REPO_ROOT / "docs" / "reconciliation"
