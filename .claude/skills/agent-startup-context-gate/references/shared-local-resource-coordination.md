@@ -41,33 +41,33 @@ if [ -z "$OWNER_NAME" ] || [ -z "$OWNER_EMAIL" ]; then
 fi
 TOKEN="owner=$OWNER_NAME email=$OWNER_EMAIL run=$RUN_ID acquired=$ACQUIRED ttl_minutes=$TTL_MINUTES"
 CHILD=""
+CREATED_LOCK=0
 CLEANED=0
 stop_child() {
-  pid="$CHILD"
-  if [ -z "$pid" ] && [ -f "$LOCK/workload.pid" ]; then pid="$(cat "$LOCK/workload.pid" 2>/dev/null || true)"; fi
-  if [ -n "$pid" ]; then
-    if kill -0 "$pid" 2>/dev/null; then
-      state=$(ps -o stat= -p "$pid" 2>/dev/null || true)
-      case "$state" in Z*) wait "$pid" 2>/dev/null || true; CHILD=""; return 0 ;; esac
-      kill -TERM "$pid" 2>/dev/null || true
+  if [ -n "$CHILD" ]; then
+    if kill -0 "$CHILD" 2>/dev/null; then
+      state=$(ps -o stat= -p "$CHILD" 2>/dev/null || true)
+      case "$state" in Z*) wait "$CHILD" 2>/dev/null || true; CHILD=""; return 0 ;; esac
+      kill -TERM "$CHILD" 2>/dev/null || true
       i=0
-      while kill -0 "$pid" 2>/dev/null && [ "$i" -lt 5 ]; do
+      while kill -0 "$CHILD" 2>/dev/null && [ "$i" -lt 5 ]; do
         i=$((i+1)); sleep 1
-        state=$(ps -o stat= -p "$pid" 2>/dev/null || true)
+        state=$(ps -o stat= -p "$CHILD" 2>/dev/null || true)
         case "$state" in Z*) break ;; esac
       done
-      if kill -0 "$pid" 2>/dev/null; then
+      if kill -0 "$CHILD" 2>/dev/null; then
         echo "INCOMPLETE: owned workload still live after TERM; retaining ownership" >&2
         return 1
       fi
     fi
-    [ "$pid" = "$CHILD" ] && wait "$CHILD" 2>/dev/null || true
+    wait "$CHILD" 2>/dev/null || true
     CHILD=""
   fi
   return 0
 }
 cleanup() {
   if [ "$CLEANED" -eq 1 ]; then return 0; fi
+  if [ "$CREATED_LOCK" -eq 0 ]; then CLEANED=1; return 0; fi
   OWNED=0
   if [ -d "$LOCK" ]; then
     if [ -e "$LOCK/token" ]; then
@@ -77,18 +77,26 @@ cleanup() {
       OWNED=1
     fi
   fi
-  if [ "$OWNED" -eq 0 ] && [ -z "$CHILD" ]; then CLEANED=1; return 0; fi
-  if [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
+  if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
   if ! stop_child; then return 1; fi
+  if [ "$OWNED" -eq 1 ] && [ -f "$LOCK/workload.pid" ]; then rm -f "$LOCK/workload.pid" 2>/dev/null || true; fi
   if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then
     current="$(cat "$LOCK/token" 2>/dev/null || true)"
     if [ "$current" = "$TOKEN" ] || [ ! -e "$LOCK/token" ]; then
-      if ! rm -rf "$LOCK"; then echo "INCOMPLETE: failed to remove owned lock" >&2; return 1; fi
+      QUAR="$LOCK.quarantine.$RUN_ID"
+      if ! mv "$LOCK" "$QUAR" 2>/dev/null; then
+        echo "INCOMPLETE: cannot quarantine owned lock; evidence retained" >&2
+        return 1
+      fi
+      if ! rm -rf "$QUAR"; then
+        echo "INCOMPLETE: failed to remove quarantined lock; evidence retained" >&2
+        return 1
+      fi
     fi
   fi
   CLEANED=1
   return 0
-  }
+}
 on_signal() { trap - INT TERM; echo "interrupted: stopping owned workload before release" >&2; exit 130; }
 trap 'cleanup' EXIT
 trap 'on_signal' INT TERM
@@ -102,6 +110,7 @@ if ! mkdir "$LOCK"; then
   echo "LOCK ERROR: atomic lock acquisition failed" >&2
   exit 2
 fi
+CREATED_LOCK=1
 TOKEN_TMP="$LOCK/token.tmp.$RUN_ID"
 if ! printf '%s\n' "$TOKEN" > "$TOKEN_TMP"; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
 if ! mv "$TOKEN_TMP" "$LOCK/token" 2>/dev/null; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot publish lock token" >&2; exit 2; fi
@@ -158,7 +167,13 @@ cleanup_fixtures() {
   CLEANED=1
   # find matches are checked against the literal prefix before deletion
   printf 'cleanup prefix %s\n' "$UNIQUE_PREFIX"
-  find .local/fixtures -maxdepth 1 -name "$UNIQUE_PREFIX*" -print
+  find .local/fixtures -maxdepth 1 -name "$UNIQUE_PREFIX*" -print | while IFS= read -r path; do
+    base="$(basename "$path")"
+    case "$base" in
+      "$UNIQUE_PREFIX"*) rm -rf "--" "$path" ;;
+      *) echo "STOP: cleanup target outside literal unique prefix: $path" >&2; exit 2 ;;
+    esac
+  done
 }
 on_signal() { trap - INT TERM; cleanup_fixtures; exit 130; }
 trap 'cleanup_fixtures' EXIT

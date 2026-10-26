@@ -110,6 +110,9 @@ AUTHOR_PAIR=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.
 COMMITTER_PAIR=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1|\2/p")
 AUTHOR_NAME=${AUTHOR_PAIR%%|*}; AUTHOR_EMAIL=${AUTHOR_PAIR#*|}
 COMMITTER_NAME=${COMMITTER_PAIR%%|*}; COMMITTER_EMAIL=${COMMITTER_PAIR#*|}
+case "$AUTHOR_PAIR" in *"|"*) ;; *) echo "STARTUP: effective author identity malformed"; MISSING=1 ;; esac
+case "$COMMITTER_PAIR" in *"|"*) ;; *) echo "STARTUP: effective committer identity malformed"; MISSING=1 ;; esac
+if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] || [ -z "$COMMITTER_EMAIL" ]; then echo "STARTUP: effective author/committer identity empty or malformed"; MISSING=1; fi
 if [ -n "$OWNER_NAME" ] || [ -n "$OWNER_EMAIL" ]; then
   if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then
     echo "STARTUP: effective author/committer identity matches the recorded owner identity"; MISSING=1
@@ -117,7 +120,7 @@ if [ -n "$OWNER_NAME" ] || [ -n "$OWNER_EMAIL" ]; then
 fi
 HOOKS_PATH=$(git config --get core.hooksPath 2>/dev/null || true)
 if [ -n "$HOOKS_PATH" ]; then HOOK_PATH="$HOOKS_PATH/pre-commit"; else HOOK_PATH=$(git rev-parse --git-path hooks/pre-commit 2>/dev/null || true); fi
-if [ -n "$HOOK_PATH" ]; then echo "STARTUP: effective hook path=$HOOK_PATH"; if [ ! -x "$HOOK_PATH" ]; then echo "STARTUP: hook missing or not executable at effective path"; fi; else echo "STARTUP: effective hook path unavailable"; fi
+if [ -n "$HOOK_PATH" ]; then echo "STARTUP: effective hook path=$HOOK_PATH"; if [ ! -f "$HOOK_PATH" ] || [ ! -x "$HOOK_PATH" ]; then echo "STARTUP: hook missing or not executable at effective path"; MISSING=1; fi; else echo "STARTUP: effective hook path unavailable"; MISSING=1; fi
 [ "$MISSING" -eq 0 ] || exit 1
 echo "STARTUP: effective author/committer identity available and distinct from the recorded owner"
 ```

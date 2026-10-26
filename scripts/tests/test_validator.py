@@ -4305,6 +4305,9 @@ def test_readiness_startup_authority_non_mutating():
         git("config", "user.email", "agent@example.invalid")
         git("config", "--local", "aegis.ownerName", "FixtureOwner")
         git("config", "--local", "aegis.ownerEmail", "owner@example.invalid")
+        hook = repo / ".git" / "hooks" / "pre-commit"
+        hook.write_text(hook_text, encoding="utf-8", newline="\n")
+        hook.chmod(0o755)
         sentinel = repo / ".git" / "hooks" / "sentinel"
         sentinel.write_text("keep-me\n", encoding="utf-8")
         def state():
@@ -4318,6 +4321,16 @@ def test_readiness_startup_authority_non_mutating():
         after = state()
         assert after == before, "read-only identity inspection must not change config or hooks"
         ok("covered startup inspection is non-mutating (git config bytes and hook files unchanged)")
+        os.chmod(hook, 0o644)
+        nonexec = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert nonexec.returncode != 0 and "hook missing or not executable" in nonexec.stdout, (nonexec.returncode, nonexec.stdout)
+        os.chmod(hook, 0o755)
+        hook.unlink()
+        missing_hook = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert missing_hook.returncode != 0 and "hook missing or not executable" in missing_hook.stdout, (missing_hook.returncode, missing_hook.stdout)
+        hook.write_text(hook_text, encoding="utf-8", newline="\n")
+        hook.chmod(0o755)
+        ok("missing and non-executable effective hooks block inspection")
         git("config", "user.name", "FixtureOwner")
         mismatch = subprocess.run(["sh", "-c", inspection], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert mismatch.returncode != 0 and "matches the recorded owner identity" in mismatch.stdout, (mismatch.returncode, mismatch.stdout)
@@ -4381,6 +4394,19 @@ def test_readiness_shared_lock_lifecycle():
             raise AssertionError("workload child was not reaped: " + str(pid))
         def clean_lock():
             if lock.exists(): shutil.rmtree(lock, ignore_errors=True)
+        if lock.exists(): clean_lock()
+        lock.mkdir()
+        tokenless = start("true")
+        tokenless.communicate(timeout=10)
+        assert tokenless.returncode == 1 and lock.exists() and not (lock / "abort").exists(), "tokenless foreign lock must be preserved untouched"
+        clean_lock()
+        lock.mkdir()
+        (lock / "token").write_text("owner=foreign@example.invalid run=foreign\n", encoding="utf-8")
+        foreign_abort = start("true")
+        foreign_abort.communicate(timeout=10)
+        assert foreign_abort.returncode == 1 and (lock / "token").read_text(encoding="utf-8") == "owner=foreign@example.invalid run=foreign\n" and not (lock / "abort").exists()
+        clean_lock()
+        ok("tokenless and foreign locks are untouched by acquisition-failure cleanup")
         holder = start("printf started > started; while :; do sleep 0.05; done")
         try:
             wait_paths(lock, lock / "ready", root / "started")
@@ -4393,7 +4419,12 @@ def test_readiness_shared_lock_lifecycle():
             assert contender.returncode == 1 and "held" in (cerr or ""), (contender.returncode, cerr)
             assert lock.exists(), "foreign lock must remain after contender stop"
             ok("contention exits 1 and preserves the foreign lock")
+            unrelated = subprocess.Popen(["sleep", "60"])
+            (lock / "workload.pid").write_text(str(unrelated.pid), encoding="utf-8")
             holder.terminate(); holder.communicate(timeout=15)
+            assert unrelated.poll() is None, "cleanup must not kill a reused/stale pid"
+            unrelated.kill(); unrelated.wait(timeout=5)
+            ok("stale/reused workload.pid is never used to kill an unrelated process")
             assert not lock.exists(), "TERM must release the owned lock after reaping"
             assert_reaped(pid)
             ok("TERM stops, reaps and releases only its own lock")
