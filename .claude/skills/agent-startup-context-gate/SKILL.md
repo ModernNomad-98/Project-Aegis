@@ -112,14 +112,12 @@ OWNER_EMAIL=$(git config --local --get aegis.ownerEmail 2>/dev/null || true)
 [ -n "$OWNER_EMAIL" ] || { echo "STARTUP: recorded owner email missing"; MISSING=1; }
 AUTHOR_IDENT=$(git var GIT_AUTHOR_IDENT 2>/dev/null) || { echo "STARTUP: effective author identity unavailable"; MISSING=1; }
 COMMITTER_IDENT=$(git var GIT_COMMITTER_IDENT 2>/dev/null) || { echo "STARTUP: effective committer identity unavailable"; MISSING=1; }
-AUTHOR_PAIR=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1|\2/p")
-COMMITTER_PAIR=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1|\2/p")
-AUTHOR_NAME=${AUTHOR_PAIR%%|*}; AUTHOR_EMAIL=${AUTHOR_PAIR#*|}
-COMMITTER_NAME=${COMMITTER_PAIR%%|*}; COMMITTER_EMAIL=${COMMITTER_PAIR#*|}
-case "$AUTHOR_PAIR" in *"|"*) ;; *) echo "STARTUP: effective author identity malformed"; MISSING=1 ;; esac
-case "$COMMITTER_PAIR" in *"|"*) ;; *) echo "STARTUP: effective committer identity malformed"; MISSING=1 ;; esac
-case "$AUTHOR_EMAIL" in *"|"*) echo "STARTUP: effective author identity has extra separators"; MISSING=1 ;; esac
-case "$COMMITTER_EMAIL" in *"|"*) echo "STARTUP: effective committer identity has extra separators"; MISSING=1 ;; esac
+AUTHOR_NAME=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
+AUTHOR_EMAIL=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
+COMMITTER_NAME=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
+COMMITTER_EMAIL=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
+case "$AUTHOR_NAME" in *"|"*) echo "STARTUP: effective author name has extra separators"; MISSING=1 ;; esac
+case "$AUTHOR_EMAIL" in *"|"*) echo "STARTUP: effective author email has extra separators"; MISSING=1 ;; esac
 if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] || [ -z "$COMMITTER_EMAIL" ]; then echo "STARTUP: effective author/committer identity empty or malformed"; MISSING=1; fi
 if [ -n "$OWNER_NAME" ] || [ -n "$OWNER_EMAIL" ]; then
   if { [ -n "$AGENT_NAME" ] && [ "$AGENT_NAME" = "$OWNER_NAME" ]; } || { [ -n "$AGENT_EMAIL" ] && [ "$AGENT_EMAIL" = "$OWNER_EMAIL" ]; } || [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then
@@ -147,7 +145,9 @@ fi
 echo "STARTUP: effective author/committer identity available and distinct from the recorded owner"
 ```
 
-Identity policy: the effective `git var` identity is authoritative; configured values are also checked when present and must not be the owner. A command-level `git -c user.name=...` override intentionally changes the configured view (and is accepted only when the resulting effective identity is non-owner); the actual commit remains the oracle.
+Supported model: Linux with POSIX sh/coreutils. Windows and non-Linux POSIX lock/readiness scenarios are explicit SKIP/UNRUN, never PASS.
+
+Identity policy: the effective `git var` identity is authoritative; configured values are also checked when present and must not be the owner. A command-level `git -c user.name=...` override intentionally changes the configured view (and is accepted only when the resulting effective identity is non-owner); the actual commit remains the oracle. Minimum Git: 2.20 (git var/config behavior); command-level `-c` visibility in hooks depends on Git exporting GIT_CONFIG_PARAMETERS/GIT_CONFIG_COUNT, so set those explicitly on older Git; the effective `git var` check remains authoritative.
 
 Effective author AND committer identities matter, not only the configured defaults:
 environment (`GIT_AUTHOR_*`, `GIT_COMMITTER_*`) can change the identity that is

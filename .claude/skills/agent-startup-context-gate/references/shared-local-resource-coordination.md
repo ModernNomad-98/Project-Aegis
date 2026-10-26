@@ -17,10 +17,12 @@ shared mutable resource without an explicit ownership handoff recorded in the ru
 Before any E2E or validation run, create an exclusive lock DIRECTORY atomically
 `.local/stack.lock` (or `.local/<stack>.stack.lock`). `.local` is untracked and never
 committed. The executable example atomically creates the lock directory with mkdir,
-writes the token through a temp+rename inside it, installs traps before acquisition,
+writes the owner marker and token immediately inside the created directory, installs traps before acquisition,
 reports contention separately from acquisition I/O errors, writes a ready marker before
 the workload starts, and only removes a lock whose full stored token matches its own (or
 a partially-created own lock with no token).
+Supported model: Linux with POSIX sh/coreutils. The lock and readiness scenarios are Linux-supported; non-Linux POSIX and Windows are explicit SKIP/UNRUN, never PASS.
+
 Set `AEGIS_STACK_WORKLOAD` to the bounded direct-child command (required; no silent
 no-op) and optionally `AEGIS_STACK_TTL_MINUTES` (default 120). Run from the repo root
 or set an absolute `AEGIS_STACK_LOCK`; the default lock path is caller-relative.
@@ -36,6 +38,8 @@ if [ -z "$LOCK" ]; then echo "STOP: AEGIS_STACK_LOCK is empty" >&2; exit 2; fi
 WORKLOAD="${AEGIS_STACK_WORKLOAD:-}"
 if [ -z "$WORKLOAD" ]; then echo "STOP: AEGIS_STACK_WORKLOAD is required; refusing silent no-op" >&2; exit 2; fi
 TTL_MINUTES="${AEGIS_STACK_TTL_MINUTES:-120}"
+case "$TTL_MINUTES" in ''|*[!0-9]*|0) echo "STOP: AEGIS_STACK_TTL_MINUTES must be a positive integer" >&2; exit 2 ;; esac
+umask 077
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)-$$"
 ACQUIRED="$(date -u +%s)"
 OWNER_NAME="$(git config user.name 2>/dev/null || true)"
@@ -54,7 +58,13 @@ CHILD=""
 CREATED_LOCK=0
 CLEANED=0
 CLEANING=0
+STOP_ATTEMPTED=0
 stop_child() {
+  if [ "$STOP_ATTEMPTED" -eq 1 ]; then
+    if [ -n "$CHILD" ] && kill -0 "$CHILD" 2>/dev/null; then echo "INCOMPLETE: stop already attempted; not waiting again" >&2; return 1; fi
+    return 0
+  fi
+  STOP_ATTEMPTED=1
   if [ -n "$CHILD" ]; then
     if kill -0 "$CHILD" 2>/dev/null; then
       state=$(ps -o stat= -p "$CHILD" 2>/dev/null || true)
@@ -91,7 +101,10 @@ cleanup() {
   OWNED=0
   if [ -d "$LOCK" ]; then
     if [ -e "$LOCK/token" ]; then
-      current="$(cat "$LOCK/token" 2>/dev/null || true)"
+      if ! current="$(cat "$LOCK/token" 2>/dev/null)" || [ -z "$current" ]; then
+        echo "INCOMPLETE: lock token unreadable; ownership cannot be verified" >&2
+        CLEANING=0; return 1
+      fi
       if [ "$current" = "$TOKEN" ]; then OWNED=1; fi
     elif [ -e "$LOCK/owner.$RUN_ID" ]; then
       OWNED=1
@@ -125,34 +138,27 @@ cleanup() {
   CLEANING=0
   return 0
 }
-on_signal() { trap '' INT TERM; echo "interrupted: stopping owned workload before release" >&2; exit 130; }
+on_signal() { sig="${1:-INT}"; trap '' INT TERM; echo "interrupted: stopping owned workload before release" >&2; if [ "$sig" = TERM ]; then exit 143; fi; exit 130; }
 trap 'cleanup' EXIT
-trap 'on_signal' INT TERM
+trap 'on_signal TERM' TERM
+trap 'on_signal INT' INT
+if [ -L "$LOCK" ]; then echo "STOP: refusing symlinked lock path" >&2; exit 2; fi
 if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock parent directory" >&2; exit 2; fi
-if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock parent directory" >&2; exit 2; fi
-if [ -e "$LOCK" ] || [ -L "$LOCK" ]; then
+if ! mkdir "$LOCK"; then
   if [ -f "$LOCK" ]; then echo "LOCK MIGRATION: legacy lock file found at $LOCK; inspect and remove manually" >&2; exit 2; fi
-  if [ -f "$LOCK/token" ]; then cat "$LOCK/token" >&2; fi
-  echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
-  exit 1
-fi
-TMP="$LOCK.tmp.$RUN_ID"
-if ! mkdir "$TMP"; then echo "LOCK ERROR: cannot create temporary lock directory" >&2; exit 2; fi
-MARKER="$TMP/owner.$RUN_ID"
-if ! : > "$MARKER" 2>/dev/null; then rm -rf "$TMP"; echo "LOCK ERROR: cannot create owner marker" >&2; exit 2; fi
-if ! printf '%s\n' "$TOKEN" > "$TMP/token"; then rm -rf "$TMP"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
-if ! mv -T "$TMP" "$LOCK" 2>/dev/null; then
-  if [ -e "$LOCK" ] || [ -L "$LOCK" ]; then
+  if [ -d "$LOCK" ]; then
     if [ -f "$LOCK/token" ]; then cat "$LOCK/token" >&2; fi
     echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
-    rm -rf "$TMP"
     exit 1
   fi
-  rm -rf "$TMP"
-  echo "LOCK ERROR: atomic lock rename failed" >&2
+  echo "LOCK ERROR: atomic lock mkdir failed" >&2
   exit 2
 fi
 CREATED_LOCK=1
+if ! chmod 700 "$LOCK"; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot set lock permissions" >&2; exit 2; fi
+MARKER="$LOCK/owner.$RUN_ID"
+if ! : > "$MARKER" 2>/dev/null; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot create owner marker" >&2; exit 2; fi
+if ! printf '%s\n' "$TOKEN" > "$LOCK/token"; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
 # supervisor launch (stable test anchor)
 sh -c '
   echo $$ > "$1/workload.pid" || exit 1

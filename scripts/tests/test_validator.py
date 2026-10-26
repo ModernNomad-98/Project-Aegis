@@ -4198,14 +4198,14 @@ def test_skills_manifest_provenance():
 
 def _readiness_posix_ready() -> bool:
     """The readiness process hooks are POSIX-shell proofs; other hosts skip."""
-    return os.name != "nt" and shutil.which("sh") is not None
+    return sys.platform.startswith("linux") and shutil.which("sh") is not None
 
 
 def _readiness_skip(label: str) -> None:
     """Skip only on Windows; an unexpected POSIX skip fails the suite."""
-    if os.name != "nt":
-        raise AssertionError("required readiness case skipped on POSIX host: " + label)
-    skip(label)
+    if sys.platform.startswith("linux"):
+        raise AssertionError("required readiness case skipped on Linux: " + label)
+    skip("UNRUN (supported model Linux): " + label)
 
 
 def test_readiness_effective_identity_hook():
@@ -4264,7 +4264,7 @@ def test_readiness_effective_identity_hook():
         assert configured_owner.returncode != 0 and "configured Git identity" in configured_owner.stderr, configured_owner.stderr
         git("config", "user.name", "FixtureAgent")
         git("config", "user.email", "agent@example.invalid")
-        ok("env-only effective identity accepted; configured owner plus env override rejected")
+        ok("configured owner plus env override rejected (env-only covered by inspection)")
         p = git("-c", "user.name=FixtureOwner", "-c", "user.email=owner@example.invalid", "commit", "--allow-empty", "-m", "config override")
         assert p.returncode != 0 and "Refusing commit" in p.stderr, p.stderr
         mutated = hook_text.replace('if { [ -n "$CONFIG_NAME" ] && [ "$CONFIG_NAME" = "$OWNER_NAME" ]; } || { [ -n "$CONFIG_EMAIL" ] && [ "$CONFIG_EMAIL" = "$OWNER_EMAIL" ]; }; then', 'if false; then')
@@ -4695,6 +4695,8 @@ def main() -> int:
     if SKIPS:
         print(f"SKIPPED: {len(SKIPS)} test(s) (UNRUN, not passes)")
     print(f"OK: {len(PASSES)} gate self-test assertion(s) passed.")
+    if SKIPS and sys.platform.startswith("linux"):
+        return 1
     return 0
 
 
