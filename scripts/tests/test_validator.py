@@ -4234,21 +4234,31 @@ def test_coverage_map_rerun_review_regressions():
             finally:
                 validator.COVERAGE_RECON_PATH = original
     assert _check_ledger(base_ledger) == [], "finding 3: clean ledger must pass"
-    later_count = (base_ledger + NL_JOIN + "- **2026-10-27 - D999: totals="
-                   + str(computed["entries"]) + ".**")
+    legitimate_later = (base_ledger + NL_JOIN
+                        + "- **2026-10-27 - D120: updated 2 entries.**")
+    assert _check_ledger(legitimate_later) == [], (
+        "finding 3: a legitimate unrelated later entry must pass")
+    stale_later = (base_ledger + NL_JOIN
+                   + "- **2026-10-27 - D121: coverage snapshot now "
+                   + str(computed["entries"]) + " entries.**")
     assert any("coverage-total count copy" in error
-               for error in _check_ledger(later_count)), (
-        "finding 3: a later ledger entry with a stale count must be rejected")
+               for error in _check_ledger(stale_later)), (
+        "finding 3: a later coverage-specific stale count must be rejected")
 
-    # 4. Count-copy regex catches hyphenated and space-separated forms.
-    for phrase in ("300-row", "85-of-254", "totals 300"):
+    # 4. Count-copy regex catches hyphenated and space-separated forms
+    #    consistently across casing and singular/plural.
+    for phrase in ("300-row", "300 row", "300 rows", "300 Rows",
+                   "85-of-254", "totals 300", "Totals 300", "300 entries"):
         assert validator._coverage_count_copy_errors(phrase, computed), (
             "finding 4: count-copy regex must catch " + repr(phrase))
     assert validator._coverage_count_copy_errors("9", computed) == [], (
         "finding 4: an unrelated small number must stay allowed")
+    assert validator._coverage_count_copy_errors("updated 2 entries", computed), (
+        "finding 4: generic count-copy detector still catches 2 entries in a "
+        "coverage-specific context (caller narrows context)")
 
     # 5. Shipped analysis and totals share the set/frozenset manifest guard.
-    for bad_manifest in (["a"], "a", {"a": 1}, 123):
+    for bad_manifest in (["a"], "a", {"a": 1}, 123, None):
         for label, call in (
                 ("shipped", lambda m=bad_manifest: validator._coverage_shipped_analysis(
                     "no shipped-as phrase here", m)),
@@ -4277,6 +4287,14 @@ def test_coverage_map_rerun_review_regressions():
             assert any("unknown priority key" in error for error in rep.errors), rep.errors
             assert not any("gap_by_priority keys must be exactly" in error
                            for error in rep.errors), rep.errors
+        def _nongap_p3(target):
+            row = target["entries"][0]
+            row["priority"] = "P3"
+        with mutated_coverage(Path(tmp), _nongap_p3) as rep:
+            assert any("priority must equal the docs/skills row" in error
+                       for error in rep.errors), rep.errors
+        assert sum(computed["by_priority"].values()) == computed["entries"], (
+            "finding 6/review Medium3: by_priority must sum to the entry count")
 
     # 7. Snapshot totals must be exact integers (True/float rejected).
     for bad_total in (True, float(computed["entries"])):

@@ -2245,8 +2245,8 @@ def _coverage_area_titles():
 
 
 def _coverage_require_manifest_set(manifest):
-    """Shared fail-closed manifest type guard for coverage helpers."""
-    if manifest is not None and not isinstance(manifest, (set, frozenset)):
+    """Shared fail-closed manifest set guard for coverage helpers (None rejected)."""
+    if not isinstance(manifest, (set, frozenset)):
         raise ValueError("coverage requires a skills manifest set of skill names (fail closed)")
     return manifest
 
@@ -2541,12 +2541,12 @@ def _coverage_count_copy_errors(text, computed):
     scrubbed = _coverage_scrub_for_counts(text)
     findings = set()
     patterns = (
-        r"\b[0-9]+\s*(?:of|-of-)\s*[0-9]+\b",
-        r"\b[0-9]+-(?:rows?|skills?|entries?|ids?|counts?|totals?)\b",
+        r"(?i)\b[0-9]+\s*(?:of|-of-)\s*[0-9]+\b",
+        r"(?i)\b[0-9]+-(?:rows?|skills?|entries?|ids?|counts?|totals?)\b",
         r"(?i)\b(?:totals?|entries|counts?|review_pending|manifest_skills|"
         r"distinct_covering_skills|beyond_roadmap_skills|by_status|by_grade|"
         r"by_priority)\s*(?::|=|\s)\s*[0-9]+",
-        r"\b[0-9]+\s+(?:rows|skills|entries|ids|count|counts|total|totals)\b",
+        r"(?i)\b[0-9]+\s+(?:rows?|skills?|entries?|ids?|counts?|totals?)\b",
     )
     for pattern in patterns:
         for match in re.finditer(pattern, scrubbed):
@@ -2616,12 +2616,17 @@ def _coverage_check_snapshot(rep, ctx, payload, entries, manifest, computed):
     if raw != 1 or len(matches) != 1 or matches[0] != digest:
         rep.error("[" + ctx + "] snapshot entry must carry exactly one "
                   "boundary-exact rows_sha256 token equal to the snapshot digest")
+    coverage_context = re.compile(
+        r"(?i)\b(?:coverage|snapshot|pinned|d_entry|rows_sha256|coverage-map|roadmap)\b")
     for row in ledger:
-        if int(row["id"][1:]) < bound_number:
+        row_number = int(row["id"][1:])
+        if row_number < bound_number:
             continue
         row_body = row["body"]
         for token in COVERAGE_DIGEST_TOKEN_RE.findall(row_body):
             row_body = row_body.replace("rows_sha256=" + token, "")
+        if row_number != bound_number and not coverage_context.search(row_body):
+            continue
         count_copies = _coverage_count_copy_errors(row_body, computed)
         if count_copies:
             rep.error("[" + ctx + "] snapshot entry or later ledger entry "
