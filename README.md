@@ -783,7 +783,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->252<!-- /SKILL-COUNT --> skills comprise **251 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->254<!-- /SKILL-COUNT --> skills comprise **253 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -799,7 +799,7 @@ keeps a human as the approval gate on anything irreversible. See
    honest: classify before acting, verify against evidence, keep diffs small, halt for
    approval, close out honestly. *e.g.* `change-classification-gate`, `human-approval-boundary`,
    `reviewable-diff-discipline`, `ai-closeout-reporter`.
-2. **AI-SDLC governance** *(Phase 1.5, 5)* — the human+agent lifecycle contract: named stages
+2. **AI-SDLC governance** *(Phase 1.5, 7)* — the human+agent lifecycle contract: named stages
    and gates, standing agent authority, memory governance, task planning, after-the-fact
    process audit.
    *e.g.* `ai-sdlc-operating-model`, `agent-authorization-matrix`, `agent-memory-governance`,
@@ -1119,7 +1119,7 @@ Phase 1 — AI engineering operating-discipline pack, under `.claude/skills/<nam
 | `agent-instruction-consolidator` | Aligns CLAUDE.md / AGENTS.md / Cursor / Copilot instruction files to one canonical source with rule-preservation proof. | **manual only** |
 
 Phase 1.5 — AI-SDLC governance completion (roadmap #261/#268/#279/#280, plus #266 under
-D69; completes the category-08 layer Phase 1 started — composes the Phase 1 skills, never
+D69 plus the two plan-stage skills under the external owner decision OD-6 (beyond-roadmap, no repository D-number); completes the category-08 layer Phase 1 started — composes the Phase 1 skills, never
 restates them):
 
 | Skill | What it does | Invocation |
@@ -1129,6 +1129,8 @@ restates them):
 | `agent-memory-governance` | Persistent-memory WRITE/TRUST/HYGIENE rules: confirmed durable facts with provenance and absolute dates, never secrets; remembered repo/PR state verified against live git/gh before acting; disposition-approved cleanups. | **manual only** |
 | `agent-governance-audit` | Audits one AI-assisted change's process compliance from primary evidence (PR timeline incl. who armed auto-merge, commits, CI runs): per-control PASS/FAIL/UNVERIFIABLE verdicts; closeout claims cross-checked; missing evidence is never a PASS. | auto + manual |
 | `ai-task-decomposer` | (D69, #266) Splits a broad goal, epic or approved spec into ordered, PR-sized tasks: one intent each, an observable done criterion with its evidence, likely files or layers, a provisional change class, risks, dependencies and approval flags; unknowns become spikes or owner questions. Plans only; starts nothing and edits nothing. | auto + manual |
+| `plan-of-record-author` | (external owner decision OD-6, 2026-10-25; beyond-roadmap) Turns a request or owner directive into ONE plan-of-record artifact package before implementation: objective/why, blast radius and paths, five-question necessity/reuse, scope + protected-path/authority map, acceptance criteria, executable fail-before/pass-after closures, surfaced owner decisions, verification/re-base and non-circular evidence bindings. Never implements and never approves its own plan; hands the captured revision to an independent plan auditor. | auto + manual |
+| `plan-audit-reviewer` | (external owner decision OD-6, 2026-10-25; beyond-roadmap) Independently audits a captured plan-of-record revision: completeness, feasibility, authority/boundary, count/protected-path coherence, acceptance observability, closure fail-before validity and owner-decision disclosure. Returns ACCEPT or REVISE/REJECT (Stage-B vocabulary) with a minimal fix list bound to the exact captured revision hash; never authors or self-approves; findings are backlog input only. | auto + manual |
 
 Phase 2 — core architecture & engineering pack:
 

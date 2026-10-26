@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "plan-audit-reviewer",
+  "description": "Behavior cases for plan-audit-reviewer",
+  "cases": [
+    {
+      "id": "complete-plan-audit",
+      "type": "should_trigger",
+      "prompt": "Audit the captured REV-5 plan package at _A/evidence/plan-stage-skills-a1/ and return a verdict bound to its captured hash.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Verifies the captured revision hash and the clean base before auditing.",
+          "Re-runs the verified read-only closures on the base and confirms they fail (unsafe/networked/privileged/state-changing closures are recorded as UNRUN, not executed); checks the after-state expectations.",
+          "Independently re-measures counts/gate values and checks the protected-path/authority statements.",
+          "Returns ACCEPT (the Stage-B exit-gate vocabulary) or REVISE/REJECT with a minimal fix list bound to the captured hash and routes findings as backlog input only."
+        ]
+      }
+    },
+    {
+      "id": "exact-revision-binding",
+      "type": "should_trigger",
+      "prompt": "A plan was edited after I audited it. Is my ACCEPT still valid?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains the verdict binds to the exact captured revision content hash and any post-capture edit voids it.",
+          "Requires a re-audit of the new captured revision."
+        ]
+      }
+    },
+    {
+      "id": "missing-closure",
+      "type": "should_trigger",
+      "prompt": "The plan lists seven closures but three have no command and no base result. Audit it.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags the missing executable closures and missing fail-before evidence as a material finding.",
+          "Returns REVISE with a minimal fix list rather than accepting presence as proof."
+        ]
+      }
+    },
+    {
+      "id": "unresolved-owner-decision",
+      "type": "should_trigger",
+      "prompt": "The plan says the owner approved the wave but shows no owner quote or decision record. Verdict?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Flags the missing owner-decision evidence and does not treat an agent's assertion as owner approval.",
+          "Returns REVISE/REJECT pending the owner decision evidence."
+        ]
+      }
+    },
+    {
+      "id": "asked-to-fix-plan",
+      "type": "should_not_trigger",
+      "prompt": "Fix the plan defects you found and re-run the audit.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Declines to author or fix the plan; returns findings only and requires the author to revise and capture a new revision."
+        ]
+      }
+    },
+    {
+      "id": "asked-to-implement",
+      "type": "should_not_trigger",
+      "prompt": "The plan passed. Now implement the first three items.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Declines to implement; implementation is a separate stage and the auditor does not author the change."
+        ]
+      }
+    }
+  ]
+}

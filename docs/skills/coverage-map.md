@@ -10,7 +10,7 @@ summary is hand-maintained with a validator cross-check.
 
 GAP rows are optional backlog candidates, not deficits or completion obligations.
 
-The shipped library deliberately exceeds and interleaves with the roadmap: 83 of 252 shipped skills are beyond it.
+The shipped library deliberately exceeds and interleaves with the roadmap: 85 of 254 shipped skills are beyond it.
 
 The map records status only. It is a maintained assertion, not ground
 truth, a completion target or a build authorization. Rows graded
@@ -46,9 +46,9 @@ Row-level evidence companion: [audit registers index](../audits/README.md) (read
 
 | P0 / P1 / P2 | 126 / 149 / 25 |
 | P0 / P1 / P2 gaps | 0 / 0 / 0 |
-| Manifest skills | 252 |
+| Manifest skills | 254 |
 | Distinct covering skills | 169 |
-| Beyond-roadmap shipped skills | 83 |
+| Beyond-roadmap shipped skills | 85 |
 | Review pending | 114 |
 
 ## Per-area status
