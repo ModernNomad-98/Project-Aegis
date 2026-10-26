@@ -115,11 +115,11 @@
     {
       "id": "implementation-now",
       "prompt": "Just implement the change; skip the plan.",
-      "expected_skill": "human-approval-boundary",
+      "expected_skill": "change-classification-gate",
       "should_not_trigger": [
         "plan-of-record-author"
       ],
-      "reason": "Human-approval-boundary/stop condition; the author never implements."
+      "reason": "An implementation request enters through change classification; the author never implements."
     },
     {
       "id": "design-doc",
