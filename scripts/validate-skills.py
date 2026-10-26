@@ -2242,6 +2242,10 @@ def _coverage_area_titles():
     return titles
 
 
+class CoveragePriorityError(ValueError):
+    """Typed invalid-priority error so duplicate suppression stays narrow."""
+
+
 def _coverage_priority_error(entry):
     """Return the single deterministic priority error for one coverage entry."""
     if "priority" not in entry:
@@ -2284,7 +2288,7 @@ def _coverage_compute_totals(entries, manifest):
         by_grade[grade] = by_grade.get(grade, 0) + 1
         priority_error = _coverage_priority_error(entry)
         if priority_error is not None:
-            raise ValueError("coverage totals: " + priority_error)
+            raise CoveragePriorityError("coverage totals: " + priority_error)
         priority = entry.get("priority")
         by_priority[priority] = by_priority.get(priority, 0) + 1
         if status == "GAP":
@@ -2570,9 +2574,19 @@ COVERAGE_LATER_NUMBER_PATTERNS = (
     r"(?i)\b[0-9]+\s*[- ]?\s*(?:rows?|entr(?:y|ies)|totals?|pins?|ids?|counts?)\b",
     r"(?i)\bcoverage\s*:\s*[0-9]+\s+skills?\b",
 )
-_COVERAGE_UPDATE_VERBS_RE = re.compile(
+_COVERAGE_LEGIT_UPDATE_RE = re.compile(
+    r"(?i)\bcoverage\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
+    r"(?:skills?|entr(?:y|ies))\b")
+_COVERAGE_UPDATE_EVENT_RE = re.compile(
     r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
-    r"renamed|moved|progressed)\b[^.\n]{0,60}?\b[0-9]+\b")
+    r"renamed|moved|progressed)(?:\s+(?:to|by|with))?\b")
+COVERAGE_LATER_PROSE_PATTERNS = (
+    r"(?i)\bcoverage\b[^\n0-9]{0,30}\b(?:now\s+has|has|contains|"
+    r"total(?:s)?\s+(?:is|are|now|at)|pinned\s+(?:at|to))\b"
+    r"[^\n0-9]{0,20}[0-9]+\s+skills?\b",
+    r"(?i)\b(?:totals?)\b[^\n0-9]{0,20}\b(?:is|are|now|at|of|equals?)\b"
+    r"[^\n0-9]{0,10}[0-9]+\b",
+)
 
 
 def _coverage_later_total_count_errors(text):
@@ -2588,13 +2602,15 @@ def _coverage_later_total_count_errors(text):
     """
     scrubbed = _coverage_scrub_for_counts(text)
     scrubbed = re.sub(r"\b(?:19|20)[0-9]{2}\b", "", scrubbed)
-    scrubbed = _COVERAGE_UPDATE_VERBS_RE.sub(" ", scrubbed)
+    scrubbed = _COVERAGE_LEGIT_UPDATE_RE.sub(" ", scrubbed)
+    scrubbed = _COVERAGE_UPDATE_EVENT_RE.sub(" ", scrubbed)
     findings = set()
     for pattern in COVERAGE_LATER_KEY_PATTERNS:
         for match in re.finditer(pattern, scrubbed):
             findings.add(match.group(0))
     if COVERAGE_LATER_CONTEXT_RE.search(scrubbed):
-        for pattern in COVERAGE_LATER_NUMBER_PATTERNS:
+        for pattern in (COVERAGE_LATER_NUMBER_PATTERNS
+                        + COVERAGE_LATER_PROSE_PATTERNS):
             for match in re.finditer(pattern, scrubbed):
                 findings.add(match.group(0))
     return sorted(findings)
@@ -3148,9 +3164,12 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
         totals = {}
     try:
         computed = _coverage_compute_totals(entries, manifest)
-    except ValueError as exc:
+    except CoveragePriorityError as exc:
         if not priority_invalid:
             rep.error("[" + ctx + "] " + str(exc))
+        return
+    except ValueError as exc:
+        rep.error("[" + ctx + "] " + str(exc))
         return
     scope_count_copies = _coverage_count_copy_errors(scope if isinstance(scope, str) else "", computed)
     if scope_count_copies:

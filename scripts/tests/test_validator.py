@@ -4217,10 +4217,15 @@ def test_coverage_map_rerun_review_regressions():
     tricky_titles = {area: "A" + chr(92) + "B|C" + chr(10) + "D"
                      for area in validator.COVERAGE_AREA_RANGES}
     tricky = validator._coverage_render_summary(payload, computed, tricky_titles)
-    tricky_line = next(line for line in tricky.split(NL_JOIN)
-                       if line.startswith("| " + first_area + " "))
-    assert chr(10) not in tricky_line, (
-        "review Medium5: a real newline in an area title must be replaced")
+    tricky_lines = tricky.split(NL_JOIN)
+    tricky_rows = [line for line in tricky_lines
+                   if line.startswith("| " + first_area + " ")]
+    assert len(tricky_rows) == 1, (
+        "review Medium5: an area title newline must not split the table row: "
+        + repr(tricky_rows))
+    assert tricky.count(NL_JOIN) == rendered.count(NL_JOIN), (
+        "review Medium5: an area title newline must not add a rendered line")
+    tricky_line = tricky_rows[0]
     assert chr(92) * 2 in tricky_line, (
         "review Medium5: a backslash in an area title must be escaped first")
     assert chr(92) + "|" in tricky_line, (
@@ -4228,6 +4233,14 @@ def test_coverage_map_rerun_review_regressions():
 
     # 3. Count-copy guard scans every ledger entry at/after the bound entry.
     base_ledger = validator.COVERAGE_RECON_PATH.read_text(encoding="utf-8")
+    ledger_ids = [int(value) for value in re.findall(r"\bD([0-9]+)\b", base_ledger)]
+    next_later = [max(ledger_ids) + 1]
+    earlier_ledger_id = max(ledger_ids)
+    def _later_entry(text):
+        entry_id = next_later[0]
+        next_later[0] += 1
+        return (base_ledger + NL_JOIN + "- **2026-10-27 - D"
+                + str(entry_id) + ": " + text + ".**")
     def _check_ledger(text):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "ledger.md"
@@ -4245,32 +4258,33 @@ def test_coverage_map_rerun_review_regressions():
     assert _check_ledger(base_ledger) == [], "finding 3: clean ledger must pass"
     n = str(computed["entries"])
     legitimate_later = (
-        "D120: updated 2 entries",
-        "D122: coverage: updated 2 skills",
-        "D123: coverage roadmap: 2 skills",
-        "D126: snapshot tests cover 2 skills",
-        "D127: coverage: updated 2 entries",
-        "D128: totals updated in D121",
-        "D129: snapshot-2026",
+        "updated 2 entries",
+        "coverage: updated 2 skills",
+        "coverage roadmap: 2 skills",
+        "snapshot tests cover 2 skills",
+        "coverage: updated 2 entries",
+        "totals updated in D" + str(earlier_ledger_id),
+        "snapshot-2026",
     )
     for extra in legitimate_later:
-        assert _check_ledger(base_ledger + NL_JOIN
-                             + "- **2026-10-27 - " + extra + ".**") == [], (
+        assert _check_ledger(_later_entry(extra)) == [], (
             "finding 3: a legitimate later entry must pass: " + extra)
     stale_later = (
-        "D121: coverage snapshot now " + n + " entries",
-        "D124: coverage total now " + n + " entries",
-        "D125: coverage: " + n + " entries",
-        "D130: coverage: " + n + " skills",
-        "D131: coverage by_area: " + n,
-        "D132: coverage manifest_skills: " + n,
-        "D133: coverage_map: " + n,
-        "D134: snapshot_totals: " + n,
-        "D135: totals: " + n,
+        "coverage snapshot now " + n + " entries",
+        "coverage total now " + n + " entries",
+        "coverage: " + n + " entries",
+        "coverage: " + n + " skills",
+        "coverage by_area: " + n,
+        "coverage manifest_skills: " + n,
+        "coverage_map: " + n,
+        "snapshot_totals: " + n,
+        "totals: " + n,
+        "coverage snapshot updated to " + n + " entries",
+        "coverage now has " + n + " skills",
+        "coverage total is " + n,
     )
     for extra in stale_later:
-        errors = _check_ledger(base_ledger + NL_JOIN
-                               + "- **2026-10-27 - " + extra + ".**")
+        errors = _check_ledger(_later_entry(extra))
         assert any("coverage-total count copy" in error
                    and "later derived-total ledger entry" in error
                    for error in errors), (extra, errors)
@@ -4363,6 +4377,20 @@ def test_coverage_map_rerun_review_regressions():
                                        if "priority" in error]
                     assert len(priority_errors) == 1, (expected, rep.errors)
                     assert expected in priority_errors[0], priority_errors
+        original_compute = validator._coverage_compute_totals
+        def _manifest_boom(entries, manifest):
+            raise ValueError("manifest validation boom")
+        validator._coverage_compute_totals = _manifest_boom
+        try:
+            with tempfile.TemporaryDirectory() as manifest_tmp:
+                def _p3_with_bad_manifest(target):
+                    target["entries"][0]["priority"] = "P3"
+                with mutated_coverage(
+                        Path(manifest_tmp), _p3_with_bad_manifest) as rep:
+                    assert any("manifest validation boom" in error
+                               for error in rep.errors), rep.errors
+        finally:
+            validator._coverage_compute_totals = original_compute
         def _nongap_p3(target):
             row = target["entries"][0]
             assert row.get("status") != "GAP", "fixture entry 0 must be non-GAP"
@@ -4383,9 +4411,11 @@ def test_coverage_map_rerun_review_regressions():
             manifest, computed)
         assert any("exact-integer" in error or "exact integer" in error
                    for error in rep.errors), (bad_total, rep.errors)
+    by_status_key = sorted(computed["by_status"])[0]
+    by_priority_key = sorted(computed["by_priority"])[0]
     for nested_key, nested_value in (
-            (("by_status", "SHIPPED"), True),
-            (("by_priority", "P0"), 1.0)):
+            (("by_status", by_status_key), True),
+            (("by_priority", by_priority_key), 1.0)):
         bad_payload = json.loads(json.dumps(payload))
         bad_payload["snapshot"]["totals"][nested_key[0]][nested_key[1]] = nested_value
         rep = validator.Report()
