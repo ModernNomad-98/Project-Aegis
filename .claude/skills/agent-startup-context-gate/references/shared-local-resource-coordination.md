@@ -39,13 +39,19 @@ ACQUIRED="$(date -u +%s)"
 OWNER_NAME="$(git config user.name 2>/dev/null || true)"
 OWNER_EMAIL="$(git config user.email 2>/dev/null || true)"
 if [ -z "$OWNER_NAME" ] || [ -z "$OWNER_EMAIL" ]; then
-  echo "STOP: lock owner identity is missing; set git user.name/user.email before acquiring the lock" >&2
+  IDENT=$(git var GIT_AUTHOR_IDENT 2>/dev/null || true)
+  OWNER_NAME=$(printf "%s\n" "$IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
+  OWNER_EMAIL=$(printf "%s\n" "$IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
+fi
+if [ -z "$OWNER_NAME" ] || [ -z "$OWNER_EMAIL" ]; then
+  echo "STOP: lock owner identity missing from configured and effective Git identity" >&2
   exit 1
 fi
 TOKEN="owner=$OWNER_NAME email=$OWNER_EMAIL run=$RUN_ID acquired=$ACQUIRED ttl_minutes=$TTL_MINUTES"
 CHILD=""
 CREATED_LOCK=0
 CLEANED=0
+CLEANING=0
 stop_child() {
   if [ -n "$CHILD" ]; then
     if kill -0 "$CHILD" 2>/dev/null; then
@@ -60,10 +66,15 @@ stop_child() {
       done
       state=$(ps -o stat= -p "$CHILD" 2>/dev/null || true)
       case "$state" in
-        ""|Z*) wait "$CHILD" 2>/dev/null || true; CHILD=""; return 0 ;;
+        Z*) wait "$CHILD" 2>/dev/null || true; CHILD=""; return 0 ;;
       esac
-      echo "INCOMPLETE: owned workload still live after TERM; retaining ownership" >&2
-      return 1
+      if kill -0 "$CHILD" 2>/dev/null; then
+        echo "INCOMPLETE: owned workload still live after TERM; retaining ownership" >&2
+        return 1
+      fi
+      wait "$CHILD" 2>/dev/null || true
+      CHILD=""
+      return 0
     fi
     wait "$CHILD" 2>/dev/null || true
     CHILD=""
@@ -72,13 +83,18 @@ stop_child() {
 }
 cleanup() {
   if [ "$CLEANED" -eq 1 ]; then return 0; fi
-  if [ "$CREATED_LOCK" -eq 0 ]; then CLEANED=1; return 0; fi
+  if [ "$CLEANING" -eq 1 ]; then return 0; fi
+  CLEANING=1
+  trap '' INT TERM
+  if [ "$CREATED_LOCK" -eq 0 ]; then CLEANING=0; return 0; fi
   OWNED=0
   if [ -d "$LOCK" ]; then
     if [ -e "$LOCK/token" ]; then
       current="$(cat "$LOCK/token" 2>/dev/null || true)"
       if [ "$current" = "$TOKEN" ]; then OWNED=1; fi
     elif [ -e "$LOCK/owner.$RUN_ID" ]; then
+      OWNED=1
+    elif [ "$CREATED_LOCK" -eq 1 ] && [ -z "$(ls -A "$LOCK" 2>/dev/null)" ]; then
       OWNED=1
     fi
   fi
@@ -125,10 +141,11 @@ if ! mkdir "$LOCK"; then
 fi
 CREATED_LOCK=1
 MARKER="$LOCK/owner.$RUN_ID"
-if ! : > "$MARKER" 2>/dev/null; then echo "LOCK ERROR: cannot create owner marker" >&2; exit 2; fi
+if ! : > "$MARKER" 2>/dev/null; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot create owner marker; removed own lock" >&2; exit 2; fi
 TOKEN_TMP="$LOCK/token.tmp.$RUN_ID"
 if ! printf '%s\n' "$TOKEN" > "$TOKEN_TMP"; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
 if ! mv "$TOKEN_TMP" "$LOCK/token" 2>/dev/null; then rm -rf "$LOCK"; echo "LOCK ERROR: cannot publish lock token" >&2; exit 2; fi
+# supervisor launch (stable test anchor)
 sh -c '
   echo $$ > "$1/workload.pid" || exit 1
   : > "$1/ready" || exit 1
@@ -179,16 +196,29 @@ UNIQUE_PREFIX="aegis-run-$RUN_ID"
 CLEANED=0
 cleanup_fixtures() {
   if [ "$CLEANED" -eq 1 ]; then return 0; fi
-  CLEANED=1
-  # find matches are checked against the literal prefix before deletion
   printf 'cleanup prefix %s\n' "$UNIQUE_PREFIX"
-  find .local/fixtures -maxdepth 1 -name "$UNIQUE_PREFIX*" -print | while IFS= read -r path; do
+  MATCHES="${TMPDIR:-/tmp}/aegis-fixtures.$$"
+  if ! find .local/fixtures -maxdepth 1 -name "$UNIQUE_PREFIX*" -print > "$MATCHES"; then
+    rm -f "$MATCHES" || true
+    echo "FAILED: fixture find failed" >&2
+    return 1
+  fi
+  while IFS= read -r path; do
     base="$(basename "$path")"
     case "$base" in
-      "$UNIQUE_PREFIX"*) rm -rf "--" "$path" ;;
-      *) echo "STOP: cleanup target outside literal unique prefix: $path" >&2; exit 2 ;;
+      "$UNIQUE_PREFIX"*)
+        if ! rm -rf "$path"; then
+          rm -f "$MATCHES" || true
+          echo "FAILED: fixture removal failed: $path" >&2
+          return 1
+        fi
+        ;;
+      *) rm -f "$MATCHES" || true; echo "STOP: cleanup target outside literal unique prefix: $path" >&2; return 1 ;;
     esac
-  done
+  done < "$MATCHES"
+  if ! rm -f "$MATCHES"; then echo "FAILED: cannot remove match list" >&2; return 1; fi
+  CLEANED=1
+  return 0
 }
 on_signal() { trap - INT TERM; cleanup_fixtures; exit 130; }
 trap 'cleanup_fixtures' EXIT

@@ -127,8 +127,13 @@ if [ -n "$HOOKS_PATH" ]; then
 else
   HOOK_BASE=$(git rev-parse --git-path hooks 2>/dev/null || true)
 fi
-HOOK_PATH="${HOOK_BASE%/}/pre-commit"
-if [ -n "$HOOK_PATH" ]; then echo "STARTUP: effective hook path=$HOOK_PATH"; if [ ! -f "$HOOK_PATH" ] || [ ! -x "$HOOK_PATH" ]; then echo "STARTUP: hook missing or not executable at effective path"; MISSING=1; fi; else echo "STARTUP: effective hook path unavailable"; MISSING=1; fi
+if [ -n "$HOOK_BASE" ]; then
+  HOOK_PATH="${HOOK_BASE%/}/pre-commit"
+  echo "STARTUP: effective hook path=$HOOK_PATH"
+  if [ ! -f "$HOOK_PATH" ] || [ ! -x "$HOOK_PATH" ]; then echo "STARTUP: hook missing or not executable at effective path"; MISSING=1; fi
+else
+  echo "STARTUP: effective hook path unavailable"; MISSING=1
+fi
 [ "$MISSING" -eq 0 ] || exit 1
 echo "STARTUP: effective author/committer identity available and distinct from the recorded owner"
 ```

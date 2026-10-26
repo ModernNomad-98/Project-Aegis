@@ -4439,6 +4439,12 @@ def test_readiness_shared_lock_lifecycle():
         assert foreign_abort.returncode == 1 and (lock / "token").read_text(encoding="utf-8") == "owner=foreign@example.invalid run=foreign\n" and not (lock / "abort").exists()
         clean_lock()
         ok("tokenless and foreign locks are untouched by acquisition-failure cleanup")
+        env_only_owner = dict(env); env_only_owner["GIT_CONFIG_GLOBAL"] = str(root / "no-such-gitconfig")
+        env_only_owner.update({"GIT_AUTHOR_NAME": "EnvAgent", "GIT_AUTHOR_EMAIL": "envagent@example.invalid", "GIT_COMMITTER_NAME": "EnvAgent", "GIT_COMMITTER_EMAIL": "envagent@example.invalid"})
+        assert lock.exists() is False
+        env_lock = subprocess.run(["sh", str(script)], cwd=root, env={**env_only_owner, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert env_lock.returncode == 0 and not lock.exists(), (env_lock.returncode, env_lock.stderr)
+        ok("lock owner identity accepts effective env-only Git identity")
         holder = start("printf started > started; while :; do sleep 0.05; done")
         try:
             wait_paths(lock, lock / "ready", root / "started")
@@ -4468,7 +4474,8 @@ def test_readiness_shared_lock_lifecycle():
         failed = start("false"); fo, fe = failed.communicate(timeout=10)
         assert failed.returncode != 0 and not lock.exists(), (failed.returncode, fe)
         ok("normal and error exits release the lock after child reaping")
-        prefix = blocks[0].split("sh -c '", 1)[0]
+        prefix = blocks[0].split("# supervisor launch (stable test anchor)", 1)[0]
+        assert prefix != blocks[0]
         cleanup_harness = root / "cleanup-twice.sh"
         cleanup_harness.write_text(prefix + "\ncleanup\nrc1=$?\ncleanup\nrc2=$?\nexit $((rc1 + rc2))\n", encoding="utf-8", newline="\n")
         cleanup_harness.chmod(0o755)
