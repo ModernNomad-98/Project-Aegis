@@ -73,7 +73,7 @@ cleanup() {
   if [ -d "$LOCK" ]; then
     current="$(cat "$LOCK/token" 2>/dev/null || true)"
     if [ "$current" = "$TOKEN" ]; then
-      if ! rm -rf "$LOCK"; then echo "INCOMPLETE: failed to remove owned lock" >&2; return 1; fi
+      if ! rm -f "$LOCK"; then echo "INCOMPLETE: failed to remove owned lock" >&2; return 1; fi
     fi
   fi
   if [ -n "$TMP" ] && [ -d "$TMP" ]; then rm -rf "$TMP" 2>/dev/null || true; fi
@@ -87,16 +87,17 @@ if ! mkdir -p "$(dirname "$LOCK")"; then echo "LOCK ERROR: cannot create lock pa
 TMP="$LOCK.tmp.$RUN_ID"
 if ! mkdir "$TMP"; then echo "LOCK ERROR: cannot create temporary lock directory" >&2; exit 2; fi
 if ! printf '%s\n' "$TOKEN" > "$TMP/token"; then rm -rf "$TMP"; echo "LOCK ERROR: cannot write lock token" >&2; exit 2; fi
-if ! mv "$TMP" "$LOCK" 2>/dev/null; then
-  TMP=""
-  if [ -e "$LOCK" ]; then
+if ! ln -s "$TMP" "$LOCK" 2>/dev/null; then
+  if [ -L "$LOCK" ] || [ -e "$LOCK" ]; then
     if [ -f "$LOCK/token" ]; then cat "$LOCK/token" >&2; fi
     echo "STOP: stack.lock is held; inspect owner/run/acquired/ttl_minutes and wait or escalate" >&2
-    exit 1
+    rm -rf "$TMP"; exit 1
   fi
+  rm -rf "$TMP"
   echo "LOCK ERROR: atomic lock acquisition failed" >&2
   exit 2
 fi
+LOCK_LINK=1
 sh -c '
   echo $$ > "$1/workload.pid" || exit 1
   : > "$1/ready" || exit 1
