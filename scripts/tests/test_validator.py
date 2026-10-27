@@ -190,6 +190,7 @@ def _coverage_row_ids_from_payload(payload, source="coverage map"):
     if not isinstance(entries, list):
         raise ValueError(source + ": entries must be a list")
     mapping = {}
+    seen_ids = set()
     for index, entry in enumerate(entries):
         if not isinstance(entry, dict):
             raise ValueError(source + ": entry[" + str(index) + "] must be an object")
@@ -201,6 +202,10 @@ def _coverage_row_ids_from_payload(payload, source="coverage map"):
         if not isinstance(row_id, int) or isinstance(row_id, bool):
             raise ValueError(source + ": entry[" + str(index)
                              + "] id must be an exact integer")
+        if row_id in seen_ids:
+            raise ValueError(source + ": duplicate canonical row id "
+                             + repr(row_id) + " at entries[" + str(index) + "]")
+        seen_ids.add(row_id)
         key = name.strip().casefold()
         if key in mapping:
             raise ValueError(source + ": duplicate canonical row name "
@@ -5255,8 +5260,157 @@ def test_ds7cc_coverage_row_ids_hardening():
             raise AssertionError("malformed row-id payload accepted: " + label)
 
 
+def test_ds7cfixc_priority_forms():
+    """DS-7c-fix-c: explicit priority keyword/copula/punctuation forms."""
+    positive = (
+        "P0: 0.",
+        "P0 count: 0",
+        "P0 total = 0",
+        "P0 total is 0",
+        "P0 is 0",
+        "P0 are 0",
+        "P0 at 0",
+        "P0 now 0",
+    )
+    for phrase in positive:
+        assert validator._coverage_later_total_count_errors(phrase), phrase
+        assert validator._coverage_count_copy_errors(phrase, {}), phrase
+    trailing = "P0: 0."
+    assert any("P0: 0" in surface for surface in
+               validator._coverage_later_total_count_errors(trailing)), trailing
+    for phrase in ("P0", "P0 items are critical", "P0 is the highest priority",
+                   "priority enum: P0, P1, P2"):
+        assert not validator._coverage_later_total_count_errors(phrase), phrase
+
+
+def test_ds7cfixc_residual_matrix():
+    """DS-7c-fix-c: bounded residual detector forms (implemented cases)."""
+    assert validator._coverage_later_total_count_errors("P0: 0. Next")
+    for phrase in (
+            "coverage was updated by 2 entries",
+            "2 entries were added",
+            "coverage was updated by 2 entries and 3 skills",
+            "3 skills were removed"):
+        assert not validator._coverage_later_total_count_errors(phrase), phrase
+    for phrase in ("totals 300", "total:300", "total=300", "total-300",
+                   "rows 300", "entries=300"):
+        assert validator._coverage_later_total_count_errors(phrase), phrase
+    BT = chr(96)
+    fence = BT * 3 + "300 entries" + BT * 3
+    multi = BT * 2 + "300 entries" + BT * 2
+    assert not validator._coverage_later_total_count_errors(fence)
+    assert not validator._coverage_later_total_count_errors(multi)
+    assert not validator._coverage_later_total_count_errors(
+        BT * 3 + "\n300 entries\n" + BT * 3)
+    assert not validator._coverage_later_total_count_errors(
+        BT * 3 + "\n300 entries")  # unclosed fence consumes the line
+    assert not validator._coverage_later_total_count_errors(
+        BT * 2 + "300 " + BT + " entries" + BT * 2)
+    for width in (2, 3, 4, 5):
+        assert not validator._coverage_later_total_count_errors(
+            BT * width + "300 entries" + BT * width), width
+    assert not validator._coverage_later_total_count_errors(
+        BT * 4 + "\n300 entries\n" + BT * 5)
+    assert validator._coverage_later_total_count_errors(
+        BT * 4 + "\n300 entries\n" + BT * 5 + "\ntotals 300")
+    for phrase in (
+            "coverage was updated by 2 entries, and 3 skills",
+            "coverage was updated by 2 entries, 3 skills, 4 notes",
+            "2 entries were added, 3 skills",
+            "3 skills had been removed"):
+        assert not validator._coverage_later_total_count_errors(phrase), phrase
+    for phrase in ("coverage totals: updated 2 entries", "totals 300",
+                   "coverage total set to 300"):
+        assert validator._coverage_later_total_count_errors(phrase), phrase
+    assert not validator._coverage_later_total_count_errors("[300 entries][]")
+    assert not validator._coverage_later_total_count_errors("[300 entries][x]")
+    assert not validator._coverage_later_total_count_errors(
+        "[x]: https://example.invalid \"300 entries\"")
+    assert validator._coverage_later_total_count_errors("[x]:\nP0: 0")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage was updated by 2 entries, 3 skills")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage: was updated by 2 entries")
+    for phrase in ("P0 is is 0", "P0 to to 0"):
+        assert not validator._coverage_later_total_count_errors(phrase), phrase
+    assert validator._coverage_later_total_count_errors(
+        "P0: 0 " + chr(0x2014) + " done")
+    # Year-policy ambiguity is disclosed, not resolved: a bare year followed
+    # by a count intent still counts; a bare year in policy prose does not.
+    assert not validator._coverage_later_total_count_errors(
+        "snapshot year policy 2026")
+    assert validator._coverage_later_total_count_errors(
+        "snapshot year 2026 entries")
+    # Encoding guard: both changed sources are valid UTF-8, no U+FFFD.
+    repo_root = Path(__file__).resolve().parents[2]
+    for source_path in (repo_root / "scripts/validate-skills.py",
+                        repo_root / "scripts/tests/test_validator.py"):
+        source_text = source_path.read_bytes().decode("utf-8")
+        assert source_text
+        assert chr(0xFFFD) not in source_text
+    for bad in (None, 123, ["300 entries"]):
+        try:
+            validator._coverage_later_total_count_errors(bad)
+        except TypeError:
+            pass
+        else:
+            raise AssertionError("non-string detector input must fail closed")
+
+
+def test_ds7cfixc_row_ids_duplicate_and_normalization():
+    """DS-7c-fix-c: duplicate ids rejected; canonical names strip+casefold."""
+    payload = load_coverage()
+    mapping = _coverage_row_ids_from_payload(payload)
+    assert len(mapping) == len(payload["entries"])
+    for entry in payload["entries"]:
+        key = entry["name"].strip().casefold()
+        assert mapping[key] == entry["id"]
+    duplicate_id = load_coverage()
+    duplicate_id["entries"][1]["id"] = duplicate_id["entries"][0]["id"]
+    try:
+        _coverage_row_ids_from_payload(duplicate_id)
+    except ValueError as error:
+        assert "duplicate canonical row id" in str(error), error
+    else:
+        raise AssertionError("duplicate row ids must fail loudly")
+    duplicate_name = load_coverage()
+    duplicate_name["entries"][1]["name"] = (
+        duplicate_name["entries"][0]["name"].upper())
+    try:
+        _coverage_row_ids_from_payload(duplicate_name)
+    except ValueError as error:
+        assert "duplicate canonical row name" in str(error), error
+    else:
+        raise AssertionError("duplicate canonical row names must fail loudly")
+    spaced = load_coverage()
+    name = spaced["entries"][0]["name"]
+    spaced["entries"][0]["name"] = "  " + name + "  "
+    spaced_mapping = _coverage_row_ids_from_payload(spaced)
+    assert spaced_mapping[name.strip().casefold()] == spaced["entries"][0]["id"]
+
+    def mutate(payload):
+        payload["entries"][1]["id"] = payload["entries"][0]["id"]
+    with tempfile.TemporaryDirectory() as tmp:
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            assert any("duplicate entry id" in error for error in rep.errors), (
+                rep.errors)
+    for label, transformed in (
+            ("uppercase", lambda value: value.upper()),
+            ("spaced", lambda value: "  " + value + "  ")):
+        def mutate_name(payload, transform=transformed):
+            payload["entries"][0]["name"] = transform(
+                payload["entries"][0]["name"])
+        with tempfile.TemporaryDirectory() as tmp:
+            with mutated_coverage(Path(tmp), mutate_name) as rep:
+                assert any("name must equal" in error for error in rep.errors), (
+                    label, rep.errors)
+
+
 TESTS = [
     test_ds7cfixb_coverage_detector_matrix,
+    test_ds7cfixc_priority_forms,
+    test_ds7cfixc_residual_matrix,
+    test_ds7cfixc_row_ids_duplicate_and_normalization,
     test_ds7cc_priority_key_totals,
     test_ds7cc_coverage_row_ids_hardening,
     test_strict_yaml_parse,

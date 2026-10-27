@@ -2611,15 +2611,19 @@ COVERAGE_KEY_NUMBER_RE = re.compile(
     + r"\b(?:\s*(?::|=|-))?(?:\s+(?:is|are|was|were|now|at|of|equals?|"
     + r"set\s+to|to))*\s*[0-9]+\b")
 COVERAGE_PRIORITY_KEY_NUMBER_RE = re.compile(
-    r"(?i)\bP[0-2]\b(?:\s*(?::|=|-)\s*|"
-    r"\s+(?:gap|counts?|rows?|entries?|totals?|total|is|are|at|now|"
-    r"equals?)\s+|\s+)[0-9]+\b(?!\.)")
+    r"(?i)\bP[0-2]\b\s*(?:"
+    r"(?::|=|-)\s*|"
+    r"(?:gap|counts?|rows?|entries?|totals?|total)\b\s*(?::|=|-)?\s*"
+    r"(?:(?:is|are|was|were|now|at|equals?|set\s+to|to)\b\s*)?"
+    r"|(?:is|are|was|were|now|at|equals?|set\s+to|to)\b\s*"
+    r")?[0-9]+\b(?!\.[0-9])")
 COVERAGE_UPDATE_EVENT_RE = re.compile(
     r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
-    r"renamed|moved|progressed)\s+[0-9]+\s+"
+    r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
     + COVERAGE_DERIVED_INTENT + r"\b")
 COVERAGE_UPDATE_CONNECTOR_RE = re.compile(
     r"(?i)\bcoverage(?!\s+snapshot\b)\s*(?::)?\s*"
+    r"(?:was|is|were|are|has\s+been|have\s+been|had\s+been)?\s*"
     r"(?:updated|added|removed|changed|incremented|decremented|edited|"
     r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
     + COVERAGE_DERIVED_INTENT + r"\b")
@@ -2630,6 +2634,10 @@ COVERAGE_TOTAL_UPDATE_CLAIM_RE = re.compile(
     r"incremented|decremented|edited|renamed|moved|progressed)\s+"
     r"[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b")
 _OPAQUE_CODE = "[" + chr(96) + "][^" + chr(96) + "\n]*[" + chr(96) + "]"
+_OPAQUE_MULTI_CODE = re.compile(
+    r"(?s)(?<!\x60)(\x60{2,})(?!\x60).*?(?<!\x60)\1(?!\x60)")
+_OPAQUE_REF_LINK = re.compile(r"\[[^\]\n]*\]\[[^\]\n]*\]|\[[^\]\n]*\]\[\]")
+_OPAQUE_REF_DEF = re.compile(r"(?m)^[ \t]*\[[^\]\n]+\]:[ \t]*\S+[^\n]*$")
 COVERAGE_ALLOWED_PROSE_RE = (
     re.compile(r"(?i)\bsnapshot\s+tests?\s+cover\s+[0-9]+\s+"
                + COVERAGE_DERIVED_INTENT + r"\b"),
@@ -2639,7 +2647,49 @@ COVERAGE_ALLOWED_PROSE_RE = (
                + COVERAGE_DERIVED_INTENT + r"\b"),
     re.compile(r"(?i)\bcoverage\s+roadmap\s*:\s*[0-9]+\s+"
                + COVERAGE_DERIVED_INTENT + r"\b"),
+    re.compile(r"(?i)\bcoverage\s*:?\s*(?:was|is|were|are|has\s+been|"
+               r"have\s+been|had\s+been)?\s*(?:updated|added|removed|changed|"
+               r"incremented|decremented|edited|renamed|moved|progressed)"
+               r"(?:\s+(?:by|with))?\s+[0-9]+\s+" + COVERAGE_DERIVED_INTENT
+               + r"\b(?:\s*(?:,|and|&)\s*[0-9]+\s+"
+               + COVERAGE_DERIVED_INTENT + r"\b)*"),
+    re.compile(r"(?i)\b[0-9]+\s+" + COVERAGE_DERIVED_INTENT
+               + r"\s+(?:were|was|are|is|have\s+been|has\s+been|had\s+been)"
+               r"\s+(?:updated|added|removed|changed|incremented|decremented|"
+               r"edited|renamed|moved|progressed)(?:\s+(?:by|with))?\b"
+               r"(?:\s*(?:,|and|&)\s*[0-9]+\s+"
+               + COVERAGE_DERIVED_INTENT + r"\b)*"),
 )
+
+
+def _coverage_mask_fences(text: str) -> str:
+    """Mask fenced code with CommonMark-like closing (same char, len >= opener)."""
+    lines = text.splitlines(True)
+    out = []
+    index = 0
+    opener_re = re.compile(r"^[ \t]*(\x60{3,}|~{3,})")
+    closer_re = re.compile(r"^[ \t]*(\x60{3,}|~{3,})[ \t]*\r?\n?$")
+    while index < len(lines):
+        opener = opener_re.match(lines[index])
+        if opener is None:
+            out.append(lines[index])
+            index += 1
+            continue
+        fence = opener.group(1)
+        char = fence[0]
+        minimum = len(fence)
+        closing = None
+        for candidate in range(index + 1, len(lines)):
+            match = closer_re.match(lines[candidate])
+            if (match is not None and match.group(1)[0] == char
+                    and len(match.group(1)) >= minimum):
+                closing = candidate
+                break
+        end = len(lines) - 1 if closing is None else closing
+        block = "".join(lines[index:end + 1])
+        out.append(" OPAQUE " + "\n" * block.count("\n"))
+        index = end + 1
+    return "".join(out)
 
 
 def _coverage_protect_opaque(text: str) -> str:
@@ -2649,7 +2699,11 @@ def _coverage_protect_opaque(text: str) -> str:
     hashes and snapshot-YYYY labels are masked. Code spans and Markdown links
     are masked before bare URLs so a link label cannot leak its count.
     """
-    protected = re.sub(_OPAQUE_CODE, " OPAQUE ", text)
+    protected = _coverage_mask_fences(text)
+    protected = _OPAQUE_MULTI_CODE.sub(" OPAQUE ", protected)
+    protected = re.sub(_OPAQUE_CODE, " OPAQUE ", protected)
+    protected = _OPAQUE_REF_LINK.sub(" OPAQUE ", protected)
+    protected = _OPAQUE_REF_DEF.sub(" OPAQUE ", protected)
     protected = re.sub(r"#[0-9]+" + chr(92) + "b", " OPAQUE ", protected)
     protected = re.sub(r"\[[^\]\n]*\]\([^)\n]*\)", " OPAQUE ", protected)
     protected = re.sub(r"https?://\S+", " OPAQUE ", protected, flags=re.IGNORECASE)
@@ -2681,6 +2735,24 @@ def _coverage_mask_allowed_update(text: str) -> str:
     return masked
 
 
+def _coverage_join_update_commas(text: str) -> str:
+    """Join comma-separated count/intent lists so clause splitting keeps one list."""
+    count_pattern = re.compile(
+        r"(?i)([0-9]+\s+" + COVERAGE_DERIVED_INTENT
+        + r")\s*,\s*(?:and\s+|&\s*)?(?=[0-9]+\s+"
+        + COVERAGE_DERIVED_INTENT + r"\b)")
+    verb_pattern = re.compile(
+        r"(?i)\b(updated|added|removed|changed|incremented|decremented|"
+        r"edited|renamed|moved|progressed)\s*,\s*(?:and\s+|&\s*)?"
+        r"(?=[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b)")
+    while True:
+        joined = count_pattern.sub(r"\1 and ", text)
+        joined = verb_pattern.sub(r"\1 and ", joined)
+        if joined == text:
+            return text
+        text = joined
+
+
 def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
     """Single structural source for derived-total count mentions.
 
@@ -2698,9 +2770,13 @@ def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
     normalized = (text.replace(chr(0x2013), "-").replace(chr(0x2014), "-")
                   .replace(chr(0x2212), "-"))
     protected = _coverage_protect_opaque(normalized)
+    if allowed_update:
+        protected = _coverage_join_update_commas(protected)
     mentions = []
     seen = set()
-    for raw_clause in re.split(r"[;,\n]|\bwhile\b", protected):
+    for raw_clause in re.split(
+            r"[;,\n]|\.\s+|\bbut\b|\bwhile\b", protected,
+            flags=re.IGNORECASE):
         clause = re.sub(r"\s+", " ", raw_clause)
         parsed = _coverage_mask_allowed_update(clause) if allowed_update else clause
         candidates = []
