@@ -84,16 +84,19 @@
     {
       "id": "positive-effective-identity-hook",
       "type": "should_trigger",
-      "prompt": "Start work in a repository and, before committing, explain the repository's advisory identity guidance: what a correct secure implementation would need to do, that this repository does not enforce it today, and that it is not a security boundary.",
+      "prompt": "Before the first commit of a work session, explain the repository's Git identity gate, including the illustrative optional hook example and the mandatory manual provenance step: its status, whether the repository enforces it automatically, what a correct implementation would need to do, and whether it is a security boundary.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "States clearly that the identity policy is guidance only and is NOT enforced by this repository today; earlier behavior attempts were withdrawn and implementation is queued as DS-R1b.",
-          "States it is not a security boundary or verified identity gate; local hooks can be bypassed with git commit --no-verify; no complete-enforcement/unbypassable claim.",
+          "States clearly that the identity gate is REQUIRED behavior, not optional, and is not automatically enforced by this repository today; the explicit-source enforcement attempt was withdrawn and implementation is queued as DS-R1b.",
+          "States the check is required before the first commit of a work session and re-run when the identity source or mode may change.",
+          "States that inherited-global-only identity with no acceptable explicit source must be rejected even when it is a non-owner; this is required manual behavior, not automatic enforcement.",
+          "States the illustrative check/hook verifies presence and owner only and does not implement explicit-source provenance; a presence/owner success is not a full gate pass, so the mandatory manual provenance step is still required.",
+          "Describes the mandatory manual provenance decision: stop on inherited global/system/auto-detected-only identity or no acceptable explicit source; accept only the documented explicit-source matrix.",
           "Describes the design a correct implementation must use: effective identity from git var GIT_AUTHOR_IDENT/GIT_COMMITTER_IDENT with a separately recorded owner, full same-scope config user.name+user.email whose pair matches one effective role, full caller author+committer environment (both fields) with clean fallbacks, a single differing caller env override, or a field-specific caller author or committer override.",
           "Describes required hardening: key-exact config reads, duplicate-key rejection, raw single-line/control validation, clean fallbacks clearing all author and committer identity env vars, same-scope and same-role-effective pairing, per-field justification.",
           "Discloses known limits: inherited-global-only not accepted; same-value caller env inherited vs same-value config restatement exception; mixed config+one-field-env can be rejected; --show-scope/version dependencies; hook bypass; git var does not cover command-level --author and a future implementation must verify the final commit identity or parse/reject --author (DS-R1b).",
-          "Makes no enforcement, verified-identity, readiness or CI-green claim."
+          "States the gate is required manual behavior, not automatically enforced; illustrative snippets/hooks are optional and not installed or activated; no complete-enforcement, verified-identity, readiness or CI-green claim is made."
         ]
       }
     },
@@ -121,10 +124,10 @@
         "assertions": [
           "Rejects inherited-global-only identity even when it is a non-owner, because no explicit identity source exists.",
           "Does not treat configured global values as an agent identity or a pass.",
-          "Records the explicit-source requirement as advisory guidance: full same-scope config pair, full caller author+committer environment (both fields) with clean fallbacks, single differing caller env override, or field-specific author/committer override; a caller committer-only environment is not a standalone full source.",
+          "Records the explicit-source requirement as required behavior: full same-scope config pair, full caller author+committer environment (both fields) with clean fallbacks, single differing caller env override, or field-specific author/committer override; a caller committer-only environment is not a standalone full source.",
           "States the effective identity from git var remains authoritative and an effective owner is rejected.",
-          "States this is guidance only and is not enforced by this repository today.",
-          "Makes clear this is advisory guidance only and is not enforced by this repository today."
+          "States this is required behavior that is not automatically enforced by this repository today; agents must still run the check manually and stop if it fails, and no automatic enforcement hook is installed.",
+          "States a presence/owner success from the illustrative check/hook is not a full gate pass; the mandatory provenance step still stops inherited-global-only identity."
         ]
       }
     }

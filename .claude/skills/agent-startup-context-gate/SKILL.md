@@ -81,9 +81,20 @@ confidently building in the wrong place or against stale context.
    location is verified and no blocking unknowns remain; otherwise ask.
 
 
-## Git Identity Gate (advisory guidance only; not enforced today)
+## Git Identity Gate (before the first commit)
 
-**Status (advisory guidance only; not enforced today):** This section is ADVISORY GUIDANCE ONLY. This repository does NOT enforce the identity gate. The pre-existing hook example below is retained unchanged for repository-test compatibility and is OPTIONAL illustrative text; it must not be read as an active policy, as enforcement, as verified identity, or as an unbypassable control. The attempted explicit-source enforcement implementation was withdrawn after independent review; implementation work is queued as backlog item **DS-R1b**. Do not treat this section as a normative requirement or a security boundary. No complete-enforcement, verified-identity, readiness or CI-green claim is made.
+**Status: REQUIRED behavior; not automatically enforced.** Run this gate before
+the first commit of a work session, and re-run it after any repository/config/
+environment change or before any commit whose identity source or mode may have
+changed. The gate has two mandatory parts: (1) the presence/owner check below,
+and (2) the mandatory manual provenance step below. This repository includes
+illustrative optional example snippets (including the hook example), but they
+are NOT installed or activated and provide no automatic enforcement. The
+attempted explicit-source enforcement implementation was withdrawn after
+independent review; implementation work is queued as backlog item **DS-R1b**.
+The gate is REQUIRED behavior, not optional, and is not a security boundary,
+verified identity, or unbypassable control. No automatic-enforcement,
+complete-enforcement, verified-identity, readiness or CI-green claim is made.
 
 Effective-identity policy (single source of truth): the identity reported by
 `git var GIT_AUTHOR_IDENT` / `git var GIT_COMMITTER_IDENT` is authoritative. A valid
@@ -122,20 +133,58 @@ AUTHOR_NAME=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.
 AUTHOR_EMAIL=$(printf "%s\n" "${AUTHOR_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
 COMMITTER_NAME=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
 COMMITTER_EMAIL=$(printf "%s\n" "${COMMITTER_IDENT:-}" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
-if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] || [ -z "$COMMITTER_EMAIL" ]; then echo "STARTUP: effective author/committer identity missing or malformed"; MISSING=1; fi
+if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] || [ -z "$COMMITTER_EMAIL" ]; then echo "STARTUP: effective author/committer identity missing or empty"; MISSING=1; fi
 if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then echo "STARTUP: effective author/committer identity matches the recorded owner"; MISSING=1; fi
 [ "$MISSING" -eq 0 ] || exit 1
-echo "STARTUP: effective author/committer identity present and distinct from the recorded owner"
+echo "STARTUP: presence/owner OK; mandatory manual provenance step still required (see below)"
 echo "STARTUP: effective author=$AUTHOR_NAME <$AUTHOR_EMAIL> committer=$COMMITTER_NAME <$COMMITTER_EMAIL>"
 ```
 
-The complete executable pre-commit hook below implements the same effective-identity
-policy. It reads the owner identity from local-only config, requires a non-empty
-effective author AND committer from `git var`, and refuses only when the effective
-author or committer equals the recorded owner. Install it at the effective hook path.
-Resolve core.hooksPath FIRST: a relative value resolves from the repository top level and a leading tilde expands to HOME;
-use git rev-parse --git-path hooks/pre-commit ONLY when core.hooksPath is unset. Verify the chosen path is executable, and
-treat hook-file presence as presence, not authenticity (inspect contents/owner/hash).
+### Mandatory manual provenance step (required; not automated)
+
+The check above verifies only that the effective identity is present and does
+not match the recorded owner. It does **not** prove that the identity has an
+acceptable explicit source, and it does not implement the explicit-source
+matrix. Before committing, the agent MUST perform this provenance step manually:
+
+    git config --show-scope --show-origin --get-all user.name
+    git config --show-scope --show-origin --get-all user.email
+    env | grep -E '^(GIT_AUTHOR|GIT_COMMITTER)_(NAME|EMAIL|DATE)=' || true
+    # Also inspect the ACTUAL commit command: a -c value used only for the check
+    # does not count unless it is present on the commit itself.
+
+Decide and record:
+- ACCEPT only when the effective identity is supplied by one of: a full
+  same-scope local/command config user.name+user.email pair matching the
+  effective author pair or the effective committer pair; a full caller
+  author+committer environment (both fields) with clean fallbacks; a single
+  differing caller env override over a resolvable fallback; or a field-specific
+  caller author OR committer override.
+- STOP when the effective identity comes only from inherited global/system/
+  auto-detected configuration or otherwise has no acceptable explicit source,
+  or when a command-scope value is present only on the check command and not
+  on the actual commit. Do not commit.
+- Record the provenance source and the decision in the run report. A
+  presence/owner check success is NOT a full gate pass; provenance is still
+  required.
+
+The illustrative hook below does NOT perform this provenance step.
+
+The executable pre-commit hook example below automates only the presence/owner
+check. It is an illustrative optional example: this repository includes it but
+does NOT install or activate it, and its presence is not evidence of automatic
+enforcement. If you choose to install a local hook, it reads the owner identity
+from local-only config, requires a non-empty effective author AND committer from
+git var, and refuses when the effective author or committer equals the recorded
+owner or when that effective identity is missing or empty. It does NOT implement
+the explicit-source provenance step above; strict raw/malformed validation and
+provenance remain DS-R1b requirements. Installing the hook is optional; the
+manual presence/owner check and the mandatory provenance step are required.
+Install it at the effective hook path. Resolve core.hooksPath FIRST: a relative value resolves from the
+repository top level and a leading tilde expands to HOME; use git rev-parse
+--git-path hooks/pre-commit ONLY when core.hooksPath is unset. Verify the chosen path
+is executable, and treat hook-file presence as presence, not authenticity (inspect
+contents/owner/hash).
 
 ```sh
 #!/bin/sh
@@ -154,7 +203,7 @@ AUTHOR_EMAIL=$(printf "%s\n" "$AUTHOR_IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/
 COMMITTER_NAME=$(printf "%s\n" "$COMMITTER_IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\1/p")
 COMMITTER_EMAIL=$(printf "%s\n" "$COMMITTER_IDENT" | sed -n "s/^\(.*\) <\([^>]*\)>.*$/\2/p")
 if [ -z "$AUTHOR_NAME" ] || [ -z "$AUTHOR_EMAIL" ] || [ -z "$COMMITTER_NAME" ] || [ -z "$COMMITTER_EMAIL" ]; then
-  echo "STOP: effective Git author/committer identity is missing, empty or malformed" >&2
+  echo "STOP: effective Git author/committer identity is missing or empty" >&2
   exit 1
 fi
 if [ "$AUTHOR_NAME" = "$OWNER_NAME" ] || [ "$AUTHOR_EMAIL" = "$OWNER_EMAIL" ] || [ "$COMMITTER_NAME" = "$OWNER_NAME" ] || [ "$COMMITTER_EMAIL" = "$OWNER_EMAIL" ]; then
@@ -263,9 +312,18 @@ Verdict: PROCEED | HALTED — <question for the human>
 - Uncommitted changes or an unexpected branch the task does not account for →
   stop and ask before touching the tree.
 - A file the task depends on does not exist → stop and surface it.
-- Configured Git identity equals the recorded owner identity, or owner/agent identity is
-  missing → STOP before committing; report the mismatch and ask the human to fix it,
-  never commit as the owner (see Git Identity Gate and the pre-commit hook).
+- Effective author or committer identity equals the recorded owner identity, is
+  missing or empty, or the mandatory manual provenance step cannot establish an
+  acceptable explicit source (full same-scope local/command config user.name+user.email
+  pair matching the effective author pair or the effective committer pair; full
+  caller author+committer environment, both fields, with clean fallbacks; a single
+  differing caller env override over a resolvable fallback; or a field-specific
+  caller author OR committer override) → STOP before committing. This includes
+  inherited global/system/auto-detected-only identities and command-scope values
+  present only on the check command, not the actual commit; report the mismatch and
+  ask the human to fix it, never commit as the owner (see Git Identity Gate and its
+  reference matrix). A presence/owner check success is not a full gate pass; strict
+  raw/malformed validation remains a DS-R1b requirement.
 
 ## Supporting Files
 
