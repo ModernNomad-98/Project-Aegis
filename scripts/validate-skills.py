@@ -2264,8 +2264,9 @@ def _coverage_require_manifest_set(manifest):
     """Fail closed unless manifest is a non-empty set/frozenset of non-empty strings."""
     if not isinstance(manifest, (set, frozenset)) or not manifest:
         raise ValueError("coverage requires a non-empty skills manifest set of skill names (fail closed)")
-    if any(not isinstance(name, str) or not name.strip() for name in manifest):
-        raise ValueError("coverage manifest must contain non-empty string skill names (fail closed)")
+    if any(not isinstance(name, str) or not name or name != name.strip()
+           for name in manifest):
+        raise ValueError("coverage manifest names must be non-empty, trimmed strings (fail closed; surrounding whitespace is rejected)")
     return manifest
 
 
@@ -2544,9 +2545,57 @@ def _coverage_all_exact_ints(value):
     return False
 
 
+COVERAGE_DOCUMENTED_NESTED_TOTALS = (
+    "by_area", "by_status", "by_grade", "by_priority",
+    "gap_by_priority", "snapshot_totals",
+)
+
+
+def _coverage_totals_shape_errors(totals, computed):
+    """Return exact-int/schema errors for the documented totals schema.
+
+    The derived computed object is the schema: every documented scalar/nested
+    map must exist with exactly the derived keys and exact-int leaves. Extra or
+    missing keys, non-dict nested maps, booleans, floats, strings and non-finite
+    values are errors. No arbitrary deeper schema expansion is performed.
+    """
+    errors = []
+    if not isinstance(totals, dict):
+        return ["totals must be an object"]
+    expected_keys = set(computed)
+    actual_keys = set(totals)
+    for key in sorted(expected_keys - actual_keys):
+        errors.append("totals is missing key " + repr(key))
+    for key in sorted(actual_keys - expected_keys):
+        errors.append("totals has unexpected key " + repr(key))
+    for key in sorted(expected_keys & actual_keys):
+        expected = computed[key]
+        value = totals[key]
+        if isinstance(expected, dict):
+            if not isinstance(value, dict):
+                errors.append("totals." + key + " must be an object")
+                continue
+            for sub in sorted(set(expected) - set(value)):
+                errors.append("totals." + key + " is missing key " + repr(sub))
+            for sub in sorted(set(value) - set(expected)):
+                errors.append("totals." + key + " has unexpected key " + repr(sub))
+            for sub in sorted(set(expected) & set(value)):
+                leaf = value[sub]
+                if not _coverage_is_exact_int(leaf):
+                    errors.append("totals." + key + "." + str(sub)
+                                  + " must be an exact integer (booleans, floats, strings rejected)")
+        else:
+            if not _coverage_is_exact_int(value):
+                errors.append("totals." + key
+                              + " must be an exact integer (booleans, floats, strings rejected)")
+    return errors
+
+
 def _coverage_validated_totals(totals, computed):
     """Return validated exact-int totals only when they equal the derived ones."""
     if not isinstance(totals, dict) or not _coverage_all_exact_ints(totals):
+        return None
+    if _coverage_totals_shape_errors(totals, computed):
         return None
     if totals != computed:
         return None
@@ -2560,84 +2609,109 @@ def _coverage_scrub_for_counts(text):
     return scrubbed
 
 
-COVERAGE_DERIVED_TOTAL_KEY_RE = (
+COVERAGE_DERIVED_INTENT = (
     r"(?:rows?|entr(?:y|ies)|skills?|ids?|counts?|totals?|pins?|"
     r"snapshot(?:_totals)?|by_area|by_status|by_grade|by_priority|"
     r"gap_by_priority|manifest_skills|coverage_map|review_pending|"
     r"distinct_covering_skills|beyond_roadmap_skills)"
 )
-COVERAGE_N_OF_M_RE = r"(?i)\b[0-9]+\s*(?:of|-of-)\s*[0-9]+\b"
-COVERAGE_NUMBER_KEY_RE = r"(?i)\b[0-9]+\s*[- ]\s*" + COVERAGE_DERIVED_TOTAL_KEY_RE + r"\b"
-COVERAGE_KEY_NUMBER_RE = (r"(?i)\b" + COVERAGE_DERIVED_TOTAL_KEY_RE
-                          + r"\s*(?::|=|-|\s)\s*[0-9]+\b")
-COVERAGE_LATER_CONTEXT_RE = re.compile(r"(?i)\b(?:coverage|snapshot|pinned)\b")
-COVERAGE_LATER_KEY_PATTERNS = (
-    COVERAGE_KEY_NUMBER_RE,
-    r"(?i)\btotals?\b[^\n0-9]{0,20}\b(?:is|are|now|at|of|equals?)\b"
-    r"[^\n0-9]{0,10}[0-9]+\b",
-    r"(?i)\bcoverage\b[^\n0-9]{0,30}\b(?:now\s+has|has|contains|"
-    r"total(?:s)?\s+(?:is|are|now|at)|pinned\s+(?:at|to))\b"
-    r"[^\n0-9]{0,20}[0-9]+\s+skills?\b",
-)
-COVERAGE_LATER_CONTEXT_PATTERNS = (
-    COVERAGE_N_OF_M_RE,
-    COVERAGE_NUMBER_KEY_RE,
-)
-_LEGIT_LATER_MASK_RE = re.compile(
-    r"(?i)(?:"
-    r"\bsnapshot\s+tests?\s+cover\s+[0-9]+\s+(?:entr(?:y|ies)|skills?)\b"
-    r"|\bsnapshot\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
-    r"(?:entr(?:y|ies)|skills?)\b"
-    r"|\bcoverage\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
-    r"(?:entr(?:y|ies)|skills?)\b"
-    r"|\bcoverage\s+roadmap\s*:\s*[0-9]+\s+skills?\b"
-    r"|\bsnapshot-(?:19|20)[0-9]{2}\b)"
-)
-_COVERAGE_UPDATE_EVENT_RE = re.compile(
+COVERAGE_DERIVED_INTENT_RE = re.compile(r"(?i)\b" + COVERAGE_DERIVED_INTENT + r"\b")
+COVERAGE_N_OF_M_RE = re.compile(r"(?i)\b[0-9]+\s*(?:of|-of-)\s*[0-9]+\b")
+COVERAGE_NUMBER_KEY_RE = re.compile(
+    r"(?i)\b[0-9]+\s*(?:-\s*|\s+)" + COVERAGE_DERIVED_INTENT + r"\b")
+COVERAGE_KEY_NUMBER_RE = re.compile(
+    r"(?i)\b" + COVERAGE_DERIVED_INTENT
+    + r"\b(?:\s*(?::|=|-))?(?:\s+(?:is|are|was|were|now|at|of|equals?|"
+    + r"set\s+to|to))*\s*[0-9]+\b")
+COVERAGE_LATER_CONTEXT_RE = re.compile(
+    r"(?i)\b(?:coverage|snapshot|pinned|d_entry|rows_sha256|coverage-map|"
+    r"roadmap)\b")
+COVERAGE_UPDATE_EVENT_RE = re.compile(
     r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
-    r"renamed|moved|progressed)(?:\s+(?:to|by|with))?\b")
+    r"renamed|moved|progressed)\s+[0-9]+\s+"
+    + COVERAGE_DERIVED_INTENT + r"\b")
+_OPAQUE_CODE = "[" + chr(96) + "][^" + chr(96) + "\n]*[" + chr(96) + "]"
+COVERAGE_ALLOWED_PROSE_RE = (
+    re.compile(r"(?i)\bsnapshot\s+tests?\s+cover\s+[0-9]+\s+"
+               + COVERAGE_DERIVED_INTENT + r"\b"),
+    re.compile(r"(?i)\bsnapshot\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
+               + COVERAGE_DERIVED_INTENT + r"\b"),
+    re.compile(r"(?i)\bcoverage\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
+               + COVERAGE_DERIVED_INTENT + r"\b"),
+    re.compile(r"(?i)\bcoverage\s+roadmap\s*:\s*[0-9]+\s+"
+               + COVERAGE_DERIVED_INTENT + r"\b"),
+)
+
+
+def _coverage_protect_opaque(text: str) -> str:
+    """Mask non-count opaque tokens before intent recognition."""
+    protected = re.sub(_OPAQUE_CODE, " OPAQUE ", text)
+    protected = re.sub(r"https?://\S+", " OPAQUE ", protected, flags=re.IGNORECASE)
+    protected = re.sub(r"\b[0-9a-f]{40,64}\b", " OPAQUE ", protected,
+                       flags=re.IGNORECASE)
+    protected = re.sub(r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}\b", " OPAQUE ", protected)
+    protected = re.sub(r"\bD[0-9]{1,12}\b", " OPAQUE ", protected)
+    protected = re.sub(r"\bsnapshot-(?:19|20)[0-9]{2}\b", " OPAQUE ", protected,
+                       flags=re.IGNORECASE)
+    protected = re.sub(r"\[[^\]\n]*\]\([^)\n]*\)", " OPAQUE ", protected)
+    return protected
+
+
+def _coverage_mask_allowed_update(text: str) -> str:
+    """Mask fixed legitimate update-event prose only; keep coverage context."""
+    masked = text
+    for pattern in COVERAGE_ALLOWED_PROSE_RE:
+        masked = pattern.sub(" ", masked)
+    masked = COVERAGE_UPDATE_EVENT_RE.sub(" ", masked)
+    return masked
+
+
+def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
+    """Single structural source for derived-total count mentions."""
+    if not isinstance(text, str) or not text:
+        return []
+    normalized = (text.casefold()
+                  .replace(chr(0x2013), "-").replace(chr(0x2014), "-")
+                  .replace(chr(0x2212), "-"))
+    normalized = re.sub(r"\s+", " ", normalized)
+    protected = _coverage_protect_opaque(normalized)
+    parsed = _coverage_mask_allowed_update(protected) if allowed_update else protected
+    entry_has_context = bool(COVERAGE_LATER_CONTEXT_RE.search(protected))
+    mentions = []
+    seen = set()
+    for clause in re.split(r"[;\n]", parsed):
+        clause_context = bool(COVERAGE_LATER_CONTEXT_RE.search(clause)) or entry_has_context
+        candidates = []
+        candidates.extend(("n-of-m", m.group(0)) for m in COVERAGE_N_OF_M_RE.finditer(clause))
+        candidates.extend(("number-key", m.group(0)) for m in COVERAGE_NUMBER_KEY_RE.finditer(clause))
+        candidates.extend(("key-number", m.group(0)) for m in COVERAGE_KEY_NUMBER_RE.finditer(clause))
+        for kind, surface in candidates:
+            cleaned = surface.strip()
+            if not cleaned or cleaned in seen:
+                continue
+            seen.add(cleaned)
+            numbers = re.findall(r"[0-9]+", cleaned)
+            intent_match = COVERAGE_DERIVED_INTENT_RE.search(cleaned)
+            mentions.append({
+                "surface": cleaned,
+                "kind": kind,
+                "intent": intent_match.group(0).lower() if intent_match else None,
+                "number": numbers[-1] if numbers else None,
+                "clause_context": clause_context,
+            })
+    return mentions
 
 
 def _coverage_later_total_count_errors(text):
-    """Later-ledger derived-total counts under one explicit shared key policy.
-
-    Policy: derived-total keys are rows, entries, skills, ids, counts, totals,
-    pins, snapshot/snapshot_totals, by_area/by_status/by_grade/by_priority,
-    gap_by_priority, manifest_skills, coverage_map, review_pending,
-    distinct_covering_skills and beyond_roadmap_skills. Key-labelled totals
-    (key + colon/equal/hyphen/space + N) are always rejected; N-of-M and bare
-    number+key forms are rejected when coverage/snapshot/pinned context is
-    present; year-valued totals are ordinary numbers. Actual dates and D ids
-    are scrubbed, legitimate update-event/test prose and snapshot-YYYY labels
-    are masked first. No bare-year scrub.
-    """
-    scrubbed = _coverage_scrub_for_counts(text)
-    scrubbed = _LEGIT_LATER_MASK_RE.sub(" ", scrubbed)
-    scrubbed = _COVERAGE_UPDATE_EVENT_RE.sub(" ", scrubbed)
-    findings = set()
-    for pattern in COVERAGE_LATER_KEY_PATTERNS:
-        for match in re.finditer(pattern, scrubbed):
-            findings.add(match.group(0))
-    if COVERAGE_LATER_CONTEXT_RE.search(scrubbed):
-        for pattern in COVERAGE_LATER_CONTEXT_PATTERNS:
-            for match in re.finditer(pattern, scrubbed):
-                findings.add(match.group(0))
-    return sorted(findings)
+    """Compat wrapper: later-ledger derived-total count copies, fixed policy."""
+    return sorted({m["surface"] for m in _coverage_derived_total_mentions(
+        text, allowed_update=True)})
 
 
 def _coverage_count_copy_errors(text, computed):
-    scrubbed = _coverage_scrub_for_counts(text)
-    findings = set()
-    patterns = (
-        COVERAGE_N_OF_M_RE,
-        r"(?i)\b[0-9]+-(?:rows?|skills?|entr(?:y|ies)|ids?|pins?|counts?|totals?)\b",
-        r"(?i)\b[0-9]+\s+(?:rows?|skills?|entr(?:y|ies)|ids?|pins?|counts?|totals?)\b",
-        COVERAGE_KEY_NUMBER_RE,
-    )
-    for pattern in patterns:
-        for match in re.finditer(pattern, scrubbed):
-            findings.add(match.group(0))
-    return sorted(findings)
+    """Compat wrapper: bound snapshot entry derived-total count copies."""
+    return sorted({m["surface"] for m in _coverage_derived_total_mentions(
+        text, allowed_update=False)})
 
 
 def _coverage_ledger_id_number(row_id):
@@ -2710,7 +2784,11 @@ def _coverage_check_snapshot(rep, ctx, payload, entries, manifest, computed):
                           + " is later than the bound snapshot " + d_entry
                           + " and carries a rows_sha256 token (fail closed)")
     totals = snapshot.get("totals")
-    if _coverage_validated_totals(totals, computed) is None:
+    shape_errors = _coverage_totals_shape_errors(totals, computed)
+    if shape_errors:
+        for shape_error in shape_errors:
+            rep.error("[" + ctx + "] " + shape_error)
+    elif _coverage_validated_totals(totals, computed) is None:
         rep.error("[" + ctx + "] snapshot.totals must be exactly the derived exact-integer totals")
     body = matching[0]["body"]
     matches = COVERAGE_DIGEST_TOKEN_RE.findall(body)
@@ -2940,12 +3018,19 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
     by_priority: dict[str, int] = {}
     gap_by_priority: dict[str, int] = {}
     area_status_counts: dict[str, dict[str, int]] = {}
-    priority_invalid = False
+    reported_priority_errors = set()
     for index, entry in enumerate(entries):
         if not isinstance(entry, dict):
             rep.error("[" + ctx + "] entry[" + str(index)
                       + "] must be a JSON object")
             continue
+        priority_error = _coverage_priority_error(entry)
+        if priority_error is not None:
+            priority_key = (index, priority_error)
+            if priority_key not in reported_priority_errors:
+                reported_priority_errors.add(priority_key)
+                rep.error("[" + ctx + "] entry[" + str(index) + "]: "
+                          + priority_error)
         row_id = entry.get("id")
         if not _coverage_is_exact_int(row_id):
             rep.error("[" + ctx + "] entry[" + str(index) + "] has a "
@@ -2953,10 +3038,6 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
                       "booleans are rejected)")
             continue
         entry_ctx = "[" + ctx + "] entry " + str(row_id) + ": "
-        priority_error = _coverage_priority_error(entry)
-        if priority_error is not None:
-            priority_invalid = True
-            rep.error(entry_ctx + priority_error)
         for key in COVERAGE_ENTRY_KEYS:
             if key == "priority":
                 continue
@@ -3185,7 +3266,7 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
     try:
         computed = _coverage_compute_totals(entries, manifest)
     except CoveragePriorityError as exc:
-        if not priority_invalid:
+        if not reported_priority_errors:
             rep.error("[" + ctx + "] " + str(exc))
         rep.error("[" + ctx + "] independent snapshot/summary/gap checks "
                   "intentionally skipped after invalid entry data (explicit "

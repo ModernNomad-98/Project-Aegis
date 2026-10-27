@@ -4682,6 +4682,99 @@ def test_readiness_memory_canonical_tristate():
         ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut forbidden")
 
 
+def test_ds7cfixb_coverage_detector_matrix():
+    """DS-7c-fix-b: derived-total parser matrix, nested exact-int, trim, priority."""
+    computed = validator._coverage_live_totals()
+    later_positive = (
+        "300 - rows", "300 - entries", "300 - skills", "300 - row",
+        "coverage total set to 300", "coverage total is set to 300",
+        "coverage totals set to 300",
+        "coverage: updated 2 skills; now has 254 skills",
+        "coverage: updated 2 entries; now has 300 entries",
+        "coverage: updated 2 entries, now has 300 entries",
+        "snapshot has 300 entries", "coverage totals: 2026",
+        "snapshot totals: 2026", "85-of-254", "85 of 254",
+        "rows: 300", "snapshot: 300", "snapshot rows: 2024",
+    )
+    for phrase in later_positive:
+        assert validator._coverage_later_total_count_errors(phrase), (
+            "DS-7c-fix-b later detector missed positive " + repr(phrase))
+    later_negative = (
+        "coverage: updated 2 skills", "coverage changed 2 skills",
+        "coverage: updated 2 entries", "D121 coverage: updated 2 entries",
+        "totals updated in D121", "snapshot tests cover 2 skills",
+        "snapshot-2026", "2026-10-26", "D121",
+        "https://example.invalid/coverage", "9",
+        "coverage roadmap: 2 skills", "there are 2 tools",
+    )
+    for phrase in later_negative:
+        assert not validator._coverage_later_total_count_errors(phrase), (
+            "DS-7c-fix-b later detector false positive " + repr(phrase))
+    for phrase in ("300 - rows", "300 row", "entry: 300", "entry-300",
+                   "85-of-254", "totals 300", "300 entries",
+                   "updated 2 entries"):
+        assert validator._coverage_count_copy_errors(phrase, computed), (
+            "DS-7c-fix-b bound detector missed " + repr(phrase))
+    # Recursive exact-int validation for every documented nested map.
+    nested_keys = ("by_area", "by_status", "by_grade", "by_priority",
+                   "gap_by_priority")
+    for key in nested_keys:
+        value = computed[key]
+        if not value:
+            continue
+        sub = sorted(value)[0]
+        for bad in (True, 1.0, "1"):
+            totals = json.loads(json.dumps(computed))
+            totals[key][sub] = bad
+            assert validator._coverage_validated_totals(totals, computed) is None, (
+                "exact-int nested map accepted invalid leaf", key, bad)
+            assert any("exact integer" in error for error in
+                       validator._coverage_totals_shape_errors(totals, computed)), (
+                "nested map shape validator missed", key, bad)
+    totals = json.loads(json.dumps(computed))
+    totals["by_area"]["__extra__"] = 1
+    assert validator._coverage_validated_totals(totals, computed) is None
+    totals = json.loads(json.dumps(computed))
+    del totals["by_area"][sorted(totals["by_area"])[0]]
+    assert validator._coverage_validated_totals(totals, computed) is None
+    # Explicit snapshot_totals documented nested map.
+    total_with_snapshot_totals = dict(computed)
+    total_with_snapshot_totals["snapshot_totals"] = {"entries": computed["entries"]}
+    computed_snapshot = dict(total_with_snapshot_totals)
+    assert validator._coverage_validated_totals(
+        total_with_snapshot_totals, computed_snapshot) is not None
+    bad_snapshot = json.loads(json.dumps(total_with_snapshot_totals))
+    bad_snapshot["snapshot_totals"]["entries"] = True
+    assert validator._coverage_validated_totals(
+        bad_snapshot, computed_snapshot) is None
+    # Manifest fail-closed trim guard for totals and shipped analysis.
+    for bad_manifest in ({" skill "}, {""}, {"ok", " skill "}):
+        try:
+            validator._coverage_compute_totals([], bad_manifest)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("untrimmed/empty manifest accepted by totals")
+        try:
+            validator._coverage_shipped_analysis("no phrase", bad_manifest)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("untrimmed/empty manifest accepted by shipped analysis")
+    validator._coverage_compute_totals([], {"ok"})
+    # Mixed priority error + malformed id: both entries report once.
+    def mutate(payload):
+        payload["entries"][0]["priority"] = "P3"
+        payload["entries"][1]["id"] = "bad-id"
+    with tempfile.TemporaryDirectory() as tmp:
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            priority_errors = [error for error in rep.errors if "priority" in error]
+            id_errors = [error for error in rep.errors if "non-integer id" in error]
+            assert len(priority_errors) == 1, rep.errors
+            assert len(id_errors) == 1, rep.errors
+            assert any("independent snapshot" in error for error in rep.errors), rep.errors
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -4752,6 +4845,7 @@ TESTS = [
     test_dco_record_parsing,
     test_startup_role_contract,
     test_atomic_stage1_question_contract,
+    test_ds7cfixb_coverage_detector_matrix,
     test_readiness_effective_identity_hook,
     test_readiness_startup_inspection_valid,
     test_readiness_memory_canonical_tristate,
