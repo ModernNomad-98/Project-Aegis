@@ -107,6 +107,11 @@ cleanup() {
   if [ "$CLEANING" -eq 1 ]; then return 0; fi
   CLEANING=1
   trap '' INT TERM
+  # Generic child-lifetime rule: ALWAYS bound/stop/reap the owned direct child
+  # BEFORE any token/ownership early return. Otherwise a still-live child holds
+  # inherited stdout/stderr pipes and can hang the caller even when cleanup is
+  # correctly reporting INCOMPLETE.
+  if ! stop_child; then CLEANING=0; return 1; fi
   OWNED=0
   if [ -d "$LOCK" ]; then
     if [ -e "$LOCK/token" ]; then
@@ -123,7 +128,6 @@ cleanup() {
   fi
   if [ "$CREATED_LOCK" -eq 0 ] && [ "$OWNED" -eq 0 ]; then CLEANING=0; return 0; fi
   if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
-  if ! stop_child; then CLEANING=0; return 1; fi
   if [ "$OWNED" -eq 1 ] && [ -f "$LOCK/workload.pid" ]; then rm -f "$LOCK/workload.pid" 2>/dev/null || true; fi
   if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then
     current="$(cat "$LOCK/token" 2>/dev/null || true)"
@@ -177,7 +181,7 @@ sh -c '
   [ -f "$1/abort" ] && exit 0
   [ -f "$1/ack" ] || exit 1
   exec sh -c "$2"
-' sh "$LOCK" "$WORKLOAD" &
+' sh "$LOCK" "$WORKLOAD" > "$LOCK/workload.out" 2> "$LOCK/workload.err" &
 CHILD=$!
 if ! : > "$LOCK/ack"; then cleanup; exit 2; fi
 wait "$CHILD"; rc=$?
