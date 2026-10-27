@@ -8940,7 +8940,240 @@ def test_consumer_install_destination_links():
             )
 
 
+def _identity_gate_env(home: Path):
+    env = {key: value for key, value in os.environ.items()
+           if not key.startswith("GIT_")}
+    env.update({
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "HOME": str(home),
+        "XDG_CONFIG_HOME": str(home / "xdg"),
+        "GIT_CONFIG_GLOBAL": str(home / "gitconfig"),
+    })
+    return env
+
+
+def _identity_gate_git(repo: Path, env, *args, extra=None):
+    e = dict(env)
+    e.update(extra or {})
+    return subprocess.run(["git"] + list(args), cwd=repo, env=e,
+                          capture_output=True, text=True,
+                          encoding="utf-8", errors="replace")
+
+
+def _identity_gate_run(repo: Path, env, extra_env=None, flags=()):
+    run_env = dict(env)
+    run_env.update(extra_env or {})
+    return subprocess.run([sys.executable] + list(flags)
+                          + [str(TESTS_DIR.parent / "agent-identity-gate.py")],
+                          cwd=repo, env=run_env, capture_output=True,
+                          text=True, encoding="utf-8", errors="replace")
+
+
+def _identity_gate_repo(home: Path, env, local=None, global_=None,
+                        owner=True, owner_value=None):
+    repo = home / "repo"
+    repo.mkdir()
+    assert _identity_gate_git(repo, env, "init", "-q").returncode == 0
+    if owner:
+        name, email = owner_value or ("Owner", "owner@example.invalid")
+        assert _identity_gate_git(repo, env, "config", "--local",
+                                  "aegis.ownerName", name).returncode == 0
+        assert _identity_gate_git(repo, env, "config", "--local",
+                                  "aegis.ownerEmail", email).returncode == 0
+    for scope, values in (("--local", local), ("--global", global_)):
+        if values is None:
+            continue
+        if values[0] is not None:
+            assert _identity_gate_git(repo, env, "config", scope,
+                                      "user.name", values[0]).returncode == 0
+        if values[1] is not None:
+            assert _identity_gate_git(repo, env, "config", scope,
+                                      "user.email", values[1]).returncode == 0
+    return repo
+
+
+def test_dsr1b_identity_gate_manual_matrix():
+    """DS-R1b: manual gate strict identity/explicit-source/owner behavior."""
+    gate_script = TESTS_DIR.parent / "agent-identity-gate.py"
+    gate = _load_by_path(gate_script, "aegis_identity_gate")
+    try:
+        gate.validate_ident("Bad\nName <a@b> 1 +0000", "author")
+    except gate.GateStop as error:
+        assert error.reason == gate.REASON_MALFORMED_IDENT
+    else:
+        raise AssertionError("multiline raw identity must be rejected")
+    try:
+        gate.validate_ident("Name <a@b> 1 +0000 extra", "author")
+    except gate.GateStop as error:
+        assert error.reason == gate.REASON_MALFORMED_IDENT
+    else:
+        raise AssertionError("non-strict raw identity must be rejected")
+    try:
+        gate.validate_ident("Name\x01Break <a@b> 1 +0000", "author")
+    except gate.GateStop as error:
+        assert error.reason == gate.REASON_MALFORMED_IDENT
+    else:
+        raise AssertionError("control-character raw identity must be rejected")
+    params = {"GIT_CONFIG_PARAMETERS":
+              "'user.name'='CmdAgent' 'user.email'='cmd@example.invalid'"}
+    command = gate._collect_command_config(params)
+    assert command["user.name"] == ["CmdAgent"]
+    assert command["user.email"] == ["cmd@example.invalid"]
+    try:
+        gate._collect_command_config({"GIT_CONFIG_PARAMETERS": "not-a-pair"})
+    except gate.GateStop as error:
+        assert error.reason == gate.REASON_CONFIG_ERROR
+    else:
+        raise AssertionError("malformed command config must stop")
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env,
+                                   local=("Agent", "agent@example.invalid"))
+        accepted = _identity_gate_run(repo, env)
+        assert accepted.returncode == 0, accepted.stdout + accepted.stderr
+        assert accepted.stdout.startswith("ACCEPT ")
+        assert "effective_author=" in accepted.stdout
+        assert "effective_committer=" in accepted.stdout
+        assert "provenance=" in accepted.stdout
+        assert "agent@example.invalid" in accepted.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env, owner=False)
+        result = _identity_gate_run(repo, env)
+        assert result.returncode != 0
+        assert "STOP reason=" + gate.REASON_NO_OWNER in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env,
+                                   local=("Owner", "owner@example.invalid"))
+        result = _identity_gate_run(repo, env)
+        assert result.returncode != 0
+        assert "STOP reason=" + gate.REASON_OWNER_EFFECTIVE in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env,
+                                   local=("Agent", "agent@example.invalid"))
+        assert _identity_gate_git(repo, env, "config", "--local", "--add",
+                                  "user.name", "Other").returncode == 0
+        result = _identity_gate_run(repo, env)
+        assert result.returncode != 0
+        assert "STOP reason=" + gate.REASON_CONFIG_DUPLICATE in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env)
+        env_only = {"GIT_AUTHOR_NAME": "EnvAgent",
+                    "GIT_AUTHOR_EMAIL": "env@example.invalid",
+                    "GIT_COMMITTER_NAME": "EnvAgent",
+                    "GIT_COMMITTER_EMAIL": "env@example.invalid"}
+        result = _identity_gate_run(repo, env, env_only)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert result.stdout.startswith("ACCEPT ")
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env)
+        env_only = {"GIT_AUTHOR_NAME": "EnvAgent",
+                    "GIT_AUTHOR_EMAIL": "env@example.invalid",
+                    "GIT_COMMITTER_NAME": "EnvAgent",
+                    "GIT_COMMITTER_EMAIL": "env@example.invalid",
+                    "GIT_CONFIG_COUNT": "2",
+                    "GIT_CONFIG_KEY_0": "user.name",
+                    "GIT_CONFIG_VALUE_0": "DupAgent",
+                    "GIT_CONFIG_KEY_1": "user.name",
+                    "GIT_CONFIG_VALUE_1": "DupAgent2"}
+        result = _identity_gate_run(repo, env, env_only)
+        assert result.returncode != 0
+        assert "STOP reason=" + gate.REASON_CONFIG_DUPLICATE in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env, local=None,
+                                   global_=("Global", "global@example.invalid"))
+        result = _identity_gate_run(repo, env)
+        assert result.returncode != 0
+        assert "STOP reason=" + gate.REASON_NO_EXPLICIT_SOURCE in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env, local=None,
+                                   global_=("Global", "global@example.invalid"))
+        same_env = {"GIT_AUTHOR_NAME": "Global",
+                    "GIT_AUTHOR_EMAIL": "global@example.invalid",
+                    "GIT_COMMITTER_NAME": "Global",
+                    "GIT_COMMITTER_EMAIL": "global@example.invalid"}
+        result = _identity_gate_run(repo, env, same_env)
+        assert result.returncode != 0
+        assert "STOP reason=" + gate.REASON_NO_EXPLICIT_SOURCE in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env, local=None,
+                                   global_=("Global", "global@example.invalid"))
+        one_field = {"GIT_AUTHOR_NAME": "DiffAgent"}
+        result = _identity_gate_run(repo, env, one_field)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "env:author-name" in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env)
+        command_env = {
+            "GIT_CONFIG_COUNT": "2",
+            "GIT_CONFIG_KEY_0": "user.name",
+            "GIT_CONFIG_VALUE_0": "CmdAgent",
+            "GIT_CONFIG_KEY_1": "user.email",
+            "GIT_CONFIG_VALUE_1": "cmd@example.invalid",
+        }
+        result = _identity_gate_run(repo, env, command_env)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "config:command:author" in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env)
+        assert _identity_gate_git(repo, env, "config", "--local",
+                                  "extensions.worktreeConfig", "yes").returncode == 0
+        assert _identity_gate_git(repo, env, "config", "--worktree",
+                                  "user.name", "WorktreeAgent").returncode == 0
+        assert _identity_gate_git(repo, env, "config", "--worktree",
+                                  "user.email", "worktree@example.invalid").returncode == 0
+        result = _identity_gate_run(repo, env)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "config:worktree:author" in result.stdout
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env, local=("NameOnly", None),
+                                   global_=(None, "email@example.invalid"))
+        result = _identity_gate_run(repo, env)
+        assert result.returncode != 0
+        assert ("STOP reason=" + gate.REASON_NO_EXPLICIT_SOURCE in result.stdout
+                or "STOP reason=" + gate.REASON_UNJUSTIFIED_FIELD in result.stdout)
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env, local=("AuthorName", "comm@example.invalid"))
+        effective = {"author": gate.Identity("AuthorName", "author@example.invalid"),
+                     "committer": gate.Identity("CommName", "comm@example.invalid")}
+        assert gate.config_pairs(repo, env, effective) == []
+    with tempfile.TemporaryDirectory() as tmp:
+        home = Path(tmp)
+        env = _identity_gate_env(home)
+        repo = _identity_gate_repo(home, env,
+                                   local=("Agent", "agent@example.invalid"))
+        opt = _identity_gate_run(repo, env, flags=("-O",))
+        assert opt.returncode == 0, opt.stdout + opt.stderr
+        assert opt.stdout.startswith("ACCEPT ")
+    ok("DS-R1b manual identity gate accepts/rejects explicit-source, owner, duplicate and malformed cases")
+
+
 TESTS = [
+    test_dsr1b_identity_gate_manual_matrix,
     test_fix942_total_guard_regressions,
     test_ds7cfixb_coverage_detector_matrix,
     test_ds7cfixc_priority_forms,
