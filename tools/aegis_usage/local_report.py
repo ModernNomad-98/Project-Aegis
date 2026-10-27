@@ -369,6 +369,12 @@ def validate_envelope(payload: object) -> dict:
         _fail("invalid_enum", "acceptance is not an allowlisted value", "snapshot.acceptance")
     if snapshot["acceptance_evidence"] not in ACCEPTANCE_EVIDENCE:
         _fail("invalid_enum", "acceptance_evidence is not an allowlisted value", "snapshot.acceptance_evidence")
+    if snapshot["acceptance"] == "not_assessed" and snapshot["acceptance_evidence"] != "none":
+        _fail("invalid_evidence", "an unassessed acceptance carries no evidence category", "snapshot.acceptance_evidence")
+    if snapshot["acceptance"] in ("independent_attested_pass", "independent_attested_fail") and snapshot[
+        "acceptance_evidence"
+    ] == "none":
+        _fail("evidence_required", "an independently attested acceptance needs a local evidence category", "snapshot.acceptance_evidence")
     for field in ("delivery_day", "acceptance_day"):
         value = snapshot[field]
         if value is not None:
@@ -381,6 +387,7 @@ def validate_envelope(payload: object) -> dict:
         _fail("too_many_transitions", "at most 256 transitions per snapshot", "snapshot.transitions")
     _unique_event_refs(transitions, "snapshot.transitions")
     status_events: list = []
+    same_day_values: dict = {}
     for index, event in enumerate(transitions):
         path = "snapshot.transitions[" + str(index) + "]"
         _exact_keys(event, TRANSITION_KEYS, path)
@@ -403,10 +410,13 @@ def validate_envelope(payload: object) -> dict:
                 _fail("stage_not_applicable", "a stage event names an inapplicable stage", path + ".stage")
         elif stage is not None:
             _fail("unexpected_stage", "only a stage event carries a stage", path + ".stage")
+        conflict_key = (kind, event["effective_day"], stage if kind == "stage" else None)
+        if conflict_key in same_day_values and same_day_values[conflict_key] != event["value"]:
+            if kind == "status":
+                _fail("conflicting_terminal_same_day", "same-day terminal transitions conflict", path)
+            _fail("conflicting_same_day_transition", "one value per kind or stage per day is allowed", path + ".value")
+        same_day_values[conflict_key] = event["value"]
         if kind == "status":
-            for other in status_events:
-                if other["effective_day"] == event["effective_day"] and other["value"] != event["value"]:
-                    _fail("conflicting_terminal_same_day", "same-day terminal transitions conflict", path)
             if status_events and status_events[0]["value"] != event["value"]:
                 _fail("conflicting_terminal", "only one terminal status is permitted", path)
             status_events.append(event)
@@ -519,6 +529,7 @@ def enable_capture(
         "applicable_stages": stages,
         "criteria_frozen_before_work": bool(criteria_frozen_before_work),
         "criteria_contract_ref": contract_ref,
+        "acceptance_evidence": "none",
         "revision": 0,
         "export_ref": None,
         "last_observed_day": None,
@@ -550,6 +561,41 @@ def disable_capture(store: dict, workflow_ref: str) -> dict:
     return opt_in
 
 
+def delete_local(store: dict, *, workflow_ref: str | None = None, delete_all: bool = False, confirm: bool = False) -> dict:
+    """Irreversibly delete locally retained reporting history.
+
+    This is the "separately selectable" local deletion the plan requires. It
+    removes the workflow history and its opt-in; it never contacts a steward or
+    any network service. Deletion is explicit: without confirm nothing is
+    changed. The store file remains when other workflows still use it, and the
+    caller saves the mutated store atomically.
+    """
+    if not confirm:
+        _fail("confirmation_required", "local deletion needs an explicit confirmation", "confirm")
+    if delete_all == bool(workflow_ref):
+        _fail("invalid_arguments", "name one workflow_ref or --all, not both or neither", "workflow_ref")
+    if delete_all:
+        removed_workflows = len(store.get("workflows", {}))
+        removed_opt_ins = len(store.get("opt_ins", {}))
+        store["workflows"] = {}
+        store["opt_ins"] = {}
+        return {
+            "deleted_workflows": removed_workflows,
+            "deleted_opt_ins": removed_opt_ins,
+            "workflows_remaining": 0,
+        }
+    ref = parse_ref(workflow_ref, "workflow_ref", "wf-")
+    workflow = store.get("workflows", {}).pop(ref, None)
+    opt_in = store.get("opt_ins", {}).pop(ref, None)
+    if workflow is None and opt_in is None:
+        _fail("unknown_workflow", "no local history for this workflow", ref)
+    return {
+        "deleted_workflows": 1 if workflow is not None else 0,
+        "deleted_opt_ins": 1 if opt_in is not None else 0,
+        "workflows_remaining": len(store.get("workflows", {})),
+    }
+
+
 def record_transition(
     store: dict,
     workflow_ref: str,
@@ -559,6 +605,7 @@ def record_transition(
     effective_day: str,
     stage: str | None = None,
     event_ref: str | None = None,
+    evidence: str | None = None,
 ) -> dict:
     workflow = require_enabled(store, workflow_ref)
     if kind not in EVENT_KINDS:
@@ -574,20 +621,37 @@ def record_transition(
             _fail("invalid_stage", "a stage event needs an allowlisted stage", "stage")
         if stage not in workflow["applicable_stages"]:
             _fail("stage_not_applicable", "not-applicable stages are chosen at start", "stage")
+        if value == "not_applicable":
+            _fail("applicability_conflict", "an applicable stage cannot be not_applicable", "value")
     elif stage is not None:
         _fail("unexpected_stage", "only a stage event carries a stage", "stage")
+    if kind == "acceptance":
+        evidence = evidence or "none"
+        if evidence not in ACCEPTANCE_EVIDENCE:
+            _fail("invalid_enum", "acceptance evidence is not an allowlisted value", "evidence")
+        if value == "not_assessed" and evidence != "none":
+            _fail("invalid_evidence", "an unassessed acceptance carries no evidence category", "evidence")
+        if value.startswith("independent_attested_") and evidence == "none":
+            _fail("evidence_required", "an independently attested acceptance needs a local evidence category", "evidence")
+    elif evidence is not None:
+        _fail("unexpected_evidence", "only an acceptance event carries an evidence category", "evidence")
     if len(workflow["transitions"]) >= MAX_TRANSITIONS:
         _fail("too_many_transitions", "at most 256 transitions per snapshot", "transitions")
 
+    for other in workflow["transitions"]:
+        if other["kind"] != kind or other["effective_day"] != day_str(effective) or other["value"] == value:
+            continue
+        if kind == "stage" and other["stage"] != stage:
+            continue
+        if kind == "status":
+            _fail("conflicting_terminal_same_day", "same-day terminal transitions conflict", "value")
+        _fail("conflicting_same_day_transition", "one value per kind or stage per day is allowed", "value")
     terminal = [event for event in workflow["transitions"] if event["kind"] == "status"]
     if kind == "status" and terminal:
         if (terminal[-1]["value"], terminal[-1]["effective_day"]) != (value, effective_day):
             _fail("conflicting_terminal", "a terminal outcome is already recorded", "value")
     if kind == "observation" and terminal:
         _fail("observation_after_terminal", "a terminal outcome needs no further observation", "kind")
-    for other in workflow["transitions"]:
-        if kind == "status" and other["kind"] == "status" and other["effective_day"] == effective_day and other["value"] != value:
-            _fail("conflicting_terminal_same_day", "same-day terminal transitions conflict", "value")
 
     event = {
         "event_ref": event_ref or random_ref("evt-"),
@@ -598,6 +662,8 @@ def record_transition(
     }
     parse_ref(event["event_ref"], "event_ref", "evt-")
     workflow["transitions"].append(event)
+    if kind == "acceptance":
+        workflow["acceptance_evidence"] = evidence
     workflow["revision"] += 1
     workflow["export_ref"] = random_ref("exp-")
     if workflow["last_observed_day"] is None or day_str(effective) > workflow["last_observed_day"]:
@@ -634,7 +700,9 @@ def build_envelope(store: dict, workflow_ref: str) -> dict:
             "stage_status": derived["stage_status"],
             "status": derived["status"],
             "acceptance": derived["acceptance"],
-            "acceptance_evidence": "none" if derived["acceptance"] == "not_assessed" else "local_review_record",
+            "acceptance_evidence": (
+                "none" if derived["acceptance"] == "not_assessed" else workflow.get("acceptance_evidence", "none")
+            ),
             "delivery_day": derived["delivery_day"],
             "acceptance_day": derived["acceptance_day"],
             "transitions": [
@@ -659,6 +727,12 @@ def preview_export(store: dict, workflow_ref: str) -> tuple[bytes, str]:
 
 
 def _repository_root(path: Path) -> Path | None:
+    """Nearest ancestor with a .git entry, or None outside a working tree.
+
+    A source archive has no .git; export_snapshot therefore also refuses a
+    target inside the tool's own source tree, so an archive copy fails closed
+    for in-tree targets instead of silently writing there.
+    """
     for candidate in [path] + list(path.parents):
         if (candidate / ".git").exists():
             return candidate
@@ -682,7 +756,12 @@ def export_snapshot(
         _fail("preview_mismatch", "the confirmed preview handle does not match these exact bytes", "preview_sha256")
     resolved = out_path.resolve()
     root = repo_root or _repository_root(resolved.parent if resolved.parent.exists() else Path.cwd())
-    if root is not None and (resolved == root or root in resolved.parents):
+    tool_root = None
+    if Path(__file__).resolve().parent.name == "aegis_usage":
+        tool_root = Path(__file__).resolve().parents[2]
+    inside_git_tree = root is not None and (resolved == root or root in resolved.parents)
+    inside_tool_tree = tool_root is not None and (resolved == tool_root or tool_root in resolved.parents)
+    if inside_git_tree or inside_tool_tree:
         _fail("export_path_in_repository", "reporting data must stay outside project version control", str(out_path))
     if resolved.exists():
         _fail("export_exists", "refusing to overwrite an existing export", str(out_path))
@@ -730,12 +809,19 @@ def _parser() -> argparse.ArgumentParser:
     opt_out = sub.add_parser("opt-out", help="stop capture for one workflow")
     opt_out.add_argument("--workflow-ref", required=True)
 
+    delete = sub.add_parser("delete-local", help="irreversibly delete locally retained history")
+    target = delete.add_mutually_exclusive_group(required=True)
+    target.add_argument("--workflow-ref")
+    target.add_argument("--all", dest="delete_all", action="store_true", help="delete every local workflow")
+    delete.add_argument("--confirm", action="store_true", help="required: deletion cannot be undone")
+
     record = sub.add_parser("record", help="record one bounded transition")
     record.add_argument("--workflow-ref", required=True)
     record.add_argument("--kind", required=True)
     record.add_argument("--value", required=True)
     record.add_argument("--effective-day", required=True)
     record.add_argument("--stage")
+    record.add_argument("--evidence", choices=ACCEPTANCE_EVIDENCE, help="local evidence category for an acceptance event")
 
     show = sub.add_parser("show", help="show the local record summary")
     show.add_argument("--workflow-ref", required=True)
@@ -786,6 +872,20 @@ def main(argv: list | None = None) -> int:
             save_store(store_path, store)
             print(json.dumps({"workflow_ref": args.workflow_ref, "capture": "disabled"}, sort_keys=True))
             return 0
+        if args.command == "delete-local":
+            if not args.delete_all and not args.workflow_ref:
+                _fail("invalid_arguments", "name one workflow_ref or --all", "workflow_ref")
+            if args.delete_all and args.workflow_ref:
+                _fail("invalid_arguments", "name one workflow_ref or --all, not both", "workflow_ref")
+            result = delete_local(
+                store,
+                workflow_ref=args.workflow_ref,
+                delete_all=args.delete_all,
+                confirm=args.confirm,
+            )
+            save_store(store_path, store)
+            print(json.dumps(result, sort_keys=True))
+            return 0
         if args.command == "record":
             event = record_transition(
                 store,
@@ -794,6 +894,7 @@ def main(argv: list | None = None) -> int:
                 value=args.value,
                 effective_day=args.effective_day,
                 stage=args.stage,
+                evidence=args.evidence,
             )
             save_store(store_path, store)
             print(json.dumps({"event_ref": event["event_ref"], "revision": store["workflows"][args.workflow_ref]["revision"]}, sort_keys=True))

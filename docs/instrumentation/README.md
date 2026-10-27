@@ -16,8 +16,13 @@ not permission to launch anything.
 - One workflow at a time is enabled by an explicit local `opt-in` action that
   records the start day, the applicable stages, the frozen-criteria flag and a
   random criteria-contract reference.
-- `opt-out` stops capture for that workflow and drops its unsent export queue.
-  Local history deletion is a separate, deliberate action.
+- `opt-out` stops capture for that workflow and drops its unsent export queue;
+  retained history is unchanged.
+- Local history deletion is a separate, deliberate action:
+  `local_report.py delete-local --workflow-ref W --confirm` (or `--all
+  --confirm`) irreversibly removes that workflow's history and opt-in from the
+  local store. It is local only and never contacts the steward. The store file
+  remains if other workflows still use it.
 - An export is written only after the **exact bytes** were previewed and the
   preview handle (SHA-256) was confirmed. There is no background upload and no
   reconnect retry; the tool imports no networking module.
@@ -34,8 +39,30 @@ reference generated for that workflow alone:
 | Timing | `start_day`, `last_observed_day`, `report_due_day` (start + 30 days) |
 | Stages | fixed `discover`, `plan`, `build`, `validate`, `deliver` with allowlisted status values |
 | Outcome | `ongoing`, `delivered`, `failed`, `abandoned`, `unknown` |
-| Acceptance | assessment enum, local evidence category, delivery and acceptance days |
+| Acceptance | assessment enum, participant-supplied local evidence category (default `none`), delivery and acceptance days |
 | History | at most 256 transitions, each with a random `event_ref`, a fixed kind, an effective day and an enum value |
+
+One value per event kind (and per stage, for stage events) per effective day is
+allowed. The recorder and the importer reject a same-day conflicting value for
+correction instead of guessing which event came last.
+
+## Stage vocabulary and project-orchestrator stages
+
+The contract fixes five stage names. They are a coarse record vocabulary, not a
+gate or a quality score. [project-orchestrator](../../.claude/skills/project-orchestrator/SKILL.md)
+uses nine finer stages; this is the correspondence a participant should use when
+recording.
+
+| Contract stage | Corresponding project-orchestrator stages |
+| --- | --- |
+| `discover` | Stage 1 — Understand the need (Stage 0 before any work starts) |
+| `plan` | Stages 2–3 and 5 — define the product, design how it is built, plan the work |
+| `build` | Stage 6 — build it one slice at a time |
+| `validate` | Stages 4 and 7 — make it safe, prove it works |
+| `deliver` | Stages 8–9 — get it ready to run, decide to release |
+
+Later stages never imply that skipped stages are complete. Record only the
+stages that actually happened; inapplicable stages are chosen at start.
 
 ## What is never collected
 

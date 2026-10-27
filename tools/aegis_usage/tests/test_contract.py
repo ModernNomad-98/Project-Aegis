@@ -87,7 +87,23 @@ class ContractValidationTests(unittest.TestCase):
         _, digest = S.preview_export(store, ref)
         target = REPO_ROOT / "tools" / "aegis_usage" / "would-be-export.json"
         with self.assertRaises(S.ContractError) as caught:
-            S.export_snapshot(store, ref, target, preview_sha256=digest, confirm=True)
+            S.export_snapshot(store, ref, target, preview_sha256=digest, confirm=True, repo_root=REPO_ROOT)
+        self.assertEqual(caught.exception.code, "export_path_in_repository")
+        self.assertFalse(target.exists())
+
+    def test_export_refuses_tool_tree_even_without_a_git_marker(self):
+        store, ref = enrolled_store()
+        _, digest = S.preview_export(store, ref)
+        target = REPO_ROOT / "tools" / "aegis_usage" / "would-be-archive-export.json"
+        with self.assertRaises(S.ContractError) as caught:
+            S.export_snapshot(
+                store,
+                ref,
+                target,
+                preview_sha256=digest,
+                confirm=True,
+                repo_root=Path(tempfile.gettempdir()) / "definitely-not-a-repository",
+            )
         self.assertEqual(caught.exception.code, "export_path_in_repository")
         self.assertFalse(target.exists())
 
@@ -227,6 +243,111 @@ class ContractValidationTests(unittest.TestCase):
             S.loads_strict(b"\xff\xfe{}")
         self.assertEqual(caught.exception.code, "invalid_encoding")
 
+    def test_same_day_conflicting_acceptance_rejected_in_both_orders(self):
+        for order in (
+            ("self_reported_fail", "self_reported_pass"),
+            ("self_reported_pass", "self_reported_fail"),
+        ):
+            payload = valid_envelope()
+            payload["snapshot"]["last_observed_day"] = "2026-01-09"
+            for index, value in enumerate(order):
+                payload["snapshot"]["transitions"].append(
+                    {
+                        "event_ref": "evt-" + (("e" if index == 0 else "f") * 32),
+                        "kind": "acceptance",
+                        "effective_day": "2026-01-09",
+                        "value": value,
+                        "stage": None,
+                    }
+                )
+            self.assertCode(payload, "conflicting_same_day_transition")
+
+    def test_same_day_conflicting_stage_value_rejected(self):
+        payload = valid_envelope()
+        payload["snapshot"]["last_observed_day"] = "2026-01-09"
+        payload["snapshot"]["transitions"].extend(
+            [
+                {"event_ref": "evt-" + "1" * 32, "kind": "stage", "effective_day": "2026-01-09", "value": "complete", "stage": "build"},
+                {"event_ref": "evt-" + "2" * 32, "kind": "stage", "effective_day": "2026-01-09", "value": "in_progress", "stage": "build"},
+            ]
+        )
+        self.assertCode(payload, "conflicting_same_day_transition")
+
+    def test_same_day_same_value_is_not_a_conflict(self):
+        payload = valid_envelope()
+        payload["snapshot"]["last_observed_day"] = "2026-01-09"
+        payload["snapshot"]["stage_status"]["build"] = "complete"
+        payload["snapshot"]["transitions"].extend(
+            [
+                {"event_ref": "evt-" + "3" * 32, "kind": "stage", "effective_day": "2026-01-09", "value": "complete", "stage": "build"},
+                {"event_ref": "evt-" + "4" * 32, "kind": "stage", "effective_day": "2026-01-09", "value": "complete", "stage": "build"},
+            ]
+        )
+        self.assertIs(S.validate_envelope(payload), payload)
+
+    def test_acceptance_evidence_defaults_to_none(self):
+        store, ref = enrolled_store()
+        S.record_transition(store, ref, kind="acceptance", value="self_reported_fail", effective_day="2026-01-09")
+        self.assertEqual(S.build_envelope(store, ref)["snapshot"]["acceptance_evidence"], "none")
+
+    def test_each_acceptance_evidence_value_is_exported_unchanged(self):
+        for evidence in S.ACCEPTANCE_EVIDENCE:
+            store, ref = enrolled_store()
+            S.record_transition(
+                store,
+                ref,
+                kind="acceptance",
+                value="self_reported_pass",
+                effective_day="2026-01-09",
+                evidence=evidence,
+            )
+            envelope = S.build_envelope(store, ref)
+            self.assertEqual(envelope["snapshot"]["acceptance_evidence"], evidence)
+
+    def test_independent_attestation_requires_a_local_evidence_category(self):
+        store, ref = enrolled_store()
+        with self.assertRaises(S.ContractError) as caught:
+            S.record_transition(
+                store, ref, kind="acceptance", value="independent_attested_pass", effective_day="2026-01-09"
+            )
+        self.assertEqual(caught.exception.code, "evidence_required")
+        S.record_transition(
+            store,
+            ref,
+            kind="acceptance",
+            value="independent_attested_pass",
+            effective_day="2026-01-09",
+            evidence="local_review_record",
+        )
+        self.assertEqual(S.build_envelope(store, ref)["snapshot"]["acceptance_evidence"], "local_review_record")
+
+    def test_independent_attestation_without_evidence_is_rejected_by_validation(self):
+        payload = valid_envelope()
+        payload["snapshot"]["acceptance"] = "independent_attested_pass"
+        payload["snapshot"]["acceptance_evidence"] = "none"
+        self.assertCode(payload, "evidence_required")
+
+    def test_unassessed_acceptance_cannot_carry_evidence(self):
+        payload = valid_envelope()
+        payload["snapshot"]["acceptance_evidence"] = "local_checklist"
+        self.assertCode(payload, "invalid_evidence")
+
+    def test_recorder_rejects_same_day_conflicting_acceptance(self):
+        store, ref = enrolled_store()
+        S.record_transition(store, ref, kind="acceptance", value="self_reported_fail", effective_day="2026-01-09")
+        with self.assertRaises(S.ContractError) as caught:
+            S.record_transition(store, ref, kind="acceptance", value="self_reported_pass", effective_day="2026-01-09")
+        self.assertEqual(caught.exception.code, "conflicting_same_day_transition")
+        self.assertEqual(len(store["workflows"][ref]["transitions"]), 2)
+
+    def test_recorder_rejects_not_applicable_for_an_applicable_stage(self):
+        store, ref = enrolled_store()
+        with self.assertRaises(S.ContractError) as caught:
+            S.record_transition(
+                store, ref, kind="stage", value="not_applicable", effective_day=START, stage="build"
+            )
+        self.assertEqual(caught.exception.code, "applicability_conflict")
+        self.assertEqual(len(store["workflows"][ref]["transitions"]), 1)
 
 class ImportRevisionTests(unittest.TestCase):
     def setUp(self):
@@ -438,6 +559,59 @@ class CliTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 2)
             self.assertIn("ERROR capture_disabled", result.stderr)
+
+    def test_cli_delete_local_requires_confirmation_and_deletes_one_workflow(self):
+        with tempfile.TemporaryDirectory() as folder:
+            store = Path(folder) / "local.json"
+            first = json.loads(self.run_cli("opt-in", "--day", "2026-01-06", "--start-day", START, store=store).stdout)
+            second = json.loads(self.run_cli("opt-in", "--day", "2026-01-06", "--start-day", START, store=store).stdout)
+            refused = self.run_cli("delete-local", "--workflow-ref", first["workflow_ref"], store=store)
+            self.assertEqual(refused.returncode, 2)
+            self.assertIn("ERROR confirmation_required", refused.stderr)
+            self.assertTrue(store.exists())
+            deleted = self.run_cli(
+                "delete-local", "--workflow-ref", first["workflow_ref"], "--confirm", store=store
+            )
+            self.assertEqual(deleted.returncode, 0, deleted.stderr)
+            self.assertEqual(
+                json.loads(deleted.stdout),
+                {"deleted_opt_ins": 1, "deleted_workflows": 1, "workflows_remaining": 1},
+            )
+            after = json.loads(store.read_text(encoding="utf-8"))
+            self.assertNotIn(first["workflow_ref"], after["workflows"])
+            self.assertIn(second["workflow_ref"], after["workflows"])
+            again = self.run_cli(
+                "delete-local", "--workflow-ref", first["workflow_ref"], "--confirm", store=store
+            )
+            self.assertEqual(again.returncode, 2)
+            self.assertIn("ERROR unknown_workflow", again.stderr)
+
+    def test_cli_record_acceptance_evidence_defaults_and_explicit_values(self):
+        with tempfile.TemporaryDirectory() as folder:
+            store = Path(folder) / "local.json"
+            ref = json.loads(self.run_cli("opt-in", "--day", "2026-01-06", "--start-day", START, store=store).stdout)[
+                "workflow_ref"
+            ]
+            refused = self.run_cli(
+                "record", "--workflow-ref", ref, "--kind", "acceptance",
+                "--value", "independent_attested_pass", "--effective-day", "2026-01-09", store=store,
+            )
+            self.assertEqual(refused.returncode, 2)
+            self.assertIn("ERROR evidence_required", refused.stderr)
+            accepted = self.run_cli(
+                "record", "--workflow-ref", ref, "--kind", "acceptance",
+                "--value", "independent_attested_pass", "--effective-day", "2026-01-09",
+                "--evidence", "local_test_record", store=store,
+            )
+            self.assertEqual(accepted.returncode, 0, accepted.stderr)
+            self.run_cli(
+                "attach-admission", "--workflow-ref", ref, "--admission-ref", ADMISSION, store=store
+            )
+            preview = self.run_cli("preview", "--workflow-ref", ref, store=store)
+            self.assertEqual(preview.returncode, 0, preview.stderr)
+            snapshot = json.loads(preview.stdout)["snapshot"]
+            self.assertEqual(snapshot["acceptance"], "independent_attested_pass")
+            self.assertEqual(snapshot["acceptance_evidence"], "local_test_record")
 
 
 if __name__ == "__main__":

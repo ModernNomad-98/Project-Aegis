@@ -290,6 +290,49 @@ class RetentionTests(unittest.TestCase):
         self.assertNotIn(ref, store["workflows"])
 
 
+class LocalDeletionTests(unittest.TestCase):
+    def setUp(self):
+        self.store = S.new_store()
+        self.first = S.enable_capture(self.store, day=START, start_day=START)["workflow_ref"]
+        self.second = S.enable_capture(self.store, day=START, start_day=START)["workflow_ref"]
+        S.record_transition(self.store, self.first, kind="observation", value="ongoing", effective_day=START)
+
+    def test_delete_local_requires_confirmation_and_changes_nothing(self):
+        before = json.dumps(self.store, sort_keys=True)
+        with self.assertRaises(S.ContractError) as caught:
+            S.delete_local(self.store, workflow_ref=self.first)
+        self.assertEqual(caught.exception.code, "confirmation_required")
+        self.assertEqual(json.dumps(self.store, sort_keys=True), before)
+
+    def test_delete_local_removes_history_and_opt_in_but_not_other_workflow(self):
+        result = S.delete_local(self.store, workflow_ref=self.first, confirm=True)
+        self.assertEqual(
+            result,
+            {"deleted_workflows": 1, "deleted_opt_ins": 1, "workflows_remaining": 1},
+        )
+        self.assertNotIn(self.first, self.store["workflows"])
+        self.assertNotIn(self.first, self.store["opt_ins"])
+        self.assertIn(self.second, self.store["workflows"])
+        self.assertIn(self.second, self.store["opt_ins"])
+        self.assertNotIn(self.first, json.dumps(self.store, sort_keys=True))
+
+    def test_delete_local_unknown_workflow_is_refused(self):
+        missing = "wf-" + "f" * 32
+        with self.assertRaises(S.ContractError) as caught:
+            S.delete_local(self.store, workflow_ref=missing, confirm=True)
+        self.assertEqual(caught.exception.code, "unknown_workflow")
+        self.assertIn(self.first, self.store["workflows"])
+
+    def test_delete_local_all_clears_the_local_store(self):
+        result = S.delete_local(self.store, delete_all=True, confirm=True)
+        self.assertEqual(
+            result,
+            {"deleted_workflows": 2, "deleted_opt_ins": 2, "workflows_remaining": 0},
+        )
+        self.assertEqual(self.store["workflows"], {})
+        self.assertEqual(self.store["opt_ins"], {})
+
+
 class MutantDetectionTests(unittest.TestCase):
     def load_mutant(self, replacements):
         source_path = REPO_ROOT / "tools" / "aegis_usage" / "aggregate.py"

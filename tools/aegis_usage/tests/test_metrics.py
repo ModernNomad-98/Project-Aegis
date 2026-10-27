@@ -523,6 +523,113 @@ class ImmutableEnrollmentTests(unittest.TestCase):
         self.assertEqual(result["code"], "enrollment_change")
 
 
+class SameDayConflictAndRetentionTests(unittest.TestCase):
+    def conflicting_export(self, central, key, order):
+        start = "2026-01-05"
+        workflow_ref = "wf-" + hashlib.sha256(("conflict:" + key).encode("utf-8")).hexdigest()[:32]
+        criteria_ref = "crit-" + hashlib.sha256(("crit:" + key).encode("utf-8")).hexdigest()[:32]
+        notice = {
+            "workflow_ref": workflow_ref,
+            "start_day": start,
+            "applicable_stages": list(S.STAGES),
+            "criteria_frozen_before_work": True,
+            "criteria_contract_ref": criteria_ref,
+        }
+        admission = aggregate.issue_admission(central, notice, issued_day=start)
+        events = [{"kind": "observation", "value": "ongoing", "effective_day": start}]
+        for value in order:
+            events.append({"kind": "acceptance", "value": value, "effective_day": add_days(start, 5)})
+        envelope = make_envelope(
+            workflow_ref, criteria_ref, start, list(S.STAGES), True, events, 1, admission["admission_ref"]
+        )
+        return envelope, admission
+
+    def test_sd_m3_same_day_correction_is_rejected_in_both_orders(self):
+        # Reproduces the audit probe: identical histories except the same-day
+        # fail/pass order. Both orders must now be refused, so the random
+        # event_ref can no longer decide the attested-success numerator.
+        outcomes = []
+        for key, order in (
+            ("fail-then-pass", ("independent_attested_fail", "independent_attested_pass")),
+            ("pass-then-fail", ("independent_attested_pass", "independent_attested_fail")),
+        ):
+            central = aggregate.new_store()
+            envelope, admission = self.conflicting_export(central, key, order)
+            with self.assertRaises(S.ContractError) as caught:
+                aggregate.import_export(
+                    central, envelope, capability=admission["capability"], receipt_day=add_days("2026-01-05", 2)
+                )
+            self.assertEqual(caught.exception.code, "conflicting_same_day_transition")
+            self.assertEqual(central["records"], {})
+            outcomes.append(caught.exception.code)
+        self.assertEqual(outcomes, ["conflicting_same_day_transition"] * 2)
+
+    def test_expired_record_marks_an_existing_cohort_incomplete(self):
+        central = aggregate.new_store()
+        start = "2026-01-05"
+        build_case(
+            central,
+            "retained",
+            start,
+            [(add_days(start, 2), [{"kind": "observation", "value": "ongoing", "effective_day": start}])],
+        )
+        build_case(
+            central,
+            "expired",
+            start,
+            [(add_days(start, 5), [{"kind": "observation", "value": "ongoing", "effective_day": start}])],
+        )
+        report = aggregate.compute_report(central, as_of="2026-04-08")
+        january = report["cohorts"]["2026-01"]
+        self.assertTrue(january["incomplete"])
+        self.assertEqual(january["expired_excluded"], 1)
+        self.assertEqual(report["expired_excluded"], 1)
+        view = aggregate.publishable_report(report)
+        self.assertEqual(
+            view["suppressed_cohorts"],
+            [{"month": "2026-01", "reason": "retention_incomplete"}],
+        )
+        self.assertEqual(view["cohorts"], [])
+
+    def test_a_month_that_only_has_expired_records_is_reported_incomplete(self):
+        central = aggregate.new_store()
+        start = "2026-01-05"
+        build_case(
+            central,
+            "only-expired",
+            start,
+            [(add_days(start, 2), [{"kind": "observation", "value": "ongoing", "effective_day": start}])],
+        )
+        report = aggregate.compute_report(central, as_of="2026-04-08")
+        self.assertEqual(report["cohorts"], {})
+        self.assertEqual(report["incomplete_cohorts"], {"2026-01": 1})
+
+    def test_late_entries_counts_each_late_receipt_not_a_boolean(self):
+        central = aggregate.new_store()
+        start = "2026-01-05"
+        build_case(
+            central,
+            "late-count",
+            start,
+            [
+                (add_days(start, 2), [{"kind": "observation", "value": "ongoing", "effective_day": start}]),
+                (add_days(start, 40), [{"kind": "status", "value": "delivered", "effective_day": add_days(start, 20)}]),
+                (add_days(start, 41), [{"kind": "stage", "value": "complete", "effective_day": add_days(start, 10), "stage": "build"}]),
+            ],
+        )
+        report = aggregate.compute_report(central, as_of=add_days(start, 60))
+        january = cell(report, start[:7])
+        self.assertEqual(january["late_entries"], 2)
+        self.assertEqual(january["late_events"], 2)
+
+    def test_report_has_no_dead_rejected_or_flagged_counters(self):
+        store, _ = fixture_store()
+        report = aggregate.compute_report(store, as_of=FIXTURE["report_as_of"])
+        self.assertNotIn("rejected", report)
+        january = cell(report, "2026-01")
+        self.assertNotIn("flagged", january)
+
+
 class SuppressionTests(unittest.TestCase):
     def test_cohort_below_floor_is_withheld(self):
         central = aggregate.new_store()

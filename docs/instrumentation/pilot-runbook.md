@@ -43,8 +43,9 @@
 
 ## Reporting (by day 30 plus 7)
 
-1. The participant reconciles the workflow and records an explicit observation
-   for day 30 when the outcome is still ongoing.
+1. The participant reconciles the workflow, records any acceptance with its
+   local evidence category (`--evidence`, default `none`), and records an
+   explicit observation for day 30 when the outcome is still ongoing.
 2. The participant runs `preview`, reviews the exact bytes, and then runs
    `export` with the printed SHA-256 and `--confirm`. Exports go to local disk;
    the participant sends the file through the approved private channel.
@@ -64,16 +65,25 @@
 
 ## Deletion
 
-1. The participant requests withdrawal through the approved channel with the
-   admission capability.
-2. The steward runs `withdraw`; the admission, raw snapshots and deletion
+1. For local history, the participant runs
+   `local_report.py delete-local --workflow-ref W --confirm` (or `--all
+   --confirm`). This is explicit, local only and irreversible; the store file
+   remains if other workflows still use it.
+2. For imported data, the participant requests withdrawal through the approved
+   channel with the admission capability.
+3. The steward runs `withdraw`; the admission, raw snapshots and deletion
    verifier are removed immediately.
-3. The steward gives the participant the random, unlinkable receipt identifier.
+4. The steward gives the participant the random, unlinkable receipt identifier.
    The receipt expires after seven days.
-4. Recompute the retained cohort. The report shows the withdrawal count and the
+5. Recompute the retained cohort. The report shows the withdrawal count and the
    bias note; no linkable tombstone is kept.
 
 ## Stop conditions
+
+For this offline tool the **steward kill switch is procedural**: stop running
+`import` and `report`, and restrict access to the central store. There is no
+remote disable flag or hosted control, so the steward's discipline is the
+control.
 
 Stop capture, import and any publication, quarantine affected data and notify
 the owner if any of these occur:
@@ -94,7 +104,7 @@ quarantined, and the owner records a new approval.
 
 | Data | Retention | Action |
 | --- | --- | --- |
-| Local raw store | 60 days from capture | `local_report.py purge-expired` |
+| Local raw store | 60 days from capture | `local_report.py purge-expired`; a participant may delete earlier with `delete-local --confirm` |
 | Central raw record | 90 days from first receipt | `aggregate.py expire` |
 | Quarantine payload | 90 days | `aggregate.py expire` |
 | Deletion receipt | 7 days | `aggregate.py expire` |

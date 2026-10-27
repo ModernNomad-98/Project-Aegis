@@ -54,7 +54,6 @@ def new_store() -> dict:
         "quarantine": [],
         "deletion_receipts": {},
         "withdrawals": 0,
-        "rejected": 0,
         "ignored": 0,
     }
 
@@ -278,11 +277,6 @@ def import_export(store: dict, payload: object, *, capability: str, receipt_day:
                 return _quarantine(
                     store, receipt_day, "history_rewrite", envelope, "an accepted event was changed by a higher revision"
                 )
-        if "first_receipt_day" in stored and "first_receipt_day" in candidate:
-            if candidate["first_receipt_day"] != stored["first_receipt_day"]:
-                return _quarantine(
-                    store, receipt_day, "history_rewrite", envelope, "an accepted event changed its receipt day"
-                )
     transitions = []
     for event in snapshot["transitions"]:
         stamped = _stamp(event, receipt_day)
@@ -295,9 +289,9 @@ def import_export(store: dict, payload: object, *, capability: str, receipt_day:
     record["revision"] = revision
     record["export_ref"] = snapshot["export_ref"]
     record["last_receipt_day"] = receipt_day
-    record["late_entries"] = 0
     record["canonical_export"] = _canonical_text(envelope)
-    record["late_entries"] = 1 if receipt_day > close_day else record.get("late_entries", 0)
+    if receipt_day > close_day:
+        record["late_entries"] = int(record.get("late_entries", 0)) + 1
     return {"status": "updated", "revision": revision, "first_receipt": record["first_receipt_day"]}
 
 
@@ -465,6 +459,7 @@ def compute_report(store: dict, *, as_of: str) -> dict:
     today = day(as_of)
     months: dict[str, dict] = {}
     open_months: dict[str, int] = {}
+    incomplete_months: dict[str, int] = {}
     retrospective = 0
     expired_excluded = 0
     records = sorted(store["records"].values(), key=lambda record: record["workflow_ref"])
@@ -479,6 +474,7 @@ def compute_report(store: dict, *, as_of: str) -> dict:
         cutoff = add_days(start, contract.REPORTING_WINDOW_DAYS)
         if today > day(record["expires_at"]):
             expired_excluded += 1
+            incomplete_months[start[:7]] = incomplete_months.get(start[:7], 0) + 1
             continue
         if today < day(close_day):
             open_months[start[:7]] = open_months.get(start[:7], 0) + 1
@@ -501,7 +497,7 @@ def compute_report(store: dict, *, as_of: str) -> dict:
                 "frozen_invalidated": 0,
                 "late_entries": 0,
                 "late_events": 0,
-                "flagged": 0,
+                "incomplete": False,
             },
         )
         if close_day > cell["closed_on"]:
@@ -510,7 +506,7 @@ def compute_report(store: dict, *, as_of: str) -> dict:
         cell["outcomes"][state["outcome"]] += 1
         if not state["frozen_valid"]:
             cell["frozen_invalidated"] += 1
-        cell["late_entries"] += int(record["last_receipt_day"] > close_day)
+        cell["late_entries"] += int(record.get("late_entries", 0))
         cell["late_events"] += state["late_events"]
         for stage in contract.STAGES:
             if not state["stages"][stage]["applicable"]:
@@ -535,8 +531,11 @@ def compute_report(store: dict, *, as_of: str) -> dict:
                 and state["acceptance_day"] <= cutoff
             ):
                 cell["attested_success"] += 1
-            if state["delivery_day"] is not None and state["delivery_day"] > cutoff:
-                cell["flagged"] += 1
+
+    for month, expired_count in incomplete_months.items():
+        if month in months:
+            months[month]["incomplete"] = True
+            months[month]["expired_excluded"] = expired_count
 
     for cell in months.values():
         n = cell["n"]
@@ -573,7 +572,6 @@ def compute_report(store: dict, *, as_of: str) -> dict:
         del cell["acceptance_independent"]
         del cell["attested_success"]
         del cell["frozen_invalidated"]
-        del cell["flagged"]
 
     return {
         "report_version": REPORT_VERSION,
@@ -586,16 +584,18 @@ def compute_report(store: dict, *, as_of: str) -> dict:
         "open_cohorts": {month: open_months[month] for month in sorted(open_months)},
         "retrospective_excluded": retrospective,
         "expired_excluded": expired_excluded,
+        "incomplete_cohorts": {
+            month: count for month, count in sorted(incomplete_months.items()) if month not in months
+        },
         "withdrawals": int(store.get("withdrawals", 0)),
         "quarantine": len(store["quarantine"]),
         "ignored": int(store.get("ignored", 0)),
-        "rejected": int(store.get("rejected", 0)),
         "truncated": truncated,
         "limitations": [
             "Opt-in starts are not a representative sample and are not adoption.",
             "Withdrawn workflows leave the denominator; the withheld count is non-linkable.",
             "Participant-reported independent attestation is not centrally verified success.",
-            "Reports after retention expiry are suppressed or explicitly incomplete.",
+            "A cohort with an observed expired record is marked incomplete and withheld from the publishable view.",
             "No public pilot metrics are authorized.",
         ],
     }
@@ -610,6 +610,9 @@ def publishable_report(report: dict) -> dict:
         cell = report["cohorts"][month]
         n = cell["n"]
         outcomes = cell["outcomes"]
+        if cell.get("incomplete"):
+            suppressed_cells.append({"month": month, "reason": "retention_incomplete"})
+            continue
         if n < OUTCOME_FLOOR:
             suppressed_cells.append({"month": month, "reason": "cohort_below_floor"})
             continue

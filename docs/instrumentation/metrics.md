@@ -20,6 +20,10 @@ population adoption, skill quality or causal effectiveness.
 - An event first received after the close day is **late**. It is stored and
   counted, but it cannot change the day-30 state: the rate uses events effective
   by day 30 **and** received by the close day.
+- One value per event kind (and per stage, for stage events) per effective day
+  is allowed. A same-day conflicting value is rejected for correction by both
+  the recorder and the importer; it is never resolved by guessing which random
+  event reference came last.
 
 ## Denominator N
 
@@ -62,19 +66,24 @@ Every rate is reported as a numerator and a denominator. A zero denominator is
 | Independently attested success | delivered **and** frozen criteria valid **and** `independent_attested_pass` by day 30 / N |
 
 "Independently attested success" is **participant-reported independent
-attestation**, not centrally verified success. Evidence stays local: only the
-category, the frozen-criteria flag and the evidence category are exported. A
-scope change during the window invalidates the frozen-criteria claim, so that
-workflow cannot earn frozen-criteria success. A skill completion hint is not a
-quality score and is not part of this dataset.
+attestation**, not centrally verified success. Evidence content stays local:
+only the acceptance status, the frozen-criteria flag and the participant-supplied
+evidence category are exported. The category defaults to `none`; an independent
+attestation requires a non-`none` category, and a self-reported assessment with
+no record exports `none`. A scope change during the window invalidates the
+frozen-criteria claim, so that workflow cannot earn frozen-criteria success. A
+skill completion hint is not a quality score and is not part of this dataset.
 
 ## What every report carries
 
 The restricted report carries the as-of day, schema and capture tier, horizon
 and lag, per-cohort numerator/denominator pairs, not-applicable counts, late
 entry and late event counts, frozen-criteria invalidations, a non-linkable
-withdrawal count, the quarantine count and the standing limitations. There is no
-headline "Aegis success rate".
+withdrawal count, the quarantine count and the standing limitations. A cohort
+with an observed expired record is marked `incomplete` with that month's
+`expired_excluded` count; a month with no retained cohort but an observed expired
+record is listed in `incomplete_cohorts`. There is no headline "Aegis success
+rate".
 
 ## Suppression
 
@@ -96,6 +105,9 @@ anything could be called public:
    recent published cohort by 1–4 in any outcome count is withheld, because a
    small month-over-month shift can isolate one contributor.
 
-These are disclosure controls, not anonymity guarantees. No public pilot metrics
-are authorised; the publishable view always states `public_release: false` and
-is a rehearsal only.
+A cohort marked `incomplete` is withheld from the publishable view with reason
+`retention_incomplete` before the other floors apply. These are disclosure
+controls, not anonymity guarantees. No public pilot metrics are authorised; the
+publishable view always states `public_release: false` and is a rehearsal only.
+SCIF completion is not acceptance evidence and never by itself qualifies a
+workflow as independently attested success.

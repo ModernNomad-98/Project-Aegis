@@ -19,7 +19,7 @@ before it can be stored or imported.
 | `status` | `ongoing`, `delivered`, `failed`, `abandoned`, `unknown` |
 | Stage status | `not_started`, `in_progress`, `complete`, `not_applicable`, `unknown` |
 | Acceptance | `not_assessed`, `self_reported_pass`, `self_reported_fail`, `independent_attested_pass`, `independent_attested_fail` |
-| Evidence | `none`, `local_checklist`, `local_test_record`, `local_review_record` |
+| Evidence | `none`, `local_checklist`, `local_test_record`, `local_review_record` (supplied by the participant; default `none`) |
 | Event kind | `status`, `stage`, `acceptance`, `scope_change`, `observation` |
 
 Keys that could smuggle content or identity — `prompt`, `output`, `code`,
@@ -57,12 +57,24 @@ Default off. Before a workflow is opted in, the participant is told:
 - how to disable capture, delete local history and withdraw imported data;
 - that already published irreversible aggregates cannot be retracted.
 
+The acceptance evidence category is the participant's own local category. Only
+that enum is exported; it is not a content hash, a review transcript or proof
+that a reviewer was independent. Independent attestation requires a non-`none`
+category, and a self-reported assessment with no local record exports `none`
+rather than claiming a record that does not exist.
+
 New recipients, purposes or fields require fresh consent and, for a schema
 change, a new dataset version with migration tests and a comparability note.
 
 ## Withdrawal and deletion
 
-- Disabling capture stops recording immediately and removes unsent exports.
+- Disabling capture stops recording immediately and removes unsent exports; it
+  does not delete retained history.
+- Local retained history is deleted by the participant with
+  `local_report.py delete-local --workflow-ref W --confirm` (or `--all
+  --confirm`). It is explicit, local only and irreversible, and removes the
+  workflow's history and opt-in from the local store. The store file remains if
+  other workflows still use it.
 - A participant who has the admission capability can ask the steward to delete
   the linked raw data. Withdrawal removes the admission, the raw snapshots and
   the deletion verifier; nothing that links back to the workflow or the
@@ -91,12 +103,15 @@ change, a new dataset version with migration tests and a comparability note.
 - No raw backups. Adding backups would require a bounded expiry and
   delete-on-restore approval before collection.
 
-Reports produced after a record's retention expiry are suppressed or explicitly
-marked incomplete; retention is never silently extended.
+When an expired record is still present at report time, its month is marked
+`incomplete` and the publishable rehearsal view withholds that cohort; after the
+record is deleted, only the global exclusion count remains. Retention is never
+silently extended.
 
 ## Limits that cannot be fixed by the contract
 
 Opt-in selection, invisible local starts, self-report truthfulness, deliberately
 fabricated new workflows, withdrawal-induced denominator change, transport
 metadata and sparse-cell differencing all remain limits. They are disclosed, not
-eliminated.
+eliminated. SCIF completion is not acceptance evidence and does not by itself
+qualify a workflow as independently attested success.
