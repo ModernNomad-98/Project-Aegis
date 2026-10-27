@@ -81,7 +81,9 @@ confidently building in the wrong place or against stale context.
    location is verified and no blocking unknowns remain; otherwise ask.
 
 
-## Git Identity Gate (before the first commit)
+## Git Identity Gate (advisory guidance only; not enforced today)
+
+**Status (advisory guidance only; not enforced today):** This section is ADVISORY GUIDANCE ONLY. This repository does NOT enforce the identity gate. The pre-existing hook example below is retained unchanged for repository-test compatibility and is OPTIONAL illustrative text; it must not be read as an active policy, as enforcement, as verified identity, or as an unbypassable control. The attempted explicit-source enforcement implementation was withdrawn after independent review; implementation work is queued as backlog item **DS-R1b**. Do not treat this section as a normative requirement or a security boundary. No complete-enforcement, verified-identity, readiness or CI-green claim is made.
 
 Effective-identity policy (single source of truth): the identity reported by
 `git var GIT_AUTHOR_IDENT` / `git var GIT_COMMITTER_IDENT` is authoritative. A valid

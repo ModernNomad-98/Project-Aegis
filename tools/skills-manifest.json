@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "a568f61a12578630f19801942bf97035b0487177",
+  "source_revision": "bb6b25f900738902a280c889567062885137110b",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -86,7 +86,7 @@
     {
       "name": "agent-startup-context-gate",
       "path": ".claude/skills/agent-startup-context-gate/SKILL.md",
-      "sha256": "ffff7d5617d025c2e2f9cc589a3efd6832049b39fd1bb66e6398066b9bdfaa19"
+      "sha256": "cdf491c15b0a28c859c69db7716d4008b572635f99ab32f3b426f4dee9e73c97"
     },
     {
       "name": "agent-tool-safety-guard",

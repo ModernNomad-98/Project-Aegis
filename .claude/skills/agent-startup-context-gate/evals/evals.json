@@ -25,7 +25,7 @@
         "assertions": [
           "Runs git config user.name and git config --get user.email to set and verify the agent's own identity before the first commit.",
           "Compares the configured identity with the recorded owner identity and never copies it.",
-          "Installs or executes the pre-commit hook so a non-owner identity is required."
+          "Explains the documented best-effort guidance for a non-owner identity; does not claim this repository enforces it today."
         ]
       }
     },
@@ -53,7 +53,7 @@
           "STOPS before commit when configured identity equals owner identity.",
           "Reports the mismatch and asks the human to fix the identity.",
           "Does not commit as owner.",
-          "Includes the pre-commit hook check usable as .git/hooks/pre-commit."
+          "Explains that a hook, if used, is optional guidance; this repository does not enforce an identity hook today."
         ]
       }
     },
@@ -84,15 +84,16 @@
     {
       "id": "positive-effective-identity-hook",
       "type": "should_trigger",
-      "prompt": "Before committing, you have the agent identity configured and a local pre-commit hook. Validate the effective Git author AND committer, including environment overrides and a --author command override, then inspect the actual resulting commit identity.",
+      "prompt": "Start work in a repository and, before committing, explain the repository's advisory identity guidance: what a correct secure implementation would need to do, that this repository does not enforce it today, and that it is not a security boundary.",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Reads git var GIT_AUTHOR_IDENT and git var GIT_COMMITTER_IDENT, not only user.name/user.email.",
-          "Inspects the actual resulting commit as the final identity oracle.",
-          "Rejects missing effective identity and effective owner identity in either author or committer position, including GIT_AUTHOR_*/GIT_COMMITTER_* environment overrides.",
-          "Exercises a git commit --author override and records the resulting identity; does not claim the hook catches every command-level override.",
-          "States that git commit --no-verify can bypass a local pre-commit hook; no global hook, host setting, remote identity service or unbypassable guarantee is introduced."
+          "States clearly that the identity policy is guidance only and is NOT enforced by this repository today; earlier behavior attempts were withdrawn and implementation is queued as DS-R1b.",
+          "States it is not a security boundary or verified identity gate; local hooks can be bypassed with git commit --no-verify; no complete-enforcement/unbypassable claim.",
+          "Describes the design a correct implementation must use: effective identity from git var GIT_AUTHOR_IDENT/GIT_COMMITTER_IDENT with a separately recorded owner, full same-scope config user.name+user.email whose pair matches one effective role, full caller author+committer environment (both fields) with clean fallbacks, a single differing caller env override, or a field-specific caller author or committer override.",
+          "Describes required hardening: key-exact config reads, duplicate-key rejection, raw single-line/control validation, clean fallbacks clearing all author and committer identity env vars, same-scope and same-role-effective pairing, per-field justification.",
+          "Discloses known limits: inherited-global-only not accepted; same-value caller env inherited vs same-value config restatement exception; mixed config+one-field-env can be rejected; --show-scope/version dependencies; hook bypass; git var does not cover command-level --author and a future implementation must verify the final commit identity or parse/reject --author (DS-R1b).",
+          "Makes no enforcement, verified-identity, readiness or CI-green claim."
         ]
       }
     },
@@ -108,6 +109,22 @@
           "Cleans only this run's unique mktemp fixture directory under a literal prefix, prints the exact rm -rf command and target paths, and rejects symlinked bases.",
           "Resolves core.hooksPath relative/tilde values first and uses git rev-parse --git-path only when core.hooksPath is unset; hook presence is not claimed as authenticity.",
           "States Linux required, macOS local/UNRUN, Windows SKIP/UNRUN and never claims PASS or readiness from SKIP/UNRUN or an unsupported shell."
+        ]
+      }
+    },
+    {
+      "id": "edge-inherited-global-only-identity",
+      "type": "should_trigger",
+      "prompt": "A repository has only a global Git user.name/user.email (no local user config, no caller identity environment, no GIT_CONFIG_COUNT or -c). Before committing, decide whether that inherited identity satisfies the agent identity gate.",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects inherited-global-only identity even when it is a non-owner, because no explicit identity source exists.",
+          "Does not treat configured global values as an agent identity or a pass.",
+          "Records the explicit-source requirement as advisory guidance: full same-scope config pair, full caller author+committer environment (both fields) with clean fallbacks, single differing caller env override, or field-specific author/committer override; a caller committer-only environment is not a standalone full source.",
+          "States the effective identity from git var remains authoritative and an effective owner is rejected.",
+          "States this is guidance only and is not enforced by this repository today.",
+          "Makes clear this is advisory guidance only and is not enforced by this repository today."
         ]
       }
     }
