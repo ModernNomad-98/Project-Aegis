@@ -4993,7 +4993,180 @@ def closure_main(closure_id: str) -> int:
     return 0
 
 
+def test_ds7cfixb_coverage_detector_matrix():
+    """DS-7c-fix-b: derived-total parser matrix, nested exact-int, trim, priority."""
+    # C10: preserve original UTF-8 source exactly (no U+FFFD/mojibake).
+    _source_text = Path(__file__).resolve().read_bytes().decode("utf-8")
+    assert chr(0xFFFD) not in _source_text, "test source has U+FFFD"
+    assert (chr(0xE2) + chr(0x20AC) + chr(0x201D)) not in _source_text
+    assert (chr(0xC2) + chr(0xA7)) not in _source_text
+    assert _source_text.count(chr(0x2014)) >= 12
+    assert _source_text.count(chr(0xA7)) >= 1
+
+    synthetic_entries = [
+        {"id": 1, "area": "01", "status": "SHIPPED",
+         "evidence_grade": "explicit-id", "priority": "P0",
+         "covering_skills": ["skill-a"]},
+        {"id": 2, "area": "01", "status": "GAP",
+         "evidence_grade": "none", "priority": "P1",
+         "covering_skills": []},
+    ]
+    computed = validator._coverage_compute_totals(
+        synthetic_entries, {"skill-a", "skill-b"})
+    later_positive = (
+        "300 - rows", "300 - entries", "300 - skills", "300 - row",
+        "coverage total set to 300", "coverage total is set to 300",
+        "coverage totals set to 300",
+        "coverage: updated 2 skills; now has 254 skills",
+        "coverage: updated 2 entries; now has 300 entries",
+        "coverage: updated 2 entries, now has 300 entries",
+        "snapshot has 300 entries", "coverage totals: 2026",
+        "snapshot totals: 2026", "85-of-254", "85 of 254",
+        "rows: 300", "snapshot: 300", "snapshot rows: 2024",
+    )
+    for phrase in later_positive:
+        assert validator._coverage_later_total_count_errors(phrase), (
+            "DS-7c-fix-b later detector missed positive " + repr(phrase))
+    later_negative = (
+        "coverage: updated 2 skills", "coverage changed 2 skills",
+        "coverage: updated 2 entries", "D121 coverage: updated 2 entries",
+        "totals updated in D121", "snapshot tests cover 2 skills",
+        "snapshot-2026", "2026-10-26", "D121",
+        "https://example.invalid/coverage", "9",
+        "coverage roadmap: 2 skills", "there are 2 tools",
+    )
+    for phrase in later_negative:
+        assert not validator._coverage_later_total_count_errors(phrase), (
+            "DS-7c-fix-b later detector false positive " + repr(phrase))
+    for phrase in ("300 - rows", "300 row", "entry: 300", "entry-300",
+                   "85-of-254", "totals 300", "300 entries",
+                   "updated 2 entries"):
+        assert validator._coverage_count_copy_errors(phrase, computed), (
+            "DS-7c-fix-b bound detector missed " + repr(phrase))
+    # Recursive exact-int validation for every documented nested map.
+    nested_keys = ("by_area", "by_status", "by_grade", "by_priority",
+                   "gap_by_priority")
+    for key in nested_keys:
+        value = computed[key]
+        if not value:
+            continue
+        sub = sorted(value)[0]
+        for bad in (True, 1.0, "1"):
+            totals = json.loads(json.dumps(computed))
+            totals[key][sub] = bad
+            assert validator._coverage_validated_totals(totals, computed) is None, (
+                "exact-int nested map accepted invalid leaf", key, bad)
+            assert any("exact integer" in error for error in
+                       validator._coverage_totals_shape_errors(totals, computed)), (
+                "nested map shape validator missed", key, bad)
+    totals = json.loads(json.dumps(computed))
+    totals["by_area"]["__extra__"] = 1
+    assert validator._coverage_validated_totals(totals, computed) is None
+    totals = json.loads(json.dumps(computed))
+    del totals["by_area"][sorted(totals["by_area"])[0]]
+    assert validator._coverage_validated_totals(totals, computed) is None
+    # Production-computed totals validate against the real schema, and a
+    # nonempty documented nested map rejects a bool leaf.
+    assert validator._coverage_totals_shape_errors(computed, computed) == []
+    nonempty_nested = next((key for key in nested_keys if computed[key]), None)
+    assert nonempty_nested is not None, "live totals need one nonempty nested map"
+    bad_real = json.loads(json.dumps(computed))
+    sub = sorted(bad_real[nonempty_nested])[0]
+    bad_real[nonempty_nested][sub] = True
+    assert validator._coverage_validated_totals(bad_real, computed) is None
+    assert any("exact integer" in error for error in
+               validator._coverage_totals_shape_errors(bad_real, computed))
+    # C3: issue refs, specific snapshot guard, broad policy surfaces/case.
+    assert not validator._coverage_later_total_count_errors(
+        "PR #123 entries are listed")
+    assert validator._coverage_later_total_count_errors(
+        "coverage updated to 2 entries while snapshot totals are unchanged")
+    assert validator._coverage_later_total_count_errors(
+        "coverage snapshot updated to 254 entries")
+    assert any("ROWS" in surface for surface in
+               validator._coverage_later_total_count_errors("300 ROWS"))
+    # The later policy is deliberately broad; these are documented positives,
+    # not coverage-context-gated findings.
+    assert validator._coverage_later_total_count_errors(
+        "The guide has 254 entries")
+    assert validator._coverage_later_total_count_errors("85 of 254")
+    # Newline/code/link masks must not pair counts across lines or expose labels.
+    assert not validator._coverage_later_total_count_errors("entries\n300")
+    assert not validator._coverage_later_total_count_errors(
+        "[300 entries](https://example.invalid/x)")
+    assert validator._coverage_later_total_count_errors(
+        "coverage updated to 300 entries")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage updated by 2 entries, coverage snapshot remains unchanged")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage updated by 2 entries")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage added by 2 skills")
+    assert validator._coverage_later_total_count_errors(
+        "coverage snapshot: updated 254 entries")
+    assert not validator._coverage_count_copy_errors(
+        chr(96) + "300 entries" + chr(96), computed)
+    assert validator._coverage_later_total_count_errors(
+        "coverage snapshot updated to 254 entries")
+    # C8: total-key update claims must not be masked; mixed while delta is
+    # legitimate; snapshot tests/ISO timestamps are opaque.
+    assert validator._coverage_later_total_count_errors(
+        "coverage totals: updated 2 entries")
+    assert validator._coverage_later_total_count_errors(
+        "totals: updated 2 entries")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage updated by 2 entries while the coverage snapshot remains unchanged")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage snapshot tests cover 300 entries")
+    assert not validator._coverage_later_total_count_errors(
+        "snapshot 2026-10-26T00:00:00Z")
+    assert not validator._coverage_later_total_count_errors(
+        "snapshot 2026-10-26T00:00:00+00:00")
+    assert not validator._coverage_later_total_count_errors(
+        "snapshot 2026-10-26T00:00:00-07:00")
+    for bad in (None, 123, ["300 entries"]):
+        try:
+            validator._coverage_later_total_count_errors(bad)
+        except TypeError:
+            pass
+        else:
+            raise AssertionError("non-string detector input must fail closed")
+    # Mixed/odd raw keys must not raise in the shape sorter and must be named.
+    mixed_errors = validator._coverage_totals_shape_errors({1: 2}, computed)
+    assert any("unexpected key" in error for error in mixed_errors), mixed_errors
+    outer_errors = validator._coverage_totals_shape_errors(
+        {**computed, 1: 2}, computed)
+    assert any("unexpected key" in error for error in outer_errors), outer_errors
+    # Manifest fail-closed trim guard for totals and shipped analysis.
+    for bad_manifest in ({" skill "}, {""}, {"ok", " skill "}):
+        try:
+            validator._coverage_compute_totals([], bad_manifest)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("untrimmed/empty manifest accepted by totals")
+        try:
+            validator._coverage_shipped_analysis("no phrase", bad_manifest)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("untrimmed/empty manifest accepted by shipped analysis")
+    validator._coverage_compute_totals([], {"ok"})
+    # Mixed priority error + malformed id: both entries report once.
+    def mutate(payload):
+        payload["entries"][0]["priority"] = "P3"
+        payload["entries"][0]["id"] = "bad-id"
+    with tempfile.TemporaryDirectory() as tmp:
+        with mutated_coverage(Path(tmp), mutate) as rep:
+            priority_errors = [error for error in rep.errors
+                               if "priority" in error and "P3" in error]
+            id_errors = [error for error in rep.errors if "non-integer id" in error]
+            assert len(priority_errors) == 1, rep.errors
+            assert len(id_errors) == 1, rep.errors
+            assert any("independent snapshot" in error for error in rep.errors), rep.errors
+
 TESTS = [
+    test_ds7cfixb_coverage_detector_matrix,
     test_strict_yaml_parse,
     test_description_block_scalar,
     test_manual_only_sentinel_bidirectional,
