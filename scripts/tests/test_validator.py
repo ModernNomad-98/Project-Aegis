@@ -177,14 +177,42 @@ PINNED_ROW_TOTALS_ORACLE = {
     "review_pending": 114,
 }
 
-COVERAGE_ROW_IDS = {
-    entry["name"].lower(): entry["id"]
-    for entry in json.loads(
-        validator.COVERAGE_MAP.read_text(encoding="utf-8"))["entries"]
-}
-assert len(COVERAGE_ROW_IDS) == len(json.loads(
-    validator.COVERAGE_MAP.read_text(encoding="utf-8"))["entries"]), (
-    "COVERAGE_ROW_IDS requires unique row names")
+def _coverage_row_ids_from_payload(payload, source="coverage map"):
+    """Return the canonical name-keyed row-id mapping, failing loudly on drift.
+
+    Keys are stripped then casefolded (the historical mapping lowercased the
+    name). Duplicate canonical names, malformed entries and non-exact-int ids
+    raise ValueError with the offending index/name instead of relying on an
+    import-time assert (which vanishes under -O). This is a test oracle only;
+    it does not change the production coverage-map schema.
+    """
+    entries = payload.get("entries") if isinstance(payload, dict) else None
+    if not isinstance(entries, list):
+        raise ValueError(source + ": entries must be a list")
+    mapping = {}
+    for index, entry in enumerate(entries):
+        if not isinstance(entry, dict):
+            raise ValueError(source + ": entry[" + str(index) + "] must be an object")
+        name = entry.get("name")
+        row_id = entry.get("id")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError(source + ": entry[" + str(index)
+                             + "] needs a nonempty string name")
+        if not isinstance(row_id, int) or isinstance(row_id, bool):
+            raise ValueError(source + ": entry[" + str(index)
+                             + "] id must be an exact integer")
+        key = name.strip().casefold()
+        if key in mapping:
+            raise ValueError(source + ": duplicate canonical row name "
+                             + repr(key)
+                             + " at entries[" + str(index) + "]")
+        mapping[key] = row_id
+    return mapping
+
+
+COVERAGE_ROW_IDS = _coverage_row_ids_from_payload(
+    json.loads(validator.COVERAGE_MAP.read_text(encoding="utf-8")),
+    source="coverage map")
 
 COVERAGE_MD = REPO_ROOT / "docs" / "skills" / "coverage-map.md"
 
@@ -5165,8 +5193,72 @@ def test_ds7cfixb_coverage_detector_matrix():
             assert len(id_errors) == 1, rep.errors
             assert any("independent snapshot" in error for error in rep.errors), rep.errors
 
+def test_ds7cc_priority_key_totals():
+    """DS-7c-c: priority-key derived totals are count copies, not prose."""
+    later_positive = (
+        "P0: 0", "P0: 0 and P1: 0", "P0 gap 0", "P0: 0; P1: 2",
+        "P0=0", "P0 0", "P0 count 0", "P1: 2, P2: 0",
+    )
+    for phrase in later_positive:
+        found = validator._coverage_later_total_count_errors(phrase)
+        assert found, "DS-7c-c later detector missed priority total " + repr(phrase)
+        assert any("P" in surface for surface in found), (phrase, found)
+    for phrase in ("P0: 0", "P0 gap 0", "P0=0", "P0 0", "P0 count 0"):
+        assert validator._coverage_count_copy_errors(phrase, {}), (
+            "DS-7c-c bound detector missed priority total " + repr(phrase))
+    later_negative = (
+        "priority enum: P0, P1, P2", "P0", "P0 items are critical",
+        "P0 is the highest priority", "P1 label", "P2 is a priority key",
+        "priority prose: P0/P1/P2",
+    )
+    for phrase in later_negative:
+        assert not validator._coverage_later_total_count_errors(phrase), (
+            "DS-7c-c priority detector false positive " + repr(phrase))
+
+
+def test_ds7cc_coverage_row_ids_hardening():
+    """DS-7c-c: row-id mapping is unique, complete and fails loudly on drift."""
+    payload = load_coverage()
+    expected = {}
+    for entry in payload["entries"]:
+        expected[entry["name"].strip().casefold()] = entry["id"]
+    assert COVERAGE_ROW_IDS == expected
+    assert len(COVERAGE_ROW_IDS) == len(payload["entries"])
+    assert set(COVERAGE_ROW_IDS.values()) == {
+        entry["id"] for entry in payload["entries"]}
+    assert all(isinstance(value, int) and not isinstance(value, bool)
+               for value in COVERAGE_ROW_IDS.values())
+    duplicate = load_coverage()
+    duplicate["entries"][1]["name"] = duplicate["entries"][0]["name"].upper()
+    try:
+        _coverage_row_ids_from_payload(duplicate)
+    except ValueError as error:
+        assert "duplicate canonical row name" in str(error), error
+    else:
+        raise AssertionError("duplicate row names must fail loudly")
+    spaced = load_coverage()
+    original_name = spaced["entries"][0]["name"]
+    spaced["entries"][0]["name"] = "  " + original_name + "  "
+    spaced_mapping = _coverage_row_ids_from_payload(spaced)
+    assert spaced_mapping[original_name.strip().casefold()] == (
+        spaced["entries"][0]["id"])
+    for bad_payload, label in (
+            ({"entries": "not-a-list"}, "entries list"),
+            ({"entries": [{"name": "x"}]}, "missing id"),
+            ({"entries": [{"id": 1}]}, "missing name"),
+            ({"entries": [{"name": "x", "id": True}]}, "bool id")):
+        try:
+            _coverage_row_ids_from_payload(bad_payload)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("malformed row-id payload accepted: " + label)
+
+
 TESTS = [
     test_ds7cfixb_coverage_detector_matrix,
+    test_ds7cc_priority_key_totals,
+    test_ds7cc_coverage_row_ids_hardening,
     test_strict_yaml_parse,
     test_description_block_scalar,
     test_manual_only_sentinel_bidirectional,
