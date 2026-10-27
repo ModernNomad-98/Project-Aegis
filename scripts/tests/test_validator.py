@@ -4760,7 +4760,7 @@ def test_ds7cfixb_coverage_detector_matrix():
     # C3: issue refs, specific snapshot guard, broad policy surfaces/case.
     assert not validator._coverage_later_total_count_errors(
         "PR #123 entries are listed")
-    assert not validator._coverage_later_total_count_errors(
+    assert validator._coverage_later_total_count_errors(
         "coverage updated to 2 entries while snapshot totals are unchanged")
     assert validator._coverage_later_total_count_errors(
         "coverage snapshot updated to 254 entries")
@@ -4775,16 +4775,26 @@ def test_ds7cfixb_coverage_detector_matrix():
     assert not validator._coverage_later_total_count_errors("entries\n300")
     assert not validator._coverage_later_total_count_errors(
         "[300 entries](https://example.invalid/x)")
-    assert not validator._coverage_later_total_count_errors(
+    assert validator._coverage_later_total_count_errors(
         "coverage updated to 300 entries")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage updated by 2 entries, coverage snapshot remains unchanged")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage updated by 2 entries")
     assert not validator._coverage_later_total_count_errors(
         "coverage added by 2 skills")
     assert validator._coverage_later_total_count_errors(
+        "coverage snapshot: updated 254 entries")
+    assert not validator._coverage_count_copy_errors(
+        chr(96) + "300 entries" + chr(96), computed)
+    assert validator._coverage_later_total_count_errors(
         "coverage snapshot updated to 254 entries")
-    # Mixed/odd raw keys must not raise in the shape sorter.
-    assert validator._coverage_totals_shape_errors({1: 2}, computed)
-    assert validator._coverage_totals_shape_errors(
+    # Mixed/odd raw keys must not raise in the shape sorter and must be named.
+    mixed_errors = validator._coverage_totals_shape_errors({1: 2}, computed)
+    assert any("unexpected key" in error for error in mixed_errors), mixed_errors
+    outer_errors = validator._coverage_totals_shape_errors(
         {**computed, 1: 2}, computed)
+    assert any("unexpected key" in error for error in outer_errors), outer_errors
     # Manifest fail-closed trim guard for totals and shipped analysis.
     for bad_manifest in ({" skill "}, {""}, {"ok", " skill "}):
         try:
@@ -4806,7 +4816,8 @@ def test_ds7cfixb_coverage_detector_matrix():
         payload["entries"][1]["id"] = "bad-id"
     with tempfile.TemporaryDirectory() as tmp:
         with mutated_coverage(Path(tmp), mutate) as rep:
-            priority_errors = [error for error in rep.errors if "priority" in error]
+            priority_errors = [error for error in rep.errors
+                               if "priority" in error and "P3" in error]
             id_errors = [error for error in rep.errors if "non-integer id" in error]
             assert len(priority_errors) == 1, rep.errors
             assert len(id_errors) == 1, rep.errors

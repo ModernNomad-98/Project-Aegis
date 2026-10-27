@@ -2615,9 +2615,10 @@ COVERAGE_UPDATE_EVENT_RE = re.compile(
     r"renamed|moved|progressed)\s+[0-9]+\s+"
     + COVERAGE_DERIVED_INTENT + r"\b")
 COVERAGE_UPDATE_CONNECTOR_RE = re.compile(
-    r"(?i)\bcoverage\s*(?::)?\s*(?:updated|added|removed|changed|"
-    r"incremented|decremented|edited|renamed|moved|progressed)"
-    r"(?:\s+(?:to|by|with))?\s+[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b")
+    r"(?i)\bcoverage(?!\s+snapshot\b)\s*(?::)?\s*"
+    r"(?:updated|added|removed|changed|incremented|decremented|edited|"
+    r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
+    + COVERAGE_DERIVED_INTENT + r"\b")
 _OPAQUE_CODE = "[" + chr(96) + "][^" + chr(96) + "\n]*[" + chr(96) + "]"
 COVERAGE_ALLOWED_PROSE_RE = (
     re.compile(r"(?i)\bsnapshot\s+tests?\s+cover\s+[0-9]+\s+"
@@ -2653,18 +2654,14 @@ def _coverage_protect_opaque(text: str) -> str:
 
 
 def _coverage_mask_allowed_update(text: str) -> str:
-    """Mask the fixed legitimate update-event prose allowlist.
-
-    Direct update-event counts and coverage-context connector forms are
-    masked. The guard is the SPECIFIC forbidden coverage-snapshot form, not
-    any clause containing the word snapshot.
-    """
+    """Mask only the fixed legitimate non-total update prose allowlist."""
+    if re.search(r"\bcoverage\s+snapshot\b", text, re.IGNORECASE):
+        return text
     masked = text
     for pattern in COVERAGE_ALLOWED_PROSE_RE:
         masked = pattern.sub(" ", masked)
     masked = COVERAGE_UPDATE_EVENT_RE.sub(" ", masked)
-    if not re.search(r"\bcoverage\s+snapshot\b", masked, re.IGNORECASE):
-        masked = COVERAGE_UPDATE_CONNECTOR_RE.sub(" ", masked)
+    masked = COVERAGE_UPDATE_CONNECTOR_RE.sub(" ", masked)
     return masked
 
 
@@ -2685,7 +2682,7 @@ def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
     protected = _coverage_protect_opaque(normalized)
     mentions = []
     seen = set()
-    for raw_clause in re.split(r"[;\n]", protected):
+    for raw_clause in re.split(r"[;,\n]", protected):
         clause = re.sub(r"\s+", " ", raw_clause)
         parsed = _coverage_mask_allowed_update(clause) if allowed_update else clause
         candidates = []
@@ -3035,7 +3032,11 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
             priority_key = (index, priority_error)
             if priority_key not in reported_priority_errors:
                 reported_priority_errors.add(priority_key)
-                rep.error("[" + ctx + "] entry[" + str(index) + "]: "
+                raw_id = entry.get("id")
+                id_hint = (" " + str(raw_id)
+                           if _coverage_is_exact_int(raw_id)
+                           else "[" + str(index) + "]")
+                rep.error("[" + ctx + "] entry" + id_hint + ": "
                           + priority_error)
         row_id = entry.get("id")
         if not _coverage_is_exact_int(row_id):
