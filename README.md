@@ -652,6 +652,22 @@ per skill), verifiable (every hash resolves in the manifest), and expected
 to record its skills). Compliance remains yours — the record is an aid to
 verifiability, never a replacement for your own accountability.
 
+#### Optional workflow-outcomes reporting (offline, off by default)
+
+An optional, offline-only reporter can record whether a consenting workflow
+reaches delivery, without collecting prompts, output, code, project or
+repository names, paths, content hashes or identities. It is off by default,
+opts in one workflow at a time, and writes an export only to local disk after an
+exact byte preview is confirmed. Rates use prospectively acknowledged starts as
+the denominator, never clone, opt-in or closeout counts, and no public pilot
+figures are authorised.
+
+The contract, privacy rules and metric definitions are in
+[`docs/instrumentation/`](docs/instrumentation/README.md); the tool's usage is in
+[`tools/aegis_usage/README.md`](tools/aegis_usage/README.md). This is
+documentation and an offline implementation only: it is not an authorisation to
+collect real data, host a service or run a pilot.
+
 #### Using Aegis with Codex CLI and other Agent Skills tools
 
 Aegis skills use the open Agent Skills format — one `SKILL.md` with frontmatter (a short settings block written in YAML, a plain-text data format) per

@@ -1,0 +1,532 @@
+{
+  "fixture_version": 1,
+  "synthetic_only": true,
+  "note": "Hand-calculated synthetic cohort. No real workflow, person or project data. Every value is invented for offline tests.",
+  "report_as_of": "2026-04-01",
+  "expectations": {
+    "2026-01": {
+      "n": 6,
+      "outcomes": {
+        "delivered": 1,
+        "failed": 1,
+        "abandoned": 1,
+        "ongoing": 2,
+        "unknown": 1
+      },
+      "delivery_30d": [
+        1,
+        6
+      ],
+      "follow_up_coverage": [
+        5,
+        6
+      ],
+      "unknown_share": [
+        1,
+        6
+      ],
+      "ongoing_share": [
+        2,
+        6
+      ],
+      "abandoned_share": [
+        1,
+        6
+      ],
+      "failed_share": [
+        1,
+        6
+      ],
+      "stage_reach": {
+        "discover": [
+          2,
+          6,
+          0
+        ],
+        "plan": [
+          2,
+          6,
+          0
+        ],
+        "build": [
+          2,
+          6,
+          0
+        ],
+        "validate": [
+          1,
+          5,
+          1
+        ],
+        "deliver": [
+          1,
+          6,
+          0
+        ]
+      },
+      "assessed_acceptance_self_report": [
+        0,
+        0
+      ],
+      "assessed_acceptance_independent": [
+        1,
+        1
+      ],
+      "independently_attested_success": [
+        1,
+        6
+      ],
+      "late_entries": 0,
+      "late_events": 0,
+      "frozen_criteria_invalidated": 0,
+      "closed_on": "2026-02-11"
+    },
+    "2026-02": {
+      "n": 1,
+      "outcomes": {
+        "delivered": 1,
+        "failed": 0,
+        "abandoned": 0,
+        "ongoing": 0,
+        "unknown": 0
+      },
+      "delivery_30d": [
+        1,
+        1
+      ],
+      "follow_up_coverage": [
+        1,
+        1
+      ],
+      "unknown_share": [
+        0,
+        1
+      ],
+      "ongoing_share": [
+        0,
+        1
+      ],
+      "abandoned_share": [
+        0,
+        1
+      ],
+      "failed_share": [
+        0,
+        1
+      ],
+      "stage_reach": {
+        "discover": [
+          0,
+          1,
+          0
+        ],
+        "plan": [
+          0,
+          1,
+          0
+        ],
+        "build": [
+          1,
+          1,
+          0
+        ],
+        "validate": [
+          0,
+          1,
+          0
+        ],
+        "deliver": [
+          0,
+          1,
+          0
+        ]
+      },
+      "assessed_acceptance_self_report": [
+        0,
+        0
+      ],
+      "assessed_acceptance_independent": [
+        1,
+        1
+      ],
+      "independently_attested_success": [
+        0,
+        1
+      ],
+      "late_entries": 0,
+      "late_events": 0,
+      "frozen_criteria_invalidated": 1,
+      "closed_on": "2026-03-14"
+    }
+  },
+  "publishable": {
+    "published_cohorts": 0,
+    "suppressed": [
+      {
+        "month": "2026-01",
+        "reason": "cohort_below_floor"
+      },
+      {
+        "month": "2026-02",
+        "reason": "cohort_below_floor"
+      }
+    ]
+  },
+  "workflows": [
+    {
+      "key": "delivered-full",
+      "workflow_ref": "wf-00000000000000000000000000000001",
+      "criteria_contract_ref": "crit-00000000000000000000000000000001",
+      "start_day": "2026-01-05",
+      "applicable_stages": [
+        "discover",
+        "plan",
+        "build",
+        "validate",
+        "deliver"
+      ],
+      "criteria_frozen_before_work": true,
+      "issued_day": "2026-01-06",
+      "exports": [
+        {
+          "receipt_day": "2026-01-07",
+          "events": [
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-01-05",
+              "stage": null
+            },
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-01-06",
+              "stage": "discover"
+            }
+          ]
+        },
+        {
+          "receipt_day": "2026-01-22",
+          "events": [
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-01-09",
+              "stage": "plan"
+            },
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-01-10",
+              "stage": "build"
+            },
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-01-12",
+              "stage": "validate"
+            },
+            {
+              "kind": "status",
+              "value": "delivered",
+              "effective_day": "2026-01-12",
+              "stage": null
+            },
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-01-15",
+              "stage": "deliver"
+            },
+            {
+              "kind": "acceptance",
+              "value": "independent_attested_pass",
+              "effective_day": "2026-01-20",
+              "stage": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "failed-early",
+      "workflow_ref": "wf-00000000000000000000000000000002",
+      "criteria_contract_ref": "crit-00000000000000000000000000000002",
+      "start_day": "2026-01-05",
+      "applicable_stages": [
+        "discover",
+        "plan",
+        "build",
+        "validate",
+        "deliver"
+      ],
+      "criteria_frozen_before_work": true,
+      "issued_day": "2026-01-06",
+      "exports": [
+        {
+          "receipt_day": "2026-01-07",
+          "events": [
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-01-05",
+              "stage": null
+            },
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-01-06",
+              "stage": "discover"
+            }
+          ]
+        },
+        {
+          "receipt_day": "2026-01-09",
+          "events": [
+            {
+              "kind": "status",
+              "value": "failed",
+              "effective_day": "2026-01-09",
+              "stage": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "abandoned-day25",
+      "workflow_ref": "wf-00000000000000000000000000000003",
+      "criteria_contract_ref": "crit-00000000000000000000000000000003",
+      "start_day": "2026-01-05",
+      "applicable_stages": [
+        "discover",
+        "plan",
+        "build",
+        "validate",
+        "deliver"
+      ],
+      "criteria_frozen_before_work": true,
+      "issued_day": "2026-01-06",
+      "exports": [
+        {
+          "receipt_day": "2026-01-06",
+          "events": [
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-01-05",
+              "stage": null
+            }
+          ]
+        },
+        {
+          "receipt_day": "2026-01-26",
+          "events": [
+            {
+              "kind": "status",
+              "value": "abandoned",
+              "effective_day": "2026-01-25",
+              "stage": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "ongoing-at-cutoff",
+      "workflow_ref": "wf-00000000000000000000000000000004",
+      "criteria_contract_ref": "crit-00000000000000000000000000000004",
+      "start_day": "2026-01-05",
+      "applicable_stages": [
+        "discover",
+        "plan",
+        "build",
+        "deliver"
+      ],
+      "criteria_frozen_before_work": true,
+      "issued_day": "2026-01-06",
+      "exports": [
+        {
+          "receipt_day": "2026-01-07",
+          "events": [
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-01-05",
+              "stage": null
+            }
+          ]
+        },
+        {
+          "receipt_day": "2026-02-04",
+          "events": [
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-01-09",
+              "stage": "build"
+            },
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-02-04",
+              "stage": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "no-cutoff-observation",
+      "workflow_ref": "wf-00000000000000000000000000000005",
+      "criteria_contract_ref": "crit-00000000000000000000000000000005",
+      "start_day": "2026-01-05",
+      "applicable_stages": [
+        "discover",
+        "plan",
+        "build",
+        "validate",
+        "deliver"
+      ],
+      "criteria_frozen_before_work": true,
+      "issued_day": "2026-01-06",
+      "exports": [
+        {
+          "receipt_day": "2026-01-07",
+          "events": [
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-01-05",
+              "stage": null
+            }
+          ]
+        },
+        {
+          "receipt_day": "2026-01-21",
+          "events": [
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-01-20",
+              "stage": "plan"
+            }
+          ]
+        },
+        {
+          "receipt_day": "2026-02-07",
+          "events": [
+            {
+              "kind": "status",
+              "value": "failed",
+              "effective_day": "2026-02-05",
+              "stage": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "ongoing-then-day31-failure",
+      "workflow_ref": "wf-00000000000000000000000000000007",
+      "criteria_contract_ref": "crit-00000000000000000000000000000007",
+      "start_day": "2026-01-05",
+      "applicable_stages": [
+        "discover",
+        "plan",
+        "build",
+        "validate",
+        "deliver"
+      ],
+      "criteria_frozen_before_work": true,
+      "issued_day": "2026-01-06",
+      "exports": [
+        {
+          "receipt_day": "2026-01-07",
+          "events": [
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-01-05",
+              "stage": null
+            }
+          ]
+        },
+        {
+          "receipt_day": "2026-02-07",
+          "events": [
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-02-04",
+              "stage": null
+            },
+            {
+              "kind": "status",
+              "value": "failed",
+              "effective_day": "2026-02-05",
+              "stage": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "scope-change",
+      "workflow_ref": "wf-00000000000000000000000000000006",
+      "criteria_contract_ref": "crit-00000000000000000000000000000006",
+      "start_day": "2026-02-05",
+      "applicable_stages": [
+        "discover",
+        "plan",
+        "build",
+        "validate",
+        "deliver"
+      ],
+      "criteria_frozen_before_work": true,
+      "issued_day": "2026-02-05",
+      "exports": [
+        {
+          "receipt_day": "2026-02-06",
+          "events": [
+            {
+              "kind": "observation",
+              "value": "ongoing",
+              "effective_day": "2026-02-05",
+              "stage": null
+            }
+          ]
+        },
+        {
+          "receipt_day": "2026-02-11",
+          "events": [
+            {
+              "kind": "stage",
+              "value": "complete",
+              "effective_day": "2026-02-08",
+              "stage": "build"
+            },
+            {
+              "kind": "scope_change",
+              "value": "criteria_changed",
+              "effective_day": "2026-02-10",
+              "stage": null
+            },
+            {
+              "kind": "status",
+              "value": "delivered",
+              "effective_day": "2026-02-10",
+              "stage": null
+            },
+            {
+              "kind": "acceptance",
+              "value": "independent_attested_pass",
+              "effective_day": "2026-02-10",
+              "stage": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
