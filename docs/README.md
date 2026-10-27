@@ -31,6 +31,7 @@ capability-evidence gates recorded in the
 ## Use the skills
 
 - [Project README](../README.md): setup, skill picker, shipped skills and agents.
+- [Consumer starter package](consumer-starter-package.md): the minimum dependency-checked installation for a first product slice — 17 skills, 2 startup files, the owner record and commit identity it requires, its recording-authority and screenshot-policy handoffs, and what it does not prove.
 - [Skills catalog](skills-catalog.md): implemented capabilities and their boundaries.
 - [Engineering discipline](ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md): principles and workflow.
 - [Skill generation standard](skill-generation-standard.md): current authoring contracts.

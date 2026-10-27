@@ -13,12 +13,13 @@ The library does not itself build, deploy or operate an application.
    use the [guided paths](#start-here-pick-your-path) in your **own product
    repository**. To maintain the Aegis library itself, work in this source
    checkout and begin with the [documentation index](docs/README.md).
-2. **Get the skills.** Install Git, then clone this source repository to obtain
-   the files. For product work, [copy your chosen skills into your own
-   repository](#using-the-skills-in-your-own-project) before opening your coding
-   assistant there. Copy the startup files too if you want the Aegis startup
-   routing. The [setup guide](#getting-started) covers Claude Code and
-   other Agent Skills tools.
+2. **Get the skills.** Install Git. There are three installation routes, and
+   they prove different things: the [starter package](docs/consumer-starter-package.md)
+   — a fixed, dependency-checked set of 17 skills and 2 startup files for a
+   first product slice; the documented allow-list copy of the skills you choose;
+   and the full source checkout, which is for maintaining the library and for
+   reading the skills before choosing. [Getting started](#getting-started) walks
+   through each one.
 
    ```bash
    git clone https://github.com/ModernNomad-98/Project-Aegis.git
@@ -278,6 +279,12 @@ cd Project-Aegis
 
 `git clone` copies the library to your machine; `cd` puts you in the folder every option
 below starts from. Later, run `git pull` from the same folder to update to the latest skills.
+
+**Choose your installation route before you start a project.**
+
+- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 39-file set (17 skills, 2 startup files), its dependency closure, the one install procedure, its fail-closed checks, the owner record it requires and the commit identity the startup gate enforces.
+- **Selected skills (any product slice).** Copy only the skills a slice needs with the allow-list block in [Using the skills in your own project](#using-the-skills-in-your-own-project); this is also how you extend the starter package.
+- **Full source checkout (library maintenance).** Keep this clone and work in it; only this route runs the repository's own validator and CI-equivalent checks.
 
 *Host facts below checked 2026-09-26 against the official
 [platforms](https://code.claude.com/docs/en/platforms),
@@ -624,6 +631,8 @@ They do NOT convert it into the Project Aegis source repository — the copied r
 After copying, open your OWN product repository and work there: for a new project, Claude (via `project-orchestrator`) creates `docs/project-state.md` in that current product repo and starts at Stage 0.
 You do NOT need to create a second project folder just because the Aegis files are present.
 The Project Aegis source repository is identified by its source-package landmarks — a `# Project Aegis` `README.md`, `docs/skills-catalog.md`, `scripts/validate-skills.py`, and `artifacts/audits/skill-contract-audit-baseline.json` — not by the copied skills alone.
+
+**Before you install, record the owner and give the agent its own commit identity.** The starter procedure asks for two local records, and they do different jobs. The **owner record** — `git config --local aegis.ownerName "<owner name>"` and `git config --local aegis.ownerEmail "<owner email>"` — names the human every approval in `docs/project-state.md` belongs to, and is never committed. The **commit identity** — `user.name` and `user.email` — signs commits, and the startup gate refuses any commit whose author or committer matches the owner record on either name or email, so the agent's commits must carry a different name and email from the owner's. If either record is missing or colliding, the procedure stops and prints the exact commands; nothing is changed by a stopped attempt.
 
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
 format if you want to write your own.
