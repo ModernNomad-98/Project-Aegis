@@ -4822,8 +4822,11 @@ def test_dsr1_lock_lifecycle():
                 assert unread.returncode != 0 and "INCOMPLETE" in (err or ""), (unread.returncode, out, err)
                 assert lock.exists(), "unreadable token must fail closed and retain the lock"
                 (lock / "token").chmod(0o600)
-                os.kill(pid, signal.SIGKILL)
-                _dsr1_pass("unreadable token fails closed: INCOMPLETE and ownership retained")
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                _dsr1_pass("unreadable token fails closed: INCOMPLETE and ownership retained; child already stopped/reaped")
             finally:
                 if unread.poll() is None:
                     unread.kill(); unread.communicate(timeout=5)
