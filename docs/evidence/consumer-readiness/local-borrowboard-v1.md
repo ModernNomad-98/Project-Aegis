@@ -1,6 +1,6 @@
 # BorrowBoard v1 - consumer readiness worked install/run record
 
-Status: readiness evidence artifact for a synthetic local fixture. Base main 36ee1554aec56ed60fa1d2534e9e70e8dfddaff4; synthetic local fixture only; no production claim, no real users, no deployment, no live-model evaluation, no CI-green claim. Publication identity is ABSENT and post-merge-only; this record contains no self-hash of the JSON or of any publication.
+Status: readiness evidence artifact for a synthetic local fixture. Base main 36ee1554aec56ed60fa1d2534e9e70e8dfddaff4; bounded local readiness claim for this fixture only; no production readiness, real-user, second-host/production-deployment or live-model claim; no CI-green claim. Publication identity is ABSENT and post-merge-only; this record contains no self-hash of the JSON or of any publication. The exact readiness scope is section 9; historical no-readiness phrases retained in limit 6 and B10 are scoped to those historical records and superseded by the verification CONFIRM.
 
 Claim labels used throughout: **OBSERVED** = recorded/observed in the evidence package named here; **REPORTED** = recorded input value; **UNVERIFIED** = not executed or not checked in this package. No label is a pass claim for CI.
 
@@ -29,7 +29,7 @@ Commands executed from a fresh cmd process (literal quoted serve command):
 
 Then the fresh browser profile opened http://127.0.0.1:8765/index.html.
 
-First-run observation (OBSERVED): HTTP status 200; served bytes 1,678; localStorage null; Home empty text "No tools yet. Add your first tool."; app data-state idle; h1 count 1; tool cards 0; accessibility node count 38; console borrowboard:ready observed. The recorded console also has a favicon.ico 404; favicon is not a required app asset and no app resource failed. Server shutdown record: PID 79964; stopped true; listening_after_stop false; clean_shutdown true.
+First-run observation (OBSERVED): HTTP status 200; served bytes 1,678; localStorage null; Home empty text "No tools yet. Add your first tool."; app data-state idle; h1 count 1; tool cards 0; accessibility node count 38; console borrowboard:ready observed. The recorded console also has a favicon.ico 404; favicon is not a required app asset and no app resource failed. Server shutdown record: stopped true; listening_after_stop false; clean_shutdown true. The local PID is omitted as non-essential; the local absolute workspace path is disclosed because it is part of the literal working command.
 
 The quoted serve command itself was separately verified from a fresh process: STATUS=HTTP_200; CONTENT_LENGTH=1678; PORT_CLOSED_AFTER_SHUTDOWN=True (limit 5 records the earlier unquoted-path failure; no app change).
 
@@ -49,7 +49,7 @@ All rows observed at BUILD REV-3. Each row's result is PASS in the recorded jour
 | B07 | PASS | stale observer exact "This tool is not currently borrowed."; state unchanged; shipped runner stale-return also unchanged; return/cancel behaves with one loan | cdp-stale-return-2026-10-27T00-12-32-410Z.jsonl 465 B / sha256 320087260252c4ff474451c59c48aac2e546f6f1352a76f2f49d95ec0f20f363 |
 | B08 | PASS | storage banner exact wording observed; state unchanged on failure; draft kept; retry recovered Hammer/Wrench/Pliers; banner hidden | cdp-journey2 JSONL sha256 4b3151f9... |
 | B09 | PASS | 320/768/1280 innerWidth=scrollWidth; min button height 44; one h1; Search tools/Name/Note labels bound; ax node count 51 | same journey2 JSONL sha256 4b3151f9...; screenshots supporting-only (320/768/1280 hashes in journey package) |
-| B10 | PASS | app hashes confirm tested product; recovery notes recorded; readiness recommendation remains NO READINESS CLAIM | app file hashes above; journey2 JSONL sha256 4b3151f9... |
+| B10 | PASS | app hashes confirm tested product; recovery notes recorded. Historical executor note: the journey4 executor made no readiness claim at execution time; that note is superseded by verification3 CONFIRM and by this record's bounded section 9 statement. | primary: journey4.json 15,824 B / 464 LF / sha256 5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33; app hashes above; prior journey2 JSONL 4b3151f9... is historical raw driver transcript only |
 
 Journey summary (OBSERVED): B01-B10 all PASS at REV-3; B03R PASS; J-RES PASS; NEG-1..4 PASS; remaining UNRUN none. The complete journey record is journey4.json 15,824 B / 464 LF / sha256 5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33.
 
@@ -69,7 +69,7 @@ Owner decisions recorded: Q1 approve (state shape per R3); Q2 approve (native da
 
 ## 5. Interruption and resume record
 
-Interrupted state (OBSERVED): runner-exported .borrowboard/state.json 326 B / 0 LF / sha256 d2ee9db958db0bdcb7859ee6c1b2171fbd79bdcb1a2d53cdcb3876befdfa4c1b. Fresh-session resume (OBSERVED): new Python server process and new headless Chrome profile/process; validates exported state; reads 2 items and cards [HammerBorrowedBorrowed by Alex, due 2026-11-02Return tool, WrenchAvailableBorrow]; state hash d2ee9db9... unchanged; J-RES PASS. No corrupted completion anchor was trusted.
+Interrupted state (OBSERVED): runner-exported .borrowboard/state.json 326 B / 0 LF / sha256 d2ee9db958db0bdcb7859ee6c1b2171fbd79bdcb1a2d53cdcb3876befdfa4c1b. Fresh-session resume (OBSERVED): new Python server process and new headless Chrome profile/process; validates exported state; reads 2 items and cards [HammerBorrowedBorrowed by Alex, due 2026-11-02Return tool, WrenchAvailableBorrow]; state hash d2ee9db9... unchanged; J-RES PASS. No corrupted completion anchor was trusted. Evidence refs: state.json 326 B / 0 LF / sha256 d2ee9db958db0bdcb7859ee6c1b2171fbd79bdcb1a2d53cdcb3876befdfa4c1b; cdp-resume-2026-10-27T00-12-24-698Z.jsonl 425 B / sha256 7aa208de184034fa921b3d0d754749abc0b64f9412f2d77819a21d58447bffa7; journey4-binding-rev2.json 3,615 B / 114 LF / sha256 20b250da9b7d9bf88bbb4b1ace68c0dab33dd9da24568b73dcbfa93b11d91663.
 
 ## 6. NEG-1..4 isolated results
 
@@ -82,6 +82,8 @@ Each negative ran in its own clean copy/session. Before and after hashes are ide
 | NEG-3 stale/revoked override | PASS / STOP | revoked/stale override; no state change | d70d868a2c903d7a34ffc2adb1595645e712b0d39dad14bed80673bee666e5cf (equal) |
 | NEG-4 accepted-but-unrunnable | PASS / UNRUN | clickthrough host/runtime unavailable; success false; never treated as success | 59c7f21a9f3c4305ed247543e4964031dfd5a83a9cc629593383018df78aa499 (equal) |
 
+NEG result evidence refs: cdp-negative1-2026-10-27T00-12-34-058Z-result.json 365 B / sha256 8bb1deff9c3cf8cd3b92c216216bcef30bdbb73c2745fc56abc6cfcab01ac409; cdp-negative2-2026-10-27T00-12-35-765Z-result.json 355 B / sha256 3ccbe899e2a776523f503820d18c4d85c5cc65141b473e6e9d67862f774901d5; cdp-negative3-2026-10-27T00-12-37-177Z-result.json 338 B / sha256 5f39a9571ffed774ea3e702e8ec06a19d291b749ac2f3a66e29f52972194600a; cdp-negative4-2026-10-27T00-12-38-609Z-result.json 384 B / sha256 8bcbbd244d431f3fe5f52990455b7f52f92b61129d02cf1fdf8411762753f28a. Each before hash equals its after hash as stated above.
+
 ## 7. Verification chain summary
 
 | Stage | Record identity | Verdict |
@@ -90,7 +92,7 @@ Each negative ran in its own clean copy/session. Before and after hashes are ide
 | verify2 | VERIFICATION2.md 5,958 B / 49 LF / sha256 dff84a318d870b25e5fab03a2df725050a49b5547e020acf187f3da7a798dd38; verify-binding 4,588 B / 130 LF / sha256 08164b3646f503a8b1679043aeaed473426b3b43d7f05c9271e5b177d6856f02 | BLOCK on identity-chain references; content/coverage/aggregate checks pass (recorded) |
 | verify3 | VERIFICATION3.md 4,735 B / 46 LF / sha256 d82d5e924eebd961581cae6da973177759c85bdbeb764133b90e8a7c2452bff7; verify-binding 3,441 B / 105 LF / sha256 8cf0dbc2d3ef13d13a3e82b33c94df68c7807d8d7bb5e7ef49c422b512f3d259 | CONFIRM (final; recorded) |
 
-Final verification verdict: CONFIRM - identity correction and journey4-binding-rev2 resolve the verify2 blockers; aggregate recomputes; observations unchanged; artifacts may be authored/published with the disclosed limits; no publication identity or readiness claim is made by verification.
+Final verification verdict: CONFIRM - identity correction and journey4-binding-rev2 resolve the verify2 blockers; aggregate recomputes; observations unchanged; artifacts may be authored/published with the disclosed limits. Verification itself makes no publication identity and no separate readiness claim; the CONFIRM supports the bounded fixture-readiness statement in section 9.
 
 ## 8. DISCLOSED LIMITS (verbatim from VERIFICATION3.md)
 
@@ -101,11 +103,11 @@ Final verification verdict: CONFIRM - identity correction and journey4-binding-r
 5. Literal serve command first failed unquoted at path space; quoted literal verified HTTP200; no app change.
 6. Tested-runtime vs tested-product separated; publication identity absent/post-merge only; screenshots supporting-only; no readiness claim.
 
+Limit 6 is the verbatim executor/verification-stage limit; it does not contradict the bounded fixture-readiness statement in section 9, which the final verification CONFIRM supports. The production/real-user/second-host/live-model non-claims remain in force.
+
 ## 9. EXACT READINESS STATEMENT
 
-**Claimed (OBSERVED):** the local synthetic BorrowBoard v1 fixture acceptance journey passed on the tested runtime and tested product; the consumer-skill path readiness is demonstrated locally for this bounded fixture.
-
-**NOT claimed:** production readiness; real users; second-host or production deployment; live-model evaluation. No CI-green claim is made. Publication identity is absent and is bound only post-merge via SD-F, merge receipt and the immutable record.
+**Readiness statement (OBSERVED, bounded local scope):** The accepted BorrowBoard acceptance journey (B01-B10 including the operator design review/refinement, interruption/resume and four isolated negatives) passed on the recorded tested-runtime and tested-product; this demonstrates local consumer-path readiness for the synthetic fixture. Not claimed: production readiness; real users; second-host or production deployment; live-model evaluation. No CI-green claim. Publication identity is absent and is bound only post-merge via SD-F, merge receipt and the immutable record.
 
 Every claim above is labelled OBSERVED, REPORTED or UNVERIFIED where applicable; no unlabelled claim is made.
 
@@ -115,4 +117,8 @@ Primary package references (all relative to _A/evidence unless stated): borrowbo
 
 Identity corrections applied (OBSERVED): build-binding-rev3.json is 7,403 B / 241 LF / sha256 90fb59600af60ac93daf48b528cd25142d2a365adf5a510ec1fd6773605e1490; tested-product identity is 4,954 B / 140 LF / sha256 5494ca2a4b19745edea28f6a795044b5d1abca03da395489c3f8a464b5a17a4b (same bytes as validated copy); journey4-binding-rev2.json 3,615 B / 114 LF / sha256 20b250da9b7d9bf88bbb4b1ace68c0dab33dd9da24568b73dcbfa93b11d91663; identity correction 2,839 B / 34 LF / sha256 3edc24d3340b84b6010b9b37237d7c77da90f7e80f4a6be57cd4e6372a7ac39b; journey4 INDEX 6,071 B / 70 LF / sha256 c794f8088d0105b65f5baa0839b2ead1e4c9eb93ac084ab599e986f8b6dd3592. Superseded stale references are recorded in the correction; observations are unchanged.
 
-Record authored by AI agent sd-a-pipeline-qa; model route DeepSeek-V41-Flash (registered id deepseek-flash @ deepseek-account; DeepSeek Harness). Evidence-authoring role only; this record is not a merge approval, not a CI pass and not a readiness claim beyond the exact statement above. 0 human; no CI-green claim; publication post-merge only.
+Per-file sha256 is over raw bytes. index.html is CRLF (34 CR bytes), so its CR bytes are part of its raw hash; CR count is informational in the aggregate algorithm, while bytes and sha256 (hence CRLF) are inputs, so the aggregate is byte-sensitive. Recomputation from the current fixture files with the published algorithm produced aggregate 797e9f5a47b914c1f32024d659d038c88066e24d57e43fcc7ddf3b565b384322 (match); the recorded proof remains AGGREGATE-PROOF.txt 1,240 B / 26 LF / sha256 4b9833bbe3df3517152748967b76a67dacf47f6dc9a243661aa3e97577c12af4.
+
+Evidence-store declaration: all _A/... references are an external immutable local evidence store, not committed by this PR; the two published artifacts are self-contained summaries. Every reference listed in this record and in the JSON carries a committed path plus byte/LF/sha256 identity, so a reviewer holding the local store can verify it; the PR does not copy the store into the repository. Local absolute paths are part of the literal working command and are disclosed; the operator name is disclosed because the owner design-review identity binds it; the local PID is omitted as non-essential.
+
+Record authored by AI agent sd-a-pipeline-qa; model route DeepSeek-V41-Flash (registered id deepseek-flash @ deepseek-account; DeepSeek Harness). Evidence-authoring role only; this record is not a merge approval, not a CI pass and not a production/CI claim beyond the bounded readiness statement in section 9. No human intervention beyond the owner's operator design review/refinement (APPROVE WITH CHANGES; Q1-Q5; R1-R5) was required; no CI-green claim; publication post-merge only.

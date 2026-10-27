@@ -5,16 +5,18 @@
    "path": "docs/evidence/consumer-readiness/local-borrowboard-v1.md",
    "role": "compact worked install/run record with actual commands, observations and evidence hashes",
    "identity": {
-    "bytes": 15387,
-    "lf": 118,
+    "bytes": 18749,
+    "lf": 124,
     "cr": 0,
-    "sha256": "c92bd151484521592138642a25aab1da518dee4ac8948a9570dddd70f0dbfbf4"
+    "sha256": "be551b24726ca64c1ec14daa408c37f13ede1e3ebb7f2db5134d32504dae7e7a"
    }
   },
   "install_json": {
    "path": "docs/evidence/consumer-readiness/local-borrowboard-v1-install.json",
    "role": "actual pinned selected-file inventory with reasons, hashes and dependency disposition",
-   "self_hash": "ABSENT BY DESIGN - no self-hash of this JSON or of any publication identity"
+   "self_hash": null,
+   "self_hash_status": "ABSENT_BY_DESIGN",
+   "self_hash_policy": "No self-hash of this JSON and no self-hashed publication identity; publication is bound post-merge via SD-F, merge receipt and the immutable record."
   }
  },
  "tested_runtime": {
@@ -57,14 +59,17 @@
    }
   ],
   "aggregate": {
-   "algorithm": "sha256 over UTF-8 of json.dumps([{path,bytes,lf,sha256} for index.html,styles.css,app.js in fixed order], sort_keys=True, separators=(',',':')); object keys sorted, no spaces, no trailing newline; CR is informational and not an input",
+   "algorithm": "sha256 over UTF-8 of json.dumps([{path,bytes,lf,sha256} for index.html,styles.css,app.js in fixed order], sort_keys=True, separators=(',',':')); object keys sorted, no spaces, no trailing newline; per-file sha256 is over raw bytes and bytes+sha256 are inputs, so the aggregate is byte-sensitive; index.html is CRLF and its CR bytes are part of its raw hash; the CR count is informational and is not a normalization input.",
    "value": "797e9f5a47b914c1f32024d659d038c88066e24d57e43fcc7ddf3b565b384322",
    "proof": {
     "path": "_A/evidence/borrowboard-build1/AGGREGATE-PROOF.txt",
     "bytes": 1240,
     "lf": 26,
     "sha256": "4b9833bbe3df3517152748967b76a67dacf47f6dc9a243661aa3e97577c12af4"
-   }
+   },
+   "crlf_note": "index.html has 34 CR bytes (CRLF); raw-byte sha256 and byte count are part of the aggregate, therefore CRLF is part of the aggregate input and is not normalized away.",
+   "recomputed_in_c2": true,
+   "recomputed_value": "797e9f5a47b914c1f32024d659d038c88066e24d57e43fcc7ddf3b565b384322"
   },
   "runner": {
    "path": "_A/consumer-workspaces/borrowboard-v1/runner/borrowboard-runner.mjs",
@@ -75,7 +80,7 @@
    "dependency_disposition": "runner-only; interacts with local Chrome CDP and the local HTTP server; not loaded by the app"
   },
   "serve": {
-   "command": "python -m http.server 8765 --bind 127.0.0.1 --directory \"C:\\\\src\\\\Project Aegis\\\\_A\\\\consumer-workspaces\\\\borrowboard-v1\"",
+   "command": "python -m http.server 8765 --bind 127.0.0.1 --directory \"C:\\src\\Project Aegis\\_A\\consumer-workspaces\\borrowboard-v1\"",
    "port": 8765,
    "url": "http://127.0.0.1:8765/index.html",
    "verified_http": 200,
@@ -88,6 +93,11 @@
     "lf": 9,
     "sha256": "6c0c21847196a6748a0fc8197c6ef06508085569e97df29cfba72489dbff343f",
     "label": "OBSERVED"
+   },
+   "command_check": {
+    "json_parsed_equals_md_literal": true,
+    "method": "parse JSON serve.command and compare with the Markdown literal command block; automated in C2",
+    "result": "PASS"
    }
   }
  },
@@ -273,7 +283,7 @@
    {
     "id": "B10",
     "result": "PASS",
-    "observed": "app file hashes confirm tested product; recovery notes recorded; readiness recommendation remains NO READINESS CLAIM",
+    "observed": "app file hashes confirm tested product; recovery notes recorded. Historical executor note: the journey4 executor made no readiness claim at execution time; superseded by verification3 CONFIRM and by this record's bounded readiness_statement.",
     "evidence_refs": [
      {
       "path": "_A/evidence/borrowboard-journey4/journey4.json",
@@ -281,8 +291,30 @@
       "lf": 464,
       "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
       "label": "OBSERVED"
+     },
+     {
+      "path": "_A/consumer-workspaces/borrowboard-v1/index.html",
+      "bytes": 1678,
+      "lf": 34,
+      "sha256": "cd005dcd95059654c3a4c2f5d0d55b453f77f7cda62b6f744ac7c64627967739",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/consumer-workspaces/borrowboard-v1/styles.css",
+      "bytes": 3846,
+      "lf": 57,
+      "sha256": "f1080bd08c5e8bd2ecc6980961474d96f448a76465beaa2dd74dcce59a43091e",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/consumer-workspaces/borrowboard-v1/app.js",
+      "bytes": 20775,
+      "lf": 298,
+      "sha256": "648fef5d73dcadd353b9c56600e67c34e62c7b7428972c7cbfc278a234ba1d43",
+      "label": "OBSERVED"
      }
-    ]
+    ],
+    "historical_evidence_note": "prior journey2 JSONL 4b3151f9... retained only as historical raw driver transcript; not primary B10 evidence"
    }
   ],
   "resume": {
@@ -298,7 +330,30 @@
     "HammerBorrowedBorrowed by Alex, due 2026-11-02Return tool",
     "WrenchAvailableBorrow"
    ],
-   "label": "OBSERVED"
+   "label": "OBSERVED",
+   "evidence_refs": [
+    {
+     "path": "_A/evidence/borrowboard-journey4/state.json",
+     "bytes": 326,
+     "lf": 0,
+     "sha256": "d2ee9db958db0bdcb7859ee6c1b2171fbd79bdcb1a2d53cdcb3876befdfa4c1b",
+     "label": "OBSERVED"
+    },
+    {
+     "path": "_A/evidence/borrowboard-journey4/cdp-resume-2026-10-27T00-12-24-698Z.jsonl",
+     "bytes": 425,
+     "lf": 6,
+     "sha256": "7aa208de184034fa921b3d0d754749abc0b64f9412f2d77819a21d58447bffa7",
+     "label": "OBSERVED"
+    },
+    {
+     "path": "_A/evidence/borrowboard-journey4/journey4-binding-rev2.json",
+     "bytes": 3615,
+     "lf": 114,
+     "sha256": "20b250da9b7d9bf88bbb4b1ace68c0dab33dd9da24568b73dcbfa93b11d91663",
+     "label": "OBSERVED"
+    }
+   ]
   },
   "negatives": [
    {
@@ -308,7 +363,16 @@
     "before_hash": "d5e3ce6894e3bc1f75981d8026442d1110a1e2a1de8dae355c1236c8c8a5df5b",
     "after_hash": "d5e3ce6894e3bc1f75981d8026442d1110a1e2a1de8dae355c1236c8c8a5df5b",
     "equal": true,
-    "label": "OBSERVED"
+    "label": "OBSERVED",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-negative1-2026-10-27T00-12-34-058Z-result.json",
+      "bytes": 365,
+      "lf": 0,
+      "sha256": "8bb1deff9c3cf8cd3b92c216216bcef30bdbb73c2745fc56abc6cfcab01ac409",
+      "label": "OBSERVED"
+     }
+    ]
    },
    {
     "id": "NEG-2",
@@ -317,7 +381,16 @@
     "before_hash": "30981d3ecf5be6169d92ad48891036ad2f72f8636eed8607170cc4c313e20acc",
     "after_hash": "30981d3ecf5be6169d92ad48891036ad2f72f8636eed8607170cc4c313e20acc",
     "equal": true,
-    "label": "OBSERVED"
+    "label": "OBSERVED",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-negative2-2026-10-27T00-12-35-765Z-result.json",
+      "bytes": 355,
+      "lf": 0,
+      "sha256": "3ccbe899e2a776523f503820d18c4d85c5cc65141b473e6e9d67862f774901d5",
+      "label": "OBSERVED"
+     }
+    ]
    },
    {
     "id": "NEG-3",
@@ -326,7 +399,16 @@
     "before_hash": "d70d868a2c903d7a34ffc2adb1595645e712b0d39dad14bed80673bee666e5cf",
     "after_hash": "d70d868a2c903d7a34ffc2adb1595645e712b0d39dad14bed80673bee666e5cf",
     "equal": true,
-    "label": "OBSERVED"
+    "label": "OBSERVED",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-negative3-2026-10-27T00-12-37-177Z-result.json",
+      "bytes": 338,
+      "lf": 0,
+      "sha256": "5f39a9571ffed774ea3e702e8ec06a19d291b749ac2f3a66e29f52972194600a",
+      "label": "OBSERVED"
+     }
+    ]
    },
    {
     "id": "NEG-4",
@@ -335,7 +417,16 @@
     "before_hash": "59c7f21a9f3c4305ed247543e4964031dfd5a83a9cc629593383018df78aa499",
     "after_hash": "59c7f21a9f3c4305ed247543e4964031dfd5a83a9cc629593383018df78aa499",
     "equal": true,
-    "label": "OBSERVED"
+    "label": "OBSERVED",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-negative4-2026-10-27T00-12-38-609Z-result.json",
+      "bytes": 384,
+      "lf": 0,
+      "sha256": "8bcbbd244d431f3fe5f52990455b7f52f92b61129d02cf1fdf8411762753f28a",
+      "label": "OBSERVED"
+     }
+    ]
    }
   ]
  },
@@ -433,6 +524,34 @@
     },
     "label": "OBSERVED"
    }
+  ],
+  "operator_human_role": "Owner operator design review: APPROVE WITH CHANGES; Q1-Q5 decisions and ordered refinements R1-R5; this is the only human intervention referenced by the artifact.",
+  "owner_decisions": [
+   {
+    "question": "Q1",
+    "decision": "approve (state shape per R3)",
+    "source": "owner verdict identity 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0"
+   },
+   {
+    "question": "Q2",
+    "decision": "approve (native date input)",
+    "source": "owner verdict identity 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0"
+   },
+   {
+    "question": "Q3",
+    "decision": "approve (disable plus idempotent one-active-loan check)",
+    "source": "owner verdict identity 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0"
+   },
+   {
+    "question": "Q4",
+    "decision": "alternative per R2 (runner CDP override; no app fail switch)",
+    "source": "owner verdict identity 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0"
+   },
+   {
+    "question": "Q5",
+    "decision": "approve (inline plus aria-live summary)",
+    "source": "owner verdict identity 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0"
+   }
   ]
  },
  "verification": {
@@ -524,7 +643,8 @@
     "sha256": "5494ca2a4b19745edea28f6a795044b5d1abca03da395489c3f8a464b5a17a4b",
     "label": "OBSERVED"
    }
-  ]
+  ],
+  "readiness_scope_note": "Verification makes no publication identity and no separate readiness claim; its CONFIRM supports the bounded fixture-readiness statement in readiness_statement. Historical limit 6 no-readiness wording remains verbatim but is scoped to the historical executor/verification stage."
  },
  "disclosed_limits": [
   "B01 empty-dir assembly was not re-executed; workspace prebuilt; literal quoted start and fresh first-run observed.",
@@ -534,8 +654,8 @@
   "Literal serve command first failed unquoted at path space; quoted literal verified HTTP200; no app change.",
   "Tested-runtime vs tested-product separated; publication identity absent/post-merge only; screenshots supporting-only; no readiness claim."
  ],
- "readiness_statement": "Claimed (OBSERVED): the local synthetic BorrowBoard v1 fixture acceptance journey passed on the tested runtime and tested product; consumer-skill path readiness is demonstrated locally for this bounded fixture. NOT claimed: production readiness; real users; second-host or production deployment; live-model evaluation. No CI-green claim. Publication identity is absent and is bound only post-merge via SD-F, merge receipt and the immutable record.",
- "publication_identity_rule": "ABSENT / post-merge only; no self-hash of this JSON and no self-hashed publication identity; publication is bound post-merge via SD-F, merge receipt and the immutable record.",
+ "readiness_statement": "The accepted BorrowBoard acceptance journey (B01-B10 including the operator design review/refinement, interruption/resume and four isolated negatives) passed on the recorded tested-runtime and tested-product; this demonstrates local consumer-path readiness for the synthetic fixture. Not claimed: production readiness; real users; second-host or production deployment; live-model evaluation. No CI-green claim. Publication identity is absent and is bound only post-merge via SD-F, merge receipt and the immutable record.",
+ "publication_identity_rule": "ABSENT / post-merge only; no self-hash of this JSON and no self-hashed publication identity; publication is bound post-merge via SD-F, merge receipt and the immutable record; this is not a production or CI pass.",
  "attribution": {
   "agent": "sd-a-pipeline-qa",
   "role": "evidence author",
@@ -543,5 +663,20 @@
   "registered_id": "deepseek-flash@deepseek-account"
  },
  "no_ci_green_claim": true,
- "human_decisions": 0
+ "disclosed_limits_note": "Limits 1-6 are verbatim from VERIFICATION3.md. Limit 6's historical 'no readiness claim' applies to the executor/verification stage and does not contradict the bounded local fixture-readiness statement here; production/real-user/second-host/live-model non-claims remain in force.",
+ "additional_human_decisions_required": 0,
+ "referenced_human_decisions": [
+  {
+   "decision": "Owner operator design review: APPROVE WITH CHANGES; Q1-Q5 and R1-R5",
+   "identity": "_A/evidence/owner-decisions/OWNER-VERDICT-2026-10-26T1640-BORROWBOARD.md 3,495 B / 20 LF / sha256 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0"
+  }
+ ],
+ "human_intervention": "No human intervention beyond the owner's operator design review/refinement (APPROVE WITH CHANGES; Q1-Q5; R1-R5) was required.",
+ "evidence_store": {
+  "path": "_A/evidence",
+  "status": "external immutable local evidence store; not committed by this PR; the two published artifacts are self-contained summaries",
+  "retrieval": "Every referenced item carries a committed path plus byte/LF/sha256 identity; a reviewer holding the local store can verify it. The PR does not copy the store into the repository.",
+  "refs_note": "Exact refs are listed in the journey rows, resume, negatives, design_review and verification objects; all are path+hash bound."
+ },
+ "local_values_disclosure": "Local absolute Windows paths are disclosed because they are part of the literal working command and workspace identity; the operator name Peter is disclosed because the owner design-review identity binds it; the local process ID is omitted as non-essential."
 }
