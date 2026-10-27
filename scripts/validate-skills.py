@@ -2545,12 +2545,6 @@ def _coverage_all_exact_ints(value):
     return False
 
 
-COVERAGE_DOCUMENTED_NESTED_TOTALS = (
-    "by_area", "by_status", "by_grade", "by_priority",
-    "gap_by_priority", "snapshot_totals",
-)
-
-
 def _coverage_totals_shape_errors(totals, computed):
     """Return exact-int/schema errors for the documented totals schema.
 
@@ -2564,22 +2558,22 @@ def _coverage_totals_shape_errors(totals, computed):
         return ["totals must be an object"]
     expected_keys = set(computed)
     actual_keys = set(totals)
-    for key in sorted(expected_keys - actual_keys):
+    for key in sorted(expected_keys - actual_keys, key=str):
         errors.append("totals is missing key " + repr(key))
-    for key in sorted(actual_keys - expected_keys):
+    for key in sorted(actual_keys - expected_keys, key=str):
         errors.append("totals has unexpected key " + repr(key))
-    for key in sorted(expected_keys & actual_keys):
+    for key in sorted(expected_keys & actual_keys, key=str):
         expected = computed[key]
         value = totals[key]
         if isinstance(expected, dict):
             if not isinstance(value, dict):
                 errors.append("totals." + key + " must be an object")
                 continue
-            for sub in sorted(set(expected) - set(value)):
+            for sub in sorted(set(expected) - set(value), key=str):
                 errors.append("totals." + key + " is missing key " + repr(sub))
-            for sub in sorted(set(value) - set(expected)):
+            for sub in sorted(set(value) - set(expected), key=str):
                 errors.append("totals." + key + " has unexpected key " + repr(sub))
-            for sub in sorted(set(expected) & set(value)):
+            for sub in sorted(set(expected) & set(value), key=str):
                 leaf = value[sub]
                 if not _coverage_is_exact_int(leaf):
                     errors.append("totals." + key + "." + str(sub)
@@ -2600,13 +2594,6 @@ def _coverage_validated_totals(totals, computed):
     if totals != computed:
         return None
     return dict(totals)
-
-
-def _coverage_scrub_for_counts(text):
-    scrubbed = re.sub(r"D[0-9]+", "", text)
-    scrubbed = re.sub(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", "", scrubbed)
-    scrubbed = re.sub(r"#[0-9]+", "", scrubbed)
-    return scrubbed
 
 
 COVERAGE_DERIVED_INTENT = (
@@ -2630,6 +2617,10 @@ COVERAGE_UPDATE_EVENT_RE = re.compile(
     r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
     r"renamed|moved|progressed)\s+[0-9]+\s+"
     + COVERAGE_DERIVED_INTENT + r"\b")
+COVERAGE_UPDATE_CONNECTOR_RE = re.compile(
+    r"(?i)\bcoverage\s*(?::)?\s*(?:updated|added|removed|changed|"
+    r"incremented|decremented|edited|renamed|moved|progressed)"
+    r"(?:\s+(?:to|by|with))?\s+[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b")
 _OPAQUE_CODE = "[" + chr(96) + "][^" + chr(96) + "\n]*[" + chr(96) + "]"
 COVERAGE_ALLOWED_PROSE_RE = (
     re.compile(r"(?i)\bsnapshot\s+tests?\s+cover\s+[0-9]+\s+"
@@ -2644,8 +2635,14 @@ COVERAGE_ALLOWED_PROSE_RE = (
 
 
 def _coverage_protect_opaque(text: str) -> str:
-    """Mask non-count opaque tokens before intent recognition."""
+    """Mask non-count opaque tokens before intent recognition.
+
+    Code spans and Markdown links are masked before bare URLs: a link whose
+    label contains a count must become opaque as a whole, not leave its label
+    exposed after the URL target is removed.
+    """
     protected = re.sub(_OPAQUE_CODE, " OPAQUE ", text)
+    protected = re.sub(r"\[[^\]\n]*\]\([^)\n]*\)", " OPAQUE ", protected)
     protected = re.sub(r"https?://\S+", " OPAQUE ", protected, flags=re.IGNORECASE)
     protected = re.sub(r"\b[0-9a-f]{40,64}\b", " OPAQUE ", protected,
                        flags=re.IGNORECASE)
@@ -2653,38 +2650,51 @@ def _coverage_protect_opaque(text: str) -> str:
     protected = re.sub(r"\bD[0-9]{1,12}\b", " OPAQUE ", protected)
     protected = re.sub(r"\bsnapshot-(?:19|20)[0-9]{2}\b", " OPAQUE ", protected,
                        flags=re.IGNORECASE)
-    protected = re.sub(r"\[[^\]\n]*\]\([^)\n]*\)", " OPAQUE ", protected)
     return protected
 
 
 def _coverage_mask_allowed_update(text: str) -> str:
-    """Mask fixed legitimate update-event prose only; keep coverage context."""
+    """Mask the fixed legitimate update-event prose allowlist.
+
+    Direct "updated N entries" forms and, for coverage context that is not a
+    snapshot-total statement, connector forms ("coverage updated to N
+    entries", "coverage added by N skills") are masked. Coverage context words
+    remain; snapshot-total update statements remain exposed as violations.
+    """
     masked = text
     for pattern in COVERAGE_ALLOWED_PROSE_RE:
         masked = pattern.sub(" ", masked)
     masked = COVERAGE_UPDATE_EVENT_RE.sub(" ", masked)
+    if "coverage" in masked.casefold() and "snapshot" not in masked.casefold():
+        masked = COVERAGE_UPDATE_CONNECTOR_RE.sub(" ", masked)
     return masked
 
 
 def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
-    """Single structural source for derived-total count mentions."""
+    """Single structural source for derived-total count mentions.
+
+    Clauses are split on newlines/semicolons BEFORE whitespace normalization so
+    a count on one line cannot pair with an intent on another. Opaque tokens
+    (code spans, Markdown links, URLs, dates, D ids, hashes, snapshot-YYYY) are
+    masked first. The later/bound wrappers share this parser. The later policy
+    is deliberately broad for derived-total keys/N-of-M (the preserved #934
+    contract); only the fixed legitimate update-prose allowlist is masked.
+    """
     if not isinstance(text, str) or not text:
         return []
     normalized = (text.casefold()
                   .replace(chr(0x2013), "-").replace(chr(0x2014), "-")
                   .replace(chr(0x2212), "-"))
-    normalized = re.sub(r"\s+", " ", normalized)
     protected = _coverage_protect_opaque(normalized)
-    parsed = _coverage_mask_allowed_update(protected) if allowed_update else protected
-    entry_has_context = bool(COVERAGE_LATER_CONTEXT_RE.search(protected))
     mentions = []
     seen = set()
-    for clause in re.split(r"[;\n]", parsed):
-        clause_context = bool(COVERAGE_LATER_CONTEXT_RE.search(clause)) or entry_has_context
+    for raw_clause in re.split(r"[;\n]", protected):
+        clause = re.sub(r"\s+", " ", raw_clause)
+        parsed = _coverage_mask_allowed_update(clause) if allowed_update else clause
         candidates = []
-        candidates.extend(("n-of-m", m.group(0)) for m in COVERAGE_N_OF_M_RE.finditer(clause))
-        candidates.extend(("number-key", m.group(0)) for m in COVERAGE_NUMBER_KEY_RE.finditer(clause))
-        candidates.extend(("key-number", m.group(0)) for m in COVERAGE_KEY_NUMBER_RE.finditer(clause))
+        candidates.extend(("n-of-m", m.group(0)) for m in COVERAGE_N_OF_M_RE.finditer(parsed))
+        candidates.extend(("number-key", m.group(0)) for m in COVERAGE_NUMBER_KEY_RE.finditer(parsed))
+        candidates.extend(("key-number", m.group(0)) for m in COVERAGE_KEY_NUMBER_RE.finditer(parsed))
         for kind, surface in candidates:
             cleaned = surface.strip()
             if not cleaned or cleaned in seen:
@@ -2697,7 +2707,6 @@ def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
                 "kind": kind,
                 "intent": intent_match.group(0).lower() if intent_match else None,
                 "number": numbers[-1] if numbers else None,
-                "clause_context": clause_context,
             })
     return mentions
 

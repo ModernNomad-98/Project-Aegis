@@ -4737,16 +4737,31 @@ def test_ds7cfixb_coverage_detector_matrix():
     totals = json.loads(json.dumps(computed))
     del totals["by_area"][sorted(totals["by_area"])[0]]
     assert validator._coverage_validated_totals(totals, computed) is None
-    # Explicit snapshot_totals documented nested map.
-    total_with_snapshot_totals = dict(computed)
-    total_with_snapshot_totals["snapshot_totals"] = {"entries": computed["entries"]}
-    computed_snapshot = dict(total_with_snapshot_totals)
-    assert validator._coverage_validated_totals(
-        total_with_snapshot_totals, computed_snapshot) is not None
-    bad_snapshot = json.loads(json.dumps(total_with_snapshot_totals))
-    bad_snapshot["snapshot_totals"]["entries"] = True
-    assert validator._coverage_validated_totals(
-        bad_snapshot, computed_snapshot) is None
+    # Production-computed totals validate against the real schema, and a
+    # nonempty documented nested map rejects a bool leaf.
+    assert validator._coverage_totals_shape_errors(computed, computed) == []
+    nonempty_nested = next((key for key in nested_keys if computed[key]), None)
+    assert nonempty_nested is not None, "live totals need one nonempty nested map"
+    bad_real = json.loads(json.dumps(computed))
+    sub = sorted(bad_real[nonempty_nested])[0]
+    bad_real[nonempty_nested][sub] = True
+    assert validator._coverage_validated_totals(bad_real, computed) is None
+    assert any("exact integer" in error for error in
+               validator._coverage_totals_shape_errors(bad_real, computed))
+    # Newline/code/link masks must not pair counts across lines or expose labels.
+    assert not validator._coverage_later_total_count_errors("entries\n300")
+    assert not validator._coverage_later_total_count_errors(
+        "[300 entries](https://example.invalid/x)")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage updated to 300 entries")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage added by 2 skills")
+    assert validator._coverage_later_total_count_errors(
+        "coverage snapshot updated to 254 entries")
+    # Mixed/odd raw keys must not raise in the shape sorter.
+    assert validator._coverage_totals_shape_errors({1: 2}, computed)
+    assert validator._coverage_totals_shape_errors(
+        {**computed, 1: 2}, computed)
     # Manifest fail-closed trim guard for totals and shipped analysis.
     for bad_manifest in ({" skill "}, {""}, {"ok", " skill "}):
         try:
