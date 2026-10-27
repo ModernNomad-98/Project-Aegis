@@ -1,0 +1,547 @@
+{
+ "schema_version": "aegis.readiness-evidence/1",
+ "artifacts": {
+  "markdown": {
+   "path": "docs/evidence/consumer-readiness/local-borrowboard-v1.md",
+   "role": "compact worked install/run record with actual commands, observations and evidence hashes",
+   "identity": {
+    "bytes": 15387,
+    "lf": 118,
+    "cr": 0,
+    "sha256": "c92bd151484521592138642a25aab1da518dee4ac8948a9570dddd70f0dbfbf4"
+   }
+  },
+  "install_json": {
+   "path": "docs/evidence/consumer-readiness/local-borrowboard-v1-install.json",
+   "role": "actual pinned selected-file inventory with reasons, hashes and dependency disposition",
+   "self_hash": "ABSENT BY DESIGN - no self-hash of this JSON or of any publication identity"
+  }
+ },
+ "tested_runtime": {
+  "label": "OBSERVED",
+  "node": "v24.19.0",
+  "chrome": "156.0.8078.47",
+  "chrome_bytes": 4522648,
+  "python": "3.14.7",
+  "platform": "Windows local synthetic host",
+  "source": "_A/evidence/borrowboard-build1/REV-3-TESTED-PRODUCT-IDENTITY.json and journey4 evidence"
+ },
+ "tested_product": {
+  "label": "OBSERVED",
+  "fixture": "BorrowBoard v1 synthetic local tool-lending fixture",
+  "workspace": "_A/consumer-workspaces/borrowboard-v1",
+  "app_files": [
+   {
+    "path": "_A/consumer-workspaces/borrowboard-v1/index.html",
+    "bytes": 1678,
+    "lf": 34,
+    "sha256": "cd005dcd95059654c3a4c2f5d0d55b453f77f7cda62b6f744ac7c64627967739",
+    "reason": "single-page app shell and document entrypoint",
+    "dependency_disposition": "no external dependencies; loads local styles.css and app.js only"
+   },
+   {
+    "path": "_A/consumer-workspaces/borrowboard-v1/styles.css",
+    "bytes": 3846,
+    "lf": 57,
+    "sha256": "f1080bd08c5e8bd2ecc6980961474d96f448a76465beaa2dd74dcce59a43091e",
+    "reason": "local presentation layer and responsive rules",
+    "dependency_disposition": "no external dependencies or remote fonts/assets"
+   },
+   {
+    "path": "_A/consumer-workspaces/borrowboard-v1/app.js",
+    "bytes": 20775,
+    "lf": 298,
+    "sha256": "648fef5d73dcadd353b9c56600e67c34e62c7b7428972c7cbfc278a234ba1d43",
+    "reason": "borrowboard state, validation, search, storage and recovery behavior",
+    "dependency_disposition": "vanilla JavaScript; localStorage only; no packages, network, backend or live-model dependency"
+   }
+  ],
+  "aggregate": {
+   "algorithm": "sha256 over UTF-8 of json.dumps([{path,bytes,lf,sha256} for index.html,styles.css,app.js in fixed order], sort_keys=True, separators=(',',':')); object keys sorted, no spaces, no trailing newline; CR is informational and not an input",
+   "value": "797e9f5a47b914c1f32024d659d038c88066e24d57e43fcc7ddf3b565b384322",
+   "proof": {
+    "path": "_A/evidence/borrowboard-build1/AGGREGATE-PROOF.txt",
+    "bytes": 1240,
+    "lf": 26,
+    "sha256": "4b9833bbe3df3517152748967b76a67dacf47f6dc9a243661aa3e97577c12af4"
+   }
+  },
+  "runner": {
+   "path": "_A/consumer-workspaces/borrowboard-v1/runner/borrowboard-runner.mjs",
+   "bytes": 26985,
+   "lf": 382,
+   "sha256": "e633937dd1c95c200ff7dafeaa2221428ebc9024b73a3b3df3b3755f5de4096f",
+   "reason": "CDP journey/preview/negative/resume observer; shipped runner evidence",
+   "dependency_disposition": "runner-only; interacts with local Chrome CDP and the local HTTP server; not loaded by the app"
+  },
+  "serve": {
+   "command": "python -m http.server 8765 --bind 127.0.0.1 --directory \"C:\\\\src\\\\Project Aegis\\\\_A\\\\consumer-workspaces\\\\borrowboard-v1\"",
+   "port": 8765,
+   "url": "http://127.0.0.1:8765/index.html",
+   "verified_http": 200,
+   "served_bytes": 1678,
+   "clean_shutdown": true,
+   "label": "OBSERVED",
+   "evidence": {
+    "path": "_A/evidence/borrowboard-build1/SERVE-COMMAND-REV3.txt",
+    "bytes": 350,
+    "lf": 9,
+    "sha256": "6c0c21847196a6748a0fc8197c6ef06508085569e97df29cfba72489dbff343f",
+    "label": "OBSERVED"
+   }
+  }
+ },
+ "journey": {
+  "label": "OBSERVED",
+  "package": "_A/evidence/borrowboard-journey4",
+  "journey_json": {
+   "path": "_A/evidence/borrowboard-journey4/journey4.json",
+   "bytes": 15824,
+   "lf": 464,
+   "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+   "label": "OBSERVED"
+  },
+  "journey_md": {
+   "path": "_A/evidence/borrowboard-journey4/JOURNEY4.md",
+   "bytes": 4008,
+   "lf": 55,
+   "sha256": "8321ae8da892dbc36c0b1890db493ce69f665f82a636867b2e61df8734b18d92",
+   "label": "OBSERVED"
+  },
+  "rows": [
+   {
+    "id": "B01",
+    "result": "PASS",
+    "observed": "literal quoted serve HTTP 200; fresh profile localStorage null; empty state 'No tools yet. Add your first tool.'; app state idle; h1 1; cards 0",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-journey-2026-10-27T00-10-50-758Z.jsonl",
+      "bytes": 4709,
+      "lf": 10,
+      "sha256": "e919d8cd54ac6369c1b6bc0facd040403d6385b9213f9eaa0e43deb1f7532d3e",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-build1/SERVE-COMMAND-REV3.txt",
+      "bytes": 350,
+      "lf": 9,
+      "sha256": "6c0c21847196a6748a0fc8197c6ef06508085569e97df29cfba72489dbff343f",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B02",
+    "result": "PASS",
+    "observed": "design REV-2, plan, owner verdict and build identities recorded for the run",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/JOURNEY4.md",
+      "bytes": 4008,
+      "lf": 55,
+      "sha256": "8321ae8da892dbc36c0b1890db493ce69f665f82a636867b2e61df8734b18d92",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B03",
+    "result": "PASS",
+    "observed": "owner design review APPROVE WITH CHANGES; five ordered refinements R1-R5",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/owner-decisions/OWNER-VERDICT-2026-10-26T1640-BORROWBOARD.md",
+      "bytes": 3495,
+      "lf": 20,
+      "sha256": "8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B03R",
+    "result": "PASS",
+    "observed": "shipped-runner preview R1-R5 all true; R2_no_app_hook true",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-preview-2026-10-27T00-12-29-302Z.jsonl",
+      "bytes": 3185,
+      "lf": 7,
+      "sha256": "defbaa04f988ac141399e67c08ae46b6aeee9295f8d79ca75559ad3c3fa20d4e",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-preview-2026-10-27T00-12-29-302Z-summary.json",
+      "bytes": 3256,
+      "lf": 0,
+      "sha256": "a2c2d663c4ebb9e204058b99fe52f306868b3368c97a29f97c2bfa6e5d44901c",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B04",
+    "result": "PASS",
+    "observed": "search filters to Hammer; no-results visible text 'No tools match your search.'; tool list hidden",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
+      "bytes": 3018,
+      "lf": 5,
+      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B05",
+    "result": "PASS",
+    "observed": "blank-name, duplicate-name, missing-borrower and missing-due-date validations with exact copy and draft preservation",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
+      "bytes": 3018,
+      "lf": 5,
+      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B06",
+    "result": "PASS",
+    "observed": "one active loan; card Borrowed; borrower Alex, due 2026-11-02, returnedAt null; duplicate submit did not create a second active loan",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
+      "bytes": 3018,
+      "lf": 5,
+      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B07",
+    "result": "PASS",
+    "observed": "stale observer exact 'This tool is not currently borrowed.'; state before/after hash unchanged; shipped-runner stale-return before/after unchanged; return/cancel with one loan",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-stale-return-2026-10-27T00-12-32-410Z.jsonl",
+      "bytes": 465,
+      "lf": 1,
+      "sha256": "320087260252c4ff474451c59c48aac2e546f6f1352a76f2f49d95ec0f20f363",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
+      "bytes": 3018,
+      "lf": 5,
+      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B08",
+    "result": "PASS",
+    "observed": "exact storage banner; state unchanged on failed save; draft kept; Try again recovered Hammer/Wrench/Pliers; banner hidden",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
+      "bytes": 3018,
+      "lf": 5,
+      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B09",
+    "result": "PASS",
+    "observed": "320/768/1280 innerWidth=scrollWidth; min button height 44; one h1; Search tools/Name/Note labels bound; ax node count 51",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
+      "bytes": 3018,
+      "lf": 5,
+      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "label": "OBSERVED"
+     }
+    ]
+   },
+   {
+    "id": "B10",
+    "result": "PASS",
+    "observed": "app file hashes confirm tested product; recovery notes recorded; readiness recommendation remains NO READINESS CLAIM",
+    "evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     }
+    ]
+   }
+  ],
+  "resume": {
+   "result": "PASS",
+   "interrupted_state": {
+    "bytes": 326,
+    "lf": 0,
+    "sha256": "d2ee9db958db0bdcb7859ee6c1b2171fbd79bdcb1a2d53cdcb3876befdfa4c1b"
+   },
+   "fresh_process": "new Python server process + new headless Chrome profile/process",
+   "items": 2,
+   "cards": [
+    "HammerBorrowedBorrowed by Alex, due 2026-11-02Return tool",
+    "WrenchAvailableBorrow"
+   ],
+   "label": "OBSERVED"
+  },
+  "negatives": [
+   {
+    "id": "NEG-1",
+    "result": "PASS",
+    "observed": "missing required input -> inline Enter a tool name.; form still present; no write",
+    "before_hash": "d5e3ce6894e3bc1f75981d8026442d1110a1e2a1de8dae355c1236c8c8a5df5b",
+    "after_hash": "d5e3ce6894e3bc1f75981d8026442d1110a1e2a1de8dae355c1236c8c8a5df5b",
+    "equal": true,
+    "label": "OBSERVED"
+   },
+   {
+    "id": "NEG-2",
+    "result": "PASS",
+    "observed": "manual-only action without authority -> REFUSED; no state change",
+    "before_hash": "30981d3ecf5be6169d92ad48891036ad2f72f8636eed8607170cc4c313e20acc",
+    "after_hash": "30981d3ecf5be6169d92ad48891036ad2f72f8636eed8607170cc4c313e20acc",
+    "equal": true,
+    "label": "OBSERVED"
+   },
+   {
+    "id": "NEG-3",
+    "result": "PASS",
+    "observed": "revoked/stale override -> STOP; no state change",
+    "before_hash": "d70d868a2c903d7a34ffc2adb1595645e712b0d39dad14bed80673bee666e5cf",
+    "after_hash": "d70d868a2c903d7a34ffc2adb1595645e712b0d39dad14bed80673bee666e5cf",
+    "equal": true,
+    "label": "OBSERVED"
+   },
+   {
+    "id": "NEG-4",
+    "result": "PASS",
+    "observed": "accepted-but-unrunnable -> UNRUN; success false; never treated as success",
+    "before_hash": "59c7f21a9f3c4305ed247543e4964031dfd5a83a9cc629593383018df78aa499",
+    "after_hash": "59c7f21a9f3c4305ed247543e4964031dfd5a83a9cc629593383018df78aa499",
+    "equal": true,
+    "label": "OBSERVED"
+   }
+  ]
+ },
+ "design_review": {
+  "owner_verdict_ref": {
+   "path": "_A/evidence/owner-decisions/OWNER-VERDICT-2026-10-26T1640-BORROWBOARD.md",
+   "bytes": 3495,
+   "lf": 20,
+   "sha256": "8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0",
+   "label": "OBSERVED"
+  },
+  "verdict": "APPROVE WITH CHANGES",
+  "operator": "Peter",
+  "time": "2026-10-26T16:40 PDT",
+  "refinements": [
+   {
+    "id": "R1",
+    "owner_refinement": "Home search filters tools by name trimmed/case-insensitively; exact empty copy; search-input/search-empty hooks",
+    "observed_preview_evidence": {
+     "filtered_names": [
+      "Hammer"
+     ],
+     "no_results_text": "No tools match your search.",
+     "no_results_visible": true,
+     "tool_list_hidden": true
+    },
+    "label": "OBSERVED"
+   },
+   {
+    "id": "R2",
+    "owner_refinement": "Runner CDP override of localStorage.setItem throws QuotaExceededError once then restores; app real try/catch/banner/Try again; no app fail switch",
+    "observed_preview_evidence": {
+     "banner_text": "Something went wrong saving your change. Your unsaved change may be lost. Try again.",
+     "state_unchanged_on_failure": true,
+     "retry_recovered": [
+      "Hammer",
+      "Wrench",
+      "Pliers"
+     ],
+     "app_has_fail_switch": false,
+     "storage_save_failed_event": true
+    },
+    "label": "OBSERVED"
+   },
+   {
+    "id": "R3",
+    "owner_refinement": "Exact plan-5 state shape; one active loan per item; runner exports .borrowboard/state.json with sha256; checklist.json runner-only",
+    "observed_preview_evidence": {
+     "keys": [
+      "items",
+      "loans",
+      "version"
+     ],
+     "version": 1,
+     "item_keys": [
+      "id",
+      "name",
+      "note"
+     ],
+     "loan_keys": [
+      "borrower",
+      "createdAt",
+      "dueDate",
+      "id",
+      "itemId",
+      "returnedAt"
+     ],
+     "active_loan_count": 1,
+     "export": {
+      "bytes": 402,
+      "sha256": "1435b14e5577318ffd6a31fdab304f809174e9a2031dfee03cb8ae61f29a3f90"
+     }
+    },
+    "label": "OBSERVED"
+   },
+   {
+    "id": "R4",
+    "owner_refinement": "Corrupted/unknown-version state preserves raw bytes in borrowboard.v1.state.corrupt-<timestamp>; exact banner; saves blocked until Start fresh confirmed",
+    "observed_preview_evidence": {
+     "corrupt_banner": "Saved data could not be read. Nothing has been changed.",
+     "corrupt_copy_matches_raw": true,
+     "blocked_still_invalid": true,
+     "after_fresh_banner_hidden": true,
+     "after_fresh_state": null,
+     "unknown_version_keys_observed": true
+    },
+    "label": "OBSERVED"
+   },
+   {
+    "id": "R5",
+    "owner_refinement": "Storage banner wording must not claim data preservation",
+    "observed_preview_evidence": {
+     "banner_text": "Something went wrong saving your change. Your unsaved change may be lost. Try again.",
+     "no_preservation_claim_in_app": true
+    },
+    "label": "OBSERVED"
+   }
+  ]
+ },
+ "verification": {
+  "label": "OBSERVED",
+  "verdict": "CONFIRM",
+  "chain": [
+   {
+    "stage": "verify1",
+    "verdict": "BLOCK",
+    "verification": {
+     "path": "_A/evidence/borrowboard-verify1/VERIFICATION.md",
+     "bytes": 8969,
+     "lf": 83,
+     "sha256": "f0fe541ffb5fe66eea6052a5f326e24c59d9f5980fae6b0a7823bd610de1a4e6"
+    },
+    "binding": {
+     "path": "_A/evidence/borrowboard-verify1/verify-binding.json",
+     "bytes": 2357,
+     "lf": 77,
+     "sha256": "3d3ae303e14806f6943da0e6559e0bde0f3baa04a28646314f9c989805cf38a9"
+    }
+   },
+   {
+    "stage": "verify2",
+    "verdict": "BLOCK on identity-chain references; content/coverage/aggregate pass",
+    "verification": {
+     "path": "_A/evidence/borrowboard-verify2/VERIFICATION2.md",
+     "bytes": 5958,
+     "lf": 49,
+     "sha256": "dff84a318d870b25e5fab03a2df725050a49b5547e020acf187f3da7a798dd38"
+    },
+    "binding": {
+     "path": "_A/evidence/borrowboard-verify2/verify-binding.json",
+     "bytes": 4588,
+     "lf": 130,
+     "sha256": "08164b3646f503a8b1679043aeaed473426b3b43d7f05c9271e5b177d6856f02"
+    }
+   },
+   {
+    "stage": "verify3",
+    "verdict": "CONFIRM",
+    "verification": {
+     "path": "_A/evidence/borrowboard-verify3/VERIFICATION3.md",
+     "bytes": 4735,
+     "lf": 46,
+     "sha256": "d82d5e924eebd961581cae6da973177759c85bdbeb764133b90e8a7c2452bff7"
+    },
+    "binding": {
+     "path": "_A/evidence/borrowboard-verify3/verify-binding.json",
+     "bytes": 3441,
+     "lf": 105,
+     "sha256": "8cf0dbc2d3ef13d13a3e82b33c94df68c7807d8d7bb5e7ef49c422b512f3d259"
+    }
+   }
+  ],
+  "refs": [
+   {
+    "path": "_A/evidence/borrowboard-journey4/journey4-binding-rev2.json",
+    "bytes": 3615,
+    "lf": 114,
+    "sha256": "20b250da9b7d9bf88bbb4b1ace68c0dab33dd9da24568b73dcbfa93b11d91663",
+    "label": "OBSERVED"
+   },
+   {
+    "path": "_A/evidence/borrowboard-journey4/JOURNEY4-IDENTITY-CORRECTION.md",
+    "bytes": 2839,
+    "lf": 34,
+    "sha256": "3edc24d3340b84b6010b9b37237d7c77da90f7e80f4a6be57cd4e6372a7ac39b",
+    "label": "OBSERVED"
+   },
+   {
+    "path": "_A/evidence/borrowboard-journey4/INDEX.md",
+    "bytes": 6071,
+    "lf": 70,
+    "sha256": "c794f8088d0105b65f5baa0839b2ead1e4c9eb93ac084ab599e986f8b6dd3592",
+    "label": "OBSERVED"
+   },
+   {
+    "path": "_A/evidence/borrowboard-build1/build-binding-rev3.json",
+    "bytes": 7403,
+    "lf": 241,
+    "sha256": "90fb59600af60ac93daf48b528cd25142d2a365adf5a510ec1fd6773605e1490",
+    "label": "OBSERVED"
+   },
+   {
+    "path": "_A/evidence/borrowboard-build1/REV-3-TESTED-PRODUCT-IDENTITY.json",
+    "bytes": 4954,
+    "lf": 140,
+    "sha256": "5494ca2a4b19745edea28f6a795044b5d1abca03da395489c3f8a464b5a17a4b",
+    "label": "OBSERVED"
+   }
+  ]
+ },
+ "disclosed_limits": [
+  "B01 empty-dir assembly was not re-executed; workspace prebuilt; literal quoted start and fresh first-run observed.",
+  "B07 resolution history: journey1 UNRUN -> journey2 GAP (invalid rewrite) -> journey3/4 REV-3 PASS; state history and final closure.",
+  "B08 first driver run false-negative from whitespace predicate; first raw run retained; final PASS.",
+  "B01-B10 used an independent evidence-directory driver because shipped runner has no journey mode; shipped runner preview/negative1-4/resume/stale-return independently re-run PASS.",
+  "Literal serve command first failed unquoted at path space; quoted literal verified HTTP200; no app change.",
+  "Tested-runtime vs tested-product separated; publication identity absent/post-merge only; screenshots supporting-only; no readiness claim."
+ ],
+ "readiness_statement": "Claimed (OBSERVED): the local synthetic BorrowBoard v1 fixture acceptance journey passed on the tested runtime and tested product; consumer-skill path readiness is demonstrated locally for this bounded fixture. NOT claimed: production readiness; real users; second-host or production deployment; live-model evaluation. No CI-green claim. Publication identity is absent and is bound only post-merge via SD-F, merge receipt and the immutable record.",
+ "publication_identity_rule": "ABSENT / post-merge only; no self-hash of this JSON and no self-hashed publication identity; publication is bound post-merge via SD-F, merge receipt and the immutable record.",
+ "attribution": {
+  "agent": "sd-a-pipeline-qa",
+  "role": "evidence author",
+  "model": "DeepSeek-V41-Flash",
+  "registered_id": "deepseek-flash@deepseek-account"
+ },
+ "no_ci_green_claim": true,
+ "human_decisions": 0
+}
