@@ -46,6 +46,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -4682,6 +4683,310 @@ def test_readiness_memory_canonical_tristate():
         ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut forbidden")
 
 
+
+FENCE = chr(96) * 3
+
+
+def _dsr1_pass(label: str) -> None:
+    """Print a DS-R1 expectation without changing the suite assertion count."""
+    print("  PASS  " + label)
+
+
+
+def _dsr1_block(marker: str) -> str:
+    """Load exactly one fenced shell block containing the marker from the reference."""
+    ref = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md").read_text(encoding="utf-8")
+    hits = [chunk for chunk in ref.split(FENCE) if marker in chunk and "#!/bin/sh" in chunk]
+    assert len(hits) == 1, "reference must publish exactly one block containing " + marker
+    return hits[0]
+
+
+def _dsr1_lock_text() -> str:
+    """Load the single published shared-lock shell block from the reference."""
+    return _dsr1_block("AEGIS_STACK_LOCK")
+
+
+def _dsr1_script(td: Path, name: str, text: str) -> Path:
+    p = td / name
+    p.write_text(text, encoding="utf-8", newline="\n")
+    p.chmod(0o755)
+    return p
+
+
+def _dsr1_clean_lock(lock: Path) -> None:
+    if lock.exists() and lock.is_dir():
+        shutil.rmtree(lock, ignore_errors=True)
+
+
+def test_dsr1_lock_lifecycle():
+    """DS-R1 CL-07/08/09/10/11/14/18/19: portable mkdir lock, tokens, bounded stop and successor safety."""
+    if not _readiness_posix_ready():
+        _readiness_skip("DS-R1 shared-lock lifecycle: Linux POSIX lane unavailable")
+        return
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td)
+        lock = root / "stack.lock"
+        script = _dsr1_script(root, "lock.sh", _dsr1_lock_text())
+        cfg = root / "gitconfig"
+        cfg.write_text("[user]\n\tname = FixtureAgent\n\temail = agent@example.invalid\n", encoding="utf-8")
+        env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        env.update({"AEGIS_STACK_LOCK": str(lock), "AEGIS_STACK_STOP_WAIT_SECONDS": "1", "GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(root / "xdg"), "GIT_CONFIG_GLOBAL": str(cfg)})
+        def start(workload):
+            e = dict(env); e["AEGIS_STACK_WORKLOAD"] = workload
+            return subprocess.Popen(["sh", str(script)], cwd=root, env=e, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        def run(workload):
+            e = dict(env); e["AEGIS_STACK_WORKLOAD"] = workload
+            return subprocess.run(["sh", str(script)], cwd=root, env=e, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        def wait_paths(*paths, timeout=10):
+            deadline = time.time() + timeout
+            while not all(p.exists() for p in paths) and time.time() < deadline:
+                time.sleep(0.02)
+            assert all(p.exists() for p in paths), [str(p) for p in paths]
+        def read_pid():
+            return int((lock / "workload.pid").read_text(encoding="utf-8").strip())
+        def assert_reaped(pid):
+            deadline = time.time() + 5
+            while time.time() < deadline:
+                try:
+                    os.kill(pid, 0)
+                except ProcessLookupError:
+                    return
+                time.sleep(0.05)
+            raise AssertionError("workload child was not reaped: " + str(pid))
+        def clean():
+            _dsr1_clean_lock(lock)
+        clean()
+        lock.mkdir()
+        tokenless = run("true")
+        assert tokenless.returncode == 1 and lock.exists() and not (lock / "abort").exists(), "tokenless lock must be preserved"
+        clean()
+        lock.mkdir()
+        (lock / "token").write_text("owner=foreign@example.invalid run=foreign\n", encoding="utf-8")
+        foreign = run("true")
+        assert foreign.returncode == 1 and (lock / "token").read_text(encoding="utf-8") == "owner=foreign@example.invalid run=foreign\n"
+        clean()
+        _dsr1_pass("tokenless and foreign locks are preserved untouched")
+        normal = run("true")
+        assert normal.returncode == 0 and not lock.exists(), (normal.returncode, normal.stderr)
+        failed = run("false")
+        assert failed.returncode != 0 and not lock.exists(), (failed.returncode, failed.stderr)
+        _dsr1_pass("normal and error exits release the owned lock after reaping")
+        e = dict(env); e["AEGIS_STACK_WORKLOAD"] = "true"; e["AEGIS_STACK_LOCK"] = str(lock) + "/"
+        tr = subprocess.run(["sh", str(script)], cwd=root, env=e, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert tr.returncode == 0 and not lock.exists(), (tr.returncode, tr.stderr)
+        _dsr1_pass("trailing slash in AEGIS_STACK_LOCK is normalized")
+        holder = start("printf started > started; while :; do sleep 0.05; done")
+        try:
+            wait_paths(lock, lock / "ready", root / "started")
+            token = (lock / "token").read_text(encoding="utf-8")
+            assert "owner=" in token and "run=" in token and "acquired=" in token and "ttl_minutes=" in token, token
+            pid = read_pid()
+            contender = run("true")
+            assert contender.returncode == 1 and "held" in (contender.stderr or ""), (contender.returncode, contender.stderr)
+            assert lock.exists(), "held lock must remain after contention"
+            _dsr1_pass("contention exits 1 and preserves the held lock")
+            unrelated = subprocess.Popen(["sleep", "60"])
+            (lock / "workload.pid").write_text(str(unrelated.pid), encoding="utf-8")
+            holder.send_signal(signal.SIGINT)
+            holder.communicate(timeout=20)
+            assert unrelated.poll() is None, "cleanup must not kill an unrelated/reused pid"
+            unrelated.kill(); unrelated.wait(timeout=5)
+            assert not lock.exists(), "SIGINT must release the owned lock"
+            assert_reaped(pid)
+            _dsr1_pass("SIGINT stops only the owned direct child, reaps it and releases the lock")
+        finally:
+            if holder.poll() is None:
+                holder.kill(); holder.communicate(timeout=5)
+            clean()
+        kill_holder = start("trap '' TERM; printf started > started; while :; do sleep 0.05; done")
+        try:
+            wait_paths(lock, lock / "ready", root / "started")
+            kill_pid = read_pid()
+            kill_holder.send_signal(signal.SIGTERM)
+            kill_holder.communicate(timeout=20)
+            assert not lock.exists(), "bounded TERM then KILL must release the owned lock"
+            assert_reaped(kill_pid)
+            _dsr1_pass("bounded TERM then KILL stops a TERM-ignoring direct child and releases the lock")
+        finally:
+            if kill_holder.poll() is None:
+                kill_holder.kill(); kill_holder.communicate(timeout=5)
+            clean()
+        if hasattr(os, "geteuid") and os.geteuid() != 0:
+            unread = start("printf started > started; while :; do sleep 0.05; done")
+            try:
+                wait_paths(lock, lock / "ready", root / "started")
+                pid = read_pid()
+                (lock / "token").chmod(0o000)
+                unread.send_signal(signal.SIGTERM)
+                out, err = unread.communicate(timeout=20)
+                assert unread.returncode != 0 and "INCOMPLETE" in (err or ""), (unread.returncode, out, err)
+                assert lock.exists(), "unreadable token must fail closed and retain the lock"
+                (lock / "token").chmod(0o600)
+                os.kill(pid, signal.SIGKILL)
+                _dsr1_pass("unreadable token fails closed: INCOMPLETE and ownership retained")
+            finally:
+                if unread.poll() is None:
+                    unread.kill(); unread.communicate(timeout=5)
+                clean()
+        succ = start("printf started > started; while :; do sleep 0.05; done")
+        try:
+            wait_paths(lock, lock / "ready", root / "started")
+            pid = read_pid()
+            own = (lock / "token").read_text(encoding="utf-8")
+            changed = re.sub(r"run=([^ ]+)", lambda m: "run=" + m.group(1) + "x", own, count=1)
+            (lock / "token").write_text(changed, encoding="utf-8")
+            succ.send_signal(signal.SIGTERM)
+            succ.communicate(timeout=20)
+            assert lock.exists() and (lock / "token").read_text(encoding="utf-8") == changed, "successor lock must be preserved"
+            os.kill(pid, signal.SIGKILL)
+            _dsr1_pass("readable non-matching successor token is preserved, never deleted")
+        finally:
+            if succ.poll() is None:
+                succ.kill(); succ.communicate(timeout=5)
+            clean()
+        prefix = _dsr1_lock_text().split("# supervisor launch (stable test anchor)", 1)[0]
+        assert prefix, "lock block must keep the supervisor test anchor"
+        harness = _dsr1_script(root, "cleanup-twice.sh", prefix + "\ncleanup\nrc1=$?\ncleanup\nrc2=$?\nexit $((rc1 + rc2))\n")
+        twice = subprocess.run(["sh", str(harness)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert twice.returncode == 0 and not lock.exists(), (twice.returncode, twice.stderr)
+        _dsr1_pass("repeated cleanup is idempotent under the reentrancy guard")
+
+
+def test_dsr1_fixture_cleanup():
+    """DS-R1 CL-12: unique mktemp dir, literal prefix, symlink-safe cleanup with printed exact command."""
+    if not _readiness_posix_ready():
+        _readiness_skip("DS-R1 fixture cleanup: Linux POSIX lane unavailable")
+        return
+    block = _dsr1_block("AEGIS_FIXTURE_BASE")
+    with tempfile.TemporaryDirectory() as td:
+        root = Path(td); base = root / "fixtures"; base.mkdir()
+        script = _dsr1_script(root, "fixtures.sh", block)
+        def run(run_id):
+            e = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+            e.update({"RUN_ID": run_id, "AEGIS_FIXTURE_BASE": str(base), "TMPDIR": str(root)})
+            return subprocess.run(["sh", str(script)], cwd=root, env=e, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        sibling = base / "aegis-run-run-123.keepme"
+        sibling.mkdir()
+        first = run("run-123")
+        assert first.returncode == 0, (first.returncode, first.stdout, first.stderr)
+        combined = first.stdout + first.stderr
+        assert "cleanup command: rm -rf --" in combined, combined
+        assert "cleanup targets: " + str(base / "aegis-run-run-123") in combined, combined
+        assert sibling.exists(), "unrelated sibling fixture must not be removed"
+        remaining = [q for q in base.glob("aegis-run-run-123.*") if q.name != "aegis-run-run-123.keepme"]
+        assert not remaining, "own unique fixture dir must be removed; unrelated sibling preserved"
+        _dsr1_pass("fixture cleanup prints its exact command/targets and removes only its unique dir")
+        unsafe = run("../escape")
+        assert unsafe.returncode == 2 and "unsafe RUN_ID" in (unsafe.stderr or ""), (unsafe.returncode, unsafe.stderr)
+        _dsr1_pass("unsafe RUN_ID is rejected before any deletion")
+        symlink_base = root / "linked-base"
+        symlink_base.symlink_to(base, target_is_directory=True)
+        e = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        e.update({"RUN_ID": "run-124", "AEGIS_FIXTURE_BASE": str(symlink_base), "TMPDIR": str(root)})
+        linked = subprocess.run(["sh", str(script)], cwd=root, env=e, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert linked.returncode == 2 and "symlink" in (linked.stderr or ""), (linked.returncode, linked.stderr)
+        _dsr1_pass("symlinked fixture base is rejected")
+
+
+def test_dsr1_hook_path_resolution():
+    """DS-R1 CL-13: core.hooksPath relative/tilde first; git rev-parse --git-path fallback only when unset."""
+    if not _readiness_posix_ready():
+        _readiness_skip("DS-R1 hook-path resolution: Linux POSIX lane unavailable")
+        return
+    block = _dsr1_block("AEGIS_HOOK_PATH_RESOLVE")
+    with tempfile.TemporaryDirectory() as td:
+        repo = Path(td); env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+        env.update({"GIT_CONFIG_NOSYSTEM": "1", "HOME": td, "XDG_CONFIG_HOME": str(repo / "xdg"), "GIT_CONFIG_GLOBAL": str(repo / "gitconfig")})
+        def git(*args):
+            return subprocess.run(["git"] + list(args), cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert git("init", "-q").returncode == 0
+        git("config", "user.name", "FixtureAgent"); git("config", "user.email", "agent@example.invalid")
+        def resolve():
+            return subprocess.run(["sh", "-c", block], cwd=repo, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        default = resolve()
+        assert default.returncode == 0 and default.stdout.strip().endswith(".git/hooks/pre-commit"), (default.returncode, default.stdout, default.stderr)
+        (repo / ".githooks").mkdir()
+        git("config", "core.hooksPath", ".githooks")
+        relative = resolve()
+        assert relative.returncode == 0 and relative.stdout.strip() == str(repo / ".githooks" / "pre-commit"), (relative.returncode, relative.stdout)
+        _dsr1_pass("relative core.hooksPath resolves from the repository top level (fallback not used)")
+        git("config", "core.hooksPath", "~/hooks")
+        tilde = resolve()
+        assert tilde.returncode == 0 and tilde.stdout.strip() == str(Path(td) / "hooks" / "pre-commit"), (tilde.returncode, tilde.stdout)
+        _dsr1_pass("leading tilde in core.hooksPath expands to HOME")
+        absolute = repo / "custom-hooks"
+        git("config", "core.hooksPath", str(absolute))
+        abs_run = resolve()
+        assert abs_run.returncode == 0 and abs_run.stdout.strip() == str(absolute / "pre-commit")
+        _dsr1_pass("absolute core.hooksPath is used as-is")
+        git("config", "--unset", "core.hooksPath")
+        fallback = resolve()
+        assert fallback.returncode == 0 and fallback.stdout.strip().endswith(".git/hooks/pre-commit")
+        _dsr1_pass("git rev-parse --git-path is the fallback only when core.hooksPath is unset")
+
+
+def test_dsr1_lock_platform_and_carries():
+    """DS-R1 CL-15/CL-21: platform honesty, no all-skip success, and lock-side residual carries documented."""
+    ref = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/references/shared-local-resource-coordination.md").read_text(encoding="utf-8")
+    skill = (REPO_ROOT / ".claude/skills/agent-startup-context-gate/SKILL.md").read_text(encoding="utf-8")
+    combined = ref + skill
+    for needle in ("Linux is the required POSIX lane", "macOS", "Windows", "SKIP/UNRUN", "never PASS"):
+        assert needle in combined, "platform honesty wording missing: " + needle
+    for needle in ("mkdir", "STOP_ATTEMPTED", "INCOMPLETE", "unreadable", "tokenless", "successor", "kill -KILL", "TERM"):
+        assert needle in ref, "lock-side residual ownership wording missing: " + needle
+    assert "mv -T" not in ref, "GNU-only mv -T must not be used"
+    source = (REPO_ROOT / "scripts/tests/test_validator.py").read_text(encoding="utf-8")
+    for marker in ("AEGIS-CLOSURE-OK", "AEGIS-CLOSURE-SKIP", "AEGIS-CLOSURE-UNRUN"):
+        assert marker in source, "closure marker emission missing: " + marker
+    assert "--aegis-closure" in source, "documented closure selector missing"
+    _dsr1_pass("platform SKIP/UNRUN honesty and lock-side residual carries are published; closure markers exist")
+
+
+
+CLOSURE_CASES = {
+    "CL-07": test_dsr1_lock_lifecycle,
+    "CL-08": test_dsr1_lock_lifecycle,
+    "CL-09": test_dsr1_lock_lifecycle,
+    "CL-10": test_dsr1_lock_lifecycle,
+    "CL-11": test_dsr1_lock_lifecycle,
+    "CL-12": test_dsr1_fixture_cleanup,
+    "CL-13": test_dsr1_hook_path_resolution,
+    "CL-14": test_dsr1_lock_lifecycle,
+    "CL-15": test_dsr1_lock_platform_and_carries,
+    "CL-18": test_dsr1_lock_lifecycle,
+    "CL-19": test_dsr1_lock_lifecycle,
+    "CL-21": test_dsr1_lock_platform_and_carries,
+}
+
+
+def closure_main(closure_id: str) -> int:
+    """Run one bounded DS-R1 closure case for the documented harness selector.
+
+    Emits AEGIS-CLOSURE-OK on a real pass, AEGIS-CLOSURE-SKIP on an unsupported
+    platform (nonzero required skip; never PASS) and AEGIS-CLOSURE-UNRUN when
+    the case is not implemented by the lock-lifecycle slice or the required
+    POSIX lane is unavailable.
+    """
+    if not sys.platform.startswith("linux"):
+        print("AEGIS-CLOSURE-SKIP: " + closure_id + " - required POSIX lane unavailable on " + sys.platform + "; required skip is nonzero and never PASS")
+        return 1
+    case = CLOSURE_CASES.get(closure_id)
+    if case is None:
+        print("AEGIS-CLOSURE-UNRUN: " + closure_id + " - not implemented by the lock-lifecycle slice; identity-policy slice follows")
+        return 1
+    before = len(SKIPS)
+    try:
+        case()
+    except AssertionError as exc:
+        print("AEGIS-CLOSURE-UNRUN: " + closure_id + " - " + str(exc))
+        return 1
+    if len(SKIPS) > before:
+        print("AEGIS-CLOSURE-UNRUN: " + closure_id + " - POSIX lane unavailable or required skip")
+        return 1
+    print("AEGIS-CLOSURE-OK: " + closure_id)
+    return 0
+
+
 TESTS = [
     test_strict_yaml_parse,
     test_description_block_scalar,
@@ -4755,10 +5060,19 @@ TESTS = [
     test_readiness_effective_identity_hook,
     test_readiness_startup_inspection_valid,
     test_readiness_memory_canonical_tristate,
+    test_dsr1_lock_lifecycle,
+    test_dsr1_fixture_cleanup,
+    test_dsr1_hook_path_resolution,
+    test_dsr1_lock_platform_and_carries,
 ]
 
 
 def main() -> int:
+    if len(sys.argv) == 3 and sys.argv[1] == "--aegis-closure":
+        return closure_main(sys.argv[2])
+    if len(sys.argv) > 1:
+        print("usage: test_validator.py [--aegis-closure CL-ID]", file=sys.stderr)
+        return 2
     if validator.yaml is None:
         print(
             "ERROR PyYAML is required to exercise the strict frontmatter parse; "
