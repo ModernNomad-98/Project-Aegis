@@ -130,9 +130,9 @@ echo "STARTUP: effective author=$AUTHOR_NAME <$AUTHOR_EMAIL> committer=$COMMITTE
 The complete executable pre-commit hook below implements the same effective-identity
 policy. It reads the owner identity from local-only config, requires a non-empty
 effective author AND committer from `git var`, and refuses only when the effective
-author or committer equals the recorded owner. Install it at the effective hook path:
-resolve `core.hooksPath` with `git config --get core.hooksPath`, else use
-`git rev-parse --git-path hooks/pre-commit`; verify the chosen path is executable, and
+author or committer equals the recorded owner. Install it at the effective hook path.
+Resolve core.hooksPath FIRST: a relative value resolves from the repository top level and a leading tilde expands to HOME;
+use git rev-parse --git-path hooks/pre-commit ONLY when core.hooksPath is unset. Verify the chosen path is executable, and
 treat hook-file presence as presence, not authenticity (inspect contents/owner/hash).
 
 ```sh
@@ -173,6 +173,34 @@ amend/recreate before push or stop and report. Local hooks are not a security bo
 `git commit --no-verify` bypasses them. No global hook, host setting or remote identity
 service is promised.
 
+## Shared Local Lock Before E2E/Validation
+
+When parallel agents could share a local stack, port, database, lock directory or fixture
+set, coordinate ownership before any E2E or validation run. Use the atomic lock-directory
+protocol in references/shared-local-resource-coordination.md:
+
+- Create the lock with mkdir as the single atomic primitive; never steal or delete a
+  foreign, tokenless or successor lock. Existing lock with a different readable token is
+  contention (exit 1, inspect and wait/escalate); an unreadable token fails closed.
+- Write owner, run id, acquisition time and ttl into the lock, and release only after the
+  full stored token matches this run. Traps make ONE cleanup attempt: set trap '' INT TERM
+  in the handler before cleanup, reset reentrancy/stop flags on failure, and never claim
+  the lock was retained or released when it was not.
+- Own and stop only the direct child workload with bounded TERM then KILL waits and
+  zombie reaping. Do not depend on POSIX-undefined process-group signalling or on GNU-only
+  mv -T. If the child is genuinely alive after the bounded stop window, retain ownership
+  and report INCOMPLETE; never report the resource free.
+- Fixture cleanup removes only this run's unique mktemp directory under a literal prefix,
+  rejects symlinked bases/dirs, prints the exact rm -rf command and target paths before
+  removal, and reports failure. Broad delete/reset is always a stop.
+- Platform honesty: Linux is the required POSIX lane (OK, required); macOS is local/UNRUN
+  with no readiness claim; Windows is SKIP/UNRUN with a nonzero required skip; unsupported
+  shell/tool capability is UNRUN. SKIP/UNRUN is never PASS and no all-skip success counts.
+
+The shared-resource reference also carries the effective hook-path resolver: core.hooksPath
+(relative resolved from the repository top level; tilde expanded) takes precedence, and
+git rev-parse --git-path hooks/pre-commit is only the fallback when core.hooksPath is unset.
+
 ## Output Format
 
 A Startup Context Report, delivered in the conversation (or as a file if the
@@ -200,6 +228,8 @@ Verdict: PROCEED | HALTED — <question for the human>
 - [ ] No assumption silently promoted to fact.
 - [ ] Every task-referenced file confirmed present, or flagged missing.
 - [ ] Blocking unknowns escalated to the human, not guessed around.
+- [ ] Shared local resources use the mkdir lock with an owner token, a single-attempt trap release, bounded direct-child TERM/KILL, foreign/tokenless/successor preservation and a fail-closed unreadable-token path; unsupported platforms are SKIP/UNRUN, never PASS.
+- [ ] Effective hook path resolves core.hooksPath first (relative/tilde handled) before the git rev-parse --git-path fallback, and hook presence is not claimed as authenticity.
 
 ## Gotchas
 
@@ -237,6 +267,7 @@ Verdict: PROCEED | HALTED — <question for the human>
 
 ## Supporting Files
 
+- references/shared-local-resource-coordination.md - exclusive local-resource lock, owner token, bounded child stop, fixture cleanup and effective hook-path resolution.
 - [references/context-source-checklist.md](references/context-source-checklist.md) —
   identity-signal table and reading precedence, per repo type.
 - `evals/evals.json` — trigger + behavior cases, including the
