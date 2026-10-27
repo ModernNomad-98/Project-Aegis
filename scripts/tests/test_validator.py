@@ -6208,6 +6208,482 @@ def test_cl2_predicate_perf():
     ok("CL2: adversarial < 100 ms each; 304-string corpus %.1f ms" % corpus_ms)
 
 
+# --- DS-7c-b: generated README count markers (APR-148) ---------------------
+#
+# The writer and print modes are driven in-process with sys.argv patched, so
+# the real flag dispatch runs while the README under test is a disposable copy.
+# The one end-to-end CLI reading (T1) runs the real command in the repository
+# root and proves it writes nothing; no test writes into the working tree.
+
+README_BASE_SHA = ("dff4542520a0e7989b0df001b24fc30723ab68e60e29a479"
+                   "f74bc857b6ba88c5")
+DS7CB_BASE = "7ed9fbd4059ea83238998d9852a9a661688c6e6d"
+# Base pins measured at Stage C over the base revision's validate-skills.py
+# with the C-11a probe: AST inventory counts and the two function source
+# segments. This is the T10 closure; AC-11 re-derives it from git.
+DS7CB_BASE_AST = {
+    "check_readme_counts": {"isinstance": 0, "rep_error": 2,
+                            "if_return": 2, "except": 0},
+    "check_readme_family_roster": {"isinstance": 0, "rep_error": 3,
+                                   "if_return": 3, "except": 0},
+    "main": {"isinstance": 3, "rep_error": 1, "if_return": 8, "except": 3},
+}
+DS7CB_BASE_SOURCE_SHA = {
+    "check_readme_counts":
+        "49eee172eb8981a7c35e948333fb4b9a4c24b4d21095cad06f563785cb0222f3",
+    "check_readme_family_roster":
+        "c97705bd5c3ec192b108c590d204a41f8e3a83504cac0d8a0051a14eadf352b2",
+}
+
+
+def _ds7cb_readme_base() -> bytes:
+    return (REPO_ROOT / "README.md").read_bytes()
+
+
+def _ds7cb_tamper_skill(data: bytes, digits: bytes = b"999") -> bytes:
+    """Drift the marked SKILL-COUNT; the digit run is the only changed byte."""
+    return data.replace(b"<!-- SKILL-COUNT -->254<!--",
+                        b"<!-- SKILL-COUNT -->" + digits + b"<!--", 1)
+
+
+def _ds7cb_main(*argv: str) -> tuple[int, str]:
+    """Run validator.main() with a patched argv and captured stdout."""
+    original = sys.argv
+    sys.argv = ["validate-skills.py", *argv]
+    out = io.StringIO()
+    try:
+        with contextlib.redirect_stdout(out):
+            code = validator.main()
+    finally:
+        sys.argv = original
+    return code, out.getvalue()
+
+
+def _ds7cb_copy_readme(tmpdir: Path, data: bytes) -> Path:
+    """A disposable README plus the docs/paths mirror its link check reads."""
+    path = tmpdir / "README.md"
+    path.write_bytes(data)
+    paths_dir = tmpdir / "docs" / "paths"
+    paths_dir.mkdir(parents=True, exist_ok=True)
+    for doc in sorted((REPO_ROOT / "docs" / "paths").glob("*.md")):
+        shutil.copyfile(doc, paths_dir / doc.name)
+    return path
+
+
+def _ds7cb_counts(fn):
+    walks = list(ast.walk(fn))
+    isinst = sum(1 for n in walks if isinstance(n, ast.Call)
+                 and isinstance(n.func, ast.Name)
+                 and n.func.id == "isinstance")
+    errs = sum(1 for n in walks if isinstance(n, ast.Call)
+               and isinstance(n.func, ast.Attribute)
+               and n.func.attr == "error")
+    guards = sum(1 for n in walks if isinstance(n, ast.If)
+                 and any(isinstance(s, (ast.Return, ast.Raise))
+                         for s in n.body))
+    handlers = sum(1 for n in walks if isinstance(n, ast.ExceptHandler))
+    return {"isinstance": isinst, "rep_error": errs,
+            "if_return": guards, "except": handlers}
+
+
+def _ds7cb_function_nodes(text: str) -> dict:
+    return {node.name: node for node in ast.parse(text).body
+            if isinstance(node, ast.FunctionDef)}
+
+
+def test_ds7cb_readme_writer_determinism():
+    """DS-7c-b T1: two copies write identical bytes; the real CLI writes nothing."""
+    base = _ds7cb_readme_base()
+    tampered = _ds7cb_tamper_skill(base)
+    written = []
+    with tempfile.TemporaryDirectory() as tmp:
+        for name in ("copy-a", "copy-b"):
+            folder = Path(tmp) / name
+            folder.mkdir()
+            path = _ds7cb_copy_readme(folder, tampered)
+            with readme_at(path):
+                code, out = _ds7cb_main("--write-readme-counts")
+            assert code == 0, out
+            assert "(updated)" in out, out
+            written.append(path.read_bytes())
+    assert written[0] == written[1], "two copies must derive identical bytes"
+    assert b"<!-- SKILL-COUNT -->254<!--" in written[0]
+    ok("T1: two independent copies derive identical written bytes (SKILL-COUNT 254)")
+
+    def porcelain():
+        return subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "status", "--porcelain"],
+            capture_output=True, check=True).stdout
+
+    before = porcelain()
+    proc = subprocess.run(
+        [sys.executable, "-P", "scripts/validate-skills.py",
+         "--print-readme-counts"],
+        cwd=REPO_ROOT, capture_output=True, text=True)
+    after = porcelain()
+    assert proc.returncode == 0, proc.stderr
+    assert proc.stdout.strip() == "SKILL-COUNT=254 FAMILY-COUNT=23", proc.stdout
+    assert after == before, (before, after)
+    ok("T1: real CLI prints exactly SKILL-COUNT=254 FAMILY-COUNT=23, "
+       "exit 0, porcelain byte-identical")
+
+
+def test_ds7cb_readme_writer_idempotence_crlf():
+    """DS-7c-b T2: a second run is a no-op; a CRLF copy keeps every CRLF."""
+    base = _ds7cb_readme_base()
+    tampered = _ds7cb_tamper_skill(base)
+    with tempfile.TemporaryDirectory() as tmp:
+        folder = Path(tmp)
+        path = _ds7cb_copy_readme(folder, tampered)
+        with readme_at(path):
+            code1, out1 = _ds7cb_main("--write-readme-counts")
+            first = path.read_bytes()
+            digest = hashlib.sha256(first).hexdigest()
+            code2, out2 = _ds7cb_main("--write-readme-counts")
+        assert code1 == 0 and "(updated)" in out1, out1
+        assert code2 == 0 and "(unchanged)" in out2, out2
+        assert path.read_bytes() == first, "the second run must not write"
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == digest
+        assert not (folder / "README.md.ds7cb-tmp").exists()
+        ok("T2: a second run prints (unchanged) with a stable sha256 and no temp file")
+
+        crlf = base.replace(b"\n", b"\r\n")
+        crlf_tampered = _ds7cb_tamper_skill(crlf, b"998")
+        path.write_bytes(crlf_tampered)
+        with readme_at(path):
+            code, out = _ds7cb_main("--write-readme-counts")
+        assert code == 0, out
+        repaired = path.read_bytes()
+        assert b"<!-- SKILL-COUNT -->254<!--" in repaired
+        ok("T2: a CRLF copy repairs its drifted marker")
+        assert repaired.count(b"\r\n") == crlf.count(b"\r\n")
+        assert repaired.count(b"\n") == crlf.count(b"\n")
+        assert repaired.count(b"\r") == crlf.count(b"\r")
+        marker = re.compile(
+            rb"(<!-- SKILL-COUNT -->)(\d+)(<!-- /SKILL-COUNT -->)")
+        assert (marker.sub(rb"\1N\3", repaired, count=1)
+                == marker.sub(rb"\1N\3", crlf_tampered, count=1))
+        ok("T2: every CRLF preserved and only the digit bytes changed")
+
+
+def test_ds7cb_readme_writer_refuses_missing_marker():
+    """DS-7c-b T3: a missing SKILL-COUNT marker is refused, never invented."""
+    base = _ds7cb_readme_base()
+    missing = base.replace(
+        b"<!-- SKILL-COUNT -->254<!-- /SKILL-COUNT -->", b"", 1)
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _ds7cb_copy_readme(Path(tmp), missing)
+        before = path.read_bytes()
+        with readme_at(path):
+            code, out = _ds7cb_main("--write-readme-counts")
+        assert code == 1, out
+        assert out.strip() == (
+            "ERROR writer: SKILL-COUNT marker missing (fail closed)"), out
+        assert path.read_bytes() == before
+    ok("T3: a missing SKILL-COUNT marker is refused (R1 literal, no write)")
+
+
+def test_ds7cb_readme_writer_refuses_duplicate_marker():
+    """DS-7c-b T4: a duplicated SKILL-COUNT marker is refused, not silently used."""
+    base = _ds7cb_readme_base()
+    pair = b"<!-- SKILL-COUNT -->254<!-- /SKILL-COUNT -->"
+    duplicated = base.replace(pair, pair + pair, 1)
+    assert duplicated != base
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _ds7cb_copy_readme(Path(tmp), duplicated)
+        before = path.read_bytes()
+        with readme_at(path):
+            rep = validator.Report()
+            validator.check_readme_counts(254, rep)
+            assert not rep.errors, (
+                "the base check searches and cannot see a duplicate: "
+                + repr(rep.errors))
+            code, out = _ds7cb_main("--write-readme-counts")
+        assert code == 1, out
+        assert out.strip() == (
+            "ERROR writer: 2 SKILL-COUNT markers found; ambiguous "
+            "(fail closed)"), out
+        assert path.read_bytes() == before
+    ok("T4: a duplicated SKILL-COUNT marker is refused (R2 literal, no write)")
+
+
+def test_ds7cb_readme_writer_repairs_drift():
+    """DS-7c-b T5: a drifted marker is repaired to the derived value."""
+    base = _ds7cb_readme_base()
+    tampered = _ds7cb_tamper_skill(base)
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _ds7cb_copy_readme(Path(tmp), tampered)
+        with readme_at(path):
+            code, out = _ds7cb_main("--write-readme-counts")
+        assert code == 0, out
+        assert out.strip() == (
+            "README counts: SKILL-COUNT 254, FAMILY-COUNT 23 (updated)"), out
+        repaired = path.read_bytes()
+        assert hashlib.sha256(repaired).hexdigest() == README_BASE_SHA
+        ok("T5: a drifted SKILL-COUNT (999) is repaired to 254 (S1 literal, "
+           "base bytes restored)")
+        old_lines = tampered.splitlines()
+        new_lines = repaired.splitlines()
+        assert len(old_lines) == len(new_lines)
+        changed = [index for index, (old, new) in enumerate(zip(old_lines, new_lines))
+                   if old != new]
+        assert len(changed) == 1, changed
+        index = changed[0]
+        assert old_lines[index].replace(b"999", b"254", 1) == new_lines[index]
+        with readme_at(path):
+            code, out = _ds7cb_main()
+        assert code == 0, out[-2000:]
+        ok("T5: exactly one line differs, only inside the digit run, and the "
+           "validator passes afterwards")
+
+
+def test_ds7cb_readme_writer_refuses_roster_sum():
+    """DS-7c-b T6: an inconsistent roster sum is refused, never 'fixed'."""
+    base = _ds7cb_readme_base()
+    assert base.count(b"*(Phase 2, 30)*") == 1
+    drifted = base.replace(b"*(Phase 2, 30)*", b"*(Phase 2, 31)*", 1)
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _ds7cb_copy_readme(Path(tmp), drifted)
+        with readme_at(path):
+            code, out = _ds7cb_main("--write-readme-counts")
+        assert code == 1, out
+        assert out.strip() == (
+            "ERROR writer: roster sum 254 + 1 = 255 != 254 skill(s) on disk; "
+            "not rewriting"), out
+        assert path.read_bytes() == drifted
+    ok("T6: a roster sum of 255 is refused (R7 literal, neither number written)")
+
+
+def test_ds7cb_readme_writer_refuses_manifest():
+    """DS-7c-b T7: a manifest disagreement is refused (R8)."""
+    base = _ds7cb_readme_base()
+    tampered = _ds7cb_tamper_skill(base)
+    with tempfile.TemporaryDirectory() as tmp:
+        folder = Path(tmp)
+        path = _ds7cb_copy_readme(folder, tampered)
+        payload = json.loads(
+            (REPO_ROOT / "tools" / "skills-manifest.json").read_text(
+                encoding="utf-8"))
+        dropped = dict(payload)
+        dropped["skills"] = payload["skills"][:-1]
+        manifest = folder / "skills-manifest.json"
+        manifest.write_text(json.dumps(dropped, indent=2) + "\n",
+                            encoding="utf-8", newline="\n")
+        original = validator.MANIFEST_PATH
+        validator.MANIFEST_PATH = manifest
+        try:
+            with readme_at(path):
+                code, out = _ds7cb_main("--write-readme-counts")
+        finally:
+            validator.MANIFEST_PATH = original
+        assert code == 1, out
+        assert out.strip().splitlines()[-1] == (
+            "ERROR writer: skills manifest disagrees with disk "
+            "(fail closed)"), out
+        assert path.read_bytes() == tampered
+    ok("T7: a dropped manifest entry is refused (R8 literal, no write)")
+
+
+def test_ds7cb_readme_writer_advisory_baseline():
+    """DS-7c-b T8: the audit baseline is advisory, never blocking."""
+    base = _ds7cb_readme_base()
+    tampered = _ds7cb_tamper_skill(base)
+    with tempfile.TemporaryDirectory() as tmp:
+        folder = Path(tmp)
+        path = _ds7cb_copy_readme(folder, tampered)
+        payload = json.loads(
+            (REPO_ROOT / "artifacts" / "audits"
+             / "skill-contract-audit-baseline.json").read_text(encoding="utf-8"))
+        payload["summary"]["skill_count"] = 253
+        baseline = folder / "skill-contract-audit-baseline.json"
+        baseline.write_text(json.dumps(payload, indent=2) + "\n",
+                            encoding="utf-8", newline="\n")
+        original = validator.AUDIT_BASELINE_PATH
+        validator.AUDIT_BASELINE_PATH = baseline
+        try:
+            with readme_at(path):
+                code, out = _ds7cb_main("--write-readme-counts")
+        finally:
+            validator.AUDIT_BASELINE_PATH = original
+        assert code == 0, out
+        assert ("WARN writer: audit baseline says 253, disk says 254 "
+                "(advisory)") in out, out
+        assert path.read_bytes() == base
+    ok("T8: a stale audit baseline warns (W0 literal) and the correct value "
+       "is still written")
+
+
+def test_ds7cb_default_path_differential():
+    """DS-7c-b T9: base and head validators behave identically with no flag."""
+    with tempfile.TemporaryDirectory() as tmp:
+        copy_root = Path(tmp) / "repo"
+        shutil.copytree(REPO_ROOT, copy_root)
+        base_source = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "show",
+             DS7CB_BASE + ":scripts/validate-skills.py"],
+            capture_output=True, check=True).stdout
+        (copy_root / "scripts" / "validate-skills-base.py").write_bytes(
+            base_source)
+        base_run = subprocess.run(
+            [sys.executable, "-P", "scripts/validate-skills-base.py"],
+            cwd=copy_root, capture_output=True)
+        head_run = subprocess.run(
+            [sys.executable, "-P", "scripts/validate-skills.py"],
+            cwd=copy_root, capture_output=True)
+        assert base_run.returncode == head_run.returncode, (
+            base_run.returncode, head_run.returncode,
+            base_run.stderr[-800:], head_run.stderr[-800:])
+        assert base_run.returncode == 0, head_run.stderr[-800:]
+        ok("T9: the no-flag exit code is identical (0) for the base and the "
+           "changed validator")
+        assert base_run.stdout == head_run.stdout, (
+            base_run.stdout[-1500:], head_run.stdout[-1500:])
+        ok("T9: the no-flag stdout bytes are identical")
+
+
+def test_ds7cb_guard_closure():
+    """DS-7c-b T10: the guard-clause inventory and the two bodies are unchanged."""
+    text = VALIDATOR_PATH.read_text(encoding="utf-8")
+    nodes = _ds7cb_function_nodes(text)
+    for name, pinned in DS7CB_BASE_AST.items():
+        assert name in nodes, name + " disappeared"
+        head = _ds7cb_counts(nodes[name])
+        for key, value in pinned.items():
+            assert head[key] >= value, (name, key, head[key], value)
+    assert "_run_repo_checks" in nodes, "the extracted runner must exist"
+    ok("T10: the AST guard inventory does not decrease for main and both "
+       "README checks")
+    for name, digest in DS7CB_BASE_SOURCE_SHA.items():
+        segment = ast.get_source_segment(text, nodes[name])
+        assert hashlib.sha256(segment.encode("utf-8")).hexdigest() == digest, name
+    ok("T10: both README check source segments hash-equal the base pin")
+
+
+def test_ds7cb_atomic_write_failure():
+    """DS-7c-b T11: a forced replace failure leaves the original intact."""
+    base = _ds7cb_readme_base()
+    tampered = _ds7cb_tamper_skill(base)
+    with tempfile.TemporaryDirectory() as tmp:
+        folder = Path(tmp)
+        path = _ds7cb_copy_readme(folder, tampered)
+        before = path.read_bytes()
+        digest = hashlib.sha256(before).hexdigest()
+
+        def _injected_replace(source, target):
+            raise OSError("injected os.replace failure")
+
+        original_replace = validator.os.replace
+        validator.os.replace = _injected_replace
+        try:
+            with readme_at(path):
+                code, out = _ds7cb_main("--write-readme-counts")
+        finally:
+            validator.os.replace = original_replace
+        assert code == 1, out
+        assert out.strip().splitlines()[-1] == (
+            "ERROR writer: cannot write README.md; original left intact"), out
+        ok("T11: an injected os.replace failure exits 1 with the R14 literal")
+
+        after = path.read_bytes()
+        assert after == before
+        assert hashlib.sha256(after).hexdigest() == digest
+        assert len(after) == len(tampered) and after.count(b"\r") == 0
+        ok("T11: README bytes and sha256 unchanged (same length, 0 CR)")
+
+        assert not (folder / "README.md.ds7cb-tmp").exists()
+        assert not (REPO_ROOT / "README.md.ds7cb-tmp").exists()
+        ok("T11: no README.md.ds7cb-tmp residue after the failed write")
+
+
+def test_ds7cb_prewrite_narrowness():
+    """DS-7c-b T12: the skip guard is exactly two calls and nothing recomputes."""
+    text = VALIDATOR_PATH.read_text(encoding="utf-8")
+    nodes = _ds7cb_function_nodes(text)
+    runner = nodes["_run_repo_checks"]
+    main_fn = nodes["main"]
+    writer = nodes["write_readme_counts"]
+    skip_ifs = [n for n in ast.walk(runner) if isinstance(n, ast.If)
+                and "skip_readme_markers"
+                in (ast.get_source_segment(text, n) or "")]
+    assert len(skip_ifs) == 1, [ast.get_source_segment(text, n) for n in skip_ifs]
+    wrapped = [ast.get_source_segment(text, statement.value)
+               for statement in skip_ifs[0].body]
+    assert wrapped == [
+        "check_readme_counts(real_count, rep)",
+        "check_readme_family_roster(real_count, rep)"], wrapped
+    for fn, label, expected in ((runner, "_run_repo_checks", 2),
+                                (main_fn, "main", 0)):
+        hits = [n for n in ast.walk(fn) if isinstance(n, ast.Call)
+                and isinstance(n.func, ast.Name)
+                and n.func.id in ("check_readme_counts",
+                                  "check_readme_family_roster")]
+        assert len(hits) == expected, (label, len(hits))
+    ok("T12: exactly one skip guard wraps exactly the two README marker calls; "
+       "neither name occurs in main()")
+
+    writer_calls = sorted(
+        (n for n in ast.walk(writer) if isinstance(n, ast.Call)
+         and isinstance(n.func, ast.Name)),
+        key=lambda n: (n.lineno, n.col_offset))
+    call_names = [n.func.id for n in writer_calls]
+    assert "check_ignored_skill_security" in call_names
+    assert "_run_repo_checks" in call_names
+    assert (call_names.index("check_ignored_skill_security")
+            < call_names.index("_run_repo_checks"))
+    runner_call = writer_calls[call_names.index("_run_repo_checks")]
+    assert {kw.arg: ast.get_source_segment(text, kw.value)
+            for kw in runner_call.keywords} == {"skip_readme_markers": "True"}
+    ok("T12: the write mode's pre-write composition is "
+       "check_ignored_skill_security then "
+       "_run_repo_checks(..., skip_readme_markers=True)")
+
+    assert [a.arg for a in runner.args.args] == ["rep", "skills"]
+    assert [a.arg for a in runner.args.kwonlyargs] == [
+        "skip_readme_markers", "refresh_manifest", "manifest_ref"]
+    manifest_calls = [n for n in ast.walk(runner) if isinstance(n, ast.Call)
+                      and isinstance(n.func, ast.Name)
+                      and n.func.id == "check_skills_manifest"]
+    assert len(manifest_calls) == 1
+    assert {kw.arg: ast.get_source_segment(text, kw.value)
+            for kw in manifest_calls[0].keywords} == {
+        "refresh": "refresh_manifest", "manifest_ref": "manifest_ref"}
+    main_runner_calls = [n for n in ast.walk(main_fn) if isinstance(n, ast.Call)
+                         and isinstance(n.func, ast.Name)
+                         and n.func.id == "_run_repo_checks"]
+    assert len(main_runner_calls) == 1
+    assert {kw.arg: ast.get_source_segment(text, kw.value)
+            for kw in main_runner_calls[0].keywords} == {
+        "refresh_manifest": "refresh_manifest",
+        "manifest_ref": "manifest_ref"}
+    ok("T12: the manifest parameters are threaded from main()'s own locals, "
+       "not recomputed")
+
+
+def test_ds7cb_non_readme_failure_refuses():
+    """DS-7c-b T13: a non-README check failure still refuses the write (R9)."""
+    base = _ds7cb_readme_base()
+    tampered = _ds7cb_tamper_skill(base)
+    with tempfile.TemporaryDirectory() as tmp:
+        folder = Path(tmp)
+        path = _ds7cb_copy_readme(folder, tampered)
+        bad_map = folder / "coverage-map.json"
+        bad_map.write_text("{not valid json", encoding="utf-8", newline="\n")
+        original = validator.COVERAGE_MAP
+        validator.COVERAGE_MAP = bad_map
+        try:
+            with readme_at(path):
+                code, out = _ds7cb_main("--write-readme-counts")
+        finally:
+            validator.COVERAGE_MAP = original
+        assert code == 1, out
+        assert out.strip().splitlines()[-1] == (
+            "ERROR writer refused to write over a failing tree"), out
+        ok("T13: a non-README check failure refuses the write with the R9 "
+           "literal")
+        assert path.read_bytes() == tampered
+        ok("T13: the README is unchanged when the pre-write suite fails")
+
+
 TESTS = [
     test_fix942_total_guard_regressions,
     test_ds7cfixb_coverage_detector_matrix,
@@ -6302,6 +6778,19 @@ TESTS = [
     test_cl2_exemptions_exact,
     test_cl2_oracle_identity,
     test_cl2_predicate_perf,
+    test_ds7cb_readme_writer_determinism,
+    test_ds7cb_readme_writer_idempotence_crlf,
+    test_ds7cb_readme_writer_refuses_missing_marker,
+    test_ds7cb_readme_writer_refuses_duplicate_marker,
+    test_ds7cb_readme_writer_repairs_drift,
+    test_ds7cb_readme_writer_refuses_roster_sum,
+    test_ds7cb_readme_writer_refuses_manifest,
+    test_ds7cb_readme_writer_advisory_baseline,
+    test_ds7cb_default_path_differential,
+    test_ds7cb_guard_closure,
+    test_ds7cb_atomic_write_failure,
+    test_ds7cb_prewrite_narrowness,
+    test_ds7cb_non_readme_failure_refuses,
 ]
 
 
