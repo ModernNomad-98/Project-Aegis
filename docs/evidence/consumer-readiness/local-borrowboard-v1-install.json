@@ -3,17 +3,17 @@
  "artifacts": {
   "markdown": {
    "path": "docs/evidence/consumer-readiness/local-borrowboard-v1.md",
-   "role": "compact worked install/run record with actual commands, observations and evidence hashes",
+   "role": "worked local run/readiness record with actual commands, observations and evidence hashes; install filename retained for compatibility, not full-install evidence",
    "identity": {
-    "bytes": 18749,
-    "lf": 124,
+    "bytes": 24152,
+    "lf": 151,
     "cr": 0,
-    "sha256": "be551b24726ca64c1ec14daa408c37f13ede1e3ebb7f2db5134d32504dae7e7a"
+    "sha256": "dca62703882177045b320059020a21747a742929d17b79c4d060ce354933d2d6"
    }
   },
   "install_json": {
    "path": "docs/evidence/consumer-readiness/local-borrowboard-v1-install.json",
-   "role": "actual pinned selected-file inventory with reasons, hashes and dependency disposition",
+   "role": "actual pinned selected-file inventory plus worked local run/readiness evidence; install filename retained for compatibility",
    "self_hash": null,
    "self_hash_status": "ABSENT_BY_DESIGN",
    "self_hash_policy": "No self-hash of this JSON and no self-hashed publication identity; publication is bound post-merge via SD-F, merge receipt and the immutable record."
@@ -39,7 +39,9 @@
     "lf": 34,
     "sha256": "cd005dcd95059654c3a4c2f5d0d55b453f77f7cda62b6f744ac7c64627967739",
     "reason": "single-page app shell and document entrypoint",
-    "dependency_disposition": "no external dependencies; loads local styles.css and app.js only"
+    "dependency_disposition": "no external dependencies; loads local styles.css and app.js only",
+    "cr": 34,
+    "raw_byte_note": "sha256 and bytes are over raw bytes; CRLF is part of index.html raw bytes"
    },
    {
     "path": "_A/consumer-workspaces/borrowboard-v1/styles.css",
@@ -47,7 +49,9 @@
     "lf": 57,
     "sha256": "f1080bd08c5e8bd2ecc6980961474d96f448a76465beaa2dd74dcce59a43091e",
     "reason": "local presentation layer and responsive rules",
-    "dependency_disposition": "no external dependencies or remote fonts/assets"
+    "dependency_disposition": "no external dependencies or remote fonts/assets",
+    "cr": 0,
+    "raw_byte_note": "sha256 and bytes are over raw bytes; CRLF is part of index.html raw bytes"
    },
    {
     "path": "_A/consumer-workspaces/borrowboard-v1/app.js",
@@ -55,11 +59,13 @@
     "lf": 298,
     "sha256": "648fef5d73dcadd353b9c56600e67c34e62c7b7428972c7cbfc278a234ba1d43",
     "reason": "borrowboard state, validation, search, storage and recovery behavior",
-    "dependency_disposition": "vanilla JavaScript; localStorage only; no packages, network, backend or live-model dependency"
+    "dependency_disposition": "vanilla JavaScript; localStorage only; no packages, network, backend or live-model dependency",
+    "cr": 0,
+    "raw_byte_note": "sha256 and bytes are over raw bytes; CRLF is part of index.html raw bytes"
    }
   ],
   "aggregate": {
-   "algorithm": "sha256 over UTF-8 of json.dumps([{path,bytes,lf,sha256} for index.html,styles.css,app.js in fixed order], sort_keys=True, separators=(',',':')); object keys sorted, no spaces, no trailing newline; per-file sha256 is over raw bytes and bytes+sha256 are inputs, so the aggregate is byte-sensitive; index.html is CRLF and its CR bytes are part of its raw hash; the CR count is informational and is not a normalization input.",
+   "algorithm": "sha256 over UTF-8 of json.dumps([{path,bytes,lf,sha256} for index.html,styles.css,app.js in fixed order], sort_keys=True, separators=(',',':')); object keys sorted, no spaces, no trailing newline; per-file sha256 is over raw bytes; bytes and sha256 are aggregate inputs, so CRLF/CR bytes are part of the aggregate; the CR count field is informational only and no line-ending normalization is applied.",
    "value": "797e9f5a47b914c1f32024d659d038c88066e24d57e43fcc7ddf3b565b384322",
    "proof": {
     "path": "_A/evidence/borrowboard-build1/AGGREGATE-PROOF.txt",
@@ -67,9 +73,10 @@
     "lf": 26,
     "sha256": "4b9833bbe3df3517152748967b76a67dacf47f6dc9a243661aa3e97577c12af4"
    },
-   "crlf_note": "index.html has 34 CR bytes (CRLF); raw-byte sha256 and byte count are part of the aggregate, therefore CRLF is part of the aggregate input and is not normalized away.",
+   "crlf_note": "index.html raw bytes are CRLF (cr=34); raw-byte sha256 and bytes include the CR bytes; aggregate is byte-sensitive and does not normalize line endings.",
    "recomputed_in_c2": true,
-   "recomputed_value": "797e9f5a47b914c1f32024d659d038c88066e24d57e43fcc7ddf3b565b384322"
+   "recomputed_value": "797e9f5a47b914c1f32024d659d038c88066e24d57e43fcc7ddf3b565b384322",
+   "recomputed_in_c3": true
   },
   "runner": {
    "path": "_A/consumer-workspaces/borrowboard-v1/runner/borrowboard-runner.mjs",
@@ -195,13 +202,21 @@
     "observed": "search filters to Hammer; no-results visible text 'No tools match your search.'; tool list hidden",
     "evidence_refs": [
      {
-      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
-      "bytes": 3018,
-      "lf": 5,
-      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-verify3/verification3.json",
+      "bytes": 3902,
+      "lf": 93,
+      "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
       "label": "OBSERVED"
      }
-    ]
+    ],
+    "primary_evidence": "final journey4 observations plus verify3 coverage record"
    },
    {
     "id": "B05",
@@ -209,13 +224,21 @@
     "observed": "blank-name, duplicate-name, missing-borrower and missing-due-date validations with exact copy and draft preservation",
     "evidence_refs": [
      {
-      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
-      "bytes": 3018,
-      "lf": 5,
-      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-verify3/verification3.json",
+      "bytes": 3902,
+      "lf": 93,
+      "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
       "label": "OBSERVED"
      }
-    ]
+    ],
+    "primary_evidence": "final journey4 observations plus verify3 coverage record"
    },
    {
     "id": "B06",
@@ -223,13 +246,21 @@
     "observed": "one active loan; card Borrowed; borrower Alex, due 2026-11-02, returnedAt null; duplicate submit did not create a second active loan",
     "evidence_refs": [
      {
-      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
-      "bytes": 3018,
-      "lf": 5,
-      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-verify3/verification3.json",
+      "bytes": 3902,
+      "lf": 93,
+      "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
       "label": "OBSERVED"
      }
-    ]
+    ],
+    "primary_evidence": "final journey4 observations plus verify3 coverage record"
    },
    {
     "id": "B07",
@@ -258,13 +289,21 @@
     "observed": "exact storage banner; state unchanged on failed save; draft kept; Try again recovered Hammer/Wrench/Pliers; banner hidden",
     "evidence_refs": [
      {
-      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
-      "bytes": 3018,
-      "lf": 5,
-      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-verify3/verification3.json",
+      "bytes": 3902,
+      "lf": 93,
+      "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
       "label": "OBSERVED"
      }
-    ]
+    ],
+    "primary_evidence": "final journey4 observations plus verify3 coverage record"
    },
    {
     "id": "B09",
@@ -272,18 +311,26 @@
     "observed": "320/768/1280 innerWidth=scrollWidth; min button height 44; one h1; Search tools/Name/Note labels bound; ax node count 51",
     "evidence_refs": [
      {
-      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
-      "bytes": 3018,
-      "lf": 5,
-      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-verify3/verification3.json",
+      "bytes": 3902,
+      "lf": 93,
+      "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
       "label": "OBSERVED"
      }
-    ]
+    ],
+    "primary_evidence": "final journey4 observations plus verify3 coverage record"
    },
    {
     "id": "B10",
     "result": "PASS",
-    "observed": "app file hashes confirm tested product; recovery notes recorded. Historical executor note: the journey4 executor made no readiness claim at execution time; superseded by verification3 CONFIRM and by this record's bounded readiness_statement.",
+    "observed": "app file hashes confirm tested product; recovery notes recorded. Current evidence is OBSERVED; the historical executor no-readiness recommendation is retained only under historical/superseded_by and is not a current claim.",
     "evidence_refs": [
      {
       "path": "_A/evidence/borrowboard-journey4/journey4.json",
@@ -296,6 +343,7 @@
       "path": "_A/consumer-workspaces/borrowboard-v1/index.html",
       "bytes": 1678,
       "lf": 34,
+      "cr": 34,
       "sha256": "cd005dcd95059654c3a4c2f5d0d55b453f77f7cda62b6f744ac7c64627967739",
       "label": "OBSERVED"
      },
@@ -303,6 +351,7 @@
       "path": "_A/consumer-workspaces/borrowboard-v1/styles.css",
       "bytes": 3846,
       "lf": 57,
+      "cr": 0,
       "sha256": "f1080bd08c5e8bd2ecc6980961474d96f448a76465beaa2dd74dcce59a43091e",
       "label": "OBSERVED"
      },
@@ -310,11 +359,17 @@
       "path": "_A/consumer-workspaces/borrowboard-v1/app.js",
       "bytes": 20775,
       "lf": 298,
+      "cr": 0,
       "sha256": "648fef5d73dcadd353b9c56600e67c34e62c7b7428972c7cbfc278a234ba1d43",
       "label": "OBSERVED"
      }
     ],
-    "historical_evidence_note": "prior journey2 JSONL 4b3151f9... retained only as historical raw driver transcript; not primary B10 evidence"
+    "historical": {
+     "recommendation": "NO READINESS CLAIM at journey execution time",
+     "status": "historical_executor_note",
+     "superseded_by": "readiness_statement (verification3 CONFIRM)",
+     "not_a_current_claim": true
+    }
    }
   ],
   "resume": {
@@ -428,7 +483,17 @@
      }
     ]
    }
-  ]
+  ],
+  "provenance": {
+   "b04_b10_primary": "final journey4 observations (journey4.json) plus verify3 coverage record (verification3.json)",
+   "raw_journey4_transcripts": "retained in the external evidence store as supporting raw transcripts only; not primary row evidence",
+   "historical_journey2_package": {
+    "status": "GAP / invalid rewrite on build1",
+    "superseded_by": "borrowboard-journey4 REV-3",
+    "primary": false,
+    "note": "no borrowboard-journey2 JSONL is retained as primary or supporting primary evidence; limit 6 records the historical GAP. If any historical journey2 raw transcript were retained in the external store, it is explicitly a historical raw transcript from a superseded app build (build1), not primary evidence for the current tested-product, and it would carry its full path+bytes/LF/sha plus superseded_by=BorrowBoard REV-3 journey4."
+   }
+  }
  },
  "design_review": {
   "owner_verdict_ref": {
@@ -439,8 +504,8 @@
    "label": "OBSERVED"
   },
   "verdict": "APPROVE WITH CHANGES",
-  "operator": "Peter",
-  "time": "2026-10-26T16:40 PDT",
+  "operator": "owner/operator (name retained only in the cited owner verdict identity)",
+  "time": "2026-10-26T16:40:00-07:00",
   "refinements": [
    {
     "id": "R1",
@@ -552,7 +617,8 @@
     "decision": "approve (inline plus aria-live summary)",
     "source": "owner verdict identity 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0"
    }
-  ]
+  ],
+  "time_label": "REPORTED; RFC3339"
  },
  "verification": {
   "label": "OBSERVED",
@@ -572,11 +638,12 @@
      "bytes": 2357,
      "lf": 77,
      "sha256": "3d3ae303e14806f6943da0e6559e0bde0f3baa04a28646314f9c989805cf38a9"
-    }
+    },
+    "verdict_scope": "historical full-coverage/identity gaps"
    },
    {
     "stage": "verify2",
-    "verdict": "BLOCK on identity-chain references; content/coverage/aggregate pass",
+    "verdict": "BLOCK",
     "verification": {
      "path": "_A/evidence/borrowboard-verify2/VERIFICATION2.md",
      "bytes": 5958,
@@ -588,7 +655,8 @@
      "bytes": 4588,
      "lf": 130,
      "sha256": "08164b3646f503a8b1679043aeaed473426b3b43d7f05c9271e5b177d6856f02"
-    }
+    },
+    "verdict_scope": "identity-chain references only; content/coverage/aggregate pass"
    },
    {
     "stage": "verify3",
@@ -604,7 +672,8 @@
      "bytes": 3441,
      "lf": 105,
      "sha256": "8cf0dbc2d3ef13d13a3e82b33c94df68c7807d8d7bb5e7ef49c422b512f3d259"
-    }
+    },
+    "verdict_scope": "final; identity correction and binding rev2 resolved; observations unchanged"
    }
   ],
   "refs": [
@@ -644,15 +713,41 @@
     "label": "OBSERVED"
    }
   ],
-  "readiness_scope_note": "Verification makes no publication identity and no separate readiness claim; its CONFIRM supports the bounded fixture-readiness statement in readiness_statement. Historical limit 6 no-readiness wording remains verbatim but is scoped to the historical executor/verification stage."
+  "readiness_scope_note": "Verification makes no publication identity and no separate readiness claim; its CONFIRM supports the bounded fixture-readiness statement in readiness_statement. Historical limit 6 and B10 executor no-readiness wording are structured as historical/superseded_by, not current claims."
  },
  "disclosed_limits": [
-  "B01 empty-dir assembly was not re-executed; workspace prebuilt; literal quoted start and fresh first-run observed.",
-  "B07 resolution history: journey1 UNRUN -> journey2 GAP (invalid rewrite) -> journey3/4 REV-3 PASS; state history and final closure.",
-  "B08 first driver run false-negative from whitespace predicate; first raw run retained; final PASS.",
-  "B01-B10 used an independent evidence-directory driver because shipped runner has no journey mode; shipped runner preview/negative1-4/resume/stale-return independently re-run PASS.",
-  "Literal serve command first failed unquoted at path space; quoted literal verified HTTP200; no app change.",
-  "Tested-runtime vs tested-product separated; publication identity absent/post-merge only; screenshots supporting-only; no readiness claim."
+  {
+   "text": "B01 empty-dir assembly was not re-executed; workspace prebuilt; literal quoted start and fresh first-run observed.",
+   "scope": "active_disclosed_limit",
+   "historical": false
+  },
+  {
+   "text": "B07 resolution history: journey1 UNRUN -> journey2 GAP (invalid rewrite) -> journey3/4 REV-3 PASS; state history and final closure.",
+   "scope": "active_disclosed_limit",
+   "historical": false
+  },
+  {
+   "text": "B08 first driver run false-negative from whitespace predicate; first raw run retained; final PASS.",
+   "scope": "active_disclosed_limit",
+   "historical": false
+  },
+  {
+   "text": "B01-B10 used an independent evidence-directory driver because shipped runner has no journey mode; shipped runner preview/negative1-4/resume/stale-return independently re-run PASS.",
+   "scope": "active_disclosed_limit",
+   "historical": false
+  },
+  {
+   "text": "Literal serve command first failed unquoted at path space; quoted literal verified HTTP200; no app change.",
+   "scope": "active_disclosed_limit",
+   "historical": false
+  },
+  {
+   "text": "Tested-runtime vs tested-product separated; publication identity absent/post-merge only; screenshots supporting-only; no readiness claim.",
+   "scope": "historical_executor_verification",
+   "historical": true,
+   "superseded_by": "readiness_statement",
+   "not_a_current_claim": true
+  }
  ],
  "readiness_statement": "The accepted BorrowBoard acceptance journey (B01-B10 including the operator design review/refinement, interruption/resume and four isolated negatives) passed on the recorded tested-runtime and tested-product; this demonstrates local consumer-path readiness for the synthetic fixture. Not claimed: production readiness; real users; second-host or production deployment; live-model evaluation. No CI-green claim. Publication identity is absent and is bound only post-merge via SD-F, merge receipt and the immutable record.",
  "publication_identity_rule": "ABSENT / post-merge only; no self-hash of this JSON and no self-hashed publication identity; publication is bound post-merge via SD-F, merge receipt and the immutable record; this is not a production or CI pass.",
@@ -673,10 +768,22 @@
  ],
  "human_intervention": "No human intervention beyond the owner's operator design review/refinement (APPROVE WITH CHANGES; Q1-Q5; R1-R5) was required.",
  "evidence_store": {
-  "path": "_A/evidence",
-  "status": "external immutable local evidence store; not committed by this PR; the two published artifacts are self-contained summaries",
-  "retrieval": "Every referenced item carries a committed path plus byte/LF/sha256 identity; a reviewer holding the local store can verify it. The PR does not copy the store into the repository.",
-  "refs_note": "Exact refs are listed in the journey rows, resume, negatives, design_review and verification objects; all are path+hash bound."
+  "path": "_A",
+  "status": "external local immutable evidence store (evidence packages plus the prebuilt fixture workspace); not committed by this PR",
+  "reproducible_from_pr": false,
+  "reviewer_requirement": "Verification requires access to the external _A store; the PR is not self-sufficient for raw-evidence verification.",
+  "ref_policy": "Every primary reference records path plus bytes/LF/sha256; the JSON and MD are self-contained summaries of observed data, not a copy of the store.",
+  "verification_recipe": "See MD section 10: local gates, JSON serve-command equality, raw-byte app aggregate recomputation, and MD identity comparison; expected hashes are recorded in the artifacts.",
+  "schema_description": "schema_version aegis.readiness-evidence/1: artifacts, base_commit/base_tree, tested_runtime, tested_product, journey (rows/resume/negatives/provenance), design_review (owner verdict/refinements/owner decisions), verification (chain/verdict/refs), disclosed_limits objects, historical_scope_note, readiness_statement, additional_human_decisions_required, evidence_store, stability."
  },
- "local_values_disclosure": "Local absolute Windows paths are disclosed because they are part of the literal working command and workspace identity; the operator name Peter is disclosed because the owner design-review identity binds it; the local process ID is omitted as non-essential."
+ "local_values_disclosure": "Absolute local paths are local-only evidence pointers needed for the literal command/workspace binding; they are not portable. The operator name is retained only inside the cited owner verdict identity; the local process ID is omitted.",
+ "base_commit": "36ee1554aec56ed60fa1d2534e9e70e8dfddaff4",
+ "base_tree": "a0a5bfd0aaa168cc308a459fbd77c881c5269958",
+ "historical_scope_note": "Top-level readiness_statement is the single current readiness claim. The historical limit-6 and B10 executor recommendation are structured as historical/superseded_by and are not current claims; production/real-user/second-host/live-model non-claims remain.",
+ "stability": {
+  "line_endings": "Raw-byte hashes include CRLF/CR bytes; Markdown/JSON artifacts themselves are LF. A committed .gitattributes LF rule is NOT added in this two-path PR; a Windows checkout with core.autocrlf could change MD bytes/hash and must be checked.",
+  "ci_verifier": "A CI schema/hash verifier is NOT added in this two-path PR; it is a recommendation for the follow-up and the risk is disclosed.",
+  "timestamps": "RFC3339; owner verdict time 2026-10-26T16:40:00-07:00 (reported).",
+  "pii": "Local absolute paths are local-only evidence pointers, not portable; the operator name is retained only in the cited owner verdict identity and not repeated as a general value; local PID omitted."
+ }
 }
