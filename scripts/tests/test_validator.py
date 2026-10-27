@@ -5406,7 +5406,62 @@ def test_ds7cfixc_row_ids_duplicate_and_normalization():
                     label, rep.errors)
 
 
+def test_fix942_total_guard_regressions():
+    """Fix-forward #942: total-key/copied-total guards and exact surfaces."""
+    positives = {
+        "totals: updated by 2 entries": {"2 entries"},
+        "coverage totals: updated by 2 entries": {"2 entries"},
+        "totals: updated with 2 entries": {"2 entries"},
+        "coverage totals: updated with 2 entries": {"2 entries"},
+        "totals: were updated by 2 entries": {"2 entries"},
+        "totals: have been updated with 2 rows": {"2 rows"},
+        "coverage was updated by 2 entries and 300 entries remain": {
+            "300 entries"},
+        "coverage was updated by 2 entries and 300 entries remaining": {
+            "300 entries"},
+        "coverage updated by 2 entries and 300 entries remaining": {
+            "300 entries"},
+        "coverage updated with 300 entries remaining": {"300 entries"},
+        "coverage updated by 2 entries and 300 entries still remain": {
+            "300 entries"},
+        "coverage updated with 2 entries and 300 entries remain": {
+            "300 entries"},
+        "coverage updated by 2 entries and 300 entries are remaining": {
+            "300 entries"},
+        "coverage updated by 2 entries and 300 entries were left": {
+            "300 entries"},
+        "coverage updated by 2 entries and 300 entries will be left": {
+            "300 entries"},
+        "coverage updated by 2 entries and 300 entries have remained": {
+            "300 entries"},
+        "totals: wasupdated by 2 entries": {"2 entries"},
+        "totals: has beenupdated by 2 entries": {"2 entries"},
+    }
+    for phrase, expected in positives.items():
+        found = validator._coverage_later_total_count_errors(phrase)
+        assert set(found) == expected, (phrase, found)
+    negatives = (
+        "coverage was updated by 2 entries",
+        "coverage updated with 2 entries",
+        "coverage was updated by 2 entries and 3 skills",
+        "coverage updated with 2 entries and 3 skills",
+        "coverage updated by 2 entries and 3 ids",
+        "coverage updated by 2 ids and 3 entries",
+        "coverage updated by 2 entries and 3 pins",
+        "coverage updated by 2 pins and 3 entries",
+    )
+    masked = validator._coverage_mask_allowed_update(
+        "2 entries remain and coverage was updated by 300 entries")
+    assert "2 entries" in masked and "300 entries" not in masked, masked
+    assert validator._coverage_later_total_count_errors(
+        "2 entries remain and coverage was updated by 300 entries") == [
+            "2 entries"]
+    for phrase in negatives:
+        assert validator._coverage_later_total_count_errors(phrase) == [], phrase
+
+
 TESTS = [
+    test_fix942_total_guard_regressions,
     test_ds7cfixb_coverage_detector_matrix,
     test_ds7cfixc_priority_forms,
     test_ds7cfixc_residual_matrix,

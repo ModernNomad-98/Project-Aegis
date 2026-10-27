@@ -2617,22 +2617,33 @@ COVERAGE_PRIORITY_KEY_NUMBER_RE = re.compile(
     r"(?:(?:is|are|was|were|now|at|equals?|set\s+to|to)\b\s*)?"
     r"|(?:is|are|was|were|now|at|equals?|set\s+to|to)\b\s*"
     r")?[0-9]+\b(?!\.[0-9])")
+COVERAGE_STATE_TAIL = (
+    r"(?!\s+(?:(?:still|would|may|might|will|can|could|now|currently|"
+    r"is|are|was|were|be|been|being|has|have|had)\s+)*"
+    r"(?:remain(?:s|ed|ing)?|left|unchanged)\b)")
+COVERAGE_MALFORMED_TOTAL_UPDATE_RE = re.compile(
+    r"(?i)\b(?:totals?|counts?|entries|skills?|rows?|snapshot_totals|"
+    r"manifest_skills|by_area|by_status|by_grade|by_priority|"
+    r"gap_by_priority)\s*:\s*(?:was|were|is|are|has\s+been|"
+    r"have\s+been|had\s+been)(?:updated|added|removed|changed|"
+    r"incremented|decremented|edited|renamed|moved|progressed)\b")
 COVERAGE_UPDATE_EVENT_RE = re.compile(
     r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
     r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
-    + COVERAGE_DERIVED_INTENT + r"\b")
+    + COVERAGE_DERIVED_INTENT + r"\b" + COVERAGE_STATE_TAIL)
 COVERAGE_UPDATE_CONNECTOR_RE = re.compile(
     r"(?i)\bcoverage(?!\s+snapshot\b)\s*(?::)?\s*"
     r"(?:was|is|were|are|has\s+been|have\s+been|had\s+been)?\s*"
     r"(?:updated|added|removed|changed|incremented|decremented|edited|"
     r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
-    + COVERAGE_DERIVED_INTENT + r"\b")
+    + COVERAGE_DERIVED_INTENT + r"\b" + COVERAGE_STATE_TAIL)
 COVERAGE_TOTAL_UPDATE_CLAIM_RE = re.compile(
     r"(?i)\b(?:totals?|counts?|entries|skills?|rows?|snapshot_totals|"
     r"manifest_skills|by_area|by_status|by_grade|by_priority|"
-    r"gap_by_priority)\s*:\s*(?:updated|added|removed|changed|"
-    r"incremented|decremented|edited|renamed|moved|progressed)\s+"
-    r"[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b")
+    r"gap_by_priority)\s*:\s*(?:(?:was|were|is|are|has\s+been|"
+    r"have\s+been|had\s+been)\s+)?(?:updated|added|removed|changed|"
+    r"incremented|decremented|edited|renamed|moved|progressed)"
+    r"(?:\s+(?:by|with))?\s+[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b")
 _OPAQUE_CODE = "[" + chr(96) + "][^" + chr(96) + "\n]*[" + chr(96) + "]"
 _OPAQUE_MULTI_CODE = re.compile(
     r"(?s)(?<!\x60)(\x60{2,})(?!\x60).*?(?<!\x60)\1(?!\x60)")
@@ -2651,14 +2662,17 @@ COVERAGE_ALLOWED_PROSE_RE = (
                r"have\s+been|had\s+been)?\s*(?:updated|added|removed|changed|"
                r"incremented|decremented|edited|renamed|moved|progressed)"
                r"(?:\s+(?:by|with))?\s+[0-9]+\s+" + COVERAGE_DERIVED_INTENT
-               + r"\b(?:\s*(?:,|and|&)\s*[0-9]+\s+"
-               + COVERAGE_DERIVED_INTENT + r"\b)*"),
+               + r"\b" + COVERAGE_STATE_TAIL
+               + r"(?:\s*(?:,|and|&)\s*[0-9]+\s+"
+               + COVERAGE_DERIVED_INTENT + r"\b" + COVERAGE_STATE_TAIL
+               + r")*"),
     re.compile(r"(?i)\b[0-9]+\s+" + COVERAGE_DERIVED_INTENT
                + r"\s+(?:were|was|are|is|have\s+been|has\s+been|had\s+been)"
                r"\s+(?:updated|added|removed|changed|incremented|decremented|"
                r"edited|renamed|moved|progressed)(?:\s+(?:by|with))?\b"
                r"(?:\s*(?:,|and|&)\s*[0-9]+\s+"
-               + COVERAGE_DERIVED_INTENT + r"\b)*"),
+               + COVERAGE_DERIVED_INTENT + r"\b" + COVERAGE_STATE_TAIL
+               + r")*"),
 )
 
 
@@ -2723,6 +2737,8 @@ def _coverage_protect_opaque(text: str) -> str:
 def _coverage_mask_allowed_update(text: str) -> str:
     """Mask only fixed legitimate non-total update prose."""
     if COVERAGE_TOTAL_UPDATE_CLAIM_RE.search(text):
+        return text
+    if COVERAGE_MALFORMED_TOTAL_UPDATE_RE.search(text):
         return text
     if re.search(r"\bcoverage\s+snapshot\b(?!\s+tests?\b)", text,
                  re.IGNORECASE):
