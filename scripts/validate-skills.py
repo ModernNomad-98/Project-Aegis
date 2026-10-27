@@ -2610,6 +2610,10 @@ COVERAGE_KEY_NUMBER_RE = re.compile(
     r"(?i)\b" + COVERAGE_DERIVED_INTENT
     + r"\b(?:\s*(?::|=|-))?(?:\s+(?:is|are|was|were|now|at|of|equals?|"
     + r"set\s+to|to))*\s*[0-9]+\b")
+COVERAGE_PRIORITY_KEY_NUMBER_RE = re.compile(
+    r"(?i)\bP[0-2]\b(?:\s*(?::|=|-)\s*|"
+    r"\s+(?:gap|counts?|rows?|entries?|totals?|total|is|are|at|now|"
+    r"equals?)\s+|\s+)[0-9]+\b(?!\.)")
 COVERAGE_UPDATE_EVENT_RE = re.compile(
     r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
     r"renamed|moved|progressed)\s+[0-9]+\s+"
@@ -2703,6 +2707,7 @@ def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
         candidates.extend(("n-of-m", m.group(0)) for m in COVERAGE_N_OF_M_RE.finditer(parsed))
         candidates.extend(("number-key", m.group(0)) for m in COVERAGE_NUMBER_KEY_RE.finditer(parsed))
         candidates.extend(("key-number", m.group(0)) for m in COVERAGE_KEY_NUMBER_RE.finditer(parsed))
+        candidates.extend(("priority-key", m.group(0)) for m in COVERAGE_PRIORITY_KEY_NUMBER_RE.finditer(parsed))
         for kind, surface in candidates:
             cleaned = surface.strip()
             if not cleaned or cleaned in seen:
