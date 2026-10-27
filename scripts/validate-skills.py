@@ -2652,7 +2652,7 @@ def _coverage_protect_opaque(text: str) -> str:
     protected = re.sub(r"\b[0-9a-f]{40,64}\b", " OPAQUE ", protected,
                        flags=re.IGNORECASE)
     protected = re.sub(
-        r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.+-Z]+",
+        r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.+Z-]+",
         " OPAQUE ", protected, flags=re.IGNORECASE)
     protected = re.sub(r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}\b", " OPAQUE ", protected)
     protected = re.sub(r"\bD[0-9]{1,12}\b", " OPAQUE ", protected,

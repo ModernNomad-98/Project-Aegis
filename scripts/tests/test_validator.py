@@ -9,8 +9,8 @@ Run:  python scripts/tests/test_validator.py      # exit 0 = every assertion hel
 
 WHY THIS EXISTS
     validate-skills.py is the repo's single load-bearing merge gate, and until
-    D55 it had no tests at all. Every hard check it grew â€” the D43 README count
-    markers, the D50 strict-YAML / sentinel / block-scalar trio â€” was hand-proved
+    D55 it had no tests at all. Every hard check it grew — the D43 README count
+    markers, the D50 strict-YAML / sentinel / block-scalar trio — was hand-proved
     once in a pull-request description and never proved again. This suite
     re-proves them on every CI run, so a later refactor cannot quietly disarm
     one. check_dco.py (D60) is held to the same standard from its first day:
@@ -33,7 +33,7 @@ PROVING THE SUITE CAN FAIL
 IMPORT WRINKLE
     validate-skills.py is hyphenated, so `import validate_skills` cannot reach
     it; it is loaded by path through importlib below. check_dco.py is loaded
-    the same way â€” not because it must be, but so both gate scripts are reached
+    the same way — not because it must be, but so both gate scripts are reached
     identically and scripts/ never has to be put on sys.path.
 """
 from __future__ import annotations
@@ -842,8 +842,8 @@ def _materialize_paths_tree(dst_root: Path) -> Path:
     `dot-claude/` as `.claude/` there (Gate 2.8). The fixture is stored under
     `dot-claude/` in the tracked tree so its `fixture-linked-skill/SKILL.md` is
     never nested under a literal `.claude/skills/` path that the session harness
-    would discover as a live skill; the `.claude` name â€” needed for the
-    guided-path links to resolve â€” exists only inside this throwaway copy."""
+    would discover as a live skill; the `.claude` name — needed for the
+    guided-path links to resolve — exists only inside this throwaway copy."""
     tree = dst_root / "paths-tree"
     shutil.copytree(FIXTURES / "paths-tree", tree)
     neutral = tree / "dot-claude"
@@ -1122,7 +1122,7 @@ _LABEL_BOUND_PATTERN = re.compile(r"\[[^\]]*?\]\(([^)\s]+)\)")
 # Shapes where the target scan must resume INSIDE a region it has already
 # walked while a later link's `[` still sits inside that region. Collapsing the
 # scanner's two cursors into one -- `pos = max(end, close + 1)`, the direction
-# A-05 Â§6 suggested -- passes every other assertion in this file and the whole
+# A-05 §6 suggested -- passes every other assertion in this file and the whole
 # corpus validator (195 valid, 0 warnings) while returning [] for the first two
 # of these, dropping the FIRST link of the third and the SECOND link of the
 # fourth. That is why this family is pinned here: it is the only committed
@@ -1364,7 +1364,7 @@ def test_no_nested_fixture_skill_or_agent_dirs():
         ["git", "ls-files", "-z"], cwd=REPO_ROOT, capture_output=True, text=True, check=True
     )
     tracked = [p for p in out.stdout.split("\0") if p]
-    assert tracked, "git ls-files returned nothing â€” wrong CWD or not a git checkout"
+    assert tracked, "git ls-files returned nothing — wrong CWD or not a git checkout"
 
     nested_skills = [
         p for p in tracked if "/.claude/skills/" in p and not p.startswith(".claude/skills/")
@@ -1645,7 +1645,7 @@ def test_dco_record_parsing():
 # consumer repo stays the current product workspace, and no sibling app folder is
 # proposed merely because the skills are copied in.
 #
-# It is DELIBERATELY structural and deterministic â€” a text/JSON contract check.
+# It is DELIBERATELY structural and deterministic — a text/JSON contract check.
 # It is NOT a model-behavior runner and proves nothing about a live Claude
 # session; the only behavioral proof of the fix is a fresh-session Scenario A
 # rerun, which this suite never executes.
@@ -1675,7 +1675,7 @@ def test_startup_role_contract():
     # --- AGENTS.md role contract -------------------------------------------
     assert "This repository is a skills library:" not in agents, (
         "AGENTS.md must drop the unconditional source-only identity sentence "
-        "'This repository is a skills library:' â€” it is false in a consumer repo"
+        "'This repository is a skills library:' — it is false in a consumer repo"
     )
     ok("AGENTS.md: unconditional 'skills library' identity sentence is gone")
 
@@ -1833,9 +1833,9 @@ def test_startup_role_contract():
 # single question. Repeating "one target" prose was demonstrably insufficient:
 # the discovery METHOD (the elicitation question bank) and the orchestrator
 # boundary both had to change. This STRUCTURAL test guards the new written shape
-# â€” the orchestrator's ATOMIC-QUESTION GATE, the facilitator's one-target
+# — the orchestrator's ATOMIC-QUESTION GATE, the facilitator's one-target
 # contract, and the atomic discovery CARDS that replaced the compound question
-# bank â€” plus the eval counts and the three regression IDs on each side.
+# bank — plus the eval counts and the three regression IDs on each side.
 #
 # It is DELIBERATELY structural and deterministic and proves the written
 # STRUCTURE only. It does NOT prove semantic atomicity and is NOT a model-
@@ -1849,14 +1849,14 @@ ELICIT_SHEET = FAC_DIR / "references" / "elicitation-sheet.md"
 ORCH_EVALS = REPO_ROOT / ".claude" / "skills" / "project-orchestrator" / "evals" / "evals.json"
 FAC_EVALS = FAC_DIR / "evals" / "evals.json"
 
-# The one-target definition and the semantic split test â€” verbatim in BOTH the
+# The one-target definition and the semantic split test — verbatim in BOTH the
 # orchestrator gate and the facilitator contract, so neither can drift alone.
 ATOMIC_TARGET_DEF = "one independently answerable information or decision target"
 ATOMIC_SEMANTIC_TEST = "answer one requested part while another remains unanswered"
 
 # The observed live compound question (FOUR targets: current process + actor +
 # recent incident + failure point). It must appear only as an INVALID example /
-# regression prompt â€” never as a usable atomic card.
+# regression prompt — never as a usable atomic card.
 OBSERVED_COMPOUND = (
     "Walk me through the booking process, include who does each step, and tell me "
     "about a recent double booking and where it went wrong."
@@ -4995,6 +4995,14 @@ def closure_main(closure_id: str) -> int:
 
 def test_ds7cfixb_coverage_detector_matrix():
     """DS-7c-fix-b: derived-total parser matrix, nested exact-int, trim, priority."""
+    # C10: preserve original UTF-8 source exactly (no U+FFFD/mojibake).
+    _source_text = Path(__file__).resolve().read_bytes().decode("utf-8")
+    assert chr(0xFFFD) not in _source_text, "test source has U+FFFD"
+    assert (chr(0xE2) + chr(0x20AC) + chr(0x201D)) not in _source_text
+    assert (chr(0xC2) + chr(0xA7)) not in _source_text
+    assert _source_text.count(chr(0x2014)) >= 12
+    assert _source_text.count(chr(0xA7)) >= 1
+
     synthetic_entries = [
         {"id": 1, "area": "01", "status": "SHIPPED",
          "evidence_grade": "explicit-id", "priority": "P0",
@@ -5112,6 +5120,10 @@ def test_ds7cfixb_coverage_detector_matrix():
         "coverage snapshot tests cover 300 entries")
     assert not validator._coverage_later_total_count_errors(
         "snapshot 2026-10-26T00:00:00Z")
+    assert not validator._coverage_later_total_count_errors(
+        "snapshot 2026-10-26T00:00:00+00:00")
+    assert not validator._coverage_later_total_count_errors(
+        "snapshot 2026-10-26T00:00:00-07:00")
     for bad in (None, 123, ["300 entries"]):
         try:
             validator._coverage_later_total_count_errors(bad)
