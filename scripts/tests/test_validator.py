@@ -4841,8 +4841,11 @@ def test_dsr1_lock_lifecycle():
             succ.send_signal(signal.SIGTERM)
             succ.communicate(timeout=20)
             assert lock.exists() and (lock / "token").read_text(encoding="utf-8") == changed, "successor lock must be preserved"
-            os.kill(pid, signal.SIGKILL)
-            _dsr1_pass("readable non-matching successor token is preserved, never deleted")
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            _dsr1_pass("readable non-matching successor token is preserved, never deleted; owned child already stopped/reaped")
         finally:
             if succ.poll() is None:
                 succ.kill(); succ.communicate(timeout=5)
