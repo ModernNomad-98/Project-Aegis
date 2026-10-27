@@ -409,7 +409,14 @@ way. If your repo has no `.claude/skills/` folder yet, create it first (it's jus
 3. Run the post-write verifier described in this section; it exits nonzero on eval material and verifies the assembled destination after the write.
 4. Open your own product repository and work there under its startup routing.
 
-A worked, host-tested record for a complete selected route - exact installed-file inventory, commands, observed results and the precise readiness scope and limits - will be linked here only after that acceptance run produces its evidence. Until then this page makes **no consumer-readiness claim** and no promise that the intended route has been exercised end to end; the setup/control-plane warnings elsewhere on this page still apply.
+**Installation status** (2026-10-27; evidence bound to candidate `534d6bbf92e5371215c5fc7d620de979e73cbaf5`, installed from base `ffb040c7a363648856475280646bbd142dfabe4e`; evidence record: [local-starter-v1](docs/evidence/consumer-readiness/local-starter-v1.md)).
+The next installation milestone is a complete, dependency-checked starter package. Structural checks and bounded synthetic tests have passed. Complete native consumer testing remains planned. Validation currently covers the documented environments; additional host coverage is planned.
+
+Measured environment: Windows 11 10.0.26200 (UBR 9711), PowerShell 7.6.6 and Windows PowerShell 5.1.26100.9711 (effective policy Restricted; scripted `.ps1` load refused, measured), Git 2.55.0.windows.5, `sh` from `C:\Program Files\Git\bin\sh.exe`, host agent DeepSeek Harness (`deepseek-flash`). The 39-file package, its aggregate and every check's result are in the evidence record.
+
+The package's definition, its 39-file closure and the one install procedure are in [docs/consumer-starter-package.md](docs/consumer-starter-package.md). The evidence record names the host, the installed-file hashes, each check's PASS/FAIL/UNRUN result, and the exact remaining action for every UNRUN.
+
+Not claimed here: production readiness, a second host, a hosted deployment, live-model evaluation, or CI-green equality. macOS/Linux remain not validated (see the copy section). The setup/control-plane warnings elsewhere on this page still apply.
 
 **Do not copy each skill's `evals/` folder.** Every shipped skill carries `evals/evals.json`
 and (usually) `evals/trigger-evals.json`. Those are the skill's **answer keys**: each case
@@ -528,7 +535,7 @@ why the skills it names are worth having when a stage applies, and not a bundle 
 up front. The shipped-skill inventory is owned by
 [`docs/skills-catalog.md`](docs/skills-catalog.md) along with this README's own roster.
 
-On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**:
+On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**; the Stage E validation host also carried **5.1.26100.9711**, where only its scripted-load behaviour was measured (a `.ps1` run through `powershell.exe -File` fails at load under the effective Restricted policy), not the copy procedure:
 
 ```powershell
 $ErrorActionPreference = 'Stop'
