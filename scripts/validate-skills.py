@@ -2617,33 +2617,46 @@ COVERAGE_PRIORITY_KEY_NUMBER_RE = re.compile(
     r"(?:(?:is|are|was|were|now|at|equals?|set\s+to|to)\b\s*)?"
     r"|(?:is|are|was|were|now|at|equals?|set\s+to|to)\b\s*"
     r")?[0-9]+\b(?!\.[0-9])")
-COVERAGE_STATE_TAIL = (
-    r"(?!\s+(?:(?:still|would|may|might|will|can|could|now|currently|"
-    r"is|are|was|were|be|been|being|has|have|had)\s+)*"
-    r"(?:remain(?:s|ed|ing)?|left|unchanged)\b)")
 COVERAGE_MALFORMED_TOTAL_UPDATE_RE = re.compile(
     r"(?i)\b(?:totals?|counts?|entries|skills?|rows?|snapshot_totals|"
     r"manifest_skills|by_area|by_status|by_grade|by_priority|"
     r"gap_by_priority)\s*:\s*(?:was|were|is|are|has\s+been|"
     r"have\s+been|had\s+been)(?:updated|added|removed|changed|"
     r"incremented|decremented|edited|renamed|moved|progressed)\b")
-COVERAGE_UPDATE_EVENT_RE = re.compile(
-    r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
-    r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
-    + COVERAGE_DERIVED_INTENT + r"\b" + COVERAGE_STATE_TAIL)
-COVERAGE_UPDATE_CONNECTOR_RE = re.compile(
-    r"(?i)\bcoverage(?!\s+snapshot\b)\s*(?::)?\s*"
-    r"(?:was|is|were|are|has\s+been|have\s+been|had\s+been)?\s*"
+COVERAGE_UPDATE_VERB = (
     r"(?:updated|added|removed|changed|incremented|decremented|edited|"
-    r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
-    + COVERAGE_DERIVED_INTENT + r"\b" + COVERAGE_STATE_TAIL)
+    r"renamed|moved|progressed)"
+)
+COVERAGE_UPDATE_COPULA = (
+    r"(?:was|is|were|are|has\s+been|have\s+been|had\s+been)"
+)
+COVERAGE_DELTA_ITEM = r"[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b"
+COVERAGE_DELTA_LIST = (
+    COVERAGE_DELTA_ITEM
+    + r"(?:\s*(?:,\s*(?:and\s+|&\s*)?|and\s+|&\s*)"
+    + COVERAGE_DELTA_ITEM + r")*"
+)
+# A delta announcement is masked only when it is positively identified: the
+# whole clause is an update verb applied to a coordinated count list. The
+# bare-event form matches a clause that begins with the verb; the coverage
+# form may begin a clause or a new "and coverage" subject. Neither form may
+# leave any word after the delta list (that is what keeps a trailing copied
+# total, e.g. "and 300 entries pending", flagged).
+COVERAGE_UPDATE_EVENT_RE = re.compile(
+    r"(?i)\b" + COVERAGE_UPDATE_VERB + r"(?:\s+(?:by|with))?\s+"
+    + COVERAGE_DELTA_LIST + r"[\s.!*_]*$")
+COVERAGE_UPDATE_CONNECTOR_RE = re.compile(
+    r"(?i)(?:^|(?<=\band ))\s*coverage(?!\s+snapshot\b)\s*:?\s*"
+    r"(?:" + COVERAGE_UPDATE_COPULA + r"\s+)?"
+    + COVERAGE_UPDATE_VERB + r"(?:\s+(?:by|with))?\s+"
+    + COVERAGE_DELTA_LIST + r"[\s.!*_]*$")
 COVERAGE_TOTAL_UPDATE_CLAIM_RE = re.compile(
     r"(?i)\b(?:totals?|counts?|entries|skills?|rows?|snapshot_totals|"
     r"manifest_skills|by_area|by_status|by_grade|by_priority|"
-    r"gap_by_priority)\s*:\s*(?:(?:was|were|is|are|has\s+been|"
-    r"have\s+been|had\s+been)\s+)?(?:updated|added|removed|changed|"
-    r"incremented|decremented|edited|renamed|moved|progressed)"
-    r"(?:\s+(?:by|with))?\s+[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b")
+    r"gap_by_priority)\s*:\s*[^.;\n]{0,60}?\b"
+    r"(?:updated|added|removed|changed|incremented|decremented|edited|"
+    r"renamed|moved|progressed)\b\s*(?:by|with)?\s*[0-9]+\s+"
+    + COVERAGE_DERIVED_INTENT + r"\b")
 _OPAQUE_CODE = "[" + chr(96) + "][^" + chr(96) + "\n]*[" + chr(96) + "]"
 _OPAQUE_MULTI_CODE = re.compile(
     r"(?s)(?<!\x60)(\x60{2,})(?!\x60).*?(?<!\x60)\1(?!\x60)")
@@ -2658,21 +2671,13 @@ COVERAGE_ALLOWED_PROSE_RE = (
                + COVERAGE_DERIVED_INTENT + r"\b"),
     re.compile(r"(?i)\bcoverage\s+roadmap\s*:\s*[0-9]+\s+"
                + COVERAGE_DERIVED_INTENT + r"\b"),
-    re.compile(r"(?i)\bcoverage\s*:?\s*(?:was|is|were|are|has\s+been|"
-               r"have\s+been|had\s+been)?\s*(?:updated|added|removed|changed|"
-               r"incremented|decremented|edited|renamed|moved|progressed)"
-               r"(?:\s+(?:by|with))?\s+[0-9]+\s+" + COVERAGE_DERIVED_INTENT
-               + r"\b" + COVERAGE_STATE_TAIL
-               + r"(?:\s*(?:,|and|&)\s*[0-9]+\s+"
-               + COVERAGE_DERIVED_INTENT + r"\b" + COVERAGE_STATE_TAIL
-               + r")*"),
-    re.compile(r"(?i)\b[0-9]+\s+" + COVERAGE_DERIVED_INTENT
-               + r"\s+(?:were|was|are|is|have\s+been|has\s+been|had\s+been)"
-               r"\s+(?:updated|added|removed|changed|incremented|decremented|"
-               r"edited|renamed|moved|progressed)(?:\s+(?:by|with))?\b"
-               r"(?:\s*(?:,|and|&)\s*[0-9]+\s+"
-               + COVERAGE_DERIVED_INTENT + r"\b" + COVERAGE_STATE_TAIL
-               + r")*"),
+    COVERAGE_UPDATE_CONNECTOR_RE,
+    re.compile(r"(?i)\b" + COVERAGE_DELTA_LIST
+               + r"\s+" + COVERAGE_UPDATE_COPULA
+               + r"\s+" + COVERAGE_UPDATE_VERB
+               + r"(?:\s+(?:by|with))?\b(?:\s*(?:,\s*(?:and\s+)?|"
+               r"and\s+|&\s*)" + COVERAGE_DELTA_ITEM
+               + r")*[\s.!*_]*$"),
 )
 
 

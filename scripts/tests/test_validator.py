@@ -38,6 +38,7 @@ IMPORT WRINKLE
 """
 from __future__ import annotations
 
+import ast
 import contextlib
 import hashlib
 import importlib.util
@@ -5416,24 +5417,24 @@ def test_fix942_total_guard_regressions():
         "totals: were updated by 2 entries": {"2 entries"},
         "totals: have been updated with 2 rows": {"2 rows"},
         "coverage was updated by 2 entries and 300 entries remain": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "coverage was updated by 2 entries and 300 entries remaining": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "coverage updated by 2 entries and 300 entries remaining": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "coverage updated with 300 entries remaining": {"300 entries"},
         "coverage updated by 2 entries and 300 entries still remain": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "coverage updated with 2 entries and 300 entries remain": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "coverage updated by 2 entries and 300 entries are remaining": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "coverage updated by 2 entries and 300 entries were left": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "coverage updated by 2 entries and 300 entries will be left": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "coverage updated by 2 entries and 300 entries have remained": {
-            "300 entries"},
+            "2 entries", "300 entries"},
         "totals: wasupdated by 2 entries": {"2 entries"},
         "totals: has beenupdated by 2 entries": {"2 entries"},
     }
@@ -5458,6 +5459,753 @@ def test_fix942_total_guard_regressions():
             "2 entries"]
     for phrase in negatives:
         assert validator._coverage_later_total_count_errors(phrase) == [], phrase
+
+
+# ---------------------------------------------------------------------------
+# CL2 — 11-form count-copy fix-forward: item-6 differential
+# (standing setup 6422386518 item 6; PLAN-CL2.md; base ffb040c7)
+# ---------------------------------------------------------------------------
+# Frozen pre-#942 oracle. Provenance: commit
+# 2a8bdb5be46ef712947b46c73239fcc3849efdbf, blob
+# 3d98a817a1f164040df9896a9516ce207f74acdd, file sha256
+# 4c9c16b677566819712e52c62b9f45c40aa4330d10a37c77fb373b8ecfd3fdb4
+# (168,938 bytes, 3,575 LF). This is blob lines 2599-2730 verbatim except
+# that every identifier carries the _pre942_ prefix; reversing the prefix
+# must reproduce those blob lines character-for-character, and
+# CL2_ORACLE_NORMALISED_SHA256 pins the result. Test-only: the validator
+# never imports this block. COVERAGE_STATE_TAIL and
+# COVERAGE_MALFORMED_TOTAL_UPDATE_RE do not exist at 2a8bdb5b and are
+# deliberately not vendored (they are #942 additions).
+# BEGIN CL2_ORACLE
+_pre942_COVERAGE_DERIVED_INTENT = (
+    r"(?:rows?|entr(?:y|ies)|skills?|ids?|counts?|totals?|pins?|"
+    r"snapshot(?:_totals)?|by_area|by_status|by_grade|by_priority|"
+    r"gap_by_priority|manifest_skills|coverage_map|review_pending|"
+    r"distinct_covering_skills|beyond_roadmap_skills)"
+)
+_pre942_COVERAGE_DERIVED_INTENT_RE = re.compile(r"(?i)\b" + _pre942_COVERAGE_DERIVED_INTENT + r"\b")
+_pre942_COVERAGE_N_OF_M_RE = re.compile(r"(?i)\b[0-9]+\s*(?:of|-of-)\s*[0-9]+\b")
+_pre942_COVERAGE_NUMBER_KEY_RE = re.compile(
+    r"(?i)\b[0-9]+\s*(?:-\s*|\s+)" + _pre942_COVERAGE_DERIVED_INTENT + r"\b")
+_pre942_COVERAGE_KEY_NUMBER_RE = re.compile(
+    r"(?i)\b" + _pre942_COVERAGE_DERIVED_INTENT
+    + r"\b(?:\s*(?::|=|-))?(?:\s+(?:is|are|was|were|now|at|of|equals?|"
+    + r"set\s+to|to))*\s*[0-9]+\b")
+_pre942_COVERAGE_PRIORITY_KEY_NUMBER_RE = re.compile(
+    r"(?i)\bP[0-2]\b(?:\s*(?::|=|-)\s*|"
+    r"\s+(?:gap|counts?|rows?|entries?|totals?|total|is|are|at|now|"
+    r"equals?)\s+|\s+)[0-9]+\b(?!\.)")
+_pre942_COVERAGE_UPDATE_EVENT_RE = re.compile(
+    r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
+    r"renamed|moved|progressed)\s+[0-9]+\s+"
+    + _pre942_COVERAGE_DERIVED_INTENT + r"\b")
+_pre942_COVERAGE_UPDATE_CONNECTOR_RE = re.compile(
+    r"(?i)\bcoverage(?!\s+snapshot\b)\s*(?::)?\s*"
+    r"(?:updated|added|removed|changed|incremented|decremented|edited|"
+    r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
+    + _pre942_COVERAGE_DERIVED_INTENT + r"\b")
+_pre942_COVERAGE_TOTAL_UPDATE_CLAIM_RE = re.compile(
+    r"(?i)\b(?:totals?|counts?|entries|skills?|rows?|snapshot_totals|"
+    r"manifest_skills|by_area|by_status|by_grade|by_priority|"
+    r"gap_by_priority)\s*:\s*(?:updated|added|removed|changed|"
+    r"incremented|decremented|edited|renamed|moved|progressed)\s+"
+    r"[0-9]+\s+" + _pre942_COVERAGE_DERIVED_INTENT + r"\b")
+_pre942__OPAQUE_CODE = "[" + chr(96) + "][^" + chr(96) + "\n]*[" + chr(96) + "]"
+_pre942_COVERAGE_ALLOWED_PROSE_RE = (
+    re.compile(r"(?i)\bsnapshot\s+tests?\s+cover\s+[0-9]+\s+"
+               + _pre942_COVERAGE_DERIVED_INTENT + r"\b"),
+    re.compile(r"(?i)\bsnapshot\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
+               + _pre942_COVERAGE_DERIVED_INTENT + r"\b"),
+    re.compile(r"(?i)\bcoverage\s*:\s*(?:updated|added|removed)\s+[0-9]+\s+"
+               + _pre942_COVERAGE_DERIVED_INTENT + r"\b"),
+    re.compile(r"(?i)\bcoverage\s+roadmap\s*:\s*[0-9]+\s+"
+               + _pre942_COVERAGE_DERIVED_INTENT + r"\b"),
+)
+
+
+def _pre942__coverage_protect_opaque(text: str) -> str:
+    """Mask opaque non-count tokens before intent recognition.
+
+    Issue/PR refs (#123), code spans, Markdown links, URLs, dates, D ids,
+    hashes and snapshot-YYYY labels are masked. Code spans and Markdown links
+    are masked before bare URLs so a link label cannot leak its count.
+    """
+    protected = re.sub(_pre942__OPAQUE_CODE, " OPAQUE ", text)
+    protected = re.sub(r"#[0-9]+" + chr(92) + "b", " OPAQUE ", protected)
+    protected = re.sub(r"\[[^\]\n]*\]\([^)\n]*\)", " OPAQUE ", protected)
+    protected = re.sub(r"https?://\S+", " OPAQUE ", protected, flags=re.IGNORECASE)
+    protected = re.sub(r"\b[0-9a-f]{40,64}\b", " OPAQUE ", protected,
+                       flags=re.IGNORECASE)
+    protected = re.sub(
+        r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.+Z-]+",
+        " OPAQUE ", protected, flags=re.IGNORECASE)
+    protected = re.sub(r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}\b", " OPAQUE ", protected)
+    protected = re.sub(r"\bD[0-9]{1,12}\b", " OPAQUE ", protected,
+                       flags=re.IGNORECASE)
+    protected = re.sub(r"\bsnapshot-(?:19|20)[0-9]{2}\b", " OPAQUE ", protected,
+                       flags=re.IGNORECASE)
+    return protected
+
+
+def _pre942__coverage_mask_allowed_update(text: str) -> str:
+    """Mask only fixed legitimate non-total update prose."""
+    if _pre942_COVERAGE_TOTAL_UPDATE_CLAIM_RE.search(text):
+        return text
+    if re.search(r"\bcoverage\s+snapshot\b(?!\s+tests?\b)", text,
+                 re.IGNORECASE):
+        return text
+    masked = text
+    for pattern in _pre942_COVERAGE_ALLOWED_PROSE_RE:
+        masked = pattern.sub(" ", masked)
+    masked = _pre942_COVERAGE_UPDATE_EVENT_RE.sub(" ", masked)
+    masked = _pre942_COVERAGE_UPDATE_CONNECTOR_RE.sub(" ", masked)
+    return masked
+
+
+def _pre942__coverage_derived_total_mentions(text: str, allowed_update: bool = True):
+    """Single structural source for derived-total count mentions.
+
+    Clauses are split on newlines/semicolons BEFORE whitespace normalization so
+    a count on one line cannot pair with an intent on another. Opaque tokens
+    (code spans, Markdown links, URLs, dates, D ids, hashes, snapshot-YYYY) are
+    masked first. The later/bound wrappers share this parser. The later policy
+    is deliberately broad for derived-total keys/N-of-M (the preserved #934
+    contract); only the fixed legitimate update-prose allowlist is masked.
+    """
+    if not isinstance(text, str):
+        raise TypeError("coverage detector text must be a string")
+    if not text:
+        return []
+    normalized = (text.replace(chr(0x2013), "-").replace(chr(0x2014), "-")
+                  .replace(chr(0x2212), "-"))
+    protected = _pre942__coverage_protect_opaque(normalized)
+    mentions = []
+    seen = set()
+    for raw_clause in re.split(r"[;,\n]|\bwhile\b", protected):
+        clause = re.sub(r"\s+", " ", raw_clause)
+        parsed = _pre942__coverage_mask_allowed_update(clause) if allowed_update else clause
+        candidates = []
+        candidates.extend(("n-of-m", m.group(0)) for m in _pre942_COVERAGE_N_OF_M_RE.finditer(parsed))
+        candidates.extend(("number-key", m.group(0)) for m in _pre942_COVERAGE_NUMBER_KEY_RE.finditer(parsed))
+        candidates.extend(("key-number", m.group(0)) for m in _pre942_COVERAGE_KEY_NUMBER_RE.finditer(parsed))
+        candidates.extend(("priority-key", m.group(0)) for m in _pre942_COVERAGE_PRIORITY_KEY_NUMBER_RE.finditer(parsed))
+        for kind, surface in candidates:
+            cleaned = surface.strip()
+            if not cleaned or cleaned in seen:
+                continue
+            seen.add(cleaned)
+            numbers = re.findall(r"[0-9]+", cleaned)
+            intent_match = _pre942_COVERAGE_DERIVED_INTENT_RE.search(cleaned)
+            mentions.append({
+                "surface": cleaned,
+                "kind": kind,
+                "intent": intent_match.group(0).lower() if intent_match else None,
+                "number": numbers[-1] if numbers else None,
+            })
+    return mentions
+
+
+def _pre942__coverage_later_total_count_errors(text):
+    """Compat wrapper: later-ledger derived-total count copies, fixed policy."""
+    return sorted({m["surface"] for m in _pre942__coverage_derived_total_mentions(
+        text, allowed_update=True)})
+# END CL2_ORACLE
+CL2_ORACLE_NORMALISED_SHA256 = "b68a7ba537c6957e63d19b9eb1f28fe103a9352816dc7b7f38ee8a4ee1dfa17c"
+
+CL2_DETECTOR_ENTRY_POINTS = frozenset({
+    "_coverage_count_copy_errors",
+    "_coverage_later_total_count_errors",
+    "_coverage_derived_total_mentions",
+})
+
+# The 11 lost forms from defect note 6446294059, with the surfaces the
+# pre-#942 predicate returned. At base ffb040c7 each returns [] — that
+# constant expectation is what makes this test fail before the fix.
+CL2_NAMED_DEFECT_SURFACES = {
+    "totals: are now updated by 2 entries": ["2 entries"],
+    "totals: were just updated by 2 entries": ["2 entries"],
+    "totals: were recently updated by 2 entries": ["2 entries"],
+    "totals: now updated by 2 entries": ["2 entries"],
+    "coverage totals: were now updated with 2 rows": ["2 rows"],
+    "totals: was-updated by 2 entries": ["2 entries"],
+    "totals: hasbeen updated by 2 entries": ["2 entries"],
+    "totals: has been-updated by 2 entries": ["2 entries"],
+    "coverage was updated by 2 entries and 300 entries pending": ["2 entries", "300 entries"],
+    "coverage was updated by 2 entries and 300 entries leftover": ["2 entries", "300 entries"],
+    "coverage was updated by 2 entries and 300 entries which remain": ["2 entries", "300 entries"],
+}
+CL2_NAMED_DEFECT = tuple(CL2_NAMED_DEFECT_SURFACES)
+CL2_944_SURFACES = (
+    "totals: updated by 2 entries",
+    "coverage was updated by 2 entries and 300 entries remain",
+)
+
+# The closed, reasoned exemption table (PLAN-CL2 §7.4). Any addition needs a
+# reason class and a Stage D justification; the set equality below is the
+# enforcement, not this comment.
+CL2_EXEMPTION_REASONS = frozenset({
+    "allowed-update-delta", "passive-delta", "opaque-mask",
+})
+CL2_EXEMPTIONS = {
+    "coverage was updated by 2 entries": "allowed-update-delta",
+    "coverage was updated by 2 entries and 3 skills": "allowed-update-delta",
+    "coverage was updated by 2 entries, 3 skills": "allowed-update-delta",
+    "coverage was updated by 2 entries, and 3 skills": "allowed-update-delta",
+    "coverage was updated by 2 entries, 3 skills, 4 notes": "allowed-update-delta",
+    "coverage: was updated by 2 entries": "allowed-update-delta",
+    "coverage updated by 2 entries and 3 ids": "allowed-update-delta",
+    "coverage updated by 2 entries and 3 pins": "allowed-update-delta",
+    "coverage updated by 2 ids and 3 entries": "allowed-update-delta",
+    "coverage updated by 2 pins and 3 entries": "allowed-update-delta",
+    "coverage updated with 2 entries and 3 skills": "allowed-update-delta",
+    "2 entries were added": "passive-delta",
+    "2 entries were added, 3 skills": "passive-delta",
+    "3 skills were removed": "passive-delta",
+    "3 skills had been removed": "passive-delta",
+    "[300 entries][]": "opaque-mask",
+    "[300 entries][x]": "opaque-mask",
+    "[x]: https://example.invalid \"300 entries\"": "opaque-mask",
+}
+
+# The 304-string corpus = 293 AST-derived coverage-test literals + 11 named
+# defect forms. "either" means the differential records the string but does not
+# require a particular verdict; "must_flag" is asserted non-empty after the
+# fix; "exempt" is a deliberately allowed delta.
+CL2_CORPUS_SHA256 = "e3ef5ae8f91016aafd6c89a5f555897b1fe54b18fe136930f6807c9ae118eaa8"
+CL2_AST_DERIVED_EXPECTED = 293
+CL2_CORPUS = (
+    ("", "either"),
+    ("\n300 entries", "either"),
+    ("\n300 entries\n", "either"),
+    ("\ntotals 300", "either"),
+    (" ", "either"),
+    (" accepted a non-set manifest ", "either"),
+    (" done", "either"),
+    (" entries", "either"),
+    (" skill ", "either"),
+    (" skills", "either"),
+    ("**Optionality.**", "either"),
+    ("**Pointer integrity (stable anchors, DS-4b migration).**", "either"),
+    ("- **2026-10-27 - D", "either"),
+    (".**", "either"),
+    ("01", "either"),
+    ("1", "either"),
+    ("2 entries", "either"),
+    ("2 entries remain and coverage was updated by 300 entries", "either"),
+    ("2 entries were added", "exempt"),
+    ("2 entries were added, 3 skills", "exempt"),
+    ("2 rows", "either"),
+    ("2026-10-26", "either"),
+    ("3 skills had been removed", "exempt"),
+    ("3 skills were removed", "exempt"),
+    ("300 ", "either"),
+    ("300 - entries", "either"),
+    ("300 - row", "either"),
+    ("300 - rows", "either"),
+    ("300 - skills", "either"),
+    ("300 ROWS", "either"),
+    ("300 Rows", "either"),
+    ("300 entries", "either"),
+    ("300 entry", "either"),
+    ("300 row", "either"),
+    ("300 rows", "either"),
+    ("300-entry", "either"),
+    ("300-row", "either"),
+    ("85 of 254", "either"),
+    ("85-of-254", "either"),
+    ("9", "either"),
+    (": ", "either"),
+    ("A", "either"),
+    ("A|B", "either"),
+    ("B|C", "either"),
+    ("D", "either"),
+    ("D121", "either"),
+    ("D121 coverage: updated 2 entries", "either"),
+    ("DS-7c-c bound detector missed priority total ", "either"),
+    ("DS-7c-c later detector missed priority total ", "either"),
+    ("DS-7c-c priority detector false positive ", "either"),
+    ("DS-7c-c: priority-key derived totals are count copies, not prose.", "either"),
+    ("DS-7c-fix-b bound detector missed ", "either"),
+    ("DS-7c-fix-b later detector false positive ", "either"),
+    ("DS-7c-fix-b later detector missed positive ", "either"),
+    ("DS-7c-fix-b: derived-total parser matrix, nested exact-int, trim, priority.", "either"),
+    ("DS-7c-fix-c: bounded residual detector forms (implemented cases).", "either"),
+    ("DS-7c-fix-c: explicit priority keyword/copula/punctuation forms.", "either"),
+    ("Fix-forward #942: total-key/copied-total guards and exact surfaces.", "either"),
+    ("GAP", "either"),
+    ("Nine HIGH merged-DS-7c re-run review findings: regressions for fixes 1-8 and D119 wording note.", "either"),
+    ("P", "either"),
+    ("P0", "either"),
+    ("P0 0", "either"),
+    ("P0 are 0", "either"),
+    ("P0 at 0", "either"),
+    ("P0 count 0", "either"),
+    ("P0 count: 0", "either"),
+    ("P0 gap 0", "either"),
+    ("P0 is 0", "either"),
+    ("P0 is is 0", "either"),
+    ("P0 is the highest priority", "either"),
+    ("P0 items are critical", "either"),
+    ("P0 now 0", "either"),
+    ("P0 to to 0", "either"),
+    ("P0 total = 0", "either"),
+    ("P0 total is 0", "either"),
+    ("P0: 0", "either"),
+    ("P0: 0 ", "either"),
+    ("P0: 0 and P1: 0", "either"),
+    ("P0: 0.", "either"),
+    ("P0: 0. Next", "either"),
+    ("P0: 0; P1: 2", "either"),
+    ("P0=0", "either"),
+    ("P1", "either"),
+    ("P1 label", "either"),
+    ("P1: 2, P2: 0", "either"),
+    ("P2 is a priority key", "either"),
+    ("P3", "either"),
+    ("PINNED_ROW_TOTALS_ORACLE", "either"),
+    ("PR #123 entries are listed", "either"),
+    ("ROWS", "either"),
+    ("SHIPPED", "either"),
+    ("The guide has 254 entries", "either"),
+    ("Totals 300", "either"),
+    ("[300 entries](https://example.invalid/x)", "either"),
+    ("[300 entries][]", "exempt"),
+    ("[300 entries][x]", "exempt"),
+    ("[x]:\nP0: 0", "either"),
+    ("[x]: https://example.invalid \"300 entries\"", "exempt"),
+    ("\\\\|", "either"),
+    ("\\bD([0-9]+)\\b", "either"),
+    ("\\|", "either"),
+    ("__extra__", "either"),
+    ("a", "either"),
+    ("area", "either"),
+    ("bad", "either"),
+    ("bad-id", "either"),
+    ("body", "either"),
+    ("by_area", "either"),
+    ("by_grade", "either"),
+    ("by_priority", "either"),
+    ("by_status", "either"),
+    ("coverage ", "either"),
+    ("coverage 85 of 254", "either"),
+    ("coverage added by 2 skills", "either"),
+    ("coverage by_area: ", "either"),
+    ("coverage changed 2 skills", "either"),
+    ("coverage manifest_skills: ", "either"),
+    ("coverage now has ", "either"),
+    ("coverage pins: 300", "either"),
+    ("coverage roadmap: 2 skills", "either"),
+    ("coverage rows: 300", "either"),
+    ("coverage snapshot now ", "either"),
+    ("coverage snapshot tests cover 300 entries", "either"),
+    ("coverage snapshot updated to ", "either"),
+    ("coverage snapshot updated to 254 entries", "either"),
+    ("coverage snapshot: 300", "either"),
+    ("coverage snapshot: updated 254 entries", "either"),
+    ("coverage total is ", "either"),
+    ("coverage total is set to 300", "either"),
+    ("coverage total now ", "either"),
+    ("coverage total set to 300", "either"),
+    ("coverage totals ", "either"),
+    ("coverage totals set to 300", "either"),
+    ("coverage totals: 2026", "either"),
+    ("coverage totals: updated 2 entries", "either"),
+    ("coverage totals: updated by 2 entries", "either"),
+    ("coverage totals: updated with 2 entries", "either"),
+    ("coverage totals: were now updated with 2 rows", "must_flag"),
+    ("coverage updated by 2 entries", "either"),
+    ("coverage updated by 2 entries and 3 ids", "exempt"),
+    ("coverage updated by 2 entries and 3 pins", "exempt"),
+    ("coverage updated by 2 entries and 300 entries are remaining", "either"),
+    ("coverage updated by 2 entries and 300 entries have remained", "either"),
+    ("coverage updated by 2 entries and 300 entries remaining", "either"),
+    ("coverage updated by 2 entries and 300 entries still remain", "either"),
+    ("coverage updated by 2 entries and 300 entries were left", "either"),
+    ("coverage updated by 2 entries and 300 entries will be left", "either"),
+    ("coverage updated by 2 entries while the coverage snapshot remains unchanged", "either"),
+    ("coverage updated by 2 entries, coverage snapshot remains unchanged", "either"),
+    ("coverage updated by 2 ids and 3 entries", "exempt"),
+    ("coverage updated by 2 pins and 3 entries", "exempt"),
+    ("coverage updated to 2 entries while snapshot totals are unchanged", "either"),
+    ("coverage updated to 300 entries", "either"),
+    ("coverage updated with 2 entries", "either"),
+    ("coverage updated with 2 entries and 3 skills", "exempt"),
+    ("coverage updated with 2 entries and 300 entries remain", "either"),
+    ("coverage updated with 300 entries remaining", "either"),
+    ("coverage was updated by 2 entries", "exempt"),
+    ("coverage was updated by 2 entries and 3 skills", "exempt"),
+    ("coverage was updated by 2 entries and 300 entries leftover", "must_flag"),
+    ("coverage was updated by 2 entries and 300 entries pending", "must_flag"),
+    ("coverage was updated by 2 entries and 300 entries remain", "must_flag"),
+    ("coverage was updated by 2 entries and 300 entries remaining", "either"),
+    ("coverage was updated by 2 entries and 300 entries which remain", "must_flag"),
+    ("coverage was updated by 2 entries, 3 skills", "exempt"),
+    ("coverage was updated by 2 entries, 3 skills, 4 notes", "exempt"),
+    ("coverage was updated by 2 entries, and 3 skills", "exempt"),
+    ("coverage-total count copy", "either"),
+    ("coverage: ", "either"),
+    ("coverage: updated 2 entries", "either"),
+    ("coverage: updated 2 entries, now has 300 entries", "either"),
+    ("coverage: updated 2 entries; now has 300 entries", "either"),
+    ("coverage: updated 2 skills", "either"),
+    ("coverage: updated 2 skills; now has 254 skills", "either"),
+    ("coverage: was updated by 2 entries", "exempt"),
+    ("coverage_map: ", "either"),
+    ("covering_skills", "either"),
+    ("d_entry", "either"),
+    ("docs", "either"),
+    ("entries", "either"),
+    ("entries\n300", "either"),
+    ("entries=300", "either"),
+    ("entry-300", "either"),
+    ("entry: 300", "either"),
+    ("evidence", "either"),
+    ("evidence_grade", "either"),
+    ("exact integer", "either"),
+    ("exact-int nested map accepted invalid leaf", "either"),
+    ("exact-integer", "either"),
+    ("explicit-id", "either"),
+    ("finding 1: Pointer integrity must follow the blank line", "either"),
+    ("finding 1: a blank line must separate Optionality and Pointer integrity", "either"),
+    ("finding 2: pipe in an area title must be escaped with a single backslash: ", "either"),
+    ("finding 2: pipe must not be double-escaped: ", "either"),
+    ("finding 3: a legitimate later entry must pass: ", "either"),
+    ("finding 3: clean ledger must pass", "either"),
+    ("finding 4: an unrelated small number must stay allowed", "either"),
+    ("finding 4: count-copy regex must catch ", "either"),
+    ("finding 4: generic count-copy detector still catches 2 entries in a coverage-specific context (caller narrows context)", "either"),
+    ("finding 5/Low5: shipped analysis accepted empty manifest", "either"),
+    ("finding 5/Low5: totals accepted empty manifest", "either"),
+    ("finding 5/Medium3: direct totals helper accepted invalid priority ", "either"),
+    ("finding 5: ", "either"),
+    ("finding 6/review Medium3: by_priority must sum to the entry count", "either"),
+    ("finding 9: D119 correction must acknowledge the test-only totals oracle", "either"),
+    ("fixture entry 0 must be non-GAP", "either"),
+    ("followup-d-entry", "either"),
+    ("followup-ledger", "either"),
+    ("followup-malformed-id", "either"),
+    ("followup-nested-totals", "either"),
+    ("followup-totals", "either"),
+    ("gap_by_priority", "either"),
+    ("gap_by_priority keys must be exactly", "either"),
+    ("https://example.invalid/coverage", "either"),
+    ("id", "either"),
+    ("independent snapshot", "either"),
+    ("independent snapshot/summary/gap checks intentionally skipped", "either"),
+    ("is not allowed", "either"),
+    ("later derived-total ledger entry", "either"),
+    ("ledger.md", "either"),
+    ("live totals need one nonempty nested map", "either"),
+    ("malformed id", "either"),
+    ("manifest", "either"),
+    ("manifest validation boom", "either"),
+    ("nested map shape validator missed", "either"),
+    ("no phrase", "either"),
+    ("no shipped-as phrase here", "either"),
+    ("non-integer id", "either"),
+    ("non-string detector input must fail closed", "either"),
+    ("none", "either"),
+    ("ok", "either"),
+    ("priority", "either"),
+    ("priority enum: P0, P1, P2", "either"),
+    ("priority is required", "either"),
+    ("priority must be a string", "either"),
+    ("priority prose: P0/P1/P2", "either"),
+    ("probe", "either"),
+    ("rationale", "either"),
+    ("reconciliation", "either"),
+    ("review Medium5: a backslash in an area title must be escaped first", "either"),
+    ("review Medium5: a pipe after a backslash must still be escaped", "either"),
+    ("review Medium5: an area title newline must not add a rendered line", "either"),
+    ("review Medium5: an area title newline must not split the table row: ", "either"),
+    ("rows ", "either"),
+    ("rows 300", "either"),
+    ("rows: 300", "either"),
+    ("rows_sha256=", "either"),
+    ("scripts/tests/test_validator.py", "either"),
+    ("scripts/validate-skills.py", "either"),
+    ("shipped", "either"),
+    ("skill", "either"),
+    ("skill-a", "either"),
+    ("skill-b", "either"),
+    ("snapshot", "either"),
+    ("snapshot 2026-10-26T00:00:00+00:00", "either"),
+    ("snapshot 2026-10-26T00:00:00-07:00", "either"),
+    ("snapshot 2026-10-26T00:00:00Z", "either"),
+    ("snapshot has 300 entries", "either"),
+    ("snapshot now ", "either"),
+    ("snapshot rows: 2024", "either"),
+    ("snapshot tests cover 2 entries", "either"),
+    ("snapshot tests cover 2 skills", "either"),
+    ("snapshot totals: 2026", "either"),
+    ("snapshot year 2026 entries", "either"),
+    ("snapshot year policy 2026", "either"),
+    ("snapshot-2026", "either"),
+    ("snapshot: 300", "either"),
+    ("snapshot: updated 2 entries", "either"),
+    ("snapshot_totals: ", "either"),
+    ("status", "either"),
+    ("step-0-reconciliation-v4.md", "either"),
+    ("test source has U+FFFD", "either"),
+    ("test-only totals oracle", "either"),
+    ("there are 2 tools", "either"),
+    ("total-300", "either"),
+    ("total:300", "either"),
+    ("total=300", "either"),
+    ("totals", "either"),
+    ("totals 300", "either"),
+    ("totals updated in D", "either"),
+    ("totals updated in D121", "either"),
+    ("totals: ", "either"),
+    ("totals: are now updated by 2 entries", "must_flag"),
+    ("totals: has been-updated by 2 entries", "must_flag"),
+    ("totals: has beenupdated by 2 entries", "either"),
+    ("totals: hasbeen updated by 2 entries", "must_flag"),
+    ("totals: have been updated with 2 rows", "either"),
+    ("totals: now updated by 2 entries", "must_flag"),
+    ("totals: updated 2 entries", "either"),
+    ("totals: updated by 2 entries", "must_flag"),
+    ("totals: updated with 2 entries", "either"),
+    ("totals: was-updated by 2 entries", "must_flag"),
+    ("totals: wasupdated by 2 entries", "either"),
+    ("totals: were just updated by 2 entries", "must_flag"),
+    ("totals: were recently updated by 2 entries", "must_flag"),
+    ("totals: were updated by 2 entries", "either"),
+    ("unexpected key", "either"),
+    ("untrimmed/empty manifest accepted by shipped analysis", "either"),
+    ("untrimmed/empty manifest accepted by totals", "either"),
+    ("updated 2 entries", "either"),
+    ("utf-8", "either"),
+    ("|", "either"),
+    ("| ", "either"),
+)
+CL2_GAINS = (
+    "P0: 0.",
+    "P0: 0. Next",
+    "coverage updated with 300 entries remaining",
+)
+
+
+def _cl2_call_name(node):
+    func = node.func
+    if isinstance(func, ast.Name):
+        return func.id
+    if isinstance(func, ast.Attribute):
+        return func.attr
+    return None
+
+
+def _cl2_derived_literals():
+    """Re-derive AST_DERIVED under PLAN-CL2 §5.4, excluding test_cl2_*."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    functions = [node for node in tree.body
+                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))]
+    literals, direct = set(), set()
+    for function in functions:
+        if not function.name.startswith("test_"):
+            continue
+        if function.name.startswith("test_cl2_"):
+            continue
+        calls = {_cl2_call_name(node) for node in ast.walk(function)
+                 if isinstance(node, ast.Call)}
+        if calls & CL2_DETECTOR_ENTRY_POINTS:
+            for node in ast.walk(function):
+                if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                    literals.add(node.value)
+    for function in functions:
+        if function.name.startswith("test_cl2_"):
+            continue
+        for node in ast.walk(function):
+            if not isinstance(node, ast.Call) or not node.args:
+                continue
+            if _cl2_call_name(node) not in CL2_DETECTOR_ENTRY_POINTS:
+                continue
+            first = node.args[0]
+            if isinstance(first, ast.Constant) and isinstance(first.value, str):
+                direct.add(first.value)
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        for call in ast.walk(node):
+            if not isinstance(call, ast.Call) or not call.args:
+                continue
+            if _cl2_call_name(call) not in CL2_DETECTOR_ENTRY_POINTS:
+                continue
+            first = call.args[0]
+            if isinstance(first, ast.Constant) and isinstance(first.value, str):
+                direct.add(first.value)
+    return literals | direct
+
+
+def _cl2_corpus_verdicts():
+    corpus = [text for text, _tag in CL2_CORPUS]
+    pre = {text for text in corpus
+           if _pre942__coverage_later_total_count_errors(text)}
+    new = {text for text in corpus
+           if validator._coverage_later_total_count_errors(text)}
+    return corpus, pre, new
+
+
+def test_cl2_lost_forms_restored():
+    """CL2 AC-CL-01: all 11 pre-#942 copied-total forms are detected again."""
+    for phrase in CL2_NAMED_DEFECT:
+        found = validator._coverage_later_total_count_errors(phrase)
+        assert found == sorted(CL2_NAMED_DEFECT_SURFACES[phrase]), (phrase, found)
+    ok("CL2: 11/11 pre-#942 copied-total forms detected, exact surfaces")
+
+
+def test_cl2_restored_944_surfaces():
+    """CL2 AC-CL-02: both #944 surfaces stay flagged, including both counts."""
+    long_sentence = "coverage was updated by 2 entries and 300 entries remain"
+    found = validator._coverage_later_total_count_errors(long_sentence)
+    assert found == ["2 entries", "300 entries"], found
+    simple = validator._coverage_later_total_count_errors(
+        "totals: updated by 2 entries")
+    assert simple == ["2 entries"], simple
+    ok("CL2: 2/2 #944 surfaces flagged; long sentence carries both counts")
+
+
+def test_cl2_corpus_completeness():
+    """CL2 §7.2: the committed corpus covers every derived coverage-test literal."""
+    derived = _cl2_derived_literals()
+    corpus = {text for text, _tag in CL2_CORPUS}
+    assert len(derived) == CL2_AST_DERIVED_EXPECTED, len(derived)
+    assert len(corpus) == len(CL2_CORPUS) == 304, (len(corpus), len(CL2_CORPUS))
+    assert derived <= corpus, sorted(derived - corpus)[:5]
+    digest = hashlib.sha256(
+        "\n".join(sorted(corpus)).encode("utf-8")).hexdigest()
+    assert digest == CL2_CORPUS_SHA256, digest
+    ok("CL2: 293 derived literals, 304 committed, corpus digest pinned")
+
+
+def test_cl2_differential_zero_loss():
+    """CL2 AC-CL-03: 304 strings, 118 oracle-flagged, 18 exemptions, 0 lost."""
+    corpus, pre, new = _cl2_corpus_verdicts()
+    exemptions = set(CL2_EXEMPTIONS)
+    losses = pre - new
+    gains = new - pre
+    assert len(corpus) == 304
+    assert len(pre) == 118, len(pre)
+    assert len(exemptions) == 18, len(exemptions)
+    assert losses == exemptions, sorted(losses ^ exemptions)
+    assert gains == set(CL2_GAINS), sorted(gains)
+    lost = len(losses - exemptions)
+    retained = len(pre) - len(exemptions)
+    assert lost == 0 and retained == 100, (lost, retained)
+    print("corpus=%d pre=%d exempt=%d lost=%d"
+          % (len(corpus), len(pre), len(exemptions), lost))
+    print("retained=%d" % retained)
+    _, pre2, new2 = _cl2_corpus_verdicts()
+    assert pre2 == pre and new2 == new, "differential is not deterministic"
+    ok("CL2: zero pre-#942 detection lost (18 reasoned exemptions, 3 gains)")
+
+
+def test_cl2_total_key_wording():
+    """CL2 AC-CL-04: every enumerated total-key wording is flagged."""
+    classes = {
+        "C1 adverb chain": (
+            "totals: are now updated by 2 entries",
+            "totals: were just updated by 2 entries",
+            "totals: were recently updated by 2 entries",
+            "totals: now updated by 2 entries",
+        ),
+        "C2 adverb+with": (
+            "coverage totals: were now updated with 2 rows",
+        ),
+        "C3 hyphenated verb": (
+            "totals: was-updated by 2 entries",
+            "totals: has been-updated by 2 entries",
+        ),
+        "C4 joined auxiliary": (
+            "totals: hasbeen updated by 2 entries",
+        ),
+    }
+    count = 0
+    for label, forms in classes.items():
+        for form in forms:
+            found = validator._coverage_later_total_count_errors(form)
+            assert found, (label, form)
+            assert validator.COVERAGE_TOTAL_UPDATE_CLAIM_RE.search(form), (
+                label, form)
+            count += 1
+    assert count == 8, count
+    clean = "totals: 300 rows, updated yesterday"
+    assert validator.COVERAGE_TOTAL_UPDATE_CLAIM_RE.search(clean) is None, clean
+    assert validator._coverage_later_total_count_errors(
+        "Counts: the ledger was updated with 2 entries") == ["2 entries"]
+    ok("CL2: 8/8 total-key wordings in 4 classes; clean negative does not fire")
+
+
+def test_cl2_allowed_deltas():
+    """CL2 AC-CL-05: every reasoned delta stays allowed (no false positives)."""
+    for phrase, reason in CL2_EXEMPTIONS.items():
+        assert reason in CL2_EXEMPTION_REASONS, (phrase, reason)
+        assert validator._coverage_later_total_count_errors(phrase) == [], phrase
+    ok("CL2: 18/18 reasoned update deltas remain clean")
+
+
+def test_cl2_denylist_removed():
+    """CL2 AC-CL-05: no state-tail denylist survives; unlisted tails flag."""
+    assert not hasattr(validator, "COVERAGE_STATE_TAIL")
+    tails = ("pending", "leftover", "which remain", "queued", "deferred",
+             "outstanding", "on hold", "unresolved")
+    for tail in tails:
+        phrase = "coverage was updated by 2 entries and 300 entries " + tail
+        found = validator._coverage_later_total_count_errors(phrase)
+        assert "300 entries" in found, (tail, found)
+    ok("CL2: COVERAGE_STATE_TAIL absent; 8/8 unlisted tails stay flagged")
+
+
+def test_cl2_exemptions_exact():
+    """CL2 AC-CL-06: the exemption table is the exact measured loss set."""
+    _, pre, new = _cl2_corpus_verdicts()
+    losses = pre - new
+    assert set(CL2_EXEMPTIONS) == losses, sorted(set(CL2_EXEMPTIONS) ^ losses)
+    assert len(CL2_EXEMPTIONS) == 18
+    for phrase, reason in CL2_EXEMPTIONS.items():
+        assert reason in CL2_EXEMPTION_REASONS, (phrase, reason)
+        assert _pre942__coverage_later_total_count_errors(phrase), phrase
+    ok("CL2: 18-entry exemption table is set-equal to the measured losses")
+
+
+def test_cl2_oracle_identity():
+    """CL2 AC-CL-12: the vendored oracle's normalised identity is pinned."""
+    source = Path(__file__).read_text(encoding="utf-8")
+    begin = "# BEGIN CL2_ORACLE\n"
+    end = "# END CL2_ORACLE"
+    start = source.index(begin) + len(begin)
+    block = source[start:source.index(end, start)]
+    assert "_pre942_" in block
+    normalised = block.replace("_pre942_", "")
+    actual = hashlib.sha256(normalised.encode("utf-8")).hexdigest()
+    assert actual == CL2_ORACLE_NORMALISED_SHA256, actual
+    assert not hasattr(validator, "_pre942__coverage_later_total_count_errors")
+    ok("CL2: vendored 2a8bdb5b oracle normalised hash matches; not imported")
+
+
+def test_cl2_predicate_perf():
+    """CL2 AC-CL-11: bounded window and anchored grammar stay linear."""
+    adversarial = (
+        ("200 chained delta items",
+         "coverage updated by " + "2 entries and " * 200 + "2 entries"),
+        ("5,000-char gap filler",
+         "totals: " + "a " * 2490 + "updated by 2 entries"),
+        ("5,000-char unbroken filler",
+         "coverage was updated by " + "x" * 5000),
+    )
+    timings = []
+    for label, text in adversarial:
+        start = time.perf_counter()
+        validator._coverage_later_total_count_errors(text)
+        elapsed_ms = (time.perf_counter() - start) * 1000.0
+        timings.append((label, elapsed_ms))
+        assert elapsed_ms < 100.0, (label, elapsed_ms)
+    start = time.perf_counter()
+    for text, _tag in CL2_CORPUS:
+        validator._coverage_later_total_count_errors(text)
+    corpus_ms = (time.perf_counter() - start) * 1000.0
+    assert corpus_ms < 5000.0, corpus_ms
+    ok("CL2: adversarial < 100 ms each; 304-string corpus %.1f ms" % corpus_ms)
 
 
 TESTS = [
@@ -5544,6 +6292,16 @@ TESTS = [
     test_dsr1_fixture_cleanup,
     test_dsr1_hook_path_resolution,
     test_dsr1_lock_platform_and_carries,
+    test_cl2_lost_forms_restored,
+    test_cl2_restored_944_surfaces,
+    test_cl2_corpus_completeness,
+    test_cl2_differential_zero_loss,
+    test_cl2_total_key_wording,
+    test_cl2_allowed_deltas,
+    test_cl2_denylist_removed,
+    test_cl2_exemptions_exact,
+    test_cl2_oracle_identity,
+    test_cl2_predicate_perf,
 ]
 
 
