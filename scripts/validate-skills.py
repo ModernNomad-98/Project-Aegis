@@ -2576,7 +2576,7 @@ def _coverage_totals_shape_errors(totals, computed):
             for sub in sorted(set(expected) & set(value), key=str):
                 leaf = value[sub]
                 if not _coverage_is_exact_int(leaf):
-                    errors.append("totals." + key + "." + str(sub)
+                    errors.append("totals." + key + "." + repr(sub)
                                   + " must be an exact integer (booleans, floats, strings rejected)")
         else:
             if not _coverage_is_exact_int(value):
@@ -2610,9 +2610,6 @@ COVERAGE_KEY_NUMBER_RE = re.compile(
     r"(?i)\b" + COVERAGE_DERIVED_INTENT
     + r"\b(?:\s*(?::|=|-))?(?:\s+(?:is|are|was|were|now|at|of|equals?|"
     + r"set\s+to|to))*\s*[0-9]+\b")
-COVERAGE_LATER_CONTEXT_RE = re.compile(
-    r"(?i)\b(?:coverage|snapshot|pinned|d_entry|rows_sha256|coverage-map|"
-    r"roadmap)\b")
 COVERAGE_UPDATE_EVENT_RE = re.compile(
     r"(?i)\b(?:updated|added|removed|changed|incremented|decremented|edited|"
     r"renamed|moved|progressed)\s+[0-9]+\s+"
@@ -2635,19 +2632,21 @@ COVERAGE_ALLOWED_PROSE_RE = (
 
 
 def _coverage_protect_opaque(text: str) -> str:
-    """Mask non-count opaque tokens before intent recognition.
+    """Mask opaque non-count tokens before intent recognition.
 
-    Code spans and Markdown links are masked before bare URLs: a link whose
-    label contains a count must become opaque as a whole, not leave its label
-    exposed after the URL target is removed.
+    Issue/PR refs (#123), code spans, Markdown links, URLs, dates, D ids,
+    hashes and snapshot-YYYY labels are masked. Code spans and Markdown links
+    are masked before bare URLs so a link label cannot leak its count.
     """
     protected = re.sub(_OPAQUE_CODE, " OPAQUE ", text)
+    protected = re.sub(r"#[0-9]+" + chr(92) + "b", " OPAQUE ", protected)
     protected = re.sub(r"\[[^\]\n]*\]\([^)\n]*\)", " OPAQUE ", protected)
     protected = re.sub(r"https?://\S+", " OPAQUE ", protected, flags=re.IGNORECASE)
     protected = re.sub(r"\b[0-9a-f]{40,64}\b", " OPAQUE ", protected,
                        flags=re.IGNORECASE)
     protected = re.sub(r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}\b", " OPAQUE ", protected)
-    protected = re.sub(r"\bD[0-9]{1,12}\b", " OPAQUE ", protected)
+    protected = re.sub(r"\bD[0-9]{1,12}\b", " OPAQUE ", protected,
+                       flags=re.IGNORECASE)
     protected = re.sub(r"\bsnapshot-(?:19|20)[0-9]{2}\b", " OPAQUE ", protected,
                        flags=re.IGNORECASE)
     return protected
@@ -2656,16 +2655,15 @@ def _coverage_protect_opaque(text: str) -> str:
 def _coverage_mask_allowed_update(text: str) -> str:
     """Mask the fixed legitimate update-event prose allowlist.
 
-    Direct "updated N entries" forms and, for coverage context that is not a
-    snapshot-total statement, connector forms ("coverage updated to N
-    entries", "coverage added by N skills") are masked. Coverage context words
-    remain; snapshot-total update statements remain exposed as violations.
+    Direct update-event counts and coverage-context connector forms are
+    masked. The guard is the SPECIFIC forbidden coverage-snapshot form, not
+    any clause containing the word snapshot.
     """
     masked = text
     for pattern in COVERAGE_ALLOWED_PROSE_RE:
         masked = pattern.sub(" ", masked)
     masked = COVERAGE_UPDATE_EVENT_RE.sub(" ", masked)
-    if "coverage" in masked.casefold() and "snapshot" not in masked.casefold():
+    if not re.search(r"\bcoverage\s+snapshot\b", masked, re.IGNORECASE):
         masked = COVERAGE_UPDATE_CONNECTOR_RE.sub(" ", masked)
     return masked
 
@@ -2682,8 +2680,7 @@ def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
     """
     if not isinstance(text, str) or not text:
         return []
-    normalized = (text.casefold()
-                  .replace(chr(0x2013), "-").replace(chr(0x2014), "-")
+    normalized = (text.replace(chr(0x2013), "-").replace(chr(0x2014), "-")
                   .replace(chr(0x2212), "-"))
     protected = _coverage_protect_opaque(normalized)
     mentions = []

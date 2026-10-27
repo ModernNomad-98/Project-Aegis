@@ -4684,7 +4684,16 @@ def test_readiness_memory_canonical_tristate():
 
 def test_ds7cfixb_coverage_detector_matrix():
     """DS-7c-fix-b: derived-total parser matrix, nested exact-int, trim, priority."""
-    computed = validator._coverage_live_totals()
+    synthetic_entries = [
+        {"id": 1, "area": "01", "status": "SHIPPED",
+         "evidence_grade": "explicit-id", "priority": "P0",
+         "covering_skills": ["skill-a"]},
+        {"id": 2, "area": "01", "status": "GAP",
+         "evidence_grade": "none", "priority": "P1",
+         "covering_skills": []},
+    ]
+    computed = validator._coverage_compute_totals(
+        synthetic_entries, {"skill-a", "skill-b"})
     later_positive = (
         "300 - rows", "300 - entries", "300 - skills", "300 - row",
         "coverage total set to 300", "coverage total is set to 300",
@@ -4748,6 +4757,20 @@ def test_ds7cfixb_coverage_detector_matrix():
     assert validator._coverage_validated_totals(bad_real, computed) is None
     assert any("exact integer" in error for error in
                validator._coverage_totals_shape_errors(bad_real, computed))
+    # C3: issue refs, specific snapshot guard, broad policy surfaces/case.
+    assert not validator._coverage_later_total_count_errors(
+        "PR #123 entries are listed")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage updated to 2 entries while snapshot totals are unchanged")
+    assert validator._coverage_later_total_count_errors(
+        "coverage snapshot updated to 254 entries")
+    assert any("ROWS" in surface for surface in
+               validator._coverage_later_total_count_errors("300 ROWS"))
+    # The later policy is deliberately broad; these are documented positives,
+    # not coverage-context-gated findings.
+    assert validator._coverage_later_total_count_errors(
+        "The guide has 254 entries")
+    assert validator._coverage_later_total_count_errors("85 of 254")
     # Newline/code/link masks must not pair counts across lines or expose labels.
     assert not validator._coverage_later_total_count_errors("entries\n300")
     assert not validator._coverage_later_total_count_errors(
