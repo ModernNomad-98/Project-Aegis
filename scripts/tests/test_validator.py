@@ -6215,8 +6215,8 @@ def test_cl2_predicate_perf():
 # The one end-to-end CLI reading (T1) runs the real command in the repository
 # root and proves it writes nothing; no test writes into the working tree.
 
-README_BASE_SHA = ("dff4542520a0e7989b0df001b24fc30723ab68e60e29a479"
-                   "f74bc857b6ba88c5")
+# T5 compares the repaired bytes with the live README fixture (only the
+# marker digit runs normalised to the canon), not a pinned whole-file digest.
 DS7CB_BASE = "7ed9fbd4059ea83238998d9852a9a661688c6e6d"
 # Base pins measured at Stage C over the base revision's validate-skills.py
 # with the C-11a probe: AST inventory counts and the two function source
@@ -6240,10 +6240,53 @@ def _ds7cb_readme_base() -> bytes:
     return (REPO_ROOT / "README.md").read_bytes()
 
 
-def _ds7cb_tamper_skill(data: bytes, digits: bytes = b"999") -> bytes:
-    """Drift the marked SKILL-COUNT; the digit run is the only changed byte."""
-    return data.replace(b"<!-- SKILL-COUNT -->254<!--",
-                        b"<!-- SKILL-COUNT -->" + digits + b"<!--", 1)
+DS7CB_SKILL_MARKER_BYTES = re.compile(
+    rb"(<!--\s*SKILL-COUNT\s*-->\s*)(\d+)(\s*<!--\s*/SKILL-COUNT\s*-->)")
+DS7CB_FAMILY_MARKER_BYTES = re.compile(
+    rb"(<!--\s*FAMILY-COUNT\s*-->\s*)(\d+)(\s*<!--\s*/FAMILY-COUNT\s*-->)")
+
+
+def _ds7cb_marked_counts(data: bytes) -> tuple[int, int]:
+    """The live fixture's own marked counts (for marker surgery, not canon)."""
+    skill = DS7CB_SKILL_MARKER_BYTES.search(data)
+    family = DS7CB_FAMILY_MARKER_BYTES.search(data)
+    assert skill is not None and family is not None, "README markers missing"
+    return int(skill.group(2)), int(family.group(2))
+
+
+def _ds7cb_canonical_counts() -> tuple[int, int]:
+    """The writer's canon: skills on disk and parsed roster family lines.
+
+    Deliberately reuses the validator's private _section_text so the test parses
+    the roster exactly as the writer does; if that helper is renamed, this test
+    fails loudly and moves with the validator.
+    """
+    data = _ds7cb_readme_base()
+    text = data.decode("utf-8")
+    section = validator._section_text(text, validator.WHATS_IN_THE_LIBRARY)
+    assert section is not None, "README roster section missing"
+    family_lines = list(validator.FAMILY_LINE.finditer(section))
+    assert family_lines, "README roster has no family lines"
+    return len(validator.discover_skills()), len(family_lines)
+
+
+def _ds7cb_normalise_counts(data: bytes, skill: int, family: int) -> bytes:
+    """The fixture with only each marked digit run normalised to the canon."""
+    data = DS7CB_SKILL_MARKER_BYTES.sub(
+        lambda m: m.group(1) + str(skill).encode() + m.group(3), data, count=1)
+    return DS7CB_FAMILY_MARKER_BYTES.sub(
+        lambda m: m.group(1) + str(family).encode() + m.group(3), data, count=1)
+
+
+def _ds7cb_tamper_skill(data: bytes, digits: bytes | None = None) -> bytes:
+    """Drift the marked SKILL-COUNT; only that marker's digit run changes."""
+    match = DS7CB_SKILL_MARKER_BYTES.search(data)
+    assert match is not None, "SKILL-COUNT marker missing"
+    current = match.group(2)
+    if digits is None:
+        digits = b"999" if current != b"999" else b"998"
+    assert digits != current, (digits, current)
+    return data[:match.start(2)] + digits + data[match.end(2):]
 
 
 def _ds7cb_main(*argv: str) -> tuple[int, str]:
@@ -6294,6 +6337,7 @@ def _ds7cb_function_nodes(text: str) -> dict:
 def test_ds7cb_readme_writer_determinism():
     """DS-7c-b T1: two copies write identical bytes; the real CLI writes nothing."""
     base = _ds7cb_readme_base()
+    expected_skill, expected_family = _ds7cb_canonical_counts()
     tampered = _ds7cb_tamper_skill(base)
     written = []
     with tempfile.TemporaryDirectory() as tmp:
@@ -6307,8 +6351,9 @@ def test_ds7cb_readme_writer_determinism():
             assert "(updated)" in out, out
             written.append(path.read_bytes())
     assert written[0] == written[1], "two copies must derive identical bytes"
-    assert b"<!-- SKILL-COUNT -->254<!--" in written[0]
-    ok("T1: two independent copies derive identical written bytes (SKILL-COUNT 254)")
+    assert _ds7cb_marked_counts(written[0]) == (expected_skill, expected_family)
+    ok(f"T1: two independent copies derive identical written bytes "
+       f"(SKILL-COUNT {expected_skill})")
 
     def porcelain():
         return subprocess.run(
@@ -6322,15 +6367,17 @@ def test_ds7cb_readme_writer_determinism():
         cwd=REPO_ROOT, capture_output=True, text=True)
     after = porcelain()
     assert proc.returncode == 0, proc.stderr
-    assert proc.stdout.strip() == "SKILL-COUNT=254 FAMILY-COUNT=23", proc.stdout
+    assert proc.stdout.strip() == (
+        f"SKILL-COUNT={expected_skill} FAMILY-COUNT={expected_family}"), proc.stdout
     assert after == before, (before, after)
-    ok("T1: real CLI prints exactly SKILL-COUNT=254 FAMILY-COUNT=23, "
-       "exit 0, porcelain byte-identical")
+    ok(f"T1: real CLI prints exactly SKILL-COUNT={expected_skill} "
+       f"FAMILY-COUNT={expected_family}, exit 0, porcelain byte-identical")
 
 
 def test_ds7cb_readme_writer_idempotence_crlf():
     """DS-7c-b T2: a second run is a no-op; a CRLF copy keeps every CRLF."""
     base = _ds7cb_readme_base()
+    expected_skill, expected_family = _ds7cb_canonical_counts()
     tampered = _ds7cb_tamper_skill(base)
     with tempfile.TemporaryDirectory() as tmp:
         folder = Path(tmp)
@@ -6348,19 +6395,18 @@ def test_ds7cb_readme_writer_idempotence_crlf():
         ok("T2: a second run prints (unchanged) with a stable sha256 and no temp file")
 
         crlf = base.replace(b"\n", b"\r\n")
-        crlf_tampered = _ds7cb_tamper_skill(crlf, b"998")
+        crlf_tampered = _ds7cb_tamper_skill(crlf)
         path.write_bytes(crlf_tampered)
         with readme_at(path):
             code, out = _ds7cb_main("--write-readme-counts")
         assert code == 0, out
         repaired = path.read_bytes()
-        assert b"<!-- SKILL-COUNT -->254<!--" in repaired
+        assert _ds7cb_marked_counts(repaired) == (expected_skill, expected_family)
         ok("T2: a CRLF copy repairs its drifted marker")
         assert repaired.count(b"\r\n") == crlf.count(b"\r\n")
         assert repaired.count(b"\n") == crlf.count(b"\n")
         assert repaired.count(b"\r") == crlf.count(b"\r")
-        marker = re.compile(
-            rb"(<!-- SKILL-COUNT -->)(\d+)(<!-- /SKILL-COUNT -->)")
+        marker = DS7CB_SKILL_MARKER_BYTES
         assert (marker.sub(rb"\1N\3", repaired, count=1)
                 == marker.sub(rb"\1N\3", crlf_tampered, count=1))
         ok("T2: every CRLF preserved and only the digit bytes changed")
@@ -6369,8 +6415,11 @@ def test_ds7cb_readme_writer_idempotence_crlf():
 def test_ds7cb_readme_writer_refuses_missing_marker():
     """DS-7c-b T3: a missing SKILL-COUNT marker is refused, never invented."""
     base = _ds7cb_readme_base()
-    missing = base.replace(
-        b"<!-- SKILL-COUNT -->254<!-- /SKILL-COUNT -->", b"", 1)
+    match = DS7CB_SKILL_MARKER_BYTES.search(base)
+    assert match is not None
+    pair = match.group(0)
+    missing = base.replace(pair, b"", 1)
+    assert missing != base
     with tempfile.TemporaryDirectory() as tmp:
         path = _ds7cb_copy_readme(Path(tmp), missing)
         before = path.read_bytes()
@@ -6386,7 +6435,10 @@ def test_ds7cb_readme_writer_refuses_missing_marker():
 def test_ds7cb_readme_writer_refuses_duplicate_marker():
     """DS-7c-b T4: a duplicated SKILL-COUNT marker is refused, not silently used."""
     base = _ds7cb_readme_base()
-    pair = b"<!-- SKILL-COUNT -->254<!-- /SKILL-COUNT -->"
+    expected_skill, _ = _ds7cb_canonical_counts()
+    match = DS7CB_SKILL_MARKER_BYTES.search(base)
+    assert match is not None
+    pair = match.group(0)
     duplicated = base.replace(pair, pair + pair, 1)
     assert duplicated != base
     with tempfile.TemporaryDirectory() as tmp:
@@ -6394,7 +6446,7 @@ def test_ds7cb_readme_writer_refuses_duplicate_marker():
         before = path.read_bytes()
         with readme_at(path):
             rep = validator.Report()
-            validator.check_readme_counts(254, rep)
+            validator.check_readme_counts(expected_skill, rep)
             assert not rep.errors, (
                 "the base check searches and cannot see a duplicate: "
                 + repr(rep.errors))
@@ -6410,6 +6462,7 @@ def test_ds7cb_readme_writer_refuses_duplicate_marker():
 def test_ds7cb_readme_writer_repairs_drift():
     """DS-7c-b T5: a drifted marker is repaired to the derived value."""
     base = _ds7cb_readme_base()
+    expected_skill, expected_family = _ds7cb_canonical_counts()
     tampered = _ds7cb_tamper_skill(base)
     with tempfile.TemporaryDirectory() as tmp:
         path = _ds7cb_copy_readme(Path(tmp), tampered)
@@ -6417,11 +6470,16 @@ def test_ds7cb_readme_writer_repairs_drift():
             code, out = _ds7cb_main("--write-readme-counts")
         assert code == 0, out
         assert out.strip() == (
-            "README counts: SKILL-COUNT 254, FAMILY-COUNT 23 (updated)"), out
+            f"README counts: SKILL-COUNT {expected_skill}, "
+            f"FAMILY-COUNT {expected_family} (updated)"), out
         repaired = path.read_bytes()
-        assert hashlib.sha256(repaired).hexdigest() == README_BASE_SHA
-        ok("T5: a drifted SKILL-COUNT (999) is repaired to 254 (S1 literal, "
-           "base bytes restored)")
+        expected = _ds7cb_normalise_counts(
+            base, expected_skill, expected_family)
+        assert repaired == expected, (
+            "the writer must restore the live fixture with only the marked "
+            "digits normalised to canon")
+        ok("T5: a drifted SKILL-COUNT is repaired to the derived value "
+           "(S1 literal, byte-for-byte fixture restored)")
         old_lines = tampered.splitlines()
         new_lines = repaired.splitlines()
         assert len(old_lines) == len(new_lines)
@@ -6429,7 +6487,14 @@ def test_ds7cb_readme_writer_repairs_drift():
                    if old != new]
         assert len(changed) == 1, changed
         index = changed[0]
-        assert old_lines[index].replace(b"999", b"254", 1) == new_lines[index]
+        tamper_digits = DS7CB_SKILL_MARKER_BYTES.search(tampered).group(2)
+        expected_digits = str(expected_skill).encode()
+        # The full-file equality above is the load-bearing proof; this line-level
+        # check is a diagnostic, so guard the replace heuristic: the tamper digits
+        # must occur exactly once in the changed line.
+        assert old_lines[index].count(tamper_digits) == 1, old_lines[index]
+        assert old_lines[index].replace(
+            tamper_digits, expected_digits, 1) == new_lines[index]
         with readme_at(path):
             code, out = _ds7cb_main()
         assert code == 0, out[-2000:]
@@ -6440,18 +6505,36 @@ def test_ds7cb_readme_writer_repairs_drift():
 def test_ds7cb_readme_writer_refuses_roster_sum():
     """DS-7c-b T6: an inconsistent roster sum is refused, never 'fixed'."""
     base = _ds7cb_readme_base()
-    assert base.count(b"*(Phase 2, 30)*") == 1
-    drifted = base.replace(b"*(Phase 2, 30)*", b"*(Phase 2, 31)*", 1)
+    expected_skill, expected_family = _ds7cb_canonical_counts()
+    text = base.decode("utf-8")
+    section = validator._section_text(text, validator.WHATS_IN_THE_LIBRARY)
+    assert section is not None, "README roster section missing"
+    lines = list(validator.FAMILY_LINE.finditer(section))
+    assert lines, "README roster has no family lines"
+    first = lines[0]
+    family_sum = sum(int(m.group(1)) for m in lines)
+    old_count = int(first.group(1))
+    rel_start = first.start(1) - first.start(0)
+    rel_end = first.end(1) - first.start(0)
+    old_fragment = first.group(0)
+    new_fragment = (old_fragment[:rel_start] + str(old_count + 1)
+                    + old_fragment[rel_end:])
+    old_bytes = old_fragment.encode("utf-8")
+    assert base.count(old_bytes) == 1, old_bytes
+    drifted = base.replace(old_bytes, new_fragment.encode("utf-8"), 1)
+    assert drifted != base
+    expected_error = (
+        f"ERROR writer: roster sum {family_sum + 1} + 1 = {family_sum + 2} "
+        f"!= {expected_skill} skill(s) on disk; not rewriting")
     with tempfile.TemporaryDirectory() as tmp:
         path = _ds7cb_copy_readme(Path(tmp), drifted)
         with readme_at(path):
             code, out = _ds7cb_main("--write-readme-counts")
         assert code == 1, out
-        assert out.strip() == (
-            "ERROR writer: roster sum 254 + 1 = 255 != 254 skill(s) on disk; "
-            "not rewriting"), out
+        assert out.strip() == expected_error, out
         assert path.read_bytes() == drifted
-    ok("T6: a roster sum of 255 is refused (R7 literal, neither number written)")
+    ok(f"T6: a roster sum of {family_sum + 2} is refused "
+       "(R7 literal, neither number written)")
 
 
 def test_ds7cb_readme_writer_refuses_manifest():
@@ -6487,6 +6570,8 @@ def test_ds7cb_readme_writer_refuses_manifest():
 def test_ds7cb_readme_writer_advisory_baseline():
     """DS-7c-b T8: the audit baseline is advisory, never blocking."""
     base = _ds7cb_readme_base()
+    expected_skill, _ = _ds7cb_canonical_counts()
+    baseline_skill = expected_skill - 1
     tampered = _ds7cb_tamper_skill(base)
     with tempfile.TemporaryDirectory() as tmp:
         folder = Path(tmp)
@@ -6494,7 +6579,7 @@ def test_ds7cb_readme_writer_advisory_baseline():
         payload = json.loads(
             (REPO_ROOT / "artifacts" / "audits"
              / "skill-contract-audit-baseline.json").read_text(encoding="utf-8"))
-        payload["summary"]["skill_count"] = 253
+        payload["summary"]["skill_count"] = baseline_skill
         baseline = folder / "skill-contract-audit-baseline.json"
         baseline.write_text(json.dumps(payload, indent=2) + "\n",
                             encoding="utf-8", newline="\n")
@@ -6506,8 +6591,8 @@ def test_ds7cb_readme_writer_advisory_baseline():
         finally:
             validator.AUDIT_BASELINE_PATH = original
         assert code == 0, out
-        assert ("WARN writer: audit baseline says 253, disk says 254 "
-                "(advisory)") in out, out
+        assert (f"WARN writer: audit baseline says {baseline_skill}, "
+                f"disk says {expected_skill} (advisory)") in out, out
         assert path.read_bytes() == base
     ok("T8: a stale audit baseline warns (W0 literal) and the correct value "
        "is still written")
