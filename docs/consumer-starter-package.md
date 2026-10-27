@@ -423,22 +423,35 @@ never by a directory enumeration of `.claude/skills`.
 
 ### P5 — Destination pre-checks (before any write)
 
-For each target path:
+The pre-checks run in this order and before anything is written:
 
-- the destination file must not exist (**exit 20**, matching the established
-  `A20-E-DEST-EXISTS` semantics);
+- none of the **17 destination skill directories** (`.claude/skills/<name>`) may
+  exist: each directory is refused whole, so the installer never merges into a
+  skill directory a beginner has already copied by hand (**exit 20**, matching
+  the established `A20-E-DEST-EXISTS` semantics at `README.md:530-535`, where
+  `$dst` is the skill directory `$root\<skill-name>`, not a file inside it);
 - a source path must contain no `..` segment, must not be a reparse
   point/symlink, and must resolve inside the clone (**exit 21**);
 - an existing `AGENTS.md`/`CLAUDE.md` that differs byte-wise from the source is
-  never overwritten (**exit 22**), while an identical one is accepted and counted.
+  never overwritten (**exit 22**), while an identical one is accepted and
+  counted. The two startup files are deliberately outside the directory check
+  above, so this branch is reachable.
 
 ```powershell
-foreach ($rel in $package) {
-  if ($rel -match '(^|/)\.\.(/|$)') { Write-Error "exit 21: unsafe source path $rel"; exit 21 }
+# The 17 skill directories, derived from the 39-path list; the 2 startup files
+# are excluded so their identical case reaches the exit-22 branch below.
+$skillDirs = @($package |
+  Where-Object { $_ -like '.claude/skills/*' } |
+  ForEach-Object { ($_ -split '/')[0..2] -join '/' } |
+  Sort-Object -Unique)
+foreach ($rel in $skillDirs) {
   $dst = Join-Path $TGT $rel
   if (Test-Path -LiteralPath $dst) {
-    Write-Error "exit 20: refusing to install over an existing path: $dst"; exit 20
+    Write-Error "exit 20: refusing to install over an existing skill directory: $dst"; exit 20
   }
+}
+foreach ($rel in $package) {
+  if ($rel -match '(^|/)\.\.(/|$)') { Write-Error "exit 21: unsafe source path $rel"; exit 21 }
   $srcPath = Join-Path $SRC $rel
   $item = Get-Item -LiteralPath $srcPath -Force
   if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
@@ -540,7 +553,8 @@ Each code stops; none warns and continues.
 
 | Code | Meaning | What you see |
 | --- | --- | --- |
-| 20 | Destination exists | The path that already exists; nothing written |
+| 1 | Prerequisite failure | `STOP: no Git sh.exe found`; nothing written |
+| 20 | Destination skill directory exists | The skill directory that already exists; nothing written |
 | 21 | Unsafe source path | The `..`/reparse-point segment; nothing written |
 | 22 | Startup-file conflict | The differing file; existing bytes unchanged |
 | 30 | Closure, count or eval-material failure | The offending path or the count found |
@@ -568,7 +582,7 @@ role ("project owner") and the approval ID, because the schema forbids identifyi
 people in the committed file ("No secrets, no live identifiers … never by
 credential or real name") and the manual-only contract forbids personal data in its
 register. The install record therefore stores only the owner record's **presence**
-and a truncated hash of the email, never the address.
+(not its value): never the name, the email address or any hash of it.
 
 ### 8.2 If the owner record is absent (exit 41)
 
