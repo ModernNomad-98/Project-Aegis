@@ -5,10 +5,10 @@
    "path": "docs/evidence/consumer-readiness/local-borrowboard-v1.md",
    "role": "worked local run/readiness record with actual commands, observations and evidence hashes; install filename retained for compatibility, not full-install evidence",
    "identity": {
-    "bytes": 24152,
-    "lf": 151,
+    "bytes": 26477,
+    "lf": 167,
     "cr": 0,
-    "sha256": "dca62703882177045b320059020a21747a742929d17b79c4d060ce354933d2d6"
+    "sha256": "e34e2172242dd11f47b89a6dda6727e5383e0dad05d874b55a9f6f0c67d02093"
    }
   },
   "install_json": {
@@ -41,7 +41,7 @@
     "reason": "single-page app shell and document entrypoint",
     "dependency_disposition": "no external dependencies; loads local styles.css and app.js only",
     "cr": 34,
-    "raw_byte_note": "sha256 and bytes are over raw bytes; CRLF is part of index.html raw bytes"
+    "raw_byte_note": "CRLF; 34 CR bytes; raw-byte sha256 includes the CRLF bytes"
    },
    {
     "path": "_A/consumer-workspaces/borrowboard-v1/styles.css",
@@ -51,7 +51,7 @@
     "reason": "local presentation layer and responsive rules",
     "dependency_disposition": "no external dependencies or remote fonts/assets",
     "cr": 0,
-    "raw_byte_note": "sha256 and bytes are over raw bytes; CRLF is part of index.html raw bytes"
+    "raw_byte_note": "LF only; 0 CR bytes; raw-byte sha256 is over exact LF bytes"
    },
    {
     "path": "_A/consumer-workspaces/borrowboard-v1/app.js",
@@ -61,7 +61,7 @@
     "reason": "borrowboard state, validation, search, storage and recovery behavior",
     "dependency_disposition": "vanilla JavaScript; localStorage only; no packages, network, backend or live-model dependency",
     "cr": 0,
-    "raw_byte_note": "sha256 and bytes are over raw bytes; CRLF is part of index.html raw bytes"
+    "raw_byte_note": "LF only; 0 CR bytes; raw-byte sha256 is over exact LF bytes"
    }
   ],
   "aggregate": {
@@ -76,7 +76,8 @@
    "crlf_note": "index.html raw bytes are CRLF (cr=34); raw-byte sha256 and bytes include the CR bytes; aggregate is byte-sensitive and does not normalize line endings.",
    "recomputed_in_c2": true,
    "recomputed_value": "797e9f5a47b914c1f32024d659d038c88066e24d57e43fcc7ddf3b565b384322",
-   "recomputed_in_c3": true
+   "recomputed_in_c3": true,
+   "path_portability": "aggregate includes _A/... local store paths; not portable if the store is moved/renamed; the app bytes may be identical while the aggregate changes. This is a disclosed portability limitation/backlog, not a claim of a portable product identity."
   },
   "runner": {
    "path": "_A/consumer-workspaces/borrowboard-v1/runner/borrowboard-runner.mjs",
@@ -132,10 +133,10 @@
     "observed": "literal quoted serve HTTP 200; fresh profile localStorage null; empty state 'No tools yet. Add your first tool.'; app state idle; h1 1; cards 0",
     "evidence_refs": [
      {
-      "path": "_A/evidence/borrowboard-journey4/cdp-journey-2026-10-27T00-10-50-758Z.jsonl",
-      "bytes": 4709,
-      "lf": 10,
-      "sha256": "e919d8cd54ac6369c1b6bc0facd040403d6385b9213f9eaa0e43deb1f7532d3e",
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
       "label": "OBSERVED"
      },
      {
@@ -145,7 +146,17 @@
       "sha256": "6c0c21847196a6748a0fc8197c6ef06508085569e97df29cfba72489dbff343f",
       "label": "OBSERVED"
      }
-    ]
+    ],
+    "supporting_evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-journey-2026-10-27T00-10-50-758Z.jsonl",
+      "bytes": 4709,
+      "lf": 10,
+      "sha256": "e919d8cd54ac6369c1b6bc0facd040403d6385b9213f9eaa0e43deb1f7532d3e",
+      "label": "OBSERVED"
+     }
+    ],
+    "provenance_note": "Literal serve/start; raw transcript supporting."
    },
    {
     "id": "B02",
@@ -153,13 +164,15 @@
     "observed": "design REV-2, plan, owner verdict and build identities recorded for the run",
     "evidence_refs": [
      {
-      "path": "_A/evidence/borrowboard-journey4/JOURNEY4.md",
-      "bytes": 4008,
-      "lf": 55,
-      "sha256": "8321ae8da892dbc36c0b1890db493ce69f665f82a636867b2e61df8734b18d92",
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
       "label": "OBSERVED"
      }
-    ]
+    ],
+    "supporting_evidence_refs": [],
+    "provenance_note": "Final journey4 record of design/plan/verdict/build identities."
    },
    {
     "id": "B03",
@@ -167,13 +180,22 @@
     "observed": "owner design review APPROVE WITH CHANGES; five ordered refinements R1-R5",
     "evidence_refs": [
      {
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     },
+     {
       "path": "_A/evidence/owner-decisions/OWNER-VERDICT-2026-10-26T1640-BORROWBOARD.md",
       "bytes": 3495,
       "lf": 20,
       "sha256": "8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0",
       "label": "OBSERVED"
      }
-    ]
+    ],
+    "supporting_evidence_refs": [],
+    "provenance_note": "Owner verdict primary for design review; J4 row is final record."
    },
    {
     "id": "B03R",
@@ -181,20 +203,30 @@
     "observed": "shipped-runner preview R1-R5 all true; R2_no_app_hook true",
     "evidence_refs": [
      {
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-verify3/verification3.json",
+      "bytes": 3902,
+      "lf": 93,
+      "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
+      "label": "OBSERVED"
+     }
+    ],
+    "supporting_evidence_refs": [
+     {
       "path": "_A/evidence/borrowboard-journey4/cdp-preview-2026-10-27T00-12-29-302Z.jsonl",
       "bytes": 3185,
       "lf": 7,
       "sha256": "defbaa04f988ac141399e67c08ae46b6aeee9295f8d79ca75559ad3c3fa20d4e",
       "label": "OBSERVED"
-     },
-     {
-      "path": "_A/evidence/borrowboard-journey4/cdp-preview-2026-10-27T00-12-29-302Z-summary.json",
-      "bytes": 3256,
-      "lf": 0,
-      "sha256": "a2c2d663c4ebb9e204058b99fe52f306868b3368c97a29f97c2bfa6e5d44901c",
-      "label": "OBSERVED"
      }
-    ]
+    ],
+    "provenance_note": "Preview raw transcript supporting."
    },
    {
     "id": "B04",
@@ -216,7 +248,9 @@
       "label": "OBSERVED"
      }
     ],
-    "primary_evidence": "final journey4 observations plus verify3 coverage record"
+    "primary_evidence": "final journey4 observations plus verify3 coverage record",
+    "supporting_evidence_refs": [],
+    "provenance_note": "Final observation and verification record."
    },
    {
     "id": "B05",
@@ -238,7 +272,9 @@
       "label": "OBSERVED"
      }
     ],
-    "primary_evidence": "final journey4 observations plus verify3 coverage record"
+    "primary_evidence": "final journey4 observations plus verify3 coverage record",
+    "supporting_evidence_refs": [],
+    "provenance_note": "Final observation and verification record."
    },
    {
     "id": "B06",
@@ -260,7 +296,9 @@
       "label": "OBSERVED"
      }
     ],
-    "primary_evidence": "final journey4 observations plus verify3 coverage record"
+    "primary_evidence": "final journey4 observations plus verify3 coverage record",
+    "supporting_evidence_refs": [],
+    "provenance_note": "Final observation and verification record."
    },
    {
     "id": "B07",
@@ -268,20 +306,37 @@
     "observed": "stale observer exact 'This tool is not currently borrowed.'; state before/after hash unchanged; shipped-runner stale-return before/after unchanged; return/cancel with one loan",
     "evidence_refs": [
      {
+      "path": "_A/evidence/borrowboard-journey4/journey4.json",
+      "bytes": 15824,
+      "lf": 464,
+      "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-verify3/verification3.json",
+      "bytes": 3902,
+      "lf": 93,
+      "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
+      "label": "OBSERVED"
+     },
+     {
+      "path": "_A/evidence/borrowboard-journey4/cdp-stale-return-2026-10-27T00-12-32-410Z-result.json",
+      "bytes": 439,
+      "lf": 19,
+      "sha256": "2e99c9898d0cf5ee9d0933e71c63fa2567328f0b384e2a41306eb1d4d19db145",
+      "label": "OBSERVED"
+     }
+    ],
+    "supporting_evidence_refs": [
+     {
       "path": "_A/evidence/borrowboard-journey4/cdp-stale-return-2026-10-27T00-12-32-410Z.jsonl",
       "bytes": 465,
       "lf": 1,
       "sha256": "320087260252c4ff474451c59c48aac2e546f6f1352a76f2f49d95ec0f20f363",
       "label": "OBSERVED"
-     },
-     {
-      "path": "_A/evidence/borrowboard-journey4/cdp-journey2-2026-10-27T00-11-44-829Z.jsonl",
-      "bytes": 3018,
-      "lf": 5,
-      "sha256": "4b3151f91fa9a493ff66081e4c08e8a4bbf6965bdc0540baa27146bfc554d74a",
-      "label": "OBSERVED"
      }
-    ]
+    ],
+    "provenance_note": "Stale-return result primary; raw JSONL supporting; return/cancel in J4."
    },
    {
     "id": "B08",
@@ -303,7 +358,9 @@
       "label": "OBSERVED"
      }
     ],
-    "primary_evidence": "final journey4 observations plus verify3 coverage record"
+    "primary_evidence": "final journey4 observations plus verify3 coverage record",
+    "supporting_evidence_refs": [],
+    "provenance_note": "Final observation and verification record."
    },
    {
     "id": "B09",
@@ -325,7 +382,9 @@
       "label": "OBSERVED"
      }
     ],
-    "primary_evidence": "final journey4 observations plus verify3 coverage record"
+    "primary_evidence": "final journey4 observations plus verify3 coverage record",
+    "supporting_evidence_refs": [],
+    "provenance_note": "Final observation and verification record."
    },
    {
     "id": "B10",
@@ -343,25 +402,25 @@
       "path": "_A/consumer-workspaces/borrowboard-v1/index.html",
       "bytes": 1678,
       "lf": 34,
-      "cr": 34,
       "sha256": "cd005dcd95059654c3a4c2f5d0d55b453f77f7cda62b6f744ac7c64627967739",
-      "label": "OBSERVED"
+      "label": "OBSERVED",
+      "cr": 34
      },
      {
       "path": "_A/consumer-workspaces/borrowboard-v1/styles.css",
       "bytes": 3846,
       "lf": 57,
-      "cr": 0,
       "sha256": "f1080bd08c5e8bd2ecc6980961474d96f448a76465beaa2dd74dcce59a43091e",
-      "label": "OBSERVED"
+      "label": "OBSERVED",
+      "cr": 0
      },
      {
       "path": "_A/consumer-workspaces/borrowboard-v1/app.js",
       "bytes": 20775,
       "lf": 298,
-      "cr": 0,
       "sha256": "648fef5d73dcadd353b9c56600e67c34e62c7b7428972c7cbfc278a234ba1d43",
-      "label": "OBSERVED"
+      "label": "OBSERVED",
+      "cr": 0
      }
     ],
     "historical": {
@@ -369,7 +428,17 @@
      "status": "historical_executor_note",
      "superseded_by": "readiness_statement (verification3 CONFIRM)",
      "not_a_current_claim": true
-    }
+    },
+    "supporting_evidence_refs": [
+     {
+      "path": "_A/evidence/borrowboard-verify3/verification3.json",
+      "bytes": 3902,
+      "lf": 93,
+      "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
+      "label": "OBSERVED"
+     }
+    ],
+    "provenance_note": "B10 exception: app hashes primary; V3 supports the verification chain, not a row observation."
    }
   ],
   "resume": {
@@ -485,13 +554,165 @@
    }
   ],
   "provenance": {
-   "b04_b10_primary": "final journey4 observations (journey4.json) plus verify3 coverage record (verification3.json)",
-   "raw_journey4_transcripts": "retained in the external evidence store as supporting raw transcripts only; not primary row evidence",
+   "row_provenance": [
+    {
+     "row": "B01",
+     "primary": "J4 + SERVE",
+     "supporting": "RAW-J1",
+     "note": "Literal serve/start; raw transcript supporting."
+    },
+    {
+     "row": "B02",
+     "primary": "J4",
+     "supporting": "none",
+     "note": "Final journey4 record of design/plan/verdict/build identities."
+    },
+    {
+     "row": "B03",
+     "primary": "J4 + OV",
+     "supporting": "none",
+     "note": "Owner verdict primary for design review; J4 row is final record."
+    },
+    {
+     "row": "B03R",
+     "primary": "J4 + V3",
+     "supporting": "RAW-PREVIEW",
+     "note": "Preview raw transcript supporting."
+    },
+    {
+     "row": "B04",
+     "primary": "J4 + V3",
+     "supporting": "none",
+     "note": "Final observation and verification record."
+    },
+    {
+     "row": "B05",
+     "primary": "J4 + V3",
+     "supporting": "none",
+     "note": "Final observation and verification record."
+    },
+    {
+     "row": "B06",
+     "primary": "J4 + V3",
+     "supporting": "none",
+     "note": "Final observation and verification record."
+    },
+    {
+     "row": "B07",
+     "primary": "J4 + V3 + SR",
+     "supporting": "RAW-SR",
+     "note": "Stale-return result primary; raw JSONL supporting; return/cancel in J4."
+    },
+    {
+     "row": "B08",
+     "primary": "J4 + V3",
+     "supporting": "none",
+     "note": "Final observation and verification record."
+    },
+    {
+     "row": "B09",
+     "primary": "J4 + V3",
+     "supporting": "none",
+     "note": "Final observation and verification record."
+    },
+    {
+     "row": "B10",
+     "primary": "J4 + APP",
+     "supporting": "V3",
+     "note": "B10 exception: app hashes primary; V3 supports the verification chain, not a row observation."
+    }
+   ],
+   "aliases": {
+    "J4": {
+     "path": "_A/evidence/borrowboard-journey4/journey4.json",
+     "bytes": 15824,
+     "lf": 464,
+     "sha256": "5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33",
+     "label": "OBSERVED"
+    },
+    "V3": {
+     "path": "_A/evidence/borrowboard-verify3/verification3.json",
+     "bytes": 3902,
+     "lf": 93,
+     "sha256": "ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28",
+     "label": "OBSERVED"
+    },
+    "OV": {
+     "path": "_A/evidence/owner-decisions/OWNER-VERDICT-2026-10-26T1640-BORROWBOARD.md",
+     "bytes": 3495,
+     "lf": 20,
+     "sha256": "8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0",
+     "label": "OBSERVED"
+    },
+    "SERVE": {
+     "path": "_A/evidence/borrowboard-build1/SERVE-COMMAND-REV3.txt",
+     "bytes": 350,
+     "lf": 9,
+     "sha256": "6c0c21847196a6748a0fc8197c6ef06508085569e97df29cfba72489dbff343f",
+     "label": "OBSERVED"
+    },
+    "SR": {
+     "path": "_A/evidence/borrowboard-journey4/cdp-stale-return-2026-10-27T00-12-32-410Z-result.json",
+     "bytes": 439,
+     "lf": 19,
+     "sha256": "2e99c9898d0cf5ee9d0933e71c63fa2567328f0b384e2a41306eb1d4d19db145",
+     "label": "OBSERVED"
+    },
+    "RAW-J1": {
+     "path": "_A/evidence/borrowboard-journey4/cdp-journey-2026-10-27T00-10-50-758Z.jsonl",
+     "bytes": 4709,
+     "lf": 10,
+     "sha256": "e919d8cd54ac6369c1b6bc0facd040403d6385b9213f9eaa0e43deb1f7532d3e",
+     "label": "OBSERVED"
+    },
+    "RAW-PREVIEW": {
+     "path": "_A/evidence/borrowboard-journey4/cdp-preview-2026-10-27T00-12-29-302Z.jsonl",
+     "bytes": 3185,
+     "lf": 7,
+     "sha256": "defbaa04f988ac141399e67c08ae46b6aeee9295f8d79ca75559ad3c3fa20d4e",
+     "label": "OBSERVED"
+    },
+    "RAW-SR": {
+     "path": "_A/evidence/borrowboard-journey4/cdp-stale-return-2026-10-27T00-12-32-410Z.jsonl",
+     "bytes": 465,
+     "lf": 1,
+     "sha256": "320087260252c4ff474451c59c48aac2e546f6f1352a76f2f49d95ec0f20f363",
+     "label": "OBSERVED"
+    },
+    "APP": [
+     {
+      "path": "_A/consumer-workspaces/borrowboard-v1/index.html",
+      "bytes": 1678,
+      "lf": 34,
+      "sha256": "cd005dcd95059654c3a4c2f5d0d55b453f77f7cda62b6f744ac7c64627967739",
+      "label": "OBSERVED",
+      "cr": 34
+     },
+     {
+      "path": "_A/consumer-workspaces/borrowboard-v1/styles.css",
+      "bytes": 3846,
+      "lf": 57,
+      "sha256": "f1080bd08c5e8bd2ecc6980961474d96f448a76465beaa2dd74dcce59a43091e",
+      "label": "OBSERVED",
+      "cr": 0
+     },
+     {
+      "path": "_A/consumer-workspaces/borrowboard-v1/app.js",
+      "bytes": 20775,
+      "lf": 298,
+      "sha256": "648fef5d73dcadd353b9c56600e67c34e62c7b7428972c7cbfc278a234ba1d43",
+      "label": "OBSERVED",
+      "cr": 0
+     }
+    ]
+   },
+   "raw_journey4_transcripts": "raw CDP transcripts are supporting only for rows where the row table lists them; never primary row evidence",
    "historical_journey2_package": {
     "status": "GAP / invalid rewrite on build1",
     "superseded_by": "borrowboard-journey4 REV-3",
     "primary": false,
-    "note": "no borrowboard-journey2 JSONL is retained as primary or supporting primary evidence; limit 6 records the historical GAP. If any historical journey2 raw transcript were retained in the external store, it is explicitly a historical raw transcript from a superseded app build (build1), not primary evidence for the current tested-product, and it would carry its full path+bytes/LF/sha plus superseded_by=BorrowBoard REV-3 journey4."
+    "limit_crossref": "limit 2 = B07 resolution history (journey1 UNRUN -> journey2 GAP -> journey3/4 REV-3 PASS); limit 6 = no-readiness/runtime-product separation. Journey2 GAP belongs to limit 2, not limit 6.",
+    "note": "no borrowboard-journey2 JSONL is retained as primary or supporting primary evidence; if any historical transcript were retained it is historical build1, full identity + superseded_by required, and never primary for the current tested-product"
    }
   }
  },
@@ -785,5 +1006,11 @@
   "ci_verifier": "A CI schema/hash verifier is NOT added in this two-path PR; it is a recommendation for the follow-up and the risk is disclosed.",
   "timestamps": "RFC3339; owner verdict time 2026-10-26T16:40:00-07:00 (reported).",
   "pii": "Local absolute paths are local-only evidence pointers, not portable; the operator name is retained only in the cited owner verdict identity and not repeated as a general value; local PID omitted."
+ },
+ "backlog": {
+  "external_evidence_store": "_A raw evidence is not committed/PR-reproducible; reviewers need store access; disclosed limitation.",
+  "gitattributes_lf": "LF enforcement via .gitattributes is not added in this two-path PR; recommendation.",
+  "ci_schema_hash_verifier": "No CI schema/hash verifier is added in this two-path PR; recommendation.",
+  "aggregate_path_portability": "Aggregate contains local _A paths and is not portable across store moves; backlog recommendation to use stable logical paths."
  }
 }

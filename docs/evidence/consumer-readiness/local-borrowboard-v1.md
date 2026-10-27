@@ -41,19 +41,35 @@ All rows observed at BUILD REV-3. Each row's result is PASS in the recorded jour
 
 | Row | Result | Observed evidence (summary) | Primary evidence and hash |
 | --- | --- | --- | --- |
-| B01 | PASS | literal quoted serve; HTTP 200; fresh profile localStorage null; empty state; idle; h1 1; cards 0 | cdp-journey-2026-10-27T00-10-50-758Z.jsonl 4,709 B / sha256 e919d8cd54ac6369c1b6bc0facd040403d6385b9213f9eaa0e43deb1f7532d3e; serve evidence sha256 6c0c21847196a6748a0fc8197c6ef06508085569e97df29cfba72489dbff343f |
-| B02 | PASS | design, plan, verdict and build identities recorded for the run | JOURNEY4.md 4,008 B / sha256 8321ae8da892dbc36c0b1890db493ce69f665f82a636867b2e61df8734b18d92 |
-| B03 | PASS | owner design review APPROVE WITH CHANGES; design follows R1-R5 | owner verdict 3,495 B / sha256 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0 |
-| B03R | PASS | shipped runner preview; R1-R5 and R2_no_app_hook all true | cdp-preview-2026-10-27T00-12-29-302Z.jsonl 3,185 B / sha256 defbaa04f988ac141399e67c08ae46b6aeee9295f8d79ca75559ad3c3fa20d4e; summary sha256 a2c2d663c4ebb9e204058b99fe52f306868b3368c97a29f97c2bfa6e5d44901c |
-| B04 | PASS | search filters to Hammer; no-results visible text "No tools match your search."; tool list hidden | J4 + V3 (full identities in section 10) |
-| B05 | PASS | blank name "Enter a tool name." draft preserved; duplicate "This tool is already listed."; borrower "Enter the borrower's name."; due "Choose a due date." | J4 + V3 (full identities in section 10) |
-| B06 | PASS | one active loan; card Borrowed; loan borrower Alex, due 2026-11-02, returnedAt null; duplicate submit did not create a second active loan | J4 + V3 (full identities in section 10) |
-| B07 | PASS | stale observer exact "This tool is not currently borrowed."; state unchanged; shipped runner stale-return also unchanged; return/cancel behaves with one loan | cdp-stale-return-2026-10-27T00-12-32-410Z.jsonl 465 B / sha256 320087260252c4ff474451c59c48aac2e546f6f1352a76f2f49d95ec0f20f363 |
-| B08 | PASS | storage banner exact wording observed; state unchanged on failure; draft kept; retry recovered Hammer/Wrench/Pliers; banner hidden | J4 + V3 (full identities in section 10) |
-| B09 | PASS | 320/768/1280 innerWidth=scrollWidth; min button height 44; one h1; Search tools/Name/Note labels bound; ax node count 51 | J4 + V3 (full identities in section 10); screenshots supporting-only (identities in external store) |
-| B10 | PASS | app hashes confirm tested product; recovery notes recorded. Current evidence is OBSERVED; the executor's historical no-readiness recommendation is retained only as a structured historical/superseded_by field, not as a current claim. | primary: journey4.json 15,824 B / 464 LF / sha256 5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33; app hashes above |
+| B01 | PASS | literal quoted serve; HTTP 200; fresh profile localStorage null; empty state; idle; h1 1; cards 0 | J4 + SERVE; RAW-J1 supporting (aliases full in section 10) |
+| B02 | PASS | design, plan, verdict and build identities recorded for the run | J4 |
+| B03 | PASS | owner design review APPROVE WITH CHANGES; design follows R1-R5 | J4 + OV |
+| B03R | PASS | shipped runner preview; R1-R5 and R2_no_app_hook all true | J4 + V3; RAW-PREVIEW supporting |
+| B04 | PASS | search filters to Hammer; no-results visible text "No tools match your search."; tool list hidden | J4 + V3 |
+| B05 | PASS | blank name "Enter a tool name." draft preserved; duplicate "This tool is already listed."; borrower "Enter the borrower's name."; due "Choose a due date." | J4 + V3 |
+| B06 | PASS | one active loan; card Borrowed; loan borrower Alex, due 2026-11-02, returnedAt null; duplicate submit did not create a second active loan | J4 + V3 |
+| B07 | PASS | stale observer exact "This tool is not currently borrowed."; state unchanged; shipped runner stale-return also unchanged; return/cancel behaves with one loan | J4 + V3 + SR; RAW-SR supporting |
+| B08 | PASS | storage banner exact wording observed; state unchanged on failure; draft kept; retry recovered Hammer/Wrench/Pliers; banner hidden | J4 + V3 |
+| B09 | PASS | 320/768/1280 innerWidth=scrollWidth; min button height 44; one h1; Search tools/Name/Note labels bound; ax node count 51 | J4 + V3; screenshots supporting-only (identities in external store) |
+| B10 | PASS | app hashes confirm tested product; recovery notes recorded; historical executor no-readiness note structured/superseded. | J4 + APP; V3 supporting verification chain (B10 exception) |
 
-Journey summary (OBSERVED): B01-B10 all PASS at REV-3; B03R PASS; J-RES PASS; NEG-1..4 PASS; remaining UNRUN none. The complete journey record is journey4.json 15,824 B / 464 LF / sha256 5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33; verify3: verification3.json 3,902 B / 93 LF / sha256 ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28. Provenance: B04-B10 primary PASS evidence is the final journey4 observations plus the verify3 coverage record; no borrowboard-journey2 JSONL is retained as primary or supporting primary evidence. The historical borrowboard-journey2 package is the superseded build1 GAP/invalid rewrite recorded in disclosed limit 6 and explicitly superseded by the REV-3 journey4 chain; it is not a source for any current row.
+Per-row provenance (authoritative; replicated identically in JSON journey.provenance.row_provenance):
+
+| Row | Primary evidence | Supporting evidence | Note |
+| --- | --- | --- | --- |
+| B01 | J4 + SERVE | RAW-J1 | Literal serve/start; raw transcript supporting. |
+| B02 | J4 | none | Final journey4 record of design/plan/verdict/build identities. |
+| B03 | J4 + OV | none | Owner verdict primary for design review; J4 row is final record. |
+| B03R | J4 + V3 | RAW-PREVIEW | Preview raw transcript supporting. |
+| B04 | J4 + V3 | none | Final observation and verification record. |
+| B05 | J4 + V3 | none | Final observation and verification record. |
+| B06 | J4 + V3 | none | Final observation and verification record. |
+| B07 | J4 + V3 + SR | RAW-SR | Stale-return result primary; raw JSONL supporting; return/cancel in J4. |
+| B08 | J4 + V3 | none | Final observation and verification record. |
+| B09 | J4 + V3 | none | Final observation and verification record. |
+| B10 | J4 + APP | V3 | B10 exception: app hashes primary; V3 supports the verification chain, not a row observation. |
+
+Journey summary (OBSERVED): B01-B10 all PASS at REV-3; B03R PASS; J-RES PASS; NEG-1..4 PASS; remaining UNRUN none. The complete journey record is journey4.json 15,824 B / 464 LF / sha256 5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33; verify3: verification3.json 3,902 B / 93 LF / sha256 ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28. Provenance: the per-row table above is the authoritative primary/supporting mapping; raw CDP transcripts appear only as supporting where listed; no borrowboard-journey2 JSONL is retained as primary or supporting primary evidence. The historical borrowboard-journey2 package is the superseded build1 GAP/invalid rewrite recorded in disclosed limit 2 (B07 resolution history; limit 6 separately covers no-readiness/runtime-product separation) and explicitly superseded by the REV-3 journey4 chain; it is not a source for any current row.
 
 ## 4. Design review and R1-R5 refinement record
 
@@ -117,7 +133,7 @@ Every claim above is labelled OBSERVED, REPORTED or UNVERIFIED where applicable;
 
 ## 10. Evidence references and attribution
 
-Identity-bound primary references (full path, bytes, LF, sha256; all under the external local evidence store _A unless stated). Display aliases: **J4** = _A/evidence/borrowboard-journey4/journey4.json 15,824 B / 464 LF / sha256 5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33; **V3** = _A/evidence/borrowboard-verify3/verification3.json 3,902 B / 93 LF / sha256 ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28.
+Identity-bound primary references (full path, bytes, LF, sha256; all under the external local evidence store _A unless stated). Display aliases (all full path+bytes+LF+sha256): **J4** = _A/evidence/borrowboard-journey4/journey4.json 15,824 B / 464 LF / sha256 5150890eb930dee28583e59f4b58dbf2db401bbd4e48e76cc067fcd2e2084a33; **V3** = _A/evidence/borrowboard-verify3/verification3.json 3,902 B / 93 LF / sha256 ce324d6fc2b5c8887235ae744ca69a15c222d5bb153ec71f06d37e2616a7cb28; **OV** = _A/evidence/owner-decisions/OWNER-VERDICT-2026-10-26T1640-BORROWBOARD.md 3,495 B / 20 LF / sha256 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0; **SERVE** = _A/evidence/borrowboard-build1/SERVE-COMMAND-REV3.txt 350 B / 9 LF / sha256 6c0c21847196a6748a0fc8197c6ef06508085569e97df29cfba72489dbff343f; **SR** = _A/evidence/borrowboard-journey4/cdp-stale-return-2026-10-27T00-12-32-410Z-result.json 439 B / 19 LF / sha256 2e99c9898d0cf5ee9d0933e71c63fa2567328f0b384e2a41306eb1d4d19db145; **RAW-J1** = _A/evidence/borrowboard-journey4/cdp-journey-2026-10-27T00-10-50-758Z.jsonl 4,709 B / 10 LF / sha256 e919d8cd54ac6369c1b6bc0facd040403d6385b9213f9eaa0e43deb1f7532d3e; **RAW-PREVIEW** = _A/evidence/borrowboard-journey4/cdp-preview-2026-10-27T00-12-29-302Z.jsonl 3,185 B / 7 LF / sha256 defbaa04f988ac141399e67c08ae46b6aeee9295f8d79ca75559ad3c3fa20d4e; **RAW-SR** = _A/evidence/borrowboard-journey4/cdp-stale-return-2026-10-27T00-12-32-410Z.jsonl 465 B / 1 LF / sha256 320087260252c4ff474451c59c48aac2e546f6f1352a76f2f49d95ec0f20f363; **APP** = _A/consumer-workspaces/borrowboard-v1/index.html 1,678 B / 34 LF / 34 CR / sha256 cd005dcd95059654c3a4c2f5d0d55b453f77f7cda62b6f744ac7c64627967739; styles.css 3,846 B / 57 LF / 0 CR / sha256 f1080bd08c5e8bd2ecc6980961474d96f448a76465beaa2dd74dcce59a43091e; app.js 20,775 B / 298 LF / 0 CR / sha256 648fef5d73dcadd353b9c56600e67c34e62c7b7428972c7cbfc278a234ba1d43.
 
 - design DESIGN.md: 9,423 B / 64 LF / sha256 695da1bb6b90faeb822dab457d8a98966af7ec08f9c01206bd24265a129033fd
 - owner verdict: 3,495 B / 20 LF / sha256 8018b7531f25215788c81ab9f21e6d344a496276a1412382ec269c041357cdd0
@@ -138,7 +154,7 @@ Identity-bound primary references (full path, bytes, LF, sha256; all under the e
 - verify3 VERIFICATION3.md: 4,735 B / 46 LF / sha256 d82d5e924eebd961581cae6da973177759c85bdbeb764133b90e8a7c2452bff7
 - verify3 verify-binding.json: 3,441 B / 105 LF / sha256 8cf0dbc2d3ef13d13a3e82b33c94df68c7807d8d7bb5e7ef49c422b512f3d259
 
-B04-B10 primary refs are J4 plus V3; every primary reference above is full, not bare or truncated. The external store also holds the prebuilt fixture workspace under _A/consumer-workspaces; it is a local immutable evidence source, not a committed path.
+The per-row provenance table above is authoritative: B07 includes SR and B10 includes APP with V3 supporting; B01 includes SERVE. Every primary reference above is full path+bytes+LF+sha256, not bare or truncated. Per-file raw-byte notes: index.html cr=34 (CRLF); styles.css cr=0 (LF only); app.js cr=0 (LF only); per-file sha256 is over exact raw bytes and CR counts are informational; the aggregate uses path/bytes/LF/sha of raw bytes. Aggregate path portability limitation: the aggregate includes local _A/... paths, so it is not portable if the store is moved or renamed; this is a disclosed backlog limitation (stable logical paths recommended), not a claim of a portable product identity. The external store also holds the prebuilt fixture workspace under _A/consumer-workspaces; it is a local immutable evidence source, not a committed path.
 
 Identity corrections applied (OBSERVED): build-binding-rev3.json is 7,403 B / 241 LF / sha256 90fb59600af60ac93daf48b528cd25142d2a365adf5a510ec1fd6773605e1490; tested-product identity is 4,954 B / 140 LF / sha256 5494ca2a4b19745edea28f6a795044b5d1abca03da395489c3f8a464b5a17a4b (same bytes as validated copy); journey4-binding-rev2.json 3,615 B / 114 LF / sha256 20b250da9b7d9bf88bbb4b1ace68c0dab33dd9da24568b73dcbfa93b11d91663; identity correction 2,839 B / 34 LF / sha256 3edc24d3340b84b6010b9b37237d7c77da90f7e80f4a6be57cd4e6372a7ac39b; journey4 INDEX 6,071 B / 70 LF / sha256 c794f8088d0105b65f5baa0839b2ead1e4c9eb93ac084ab599e986f8b6dd3592. Superseded stale references are recorded in the correction; observations are unchanged.
 
