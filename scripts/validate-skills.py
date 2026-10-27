@@ -3557,6 +3557,182 @@ def check_coverage_map(rep: Report, skip_md: bool = False) -> None:
         display_totals = dict(computed)
     _coverage_check_generated_summary(rep, payload, display_totals)
 
+# --- DS-7c-b: generated README count markers (AEGIS-APR-148) ---------------
+#
+# The two marked README numbers are derived here from the counts the validator
+# already computes (skills on disk, roster family lines) instead of being
+# hand-maintained. Both modes are flag-gated; every ambiguity is refused before
+# a byte is written, and a write replaces only each marker's digit run in the
+# bytes that were read -- so an LF file stays LF and a CRLF file keeps every
+# CRLF (no newline byte is ever produced).
+
+README_COUNT_TMP_SUFFIX = ".ds7cb-tmp"
+AUDIT_BASELINE_PATH = (REPO_ROOT / "artifacts" / "audits"
+                       / "skill-contract-audit-baseline.json")
+
+
+def write_readme_counts(print_only: bool = False) -> int:
+    """(DS-7c-b) Derive the README count markers from canon and write them.
+
+    Print mode derives and verifies, prints the two values and never writes.
+    Write mode runs the pre-write suite (main()'s check sequence minus exactly
+    the two README marker checks, because marker drift is the state this mode
+    repairs), then substitutes only the digit runs and replaces the file
+    atomically. Any refusal prints one literal ERROR line and returns 1 with
+    the README untouched.
+    """
+    try:
+        data = README.read_bytes()
+        text = data.decode("utf-8")
+    except (OSError, UnicodeDecodeError):
+        print("ERROR writer: README.md unreadable or missing (fail closed)")
+        return 1
+    skills = discover_skills()
+    if not skills:
+        print("ERROR writer: no skills found under .claude/skills/ (fail closed)")
+        return 1
+    skill_markers = list(SKILL_COUNT_MARKER.finditer(text))
+    if not skill_markers:
+        print("ERROR writer: SKILL-COUNT marker missing (fail closed)")
+        return 1
+    if len(skill_markers) > 1:
+        print(f"ERROR writer: {len(skill_markers)} SKILL-COUNT markers found; "
+              "ambiguous (fail closed)")
+        return 1
+    family_markers = list(FAMILY_COUNT_MARKER.finditer(text))
+    if not family_markers:
+        print("ERROR writer: FAMILY-COUNT marker missing (fail closed)")
+        return 1
+    if len(family_markers) > 1:
+        print(f"ERROR writer: {len(family_markers)} FAMILY-COUNT markers found; "
+              "ambiguous (fail closed)")
+        return 1
+    section = _section_text(text, WHATS_IN_THE_LIBRARY)
+    if section is None:
+        print("ERROR writer: roster section '## What's in the library' not "
+              "found (fail closed)")
+        return 1
+    family_counts = [int(m.group(1)) for m in FAMILY_LINE.finditer(section)]
+    if not family_counts:
+        print("ERROR writer: roster has no family lines (fail closed)")
+        return 1
+    n_disk = len(skills)
+    n_families = len(family_counts)
+    family_sum = sum(family_counts)
+    if family_sum + 1 != n_disk:
+        print(f"ERROR writer: roster sum {family_sum} + 1 = {family_sum + 1} "
+              f"!= {n_disk} skill(s) on disk; not rewriting")
+        return 1
+    manifest_rep = Report()
+    check_skills_manifest(skills, manifest_rep)
+    if manifest_rep.errors:
+        for error in manifest_rep.errors:
+            print("ERROR", error)
+        print("ERROR writer: skills manifest disagrees with disk (fail closed)")
+        return 1
+    if print_only:
+        print(f"SKILL-COUNT={n_disk} FAMILY-COUNT={n_families}")
+        return 0
+    writer_rep = Report()
+    check_ignored_skill_security(writer_rep)
+    _run_repo_checks(writer_rep, skills, skip_readme_markers=True)
+    if writer_rep.errors:
+        for error in writer_rep.errors:
+            print("ERROR", error)
+        print("ERROR writer refused to write over a failing tree")
+        return 1
+    try:
+        baseline = json.loads(AUDIT_BASELINE_PATH.read_text(encoding="utf-8"))
+        baseline_count = baseline["summary"]["skill_count"]
+    except (OSError, UnicodeDecodeError, ValueError, KeyError, TypeError):
+        baseline_count = None
+    if (isinstance(baseline_count, int)
+            and not isinstance(baseline_count, bool)
+            and baseline_count != n_disk):
+        print(f"WARN writer: audit baseline says {baseline_count}, disk says "
+              f"{n_disk} (advisory)")
+    marked_skill = int(skill_markers[0].group(1))
+    marked_family = int(family_markers[0].group(1))
+    if marked_skill == n_disk and marked_family == n_families:
+        print(f"README counts: SKILL-COUNT {n_disk}, FAMILY-COUNT "
+              f"{n_families} (unchanged)")
+        return 0
+    edits = sorted(((skill_markers[0].span(1), str(n_disk)),
+                    (family_markers[0].span(1), str(n_families))),
+                   reverse=True)
+    edited = text
+    for (start, end), digits in edits:
+        candidate = edited[:start] + digits + edited[end:]
+        assert (candidate[:start] == edited[:start]
+                and candidate[start + len(digits):] == edited[end:]), (
+            "README count rewrite must touch only the marker's digit run")
+        edited = candidate
+    new_bytes = edited.encode("utf-8")
+    assert len(new_bytes) == (len(data) + sum(len(d) for _, d in edits)
+                              - sum(e - s for (s, e), _ in edits)), (
+        "README count rewrite must not change any byte outside the digit runs")
+    temp_path = README.with_name(README.name + README_COUNT_TMP_SUFFIX)
+    try:
+        with open(temp_path, "wb") as handle:
+            handle.write(new_bytes)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_path, README)
+    except OSError:
+        print("ERROR writer: cannot write README.md; original left intact")
+        return 1
+    finally:
+        try:
+            if temp_path.exists():
+                temp_path.unlink()
+        except OSError:
+            pass
+    print(f"README counts: SKILL-COUNT {n_disk}, FAMILY-COUNT {n_families} "
+          "(updated)")
+    return 0
+
+
+def _run_repo_checks(rep: Report, skills: list[Path], *,
+                     skip_readme_markers: bool = False,
+                     refresh_manifest: bool = False,
+                     manifest_ref: str | None = None) -> None:
+    """The per-skill and repository check sequence of the default path.
+
+    Extracted verbatim from main() so the README count writer can run the same
+    pre-write suite with exactly the two README marker checks excluded (marker
+    drift is the state that writer repairs). main() passes its own
+    `refresh_manifest` and `manifest_ref` locals, so neither is recomputed.
+    """
+    names: list[str] = []
+    for skill_dir in skills:
+        name = validate_skill(skill_dir, rep)
+        names.append(name or "")
+
+    check_name_collisions(names, rep)
+    check_catalog_integrity([n for n in names if n], rep)
+    check_skills_manifest(skills, rep, refresh=refresh_manifest,
+                          manifest_ref=manifest_ref)     # HARD  (D91)
+    check_coverage_map(rep)                       # HARD (coverage map)
+
+    # Repo surfaces outside .claude/skills/ (decision D55).
+    check_agents_schema(rep)                       # HARD
+    check_config_surfaces(rep)                     # HARD
+    check_docs_paths_links(rep)                    # HARD
+    check_no_cross_skill_file_dependencies(rep)    # HARD  (standard section 1)
+    check_workflows_sha_pinned(rep)                # HARD
+    check_claude_bridge(rep)                       # HARD  (decision D61)
+
+    # README map-matches-territory (decision D43): reconcile the README's
+    # authoritative counts and roster against the real skills on disk.
+    real_count = len(skills)
+    real_names = {s.name for s in skills}
+    if not skip_readme_markers:
+        check_readme_counts(real_count, rep)          # HARD
+        check_readme_family_roster(real_count, rep)   # HARD
+    check_roster_flagships_exist(real_names, rep)  # WARN
+    check_roles_table_present(rep)                 # WARN
+
+
 def main() -> int:
     refresh_manifest = "--refresh-skills-manifest" in sys.argv
     manifest_ref = None
@@ -3569,6 +3745,20 @@ def main() -> int:
             "(decision D50). Install it with: python -m pip install pyyaml"
         )
         return 1
+
+    write_readme = "--write-readme-counts" in sys.argv
+    print_readme = "--print-readme-counts" in sys.argv
+    if (write_readme or print_readme) and (
+            "--write-coverage-map-md" in sys.argv or refresh_manifest):
+        print("ERROR writer: a README count mode cannot be combined with "
+              "--write-coverage-map-md or --refresh-skills-manifest")
+        return 1
+    if write_readme and print_readme:
+        print("ERROR writer: choose exactly one of --write-readme-counts and "
+              "--print-readme-counts")
+        return 1
+    if write_readme or print_readme:
+        return write_readme_counts(print_only=print_readme)
 
     if "--write-coverage-map-md" in sys.argv:
         try:
@@ -3627,33 +3817,8 @@ def main() -> int:
 
     print(f"Validating {len(skills)} skill(s) under .claude/skills/ ...\n")
 
-    names: list[str] = []
-    for skill_dir in skills:
-        name = validate_skill(skill_dir, rep)
-        names.append(name or "")
-
-    check_name_collisions(names, rep)
-    check_catalog_integrity([n for n in names if n], rep)
-    check_skills_manifest(skills, rep, refresh=refresh_manifest,
-                          manifest_ref=manifest_ref)     # HARD  (D91)
-    check_coverage_map(rep)                       # HARD (coverage map)
-
-    # Repo surfaces outside .claude/skills/ (decision D55).
-    check_agents_schema(rep)                       # HARD
-    check_config_surfaces(rep)                     # HARD
-    check_docs_paths_links(rep)                    # HARD
-    check_no_cross_skill_file_dependencies(rep)    # HARD  (standard section 1)
-    check_workflows_sha_pinned(rep)                # HARD
-    check_claude_bridge(rep)                       # HARD  (decision D61)
-
-    # README map-matches-territory (decision D43): reconcile the README's
-    # authoritative counts and roster against the real skills on disk.
-    real_count = len(skills)
-    real_names = {s.name for s in skills}
-    check_readme_counts(real_count, rep)          # HARD
-    check_readme_family_roster(real_count, rep)   # HARD
-    check_roster_flagships_exist(real_names, rep)  # WARN
-    check_roles_table_present(rep)                 # WARN
+    _run_repo_checks(rep, skills, refresh_manifest=refresh_manifest,
+                     manifest_ref=manifest_ref)
 
     for w in rep.warnings:
         print(f"WARN  {w}")
