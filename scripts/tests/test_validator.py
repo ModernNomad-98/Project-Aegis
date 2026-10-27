@@ -4789,6 +4789,25 @@ def test_ds7cfixb_coverage_detector_matrix():
         chr(96) + "300 entries" + chr(96), computed)
     assert validator._coverage_later_total_count_errors(
         "coverage snapshot updated to 254 entries")
+    # C8: total-key update claims must not be masked; mixed while delta is
+    # legitimate; snapshot tests/ISO timestamps are opaque.
+    assert validator._coverage_later_total_count_errors(
+        "coverage totals: updated 2 entries")
+    assert validator._coverage_later_total_count_errors(
+        "totals: updated 2 entries")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage updated by 2 entries while the coverage snapshot remains unchanged")
+    assert not validator._coverage_later_total_count_errors(
+        "coverage snapshot tests cover 300 entries")
+    assert not validator._coverage_later_total_count_errors(
+        "snapshot 2026-10-26T00:00:00Z")
+    for bad in (None, 123, ["300 entries"]):
+        try:
+            validator._coverage_later_total_count_errors(bad)
+        except TypeError:
+            pass
+        else:
+            raise AssertionError("non-string detector input must fail closed")
     # Mixed/odd raw keys must not raise in the shape sorter and must be named.
     mixed_errors = validator._coverage_totals_shape_errors({1: 2}, computed)
     assert any("unexpected key" in error for error in mixed_errors), mixed_errors
@@ -4813,7 +4832,7 @@ def test_ds7cfixb_coverage_detector_matrix():
     # Mixed priority error + malformed id: both entries report once.
     def mutate(payload):
         payload["entries"][0]["priority"] = "P3"
-        payload["entries"][1]["id"] = "bad-id"
+        payload["entries"][0]["id"] = "bad-id"
     with tempfile.TemporaryDirectory() as tmp:
         with mutated_coverage(Path(tmp), mutate) as rep:
             priority_errors = [error for error in rep.errors

@@ -2619,6 +2619,12 @@ COVERAGE_UPDATE_CONNECTOR_RE = re.compile(
     r"(?:updated|added|removed|changed|incremented|decremented|edited|"
     r"renamed|moved|progressed)(?:\s+(?:by|with))?\s+[0-9]+\s+"
     + COVERAGE_DERIVED_INTENT + r"\b")
+COVERAGE_TOTAL_UPDATE_CLAIM_RE = re.compile(
+    r"(?i)\b(?:totals?|counts?|entries|skills?|rows?|snapshot_totals|"
+    r"manifest_skills|by_area|by_status|by_grade|by_priority|"
+    r"gap_by_priority)\s*:\s*(?:updated|added|removed|changed|"
+    r"incremented|decremented|edited|renamed|moved|progressed)\s+"
+    r"[0-9]+\s+" + COVERAGE_DERIVED_INTENT + r"\b")
 _OPAQUE_CODE = "[" + chr(96) + "][^" + chr(96) + "\n]*[" + chr(96) + "]"
 COVERAGE_ALLOWED_PROSE_RE = (
     re.compile(r"(?i)\bsnapshot\s+tests?\s+cover\s+[0-9]+\s+"
@@ -2645,6 +2651,9 @@ def _coverage_protect_opaque(text: str) -> str:
     protected = re.sub(r"https?://\S+", " OPAQUE ", protected, flags=re.IGNORECASE)
     protected = re.sub(r"\b[0-9a-f]{40,64}\b", " OPAQUE ", protected,
                        flags=re.IGNORECASE)
+    protected = re.sub(
+        r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.+-Z]+",
+        " OPAQUE ", protected, flags=re.IGNORECASE)
     protected = re.sub(r"\b[0-9]{4}-[0-9]{2}-[0-9]{2}\b", " OPAQUE ", protected)
     protected = re.sub(r"\bD[0-9]{1,12}\b", " OPAQUE ", protected,
                        flags=re.IGNORECASE)
@@ -2654,8 +2663,11 @@ def _coverage_protect_opaque(text: str) -> str:
 
 
 def _coverage_mask_allowed_update(text: str) -> str:
-    """Mask only the fixed legitimate non-total update prose allowlist."""
-    if re.search(r"\bcoverage\s+snapshot\b", text, re.IGNORECASE):
+    """Mask only fixed legitimate non-total update prose."""
+    if COVERAGE_TOTAL_UPDATE_CLAIM_RE.search(text):
+        return text
+    if re.search(r"\bcoverage\s+snapshot\b(?!\s+tests?\b)", text,
+                 re.IGNORECASE):
         return text
     masked = text
     for pattern in COVERAGE_ALLOWED_PROSE_RE:
@@ -2675,14 +2687,16 @@ def _coverage_derived_total_mentions(text: str, allowed_update: bool = True):
     is deliberately broad for derived-total keys/N-of-M (the preserved #934
     contract); only the fixed legitimate update-prose allowlist is masked.
     """
-    if not isinstance(text, str) or not text:
+    if not isinstance(text, str):
+        raise TypeError("coverage detector text must be a string")
+    if not text:
         return []
     normalized = (text.replace(chr(0x2013), "-").replace(chr(0x2014), "-")
                   .replace(chr(0x2212), "-"))
     protected = _coverage_protect_opaque(normalized)
     mentions = []
     seen = set()
-    for raw_clause in re.split(r"[;,\n]", protected):
+    for raw_clause in re.split(r"[;,\n]|\bwhile\b", protected):
         clause = re.sub(r"\s+", " ", raw_clause)
         parsed = _coverage_mask_allowed_update(clause) if allowed_update else clause
         candidates = []
