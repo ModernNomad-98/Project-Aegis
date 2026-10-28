@@ -13,12 +13,13 @@ The library does not itself build, deploy or operate an application.
    use the [guided paths](#start-here-pick-your-path) in your **own product
    repository**. To maintain the Aegis library itself, work in this source
    checkout and begin with the [documentation index](docs/README.md).
-2. **Get the skills.** Install Git, then clone this source repository to obtain
-   the files. For product work, [copy your chosen skills into your own
-   repository](#using-the-skills-in-your-own-project) before opening your coding
-   assistant there. Copy the startup files too if you want the Aegis startup
-   routing. The [setup guide](#getting-started) covers Claude Code and
-   other Agent Skills tools.
+2. **Get the skills.** Install Git. There are three installation routes, and
+   they prove different things: the [starter package](docs/consumer-starter-package.md)
+   — a fixed, dependency-checked set of 37 skill files for 17 skills plus 2
+   startup files for a first product slice; the documented allow-list copy of the skills you choose;
+   and the full source checkout, which is for maintaining the library and for
+   reading the skills before choosing. [Getting started](#getting-started) walks
+   through each one.
 
    ```bash
    git clone https://github.com/ModernNomad-98/Project-Aegis.git
@@ -279,6 +280,12 @@ cd Project-Aegis
 `git clone` copies the library to your machine; `cd` puts you in the folder every option
 below starts from. Later, run `git pull` from the same folder to update to the latest skills.
 
+**Choose your installation route before you start a project.**
+
+- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 39-file set (37 skill files for 17 skills plus 2 startup files), its dependency closure, the one Windows PowerShell install procedure with a runnable harness, its fail-closed checks, the owner record it requires, and the commit identity the startup gate checks and requires. The install writes only the 17 skill directories, the two startup files, and the optional install record at the `-RecordPath` you pass; your repository's other files are outside its scope, and the clone must be an LF checkout (the procedure checks it).
+- **Selected skills (any product slice).** Copy only the skills a slice needs with the allow-list block in [Using the skills in your own project](#using-the-skills-in-your-own-project); this is also how you extend the starter package.
+- **Full source checkout (library maintenance).** Keep this clone and work in it; only this route runs the repository's own validator and CI-equivalent checks.
+
 *Host facts below checked 2026-09-26 against the official
 [platforms](https://code.claude.com/docs/en/platforms),
 [quickstart](https://code.claude.com/docs/en/quickstart),
@@ -402,7 +409,18 @@ way. If your repo has no `.claude/skills/` folder yet, create it first (it's jus
 3. Run the post-write verifier described in this section; it exits nonzero on eval material and verifies the assembled destination after the write.
 4. Open your own product repository and work there under its startup routing.
 
-A worked, host-tested record for a complete selected route - exact installed-file inventory, commands, observed results and the precise readiness scope and limits - will be linked here only after that acceptance run produces its evidence. Until then this page makes **no consumer-readiness claim** and no promise that the intended route has been exercised end to end; the setup/control-plane warnings elsewhere on this page still apply.
+**Installation status** (2026-10-27; evidence bound to candidate `534d6bbf92e5371215c5fc7d620de979e73cbaf5`, installed from base `ffb040c7a363648856475280646bbd142dfabe4e`; evidence record: [local-starter-v1](docs/evidence/consumer-readiness/local-starter-v1.md)).
+**One documented Windows environment is validated, not a set of them.** Windows 11 10.0.26200 (UBR 9711); PowerShell 7.6.6 for the scripted procedure, and Windows PowerShell 5.1.26100.9711 measured only for its scripted-load refusal (effective policy Restricted); Git 2.55.0.windows.5; `sh` from `C:\Program Files\Git\bin\sh.exe`; host agent DeepSeek Harness (`deepseek-flash`). Claude Code 2.1.311 was present on that host but was not the agent used.
+
+**The starter file set is closed for J1 (39 files verified), and J1 acceptance is incomplete: 26 PASS, 0 FAIL, 9 UNRUN.** The UNRUNs are the AC-17 owner-coverage table, independent plan audit, independent code review, delivery GO, cross-session continuation and authority reuse, screenshot capture, and E3 confirmation; each has its exact remaining action in the evidence record. Independent audit/review and cross-host testing remain, and a closed file set is not evidence of consumer readiness. All 39 packaged files check out LF (`git ls-files --eol` reports `w/lf` for every one; re-checked 2026-10-27), as the source `.gitattributes` requires, and the published 39-file aggregate was reproduced.
+
+**The startup gate is required behaviour, not automatic enforcement.** Installing it ships the contract and its check, not a hook or a security boundary; the commit identity is checked and required by the procedure, never enforced by the files themselves.
+
+**Solo-owner commit identity — decided (2026-10-28):** a solo owner may commit under their own identity; only agent-authored commits must use the documented repository-local agent identity. The startup gate's fail-closed check for agent commits is unchanged, and the package still makes no consumer-readiness claim (package section 8.3; owner decision via [OWNER BRIEF] #910 comment 6463527894).
+
+The package's definition, its 39-file closure and the one install procedure are in [docs/consumer-starter-package.md](docs/consumer-starter-package.md). The evidence record names the host, the installed-file hashes, each check's PASS/FAIL/UNRUN result, and the exact remaining action for every UNRUN.
+
+Not claimed here: consumer readiness, production readiness, multi-tenant or SaaS readiness, a second host, a hosted deployment, live-model evaluation, or CI-green equality. macOS/Linux remain not validated (see the copy section). The setup/control-plane warnings elsewhere on this page still apply.
 
 **Do not copy each skill's `evals/` folder.** Every shipped skill carries `evals/evals.json`
 and (usually) `evals/trigger-evals.json`. Those are the skill's **answer keys**: each case
@@ -521,7 +539,7 @@ why the skills it names are worth having when a stage applies, and not a bundle 
 up front. The shipped-skill inventory is owned by
 [`docs/skills-catalog.md`](docs/skills-catalog.md) along with this README's own roster.
 
-On Windows (PowerShell) — **validated on PowerShell 5.1.26100.9444 and 7.6.6**:
+On Windows (PowerShell) — **the copy block below was validated on Windows PowerShell 5.1.26100.9444 and PowerShell 7.6.6 in an earlier run**. It was not validated under the Stage E host's Windows PowerShell **5.1.26100.9711**, where only scripted-load behaviour was measured (a `.ps1` run through `powershell.exe -File` fails at load under the effective Restricted policy), not this copy block:
 
 ```powershell
 $ErrorActionPreference = 'Stop'
@@ -624,6 +642,8 @@ They do NOT convert it into the Project Aegis source repository — the copied r
 After copying, open your OWN product repository and work there: for a new project, Claude (via `project-orchestrator`) creates `docs/project-state.md` in that current product repo and starts at Stage 0.
 You do NOT need to create a second project folder just because the Aegis files are present.
 The Project Aegis source repository is identified by its source-package landmarks — a `# Project Aegis` `README.md`, `docs/skills-catalog.md`, `scripts/validate-skills.py`, and `artifacts/audits/skill-contract-audit-baseline.json` — not by the copied skills alone.
+
+**Before you install, record the owner and give the agent its own commit identity.** The starter procedure asks for two identity records, and they do different jobs. The **owner record** — `git config --local aegis.ownerName "<owner name>"` and `git config --local aegis.ownerEmail "<owner email>"` — is repository-local only: it names the human every approval in `docs/project-state.md` belongs to, and it is never committed. The **commit identity** — `user.name` and `user.email`, which may come from any Git scope (local, global, environment or `git -c`) — signs commits. The startup gate is the agent's startup check: it compares the effective author and committer with the owner record and refuses a match on either name or email, so an agent-authored commit must carry a different name and email from the owner's. A solo owner may commit under their own identity; only agent-authored commits must use the separate agent identity. If the owner record is missing, the procedure stops and prints the exact `git config --local` commands (exit 41); if the commit identity is missing or matches the owner, it stops and asks exactly one question (exit 42). Both checks run before the copy phase, so a stop there changes nothing.
 
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
 format if you want to write your own.
