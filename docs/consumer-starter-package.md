@@ -4,10 +4,12 @@ Status: **normative definition of the v1 consumer starter package.** This page
 defines one fixed, dependency-checked installation for a beginner's first product
 slice. It is measured against the Project Aegis source tree at commit
 `ffb040c7a363648856475280646bbd142dfabe4e` (tree
-`88a5aee4ad928a49c2fb945032585843ec652da7`). It does not itself record an
-installation, a test run or an acceptance result: the first native-host acceptance
-record is produced separately, after the run it describes, and nothing here is
-evidence that the procedure has already been executed on your machine.
+`88a5aee4ad928a49c2fb945032585843ec652da7`). It is not an installation log
+and not an acceptance record: the first native-host acceptance record is produced
+separately, after the run it describes, and nothing here is evidence that the
+procedure has already been executed on your machine. Section 7.1 does report a
+local verification run of the published block; that is a check of the block, not
+an acceptance result for your repository.
 
 **Reading key.** **Role A** is the Project Aegis source repository; **Role B** is
 your own consumer/product repository, which copies Aegis files into its workspace.
@@ -57,10 +59,11 @@ J1 is the beginner's first end-to-end slice, delivered locally:
 
 ### 1.2 The claim boundary
 
-The package is **complete for J1** under two rules that are checked, not asserted:
+The package is **complete for J1** under two rules that the procedure in section
+7 applies file by file and the install verifies for the enumerated set:
 
 1. every file J1's documented workflow reads is either copied or classified in
-   section 4 with the reason it is not needed; and
+   section 3 with the reason it is not needed; and
 2. every skill the stage map tells a J1 stage to invoke is either installed or
    classified the same way.
 
@@ -85,6 +88,12 @@ silently skip a gate.
 - The solo-owner commit-identity policy is an **open owner decision**
   (section 8.3). The package ships the gate's fail-closed behaviour and asserts no
   policy; that is one reason it makes no consumer-readiness claim.
+- A destination `AGENTS.md`/`CLAUDE.md` that differs by any byte stops the
+  install (exit 22), and v1 documents no in-place merge: reconcile the two files
+  to the pinned bytes before installing, or install into a tree that has neither.
+- The procedure checks the source chain for reparse points but not your
+  destination tree, so a junction or symlink that already exists inside the target
+  is not detected by the published harness.
 - This package installs files; it does not run your project, choose your
   technology, or approve anything. Approvals remain the human's.
 
@@ -305,6 +314,11 @@ When the skill that owns a step is not in the package, the fail-closed rule appl
    skill "already exists; route to it, do not invent a new procedure"
    (`SKILL.md:81-82, 518-520`), which is why absence must stop the route rather
    than be improvised around.
+
+This rule is also the consumer-side answer when an installed skill's routing text
+names one of the excluded skills: the ledger in section 4.1 and this rule are the
+instruction to follow, and the copied `SKILL.md` stays byte-identical (section 3)
+so it cannot carry a local "not installed" note.
 
 ## 5. Package layout in your repository
 
@@ -828,16 +842,18 @@ foreach ($rel in ($package | Where-Object { $_ -notlike '.claude/skills/*/SKILL.
 }
 if ($manifestPins -ne 17 -or $sourcePins -ne 22) { Stop-Step 31 "pin counts $manifestPins/$sourcePins, expected 17/22" }
 
-$siblingMissing = 0
+$siblingMissing = @()
 foreach ($rel in ($package | Where-Object { $_ -like '.claude/skills/*' })) {
   $dst = Join-Path $Tgt ($rel -replace '/', [IO.Path]::DirectorySeparatorChar)
   $text = Get-Content -LiteralPath $dst -Raw
   foreach ($m in [regex]::Matches($text, '\.\./([a-z0-9-]+)/SKILL\.md')) {
     $sibling = $m.Groups[1].Value
-    if (-not (Test-Path -LiteralPath (Join-Path (Join-Path $Tgt '.claude\skills') (Join-Path $sibling 'SKILL.md')) -PathType Leaf)) { $siblingMissing++ }
+    if (-not (Test-Path -LiteralPath (Join-Path (Join-Path $Tgt '.claude\skills') (Join-Path $sibling 'SKILL.md')) -PathType Leaf)) {
+      $siblingMissing += ('{0} links {1}/SKILL.md' -f (($rel -split '/')[2]), $sibling)
+    }
   }
 }
-if ($siblingMissing) { Stop-Step 32 "missing sibling SKILL.md files: $siblingMissing" }
+if ($siblingMissing.Count) { Stop-Step 32 "missing sibling SKILL.md: $($siblingMissing -join '; ')" }
 
 if (-not (Test-Path -LiteralPath $Sh -PathType Leaf)) { Stop-Step 1 "no sh at $Sh" }
 $shOut = (& $Sh -c 'echo ok' 2>$null | Out-String).Trim()
@@ -855,10 +871,17 @@ if ($RecordPath) {
     Write-Output "P9: install record already present, left unchanged: $RecordPath"
   } else {
     $record = New-Object System.Text.StringBuilder
-    $ownerPresent = if ((& git -C $Tgt config --local --get aegis.ownerName 2>$null)) { 'present (value not recorded)' } else { 'absent - exit 41 before install' }
+    $ownerName = (& git -C $Tgt config --local --get aegis.ownerName 2>$null)
+    $ownerEmail = (& git -C $Tgt config --local --get aegis.ownerEmail 2>$null)
+    $ownerPresent = 'absent - P2 (exit 41) stops before an install; this harness does not enforce P2; values never recorded'
+    if ($ownerName -and $ownerEmail) { $ownerPresent = 'present on both keys (values not recorded)' }
+    elseif ($ownerName -or $ownerEmail) { $ownerPresent = 'incomplete - one key missing; P2 (exit 41) stops before an install; values never recorded' }
+    $branch = (& git -C $Src symbolic-ref -q --short HEAD 2>$null)
+    $headState = 'detached HEAD'
+    if ($branch) { $headState = 'on branch ' + $branch }
     [void]$record.AppendLine('# Consumer install record - starter package v1')
     [void]$record.AppendLine('')
-    [void]$record.AppendLine('- Source: ModernNomad-98/Project-Aegis at commit ' + $head + ' (tree ' + $tree + '), detached HEAD, clean.')
+    [void]$record.AppendLine('- Source: ModernNomad-98/Project-Aegis at commit ' + $head + ' (tree ' + $tree + '), ' + $headState + ', clean.')
     [void]$record.AppendLine('- Installed: ' + (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssK'))
     [void]$record.AppendLine('- Tools: PowerShell ' + $PSVersionTable.PSVersion.ToString() + '; ' + ((& git --version) -join '').Trim() + '; sh ' + $Sh)
     [void]$record.AppendLine('- Owner record: ' + $ownerPresent)
@@ -882,16 +905,24 @@ Write-Output 'OK: 39 installed files; closure, pins, siblings, eval and aggregat
 exit 0
 ```
 
+If `-RecordPath` already exists, the block prints the path and leaves the file
+unchanged - it never overwrites a record - so choose a new path for a fresh one.
+
 **Verified, not illustrative.** The block was extracted from this page and run on
 2026-10-27 against (a) a fresh local clone of the pinned commit `ffb040c7` and
 (b) a populated target containing `README.md`, `.gitignore`, a source directory,
 an unrelated skill directory and `.claude/settings.json`. Result: exit 0; 39
 installed files; 17/17 manifest pins; 22/22 source pins; 0 missing siblings;
-aggregate `0c885bcd...a5a7` over 5,152 bytes; install record written and 6,512 B.
-Negative runs: one changed byte in an installed reference -> **exit 31** naming
-that file; an `evals/` directory inside an installed skill -> **exit 30**; a second
-run on the completed target -> **exit 0** (resume). The command, outputs and the
-extraction method are recorded in the fix-round evidence record. The Stage E
+aggregate `0c885bcd...a5a7` over 5,152 bytes; install record written and **6,586 B**.
+The block was re-extracted and re-run on 2026-10-27 after the P9 record line above
+was corrected; that run also recorded `present on both keys` on a target that
+carries both `aegis.*` keys, and `on branch <name>` on a clone checked out to a
+branch. Negative runs: one changed byte in an installed reference -> **exit 31**
+naming that file; an `evals/` directory inside an installed skill -> **exit 30**; a
+second run on the completed target -> **exit 0** (resume), and a run whose
+`-RecordPath` already exists also exits 0 and reports the record left unchanged.
+The command, outputs and the extraction method are recorded in the fix-round
+evidence record. The Stage E
 validation used a larger harness that is not part of this repository; this page now
 carries its own executable form, so a reader does not have to take the checks on
 trust.
@@ -902,13 +933,13 @@ Each code stops; none warns and continues.
 
 | Code | Meaning | What you see |
 | --- | --- | --- |
-| 1 | Prerequisite failure | `STOP: no Git sh.exe found`, a missing source/target, or a `sh` that did not answer; nothing written |
+| 1 | Prerequisite failure | `STOP: no Git sh.exe found`, a missing source/target clone, or a `sh` that did not answer. The source/target checks run before any write. The published harness probes `sh` at the end of P8, so that path stops **after** the 39 files are written - the install is resumable from there and no record is written |
 | 20 | Foreign material in a destination skill directory | The exact file that is outside the package; nothing overwritten |
 | 21 | Unsafe or missing source path | The `..`/reparse-point segment or the missing file; nothing written |
 | 22 | Startup-file conflict | The differing file; existing bytes unchanged |
 | 30 | Closure, count or eval-material failure | The offending path or the count found |
 | 31 | Pin or byte mismatch (including a CRLF checkout or an aggregate mismatch) | The exact file, or the aggregate comparison that failed |
-| 32 | Missing sibling dependency | The installed skill that links the absent sibling |
+| 32 | Missing sibling dependency | The installed skill that links it and the absent sibling it names, as `<skill> links <sibling>/SKILL.md` |
 | 40 | Wrong repository role | The four-landmark stop message (P1) |
 | 41 | Owner record missing | The exact `aegis.*` remediation text (section 8.2) |
 | 42 | Commit identity missing or owner-matching | The resolved author/committer values and one question (section 8.3). This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
@@ -1096,9 +1127,10 @@ Highest first, applied in your product repository:
   the grant ID, the content hash compared, and that independent verification
   result. A writing agent may not verify its own grant and then cite its own
   verification. **Solo-consumer reading:** in a one-agent product repository the
-  independent verifier is the human — their own content-specific yes to that exact
-  path and content is the independent check, and the DECISION entry records that
-  the human verified it. An agent's self-verification is never recorded as one.
+  human's content-specific yes to that exact path and content is the check that
+  stands in for independent verification - human confirmation, not a second
+  independent agent - and the DECISION entry records it as human confirmation.
+  An agent's self-verification is never recorded as one.
 - **Missing owner is a stop, not a default.** No owner record -> exit 41; no
   acceptable commit identity -> exit 42 (section 8). No covering grant -> stop and
   request one. No owning skill -> stop and name the install (section 4.2).
