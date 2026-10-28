@@ -14,13 +14,14 @@ an acceptance result for your repository.
 **Revision (2026-10-28).** v2 differs from v1 in one respect: it installs the two
 `scoped-approval-register` files that the composed `docs/project-state.md` schema
 requires (sections 2.2 and 3), so the set is **41 files / 18 skills** instead of
-39 files / 17 skills. The v1 definition and its evidence record
-(`docs/evidence/consumer-readiness/local-starter-v1.md`) stay byte-unchanged as
-history. **No native run of this v2 definition has been executed:** every native
-copy, verification, lifecycle and collision check for the 41-file set is
-**UNRUN**, and the v2 evidence record does not exist yet. The derived numbers in
-sections 2.3, 7.1 and 9.2 are recomputed from the pinned commit's bytes, not
-copied from the v1 record.
+39 files / 17 skills. The v1 evidence record
+(`docs/evidence/consumer-readiness/local-starter-v1.md`) stays byte-unchanged as
+history, but the definition is this page and it is revised here: only the record
+is frozen, not the v1 wording. **No native run of this v2 definition has been
+executed:** every native copy, verification, lifecycle and collision check for the
+41-file set is **UNRUN**, and the v2 evidence record does not exist yet. The
+derived numbers in sections 2.3, 7.1 and 9.2 are recomputed from the pinned
+commit's bytes, not copied from the v1 record.
 
 **Reading key.** **Role A** is the Project Aegis source repository; **Role B** is
 your own consumer/product repository, which copies Aegis files into its workspace.
@@ -154,12 +155,16 @@ The two startup files are `AGENTS.md` (the role-detection and operating contract
 25,228 B) and `CLAUDE.md` (`@AGENTS.md` import plus startup routing, 2,687 B).
 Both are required because the role recognition J1 step 2 tests lives in them.
 
-### 2.3 The file list (41 paths, bytes and LF at the base)
+### 2.3 The file list (41 paths, bytes and LF at the pin `ffb040c7`)
 
 Every file is copied byte-identically by the allow-list rule: `SKILL.md` plus
 everything under `references/`, plus the two startup files. This is the exact
 closure measured at `ffb040c7a363648856475280646bbd142dfabe4e`, sorted by path in
-ordinal order (the same order the install-record aggregate uses).
+ordinal order (the same order the install-record aggregate uses). The pin is not
+the branch base `aa4ae348`: one selected file,
+`agent-startup-context-gate/references/shared-local-resource-coordination.md`, is
+16,797 B here and 19,372 B at that base, so a value computed at the base differs
+for that row and for the aggregate.
 
 | Path (consumer-relative) | Bytes | LF |
 | --- | --- | --- |
@@ -207,15 +212,14 @@ ordinal order (the same order the install-record aggregate uses).
 | **Total: 41 files** | **369093** | **5841** |
 
 Composition: 18 `SKILL.md` + 21 `references/*` files = 39 skill files, plus the 2
-startup files. Fourteen skills carry 2 files each; `project-orchestrator`,
-`test-plan-designer`, `agent-startup-context-gate` and
-`scoped-approval-register` carry 3. There are zero `assets/`, zero `scripts/`
-and zero `evals/` files in the list.
+startup files. Fifteen skills carry 2 files each; `project-orchestrator`,
+`test-plan-designer` and `agent-startup-context-gate` carry 3. There are zero
+`assets/`, zero `scripts/` and zero `evals/` files in the list.
 
 Aggregate over these 41 rows, using the algorithm in section 9.2:
 `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over
-**5,420 serialized bytes** for **41 rows**. That is the base measurement; your
-install record records the same three numbers for the files you actually
+**5,420 serialized bytes** for **41 rows**. That is the measurement at the pin;
+your install record records the same three numbers for the files you actually
 installed, and any difference is a finding, not a rounding. The 41 per-file
 SHA-256 values are reproducible from the pinned commit and belong in the v2
 evidence record when its native run is executed; the 39 v1 values remain
@@ -247,11 +251,20 @@ relative citations are outside that rule but must still be classified for a copy
   Stage 7 tests, Stage 8/9 local delivery — then classify every named skill as
   installed or excluded with a trigger.
 
-Pass 2 also reads the map's Merge, Close and Learn rows even though J1 stops before
-merge, so a consumer who continues past J1 finds every owner already classified
-instead of meeting a gap mid-route.
+Pass 2 also reads the map's Merge, Close and Learn rows even though J1 stops
+before merge. Their owners are only partly classified here, and this page does not
+claim otherwise: `ai-closeout-reporter` (Close) has its own row in section 4.1;
+`agent-authorization-matrix` (Merge) and `tdd-engineer` (Implement) appear only
+among that table's MANUAL-ONLY examples; five MANUAL-ONLY owners —
+`agent-memory-governance`, `agent-failure-recovery`,
+`agent-instruction-consolidator`, `reviewable-diff-discipline` and
+`docs-first-implementer` — are covered by that table's category row but never
+named; and `agent-governance-audit`, the Learn row's other owner, is not
+MANUAL-ONLY and is not classified on this page at all. A consumer who continues
+past J1 must classify one of those owners before use instead of assuming this page
+already did.
 
-Measured at the base for the 18 selected skills: all file links are intra-skill or
+Measured at the pin for the 18 selected skills: all file links are intra-skill or
 sibling-`SKILL.md` delegation **except five repo-root citations**, all in two
 skills. `agent-startup-context-gate` adds none: its three files carry two relative
 links, both inside its own directory (`SKILL.md:74, 331`).
@@ -335,7 +348,7 @@ pinned clone — never a recursive tree copy, which would carry `evals/`.
 | Release-with-agents route | `risk-tiered-validation-selector`, `sharded-validation-with-resume` | A multi-reviewer release is in scope (`SKILL.md:278-280`). |
 | Close — the map's Close row, entered on "merged (or work stopped)" | `ai-closeout-reporter` | The stage map's Close row names it (`stage-gate-map.md:24`) and the orchestrator lists it among the Stage-6 enforcers (`project-orchestrator/SKILL.md:255-259`). J1 stops at local delivery and does not merge, so J1 never enters that row. Trigger: the change is merged or the work is stopped and a closeout report is required, including its "intentionally not done" section -> allow-list copy, recorded as a DECISION before the step runs. Never present it as a J1 dependency. |
 | A shared local stack, port, database or fixture set | none | The gate's lock protocol applies only when parallel agents could share a local resource (`SKILL.md:227-249`). J1 is single-agent; on Windows that lane is SKIP/UNRUN by the gate's own platform rule and is never a pass. |
-| Any MANUAL-ONLY skill (for example `clickthrough-test-engineer`, `aegis-setup`, `tdd-engineer`, `agent-authorization-matrix`, `standing-approval-and-auto-advance`, `ci-pipeline-architect`, `observability-operator`, `prompt-injection-defender`, `playwright-e2e-engineer`) | not installed by v1 at all | A human names the exact skill for the task; the consumer records a trigger-scoped override in its own append-only register before use (`.claude/skills/human-approval-boundary/references/consumer-manual-only-policy.md:19-27`). v1 installs none of them, so the default is a clean refusal, not a latent auto-invocation risk. |
+| Any MANUAL-ONLY skill (for example `clickthrough-test-engineer`, `aegis-setup`, `tdd-engineer`, `agent-authorization-matrix`, `standing-approval-and-auto-advance`, `ci-pipeline-architect`, `observability-operator`, `prompt-injection-defender`, `playwright-e2e-engineer`) | not installed by this package at all | A human names the exact skill for the task; the consumer records a trigger-scoped override in its own append-only register before use (`.claude/skills/human-approval-boundary/references/consumer-manual-only-policy.md:19-27`). This package installs none of them, so the default is a clean refusal, not a latent auto-invocation risk. |
 
 The Stage-3 set is the one place where a default routing chain names owners this
 package does not install. For a bounded J1 slice the installed pair produces the
@@ -371,7 +384,7 @@ so it cannot carry a local "not installed" note.
   CLAUDE.md                                  copied, byte-identical, never overwritten
   .claude/skills/<18 skill directories>/      SKILL.md + references/*.md only
   docs/project-state.md                      created by project-orchestrator at Stage 0 (not copied)
-  docs/consumer-install-record.md            written by install step P9 (path/bytes/LF/sha256 x39 + aggregate + source commit)
+  docs/consumer-install-record.md            written by install step P9 (path/bytes/LF/sha256 x41 + aggregate + source commit)
   docs/consumer-authority-register.md        only if a manual-only override is ever recorded
 ```
 
@@ -579,8 +592,8 @@ before anything is written:
 Per selected skill: create the directory, copy `SKILL.md`, then every file under
 `references/`, preserving the relative path; nothing else. Then copy the two
 startup files to the target root — `AGENTS.md` -> `<target>/AGENTS.md` and
-`CLAUDE.md` -> `<target>/CLAUDE.md` — byte-identically. Fourteen skills
-contribute 2 files and four contribute 3, so the copy leaves 39 skill files plus
+`CLAUDE.md` -> `<target>/CLAUDE.md` — byte-identically. Fifteen skills
+contribute 2 files and three contribute 3, so the copy leaves 39 skill files plus
 2 startup files. Nothing is ever deleted, so the procedure cannot damage an
 existing tree, and an existing file is **never overwritten**: it is skipped only
 after its hash matches the pinned source, so an interrupted run resumes where it
@@ -607,9 +620,9 @@ the first failure:
    files plus the 2 startup files.
 2. **Skill pins:** each of the 18 `SKILL.md` files, with CRLF->LF normalization,
    equals its `tools/skills-manifest.json` entry (**exit 31**).
-3. **Reference and startup pins:** each of the 20 reference files and the 2
-   startup files matches the pinned source, after P3 has proven the source is the
-   pinned commit and tree and is clean (**exit 31**).
+3. **Reference and startup pins:** each of the 21 reference files and the 2
+   startup files (23 source pins) matches the pinned source, after P3 has proven
+   the source is the pinned commit and tree and is clean (**exit 31**).
 4. **Siblings:** every sibling `SKILL.md` linked by an installed skill exists in
    the destination (**exit 32**).
 5. **No forbidden material:** no eval material, `scripts/`, executable or other
