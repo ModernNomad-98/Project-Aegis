@@ -607,8 +607,11 @@ pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:
 It is a complete, runnable form of P5-P9: the failure paths write to stderr and
 `exit`, never `Write-Error`, so an inherited `$ErrorActionPreference = 'Stop'`
 cannot turn a documented code into exit 1. It defines `$package` (the 39 paths)
-and takes `$Src`, `$Tgt`, `$Sh` and `-RecordPath` as parameters; it writes
-nothing outside the 39 package paths and the install record.
+and takes `$Src`, `$Tgt`, `$Sh` and `-RecordPath` as parameters. In a target
+tree with no junction or symlink on a destination path, it writes nothing
+outside the 39 package paths and the install record. A destination reparse point
+is outside v1's guarantee: the harness does not detect it, and a write can pass
+through it to a location outside the target (section 1.3).
 
 ```powershell
 param(
