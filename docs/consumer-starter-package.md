@@ -520,8 +520,11 @@ There is no default and no inference from the identity values. Pass the token as
 `-Mode` and the owner's exact words as `-OwnerAuthorization`; the words are
 required for both modes, are used only to establish that the owner stated the
 mode, and are never written to a file (they may contain the owner's name, which
-section 8 keeps out of records). A missing, empty or unrecognised mode, or a
-missing authorization, stops at exit 43 before anything is written.
+section 8 keeps out of records). The mode and authorization are checked
+**before either identity record** (exit 43), then the owner record (exit 41),
+then the effective identity (exit 42), so an unstated mode is always 43. A
+missing, empty or unrecognised mode, or a missing authorization, stops before
+anything is written.
 
 Save the block below as `install-mode.ps1` beside the section 7.1 harness. The
 harness runs it as its first step and copies nothing when it stops.
@@ -550,7 +553,23 @@ if (-not (Test-Path -LiteralPath $Tgt -PathType Container)) { Stop-Gate 1 "targe
 $null = (& git -C $Tgt rev-parse --git-dir 2>$null)
 if ($LASTEXITCODE -ne 0) { Stop-Gate 1 "target is not a git repository: $Tgt" }
 
-# P2.1 - the owner record is read from --local only; its values are never printed.
+# P2.1 - state and validate the mode and the owner's authorization FIRST. The mode
+# is a decision the human states before either identity record is read; the token
+# is trimmed once and every later test uses that normalized value, so a padded
+# token cannot take a branch its trimmed form would not.
+$modeGiven = ''
+if ($null -ne $Mode) { $modeGiven = $Mode.Trim() }
+$authGiven = ''
+if ($null -ne $OwnerAuthorization) { $authGiven = $OwnerAuthorization.Trim() }
+if ($modeGiven -cnotin @('human-only', 'agent-commit')) {
+  Stop-Gate 43 ("install mode not stated or not recognised: Will an agent commit in this repository, or will you commit yourself? State exactly one of -Mode human-only (you commit yourself) or -Mode agent-commit (an agent commits), and pass the owner's words as -OwnerAuthorization. Nothing was written.")
+}
+if (-not $authGiven) {
+  Stop-Gate 43 "owner authorization missing: pass the owner's exact words that stated the mode as -OwnerAuthorization. Nothing was written."
+}
+
+# P2.2 - the owner record is read from --local only. Its values are not printed,
+# except when the effective identity is reported as matching them at exit 42.
 $ownerName  = ((& git -C $Tgt config --local --get aegis.ownerName)  2>$null | Out-String).Trim()
 $ownerEmail = ((& git -C $Tgt config --local --get aegis.ownerEmail) 2>$null | Out-String).Trim()
 if (-not $ownerName -or -not $ownerEmail) {
@@ -572,7 +591,7 @@ Then run the installation again. Nothing was changed by this attempt.
   exit 41
 }
 
-# P2.2 - the effective identity is whatever git var reports, from any scope.
+# P2.3 - the effective identity is whatever git var reports, from any scope.
 $authorLine    = ((& git -C $Tgt var GIT_AUTHOR_IDENT)    2>$null | Out-String).Trim()
 $committerLine = ((& git -C $Tgt var GIT_COMMITTER_IDENT) 2>$null | Out-String).Trim()
 $rx = '^(.*) <([^>]*)> (\d+) ([+-]\d{4})$'
@@ -582,32 +601,28 @@ if ($authorLine -match $rx) { $author = [pscustomobject]@{ Name = $Matches[1].Tr
 if ($committerLine -match $rx) { $committer = [pscustomobject]@{ Name = $Matches[1].Trim(); Email = $Matches[2].Trim() } }
 if ($null -eq $author -or $null -eq $committer -or
     -not $author.Name -or -not $author.Email -or -not $committer.Name -or -not $committer.Email) {
-  Stop-Gate 42 "commit identity missing or unparsable: git var GIT_AUTHOR_IDENT and GIT_COMMITTER_IDENT must each report 'Name <email> <epoch> <tz>'; set user.name and user.email or stop"
+  $identityHint = 'set user.name and user.email in a scope git var reads (or the GIT_AUTHOR_* and GIT_COMMITTER_* variables) and re-run'
+  if ($modeGiven -ceq 'human-only') {
+    Stop-Gate 42 ("commit identity missing or unparsable: git var GIT_AUTHOR_IDENT and GIT_COMMITTER_IDENT must each report 'Name <email> <epoch> <tz>'. This human-only install makes no commit and needs no agent commit, but P2 still measures the effective identity so its owner-match report is accurate; $identityHint. Nothing was written.")
+  }
+  Stop-Gate 42 ("commit identity missing or unparsable: git var GIT_AUTHOR_IDENT and GIT_COMMITTER_IDENT must each report 'Name <email> <epoch> <tz>'; $identityHint. Nothing was written.")
 }
 # The startup gate's own check is exact equality on either name or email (section 8.1).
-$ownerMatch = ($author.Name -ceq $ownerName) -or ($author.Email -ceq $ownerEmail) -or
-              ($committer.Name -ceq $ownerName) -or ($committer.Email -ceq $ownerEmail)
-
-# P2.3 - the owner must state one exact mode, in their own words, before any copy.
-$modeGiven = ''
-if ($null -ne $Mode) { $modeGiven = $Mode.Trim() }
-$authGiven = ''
-if ($null -ne $OwnerAuthorization) { $authGiven = $OwnerAuthorization.Trim() }
-if ($modeGiven -cnotin @('human-only', 'agent-commit')) {
-  Stop-Gate 43 ("install mode not stated or not recognised: Will an agent commit in this repository, or will you commit yourself? State exactly one of -Mode human-only (you commit yourself) or -Mode agent-commit (an agent commits), and pass the owner's words as -OwnerAuthorization. Nothing was written.")
-}
-if (-not $authGiven) {
-  Stop-Gate 43 "owner authorization missing: pass the owner's exact words that stated the mode as -OwnerAuthorization. Nothing was written."
-}
+$matchFields = @()
+if ($author.Name -ceq $ownerName) { $matchFields += ('author name "{0}"' -f $author.Name) }
+if ($author.Email -ceq $ownerEmail) { $matchFields += ('author email "{0}"' -f $author.Email) }
+if ($committer.Name -ceq $ownerName) { $matchFields += ('committer name "{0}"' -f $committer.Name) }
+if ($committer.Email -ceq $ownerEmail) { $matchFields += ('committer email "{0}"' -f $committer.Email) }
+$ownerMatch = $matchFields.Count -gt 0
 
 # P2.4 - the mode decides which identity is acceptable. A human-only install makes
-# no commit; an agent-commit route keeps the unchanged non-owner requirement. Every
-# test below uses $modeGiven (the token trimmed once at P2.3), never the raw -Mode
-# value, so whitespace padding cannot select a branch its trimmed form would not.
+# no commit; an agent-commit route keeps the unchanged non-owner requirement.
 if ($ownerMatch -and ($modeGiven -ceq 'agent-commit')) {
-  Write-Output ('author={0} <{1}>' -f $author.Name, $author.Email)
-  Write-Output ('committer={0} <{1}>' -f $committer.Name, $committer.Email)
-  Write-Output ('Git reports this repository''s author and committer as "{0} <{1}>", which is the recorded owner. Will an agent commit in this repository, or will you commit yourself?' -f $author.Name, $author.Email)
+  $matched = $matchFields -join '; '
+  [Console]::Error.WriteLine(('matched={0}' -f $matched))
+  [Console]::Error.WriteLine(('author={0} <{1}>' -f $author.Name, $author.Email))
+  [Console]::Error.WriteLine(('committer={0} <{1}>' -f $committer.Name, $committer.Email))
+  [Console]::Error.WriteLine(('Git reports this repository''s commit identity as matching the recorded owner on {0}. Will an agent commit in this repository, or will you commit yourself?' -f $matched))
   exit 42
 }
 if ($modeGiven -ceq 'human-only') {
@@ -627,15 +642,17 @@ exit 0
   configuration. That is the decided solo-owner policy (section 8.3): a mode
   decision, not a relaxed agent check.
 - **`agent-commit` with an owner-matching effective identity still exits 42**,
-  before any copy, printing the resolved values and exactly one question
-  (section 8.3). The previous stop is preserved for the route it was written for.
+  before any copy, printing the matched field and value, the resolved author and
+  committer, and exactly one question on **stderr** (section 8.3). The previous
+  stop is preserved for the route it was written for.
 - **Mode tokens are trimmed once.** `-Mode ' agent-commit '` is validated and
   branched on exactly as `agent-commit`, and `-Mode ' human-only '` exactly as
-  `human-only`: leading, trailing or both-edge whitespace, and TAB padding, never
-  change the decision. The gate reads `$Mode` only to normalize it.
-- **Missing owner (exit 41), missing or unparsable effective identity (exit 42)
-  and an unstated or malformed mode (exit 43)** all stop before the copy. The
-  gate writes nothing, makes no commit and never runs `git config` in write mode.
+  `human-only`; padding never changes the decision or the recorded mode.
+- **The mode and authorization are checked first (exit 43), then the owner record
+  (exit 41), then the effective identity (exit 42)**, so a missing owner or a
+  malformed identity cannot pre-empt the mode question. All three stop before the
+  copy; the gate writes nothing, makes no commit and never runs `git config` in
+  write mode.
 - **A later agent commit is re-gated.** `human-only` is not a standing
   permission: before an agent commits, this same procedure must accept
   `agent-commit` with current commit authority, an effective non-owner identity
@@ -812,7 +829,9 @@ defines `$package` (the 41 paths) and takes `$Src`, `$Tgt`, `$Mode`,
 `-OwnerAuthorization`, `$ModeGate`, `$Sh` and `-RecordPath` as parameters. It
 runs P2's `install-mode.ps1` as a child process before it reads a source pin or
 writes a file, and exits with that gate's code; `-ModeGate` overrides the default
-location beside the harness. In a target tree with no junction or symlink on a
+location beside the harness. After the gate accepts, the harness trims the mode
+once and uses that normalized value for the install record and every later branch,
+so a padded token cannot record a policy it did not authorize. In a target tree with no junction or symlink on a
 destination path, it writes nothing outside the 41 package paths and the install
 record. A destination reparse point is outside this package's guarantee: the
 harness does not detect it, and a write can pass through it to a location outside
@@ -863,6 +882,9 @@ if (-not (Test-Path -LiteralPath $pwshExe)) { $pwshExe = Join-Path $PSHOME 'pwsh
 & $pwshExe -NoProfile -File $ModeGate -Tgt $Tgt -Mode $Mode -OwnerAuthorization $OwnerAuthorization
 $gateCode = $LASTEXITCODE
 if ($gateCode -ne 0) { Stop-Step $gateCode "the P2 install-mode gate refused; nothing was copied" }
+# The gate accepted this mode after trimming; use that same normalized value for
+# the install record and every later branch, never the raw argument.
+$Mode = $Mode.Trim()
 
 # P4 - the 41-path package list, transcribed from section 2.3 (ordinal order).
 $package = @(
@@ -1189,12 +1211,12 @@ commands, outputs, host versions and retained UNRUNs are in
 [the v2 evidence record](evidence/consumer-readiness/local-starter-v2.md); the v1
 measurement above is unchanged.
 
-**Verified for the install-mode revision on 2026-10-28**, with P2's block
-re-extracted after the F1 normalized-mode correction of the same date (P2
-`install-mode.ps1` **5,460 B / 93 LF**, sha256
-`b50ebdfda90647dd8a1245f002837296031b8e07010216f9178a2088292ff30d`;
-harness `install-starter.ps1` **18,905 B / 318 LF**, sha256
-`e63ca4a79577acbe1830d8efe36cde808d7a8b38be1e4529c7f5c31fbeb7e21d`) and run on
+**Verified for the install-mode revision on 2026-10-28** (re-verified after the
+Stage D correction of the same date). P2's block and the section 7.1 block were
+re-extracted exactly (P2 `install-mode.ps1` **6,493 B / 105 LF**, sha256
+`fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea`; harness
+`install-starter.ps1` **19,076 B / 321 LF**, sha256
+`435c7b64db3cfb8df0645525422bc6781e60108a24f46c1327f997c516c91a6c`) and run on
 the same measured host against a worktree of `ffb040c7` and isolated consumer
 fixtures. Results: a `human-only` install with `owner_match=yes` exited **0**
 with 41 installed files, 18/18 manifest pins, 23/23 source pins and the published
@@ -1203,14 +1225,22 @@ commit was made and no Git identity was written, and left the fixture at **0
 commits** with its local Git configuration byte-identical. An `agent-commit`
 route exited **0**, and its fixture commit carried the measured non-owner author
 and committer plus a DCO `Signed-off-by`. An owner identity on the
-`agent-commit` route exited **42** before any commit. A missing owner exited
-**41**; a missing, empty or malformed mode and a missing authorization exited
-**43**; a malformed effective identity exited **42**; and the section 7.1 harness
-with no mode exited **43** with **0 files** written. A later `agent-commit`
-proposal on the installed `human-only` tree exited **42** until the human stated
-the distinct agent identity. Restoring the old unconditional owner-match branch
-made the same `human-only` fixture exit **42**. The commands, outputs, exit codes
-and retained UNRUNs are in
+`agent-commit` route exited **42** before any commit, writing the matched field
+and value plus the question to **stderr**; a padded `-Mode ' agent-commit '` was
+refused identically (before this correction it was wrongly accepted with exit 0
+and `owner_match=no`). A padded `-Mode ' human-only '` was accepted as
+`human-only`, and the harness recorded that normalized mode and the human-only
+policy, not the raw token. A missing owner exited **41**; a missing, empty or
+malformed mode and a missing authorization exited **43**; a missing owner or a
+malformed identity **with no mode** exited **43** (the mode is checked first); a
+malformed effective identity with `human-only` exited **42**; and the section
+7.1 harness with no mode exited **43** with **0 files** written. A later
+`agent-commit` proposal on the installed `human-only` tree exited **42** until
+the human stated the distinct agent identity. Restoring the old unconditional
+owner-match branch made the same `human-only` fixture exit **42**. A
+command-scoped `git -c` identity that the gate's separate `git var` cannot see
+was refused **42** on the identity it measured, rather than approved. The
+commands, outputs, exit codes and retained UNRUNs are in
 [human-commit-install-v1](evidence/consumer-readiness/human-commit-install-v1.md).
 
 ### 7.2 Exit codes
@@ -1228,7 +1258,7 @@ Each code stops; none warns and continues.
 | 32 | Missing sibling dependency | The installed skill that links it and the absent sibling it names, as `<skill> links <sibling>/SKILL.md` |
 | 40 | Wrong repository role | The four-landmark stop message (P1) |
 | 41 | Owner record missing | The exact `aegis.*` remediation text (section 8.2) |
-| 42 | Commit identity missing or owner-matching on the `agent-commit` route | The resolved author/committer values and one question (section 8.3). A `human-only` install does not exit 42 on an owner match, because it makes no commit; it is not a relaxed agent check. This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
+| 42 | Commit identity missing or owner-matching on the `agent-commit` route | On **stderr**: the parse failure, or the matched field and value plus the resolved author/committer and one question (section 8.3). A `human-only` install does not exit 42 on an owner match, because it makes no commit; it is not a relaxed agent check. Both modes still need a parsable identity, because P2 reports `owner_match=` in its acceptance line. This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
 | 43 | Install mode or owner authorization not stated, empty or unrecognised | The exact question and the two valid `-Mode` tokens (P2). Nothing written; no package file copied |
 
 ## 8. The two identity records
@@ -1242,7 +1272,16 @@ The human who authorizes: the person the Aegis route calls "you" and the actor a
 | Record | Keys | Scope that counts | What it is for | Who reads it |
 | --- | --- | --- | --- | --- |
 | **Owner record** | `aegis.ownerName`, `aegis.ownerEmail` | `--local` **only** — the gate reads these with `git config --local` (`SKILL.md:117-120, 126-127`) | Names the human every approval belongs to; never committed; the identity the gate refuses to see commit | The gate's presence/owner check before the first commit (`SKILL.md:126-141`) |
-| **Commit identity** | `user.name`, `user.email` (any scope; `git var` is authoritative) | local, global, `GIT_AUTHOR_*`/`GIT_COMMITTER_*`, `GIT_CONFIG_*`, or `git -c` (`SKILL.md:99-110`) | Signs the commit | Git, and the gate, which compares it with the owner record and **refuses a match on either name or email** (`SKILL.md:105-110, 137, 209-211`) |
+| **Commit identity** | `user.name`, `user.email` (any scope; `git var` is authoritative) | local, global, `GIT_AUTHOR_*`/`GIT_COMMITTER_*`, `GIT_CONFIG_*` (`SKILL.md:99-110`) | Signs the commit | Git, and the gate, which compares it with the owner record and **refuses a match on either name or email** (`SKILL.md:105-110, 137, 209-211`) |
+
+A command-scoped `git -c user.name=…` given only to a later `git commit` is **not
+visible** to P2's separate `git var` process, so this route does not accept it as
+the effective identity. Set the identity in a scope `git var` reads (local or
+global config, or the `GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables) before P2; if
+P2 measures a different fallback identity, the route fails closed (usually exit
+42) instead of approving an identity it did not measure. The same rule applies to
+the harness, which invokes the gate as its own process and records only what that
+process measured.
 
 The approval record stays separate from both: `docs/project-state.md` carries the
 role ("project owner") and the approval ID, because the schema forbids identifying
@@ -1277,11 +1316,23 @@ human's behalf without their words.
 
 ### 8.3 If the agent-commit identity is missing or matches the owner (exit 42)
 
-The question is asked only on the `agent-commit` route. When the effective author
-or committer is missing/unparsable, or equals the owner record on name or email,
-show the resolved values and ask **exactly one** question:
+The 42 stop has two forms, both written to **stderr**.
 
-> Git reports this repository's author and committer as `<name> <email>`, which is the recorded owner. Will an agent commit in this repository, or will you commit yourself?
+When the effective author or committer is missing/unparsable, the gate prints the
+parse failure and the identity hint; on the `human-only` route the hint says
+explicitly that the install makes no commit and needs no agent commit, and only
+requires a parsable identity for the owner-match report.
+
+When an `agent-commit` attempt matches the owner record on name or email, the
+gate prints the matched field and value, the resolved author and committer, and
+asks **exactly one** question:
+
+> Git reports this repository's commit identity as matching the recorded owner on `<matched>`. Will an agent commit in this repository, or will you commit yourself?
+
+`<matched>` is the field/value list that actually matched (`author name "…"`,
+`author email "…"`, `committer name "…"` or `committer email "…"`), printed as
+a `matched=` line; the gate never labels the author as the owner when only the
+committer matched.
 
 Then:
 
@@ -1299,6 +1350,14 @@ Then:
   `agent-commit` route still refuses the same identity.
 - If the answer is unclear, do not guess and do not write: the gate exits 43 and
   copies nothing.
+
+**A `human-only` install still needs a parsable Git identity**, even though it
+makes no commit: P2's acceptance line reports `owner_match=`, which is the same
+exact-equality check a later agent commit will apply, and an unparsable identity
+would make that report meaningless. It does **not** require the human to let an
+agent commit, choose an agent identity, or change any Git configuration. Set
+`user.name` and `user.email` for the repository (or the `GIT_AUTHOR_*`/
+`GIT_COMMITTER_*` variables) and re-run the same `-Mode human-only` command.
 
 **A `human-only` install does not authorize a later agent commit.** Before an
 agent-authored commit in that repository, run this procedure again with

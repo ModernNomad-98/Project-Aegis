@@ -17,27 +17,25 @@ retained UNRUN is named in section 7.
 | Procedure page, before | `docs/consumer-starter-package.md` at the base, **91,779 B**, sha256 `b9c015e5fec171e8a1b8328dbc4389195ecd7761cbb18302b639e96abbcdef4c` |
 | Before P2 block | **657 B / 11 lines**, sha256 `ee0fb37aca29b3eada063eadf71b5c7c49c26ae1a6359f5fb69ff6d0fecc1a28` |
 | Before section 7.1 block | **17,305 B / 294 LF**, sha256 `78f8a2f93bb46f274d6bc59027e69108bd1ebd416b9b0661d521a69c5753bf86` |
-| P2 block after the F1 correction | **5,460 B / 93 LF**, sha256 `b50ebdfda90647dd8a1245f002837296031b8e07010216f9178a2088292ff30d` |
-| Section 7.1 block (unchanged by F1) | **18,905 B / 318 LF**, sha256 `e63ca4a79577acbe1830d8efe36cde808d7a8b38be1e4529c7f5c31fbeb7e21d` |
-| Pre-fix padded probe, four padding shapes | `item3-split/logs/prefix-padded.log`, **4,056 B**, sha256 `efb08da7e3145f598cb12c64928a09d8b633edd7211080e3fdc27b61b37a0ef8` |
-| Corrected padded probe, same fixtures | `item3-split/logs/f1-padded.log`, **4,670 B**, sha256 `2f408ef9458245f06bee81f297cf60b19c575a57b169af31ef4325073d4de623` |
-| Corrected F1 tests against the pre-fix code | `item3-split/logs/prefix-f1-tests.log`, **922 B**, sha256 `60cee0cbc3eb96d5018f418459d4e6489cbd3685814e152e1031eecf36b67420` |
-| Behavioural F1 cases against the pre-fix code (static oracle masked) | `item3-split/logs/prefix-f1-tests-masked.log`, **1,587 B**, sha256 `9daeeec78f53af616c6a83bae22e22a9de34be1902025741b52f5aced055abf2` |
-| Extraction wrapper | `extract-block.ps1`, **1,798 B**, sha256 `159f9af86b05e752b903b1be0e4225a96e2aac892665452d2edd105554f8e047`; it reads the fence body plus one trailing LF and reports the span, size, LF count and hash |
+| P2 block at the Stage C head (superseded by the correction below) | **5,284 B / 91 LF**, sha256 `88db8dcce5245e458dfcca794a8c9dc03b1f2a89397643ddfd482f507376694d` |
+| Section 7.1 block at the Stage C head (superseded) | **18,905 B / 318 LF**, sha256 `e63ca4a79577acbe1830d8efe36cde808d7a8b38be1e4529c7f5c31fbeb7e21d` |
+| **Corrected P2 block** (Stage D correction) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
+| **Corrected section 7.1 block** | **19,076 B / 321 LF**, sha256 `435c7b64db3cfb8df0645525422bc6781e60108a24f46c1327f997c516c91a6c` |
+| Extraction wrapper (this correction) | `item3-fix/tools/extract-block.py`, **1,929 B**, sha256 `89daa9b1c27e69829e8a2987041b34ed5bdab8f949312468d8c25be998aa5640`; it bounds the block at the next same-level heading and writes the body plus one trailing LF |
 | Retained v1 walkthrough wrapper | `install-step.ps1` from the v1 validation raw material, **14,477 B**, sha256 `1eb9174d87b68900671320666a8377be2bf81e5dbaa20ab54f56b9daeb1a7636`; its P2 branch is the implementation the v1 evidence record ran |
-| Raw before log | `before-native.log`, **1,631 B**, sha256 `4c56aa012ba116b43bac325d88fcec5ab3ca83049d9789561bf2b77d128484cf` |
-| Raw after log | `after-native.log`, **11,746 B**, sha256 `5747d4591a94b1a5821d35df9a2f91191e2d0f08f0d022eff44ab071f7834025` |
+| Raw before log (F1 exploit on the Stage C block) | `item3-fix/before/raw/before-f1.log`, **2,529 B**, sha256 `93d8a78f691ae83c8aaaeea1b38a4176c9bded316a9bddd02360d08148815f5a` |
+| Raw corrected after log | `item3-fix/after/raw/after-native.log`, **10,878 B**, sha256 `e6aca7baf3426d46c084bb0650f4440b4f369c0a044cdc93b11e65a9d9b16662` |
+| Corrected full-suite log (at `6b22bd61`) | `item3-fix/after/raw/validator-suite.log`, **58,492 B**, sha256 `542e155a293ab1e595eb3ebde5bbbab8f3cb2ab13c8c9a9c1c79045e4311ea98` |
+| Padded-token probe at this head | `item3-split/logs/f2f11-padded.log`, **6,735 B**, sha256 `9d833d65efbf31482bfef674b23c15f42e4115dc784e52c59f822874f276c2f2`; the four padding shapes through the gate and the published harness |
 
 The extraction check is non-circular: run against the unmodified page, the
 wrapper reproduces the page's own published v2 measurement of the section 7.1
 block byte for byte (**17,305 B / 294 LF**, sha256 `78f8a2f9…bf86`). The same
 wrapper then produces the before and after identities above.
 
-The raw logs live under `_A/remediation/handshake/item3/` beside this work; the F1
-correction's probe and test logs are under
-`_A/remediation/handshake/item3-split/logs/`. Every decisive command line and its
-output is reproduced below, so the record does not depend on opening either
-folder.
+The raw logs live under `_A/remediation/handshake/item3/` beside this work. Every
+decisive command line and its output is reproduced below, so the record does not
+depend on opening that folder.
 
 ## 2. Host and tools (measured in the run)
 
@@ -140,10 +138,6 @@ change closes.
   **41** owner record missing, **42** identity missing/unparsable or an
   `agent-commit` attempt under the owner identity, **43** install mode or owner
   authorization missing, empty or unrecognised.
-- **A padded `-Mode` token changes no decision.** `$Mode` is trimmed once into
-  `$modeGiven` at P2.3 and every mode branch tests `$modeGiven`, never the raw
-  argument, so leading, trailing, both-edge and TAB padding are treated exactly as
-  the trimmed token and cannot reach the accepted `agent-commit` line (F1).
 - **The section 7.1 harness runs the gate first.** It takes `-Mode`,
   `-OwnerAuthorization` and an optional `-ModeGate`, invokes the gate as a child
   process before it reads a source pin or writes a file, and exits with the
@@ -161,6 +155,40 @@ change closes.
   non-owner identity and the mandatory provenance step, and every agent commit
   carries a DCO `Signed-off-by` trailer.
 
+### 4.1 Stage D correction (F1-F9, 2026-10-28)
+
+The Stage D audit (sha256 `be4a5620…`) found **F1** (a whitespace-padded `-Mode`
+bypass) blocking and **F2-F9** smaller defects. This correction keeps the published
+blocks as the oracle and changes them as follows:
+
+- **F1** — the gate trims `-Mode` once into `$modeGiven` and every mode branch uses
+  that value (`$ownerMatch -and ($modeGiven -ceq 'agent-commit')`). Padding can no
+  longer select the accepted agent path: leading, trailing, both-edge and TAB
+  padding are each refused at 42 under the owner identity, through the gate and
+  through the published harness, before any commit, file or record write.
+- **F2** — mode and authorization are checked first (43), then the owner record
+  (41), then the effective identity (42), matching section P2's declared order.
+- **F3** — the harness trims `$Mode` after the gate accepts and records that value;
+  `' human-only '` writes `Install mode: human-only`.
+- **F4** — `git -c` is no longer listed as a supported identity source; the page and
+  README state that a command-scoped value is invisible to the gate's separate
+  `git var` and the route fails closed. A test proves the scoped value is visible to
+  one git invocation but not to the gate.
+- **F5** — exit 42 prints `matched=<field "value">` and names the field that matched,
+  so a committer-only match does not label the author as the owner.
+- **F6** — exit 42 writes to stderr like 41 and 43; the tests assert stdout is empty.
+- **F7** — the P2.1 comment now says the owner values are not printed except as the
+  effective identity reported at exit 42.
+- **F8** — the human-only parse failure says the install makes no commit and needs no
+  agent commit, and only requires a parsable identity for the owner-match report.
+- **F9** — tests cover padded modes, whitespace-only authorization, `ident=None`, a
+  non-git target, `-ModeGate`, a missing `git` (declared UNRUN) and a fence scan
+  bounded at the section heading.
+
+No assertion was removed or weakened. The two tests that locked the raw `$Mode`
+literal now assert the normalized branch, and the exit-42 stream assertions moved
+from stdout to stderr with an added empty-stdout check.
+
 ## 5. After-state: the six required observations (native)
 
 Commands and results below are quoted from `after-native.log`. Unless stated,
@@ -171,10 +199,33 @@ outside `.git`; "config" is the `git config --local --list` snapshot.
 | --- | --- |
 | **S3-1** — a valid human-only install succeeds with no agent commit or identity change | Gate exit **0**: `P2: mode=human-only owner_match=yes identity=not-recorded install_commit=none identity_mutation=none`; config hash unchanged; 0 commits; 0 files. Full harness exit **0**: 41 installed files, 18/18 manifest pins, 23/23 source pins, published aggregate, **42 files** including a **7,025 B** record, **0 commits**, config hash byte-identical, record's mode lines present and the owner's name/email absent from the record |
 | **S3-2** — an authorized explicit non-owner agent route preserves the measured identity in an isolated fixture commit | Gate exit **0**: `P2: mode=agent-commit owner_match=no identity=Aegis Agent (DeepSeek V4 Flash) <agent@example.invalid>`; `git var GIT_AUTHOR_IDENT` starts with the same identity; an isolated `git commit -s` records `author=Aegis Agent (DeepSeek V4 Flash) <agent@example.invalid>`, the same committer, `Signed-off-by: …`, and the owner record still reads `Owner Person` |
-| **S3-3** — owner identity used by an agent is refused before commit | Gate exit **42**, prints `author=…`, `committer=…` and the one question `Will an agent commit in this repository, or will you commit yourself?`; **0 commits**, **0 files**, config unchanged |
+| **S3-3** — owner identity used by an agent is refused before commit | Gate exit **42** on **stderr**, printing `matched=<field "value">`, `author=…`, `committer=…` and the one question `Will an agent commit in this repository, or will you commit yourself?`; stdout empty; **0 commits**, **0 files**, config unchanged |
 | **S3-4** — missing owner, unclear mode or malformed values refuse before package writes | Missing owner: exit **41** with the section 8.2 text, 0 files. No `-Mode`: exit **43**, 0 files. `-Mode human_only`: exit **43**, 0 files. No `-OwnerAuthorization`: exit **43**, 0 files; config and commit count unchanged. Malformed effective identity (`GIT_AUTHOR_DATE=not-a-date`): exit **42**, 0 files. The full harness with no `-Mode`: exit **43**, **0 files**, **0 commits** |
 | **S3-5** — a later agent-commit proposal after a human-only install is re-gated | On the installed `human-only` tree with the owner identity: exit **42**, no commit. After the human states the distinct agent identity, the same gate exits **0**; a later signed commit carries that identity. The check itself makes no commit |
-| **S3-6** — restoring the old contradictory branch makes the behavioral test fail | The published block contains exactly one mode branch, `if ($ownerMatch -and ($modeGiven -ceq 'agent-commit'))`. Replacing it with the old unconditional `if ($ownerMatch)` leaves the block parseable; the same human-only fixture then exits **42**, with 0 files and 0 commits, while the published block exits 0 on an identical fixture |
+| **S3-6** — restoring the old contradictory branch makes the behavioral test fail | The corrected block contains exactly one mode branch, `if ($ownerMatch -and ($modeGiven -ceq 'agent-commit'))`. Replacing it with the old unconditional `if ($ownerMatch)` leaves the block parseable; the same human-only fixture then exits **42** on stderr, with 0 files and 0 commits, while the published block exits 0 on an identical fixture |
+
+### Correction observations (F1-F9, native)
+
+Fixture identities are the same as above; commands and full outputs are in
+`item3-fix/after/raw/after-native.log` (the Stage D correction at `6b22bd61`, whose
+two published blocks are byte-identical at this head) and in
+`item3-split/logs/f2f11-padded.log` (all four padding shapes at this head). The
+before-state exploit is `item3-split/logs/prefix-padded.log`, the corrected-block
+probe `item3-split/logs/f1-padded.log`, and the original single-case exploit log
+remains `item3-fix/before/raw/before-f1.log`.
+
+| Case | Observed |
+| --- | --- |
+| **F1 before** — Stage C block, all four padded tokens under the owner identity | exit **0** for each shape, `P2: mode=agent-commit owner_match=no identity=Owner Person <owner@example.invalid>`, 0 files, 0 commits: the identity refusal was skipped |
+| **F1 after** — corrected block, the same four tokens | exit **42** for each shape, stdout **0 B**, stderr **524 B** LF-normalized with `matched=author name "Owner Person"; …`, 0 files, 0 commits, config byte-identical |
+| **F1** — padded human-only | `-Mode ' human-only '` → exit **0**, `mode=human-only owner_match=yes`, 0 files, 0 commits |
+| **F1** — published harness end to end | all four padded tokens with the owner identity and an explicit `-RecordPath` → exit **42** on stderr before the dummy source is read, 0 files, 0 commits, no install record |
+| **F2** — declared order | missing owner + no mode → **43**; malformed identity + no mode → **43**; missing owner + human-only → **41**; malformed identity + human-only → **42**; every refusal 0 files |
+| **F3** — normalized record | padded human-only harness → exit **0**, 42 files, record **7,025 B**, `- Install mode: human-only (owner-stated; …)` and the human-only agent-commit line; no raw padded mode in the record |
+| **F4** — command-scoped `git -c` | `git -c user.name='Scoped Agent' … var` reports `Scoped Agent`; the gate still measures the owner identity and exits **42**; 0 files, 0 commits |
+| **F5** — committer-only match | author agent, committer owner → exit **42**, `matched=committer name "Owner Person"; committer email "owner@example.invalid"`; the question names the committer, never the author |
+| **F6** — stream discipline | exit 42: stdout **0 B**, stderr **524 B** LF-normalized (**528 B** with CRLF, the raw count the Stage D run logged); exit 43: stdout **0 B**, stderr **297 B** |
+| **F9** — non-git target / `ident=None` | non-git target → exit **1**, 0 files; the test suite's `ident=None` fixture → exit **42** with the parse message; a missing `git` or `pwsh` is declared UNRUN, never a `FileNotFoundError` |
 
 ### Decisive output (quoted)
 
@@ -196,11 +247,14 @@ S3-2 gate    P2: mode=agent-commit owner_match=no
 S3-2 commit  author=Aegis Agent (DeepSeek V4 Flash) <agent@example.invalid>
              committer=Aegis Agent (DeepSeek V4 Flash) <agent@example.invalid>
              Signed-off-by: Aegis Agent (DeepSeek V4 Flash) <agent@example.invalid>
-S3-3 gate    author=Owner Person <owner@example.invalid>
+S3-3 gate    matched=author name "Owner Person"; author email "owner@example.invalid";
+             committer name "Owner Person"; committer email "owner@example.invalid"
+             author=Owner Person <owner@example.invalid>
              committer=Owner Person <owner@example.invalid>
-             Git reports this repository's author and committer as "Owner Person
-             <owner@example.invalid>", which is the recorded owner. Will an agent
-             commit in this repository, or will you commit yourself?          EXIT 42
+             Git reports this repository's commit identity as matching the recorded
+             owner on … Will an agent commit in this repository, or will you commit
+             yourself?                                                        EXIT 42
+             OBSERVED stdout=0B  stderr=528B
              OBSERVED commits_after=0  files_after=0  config_hash_unchanged=True
 S3-4         exit 41 (missing owner); exit 43 (no mode); exit 43 (human_only);
              exit 43 (no authorization); exit 42 (malformed identity);
@@ -208,52 +262,15 @@ S3-4         exit 41 (missing owner); exit 43 (no mode); exit 43 (human_only);
 S3-5         installed tree + owner identity → EXIT 42, commits_after_refusal=0;
              distinct agent identity → EXIT 0; gate made no commit
 S3-6         OBSERVED old_branch_matches=1; mutated block on the same fixture → EXIT 42
+F1 before    padded ' agent-commit ' → EXIT 0, owner_match=no, files=0, commits=0
+F1 after     padded ' agent-commit ' → EXIT 42, stdout=0B, files=0, commits=0
+F1 human     padded ' human-only ' → EXIT 0, mode=human-only, owner_match=yes
+F2           missing owner + no mode → 43; malformed identity + no mode → 43
+F3           padded human-only harness → EXIT 0, record 7,025 B, mode=human-only
+F4           git -c var shows Scoped Agent; gate → EXIT 42 on measured owner
+F5           committer-only → EXIT 42, matched=committer name/email, author=agent
+F6           42: stdout 0B / stderr 528B; 43: stdout 0B / stderr 297B
 ```
-
-### F1 correction observations (native)
-
-The F1 finding was that `-Mode ' agent-commit '` skipped the owner-identity
-refusal: the branch tested the raw `$Mode`, so a padded token fell through to the
-accepted `agent-commit` line at exit 0. The published P2 block remains the oracle:
-the pre-fix block was extracted from `05be9615` (**5,284 B / 91 LF**, sha256
-`88db8dcc…694d`) and the same four tokens were run against both trees with the same
-owner record and an owner-matching identity.
-
-| Case | Pre-fix block | Corrected block |
-| --- | --- | --- |
-| leading space, `-Mode ' agent-commit'` | exit **0**, `P2: mode=agent-commit owner_match=no` | exit **42**, the owner match is refused |
-| trailing space, `-Mode 'agent-commit '` | exit **0**, the same acceptance line | exit **42** |
-| leading and trailing space, `-Mode ' agent-commit '` | exit **0**, the same acceptance line | exit **42** |
-| TAB, `-Mode "<TAB>agent-commit<TAB>"` | exit **0**, the same acceptance line | exit **42** |
-
-Each pre-fix row also shows the bypass reaching the harness: the section 7.1
-harness continued past P2 and stopped at the source-pin check (exit **31**,
-`exit 31: source HEAD  is not the pinned commit …`) instead of exiting 42, with
-0 files, 0 commits and no install record. On the corrected block every row exits
-**42** through the harness with `exit 42: the P2 install-mode gate refused;
-nothing was copied`, 0 files, 0 commits, no record and byte-identical local Git
-config.
-
-The corrected tests, run against the pre-fix code (the F1 test file copied into a
-detached `05be9615` worktree), fail in exactly the two places that define F1:
-
-```text
-  FAIL  the P2 block does not branch on the normalized mode
-  FAIL  F1: the harness did not refuse padded <SP>agent-commit (leading space):
-        exit 31, P2: mode=agent-commit owner_match=no …
-```
-
-With only those two static text oracles masked on that pre-fix tree, so the
-behavioural cases can execute, the padded case fails on the behaviour itself:
-
-```text
-  FAIL  F1: -Mode <SP>agent-commit (leading space) under the owner identity was
-        not refused: exit 0, P2: mode=agent-commit owner_match=no …
-```
-
-No assertion was removed or weakened at this head: the two tests that locked the
-raw `$Mode` literal now lock the normalized literal and assert the raw branch is
-absent, and the padded cases were added around them.
 
 ## 6. Source regression
 
@@ -261,16 +278,16 @@ Added to the existing dispatcher in `scripts/tests/test_validator.py` (protected
 AEGIS-APR-140 applies, and no existing assertion is removed or weakened):
 
 - `test_consumer_install_mode_gate` (**S3-1** human-only success, **S3-2**
-  non-owner route with a fixture commit, **S3-3** owner refusal, **S3-4** the four
-  refusal classes, **S3-5** re-gating, **S3-6** old-branch mutation).
+  non-owner route with a fixture commit, **S3-3** owner refusal on stderr, **S3-4**
+  the refusal classes and the **F2** ordering, **S3-5** re-gating, **S3-6**
+  normalized-branch mutation, **F1** the four padded shapes (leading, trailing,
+  both, TAB), **F4** command-scoped `git -c`,
+  **F5** committer-only match, **F9** `ident=None`, non-git target and the bounded
+  fence scan).
 - `test_consumer_install_mode_native` (full published harness: human-only install
-  with the record, the installed-tree re-gate, and a no-mode harness refusal with
-  0 files).
-- **F1**: both tests assert the normalized branch literal and that the raw `$Mode`
-  branch is absent, and both execute four padding shapes (leading, trailing, both,
-  TAB) under an owner-matching identity, each required to exit 42 before any
-  commit, file or record write. The published harness is the second surface, so a
-  padded token that reached it is refused before the source is read.
+  with the record, the **F3** padded human-only record, the installed-tree re-gate,
+  a no-mode harness refusal, the **F1** padded agent-commit end-to-end refusal, and
+  **F9** `-ModeGate` from an explicit path; all with 0 files where they refuse).
 
 The oracle is the published procedure itself: both fenced blocks are extracted
 from the page and executed with `pwsh`, and the S3-6 control is the published
@@ -281,12 +298,13 @@ produce if pin checks ran first, on a dummy source directory.
 
 Availability policy: an absent `pwsh`/Git/`sh` or a clone without the pinned
 commit is UNRUN — a required failure on Linux (`AssertionError`), an explicit
-`REQUIRED_SKIPS` entry on other hosts, never a pass. Linux closure therefore
-remains nonzero when the case cannot run.
+`REQUIRED_SKIPS` entry on other hosts, never a pass and never a
+`FileNotFoundError`. Linux closure therefore remains nonzero when the case
+cannot run.
 
-Local execution of the F1 correction (Windows, this host): both tests **18 PASS,
-0 SKIP** (11 in the gate test, 7 in the native test); the full suite is recorded
-in section 9.
+Local execution of the corrected tests (Windows, this host): **25 PASS, 0 SKIP**
+(16 in the gate test, 9 in the native test); the full suite is recorded in
+section 9.
 
 ## 7. Retained UNRUN
 
@@ -297,7 +315,8 @@ in section 9.
 | A real consumer repository and the J1 journey | This item changes the installation prerequisite; it does not run J1 | Execute J1 in a fresh consumer repository and record the Stage 0/1 result |
 | The 9 Stage E acceptance rows | They were UNRUN before this change and are not converted by it | As listed in [local-starter-v2](local-starter-v2.md) |
 | The v2 negative fixtures (changed byte, eval material, conflicting `AGENTS.md`, missing reference) | P5-P8 bytes are unchanged by this item; they were last executed for the pre-revision block | Re-run them if a future change touches P5-P8 |
-| CI execution of this branch and any push, PR, merge or deployment | None was performed or is authorized here | Open the PR under the source's stages; CI runs the new cases on Linux and Windows |
+| CI execution of the corrected head and any push, PR edit, merge or deployment | This correction is local only. PR #959's live head remains `05be9615`; its CI (including `gate-guard` failure as the expected protected-path signal and skipped `tools-tests-*`) does not cover the corrected blocks | Push only when authorized, then run and record CI at the new head; skipped jobs stay UNRUN |
+| A fresh independent review at the corrected head (Stage D re-audit / Stage F) | The Stage D audit was written at `05be9615`; this correction has not been reviewed by another provider or a human | Re-run Codex/DeepSeek and obtain human review at the new head; this record is the author's evidence, not a review verdict |
 
 ## 8. Limits
 
@@ -317,7 +336,7 @@ in section 9.
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Validator self-tests (full suite) | `python -P scripts/tests/test_validator.py` | **OK: 312 gate self-test assertion(s) passed; exit 0** (18 in the two install-mode tests) |
+| Validator self-tests (full suite) | `python -P scripts/tests/test_validator.py` | **OK: 319 gate self-test assertion(s) passed; exit 0** (25 in the two install-mode tests: 16 + 9; 16 more than the Stage C head) |
 | Skill validator | `python -P scripts/validate-skills.py` | **exit 0**, `OK: 254 skill(s) valid, 0 warning(s)` |
 | Markdown link check on the changed pages | `python -P scripts/ci/check-markdown-links.py <pages>` | **exit 0**, 3 files / 97 links checked / 0 broken / 0 dead |
 | Whitespace / conflict markers | `git diff --check` | **clean** |
@@ -326,28 +345,35 @@ in section 9.
 ```text
 $ python -P scripts/tests/test_validator.py
 ...
+  PASS  F9: a missing P2 closing fence fails at the section boundary
   PASS  S3-1: human-only with owner-matching identity exits 0, with 0 commits, 0 files written and byte-identical local Git config
   PASS  S3-2: agent-commit exits 0 for the measured non-owner identity, and an isolated fixture commit carries that author and committer plus Signed-off-by
-  PASS  S3-3: agent-commit under the owner identity exits 42 before any commit, with the resolved values, one question and 0 files written
-  PASS  F1: padded agent-commit token <SP>agent-commit (leading space) under the owner identity is refused at 42 before any commit, with 0 files and byte-identical config
-  PASS  F1: padded agent-commit token agent-commit<SP> (trailing space) under the owner identity is refused at 42 before any commit, with 0 files and byte-identical config
-  PASS  F1: padded agent-commit token <SP>agent-commit<SP> (leading and trailing space) under the owner identity is refused at 42 before any commit, with 0 files and byte-identical config
-  PASS  F1: padded agent-commit token <TAB>agent-commit<TAB> (TAB) under the owner identity is refused at 42 before any commit, with 0 files and byte-identical config
+  PASS  S3-3: agent-commit under the owner identity exits 42 on stderr before any commit, with the matched field, resolved values, one question and 0 files
+  PASS  F5: a committer-only owner match prints the committer field and value, not a claim that the author is the owner
+  PASS  F1: padded agent-commit token <SP>agent-commit (leading space) under the owner identity is refused at 42 on stderr before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token agent-commit<SP> (trailing space) under the owner identity is refused at 42 on stderr before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token <SP>agent-commit<SP> (leading and trailing space) under the owner identity is refused at 42 on stderr before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token <TAB>agent-commit<TAB> (TAB) under the owner identity is refused at 42 on stderr before any commit, with 0 files and byte-identical config
   PASS  F1: padded ' human-only ' is accepted as human-only with 0 files and 0 commits
+  PASS  F4: the gate cannot see a later command-scoped git -c identity and fails closed on the identity it measured (42, no commit)
+  PASS  F2: missing owner/no mode and malformed identity/no mode both exit 43; the mode check precedes both identity records
+  PASS  F9: ident=None exits 42 and a non-git target exits 1, with 0 files
   PASS  S3-4: missing owner (41), absent/malformed mode and missing authorization (43) and a malformed effective identity (42) all refuse with 0 package files
   PASS  S3-5: after a human-only acceptance a later agent-commit proposal is re-gated: exit 42 under the owner identity, exit 0 only after the explicit distinct identity, and no commit is made by the check
-  PASS  S3-6: restoring the old unconditional owner-match branch makes the same human-only fixture fail (exit 42) while the published branch exits 0
+  PASS  S3-6: restoring the old unconditional owner-match branch makes the same human-only fixture fail (exit 42 on stderr) while the published branch exits 0
   PASS  S3-1: the published harness completes a human-only install with 41 files, the mode in the record, 0 commits and byte-identical config
+  PASS  F3: a padded ' human-only ' install records the normalized mode and the human-only policy, with 0 commits and byte-identical config
   PASS  S3-5: on the installed human-only tree, a later agent-commit proposal exits 42 and creates no commit
   PASS  S3-4: the published harness with no -Mode exits 43 before reading a source pin, with 0 package files and 0 commits
-  PASS  F1: the published harness refuses padded <SP>agent-commit (leading space) under the owner identity at 42 before any source read, record write or commit
-  PASS  F1: the published harness refuses padded agent-commit<SP> (trailing space) under the owner identity at 42 before any source read, record write or commit
-  PASS  F1: the published harness refuses padded <SP>agent-commit<SP> (leading and trailing space) under the owner identity at 42 before any source read, record write or commit
-  PASS  F1: the published harness refuses padded <TAB>agent-commit<TAB> (TAB) under the owner identity at 42 before any source read, record write or commit
+  PASS  F1: the published harness refuses padded <SP>agent-commit (leading space) under the owner identity at 42 on stderr before any source read, record write or commit
+  PASS  F1: the published harness refuses padded agent-commit<SP> (trailing space) under the owner identity at 42 on stderr before any source read, record write or commit
+  PASS  F1: the published harness refuses padded <SP>agent-commit<SP> (leading and trailing space) under the owner identity at 42 on stderr before any source read, record write or commit
+  PASS  F1: the published harness refuses padded <TAB>agent-commit<TAB> (TAB) under the owner identity at 42 on stderr before any source read, record write or commit
+  PASS  F9: -ModeGate runs the gate from an explicit path and refuses the padded agent-commit owner identity at 42
 
 SKIPPED: 6 test(s) (UNRUN, not passes)
 UNRUN: 6 required readiness case(s) did not run on this platform (non-Linux UNRUN; Linux gate remains nonzero on skip)
-OK: 312 gate self-test assertion(s) passed.
+OK: 319 gate self-test assertion(s) passed.
 ```
 
 ## 10. Skills applied
@@ -357,3 +383,4 @@ OK: 312 gate self-test assertion(s) passed.
 | `agent-startup-context-gate` at `482ba16` | DeepSeek V4 Flash / Item 3 implementer | Establish the source role and the scope of the change | Read the skill and `AGENTS.md`; confirmed the source landmarks, branch and base before acting | Source role verified; no consumer authority inferred |
 | `source-of-truth-reconciler` at `482ba16` | Same implementer | Reconcile the published page, the retained v1 walkthrough and the plan's claims | Compared the page's P2 comments with the retained wrapper and the copy harness; re-ran all three natively | The plan's dependency claim (copy harness cannot prove the branch) reproduced; no stale pass reused |
 | `plan-of-record-author` / `plan-audit-reviewer` (plan only) | Separate plan and audit agents | Bind the acceptance criteria used here | Read section 5 and the six observations; implemented against them | Implementation scope matches the accepted S3-1..S3-6 set |
+| `source-of-truth-reconciler` at `05be9615` (SKILL.md **8,663 B**, sha256 `b5fd9feda97235430259913aedd33447ab06e1c0ded281e9e131fa6bf9b78be2`) | DeepSeek V4 Flash — Stage D correction author | Reconcile the Stage D audit's claims with the published page, tests, harness and record | Read the audit; quoted each finding against the page/tests; reproduced F1/F3 before editing; applied F1-F9; re-extracted the blocks with a bounded extractor and re-ran the native probes and full suite | F1 closed without weakening any check; F2-F9 fixed or tested; remaining limits are the one-host UNRUNs and the missing independent review |
