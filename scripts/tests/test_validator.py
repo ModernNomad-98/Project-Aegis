@@ -7008,6 +7008,169 @@ def test_ds7cb_non_readme_failure_refuses():
         assert path.read_bytes() == tampered
         ok("T13: the README is unchanged when the pre-write suite fails")
 
+# --- consumer starter package: the two selectors (S1-1) ---------------------
+
+STARTER_DOC = REPO_ROOT / "docs" / "consumer-starter-package.md"
+STARTER_REQUIRED_PATHS = (
+    ".claude/skills/scoped-approval-register/SKILL.md",
+    ".claude/skills/scoped-approval-register/references/register-format.md",
+)
+
+_STARTER_TABLE_ROW = re.compile(r"^\| `([^`]+)` \| (\d+) \| (\d+) \|$", re.M)
+_STARTER_TOTAL_ROW = re.compile(
+    r"^\| \*\*Total: (\d+) files\*\* \| \*\*(\d+)\*\* \| \*\*(\d+)\*\* \|$", re.M
+)
+
+
+def parse_starter_selectors(text: str):
+    """Return (table_rows, array_rows, problems) for the starter package page.
+
+    The page selects the same file set twice: the section 2.3 table and the
+    executable $package array inside the section 7.1 harness. Both are
+    selectors, and the v1 defect was exactly the package claiming closure while
+    neither selector carried a required composed dependency, so the two are
+    parsed here and compared.
+    """
+    problems: list[str] = []
+    start = text.find("### 2.3")
+    end = text.find("\n## 3.", start)
+    if start < 0 or end < 0:
+        return [], [], ["sections 2.3 and 3 could not both be located"]
+    section = text[start:end]
+    table = [m.group(1) for m in _STARTER_TABLE_ROW.finditer(section)]
+    total = _STARTER_TOTAL_ROW.search(section)
+    if total is None:
+        problems.append("the section 2.3 total row is missing")
+    elif int(total.group(1)) != len(table):
+        problems.append(
+            "the section 2.3 total says %s files but the table lists %d"
+            % (total.group(1), len(table))
+        )
+
+    array_match = re.search(r"\$package = @\((.*?)\n\)", text, re.S)
+    if array_match is None:
+        return table, [], problems + ["the $package array is missing"]
+    array = re.findall(r"^  '([^']+)'$", array_match.group(1), re.M)
+
+    agg_rows = re.search(r"\$AggRows\s*=\s*(\d+)", text)
+    if agg_rows is None:
+        problems.append("the $AggRows constant is missing")
+    elif int(agg_rows.group(1)) != len(array):
+        problems.append(
+            "$AggRows is %s but the executable array lists %d rows"
+            % (agg_rows.group(1), len(array))
+        )
+    guard = re.search(r"\$package\.Count -ne (\d+)", text)
+    if guard is None:
+        problems.append("the $package row-count guard is missing")
+    elif int(guard.group(1)) != len(array):
+        problems.append(
+            "the $package row-count guard is %s but the array lists %d rows"
+            % (guard.group(1), len(array))
+        )
+
+    if table != array:
+        only_table = [p for p in table if p not in array]
+        only_array = [p for p in array if p not in table]
+        problems.append(
+            "the section 2.3 table and the executable array select different "
+            "rows: table-only %s, array-only %s" % (only_table, only_array)
+        )
+    return table, array, problems
+
+
+def check_starter_selection(table, array, required) -> list[str]:
+    """Return every S1-1 problem the two selectors have for this page."""
+    problems: list[str] = []
+    for path in required:
+        if path not in table:
+            problems.append("the section 2.3 table is missing required path " + path)
+        if path not in array:
+            problems.append("the executable array is missing required path " + path)
+    for path in list(table) + list(array):
+        if "evals" in Path(path).parts:
+            problems.append("evaluation content must not be installed: " + path)
+
+    skill_dirs = sorted(
+        {p.split("/")[2] for p in table if p.startswith(".claude/skills/")}
+    )
+    for skill in skill_dirs:
+        directory = REPO_ROOT / ".claude" / "skills" / skill
+        if not (directory / "SKILL.md").is_file():
+            problems.append("the selected skill directory has no SKILL.md: " + skill)
+            continue
+        references = directory / "references"
+        if not references.is_dir():
+            continue
+        for item in sorted(references.rglob("*")):
+            if item.is_file():
+                rel = item.relative_to(REPO_ROOT).as_posix()
+                if rel not in table:
+                    problems.append(
+                        skill
+                        + " carries "
+                        + rel
+                        + " under references/ but no selector lists it (the "
+                        "allow-list rule copies every reference)"
+                    )
+    return problems
+
+
+def _starter_without(text: str, needle: str, label: str) -> str:
+    """Return the page with the one selector row carrying `needle` removed."""
+    lines = text.splitlines(keepends=True)
+    kept = [line for line in lines if needle not in line]
+    assert len(kept) == len(lines) - 1, (
+        "the %s mutation removed %d lines, not 1: %s"
+        % (label, len(lines) - len(kept), needle)
+    )
+    return "".join(kept)
+
+
+def test_consumer_starter_selectors():
+    """S1-1: both starter selectors agree; a removed required row fails."""
+    assert STARTER_DOC.is_file(), "the starter package page is missing: %s" % STARTER_DOC
+    text = STARTER_DOC.read_text(encoding="utf-8")
+
+    table, array, problems = parse_starter_selectors(text)
+    if not table or not array:
+        raise AssertionError(
+            "S1-1: the starter page yielded no selection at all: "
+            + ("; ".join(problems) or "both selectors parsed empty")
+        )
+    problems += check_starter_selection(table, array, STARTER_REQUIRED_PATHS)
+    assert not problems, "S1-1: " + "; ".join(problems)
+    ok("S1-1: the table and the executable array select the same %d rows" % len(table))
+    ok("S1-1: both selectors carry the two scoped-approval-register paths")
+    skill_count = len(
+        {p.split("/")[2] for p in table if p.startswith(".claude/skills/")}
+    )
+    ok(
+        "S1-1: the selection closes over %d skill directories and every "
+        "references/ file each of them carries" % skill_count
+    )
+
+    for path in STARTER_REQUIRED_PATHS:
+        for label, needle in (
+            ("table", "| `" + path + "` |"),
+            ("array", "  '" + path + "'"),
+        ):
+            broken = _starter_without(text, needle, label + "-row")
+            btable, barray, bproblems = parse_starter_selectors(broken)
+            bproblems += check_starter_selection(btable, barray, STARTER_REQUIRED_PATHS)
+            assert bproblems, (
+                "S1-1: removing %s from the %s selector produced no failure"
+                % (path, label)
+            )
+            assert any(path in problem for problem in bproblems), (
+                "S1-1: removing %s from the %s selector failed without naming it: %s"
+                % (path, label, bproblems)
+            )
+            ok(
+                "S1-1: removing %s from the %s selector fails deliberately"
+                % (path, label)
+            )
+
 
 TESTS = [
     test_fix942_total_guard_regressions,
@@ -7116,6 +7279,7 @@ TESTS = [
     test_ds7cb_atomic_write_failure,
     test_ds7cb_prewrite_narrowness,
     test_ds7cb_non_readme_failure_refuses,
+    test_consumer_starter_selectors,
 ]
 
 
