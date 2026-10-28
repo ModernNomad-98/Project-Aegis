@@ -19,9 +19,11 @@ population adoption, skill quality or causal effectiveness.
   only the early starts and its denominator would grow later.
 - A workflow whose first receipt is later than `start_day + 7` is
   **retrospective** evidence and is excluded from the prospective rates.
-- An event first received after the close day is **late**. It is stored and
-  counted, but it cannot change the day-30 state: the rate uses events effective
-  by day 30 **and** received by the close day.
+- An event first received after the close day is **late**, whatever its
+  effective day. It is stored and counted, but it cannot change the day-30
+  state: the rate uses events effective by day 30 **and** received by the close
+  day. `late_entries` counts late higher-revision receipts; `late_events` counts
+  events whose first receipt was after the close day.
 - One value per event kind (and per stage, for stage events) per effective day
   is allowed. A same-day conflicting value is rejected for correction by both
   the recorder and the importer; it is never resolved by guessing which random
@@ -60,7 +62,7 @@ Every rate is reported as a numerator and a denominator. A zero denominator is
 | Metric | Numerator / denominator |
 | --- | --- |
 | 30-day delivery | D / N — delivery, not quality |
-| Stage reach | starts with that stage `complete` by day 30 / starts where the stage is applicable; not-applicable starts are reported separately, and unknown stays in the denominator |
+| Stage reach | starts whose latest stage event effective by day 30 has that stage `complete` / starts where the stage is applicable; not-applicable starts are reported separately, and unknown stays in the denominator |
 | Follow-up coverage | (D + A + F + O) / N — known status, not all local starts |
 | Unknown, ongoing, abandoned, failed share | U/N, O/N, A/N, F/N |
 | Assessed acceptance (self-report) | delivered with `self_reported_pass` / delivered with a self-reported assessment by day 30 |
@@ -122,9 +124,14 @@ anything could be called public:
 8. **Truncation** — a report computed from a capped store is never publishable;
    the view refuses with `report_truncated` instead of showing partial
    denominators.
+9. **Late cells** — `late_entries` and `late_events` are published only when
+   zero or at least 5; a nonzero count below the cell floor is withheld with
+   reason `sparse_late_cell`.
 
 A cohort marked `incomplete` is withheld from the publishable view with reason
-`retention_incomplete` before the other floors apply. These are disclosure
+`retention_incomplete` before the other floors apply; a month with no retained
+cohort but an observed expired record is listed in `suppressed_cohorts` with
+the same reason. These are disclosure
 controls, not anonymity guarantees. No public pilot metrics are authorised; the
 publishable view always states `public_release: false` and is a rehearsal only.
 SCIF completion is not acceptance evidence and never by itself qualifies a

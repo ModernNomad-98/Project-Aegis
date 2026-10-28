@@ -69,6 +69,11 @@ def load_store(path: Path) -> dict:
         _fail("store_unreadable", "central model store cannot be read: " + str(exc), str(path))
     if not isinstance(store, dict) or store.get("store_version") != STORE_VERSION:
         _fail("store_version", "central model store version is not supported", str(path))
+    for key in ("admissions", "admission_tombstones", "records", "expired_cohorts", "deletion_receipts"):
+        if not isinstance(store.get(key, {}), dict):
+            _fail("store_unreadable", "central model store has an unsupported shape", str(path))
+    if not isinstance(store.get("quarantine", []), list):
+        _fail("store_unreadable", "central model store has an unsupported shape", str(path))
     for key, value in new_store().items():
         store.setdefault(key, value)
     return store
@@ -125,6 +130,8 @@ def issue_admission(store: dict, notice: dict, *, issued_day: str) -> dict:
     the frozen-criteria flag and the random criteria contract reference. No
     identity is accepted or stored.
     """
+    if not isinstance(notice, dict):
+        _fail("notice_unreadable", "the start notice must be a JSON object", "notice")
     issued = day(issued_day)
     start = contract.parse_day(notice.get("start_day"), "start_day")
     if start > issued:
@@ -377,7 +384,13 @@ def withdraw(store: dict, *, admission_ref: str, capability: str, decision_day: 
     store["records"].pop(workflow_ref, None)
     store["quarantine"] = [entry for entry in store["quarantine"] if entry["workflow_ref"] != workflow_ref]
     store["admissions"].pop(admission_ref, None)
-    store.get("admission_tombstones", {}).pop(admission_ref, None)
+    # Withdrawal promises that no tombstone keeps the workflow or admission
+    # reference alive. Remove every same-workflow tombstone, not only the one
+    # named by this capability; expire() purges the rest with the last datum,
+    # but a stale older tombstone would otherwise survive until then.
+    tombstones = store.get("admission_tombstones", {})
+    for ref in [ref for ref, item in tombstones.items() if item.get("workflow_ref") == workflow_ref]:
+        del tombstones[ref]
     receipt_id = secrets.token_hex(16)
     store["deletion_receipts"][receipt_id] = {
         "deleted_day": decision_day,
@@ -473,11 +486,12 @@ def _classify(record: dict, close_day: str, cutoff: str) -> dict:
         if event["effective_day"] <= cutoff and event["first_receipt_day"] <= close_day
     ]
     usable.sort(key=lambda event: (event["effective_day"], event["event_ref"]))
-    late_events = [
-        event
-        for event in record["transitions"]
-        if event["first_receipt_day"] > close_day and event["effective_day"] <= cutoff
-    ]
+    # "Late" is defined by first receipt, not by the day the event was
+    # effective: an event effective on day 31 and received after close is
+    # still late (the metrics document says any event first received after
+    # the close day is late). It cannot change the day-30 state, but it is
+    # counted and disclosed as a late event.
+    late_events = [event for event in record["transitions"] if event["first_receipt_day"] > close_day]
     terminal = [event for event in usable if event["kind"] == "status"]
     if terminal:
         outcome = terminal[-1]["value"]
@@ -501,10 +515,15 @@ def _classify(record: dict, close_day: str, cutoff: str) -> dict:
         if stage not in record["enrollment"]["applicable_stages"]:
             stages[stage] = {"applicable": False, "complete": False}
             continue
-        complete = any(
-            event["kind"] == "stage" and event["stage"] == stage and event["value"] == "complete"
+        # The day-30 stage state is the latest stage event effective by the
+        # cutoff, exactly as local_report.derive_state reads it. A stage that
+        # was completed and later returned to in_progress is not reached.
+        stage_events = [
+            event
             for event in usable
-        )
+            if event["kind"] == "stage" and event["stage"] == stage
+        ]
+        complete = bool(stage_events) and stage_events[-1]["value"] == "complete"
         stages[stage] = {"applicable": True, "complete": complete}
     return {
         "outcome": outcome,
@@ -618,13 +637,7 @@ def compute_report(store: dict, *, as_of: str) -> dict:
             "failed_share": _rate(outcomes["failed"], n),
             "stage_reach": {
                 stage: {
-                    "numerator": cell["stages"][stage]["complete"],
-                    "denominator": cell["stages"][stage]["denominator"],
-                    "rate": (
-                        None
-                        if cell["stages"][stage]["denominator"] == 0
-                        else round(cell["stages"][stage]["complete"] / cell["stages"][stage]["denominator"], 4)
-                    ),
+                    **_rate(cell["stages"][stage]["complete"], cell["stages"][stage]["denominator"]),
                     "not_applicable": cell["stages"][stage]["not_applicable"],
                 }
                 for stage in contract.STAGES
@@ -680,18 +693,31 @@ def publishable_report(report: dict) -> dict:
             "",
         )
     open_months = report.get("open_cohorts") or {}
+    incomplete_months = report.get("incomplete_cohorts") or {}
     published: list = []
     last_counts = None
-    suppressed_cells: list = []
+    suppressed_cells: list = [
+        {"month": month, "reason": "retention_incomplete"}
+        for month in sorted(incomplete_months)
+        if month not in report["cohorts"]
+    ]
+
+    def floored_late(value: int) -> object:
+        # A nonzero late count below the cell floor can isolate one contributor
+        # in a cohort whose outcome cells otherwise pass the floors.
+        if 0 < value < CELL_FLOOR:
+            return {"status": "withheld", "reason": "sparse_late_cell"}
+        return value
+
     for month in sorted(report["cohorts"]):
         cell = report["cohorts"][month]
         n = cell["n"]
         outcomes = cell["outcomes"]
-        if month in open_months:
-            suppressed_cells.append({"month": month, "reason": "cohort_open"})
-            continue
         if cell.get("incomplete"):
             suppressed_cells.append({"month": month, "reason": "retention_incomplete"})
+            continue
+        if month in open_months:
+            suppressed_cells.append({"month": month, "reason": "cohort_open"})
             continue
         if n < OUTCOME_FLOOR:
             suppressed_cells.append({"month": month, "reason": "cohort_below_floor"})
@@ -718,8 +744,8 @@ def publishable_report(report: dict) -> dict:
                 else attested
             ),
             "stage_reach": {},
-            "late_entries": cell["late_entries"],
-            "late_events": cell["late_events"],
+            "late_entries": floored_late(cell["late_entries"]),
+            "late_events": floored_late(cell["late_events"]),
         }
         for stage, metric in cell["metrics"]["stage_reach"].items():
             denominator = metric["denominator"]
@@ -847,6 +873,11 @@ def main(argv: list | None = None) -> int:
         sys.stderr.write("ERROR " + exc.code + ": " + exc.message + (" [" + exc.path + "]" if exc.path else "") + "\n")
         return 2
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        sys.stderr.write("ERROR store_unreadable: " + str(exc) + "\n")
+        return 2
+    except (TypeError, KeyError, AttributeError) as exc:
+        # A structurally invalid nested store is still operator-readable input,
+        # not a reason for a traceback.
         sys.stderr.write("ERROR store_unreadable: " + str(exc) + "\n")
         return 2
     return 2

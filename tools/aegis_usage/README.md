@@ -7,7 +7,7 @@ Two stdlib-only Python 3.14 programs that implement the contract in
 | --- | --- |
 | [`local_report.py`](local_report.py) | Participant side: per-workflow opt-in, bounded transition history, exact preview, local-only export. |
 | [`aggregate.py`](aggregate.py) | Steward side: manual admissions, import with revision invariants, 90-day retention, deletion, cohort arithmetic and suppression. |
-| [`tests/`](tests) | 126 behavioral tests, including mutant demonstrations, over synthetic fixtures only. |
+| [`tests/`](tests) | 186 behavioral tests, including mutant demonstrations, over synthetic fixtures only. |
 
 **No network, no threads, no subprocesses, no third-party packages.** Capture is
 off until a workflow is explicitly opted in. There is no background upload and
@@ -40,8 +40,8 @@ Invoke-Expression "$py record --workflow-ref wf-c616... --kind stage --value com
 # 3. Send the minimized start notice; the steward issues an admission.
 #    Write JSON as UTF-8 without BOM: Windows PowerShell's default Set-Content
 #    encoding can add a BOM, which the strict UTF-8 reader refuses.
-[IO.File]::WriteAllText("$PWD\start-notice.json", (Invoke-Expression "$py notice --workflow-ref wf-c616..."), [Text.UTF8Encoding]::new($false))
-Invoke-Expression "$ag issue-admission --notice .\start-notice.json --day 2026-01-08"
+[IO.File]::WriteAllText("$env:TEMP\start-notice.json", (Invoke-Expression "$py notice --workflow-ref wf-c616..."), [Text.UTF8Encoding]::new($false))
+Invoke-Expression "$ag issue-admission --notice $env:TEMP\start-notice.json --day 2026-01-08"
 # {"admission_ref": "adm-57ec...", "capability": "51eb...", "enrollment_fingerprint": "9a5c..."}
 
 # 4. Attach it, export the start snapshot, and import it (accepted).
@@ -109,8 +109,8 @@ on stderr, including a corrupt or incompatible store (`store_unreadable`,
 `history_rewrite`, `applicability_conflict`, `evidence_required`,
 `duplicate_event_ref`, `conflicting_same_day_transition`,
 `store_path_in_repository`, `event_after_receipt`, `receipt_before_issue`,
-`receipt_day_regression`, `capability_unreadable`, `report_truncated` and
-`oversize`.
+`receipt_day_regression`, `capability_unreadable`, `notice_unreadable`,
+`workflow_exists`, `invalid_nesting`, `report_truncated` and `oversize`.
 
 One value per event kind (and per stage, for stage events) per effective day is
 allowed. A second same-day value is refused as `conflicting_same_day_transition`
@@ -145,7 +145,12 @@ status keeps its own same-day code, `conflicting_terminal_same_day`.
 - Reporting data must stay outside project version control; both the exporter
   and the store writers refuse a path under a Git working tree and under the
   tool's own source tree, so a source archive without `.git` also fails closed
-  for in-tree targets.
+  for in-tree targets. The check walks the target path and its existing
+  ancestors, so a target whose parent directory does not exist is still
+  refused inside another checkout.
+- Read commands (`show`, `notice`, `preview`, `report`) do not re-check the
+  path of an **existing** store, and `preview` cannot stop a shell redirect.
+  The guard is a write-side control: keep stores outside version control.
 
 ## Tests
 

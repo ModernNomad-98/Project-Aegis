@@ -20,7 +20,9 @@ import json
 import os
 import re
 import secrets
+import stat
 import sys
+import tempfile
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -240,8 +242,15 @@ def _tool_root() -> Path | None:
 
 
 def _inside_reporting_tree(resolved: Path, repo_root: Path | None = None) -> bool:
-    """True when a resolved path sits inside version control or the tool tree."""
-    root = repo_root or _repository_root(resolved.parent if resolved.parent.exists() else Path.cwd())
+    """True when a resolved path sits inside version control or the tool tree.
+
+    The repository root is looked up from the resolved target itself, walking
+    its lexical ancestors, not from the current directory. A missing target
+    parent must never move the check to the caller's working directory: that
+    would let a path such as '<other-checkout>/missing_dir/export.json' be
+    created inside another Git working tree.
+    """
+    root = repo_root if repo_root is not None else _repository_root(resolved)
     if root is not None and (resolved == root or root in resolved.parents):
         return True
     tool_root = _tool_root()
@@ -279,8 +288,11 @@ def _ensure_private_dir(path: Path) -> None:
 def _write_private_bytes(path: Path, data: bytes, *, exclusive: bool) -> None:
     """Create or replace one file readable only by its owner (POSIX 0600)."""
     flags = os.O_WRONLY | os.O_CREAT | (os.O_EXCL if exclusive else os.O_TRUNC)
+    flags |= getattr(os, "O_NOFOLLOW", 0)
     descriptor = os.open(path, flags, FILE_MODE)
     try:
+        if os.name == "posix":
+            os.fchmod(descriptor, FILE_MODE)
         with os.fdopen(descriptor, "wb") as stream:
             descriptor = -1
             stream.write(data)
@@ -294,15 +306,36 @@ def _write_private_bytes(path: Path, data: bytes, *, exclusive: bool) -> None:
 
 
 def write_private_store(path: Path, text: str) -> None:
-    """Atomically replace a store with a user-only file under private parents."""
+    """Atomically replace a store with a user-only file under private parents.
+
+    The temporary file is created with an unpredictable name and O_EXCL by
+    tempfile.mkstemp in the destination directory, so a pre-created
+    store.tmp symlink (for example in a shared writable directory) is never
+    followed. On Windows an existing read-only store is made writable
+    immediately before the atomic replace, because the read-only attribute
+    otherwise makes os.replace fail.
+    """
     path = Path(path)
     guard_store_path(path)
     _ensure_private_dir(path.parent)
-    temporary = path.with_name(path.name + ".tmp")
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=path.name + ".", suffix=".tmp", dir=str(path.parent)
+    )
+    temporary = Path(temporary_name)
     try:
-        _write_private_bytes(temporary, text.encode("utf-8"), exclusive=False)
+        with os.fdopen(descriptor, "wb") as stream:
+            descriptor = -1
+            if os.name == "posix":
+                os.fchmod(stream.fileno(), FILE_MODE)
+            stream.write(text.encode("utf-8"))
+            stream.flush()
+            os.fsync(stream.fileno())
+        if os.name == "nt" and path.exists():
+            os.chmod(path, stat.S_IWRITE)
         os.replace(temporary, path)
     finally:
+        if descriptor >= 0:
+            os.close(descriptor)
         if temporary.exists():
             temporary.unlink()
     if os.name == "posix":
@@ -314,16 +347,34 @@ def write_private_store(path: Path, text: str) -> None:
 # --------------------------------------------------------------------------
 
 
-def _forbidden_walk(node: object, path: str) -> None:
+MAX_NESTING_DEPTH = 64
+
+
+def _assert_nesting(node: object) -> None:
+    """Refuse a payload deeper than the contract bound without recursing."""
+    stack = [(node, 0)]
+    while stack:
+        current, depth = stack.pop()
+        if depth > MAX_NESTING_DEPTH:
+            _fail("invalid_nesting", "the payload nesting is too deep", "")
+        if isinstance(current, dict):
+            stack.extend((value, depth + 1) for value in current.values())
+        elif isinstance(current, list):
+            stack.extend((value, depth + 1) for value in current)
+
+
+def _forbidden_walk(node: object, path: str, depth: int = 0) -> None:
+    if depth > MAX_NESTING_DEPTH:
+        _fail("invalid_nesting", "the payload nesting is too deep", path)
     if isinstance(node, dict):
         for key, value in node.items():
             child = path + "." + str(key) if path else str(key)
             if str(key).lower() in FORBIDDEN_KEYS:
                 _fail("forbidden_field", "field is never part of the contract", child)
-            _forbidden_walk(value, child)
+            _forbidden_walk(value, child, depth + 1)
     elif isinstance(node, list):
         for index, item in enumerate(node):
-            _forbidden_walk(item, path + "[" + str(index) + "]")
+            _forbidden_walk(item, path + "[" + str(index) + "]", depth + 1)
 
 
 def _exact_keys(node: object, allowed: tuple, path: str) -> None:
@@ -331,7 +382,9 @@ def _exact_keys(node: object, allowed: tuple, path: str) -> None:
         _fail("invalid_type", "expected a JSON object", path)
     extra = sorted(set(node) - set(allowed))
     if extra:
-        _fail("unknown_field", "unknown field(s): " + ", ".join(extra), path)
+        # The key names are attacker-controlled input. Never echo them into
+        # logs or a stable error message; the path names only the parent.
+        _fail("unknown_field", "the object has field(s) outside the allowlist", path)
     missing = sorted(set(allowed) - set(node))
     if missing:
         _fail("missing_field", "missing field(s): " + ", ".join(missing), path)
@@ -519,6 +572,8 @@ def validate_envelope(payload: object) -> dict:
                 _fail("invalid_stage", "a stage event needs an allowlisted stage", path + ".stage")
             if stage not in stages:
                 _fail("stage_not_applicable", "a stage event names an inapplicable stage", path + ".stage")
+            if event["value"] == "not_applicable":
+                _fail("applicability_conflict", "an applicable stage cannot be not_applicable", path + ".value")
         elif stage is not None:
             _fail("unexpected_stage", "only a stage event carries a stage", path + ".stage")
         conflict_key = (kind, event["effective_day"], stage if kind == "stage" else None)
@@ -531,8 +586,13 @@ def validate_envelope(payload: object) -> dict:
             if status_events and status_events[0]["value"] != event["value"]:
                 _fail("conflicting_terminal", "only one terminal status is permitted", path)
             status_events.append(event)
-        if kind == "observation" and status_events:
-            _fail("observation_after_terminal", "a terminal outcome needs no further observation", path)
+    terminal_days = [parse_day(item["effective_day"], "effective_day") for item in status_events]
+    for index, event in enumerate(transitions):
+        if event["kind"] != "observation":
+            continue
+        observed = parse_day(event["effective_day"], "effective_day")
+        if any(observed > terminal for terminal in terminal_days):
+            _fail("observation_after_terminal", "a terminal outcome needs no further observation", "snapshot.transitions[" + str(index) + "]")
 
     expected = derive_state(transitions, stages, last)
     for field in ("status", "delivery_day", "acceptance", "acceptance_day"):
@@ -563,15 +623,19 @@ def loads_strict(raw: bytes) -> object:
         result: dict = {}
         for key, value in items:
             if key in seen:
-                _fail("duplicate_key", "a JSON object repeats a key: " + str(key), "")
+                _fail("duplicate_key", "a JSON object repeats a key", "")
             seen.add(key)
             result[key] = value
         return result
 
     try:
-        return json.loads(text, object_pairs_hook=pairs)
+        parsed = json.loads(text, object_pairs_hook=pairs)
     except json.JSONDecodeError as exc:
         _fail("malformed_json", "payload is not valid JSON: " + exc.msg, "")
+    except RecursionError:
+        _fail("invalid_nesting", "the payload nesting is too deep", "")
+    _assert_nesting(parsed)
+    return parsed
 
 
 # --------------------------------------------------------------------------
@@ -592,6 +656,8 @@ def load_store(path: Path) -> dict:
         _fail("store_unreadable", "local store cannot be read: " + str(exc), str(path))
     if not isinstance(store, dict) or store.get("store_version") != STORE_VERSION:
         _fail("store_version", "local store version is not supported", str(path))
+    if not isinstance(store.get("opt_ins", {}), dict) or not isinstance(store.get("workflows", {}), dict):
+        _fail("store_unreadable", "local store has an unsupported shape", str(path))
     store.setdefault("opt_ins", {})
     store.setdefault("workflows", {})
     return store
@@ -613,6 +679,8 @@ def enable_capture(
     admission_ref: str | None = None,
 ) -> dict:
     """Explicit per-workflow opt-in. Nothing is captured before this call."""
+    if not isinstance(criteria_frozen_before_work, bool):
+        _fail("invalid_type", "criteria_frozen_before_work must be boolean", "criteria_frozen_before_work")
     start = parse_day(start_day, "start_day")
     captured = parse_day(day, "day")
     if start > captured or start < captured - timedelta(days=7):
@@ -627,6 +695,8 @@ def enable_capture(
     stages = [stage for stage in STAGES if stage in requested]
     ref = workflow_ref or random_ref("wf-")
     parse_ref(ref, "workflow_ref", "wf-")
+    if ref in store.get("workflows", {}):
+        _fail("workflow_exists", "this workflow already has local enrollment; delete-local before re-enrolling", "workflow_ref")
     contract_ref = criteria_contract_ref or random_ref("crit-")
     parse_ref(contract_ref, "criteria_contract_ref", "crit-")
     if admission_ref is not None:
@@ -637,7 +707,7 @@ def enable_capture(
         "captured_day": day_str(captured),
         "start_day": day_str(start),
         "applicable_stages": stages,
-        "criteria_frozen_before_work": bool(criteria_frozen_before_work),
+        "criteria_frozen_before_work": criteria_frozen_before_work,
         "criteria_contract_ref": contract_ref,
         "acceptance_evidence": "none",
         "revision": 0,
@@ -671,7 +741,7 @@ def read_workflow(store: dict, workflow_ref: str) -> dict:
 
 
 def disable_capture(store: dict, workflow_ref: str) -> dict:
-    """Stop capture and drop the unsent export queue for this workflow."""
+    """Stop capture for this workflow; retained history stays readable."""
     parse_ref(workflow_ref, "workflow_ref", "wf-")
     opt_in = store.get("opt_ins", {}).get(workflow_ref)
     if not opt_in:
@@ -773,8 +843,20 @@ def record_transition(
     if kind == "status" and terminal:
         if (terminal[-1]["value"], terminal[-1]["effective_day"]) != (value, effective_day):
             _fail("conflicting_terminal", "a terminal outcome is already recorded", "value")
-    if kind == "observation" and terminal:
-        _fail("observation_after_terminal", "a terminal outcome needs no further observation", "kind")
+    if kind == "observation":
+        # Chronology is decided by effective day, not by recording order: an
+        # observation may be backfilled before a terminal already recorded.
+        for other in terminal:
+            if effective > parse_day(other["effective_day"], "effective_day"):
+                _fail("observation_after_terminal", "a terminal outcome needs no further observation", "effective_day")
+    if kind == "status":
+        for other in workflow["transitions"]:
+            if other["kind"] == "observation" and parse_day(other["effective_day"], "effective_day") > effective:
+                _fail(
+                    "observation_after_terminal",
+                    "a terminal outcome cannot precede a recorded observation",
+                    "effective_day",
+                )
 
     event = {
         "event_ref": event_ref or random_ref("evt-"),
@@ -983,7 +1065,14 @@ def main(argv: list | None = None) -> int:
         if args.command == "attach-admission":
             workflow = require_enabled(store, args.workflow_ref)
             parse_ref(args.admission_ref, "admission_ref", "adm-")
-            workflow["admission_ref"] = args.admission_ref
+            if workflow.get("admission_ref") != args.admission_ref:
+                # The admission reference is part of the exported envelope but
+                # not of the snapshot. Rotate the revision and export handle so
+                # the importer never sees two different payloads at one
+                # revision (which it would quarantine as conflicting).
+                workflow["admission_ref"] = args.admission_ref
+                workflow["revision"] += 1
+                workflow["export_ref"] = random_ref("exp-")
             save_store(store_path, store)
             print(json.dumps({"workflow_ref": workflow["workflow_ref"], "admission_attached": True}, sort_keys=True))
             return 0
@@ -1077,6 +1166,11 @@ def main(argv: list | None = None) -> int:
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         # A corrupt store or an unreadable input is a stable refusal, never a
         # traceback: these are the failures that used to escape the handler.
+        sys.stderr.write("ERROR store_unreadable: " + str(exc) + "\n")
+        return 2
+    except (TypeError, KeyError, AttributeError) as exc:
+        # A structurally invalid nested store is still operator-readable input,
+        # not a reason for a traceback.
         sys.stderr.write("ERROR store_unreadable: " + str(exc) + "\n")
         return 2
     return 2

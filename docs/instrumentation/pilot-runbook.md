@@ -28,9 +28,10 @@
    user-only access. The tool enforces this where the platform allows it:
    stores, exports and the directories it creates are `0600`/`0700` on POSIX
    whatever the umask, and a path inside a Git working tree or the tool source
-   tree is refused. On Windows the tool cannot set POSIX bits, so the store
-   must sit in a directory whose ACL is user-only (a profile or `%TEMP%`
-   directory, not a shared folder).
+   tree is refused. On Windows the tool cannot set POSIX bits: it clears the
+   read-only flag before replacing an existing store, but the store must still
+   sit in a directory whose ACL is user-only (a profile or `%TEMP%` directory,
+   not a shared folder).
 
 ## Start (day 0–7)
 
