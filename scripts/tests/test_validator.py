@@ -4714,7 +4714,12 @@ def test_readiness_memory_canonical_tristate():
         empty=run(b,b,""); assert empty.returncode==2 and "UNVERIFIED" in empty.stdout
         memrules=(REPO_ROOT/".claude/skills/agent-memory-governance/references/memory-rules.md").read_text(encoding="utf-8")
         assert "Legacy boolean shortcut - forbidden" in memrules
-        ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut forbidden")
+        trust=memrules.split("## TRUST rules",1)[1].split("## HYGIENE",1)[0]
+        assert not re.search(r"if git merge-base --is-ancestor[^;]+; then echo yes; else echo no; fi", trust), "the operative TRUST row must not collapse a Git error to no with shell exit 0"
+        assert "canonical" in trust.lower() and "UNVERIFIED" in trust, "the operative TRUST row must route to the canonical wrapper and its UNVERIFIED disposition"
+        assert "ancestry_status=ancestor_or_equal" in trust and "content_match_status=same" in trust and "oid_match_status=same" in trust, "the operative TRUST row must state the completion-content gate"
+        assert all(word in trust for word in ("ANCHOR_SHA","REVERT_SHA","RE_REVERT_SHA","migration","mergeCommit")), "the operative TRUST row must keep the completion-anchor proofs"
+        ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut forbidden; operative TRUST row routes through it")
 
 
 
