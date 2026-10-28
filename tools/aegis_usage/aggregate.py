@@ -50,8 +50,10 @@ def new_store() -> dict:
     return {
         "store_version": STORE_VERSION,
         "admissions": {},
+        "admission_tombstones": {},
         "records": {},
         "quarantine": [],
+        "expired_cohorts": {},
         "deletion_receipts": {},
         "withdrawals": 0,
         "ignored": 0,
@@ -73,10 +75,7 @@ def load_store(path: Path) -> dict:
 
 
 def save_store(path: Path, store: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(json.dumps(store, indent=2, sort_keys=True, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")
-    temporary.replace(path)
+    contract.write_private_store(path, json.dumps(store, indent=2, sort_keys=True, ensure_ascii=True) + "\n")
 
 
 def day(value: str) -> date:
@@ -138,7 +137,11 @@ def issue_admission(store: dict, notice: dict, *, issued_day: str) -> dict:
     for existing in store["admissions"].values():
         if existing["workflow_ref"] == workflow_ref:
             _fail("admission_exists", "an active admission already covers this workflow", "workflow_ref")
-    stages = notice.get("applicable_stages") or list(contract.STAGES)
+    stages = notice.get("applicable_stages")
+    if stages is None:
+        stages = list(contract.STAGES)
+    if not isinstance(stages, list) or not stages:
+        _fail("invalid_stages", "applicable_stages needs at least one stage", "applicable_stages")
     if any(stage not in contract.STAGES for stage in stages) or [s for s in contract.STAGES if s in stages] != list(stages):
         _fail("invalid_stages", "applicable_stages must be an ordered subset of the five stages", "applicable_stages")
     frozen = notice.get("criteria_frozen_before_work")
@@ -173,6 +176,27 @@ def issue_admission(store: dict, notice: dict, *, issued_day: str) -> dict:
     return {"admission_ref": admission_ref, "capability": capability, "enrollment_fingerprint": fingerprint}
 
 
+def _verify_capability(store: dict, admission_ref: str, capability: str) -> dict:
+    """Authenticate a capability without deciding whether import is allowed.
+
+    An expired admission keeps a verification-only tombstone for as long as
+    linked raw or quarantined data is retained, so withdrawal does not depend
+    on import eligibility.
+    """
+    if not isinstance(admission_ref, str):
+        _fail("unknown_admission", "no active admission for this reference", "admission_ref")
+    record = store["admissions"].get(admission_ref)
+    if record is None:
+        record = store.get("admission_tombstones", {}).get(admission_ref)
+    if record is None:
+        _fail("unknown_admission", "no active admission for this reference", "admission_ref")
+    if not isinstance(capability, str) or not secrets.compare_digest(
+        admission_verifier(admission_ref, capability), record["verifier"]
+    ):
+        _fail("bad_capability", "the admission capability does not verify", "capability")
+    return record
+
+
 def _require_admission(store: dict, admission_ref: str, capability: str, receipt_day: str) -> dict:
     if not isinstance(admission_ref, str) or admission_ref not in store["admissions"]:
         _fail("unknown_admission", "no active admission for this reference", "admission_ref")
@@ -205,6 +229,16 @@ def import_export(store: dict, payload: object, *, capability: str, receipt_day:
     admission = _require_admission(store, admission_ref, capability, receipt_day)
     if admission["workflow_ref"] != snapshot["workflow_ref"]:
         _fail("admission_mismatch", "the admission names a different workflow", "workflow_ref")
+    today = day(receipt_day)
+    if today < day(admission["issued_day"]):
+        _fail("receipt_before_issue", "an export cannot be received before its admission was issued", "day")
+    for event in snapshot["transitions"]:
+        if day(event["effective_day"]) > today:
+            _fail(
+                "event_after_receipt",
+                "an event cannot be effective after the day its export was received",
+                "snapshot.transitions",
+            )
     fingerprint = enrollment_fingerprint(envelope)
     if fingerprint != admission["enrollment_fingerprint"]:
         return _quarantine(
@@ -215,8 +249,9 @@ def import_export(store: dict, payload: object, *, capability: str, receipt_day:
             "the immutable enrollment fields differ from the acknowledged enrollment",
         )
 
-    today = day(receipt_day)
     record = store["records"].get(snapshot["workflow_ref"])
+    if record is not None and today < day(record["last_receipt_day"]):
+        _fail("receipt_day_regression", "a received export cannot predate the record's last receipt", "day")
     if record is None:
         if today > day(snapshot["start_day"]) + timedelta(days=PENDING_ADMISSION_DAYS):
             prospective = False
@@ -336,12 +371,13 @@ def withdraw(store: dict, *, admission_ref: str, capability: str, decision_day: 
     The deletion receipt is a random, unlinkable id with its own seven-day
     expiry; no tombstone keeps the workflow or admission reference alive.
     """
-    admission = _require_admission(store, admission_ref, capability, decision_day)
-    workflow_ref = admission["workflow_ref"]
+    identity = _verify_capability(store, admission_ref, capability)
+    workflow_ref = identity["workflow_ref"]
     removed = 1 if workflow_ref in store["records"] else 0
     store["records"].pop(workflow_ref, None)
     store["quarantine"] = [entry for entry in store["quarantine"] if entry["workflow_ref"] != workflow_ref]
-    del store["admissions"][admission_ref]
+    store["admissions"].pop(admission_ref, None)
+    store.get("admission_tombstones", {}).pop(admission_ref, None)
     receipt_id = secrets.token_hex(16)
     store["deletion_receipts"][receipt_id] = {
         "deleted_day": decision_day,
@@ -352,21 +388,40 @@ def withdraw(store: dict, *, admission_ref: str, capability: str, decision_day: 
 
 
 def expire(store: dict, *, today: str) -> dict:
-    """Apply 90-day central retention, quarantine and receipt expiry."""
+    """Apply 90-day central retention, quarantine and receipt expiry.
+
+    An expired admission leaves a capability-verification tombstone while any
+    linked raw record or quarantine payload survives, so the participant can
+    still withdraw; the tombstone is deleted with the last linked datum.
+    """
     now = day(today)
     removed_admissions = 0
+    removed_tombstones = 0
     for admission_ref, admission in list(store["admissions"].items()):
         expiry = admission["expires_at"]
         if expiry is not None:
             if now > day(expiry):
+                store.setdefault("admission_tombstones", {})[admission_ref] = {
+                    "workflow_ref": admission["workflow_ref"],
+                    "verifier": admission["verifier"],
+                    "expired_day": expiry,
+                }
                 del store["admissions"][admission_ref]
                 removed_admissions += 1
         elif now > day(admission["issued_day"]) + timedelta(days=PENDING_ADMISSION_DAYS):
+            store.setdefault("admission_tombstones", {})[admission_ref] = {
+                "workflow_ref": admission["workflow_ref"],
+                "verifier": admission["verifier"],
+                "expired_day": add_days(admission["issued_day"], PENDING_ADMISSION_DAYS),
+            }
             del store["admissions"][admission_ref]
             removed_admissions += 1
     removed_records = 0
     for workflow_ref, record in list(store["records"].items()):
         if now > day(record["expires_at"]):
+            month = record["enrollment"]["start_day"][:7]
+            cohorts = store.setdefault("expired_cohorts", {})
+            cohorts[month] = int(cohorts.get(month, 0)) + 1
             del store["records"][workflow_ref]
             removed_records += 1
     kept_quarantine = []
@@ -380,8 +435,14 @@ def expire(store: dict, *, today: str) -> dict:
         if now > day(receipt["expires_at"]):
             del store["deletion_receipts"][receipt_id]
             removed_receipts += 1
+    linked = set(store["records"]) | {entry["workflow_ref"] for entry in store["quarantine"]}
+    for admission_ref, tombstone in list(store.get("admission_tombstones", {}).items()):
+        if tombstone["workflow_ref"] not in linked:
+            del store["admission_tombstones"][admission_ref]
+            removed_tombstones += 1
     return {
         "admissions": removed_admissions,
+        "tombstones": removed_tombstones,
         "records": removed_records,
         "quarantine": removed_quarantine,
         "receipts": removed_receipts,
@@ -430,9 +491,11 @@ def _classify(record: dict, close_day: str, cutoff: str) -> dict:
     acceptance_events = [event for event in usable if event["kind"] == "acceptance"]
     acceptance = acceptance_events[-1]["value"] if acceptance_events else "not_assessed"
     acceptance_day = acceptance_events[-1]["effective_day"] if acceptance_events else None
-    frozen_valid = bool(record["enrollment"]["criteria_frozen_before_work"]) and not any(
+    frozen_claimed = bool(record["enrollment"]["criteria_frozen_before_work"])
+    scope_changed = any(
         event["kind"] == "scope_change" and event["effective_day"] <= cutoff for event in usable
     )
+    frozen_valid = frozen_claimed and not scope_changed
     stages = {}
     for stage in contract.STAGES:
         if stage not in record["enrollment"]["applicable_stages"]:
@@ -449,6 +512,8 @@ def _classify(record: dict, close_day: str, cutoff: str) -> dict:
         "acceptance": acceptance,
         "acceptance_day": acceptance_day,
         "frozen_valid": frozen_valid,
+        "frozen_claimed": frozen_claimed,
+        "scope_changed": scope_changed,
         "stages": stages,
         "late_events": len(late_events),
     }
@@ -462,6 +527,9 @@ def compute_report(store: dict, *, as_of: str) -> dict:
     incomplete_months: dict[str, int] = {}
     retrospective = 0
     expired_excluded = 0
+    for month, count in (store.get("expired_cohorts") or {}).items():
+        incomplete_months[month] = incomplete_months.get(month, 0) + int(count)
+        expired_excluded += int(count)
     records = sorted(store["records"].values(), key=lambda record: record["workflow_ref"])
     truncated = False
     if len(records) > MAX_AGGREGATE_RECORDS:
@@ -504,7 +572,7 @@ def compute_report(store: dict, *, as_of: str) -> dict:
             cell["closed_on"] = close_day
         cell["n"] += 1
         cell["outcomes"][state["outcome"]] += 1
-        if not state["frozen_valid"]:
+        if state["frozen_claimed"] and state["scope_changed"]:
             cell["frozen_invalidated"] += 1
         cell["late_entries"] += int(record.get("late_entries", 0))
         cell["late_events"] += state["late_events"]
@@ -603,6 +671,15 @@ def compute_report(store: dict, *, as_of: str) -> dict:
 
 def publishable_report(report: dict) -> dict:
     """Apply sparse, complementary and differencing suppression to a report."""
+    if report.get("truncated"):
+        # A capped store yields partial denominators; refuse the rehearsal view
+        # rather than publishing a cohort computed from part of the record set.
+        _fail(
+            "report_truncated",
+            "the retained store exceeded the aggregate record cap; a partial cohort is never publishable",
+            "",
+        )
+    open_months = report.get("open_cohorts") or {}
     published: list = []
     last_counts = None
     suppressed_cells: list = []
@@ -610,6 +687,9 @@ def publishable_report(report: dict) -> dict:
         cell = report["cohorts"][month]
         n = cell["n"]
         outcomes = cell["outcomes"]
+        if month in open_months:
+            suppressed_cells.append({"month": month, "reason": "cohort_open"})
+            continue
         if cell.get("incomplete"):
             suppressed_cells.append({"month": month, "reason": "retention_incomplete"})
             continue
@@ -624,6 +704,7 @@ def publishable_report(report: dict) -> dict:
         if last_counts is not None and any(abs(left - right) in (1, 2, 3, 4) for left, right in zip(last_counts, counts)):
             suppressed_cells.append({"month": month, "reason": "differencing_withheld"})
             continue
+        attested = cell["metrics"]["independently_attested_success"]
         entry = {
             "month": month,
             "closed_on": cell["closed_on"],
@@ -631,7 +712,11 @@ def publishable_report(report: dict) -> dict:
             "outcomes": {name: outcomes[name] for name in ("delivered", "failed", "abandoned", "ongoing", "unknown")},
             "delivery_30d": cell["metrics"]["delivery_30d"],
             "follow_up_coverage": cell["metrics"]["follow_up_coverage"],
-            "independently_attested_success": cell["metrics"]["independently_attested_success"],
+            "independently_attested_success": (
+                {"status": "withheld", "reason": "sparse_attestation_cell"}
+                if 0 < attested["numerator"] < CELL_FLOOR
+                else attested
+            ),
             "stage_reach": {},
             "late_entries": cell["late_entries"],
             "late_events": cell["late_events"],
@@ -682,12 +767,14 @@ def _parser() -> argparse.ArgumentParser:
 
     import_cmd = sub.add_parser("import", help="import one previewed export")
     import_cmd.add_argument("--payload", required=True)
-    import_cmd.add_argument("--capability", required=True)
+    import_cmd.add_argument("--capability")
+    import_cmd.add_argument("--capability-file", help="file holding the capability secret (preferred)")
     import_cmd.add_argument("--day", required=True)
 
     withdraw_cmd = sub.add_parser("withdraw", help="delete a workflow's linked reporting data")
     withdraw_cmd.add_argument("--admission-ref", required=True)
-    withdraw_cmd.add_argument("--capability", required=True)
+    withdraw_cmd.add_argument("--capability")
+    withdraw_cmd.add_argument("--capability-file", help="file holding the capability secret (preferred)")
     withdraw_cmd.add_argument("--day", required=True)
 
     expire_cmd = sub.add_parser("expire", help="apply central retention and receipt expiry")
@@ -699,25 +786,50 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _capability(args) -> str:
+    """Read the capability secret, preferring a file over argv."""
+    chosen = int(bool(args.capability)) + int(bool(args.capability_file))
+    if chosen != 1:
+        _fail("invalid_arguments", "supply exactly one of --capability or --capability-file", "capability")
+    if args.capability_file:
+        try:
+            value = Path(args.capability_file).read_text(encoding="utf-8").strip()
+        except OSError as exc:
+            _fail("capability_unreadable", "the capability file cannot be read: " + str(exc), args.capability_file)
+        if not value:
+            _fail("capability_unreadable", "the capability file is empty", args.capability_file)
+        return value
+    sys.stderr.write(
+        "WARNING capability_in_argv: a secret in argv is visible to other local processes and shell history; prefer --capability-file\n"
+    )
+    return args.capability
+
+
 def main(argv: list | None = None) -> int:
     args = _parser().parse_args(argv)
     store_path = Path(args.store)
-    store = load_store(store_path)
     try:
+        store = load_store(store_path)
         if args.command == "issue-admission":
-            notice = json.loads(Path(args.notice).read_text(encoding="utf-8"))
+            try:
+                notice = json.loads(Path(args.notice).read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+                _fail("notice_unreadable", "the start notice cannot be read: " + str(exc), str(args.notice))
             result = issue_admission(store, notice, issued_day=args.day)
             save_store(store_path, store)
             print(json.dumps(result, sort_keys=True))
             return 0
         if args.command == "import":
-            raw = Path(args.payload).read_bytes()
-            result = import_export(store, raw, capability=args.capability, receipt_day=args.day)
+            try:
+                raw = Path(args.payload).read_bytes()
+            except OSError as exc:
+                _fail("payload_unreadable", "the payload cannot be read: " + str(exc), str(args.payload))
+            result = import_export(store, raw, capability=_capability(args), receipt_day=args.day)
             save_store(store_path, store)
             print(json.dumps(result, sort_keys=True))
             return 0
         if args.command == "withdraw":
-            result = withdraw(store, admission_ref=args.admission_ref, capability=args.capability, decision_day=args.day)
+            result = withdraw(store, admission_ref=args.admission_ref, capability=_capability(args), decision_day=args.day)
             save_store(store_path, store)
             print(json.dumps(result, sort_keys=True))
             return 0
@@ -733,6 +845,9 @@ def main(argv: list | None = None) -> int:
             return 0
     except contract.ContractError as exc:
         sys.stderr.write("ERROR " + exc.code + ": " + exc.message + (" [" + exc.path + "]" if exc.path else "") + "\n")
+        return 2
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        sys.stderr.write("ERROR store_unreadable: " + str(exc) + "\n")
         return 2
     return 2
 

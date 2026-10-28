@@ -25,7 +25,12 @@
    purpose, fields, recipient, retention, optional skill plane, withdrawal,
    deletion limits, missing-data limits and no public metrics.
 4. Set the participant's local store outside project version control with
-   user-only access.
+   user-only access. The tool enforces this where the platform allows it:
+   stores, exports and the directories it creates are `0600`/`0700` on POSIX
+   whatever the umask, and a path inside a Git working tree or the tool source
+   tree is refused. On Windows the tool cannot set POSIX bits, so the store
+   must sit in a directory whose ACL is user-only (a profile or `%TEMP%`
+   directory, not a shared folder).
 
 ## Start (day 0–7)
 
@@ -70,13 +75,21 @@
    --confirm`). This is explicit, local only and irreversible; the store file
    remains if other workflows still use it.
 2. For imported data, the participant requests withdrawal through the approved
-   channel with the admission capability.
-3. The steward runs `withdraw`; the admission, raw snapshots and deletion
-   verifier are removed immediately.
+   channel with the admission capability. Withdrawal does not depend on import
+   eligibility: it works after the seven-day pending admission expires and
+   after the 90-day record expiry, for as long as any linked raw or quarantined
+   payload is retained. The importer keeps only a capability-verification
+   tombstone (random admission reference, verifier hash, random workflow
+   reference) while that data exists, and deletes the tombstone with the last
+   linked datum.
+3. The steward runs `withdraw`; the admission or its tombstone, raw snapshots
+   and quarantine copies are removed immediately, and the deletion receipt is
+   issued.
 4. The steward gives the participant the random, unlinkable receipt identifier.
    The receipt expires after seven days.
 5. Recompute the retained cohort. The report shows the withdrawal count and the
-   bias note; no linkable tombstone is kept.
+   bias note; no linkable workflow or admission record is kept after
+   withdrawal.
 
 ## Stop conditions
 
@@ -107,6 +120,8 @@ quarantined, and the owner records a new approval.
 | Local raw store | 60 days from capture | `local_report.py purge-expired`; a participant may delete earlier with `delete-local --confirm` |
 | Central raw record | 90 days from first receipt | `aggregate.py expire` |
 | Quarantine payload | 90 days | `aggregate.py expire` |
+| Expired-record month counters | retained with the store; no workflow or admission reference | non-linkable count per start month, so a month whose data retention deleted is never republished as complete |
+| Expired admission tombstone | while linked raw or quarantine data survives | `aggregate.py expire` deletes it with the last linked datum |
 | Deletion receipt | 7 days | `aggregate.py expire` |
 | Approved irreversible aggregate | 365 days | not implemented; no publication authorised |
 

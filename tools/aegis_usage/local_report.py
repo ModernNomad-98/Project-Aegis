@@ -215,6 +215,100 @@ def bytes_sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+FILE_MODE = 0o600
+DIR_MODE = 0o700
+
+
+def _repository_root(path: Path) -> Path | None:
+    """Nearest ancestor with a .git entry, or None outside a working tree.
+
+    A source archive has no .git; callers therefore also refuse a target
+    inside the tool's own source tree, so an archive copy fails closed for
+    in-tree targets instead of silently writing there.
+    """
+    for candidate in [path] + list(path.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    return None
+
+
+def _tool_root() -> Path | None:
+    resolved = Path(__file__).resolve()
+    if resolved.parent.name == "aegis_usage":
+        return resolved.parents[2]
+    return None
+
+
+def _inside_reporting_tree(resolved: Path, repo_root: Path | None = None) -> bool:
+    """True when a resolved path sits inside version control or the tool tree."""
+    root = repo_root or _repository_root(resolved.parent if resolved.parent.exists() else Path.cwd())
+    if root is not None and (resolved == root or root in resolved.parents):
+        return True
+    tool_root = _tool_root()
+    return tool_root is not None and (resolved == tool_root or tool_root in resolved.parents)
+
+
+def guard_store_path(path: Path) -> None:
+    """Refuse a reporting store inside project version control."""
+    if _inside_reporting_tree(Path(path).resolve()):
+        _fail("store_path_in_repository", "reporting data must stay outside project version control", str(path))
+
+
+def _ensure_private_dir(path: Path) -> None:
+    """Create missing directories with user-only access, whatever the umask.
+
+    Only directories this call creates are re-moded; an existing parent (a
+    home directory or a system temp directory) is left as its owner set it.
+    """
+    missing: list[Path] = []
+    current = path
+    while not current.exists():
+        missing.append(current)
+        if current.parent == current:
+            break
+        current = current.parent
+    for directory in reversed(missing):
+        try:
+            directory.mkdir(mode=DIR_MODE)
+        except FileExistsError:
+            continue
+        if os.name == "posix":
+            os.chmod(directory, DIR_MODE)
+
+
+def _write_private_bytes(path: Path, data: bytes, *, exclusive: bool) -> None:
+    """Create or replace one file readable only by its owner (POSIX 0600)."""
+    flags = os.O_WRONLY | os.O_CREAT | (os.O_EXCL if exclusive else os.O_TRUNC)
+    descriptor = os.open(path, flags, FILE_MODE)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            descriptor = -1
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+    finally:
+        if descriptor >= 0:
+            os.close(descriptor)
+    if os.name == "posix":
+        os.chmod(path, FILE_MODE)
+
+
+def write_private_store(path: Path, text: str) -> None:
+    """Atomically replace a store with a user-only file under private parents."""
+    path = Path(path)
+    guard_store_path(path)
+    _ensure_private_dir(path.parent)
+    temporary = path.with_name(path.name + ".tmp")
+    try:
+        _write_private_bytes(temporary, text.encode("utf-8"), exclusive=False)
+        os.replace(temporary, path)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+    if os.name == "posix":
+        os.chmod(path, FILE_MODE)
+
+
 # --------------------------------------------------------------------------
 # Contract validation
 # --------------------------------------------------------------------------
@@ -257,6 +351,23 @@ def _unique_event_refs(transitions: list, path: str) -> None:
         seen.add(ref)
 
 
+def _acceptance_events(transitions: list, as_of_day: date) -> list:
+    """Acceptance transitions effective by the day, in deterministic order."""
+    relevant = [
+        event
+        for event in transitions
+        if event["kind"] == "acceptance" and parse_day(event["effective_day"], "effective_day") <= as_of_day
+    ]
+    relevant.sort(key=lambda event: (event["effective_day"], event["event_ref"]))
+    return relevant
+
+
+def winning_acceptance(transitions: list, as_of_day: date) -> dict | None:
+    """The acceptance transition whose value and evidence the export carries."""
+    events = _acceptance_events(transitions, as_of_day)
+    return events[-1] if events else None
+
+
 def derive_state(transitions: list, applicable_stages: list, as_of_day: date) -> dict:
     """Reconstruct the snapshot state at as_of_day from event history.
 
@@ -277,7 +388,7 @@ def derive_state(transitions: list, applicable_stages: list, as_of_day: date) ->
         status = observations[-1]["value"] if observations else "unknown"
         delivery_day = None
 
-    acceptance_events = [event for event in relevant if event["kind"] == "acceptance"]
+    acceptance_events = _acceptance_events(transitions, as_of_day)
     if acceptance_events:
         acceptance = acceptance_events[-1]["value"]
         acceptance_day = acceptance_events[-1]["effective_day"]
@@ -487,10 +598,7 @@ def load_store(path: Path) -> dict:
 
 
 def save_store(path: Path, store: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(json.dumps(store, indent=2, sort_keys=True, ensure_ascii=True) + "\n", encoding="utf-8", newline="\n")
-    os.replace(temporary, path)
+    write_private_store(path, json.dumps(store, indent=2, sort_keys=True, ensure_ascii=True) + "\n")
 
 
 def enable_capture(
@@ -509,7 +617,9 @@ def enable_capture(
     captured = parse_day(day, "day")
     if start > captured or start < captured - timedelta(days=7):
         _fail("start_outside_window", "a start must be acknowledged within seven days", "start_day")
-    requested = list(applicable_stages) if applicable_stages else list(STAGES)
+    requested = list(STAGES) if applicable_stages is None else list(applicable_stages)
+    if not requested:
+        _fail("invalid_stages", "applicable_stages needs at least one stage", "applicable_stages")
     if any(stage not in STAGES for stage in requested):
         _fail("invalid_stages", "applicable_stages contains a non-stage", "applicable_stages")
     if [stage for stage in STAGES if stage in requested] != list(requested):
@@ -545,6 +655,15 @@ def require_enabled(store: dict, workflow_ref: str) -> dict:
     opt_in = store.get("opt_ins", {}).get(workflow_ref)
     if not opt_in or not opt_in.get("enabled"):
         _fail("capture_disabled", "capture is off for this workflow; opt in first", workflow_ref)
+    workflow = store.get("workflows", {}).get(workflow_ref)
+    if not workflow:
+        _fail("unknown_workflow", "no local enrollment for this workflow", workflow_ref)
+    return workflow
+
+
+def read_workflow(store: dict, workflow_ref: str) -> dict:
+    """Read a retained workflow without requiring capture to be enabled."""
+    parse_ref(workflow_ref, "workflow_ref", "wf-")
     workflow = store.get("workflows", {}).get(workflow_ref)
     if not workflow:
         _fail("unknown_workflow", "no local enrollment for this workflow", workflow_ref)
@@ -637,6 +756,10 @@ def record_transition(
         _fail("unexpected_evidence", "only an acceptance event carries an evidence category", "evidence")
     if len(workflow["transitions"]) >= MAX_TRANSITIONS:
         _fail("too_many_transitions", "at most 256 transitions per snapshot", "transitions")
+    if event_ref is not None:
+        parse_ref(event_ref, "event_ref", "evt-")
+        if any(other["event_ref"] == event_ref for other in workflow["transitions"]):
+            _fail("duplicate_event_ref", "event_ref repeats", "event_ref")
 
     for other in workflow["transitions"]:
         if other["kind"] != kind or other["effective_day"] != day_str(effective) or other["value"] == value:
@@ -661,9 +784,18 @@ def record_transition(
         "stage": stage,
     }
     parse_ref(event["event_ref"], "event_ref", "evt-")
+    if kind == "acceptance":
+        # Evidence is bound to this transition, not to the workflow slot: an
+        # acceptance recorded later with an earlier effective day must never
+        # overwrite the category of the acceptance that wins by effective day.
+        event["evidence"] = evidence
     workflow["transitions"].append(event)
     if kind == "acceptance":
-        workflow["acceptance_evidence"] = evidence
+        winner = max(
+            (item for item in workflow["transitions"] if item["kind"] == "acceptance"),
+            key=lambda item: (item["effective_day"], item["event_ref"]),
+        )
+        workflow["acceptance_evidence"] = winner.get("evidence", "none")
     workflow["revision"] += 1
     workflow["export_ref"] = random_ref("exp-")
     if workflow["last_observed_day"] is None or day_str(effective) > workflow["last_observed_day"]:
@@ -680,6 +812,13 @@ def build_envelope(store: dict, workflow_ref: str) -> dict:
     last = parse_day(workflow["last_observed_day"], "last_observed_day")
     start = parse_day(workflow["start_day"], "start_day")
     derived = derive_state(workflow["transitions"], workflow["applicable_stages"], last)
+    winner = winning_acceptance(workflow["transitions"], last)
+    if derived["acceptance"] == "not_assessed" or winner is None:
+        evidence = "none"
+    else:
+        evidence = winner.get("evidence")
+        if evidence is None:  # a store written before evidence was per-event
+            evidence = workflow.get("acceptance_evidence", "none")
     envelope = {
         "schema": SCHEMA_NAME,
         "library_revision": SUPPORTED_LIBRARY_REVISIONS[0],
@@ -700,9 +839,7 @@ def build_envelope(store: dict, workflow_ref: str) -> dict:
             "stage_status": derived["stage_status"],
             "status": derived["status"],
             "acceptance": derived["acceptance"],
-            "acceptance_evidence": (
-                "none" if derived["acceptance"] == "not_assessed" else workflow.get("acceptance_evidence", "none")
-            ),
+            "acceptance_evidence": evidence,
             "delivery_day": derived["delivery_day"],
             "acceptance_day": derived["acceptance_day"],
             "transitions": [
@@ -726,19 +863,6 @@ def preview_export(store: dict, workflow_ref: str) -> tuple[bytes, str]:
     return payload, bytes_sha256(payload)
 
 
-def _repository_root(path: Path) -> Path | None:
-    """Nearest ancestor with a .git entry, or None outside a working tree.
-
-    A source archive has no .git; export_snapshot therefore also refuses a
-    target inside the tool's own source tree, so an archive copy fails closed
-    for in-tree targets instead of silently writing there.
-    """
-    for candidate in [path] + list(path.parents):
-        if (candidate / ".git").exists():
-            return candidate
-    return None
-
-
 def export_snapshot(
     store: dict,
     workflow_ref: str,
@@ -755,19 +879,15 @@ def export_snapshot(
     if not isinstance(preview_sha256, str) or preview_sha256.strip().lower() != digest:
         _fail("preview_mismatch", "the confirmed preview handle does not match these exact bytes", "preview_sha256")
     resolved = out_path.resolve()
-    root = repo_root or _repository_root(resolved.parent if resolved.parent.exists() else Path.cwd())
-    tool_root = None
-    if Path(__file__).resolve().parent.name == "aegis_usage":
-        tool_root = Path(__file__).resolve().parents[2]
-    inside_git_tree = root is not None and (resolved == root or root in resolved.parents)
-    inside_tool_tree = tool_root is not None and (resolved == tool_root or tool_root in resolved.parents)
-    if inside_git_tree or inside_tool_tree:
+    if _inside_reporting_tree(resolved, repo_root):
         _fail("export_path_in_repository", "reporting data must stay outside project version control", str(out_path))
     if resolved.exists():
         _fail("export_exists", "refusing to overwrite an existing export", str(out_path))
-    resolved.parent.mkdir(parents=True, exist_ok=True)
-    with open(resolved, "xb") as stream:
-        stream.write(payload)
+    _ensure_private_dir(resolved.parent)
+    try:
+        _write_private_bytes(resolved, payload, exclusive=True)
+    except FileExistsError:
+        _fail("export_exists", "refusing to overwrite an existing export", str(out_path))
     return {"path": str(resolved), "bytes": len(payload), "sha256": digest}
 
 
@@ -846,8 +966,8 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list | None = None) -> int:
     args = _parser().parse_args(argv)
     store_path = Path(args.store)
-    store = load_store(store_path)
     try:
+        store = load_store(store_path)
         if args.command == "opt-in":
             workflow = enable_capture(
                 store,
@@ -900,7 +1020,7 @@ def main(argv: list | None = None) -> int:
             print(json.dumps({"event_ref": event["event_ref"], "revision": store["workflows"][args.workflow_ref]["revision"]}, sort_keys=True))
             return 0
         if args.command == "show":
-            workflow = require_enabled(store, args.workflow_ref)
+            workflow = read_workflow(store, args.workflow_ref)
             print(
                 json.dumps(
                     {
@@ -953,6 +1073,11 @@ def main(argv: list | None = None) -> int:
             return 0
     except ContractError as exc:
         sys.stderr.write("ERROR " + exc.code + ": " + exc.message + (" [" + exc.path + "]" if exc.path else "") + "\n")
+        return 2
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        # A corrupt store or an unreadable input is a stable refusal, never a
+        # traceback: these are the failures that used to escape the handler.
+        sys.stderr.write("ERROR store_unreadable: " + str(exc) + "\n")
         return 2
     return 2
 

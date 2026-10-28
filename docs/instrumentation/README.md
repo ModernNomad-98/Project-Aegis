@@ -16,13 +16,14 @@ not permission to launch anything.
 - One workflow at a time is enabled by an explicit local `opt-in` action that
   records the start day, the applicable stages, the frozen-criteria flag and a
   random criteria-contract reference.
-- `opt-out` stops capture for that workflow and drops its unsent export queue;
-  retained history is unchanged.
+- `opt-out` stops capture for that workflow; there is no export queue, so
+  nothing is discarded and retained history stays readable with `show`.
 - Local history deletion is a separate, deliberate action:
   `local_report.py delete-local --workflow-ref W --confirm` (or `--all
   --confirm`) irreversibly removes that workflow's history and opt-in from the
   local store. It is local only and never contacts the steward. The store file
-  remains if other workflows still use it.
+  remains if other workflows still use it; export files already written to disk
+  are not tracked and not removed.
 - An export is written only after the **exact bytes** were previewed and the
   preview handle (SHA-256) was confirmed. There is no background upload and no
   reconnect retry; the tool imports no networking module.
@@ -44,7 +45,10 @@ reference generated for that workflow alone:
 
 One value per event kind (and per stage, for stage events) per effective day is
 allowed. The recorder and the importer reject a same-day conflicting value for
-correction instead of guessing which event came last.
+correction instead of guessing which event came last. The exported evidence
+category belongs to the acceptance that wins by effective day: each acceptance
+event keeps its own category locally, so recording an earlier acceptance later
+cannot relabel a later one.
 
 ## Stage vocabulary and project-orchestrator stages
 

@@ -14,7 +14,9 @@ population adoption, skill quality or causal effectiveness.
   `start_day + 30` decide the day-30 state.
 - The reporting lag is exactly **7 days**: a cohort closes on `start_day + 37`.
   A cell is reported only when the as-of day reaches its close day; open cohorts
-  are counted separately.
+  are counted separately. A month that still has an open start is withheld from
+  the publishable view (`cohort_open`), because its recorded cohort would hold
+  only the early starts and its denominator would grow later.
 - A workflow whose first receipt is later than `start_day + 7` is
   **retrospective** evidence and is excluded from the prospective rates.
 - An event first received after the close day is **late**. It is stored and
@@ -70,9 +72,12 @@ attestation**, not centrally verified success. Evidence content stays local:
 only the acceptance status, the frozen-criteria flag and the participant-supplied
 evidence category are exported. The category defaults to `none`; an independent
 attestation requires a non-`none` category, and a self-reported assessment with
-no record exports `none`. A scope change during the window invalidates the
-frozen-criteria claim, so that workflow cannot earn frozen-criteria success. A
-skill completion hint is not a quality score and is not part of this dataset.
+no record exports `none`. The exported category belongs to the acceptance
+transition that wins by effective day, not to the last one recorded. A scope
+change during the window invalidates the frozen-criteria claim, so that workflow
+cannot earn frozen-criteria success; `frozen_criteria_invalidated` counts only
+workflows that actually claimed frozen criteria and then changed scope. A skill
+completion hint is not a quality score and is not part of this dataset.
 
 ## What every report carries
 
@@ -82,8 +87,12 @@ entry and late event counts, frozen-criteria invalidations, a non-linkable
 withdrawal count, the quarantine count and the standing limitations. A cohort
 with an observed expired record is marked `incomplete` with that month's
 `expired_excluded` count; a month with no retained cohort but an observed expired
-record is listed in `incomplete_cohorts`. There is no headline "Aegis success
-rate".
+record is listed in `incomplete_cohorts`. After housekeeping deletes the record,
+a non-linkable per-month count keeps that month `incomplete` (and keeps its
+exclusion counted), so deleting the raw record cannot make a partial month look
+complete. If the retained store exceeds the 5,000-record cap the report sets
+`truncated` and the publishable view refuses to compute at all. There is no
+headline "Aegis success rate".
 
 ## Suppression
 
@@ -104,6 +113,15 @@ anything could be called public:
 5. **Differencing** — a cohort that passes the floors but differs from the most
    recent published cohort by 1–4 in any outcome count is withheld, because a
    small month-over-month shift can isolate one contributor.
+6. **Open month** — a month with any start still inside the 37-day window is
+   withheld with reason `cohort_open`, because its cohort cell holds only the
+   starts that already closed.
+7. **Sparse attestation** — `independently_attested_success` is published only
+   when its numerator is 0 or at least 5; a nonzero numerator below the cell
+   floor is withheld with reason `sparse_attestation_cell`.
+8. **Truncation** — a report computed from a capped store is never publishable;
+   the view refuses with `report_truncated` instead of showing partial
+   denominators.
 
 A cohort marked `incomplete` is withheld from the publishable view with reason
 `retention_incomplete` before the other floors apply. These are disclosure

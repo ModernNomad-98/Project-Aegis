@@ -61,24 +61,34 @@ The acceptance evidence category is the participant's own local category. Only
 that enum is exported; it is not a content hash, a review transcript or proof
 that a reviewer was independent. Independent attestation requires a non-`none`
 category, and a self-reported assessment with no local record exports `none`
-rather than claiming a record that does not exist.
+rather than claiming a record that does not exist. Each acceptance event keeps
+its own category locally, and the export carries the category of the acceptance
+that wins by effective day, so recording an earlier acceptance later cannot
+relabel a later one.
 
 New recipients, purposes or fields require fresh consent and, for a schema
 change, a new dataset version with migration tests and a comparability note.
 
 ## Withdrawal and deletion
 
-- Disabling capture stops recording immediately and removes unsent exports; it
-  does not delete retained history.
+- Disabling capture stops recording immediately; it does not delete retained
+  history and there is no export queue to discard. `show` remains available
+  read-only.
 - Local retained history is deleted by the participant with
   `local_report.py delete-local --workflow-ref W --confirm` (or `--all
   --confirm`). It is explicit, local only and irreversible, and removes the
   workflow's history and opt-in from the local store. The store file remains if
-  other workflows still use it.
+  other workflows still use it. Export files already written to disk are not
+  tracked and are not removed by `delete-local`.
 - A participant who has the admission capability can ask the steward to delete
-  the linked raw data. Withdrawal removes the admission, the raw snapshots and
-  the deletion verifier; nothing that links back to the workflow or the
-  admission is retained.
+  the linked raw data. Withdrawal removes the admission (or its expired
+  tombstone), the raw snapshots, the quarantine copies and the deletion
+  verifier; nothing that links back to the workflow or the admission is
+  retained.
+- Withdrawal does not depend on import eligibility. It works after the
+  seven-day pending admission expires and after the 90-day record expiry while
+  any linked raw or quarantined payload is retained; once retention has deleted
+  the last linked datum there is nothing left to delete.
 - Deletion is immediate in this implementation, which satisfies the seven-day
   obligation. The only surviving artefact is a random, unlinkable deletion
   receipt with its own seven-day expiry, so the participant can confirm the
@@ -97,6 +107,9 @@ change, a new dataset version with migration tests and a comparability note.
 - Central-model minimized raw records: **90 days from first receipt**, never
   reset by a retry or an update.
 - Quarantined contract-valid payloads kept for correction: **90 days**.
+- Expired-admission tombstone (random admission reference, verifier hash and
+  random workflow reference): only while linked raw or quarantined data
+  survives, then deleted with the last linked datum.
 - Deletion receipts: **7 days**.
 - Approved irreversible aggregates: **365 days** (not implemented here; no
   aggregation is published).
@@ -104,9 +117,11 @@ change, a new dataset version with migration tests and a comparability note.
   delete-on-restore approval before collection.
 
 When an expired record is still present at report time, its month is marked
-`incomplete` and the publishable rehearsal view withholds that cohort; after the
-record is deleted, only the global exclusion count remains. Retention is never
-silently extended.
+`incomplete` and the publishable rehearsal view withholds that cohort. When
+housekeeping deletes the record, a non-linkable per-month count survives, so the
+month stays `incomplete` and is never republished as a complete cohort; the
+report also keeps the global exclusion count. Retention is never silently
+extended.
 
 ## Limits that cannot be fixed by the contract
 
