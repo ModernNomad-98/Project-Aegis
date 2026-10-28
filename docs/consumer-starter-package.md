@@ -601,8 +601,10 @@ if (-not $authGiven) {
 }
 
 # P2.4 - the mode decides which identity is acceptable. A human-only install makes
-# no commit; an agent-commit route keeps the unchanged non-owner requirement.
-if ($ownerMatch -and ($Mode -ceq 'agent-commit')) {
+# no commit; an agent-commit route keeps the unchanged non-owner requirement. Every
+# test below uses $modeGiven (the token trimmed once at P2.3), never the raw -Mode
+# value, so whitespace padding cannot select a branch its trimmed form would not.
+if ($ownerMatch -and ($modeGiven -ceq 'agent-commit')) {
   Write-Output ('author={0} <{1}>' -f $author.Name, $author.Email)
   Write-Output ('committer={0} <{1}>' -f $committer.Name, $committer.Email)
   Write-Output ('Git reports this repository''s author and committer as "{0} <{1}>", which is the recorded owner. Will an agent commit in this repository, or will you commit yourself?' -f $author.Name, $author.Email)
@@ -627,6 +629,10 @@ exit 0
 - **`agent-commit` with an owner-matching effective identity still exits 42**,
   before any copy, printing the resolved values and exactly one question
   (section 8.3). The previous stop is preserved for the route it was written for.
+- **Mode tokens are trimmed once.** `-Mode ' agent-commit '` is validated and
+  branched on exactly as `agent-commit`, and `-Mode ' human-only '` exactly as
+  `human-only`: leading, trailing or both-edge whitespace, and TAB padding, never
+  change the decision. The gate reads `$Mode` only to normalize it.
 - **Missing owner (exit 41), missing or unparsable effective identity (exit 42)
   and an unstated or malformed mode (exit 43)** all stop before the copy. The
   gate writes nothing, makes no commit and never runs `git config` in write mode.
@@ -1183,9 +1189,10 @@ commands, outputs, host versions and retained UNRUNs are in
 [the v2 evidence record](evidence/consumer-readiness/local-starter-v2.md); the v1
 measurement above is unchanged.
 
-**Verified for the install-mode revision on 2026-10-28.** P2's block and the
-section 7.1 block were re-extracted exactly (P2 `install-mode.ps1` **5,284 B /
-91 LF**, sha256 `88db8dcce5245e458dfcca794a8c9dc03b1f2a89397643ddfd482f507376694d`;
+**Verified for the install-mode revision on 2026-10-28**, with P2's block
+re-extracted after the F1 normalized-mode correction of the same date (P2
+`install-mode.ps1` **5,460 B / 93 LF**, sha256
+`b50ebdfda90647dd8a1245f002837296031b8e07010216f9178a2088292ff30d`;
 harness `install-starter.ps1` **18,905 B / 318 LF**, sha256
 `e63ca4a79577acbe1830d8efe36cde808d7a8b38be1e4529c7f5c31fbeb7e21d`) and run on
 the same measured host against a worktree of `ffb040c7` and isolated consumer

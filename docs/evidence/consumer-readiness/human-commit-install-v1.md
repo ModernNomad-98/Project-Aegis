@@ -17,8 +17,12 @@ retained UNRUN is named in section 7.
 | Procedure page, before | `docs/consumer-starter-package.md` at the base, **91,779 B**, sha256 `b9c015e5fec171e8a1b8328dbc4389195ecd7761cbb18302b639e96abbcdef4c` |
 | Before P2 block | **657 B / 11 lines**, sha256 `ee0fb37aca29b3eada063eadf71b5c7c49c26ae1a6359f5fb69ff6d0fecc1a28` |
 | Before section 7.1 block | **17,305 B / 294 LF**, sha256 `78f8a2f93bb46f274d6bc59027e69108bd1ebd416b9b0661d521a69c5753bf86` |
-| After P2 block | **5,284 B / 91 LF**, sha256 `88db8dcce5245e458dfcca794a8c9dc03b1f2a89397643ddfd482f507376694d` |
-| After section 7.1 block | **18,905 B / 318 LF**, sha256 `e63ca4a79577acbe1830d8efe36cde808d7a8b38be1e4529c7f5c31fbeb7e21d` |
+| P2 block after the F1 correction | **5,460 B / 93 LF**, sha256 `b50ebdfda90647dd8a1245f002837296031b8e07010216f9178a2088292ff30d` |
+| Section 7.1 block (unchanged by F1) | **18,905 B / 318 LF**, sha256 `e63ca4a79577acbe1830d8efe36cde808d7a8b38be1e4529c7f5c31fbeb7e21d` |
+| Pre-fix padded probe, four padding shapes | `item3-split/logs/prefix-padded.log`, **4,056 B**, sha256 `efb08da7e3145f598cb12c64928a09d8b633edd7211080e3fdc27b61b37a0ef8` |
+| Corrected padded probe, same fixtures | `item3-split/logs/f1-padded.log`, **4,670 B**, sha256 `2f408ef9458245f06bee81f297cf60b19c575a57b169af31ef4325073d4de623` |
+| Corrected F1 tests against the pre-fix code | `item3-split/logs/prefix-f1-tests.log`, **922 B**, sha256 `60cee0cbc3eb96d5018f418459d4e6489cbd3685814e152e1031eecf36b67420` |
+| Behavioural F1 cases against the pre-fix code (static oracle masked) | `item3-split/logs/prefix-f1-tests-masked.log`, **1,587 B**, sha256 `9daeeec78f53af616c6a83bae22e22a9de34be1902025741b52f5aced055abf2` |
 | Extraction wrapper | `extract-block.ps1`, **1,798 B**, sha256 `159f9af86b05e752b903b1be0e4225a96e2aac892665452d2edd105554f8e047`; it reads the fence body plus one trailing LF and reports the span, size, LF count and hash |
 | Retained v1 walkthrough wrapper | `install-step.ps1` from the v1 validation raw material, **14,477 B**, sha256 `1eb9174d87b68900671320666a8377be2bf81e5dbaa20ab54f56b9daeb1a7636`; its P2 branch is the implementation the v1 evidence record ran |
 | Raw before log | `before-native.log`, **1,631 B**, sha256 `4c56aa012ba116b43bac325d88fcec5ab3ca83049d9789561bf2b77d128484cf` |
@@ -29,9 +33,11 @@ wrapper reproduces the page's own published v2 measurement of the section 7.1
 block byte for byte (**17,305 B / 294 LF**, sha256 `78f8a2f9…bf86`). The same
 wrapper then produces the before and after identities above.
 
-The raw logs live under `_A/remediation/handshake/item3/` beside this work. Every
-decisive command line and its output is reproduced below, so the record does not
-depend on opening that folder.
+The raw logs live under `_A/remediation/handshake/item3/` beside this work; the F1
+correction's probe and test logs are under
+`_A/remediation/handshake/item3-split/logs/`. Every decisive command line and its
+output is reproduced below, so the record does not depend on opening either
+folder.
 
 ## 2. Host and tools (measured in the run)
 
@@ -134,6 +140,10 @@ change closes.
   **41** owner record missing, **42** identity missing/unparsable or an
   `agent-commit` attempt under the owner identity, **43** install mode or owner
   authorization missing, empty or unrecognised.
+- **A padded `-Mode` token changes no decision.** `$Mode` is trimmed once into
+  `$modeGiven` at P2.3 and every mode branch tests `$modeGiven`, never the raw
+  argument, so leading, trailing, both-edge and TAB padding are treated exactly as
+  the trimmed token and cannot reach the accepted `agent-commit` line (F1).
 - **The section 7.1 harness runs the gate first.** It takes `-Mode`,
   `-OwnerAuthorization` and an optional `-ModeGate`, invokes the gate as a child
   process before it reads a source pin or writes a file, and exits with the
@@ -164,7 +174,7 @@ outside `.git`; "config" is the `git config --local --list` snapshot.
 | **S3-3** — owner identity used by an agent is refused before commit | Gate exit **42**, prints `author=…`, `committer=…` and the one question `Will an agent commit in this repository, or will you commit yourself?`; **0 commits**, **0 files**, config unchanged |
 | **S3-4** — missing owner, unclear mode or malformed values refuse before package writes | Missing owner: exit **41** with the section 8.2 text, 0 files. No `-Mode`: exit **43**, 0 files. `-Mode human_only`: exit **43**, 0 files. No `-OwnerAuthorization`: exit **43**, 0 files; config and commit count unchanged. Malformed effective identity (`GIT_AUTHOR_DATE=not-a-date`): exit **42**, 0 files. The full harness with no `-Mode`: exit **43**, **0 files**, **0 commits** |
 | **S3-5** — a later agent-commit proposal after a human-only install is re-gated | On the installed `human-only` tree with the owner identity: exit **42**, no commit. After the human states the distinct agent identity, the same gate exits **0**; a later signed commit carries that identity. The check itself makes no commit |
-| **S3-6** — restoring the old contradictory branch makes the behavioral test fail | The published block contains exactly one mode branch, `if ($ownerMatch -and ($Mode -ceq 'agent-commit'))`. Replacing it with the old unconditional `if ($ownerMatch)` leaves the block parseable; the same human-only fixture then exits **42**, with 0 files and 0 commits, while the published block exits 0 on an identical fixture |
+| **S3-6** — restoring the old contradictory branch makes the behavioral test fail | The published block contains exactly one mode branch, `if ($ownerMatch -and ($modeGiven -ceq 'agent-commit'))`. Replacing it with the old unconditional `if ($ownerMatch)` leaves the block parseable; the same human-only fixture then exits **42**, with 0 files and 0 commits, while the published block exits 0 on an identical fixture |
 
 ### Decisive output (quoted)
 
@@ -200,6 +210,51 @@ S3-5         installed tree + owner identity → EXIT 42, commits_after_refusal=
 S3-6         OBSERVED old_branch_matches=1; mutated block on the same fixture → EXIT 42
 ```
 
+### F1 correction observations (native)
+
+The F1 finding was that `-Mode ' agent-commit '` skipped the owner-identity
+refusal: the branch tested the raw `$Mode`, so a padded token fell through to the
+accepted `agent-commit` line at exit 0. The published P2 block remains the oracle:
+the pre-fix block was extracted from `05be9615` (**5,284 B / 91 LF**, sha256
+`88db8dcc…694d`) and the same four tokens were run against both trees with the same
+owner record and an owner-matching identity.
+
+| Case | Pre-fix block | Corrected block |
+| --- | --- | --- |
+| leading space, `-Mode ' agent-commit'` | exit **0**, `P2: mode=agent-commit owner_match=no` | exit **42**, the owner match is refused |
+| trailing space, `-Mode 'agent-commit '` | exit **0**, the same acceptance line | exit **42** |
+| leading and trailing space, `-Mode ' agent-commit '` | exit **0**, the same acceptance line | exit **42** |
+| TAB, `-Mode "<TAB>agent-commit<TAB>"` | exit **0**, the same acceptance line | exit **42** |
+
+Each pre-fix row also shows the bypass reaching the harness: the section 7.1
+harness continued past P2 and stopped at the source-pin check (exit **31**,
+`exit 31: source HEAD  is not the pinned commit …`) instead of exiting 42, with
+0 files, 0 commits and no install record. On the corrected block every row exits
+**42** through the harness with `exit 42: the P2 install-mode gate refused;
+nothing was copied`, 0 files, 0 commits, no record and byte-identical local Git
+config.
+
+The corrected tests, run against the pre-fix code (the F1 test file copied into a
+detached `05be9615` worktree), fail in exactly the two places that define F1:
+
+```text
+  FAIL  the P2 block does not branch on the normalized mode
+  FAIL  F1: the harness did not refuse padded <SP>agent-commit (leading space):
+        exit 31, P2: mode=agent-commit owner_match=no …
+```
+
+With only those two static text oracles masked on that pre-fix tree, so the
+behavioural cases can execute, the padded case fails on the behaviour itself:
+
+```text
+  FAIL  F1: -Mode <SP>agent-commit (leading space) under the owner identity was
+        not refused: exit 0, P2: mode=agent-commit owner_match=no …
+```
+
+No assertion was removed or weakened at this head: the two tests that locked the
+raw `$Mode` literal now lock the normalized literal and assert the raw branch is
+absent, and the padded cases were added around them.
+
 ## 6. Source regression
 
 Added to the existing dispatcher in `scripts/tests/test_validator.py` (protected;
@@ -211,6 +266,11 @@ AEGIS-APR-140 applies, and no existing assertion is removed or weakened):
 - `test_consumer_install_mode_native` (full published harness: human-only install
   with the record, the installed-tree re-gate, and a no-mode harness refusal with
   0 files).
+- **F1**: both tests assert the normalized branch literal and that the raw `$Mode`
+  branch is absent, and both execute four padding shapes (leading, trailing, both,
+  TAB) under an owner-matching identity, each required to exit 42 before any
+  commit, file or record write. The published harness is the second surface, so a
+  padded token that reached it is refused before the source is read.
 
 The oracle is the published procedure itself: both fenced blocks are extracted
 from the page and executed with `pwsh`, and the S3-6 control is the published
@@ -224,8 +284,9 @@ commit is UNRUN — a required failure on Linux (`AssertionError`), an explicit
 `REQUIRED_SKIPS` entry on other hosts, never a pass. Linux closure therefore
 remains nonzero when the case cannot run.
 
-Local execution of this change (Windows, this host): both tests **9 PASS, 0
-SKIP**; the full suite is recorded in section 9.
+Local execution of the F1 correction (Windows, this host): both tests **18 PASS,
+0 SKIP** (11 in the gate test, 7 in the native test); the full suite is recorded
+in section 9.
 
 ## 7. Retained UNRUN
 
@@ -256,11 +317,11 @@ SKIP**; the full suite is recorded in section 9.
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Validator self-tests (full suite) | `python -P scripts/tests/test_validator.py` | **OK: 303 gate self-test assertion(s) passed; exit 0** (9 of them the new install-mode cases) |
+| Validator self-tests (full suite) | `python -P scripts/tests/test_validator.py` | **OK: 312 gate self-test assertion(s) passed; exit 0** (18 in the two install-mode tests) |
 | Skill validator | `python -P scripts/validate-skills.py` | **exit 0**, `OK: 254 skill(s) valid, 0 warning(s)` |
 | Markdown link check on the changed pages | `python -P scripts/ci/check-markdown-links.py <pages>` | **exit 0**, 3 files / 97 links checked / 0 broken / 0 dead |
 | Whitespace / conflict markers | `git diff --check` | **clean** |
-| DCO sign-off on the candidate commit | `python -P scripts/check_dco.py --range <base>..<head>` | **OK: 1 commit(s) checked, all signed off or exempt** |
+| DCO sign-off on the candidate commits | `python -P scripts/check_dco.py --range 482ba165..HEAD` | **OK: 2 commit(s) checked, all signed off or exempt** |
 
 ```text
 $ python -P scripts/tests/test_validator.py
@@ -268,16 +329,25 @@ $ python -P scripts/tests/test_validator.py
   PASS  S3-1: human-only with owner-matching identity exits 0, with 0 commits, 0 files written and byte-identical local Git config
   PASS  S3-2: agent-commit exits 0 for the measured non-owner identity, and an isolated fixture commit carries that author and committer plus Signed-off-by
   PASS  S3-3: agent-commit under the owner identity exits 42 before any commit, with the resolved values, one question and 0 files written
+  PASS  F1: padded agent-commit token <SP>agent-commit (leading space) under the owner identity is refused at 42 before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token agent-commit<SP> (trailing space) under the owner identity is refused at 42 before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token <SP>agent-commit<SP> (leading and trailing space) under the owner identity is refused at 42 before any commit, with 0 files and byte-identical config
+  PASS  F1: padded agent-commit token <TAB>agent-commit<TAB> (TAB) under the owner identity is refused at 42 before any commit, with 0 files and byte-identical config
+  PASS  F1: padded ' human-only ' is accepted as human-only with 0 files and 0 commits
   PASS  S3-4: missing owner (41), absent/malformed mode and missing authorization (43) and a malformed effective identity (42) all refuse with 0 package files
   PASS  S3-5: after a human-only acceptance a later agent-commit proposal is re-gated: exit 42 under the owner identity, exit 0 only after the explicit distinct identity, and no commit is made by the check
   PASS  S3-6: restoring the old unconditional owner-match branch makes the same human-only fixture fail (exit 42) while the published branch exits 0
   PASS  S3-1: the published harness completes a human-only install with 41 files, the mode in the record, 0 commits and byte-identical config
   PASS  S3-5: on the installed human-only tree, a later agent-commit proposal exits 42 and creates no commit
   PASS  S3-4: the published harness with no -Mode exits 43 before reading a source pin, with 0 package files and 0 commits
+  PASS  F1: the published harness refuses padded <SP>agent-commit (leading space) under the owner identity at 42 before any source read, record write or commit
+  PASS  F1: the published harness refuses padded agent-commit<SP> (trailing space) under the owner identity at 42 before any source read, record write or commit
+  PASS  F1: the published harness refuses padded <SP>agent-commit<SP> (leading and trailing space) under the owner identity at 42 before any source read, record write or commit
+  PASS  F1: the published harness refuses padded <TAB>agent-commit<TAB> (TAB) under the owner identity at 42 before any source read, record write or commit
 
 SKIPPED: 6 test(s) (UNRUN, not passes)
 UNRUN: 6 required readiness case(s) did not run on this platform (non-Linux UNRUN; Linux gate remains nonzero on skip)
-OK: 303 gate self-test assertion(s) passed.
+OK: 312 gate self-test assertion(s) passed.
 ```
 
 ## 10. Skills applied

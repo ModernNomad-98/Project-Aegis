@@ -7185,6 +7185,14 @@ STARTER_PIN_TREE = "88a5aee4ad928a49c2fb945032585843ec652da7"
 STARTER_SOLO = ("Peter Nguyen", "263130032+ModernNomad-98@users.noreply.github.com")
 STARTER_AGENT = ("Aegis Agent (DeepSeek V4 Flash)", "agent@example.invalid")
 STARTER_OWNER = ("Owner Person", "owner@example.invalid")
+# F1: the four padding shapes a -Mode token can carry. Each must behave
+# exactly as its trimmed form; none may skip the owner-identity refusal.
+STARTER_PADDED_MODES = (
+    ("leading space", " agent-commit"),
+    ("trailing space", "agent-commit "),
+    ("leading and trailing space", " agent-commit "),
+    ("TAB", "\tagent-commit\t"),
+)
 
 
 def _starter_fenced_block(text: str, heading: str, ordinal: int = 0) -> str:
@@ -7316,8 +7324,11 @@ def test_consumer_install_mode_gate():
     assert "param(" in gate_text and "Stop-Gate" in gate_text, (
         "the P2 section does not publish a runnable block"
     )
-    assert "$ownerMatch -and ($Mode -ceq 'agent-commit')" in gate_text, (
-        "the P2 block does not carry the mode branch"
+    assert "$ownerMatch -and ($modeGiven -ceq 'agent-commit')" in gate_text, (
+        "the P2 block does not branch on the normalized mode"
+    )
+    assert "$Mode -ceq 'agent-commit'" not in gate_text, (
+        "the P2 block still branches on the raw -Mode value"
     )
     pwsh = _install_mode_pwsh()
     if pwsh is None:
@@ -7384,6 +7395,46 @@ def test_consumer_install_mode_gate():
         ok("S3-3: agent-commit under the owner identity exits 42 before any commit, "
            "with the resolved values, one question and 0 files written")
 
+        # F1: the gate trims -Mode once into $modeGiven and every mode branch uses
+        # that value, so whitespace padding can never take a branch its trimmed
+        # form would not. Each padded agent-commit token under an owner-matching
+        # identity must still be refused at 42 before any commit, with no file
+        # written and no Git configuration change.
+        for index, (label, token) in enumerate(STARTER_PADDED_MODES, start=1):
+            shown = token.replace("\t", "<TAB>").replace(" ", "<SP>")
+            case_repo = _install_mode_repo(
+                tmp / ("f1-padded-%d-%s" % (index, label.split()[0])), env,
+                owner=STARTER_OWNER, ident=STARTER_OWNER)
+            case_config = _install_mode_config(case_repo, env)
+            proc = _install_mode_gate(pwsh, gate, case_repo, env, token,
+                                      "The agent will commit.")
+            assert proc.returncode == 42, (
+                "F1: -Mode %s (%s) under the owner identity was not refused: exit %s, %s"
+                % (shown, label, proc.returncode, proc.stdout + proc.stderr))
+            assert "which is the recorded owner" in proc.stdout, (label, proc.stdout)
+            assert ("Will an agent commit in this repository, or will you commit yourself?"
+                    in proc.stdout), (label, proc.stdout)
+            assert _install_mode_commits(case_repo, env) == 0, (
+                "a commit exists after the %s refusal" % label)
+            assert _install_mode_files(case_repo) == [], (label, _install_mode_files(case_repo))
+            assert _install_mode_config(case_repo, env) == case_config
+            ok("F1: padded agent-commit token %s (%s) under the owner identity is "
+               "refused at 42 before any commit, with 0 files and byte-identical "
+               "config" % (shown, label))
+
+        # F1: padding never changes an accepted decision either. A padded
+        # human-only token is accepted as human-only, with nothing written.
+        padded_human = _install_mode_repo(
+            tmp / "f1-padded-human", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        proc = _install_mode_gate(pwsh, gate, padded_human, env, " human-only ",
+                                  "I will commit myself.")
+        assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+        assert "mode=human-only" in proc.stdout and "owner_match=yes" in proc.stdout, proc.stdout
+        assert _install_mode_files(padded_human) == []
+        assert _install_mode_commits(padded_human, env) == 0
+        ok("F1: padded ' human-only ' is accepted as human-only with 0 files and "
+           "0 commits")
+
         # S3-4: missing owner, unclear/malformed mode, missing authorization and
         # a malformed effective identity all stop before a package write.
         missing_owner = _install_mode_repo(tmp / "s3-4-owner", env, owner=None, ident=STARTER_AGENT)
@@ -7435,7 +7486,7 @@ def test_consumer_install_mode_gate():
 
         # S3-6: restoring the old unconditional owner-match branch fails the
         # same human-only behavioral check (the pre-change behaviour, proved).
-        old_branch = "if ($ownerMatch -and ($Mode -ceq 'agent-commit'))"
+        old_branch = "if ($ownerMatch -and ($modeGiven -ceq 'agent-commit'))"
         assert gate_text.count(old_branch) == 1, "the published mode branch is not uniquely editable"
         mutated = gate_text.replace(old_branch, "if ($ownerMatch)", 1)
         assert mutated != gate_text
@@ -7546,6 +7597,44 @@ def test_consumer_install_mode_native():
             assert _install_mode_commits(refusal_target, env) == 0
             ok("S3-4: the published harness with no -Mode exits 43 before reading a "
                "source pin, with 0 package files and 0 commits")
+
+            # F1 end to end: the published harness passes each padded agent-commit
+            # token to the real gate. The owner-matching identity must be refused
+            # before the source is read, the record is written or a file is
+            # created. A wrongly accepted token would instead reach the dummy
+            # source and fail later at exit 1, never 42.
+            for index, (label, token) in enumerate(STARTER_PADDED_MODES, start=1):
+                shown = token.replace("\t", "<TAB>").replace(" ", "<SP>")
+                exploit_target = _install_mode_repo(
+                    tmp / ("consumer-padded-%d-%s" % (index, label.split()[0])), env,
+                    owner=STARTER_OWNER, ident=STARTER_OWNER)
+                exploit_config = _install_mode_config(exploit_target, env)
+                exploit_record = exploit_target / "docs" / "consumer-install-record.md"
+                exploit = subprocess.run(
+                    [pwsh, "-NoProfile", "-File", str(harness),
+                     "-Src", str(dummy), "-Tgt", str(exploit_target), "-Sh", sh,
+                     "-Mode", token,
+                     "-OwnerAuthorization", "The agent will commit.",
+                     "-RecordPath", str(exploit_record)],
+                    env=env, capture_output=True, text=True,
+                    encoding="utf-8", errors="replace", timeout=300,
+                )
+                assert exploit.returncode == 42, (
+                    "F1: the harness did not refuse padded %s (%s): exit %s, %s"
+                    % (shown, label, exploit.returncode,
+                       exploit.stdout + exploit.stderr))
+                assert ("Will an agent commit in this repository, or will you commit yourself?"
+                        in exploit.stdout), (label, exploit.stdout)
+                assert "which is the recorded owner" in exploit.stdout, (label, exploit.stdout)
+                assert not exploit_record.exists(), (
+                    "F1: the harness wrote the install record for %s" % shown)
+                assert _install_mode_files(exploit_target) == [], (
+                    label, _install_mode_files(exploit_target))
+                assert _install_mode_commits(exploit_target, env) == 0
+                assert _install_mode_config(exploit_target, env) == exploit_config
+                ok("F1: the published harness refuses padded %s (%s) under the owner "
+                   "identity at 42 before any source read, record write or commit"
+                   % (shown, label))
         finally:
             subprocess.run(
                 ["git", "-C", str(REPO_ROOT), "worktree", "remove", "--force", str(source)],
