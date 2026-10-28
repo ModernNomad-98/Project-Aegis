@@ -263,8 +263,38 @@ def _inside_reporting_tree(resolved: Path, repo_root: Path | None = None) -> boo
     return tool_root is not None and (resolved == tool_root or tool_root in resolved.parents)
 
 
+def _symlink_component(path: Path) -> Path | None:
+    """Return the first symlink in an absolute lexical path, if any.
+
+    Every component is inspected without following it, so a final or parent
+    symlink, and a dangling symlink (which exists() reports as absent), are
+    all found. A relative path is anchored with os.path.abspath, which
+    normalises lexically and never resolves a link.
+    """
+    absolute = Path(os.path.abspath(os.fspath(path)))
+    current = Path(absolute.anchor)
+    for part in absolute.parts[1:]:
+        current = current / part
+        if current.is_symlink():
+            return current
+    return None
+
+
 def guard_store_path(path: Path) -> None:
-    """Refuse a reporting store inside project version control."""
+    """Refuse a reporting store inside version control or behind a symlink.
+
+    A symlink anywhere in the path is refused, even one that resolves outside
+    the repository: the guard resolves the path for the version-control test
+    but the writer uses the lexical path, so following a link would let a
+    store inside a worktree be written through to another location.
+    """
+    link = _symlink_component(Path(path))
+    if link is not None:
+        _fail(
+            "store_path_symlink",
+            "a symlink is not allowed anywhere in the store path; use a real directory path",
+            str(link),
+        )
     if _inside_reporting_tree(Path(path).resolve()):
         _fail("store_path_in_repository", "reporting data must stay outside project version control", str(path))
 
@@ -981,6 +1011,13 @@ def export_snapshot(
         _fail("confirmation_required", "export needs a fresh affirmative confirmation", "confirm")
     if not isinstance(preview_sha256, str) or preview_sha256.strip().lower() != digest:
         _fail("preview_mismatch", "the confirmed preview handle does not match these exact bytes", "preview_sha256")
+    link = _symlink_component(out_path)
+    if link is not None:
+        _fail(
+            "export_path_symlink",
+            "a symlink is not allowed anywhere in the export path; use a real directory path",
+            str(link),
+        )
     resolved = out_path.resolve()
     if _inside_reporting_tree(resolved, repo_root):
         _fail("export_path_in_repository", "reporting data must stay outside project version control", str(out_path))

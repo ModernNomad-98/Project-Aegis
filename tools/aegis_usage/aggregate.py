@@ -373,17 +373,29 @@ def _quarantine(store: dict, receipt_day: str, code: str, envelope: dict, messag
 
 
 def withdraw(store: dict, *, admission_ref: str, capability: str, decision_day: str) -> dict:
-    """Delete a workflow's admission, raw snapshots and quarantine copies.
+    """Delete every admission for a workflow plus its raw and quarantine data.
 
-    The deletion receipt is a random, unlinkable id with its own seven-day
-    expiry; no tombstone keeps the workflow or admission reference alive.
+    A capability for any admission of the workflow authorises a workflow-level
+    withdrawal: revoking only the named admission could leave a sibling
+    admission active, and a later export under that sibling would re-create
+    the records this call deleted. The deletion receipt is a random,
+    unlinkable id with its own seven-day expiry; no tombstone keeps the
+    workflow or admission reference alive.
     """
     identity = _verify_capability(store, admission_ref, capability)
     workflow_ref = identity["workflow_ref"]
     removed = 1 if workflow_ref in store["records"] else 0
     store["records"].pop(workflow_ref, None)
     store["quarantine"] = [entry for entry in store["quarantine"] if entry["workflow_ref"] != workflow_ref]
-    store["admissions"].pop(admission_ref, None)
+    # Revoke every admission for the workflow, not only the one named by the
+    # presented capability: a sibling left active could import a later export
+    # and re-create the records removed above.
+    for ref in [
+        ref
+        for ref, admission in store["admissions"].items()
+        if admission.get("workflow_ref") == workflow_ref
+    ]:
+        del store["admissions"][ref]
     # Withdrawal promises that no tombstone keeps the workflow or admission
     # reference alive. Remove every same-workflow tombstone, not only the one
     # named by this capability; expire() purges the rest with the last datum,
@@ -701,6 +713,13 @@ def publishable_report(report: dict) -> dict:
         for month in sorted(incomplete_months)
         if month not in report["cohorts"]
     ]
+    # An open-only month never reached a retained cohort cell, but it is still
+    # a withheld month: it must be disclosed and must take part in the
+    # complementary decision below. An incomplete-only month is already in
+    # suppressed_cells (retention_incomplete) and is not repeated here.
+    for month in sorted(open_months):
+        if month not in report["cohorts"] and month not in incomplete_months:
+            suppressed_cells.append({"month": month, "reason": "cohort_open"})
 
     def floored_late(value: int) -> object:
         # A nonzero late count below the cell floor can isolate one contributor
@@ -768,9 +787,16 @@ def publishable_report(report: dict) -> dict:
             entry["flags"].append("dominant_contributor_review")
         published.append(entry)
         last_counts = counts
-    if len(published) == 1 and len(report["cohorts"]) > 1:
-        suppressed_cells.append({"month": published[0]["month"], "reason": "complementary_suppression"})
-        published = []
+    if len(published) == 1:
+        only_month = published[0]["month"]
+        # Complementary suppression must see every withheld month, including
+        # an incomplete-only or open-only earlier month that has no retained
+        # cohort cell. Otherwise the earlier month is suppressed while the
+        # next publishable month is released alone.
+        earlier_suppressed = any(item["month"] < only_month for item in suppressed_cells)
+        if len(report["cohorts"]) > 1 or earlier_suppressed:
+            suppressed_cells.append({"month": only_month, "reason": "complementary_suppression"})
+            published = []
     return {
         "disclosure": {
             "public_release": False,

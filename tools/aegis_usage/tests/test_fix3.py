@@ -678,6 +678,261 @@ class PublishableDisclosureTests(unittest.TestCase):
         self.assertEqual(view["cohorts"], [])
         self.assertEqual(view["suppressed_cohorts"], [{"month": "2026-01", "reason": "retention_incomplete"}])
 
+    def test_incomplete_only_month_withholds_the_next_publishable_month(self):
+        # F3: an incomplete-only earlier month must not be silently absent
+        # while the next publishable month is released.
+        counts = {"delivered": 5, "failed": 5, "abandoned": 5, "ongoing": 5, "unknown": 0}
+        report = self.base_report({"2026-02": synthetic_cell("2026-02", counts)})
+        report["incomplete_cohorts"] = {"2026-01": 1}
+        view = A.publishable_report(report)
+        reasons = {item["month"]: item["reason"] for item in view["suppressed_cohorts"]}
+        self.assertEqual(view["cohorts"], [])
+        self.assertEqual(reasons.get("2026-01"), "retention_incomplete")
+        self.assertEqual(reasons.get("2026-02"), "complementary_suppression")
+
+    def test_open_only_month_is_listed_and_withholds_the_next_publishable_month(self):
+        # F3: an open-only month previously vanished from suppressed_cohorts
+        # and the next closed month published alone.
+        counts = {"delivered": 5, "failed": 5, "abandoned": 5, "ongoing": 5, "unknown": 0}
+        report = self.base_report({"2026-02": synthetic_cell("2026-02", counts)})
+        report["open_cohorts"] = {"2026-01": 3}
+        view = A.publishable_report(report)
+        reasons = {item["month"]: item["reason"] for item in view["suppressed_cohorts"]}
+        self.assertEqual(view["cohorts"], [])
+        self.assertEqual(reasons.get("2026-01"), "cohort_open")
+        self.assertEqual(reasons.get("2026-02"), "complementary_suppression")
+
+    def test_two_retained_publishable_cohorts_are_both_published(self):
+        # Control: complementary suppression must not withhold a pair of
+        # publishable retained cohorts that have no suppressed earlier month.
+        january = {"delivered": 10, "failed": 10, "abandoned": 0, "ongoing": 0, "unknown": 0}
+        february = {"delivered": 5, "failed": 5, "abandoned": 5, "ongoing": 5, "unknown": 0}
+        report = self.base_report(
+            {
+                "2026-01": synthetic_cell("2026-01", january),
+                "2026-02": synthetic_cell("2026-02", february),
+            }
+        )
+        view = A.publishable_report(report)
+        self.assertEqual([item["month"] for item in view["cohorts"]], ["2026-01", "2026-02"])
+
+
+class WithdrawalRevokesSiblingsTests(unittest.TestCase):
+    """F1: withdrawing a workflow revokes every admission for that workflow."""
+
+    def quarantined_admission(self, central, workflow_ref, issued=START):
+        admission = A.issue_admission(central, notice_for(workflow_ref), issued_day=issued)
+        envelope = make_envelope(
+            workflow_ref,
+            "crit-" + "9" * 32,
+            START,
+            S.STAGES,
+            True,
+            [{"kind": "observation", "value": "ongoing", "effective_day": START}],
+            1,
+            admission["admission_ref"],
+        )
+        result = A.import_export(central, envelope, capability=admission["capability"], receipt_day=advance(2))
+        self.assertEqual(result["status"], "quarantined")
+        return admission, envelope
+
+    def sibling_state(self):
+        workflow_ref = "wf-" + "f" * 32
+        central = A.new_store()
+        first, _ = self.quarantined_admission(central, workflow_ref)
+        A.expire(central, today=advance(8))
+        self.assertEqual(list(central["admission_tombstones"]), [first["admission_ref"]])
+        second = A.issue_admission(central, notice_for(workflow_ref), issued_day=advance(7))
+        self.assertIn(second["admission_ref"], central["admissions"])
+        return central, workflow_ref, first, second
+
+    def test_withdrawing_a_tombstoned_admission_revokes_a_sibling_active_admission(self):
+        central, workflow_ref, first, second = self.sibling_state()
+        result = A.withdraw(
+            central,
+            admission_ref=first["admission_ref"],
+            capability=first["capability"],
+            decision_day=advance(9),
+        )
+        self.assertEqual(result["deleted_records"], 0)
+        self.assertEqual(central["admissions"], {})
+        self.assertEqual(central["admission_tombstones"], {})
+        self.assertEqual(central["quarantine"], [])
+
+        # A later export naming the revoked sibling admission must not import
+        # as accepted and re-create the record.
+        notice = notice_for(workflow_ref)
+        fresh = make_envelope(
+            workflow_ref,
+            notice["criteria_contract_ref"],
+            START,
+            S.STAGES,
+            True,
+            [{"kind": "observation", "value": "ongoing", "effective_day": START}],
+            1,
+            second["admission_ref"],
+        )
+        with self.assertRaises(S.ContractError) as caught:
+            A.import_export(central, fresh, capability=second["capability"], receipt_day=advance(10))
+        self.assertEqual(caught.exception.code, "unknown_admission")
+        self.assertEqual(central["records"], {})
+
+    def test_withdrawal_with_a_wrong_capability_revokes_nothing(self):
+        central, workflow_ref, first, second = self.sibling_state()
+        with self.assertRaises(S.ContractError) as caught:
+            A.withdraw(
+                central,
+                admission_ref=first["admission_ref"],
+                capability="00" * 32,
+                decision_day=advance(9),
+            )
+        self.assertEqual(caught.exception.code, "bad_capability")
+        self.assertIn(second["admission_ref"], central["admissions"])
+        self.assertIn(first["admission_ref"], central["admission_tombstones"])
+        self.assertEqual(len(central["quarantine"]), 1)
+
+    def test_withdrawal_leaves_another_workflows_active_admission_alone(self):
+        target = "wf-" + "1" * 32
+        other = "wf-" + "2" * 32
+        central = A.new_store()
+        first, _ = self.quarantined_admission(central, target)
+        A.expire(central, today=advance(8))
+        A.issue_admission(central, notice_for(target), issued_day=advance(7))
+        survivor = A.issue_admission(central, notice_for(other), issued_day=advance(7))
+        A.withdraw(
+            central,
+            admission_ref=first["admission_ref"],
+            capability=first["capability"],
+            decision_day=advance(9),
+        )
+        self.assertIn(survivor["admission_ref"], central["admissions"])
+        self.assertEqual(
+            [ref for ref, admission in central["admissions"].items() if admission["workflow_ref"] == target],
+            [],
+        )
+
+
+class SymlinkPathGuardTests(unittest.TestCase):
+    """F2: every component of a store or export path must not be a symlink."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix="aegis-fix5-symlink-")
+        self.root = Path(self.temp.name)
+        self.store = S.new_store()
+        self.workflow = S.enable_capture(self.store, day=START, start_day=START)
+        self.ref = self.workflow["workflow_ref"]
+        S.record_transition(self.store, self.ref, kind="observation", value="ongoing", effective_day=START)
+        self.workflow["admission_ref"] = ADMISSION
+        self.payload, self.sha = S.preview_export(self.store, self.ref)
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def other_checkout(self):
+        repo = self.root / "other-checkout"
+        (repo / ".git").mkdir(parents=True, exist_ok=True)
+        return repo
+
+    def symlink(self, target, link, *, directory=False):
+        try:
+            os.symlink(target, link, target_is_directory=directory)
+        except (OSError, NotImplementedError) as exc:
+            self.skipTest("symlink creation unavailable on this host: " + str(exc))
+
+    def test_store_with_a_final_symlink_inside_a_checkout_is_refused(self):
+        repo = self.other_checkout()
+        outside = self.root / "outside"
+        outside.mkdir()
+        target = outside / "store.json"
+        link = repo / "store.json"
+        self.symlink(target, link)
+        with working_directory(self.root):
+            with self.assertRaises(S.ContractError) as caught:
+                S.save_store(link, S.new_store())
+        self.assertEqual(caught.exception.code, "store_path_symlink")
+        self.assertTrue(link.is_symlink())
+        self.assertFalse(target.exists())
+
+    def test_store_with_a_symlinked_parent_inside_a_checkout_is_refused(self):
+        repo = self.other_checkout()
+        outside = self.root / "outside"
+        outside.mkdir()
+        linked_dir = repo / "linked"
+        self.symlink(outside, linked_dir, directory=True)
+        target = linked_dir / "store.json"
+        with working_directory(self.root):
+            with self.assertRaises(S.ContractError) as caught:
+                S.save_store(target, S.new_store())
+        self.assertEqual(caught.exception.code, "store_path_symlink")
+        self.assertFalse((outside / "store.json").exists())
+
+    def test_store_with_a_dangling_symlink_is_refused(self):
+        repo = self.other_checkout()
+        target = self.root / "missing-store.json"
+        link = repo / "store.json"
+        self.symlink(target, link)
+        with working_directory(self.root):
+            with self.assertRaises(S.ContractError) as caught:
+                S.save_store(link, S.new_store())
+        self.assertEqual(caught.exception.code, "store_path_symlink")
+        self.assertTrue(link.is_symlink())
+        self.assertFalse(target.exists())
+
+    def test_store_through_a_symlink_outside_version_control_is_refused(self):
+        real = self.root / "real"
+        real.mkdir()
+        alias = self.root / "alias"
+        self.symlink(real, alias, directory=True)
+        with working_directory(self.root):
+            with self.assertRaises(S.ContractError) as caught:
+                S.save_store(alias / "store.json", S.new_store())
+        self.assertEqual(caught.exception.code, "store_path_symlink")
+        self.assertFalse((real / "store.json").exists())
+
+    def test_export_with_a_final_symlink_is_refused(self):
+        out = self.root / "export.json"
+        target = self.root / "target.json"
+        self.symlink(target, out)
+        with working_directory(self.root):
+            with self.assertRaises(S.ContractError) as caught:
+                S.export_snapshot(self.store, self.ref, out, preview_sha256=self.sha, confirm=True)
+        self.assertEqual(caught.exception.code, "export_path_symlink")
+        self.assertTrue(out.is_symlink())
+        self.assertFalse(target.exists())
+
+    def test_export_with_a_dangling_symlink_is_refused(self):
+        out = self.root / "export.json"
+        target = self.root / "missing-export.json"
+        self.symlink(target, out)
+        with working_directory(self.root):
+            with self.assertRaises(S.ContractError) as caught:
+                S.export_snapshot(self.store, self.ref, out, preview_sha256=self.sha, confirm=True)
+        self.assertEqual(caught.exception.code, "export_path_symlink")
+        self.assertTrue(out.is_symlink())
+        self.assertFalse(target.exists())
+
+    def test_export_through_a_symlinked_parent_is_refused(self):
+        real = self.root / "real"
+        real.mkdir()
+        alias = self.root / "alias"
+        self.symlink(real, alias, directory=True)
+        out = alias / "export.json"
+        with working_directory(self.root):
+            with self.assertRaises(S.ContractError) as caught:
+                S.export_snapshot(self.store, self.ref, out, preview_sha256=self.sha, confirm=True)
+        self.assertEqual(caught.exception.code, "export_path_symlink")
+        self.assertFalse((real / "export.json").exists())
+
+    def test_a_clean_path_still_writes_the_store_and_export(self):
+        plain = self.root / "plain"
+        store_path = plain / "store.json"
+        S.save_store(store_path, self.store)
+        self.assertTrue(store_path.exists())
+        out = plain / "export.json"
+        result = S.export_snapshot(self.store, self.ref, out, preview_sha256=self.sha, confirm=True)
+        self.assertTrue(out.exists())
+        self.assertEqual(result["sha256"], self.sha)
+
 
 if __name__ == "__main__":
     unittest.main()

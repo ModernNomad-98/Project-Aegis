@@ -106,9 +106,12 @@ anything could be called public:
 2. **Sparse outcome** — if any nonzero outcome count is below 5, the cohort is
    withheld; publishing the other cells plus N would let the withheld cell be
    recovered by subtraction.
-3. **Complementary suppression** — if only one cohort in the report would
-   publish, it is withheld too, so a previously published total cannot be used
-   to difference a suppressed cohort.
+3. **Complementary suppression** — if only one cohort would publish and any
+   earlier month is withheld (a retained cohort, a month with an open start, or
+   a month known only from expired records), that cohort is withheld too. A
+   suppressed month must not be singled out while the next publishable month is
+   released, and a previously published total cannot be used to difference a
+   suppressed cohort.
 4. **Stage cells** — a stage rate is published only when its denominator is at
    least 20 and its numerator is either 0 or at least 5. The stage cell also
    carries a `not_applicable` count; because a published denominator smaller
@@ -120,7 +123,8 @@ anything could be called public:
    small month-over-month shift can isolate one contributor.
 6. **Open month** — a month with any start still inside the 37-day window is
    withheld with reason `cohort_open`, because its cohort cell holds only the
-   starts that already closed.
+   starts that already closed. A month with an open start but no retained
+   closed cohort is listed in `suppressed_cohorts` with the same reason.
 7. **Sparse attestation** — `independently_attested_success` is published only
    when its numerator is 0 or at least 5; a nonzero numerator below the cell
    floor is withheld with reason `sparse_attestation_cell`.
@@ -134,7 +138,8 @@ anything could be called public:
 A cohort marked `incomplete` is withheld from the publishable view with reason
 `retention_incomplete` before the other floors apply; a month with no retained
 cohort but an observed expired record is listed in `suppressed_cohorts` with
-the same reason. These are disclosure
+the same reason. A month that is both incomplete and open is listed once, with
+`retention_incomplete` taking precedence. These are disclosure
 controls, not anonymity guarantees. No public pilot metrics are authorised; the
 publishable view always states `public_release: false` and is a rehearsal only.
 SCIF completion is not acceptance evidence and never by itself qualifies a

@@ -7,7 +7,7 @@ Two stdlib-only Python 3.14 programs that implement the contract in
 | --- | --- |
 | [`local_report.py`](local_report.py) | Participant side: per-workflow opt-in, bounded transition history, exact preview, local-only export. |
 | [`aggregate.py`](aggregate.py) | Steward side: manual admissions, import with revision invariants, 90-day retention, deletion, cohort arithmetic and suppression. |
-| [`tests/`](tests) | 186 behavioral tests, including mutant demonstrations, over synthetic fixtures only. |
+| [`tests/`](tests) | 205 behavioral tests, including mutant demonstrations, over synthetic fixtures only. |
 
 **No network, no threads, no subprocesses, no third-party packages.** Capture is
 off until a workflow is explicitly opted in. There is no background upload and
@@ -96,7 +96,7 @@ matching hash, and refuses to overwrite an existing file.
 | --- | --- |
 | `issue-admission --notice F --day D` | Issue a random admission and capability after a prospective-review check; the secret is returned once and only its verifier is stored. |
 | `import --payload F (--capability-file C | --capability C) --day D` | Validate, dedupe and store one export. Never enrolls. Prefer `--capability-file`; `--capability` still works but prints a warning because argv is visible to other processes. |
-| `withdraw --admission-ref A (--capability-file C | --capability C) --day D` | Delete the admission and linked raw data; returns an unlinkable receipt id. Works after the admission expires while linked data remains. |
+| `withdraw --admission-ref A (--capability-file C | --capability C) --day D` | Delete every admission for the named admission's workflow and its linked raw data; returns an unlinkable receipt id. Works after the admission expires while linked data remains. |
 | `expire --day D` | Apply central 90-day retention, quarantine expiry, admission tombstones and 7-day receipt expiry. |
 | `report --as-of D [--publishable]` | Compute the restricted cohort report, or the suppressed rehearsal view. |
 
@@ -108,7 +108,8 @@ on stderr, including a corrupt or incompatible store (`store_unreadable`,
 `expired_admission`, `enrollment_change`, `conflicting_revision`,
 `history_rewrite`, `applicability_conflict`, `evidence_required`,
 `duplicate_event_ref`, `conflicting_same_day_transition`,
-`store_path_in_repository`, `event_after_receipt`, `receipt_before_issue`,
+`store_path_in_repository`, `store_path_symlink`, `export_path_symlink`,
+`event_after_receipt`, `receipt_before_issue`,
 `receipt_day_regression`, `capability_unreadable`, `notice_unreadable`,
 `workflow_exists`, `invalid_nesting`, `report_truncated` and `oversize`.
 
@@ -137,7 +138,10 @@ status keeps its own same-day code, `conflicting_terminal_same_day`.
   deletion receipts. An expired admission leaves a verification-only tombstone
   (random admission reference, verifier hash, random workflow reference) while
   any linked record or quarantine payload survives, so the capability can still
-  authorise withdrawal; it is deleted with the last linked datum. A
+  authorise withdrawal; it is deleted with the last linked datum. Withdrawal is
+  workflow-level: a valid capability for any admission of a workflow revokes
+  every admission for that workflow, so a sibling admission cannot later
+  re-create the deleted records. A
   non-linkable count per start month records how many records retention
   deleted, so a completed month is never republished as complete.
 - Stores, exports and directories this tool creates are user-only on POSIX
@@ -151,7 +155,12 @@ status keeps its own same-day code, `conflicting_terminal_same_day`.
   tool's own source tree, so a source archive without `.git` also fails closed
   for in-tree targets. The check walks the target path and its existing
   ancestors, so a target whose parent directory does not exist is still
-  refused inside another checkout.
+  refused inside another checkout. A symlink anywhere in the path - the final
+  component, a parent directory, or a dangling link whose target does not
+  exist - is refused with `store_path_symlink` or `export_path_symlink`
+  before any write; use a real directory path. Creating a symlink is denied to
+  unprivileged Windows processes, so the symlink tests run on POSIX and are
+  skipped on Windows.
 - Read commands (`show`, `notice`, `preview`, `report`) do not re-check the
   path of an **existing** store, and `preview` cannot stop a shell redirect.
   The guard is a write-side control: keep stores outside version control.
@@ -168,7 +177,8 @@ duplicate/conflicting/stale revisions, immutable enrollment, the day-30 and
 day-31 horizon cases, stale-ongoing to unknown, scope-change invalidation, zero
 denominators, stage applicability, local history deletion, acceptance evidence,
 same-day conflict rejection, deletion and expiry replay, retention that a retry
-cannot extend, suppression and differencing, and hand-calculated synthetic
+cannot extend, cross-admission withdrawal, symlink-path refusal (POSIX),
+suppression and differencing, and hand-calculated synthetic
 expectations. Several tests load deliberately mutated copies of the modules and
 assert that the mutation is detected.
 
