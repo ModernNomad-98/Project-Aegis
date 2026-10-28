@@ -85,9 +85,11 @@ silently skip a gate.
   never reported as a pass.
 - The gate's mandatory manual provenance step is a human/agent decision recorded
   in its report (`SKILL.md:143-169`); no automation is claimed for it.
-- The solo-owner commit-identity policy is an **open owner decision**
-  (section 8.3). The package ships the gate's fail-closed behaviour and asserts no
-  policy; that is one reason it makes no consumer-readiness claim.
+- The solo-owner commit-identity policy is **decided** (section 8.3): a solo
+  owner may commit under their own identity; only agent-authored commits must use
+  the documented repository-local agent identity. The gate's fail-closed check for
+  agent commits is unchanged, and the package still makes no consumer-readiness
+  claim.
 - A destination `AGENTS.md`/`CLAUDE.md` that differs by any byte stops the
   install (exit 22), and v1 documents no in-place merge: reconcile the two files
   to the pinned bytes before installing, or install into a tree that has neither.
@@ -995,43 +997,59 @@ human's behalf without their words.
 
 Show the resolved values and ask **exactly one** question:
 
-> Git reports this repository's author and committer as `<name> <email>`, which is the recorded owner. Should the agent commit under a different identity for this repository, or will you commit yourself?
+> Git reports this repository's author and committer as `<name> <email>`, which is the recorded owner. Will an agent commit in this repository, or will you commit yourself?
 
 Then:
 
-- If the human names a distinct agent identity, set it **only with their words**,
-  for that repository (`git config --local user.name` / `user.email`), and re-run
-  P2; a passing run prints the resolved author and committer and continues.
-- If the human says they will commit themselves, stop the install and say plainly
-  that the gate will refuse a commit whose identity is the owner's — the same
-  exit-42 condition — so a distinct identity is still needed for any commit made in
-  this repository.
+- If an agent will commit and the human names a distinct agent identity, set it
+  **only with their words**, for that repository (`git config --local user.name` /
+  `user.email`), and re-run P2; a passing run prints the resolved author and
+  committer and continues.
+- If the human says they will commit themselves, record that answer: a solo owner
+  may commit under their own identity (the decided policy below). The install's P2
+  check still stops at exit 42 because the shipped check is unchanged and cannot
+  tell an owner's commit from an agent's; that stop is the check's behaviour, not a
+  finding that the owner's commit is disallowed. This page does not claim a bypass.
+  Only agent-authored commits must use the separate agent identity.
 - If the answer is unclear, do not guess and do not write.
 
-**A solo consumer is the normal case, and it is the hard case.** If the owner's
-name and email are the same as the machine's Git identity, every commit in that
-repository is refused — including the owner's own. The documented workaround is a
-repository-local **agent** identity (a name and email that are not the owner's)
-used for the agent's commits, with the owner record keeping the human's own values.
-That workaround is the gate's fail-closed rule, not this package's policy invention.
+**A solo consumer is the normal case.** If the owner's name and email are the same
+as the machine's Git identity, an agent commit under that identity is refused by
+the gate's unchanged check. The documented **agent** identity is a repository-local
+name and email that are not the owner's, used for agent-authored commits, with the
+owner record keeping the human's own values. That requirement is the gate's
+fail-closed rule for agent commits; it is not a rule that the owner may not commit
+as themselves.
 
-#### Owner decision still needed (review row 6)
+#### Owner decision (review row 6) - resolved
 
-**This package does not decide the solo-owner policy, and it does not invent one.**
-The open question is whether a solo owner may commit under their own identity —
-which the gate refuses — or must use a repository-local agent identity. Two
-answers are on the table, and only the repository owner can choose:
+**Decided: a solo owner may commit under their own identity. Only agent-authored
+commits must use the documented repository-local agent identity.**
 
-1. **Owner commits are allowed**; only agent commits must differ from the owner,
-   with the gate changed to distinguish the acting identity from the owner record.
-2. **The agent identity is the supported solo flow**, with exact per-command
-   identity commands documented and the gate left fail-closed.
+Source: owner decision via [OWNER BRIEF] #910 comment 6463527894
+(2026-10-28T07:43:52Z; the owner's answer is recorded as ~00:45 PDT), quoted
+verbatim:
 
-Until that decision is recorded, the shipped behaviour is the gate's fail-closed
-refusal: exit 42 at this prerequisite layer and exit 1 at the gate. The package is
-therefore **not consumer-ready**, and the evidence record does not claim it is. No
-instruction in this page grants an exception, and a consumer must not treat the
-workaround as an approved policy.
+> Only agent commits must use the separate agent identity. Update the package to
+> say so, fresh final review at the new head, then merge under the standing
+> no-protected-path grant.
+
+The brief's resolution for row 6: "a solo owner may commit under their own
+identity; only agent-authored commits must use the documented repository-local
+agent identity." That is the one policy here; the alternative of requiring the
+owner's own commits to use a separate identity is removed.
+
+The gate's shipped check is unchanged: it compares the effective author and
+committer with the owner record and exits 1 on a name or email match
+(`.claude/skills/agent-startup-context-gate/SKILL.md:137-138`), and this
+prerequisite layer exits 42 on the same condition. The check cannot distinguish
+an agent's commit from the owner's; the policy decides which commits must use the
+agent identity, and the check remains the fail-closed guard that an agent commit
+must satisfy. No gate change is made or claimed.
+
+This decision does not make the package consumer-ready: the 9 Stage E acceptance
+rows listed in the evidence record remain UNRUN, and none is converted by this
+section. No instruction in this page grants an exception to any check.
 
 ## 9. The install record and its aggregate
 
@@ -1204,9 +1222,10 @@ a pass.
   would change pinned bytes. The install record lists them.
 - **One host is one host.** The measured acceptance evidence covers one Windows
   machine, one slice and J1. macOS and Linux remain not validated.
-- **The solo-owner commit-identity policy is an open owner decision**
-  (section 8.3). The package ships the gate's fail-closed behaviour and asserts no
-  policy; that is one reason it makes no consumer-readiness claim.
+- **The solo-owner commit-identity policy is decided** (section 8.3): a solo owner
+  may commit under their own identity; only agent-authored commits must use the
+  documented repository-local agent identity. The gate's fail-closed check for
+  agent commits is unchanged; the package still makes no consumer-readiness claim.
 - **The startup gate is behaviour, not a boundary** (section 1.3): it can be
   bypassed by anyone who chooses to, and its Windows lock lane is SKIP/UNRUN.
 - **The install record is evidence of identity, not a signature or a tamper-proof
