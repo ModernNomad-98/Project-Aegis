@@ -340,7 +340,7 @@ section 9.
 | Skill validator | `python -P scripts/validate-skills.py` | **exit 0**, `OK: 254 skill(s) valid, 0 warning(s)` |
 | Markdown link check on the changed pages | `python -P scripts/ci/check-markdown-links.py <pages>` | **exit 0**, 3 files / 97 links checked / 0 broken / 0 dead |
 | Whitespace / conflict markers | `git diff --check` | **clean** |
-| DCO sign-off on the candidate commits | `python -P scripts/check_dco.py --range 482ba165..HEAD` | **OK: 2 commit(s) checked, all signed off or exempt** |
+| DCO sign-off on the candidate commits | `python -P scripts/check_dco.py --range 482ba165..055401cd` | **OK: 3 commit(s) checked, all signed off or exempt** (the F1 and F2-F11 commits); the correction commit is a fourth, signed - `482ba165..HEAD` = 4 |
 
 ```text
 $ python -P scripts/tests/test_validator.py

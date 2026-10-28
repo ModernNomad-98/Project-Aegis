@@ -33,9 +33,9 @@ install makes no commit and changes no Git identity. `agent-commit` is the route
 for an agent that will commit, and its effective author and committer must be
 valid non-owner identities; an owner match still stops at exit 42. The mode is
 the owner's explicit statement, is checked before any copy and is recorded in the
-install record; an unstated or unrecognised mode stops at exit 43. The missing-owner
-stop (exit 41), the startup gate, the 41-file set, its pins and its aggregate are
-unchanged. Native before/after evidence is in
+install record; an unstated or unrecognised mode stops at exit 43 when the target
+is usable. The missing-owner stop (exit 41), the startup gate, the 41-file set, its
+pins and its aggregate are unchanged. Native before/after evidence is in
 [human-commit-install-v1](evidence/consumer-readiness/human-commit-install-v1.md).
 
 **Reading key.** **Role A** is the Project Aegis source repository; **Role B** is
@@ -522,9 +522,11 @@ required for both modes, are used only to establish that the owner stated the
 mode, and are never written to a file (they may contain the owner's name, which
 section 8 keeps out of records). The mode and authorization are checked
 **before either identity record** (exit 43), then the owner record (exit 41),
-then the effective identity (exit 42), so an unstated mode is always 43. A
-missing, empty or unrecognised mode, or a missing authorization, stops before
-anything is written.
+then the effective identity (exit 42). With an otherwise-valid target, an
+unstated mode therefore exits 43; an unusable target is refused earlier at its
+own documented exit 1 (missing target or not a Git repository). Nothing is
+written on either path, and a missing, empty or unrecognised mode, or a missing
+authorization, stops before anything is written.
 
 Save the block below as `install-mode.ps1` beside the section 7.1 harness. The
 harness runs it as its first step and copies nothing when it stops.
