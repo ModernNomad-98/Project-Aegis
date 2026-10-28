@@ -94,7 +94,7 @@
           "Treats merge-base rc0=ancestor_or_equal, rc1=not_ancestor, rc>=2=UNVERIFIED; content diff rc0=same, rc1=differs, rc>=2=UNVERIFIED; missing/empty TARGET_PATH is UNVERIFIED, never no.",
           "Does not use a legacy boolean shortcut (for example git merge-base --is-ancestor ... || echo no or mapping Git error 128 to no/exit 0).",
           "Applies the operative completion-anchor TRUST row as written: it routes the ancestry, content and blob-OID checks through the canonical wrapper and records the three statuses, and it contains no executable yes/no fallback that would turn a Git error into no with shell exit 0.",
-          "Requires ancestry_status=ancestor_or_equal AND content_match_status=same AND oid_match_status=same plus the row's separate completion evidence (current-tree artifacts, revert/re-revert content proofs, applied-migration status and merged-PR mergeCommit) before treating a remembered completion claim as verified.",
+          "Requires ancestry_status=ancestor_or_equal AND content_match_status=same AND oid_match_status=same for EVERY claimed artifact path - one wrapper run and one recorded three-status triple per path, never one path covering another - plus the row's separate completion evidence (current-tree artifacts, revert/re-revert content proofs, applied-migration status and merged-PR mergeCommit) before treating a remembered completion claim as verified.",
           "A gate passes only when all three statuses are the required pass values; wrapper exit 0 alone is completed-only, never a pass.",
           "Stops for approval before editing any memory file."
         ]
