@@ -4716,6 +4716,18 @@ def test_readiness_memory_canonical_tristate():
         assert "Legacy boolean shortcut - forbidden" in memrules
         trust=memrules.split("## TRUST rules",1)[1].split("## HYGIENE",1)[0]
         assert not re.search(r"if git merge-base --is-ancestor[^;]+; then echo yes; else echo no; fi", trust), "the operative TRUST row must not collapse a Git error to no with shell exit 0"
+        # D5 (APR-140 (e) triage): the check above is section-wide and matches one
+        # literal shape. Scope a second, additive check to the completion-anchor row
+        # itself and reject the broader error-collapsing fallback shapes there.
+        anchor_rows = [line for line in trust.splitlines() if line.startswith("| Completion anchor")]
+        assert len(anchor_rows) == 1, "the operative TRUST table must publish exactly one completion-anchor row"
+        anchor_row = anchor_rows[0]
+        for fallback_shape in ("|| echo no", "&& echo", "if !", "128"):
+            assert fallback_shape not in anchor_row, (
+                "the completion-anchor row must not contain the error-collapsing fallback shape " + repr(fallback_shape))
+        assert "canonical wrapper" in anchor_row and "UNVERIFIED" in anchor_row, "the completion-anchor row must route to the canonical wrapper and its UNVERIFIED disposition"
+        assert "ancestry_status=ancestor_or_equal" in anchor_row and "content_match_status=same" in anchor_row and "oid_match_status=same" in anchor_row, "the completion-anchor row must state the completion-content gate"
+        assert all(word in anchor_row for word in ("ANCHOR_SHA", "REVERT_SHA", "RE_REVERT_SHA", "migration", "mergeCommit")), "the completion-anchor row must keep the completion-anchor proofs"
         assert "canonical" in trust.lower() and "UNVERIFIED" in trust, "the operative TRUST row must route to the canonical wrapper and its UNVERIFIED disposition"
         assert "ancestry_status=ancestor_or_equal" in trust and "content_match_status=same" in trust and "oid_match_status=same" in trust, "the operative TRUST row must state the completion-content gate"
         assert all(word in trust for word in ("ANCHOR_SHA","REVERT_SHA","RE_REVERT_SHA","migration","mergeCommit")), "the operative TRUST row must keep the completion-anchor proofs"
@@ -4926,25 +4938,38 @@ def test_dsr1_lock_lifecycle():
             clean()
         prefix = _dsr1_lock_text().split("# supervisor launch (stable test anchor)", 1)[0]
         assert prefix, "lock block must keep the supervisor test anchor"
+        def clean_all():
+            """Remove every lock fixture path, including symlinks, after a case."""
+            for path in list(root.glob("stack.lock*")):
+                if path.is_symlink() or path.is_file():
+                    path.unlink(missing_ok=True)
+                elif path.is_dir():
+                    shutil.rmtree(path, ignore_errors=True)
+        def run_cleanup(name, suffix):
+            """Run acquisition plus an injected cleanup schedule in one shell."""
+            harness_path = _dsr1_script(root, name, prefix + suffix)
+            return subprocess.run(["sh", str(harness_path)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
         harness = _dsr1_script(root, "cleanup-twice.sh", prefix + "\ncleanup\nrc1=$?\ncleanup\nrc2=$?\nexit $((rc1 + rc2))\n")
         twice = subprocess.run(["sh", str(harness)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert twice.returncode == 0 and not lock.exists(), (twice.returncode, twice.stderr)
         _dsr1_pass("repeated cleanup is idempotent under the reentrancy guard")
         early = _dsr1_script(root, "replacement-before-cleanup.sh", prefix + "\nmv \"$LOCK\" \"$LOCK.original\"\nmkdir \"$LOCK\"\nls -di \"$LOCK\" | awk '{print $1}' > \"$LOCK.identity\"\ncleanup\nexit $?\n")
-        early_run = subprocess.run(["sh", str(early)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
         identity_file = root / "stack.lock.identity"
         original = root / "stack.lock.original"
-        assert early_run.returncode != 0, (early_run.returncode, early_run.stdout, early_run.stderr)
-        assert re.search(r"INCOMPLETE|OWNERSHIP LOST", early_run.stderr or ""), early_run.stderr
-        assert identity_file.is_file(), "the replacement identity was not recorded"
-        replacement_inode = int(identity_file.read_text(encoding="utf-8").strip())
-        assert lock.is_dir() and not lock.is_symlink(), "the replacement must remain a real directory at the public path"
-        assert lock.stat().st_ino == replacement_inode, "the replacement directory identity must be preserved"
-        assert not list(lock.iterdir()), "the empty replacement must remain empty and unchanged"
-        assert not (lock / "abort").exists() and not (lock / "workload.pid").exists(), "an unproved replacement must receive no abort/PID write"
-        assert original.is_dir() and (original / "token").is_file(), "the original owned lock evidence must be retained"
-        _dsr1_pass("CL-07 FIX3-a: an empty replacement installed before cleanup is preserved at its public path with nonzero uncertainty")
-        _dsr1_clean_lock(lock); _dsr1_clean_lock(original); identity_file.unlink()
+        try:
+            early_run = subprocess.run(["sh", str(early)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
+            assert early_run.returncode != 0, (early_run.returncode, early_run.stdout, early_run.stderr)
+            assert re.search(r"INCOMPLETE|OWNERSHIP LOST", early_run.stderr or ""), early_run.stderr
+            assert identity_file.is_file(), "the replacement identity was not recorded"
+            replacement_inode = int(identity_file.read_text(encoding="utf-8").strip())
+            assert lock.is_dir() and not lock.is_symlink(), "the replacement must remain a real directory at the public path"
+            assert lock.stat().st_ino == replacement_inode, "the replacement directory identity must be preserved"
+            assert not list(lock.iterdir()), "the empty replacement must remain empty and unchanged"
+            assert not (lock / "abort").exists() and not (lock / "workload.pid").exists(), "an unproved replacement must receive no abort/PID write"
+            assert original.is_dir() and (original / "token").is_file(), "the original owned lock evidence must be retained"
+            _dsr1_pass("CL-07 FIX3-a: an empty replacement installed before cleanup is preserved at its public path with nonzero uncertainty")
+        finally:
+            clean_all()
         late_suffix = ("\nmv() {\n"
                        "  if [ \"$1\" = \"$LOCK\" ] && [ ! -e \"$LOCK.schedule-hit\" ]; then\n"
                        "    command mv \"$LOCK\" \"$LOCK.original\"\n"
@@ -4958,23 +4983,153 @@ def test_dsr1_lock_lifecycle():
                        "}\n"
                        "cleanup\nexit $?\n")
         late = _dsr1_script(root, "replacement-at-quarantine-mv.sh", prefix + late_suffix)
-        late_run = subprocess.run(["sh", str(late)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
-        assert (root / "stack.lock.schedule-hit").is_file(), "the late-replacement barrier must actually fire"
-        assert late_run.returncode != 0, (late_run.returncode, late_run.stdout, late_run.stderr)
-        assert re.search(r"INCOMPLETE|OWNERSHIP LOST", late_run.stderr or ""), late_run.stderr
-        late_inode = int((root / "stack.lock.identity").read_text(encoding="utf-8").strip())
-        assert lock.is_dir() and not lock.is_symlink(), "the successor must remain a real directory at the public path"
-        assert lock.stat().st_ino == late_inode, "the successor directory identity must be preserved"
-        assert sorted(p.name for p in lock.iterdir()) == ["evidence", "token"], sorted(p.name for p in lock.iterdir())
-        assert (lock / "token").read_text(encoding="utf-8") == "owner=successor run=successor\n"
-        assert (lock / "evidence").read_text(encoding="utf-8") == "successor evidence\n"
-        assert not list(root.glob("stack.lock.quarantine.*")), "no quarantine remnant may retain the successor"
-        late_locations = [p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_dir() and not p.is_symlink() and p.stat().st_ino == late_inode]
-        assert late_locations == ["stack.lock"], late_locations
-        assert (root / "stack.lock.original").is_dir(), "the original owned lock evidence must be retained"
-        _dsr1_pass("CL-07 FIX3-b: a readable foreign successor installed at the quarantine-mv boundary is restored to its public path and reported as OWNERSHIP LOST")
-        _dsr1_clean_lock(lock); _dsr1_clean_lock(root / "stack.lock.original")
-        (root / "stack.lock.identity").unlink(); (root / "stack.lock.schedule-hit").unlink()
+        try:
+            late_run = subprocess.run(["sh", str(late)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
+            assert (root / "stack.lock.schedule-hit").is_file(), "the late-replacement barrier must actually fire"
+            assert late_run.returncode != 0, (late_run.returncode, late_run.stdout, late_run.stderr)
+            assert re.search(r"INCOMPLETE|OWNERSHIP LOST", late_run.stderr or ""), late_run.stderr
+            late_inode = int((root / "stack.lock.identity").read_text(encoding="utf-8").strip())
+            assert lock.is_dir() and not lock.is_symlink(), "the successor must remain a real directory at the public path"
+            assert lock.stat().st_ino == late_inode, "the successor directory identity must be preserved"
+            assert sorted(p.name for p in lock.iterdir()) == ["evidence", "token"], sorted(p.name for p in lock.iterdir())
+            assert (lock / "token").read_text(encoding="utf-8") == "owner=successor run=successor\n"
+            assert (lock / "evidence").read_text(encoding="utf-8") == "successor evidence\n"
+            assert not list(root.glob("stack.lock.quarantine.*")), "no quarantine remnant may retain the successor"
+            late_locations = [p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_dir() and not p.is_symlink() and p.stat().st_ino == late_inode]
+            assert late_locations == ["stack.lock"], late_locations
+            assert (root / "stack.lock.original").is_dir(), "the original owned lock evidence must be retained"
+            _dsr1_pass("CL-07 FIX3-b: a readable foreign successor installed at the quarantine-mv boundary is restored to its public path and reported as OWNERSHIP LOST")
+        finally:
+            clean_all()
+
+        # D-1 / A-ROWS FIX-3 quarantine-restoration regression coverage. The
+        # acquisition half runs first, then the suffix installs the exact boundary
+        # state before cleanup in the same shell; every case is fail-closed.
+        try:
+            dangling_lock = run_cleanup("dangling-lock-symlink.sh",
+                "\nmv \"$LOCK\" \"$LOCK.original\"\n"
+                "ln -s \"$LOCK.dangling-lock-target\" \"$LOCK\"\n"
+                "cleanup\nexit $?\n")
+            assert dangling_lock.returncode != 0, (dangling_lock.returncode, dangling_lock.stdout, dangling_lock.stderr)
+            assert "lock path is now a symlink" in (dangling_lock.stderr or ""), dangling_lock.stderr
+            assert "current ownership cannot be proved" in (dangling_lock.stderr or ""), dangling_lock.stderr
+            assert lock.is_symlink(), "the dangling lock-path symlink must be retained"
+            assert os.readlink(lock) == str(lock) + ".dangling-lock-target", os.readlink(lock)
+            assert not (root / "stack.lock.dangling-lock-target").exists(), "the symlink target must not be created or followed"
+            original_evidence = root / "stack.lock.original"
+            assert original_evidence.is_dir() and (original_evidence / "token").is_file(), "the moved-aside owned lock must be retained"
+            assert "owner=FixtureAgent" in (original_evidence / "token").read_text(encoding="utf-8")
+            assert not list(root.glob("stack.lock.quarantine.*")), "the symlink guard must run before any quarantine path"
+            _dsr1_pass("CL-07 D-1a: dangling symlink at the lock path is caught by the CREATED_LOCK guard; target untouched, no quarantine")
+        finally:
+            clean_all()
+        try:
+            dangling_quar = run_cleanup("dangling-quarantine-symlink.sh",
+                "\nQUAR=\"$LOCK.quarantine.$RUN_ID\"\n"
+                "ln -s \"$LOCK.dangling-quarantine-target\" \"$QUAR\"\n"
+                "cleanup\nexit $?\n")
+            assert dangling_quar.returncode != 0, (dangling_quar.returncode, dangling_quar.stdout, dangling_quar.stderr)
+            assert "cannot quarantine owned lock; evidence retained" in (dangling_quar.stderr or ""), dangling_quar.stderr
+            assert lock.is_dir() and not lock.is_symlink(), "the owned lock must be retained"
+            assert "owner=FixtureAgent" in (lock / "token").read_text(encoding="utf-8")
+            quarantine_links = [p for p in root.glob("stack.lock.quarantine.*") if p.is_symlink()]
+            assert len(quarantine_links) == 1, [str(p) for p in quarantine_links]
+            assert os.readlink(quarantine_links[0]) == str(lock) + ".dangling-quarantine-target", os.readlink(quarantine_links[0])
+            assert not quarantine_links[0].exists(), "the quarantine symlink must stay dangling and untouched"
+            assert not (root / "stack.lock.dangling-quarantine-target").exists(), "the symlink target must not be created or followed"
+            _dsr1_pass("CL-07 D-1b: dangling symlink at the quarantine path fails closed; symlink intact and owned lock retained")
+        finally:
+            clean_all()
+        try:
+            preexisting = run_cleanup("pre-existing-quarantine.sh",
+                "\nQUAR=\"$LOCK.quarantine.$RUN_ID\"\n"
+                "mkdir \"$QUAR\"\n"
+                "printf '%s\\n' 'owner=prior@example.invalid run=prior' > \"$QUAR/token\"\n"
+                "printf '%s\\n' 'prior evidence' > \"$QUAR/evidence\"\n"
+                "cleanup\nexit $?\n")
+            assert preexisting.returncode != 0, (preexisting.returncode, preexisting.stdout, preexisting.stderr)
+            assert "quarantine path" in (preexisting.stderr or "") and "already exists" in (preexisting.stderr or ""), preexisting.stderr
+            assert "prior evidence ownership is unproved" in (preexisting.stderr or ""), preexisting.stderr
+            assert lock.is_dir() and not lock.is_symlink(), "the owned lock must be retained"
+            assert "owner=FixtureAgent" in (lock / "token").read_text(encoding="utf-8")
+            prior = [p for p in root.glob("stack.lock.quarantine.*") if p.is_dir() and not p.is_symlink()]
+            assert len(prior) == 1, [str(p) for p in prior]
+            assert (prior[0] / "token").read_text(encoding="utf-8") == "owner=prior@example.invalid run=prior\n"
+            assert (prior[0] / "evidence").read_text(encoding="utf-8") == "prior evidence\n"
+            assert not (prior[0] / "abort").exists() and not (prior[0] / "workload.pid").exists(), "prior quarantine evidence must not be adopted or written to"
+            _dsr1_pass("CL-07 D-1c: pre-existing real quarantine evidence is preserved, never adopted, and the owned lock is retained with nonzero uncertainty")
+        finally:
+            clean_all()
+        try:
+            rename_failure = run_cleanup("quarantine-rename-failure.sh",
+                "\nmv() {\n"
+                "  if [ \"$1\" = \"$LOCK\" ]; then case \"$2\" in \"$LOCK\".quarantine.*) return 1 ;; esac; fi\n"
+                "  command mv \"$@\"\n"
+                "}\n"
+                "cleanup\nexit $?\n")
+            assert rename_failure.returncode != 0, (rename_failure.returncode, rename_failure.stdout, rename_failure.stderr)
+            assert "cannot quarantine owned lock; evidence retained" in (rename_failure.stderr or ""), rename_failure.stderr
+            assert lock.is_dir() and not lock.is_symlink(), "the owned lock must be retained after a rename failure"
+            assert "owner=FixtureAgent" in (lock / "token").read_text(encoding="utf-8")
+            assert not list(root.glob("stack.lock.quarantine.*")), "a failed rename must not leave a quarantine path"
+            _dsr1_pass("CL-07 D-1d: quarantine rename failure retains the owned lock and evidence with nonzero uncertainty")
+        finally:
+            clean_all()
+        try:
+            removal_failure = run_cleanup("quarantine-removal-failure.sh",
+                "\nrm() {\n"
+                "  if [ \"$1\" = \"-rf\" ]; then case \"$2\" in \"$LOCK\".quarantine.*) return 1 ;; esac; fi\n"
+                "  command rm \"$@\"\n"
+                "}\n"
+                "cleanup\nexit $?\n")
+            assert removal_failure.returncode != 0, (removal_failure.returncode, removal_failure.stdout, removal_failure.stderr)
+            assert "quarantine removal failed; owned lock restored" in (removal_failure.stderr or ""), removal_failure.stderr
+            assert lock.is_dir() and not lock.is_symlink(), "the owned lock must be restored after a removal failure"
+            assert "owner=FixtureAgent" in (lock / "token").read_text(encoding="utf-8")
+            assert not list(root.glob("stack.lock.quarantine.*")), "the restored lock must not leave a quarantine remnant"
+            _dsr1_pass("CL-07 D-1e: quarantine removal failure restores the owned lock and evidence with nonzero uncertainty")
+        finally:
+            clean_all()
+        try:
+            occupied = run_cleanup("occupied-restore-target.sh",
+                "\nmv() {\n"
+                "  if [ \"$1\" = \"$LOCK\" ] && [ ! -e \"$LOCK.occupied-hit\" ]; then\n"
+                "    case \"$2\" in \"$LOCK\".quarantine.*) ;; *) command mv \"$@\"; return $? ;; esac\n"
+                "    command mv \"$LOCK\" \"$LOCK.original\"\n"
+                "    mkdir \"$LOCK\"\n"
+                "    printf '%s\\n' 'owner=foreign@example.invalid run=foreign' > \"$LOCK/token\"\n"
+                "    printf '%s\\n' 'foreign evidence' > \"$LOCK/evidence\"\n"
+                "    command mv \"$LOCK\" \"$2\"\n"
+                "    mkdir \"$LOCK\"\n"
+                "    printf '%s\\n' 'owner=occupier@example.invalid run=occupier' > \"$LOCK/token\"\n"
+                "    printf '%s\\n' 'occupier evidence' > \"$LOCK/evidence\"\n"
+                "    ls -di \"$LOCK\" | awk '{print $1}' > \"$LOCK.occupier.inode\"\n"
+                "    : > \"$LOCK.occupied-hit\"\n"
+                "    return 0\n"
+                "  fi\n"
+                "  command mv \"$@\"\n"
+                "}\n"
+                "cleanup\nexit $?\n")
+            assert occupied.returncode != 0, (occupied.returncode, occupied.stdout, occupied.stderr)
+            assert "OWNERSHIP LOST" in (occupied.stderr or "") and "no deletion performed" in (occupied.stderr or ""), occupied.stderr
+            assert lock.is_dir() and not lock.is_symlink(), "the occupier must remain a real directory at the public path"
+            assert sorted(p.name for p in lock.iterdir()) == ["evidence", "token"], sorted(p.name for p in lock.iterdir())
+            assert (lock / "token").read_text(encoding="utf-8") == "owner=occupier@example.invalid run=occupier\n"
+            assert (lock / "evidence").read_text(encoding="utf-8") == "occupier evidence\n"
+            occupier_inode = int((root / "stack.lock.occupier.inode").read_text(encoding="utf-8").strip())
+            assert lock.stat().st_ino == occupier_inode, "the occupier directory identity must be preserved"
+            assert not (lock / "abort").exists() and not (lock / "workload.pid").exists(), "the occupier must receive no abort/PID write"
+            foreign = [p for p in root.glob("stack.lock.quarantine.*") if p.is_dir() and not p.is_symlink()]
+            assert len(foreign) == 1, [str(p) for p in foreign]
+            assert foreign[0].parent == root, "the quarantine copy must not nest inside the occupier"
+            assert (foreign[0] / "token").read_text(encoding="utf-8") == "owner=foreign@example.invalid run=foreign\n"
+            assert (foreign[0] / "evidence").read_text(encoding="utf-8") == "foreign evidence\n"
+            original_evidence = root / "stack.lock.original"
+            assert original_evidence.is_dir(), "the original owned lock evidence must be retained"
+            assert "owner=FixtureAgent" in (original_evidence / "token").read_text(encoding="utf-8")
+            _dsr1_pass("CL-07 D-1f: occupied restore target retains the foreign quarantine copy, leaves the occupier untouched and reports OWNERSHIP LOST")
+        finally:
+            clean_all()
 
 
 def test_dsr1_fixture_cleanup():
