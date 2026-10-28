@@ -15,8 +15,8 @@ The library does not itself build, deploy or operate an application.
    checkout and begin with the [documentation index](docs/README.md).
 2. **Get the skills.** Install Git. There are three installation routes, and
    they prove different things: the [starter package](docs/consumer-starter-package.md)
-   — a fixed, dependency-checked set of 17 skills and 2 startup files for a
-   first product slice; the documented allow-list copy of the skills you choose;
+   — a fixed, dependency-checked set of 37 skill files for 17 skills plus 2
+   startup files for a first product slice; the documented allow-list copy of the skills you choose;
    and the full source checkout, which is for maintaining the library and for
    reading the skills before choosing. [Getting started](#getting-started) walks
    through each one.
@@ -282,7 +282,7 @@ below starts from. Later, run `git pull` from the same folder to update to the l
 
 **Choose your installation route before you start a project.**
 
-- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 39-file set (17 skills, 2 startup files), its dependency closure, the one install procedure, its fail-closed checks, the owner record it requires and the commit identity the startup gate enforces.
+- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 39-file set (37 skill files for 17 skills plus 2 startup files), its dependency closure, the one Windows PowerShell install procedure with a runnable harness, its fail-closed checks, the owner record it requires, and the commit identity the startup gate checks and requires. The install writes only the 17 skill directories and the two startup files; your repository's other files are outside its scope, and the clone must be an LF checkout (the procedure checks it).
 - **Selected skills (any product slice).** Copy only the skills a slice needs with the allow-list block in [Using the skills in your own project](#using-the-skills-in-your-own-project); this is also how you extend the starter package.
 - **Full source checkout (library maintenance).** Keep this clone and work in it; only this route runs the repository's own validator and CI-equivalent checks.
 
@@ -410,13 +410,17 @@ way. If your repo has no `.claude/skills/` folder yet, create it first (it's jus
 4. Open your own product repository and work there under its startup routing.
 
 **Installation status** (2026-10-27; evidence bound to candidate `534d6bbf92e5371215c5fc7d620de979e73cbaf5`, installed from base `ffb040c7a363648856475280646bbd142dfabe4e`; evidence record: [local-starter-v1](docs/evidence/consumer-readiness/local-starter-v1.md)).
-The next installation milestone is a complete, dependency-checked starter package. Structural checks and bounded synthetic tests have passed. Complete native consumer testing remains planned. Validation currently covers the documented environments; additional host coverage is planned.
+**One documented Windows environment is validated, not a set of them.** Windows 11 10.0.26200 (UBR 9711); PowerShell 7.6.6 for the scripted procedure, and Windows PowerShell 5.1.26100.9711 measured only for its scripted-load refusal (effective policy Restricted); Git 2.55.0.windows.5; `sh` from `C:\Program Files\Git\bin\sh.exe`; host agent DeepSeek Harness (`deepseek-flash`). Claude Code 2.1.311 was present on that host but was not the agent used.
 
-Measured environment: Windows 11 10.0.26200 (UBR 9711), PowerShell 7.6.6 and Windows PowerShell 5.1.26100.9711 (effective policy Restricted; scripted `.ps1` load refused, measured), Git 2.55.0.windows.5, `sh` from `C:\Program Files\Git\bin\sh.exe`, host agent DeepSeek Harness (`deepseek-flash`). The 39-file package, its aggregate and every check's result are in the evidence record.
+**The starter file set is closed for J1: 26 PASS, 0 FAIL, 9 UNRUN.** The UNRUNs are the AC-17 owner-coverage table, independent plan audit, independent code review, delivery GO, cross-session continuation and authority reuse, screenshot capture, and E3 confirmation; each has its exact remaining action in the evidence record. Independent audit/review and cross-host testing remain, and a closed file set is not evidence of consumer readiness. All 39 packaged files check out LF (`git ls-files --eol` reports `w/lf` for every one; re-checked 2026-10-27), as the source `.gitattributes` requires, and the published 39-file aggregate was reproduced.
+
+**The startup gate is required behaviour, not automatic enforcement.** Installing it ships the contract and its check, not a hook or a security boundary; the commit identity is checked and required by the procedure, never enforced by the files themselves.
+
+**Owner decision still open:** whether a solo owner may commit under their own identity or must use a repository-local agent identity. The package ships the gate's fail-closed behaviour and states the question; it asserts no policy and does not claim consumer readiness (package section 8.3).
 
 The package's definition, its 39-file closure and the one install procedure are in [docs/consumer-starter-package.md](docs/consumer-starter-package.md). The evidence record names the host, the installed-file hashes, each check's PASS/FAIL/UNRUN result, and the exact remaining action for every UNRUN.
 
-Not claimed here: production readiness, a second host, a hosted deployment, live-model evaluation, or CI-green equality. macOS/Linux remain not validated (see the copy section). The setup/control-plane warnings elsewhere on this page still apply.
+Not claimed here: consumer readiness, production readiness, multi-tenant or SaaS readiness, a second host, a hosted deployment, live-model evaluation, or CI-green equality. macOS/Linux remain not validated (see the copy section). The setup/control-plane warnings elsewhere on this page still apply.
 
 **Do not copy each skill's `evals/` folder.** Every shipped skill carries `evals/evals.json`
 and (usually) `evals/trigger-evals.json`. Those are the skill's **answer keys**: each case
@@ -639,7 +643,7 @@ After copying, open your OWN product repository and work there: for a new projec
 You do NOT need to create a second project folder just because the Aegis files are present.
 The Project Aegis source repository is identified by its source-package landmarks — a `# Project Aegis` `README.md`, `docs/skills-catalog.md`, `scripts/validate-skills.py`, and `artifacts/audits/skill-contract-audit-baseline.json` — not by the copied skills alone.
 
-**Before you install, record the owner and give the agent its own commit identity.** The starter procedure asks for two local records, and they do different jobs. The **owner record** — `git config --local aegis.ownerName "<owner name>"` and `git config --local aegis.ownerEmail "<owner email>"` — names the human every approval in `docs/project-state.md` belongs to, and is never committed. The **commit identity** — `user.name` and `user.email` — signs commits, and the startup gate refuses any commit whose author or committer matches the owner record on either name or email, so the agent's commits must carry a different name and email from the owner's. If either record is missing or colliding, the procedure stops and prints the exact commands; nothing is changed by a stopped attempt.
+**Before you install, record the owner and give the agent its own commit identity.** The starter procedure asks for two local records, and they do different jobs. The **owner record** — `git config --local aegis.ownerName "<owner name>"` and `git config --local aegis.ownerEmail "<owner email>"` — names the human every approval in `docs/project-state.md` belongs to, and is never committed. The **commit identity** — `user.name` and `user.email` — signs commits, and the startup gate refuses any commit whose author or committer matches the owner record on either name or email, so the agent's commits must carry a different name and email from the owner's. If the owner record is missing, the procedure stops and prints the exact `git config --local` commands (exit 41); if the commit identity is missing or matches the owner, it stops and asks exactly one question (exit 42). Nothing is changed by a stopped attempt.
 
 [`docs/skill-generation-standard.md`](docs/skill-generation-standard.md) defines the
 format if you want to write your own.

@@ -5,7 +5,9 @@ Status: **Stage E acceptance record** for the v1 consumer starter package (F2 of
 `docs/consumer-starter-package.md`. It is written by the Stage E-2 evidence
 recorder **after** the independent Stage E validation completed, and from that
 validation's artifacts only. It is not a readiness, completion, production or
-second-host claim; section 9 states the boundary.
+second-host claim; section 9 states the boundary. One later correction is
+disclosed rather than silent: section 12 records the #947 fix-round author's
+AC-17 change from PASS to UNRUN, and no other row changed.
 
 Claim labels used below: **OBSERVED** = quoted from this run's own command output
 or artifacts; **UNRUN** = not executed, with the exact remaining action named -
@@ -172,19 +174,29 @@ commits (`72e6d15` journey artifacts, `03c025b` implementation), **no remote and
 nothing pushed**; the recorder re-checked its HEAD
 (`03c025baa0fcaa65aaba114c7633d41204b9af4d`) and clean status read-only.
 
+**The raw material is withheld from this repository.** It lives under `_A/`,
+which is not part of this change, so the hashes above bind artifacts a reader
+cannot open from this page. This record is therefore a transcription, not a
+self-contained proof; where a value is published (the 39 rows and the aggregate),
+it can be re-derived from an installed tree, and section 12 does exactly that.
+
 ## 6. Results at a glance
 
 | Result | Count | Rows |
 | --- | --- | --- |
-| PASS | **27** | AC-01...AC-18, AC-20, AC-22, AC-27, AC-28, AC-29, AC-31, AC-33, AC-34, AC-35 |
+| PASS | **26** | AC-01...AC-16, AC-18, AC-20, AC-22, AC-27, AC-28, AC-29, AC-31, AC-33, AC-34, AC-35 |
 | FAIL | **0** | - |
-| UNRUN | **8** | AC-19, AC-21, AC-23, AC-24, AC-25, AC-26, AC-30, AC-32 |
+| UNRUN | **9** | AC-17, AC-19, AC-21, AC-23, AC-24, AC-25, AC-26, AC-30, AC-32 |
 
-These counts are the Stage E report's own (sections 0 and 5). Three further
-UNRUN items are recorded **inside** PASS rows rather than as rows of their own -
-AC-07's reparse-point sub-case, AC-33's four-page form, and AC-17's absent
-STAGE-2 OWNERS table - and are carried in section 8. No FAIL row exists, and no
-UNRUN row is presented as a pass anywhere in this record.
+These counts are the Stage E report's own (sections 0 and 5), **corrected for
+AC-17**: the report marked AC-17 PASS although its threshold includes the
+"STAGE-2 OWNERS" coverage table, which was not produced (U-9), so the row is
+UNRUN and the headline is **26 PASS / 0 FAIL / 9 UNRUN**. Two further UNRUN items
+are recorded **inside** PASS rows rather than as rows of their own - AC-07's
+reparse-point sub-case and AC-33's four-page form - and are carried in section 8.
+No FAIL row exists, and no UNRUN row is presented as a pass anywhere in this
+record. The AC-17 correction is recorded again, with its date and author, in
+section 12.
 
 ## 7. Acceptance criteria AC-01...AC-35 (one row per criterion)
 
@@ -210,7 +222,7 @@ Evidence keys: **IR** = `consumer-v1/docs/consumer-install-record.md`; **LOG** =
 | AC-14 | Owner record missing | **PASS** | **exit 41** with the page's exact remediation text naming both `git config --local aegis.*` commands, 0 files written, no install record. Sub-case: the global identity **was** present and it still exited 41 - the owner record is never read from global config (section 4.3; `raw/logs/install-P2.log`) |
 | AC-15 | Owner-matching commit identity | **PASS** | **exit 42** showing the resolved author and committer and asking exactly one question, 0 writes; a distinct local identity → **exit 0** with the resolved values printed. Missing-identity sub-case: blanking the four `GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables made `git var` fail → exit 42. A zero-commit repository is **not** the trigger (sections 4.4, 4.5, 4.15) |
 | AC-16 | Requirements stage | **PASS** | `docs/requirements.md`: four questions, one per turn; facts (REQ-*) separated from assumptions (AS-*); no invented human quote; decisions recorded through the approved batch (S-2) (section 4.16) |
-| AC-17 | Spec and Stage 2 gate | **PASS** | `docs/product-spec.md` path + SHA-256 recorded; acceptance recorded as its own snapshot/decision entry (S-3, D-2). *Recorded gap, not an AC failure:* no "STAGE-2 OWNERS" coverage table was produced (section 8, U-9) (section 4.16) |
+| AC-17 | Spec and Stage 2 gate | **UNRUN** | `docs/product-spec.md` path + SHA-256 recorded and acceptance recorded as its own snapshot/decision entry (S-3, D-2), but the criterion's threshold also requires "STAGE-2 OWNERS shows every owner `*-recorded` or `n/a-recorded` with a reason" (`PLAN-R3:728`), and no such table was produced (U-9). **Remaining action:** the host agent records an owner-coverage table at Stage 2; the row cannot be PASS until it exists (section 4.16) |
 | AC-18 | Design and refinement | **PASS** | `docs/domain-model.md` and `docs/architecture.md` exist; ADR-1 explains the trade-off in business terms; D-3 carries "(chosen over ..., because ...)" (section 4.16) |
 | AC-19 | Independently audited plan | **UNRUN** | The author may not audit its own plan and this session could not create a second agent (`subagent depth 2 exceeds maxDepth 1`). **Remaining action:** a different session runs `plan-audit-reviewer` on `consumer-v1/docs/plan/PLAN-001.md` (sha256 `ccc5a25d...face`) and writes the bound verdict (section 5) |
 | AC-20 | Implementation matches plan | **PASS** | `git show --name-only HEAD` → `tests/test_tocgen.py`, `tools/tocgen.py`; both inside PLAN-001's four declared paths; no unrelated file (section 4.16) |
@@ -230,9 +242,10 @@ Evidence keys: **IR** = `consumer-v1/docs/consumer-install-record.md`; **LOG** =
 | AC-34 | Repository gates and scope (guard) | **PASS** | `python -P -B scripts/validate-skills.py` → "OK: 254 skill(s) valid, 0 warning(s)", exit 0; changed paths = 3 of the plan's 4; 0 protected paths; `tools/skills-manifest.json` unchanged; worktree clean before and after (section 4.18) |
 | AC-35 | Startup gate on the installed set | **PASS** | Installed gate's own `sh` snippet run with the absolute Git `sh`: `STARTUP: presence/owner OK; mandatory manual provenance step still required` with the effective author and committer, exit 0; owner-matching identity → exit 1; missing identity → exit 42 (section 4.15) |
 
-Counts: **27 PASS, 0 FAIL, 8 UNRUN**, matching the Stage E report's verdict
-summary exactly. UNRUN sub-cases inside PASS rows are listed separately in
-section 8 so that they cannot be read as passes.
+Counts: **26 PASS, 0 FAIL, 9 UNRUN**, matching the Stage E report's verdict
+summary after the AC-17 correction recorded in section 6 and section 12. UNRUN
+sub-cases inside PASS rows are listed separately in section 8 so that they cannot
+be read as passes.
 
 ## 8. UNRUN register (each with its exact remaining action)
 
@@ -246,7 +259,7 @@ section 8 so that they cannot be read as passes.
 | U-6 | AC-30 capture | UNRUN by design in J1, and no runner or authenticated context exists here | a human names the MANUAL-ONLY executor for the evidence type and records a trigger-scoped override; a runner or authenticated context is a host change requiring approval |
 | U-7 | AC-32 E3 block | E3 did not exist when Stage E ran; it is written after this record | the recorder applies E3 from the measured values, checks the three supplied sentences verbatim against this record, and the check is then re-run |
 | U-8 | AC-07 reparse-point sub-case | the host denied symlink creation (no elevation) | run on a host that permits reparse points, with approval; the `..`-path leg already passed |
-| U-9 | "STAGE-2 OWNERS" coverage table (an element of AC-17's threshold) | not produced; the spec and its acceptance entry exist | the host agent records an owner-coverage table at Stage 2 |
+| U-9 | AC-17's missing "STAGE-2 OWNERS" coverage table (an element of the AC-17 threshold, `PLAN-R3:728`) | not produced; the spec and its acceptance entry exist | the host agent records an owner-coverage table at Stage 2; AC-17 stays UNRUN until then |
 | U-10 | AC-33 four-page form | the fourth page (this record) did not exist at Stage E | re-run the four-page link check after this record exists; the recorder did so, result recorded in the Stage E-2 record - it is a recorder gate, not a Stage E result |
 | U-11 | Hosted CI (`validate-skills`, `gate-guard` workflows) | no push and no PR, so no hosted run exists | none authorized; no CI-green claim is made |
 | U-12 | macOS / Linux | not covered | a future host run; the page and the plan claim nothing there |
@@ -254,9 +267,9 @@ section 8 so that they cannot be read as passes.
 | U-14 | This run's active-time split | wall clock was sampled; active time was not separately instrumented | none; no duration was invented |
 | U-15 | Reading depth of the applied skills | `acceptance-criteria-reviewer` and `release-readiness-reviewer` were read in part (lines 1-120 of 234 and 1-70 of 192); `project-orchestrator` was read at Capability 1/3 and via its `project-state-template.md`, not end to end | read the unread remainders before the next stage relies on them |
 
-Nothing in this register is a pass. U-1 to U-7 are the eight UNRUN
-acceptance rows (U-4 covers two rows); U-8 to U-15 are the in-row sub-cases and
-the run's stated limits.
+Nothing in this register is a pass. U-1 to U-7 and U-9 are the nine UNRUN
+acceptance rows (U-4 covers two rows; U-9 is AC-17); U-8 to U-15 are the in-row
+sub-cases and the run's stated limits.
 
 ## 9. Claim boundary and limits
 
@@ -266,9 +279,10 @@ the run's stated limits.
   live-model evaluation, or CI-green equivalence.
 - **One host, one slice.** Windows 11 build 26200 UBR 9711 with PowerShell 7.6.6.
   It says nothing about macOS, Linux, another Windows build, or a hosted runner.
-- **Docs-only change.** The validated change set is two new Markdown pages and
-  two Markdown edits; no skill byte, script, workflow, dependency or register
-  entry is involved, and `tools/skills-manifest.json` is unchanged.
+- **Docs-only change.** The implementation set was three paths (two edited, one
+  new); this evidence page is the fourth, written after the validation. No skill
+  byte, script, workflow, dependency or register entry is involved, and
+  `tools/skills-manifest.json` is unchanged.
 - **Behavioural rows are host-agent behaviours.** AC-26/27/28/29/31 are recorded
   as observed agent responses plus unchanged file hashes; the plan states that no
   machine check enforces them, and nothing here claims enforcement.
@@ -276,7 +290,8 @@ the run's stated limits.
   taken or simulated; AC-30 is UNRUN with its exact remaining action.
 - **Identity, not authenticity.** The install aggregate is evidence of identity,
   not a signature or a tamper-proof seal: the clone and the manifest come from the
-  same checkout (disclosed in the package and unchanged here).
+  same checkout, and the published aggregate is the independent anchor the package
+  now checks fail-closed (section 12).
 - **The startup gate is behaviour, not a boundary.** Its Windows shared-resource
   lane is SKIP/UNRUN and was not exercised; its mandatory provenance step is a
   manual decision. Neither is reported as a pass.
@@ -289,9 +304,16 @@ the run's stated limits.
 It is not the README status block (that is the E3 edit, which links here), not a
 posted verdict, not an independent audit, and not a merge, deployment or
 publication receipt. No row in it was converted from UNRUN to PASS by the
-recorder, and no value was re-measured, rounded or improved: every number is the
-Stage E report's own. A later pass appends a new record; it does not rewrite this
-one.
+recorder, and no value was re-measured, rounded or improved: every original number
+is the Stage E report's own.
+
+**One disclosed correction, not a rewrite.** The #947 fix round corrected AC-17
+from PASS to UNRUN, because the plan's threshold requires the "STAGE-2 OWNERS"
+table and the run did not produce it (section 6, section 12). That is a correction
+of one row against the plan of record, made after the record, with its author and
+date named in section 12. No other row, count or measured value changed. A later
+pass appends a new record or records its own correction; it does not silently
+rewrite this one.
 
 ## 11. Recording note
 
@@ -301,4 +323,48 @@ in section 1, after the independent Stage E validation completed. The recorder
 did not implement, validate or audit the change. The four-page link check over
 this record and the three existing pages was run by the recorder after the write;
 its command, exit code and output are recorded in the Stage E-2 record, not here.
+A later fix-round re-run of that check, and the execution of the harness now
+published in the package page, are recorded in section 12.
+
+## 12. Fix-round verification (2026-10-27)
+
+Added by the #947 fix-round author (DeepSeek V4 Flash, `deepseek-flash` @
+`deepseek-account`, DeepSeek Harness; the serving model is not observable). It
+records checks run at the fix-round head, not at Stage E, and it converts no
+Stage E row.
+
+- **AC-17 correction.** Row AC-17 is UNRUN (section 7) and the headline is
+  **26 PASS / 0 FAIL / 9 UNRUN** (section 6). The correction is the only row
+  change; every other result is the Stage E report's own.
+- **Four-page link check.** `python -P -B
+  scripts/ci/check-markdown-links.py README.md docs/README.md
+  docs/consumer-starter-package.md
+  docs/evidence/consumer-readiness/local-starter-v1.md` -> exit 0:
+  `files: 4   links checked: 143   anchors checked: 21   broken: 0   dead: 0
+  external-skipped: 30   other-skipped: 0`. This is a fix-round check, not the
+  Stage E AC-33 row: AC-33's four-page form stays UNRUN in section 6, and no row
+  was converted.
+- **The published harness executes.** The P5-P9 harness published in
+  `docs/consumer-starter-package.md` section 7.1 was extracted from that page and
+  run under PowerShell 7.6.6 against a fresh local clone of the pinned commit
+  (HEAD `ffb040c7...`, tree `88a5aee4...`, clean) and a populated target
+  (`README.md`, `.gitignore`, a source file, an unrelated skill directory,
+  `.claude/settings.json`, and the two `aegis.*` records). Exit 0;
+  `count_check=PASS installed=39 extra=0`, `manifest_pins=PASS 17/17`,
+  `source_pins=PASS 22/22`, `siblings=PASS absent=0`, `forbidden=PASS none`;
+  aggregate `0c885bcd...a5a7` over 5,152 bytes and 39 rows; install record
+  6,512 B.
+- **Negative runs.** One changed byte in
+  `.claude/skills/code-reviewer/references/severity-rubric.md` -> **exit 31**
+  naming that file; a directory `.claude/skills/tech-spec-writer/evals` ->
+  **exit 30**; a second run on the completed target -> **exit 0** (resume); a
+  source whose HEAD was not the pinned commit -> **exit 31**.
+- **Not run.** The P3 `git clone` command itself was not re-executed against
+  github.com; its pin, clean-status and `git ls-files --eol` checks were run
+  against the local clone, and the harness repeats the pin check. No Stage E
+  row, J1 journey, gate or hosted CI was re-run.
+
+The command lines and their captured output are in
+`_A/remediation/handoff/H947-FIXROUND-RECORD.md`; this section is the in-repo
+summary, so the result is no longer only "elsewhere".
 
