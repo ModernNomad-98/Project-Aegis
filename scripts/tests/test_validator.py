@@ -4714,7 +4714,12 @@ def test_readiness_memory_canonical_tristate():
         empty=run(b,b,""); assert empty.returncode==2 and "UNVERIFIED" in empty.stdout
         memrules=(REPO_ROOT/".claude/skills/agent-memory-governance/references/memory-rules.md").read_text(encoding="utf-8")
         assert "Legacy boolean shortcut - forbidden" in memrules
-        ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut forbidden")
+        trust=memrules.split("## TRUST rules",1)[1].split("## HYGIENE",1)[0]
+        assert not re.search(r"if git merge-base --is-ancestor[^;]+; then echo yes; else echo no; fi", trust), "the operative TRUST row must not collapse a Git error to no with shell exit 0"
+        assert "canonical" in trust.lower() and "UNVERIFIED" in trust, "the operative TRUST row must route to the canonical wrapper and its UNVERIFIED disposition"
+        assert "ancestry_status=ancestor_or_equal" in trust and "content_match_status=same" in trust and "oid_match_status=same" in trust, "the operative TRUST row must state the completion-content gate"
+        assert all(word in trust for word in ("ANCHOR_SHA","REVERT_SHA","RE_REVERT_SHA","migration","mergeCommit")), "the operative TRUST row must keep the completion-anchor proofs"
+        ok(f"canonical wrapper {wrapper} distinguishes ancestor/content/OID; errors UNVERIFIED; exit 0 not a pass; legacy shortcut forbidden; operative TRUST row routes through it")
 
 
 
@@ -4846,41 +4851,76 @@ def test_dsr1_lock_lifecycle():
                 kill_holder.kill(); kill_holder.communicate(timeout=5)
             clean()
         if hasattr(os, "geteuid") and os.geteuid() != 0:
+            (root / "started").unlink(missing_ok=True)
             unread = start("printf started > started; while :; do sleep 0.05; done")
+            unread_pid = None
+            unread_start = None
             try:
                 wait_paths(lock, lock / "ready", root / "started")
-                pid = read_pid()
+                unread_pid = read_pid()
+                try:
+                    with open("/proc/%d/stat" % unread_pid, "rb") as fh:
+                        unread_start = fh.read().rsplit(b")", 1)[1].split()[19]
+                except (OSError, IndexError):
+                    unread_start = None
                 (lock / "token").chmod(0o000)
                 unread.send_signal(signal.SIGTERM)
                 out, err = unread.communicate(timeout=20)
                 assert unread.returncode != 0 and "INCOMPLETE" in (err or ""), (unread.returncode, out, err)
                 assert lock.exists(), "unreadable token must fail closed and retain the lock"
-                (lock / "token").chmod(0o600)
-                try:
-                    os.kill(pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
+                assert_reaped(unread_pid)
                 _dsr1_pass("unreadable token fails closed: INCOMPLETE and ownership retained; child already stopped/reaped")
             finally:
+                if (lock / "token").exists():
+                    (lock / "token").chmod(0o600)
+                if unread_pid is not None:
+                    same_child = False
+                    try:
+                        with open("/proc/%d/stat" % unread_pid, "rb") as fh:
+                            same_child = fh.read().rsplit(b")", 1)[1].split()[19] == unread_start
+                    except (OSError, IndexError):
+                        same_child = False
+                    if same_child:
+                        try:
+                            os.kill(unread_pid, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
                 if unread.poll() is None:
                     unread.kill(); unread.communicate(timeout=5)
                 clean()
+        succ_pid = None
+        succ_start = None
+        (root / "started").unlink(missing_ok=True)
         succ = start("printf started > started; while :; do sleep 0.05; done")
         try:
             wait_paths(lock, lock / "ready", root / "started")
-            pid = read_pid()
+            succ_pid = read_pid()
+            try:
+                with open("/proc/%d/stat" % succ_pid, "rb") as fh:
+                    succ_start = fh.read().rsplit(b")", 1)[1].split()[19]
+            except (OSError, IndexError):
+                succ_start = None
             own = (lock / "token").read_text(encoding="utf-8")
             changed = re.sub(r"run=([^ ]+)", lambda m: "run=" + m.group(1) + "x", own, count=1)
             (lock / "token").write_text(changed, encoding="utf-8")
             succ.send_signal(signal.SIGTERM)
             succ.communicate(timeout=20)
             assert lock.exists() and (lock / "token").read_text(encoding="utf-8") == changed, "successor lock must be preserved"
-            try:
-                os.kill(pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
+            assert_reaped(succ_pid)
             _dsr1_pass("readable non-matching successor token is preserved, never deleted; owned child already stopped/reaped")
         finally:
+            if succ_pid is not None:
+                same_child = False
+                try:
+                    with open("/proc/%d/stat" % succ_pid, "rb") as fh:
+                        same_child = fh.read().rsplit(b")", 1)[1].split()[19] == succ_start
+                except (OSError, IndexError):
+                    same_child = False
+                if same_child:
+                    try:
+                        os.kill(succ_pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
             if succ.poll() is None:
                 succ.kill(); succ.communicate(timeout=5)
             clean()
@@ -4890,6 +4930,51 @@ def test_dsr1_lock_lifecycle():
         twice = subprocess.run(["sh", str(harness)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
         assert twice.returncode == 0 and not lock.exists(), (twice.returncode, twice.stderr)
         _dsr1_pass("repeated cleanup is idempotent under the reentrancy guard")
+        early = _dsr1_script(root, "replacement-before-cleanup.sh", prefix + "\nmv \"$LOCK\" \"$LOCK.original\"\nmkdir \"$LOCK\"\nls -di \"$LOCK\" | awk '{print $1}' > \"$LOCK.identity\"\ncleanup\nexit $?\n")
+        early_run = subprocess.run(["sh", str(early)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        identity_file = root / "stack.lock.identity"
+        original = root / "stack.lock.original"
+        assert early_run.returncode != 0, (early_run.returncode, early_run.stdout, early_run.stderr)
+        assert re.search(r"INCOMPLETE|OWNERSHIP LOST", early_run.stderr or ""), early_run.stderr
+        assert identity_file.is_file(), "the replacement identity was not recorded"
+        replacement_inode = int(identity_file.read_text(encoding="utf-8").strip())
+        assert lock.is_dir() and not lock.is_symlink(), "the replacement must remain a real directory at the public path"
+        assert lock.stat().st_ino == replacement_inode, "the replacement directory identity must be preserved"
+        assert not list(lock.iterdir()), "the empty replacement must remain empty and unchanged"
+        assert not (lock / "abort").exists() and not (lock / "workload.pid").exists(), "an unproved replacement must receive no abort/PID write"
+        assert original.is_dir() and (original / "token").is_file(), "the original owned lock evidence must be retained"
+        _dsr1_pass("CL-07 FIX3-a: an empty replacement installed before cleanup is preserved at its public path with nonzero uncertainty")
+        _dsr1_clean_lock(lock); _dsr1_clean_lock(original); identity_file.unlink()
+        late_suffix = ("\nmv() {\n"
+                       "  if [ \"$1\" = \"$LOCK\" ] && [ ! -e \"$LOCK.schedule-hit\" ]; then\n"
+                       "    command mv \"$LOCK\" \"$LOCK.original\"\n"
+                       "    mkdir \"$LOCK\"\n"
+                       "    printf '%s\\n' 'owner=successor run=successor' > \"$LOCK/token\"\n"
+                       "    printf '%s\\n' 'successor evidence' > \"$LOCK/evidence\"\n"
+                       "    ls -di \"$LOCK\" | awk '{print $1}' > \"$LOCK.identity\"\n"
+                       "    printf '%s\\n' 'successor installed immediately before delegated quarantine mv' > \"$LOCK.schedule-hit\"\n"
+                       "  fi\n"
+                       "  command mv \"$@\"\n"
+                       "}\n"
+                       "cleanup\nexit $?\n")
+        late = _dsr1_script(root, "replacement-at-quarantine-mv.sh", prefix + late_suffix)
+        late_run = subprocess.run(["sh", str(late)], cwd=root, env={**env, "AEGIS_STACK_WORKLOAD": "true"}, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        assert (root / "stack.lock.schedule-hit").is_file(), "the late-replacement barrier must actually fire"
+        assert late_run.returncode != 0, (late_run.returncode, late_run.stdout, late_run.stderr)
+        assert re.search(r"INCOMPLETE|OWNERSHIP LOST", late_run.stderr or ""), late_run.stderr
+        late_inode = int((root / "stack.lock.identity").read_text(encoding="utf-8").strip())
+        assert lock.is_dir() and not lock.is_symlink(), "the successor must remain a real directory at the public path"
+        assert lock.stat().st_ino == late_inode, "the successor directory identity must be preserved"
+        assert sorted(p.name for p in lock.iterdir()) == ["evidence", "token"], sorted(p.name for p in lock.iterdir())
+        assert (lock / "token").read_text(encoding="utf-8") == "owner=successor run=successor\n"
+        assert (lock / "evidence").read_text(encoding="utf-8") == "successor evidence\n"
+        assert not list(root.glob("stack.lock.quarantine.*")), "no quarantine remnant may retain the successor"
+        late_locations = [p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_dir() and not p.is_symlink() and p.stat().st_ino == late_inode]
+        assert late_locations == ["stack.lock"], late_locations
+        assert (root / "stack.lock.original").is_dir(), "the original owned lock evidence must be retained"
+        _dsr1_pass("CL-07 FIX3-b: a readable foreign successor installed at the quarantine-mv boundary is restored to its public path and reported as OWNERSHIP LOST")
+        _dsr1_clean_lock(lock); _dsr1_clean_lock(root / "stack.lock.original")
+        (root / "stack.lock.identity").unlink(); (root / "stack.lock.schedule-hit").unlink()
 
 
 def test_dsr1_fixture_cleanup():

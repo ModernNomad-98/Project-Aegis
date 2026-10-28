@@ -118,6 +118,10 @@ cleanup() {
   # inherited stdout/stderr pipes and can hang the caller even when cleanup is
   # correctly reporting INCOMPLETE.
   if ! stop_child; then CLEANING=0; return 1; fi
+  if [ "$CREATED_LOCK" -eq 1 ] && [ -L "$LOCK" ]; then
+    echo "INCOMPLETE: lock path is now a symlink; current ownership cannot be proved" >&2
+    CLEANING=0; return 1
+  fi
   OWNED=0
   if [ -d "$LOCK" ]; then
     if [ -e "$LOCK/token" ]; then
@@ -128,9 +132,15 @@ cleanup() {
       if [ "$current" = "$TOKEN" ]; then OWNED=1; fi
     elif [ -e "$LOCK/owner.$RUN_ID" ]; then
       OWNED=1
-    elif [ "$CREATED_LOCK" -eq 1 ] && [ -z "$(ls -A "$LOCK" 2>/dev/null)" ]; then
-      OWNED=1
     fi
+  fi
+  # Historical CREATED_LOCK=1 plus a currently empty pathname is NOT ownership
+  # proof: a different empty directory can replace the created one. Only
+  # positive evidence about this run's own object (exact token or own owner
+  # marker) proves ownership; otherwise retain the path and report uncertainty.
+  if [ "$CREATED_LOCK" -eq 1 ] && [ "$OWNED" -eq 0 ] && [ -e "$LOCK" ]; then
+    echo "INCOMPLETE: current ownership of $LOCK cannot be proved; retaining the replacement and its evidence for recovery" >&2
+    CLEANING=0; return 1
   fi
   if [ "$CREATED_LOCK" -eq 0 ] && [ "$OWNED" -eq 0 ]; then CLEANING=0; return 0; fi
   if [ "$OWNED" -eq 1 ] && [ -d "$LOCK" ]; then : > "$LOCK/abort" 2>/dev/null || true; fi
@@ -139,8 +149,28 @@ cleanup() {
     current="$(cat "$LOCK/token" 2>/dev/null || true)"
     if [ "$current" = "$TOKEN" ] || [ ! -e "$LOCK/token" ]; then
       QUAR="$LOCK.quarantine.$RUN_ID"
+      if [ -e "$QUAR" ]; then
+        echo "INCOMPLETE: quarantine path $QUAR already exists; prior evidence ownership is unproved; lock preserved" >&2
+        CLEANING=0; return 1
+      fi
       if ! mv "$LOCK" "$QUAR" 2>/dev/null; then
         echo "INCOMPLETE: cannot quarantine owned lock; evidence retained" >&2
+        CLEANING=0; return 1
+      fi
+      # The rename is a separate operation from the ownership test above, so
+      # prove again that the object now in quarantine is this run's own object
+      # BEFORE any destructive removal. A readable foreign successor moved at
+      # this boundary is put back at its public path and retained.
+      moved="$(cat "$QUAR/token" 2>/dev/null || true)"
+      moved_owned=0
+      if [ "$moved" = "$TOKEN" ]; then moved_owned=1; fi
+      if [ ! -e "$QUAR/token" ] && [ -e "$QUAR/owner.$RUN_ID" ]; then moved_owned=1; fi
+      if [ "$moved_owned" -eq 0 ]; then
+        if [ ! -e "$LOCK" ] && mv "$QUAR" "$LOCK" 2>/dev/null; then
+          echo "OWNERSHIP LOST: the moved object was not this run's lock; replacement preserved at $LOCK and nothing deleted" >&2
+        else
+          echo "OWNERSHIP LOST: quarantine $QUAR retained; lock path $LOCK unavailable; no deletion performed" >&2
+        fi
         CLEANING=0; return 1
       fi
       if ! rm -rf "$QUAR"; then
@@ -198,10 +228,21 @@ exit "$rc"
 
 Foreign/stale rule: if the lock exists, read owner/email/run/acquired/ttl_minutes from
 the token. If the owner is not this agent, stop: it is a foreign lock and must never be
-stolen or deleted. Tokenless lock: never delete a tokenless lock; if this run created it and it is empty, bootstrapping cleanup may remove that empty directory, otherwise preserve it. A readable token that does not exactly match this run's full token is a successor/foreign owner: preserve it and report; an unreadable token fails closed and retains ownership. If the owner is this agent but the stored age exceeds ttl_minutes,
+stolen or deleted. Tokenless lock: never delete a tokenless lock. A tokenless or empty
+directory is owned only with positive evidence about this run's own object - the
+`owner.$RUN_ID` marker this run wrote, or the exact stored token. Historical
+`CREATED_LOCK=1` plus a currently empty pathname is not ownership proof: a different
+empty directory may have replaced the created one, so that replacement is preserved at
+its public path and reported as an ownership-uncertainty failure. A readable token that does not exactly match this run's full token is a successor/foreign owner: preserve it and report; an unreadable token fails closed and retains ownership. If the owner is this agent but the stored age exceeds ttl_minutes,
 stop, report the stale lock and require owner confirmation before removal. Release only
 your own lock, only after the owned workload has stopped and been reaped, and only when
-the full stored token matches exactly. Acquisition errors are reported separately with
+the full stored token matches exactly (or, for a partially initialized own lock, when
+this run's `owner.$RUN_ID` marker proves it). Because the ownership test and the
+quarantine rename are separate operations, the object moved to the quarantine path is
+re-proved before removal; a replacement moved at that boundary is put back at the public
+path and reported as OWNERSHIP LOST with nothing deleted. These are bounded guards for
+the documented cooperative model, not an atomic protocol or a filesystem-security
+boundary, and an unproved successor is always retained. Acquisition errors are reported separately with
 exit 2; contention exits 1. The temp directory is unique to the run, so a signal before
 the atomic rename can only remove this run's temp/lock, never a successor's.
 

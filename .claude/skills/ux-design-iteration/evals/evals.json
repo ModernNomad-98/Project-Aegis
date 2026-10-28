@@ -519,7 +519,10 @@
           "Canonical R8-UX-4 is never claimed to govern proof-set rules.",
           "Evidence never upgrades readiness.",
           "declined is never a pass.",
-          "UNRUN is never a pass."
+          "UNRUN is never a pass.",
+          "When screenshot/visual-evidence policy is needed but capture is not requested, plans the policy with screenshot-evidence-planner without falsely requiring explicit invocation of a manual-only planner; that policy work captures nothing and infers no capture, browser use or repository write.",
+          "When the user declines capture, has not answered, or capture authority is absent, preserves the recorded decision or unanswered state and manufactures no consent; the proof set stays optional and never upgrades readiness.",
+          "When actual capture is requested, routes to the existing exact manual-only capture owners under their own invocation and authority rules, uses fixtures/UAT only with masking, and records the named UNRUN reason; production-only material is never captured."
         ]
       },
       "host_evidence": false,
