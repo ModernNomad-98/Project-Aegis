@@ -1079,7 +1079,8 @@ reproduce it:
 
 The section 7.1 harness computes this exact serialization and **compares it
 fail-closed** with the base value above; it exits 31 on a row-count,
-serialized-length or hash difference, naming the first row that breaks a check.
+serialized-length or hash difference, and the check reports the row count,
+serialized length and aggregate hash; it does not name an individual row.
 A mismatch is a finding, not a rounding.
 
 The arithmetic makes the length checkable: the 39 consumer-relative paths total
