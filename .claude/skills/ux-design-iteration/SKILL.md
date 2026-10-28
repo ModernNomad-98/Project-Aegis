@@ -379,8 +379,11 @@ The full record schema and readiness rules are in
   visual-regression-test-designer designs visual-regression coverage;
   clickthrough execution belongs to the exact manual-only owner
   clickthrough-test-engineer, while screenshot/Playwright capture belongs to the
-  exact manual-only owner playwright-e2e-engineer; each action needs that owner's
-  own applicable authority. This skill never performs capture/execution.
+  exact manual-only owner playwright-e2e-engineer only inside an
+  already-justified permanent critical E2E journey, and one-session checkpoint
+  capture (including one-off proof sets) belongs to clickthrough-test-engineer;
+  each action needs that owner's own applicable authority. This skill never
+  performs capture/execution.
 - The work would cross the production boundary (real app behavior, API/data/
   schema integration) before the criteria pass: stop, state NOT READY, and take
   the smallest decision back to the user under existing authority.
