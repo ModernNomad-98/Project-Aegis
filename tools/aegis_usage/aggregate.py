@@ -750,7 +750,15 @@ def publishable_report(report: dict) -> dict:
         for stage, metric in cell["metrics"]["stage_reach"].items():
             denominator = metric["denominator"]
             numerator = metric["numerator"]
-            if denominator >= STAGE_FLOOR and (numerator == 0 or numerator >= CELL_FLOOR):
+            not_applicable = metric["not_applicable"]
+            # A published denominator below the cohort's n discloses the
+            # not_applicable count by subtraction, so a nonzero count below the
+            # cell floor withholds the whole stage cell, not just the count.
+            if (
+                denominator >= STAGE_FLOOR
+                and (numerator == 0 or numerator >= CELL_FLOOR)
+                and (not_applicable == 0 or not_applicable >= CELL_FLOOR)
+            ):
                 entry["stage_reach"][stage] = metric
             else:
                 entry["stage_reach"][stage] = {"status": "withheld", "reason": "sparse_stage_cell"}

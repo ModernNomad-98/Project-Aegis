@@ -110,8 +110,11 @@ anything could be called public:
    publish, it is withheld too, so a previously published total cannot be used
    to difference a suppressed cohort.
 4. **Stage cells** — a stage rate is published only when its denominator is at
-   least 20 and its numerator is either 0 or at least 5; otherwise that stage
-   cell is withheld.
+   least 20 and its numerator is either 0 or at least 5. The stage cell also
+   carries a `not_applicable` count; because a published denominator smaller
+   than the cohort's `n` discloses that count by subtraction, a nonzero
+   `not_applicable` count below 5 withholds the whole stage cell (rate,
+   denominator and count) with reason `sparse_stage_cell`.
 5. **Differencing** — a cohort that passes the floors but differs from the most
    recent published cohort by 1–4 in any outcome count is withheld, because a
    small month-over-month shift can isolate one contributor.

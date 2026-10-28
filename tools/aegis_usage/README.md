@@ -112,6 +112,10 @@ on stderr, including a corrupt or incompatible store (`store_unreadable`,
 `receipt_day_regression`, `capability_unreadable`, `notice_unreadable`,
 `workflow_exists`, `invalid_nesting`, `report_truncated` and `oversize`.
 
+An invalid payload's error path names contract fields only. A key outside the
+fixed contract and forbidden vocabularies is reported as `<key>`, so an
+attacker-chosen key name (for example an address) is never echoed.
+
 One value per event kind (and per stage, for stage events) per effective day is
 allowed. A second same-day value is refused as `conflicting_same_day_transition`
 for correction rather than guessed from random event references. A terminal

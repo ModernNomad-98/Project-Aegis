@@ -96,6 +96,12 @@ SNAPSHOT_KEYS = (
 )
 TRANSITION_KEYS = ("event_ref", "kind", "effective_day", "value", "stage")
 
+# The only key names the contract allows. An error path may echo these; any
+# other key is attacker-chosen input and is replaced by "<key>" before it can
+# reach a log line. FORBIDDEN_KEYS is itself a fixed vocabulary, so its
+# canonical (lower-case) names are safe to report.
+CONTRACT_KEY_NAMES = frozenset(TOP_KEYS + SNAPSHOT_KEYS + TRANSITION_KEYS + STAGES)
+
 # Defense in depth: these keys are never part of the contract at any depth. A
 # payload carrying one is rejected with its own error code so a leak is loud,
 # not merely "unknown field".
@@ -363,12 +369,27 @@ def _assert_nesting(node: object) -> None:
             stack.extend((value, depth + 1) for value in current)
 
 
+def _reported_key(key: object) -> str:
+    """Return a path segment that is safe to put in an error message.
+
+    The walk runs before the key allowlist, so an ancestor key can be any
+    attacker-chosen string (for example an email address). Only the contract's
+    fixed names and the fixed forbidden vocabulary are echoed; every other key
+    becomes the placeholder "<key>".
+    """
+    name = str(key)
+    if name.lower() in FORBIDDEN_KEYS:
+        return name.lower()
+    return name if name in CONTRACT_KEY_NAMES else "<key>"
+
+
 def _forbidden_walk(node: object, path: str, depth: int = 0) -> None:
     if depth > MAX_NESTING_DEPTH:
         _fail("invalid_nesting", "the payload nesting is too deep", path)
     if isinstance(node, dict):
         for key, value in node.items():
-            child = path + "." + str(key) if path else str(key)
+            segment = _reported_key(key)
+            child = path + "." + segment if path else segment
             if str(key).lower() in FORBIDDEN_KEYS:
                 _fail("forbidden_field", "field is never part of the contract", child)
             _forbidden_walk(value, child, depth + 1)

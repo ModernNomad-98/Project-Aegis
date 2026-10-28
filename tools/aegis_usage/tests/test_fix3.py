@@ -3,7 +3,10 @@
 Covers R1 (repository guard for a missing parent), R2 (withdraw purges
 same-workflow tombstones), R3 (Windows read-only store replacement), R4
 (stage_reach uses the latest stage event), the material advisory findings that
-were fixed in this round, and the documented residuals. Synthetic data only.
+were fixed in this round, and the documented residuals. It also carries the
+FIX4 regressions for the two SD-F residuals: M4 (per-stage not_applicable is
+floored with the whole stage cell) and M5 (a forbidden field under an
+attacker-chosen key reports a redacted path). Synthetic data only.
 """
 
 import contextlib
@@ -474,6 +477,36 @@ class KeyEchoTests(unittest.TestCase):
         self.assertEqual(caught.exception.code, "duplicate_key")
         self.assertNotIn("alice@example.com", caught.exception.message)
 
+    def test_a_forbidden_field_under_an_attacker_key_does_not_echo_the_key(self):
+        # FIX4 / SD-F M5: the walk runs before the key allowlist, so an
+        # arbitrary ancestor key must not reach the reported path.
+        with self.assertRaises(S.ContractError) as caught:
+            S.validate_envelope({"alice@example.com": {"email": 1}})
+        self.assertEqual(caught.exception.code, "forbidden_field")
+        self.assertEqual(caught.exception.path, "<key>.email")
+        self.assertNotIn("alice@example.com", caught.exception.path)
+        self.assertNotIn("alice@example.com", caught.exception.message)
+
+    def test_the_cli_reports_a_redacted_path_for_an_attacker_key(self):
+        with tempfile.TemporaryDirectory(prefix="aegis-fix4-echo-") as folder:
+            payload = Path(folder) / "payload.json"
+            payload.write_text(json.dumps({"alice@example.com": {"email": 1}}), encoding="utf-8")
+            result = run_cli(
+                "aggregate.py",
+                Path(folder) / "central.json",
+                "import",
+                "--payload",
+                str(payload),
+                "--capability",
+                "x",
+                "--day",
+                START,
+            )
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("ERROR forbidden_field", result.stderr)
+        self.assertIn("[<key>.email]", result.stderr)
+        self.assertNotIn("alice@example.com", result.stderr)
+
 
 class NestingTests(unittest.TestCase):
     """Medium finding: deep nesting is a contract refusal, not a traceback."""
@@ -587,6 +620,47 @@ class PublishableDisclosureTests(unittest.TestCase):
         view = A.publishable_report(report)
         self.assertEqual(view["cohorts"][0]["late_entries"], 0)
         self.assertEqual(view["cohorts"][0]["late_events"], 0)
+
+    def test_a_sparse_not_applicable_count_withholds_the_stage_cell(self):
+        # FIX4 / SD-F M4: n=21 with a stage denominator of 20 discloses one
+        # not-applicable start, so the whole stage cell is withheld rather
+        # than letting the count be recovered by subtraction.
+        counts = {"delivered": 6, "failed": 5, "abandoned": 5, "ongoing": 5, "unknown": 0}
+        cell = synthetic_cell("2026-01", counts)
+        cell["metrics"]["stage_reach"]["build"] = {
+            "numerator": 20,
+            "denominator": 20,
+            "rate": 1.0,
+            "not_applicable": 1,
+        }
+        view = A.publishable_report(self.base_report({"2026-01": cell}))
+        self.assertEqual(
+            view["cohorts"][0]["stage_reach"]["build"],
+            {"status": "withheld", "reason": "sparse_stage_cell"},
+        )
+
+    def test_a_not_applicable_count_at_the_cell_floor_is_published(self):
+        counts = {"delivered": 8, "failed": 7, "abandoned": 5, "ongoing": 5, "unknown": 5}
+        cell = synthetic_cell("2026-01", counts)
+        cell["metrics"]["stage_reach"]["build"] = {
+            "numerator": 25,
+            "denominator": 25,
+            "rate": 1.0,
+            "not_applicable": 5,
+        }
+        view = A.publishable_report(self.base_report({"2026-01": cell}))
+        published = view["cohorts"][0]["stage_reach"]["build"]
+        self.assertEqual(published["not_applicable"], 5)
+        self.assertEqual(published["denominator"], 25)
+        self.assertEqual(published["numerator"], 25)
+
+    def test_a_zero_not_applicable_count_is_published(self):
+        counts = {"delivered": 5, "failed": 5, "abandoned": 5, "ongoing": 5, "unknown": 0}
+        report = self.base_report({"2026-01": synthetic_cell("2026-01", counts)})
+        view = A.publishable_report(report)
+        build = view["cohorts"][0]["stage_reach"]["build"]
+        self.assertEqual(build["not_applicable"], 0)
+        self.assertEqual(build["denominator"], 20)
 
     def test_a_month_with_only_expired_records_is_listed_as_suppressed(self):
         report = self.base_report({})
