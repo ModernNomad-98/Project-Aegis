@@ -31,7 +31,7 @@ capability-evidence gates recorded in the
 ## Use the skills
 
 - [Project README](../README.md): setup, skill picker, shipped skills and agents.
-- [Consumer starter package](consumer-starter-package.md): the fixed, dependency-checked file set for a first product slice — 39 skill files for 18 skills plus 2 startup files. It covers the owner record and commit identity it requires, its recording-authority and screenshot-policy handoffs, and lists the remaining UNRUNs in its [evidence record](evidence/consumer-readiness/local-starter-v1.md).
+- [Consumer starter package](consumer-starter-package.md): the fixed, dependency-checked file set for a first product slice — 39 skill files for 18 skills plus 2 startup files. It covers the owner record and commit identity it requires, its recording-authority and screenshot-policy handoffs, and lists the remaining UNRUNs in its [evidence record](evidence/consumer-readiness/local-starter-v2.md); the [v1 record](evidence/consumer-readiness/local-starter-v1.md) remains the historical 39-file record.
 - [Skills catalog](skills-catalog.md): implemented capabilities and their boundaries.
 - [Engineering discipline](ZERO_TRUST_AI_ENGINEERING_DISCIPLINE.md): principles and workflow.
 - [Skill generation standard](skill-generation-standard.md): current authoring contracts.

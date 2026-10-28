@@ -17,11 +17,15 @@ requires (sections 2.2 and 3), so the set is **41 files / 18 skills** instead of
 39 files / 17 skills. The v1 evidence record
 (`docs/evidence/consumer-readiness/local-starter-v1.md`) stays byte-unchanged as
 history, but the definition is this page and it is revised here: only the record
-is frozen, not the v1 wording. **No native run of this v2 definition has been
-executed:** every native copy, verification, lifecycle and collision check for the
-41-file set is **UNRUN**, and the v2 evidence record does not exist yet. The
-derived numbers in sections 2.3, 7.1 and 9.2 are recomputed from the pinned
-commit's bytes, not copied from the v1 record.
+is frozen, not the v1 wording. **A native run of this v2 definition was executed
+on 2026-10-28** on the measured Windows host (PowerShell 7.6.6, Git
+2.55.0.windows.5, absolute Git `sh`): the published harness installed at the
+pinned commit with exit 0, the 41-file pins and the aggregate below. Its evidence
+record is [local-starter-v2](evidence/consumer-readiness/local-starter-v2.md):
+one host's install evidence, not consumer readiness, a second host or a J1
+acceptance result, with every retained UNRUN listed there. The derived numbers in
+sections 2.3, 7.1 and 9.2 are recomputed from the pinned commit's bytes, not
+copied from the v1 record.
 
 **Reading key.** **Role A** is the Project Aegis source repository; **Role B** is
 your own consumer/product repository, which copies Aegis files into its workspace.
@@ -221,9 +225,11 @@ Aggregate over these 41 rows, using the algorithm in section 9.2:
 **5,420 serialized bytes** for **41 rows**. That is the measurement at the pin;
 your install record records the same three numbers for the files you actually
 installed, and any difference is a finding, not a rounding. The 41 per-file
-SHA-256 values are reproducible from the pinned commit and belong in the v2
-evidence record when its native run is executed; the 39 v1 values remain
-published in `docs/evidence/consumer-readiness/local-starter-v1.md`, section 4.
+SHA-256 values are published in the installed-package table of
+[the v2 evidence record](evidence/consumer-readiness/local-starter-v2.md), which
+was produced by the native run and cross-checked against the pinned blobs; the 39
+v1 values remain published in
+`docs/evidence/consumer-readiness/local-starter-v1.md`, section 4.
 The aggregate is their compact, independently pinned form, not a substitute for
 inspection.
 
@@ -988,15 +994,31 @@ validation used a larger harness that is not part of this repository; this page 
 carries its own executable form, so a reader does not have to take the checks on
 trust.
 
-That measured run covers the **39-file v1 definition**. The v2 block differs from
-it only in the two added `$package` rows and the values and labels derived from
-them: the counts (`41`, `18`, `39`, `18/23`, the record's row count), the
-`$AggSha`/`$AggRows`/`$AggBytes` constants, and the comment and install-record
-header text that names the row count. The aggregate was recomputed from the
-pinned commit's bytes (section 9.2) and the block's syntax was parsed, but **the
-v2 block has not been executed**: every copy, verification, collision and
-lifecycle check for the 41-file set is **UNRUN** until the v2 evidence record's
-native run is performed on a verified host.
+That measured run covers the **39-file v1 definition**; it remains the v1
+measurement. The v2 block differs from it only in the two added `$package` rows
+and the values and labels derived from them: the counts (`41`, `18`, `39`,
+`18/23`, the record's row count), the `$AggSha`/`$AggRows`/`$AggBytes`
+constants, and the comment and install-record header text that names the row
+count.
+
+**Verified for v2 on 2026-10-28.** The block was extracted from this page exactly
+(17,305 B / 294 LF, sha256 `78f8a2f93bb46f274d6bc59027e69108bd1ebd416b9b0661d521a69c5753bf86`)
+and run as written under PowerShell 7.6.6 against a fresh clone of `ffb040c7`
+and an isolated consumer destination outside this repository. Result: **exit 0**;
+41 installed files; 18/18 manifest pins; 23/23 source pins; 0 missing siblings;
+aggregate `fcff1124…b699` over 5,420 serialized bytes; install record **6,816 B**.
+Negative fixtures: a changed destination byte -> **exit 31** naming the file; an
+eval-answer file in an installed skill -> **exit 20** naming it (P5 refuses before
+P7); a conflicting `AGENTS.md` -> **exit 22**, existing bytes unchanged; a source
+missing a required reference -> **exit 21**; a changed source byte -> **exit 31**
+on the aggregate comparison; a second run on the completed target -> **exit 0**,
+48/48 destination files identical, existing record left unchanged. A fresh
+isolated consumer context read the installed lifecycle material and distinguished
+a valid scope from a late-recorded revocation, a malformed target and a
+duplicate-ID history, refusing the invalid ones without performing any action. The
+commands, outputs, host versions and retained UNRUNs are in
+[the v2 evidence record](evidence/consumer-readiness/local-starter-v2.md); the v1
+measurement above is unchanged.
 
 ### 7.2 Exit codes
 
