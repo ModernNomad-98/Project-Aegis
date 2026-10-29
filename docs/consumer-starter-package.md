@@ -1277,13 +1277,15 @@ The human who authorizes: the person the Aegis route calls "you" and the actor a
 | **Commit identity** | `user.name`, `user.email` (any scope; `git var` is authoritative) | local, global, `GIT_AUTHOR_*`/`GIT_COMMITTER_*`, `GIT_CONFIG_*` (`SKILL.md:99-110`) | Signs the commit | Git, and the gate, which compares it with the owner record and **refuses a match on either name or email** (`SKILL.md:105-110, 137, 209-211`) |
 
 A command-scoped `git -c user.name=…` given only to a later `git commit` is **not
-visible** to P2's separate `git var` process, so this route does not accept it as
-the effective identity. Set the identity in a scope `git var` reads (local or
-global config, or the `GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables) before P2; if
-P2 measures a different fallback identity, the route fails closed (usually exit
-42) instead of approving an identity it did not measure. The same rule applies to
-the harness, which invokes the gate as its own process and records only what that
-process measured.
+visible** to P2's separate `git var` process. P2 measures the fallback/default
+identity, not that override, so a `git -c` identity used for the commit is
+**unobserved** by the gate. It is therefore **unsupported** on this route and
+**must not be used for commits**; the route does not claim to fail closed on it.
+Set the identity in a scope `git var` reads (local or global config, or the
+`GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables) before P2; keep the startup gate's
+own check and the mandatory manual provenance step, and verify the identity the
+commit actually records. The same rule applies to the harness, which invokes the
+gate as its own process and records only what that process measured.
 
 The approval record stays separate from both: `docs/project-state.md` carries the
 role ("project owner") and the approval ID, because the schema forbids identifying
@@ -1341,7 +1343,8 @@ Then:
 - If an agent will commit and the human names a distinct agent identity, set it
   **only with their words**, for that repository (`git config --local user.name` /
   `user.email`), and re-run P2 with `-Mode agent-commit`; a passing run prints
-  the resolved author and committer and continues.
+  the resolved author identity in its `identity=<name> <email>` field and
+  continues (the gate does not print the committer on success).
 - If the human says they will commit themselves, that is the **`human-only`
   mode**: re-run P2 with `-Mode human-only` and the owner's words as
   `-OwnerAuthorization`. A solo owner may commit under their own identity (the
