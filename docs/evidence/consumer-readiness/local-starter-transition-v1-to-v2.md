@@ -21,7 +21,7 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **128,940 B**, working-file sha256 `2401ba34acd8d88fd5529859df62b20be7d877156fd27726c502528180bfbbf4` |
+| Page after the section 7.3 insert and review revisions | **129,488 B**, LF-normalized sha256 `2cc6329141423811abe7137e56cd04c429aa4dad31f22b282ebc6c9293cf5b7c`, Git blob `2937521e9f74508755b67f82be80bfdcda89436c` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
@@ -136,7 +136,7 @@ Two cases that the review asked to be explicit about were executed natively:
 
 | Case | Exit | Observed |
 | --- | --- | --- |
-| C7 - stale record already at the new path | **0** | 41 package files installed; the stale 31-byte file was **left unchanged** (`P9: install record already present, left unchanged`); the new receipt was **not** produced. This is the observed footgun the page warns about: completion needs the 41-row / 5,420-serialized-byte / destination check in sections 9.1-9.2, not just exit 0 |
+| C7 - stale record already at the new path | **0** | 41 package files installed; the stale 31-byte file was **left unchanged** (`P9: install record already present, left unchanged`); the new receipt was **not** produced. This is the observed footgun the page warns about: completion needs every item of the page's completion rule (provenance, rows/aggregate, destination bytes, v1 record), not just exit 0 |
 | C8 - foreign file in a selected skill directory | **20** | `.claude/skills/code-reviewer/notes.md` named on stderr, bytes preserved, no record, no package write |
 
 Kill during P9 itself (a partial record at the new path) is **UNRUN**; the
@@ -230,7 +230,7 @@ record path, testing `agent-commit`) are recorded as out of scope / **UNRUN**
 rather than claimed. `tools-tests-linux`, `tools-tests-windows` and
 `windows-offline-checks` were **skipped** by design for a docs-only change and
 are UNRUN, never passes. This acceptance is bound to the page **working-file** sha256
-`2401ba34...bf4` and the installer at `2a7e9c06`; a later page edit invalidates
+the LF-normalized sha256 `2cc63291...5b7c` (Git blob `2937521e...`) and the installer at `2a7e9c06`; a later page edit invalidates
 it and requires a rerun. The commit that carries this record re-triggers CI;
 that later run is delivery-stage evidence and is not claimed here.
 
@@ -255,6 +255,9 @@ that later run is delivery-stage evidence and is not claimed here.
 - **A fail-closed refusal of an existing `-RecordPath`** - not implemented; the
   documented operator check and C7 are the current state. The installer-side
   remediation is tracked as [issue #966](https://github.com/ModernNomad-98/Project-Aegis/issues/966).
+- **An external `-RecordPath`** - the harness supports it (S4-6), but it is not an
+  in-repository v2 receipt and does not satisfy this transition's completion
+  rule; no external-path transition was accepted.
 - **Review, CI and merge** - delivery-stage work; a PR is opened, not merged.
   Skipped or pending jobs are never counted as passes. Advisory review
   findings are dispositioned in the PR body, not silently absorbed.
