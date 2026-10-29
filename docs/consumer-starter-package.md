@@ -1417,30 +1417,32 @@ as section 7.1 instructs; the harness then defaults `-ModeGate` to that file. Pa
 `-ModeGate` explicitly only when the gate lives somewhere else. Run the harness with
 the owner-selected mode and `-RecordPath` naming the new path:
 
+```powershell
 $Mode = 'human-only' # or 'agent-commit'; must be the mode the owner authorized
-$OwnerAuthorization = '<replace with the owner''s words>'
-pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath C:\path\to\product\docs\consumer-install-record-v2.md
+$OwnerAuthorization = Read-Host 'Owner authorization (not echoed to history)'
+pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath 'C:\path\to\product\docs\consumer-install-record-v2.md'
 ```
 
-Angle-bracket values above are placeholders to replace; the example is runnable
-once they are filled in. Keep authorization text in a variable (or supply it
-without echoing it) if it is sensitive, because a literal on the command line is
-visible in shell history and process listings.
+`Read-Host` keeps the authorization out of PowerShell history; quote every path
+because real paths may contain spaces. The comment is the only placeholder in
+this example.
 
 Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
 run that reuses it installs the two files but cannot produce a v2 receipt: the
 retained 39-row file still describes the v1 result and must not be presented as the
 new one. For the **initial** transition the new path must not exist. An
 **identical rerun** of a completed transition may point at the existing record
-(that is C6, the only accepted case of an existing file at the new path); any
+(that is case C6 in the evidence record, the only case that can satisfy the
+completion rule with an existing file at the new path); any
 other existing file there - stale, partial, or copied from another run - must be
-inspected and removed before the run. That preservation is observed, not
+inspected and removed before the run. C3 and C7 deliberately exercise exit-0
+paths that leave an existing record unchanged; neither satisfies the completion
+rule below. That preservation is observed, not
 hypothetical: with a stale file at the new path the harness installed the two
 package files, exited **0**, printed `P9: install record already present, left
 unchanged`, and left the stale file byte-identical. A kill that lands during P9
 itself can therefore leave a partial record behind; that window is **UNRUN**, and
-the operator must verify or delete the file before rerunning (no tracking issue is
-filed; the gap is recorded here as a limitation). Fail-closed refusal of an
+the operator must verify or delete the file before rerunning (tracked as [issue #966](https://github.com/ModernNomad-98/Project-Aegis/issues/966)). Fail-closed refusal of an
 existing `-RecordPath`, and an atomic temp-file-plus-rename record write, are
 installer changes this documentation item does not make.
 
@@ -1464,8 +1466,9 @@ intermediate directory, one of the 41 leaf paths, or the record path and its par
 - a junction, symbolic link or other link type - is refused before any write by
 inspecting attributes only. That attribute check is not a defence against concurrent
 replacement of a checked directory (section 1.3). Native evidence covers directory
-junctions; creating a file symbolic link needs administrator privilege on the
-recorded host, so that leaf case is **UNRUN**, not claimed. Remediation: restore the named file from the
+junctions; creating a file symbolic link was not available under the recorded host's
+privileges (Developer Mode or `SeCreateSymbolicLinkPrivilege` can allow it), so
+that leaf case is **UNRUN**, not claimed. Remediation: restore the named file from the
 pin (or move the local edit aside with the human's approval), then rerun. If the copy
 is interrupted, an unchanged rerun resumes under P5's identical-byte policy and
 writes the fresh record when the interruption happened before P9; a partial file that
@@ -1480,9 +1483,11 @@ changes no package file and leaves an existing record at the same path unchanged
 1. the run exited 0;
 2. the record at the new path is fresh, or - for the identical-rerun case only -
 an existing record that verifies;
-3. the record has 41 measured rows in ordinal order (byte-wise path order, not
-culture-aware collation), its own header agrees, and a recomputation with the row
-format and aggregate algorithm of sections 9.1 and 9.2 equals
+3. the record has 41 measured rows in the harness's `[System.StringComparer]::Ordinal`
+order (UTF-16 code-unit order, not culture-aware collation), its header's
+`Rows`, `Serialized bytes`, `Aggregate SHA-256`, source commit and source tree
+agree with the measured values, and a recomputation with the row format and
+aggregate algorithm of sections 9.1 and 9.2 equals
 `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over 5,420
 serialized bytes (the 7,025 B record file is the observed fixture size, not a
 universal constant);
