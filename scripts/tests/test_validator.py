@@ -49,6 +49,7 @@ import os
 import re
 import shutil
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -85,6 +86,11 @@ REQUIRED_SKIPS: list[str] = []
 # nonzero when it grows on Linux, because required coverage that did not run is
 # UNRUN and can never be counted as a pass.
 REQUIRED_UNRUN: list[str] = []
+# A case whose fixture only exists on one platform. Unlike SKIPS and the
+# REQUIRED_* channels this is an EXPECTED boundary, not required coverage on
+# the host that cannot run it: it is printed and recorded, never counted as a
+# pass, and suite_exit_status() deliberately does not read it.
+EXPECTED_PLATFORM_SKIPS: list[str] = []
 
 
 def ok(label: str) -> None:
@@ -111,6 +117,25 @@ def required_unrun(case: str, reason: str) -> None:
     REQUIRED_UNRUN.append(detail)
     REQUIRED_SKIPS.append(detail)
     print(f"  UNRUN  {detail}")
+
+
+def expected_platform_skip(native: str, label: str, platform: str | None = None) -> None:
+    """Record a fixture that only exists on its native platform.
+
+    The Linux lane is the required coverage lane, so a skip recorded through
+    skip() there is non-OK. A case whose fixture is inherently platform-specific
+    is not required coverage on the other host: this helper keeps it out of
+    SKIPS, REQUIRED_SKIPS and REQUIRED_UNRUN while still printing it as UNRUN,
+    never as a pass. Calling it on the native platform is a defect and raises.
+    """
+    current = sys.platform if platform is None else platform
+    if current == native:
+        raise AssertionError(
+            "platform-required case skipped on its native " + native + ": " + label)
+    detail = f"{label} [native {native}; expected on {current}]"
+    EXPECTED_PLATFORM_SKIPS.append(detail)
+    print(f"  SKIP  {label} [expected platform skip: native {native}; "
+          f"not required coverage on {current}]")
 
 
 def expect_error(rep, needle: str, label: str) -> None:
@@ -5386,11 +5411,13 @@ def test_dsr1_required_omission_accounting():
     saved_unrun = list(REQUIRED_UNRUN)
     saved_required = list(REQUIRED_SKIPS)
     saved_skips = list(SKIPS)
+    saved_expected = list(EXPECTED_PLATFORM_SKIPS)
 
     def reset_channels():
         REQUIRED_UNRUN.clear()
         REQUIRED_SKIPS.clear()
         SKIPS.clear()
+        EXPECTED_PLATFORM_SKIPS.clear()
 
     def closure_result(case):
         CLOSURE_CASES[synthetic_id] = case
@@ -5442,6 +5469,27 @@ def test_dsr1_required_omission_accounting():
         assert suite_exit_status("linux") == 1, "required omission must make the Linux aggregate nonzero"
         assert suite_exit_status("win32") == 0, "non-Linux UNRUN keeps unrelated Windows suites runnable"
 
+        # A known platform boundary is recorded but is not required coverage
+        # on the host that cannot run the fixture. The native-platform call is
+        # a defect and must raise rather than become a quiet skip.
+        reset_channels()
+        expected_platform_skip(
+            "win32", "synthetic Windows-only fixture", platform="linux")
+        assert suite_exit_status("linux") == 0, (
+            "an expected platform skip must not make the Linux aggregate nonzero")
+        assert suite_exit_status("win32") == 0
+        assert len(EXPECTED_PLATFORM_SKIPS) == 1
+        assert not SKIPS and not REQUIRED_SKIPS and not REQUIRED_UNRUN, (
+            "expected platform skips must stay off the required channels")
+        try:
+            expected_platform_skip(
+                "win32", "synthetic native-platform skip", platform="win32")
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(
+                "a Windows-only fixture must not be skippable on Windows")
+
         # Root/non-root split: the required denial is UNRUN for uid 0 only.
         available, reason = _permission_denial_case(lambda: 0)
         assert available is False and "uid 0" in reason, (available, reason)
@@ -5467,6 +5515,7 @@ def test_dsr1_required_omission_accounting():
         REQUIRED_UNRUN[:] = saved_unrun
         REQUIRED_SKIPS[:] = saved_required
         SKIPS[:] = saved_skips
+        EXPECTED_PLATFORM_SKIPS[:] = saved_expected
 
 
 CLOSURE_CASES = {
@@ -8662,6 +8711,235 @@ def test_consumer_install_mode_native():
                 capture_output=True, text=True,
             )
 
+
+def _dest_snapshot(root: Path) -> list:
+    """No-follow inventory: a reparse point is recorded and never entered."""
+    rows = []
+
+    def walk(directory: Path, rel: str) -> None:
+        for entry in os.scandir(directory):
+            if rel == "" and entry.name == ".git":
+                continue
+            relpath = rel + entry.name
+            info = entry.stat(follow_symlinks=False)
+            attrs = getattr(info, "st_file_attributes", 0)
+            if attrs & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+                rows.append((relpath, "REPARSE"))
+            elif entry.is_dir(follow_symlinks=False):
+                rows.append((relpath + "/", "DIR"))
+                walk(Path(entry.path), relpath + "/")
+            else:
+                digest = hashlib.sha256(Path(entry.path).read_bytes()).hexdigest()
+                rows.append((relpath, "FILE", info.st_size, digest))
+
+    if root.exists():
+        walk(root, "")
+    return sorted(rows)
+
+
+def _dest_junction(link: Path, target: Path) -> None:
+    """Create a real directory junction (cmd.exe, no elevation, no policy change)."""
+    link.parent.mkdir(parents=True, exist_ok=True)
+    proc = subprocess.run(
+        ["cmd", "/c", "mklink", "/J", link.name, str(target)],
+        cwd=str(link.parent), capture_output=True, text=True,
+        encoding="utf-8", errors="replace",
+    )
+    assert proc.returncode == 0, (proc.stdout, proc.stderr)
+    assert os.path.isjunction(link), "fixture junction was not created: %s" % link
+
+
+def test_consumer_install_destination_links():
+    """S4-1..S4-9: destination reparse points are refused before any write."""
+    if sys.platform != "win32":
+        # Junctions are a Windows kernel object. This case is required on
+        # Windows and is an expected platform boundary on POSIX, not missing
+        # required coverage there; it is still recorded as UNRUN, never a pass.
+        expected_platform_skip(
+            "win32",
+            "UNRUN: destination junction fixtures are Windows-specific; the POSIX lane is not run")
+        return
+    pwsh = _install_mode_pwsh()
+    sh = _install_mode_sh()
+    if pwsh is None or sh is None:
+        _install_mode_unrun("pwsh 7 and a POSIX sh are required for the destination fixtures")
+        return
+    if shutil.which("git") is None:
+        _install_mode_unrun("git is required to build the destination fixtures")
+        return
+    page = STARTER_DOC.read_text(encoding="utf-8")
+    gate_text = _starter_fenced_block(page, STARTER_MODE_HEADING)
+    harness_text = _starter_fenced_block(page, STARTER_HARNESS_HEADING, 1)
+    assert "Assert-DestinationPath" in harness_text, (
+        "the published harness has no destination containment preflight"
+    )
+    assert "Stop-Step 23" in harness_text, (
+        "the published harness does not refuse a destination reparse point at 23"
+    )
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        env = _install_mode_env(tmp)
+        gate = tmp / "install-mode.ps1"
+        harness = tmp / "install-starter.ps1"
+        gate.write_text(gate_text, encoding="utf-8", newline="\n")
+        harness.write_text(harness_text, encoding="utf-8", newline="\n")
+        source, proc = _starter_pinned_source(tmp)
+        if proc.returncode != 0:
+            _install_mode_unrun(
+                "the pinned commit %s is not in this clone's history: %s"
+                % (STARTER_PIN_COMMIT, (proc.stderr or proc.stdout).strip()[:160]))
+            return
+        try:
+            def install(target, record=None):
+                args = [pwsh, "-NoProfile", "-File", str(harness),
+                        "-Src", str(source), "-Tgt", str(target), "-Sh", sh,
+                        "-Mode", "human-only", "-OwnerAuthorization", "I will commit myself."]
+                if record is not None:
+                    args += ["-RecordPath", str(record)]
+                return subprocess.run(
+                    args, env=env, capture_output=True, text=True,
+                    encoding="utf-8", errors="replace", timeout=600,
+                )
+
+            # S4-1: an ordinary target still succeeds, and packing is unchanged.
+            clean = _install_mode_repo(tmp / "d-clean", env)
+            proc = install(clean, clean / "docs" / "consumer-install-record.md")
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            first = _dest_snapshot(clean)
+            assert len([row for row in first if row[1] == "FILE"]) == 42, first
+            ok("S4-1: an ordinary clean target still installs 41 files plus the "
+               "declared record with the containment preflight in place")
+
+            # S4-2: a linked target root is refused, and the external tree is
+            # byte-for-byte unchanged - nothing is written through the junction.
+            ext = _install_mode_repo(tmp / "d-root-ext", env)
+            linked = tmp / "d-linked-root"
+            _dest_junction(linked, ext)
+            ext_before = _dest_snapshot(ext)
+            proc = install(linked)
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert "destination reparse point" in proc.stderr, proc.stderr
+            assert "Junction" in proc.stderr, proc.stderr
+            assert _dest_snapshot(ext) == ext_before, "a write passed through the linked target root"
+            assert not (ext / "AGENTS.md").exists(), "a package file was written through the link"
+            ok("S4-2: a linked target root exits 23 naming the Junction before any write; "
+               "the external inventory is unchanged")
+
+            # S4-3: an intermediate junction late in the selected array is found
+            # before the first package write, not after earlier files were copied.
+            late = _install_mode_repo(tmp / "d-late", env)
+            (late / ".claude" / "skills" / "test-plan-designer").mkdir(parents=True)
+            ext = tmp / "d-late-ext"
+            ext.mkdir()
+            _dest_junction(late / ".claude" / "skills" / "test-plan-designer" / "references", ext)
+            late_before = _dest_snapshot(late)
+            proc = install(late, late / "docs" / "record.md")
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert _dest_snapshot(ext) == [], "a skill file was written through the reference junction"
+            assert _dest_snapshot(late) == late_before, "a package file was written before the refusal"
+            assert not (late / ".claude" / "skills" / "agent-startup-context-gate" / "SKILL.md").exists()
+            ok("S4-3: an intermediate junction at the 38th package row exits 23 before "
+               "the first package file is written; target and external trees unchanged")
+
+            # S4-4: a broken junction is refused, not treated as a missing path.
+            broken = _install_mode_repo(tmp / "d-broken", env)
+            (broken / ".claude").mkdir()
+            _dest_junction(broken / ".claude" / "skills", tmp / "d-broken-missing")
+            broken_before = _dest_snapshot(broken)
+            proc = install(broken)
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert "destination reparse point" in proc.stderr, proc.stderr
+            assert _dest_snapshot(broken) == broken_before, "a broken junction was traversed or written"
+            ok("S4-4: a dangling Junction exits 23 without traversal or inferred safety")
+
+            # S4-5: the explicit record path is part of the preflight. A record
+            # path through a junction is refused before any package write.
+            record = _install_mode_repo(tmp / "d-record", env)
+            ext = tmp / "d-record-ext"
+            ext.mkdir()
+            _dest_junction(record / "record-link", ext)
+            record_before = _dest_snapshot(record)
+            proc = install(record, record / "record-link" / "consumer-install-record.md")
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert _dest_snapshot(ext) == [], "the install record was written through a junction"
+            assert _dest_snapshot(record) == record_before, "a package file was written before the record refusal"
+            ok("S4-5: an install-record path through a Junction exits 23 before any "
+               "package or record write")
+
+            # S4-6: an ordinary external record path keeps its documented scope.
+            external = _install_mode_repo(tmp / "d-external", env)
+            ext = tmp / "d-external-record"
+            ext.mkdir()
+            ext_record = ext / "consumer-install-record.md"
+            proc = install(external, ext_record)
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            assert ext_record.is_file(), "the declared ordinary external record was not written"
+            rows = [row for row in _dest_snapshot(external) if row[1] == "FILE"]
+            assert len(rows) == 41, rows
+            assert not (external / "docs" / "consumer-install-record.md").exists()
+            ok("S4-6: an ordinary external record path remains allowed and is written "
+               "at its declared location, with 41 package files in the target")
+
+            # S4-7: the existing startup-file refusal is not weakened or pre-empted.
+            conflict = _install_mode_repo(tmp / "d-conflict", env)
+            (conflict / "AGENTS.md").write_text("different bytes\n", encoding="utf-8")
+            proc = install(conflict)
+            assert proc.returncode == 22, (proc.returncode, proc.stdout, proc.stderr)
+            assert "startup file differs" in proc.stderr, proc.stderr
+            assert (conflict / "AGENTS.md").read_text(encoding="utf-8") == "different bytes\n"
+            assert not (conflict / ".claude").exists(), "a package file was written before exit 22"
+            ok("S4-7: the conflicting AGENTS.md refusal still exits 22 with the file "
+               "unchanged and no package write")
+
+            # S4-8: a legitimate identical target still resumes, preserving the
+            # first record and writing only the second declared record.
+            second_record = clean / "docs" / "second-install-record.md"
+            proc = install(clean, second_record)
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            assert second_record.is_file()
+            package_rows = [row for row in first
+                            if row[1] != "FILE" or not row[0].startswith("docs/")]
+            resumed_rows = [row for row in _dest_snapshot(clean)
+                            if row[1] != "FILE" or not row[0].startswith("docs/")]
+            assert len([row for row in resumed_rows if row[1] == "FILE"]) == 41, resumed_rows
+            assert package_rows == resumed_rows, (
+                "the resume changed an installed package file")
+            assert (clean / "docs" / "consumer-install-record.md").is_file()
+            ok("S4-8: an identical resume still exits 0, preserves the package files "
+               "and the prior record, and writes the second record")
+
+            # S4-9: the required file-symlink fixture needs administrator privilege
+            # on this host. Record that as UNRUN; never count it as a pass.
+            ext = tmp / "d-file-ext"
+            ext.mkdir()
+            sentinel = ext / "sentinel.txt"
+            sentinel.write_bytes(b"sentinel-bytes")
+            link_target = _install_mode_repo(tmp / "d-file-leaf", env)
+            made = subprocess.run(
+                ["cmd", "/c", "mklink", str(link_target / "AGENTS.md"), str(sentinel)],
+                capture_output=True, text=True, encoding="utf-8", errors="replace",
+            )
+            if made.returncode != 0:
+                skip("UNRUN: file symbolic-link leaf fixture unavailable on this host: "
+                     + (made.stderr or made.stdout).strip()[:160])
+            else:
+                digest_before = hashlib.sha256(sentinel.read_bytes()).hexdigest()
+                proc = install(link_target)
+                assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+                assert hashlib.sha256(sentinel.read_bytes()).hexdigest() == digest_before
+                ok("S4-9: an existing linked file leaf exits 23 and the external "
+                   "sentinel hash is unchanged")
+        finally:
+            subprocess.run(
+                ["git", "-C", str(REPO_ROOT), "worktree", "remove", "--force", str(source)],
+                capture_output=True, text=True,
+            )
+            subprocess.run(
+                ["git", "-C", str(REPO_ROOT), "worktree", "prune"],
+                capture_output=True, text=True,
+            )
+
+
 TESTS = [
     test_fix942_total_guard_regressions,
     test_ds7cfixb_coverage_detector_matrix,
@@ -8774,6 +9052,7 @@ TESTS = [
     test_consumer_starter_selector_pin_closure,
     test_consumer_install_mode_gate,
     test_consumer_install_mode_native,
+    test_consumer_install_destination_links,
 ]
 
 
@@ -8783,7 +9062,9 @@ def suite_exit_status(platform: str = sys.platform) -> int:
     Kept as a function so the classification is unit-tested directly instead of
     only being observed by running the whole suite. Non-Linux UNRUN stays
     explicit without breaking unrelated Windows suites, which is the existing
-    platform policy.
+    platform policy. EXPECTED_PLATFORM_SKIPS is intentionally not read here: a
+    fixture that only exists on another platform is not required coverage on
+    this host, while any unexpected SKIPS entry on Linux remains non-OK.
     """
     if platform.startswith("linux") and (SKIPS or REQUIRED_SKIPS or REQUIRED_UNRUN):
         return 1
@@ -8815,6 +9096,9 @@ def main() -> int:
             return 1
         print()
 
+    if EXPECTED_PLATFORM_SKIPS:
+        print(f"PLATFORM-SKIPPED: {len(EXPECTED_PLATFORM_SKIPS)} test(s) "
+              f"(expected on {sys.platform}; not required coverage, never passes)")
     if SKIPS:
         print(f"SKIPPED: {len(SKIPS)} test(s) (UNRUN, not passes)")
     for entry in REQUIRED_UNRUN:

@@ -121,9 +121,14 @@ silently skip a gate.
 - A destination `AGENTS.md`/`CLAUDE.md` that differs by any byte stops the
   install (exit 22), and this package documents no in-place merge: reconcile the two files
   to the pinned bytes before installing, or install into a tree that has neither.
-- The procedure checks the source chain for reparse points but not your
-  destination tree, so a junction or symlink that already exists inside the target
-  is not detected by the published harness.
+- The procedure checks the source chain for reparse points, and the harness's
+  destination preflight refuses a target root, target ancestor, intermediate
+  destination directory, existing destination leaf or install-record path that is
+  a junction, symbolic link or other reparse point before any write (exit 23). The
+  preflight inspects the tree it is given: it does not prove immunity to another
+  process replacing a directory between the check and the copy, so concurrent
+  destination mutation is unsupported and the guarantee covers the inspected,
+  quiescent target.
 - This package installs files; it does not run your project, choose your
   technology, or approve anything. Approvals remain the human's.
 
@@ -734,9 +739,11 @@ The runnable implementation of P5-P9 is the harness in section 7.1; the bullets
 below state what each step requires and why. The pre-checks run in this order and
 before anything is written:
 
-- **Scope.** Only the 18 destination skill directories (`.claude/skills/<name>`) and
-  the two startup files are examined. A file elsewhere in your repository is never
-  considered, so a populated product repository is a supported target.
+- **Scope.** The 18 destination skill directories (`.claude/skills/<name>`), the two
+  startup files and the declared `-RecordPath` output are examined, together with
+  the existing components of the target path itself. A file elsewhere in your
+  repository is never considered, so a populated product repository is a supported
+  target.
 - **Existing skill directories are resume-or-refuse.** A directory that already
   exists is accepted only when every file in it is one of that skill's packaged
   files and byte-identical to the pinned source — an install interrupted mid-copy
@@ -749,6 +756,15 @@ before anything is written:
   `..` segment; must not be a reparse point at the leaf **or at any parent
   segment** (the check walks `.claude`, `.claude/skills`, the skill directory and
   `references/`); and must resolve inside the clone (**exit 21**).
+- **Destination links fail closed.** The target root, every existing ancestor of
+  the target, every existing intermediate directory and leaf on the 41 intended
+  destination paths, and the existing components of `-RecordPath` are inspected
+  with `[IO.File]::GetAttributes`; a junction, symbolic link or other reparse
+  point stops the run (**exit 23**) with the exact path and link type before any
+  package or record write. A missing component ends that path's walk, because
+  nothing below it can exist. The check does not follow, repair or delete the
+  link, and it does not claim to survive concurrent replacement of a checked
+  directory.
 - **Startup files never overwrite.** An existing `AGENTS.md`/`CLAUDE.md` that
   differs byte-wise from the source is refused (**exit 22**); an identical one is
   accepted and counted, and is re-checked at copy time rather than trusted from
@@ -847,11 +863,15 @@ runs P2's `install-mode.ps1` as a child process before it reads a source pin or
 writes a file, and exits with that gate's code; `-ModeGate` overrides the default
 location beside the harness. After the gate accepts, the harness trims the mode
 once and uses that normalized value for the install record and every later branch,
-so a padded token cannot record a policy it did not authorize. In a target tree with no junction or symlink on a
+so a padded token cannot record a policy it did not authorize. Before it creates
+a directory or copies a file, it refuses a target root, target ancestor,
+intermediate destination directory, existing destination leaf or install-record
+path that is a junction, symbolic link or other reparse point (**exit 23**,
+naming the exact path and link type); the refusal happens before any package or
+record write. On a quiescent target tree with no such reparse point on a
 destination path, it writes nothing outside the 41 package paths and the install
-record. A destination reparse point is outside this package's guarantee: the
-harness does not detect it, and a write can pass through it to a location outside
-the target (section 1.3).
+record. The preflight is not a boundary against concurrent replacement of a
+directory between the check and the write (section 1.3).
 
 ```powershell
 param(
@@ -967,6 +987,59 @@ function Get-FileSha256([string]$Path) {
 function Get-LfCount([byte[]]$Bytes) { return @($Bytes | Where-Object { $_ -eq 10 }).Count }
 function Get-CrCount([byte[]]$Bytes) { return @($Bytes | Where-Object { $_ -eq 13 }).Count }
 
+# P5a - destination containment. A junction, symbolic link or other reparse point
+# on the way to a write can redirect it outside the target, so every component of
+# every intended destination path, the target chain and the install-record path is
+# inspected before a directory is created or a byte is written. Any reparse point
+# and any path that cannot be inspected stops the run (exit 23). The check reads
+# attributes only: it never follows, repairs or deletes the link.
+$destChecked = @{}
+function Get-DestinationAttributes([string]$Path) {
+  try { return [IO.File]::GetAttributes($Path) }
+  catch {
+    $inner = $_.Exception.InnerException
+    if (($inner -is [IO.FileNotFoundException]) -or ($inner -is [IO.DirectoryNotFoundException])) { return $null }
+    Stop-Step 23 ("destination path cannot be inspected: {0} ({1}); nothing was written" -f $Path, $_.Exception.Message)
+  }
+}
+function Assert-DestinationPath([string]$Path, [string]$Root) {
+  $full = [IO.Path]::GetFullPath($Path)
+  if ($Root) {
+    $prefix = $Root.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+    if (-not $full.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+      Stop-Step 23 ("destination path leaves the target boundary: {0}; nothing was written" -f $full)
+    }
+  }
+  $components = New-Object System.Collections.Generic.List[string]
+  $cursor = $full
+  while ($cursor) {
+    $components.Insert(0, $cursor)
+    $parent = [IO.Path]::GetDirectoryName($cursor)
+    if (-not $parent -or $parent -eq $cursor) { break }
+    $cursor = $parent
+  }
+  foreach ($component in $components) {
+    $key = $component.ToLowerInvariant()
+    if ($destChecked.ContainsKey($key)) {
+      if (-not $destChecked[$key]) { break }
+      continue
+    }
+    $attrs = Get-DestinationAttributes $component
+    if ($null -eq $attrs) { $destChecked[$key] = $false; break }
+    $destChecked[$key] = $true
+    if ($attrs -band [IO.FileAttributes]::ReparsePoint) {
+      $kind = 'reparse point'
+      $target = ''
+      $item = Get-Item -LiteralPath $component -Force -ErrorAction SilentlyContinue
+      if ($item) {
+        if ($item.LinkType) { $kind = $item.LinkType }
+        if ($item.Target) { $target = ' -> ' + (@($item.Target) -join ', ') }
+      }
+      Stop-Step 23 ("destination reparse point ({0}{1}): {2}; refusing before any write" -f $kind, $target, $component)
+    }
+  }
+}
+
 # P5 - destination pre-checks. An existing skill directory is accepted only as a
 # resume of a prior partial install: every file already there must be one of that
 # skill's packaged files and byte-identical to the pinned source.
@@ -988,6 +1061,17 @@ foreach ($rel in $package) {
   if (-not $resolved.StartsWith($srcPrefix, [StringComparison]::OrdinalIgnoreCase)) {
     Stop-Step 21 "source resolves outside the clone: $resolved"
   }
+}
+# P5b - run the containment preflight before the destination is enumerated or any
+# directory is created. The target chain is walked from the volume root, so a
+# linked target root or ancestor is refused rather than followed.
+Assert-DestinationPath $Tgt $null
+foreach ($rel in $package) {
+  Assert-DestinationPath (Join-Path $Tgt ($rel -replace '/', [IO.Path]::DirectorySeparatorChar)) $Tgt
+}
+if ($RecordPath) {
+  $RecordPath = [IO.Path]::GetFullPath($RecordPath)
+  Assert-DestinationPath $RecordPath $null
 }
 foreach ($rel in $skillDirs) {
   $dst = Join-Path $Tgt ($rel -replace '/', [IO.Path]::DirectorySeparatorChar)
@@ -1259,6 +1343,26 @@ was refused **42** on the identity it measured, rather than approved. The
 commands, outputs, exit codes and retained UNRUNs are in
 [human-commit-install-v1](evidence/consumer-readiness/human-commit-install-v1.md).
 
+**Verified for the destination-containment revision on 2026-10-28.** The section
+7.1 block was re-extracted exactly (**21,977 B / 385 LF**, sha256
+`5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0`; P2's block
+is unchanged at **6,493 B / 105 LF**, sha256
+`fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea`) and run
+natively on the same Windows host against a worktree of `ffb040c7` and isolated
+consumer fixtures. A clean target exited **0** with 41 package files and the
+record. A linked target root, a linked target ancestor, a junction at
+`.claude/skills`, a junction at one skill's `references/`, a dangling junction
+and an install-record path through a junction each exited **23**, naming the
+exact path and `Junction`; before and after inventories were identical and no
+package or record byte was written through a link. An ordinary external
+`-RecordPath` still exited **0** and wrote the record at its declared location.
+A file symbolic link at an existing leaf is **UNRUN** on this host: creating one
+requires administrator privilege, and no machine policy was changed to obtain
+it. The concurrent-replacement limit in sections 1.3 and 12 is unchanged. The
+Windows validator suite is **OK: 350** (baseline **342**), exit 0. The commands,
+exit codes, inventories and fixture topology are in
+[destination-links-v1](evidence/consumer-readiness/destination-links-v1.md).
+
 ### 7.2 Exit codes
 
 Each code stops; none warns and continues.
@@ -1269,6 +1373,7 @@ Each code stops; none warns and continues.
 | 20 | Foreign material in a destination skill directory | The exact file that is outside the package; nothing overwritten |
 | 21 | Unsafe or missing source path | The `..`/reparse-point segment or the missing file; nothing written |
 | 22 | Startup-file conflict | The differing file; existing bytes unchanged |
+| 23 | Unsafe destination path (junction, symbolic link or other reparse point) | The exact path and the link type/target; refused before any package or record write |
 | 30 | Closure, count or eval-material failure | The offending path or the count found |
 | 31 | Pin or byte mismatch (including a CRLF checkout or an aggregate mismatch) | The exact file, or the aggregate comparison that failed |
 | 32 | Missing sibling dependency | The installed skill that links it and the absent sibling it names, as `<skill> links <sibling>/SKILL.md` |
@@ -1607,6 +1712,11 @@ a pass.
   would change pinned bytes. The install record lists them.
 - **One host is one host.** The measured acceptance evidence covers one Windows
   machine, one slice and J1. macOS and Linux remain not validated.
+- **Destination containment covers the inspected, quiescent tree.** The preflight
+  refuses an existing reparse point on the target chain, a destination path or the
+  install-record path (exit 23), but it cannot detect a process that replaces a
+  checked directory between the check and the copy. A linked path is refused,
+  never followed.
 - **The solo-owner commit-identity policy is decided** (section 8.3): a solo owner
   may commit under their own identity; only agent-authored commits must use the
   documented repository-local agent identity. The gate's fail-closed check for
