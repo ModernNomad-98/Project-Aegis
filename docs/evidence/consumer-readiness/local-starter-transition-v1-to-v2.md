@@ -19,12 +19,12 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **125,163 B**, sha256 `d79889c8a75bbc08d0ac8b08d914e940b2b90c449d74901afee18552d7adbc05` |
+| Page after the section 7.3 insert and review revisions | **126,542 B**, sha256 `da03f5ef2c7f8ee5b54dc5366142944abaa9b81ecd5c5de7e791d1afd4a873fe` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
 | Host | Windows 10.0.26200 (64-bit); PowerShell 7.6.6; Git 2.55.0.windows.5; Python 3.14.7 |
-| Native runner | `_A/work-package-3/item7-final/evidence/scripts/run_transition.py` (local, not committed) |
+| Native runner | `_A/work-package-3/item7-final/evidence/scripts/run_transition.py` (local, not committed; the scripts and logs are retained in the local evidence package, so this is a local observation, not an independently reproducible artefact in the repository) |
 
 A "block" is the fenced body plus one trailing LF, the convention the earlier
 install-mode and Item 6 records used. The P2 and 7.1 identities above reproduce
@@ -116,7 +116,7 @@ Two cases that the review asked to be explicit about were executed natively:
 
 | Case | Exit | Observed |
 | --- | --- | --- |
-| C7 - stale record already at the new path | **0** | 41 package files installed; the stale 31-byte file was **left unchanged** (`P9: install record already present, left unchanged`); the new receipt was **not** produced. This is the observed footgun the page warns about: completion needs the 41-row/5,420-byte check in sections 9.1-9.2, not just exit 0 |
+| C7 - stale record already at the new path | **0** | 41 package files installed; the stale 31-byte file was **left unchanged** (`P9: install record already present, left unchanged`); the new receipt was **not** produced. This is the observed footgun the page warns about: completion needs the 41-row / 5,420-serialized-byte / destination check in sections 9.1-9.2, not just exit 0 |
 | C8 - foreign file in a selected skill directory | **20** | `.claude/skills/code-reviewer/notes.md` named on stderr, bytes preserved, no record, no package write |
 
 Kill during P9 itself (a partial record at the new path) is **UNRUN**; the
@@ -197,23 +197,25 @@ than by a migration step.
 | DCO on the commits | signed off; verified with `scripts/check_dco.py` over `origin/main..HEAD` |
 | PR-body bound fields (`check_pr_body_skills.py`) | OK on the draft and on the live body read back |
 
-Hosted CI at `1b63544b` and at the review-fix commit `8fc806d3` completed with
-**all required checks green**: `gate-guard`, `validate-skills`, `changes` and
-both review-switch jobs. The first DeepSeek review posted six advisory findings
-and Codex four; a second DeepSeek review at `8fc806d3` posted sixteen more. All
-were read and dispositioned in the PR body: the documentation findings are
-fixed in the commit that carries this record, and the installer-behaviour
-requests (atomic record write, a new fail-closed code for an existing record
-path, testing `agent-commit`) are recorded as out of scope / **UNRUN** rather
-than claimed. `tools-tests-linux`, `tools-tests-windows` and
+Hosted CI at `1b63544b`, `8fc806d3` and `844a1261` completed with **all required
+checks green**: `gate-guard`, `validate-skills`, `changes` and both review-switch
+jobs. Three DeepSeek review rounds and one Codex round posted 35 advisory
+findings; all were read and dispositioned in the PR body. The documentation
+findings are fixed in the commit that carries this record; the installer-
+behaviour requests (atomic record write, a new fail-closed code for an existing
+record path, testing `agent-commit`) are recorded as out of scope / **UNRUN**
+rather than claimed. `tools-tests-linux`, `tools-tests-windows` and
 `windows-offline-checks` were **skipped** by design for a docs-only change and
-are UNRUN, never passes. The final head re-triggers CI; that run is delivery
-stage evidence and is not claimed here.
+are UNRUN, never passes. This acceptance is bound to the page blob sha256
+`da03f5ef...73fe` and the installer at `2a7e9c06`; a later page edit invalidates
+it and requires a rerun. The final head re-triggers CI; that later run is
+delivery-stage evidence and is not claimed here.
 
 ## 10. UNRUN and limits
 
-- **Other operating systems**, a second Windows host, GitHub-hosted CI evidence
-  for this branch, a real consumer repository and J1 - not run here.
+- **Other operating systems**, a second Windows host, a real consumer repository
+  and J1 - not run here. Hosted CI itself ran at `1b63544b`, `8fc806d3` and
+  `844a1261` (all required checks green); the final review-fix head re-runs it.
 - **Concurrent writers** and replacement of a checked directory between
   preflight and write - not covered; the guarantee is the inspected quiescent
   tree (sections 1.3 and 12 of the page).

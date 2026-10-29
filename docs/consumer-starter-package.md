@@ -1401,9 +1401,11 @@ differing byte with exit **31**, before any write. This applies to the newly sel
 `scoped-approval-register` directory too if it already exists - an identical partial
 resumes, a foreign file is refused at 20, a differing byte at 31. The owner states
 one install mode and the words that authorize **this transition**; a v1
-authorization is not reused by inference, `-Mode` must be that exact token and
-`-OwnerAuthorization` those words, because P2 checks the token and nonempty
-authorization, not their agreement. Finally, the caller supplies a **new,
+authorization is not reused by inference, and `-Mode` must be that exact token
+with `-OwnerAuthorization` carrying those words. P2 validates only that the token
+is recognised and the authorization is nonempty - it cannot confirm that the
+words belong to this transition, so ensuring that is the owner/operator's duty,
+not an installer control. Finally, the caller supplies a **new,
 nonexisting** record path, for example `docs/consumer-install-record-v2.md`. The v2
 profile adds exactly two skill files -
 `.claude/skills/scoped-approval-register/SKILL.md` and
@@ -1415,24 +1417,32 @@ as section 7.1 instructs; the harness then defaults `-ModeGate` to that file. Pa
 `-ModeGate` explicitly only when the gate lives somewhere else. Run the harness with
 the owner-selected mode and `-RecordPath` naming the new path:
 
-```powershell
-pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode <human-only|agent-commit> -OwnerAuthorization '<the owner''s words>' -RecordPath C:\path\to\product\docs\consumer-install-record-v2.md
+$Mode = 'human-only' # or 'agent-commit'; must be the mode the owner authorized
+$OwnerAuthorization = '<replace with the owner''s words>'
+pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath C:\path\to\product\docs\consumer-install-record-v2.md
 ```
+
+Angle-bracket values above are placeholders to replace; the example is runnable
+once they are filled in. Keep authorization text in a variable (or supply it
+without echoing it) if it is sensitive, because a literal on the command line is
+visible in shell history and process listings.
 
 Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
 run that reuses it installs the two files but cannot produce a v2 receipt: the
 retained 39-row file still describes the v1 result and must not be presented as the
-new one. The same applies to any stale or partial file already sitting at the new
-path: P9 leaves it unchanged, so the run can exit 0 without a fresh receipt. The new
-path must not exist before the run; if it does, inspect and remove or rename it
-first. That preservation is observed, not hypothetical: with a stale file at the new
-path the harness installed the two package files, exited **0**, printed
-`P9: install record already present, left unchanged`, and left the stale file
-byte-identical. A kill that lands during P9 itself can therefore leave a partial
-record behind; that window is **UNRUN**, and the operator must verify or delete the
-file before rerunning. Fail-closed refusal of an existing `-RecordPath`, and an
-atomic temp-file-plus-rename record write, are installer changes this documentation
-item does not make.
+new one. For the **initial** transition the new path must not exist. An
+**identical rerun** of a completed transition may point at the existing record
+(that is C6, the only accepted case of an existing file at the new path); any
+other existing file there - stale, partial, or copied from another run - must be
+inspected and removed before the run. That preservation is observed, not
+hypothetical: with a stale file at the new path the harness installed the two
+package files, exited **0**, printed `P9: install record already present, left
+unchanged`, and left the stale file byte-identical. A kill that lands during P9
+itself can therefore leave a partial record behind; that window is **UNRUN**, and
+the operator must verify or delete the file before rerunning (no tracking issue is
+filed; the gap is recorded here as a limitation). Fail-closed refusal of an
+existing `-RecordPath`, and an atomic temp-file-plus-rename record write, are
+installer changes this documentation item does not make.
 
 **Expected result (the tested `human-only` route).** Exit 0; 41 selected paths
 present; from a clean 39-file start exactly the two added package files are new
@@ -1447,13 +1457,15 @@ a commit that route would make.
 
 **Refusals and interruption.** A changed pre-existing selected file is refused with
 exit **31**; a foreign file in a selected skill directory with exit **20**; a
-differing startup file with exit **22**; a destination link with exit **23** (section
-7.2 is the authoritative code table). Each refusal names the file, preserves its
-bytes and writes no record. Any reparse point on the 41 destination paths or the
-record path - a junction, symbolic link or other link type - is refused before any
-write by inspecting attributes only; native evidence covers directory junctions, and
-creating a file symbolic link needs administrator privilege on the recorded host, so
-that leaf case is **UNRUN**, not claimed. Remediation: restore the named file from the
+differing startup file (`AGENTS.md`/`CLAUDE.md`, exit **22** in section 7.2); a
+destination link with exit **23** (section 7.2 is the authoritative code table). Each refusal names the file, preserves its
+bytes and writes no record. Any reparse point on the target root, an existing
+intermediate directory, one of the 41 leaf paths, or the record path and its parents
+- a junction, symbolic link or other link type - is refused before any write by
+inspecting attributes only. That attribute check is not a defence against concurrent
+replacement of a checked directory (section 1.3). Native evidence covers directory
+junctions; creating a file symbolic link needs administrator privilege on the
+recorded host, so that leaf case is **UNRUN**, not claimed. Remediation: restore the named file from the
 pin (or move the local edit aside with the human's approval), then rerun. If the copy
 is interrupted, an unchanged rerun resumes under P5's identical-byte policy and
 writes the fresh record when the interruption happened before P9; a partial file that
@@ -1463,16 +1475,27 @@ files plus the fresh record, and a truncated new file was refused at 31 with the
 bytes preserved and no record. An identical rerun after a completed transition
 changes no package file and leaves an existing record at the same path unchanged.
 
-**Completion rule.** The transition is complete only when the new record exists with
-41 measured rows and the published aggregate. Recompute the aggregate from the record
-rows with the algorithm and row format defined in sections 9.1 and 9.2; if the file
-is missing, is not 41 rows, or does not reproduce the aggregate, the transition is
-not complete - check for a stale file at the path, remove it, and rerun. Adding the
-two files while reusing the old record path is not a completed transition. Keep the
-v1 record: after success the repository holds both `docs/consumer-install-record.md`
-(39 rows, the v1 receipt) and `docs/consumer-install-record-v2.md` (41 rows, the only
-v2 receipt); never overwrite the v1 file, and label any rename so the two are not
-confused.
+**Completion rule.** The transition is complete only when **all** of these hold:
+
+1. the run exited 0;
+2. the record at the new path is fresh, or - for the identical-rerun case only -
+an existing record that verifies;
+3. the record has 41 measured rows in ordinal order (byte-wise path order, not
+culture-aware collation), its own header agrees, and a recomputation with the row
+format and aggregate algorithm of sections 9.1 and 9.2 equals
+`fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over 5,420
+serialized bytes (the 7,025 B record file is the observed fixture size, not a
+universal constant);
+4. all 41 selected paths are present and byte-identical to the pin;
+5. unrelated product files and the v1 record are unchanged.
+
+If the file is missing, is not 41 rows, or does not reproduce the aggregate, the
+transition is not complete - check for a stale file at the path, remove it, and
+rerun. Adding the two files while reusing the old record path is not a completed
+transition. Keep the v1 record: after success the repository holds both
+`docs/consumer-install-record.md` (39 rows, the v1 receipt) and
+`docs/consumer-install-record-v2.md` (41 rows, the only v2 receipt); never
+overwrite or rename the v1 file.
 
 The native results for this exact case are in
 [local-starter-transition-v1-to-v2](evidence/consumer-readiness/local-starter-transition-v1-to-v2.md).
