@@ -54,7 +54,7 @@ candidate block as committed.
 | --- | --- | --- |
 | Existing `-RecordPath`, second run on a completed target | exit **0**, record and target unchanged, `P9: ... left unchanged` | exit **24**, nothing written, record byte-identical |
 | The same run with `-AllowExistingRecord` | exit **1**, `A parameter cannot be found that matches parameter name 'AllowExistingRecord'` | exit **0**, record byte-identical, no package write |
-| A directory occupying <<BT><record>.tmp` | exit **0**, record written, 42 files | exit **25**, no record, 41 package files |
+| A directory occupying `<record>.tmp` | exit **0**, record written, 42 files | exit **25**, no record, 41 package files |
 
 ## 4. Validator suite
 
