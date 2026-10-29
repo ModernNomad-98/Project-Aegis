@@ -14,15 +14,21 @@ This evidence covers **publication integrity and recovery**: what was published,
 
 No CI provider status is asserted as a pass. The checks recorded here are the named, per-row observations with their own outputs and exit codes. Where a hosted job was **skipped**, it is recorded as **UNRUN** — never as a hosted pass. Where a suite was run on a local host because the hosted job was skipped, it is recorded as "local run, hosted UNRUN". A green check on this pull request, if one appears, is not part of this evidence and proves nothing about the rows.
 
-## 4. Browser rows are UNRUN as of export
+## 4. Browser rows: one engine, one owner-run pair, evidence not delivered
 
-CP-11, CP-15, CP-17 and CP-20 are **UNRUN** at the time of export. No browser session was run against the live site for this export; no screenshots, DOM observations, rendered-state captures or timestamps exist in this bundle. The corrected R-RB1/R-RB2 windows required by the owner's browser decision=B (2026-10-29 ~10:05 PDT: announce each window with deployment id and served aggregate, hold the next step at least 45 minutes, post the exact visible-check steps inline) have **not** been opened. A later browser record is a **new record**; it does not retroactively change this export and must not be read back into it.
+CP-11, CP-15 and CP-20 are **PASS** on the owner-run corrected R-RB1/R-RB2 pair; CP-17 is **UNRUN**. The basis is the owner's summary as recorded in `README.md` §4 — not a capture carried here. Three limits are part of the record:
+
+- **Second engine not exercised (CP-17).** The runner disclosed a single engine — the built-in Chromium pane — so CP-17's second-engine property was never tested. Journey observations from that session are supplementary only and are not scored. CP-17 is **UNRUN**, not PASS and not FAIL.
+- **Attachments not delivered.** The owner named two batch files (`CP15-CP20-RRB1-batch.md`, `CP11-CP17-CP15B-CP20B-RRB2-batch.md`). Their payloads did not reach the Lead session, so this bundle does not quote them and records only what the owner's summary stated. Per-capture filenames and SHA-256 values, per-row timestamps, viewport/UA, console and network captures, and the DOM snapshots themselves were **not received** — the runner reported DOM snapshots attached with sha256 (A `faac9e87…`, B `b5da03f7…`) and screenshots held in the runner session.
+- **Profile.** The runner disclosed a “persistent pane profile (not private window)”, whereas the announced steps called for a fresh private window. It also reported “localStorage 0 keys throughout” and “no storage written”. The departure from the announced profile is recorded, not smoothed over.
+
+The windows, deployments, aggregates, hold arithmetic and verbatim disclosures are in `README.md` §4. A later browser record is a **new record**; it does not retroactively change these results.
 
 ## 5. FAIL rows are published as FAIL
 
 CP-03, CP-09 and CP-19 are FAIL. They are not softened to "UNRUN", "partial" or "accepted limitation" anywhere. CP-19's earlier UNRUN typing was wrong and is corrected by the owner's rescore (RUN = FAIL, 13/14, F2-late-revocation). CP-09's FAIL stands with no retroactive exception and no history rewrite. CP-03's earlier PASS review is superseded by the executed missing-reference control.
 
-**Point-in-time statements inside evidence.** Some carried records state counts as of the moment they were written, not final totals: the CP-22 signature block records “open rows at signing: 12 (9 UNRUN + 3 BLOCKED)” at 10:17 PDT, and several CP-21 records state deployment counts as of their own run. The final totals are the ledger v4 and README figures (15 PASS / 3 FAIL / 4 UNRUN / 0 BLOCKED). A point-in-time count is not a contradiction; it is evidence of the state it describes.
+**Point-in-time statements inside evidence.** Some carried records state counts as of the moment they were written, not final totals: the CP-22 signature block records “open rows at signing: 12 (9 UNRUN + 3 BLOCKED)” at 10:17 PDT, and several CP-21 records state deployment counts as of their own run. The final totals are the ledger v5 and README figures (18 PASS / 3 FAIL / 1 UNRUN / 0 BLOCKED). A point-in-time count is not a contradiction; it is evidence of the state it describes.
 
 ## 6. The CP-21 settings change is recorded, not registered
 
@@ -34,11 +40,11 @@ The CP-09 finding is that public consumer commit metadata contains plan-forbidde
 
 ## 8. Masked derivatives
 
-Thirteen carried files differ from their sources. Eight contain a personal full name inside a commit-metadata citation, and one of those also carries a host home path; in each, the name is replaced with `<name withheld>` and the home path with `<home-path withheld>`. Six JSON records carried CRLF line endings; these are normalised to LF so that the committed bytes equal this manifest (the repository enforces `* text=auto eol=lf`, and a CRLF manifest would verify only on one platform). One file carries both changes, hence thirteen files for fourteen declared changes. Nothing else changes. `DERIVATIVE-MANIFEST.tsv` records the before/after byte counts, SHA-256 values and the change class for each file. Consequence: a reader comparing one of those thirteen files against its workspace source will see exactly that difference and no other. The owner-answers record (`owner/OWNER-DECISION-BATCH-ANSWERS-2026-10-29.md`) is carried **byte-identical** to its source and is cited by digest `36495683…`; it refers to the owner by first name only, which is the owner's own self-reference, not commit metadata.
+Thirteen carried files differ from their sources. Eight contain a personal full name inside a commit-metadata citation, and one of those also carries a host home path; in each, the name is replaced with `<name withheld>` and the home path with `<home-path withheld>`. Six JSON records carried CRLF line endings; these are normalised to LF so that the committed bytes equal this manifest (the repository enforces `* text=auto eol=lf`, and a CRLF manifest would verify only on one platform). One file carries both changes, hence thirteen files for fourteen declared changes. Nothing else changes. `DERIVATIVE-MANIFEST.tsv` records the before/after byte counts, SHA-256 values and the change class for each file. Consequence: a reader comparing one of those thirteen files against its workspace source will see exactly that difference and no other. `DERIVATIVE-MANIFEST.tsv` is itself listed in `EVIDENCE-INDEX.tsv` and `manifest.sha256`, so the redaction map is bound by the same chain as the files it describes. The owner-answers record (`owner/OWNER-DECISION-BATCH-ANSWERS-2026-10-29.md`) is carried **byte-identical** to its source: 14,280 B, SHA-256 `97f0f5c8…`; it refers to the owner by first name only, which is the owner's own self-reference, not commit metadata. The ledger's evidence line and the CP-22 record cite the earlier 13,148-byte version of that file (`36495683…`), which is the version supplied to the CP-22 review; the file was later extended by the owner, and the carried bytes are the current version.
 
 ## 9. Workspace-only evidence pointers
 
-Some row records name evidence that is deliberately **not** carried (for example CP-17's E-23/E-25 control records at `_A/work-package-3/item2-cp-acceptance/evidence/04-cp17/controls-summary.json`). Those paths are named as workspace-only; they are not retrievable from this bundle, and no row's verdict depends on a reader trusting a file they cannot open. Where a verdict does depend on a record, the record travels.
+Some row records name evidence that is deliberately **not** carried (for example CP-17's E-23/E-25 control records at `_A/work-package-3/item2-cp-acceptance/evidence/04-cp17/controls-summary.json`). Those paths are named as workspace-only; they are not retrievable from this bundle, and no row's verdict depends on a reader trusting a file they cannot open. Where a verdict does depend on a record, the record travels. The single exception is the owner-run browser observations (CP-11, CP-15, CP-20): they rest on the owner's summary, are recorded as such in §4 and in each row, and no capture is carried.
 
 ## 10. Scope of the claim
 
@@ -46,7 +52,7 @@ One repository (`ModernNomad-98/aegis-consumer-proof`), one account, one Pages U
 
 ## 11. The final D121 closeout is not in this bundle
 
-This export carries the final consolidated ledger v4 and the 22 row records, not the D121 closeout narrative. The closeout is written by the parent after the last rows land and restates totals at that time; a draft is not included here because a stale draft would contradict the ledger. Nothing in this bundle asserts that the closeout is written.
+This export carries the final consolidated ledger v5 and the 22 row records, not the D121 closeout narrative. The closeout is written by the parent after the last rows land and restates totals at that time; a draft is not included here because a stale draft would contradict the ledger. Nothing in this bundle asserts that the closeout is written.
 
 ## 12. Serving models
 

@@ -19,7 +19,7 @@ PowerShell:
       $h,$p = $_ -split '  ',2
       if ((Get-FileHash $p -Algorithm SHA256).Hash -ne $h.ToUpper()) { "FAIL $p" } }
 
-`manifest.sha256` covers every content file plus `EVIDENCE-INDEX.tsv`; it cannot cover itself or `BUNDLE-AGGREGATE.txt`.
+`manifest.sha256` covers the 90 files listed in `EVIDENCE-INDEX.tsv` plus `EVIDENCE-INDEX.tsv` itself (91 lines); it cannot cover itself or `BUNDLE-AGGREGATE.txt`. `DERIVATIVE-MANIFEST.tsv` is inside that set, so the redaction map is bound by the same chain as the files it describes.
 
 **Aggregate.** SHA-256 over the concatenation of the 64-character lowercase per-file SHA-256 digests of the `EVIDENCE-INDEX.tsv` rows, in ascending path order (byte order of the UTF-8 path), with **no separators or newlines** between digests. Python:
 
@@ -42,7 +42,7 @@ Thirteen files differ from their Project Aegis workspace records (fourteen decla
 ## 4. Reading order
 
 1. `README.md` §1–§3 — what this is, the 22 rows, the export gate.
-2. `CONSOLIDATED-CP-LEDGER-V4.md` — the adjudicated ledger; then `rows/CP-01.md` … `rows/CP-22.md` for the row-level basis and evidence pointers.
+2. `CONSOLIDATED-CP-LEDGER-V5.md` — the adjudicated ledger (it supersedes v4, which is not carried); then `rows/CP-01.md` … `rows/CP-22.md` for the row-level basis and evidence pointers. Browser results are §4 of `README.md`.
 3. `LIMITATIONS.md` — what is not claimed and what is withheld, before relying on any claim.
 4. `records/CP21-EXECUTION-RECORD.md` and `records/CP22-SIGNATURE-BLOCK.txt` — the two observations that closed the export gate.
 5. `deployments/live-capture-after.json` and the two retained manifests — the served bytes themselves.
