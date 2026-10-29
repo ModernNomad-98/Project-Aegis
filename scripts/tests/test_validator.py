@@ -42,6 +42,7 @@ import ast
 import contextlib
 import hashlib
 import importlib.util
+import inspect
 import io
 import json
 import os
@@ -79,6 +80,11 @@ dco = _load_by_path(DCO_PATH, "aegis_check_dco")
 PASSES: list[str] = []
 SKIPS: list[str] = []
 REQUIRED_SKIPS: list[str] = []
+# Required coverage that did not execute on this host, with its reason. Unlike
+# SKIPS this is never informational: closure_main() and main() both return
+# nonzero when it grows on Linux, because required coverage that did not run is
+# UNRUN and can never be counted as a pass.
+REQUIRED_UNRUN: list[str] = []
 
 
 def ok(label: str) -> None:
@@ -91,6 +97,20 @@ def skip(label: str) -> None:
     """Record an explicit UNRUN/skip; skips are never passes."""
     SKIPS.append(label)
     print(f"  SKIP  {label}")
+
+
+def required_unrun(case: str, reason: str) -> None:
+    """Record required coverage that could not run here, and say why.
+
+    A required case that did not execute is UNRUN, never a pass. The record is
+    printed, kept on the legacy REQUIRED_SKIPS channel so no existing consumer
+    loses it, and mirrored into REQUIRED_UNRUN, which closure_main() and
+    main() read as a hard non-OK signal.
+    """
+    detail = f"{case}: {reason}"
+    REQUIRED_UNRUN.append(detail)
+    REQUIRED_SKIPS.append(detail)
+    print(f"  UNRUN  {detail}")
 
 
 def expect_error(rep, needle: str, label: str) -> None:
@@ -4769,6 +4789,22 @@ def _dsr1_clean_lock(lock: Path) -> None:
         shutil.rmtree(lock, ignore_errors=True)
 
 
+def _permission_denial_case(geteuid=None) -> tuple[bool, str]:
+    """Whether the required real chmod(0o000) denial can execute on this host.
+
+    uid 0 bypasses file permission checks, so a root host cannot execute the
+    required denial. That host is a required omission: the case is reported as
+    UNRUN with its reason, never left as a silent pass. `geteuid` is injectable
+    so the split itself stays unit-tested on any host.
+    """
+    probe = geteuid if geteuid is not None else getattr(os, "geteuid", None)
+    if probe is None:
+        return (False, "os.geteuid is unavailable, so the effective uid cannot be established")
+    if probe() == 0:
+        return (False, "running as uid 0, which bypasses chmod permissions, so the required denial cannot be exercised")
+    return (True, "")
+
+
 def test_dsr1_lock_lifecycle():
     """DS-R1 CL-07/08/09/10/11/14/18/19: portable mkdir lock, tokens, bounded stop and successor safety."""
     if not _readiness_posix_ready():
@@ -4862,6 +4898,13 @@ def test_dsr1_lock_lifecycle():
             if kill_holder.poll() is None:
                 kill_holder.kill(); kill_holder.communicate(timeout=5)
             clean()
+        # Required coverage split: the real chmod(0o000) denial can only run
+        # for a non-root uid. On a root host the case is a required omission,
+        # reported as UNRUN with its reason instead of vanishing from the
+        # output; closure_main() and main() then refuse to call the run OK.
+        permission_available, permission_reason = _permission_denial_case()
+        if not permission_available:
+            required_unrun("CL-07 unreadable-token denial (real chmod(0o000))", permission_reason)
         if hasattr(os, "geteuid") and os.geteuid() != 0:
             (root / "started").unlink(missing_ok=True)
             unread = start("printf started > started; while :; do sleep 0.05; done")
@@ -4936,6 +4979,120 @@ def test_dsr1_lock_lifecycle():
             if succ.poll() is None:
                 succ.kill(); succ.communicate(timeout=5)
             clean()
+        # P3-03-03 / P3-03-04: deterministic token-read-failure fixture and
+        # durable faulty-supervisor controls. Only the token path is faulted, and
+        # the owned child is sampled at the supervisor's own return, before any
+        # rescue here, so teardown can never repair the situation into a pass.
+        def proc_state(pid):
+            """State letter of a live pid from /proc, or None once it is gone."""
+            try:
+                with open("/proc/%d/stat" % pid, "rb") as fh:
+                    return fh.read().rsplit(b")", 1)[1].split()[0].decode("ascii", "replace")
+            except (OSError, IndexError):
+                return None
+
+        def child_live(pid):
+            """True only while the pid is a running process (a zombie is stopped)."""
+            state = proc_state(pid)
+            return state is not None and state != "Z"
+
+        def rescue(pid):
+            """Kill and settle a child that a faulty supervisor left behind."""
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                return
+            deadline = time.time() + 10
+            while time.time() < deadline:
+                try:
+                    if os.waitpid(pid, os.WNOHANG)[0] == pid:
+                        return
+                except ChildProcessError:
+                    pass
+                if not child_live(pid):
+                    return
+                time.sleep(0.05)
+            raise AssertionError("faulty-supervisor child survived rescue: " + str(pid))
+
+        def supervisor_run(name, text, fault):
+            """Run one supervisor under one injected fault, observing its child.
+
+            Returns the exit code, both streams, and whether the owned child was
+            still running at the moment the supervisor process exited. The
+            observation is taken before this test kills or reaps anything.
+            """
+            (root / "started").unlink(missing_ok=True)
+            harness = _dsr1_script(root, name, text)
+            proc = subprocess.Popen(
+                ["sh", str(harness)], cwd=root,
+                env={**env, "AEGIS_STACK_WORKLOAD": "printf started > started; while :; do sleep 0.05; done"},
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            pid = None
+            try:
+                wait_paths(lock, lock / "ready", root / "started")
+                pid = read_pid()
+                if fault == "unreadable-token":
+                    # A directory named token fails `cat` with EISDIR for every
+                    # uid, root included: a real read failure, independent of
+                    # the privilege bits that root bypasses.
+                    (lock / "token").unlink()
+                    (lock / "token").mkdir()
+                else:
+                    own = (lock / "token").read_text(encoding="utf-8")
+                    changed = re.sub(r"run=([^ ]+)", lambda m: "run=" + m.group(1) + "x", own, count=1)
+                    (lock / "token").write_text(changed, encoding="utf-8")
+                proc.send_signal(signal.SIGTERM)
+                rc = proc.wait(timeout=20)
+                live = child_live(pid)
+                observed = {
+                    "rc": rc,
+                    "live": live,
+                    "retained": lock.exists(),
+                    "token_is_dir": (lock / "token").is_dir(),
+                    "token": ((lock / "token").read_text(encoding="utf-8")
+                              if (lock / "token").is_file() else None),
+                }
+                if live:
+                    rescue(pid)
+                out, err = proc.communicate(timeout=20)
+                observed["out"] = out or ""
+                observed["err"] = err or ""
+                return observed
+            finally:
+                if proc.poll() is None:
+                    proc.kill()
+                    proc.communicate(timeout=5)
+                clean()
+
+        published_text = _dsr1_lock_text()
+        stop_anchor = "  if ! stop_child; then CLEANING=0; return 1; fi\n"
+        assert stop_anchor in published_text, "the published lock block must keep its child-lifetime rule"
+        faulty_text = published_text.replace(stop_anchor, "", 1)
+
+        for fault, needle in (("unreadable-token", "lock token unreadable"),
+                              ("successor-token", "cannot be proved")):
+            good = supervisor_run("read-failure-" + fault + ".sh", published_text, fault)
+            assert good["rc"] != 0 and needle in good["err"], (fault, good["rc"], good["err"])
+            assert good["retained"], "read failure must fail closed and retain the lock on " + fault
+            assert good["live"] is False, (
+                "the published supervisor returned from " + fault
+                + " while its owned child was still live; child lifetime must be bounded before the ownership return")
+            if fault == "unreadable-token":
+                assert good["token_is_dir"], "the injected read failure must be preserved as evidence"
+            else:
+                assert good["token"] and re.search(r"run=\S+x acquired=", good["token"]), good["token"]
+            faulty_run = supervisor_run("faulty-" + fault + ".sh", faulty_text, fault)
+            assert faulty_run["rc"] != 0 and needle in faulty_run["err"], (fault, faulty_run["rc"], faulty_run["err"])
+            assert faulty_run["retained"], "the faulty variant must reach the same retained-lock outcome on " + fault
+            assert faulty_run["live"] is True, (
+                "the removed child-lifetime rule must leave the owned child live at the assertion point on "
+                + fault + "; the control would not discriminate otherwise")
+            if fault == "unreadable-token":
+                _dsr1_pass("P3-03-03 SYNTHETIC token-read failure (token replaced by a directory) reaches the real supervisor's read-failure path on any uid: INCOMPLETE, lock retained, owned child stopped/reaped before the ownership return")
+                _dsr1_pass("P3-03-04 faulty supervisor control (unreadable token): removing the child-lifetime rule is rejected, with the owned child still live at the assertion point before rescue")
+            else:
+                _dsr1_pass("P3-03-04 faulty supervisor control (successor token): removing the child-lifetime rule is rejected, with the owned child still live at the assertion point before rescue")
+
         prefix = _dsr1_lock_text().split("# supervisor launch (stable test anchor)", 1)[0]
         assert prefix, "lock block must keep the supervisor test anchor"
         def clean_all():
@@ -5222,6 +5379,95 @@ def test_dsr1_lock_platform_and_carries():
     _dsr1_pass("platform SKIP/UNRUN honesty and lock-side residual carries are published; closure markers exist")
 
 
+def test_dsr1_required_omission_accounting():
+    """P3-03-02: a required omission is UNRUN and makes the closure and aggregate nonzero."""
+    synthetic_id = "CL-00-required-omission-accounting"
+    saved_cases = dict(CLOSURE_CASES)
+    saved_unrun = list(REQUIRED_UNRUN)
+    saved_required = list(REQUIRED_SKIPS)
+    saved_skips = list(SKIPS)
+
+    def reset_channels():
+        REQUIRED_UNRUN.clear()
+        REQUIRED_SKIPS.clear()
+        SKIPS.clear()
+
+    def closure_result(case):
+        CLOSURE_CASES[synthetic_id] = case
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            code = closure_main(synthetic_id)
+        return code, buffer.getvalue()
+
+    try:
+        if sys.platform.startswith("linux"):
+            # Control: a satisfied case still reports OK.
+            reset_channels()
+            code, output = closure_result(lambda: None)
+            assert code == 0 and "AEGIS-CLOSURE-OK" in output, (code, output)
+
+            # The legacy required channel alone must already be non-OK. At
+            # fca7bc73 closure_main() counted only the SKIPS delta, so this
+            # assertion is the pre-fix defect control and fails there.
+            reset_channels()
+
+            def legacy_omission():
+                REQUIRED_SKIPS.append("synthetic legacy required omission")
+
+            code, output = closure_result(legacy_omission)
+            assert code != 0, "closure must be nonzero when REQUIRED_SKIPS grows: " + output
+            assert "AEGIS-CLOSURE-OK" not in output, output
+
+            # The explicit record names the case and the reason on the closure line.
+            reset_channels()
+
+            def named_omission():
+                required_unrun("synthetic required case", "synthetic precondition unavailable")
+
+            code, output = closure_result(named_omission)
+            assert code != 0, output
+            assert "AEGIS-CLOSURE-UNRUN" in output and "synthetic required case" in output, output
+            assert "AEGIS-CLOSURE-OK" not in output, output
+        else:
+            # Off Linux the required lane is a documented nonzero SKIP, never OK.
+            reset_channels()
+            code, output = closure_result(lambda: None)
+            assert code == 1 and "AEGIS-CLOSURE-SKIP" in output, (code, output)
+
+        # Aggregate classification reads the same accounting on the Linux lane.
+        reset_channels()
+        assert suite_exit_status("linux") == 0
+        assert suite_exit_status("win32") == 0
+        REQUIRED_UNRUN.append("synthetic required case: synthetic precondition unavailable")
+        assert suite_exit_status("linux") == 1, "required omission must make the Linux aggregate nonzero"
+        assert suite_exit_status("win32") == 0, "non-Linux UNRUN keeps unrelated Windows suites runnable"
+
+        # Root/non-root split: the required denial is UNRUN for uid 0 only.
+        available, reason = _permission_denial_case(lambda: 0)
+        assert available is False and "uid 0" in reason, (available, reason)
+        available, reason = _permission_denial_case(lambda: 1000)
+        assert available is True and reason == "", (available, reason)
+        if hasattr(os, "geteuid"):
+            assert _permission_denial_case()[0] == (os.geteuid() != 0), "host policy must match os.geteuid"
+
+        # Wiring pins: CL-07 consults the policy and still holds the real denial.
+        # These pin the regression OMISSIONS-MAP O1 describes; they are not a
+        # substitute for the native root run.
+        source = inspect.getsource(test_dsr1_lock_lifecycle)
+        assert "_permission_denial_case()" in source, "CL-07 must consult the permission-case policy"
+        assert "required_unrun(" in source, "root omission branch missing from CL-07"
+        assert "chmod(0o000)" in source, "the real permission-denial injection must remain"
+        assert "unreadable token fails closed" in source, "the real denial assertion label must remain"
+        assert "REQUIRED_UNRUN" in inspect.getsource(closure_main), "closure must read required omissions"
+        assert "REQUIRED_UNRUN" in inspect.getsource(main), "the aggregate must read required omissions"
+        _dsr1_pass("P3-03-02 required-omission accounting: closure and aggregate are nonzero and name the omission, and the root/non-root split is explicit")
+    finally:
+        CLOSURE_CASES.clear()
+        CLOSURE_CASES.update(saved_cases)
+        REQUIRED_UNRUN[:] = saved_unrun
+        REQUIRED_SKIPS[:] = saved_required
+        SKIPS[:] = saved_skips
+
 
 CLOSURE_CASES = {
     "CL-07": test_dsr1_lock_lifecycle,
@@ -5242,10 +5488,13 @@ CLOSURE_CASES = {
 def closure_main(closure_id: str) -> int:
     """Run one bounded DS-R1 closure case for the documented harness selector.
 
-    Emits AEGIS-CLOSURE-OK on a real pass, AEGIS-CLOSURE-SKIP on an unsupported
-    platform (nonzero required skip; never PASS) and AEGIS-CLOSURE-UNRUN when
-    the case is not implemented by the lock-lifecycle slice or the required
-    POSIX lane is unavailable.
+    Emits AEGIS-CLOSURE-OK only on a real pass, AEGIS-CLOSURE-SKIP on an
+    unsupported platform (nonzero required skip; never PASS) and
+    AEGIS-CLOSURE-UNRUN when the case is not implemented by the lock-lifecycle
+    slice, the required POSIX lane is unavailable, or the case recorded required
+    coverage it could not execute. Required omissions are read from both
+    REQUIRED_UNRUN and the legacy REQUIRED_SKIPS channel, so a required case
+    that did not run can never leave this function printing OK.
     """
     if not sys.platform.startswith("linux"):
         print("AEGIS-CLOSURE-SKIP: " + closure_id + " - required POSIX lane unavailable on " + sys.platform + "; required skip is nonzero and never PASS")
@@ -5255,10 +5504,20 @@ def closure_main(closure_id: str) -> int:
         print("AEGIS-CLOSURE-UNRUN: " + closure_id + " - not implemented by the lock-lifecycle slice; identity-policy slice follows")
         return 1
     before = len(SKIPS)
+    required_before = len(REQUIRED_UNRUN)
+    required_skips_before = len(REQUIRED_SKIPS)
     try:
         case()
     except AssertionError as exc:
         print("AEGIS-CLOSURE-UNRUN: " + closure_id + " - " + str(exc))
+        return 1
+    omissions = REQUIRED_UNRUN[required_before:]
+    for entry in omissions:
+        print("AEGIS-CLOSURE-UNRUN: " + closure_id + " - required coverage unavailable: " + entry)
+    if omissions:
+        return 1
+    if len(REQUIRED_SKIPS) > required_skips_before:
+        print("AEGIS-CLOSURE-UNRUN: " + closure_id + " - required coverage unavailable: a required skip was recorded")
         return 1
     if len(SKIPS) > before:
         print("AEGIS-CLOSURE-UNRUN: " + closure_id + " - POSIX lane unavailable or required skip")
@@ -7906,6 +8165,7 @@ TESTS = [
     test_dsr1_fixture_cleanup,
     test_dsr1_hook_path_resolution,
     test_dsr1_lock_platform_and_carries,
+    test_dsr1_required_omission_accounting,
     test_cl2_lost_forms_restored,
     test_cl2_restored_944_surfaces,
     test_cl2_corpus_completeness,
@@ -7935,6 +8195,19 @@ TESTS = [
 ]
 
 
+def suite_exit_status(platform: str = sys.platform) -> int:
+    """Aggregate exit status: a required omission is non-OK on the Linux lane.
+
+    Kept as a function so the classification is unit-tested directly instead of
+    only being observed by running the whole suite. Non-Linux UNRUN stays
+    explicit without breaking unrelated Windows suites, which is the existing
+    platform policy.
+    """
+    if platform.startswith("linux") and (SKIPS or REQUIRED_SKIPS or REQUIRED_UNRUN):
+        return 1
+    return 0
+
+
 def main() -> int:
     if len(sys.argv) == 3 and sys.argv[1] == "--aegis-closure":
         return closure_main(sys.argv[2])
@@ -7962,13 +8235,18 @@ def main() -> int:
 
     if SKIPS:
         print(f"SKIPPED: {len(SKIPS)} test(s) (UNRUN, not passes)")
-    if REQUIRED_SKIPS:
-        print(f"UNRUN: {len(REQUIRED_SKIPS)} required readiness case(s) did not run on this platform (non-Linux UNRUN; Linux gate remains nonzero on skip)")
-    print(f"OK: {len(PASSES)} gate self-test assertion(s) passed.")
-    if SKIPS and sys.platform.startswith("linux"):
-        return 1
-    return 1 if (REQUIRED_SKIPS and sys.platform.startswith("linux")) else 0
-    # Non-Linux UNRUN is explicit and does not break unrelated local/Windows suites.
+    for entry in REQUIRED_UNRUN:
+        print(f"UNRUN: required case did not run: {entry}")
+    for entry in REQUIRED_SKIPS:
+        if entry not in REQUIRED_UNRUN:
+            print(f"UNRUN: required case did not run: {entry}")
+    status = suite_exit_status()
+    if status == 0:
+        print(f"OK: {len(PASSES)} gate self-test assertion(s) passed.")
+    else:
+        print(f"UNRUN: {len(PASSES)} assertion(s) passed, but required coverage did not run on "
+              f"{sys.platform}; this run is not OK and is never a pass.")
+    return status
 
 
 if __name__ == "__main__":
