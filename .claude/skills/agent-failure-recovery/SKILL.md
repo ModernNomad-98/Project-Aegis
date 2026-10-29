@@ -119,4 +119,8 @@ picks); or the diagnosis cannot confidently classify the state.
 - [references/recovery-playbooks.md](references/recovery-playbooks.md) —
   per-failure-mode playbooks (diagnose → preserve → recover → verify).
 - `evals/evals.json` — behavior cases, including the never-auto-invoke rule.
-- Manual-only invocation prevents trigger overlap, so no trigger-evals file.
+- `evals/trigger-evals.json` — 23 cases discriminating against
+  `systematic-debugger`, `reviewable-diff-discipline`,
+  `sharded-validation-with-resume` and the other nearest owners; manual-only
+  invocation still requires an explicit human start, so every case
+  expecting this skill names it.

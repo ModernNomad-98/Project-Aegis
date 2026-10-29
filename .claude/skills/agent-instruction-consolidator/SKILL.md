@@ -119,4 +119,8 @@ Status: AWAITING APPROVAL | APPLIED (verified)
   file locations, owning tools, scope, and precedence semantics.
 - `evals/evals.json` — behavior cases, including the no-edit-before-approval
   stop.
-- Manual-only invocation prevents trigger overlap, so no trigger-evals file.
+- `evals/trigger-evals.json` — 23 cases discriminating against
+  `source-of-truth-reconciler`, `docs-as-code-architect`,
+  `prompt-injection-defender` and the other nearest owners; manual-only
+  invocation still requires an explicit human start, so every case
+  expecting this skill names it.

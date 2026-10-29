@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "a3f6830b55f1c1159183fd3e59589262a2f5c6f8",
+  "source_revision": "ca5fbca749fb70d9c16f450cfbcea9bb243e4740",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -51,7 +51,7 @@
     {
       "name": "agent-failure-recovery",
       "path": ".claude/skills/agent-failure-recovery/SKILL.md",
-      "sha256": "1a11951e3326f28b4e1c4a1511658b928dbaf88855b96a19d480946eeb1bffe1"
+      "sha256": "50065813995a74596012450a684236ef9d83b50494679d0c6f9a6733b4c0dfc8"
     },
     {
       "name": "agent-goal-hijack-defender",
@@ -76,7 +76,7 @@
     {
       "name": "agent-instruction-consolidator",
       "path": ".claude/skills/agent-instruction-consolidator/SKILL.md",
-      "sha256": "f8ae697f980201ef1bea6e856ea6d8e59a42b75ac0847300d001aedbd99518bc"
+      "sha256": "133ac78a3a729464dfbe8e587af19cff41e8cb2e0ee0bef313d6f47b72680072"
     },
     {
       "name": "agent-memory-governance",
