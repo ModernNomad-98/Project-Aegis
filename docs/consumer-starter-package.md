@@ -1418,49 +1418,85 @@ expands the selected profile from 17 to 18 skills over the same package pin.
 
 **Procedure.** Save P2's block as `install-mode.ps1` beside the section 7.1 harness,
 as section 7.1 instructs; the harness then defaults `-ModeGate` to that file. Pass
-`-ModeGate` explicitly only when the gate lives somewhere else. Run the harness with
-the owner-selected mode and `-RecordPath` naming the new path:
+`-ModeGate` explicitly only when the gate lives somewhere else. Before the first
+run, check the three preconditions the installer does not check for you:
+
+- **The v1 receipt.** It must exist at the v1 path **inside the target repository**
+  (by default `docs/consumer-install-record.md`), hold 39 rows and aggregate to
+  the published v1 value
+  `0c885bcd07d62d244da06748e81f006c0f4f93b3fae3cc54f611c7c72218a5a7` over
+  5,152 serialized bytes. Confirm that now: the run installs the two package files
+  before any completion check, so a missing, invalid or outside-the-target v1
+  record is a stop here, not a discovery after the install.
+- **The v2 record path.** It must not exist. P9 does not refuse an existing file
+  there: it prints `P9: install record already present, left unchanged`, exits
+  **0**, installs the two package files and produces **no v2 receipt** (case C7).
+  The `Test-Path` guard in the block below is what stops that, and it is an
+  operator pre-check, not an installer control. If a file is already there -
+  stale, partial, or copied from another run - quarantine it (move it aside)
+  before the run, so audit evidence survives.
+- **The harness directory.** It holds the section 7.1 harness and the
+  `install-mode.ps1` saved beside it (section 7.1).
+
+Then run the harness with the owner-selected mode. Every variable the block uses
+is set in the block; replace the `C:\path\to\...` values and `$Sh`, select one
+mode, and set `$IdenticalRerun` to `$true` only for the identical-rerun case
+described below:
 
 ```powershell
-$Mode = 'human-only' # or 'agent-commit'; must be the mode the owner authorized
+$IdenticalRerun = $false                   # $true only for an identical rerun of a completed transition
+$Mode = 'human-only'                       # or 'agent-commit'; must be the mode the owner authorized
+$Harness = 'C:\path\to\harness\install-starter.ps1'  # section 7.1 harness; install-mode.ps1 beside it
 $Src = 'C:\path\to\pinned-clone'
 $Tgt = 'C:\path\to\product'
 $Sh = 'C:\Program Files\Git\bin\sh.exe'
+$V1Record = 'C:\path\to\product\docs\consumer-install-record.md'       # the v1 receipt (prerequisite)
+$RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md'  # the v2 receipt; new on the initial run
 $OwnerAuthorization = Read-Host -MaskInput 'Owner authorization (non-secret attestation)'
-$RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md'
-if ([string]::IsNullOrWhiteSpace($OwnerAuthorization) -or $OwnerAuthorization -match '[\r\n"]' -or $OwnerAuthorization.StartsWith('-')) { throw 'Owner authorization contains unsupported characters' }
-if (Test-Path -LiteralPath $RecordPath) { throw "Record path already exists: $RecordPath" }
+if ([string]::IsNullOrWhiteSpace($OwnerAuthorization) -or $OwnerAuthorization -match '[\x00-\x1F"]|\\$' -or $OwnerAuthorization.StartsWith('-')) { throw 'Owner authorization contains unsupported characters' }
 $TgtFull = [IO.Path]::GetFullPath($Tgt).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-$RecFull = [IO.Path]::GetFullPath($RecordPath)
-if (-not $RecFull.StartsWith($TgtFull, [StringComparison]::OrdinalIgnoreCase)) { throw "Record path is outside the target: $RecordPath" }
-pwsh -NoProfile -File .\install-starter.ps1 -Src $Src -Tgt $Tgt -Sh $Sh -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
+foreach ($p in @($RecordPath, $V1Record)) { $full = [IO.Path]::GetFullPath($p); if (-not $full.StartsWith($TgtFull, [StringComparison]::OrdinalIgnoreCase)) { throw "Record path is outside the target: $p" } }
+if (-not (Test-Path -LiteralPath $V1Record -PathType Leaf)) { throw "v1 record is missing: $V1Record" }
+$V1Sha256Before = (Get-FileHash -Algorithm SHA256 -LiteralPath $V1Record).Hash  # completion rule 5 requires this unchanged
+if ($IdenticalRerun) { if (-not (Test-Path -LiteralPath $RecordPath -PathType Leaf)) { throw "rerun needs the existing record: $RecordPath" } }
+elseif (Test-Path -LiteralPath $RecordPath) { throw "Record path already exists: $RecordPath" }
+pwsh -NoProfile -File $Harness -Src $Src -Tgt $Tgt -Sh $Sh -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
 ```
+
+The `$IdenticalRerun = $true` path is the **identical rerun** of a completed
+transition: the record at `$RecordPath` must already verify as this target's
+41-row v2 receipt for the prior identical run (completion rule 2). That is the
+only difference - the block still runs the authorization guard, the v1 receipt
+check and the containment check, and it replaces the nonexistent-path guard with
+a "the record must exist" check.
 
 The prefix comparison is the Windows, case-insensitive form; on a case-sensitive
-host use `[StringComparison]::Ordinal`.
+host use `[StringComparison]::Ordinal`. The existence guard is a **pre-check**,
+not an atomic guarantee (the TOCTOU window is section 1.3): an existing path
+stops the script before the harness runs.
 
-For the **identical rerun only**, after verifying the existing record, omit only
-the existence guard and keep the containment check (run in the same session, or
-repeat the `$Mode`, `$Tgt` and `$OwnerAuthorization` setup above):
-
-```powershell
-$RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md' # verified existing record
-$TgtFull = [IO.Path]::GetFullPath($Tgt).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-$RecFull = [IO.Path]::GetFullPath($RecordPath)
-if (-not $RecFull.StartsWith($TgtFull, [StringComparison]::OrdinalIgnoreCase)) { throw "Record path is outside the target: $RecordPath" }
-pwsh -NoProfile -File .\install-starter.ps1 -Src $Src -Tgt $Tgt -Sh $Sh -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
-```
-
-Replace the `C:\path\to\...` values and select one mode; the comment is
-optional guidance. The whole snippet requires PowerShell 7.1+ (`pwsh`), because
-`Read-Host -MaskInput` is not available in Windows PowerShell 5.1. The guard is a **pre-check**, not an atomic guarantee (the TOCTOU window is
-acknowledged above): an existing path stops the script before the harness runs. `Read-Host -MaskInput` keeps the
+The whole block requires PowerShell 7.1+ (`pwsh`), because `Read-Host -MaskInput`
+is not available in Windows PowerShell 5.1. `Read-Host -MaskInput` keeps the
 authorization off the console only; it is **non-secret attestation text** because
 the harness receives it as a command-line argument (visible to process listings
 and audit), so run on a host where that exposure is acceptable. Masking is
-shoulder-surfing protection only: quotes or a leading hyphen in the words can be
-mangled or parsed as a parameter by the harness's parameter binder. Quote every path
-because real paths may contain spaces.
+shoulder-surfing protection only. Quote every path because real paths may contain
+spaces.
+
+**Authorization argument, by PowerShell version.** The guard above rejects
+control characters (`\x00-\x1F`), a double quote, a leading `-` and a trailing
+backslash. The trailing backslash, the control characters and the quote are what
+break PowerShell 7.1/7.2: those versions have no
+`$PSNativeCommandArgumentPassing` and always use the legacy native argument
+passing, in which a value containing a space and ending in `\` is emitted with
+the backslash immediately before the closing quote. The quote is then escaped and
+the child `pwsh -File` can absorb the following argument (`-RecordPath`, for
+example). On those versions the guard is the control that makes the invocation
+safe; do not weaken it to `[\r\n"]`. PowerShell 7.3+ adds
+`$PSNativeCommandArgumentPassing`: set it to `Standard` before the call to state
+the quote-safe mode explicitly (this host's 7.6.6 defaults to `Windows`, which
+also delivered a trailing backslash intact). Keep the guard on every version - it
+costs nothing above 7.3 and it is the only protection at or below 7.2.
 
 Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
 run that reuses it installs the two files but cannot produce a v2 receipt: the
@@ -1538,8 +1574,13 @@ serialized bytes (the 7,025 B record file is the observed fixture size, not a
 universal constant);
 4. all 41 selected paths are present and byte-identical to the pin;
 5. unrelated product files, the local Git configuration and the commit are
-unchanged, and the v1 record is intact (39 rows with the published v1 aggregate
-`0c885bcd07d62d244da06748e81f006c0f4f93b3fae3cc54f611c7c72218a5a7`).
+unchanged, and the v1 record is **at the v1 path inside the target repository**,
+with its file bytes unchanged from the value captured before the run
+(`$V1Sha256Before`) and, recomputed under sections 9.1 and 9.2 over those 39 rows,
+the published v1 aggregate
+`0c885bcd07d62d244da06748e81f006c0f4f93b3fae3cc54f611c7c72218a5a7` over 5,152
+serialized bytes; a v1 record moved within the repository, edited, or kept outside
+the target does not satisfy this item.
 
 Proceed only if every numbered item above holds. A present-but-invalid record is
 quarantined (moved aside) and the run repeated; a missing record is generated by
@@ -1547,7 +1588,7 @@ rerunning. Row count and aggregate alone are not sufficient. Adding the two file
 transition. Keep the v1 record: after success the repository holds both
 the existing v1 record path (39 rows, the v1 receipt) and the chosen new record
 path, for example `docs/consumer-install-record-v2.md` (41 rows, the v2 receipt
-for this transition; a second declared record path is permitted only for an
+for this transition). A second declared record path is permitted only for an
 identical resume (S4-8), must be labelled as such, and is a separate receipt. For
 audit clarity prefer one declared v2 receipt per transition; never overwrite or
 rename the v1 file.

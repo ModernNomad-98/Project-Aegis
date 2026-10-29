@@ -21,11 +21,11 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **130,854 B**, LF-normalized sha256 `7a89969930e3ff2ea0ede182c531bd27c2a69148318415c4ceb7aa1499c1a808`, Git blob `b1417f52ba7be530685c912802b38fcdf2e6c1f2` |
+| Page after the section 7.3 insert and review revisions (**at `4d26abe8`**) | **130,854 B**, LF-normalized sha256 `7a89969930e3ff2ea0ede182c531bd27c2a69148318415c4ceb7aa1499c1a808`, Git blob `b1417f52ba7be530685c912802b38fcdf2e6c1f2` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
-| Host | Windows 10.0.26200 (64-bit); PowerShell 7.6.6; Git 2.55.0.windows.5; Python 3.14.7 |
+| Host | Windows 11 (NT 10.0.26200, 64-bit); PowerShell 7.6.6 (`$PSNativeCommandArgumentPassing` = `Windows`); Git 2.55.0.windows.5; Python 3.14.7 |
 | Native runner | `_A/work-package-3/item7-final/evidence/scripts/run_transition.py` (local, not committed; the scripts and logs are retained in the local evidence package). This is therefore a **local, self-attested acceptance**: the committed record summarises the run, and the script manifest below lets a supplied copy be checked, but the repository alone cannot reproduce the PASS |
 
 | Script (local) | Bytes | SHA-256 |
@@ -43,6 +43,22 @@ These files and the logs are retained under
 `_A/work-package-3/item7-final/evidence/` and are **not committed**; the hashes
 and the published tables let a reviewer check that a supplied copy is the one used.
 
+
+**Revision for late review `5695279872`.** After that review, section 7.3's
+operator block was made complete and self-contained (one block that sets every
+variable, including `$Harness` and `$V1Record`, with the `$IdenticalRerun`
+switch for the rerun case), the authorization guard was strengthened, a three-item
+pre-run check was added, completion item 5 was aligned with the prerequisites, the
+unclosed parenthesis was fixed, and errata E1-E4 from the combined audit were
+corrected in this record. The page is now **133,758 B**, LF-normalized sha256
+`7159cfa7ae86b6532bc4a074c654285fe4bc61af81c06c12b7d4c100159dde74`, Git blob
+`23147b10a87eeeb5510dd59bcd4554610cb9125d`. **P2 and section 7.1 are
+byte-identical at `2a7e9c06`, `4d26abe8` and the head that carries this
+revision** (`fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea`
+and `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0`), so
+the executed case results in sections 5-7 stand: the revision edits prose and the
+operator snippet, not the harness, the P2 gate or the fixture. The revised block
+was executed as published (section 9.1).
 
 A "block" is the fenced body plus one trailing LF, the convention the earlier
 install-mode and Item 6 records used. The P2 and 7.1 identities above reproduce
@@ -136,7 +152,7 @@ Two cases that the review asked to be explicit about were executed natively:
 
 | Case | Exit | Observed |
 | --- | --- | --- |
-| C7 - stale record already at the new path | **0** | 41 package files installed; the stale 31-byte file was **left unchanged** (`P9: install record already present, left unchanged`); the new receipt was **not** produced. This is the observed footgun the page warns about: completion needs every item of the page's completion rule (provenance, rows/aggregate, destination bytes, v1 record), not just exit 0 |
+| C7 - stale record already at the new path | **0** | 41 package files installed; the stale **47-byte** file (sha256 `ae83e1a4...`) was **left unchanged** (`P9: install record already present, left unchanged`); the new receipt was **not** produced. This is the observed footgun the page warns about: completion needs every item of the page's completion rule (provenance, rows/aggregate, destination bytes, v1 record), not just exit 0 |
 | C8 - foreign file in a selected skill directory | **20** | `.claude/skills/code-reviewer/notes.md` named on stderr, bytes preserved, no record, no package write |
 
 Kill during P9 itself (a partial record at the new path) is **UNRUN**; the
@@ -204,7 +220,7 @@ contract itself is Item 6's and is cited, not duplicated:
 The v1 record Git blob `f16e720894a27f75d74ae188c6365f242dd9eb63` and the v2
 record Git blob `dd63e7690ddca7d305949b11c1cbf7bfbdd28d1e` are unchanged at every
 pin where each exists, including the accepted main. These are **Git object IDs**,
-not working-file SHA-256 values; The committed example record's Git blob is `dd63e769...`;
+not working-file SHA-256 values; the committed example record's Git blob is `dd63e769...`;
 C1's generated working-file SHA-256 is `d6db86a3...`; they are different objects. No v1 path is removed or
 modified by the v2 profile, so v1 history is preserved by construction rather
 than by a migration step.
@@ -215,24 +231,62 @@ than by a migration step.
 | --- | --- |
 | `python scripts/tests/test_validator.py` | **OK: 350** gate self-test assertion(s), exit 0; 7 UNRUN skips (six Linux-lane cases and S4-9 file-symlink) |
 | `python scripts/validate-skills.py` | **OK: 254** skill(s) valid, 0 warning(s), exit 0 |
-| Markdown link corpus (`check-markdown-links.py`) | **OK: 878** pages checked in 3 batches, exit 0 |
+| Markdown link corpus (`check-markdown-links.py`) | **OK: 879** pages checked in 3 batches of 293 (the CI page set: `git ls-files` excluding `scripts/tests/fixtures/`), exit 0; 4,162 links and 1,135 anchors checked, 0 broken, 0 dead |
 | `git diff --check` | clean (no whitespace errors) |
 | DCO on the commits | signed off; verified with `scripts/check_dco.py` over `origin/main..HEAD` |
 | PR-body bound fields (`check_pr_body_skills.py`) | OK on the draft and on the live body read back |
 
 Hosted CI at `1b63544b`, `8fc806d3`, `844a1261`, `47336d06`, `79529ede` and
 `9108cd51` completed with **all required checks green**: `gate-guard`, `validate-skills`, `changes` and both review-switch
-jobs. Four DeepSeek review rounds and one Codex round posted 41 advisory findings;
-all were read and dispositioned in the PR body. The documentation
+jobs. Thirteen reviews exist on the PR and all are `COMMENTED` (none is an
+approval); twelve precede `4d26abe8` - 11 from the DeepSeek review bot and 1 from
+the Codex connector - and the PR body's disposition table counts **86 findings**
+across them, a count this record does not independently recount. The thirteenth
+is the late review `5695279872` at `4d26abe8`, dispositioned in section 9.1;
+section 7.3 and this record were revised to fix its items 1, 4, 5, 6 and 7 and the
+minor notes, and items 2 and 3 are refuted there with evidence. The documentation
 findings are fixed in the commit that carries this record; the installer-
 behaviour requests (atomic record write, a new fail-closed code for an existing
 record path, testing `agent-commit`) are recorded as out of scope / **UNRUN**
 rather than claimed. `tools-tests-linux`, `tools-tests-windows` and
 `windows-offline-checks` were **skipped** by design for a docs-only change and
-are UNRUN, never passes. This acceptance is bound to the page's LF-normalized working-file sha256
-`7a899699...1a808` (Git blob `b1417f52...`) and the installer at `2a7e9c06`; a later page edit invalidates
-it and requires a rerun. The commit that carries this record re-triggers CI;
-that later run is delivery-stage evidence and is not claimed here.
+are UNRUN, never passes. This acceptance was bound to the page's LF-normalized
+working-file sha256 `7a899699...1a808` (Git blob `b1417f52...`) at `4d26abe8`
+and the installer at `2a7e9c06`; the revision recorded in section 1 re-binds the
+page identity (`7159cfa7...` / blob `23147b10...`) **without** changing P2 or
+section 7.1, and any edit to those two blocks invalidates the recorded results and
+requires a rerun. The commit that carries this record re-triggers CI; that later
+run is delivery-stage evidence and is not claimed here.
+
+### 9.1 Review churn, and the late review at `4d26abe8`
+
+Thirteen reviews exist on PR #965 and all are `COMMENTED`; none is an approval.
+Twelve precede the reviewed head - 11 DeepSeek reviews and 1 Codex review - and
+the PR body's disposition table counts 86 findings across them; that count is the
+PR body's and is not independently recounted here.
+
+The thirteenth is DeepSeek review **`5695279872`** (posted 2026-10-29T09:11:30Z
+at `4d26abe8`: 7 numbered issues, 4 minor notes, 1 residual-risk note), whose
+dispositions are:
+
+| Item | Disposition |
+| --- | --- |
+| 1. Rerun snippet not self-contained | **Fixed.** Section 7.3 publishes one block that defines every variable (`$IdenticalRerun`, `$Mode`, `$Harness`, `$Src`, `$Tgt`, `$Sh`, `$V1Record`, `$RecordPath`, `$OwnerAuthorization`), keeps the `Read-Host` call and the authorization guard, and carries the rerun through the flag instead of an omitted setup |
+| 2. Leaf reparse-point claim broader than the evidence | **Refuted with evidence.** `Assert-DestinationPath` walks every component including the leaf (page 1005-1041, check loop 1069-1071 at `4d26abe8`), and the combined audit's leaf-directory-junction probe exited 23 with no write. The one genuine gap, the file-symbolic-link leaf, was already UNRUN and disclosed |
+| 3. "Before any write" for exit 20/31 not demonstrated | **Refuted as a structural property.** Every P5 source check, the P5b 41-path destination preflight and the 20/31/22 existing-file checks run before the P6 copy loop (page 1046-1107 at `4d26abe8`), and the observed destination delta is empty |
+| 4. Guard misses a trailing backslash / control characters | **Fixed.** The guard now rejects `[\x00-\x1F"]\|\\$` and a leading `-`; section 7.3 states the PowerShell 7.1/7.2 limitation and the 7.3+ `$PSNativeCommandArgumentPassing` form |
+| 5. No pre-run check for the v1 record | **Fixed.** Section 7.3 now lists three pre-run preconditions before the block (v1 receipt present inside the target with 39 rows and the v1 aggregate; v2 path must not exist; harness directory), and the block fails fast on the v1 path's containment and existence and records its SHA-256 |
+| 6. Completion item 5 weaker than the prerequisites | **Fixed.** Item 5 now requires the v1 record at the v1 path, unchanged file bytes against `$V1Sha256Before`, and the recomputed 39-row v1 aggregate |
+| 7. Unclosed parenthesis | **Fixed.** The "Keep the v1 record" sentence closes the parenthesis and starts the S4-8 sentence separately |
+| Minor: "acknowledged above"; `.install-starter.ps1` cwd; "Windows 10.0.26200"; section 8 semicolon | **Fixed.** Section 1.3 is named, `$Harness` is absolute, the host is labelled Windows 11 (NT 10.0.26200), and the section 8 semicolon is lowercased |
+| Residual risk: assembled v1 fixture | **Accepted, disclosed.** Section 3 discloses it and `agent-commit` remains UNRUN |
+
+The revised block was executed as published on PowerShell 7.6.6, with
+`Read-Host` replaced by a literal only because it needs a console: the valid
+initial run reached the harness with the multi-word authorization intact; an
+existing v2 path, a trailing backslash, an embedded quote, a tab, a missing v1
+record and an out-of-target v1 record each stopped before the harness; and the
+`$IdenticalRerun` path ran only when the record existed.
 
 ## 10. UNRUN and limits
 
