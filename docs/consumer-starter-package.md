@@ -1423,15 +1423,21 @@ the owner-selected mode and `-RecordPath` naming the new path:
 
 ```powershell
 $Mode = 'human-only' # or 'agent-commit'; must be the mode the owner authorized
+$Src = 'C:\path\to\pinned-clone'
 $Tgt = 'C:\path\to\product'
+$Sh = 'C:\Program Files\Git\bin\sh.exe'
 $OwnerAuthorization = Read-Host -MaskInput 'Owner authorization (non-secret attestation)'
 $RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md'
+if ([string]::IsNullOrWhiteSpace($OwnerAuthorization) -or $OwnerAuthorization -match '[\r\n"]' -or $OwnerAuthorization.StartsWith('-')) { throw 'Owner authorization contains unsupported characters' }
 if (Test-Path -LiteralPath $RecordPath) { throw "Record path already exists: $RecordPath" }
 $TgtFull = [IO.Path]::GetFullPath($Tgt).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 $RecFull = [IO.Path]::GetFullPath($RecordPath)
 if (-not $RecFull.StartsWith($TgtFull, [StringComparison]::OrdinalIgnoreCase)) { throw "Record path is outside the target: $RecordPath" }
-pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
+pwsh -NoProfile -File .\install-starter.ps1 -Src $Src -Tgt $Tgt -Sh $Sh -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
 ```
+
+The prefix comparison is the Windows, case-insensitive form; on a case-sensitive
+host use `[StringComparison]::Ordinal`.
 
 For the **identical rerun only**, after verifying the existing record, omit only
 the existence guard and keep the containment check (run in the same session, or
@@ -1442,13 +1448,13 @@ $RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md' # verified
 $TgtFull = [IO.Path]::GetFullPath($Tgt).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
 $RecFull = [IO.Path]::GetFullPath($RecordPath)
 if (-not $RecFull.StartsWith($TgtFull, [StringComparison]::OrdinalIgnoreCase)) { throw "Record path is outside the target: $RecordPath" }
-pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
+pwsh -NoProfile -File .\install-starter.ps1 -Src $Src -Tgt $Tgt -Sh $Sh -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
 ```
 
 Replace the `C:\path\to\...` values and select one mode; the comment is
 optional guidance. The whole snippet requires PowerShell 7.1+ (`pwsh`), because
-`Read-Host -MaskInput` is not available in Windows PowerShell 5.1. The guard makes the initial-run rule mechanical: an existing
-path stops the script before the harness runs. `Read-Host -MaskInput` keeps the
+`Read-Host -MaskInput` is not available in Windows PowerShell 5.1. The guard is a **pre-check**, not an atomic guarantee (the TOCTOU window is
+acknowledged above): an existing path stops the script before the harness runs. `Read-Host -MaskInput` keeps the
 authorization off the console only; it is **non-secret attestation text** because
 the harness receives it as a command-line argument (visible to process listings
 and audit), so run on a host where that exposure is acceptable. Masking is
@@ -1517,10 +1523,11 @@ same path unchanged.
 **Completion rule.** The transition is complete only when **all** of these hold:
 
 1. the run exited 0;
-2. the operator attests that the record is fresh for this run, or - for the
-identical-rerun case only - an existing record that verifies and belongs to this
-target and a prior identical run; a record copied from another target or run is
-invalid. Row count and aggregate alone do not establish provenance;
+2. the record is at the declared path inside the target repository, and the
+operator attests that it is fresh for this run, or - for the identical-rerun case
+only - an existing record that verifies and belongs to this target and a prior
+identical run; a record copied from another target or run is invalid. Row count
+and aggregate alone do not establish provenance;
 3. the record has 41 measured rows in the harness's `[System.StringComparer]::Ordinal`
 order (UTF-16 code-unit order, not culture-aware collation), its header's
 `Rows`, `Serialized bytes`, `Aggregate SHA-256`, source commit and source tree
@@ -1540,8 +1547,10 @@ rerunning. Row count and aggregate alone are not sufficient. Adding the two file
 transition. Keep the v1 record: after success the repository holds both
 the existing v1 record path (39 rows, the v1 receipt) and the chosen new record
 path, for example `docs/consumer-install-record-v2.md` (41 rows, the v2 receipt
-for this transition; a second declared record path for an identical resume is
-permitted, as S4-8 shows); never overwrite or rename the v1 file.
+for this transition; a second declared record path is permitted only for an
+identical resume (S4-8), must be labelled as such, and is a separate receipt. For
+audit clarity prefer one declared v2 receipt per transition; never overwrite or
+rename the v1 file.
 
 The native results for this exact case are in
 [local-starter-transition-v1-to-v2](evidence/consumer-readiness/local-starter-transition-v1-to-v2.md).

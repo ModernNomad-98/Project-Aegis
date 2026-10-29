@@ -21,7 +21,7 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **130,370 B**, LF-normalized sha256 `63655954183c03bf434beacbc87a491cb531c9ac1ddc985c6af3e41461eceb2e`, Git blob `9550f37470f9b03d725c4570941adf006ef0037d` |
+| Page after the section 7.3 insert and review revisions | **130,854 B**, LF-normalized sha256 `7a89969930e3ff2ea0ede182c531bd27c2a69148318415c4ceb7aa1499c1a808`, Git blob `b1417f52ba7be530685c912802b38fcdf2e6c1f2` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
@@ -230,7 +230,7 @@ record path, testing `agent-commit`) are recorded as out of scope / **UNRUN**
 rather than claimed. `tools-tests-linux`, `tools-tests-windows` and
 `windows-offline-checks` were **skipped** by design for a docs-only change and
 are UNRUN, never passes. This acceptance is bound to the page's LF-normalized working-file sha256
-`63655954...eceb2e` (Git blob `9550f374...`) and the installer at `2a7e9c06`; a later page edit invalidates
+`7a899699...1a808` (Git blob `b1417f52...`) and the installer at `2a7e9c06`; a later page edit invalidates
 it and requires a rerun. The commit that carries this record re-triggers CI;
 that later run is delivery-stage evidence and is not claimed here.
 
