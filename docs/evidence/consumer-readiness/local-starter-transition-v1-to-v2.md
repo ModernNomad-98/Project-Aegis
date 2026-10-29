@@ -19,12 +19,12 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **126,886 B**, sha256 `fd39337e6a97bc99619ee646a766b6181845ff24561d6a3e446eb815f3232902` |
+| Page after the section 7.3 insert and review revisions | **127,466 B**, sha256 `2959c7221f7fa8aac4b3b5dfe2d607b32add1e25314babbf8cb12ecbd8dca6d1` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
 | Host | Windows 10.0.26200 (64-bit); PowerShell 7.6.6; Git 2.55.0.windows.5; Python 3.14.7 |
-| Native runner | `_A/work-package-3/item7-final/evidence/scripts/run_transition.py` (local, not committed; the scripts and logs are retained in the local evidence package, so this is a local observation, not an independently reproducible artefact in the repository) |
+| Native runner | `_A/work-package-3/item7-final/evidence/scripts/run_transition.py` (local, not committed; the scripts and logs are retained in the local evidence package). This is therefore a **local, self-attested acceptance**: the committed record summarises the run, and the script manifest below lets a supplied copy be checked, but the repository alone cannot reproduce the PASS |
 
 | Script (local) | Bytes | SHA-256 |
 | --- | --- | --- |
@@ -198,9 +198,11 @@ contract itself is Item 6's and is cited, not duplicated:
 
 ## 8. Historical bytes preserved
 
-The v1 record blob `f16e720894a27f75d74ae188c6365f242dd9eb63` and the v2
-record blob `dd63e7690ddca7d305949b11c1cbf7bfbdd28d1e` are unchanged at every
-pin where each exists, including the accepted main. No v1 path is removed or
+The v1 record Git blob `f16e720894a27f75d74ae188c6365f242dd9eb63` and the v2
+record Git blob `dd63e7690ddca7d305949b11c1cbf7bfbdd28d1e` are unchanged at every
+pin where each exists, including the accepted main. These are **Git object IDs**,
+not working-file SHA-256 values; C1's generated v2 file hash `d6db86a3...` is a
+different object (the committed example record's bytes). No v1 path is removed or
 modified by the v2 profile, so v1 history is preserved by construction rather
 than by a migration step.
 
@@ -232,8 +234,9 @@ that later run is delivery-stage evidence and is not claimed here.
 ## 10. UNRUN and limits
 
 - **Other operating systems**, a second Windows host, a real consumer repository
-  and J1 - not run here. Hosted CI itself ran at `1b63544b`, `8fc806d3` and
-  `844a1261` (all required checks green); the final review-fix head re-runs it.
+  and J1 - not run here. Hosted CI itself ran at `1b63544b`, `8fc806d3`,
+  `844a1261` and `47336d06` (all required checks green); the commit carrying
+  this record re-runs it.
 - **Concurrent writers** and replacement of a checked directory between
   preflight and write - not covered; the guarantee is the inspected quiescent
   tree (sections 1.3 and 12 of the page).
@@ -274,7 +277,8 @@ python scripts/kill_native.py --repo ../repo --tools work/transition/tools --src
 | `release-readiness-reviewer` - `.claude/skills/release-readiness-reviewer/SKILL.md` at `2a7e9c06` | DeepSeek (deepseek-flash), item-7 final-acceptance agent | Evidence-not-vibes acceptance check | Built section 5-9 as an evidence table: every accepted case cites a command exit, an inventory hash, or an explicit UNRUN; verified the accepted installer identity (P2 and 7.1 block hashes) rather than assuming the merge | All nine work-item acceptance rows have native evidence or an explicit UNRUN; the destination-link row reuses Item 6's accepted test; review/CI/merge are delivery-stage UNRUN, not passes |
 
 The work-item acceptance rows, mapped: exact starting fixture -> section 3;
-valid transition -> C1; new receipt -> C1/C6; product preservation -> C1;
+valid transition -> C1; new receipt -> C1 (C6 only retains an existing
+record on an identical rerun); product preservation -> C1;
 conflicting selected file -> C2; reused old record path -> C3; interrupted
 matching copy -> C4 and the real matching kill in section 6; interrupted
 conflicting copy -> the real divergent kill in section 6 (C5 is the

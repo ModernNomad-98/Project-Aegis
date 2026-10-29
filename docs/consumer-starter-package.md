@@ -1419,13 +1419,16 @@ the owner-selected mode and `-RecordPath` naming the new path:
 
 ```powershell
 $Mode = 'human-only' # or 'agent-commit'; must be the mode the owner authorized
-$OwnerAuthorization = Read-Host 'Owner authorization (not echoed to history)'
+$OwnerAuthorization = Read-Host -MaskInput 'Owner authorization (masked on screen)'
 pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath 'C:\path\to\product\docs\consumer-install-record-v2.md'
 ```
 
-`Read-Host` keeps the authorization out of PowerShell history; quote every path
-because real paths may contain spaces. The comment is the only placeholder in
-this example.
+Replace the `C:\path\to\...` values and select one mode; the comment is
+optional guidance. `Read-Host -MaskInput` keeps the text off the console, but the
+harness receives it as a command-line argument, so treat the authorization as
+non-secret or run on a host where that argument exposure (process listings,
+audit, scrollback) is acceptable. Quote every path because real paths may
+contain spaces.
 
 Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
 run that reuses it installs the two files but cannot produce a v2 receipt: the
@@ -1433,7 +1436,10 @@ retained 39-row file still describes the v1 result and must not be presented as 
 new one. For the **initial** transition the new path must not exist. An
 **identical rerun** of a completed transition may point at the existing record
 (that is case C6 in the evidence record, the only case that can satisfy the
-completion rule with an existing file at the new path); any
+completion rule with an existing file at the new path). The installer does not
+bind a record to a run ID, target or nonce, so "fresh" versus "a copied
+identical record" is **operator-attested**, not installer-enforced; fail-closed
+refusal is requested in issue #966.; any
 other existing file there - stale, partial, or copied from another run - must be
 inspected and removed before the run. C3 and C7 deliberately exercise exit-0
 paths that leave an existing record unchanged; neither satisfies the completion
@@ -1472,11 +1478,12 @@ that leaf case is **UNRUN**, not claimed. Remediation: restore the named file fr
 pin (or move the local edit aside with the human's approval), then rerun. If the copy
 is interrupted, an unchanged rerun resumes under P5's identical-byte policy and
 writes the fresh record when the interruption happened before P9; a partial file that
-differs from the pin is refused with exit **31** and preserved. A real process kill
-at 40 of 41 files reproduced both outcomes: an all-matching partial resumed to 41
-files plus the fresh record, and a truncated new file was refused at 31 with the
-bytes preserved and no record. An identical rerun after a completed transition
-changes no package file and leaves an existing record at the same path unchanged.
+differs from the pin is refused with exit **31** and preserved. Real process kills
+reproduced both outcomes: a 40-of-41 all-matching partial resumed to 41 files plus
+the fresh record, and a partial with a 0-byte last file (41 paths present) was
+refused at 31 with the bytes preserved and no record. An identical rerun after a
+completed transition changes no package file and leaves an existing record at the
+same path unchanged.
 
 **Completion rule.** The transition is complete only when **all** of these hold:
 
@@ -1492,7 +1499,9 @@ aggregate algorithm of sections 9.1 and 9.2 equals
 serialized bytes (the 7,025 B record file is the observed fixture size, not a
 universal constant);
 4. all 41 selected paths are present and byte-identical to the pin;
-5. unrelated product files and the v1 record are unchanged.
+5. unrelated product files, the local Git configuration and the commit are
+unchanged, and the v1 record is intact (39 rows with the published v1 aggregate
+`0c885bcd...a5a7`).
 
 If the file is missing, is not 41 rows, or does not reproduce the aggregate, the
 transition is not complete - check for a stale file at the path, remove it, and
