@@ -8750,7 +8750,7 @@ def _dest_junction(link: Path, target: Path) -> None:
 
 
 def test_consumer_install_destination_links():
-    """S4-1..S4-12: destination reparse points are refused before any write, and
+    """S4-1..S4-11: destination reparse points are refused before any write, and
     the install record is refused when it already exists unless the caller asks to
     resume, with an atomic record write (AEP3-I9)."""
     if sys.platform != "win32":
@@ -8775,7 +8775,7 @@ def test_consumer_install_destination_links():
     assert "Assert-DestinationPath" in harness_text, (
         "the published harness has no destination containment preflight"
     )
-    assert "Stop-Step 23" in harness_text, (
+    assert "[int]$Code = 23" in harness_text and "Stop-Step $Code" in harness_text, (
         "the published harness does not refuse a destination reparse point at 23"
     )
     assert "AllowExistingRecord" in harness_text, (
@@ -8974,23 +8974,6 @@ def test_consumer_install_destination_links():
                 "the resume changed the installed package files")
             ok("S4-11: -AllowExistingRecord keeps the identical-resume behaviour - exit 0, "
                "the existing record byte-identical, no package change")
-
-            # S4-12: the record is written through a same-directory temp file and
-            # renamed. A blocked temp path stops the run with no record at
-            # -RecordPath, so a failed record write cannot leave a partial receipt
-            # that a later run or an online check could read as one.
-            atomic = _install_mode_repo(tmp / "d-atomic", env)
-            atomic_record = atomic / "docs" / "consumer-install-record.md"
-            atomic_record.parent.mkdir(parents=True, exist_ok=True)
-            (atomic / "docs" / "consumer-install-record.md.tmp").mkdir()
-            proc = install(atomic, atomic_record)
-            assert proc.returncode == 25, (proc.returncode, proc.stdout, proc.stderr)
-            assert "atomically" in proc.stderr, proc.stderr
-            assert not atomic_record.exists(), "a partial record was left at the record path"
-            assert len([row for row in _dest_snapshot(atomic) if row[1] == "FILE"]) == 41, (
-                _dest_snapshot(atomic))
-            ok("S4-12: a blocked temp path exits 25 with no record at -RecordPath, so a "
-               "failed record write cannot leave a partial receipt")
 
         finally:
             subprocess.run(
@@ -9461,6 +9444,305 @@ def test_dsr1b_identity_gate_command_config():
     ok("DS-R1b command-scope config is decoded by Git itself, including hard quoting")
 
 
+def _starter_guard_fixture(tmp: Path, env, pwsh: str, sh: str):
+    """Save the published gate and harness blocks, and return the install call.
+
+    Returns (source, install, harness_text); source is None when the pinned commit
+    is unavailable in this clone, which the caller records as UNRUN.
+    """
+    page = STARTER_DOC.read_text(encoding="utf-8")
+    gate_text = _starter_fenced_block(page, STARTER_MODE_HEADING)
+    harness_text = _starter_fenced_block(page, STARTER_HARNESS_HEADING, 1)
+    gate = tmp / "install-mode.ps1"
+    harness = tmp / "install-starter.ps1"
+    gate.write_text(gate_text, encoding="utf-8", newline="\n")
+    harness.write_text(harness_text, encoding="utf-8", newline="\n")
+    source, proc = _starter_pinned_source(tmp)
+    if proc.returncode != 0:
+        _install_mode_unrun(
+            "the pinned commit %s is not in this clone's history: %s"
+            % (STARTER_PIN_COMMIT, (proc.stderr or proc.stdout).strip()[:160]))
+        return None, None, harness_text
+
+    def install(target, record=None, extra=()):
+        args = [pwsh, "-NoProfile", "-File", str(harness),
+                "-Src", str(source), "-Tgt", str(target), "-Sh", sh,
+                "-Mode", "human-only", "-OwnerAuthorization", "I will commit myself."]
+        if record is not None:
+            args += ["-RecordPath", str(record)]
+        args += list(extra)
+        return subprocess.run(
+            args, env=env, capture_output=True, text=True,
+            encoding="utf-8", errors="replace", timeout=600,
+        )
+
+    return source, install, harness_text
+
+
+def _starter_guard_cleanup(source) -> None:
+    subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "worktree", "remove", "--force", str(source)],
+        capture_output=True, text=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "worktree", "prune"],
+        capture_output=True, text=True,
+    )
+
+
+def test_consumer_install_record_temp_collision():
+    """S4-12..S4-14: the record is written through a unique same-directory
+    create-new temp, so a pre-existing <record>.tmp leaf is neither truncated
+    nor consumed and an external hardlink/symlink target keeps its bytes."""
+    if sys.platform != "win32":
+        expected_platform_skip(
+            "win32",
+            "UNRUN: record-temp collision fixtures are Windows-specific; "
+            "the POSIX lane is not run")
+        return
+    pwsh = _install_mode_pwsh()
+    sh = _install_mode_sh()
+    if pwsh is None or sh is None:
+        _install_mode_unrun("pwsh 7 and a POSIX sh are required for the record fixtures")
+        return
+    if shutil.which("git") is None:
+        _install_mode_unrun("git is required to build the record fixtures")
+        return
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        env = _install_mode_env(tmp)
+        source, install, harness_text = _starter_guard_fixture(tmp, env, pwsh, sh)
+        if install is None:
+            return
+        try:
+            # S4-12: a stale file at the OLD predictable temp leaf survives; the
+            # record is written through a unique leaf instead.
+            stale = _install_mode_repo(tmp / "d-stale-temp", env)
+            stale_record = stale / "docs" / "consumer-install-record.md"
+            stale_record.parent.mkdir(parents=True, exist_ok=True)
+            stale_tmp = Path(str(stale_record) + ".tmp")
+            sentinel = b"operator-temp-sentinel\n"
+            stale_tmp.write_bytes(sentinel)
+            proc = install(stale, stale_record)
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            assert stale_record.is_file(), "the record was not written"
+            assert stale_tmp.is_file(), (
+                "the record write consumed the pre-existing .tmp leaf")
+            assert stale_tmp.read_bytes() == sentinel, (
+                "the record write truncated the pre-existing .tmp leaf")
+            files = [row for row in _dest_snapshot(stale) if row[1] == "FILE"]
+            assert len(files) == 43, files  # 41 package + record + stale .tmp
+            ok("S4-12: a stale file at the old predictable <record>.tmp leaf is "
+               "neither truncated nor consumed; the record is written through a "
+               "unique temp")
+
+            # S4-13: a hardlink at the old leaf must not corrupt its external peer.
+            linked = _install_mode_repo(tmp / "d-hardlink-temp", env)
+            linked_record = linked / "docs" / "consumer-install-record.md"
+            linked_record.parent.mkdir(parents=True, exist_ok=True)
+            external = tmp / "hardlink-sentinel.txt"
+            external.write_bytes(b"external-hardlink-sentinel\n")
+            hard = Path(str(linked_record) + ".tmp")
+            try:
+                os.link(external, hard)
+            except OSError as exc:
+                skip("UNRUN: hardlink fixture unavailable on this host: %s" % exc)
+            else:
+                digest_before = hashlib.sha256(external.read_bytes()).hexdigest()
+                proc = install(linked, linked_record)
+                assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+                assert linked_record.is_file(), "the record was not written"
+                assert hashlib.sha256(external.read_bytes()).hexdigest() == digest_before, (
+                    "the record write followed the hardlink and rewrote its external peer")
+                assert hard.is_file(), "the pre-existing hardlink leaf was consumed"
+                ok("S4-13: a hardlink at <record>.tmp keeps its external bytes; the "
+                   "record is written through a unique temp")
+
+            # S4-14: a file symlink at the old leaf must not redirect the write.
+            symlinked = _install_mode_repo(tmp / "d-symlink-temp", env)
+            sym_record = symlinked / "docs" / "consumer-install-record.md"
+            sym_record.parent.mkdir(parents=True, exist_ok=True)
+            sym_external = tmp / "symlink-sentinel.txt"
+            sym_external.write_bytes(b"external-symlink-sentinel\n")
+            sym = Path(str(sym_record) + ".tmp")
+            try:
+                os.symlink(sym_external, sym)
+            except OSError as exc:
+                skip("UNRUN: file symbolic-link fixture unavailable on this host: %s"
+                     % str(exc)[:160])
+            else:
+                digest_before = hashlib.sha256(sym_external.read_bytes()).hexdigest()
+                proc = install(symlinked, sym_record)
+                assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+                assert sym_record.is_file(), "the record was not written"
+                assert hashlib.sha256(sym_external.read_bytes()).hexdigest() == digest_before, (
+                    "the record write followed the symlink outside the verified directory")
+                assert os.path.islink(sym), "the pre-existing symlink leaf was consumed"
+                ok("S4-14: a file symlink at <record>.tmp does not redirect the "
+                   "write; the external sentinel hash is unchanged")
+
+            assert "[guid]::NewGuid()" in harness_text, (
+                "the record temp leaf is not unique (no GUID suffix)")
+            assert "CreateNew" in harness_text, (
+                "the record temp is not opened with create-new semantics")
+            assert "Assert-DestinationPath $recordTemp" in harness_text, (
+                "the record temp path never passes through the containment preflight")
+        finally:
+            _starter_guard_cleanup(source)
+
+
+def test_consumer_install_record_write_failure():
+    """S4-15: a record-directory creation failure is inside the exit-25 contract -
+    no record at -RecordPath, no temp left, and the package copy is complete."""
+    if sys.platform != "win32":
+        expected_platform_skip(
+            "win32",
+            "UNRUN: record-directory failure fixtures are Windows-specific; "
+            "the POSIX lane is not run")
+        return
+    pwsh = _install_mode_pwsh()
+    sh = _install_mode_sh()
+    if pwsh is None or sh is None:
+        _install_mode_unrun("pwsh 7 and a POSIX sh are required for the record fixtures")
+        return
+    if shutil.which("git") is None:
+        _install_mode_unrun("git is required to build the record fixtures")
+        return
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        env = _install_mode_env(tmp)
+        source, install, _ = _starter_guard_fixture(tmp, env, pwsh, sh)
+        if install is None:
+            return
+        try:
+            # The record's parent cannot be created because a file occupies the
+            # intermediate component. Before the fix this escaped the try and
+            # surfaced as the generic exit 1.
+            blocked = _install_mode_repo(tmp / "d-dir-failure", env)
+            (blocked / "blocker").write_text("not a directory\n", encoding="utf-8")
+            blocked_record = blocked / "blocker" / "sub" / "consumer-install-record.md"
+            proc = install(blocked, blocked_record)
+            assert proc.returncode == 25, (proc.returncode, proc.stdout, proc.stderr)
+            assert "atomically" in proc.stderr, proc.stderr
+            assert not blocked_record.exists(), "a record was left at the record path"
+            assert not list(blocked.rglob("*.tmp")), "a temp file was left behind"
+            files = [row for row in _dest_snapshot(blocked) if row[1] == "FILE"]
+            assert len(files) == 42, files  # 41 package + the blocker fixture
+            ok("S4-15: a record-directory creation failure exits 25 with no record "
+               "at -RecordPath and no temp, not a generic exit 1")
+        finally:
+            _starter_guard_cleanup(source)
+
+
+def test_consumer_install_record_nonfile_switch():
+    """S4-16 and S4-18: -AllowExistingRecord only resumes an existing regular
+    file, and with no record present it still takes the normal write path."""
+    if sys.platform != "win32":
+        expected_platform_skip(
+            "win32",
+            "UNRUN: record-path conflict fixtures are Windows-specific; "
+            "the POSIX lane is not run")
+        return
+    pwsh = _install_mode_pwsh()
+    sh = _install_mode_sh()
+    if pwsh is None or sh is None:
+        _install_mode_unrun("pwsh 7 and a POSIX sh are required for the record fixtures")
+        return
+    if shutil.which("git") is None:
+        _install_mode_unrun("git is required to build the record fixtures")
+        return
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        env = _install_mode_env(tmp)
+        source, install, harness_text = _starter_guard_fixture(tmp, env, pwsh, sh)
+        if install is None:
+            return
+        try:
+            # S4-16: a directory at -RecordPath is not a resume target, even with
+            # the switch; the pre-fix block printed "left unchanged" and exited 0.
+            nonfile = _install_mode_repo(tmp / "d-nonfile-record", env)
+            nonfile_record = nonfile / "docs" / "consumer-install-record.md"
+            nonfile_record.mkdir(parents=True)
+            proc = install(nonfile, nonfile_record, extra=["-AllowExistingRecord"])
+            assert proc.returncode == 24, (proc.returncode, proc.stdout, proc.stderr)
+            assert "not a regular file" in proc.stderr, proc.stderr
+            assert not (nonfile / "AGENTS.md").exists(), (
+                "a package file was written before the non-file refusal")
+            assert not (nonfile / ".claude").exists(), (
+                "a package directory was created before the non-file refusal")
+            assert nonfile_record.is_dir(), "the existing directory was changed"
+            ok("S4-16: -AllowExistingRecord with a directory at -RecordPath exits 24 "
+               "before any package write instead of a false success without a record")
+
+            # S4-18: the switch is not a blanket skip - with no record present the
+            # normal write path runs and leaves no unique temp behind.
+            fresh = _install_mode_repo(tmp / "d-fresh-record", env)
+            fresh_record = fresh / "docs" / "consumer-install-record.md"
+            proc = install(fresh, fresh_record, extra=["-AllowExistingRecord"])
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            assert fresh_record.is_file(), "the switch skipped a needed record write"
+            assert not list(fresh_record.parent.glob("consumer-install-record.md.*.tmp")), (
+                "a unique temp file was left behind")
+            files = [row for row in _dest_snapshot(fresh) if row[1] == "FILE"]
+            assert len(files) == 42, files  # 41 package + record
+            ok("S4-18: -AllowExistingRecord with no existing record still writes a "
+               "fresh record and leaves no temp")
+
+            assert "is not a regular file" in harness_text, (
+                "the published harness does not require a regular file when "
+                "-AllowExistingRecord is used")
+            assert ("if ($AllowExistingRecord -and (Test-Path -LiteralPath $RecordPath "
+                    "-PathType Leaf))") in harness_text, (
+                "P9 can still skip the receipt without the explicit switch")
+        finally:
+            _starter_guard_cleanup(source)
+
+
+def test_consumer_install_record_package_overlap():
+    """S4-17: a -RecordPath equal to a package output is refused at 24 before P6
+    can create that output and P9 can mistake it for an existing record."""
+    if sys.platform != "win32":
+        expected_platform_skip(
+            "win32",
+            "UNRUN: record-path overlap fixtures are Windows-specific; "
+            "the POSIX lane is not run")
+        return
+    pwsh = _install_mode_pwsh()
+    sh = _install_mode_sh()
+    if pwsh is None or sh is None:
+        _install_mode_unrun("pwsh 7 and a POSIX sh are required for the record fixtures")
+        return
+    if shutil.which("git") is None:
+        _install_mode_unrun("git is required to build the record fixtures")
+        return
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        env = _install_mode_env(tmp)
+        source, install, harness_text = _starter_guard_fixture(tmp, env, pwsh, sh)
+        if install is None:
+            return
+        try:
+            # A record path that is itself a package output must be refused
+            # before P6 can create that output and P9 can mistake it for a record.
+            overlap = _install_mode_repo(tmp / "d-overlap-record", env)
+            proc = install(overlap, overlap / "AGENTS.md")
+            assert proc.returncode == 24, (proc.returncode, proc.stdout, proc.stderr)
+            assert "overlaps a package output" in proc.stderr, proc.stderr
+            assert not (overlap / "AGENTS.md").exists(), (
+                "the overlapping package output was written before the refusal")
+            assert not (overlap / ".claude").exists(), (
+                "a package directory was created before the overlap refusal")
+            assert not any(row[1] == "FILE" for row in _dest_snapshot(overlap)), (
+                _dest_snapshot(overlap))
+            ok("S4-17: a -RecordPath equal to a package output exits 24 before any "
+               "package write instead of exit 0 with no receipt")
+
+            assert "overlaps a package output" in harness_text, (
+                "the published harness does not refuse a record path overlapping a "
+                "package output")
+        finally:
+            _starter_guard_cleanup(source)
+
 TESTS = [
     test_dsr1b_identity_gate_fallback_justification,
     test_dsr1b_identity_gate_owner_semantics,
@@ -9578,6 +9860,10 @@ TESTS = [
     test_consumer_install_mode_gate,
     test_consumer_install_mode_native,
     test_consumer_install_destination_links,
+    test_consumer_install_record_temp_collision,
+    test_consumer_install_record_write_failure,
+    test_consumer_install_record_nonfile_switch,
+    test_consumer_install_record_package_overlap,
 ]
 
 
