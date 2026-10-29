@@ -21,7 +21,7 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **128,013 B**, working-file sha256 `774410d1736f13edd640c619dbb220b362021a019f83d69d14a64a591aaa5b74` |
+| Page after the section 7.3 insert and review revisions | **128,940 B**, working-file sha256 `2401ba34acd8d88fd5529859df62b20be7d877156fd27726c502528180bfbbf4` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
@@ -194,7 +194,8 @@ and 7.1 blocks itself and builds real `mklink /J` junctions:
 | S4-8 identical resume | exit 0 with a **different** declared record path; 41 package files and the first record preserved; second record written |
 | S4-9 file symbolic-link leaf | **UNRUN**: creating a file symlink needs administrator privilege on this host |
 
-The full test result is recorded in section 9 with the validator suite. The
+The full S4 test result is the table above; the validator suite summary is in
+section 9. The
 contract itself is Item 6's and is cited, not duplicated:
 [destination-links-v1](destination-links-v1.md).
 
@@ -229,7 +230,7 @@ record path, testing `agent-commit`) are recorded as out of scope / **UNRUN**
 rather than claimed. `tools-tests-linux`, `tools-tests-windows` and
 `windows-offline-checks` were **skipped** by design for a docs-only change and
 are UNRUN, never passes. This acceptance is bound to the page **working-file** sha256
-`774410d1...5b74` and the installer at `2a7e9c06`; a later page edit invalidates
+`2401ba34...bf4` and the installer at `2a7e9c06`; a later page edit invalidates
 it and requires a rerun. The commit that carries this record re-triggers CI;
 that later run is delivery-stage evidence and is not claimed here.
 

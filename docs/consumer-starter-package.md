@@ -1405,8 +1405,9 @@ authorization is not reused by inference, and `-Mode` must be that exact token
 with `-OwnerAuthorization` carrying those words. P2 validates only that the token
 is recognised and the authorization is nonempty - it cannot confirm that the
 words belong to this transition, so ensuring that is the owner/operator's duty,
-not an installer control. Finally, the caller supplies a **new,
-nonexisting** record path, for example `docs/consumer-install-record-v2.md`. The v2
+not an installer control. For the **initial** transition the caller supplies a **new, nonexisting** record
+path, for example `docs/consumer-install-record-v2.md` (the identical-rerun
+exception is stated below). The v2
 profile adds exactly two skill files -
 `.claude/skills/scoped-approval-register/SKILL.md` and
 `.claude/skills/scoped-approval-register/references/register-format.md` - because v2
@@ -1422,6 +1423,14 @@ $Mode = 'human-only' # or 'agent-commit'; must be the mode the owner authorized
 $OwnerAuthorization = Read-Host -MaskInput 'Owner authorization (non-secret attestation)'
 $RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md'
 if (Test-Path -LiteralPath $RecordPath) { throw "Record path already exists: $RecordPath" }
+pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
+```
+
+For the **identical rerun only**, after verifying the existing record, omit the
+guard and pass the same, already-verified path:
+
+```powershell
+$RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md' # verified existing record
 pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
 ```
 
@@ -1444,14 +1453,14 @@ identical record" is **operator-attested**, not installer-enforced; a record
 copied from another target or run must be declared invalid. Fail-closed refusal
 is requested in [issue #966](https://github.com/ModernNomad-98/Project-Aegis/issues/966).
 Any other existing file there - stale, partial, or copied from another run - must
-be inspected and removed before the run. C3 and C7 deliberately exercise exit-0
+be quarantined (moved aside) before the run, so audit evidence survives. C3 and C7 deliberately exercise exit-0
 paths that leave an existing record unchanged; neither satisfies the completion
 rule below. That preservation is observed, not hypothetical: with a stale file at
 the new path the harness installed the two package files, exited **0**, printed
 `P9: install record already present, left unchanged`, and left the stale file
 byte-identical. A kill that lands during P9 itself can therefore leave a partial
-record behind; that window is **UNRUN**, and the operator must verify or delete
-the file before rerunning. Fail-closed refusal of an existing `-RecordPath`, and
+record behind; that window is **UNRUN**, and the operator must verify the file and
+quarantine it (move it aside) before rerunning. Fail-closed refusal of an existing `-RecordPath`, and
 an atomic temp-file-plus-rename record write, are installer changes this
 documentation item does not make.
 
@@ -1459,8 +1468,8 @@ documentation item does not make.
 present; from a clean 39-file start exactly the two added package files are new
 (this count excludes the new record); the 39 v1 **files** are byte-identical to the
 pin at the destination; unrelated product files, the old record, the local Git
-configuration and the commit unchanged; a fresh 41-row record **file of 7,025 B**
-whose aggregate is
+configuration and the commit unchanged; a fresh 41-row record (**7,025 B** in
+this fixture; the file size is observed, not a constant) whose aggregate is
 `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over **5,420
 serialized bytes**. The `agent-commit` route was not exercised here and is
 **UNRUN**: P2's identity contract still applies, and this page makes no claim about
@@ -1494,8 +1503,10 @@ same path unchanged.
 **Completion rule.** The transition is complete only when **all** of these hold:
 
 1. the run exited 0;
-2. the record at the new path is fresh, or - for the identical-rerun case only -
-an existing record that verifies;
+2. the operator attests that the record is fresh for this run, or - for the
+identical-rerun case only - an existing record that verifies and belongs to this
+target and a prior identical run; a record copied from another target or run is
+invalid. Row count and aggregate alone do not establish provenance;
 3. the record has 41 measured rows in the harness's `[System.StringComparer]::Ordinal`
 order (UTF-16 code-unit order, not culture-aware collation), its header's
 `Rows`, `Serialized bytes`, `Aggregate SHA-256`, source commit and source tree
@@ -1514,8 +1525,9 @@ it is missing, rerun to generate it; if it has 41 rows and the aggregate matches
 proceed. Adding the two files while reusing the old record path is not a completed
 transition. Keep the v1 record: after success the repository holds both
 the existing v1 record path (39 rows, the v1 receipt) and the chosen new record
-path, for example `docs/consumer-install-record-v2.md` (41 rows, the only v2
-receipt); never overwrite or rename the v1 file.
+path, for example `docs/consumer-install-record-v2.md` (41 rows, the v2 receipt
+for this transition; a second declared record path for an identical resume is
+permitted, as S4-8 shows); never overwrite or rename the v1 file.
 
 The native results for this exact case are in
 [local-starter-transition-v1-to-v2](evidence/consumer-readiness/local-starter-transition-v1-to-v2.md).
