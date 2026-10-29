@@ -1,0 +1,206 @@
+{
+  "observed_utc": null,
+  "repo": {
+    "full_name": "ModernNomad-98/aegis-consumer-proof",
+    "private": false,
+    "default_branch": "main"
+  },
+  "head": {
+    "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "tree": "00810e7ca51e0386f99d980cb47440630769d18b",
+    "date": "2026-10-29T02:08:58Z"
+  },
+  "deployments": {
+    "count": 2,
+    "ids": [
+      7402303270,
+      7401326753
+    ],
+    "rows": [
+      {
+        "id": 7402303270,
+        "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+        "ref": "main",
+        "env": "github-pages",
+        "created_at": "2026-10-29T02:18:10Z"
+      },
+      {
+        "id": 7401326753,
+        "sha": "7591c657010685fa5fe158fb73828f73a26bbb98",
+        "ref": "main",
+        "env": "github-pages",
+        "created_at": "2026-10-29T01:07:53Z"
+      }
+    ]
+  },
+  "deployment_B": {
+    "id": 7402303270,
+    "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "ref": "main",
+    "environment": "github-pages",
+    "created_at": "2026-10-29T02:18:10Z",
+    "latest_status": {
+      "url": "https://api.github.com/repos/ModernNomad-98/aegis-consumer-proof/deployments/7402303270/statuses/20873912669",
+      "id": 20873912669,
+      "node_id": "DES_kwDOVbBuwc8AAAAE3C6hXQ",
+      "state": "success",
+      "creator": {
+        "login": "ModernNomad-98",
+        "id": 263130032,
+        "node_id": "U_kgDOD68LsA",
+        "avatar_url": "https://avatars.githubusercontent.com/u/263130032?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ModernNomad-98",
+        "html_url": "https://github.com/ModernNomad-98",
+        "followers_url": "https://api.github.com/users/ModernNomad-98/followers",
+        "following_url": "https://api.github.com/users/ModernNomad-98/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ModernNomad-98/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ModernNomad-98/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ModernNomad-98/subscriptions",
+        "organizations_url": "https://api.github.com/users/ModernNomad-98/orgs",
+        "repos_url": "https://api.github.com/users/ModernNomad-98/repos",
+        "events_url": "https://api.github.com/users/ModernNomad-98/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ModernNomad-98/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "description": "",
+      "environment": "github-pages",
+      "target_url": "https://github.com/ModernNomad-98/aegis-consumer-proof/actions/runs/40805535198/job/123223471921",
+      "created_at": "2026-10-29T02:18:31Z",
+      "updated_at": "2026-10-29T02:18:31Z",
+      "deployment_url": "https://api.github.com/repos/ModernNomad-98/aegis-consumer-proof/deployments/7402303270",
+      "repository_url": "https://api.github.com/repos/ModernNomad-98/aegis-consumer-proof",
+      "environment_url": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+      "log_url": "https://github.com/ModernNomad-98/aegis-consumer-proof/actions/runs/40805535198/job/123223471921",
+      "performed_via_github_app": null
+    },
+    "status_count": 4,
+    "payload": {}
+  },
+  "deployment_A": {
+    "id": 7401326753,
+    "sha": "7591c657010685fa5fe158fb73828f73a26bbb98",
+    "ref": "main",
+    "environment": "github-pages",
+    "created_at": "2026-10-29T01:07:53Z",
+    "latest_status": {
+      "url": "https://api.github.com/repos/ModernNomad-98/aegis-consumer-proof/deployments/7401326753/statuses/20870583731",
+      "id": 20870583731,
+      "node_id": "DES_kwDOVbBuwc8AAAAE2_vVsw",
+      "state": "success",
+      "creator": {
+        "login": "ModernNomad-98",
+        "id": 263130032,
+        "node_id": "U_kgDOD68LsA",
+        "avatar_url": "https://avatars.githubusercontent.com/u/263130032?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/ModernNomad-98",
+        "html_url": "https://github.com/ModernNomad-98",
+        "followers_url": "https://api.github.com/users/ModernNomad-98/followers",
+        "following_url": "https://api.github.com/users/ModernNomad-98/following{/other_user}",
+        "gists_url": "https://api.github.com/users/ModernNomad-98/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/ModernNomad-98/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/ModernNomad-98/subscriptions",
+        "organizations_url": "https://api.github.com/users/ModernNomad-98/orgs",
+        "repos_url": "https://api.github.com/users/ModernNomad-98/repos",
+        "events_url": "https://api.github.com/users/ModernNomad-98/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/ModernNomad-98/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "description": "",
+      "environment": "github-pages",
+      "target_url": "https://github.com/ModernNomad-98/aegis-consumer-proof/actions/runs/40798505740/job/123200676832",
+      "created_at": "2026-10-29T01:08:17Z",
+      "updated_at": "2026-10-29T01:08:17Z",
+      "deployment_url": "https://api.github.com/repos/ModernNomad-98/aegis-consumer-proof/deployments/7401326753",
+      "repository_url": "https://api.github.com/repos/ModernNomad-98/aegis-consumer-proof",
+      "environment_url": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+      "log_url": "https://github.com/ModernNomad-98/aegis-consumer-proof/actions/runs/40798505740/job/123200676832",
+      "performed_via_github_app": null
+    },
+    "status_count": 4
+  },
+  "pages": {
+    "status": null,
+    "build_type": "workflow",
+    "cname": null,
+    "html_url": "https://modernnomad-98.github.io/aegis-consumer-proof/"
+  },
+  "pages_builds": {
+    "count": 0,
+    "raw": []
+  },
+  "runs": {
+    "total_count": 4,
+    "ids": [
+      40805535198,
+      40801962008,
+      40798505740,
+      40794805183
+    ],
+    "events": [
+      "workflow_dispatch",
+      "workflow_dispatch",
+      "workflow_dispatch",
+      "workflow_dispatch"
+    ],
+    "conclusions": [
+      "success",
+      "success",
+      "success",
+      "success"
+    ]
+  },
+  "run_40805535198": {
+    "id": 40805535198,
+    "name": "pages",
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "attempt": 1,
+    "head_sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "head_branch": "main",
+    "created_at": "2026-10-29T02:18:09Z",
+    "run_started_at": "2026-10-29T02:18:09Z",
+    "updated_at": "2026-10-29T02:18:31Z",
+    "path": ".github/workflows/pages.yml",
+    "display_title": "pages"
+  },
+  "jobs": [
+    {
+      "name": "deploy (committed retained bytes only)",
+      "id": 123223471921,
+      "status": "completed",
+      "conclusion": "success",
+      "steps": 9,
+      "started_at": "2026-10-29T02:18:13Z",
+      "completed_at": "2026-10-29T02:18:30Z"
+    },
+    {
+      "name": "build (assemble and retain; never deploy)",
+      "id": 123223473266,
+      "status": "completed",
+      "conclusion": "skipped",
+      "steps": 0,
+      "started_at": "2026-10-29T02:18:11Z",
+      "completed_at": "2026-10-29T02:18:10Z"
+    }
+  ],
+  "checks": {
+    "head_is_dispatch_commit": true,
+    "two_deployments": true,
+    "B_sha_is_dispatch_commit": true,
+    "B_status_success": true,
+    "A_status_success": true,
+    "pages_builds_zero": true,
+    "runs_four": true,
+    "single_dispatch_run": true,
+    "deploy_job_success": true,
+    "build_job_skipped": true,
+    "environment_url": "https://modernnomad-98.github.io/aegis-consumer-proof/"
+  }
+}

@@ -1,0 +1,276 @@
+name: pages
+
+# Manual only. There is no push or pull_request trigger, so committing or merging
+# content never publishes anything. Build assembles and retains an artifact; only
+# the deploy mode verifies already-committed retained bytes and publishes them.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "build assembles and retains only; deploy publishes committed retained bytes"
+        required: true
+        type: choice
+        options:
+          - build
+          - deploy
+      release:
+        description: "release whose frozen three-file allowlist and retained bytes apply"
+        required: true
+        type: choice
+        options:
+          - A
+          - B
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build (assemble and retain; never deploy)
+    if: ${{ inputs.mode == 'build' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      RELEASE: ${{ inputs.release }}
+    steps:
+      - name: Check out the dispatched commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # actions/checkout v4
+        with:
+          persist-credentials: false
+
+      - name: Record the candidate identity
+        run: |
+          echo "candidate_commit=$(git rev-parse HEAD)"
+          echo "candidate_tree=$(git rev-parse HEAD^{tree})"
+          echo "run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT release=$RELEASE"
+          echo "workflow_blob=$(git hash-object .github/workflows/pages.yml)"
+
+      - name: Assemble and gate the frozen three-file allowlist
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, os, re, shutil, sys
+
+          RELEASE = os.environ.get("RELEASE", "")
+          if RELEASE not in ("A", "B"):
+              sys.exit("unsupported release: " + RELEASE)
+          ALLOW = ["app.js", "index.html", "styles.css"]
+          SRC = "site"
+          STAGE = os.path.join(os.environ["RUNNER_TEMP"], "site")
+
+          def fail(message):
+              print("::error::" + message)
+              sys.exit(1)
+
+          if not os.path.isdir(SRC):
+              fail("missing site/ directory")
+          entries = sorted(os.listdir(SRC), key=lambda s: s.encode("utf-8"))
+          if entries != ALLOW:
+              fail("site/ must contain exactly " + ", ".join(ALLOW) + "; found " + repr(entries))
+          if os.path.isdir(STAGE):
+              shutil.rmtree(STAGE)
+          os.makedirs(STAGE)
+          bad_name = re.compile(r"(?i)(^|/)(evals?|evals\.json|trigger-evals\.json|\.env[^/]*|id_rsa|id_ed25519|[^/]+\.(pem|key|p12|pfx))$")
+          bad_bytes = re.compile(rb"(BEGIN (?:RSA |OPENSSH |EC |DSA )?PRIVATE KEY|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36,}|xox[baprs]-[A-Za-z0-9-]{10,})")
+          for name in ALLOW:
+              path = os.path.join(SRC, name)
+              if os.path.islink(path) or not os.path.isfile(path):
+                  fail("not a regular file: " + path)
+              if name.startswith(".") or ".." in name.split("/"):
+                  fail("unsafe path: " + name)
+              if bad_name.search(path.replace(os.sep, "/")):
+                  fail("forbidden material name: " + path)
+              data = open(path, "rb").read()
+              if b"\r" in data:
+                  fail("CR byte in " + path + "; LF is required")
+              if bad_bytes.search(data):
+                  fail("forbidden material content in " + path)
+              shutil.copyfile(path, os.path.join(STAGE, name))
+          staged = sorted(os.listdir(STAGE), key=lambda s: s.encode("utf-8"))
+          if staged != ALLOW:
+              fail("staged tree is not the frozen allowlist: " + repr(staged))
+
+          rows = []
+          for name in ALLOW:
+              data = open(os.path.join(STAGE, name), "rb").read()
+              rows.append((name, len(data), data.count(10), hashlib.sha256(data).hexdigest()))
+          rows.sort(key=lambda row: row[0].encode("utf-8"))
+          serialized = "".join("%s\t%d\t%d\t%s\n" % row for row in rows).encode("utf-8")
+          aggregate = hashlib.sha256(serialized).hexdigest()
+          manifest = "".join("%s\t%d\t%d\t%s\n" % row for row in rows)
+          manifest += "# aggregate rows=%d serialized_bytes=%d sha256=%s\n" % (len(rows), len(serialized), aggregate)
+          with open(os.path.join(os.environ["RUNNER_TEMP"], "manifest.txt"), "w", encoding="utf-8", newline="\n") as handle:
+              handle.write(manifest)
+          print(manifest)
+          summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary:
+              with open(summary, "a", encoding="utf-8") as handle:
+                  handle.write("### Build manifest (" + RELEASE + ")\n\n```\n" + manifest + "```\n")
+          print("build_manifest_ok rows=%d serialized_bytes=%d aggregate=%s" % (len(rows), len(serialized), aggregate))
+          PY
+
+      - name: Retain the build artifact (no deployment)
+        id: upload
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # actions/upload-pages-artifact v3
+        with:
+          path: ${{ runner.temp }}/site
+          retention-days: 90
+
+      - name: State the build outcome
+        run: |
+          echo "build_artifact_id=${{ steps.upload.outputs.artifact_id }}"
+          echo "build mode complete: artifact retained, deployment not requested."
+          echo "A build run that deploys is a defect; this job has no deploy step."
+
+  deploy:
+    name: deploy (committed retained bytes only)
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mode == 'deploy' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    env:
+      RELEASE: ${{ inputs.release }}
+    steps:
+      - name: Check out the dispatched commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # actions/checkout v4
+        with:
+          persist-credentials: false
+
+      - name: Record the candidate identity
+        run: |
+          echo "candidate_commit=$(git rev-parse HEAD)"
+          echo "candidate_tree=$(git rev-parse HEAD^{tree})"
+          echo "run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT release=$RELEASE"
+          echo "workflow_blob=$(git hash-object .github/workflows/pages.yml)"
+
+      - name: Verify committed retained bytes against the committed manifest
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, os, re, sys
+
+          RELEASE = os.environ.get("RELEASE", "")
+          if RELEASE not in ("A", "B"):
+              sys.exit("unsupported release: " + RELEASE)
+          ALLOW = ["app.js", "index.html", "styles.css"]
+          ROOT = os.path.join("docs", "evidence", "releases", RELEASE)
+          SITE = os.path.join(ROOT, "site")
+          MANIFEST = os.path.join(ROOT, "manifest.txt")
+
+          def fail(message):
+              print("::error::" + message)
+              sys.exit(1)
+
+          # Content gates copied verbatim from build mode. The manifest binds bytes,
+          # not policy; these checks are repeated here so a matching manifest cannot
+          # carry a CR byte or forbidden material past upload (plan section 3, step 4).
+          bad_name = re.compile(r"(?i)(^|/)(evals?|evals\.json|trigger-evals\.json|\.env[^/]*|id_rsa|id_ed25519|[^/]+\.(pem|key|p12|pfx))$")
+          bad_bytes = re.compile(rb"(BEGIN (?:RSA |OPENSSH |EC |DSA )?PRIVATE KEY|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36,}|xox[baprs]-[A-Za-z0-9-]{10,})")
+
+          if os.path.abspath(MANIFEST).startswith(os.path.abspath(SITE) + os.sep):
+              fail("manifest must not live inside the retained distribution")
+          if not os.path.isdir(SITE):
+              fail("missing retained directory: " + SITE)
+          targets = sorted(os.listdir(SITE), key=lambda s: s.encode("utf-8"))
+          if targets != ALLOW:
+              fail("retained site/ must contain exactly " + ", ".join(ALLOW) + "; found " + repr(targets))
+          for name in ALLOW:
+              path = os.path.join(SITE, name)
+              if os.path.islink(path) or not os.path.isfile(path):
+                  fail("not a regular retained file: " + path)
+              if name.startswith(".") or ".." in name.split("/"):
+                  fail("unsafe retained path: " + name)
+          if not os.path.isfile(MANIFEST):
+              fail("missing manifest: " + MANIFEST)
+          raw = open(MANIFEST, "rb").read()
+          if raw.startswith(b"\xef\xbb\xbf"):
+              fail("manifest has a UTF-8 BOM")
+          if b"\r" in raw:
+              fail("manifest has a CR byte; LF is required")
+          text = raw.decode("utf-8")
+          lines = [line for line in text.splitlines() if line.strip()]
+          data_lines = [line for line in lines if not line.startswith("#")]
+          comment_lines = [line for line in lines if line.startswith("#")]
+          if len(data_lines) != 3:
+              fail("manifest must have exactly 3 data rows; found " + str(len(data_lines)))
+          if len(comment_lines) != 1:
+              fail("manifest must have exactly 1 aggregate comment; found " + str(len(comment_lines)))
+          match = re.fullmatch(r"# aggregate rows=(\d+) serialized_bytes=(\d+) sha256=([0-9a-f]{64})", comment_lines[0])
+          if not match:
+              fail("malformed aggregate comment")
+          agg_rows, agg_bytes, agg_sha = int(match.group(1)), int(match.group(2)), match.group(3)
+          if agg_rows != 3:
+              fail("aggregate rows must be 3; found " + str(agg_rows))
+
+          recorded = []
+          for line in data_lines:
+              fields = line.split("\t")
+              if len(fields) != 4:
+                  fail("manifest row must have 4 TAB-separated fields: " + line)
+              path, nbytes, nlf, sha = fields
+              if path not in ALLOW:
+                  fail("manifest row outside the allowlist: " + path)
+              if not nbytes.isdigit() or not nlf.isdigit():
+                  fail("manifest row bytes/LF must be decimal: " + line)
+              if not re.fullmatch(r"[0-9a-f]{64}", sha):
+                  fail("manifest row SHA-256 must be lowercase hex: " + line)
+              recorded.append((path, int(nbytes), int(nlf), sha))
+          recorded.sort(key=lambda row: row[0].encode("utf-8"))
+          if [row[0] for row in recorded] != ALLOW:
+              fail("manifest rows do not match the frozen allowlist")
+
+          for path, nbytes, nlf, sha in recorded:
+              path_on_disk = os.path.join(SITE, path)
+              data = open(path_on_disk, "rb").read()
+              if len(data) != nbytes:
+                  fail("byte count mismatch: " + path)
+              if data.count(10) != nlf:
+                  fail("LF count mismatch: " + path)
+              if hashlib.sha256(data).hexdigest() != sha:
+                  fail("SHA-256 mismatch: " + path)
+              if bad_name.search(path_on_disk.replace(os.sep, "/")):
+                  fail("forbidden material name in retained path: " + path)
+              if b"\r" in data:
+                  fail("CR byte in retained " + path + "; LF is required")
+              if bad_bytes.search(data):
+                  fail("forbidden material content in retained " + path)
+
+          serialized = "".join("%s\t%d\t%d\t%s\n" % row for row in recorded).encode("utf-8")
+          if len(serialized) != agg_bytes:
+              fail("aggregate serialized length mismatch")
+          if hashlib.sha256(serialized).hexdigest() != agg_sha:
+              fail("aggregate SHA-256 mismatch")
+          print("manifest_verified release=%s rows=%d serialized_bytes=%d aggregate=%s" % (RELEASE, len(recorded), len(serialized), agg_sha))
+          print("content_gates_replayed release=%s files=%d cr_bytes=0 forbidden_material=0" % (RELEASE, len(recorded)))
+          PY
+
+      - name: Upload the verified retained bytes
+        id: upload
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # actions/upload-pages-artifact v3
+        with:
+          path: docs/evidence/releases/${{ inputs.release }}/site
+          retention-days: 1
+
+      - name: Publish the verified artifact
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # actions/deploy-pages v4
+
+      - name: Record the deployment identity
+        run: |
+          echo "deployment_url=${{ steps.deployment.outputs.page_url }}"
+          echo "deploy_artifact_id=${{ steps.upload.outputs.artifact_id }}"
+          echo "candidate_commit=$(git rev-parse HEAD) candidate_tree=$(git rev-parse HEAD^{tree})"
+          echo "run_id=$GITHUB_RUN_ID run_attempt=$GITHUB_RUN_ATTEMPT release=$RELEASE"
+          echo "deployment_id is read from the provider deployments API after the run; the deploy-pages action exposes only page_url."
+          echo "This run wrote nothing back to the repository."

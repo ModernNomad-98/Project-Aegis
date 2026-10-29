@@ -1,0 +1,25 @@
+CP-22 INDEPENDENT REVIEW — SIGNATURE (ROUND 7, FINAL CYCLE)
+
+Reviewer identity: CP22-REVIEWER round 7 — fresh Claude Agent SDK session (single session, no resume/fork), role: independent record reviewer; vendor/model Anthropic, claude-opus-5-5
+Signed at:        2026-10-29T10:17:46-07:00 (2026-10-29T17:17:47Z)
+Bundle:           RF1-DRAFT-v8.json revision 8, sha256 <measured by me: 9b595c241679f6bbb1da66dcc1a547cf53f0dc1f6ce1ca0b861edfd30d07aeb0> (190645 bytes; re-measured unchanged at signing)
+Case set:         recomputed by me -> 48a28ba14e0d589757d6be1269202631ca15fa6631677ca4ed1175ed473c1de9 (22 IDs, CP-01..CP-22 in order)
+
+Independence: I did not produce any of the 22 records, the plan, or the fixture
+runs; I am not the producer session; I am a different vendor from the producer;
+nobody told me which verdict to reach.
+  (Producer/implementer sessions are DeepSeek Harness / deepseek-flash per the records'
+   own model lines. Disclosure: the 14 CP-19 oracle sessions under test were Claude Code
+   sessions reporting claude-opus-5-5, the same model as this reviewer; they were test
+   subjects, not record producers, and I was not one of them.)
+
+Controls:  C-MISSING rejected / C-DUPLICATE rejected / C-UNKNOWN rejected /
+           C-EVIDENCE-FREE rejected / C-HASH-TAMPER rejected
+           (clean baseline: exit 0)
+
+Clocks:    accepted as documented deviation
+
+Row decisions: 22 rows: ACCEPT 22, REJECT 0
+
+Outcome:   SIGNED
+Open rows at signing: 12 (9 UNRUN + 3 BLOCKED, CP-22 among the UNRUN)  — CP-22 gate: MET

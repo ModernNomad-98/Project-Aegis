@@ -1,0 +1,15 @@
+AEP3-I2 consumer-proof export - bundle aggregate (ledger v5)
+
+recipe          : SHA-256 over the concatenation of the 64-character lowercase per-file
+                  SHA-256 digests of EVIDENCE-INDEX.tsv, ascending path order (UTF-8 byte
+                  order), no separators or newlines.
+files           : 90
+total bytes     : 757901
+aggregate       : 12eef772f9c92e578cc11885179d858bddd4d58856150f4cdde6afc81e42e293
+EVIDENCE-INDEX  : fe4c1082df7f1ae3b8e86fffba9ac79069fc56e80b58e5e5f3ba40785798ff23  (8957 bytes)
+manifest.sha256 : 90065bfb1db86c20792da7c44b9663c36d58c2dccf2e6c0d42a89fa86da6f406  (8330 bytes, 91 lines)
+derivatives     : 13 (deployments/ITEM2-RELEASE-B-RECORD.md, deployments/live-summary-20261029.json, deployments/provider-facts-cp16.json, deployments/rb1post-summary.json, deployments/rb2post-summary.json, records/CP-01-RECORD.md, records/CP-CLOSEOUT-RECORD.md, records/CP03-04-INSTALL-CONTROLS.json, records/CP12.8-REVIEW-SUMMARY.md, records/CP12.8-REVIEW.md, records/CP127-BUILD-RECORD.md, records/CP21-MERGE-RECORD.md, records/CP22-REVIEW-MATRIX.json)
+
+Reproduce the aggregate from EVIDENCE-INDEX.tsv; reproduce EVIDENCE-INDEX.tsv by hashing
+every file it lists (all content files except EVIDENCE-INDEX.tsv, manifest.sha256 and
+BUNDLE-AGGREGATE.txt). manifest.sha256 covers every listed file plus EVIDENCE-INDEX.tsv.

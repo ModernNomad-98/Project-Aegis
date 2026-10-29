@@ -1,0 +1,516 @@
+{
+ "phase": "rb2post",
+ "observed_utc_start": "2026-10-29T02:46:04Z",
+ "observed_utc_end": "2026-10-29T02:46:11Z",
+ "head": {
+  "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+  "tree": "00810e7ca51e0386f99d980cb47440630769d18b",
+  "date": "2026-10-29T02:08:58Z"
+ },
+ "deployments": {
+  "count": 4,
+  "ids": [
+   7402685306,
+   7402651775,
+   7402303270,
+   7401326753
+  ],
+  "detail": {
+   "7402685306": {
+    "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "created_at": "2026-10-29T02:45:43Z",
+    "environment": "github-pages",
+    "n_statuses": 4,
+    "latest_state": "success",
+    "environment_url": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+    "latest_created_at": "2026-10-29T02:46:01Z",
+    "all_states": [
+     "waiting",
+     "queued",
+     "in_progress",
+     "success"
+    ]
+   },
+   "7402651775": {
+    "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "created_at": "2026-10-29T02:43:09Z",
+    "environment": "github-pages",
+    "n_statuses": 5,
+    "latest_state": "success",
+    "environment_url": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+    "latest_created_at": "2026-10-29T02:43:27Z",
+    "all_states": [
+     "waiting",
+     "queued",
+     "queued",
+     "in_progress",
+     "success"
+    ]
+   },
+   "7402303270": {
+    "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "created_at": "2026-10-29T02:18:10Z",
+    "environment": "github-pages",
+    "n_statuses": 4,
+    "latest_state": "success",
+    "environment_url": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+    "latest_created_at": "2026-10-29T02:18:31Z",
+    "all_states": [
+     "waiting",
+     "queued",
+     "in_progress",
+     "success"
+    ]
+   },
+   "7401326753": {
+    "sha": "7591c657010685fa5fe158fb73828f73a26bbb98",
+    "created_at": "2026-10-29T01:07:53Z",
+    "environment": "github-pages",
+    "n_statuses": 4,
+    "latest_state": "success",
+    "environment_url": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+    "latest_created_at": "2026-10-29T01:08:17Z",
+    "all_states": [
+     "waiting",
+     "queued",
+     "in_progress",
+     "success"
+    ]
+   }
+  }
+ },
+ "pages": {
+  "build_type": "workflow",
+  "status": null,
+  "builds": 0
+ },
+ "runs": {
+  "total_count": 6,
+  "rows": [
+   {
+    "id": 40808262509,
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "head_sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "created_at": "2026-10-29T02:45:41Z",
+    "name": "pages"
+   },
+   {
+    "id": 40808009410,
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "head_sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "created_at": "2026-10-29T02:43:07Z",
+    "name": "pages"
+   },
+   {
+    "id": 40805535198,
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "head_sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+    "created_at": "2026-10-29T02:18:09Z",
+    "name": "pages"
+   },
+   {
+    "id": 40801962008,
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "head_sha": "d248d7cc666e68dc689e51f34b1a152c367d1af5",
+    "created_at": "2026-10-29T01:41:49Z",
+    "name": "pages"
+   },
+   {
+    "id": 40798505740,
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "head_sha": "7591c657010685fa5fe158fb73828f73a26bbb98",
+    "created_at": "2026-10-29T01:07:52Z",
+    "name": "pages"
+   },
+   {
+    "id": 40794805183,
+    "event": "workflow_dispatch",
+    "status": "completed",
+    "conclusion": "success",
+    "run_attempt": 1,
+    "head_sha": "8c5eaf0f4b852cc7456d0a69b4cf08fd241126f3",
+    "created_at": "2026-10-29T00:33:15Z",
+    "name": "pages"
+   }
+  ]
+ },
+ "manifests": {
+  "A": {
+   "rows": {
+    "app.js": [
+     11072,
+     427,
+     "e4e970ff10ccd42d5c868193f59d3e7222d565ad1c96bff3e32843e410906281"
+    ],
+    "index.html": [
+     1595,
+     40,
+     "e2e1ceecb84981c248aadbcec1650b1f0e1a468ed308640cb03e64bc6bd5b8f8"
+    ],
+    "styles.css": [
+     3860,
+     247,
+     "1874ebf51643115e099aff13c8a4640fa980d693eaa69312d5fa368130b17137"
+    ]
+   },
+   "aggregate_line": "# aggregate rows=3 serialized_bytes=251 sha256=12ad18e157ee0ed91ff174465d0adf65cca3430a6a29836d363b885c48bb867c",
+   "bytes": 363,
+   "sha256": "897e222abcfc7a0fdbd5bc4c6df1933ff3e86364ba513810f4d5eb071ebe4479"
+  },
+  "B": {
+   "rows": {
+    "app.js": [
+     11776,
+     452,
+     "4ae8bf8ede12a97627c63696f4b99172ba9cdbead519696a282035c4eab8d733"
+    ],
+    "index.html": [
+     1666,
+     42,
+     "27d54db89978ea1e9677ac953689a04ed077991f6dc35cf00a713e413fc385a2"
+    ],
+    "styles.css": [
+     3914,
+     252,
+     "94c4ee228c4e192c07e1794e6abe957bd3506a66235e8573842d39a4cf8b84f8"
+    ]
+   },
+   "aggregate_line": "# aggregate rows=3 serialized_bytes=251 sha256=36bc4407514265db0bd0fcaa9dde87ad2db18373ed5646fd178ec97af5a9ba4a",
+   "bytes": 363,
+   "sha256": "112edb0b3bfe469a5674aefbd3b74e8bc65baed02ef8aa07adea966aa62ca891"
+  }
+ },
+ "served": {
+  "rows": [
+   {
+    "file": "app.js",
+    "http": 200,
+    "bytes": 11776,
+    "lf": 452,
+    "sha256": "4ae8bf8ede12a97627c63696f4b99172ba9cdbead519696a282035c4eab8d733",
+    "expected_bytes": 11776,
+    "expected_lf": 452,
+    "expected_sha256": "4ae8bf8ede12a97627c63696f4b99172ba9cdbead519696a282035c4eab8d733",
+    "match": true,
+    "last_modified": "Thu, 29 Oct 2026 02:46:08 GMT",
+    "content_type": "application/javascript; charset=utf-8",
+    "at": "2026-10-29T02:46:11Z"
+   },
+   {
+    "file": "index.html",
+    "http": 200,
+    "bytes": 1666,
+    "lf": 42,
+    "sha256": "27d54db89978ea1e9677ac953689a04ed077991f6dc35cf00a713e413fc385a2",
+    "expected_bytes": 1666,
+    "expected_lf": 42,
+    "expected_sha256": "27d54db89978ea1e9677ac953689a04ed077991f6dc35cf00a713e413fc385a2",
+    "match": true,
+    "last_modified": "Thu, 29 Oct 2026 02:46:08 GMT",
+    "content_type": "text/html; charset=utf-8",
+    "at": "2026-10-29T02:46:11Z"
+   },
+   {
+    "file": "styles.css",
+    "http": 200,
+    "bytes": 3914,
+    "lf": 252,
+    "sha256": "94c4ee228c4e192c07e1794e6abe957bd3506a66235e8573842d39a4cf8b84f8",
+    "expected_bytes": 3914,
+    "expected_lf": 252,
+    "expected_sha256": "94c4ee228c4e192c07e1794e6abe957bd3506a66235e8573842d39a4cf8b84f8",
+    "match": true,
+    "last_modified": "Thu, 29 Oct 2026 02:46:08 GMT",
+    "content_type": "text/css; charset=utf-8",
+    "at": "2026-10-29T02:46:11Z"
+   }
+  ],
+  "aggregate": "36bc4407514265db0bd0fcaa9dde87ad2db18373ed5646fd178ec97af5a9ba4a",
+  "expected_aggregate": "36bc4407514265db0bd0fcaa9dde87ad2db18373ed5646fd178ec97af5a9ba4a",
+  "status": 200,
+  "root_bytes": 1666
+ },
+ "checks": [
+  {
+   "id": "C01",
+   "claim": "head readable from provider",
+   "observed": "390363f66c72f81834b9d910b6859ff82ea45bda",
+   "pass": true
+  },
+  {
+   "id": "C02",
+   "claim": "head sha equals the expected dispatch commit",
+   "observed": "390363f66c72f81834b9d910b6859ff82ea45bda",
+   "pass": true
+  },
+  {
+   "id": "C03",
+   "claim": "head tree equals 00810e7c...",
+   "observed": "00810e7c",
+   "pass": true
+  },
+  {
+   "id": "C04",
+   "claim": "deployment count == 4",
+   "observed": 4,
+   "pass": true
+  },
+  {
+   "id": "C05",
+   "claim": "all pre-existing deployment ids still present",
+   "observed": [
+    7402685306,
+    7402651775,
+    7402303270,
+    7401326753
+   ],
+   "pass": true
+  },
+  {
+   "id": "C06",
+   "claim": "every deployment status is terminal success",
+   "observed": {
+    "7402685306": "success",
+    "7402651775": "success",
+    "7402303270": "success",
+    "7401326753": "success"
+   },
+   "pass": true
+  },
+  {
+   "id": "C07",
+   "claim": "pages build_type stays 'workflow' (unchanged)",
+   "observed": "workflow",
+   "pass": true
+  },
+  {
+   "id": "C08",
+   "claim": "pages status stays null (no settings change)",
+   "observed": "None",
+   "pass": true
+  },
+  {
+   "id": "C09",
+   "claim": "pages html_url unchanged",
+   "observed": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+   "pass": true
+  },
+  {
+   "id": "C10",
+   "claim": "Pages builds == 0",
+   "observed": 0,
+   "pass": true
+  },
+  {
+   "id": "C11",
+   "claim": "workflow run total_count == 6",
+   "observed": 6,
+   "pass": true
+  },
+  {
+   "id": "C12",
+   "claim": "no run is queued or in_progress (CP-21)",
+   "observed": [
+    [
+     40808262509,
+     "completed"
+    ],
+    [
+     40808009410,
+     "completed"
+    ],
+    [
+     40805535198,
+     "completed"
+    ],
+    [
+     40801962008,
+     "completed"
+    ],
+    [
+     40798505740,
+     "completed"
+    ],
+    [
+     40794805183,
+     "completed"
+    ]
+   ],
+   "pass": true
+  },
+  {
+   "id": "C13",
+   "claim": "all prior run ids still present",
+   "observed": [
+    40808262509,
+    40808009410,
+    40805535198,
+    40801962008,
+    40798505740,
+    40794805183
+   ],
+   "pass": true
+  },
+  {
+   "id": "C14",
+   "claim": "newest run is the expected dispatch run",
+   "observed": 40808262509,
+   "pass": true
+  },
+  {
+   "id": "C15",
+   "claim": "newest run attempt == 1 (no retry)",
+   "observed": 1,
+   "pass": true
+  },
+  {
+   "id": "C16",
+   "claim": "newest run event == workflow_dispatch",
+   "observed": "workflow_dispatch",
+   "pass": true
+  },
+  {
+   "id": "C17",
+   "claim": "newest run head_sha == dispatch commit",
+   "observed": "390363f6",
+   "pass": true
+  },
+  {
+   "id": "C18",
+   "claim": "newest run is completed/success",
+   "observed": "completed/success",
+   "pass": true
+  },
+  {
+   "id": "C19",
+   "claim": "no job failed or was cancelled",
+   "observed": [
+    [
+     "deploy (committed retained bytes only)",
+     "success"
+    ],
+    [
+     "build (assemble and retain; never deploy)",
+     "skipped"
+    ]
+   ],
+   "pass": true
+  },
+  {
+   "id": "C19b",
+   "claim": "only the deploy-mode build job is skipped (expected)",
+   "observed": [
+    "build (assemble and retain; never deploy)"
+   ],
+   "pass": true
+  },
+  {
+   "id": "C20",
+   "claim": "A manifest at head: 3 rows, aggregate 12ad18e1...",
+   "observed": "# aggregate rows=3 serialized_bytes=251 sha256=12ad18e157ee0ed91ff174465d0adf65cca3430a6a29836d363b885c48bb867c",
+   "pass": true
+  },
+  {
+   "id": "C21",
+   "claim": "B manifest at head: 3 rows, aggregate 36bc4407...",
+   "observed": "# aggregate rows=3 serialized_bytes=251 sha256=36bc4407514265db0bd0fcaa9dde87ad2db18373ed5646fd178ec97af5a9ba4a",
+   "pass": true
+  },
+  {
+   "id": "C22",
+   "claim": "A manifest digest 897e222a...",
+   "observed": "897e222abcfc7a0fdbd5bc4c6df1933ff3e86364ba513810f4d5eb071ebe4479",
+   "pass": true
+  },
+  {
+   "id": "C23",
+   "claim": "workflow blob at head == 927bad72...",
+   "observed": "927bad72",
+   "pass": true
+  },
+  {
+   "id": "C24",
+   "claim": "site root returns HTTP 200",
+   "observed": 200,
+   "pass": true
+  },
+  {
+   "id": "C25",
+   "claim": "root document is 1666 bytes",
+   "observed": 1666,
+   "pass": true
+  },
+  {
+   "id": "C26",
+   "claim": "app.js serves HTTP 200",
+   "observed": 200,
+   "pass": true
+  },
+  {
+   "id": "C27",
+   "claim": "app.js bytes/LF/SHA-256 match the B manifest",
+   "observed": "4ae8bf8ede12a976",
+   "pass": true
+  },
+  {
+   "id": "C28",
+   "claim": "index.html serves HTTP 200",
+   "observed": 200,
+   "pass": true
+  },
+  {
+   "id": "C29",
+   "claim": "index.html bytes/LF/SHA-256 match the B manifest",
+   "observed": "27d54db89978ea1e",
+   "pass": true
+  },
+  {
+   "id": "C30",
+   "claim": "styles.css serves HTTP 200",
+   "observed": 200,
+   "pass": true
+  },
+  {
+   "id": "C31",
+   "claim": "styles.css bytes/LF/SHA-256 match the B manifest",
+   "observed": "94c4ee228c4e192c",
+   "pass": true
+  },
+  {
+   "id": "C32",
+   "claim": "served aggregate == B ... (36bc4407)",
+   "observed": "36bc4407514265db",
+   "pass": true
+  },
+  {
+   "id": "C33",
+   "claim": "B marker present: <p id=\"count\"> in served index.html",
+   "observed": true,
+   "pass": true
+  },
+  {
+   "id": "C34",
+   "claim": "served index.html carries the storage key checklist.state.v1",
+   "observed": true,
+   "pass": true
+  }
+ ],
+ "n_checks": 35,
+ "n_pass": 35,
+ "all_pass": true
+}
