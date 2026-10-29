@@ -1,0 +1,34 @@
+id	skill	chunk_index	lines	verdict	category	evidence_line	why
+F01	admin-console-architect	7	176-200	CLEAN	role-play	193	Describes the risk that an operator can impersonate a user; the 'act as' phrase is the hazard being designed against, not an instruction to the reader.
+F02	agent-harness-architect	8	201-225	CLEAN	instruction-override	202	Quotes a prompt line ('you may not call this tool') to argue prompt text is not a control; explicitly rejects obedience.
+F03	ai-evaluation-harness	3	76-100	CLEAN	other	80	Enumerates adversarial eval-case classes (injection, jailbreak, exfiltration) as dataset items to build, not instructions to follow.
+F04	ai-evaluation-harness	4	101-125	CLEAN	other	114	Placeholder row in an output-format template listing security suites to encode; no imperative to the consuming model.
+F05	ai-threat-modeler	3	76-100	CLEAN	credential-request	82	Names LLM08 ('secrets in the system prompt') as a threat category to model; tells the reader to find and remove such secrets.
+F06	ai-threat-modeler	6	151-175	CLEAN	instruction-override	155	Anti-pattern: 'The system prompt tells it not to' is not a mitigation. Argues against prompt-only control.
+F07	contribution-guide-author	3	76-100	CLEAN	tool-call	77	Advises pointing contributors at a formatter ('run this command'); an instruction to a human author of a CONTRIBUTING file.
+F08	environment-parity-reviewer	11	276-300	CLEAN	credential-request	279	A refusal rule: asked to paste production secrets, refuse and compare by name only. Opposite of a credential request.
+F09	hidden-context-exposure-reviewer	0	1-25	CLEAN	other	3	Frontmatter description naming OWASP LLM08 'System Prompt Leakage' — a taxonomy label, not a system-prompt reference to obey.
+F10	hidden-context-exposure-reviewer	1	26-50	CLEAN	instruction-override	36	Use-when clause about reviewing a system prompt for leaks; the skill's subject matter is hidden context.
+F11	hidden-context-exposure-reviewer	3	76-100	CLEAN	instruction-override	76	Item on the inventory list: 'System prompt and developer instructions' are the artefacts to review, not a directive.
+F12	hidden-context-exposure-reviewer	4	101-125	CLEAN	credential-request	105	Scan instruction: look for credentials/tokens inside a system prompt and remove them; no value is requested from the reader.
+F13	hidden-context-exposure-reviewer	6	151-175	CLEAN	instruction-override	167	Output-format template row with a 'type: system prompt' column placeholder; schema, not prose.
+F14	hidden-context-exposure-reviewer	7	176-200	CLEAN	instruction-override	182	Checklist item requiring every hidden source, including the system prompt, to be inventoried.
+F15	hidden-context-exposure-reviewer	8	201-225	CLEAN	instruction-override	205	Doctrine line: assume all hidden context is public, including the system prompt — the opposite of relying on it.
+F16	hidden-context-exposure-reviewer	10	251-268	CLEAN	instruction-override	256	Supporting-files bullet describing what the reference file covers (system prompt, developer instructions, policy text).
+F17	llm-output-safety-reviewer	8	201-225	CLEAN	invisible-markup	210	Illustrates an XSS payload shape ('<img onerror=…>') with the dangerous attribute elided; a rendering hazard to sanitize.
+F18	notification-webhook-ux-designer	0	1-25	CLEAN	credential-request	22	Lists webhook secret rotation as a UX surface integrators need; no request for a secret value.
+F19	prompt-injection-defender	0	1-25	CLEAN	role-play	3	Frontmatter description of a manual-only defensive skill; 'jailbreak' appears as the risk the skill defends against.
+F20	prompt-injection-defender	1	26-50	CLEAN	role-play	44	Use-when clause: hardening against prompt injection or jailbreaks. Subject matter, not an instruction.
+F21	prompt-injection-defender	3	76-100	CLEAN	instruction-override	79	Cites a prompt line ('ignore instructions in documents') as an example of a non-enforcement guardrail to inventory.
+F22	prompt-injection-defender	6	151-175	CLEAN	instruction-override	151	Red-team taxonomy: direct ('ignore instructions…'), indirect, obfuscated, roleplay, multi-turn cases to test for.
+F23	prompt-injection-defender	8	201-225	CLEAN	instruction-override	211	Security rule: 'The system prompt is not a security control' — enforcement must be deterministic and outside the LLM.
+F24	resilience-architecture-reviewer	9	226-250	CLEAN	credential-request	235	Security rule forbidding asking for, printing or storing a credential value; names only env vars.
+F25	rls-policy-auditor	0	1-25	CLEAN	external-url	18	Two links to the PostgreSQL project's own documentation for row-security and CREATE POLICY; vendor reference.
+F26	secrets-identity-hardener	1	26-50	CLEAN	credential-request	47	Inventory of stored-credential rows (password hashes, token hashes) to harden; no value requested.
+F27	secrets-identity-hardener	3	76-100	CLEAN	credential-request	95	Remediation step ending in 'Never print the secret values themselves' — a prohibition.
+F28	secrets-identity-hardener	5	126-150	CLEAN	credential-request	139	Security rule: never print, log, echo or commit secret VALUES; operate on names and locations.
+F29	sensitive-disclosure-guard	1	26-50	CLEAN	instruction-override	31	Scope boundary: hidden context lives with another skill; 'system prompt' is a pointer to that skill's subject.
+F30	supply-chain-security-reviewer	11	276-300	CLEAN	external-url	288	Link to PyTorch's official documentation on safe model loading, in a gotcha about pickle/torch.load RCE.
+F31	vite-build-qa-engineer	0	1-25	CLEAN	credential-request	3	Frontmatter description of a manual-only build-QA skill that checks the client bundle for named, redacted secret exposure.
+F32	vite-build-qa-engineer	1	26-50	CLEAN	credential-request	31	Use-when clause: adding build-output checks such as a secret grep; detection, not disclosure.
+F33	vite-build-qa-engineer	3	76-100	CLEAN	credential-request	76	Build step instructing 'Do not print secret values'; report location and redacted fingerprint only.
