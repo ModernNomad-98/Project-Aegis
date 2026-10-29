@@ -18,7 +18,8 @@ exercised family was exercised well.
 **Reading key.**
 - **EXERCISED** — the proof bundle contains a primary record stating that a named skill
   from the family was invoked, consulted or followed by the performing session, at a cited
-  bundle-relative `file:line`.
+  bundle-relative `file:line`. "Consulted" means the session read the skill to apply its
+  rules; "followed" means the record says the procedure was carried out.
 - **SURFACED, NOT INVOKED** — the bundle shows the skill was loaded or exposed (for example
   in a `system/init` event) but not that the session selected, consulted or followed it. It
   is recorded for traceability and does not make a family EXERCISED.
@@ -30,31 +31,31 @@ exercised family was exercised well.
 
 All evidence paths are relative to `docs/evidence/aep3-item2-consumer-proof-20261029/`.
 
-| # | Family | Skills | Proof #1 | Recorded invocation (bundle-relative) | Date · commit |
-| --- | --- | ---: | --- | --- | --- |
-| 1 | Operating discipline | 9 | **EXERCISED** | `records/CP-01-RECORD.md:90` — `agent-startup-context-gate` (read and followed); `records/CP-01-RECORD.md:91` — `human-approval-boundary` (read and used for the authority/merge rules); `records/CP-05-ROW-UPDATE.md:99-100` — `source-of-truth-reconciler` surfaced at `system/init`, **not counted** as an invocation | 2026-10-29 · `501dff1f` |
-| 2 | AI-SDLC governance | 7 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 3 | Core architecture & engineering | 30 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 4 | SaaS & tenant isolation | 20 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 5 | Security, RLS & supply chain | 14 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 6 | QA, E2E & evidence | 28 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 7 | Cloud, DevOps, reliability & release | 15 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 8 | AI security & LLM systems | 16 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 9 | Agentic AI security | 6 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 10 | Compliance & governance | 9 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 11 | Library meta / self-application | 6 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 12 | Operational workflow patterns | 10 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 13 | Data + performance engineering & load validation | 15 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 14 | Product, PM & growth | 24 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 15 | Docs engineering | 8 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 16 | Staff+ IC, architecture advisory & framework refresh | 11 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 17 | OWASP web-app gap closure | 2 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 18 | SaaS architecture depth — strong cluster | 11 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 19 | SaaS architecture depth — low-priority set | 4 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 20 | CONSTRAIN/CURATE design pack | 3 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 21 | Security scanning & orchestration | 3 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 22 | Authority invalidation & propagation | 1 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
-| 23 | Optional Aegis setup | 1 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
+| # | Family | Skills | Proof #1 | Recorded invocation (bundle-relative) | Proof date | Bundle commit | Base commit |
+| --- | --- | ---: | --- | --- | --- | --- | --- |
+| 1 | Operating discipline | 9 | **EXERCISED** | `records/CP-01-RECORD.md:90` — `agent-startup-context-gate` (read and followed); `records/CP-01-RECORD.md:91` — `human-approval-boundary` (read and used for the authority/merge rules); `records/CP-05-ROW-UPDATE.md:99-100` — `source-of-truth-reconciler` surfaced at `system/init`, **not counted** as an invocation | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 2 | AI-SDLC governance | 7 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 3 | Core architecture & engineering | 30 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 4 | SaaS & tenant isolation | 20 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 5 | Security, RLS & supply chain | 14 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 6 | QA, E2E & evidence | 28 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 7 | Cloud, DevOps, reliability & release | 15 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 8 | AI security & LLM systems | 16 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 9 | Agentic AI security | 6 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 10 | Compliance & governance | 9 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 11 | Library meta / self-application | 6 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 12 | Operational workflow patterns | 10 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 13 | Data + performance engineering & load validation | 15 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 14 | Product, PM & growth | 24 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 15 | Docs engineering | 8 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 16 | Staff+ IC, architecture advisory & framework refresh | 11 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 17 | OWASP web-app gap closure | 2 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 18 | SaaS architecture depth — strong cluster | 11 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 19 | SaaS architecture depth — low-priority set | 4 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 20 | CONSTRAIN/CURATE design pack | 3 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 21 | Security scanning & orchestration | 3 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 22 | Authority invalidation & propagation | 1 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
+| 23 | Optional Aegis setup | 1 | NOT EXERCISED | no recorded invocation found | 2026-10-29 | `63eb9179` | `501dff1f` |
 
 **Skill counts.** Each `Skills` value is the count printed in the README roster
 ([What's in the library](../../README.md#whats-in-the-library)); the 23 counts sum to the
@@ -79,7 +80,7 @@ The rule is the one in the 15:59 STATUS proposal (Block 2a): *EXERCISED only whe
 in the family was actually invoked in the consumer proof with a recorded invocation;
 everything else NOT EXERCISED — not inflated.*
 
-Counted, because the record states the session read or followed the named skill:
+Counted, because the record states the session consulted or followed the named skill:
 
 - `agent-startup-context-gate` — `records/CP-01-RECORD.md:90`: the session "read
   `agent-startup-context-gate/SKILL.md` from line 270, its checklist reference,
@@ -109,27 +110,60 @@ Not counted, because none of these records states that a skill was invoked:
 - `records/CP-CLOSEOUT-RECORD.md:190` names a missing `code-reviewer/SKILL.md` in a verifier
   fixture — a negative test, not an invocation.
 
-**Absence check.** Every skill name under `.claude/skills/` was searched against the
-bundle's 93 files. 41 names occur somewhere in the bundle; each occurrence was read and
-classified into the groups above. Only the two CP-01 records state an invocation; the CP-05
-record states a harness load.
-This is a text-and-records check, not a telemetry capture: the bundle cannot show a skill
-that a session consulted without naming it, and a skill named once as background is still
-not an invocation.
+**Absence check.** Every skill name under `.claude/skills/` (254 skill directories; the
+`_template` scaffold is excluded) was searched against the bundle's 93 files. 41 names occur
+somewhere in the bundle; each occurrence was read and classified into the groups above. Only
+the two CP-01 records state an invocation; the CP-05 record states a harness load. The scan is
+reproducible from the cited base:
+
+```sh
+python - <<'PY'
+import pathlib
+repo = pathlib.Path(".")
+bundle = repo / "docs/evidence/aep3-item2-consumer-proof-20261029"
+skills = sorted(p.name for p in (repo / ".claude/skills").iterdir()
+                if p.is_dir() and p.name != "_template")
+files = sorted(p for p in bundle.rglob("*") if p.is_file())
+hits = {}
+for f in files:
+    text = f.read_text(encoding="utf-8", errors="replace")
+    for name in skills:
+        if name in text:
+            hits.setdefault(name, []).append(f.relative_to(bundle).as_posix())
+print(len(skills), len(files), len(hits))
+for name in sorted(hits):
+    print(name, len(hits[name]))
+PY
+# observed at 501dff1f: 254 93 41
+```
+
+The output is a name-to-file list; the classification of each hit is recorded in the four
+"not counted" bullets above. This is a text-and-records check, not a telemetry capture: the
+bundle cannot show a skill that a session consulted without naming it, and a skill named once
+as background is still not an invocation.
+
+**Source note.** The 15:59 STATUS proposal is a workspace/chat record, not a retrievable
+repository document, so it is quoted verbatim here where it governs ("EXERCISED only where a
+skill in the family was actually invoked in the consumer proof with a recorded invocation;
+everything else NOT EXERCISED — not inflated") rather than linked by path. The owner GO for
+this page is recorded in the PR body.
 
 ## How to update this map per proof
 
 1. **Add a column, do not overwrite.** When Proof #2 lands, add a `P2` status column after
    `Proof #1`; then `P3`, `P4`, `P5` in order. A later proof never rewrites an earlier
-   proof's cell: each cell is the status at that proof's own bundle and commit.
+   proof's cell: each cell is the status at that proof's own bundle and commit. Record that
+   proof's own date, bundle commit and base in its column header or a per-proof evidence
+   note; do not reuse Proof #1's date columns for a different proof.
 2. **Change NOT EXERCISED → EXERCISED only with a recorded invocation.** The evidence cell
    must name the skill and a bundle-relative `file:line`, prefixed by the proof id, for
    example `P2 records/CP-30-RECORD.md:41 — tenant-isolation-reviewer`. A skill that appears
    only in a plan, an install manifest, a review's exclusion ledger, a task list or an
    ownership mapping stays NOT EXERCISED.
-3. **Record date and commit per proof.** Add the proof's bundle date and the base commit it
-   was assessed at, in the same style as the `Date · commit` column. Do not backdate a
-   later record into an earlier proof's column.
+3. **Record three revisions per proof, separately.** `Proof date`, `Bundle commit` (the
+   commit that last changed the proof's bundle) and `Base commit` (the repository revision the
+   status was assessed at) are distinct facts and get distinct cells. Do not backdate a later
+   record into an earlier proof's column.
 4. **Update the totals before publishing.** Recompute the `EXERCISED` / `NOT EXERCISED`
    counts and the per-proof covered-family counts; the totals table must equal the rows.
 5. **Re-verify the citations.** Re-read every cited line at the new base, run the repository's
@@ -149,14 +183,16 @@ not evidence.
 
 | Order | Proof | Families covered (new) | Count | Minimal shape |
 | ---: | --- | --- | ---: | --- |
-| 1 | Proof #2 — small multi-tenant SaaS | 2, 3, 4, 5, 6, 7, 11, 12, 13, 18, 19 | 11 | Node 22 LTS + TypeScript + Fastify; Postgres 16 with row-level security; one migration; Vitest + supertest (unit, integration, cross-tenant negatives); two synthetic tenants; member vs admin; a feature flag; deploy gate + rollback; a sealed cross-tenant defect reviewed by fresh independent reviewers with the review skills installed; a reproduce runner |
+| 1 | Proof #2 — small multi-tenant SaaS | 2, 3, 4, 5, 6, 7, 11, 12, 13, 18, 19 | 11 | Node 22 LTS + TypeScript + Fastify; Postgres 16 with row-level security; one migration; Vitest + supertest (unit, integration, cross-tenant negatives); two synthetic tenants; member vs admin; a feature flag; deploy gate + rollback; a sealed cross-tenant defect reviewed by fresh independent reviewers who **invoke and record** the review skills (`tenant-isolation-reviewer`, `rls-policy-auditor`, `security-pr-reviewer`, `code-reviewer`) at a cited file:line; a bounded load/performance scenario (for example a short k6 run with p95 latency and error-rate thresholds) plus a query-count budget, so family 13 is exercised; a reproduce runner |
 | 2 | Proof #3 — LLM feature + agentic security | 8, 9, 17, 21, 22 | 5 | A chat feature over a synthetic corpus with tool calls, prompt-injection fixtures, cost/latency guardrails and an agent handoff; A09/A10 logging and error-path security; scan orchestration; authority invalidation |
 | 3 | Proof #4 — product, docs, staff, design, setup | 14, 15, 16, 20, 23 | 5 | A no-code-ish product slice with specs/ADRs, a docs site, design-review artifacts and a setup walkthrough |
 | 4 | Proof #5 — compliance evidence pack | 10 | 1 | Evidence collection over the outputs of Proofs #2–#4, producing a control crosswalk, evidence pack and gap audit |
 
 The counts reconcile to 22 remaining families: 11 + 5 + 5 + 1 = 22, plus the family already
-EXERCISED by Proof #1 = 23. The proposal counts Proof #2 as "12/22" because it also
-reinforces family 1; the 11 families new to Proof #2 are the ones listed above.
+EXERCISED by Proof #1 = 23. The proposal labels Proof #2 "12/22"; by its own counting that is
+11 new families plus a reinforcement of family 1 — **12 of the 23 total**, not 12 of the 22
+remaining. This map counts the 11 new families, so the remaining-family arithmetic stays
+11 + 5 + 5 + 1 = 22.
 
 ## Limitations
 
@@ -190,11 +226,17 @@ reinforces family 1; the 11 families new to Proof #2 are the ones listed above.
 ```sh
 git rev-parse 501dff1f57246c25ae099b7b21d40915e373e9a3
 # 501dff1f57246c25ae099b7b21d40915e373e9a3
-git log -1 --format='%H %cI' -- docs/evidence/aep3-item2-consumer-proof-20261029
+git merge-base --is-ancestor 63eb9179 501dff1f && echo "bundle commit is in base"
+git log -1 501dff1f --format='%H %cI' -- docs/evidence/aep3-item2-consumer-proof-20261029
 # 63eb91794020f790be970d2c175447530d57681c 2026-10-29T13:41:03-07:00
-sed -n '90,91p' docs/evidence/aep3-item2-consumer-proof-20261029/records/CP-01-RECORD.md
-sed -n '99,100p' docs/evidence/aep3-item2-consumer-proof-20261029/records/CP-05-ROW-UPDATE.md
+git show 501dff1f:docs/evidence/aep3-item2-consumer-proof-20261029/records/CP-01-RECORD.md \
+  | sed -n '90,91p'
+git show 501dff1f:docs/evidence/aep3-item2-consumer-proof-20261029/records/CP-05-ROW-UPDATE.md \
+  | sed -n '99,100p'
 ```
+
+Every citation is read from `501dff1f`, not from the working tree, so a later commit cannot
+make these checks pass against different bytes.
 
 The counts in this page were checked against the README roster at the same base: 23 family
 entries, counts summing to 253, one family with a recorded invocation and 22 without.
@@ -205,3 +247,4 @@ entries, counts summing to 253, one family with a recorded invocation and 22 wit
 | --- | --- | --- |
 | 2026-10-29 | Initial map: 23 families × Proof #1; 1 EXERCISED, 22 NOT EXERCISED | Base `501dff1f`; bundle `63eb9179`; proposal in the 15:59 STATUS, Block 2 |
 | 2026-10-29 | Review correction: `source-of-truth-reconciler` moved from "counted invocation" to "surfaced, not invoked"; recorded invocations 3 → 2. Family 1 stays EXERCISED on the two CP-01 records. | Codex review comment 4419015504 on `0eb7229d`; `records/CP-05-ROW-UPDATE.md:99-100` says only that the CLI loaded the skill |
+| 2026-10-29 | Consistency pass: criteria aligned to "consulted or followed"; `Proof date` / `Bundle commit` / `Base commit` split into separate columns; verification pinned to `501dff1f`; absence scan published as a runnable recipe; Proof #2 "12/22" corrected to 11 new families (12 of 23 total); Proof #2 shape requires recorded review-skill invocations and a load/performance scenario for family 13 | DeepSeek review 5706354842 findings 1–6; all six accepted or clarified in place |
