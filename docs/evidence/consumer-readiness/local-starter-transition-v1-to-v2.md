@@ -19,7 +19,7 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insertion | **121,703 B**, sha256 `3a6e5e85969fae9aec802dd5701182806c40d5342a096b4b91319ea8b535afb1` |
+| Page after the section 7.3 insert and review revisions | **123,373 B**, sha256 `6488c6754a20915639e672b3818f37c45fda6b2104ca0c447e00660045e3b607` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
@@ -32,8 +32,12 @@ the Item 6 record's published values **exactly**, which is the non-circular
 control that this extraction is the delivered block and not a copy.
 
 The runner re-extracts both blocks from the ref it is given and fails closed
-(`SystemExit`) unless all five constants match the frozen values. It was run
-against `2a7e9c06` and did not fail closed.
+(`SystemExit`) unless all five constants match the frozen values. It ran
+against `2a7e9c06` and did not fail closed. The check was exercised with a
+local-only tamper commit (`28325e59`, not on this branch) that changed
+`$AggRows` from 41 to 40: the runner exited **1** with
+`post-I6 harness constants changed; re-freeze item7 before running: {... "AggRows": "40" ...}`
+and ran no case.
 
 ## 2. Profile delta: same pin, 17 -> 18 skills
 
@@ -99,7 +103,7 @@ All six cases ran against `2a7e9c06` with the extracted blocks. "Added" and
 
 | Case | Exit | Observed |
 | --- | --- | --- |
-| C1 - valid transition, fresh record | **0** | 41 package files; added exactly the two package files plus the new record; 0 removed, 0 changed; new record **41 rows, 7,025 B**, sha256 `d6db86a31c07e00b6f41cf0323ef5eeedb05740821ed0a1648bd959bbd246820`; old record hash unchanged; fixture commit unchanged |
+| C1 - valid transition, fresh record | **0** | 41 package files; added exactly the two package files plus the new record; 0 removed, 0 changed; new record **41 rows, 7,025 B**, sha256 `d6db86a31c07e00b6f41cf0323ef5eeedb05740821ed0a1648bd959bbd246820`; old record hash unchanged; fixture commit and local Git config unchanged (config file sha256 `c4454039...f433`, `git config --local --list` identical) |
 | C2 - conflicting selected file | **31** | `existing installed file differs from the pinned source: .claude/skills/code-reviewer/SKILL.md`; conflicting bytes preserved; no record written; old record unchanged |
 | C3 - reused old record path | **0** | 41 package files installed; `P9: install record already present, left unchanged`; the old record is still 39 rows / 6,738 B and unchanged; no "record written" claim |
 | C4 - constructed matching partial (40/41) | **0** | resumed; added `register-format.md` and the fresh record; 41 package files; record 41 rows |
@@ -111,29 +115,31 @@ and its rows independently aggregate to
 `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over 5,420
 serialized bytes - matching both its own header and the published value.
 
-A 54-check assertion record over the case JSON, record text and published tables
-(`verify_native.py`) is **54/54 PASS**, including: the 39 published v1 paths are
+A 59-check assertion record over the case JSON, record text, real-kill runs and
+published tables (`verify_native.py`) is **59/59 PASS**, including: the 39 published v1 paths are
 byte-identical at the destination after C1; the four product files, the old
-record and the commit are unchanged; C3 adds exactly the two package files but
-produces no v2 receipt; C4's starting state is exactly 40 package files; C5
-writes nothing.
+record, the commit and the local Git config are unchanged; C3 adds exactly the
+two package files but produces no v2 receipt; C4's starting state is exactly 40
+package files; C5 writes nothing.
 
 ## 6. Real process-kill interruption
 
 The interruption method is a real process kill, not a simulated flag: the
 runner starts the published harness, polls the destination, and calls
-`TerminateProcess` when the defined boundary is reached. Two boundaries were
-observed:
+`TerminateProcess` when the defined boundary is reached. Three observed
+outcomes cover both the matching and the divergent interruption case:
 
 | Boundary | Kill result | Partial state | Rerun (unchanged command) |
 | --- | --- | --- | --- |
 | **40 of 41 package files** | process exit 1; observed count 40 | all 40 present package files byte-identical to the pin | exit 0; added `register-format.md` + the fresh record; final 41 files; record 41 rows / 5,420 bytes / published aggregate |
 | 41 of 41, before P9 record write | process exit 1; observed count 41 | 41 files, all pin-identical; no record | exit 0; added only the fresh record; record 41 rows |
+| **real divergent partial** | process exit 1; the last file existed at **0 bytes** | 41 paths present; `register-format.md` mismatched the pin (0 B vs 7,518 B); no record | exit **31**: `existing installed file differs from the pinned source: .../register-format.md`; bytes preserved; no record, no package write |
 
-The 40/41 row is the acceptance case for an interrupted **matching** copy. No
-rollback is claimed and none occurred; the partial state is reported as it was
-found. A divergent real-kill partial was not manufactured separately: C5
-provides the divergent case deterministically and is labelled constructed.
+The 40/41 all-matching row is the acceptance case for an interrupted
+**matching** copy. The third row is the interrupted **divergent** copy produced
+by a real kill (not by C5's constructed state): the truncated file was detected
+and preserved, and the run could not be counted complete. No rollback is claimed
+and none occurred; each partial state is reported as it was found.
 
 ## 7. Destination-link containment (Item 6 fixture, re-executed)
 
@@ -151,7 +157,7 @@ and 7.1 blocks itself and builds real `mklink /J` junctions:
 | S4-5 record path through a junction | exit **23** before any package or record write |
 | S4-6 ordinary external record path | exit 0, record at the declared path |
 | S4-7 conflicting `AGENTS.md` control | exit **22**, bytes unchanged |
-| S4-8 identical resume | exit 0; 41 package files and the first record preserved; second record written |
+| S4-8 identical resume | exit 0 with a **different** declared record path; 41 package files and the first record preserved; second record written |
 | S4-9 file symbolic-link leaf | **UNRUN**: creating a file symlink needs administrator privilege on this host |
 
 The full test result is recorded in section 9 with the validator suite. The
@@ -174,8 +180,17 @@ than by a migration step.
 | `python scripts/validate-skills.py` | **OK: 254** skill(s) valid, 0 warning(s), exit 0 |
 | Markdown link corpus (`check-markdown-links.py`) | **OK: 878** pages checked in 3 batches, exit 0 |
 | `git diff --check` | clean (no whitespace errors) |
-| DCO on the commit | signed off; re-verified with `scripts/check_dco.py` after the commit (final receipt) |
-| PR-body bound fields (`check_pr_body_skills.py`) | OK on the draft body; the posted body is re-checked at posting and read back |
+| DCO on the commits | signed off; verified with `scripts/check_dco.py` over `origin/main..HEAD` |
+| PR-body bound fields (`check_pr_body_skills.py`) | OK on the draft and on the live body read back |
+
+Hosted CI at the first commit `1b63544b` completed with **all required checks
+green**: `gate-guard`, `validate-skills`, `changes` and both review-switch
+jobs; the DeepSeek review posted six advisory findings and Codex posted four,
+all dispositioned in the PR body. `tools-tests-linux`,
+`tools-tests-windows` and `windows-offline-checks` were **skipped** by design
+for a docs-only change and are UNRUN, never passes. The review-fix commit
+re-triggers CI; that later run is delivery-stage evidence and is not claimed
+here.
 
 ## 10. UNRUN and limits
 
@@ -189,7 +204,8 @@ than by a migration step.
 - **File symbolic-link leaf** - UNRUN on this host (administrator privilege);
   only directory junctions were exercised natively.
 - **Review, CI and merge** - delivery-stage work; a PR is opened, not merged.
-  Skipped or pending jobs are never counted as passes.
+  Skipped or pending jobs are never counted as passes. Advisory review
+  findings are dispositioned in the PR body, not silently absorbed.
 
 ## 11. Reproduction
 
@@ -197,10 +213,10 @@ From `_A/work-package-3/item7-final/evidence` (local, not committed):
 
 ```text
 python scripts/verify_matrix.py --repo ../repo --history-pin 2a7e9c064276baad1a45fe80f7b0acbf615f822b --out-json matrix-verification-newmain.json --out-md matrix-generated-newmain.md
-python scripts/block_identity.py --repo ../repo --ref 2a7e9c06... --out-json blocks-main.json --out-dir blocks-main
-python scripts/run_transition.py --repo ../repo --ref 2a7e9c06... --fixture ../../item7-local/evidence/work/v1-consumer --work work/transition --force
+python scripts/block_identity.py --repo ../repo --ref 2a7e9c064276baad1a45fe80f7b0acbf615f822b --out-json blocks-main.json --out-dir blocks-main
+python scripts/run_transition.py --repo ../repo --ref 2a7e9c064276baad1a45fe80f7b0acbf615f822b --fixture ../../item7-local/evidence/work/v1-consumer --work work/transition --force
 python scripts/verify_native.py
-python scripts/kill_native.py --repo ../repo --tools work/transition/tools --src work/pin-src --fixture ../../item7-local/evidence/work/v1-consumer --work work/process-kill-40 --ref 2a7e9c06... --threshold 40
+python scripts/kill_native.py --repo ../repo --tools work/transition/tools --src work/pin-src --fixture ../../item7-local/evidence/work/v1-consumer --work work/process-kill-40 --ref 2a7e9c064276baad1a45fe80f7b0acbf615f822b --threshold 40
 ```
 
 ## 12. Aegis skills applied
@@ -214,5 +230,6 @@ python scripts/kill_native.py --repo ../repo --tools work/transition/tools --src
 The work-item acceptance rows, mapped: exact starting fixture -> section 3;
 valid transition -> C1; new receipt -> C1/C6; product preservation -> C1;
 conflicting selected file -> C2; reused old record path -> C3; interrupted
-matching copy -> C4 and the real kill in section 6; interrupted conflicting
-copy -> C5; identical completed rerun -> C6.
+matching copy -> C4 and the real matching kill in section 6; interrupted
+conflicting copy -> the real divergent kill in section 6 (C5 is the
+deterministic constructed variant); identical completed rerun -> C6.

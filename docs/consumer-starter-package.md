@@ -1391,40 +1391,61 @@ substitution of the old record.
 
 **Prerequisites.** The target is the consumer repository already described in P1;
 its 39 v1 files are byte-identical to the pin and its v1 install record is intact at
-the path the v1 procedure wrote (by default `docs/consumer-install-record.md`); the
-owner states an install mode P2 accepts; and the caller supplies a **new, nonexisting**
-record path, for example `docs/consumer-install-record-v2.md`. The v2 profile adds
-exactly two skill files - `.claude/skills/scoped-approval-register/SKILL.md` and
+the path the v1 procedure wrote (by default `docs/consumer-install-record.md`).
+Every already-existing selected skill directory must contain **only** that skill's
+packaged files and every one of those must be byte-identical to the pin: a foreign
+file (for example `.claude/skills/code-reviewer/notes.md`) is refused with exit
+**20**, and a differing byte with exit **31**, before any write. This applies to the
+newly selected `scoped-approval-register` directory too if it already exists - an
+identical partial resumes, a foreign file is refused at 20, a differing byte at 31.
+The owner states one install mode and the words that authorize it; `-Mode` must be
+that exact token and `-OwnerAuthorization` those words, because P2 checks the token
+and nonempty authorization, not their agreement. Finally, the caller supplies a
+**new, nonexisting** record path, for example `docs/consumer-install-record-v2.md`.
+The v2 profile adds exactly two skill files -
+`.claude/skills/scoped-approval-register/SKILL.md` and
 `.claude/skills/scoped-approval-register/references/register-format.md` - because v2
 expands the selected profile from 17 to 18 skills over the same package pin.
 
-**Procedure.** Run the section 7.1 harness as written, with `-RecordPath` naming the
-new path:
+**Procedure.** Save P2's block as `install-mode.ps1` beside the section 7.1 harness,
+as section 7.1 instructs; the harness then defaults `-ModeGate` to that file. Pass
+`-ModeGate` explicitly only when the gate lives somewhere else. Run the harness with
+the owner-selected mode and `-RecordPath` naming the new path:
 
 ```powershell
-pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode human-only -OwnerAuthorization '<the owner''s words>' -RecordPath C:\path\to\product\docs\consumer-install-record-v2.md
+pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode <human-only|agent-commit> -OwnerAuthorization '<the owner''s words>' -RecordPath C:\path\to\product\docs\consumer-install-record-v2.md
 ```
 
 Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
 run that reuses it installs the two files but cannot produce a v2 receipt: the
 retained 39-row file still describes the v1 result and must not be presented as the
-new one.
+new one. The same applies to any stale or partial file already sitting at the new
+path: P9 leaves it unchanged, so the run can exit 0 without a fresh receipt. The new
+path must not exist before the run; if it does, inspect and remove or rename it
+first.
 
 **Expected result.** Exit 0; 41 selected paths present; exactly the two added package
-files new; the 39 v1 rows byte-identical at the destination; unrelated product files,
-the old record, the local Git configuration and the commit unchanged; a fresh 41-row
-record whose aggregate is `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699`
-over 5,420 serialized bytes.
+files are new (this count excludes the new record); the 39 v1 **files** are
+byte-identical at the destination; unrelated product files, the old record, the local
+Git configuration and the commit unchanged; a fresh 41-row record whose aggregate is
+`fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over 5,420
+serialized bytes.
 
 **Refusals and interruption.** A changed pre-existing selected file is refused with
 exit **31**, the file is named and its bytes are preserved, and no record is written.
-A destination link anywhere on the 41 paths or the record path is refused with exit
-**23** before any write. A differing startup file is refused with exit **22**. If the
-copy is interrupted, an unchanged rerun resumes under P5's identical-byte policy and
-writes the fresh record when the interruption happened before P9; a partial file that
-differs from the pin is refused with exit **31** and preserved. An identical rerun
-after a completed transition changes no package file and leaves an existing record at
-the same path unchanged.
+Any reparse point on the 41 destination paths or the record path - a junction,
+symbolic link or other link type - is refused with exit **23** before any write by
+inspecting attributes only. Native evidence covers directory junctions; creating a
+file symbolic link needs administrator privilege on the recorded host and that leaf
+case is **UNRUN**, not claimed. A differing startup file is refused with exit **22**.
+If the copy is interrupted, an unchanged rerun resumes under P5's identical-byte
+policy and writes the fresh record when the interruption happened before P9; a
+partial file that differs from the pin is refused with exit **31** and preserved. A
+real process kill at 40 of 41 files reproduced both outcomes: an all-matching partial
+resumed to 41 files plus the fresh record, and a truncated new file was refused at 31
+with the bytes preserved and no record. An identical rerun after a completed
+transition changes no package file and leaves an existing record at the same path
+unchanged.
 
 **Completion rule.** The transition is complete only when the new record exists with
 41 measured rows and the published aggregate. Adding the two files while reusing the
