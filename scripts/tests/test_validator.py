@@ -86,6 +86,11 @@ REQUIRED_SKIPS: list[str] = []
 # nonzero when it grows on Linux, because required coverage that did not run is
 # UNRUN and can never be counted as a pass.
 REQUIRED_UNRUN: list[str] = []
+# A case whose fixture only exists on one platform. Unlike SKIPS and the
+# REQUIRED_* channels this is an EXPECTED boundary, not required coverage on
+# the host that cannot run it: it is printed and recorded, never counted as a
+# pass, and suite_exit_status() deliberately does not read it.
+EXPECTED_PLATFORM_SKIPS: list[str] = []
 
 
 def ok(label: str) -> None:
@@ -112,6 +117,25 @@ def required_unrun(case: str, reason: str) -> None:
     REQUIRED_UNRUN.append(detail)
     REQUIRED_SKIPS.append(detail)
     print(f"  UNRUN  {detail}")
+
+
+def expected_platform_skip(native: str, label: str, platform: str | None = None) -> None:
+    """Record a fixture that only exists on its native platform.
+
+    The Linux lane is the required coverage lane, so a skip recorded through
+    skip() there is non-OK. A case whose fixture is inherently platform-specific
+    is not required coverage on the other host: this helper keeps it out of
+    SKIPS, REQUIRED_SKIPS and REQUIRED_UNRUN while still printing it as UNRUN,
+    never as a pass. Calling it on the native platform is a defect and raises.
+    """
+    current = sys.platform if platform is None else platform
+    if current == native:
+        raise AssertionError(
+            "platform-required case skipped on its native " + native + ": " + label)
+    detail = f"{label} [native {native}; expected on {current}]"
+    EXPECTED_PLATFORM_SKIPS.append(detail)
+    print(f"  SKIP  {label} [expected platform skip: native {native}; "
+          f"not required coverage on {current}]")
 
 
 def expect_error(rep, needle: str, label: str) -> None:
@@ -5387,11 +5411,13 @@ def test_dsr1_required_omission_accounting():
     saved_unrun = list(REQUIRED_UNRUN)
     saved_required = list(REQUIRED_SKIPS)
     saved_skips = list(SKIPS)
+    saved_expected = list(EXPECTED_PLATFORM_SKIPS)
 
     def reset_channels():
         REQUIRED_UNRUN.clear()
         REQUIRED_SKIPS.clear()
         SKIPS.clear()
+        EXPECTED_PLATFORM_SKIPS.clear()
 
     def closure_result(case):
         CLOSURE_CASES[synthetic_id] = case
@@ -5443,6 +5469,27 @@ def test_dsr1_required_omission_accounting():
         assert suite_exit_status("linux") == 1, "required omission must make the Linux aggregate nonzero"
         assert suite_exit_status("win32") == 0, "non-Linux UNRUN keeps unrelated Windows suites runnable"
 
+        # A known platform boundary is recorded but is not required coverage
+        # on the host that cannot run the fixture. The native-platform call is
+        # a defect and must raise rather than become a quiet skip.
+        reset_channels()
+        expected_platform_skip(
+            "win32", "synthetic Windows-only fixture", platform="linux")
+        assert suite_exit_status("linux") == 0, (
+            "an expected platform skip must not make the Linux aggregate nonzero")
+        assert suite_exit_status("win32") == 0
+        assert len(EXPECTED_PLATFORM_SKIPS) == 1
+        assert not SKIPS and not REQUIRED_SKIPS and not REQUIRED_UNRUN, (
+            "expected platform skips must stay off the required channels")
+        try:
+            expected_platform_skip(
+                "win32", "synthetic native-platform skip", platform="win32")
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(
+                "a Windows-only fixture must not be skippable on Windows")
+
         # Root/non-root split: the required denial is UNRUN for uid 0 only.
         available, reason = _permission_denial_case(lambda: 0)
         assert available is False and "uid 0" in reason, (available, reason)
@@ -5468,6 +5515,7 @@ def test_dsr1_required_omission_accounting():
         REQUIRED_UNRUN[:] = saved_unrun
         REQUIRED_SKIPS[:] = saved_required
         SKIPS[:] = saved_skips
+        EXPECTED_PLATFORM_SKIPS[:] = saved_expected
 
 
 CLOSURE_CASES = {
@@ -8704,7 +8752,12 @@ def _dest_junction(link: Path, target: Path) -> None:
 def test_consumer_install_destination_links():
     """S4-1..S4-9: destination reparse points are refused before any write."""
     if sys.platform != "win32":
-        skip("UNRUN: destination junction fixtures are Windows-specific; the POSIX lane is not run")
+        # Junctions are a Windows kernel object. This case is required on
+        # Windows and is an expected platform boundary on POSIX, not missing
+        # required coverage there; it is still recorded as UNRUN, never a pass.
+        expected_platform_skip(
+            "win32",
+            "UNRUN: destination junction fixtures are Windows-specific; the POSIX lane is not run")
         return
     pwsh = _install_mode_pwsh()
     sh = _install_mode_sh()
@@ -9009,7 +9062,9 @@ def suite_exit_status(platform: str = sys.platform) -> int:
     Kept as a function so the classification is unit-tested directly instead of
     only being observed by running the whole suite. Non-Linux UNRUN stays
     explicit without breaking unrelated Windows suites, which is the existing
-    platform policy.
+    platform policy. EXPECTED_PLATFORM_SKIPS is intentionally not read here: a
+    fixture that only exists on another platform is not required coverage on
+    this host, while any unexpected SKIPS entry on Linux remains non-OK.
     """
     if platform.startswith("linux") and (SKIPS or REQUIRED_SKIPS or REQUIRED_UNRUN):
         return 1
@@ -9041,6 +9096,9 @@ def main() -> int:
             return 1
         print()
 
+    if EXPECTED_PLATFORM_SKIPS:
+        print(f"PLATFORM-SKIPPED: {len(EXPECTED_PLATFORM_SKIPS)} test(s) "
+              f"(expected on {sys.platform}; not required coverage, never passes)")
     if SKIPS:
         print(f"SKIPPED: {len(SKIPS)} test(s) (UNRUN, not passes)")
     for entry in REQUIRED_UNRUN:
