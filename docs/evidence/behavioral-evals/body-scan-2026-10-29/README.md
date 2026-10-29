@@ -16,7 +16,7 @@ finding that there is no prompt injection in the corpus.
 
 255 files scanned (`2,962,866` bytes, `48,478` lines); 44 Tier-1 deterministic
 flags across 16 skills; 33 flagged chunks and 202 randomly sampled clean chunks
-adjudicated (`33` of `235`); **0 INJECTION, 0 SUSPECT**; every
+adjudicated (`235` of `235`); **0 INJECTION, 0 SUSPECT**; every
 Tier-1 flag dismissed as a false positive (`44 of 44 hits; 33 of 33 chunks`); external spend **$0.00**
 against the `$10` ceiling, which was never drawn on.
 
@@ -56,8 +56,10 @@ table in this directory carries both counts, and `PER-SKILL.tsv` marks each row
 - It is **not** a malware or dependency scan, and it does not execute anything.
 - No SKILL.md file was modified. The triage script is not committed; see
   METHOD.md, "Reproducibility".
-- The sample adjudication is single-reader (see METHOD.md, "Adjudication
-  execution" and "Limits"). That is a confidence limit, not a hidden one.
+- Adjudication used one model family (four DeepSeek V4 Flash sessions, one per
+  batch, plus an author cross-check on the flagged set); it is not a
+  cross-model review (METHOD.md, "Adjudication execution" and "Limits"). That
+  is a confidence limit, not a hidden one.
 
 ## Files
 

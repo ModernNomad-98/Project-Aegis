@@ -1,6 +1,6 @@
 {
   "adjudicated_flagged": 33,
-  "adjudicated_sample": 0,
+  "adjudicated_sample": 202,
   "base_revision": "501dff1f57246c25ae099b7b21d40915e373e9a3",
   "bytes": 2962866,
   "categories": {
@@ -42,6 +42,6 @@
   "tier1_hit_skills": 16,
   "tier1_hits": 44,
   "verdicts": {
-    "CLEAN": 33
+    "CLEAN": 235
   }
 }

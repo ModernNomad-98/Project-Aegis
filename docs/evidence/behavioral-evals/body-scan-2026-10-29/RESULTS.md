@@ -7,7 +7,7 @@ modified.
 
 **0 INJECTION, 0 SUSPECT, 0 findings.** 255 files scanned, 44 Tier-1 flags, 33
 flagged chunks and a fixed 10% random sample of clean chunks adjudicated
-(33 of 235 chunks), every Tier-1 flag dismissed as a false positive.
+(235 of 235 chunks), every Tier-1 flag dismissed as a false positive.
 External spend **$0.00** against a **$10** ceiling that was never drawn on.
 
 This is the published result either way. A zero-finding outcome is a result,
@@ -87,17 +87,23 @@ documentation; there is no other external link anywhere in the 255 bodies.
 
 | | Flagged chunks | Sampled clean chunks | Total |
 | --- | --- | --- | --- |
-| Adjudicated | 33 | 0 | 33 |
-| CLEAN | 33 | 0 | 33 |
+| Adjudicated | 33 | 202 | 235 |
+| CLEAN | 33 | 202 | 235 |
 | SUSPECT | 0 | 0 | 0 |
 | INJECTION | 0 | 0 | 0 |
 
-Verdicts: **CLEAN 33 / SUSPECT 0 / INJECTION 0**.
+Verdicts: **CLEAN 235 / SUSPECT 0 / INJECTION 0**.
 
 Every sampled clean chunk came back CLEAN, which is the expected direction: the
 sample exists to test whether Tier 1 misses anything, and it did not.
 
-The sample is **partial**: 0 of 202 drawn chunks adjudicated (0.0% of the sample). The shortfall is recorded in section 8 as a deviation; the clean-chunk miss rate claim is limited to the chunks actually read.
+The sample is complete: 202 of 202 drawn chunks adjudicated, 9.98% of the clean set. The 235 verdicts came from four parallel DeepSeek V4 Flash
+sessions, one batch each, none able to see another's output, and passed a
+format validation before use: 235 of 235 expected ids, no duplicates, no
+unknown ids, every verdict in range, every line an integer, zero defects. The
+executing session had read the 33 flagged chunks itself before the children
+returned and reached the same verdict on all 33, so the highest-risk set has
+two independent reads.
 
 ## 5. False-positive handling
 
@@ -161,13 +167,18 @@ and is unused, so a later re-scan or a bead on an expanded corpus can spend it.
 - The 44 hit lines and 33 flagged chunk ranges are published with absolute line
   numbers; `evidence/sample-verdicts.tsv` states the chunk index and line range
   of every sampled chunk.
+- The four adjudication TSVs were validated for id coverage, duplicates,
+  verdict vocabulary, integer line numbers and rationale length before merging:
+  235/235 ids, 0 format defects.
+- The scan was re-run end to end after the one setup-code fix and reproduced the
+  same file count, hit count and flagged-chunk set.
 
 ## 8. UNRUN
 
 | Not run | Why |
 | --- | --- |
 | Any skill invocation, tool call, or model fed a skill body | The decision asks for a body scan, not a behavioural test; executing 255 skills would cross the read-only scope and the approval boundary. Behavioural confirmation of "no injection" is therefore **not** claimed. |
-| An independent second adjudicator | Harness delegation limit (METHOD.md `6); single-reader confidence limit, stated in every document. |
+| A cross-model or human second reader | Adjudication used one model family (four child sessions of DeepSeek V4 Flash plus the author's cross-check on the flagged set). A different family would have needed external spend; the limit is stated in METHOD.md `9. |
 | Provider/API spend | Not needed; ceiling untouched. |
 | Merge | Out of scope for this work package: publication only, Lead runs fresh review and a fresh merger. |
 | Scan of `references/`, `evals/`, or any non-SKILL.md file | Out of scope for decision 3, which scopes the 254/255 SKILL.md bodies. Those files are the obvious next surface. |

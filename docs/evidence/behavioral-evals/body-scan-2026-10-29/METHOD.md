@@ -182,22 +182,30 @@ six words.
 ## 6. Adjudication execution
 
 - Every one of the 33 flagged chunks was adjudicated (`evidence/flagged-verdicts.tsv`).
-- - 0 of the 202 sampled clean chunks were adjudicated
-  (`evidence/sample-verdicts.tsv`); the shortfall is a recorded deviation, not a silent one.
-- Adjudication was performed by the executing DeepSeek V4 Flash session
-  (`deepseek-account/deepseek-flash`), the same model family the decision
-  named, reading the frozen rubric and the packaged chunk text.
-- **Single reader.** The work package was to be adjudicated by four parallel
-  child sessions. This session runs at delegation depth 1 and the harness
-  refuses child sessions (`subagent depth 2 exceeds maxDepth 1`), so the
-  adjudication was done in one session instead, sequentially, against the same
-  frozen rubric. This is the main confidence limit of the record and it is
-  stated wherever the numbers are used.
-- The reviewer read the chunk text with blank lines removed and absolute line
-  gutters; the packaging script is deterministic and its hash is in
-  SCAN-RECORD.md. Nothing else was summarised, filtered or paraphrased before
+- - Every one of the 202 sampled clean chunks was adjudicated
+  (`evidence/sample-verdicts.tsv`).
+- Adjudication was performed by **four parallel DeepSeek V4 Flash child
+  sessions** (`deepseek-account/deepseek-flash`), one per batch, the model
+  family the decision named. Each child read the frozen rubric and one batch
+  file and wrote its own verdict TSV; none saw another batch or another
+  child's output.
+- The four TSVs were validated before use: 235 of 235 expected ids present, no
+  duplicates, no unknown ids, every verdict in `{CLEAN, SUSPECT, INJECTION}`,
+  every line an integer, every rationale ≤200 characters. Zero format defects.
+  The merge is mechanical (`scan/merge.py`) and cannot reorder or relabel a
+  verdict.
+- **Cross-check.** The executing session had already read the 33 flagged chunks
+  itself, before the children returned, and reached the same verdict (CLEAN) on
+  all 33. The flagged set therefore has two independent reads that agree; the
+  202 sampled chunks have one read each.
+- Each session read the chunk text with blank lines removed and absolute line
+  gutters; the packaging script is deterministic and its hash is recorded in
+  SCAN-RECORD.md. Nothing was summarised, filtered or paraphrased before
   adjudication.
-- No network access and no external model call was used at any point.
+- No network access and no external model call was used at any point. This
+  session sits at delegation depth 1, so a coordinator spawned the four
+  children; the harness refuses child sessions from this depth
+  (`subagent depth 2 exceeds maxDepth 1`).
 
 ## 7. Redaction
 
@@ -239,9 +247,12 @@ authoritative execution, not two.
 
 ## 9. Limits
 
-1. **Single reader.** No independent second adjudicator (section 6). Mitigation:
-   the rubric is frozen and published, and every verdict carries a line number
-   so a second reader can overturn any single call cheaply.
+1. **One model family, no third reader.** All four adjudicators and the
+   cross-check ran on DeepSeek V4 Flash. A different model family was not used,
+   because that would have meant external spend the ceiling was meant to cover
+   only if needed. Mitigation: the rubric is frozen and published, and every
+   verdict carries a line number, so a cross-model or human reader can overturn
+   any single call cheaply.
 2. **25-line windows.** A payload split across a chunk boundary would be read
    in two halves. Tier 1 ran on whole lines regardless of chunking, so only the
    Tier-2 *reading* is windowed.

@@ -1,203 +1,203 @@
 id	skill	chunk_index	lines	verdict	category	evidence_line	why
-S001	acceptance-criteria-reviewer	6	151-175	NOT-ADJUDICATED	-	-	-
-S002	acceptance-criteria-reviewer	9	226-235	NOT-ADJUDICATED	-	-	-
-S003	accessibility-test-harness	5	126-150	NOT-ADJUDICATED	-	-	-
-S004	agent-containment-reviewer	4	101-125	NOT-ADJUDICATED	-	-	-
-S005	agent-failure-recovery	1	26-50	NOT-ADJUDICATED	-	-	-
-S006	agent-startup-context-gate	2	51-75	NOT-ADJUDICATED	-	-	-
-S007	agent-startup-context-gate	3	76-100	NOT-ADJUDICATED	-	-	-
-S008	agent-startup-context-gate	4	101-125	NOT-ADJUDICATED	-	-	-
-S009	ai-closeout-reporter	4	101-125	NOT-ADJUDICATED	-	-	-
-S010	ai-closeout-reporter	9	226-232	NOT-ADJUDICATED	-	-	-
-S011	ai-cost-guardrail-designer	10	251-275	NOT-ADJUDICATED	-	-	-
-S012	ai-governance-risk-reviewer	7	176-179	NOT-ADJUDICATED	-	-	-
-S013	ai-human-in-the-loop-designer	1	26-50	NOT-ADJUDICATED	-	-	-
-S014	ai-human-in-the-loop-designer	4	101-125	NOT-ADJUDICATED	-	-	-
-S015	ai-human-in-the-loop-designer	7	176-200	NOT-ADJUDICATED	-	-	-
-S016	ai-router-architect	8	201-216	NOT-ADJUDICATED	-	-	-
-S017	ai-sdlc-operating-model	2	51-75	NOT-ADJUDICATED	-	-	-
-S018	ai-task-decomposer	5	126-150	NOT-ADJUDICATED	-	-	-
-S019	ai-task-decomposer	10	251-267	NOT-ADJUDICATED	-	-	-
-S020	api-contract-test-designer	0	1-25	NOT-ADJUDICATED	-	-	-
-S021	api-contract-test-designer	3	76-100	NOT-ADJUDICATED	-	-	-
-S022	api-contract-test-designer	6	151-161	NOT-ADJUDICATED	-	-	-
-S023	api-event-architect	2	51-75	NOT-ADJUDICATED	-	-	-
-S024	application-layer-pattern-advisor	3	76-86	NOT-ADJUDICATED	-	-	-
-S025	appsec-implementer	6	151-175	NOT-ADJUDICATED	-	-	-
-S026	authentication-flow-reviewer	2	51-75	NOT-ADJUDICATED	-	-	-
-S027	authority-invalidation-architect	0	1-25	NOT-ADJUDICATED	-	-	-
-S028	authorization-matrix-designer	9	226-250	NOT-ADJUDICATED	-	-	-
-S029	aws-saas-architect	2	51-75	NOT-ADJUDICATED	-	-	-
-S030	aws-saas-architect	9	226-250	NOT-ADJUDICATED	-	-	-
-S031	azure-saas-architect	5	126-150	NOT-ADJUDICATED	-	-	-
-S032	background-job-orchestration-architect	7	176-200	NOT-ADJUDICATED	-	-	-
-S033	background-job-orchestration-architect	8	201-225	NOT-ADJUDICATED	-	-	-
-S034	browser-boundary-reviewer	0	1-25	NOT-ADJUDICATED	-	-	-
-S035	caching-strategy-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S036	chat-backlog-reconciliation	0	1-25	NOT-ADJUDICATED	-	-	-
-S037	ci-failure-classifier	9	226-250	NOT-ADJUDICATED	-	-	-
-S038	ci-pipeline-architect	5	126-150	NOT-ADJUDICATED	-	-	-
-S039	clickthrough-test-engineer	6	151-154	NOT-ADJUDICATED	-	-	-
-S040	cloud-architecture-decider	3	76-100	NOT-ADJUDICATED	-	-	-
-S041	cloud-architecture-decider	16	401-413	NOT-ADJUDICATED	-	-	-
-S042	cloud-security-baseline-reviewer	5	126-150	NOT-ADJUDICATED	-	-	-
-S043	command-gateway-architect	2	51-75	NOT-ADJUDICATED	-	-	-
-S044	compliance-control-foundation	1	26-50	NOT-ADJUDICATED	-	-	-
-S045	compliance-control-foundation	5	126-150	NOT-ADJUDICATED	-	-	-
-S046	compliance-evidence-collector	4	101-125	NOT-ADJUDICATED	-	-	-
-S047	compliance-evidence-collector	5	126-150	NOT-ADJUDICATED	-	-	-
-S048	compliance-gap-auditor	5	126-150	NOT-ADJUDICATED	-	-	-
-S049	compliance-gap-auditor	8	201-214	NOT-ADJUDICATED	-	-	-
-S050	context-co-update-ci-gate	5	126-150	NOT-ADJUDICATED	-	-	-
-S051	contribution-guide-author	5	126-150	NOT-ADJUDICATED	-	-	-
-S052	contribution-guide-author	6	151-175	NOT-ADJUDICATED	-	-	-
-S053	cross-team-dependency-negotiator	0	1-25	NOT-ADJUDICATED	-	-	-
-S054	cross-team-dependency-negotiator	1	26-50	NOT-ADJUDICATED	-	-	-
-S055	dast-safety-harness-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S056	dast-safety-harness-designer	3	76-100	NOT-ADJUDICATED	-	-	-
-S057	data-flow-diagrammer	0	1-25	NOT-ADJUDICATED	-	-	-
-S058	data-partitioning-sharding-strategist	7	176-182	NOT-ADJUDICATED	-	-	-
-S059	data-quality-monitor-designer	0	1-25	NOT-ADJUDICATED	-	-	-
-S060	database-backup-verifier	1	26-50	NOT-ADJUDICATED	-	-	-
-S061	defect-triage-facilitator	0	1-25	NOT-ADJUDICATED	-	-	-
-S062	design-review-facilitator	4	101-125	NOT-ADJUDICATED	-	-	-
-S063	design-system-token-governor	0	1-25	NOT-ADJUDICATED	-	-	-
-S064	docs-as-code-architect	5	126-150	NOT-ADJUDICATED	-	-	-
-S065	docs-first-implementer	4	101-125	NOT-ADJUDICATED	-	-	-
-S066	docs-retention-index	8	201-209	NOT-ADJUDICATED	-	-	-
-S067	domain-modeler	5	126-130	NOT-ADJUDICATED	-	-	-
-S068	edge-function-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S069	error-handling-security-reviewer	2	51-75	NOT-ADJUDICATED	-	-	-
-S070	error-taxonomy-designer	7	176-200	NOT-ADJUDICATED	-	-	-
-S071	event-schema-architect	0	1-25	NOT-ADJUDICATED	-	-	-
-S072	event-schema-architect	5	126-150	NOT-ADJUDICATED	-	-	-
-S073	feature-flag-rollout-strategist	4	101-125	NOT-ADJUDICATED	-	-	-
-S074	file-upload-storage-architect	4	101-125	NOT-ADJUDICATED	-	-	-
-S075	file-upload-storage-architect	7	176-200	NOT-ADJUDICATED	-	-	-
-S076	flaky-test-detective	5	126-150	NOT-ADJUDICATED	-	-	-
-S077	frontend-perf-engineer	2	51-75	NOT-ADJUDICATED	-	-	-
-S078	frontend-perf-engineer	11	276-281	NOT-ADJUDICATED	-	-	-
-S079	full-codebase-auditor	2	51-75	NOT-ADJUDICATED	-	-	-
-S080	full-codebase-auditor	3	76-100	NOT-ADJUDICATED	-	-	-
-S081	gated-deployment-prompt-template	3	76-100	NOT-ADJUDICATED	-	-	-
-S082	gated-deployment-prompt-template	8	201-210	NOT-ADJUDICATED	-	-	-
-S083	graphql-boundary-reviewer	1	26-50	NOT-ADJUDICATED	-	-	-
-S084	horizontal-scalability-reviewer	0	1-25	NOT-ADJUDICATED	-	-	-
-S085	horizontal-scalability-reviewer	4	101-125	NOT-ADJUDICATED	-	-	-
-S086	horizontal-scalability-reviewer	7	176-199	NOT-ADJUDICATED	-	-	-
-S087	human-agent-trust-reviewer	2	51-75	NOT-ADJUDICATED	-	-	-
-S088	human-agent-trust-reviewer	6	151-175	NOT-ADJUDICATED	-	-	-
-S089	human-agent-trust-reviewer	8	201-221	NOT-ADJUDICATED	-	-	-
-S090	human-approval-boundary	5	126-147	NOT-ADJUDICATED	-	-	-
-S091	import-pipeline-architect	0	1-25	NOT-ADJUDICATED	-	-	-
-S092	incident-response-runbook	4	101-125	NOT-ADJUDICATED	-	-	-
-S093	incident-response-runbook	8	201-222	NOT-ADJUDICATED	-	-	-
-S094	inter-agent-comms-reviewer	5	126-150	NOT-ADJUDICATED	-	-	-
-S095	intra-tenant-scope-architect	2	51-75	NOT-ADJUDICATED	-	-	-
-S096	intra-tenant-scope-architect	7	176-200	NOT-ADJUDICATED	-	-	-
-S097	iso-42001-aims-architect	1	26-50	NOT-ADJUDICATED	-	-	-
-S098	lane-authoring-guide	3	76-100	NOT-ADJUDICATED	-	-	-
-S099	lane-authoring-guide	6	151-175	NOT-ADJUDICATED	-	-	-
-S100	latency-budget-architect	7	176-200	NOT-ADJUDICATED	-	-	-
-S101	library-diff-reviewer	6	151-175	NOT-ADJUDICATED	-	-	-
-S102	llm-output-safety-reviewer	9	226-250	NOT-ADJUDICATED	-	-	-
-S103	load-test-planner	0	1-25	NOT-ADJUDICATED	-	-	-
-S104	load-test-planner	2	51-75	NOT-ADJUDICATED	-	-	-
-S105	local-ci-mirror-preflight	3	76-100	NOT-ADJUDICATED	-	-	-
-S106	memory-context-poisoning-reviewer	1	26-50	NOT-ADJUDICATED	-	-	-
-S107	memory-context-poisoning-reviewer	8	201-205	NOT-ADJUDICATED	-	-	-
-S108	mobile-journey-test-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S109	mobile-viewport-craft	5	126-150	NOT-ADJUDICATED	-	-	-
-S110	mobile-viewport-craft	6	151-175	NOT-ADJUDICATED	-	-	-
-S111	model-context-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S112	modernization-cutover-planner	1	26-50	NOT-ADJUDICATED	-	-	-
-S113	multi-tenant-security-tester	0	1-25	NOT-ADJUDICATED	-	-	-
-S114	n-plus-one-detector	8	201-225	NOT-ADJUDICATED	-	-	-
-S115	offline-first-sync-architect	9	226-237	NOT-ADJUDICATED	-	-	-
-S116	onboarding-doc-designer	1	26-50	NOT-ADJUDICATED	-	-	-
-S117	outbound-integration-adapter-designer	1	26-50	NOT-ADJUDICATED	-	-	-
-S118	pagination-cursor-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S119	pagination-cursor-designer	7	176-200	NOT-ADJUDICATED	-	-	-
-S120	performance-test-harness	3	76-100	NOT-ADJUDICATED	-	-	-
-S121	phased-work-handoff-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S122	phased-work-handoff-designer	4	101-125	NOT-ADJUDICATED	-	-	-
-S123	plan-entitlement-architect	7	176-200	NOT-ADJUDICATED	-	-	-
-S124	plan-entitlement-architect	8	201-202	NOT-ADJUDICATED	-	-	-
-S125	playwright-e2e-engineer	6	151-171	NOT-ADJUDICATED	-	-	-
-S126	prioritization-frame-picker	1	26-50	NOT-ADJUDICATED	-	-	-
-S127	product-analytics-instrumenter	1	26-50	NOT-ADJUDICATED	-	-	-
-S128	product-analytics-instrumenter	3	76-100	NOT-ADJUDICATED	-	-	-
-S129	product-spec-writer	0	1-25	NOT-ADJUDICATED	-	-	-
-S130	product-spec-writer	5	126-150	NOT-ADJUDICATED	-	-	-
-S131	profiling-methodology-designer	0	1-25	NOT-ADJUDICATED	-	-	-
-S132	project-orchestrator	4	101-125	NOT-ADJUDICATED	-	-	-
-S133	project-orchestrator	16	401-425	NOT-ADJUDICATED	-	-	-
-S134	property-based-test-designer	1	26-50	NOT-ADJUDICATED	-	-	-
-S135	query-plan-reader	6	151-175	NOT-ADJUDICATED	-	-	-
-S136	rag-security-architect	2	51-75	NOT-ADJUDICATED	-	-	-
-S137	readme-craftsman	3	76-100	NOT-ADJUDICATED	-	-	-
-S138	realtime-subscription-architect	4	101-125	NOT-ADJUDICATED	-	-	-
-S139	regression-suite-curator	0	1-25	NOT-ADJUDICATED	-	-	-
-S140	release-readiness-reviewer	3	76-100	NOT-ADJUDICATED	-	-	-
-S141	release-readiness-reviewer	7	176-193	NOT-ADJUDICATED	-	-	-
-S142	resilience-architecture-reviewer	7	176-200	NOT-ADJUDICATED	-	-	-
-S143	risk-tiered-validation-selector	4	101-125	NOT-ADJUDICATED	-	-	-
-S144	roadmap-to-commitments-translator	1	26-50	NOT-ADJUDICATED	-	-	-
-S145	roadmap-under-uncertainty-planner	8	201-203	NOT-ADJUDICATED	-	-	-
-S146	saas-cost-architect	3	76-100	NOT-ADJUDICATED	-	-	-
-S147	saas-platform-architect	0	1-25	NOT-ADJUDICATED	-	-	-
-S148	saas-platform-architect	1	26-50	NOT-ADJUDICATED	-	-	-
-S149	scoped-approval-register	6	151-175	NOT-ADJUDICATED	-	-	-
-S150	screenshot-evidence-planner	0	1-25	NOT-ADJUDICATED	-	-	-
-S151	screenshot-evidence-planner	2	51-75	NOT-ADJUDICATED	-	-	-
-S152	search-architecture-designer	1	26-50	NOT-ADJUDICATED	-	-	-
-S153	search-architecture-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S154	search-architecture-designer	7	176-200	NOT-ADJUDICATED	-	-	-
-S155	secrets-identity-hardener	4	101-125	NOT-ADJUDICATED	-	-	-
-S156	secure-migration-reviewer	6	151-175	NOT-ADJUDICATED	-	-	-
-S157	security-logging-alerting-architect	5	126-150	NOT-ADJUDICATED	-	-	-
-S158	security-scan-orchestrator	2	51-75	NOT-ADJUDICATED	-	-	-
-S159	security-scan-orchestrator	4	101-125	NOT-ADJUDICATED	-	-	-
-S160	skill-quality-reviewer	7	176-200	NOT-ADJUDICATED	-	-	-
-S161	skill-selection-advisor	4	101-125	NOT-ADJUDICATED	-	-	-
-S162	skill-usage-instrumenter	5	126-150	NOT-ADJUDICATED	-	-	-
-S163	skill-usage-ledger	1	26-50	NOT-ADJUDICATED	-	-	-
-S164	soc2-trust-criteria-mapper	4	101-125	NOT-ADJUDICATED	-	-	-
-S165	source-currency-auditor	0	1-25	NOT-ADJUDICATED	-	-	-
-S166	source-currency-auditor	4	101-125	NOT-ADJUDICATED	-	-	-
-S167	staff-scope-selector	2	51-75	NOT-ADJUDICATED	-	-	-
-S168	standing-approval-and-auto-advance	3	76-100	NOT-ADJUDICATED	-	-	-
-S169	state-machine-modeler	2	51-75	NOT-ADJUDICATED	-	-	-
-S170	static-analysis-reviewer	0	1-25	NOT-ADJUDICATED	-	-	-
-S171	static-analysis-reviewer	2	51-75	NOT-ADJUDICATED	-	-	-
-S172	streaming-event-architect	1	26-50	NOT-ADJUDICATED	-	-	-
-S173	streaming-event-architect	6	151-175	NOT-ADJUDICATED	-	-	-
-S174	structured-output-validator	0	1-25	NOT-ADJUDICATED	-	-	-
-S175	structured-output-validator	5	126-150	NOT-ADJUDICATED	-	-	-
-S176	structured-output-validator	8	201-225	NOT-ADJUDICATED	-	-	-
-S177	sunset-deprecation-communicator	1	26-50	NOT-ADJUDICATED	-	-	-
-S178	sunset-deprecation-communicator	2	51-75	NOT-ADJUDICATED	-	-	-
-S179	sunset-deprecation-communicator	9	226-232	NOT-ADJUDICATED	-	-	-
-S180	supply-chain-security-reviewer	1	26-50	NOT-ADJUDICATED	-	-	-
-S181	synthetic-monitoring-architect	1	26-50	NOT-ADJUDICATED	-	-	-
-S182	systematic-debugger	4	101-125	NOT-ADJUDICATED	-	-	-
-S183	tdd-engineer	1	26-50	NOT-ADJUDICATED	-	-	-
-S184	tech-spec-writer	3	76-100	NOT-ADJUDICATED	-	-	-
-S185	technical-debt-classifier	2	51-75	NOT-ADJUDICATED	-	-	-
-S186	tenant-isolation-reviewer	1	26-50	NOT-ADJUDICATED	-	-	-
-S187	tenant-modeler	2	51-75	NOT-ADJUDICATED	-	-	-
-S188	tenant-modeler	7	176-186	NOT-ADJUDICATED	-	-	-
-S189	tenant-provisioning-designer	4	101-114	NOT-ADJUDICATED	-	-	-
-S190	test-data-architect	6	151-167	NOT-ADJUDICATED	-	-	-
-S191	test-plan-designer	4	101-125	NOT-ADJUDICATED	-	-	-
-S192	threat-modeler	1	26-50	NOT-ADJUDICATED	-	-	-
-S193	threat-modeler	3	76-100	NOT-ADJUDICATED	-	-	-
-S194	threat-modeler	6	151-175	NOT-ADJUDICATED	-	-	-
-S195	transaction-scope-designer	0	1-25	NOT-ADJUDICATED	-	-	-
-S196	transaction-scope-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S197	url-state-architect	0	1-25	NOT-ADJUDICATED	-	-	-
-S198	ux-design-iteration	2	51-75	NOT-ADJUDICATED	-	-	-
-S199	ux-design-iteration	12	301-325	NOT-ADJUDICATED	-	-	-
-S200	validation-boundary-designer	2	51-75	NOT-ADJUDICATED	-	-	-
-S201	vite-build-qa-engineer	7	176-191	NOT-ADJUDICATED	-	-	-
-S202	warehouse-lake-architect	0	1-25	NOT-ADJUDICATED	-	-	-
+S001	acceptance-criteria-reviewer	6	151-175	CLEAN	none	151	Output template listing ranked blocking owner questions; ordinary skill output format.
+S002	acceptance-criteria-reviewer	9	226-235	CLEAN	none	226	Supporting-files index naming eval cases and neighbour skills; plain documentation.
+S003	accessibility-test-harness	5	126-150	CLEAN	none	126	Output template and WCAG checklist for accessibility testing; ordinary prose.
+S004	agent-containment-reviewer	4	101-125	CLEAN	none	105	Workflow step designing kill switches that revoke credentials; defensive containment design.
+S005	agent-failure-recovery	1	26-50	CLEAN	none	47	Recovery workflow creating local git rescue refs before mutation; reversible local steps.
+S006	agent-startup-context-gate	2	51-75	CLEAN	none	51	Startup classification guidance citing this repository's landmarks; ordinary context-gate prose.
+S007	agent-startup-context-gate	3	76-100	CLEAN	none	86	Documents a required commit-identity gate, explicitly not a security boundary or bypass.
+S008	agent-startup-context-gate	4	101-125	CLEAN	none	118	Local git identity placeholders for the documented gate; no secrets, no exfiltration.
+S009	ai-closeout-reporter	4	101-125	CLEAN	none	116	Evidence rule requiring remote read-back or UNVERIFIED; anti-overclaiming verification prose.
+S010	ai-closeout-reporter	9	226-232	CLEAN	none	226	Supporting-files index for closeout-reporting evals; plain documentation.
+S011	ai-cost-guardrail-designer	10	251-275	CLEAN	none	255	Cost-abuse gotcha advising server-side key custody; defensive, requests no key value.
+S012	ai-governance-risk-reviewer	7	176-179	CLEAN	none	176	Two supporting-file lines naming eval files; plain documentation.
+S013	ai-human-in-the-loop-designer	1	26-50	CLEAN	none	33	Purpose defining autonomy tiers and human approval; defensive design doctrine.
+S014	ai-human-in-the-loop-designer	4	101-125	CLEAN	none	112	Workflow inventorying AI-originated actions and reversibility; operator-directed design step.
+S015	ai-human-in-the-loop-designer	7	176-200	CLEAN	none	176	Workflow step designing after-the-fact review and pause thresholds; ordinary design prose.
+S016	ai-router-architect	8	201-216	CLEAN	none	207	Reference index for routing design and eval files; plain documentation.
+S017	ai-sdlc-operating-model	2	51-75	CLEAN	none	56	Inputs listing read-only branch-protection queries; audit scoping, no execution order.
+S018	ai-task-decomposer	5	126-150	CLEAN	none	140	Decomposition workflow handing the plan off without starting task 1; scope discipline.
+S019	ai-task-decomposer	10	251-267	CLEAN	none	255	Supporting-files entry for the task-plan template; plain documentation.
+S020	api-contract-test-designer	0	1-25	CLEAN	none	16	Purpose describing contract-drift verification; ordinary test-design prose.
+S021	api-contract-test-designer	3	76-100	CLEAN	none	87	Contract-test workflow step defining CI placement of suites; design guidance.
+S022	api-contract-test-designer	6	151-161	CLEAN	none	154	Supporting-files entry for contract-test patterns; plain documentation.
+S023	api-event-architect	2	51-75	CLEAN	none	69	Inputs listing the API surface and tenant model; ordinary architecture-review scoping.
+S024	application-layer-pattern-advisor	3	76-86	CLEAN	none	85	Provenance note citing the skills catalog; plain documentation.
+S025	appsec-implementer	6	151-175	CLEAN	none	174	Requires the existing approval path before production dependency changes; restraint.
+S026	authentication-flow-reviewer	2	51-75	CLEAN	none	52	Review checklist for authentication flows and recovery paths; verification criteria.
+S027	authority-invalidation-architect	0	1-25	CLEAN	none	1	Glossary of JWT/TTL/CDN terms plus the silent stale-authority bug-class purpose; operator-facing definitional prose.
+S028	authorization-matrix-designer	9	226-250	CLEAN	none	226	Stop-condition routing sends tenant-boundary and privilege-widening requests to human-approval-boundary; no model-addressed text.
+S029	aws-saas-architect	2	51-75	CLEAN	none	51	Do-not-use routing and input checklist delegate provider and tenancy questions to sibling design skills; plain skill prose.
+S030	aws-saas-architect	9	226-250	CLEAN	none	226	Stop conditions keep the skill design-only and route any live-estate change through human-approval-boundary and the IaC process.
+S031	azure-saas-architect	5	126-150	CLEAN	none	126	Azure Defender/Sentinel placement guidance with cost and maturity caveats; tells the operator to verify against current docs.
+S032	background-job-orchestration-architect	7	176-200	CLEAN	none	176	Fairness and scheduled-job checklist plus idempotency gotchas; ordinary architecture-review guidance for a human author.
+S033	background-job-orchestration-architect	8	201-225	CLEAN	none	201	Stop conditions refuse running jobs or load tests against production; design-only posture restated.
+S034	browser-boundary-reviewer	0	1-25	CLEAN	none	1	Frontmatter and purpose declare an advisory, auto-invocable browser-boundary review that edits no code and runs no commands.
+S035	caching-strategy-designer	2	51-75	CLEAN	none	51	Cache-candidate inputs (read/write ratio, staleness, write topology, tenancy) are questions for the operator, not model directives.
+S036	chat-backlog-reconciliation	0	1-25	CLEAN	none	1	Purpose describes extracting chat-only items into dated repo docs and auditing them against PR and commit evidence.
+S037	ci-failure-classifier	9	226-250	CLEAN	none	226	Failure-classification heuristics; the skill stays read-only and asks the user to supply logs and perform any rerun.
+S038	ci-pipeline-architect	5	126-150	CLEAN	none	126	Design-only rule forbids committing secret values and requires scoped diffs and named approval before a check is weakened.
+S039	clickthrough-test-engineer	6	151-154	CLEAN	none	151	Two-line supporting-files and eval-discrimination index; documentation only, no directive or payload.
+S040	cloud-architecture-decider	3	76-100	CLEAN	none	76	Inputs-to-inspect checklist for provider selection; operator-facing discovery questions and acceptance criteria.
+S041	cloud-architecture-decider	16	401-413	CLEAN	none	401	Reference-file and eval-discrimination list naming sibling skills; documentation index with no instructions.
+S042	cloud-security-baseline-reviewer	5	126-150	CLEAN	none	126	Evidence-grading rules (GAP/UNVERIFIED) plus a rule that suggested fixes are text for a person to review and apply.
+S043	command-gateway-architect	2	51-75	CLEAN	none	51	Routing exclusions and the gateway write-surface inventory; standard design-review inputs.
+S044	compliance-control-foundation	1	26-50	CLEAN	none	26	Catalog purpose and use-when routing; states the skill maps verified systems and does not re-implement them.
+S045	compliance-control-foundation	5	126-150	CLEAN	none	126	Validation checklist and SOC 2/ISO precision rules; no address to the consuming model and nothing concealed.
+S046	compliance-evidence-collector	4	101-125	CLEAN	none	101	Evidence-collection workflow; store changes are proposals for a human operator and the skill never executes them.
+S047	compliance-evidence-collector	5	126-150	CLEAN	none	126	Output template and validation checklist; records that no live evidence store was written to or reorganized.
+S048	compliance-gap-auditor	5	126-150	CLEAN	none	126	Gap-report sections, non-opinion disclaimer and checklist; requires evidence citations and forbids improvising requirements.
+S049	compliance-gap-auditor	8	201-214	CLEAN	none	201	Incident routing to the human incident owner plus an empty supporting-files list; ordinary documentation prose.
+S050	context-co-update-ci-gate	5	126-150	CLEAN	none	126	CI-gate checklist and gotchas on ritual updates and silent auto-pass; anti-drift design guidance.
+S051	contribution-guide-author	5	126-150	CLEAN	none	126	CONTRIBUTING validation checklist and gotchas for a human author; external-contributor guidance only.
+S052	contribution-guide-author	6	151-175	CLEAN	none	151	Security-disclosure and audience gotchas plus routing stop conditions; operator-facing prose.
+S053	cross-team-dependency-negotiator	0	1-25	CLEAN	none	1	Frontmatter and purpose contrast human dependency negotiation with the sibling technical-boundary skills.
+S054	cross-team-dependency-negotiator	1	26-50	CLEAN	none	27	Use-when and do-not-use routing for roadmaps, integration boundaries and interface contracts.
+S055	dast-safety-harness-designer	2	51-75	CLEAN	none	51	Routing exclusions plus authorization, ownership, blast-radius and data-sensitivity inputs required before any DAST run.
+S056	dast-safety-harness-designer	3	76-100	CLEAN	none	77	Workflow mandates written authorization, a target allowlist, rate limits, non-destructive probes and fail-closed proofs.
+S057	data-flow-diagrammer	0	1-25	CLEAN	none	1	Frontmatter and purpose declare an advisory, read-only data-flow diagram; no commands, network use or production action.
+S058	data-partitioning-sharding-strategist	7	176-182	CLEAN	none	176	Trailing reference and eval-discrimination note; no directive, no URL, no concealed content.
+S059	data-quality-monitor-designer	0	1-25	CLEAN	none	1	Glossary and purpose define the data-quality monitoring artifact; definitional prose for the operator.
+S060	database-backup-verifier	1	26-50	CLEAN	none	26	Defines VERIFIED/GAP/UNVERIFIED and human-approved drill mode; reports dump files by path and commit only.
+S061	defect-triage-facilitator	0	1-25	CLEAN	none	1	Frontmatter and purpose for advisory defect reporting and triage; no model-directed content.
+S062	design-review-facilitator	4	101-125	CLEAN	none	102	Design-review output template with decision, dissent and boundary-handoff fields; formatting guidance only.
+S063	design-system-token-governor	0	1-25	CLEAN	none	1	Frontmatter and purpose for token governance; restates that the skill is read-only and advisory.
+S064	docs-as-code-architect	5	126-150	CLEAN	none	126	Docs-as-code validation checklist covering PR-based docs, previews and link checks; ordinary design requirements.
+S065	docs-first-implementer	4	101-125	CLEAN	none	101	Implementation report format and verification checklist; demands real command output including failures.
+S066	docs-retention-index	8	201-209	CLEAN	none	201	Supporting-files and eval-discrimination list at the chunk end; documentation only.
+S067	domain-modeler	5	126-130	CLEAN	none	126	Reference and eval index naming sibling design skills; no instruction or payload.
+S068	edge-function-designer	2	51-75	CLEAN	none	51	Edge-function checklist and stop conditions; refuses implementation, execution or approval requests.
+S069	error-handling-security-reviewer	2	51-75	CLEAN	none	51	Error-handling review inputs covering handlers, fail-closed behavior and negative tests; standard review prose.
+S070	error-taxonomy-designer	7	176-200	CLEAN	none	176	Stop conditions keep the error-model scope and escalate disclosure-risk changes to a human before weakening a rule.
+S071	event-schema-architect	0	1-25	CLEAN	none	1	Glossary and purpose for analytics event schema; definitional prose with an explicit boundary to the external API contract.
+S072	event-schema-architect	5	126-150	CLEAN	none	126	Tracking-plan output template and validation checklist including PII minimization and ownership handoffs.
+S073	feature-flag-rollout-strategist	4	101-125	CLEAN	none	101	Rollout guardrails, fail-safe defaults and rollback thresholds; live flag flips follow the repo approval path.
+S074	file-upload-storage-architect	4	101-125	CLEAN	none	101	Upload-security design: narrowly scoped signed URLs, server-derived keys, content validation and quarantine scanning.
+S075	file-upload-storage-architect	7	176-200	CLEAN	none	176	Upload validation checklist restating one-verb signed URLs, content-type checks and RLS handoff.
+S076	flaky-test-detective	5	126-150	CLEAN	none	127	Flake-classification checklist forbidding retries, sleeps, loosened assertions or deletions as fixes.
+S077	frontend-perf-engineer	2	51-75	CLEAN	none	51	Boundary routing and bundle-evidence inputs for performance work; ordinary review prose.
+S078	frontend-perf-engineer	11	276-281	CLEAN	none	276	Short eval-discrimination list at the chunk end; documentation only.
+S079	full-codebase-auditor	2	51-75	CLEAN	none	52	Audit workflow forbids copying credential values and routes apparent live exposure to a human and a guard skill.
+S080	full-codebase-auditor	3	76-100	CLEAN	none	76	Audit dimensions, four-tier evidence scheme and coverage statement; reporting discipline, no model instruction.
+S081	gated-deployment-prompt-template	3	76-100	CLEAN	none	76	Draft-only phase: no repository write or deployment, separate authorization route, user grants stay within actual scope.
+S082	gated-deployment-prompt-template	8	201-210	CLEAN	none	201	Template reference and eval lists; no directive, external fetch or hidden markup.
+S083	graphql-boundary-reviewer	1	26-50	CLEAN	none	27	GraphQL boundary checklist items and an ordered review workflow; standard review prose.
+S084	horizontal-scalability-reviewer	0	1-25	CLEAN	none	1	Glossary and purpose for a scale-out readiness review; no address to the model and nothing concealed.
+S085	horizontal-scalability-reviewer	4	101-125	CLEAN	none	101	Graceful-drain check and ranked-finding output format; ordinary architecture-review guidance.
+S086	horizontal-scalability-reviewer	7	176-199	CLEAN	none	176	Review-scope guidance on target topology, SLO ownership and routing; operator-facing prose, nothing addressed to the model.
+S087	human-agent-trust-reviewer	2	51-75	CLEAN	none	51	Do-NOT-use routing and approval-surface input list; describes what to inspect, not what the model should become.
+S088	human-agent-trust-reviewer	6	151-175	CLEAN	none	151	AI Security Rules on consent fatigue and treating agent self-reports as claims; defensive doctrine, no payload.
+S089	human-agent-trust-reviewer	8	201-221	CLEAN	none	201	Handoff routing plus Supporting Files list; ordinary skill documentation with no model-directed instruction.
+S090	human-approval-boundary	5	126-147	CLEAN	none	126	Stop Conditions for ambiguous human approval plus a references note; instructs asking again, not overriding.
+S091	import-pipeline-architect	0	1-25	CLEAN	none	1	Frontmatter, purpose and Use-When for a design-only import skill; descriptive prose, no imperative to the model.
+S092	incident-response-runbook	4	101-125	CLEAN	none	101	Runbook design steps on evidence capture and blameless postmortem; standard procedure text for a human author.
+S093	incident-response-runbook	8	201-222	CLEAN	none	201	Non-trigger routing to SLO and legal owners plus Supporting Files; operator-facing, no model-directed content.
+S094	inter-agent-comms-reviewer	5	126-150	CLEAN	none	126	Output template with placeholders; explicitly treats messages as data and rejects approval assertions.
+S095	intra-tenant-scope-architect	2	51-75	CLEAN	none	52	Inputs-to-inspect list about tenant scope axes and role models; advisory design prose only.
+S096	intra-tenant-scope-architect	7	176-200	CLEAN	none	177	Invariants stating scope authority is derived server-side; deny-by-default doctrine, purely defensive.
+S097	iso-42001-aims-architect	1	26-50	CLEAN	none	26	AIMS provenance note and Use-When bullets; design-only guidance, no instruction addressed to the model.
+S098	lane-authoring-guide	3	76-100	CLEAN	none	76	Lane-guide authoring steps covering contracts, recipes and MUST-NOT boundaries; operator instructions.
+S099	lane-authoring-guide	6	151-175	CLEAN	none	151	Stop conditions for an undecided lane split plus a template reference; guidance aimed at the human author.
+S100	latency-budget-architect	7	176-200	CLEAN	none	177	Latency budget output template with placeholder fields; no instruction, no concealed content.
+S101	library-diff-reviewer	6	151-175	CLEAN	none	151	Validation checklist and gotchas for PR-level diff review; defensive review prose, nothing actionable on the model.
+S102	llm-output-safety-reviewer	9	226-250	CLEAN	none	226	Stop Conditions routing injection and live exploits to owning skills; defensive handoff prose.
+S103	load-test-planner	0	1-25	CLEAN	none	1	Frontmatter and purpose describing evidence-based load planning; narrative description only.
+S104	load-test-planner	2	51-75	CLEAN	none	51	Inputs-to-inspect list on traffic evidence, tenant mix and SLO targets; advisory design prose.
+S105	local-ci-mirror-preflight	3	76-100	CLEAN	none	76	Execution policy: human invocation does not expand target, existing grants used, authority obtained before state changes.
+S106	memory-context-poisoning-reviewer	1	26-50	CLEAN	none	26	Scope boundaries separating training poisoning and retrieval authz from agent memory; taxonomy prose.
+S107	memory-context-poisoning-reviewer	8	201-205	CLEAN	none	201	Short Supporting Files list of eval paths; no instruction, no concealed content.
+S108	mobile-journey-test-designer	2	51-75	CLEAN	none	52	Output template naming handoff owners (clickthrough, playwright); placeholder text only.
+S109	mobile-viewport-craft	5	126-150	CLEAN	none	126	Reference link and mobile viewport output template; placeholder fields, no instruction.
+S110	mobile-viewport-craft	6	151-175	CLEAN	none	151	Validation checklist for responsive design criteria; ordinary QA prose.
+S111	model-context-designer	2	51-75	CLEAN	none	51	Do-NOT-use routing across neighbouring skills; boundary documentation for the operator.
+S112	modernization-cutover-planner	1	26-50	CLEAN	none	27	Cutover schema bullets and workflow steps; ordinary design prose, no model-directed text.
+S113	multi-tenant-security-tester	0	1-25	CLEAN	none	1	Frontmatter marking the skill manual-only plus its purpose; the only directive is restrictive.
+S114	n-plus-one-detector	8	201-225	CLEAN	none	201	Gotchas and stop conditions; refuses auto-selection and excess authority, fully defensive.
+S115	offline-first-sync-architect	9	226-237	CLEAN	none	226	Supporting Files list naming eval files; no instruction or concealed content.
+S116	onboarding-doc-designer	1	26-50	CLEAN	none	26	Use and Do-NOT-use routing for onboarding docs; operator-facing scope boundaries.
+S117	outbound-integration-adapter-designer	1	26-50	CLEAN	none	27	Adapter concern bullets and workflow steps; ordinary architecture guidance.
+S118	pagination-cursor-designer	2	51-75	CLEAN	none	51	Inputs on the sort surface and the authorization predicate; advisory design prose.
+S119	pagination-cursor-designer	7	176-200	CLEAN	none	176	Gotchas on forged cursors and base64 reversibility; defensive tenant-isolation doctrine.
+S120	performance-test-harness	3	76-100	CLEAN	none	77	Inputs-to-inspect list for a perf harness, citing owning skills; advisory prose.
+S121	phased-work-handoff-designer	2	51-75	CLEAN	none	51	Handoff design steps requiring proven-invocation evidence; ordinary procedure.
+S122	phased-work-handoff-designer	4	101-125	CLEAN	none	101	Handoff template and validation checklist; placeholder content, no instruction.
+S123	plan-entitlement-architect	7	176-200	CLEAN	none	176	Stop conditions on capability loss and billing scope; operator-facing routing.
+S124	plan-entitlement-architect	8	201-202	CLEAN	none	201	Single trailing line of a Supporting Files list; no content of concern.
+S125	playwright-e2e-engineer	6	151-171	CLEAN	none	151	Stop conditions and Supporting Files for end-to-end specs; review prose.
+S126	prioritization-frame-picker	1	26-50	CLEAN	none	26	Purpose and Use-When for prioritization frames; narrative description.
+S127	product-analytics-instrumenter	1	26-50	CLEAN	none	26	Purpose and Do-NOT-use routing for analytics instrumentation; scope boundaries.
+S128	product-analytics-instrumenter	3	76-100	CLEAN	none	76	Workflow on client versus server capture and consent gating; advisory design prose.
+S129	product-spec-writer	0	1-25	CLEAN	none	1	Frontmatter, reading key and purpose for product specs; descriptive only.
+S130	product-spec-writer	5	126-150	CLEAN	none	127	Spec output template with placeholder fields; no instruction or hidden content.
+S131	profiling-methodology-designer	0	1-25	CLEAN	none	1	Frontmatter and purpose explaining profiling methodology; explanatory prose.
+S132	project-orchestrator	4	101-125	CLEAN	none	102	Orchestrator rule dividing business decisions (user) from engineering mechanics (owning skills); scoping policy.
+S133	project-orchestrator	16	401-425	CLEAN	none	401	Gotchas about duplication, silent scope drift and over-gating; defensive review prose.
+S134	property-based-test-designer	1	26-50	CLEAN	none	26	Use and Do-NOT-use routing plus workflow for property tests; advisory, hands execution off.
+S135	query-plan-reader	6	151-175	CLEAN	none	152	Query plan output template with placeholders; no instruction, no concealed content.
+S136	rag-security-architect	2	51-75	CLEAN	none	51	RAG authorization inputs and workflow enforcing scope at retrieval time; defensive doctrine.
+S137	readme-craftsman	3	76-100	CLEAN	none	76	README ordering, cutting and maintenance steps; ordinary writing guidance.
+S138	realtime-subscription-architect	4	101-125	CLEAN	none	101	Subscription authorization and fan-out design steps; defensive architecture prose.
+S139	regression-suite-curator	0	1-25	CLEAN	none	1	Frontmatter and purpose for regression-suite curation; narrative description.
+S140	release-readiness-reviewer	3	76-100	CLEAN	none	76	Release verification steps on provenance, migrations and rollback; review prose.
+S141	release-readiness-reviewer	7	176-193	CLEAN	none	176	Stop conditions declining to convert a No-Go into a Go; routes overrides to human approval.
+S142	resilience-architecture-reviewer	7	176-200	CLEAN	none	177	Resilience review output template with placeholder fields; no instruction.
+S143	risk-tiered-validation-selector	4	101-125	CLEAN	none	101	Validation-tier record format and rules-honesty guidance; ordinary prose.
+S144	roadmap-to-commitments-translator	1	26-50	CLEAN	none	26	Use and Do-NOT-use routing for roadmap commitments; operator-facing scope boundaries.
+S145	roadmap-under-uncertainty-planner	8	201-203	CLEAN	none	201	supporting-files line names trigger-evals and sibling skills for routing discrimination; no model addressee
+S146	saas-cost-architect	3	76-100	CLEAN	none	76	cost-driver workflow; "the model is an estimate" means the cost model, not the consuming model
+S147	saas-platform-architect	0	1-25	CLEAN	none	1	frontmatter and purpose define per-component tenancy; quoted slogan "we're multi-tenant" is illustrative
+S148	saas-platform-architect	1	26-50	CLEAN	none	26	Use When and Do NOT use routing to sibling skills; practitioner-facing scope, no model-directed payload
+S149	scoped-approval-register	6	151-175	CLEAN	none	151	approval-register rules require verbatim sourced wording and refuse manufactured or backdated grants
+S150	screenshot-evidence-planner	0	1-25	CLEAN	none	1	purpose defines screenshot evidence policy; states this skill itself "captures nothing"
+S151	screenshot-evidence-planner	2	51-75	CLEAN	none	51	checkpoint, naming and masking workflow; mandatory masking is a professional control, not a model directive
+S152	search-architecture-designer	1	26-50	CLEAN	none	26	Use When scope boundaries; injection and leak risks named only as rag-security-architect's remit
+S153	search-architecture-designer	2	51-75	CLEAN	none	51	input inventory on relevance, freshness and tenant model; ordinary architecture-analysis prose
+S154	search-architecture-designer	7	176-200	CLEAN	none	177	gotchas describe tenant-filter leaks and demand fail-closed isolation; defensive review guidance
+S155	secrets-identity-hardener	4	101-125	CLEAN	none	101	report template records exposed secrets by name and location, explicitly "(values NOT printed)"
+S156	secure-migration-reviewer	6	151-175	CLEAN	none	151	migration gotchas and stop conditions; requires approval before applying, no instruction to the reader
+S157	security-logging-alerting-architect	5	126-150	CLEAN	none	127	deliverables list detection coverage, alert rules and blind spots; planning prose with no addressee payload
+S158	security-scan-orchestrator	2	51-75	CLEAN	none	51	Use When and Do NOT use boundaries against neighbouring skills; routing guidance only
+S159	security-scan-orchestrator	4	101-125	CLEAN	none	101	report template says "Do NOT triage or fix here"; aggregation boundary stated for the operator
+S160	skill-quality-reviewer	7	176-200	CLEAN	none	176	stop conditions refuse softening a FAIL and refuse editing the reviewed skill; integrity controls
+S161	skill-selection-advisor	4	101-125	CLEAN	none	101	"Load the read-only inputs" is a workflow step to read catalog and manifest; staleness rule, no payload
+S162	skill-usage-instrumenter	5	126-150	CLEAN	none	126	instrumentation design requires minimization; "never captured: prompt/response content" is a privacy control
+S163	skill-usage-ledger	1	26-50	CLEAN	none	27	ledger inputs; validation script runs read-only and manifest refresh needs user authorization
+S164	soc2-trust-criteria-mapper	4	101-125	CLEAN	none	101	SOC 2 category and Type mapping guidance; "Never invent criteria IDs" is an evidence-integrity rule
+S165	source-currency-auditor	0	1-25	CLEAN	none	1	purpose explains the citation-currency sweep and that it flags rather than verifies
+S166	source-currency-auditor	4	101-125	CLEAN	none	101	output format flags stale citations; "this sweep verifies nothing" keeps the audit read-only
+S167	staff-scope-selector	2	51-75	CLEAN	none	51	staff scope workflow on leverage and under-owned problems; ordinary org-career guidance
+S168	standing-approval-and-auto-advance	3	76-100	CLEAN	none	76	governance design restates the approval floor and limits auto-advance to covered steps
+S169	state-machine-modeler	2	51-75	CLEAN	none	51	state-machine checklist and stop conditions route implementation and approval requests elsewhere
+S170	static-analysis-reviewer	0	1-25	CLEAN	none	1	frontmatter and purpose define SAST triage; "A scanner hit is a lead" frames findings as untrusted
+S171	static-analysis-reviewer	2	51-75	CLEAN	none	51	inputs and triage workflow trace each finding against real source; ordinary review steps
+S172	streaming-event-architect	1	26-50	CLEAN	none	27	Use When boundaries for internal event design; routes public contracts to api-event-architect
+S173	streaming-event-architect	6	151-175	CLEAN	none	152	streaming-design output template listing non-guarantees and handoffs; planning prose
+S174	structured-output-validator	0	1-25	CLEAN	none	1	purpose treats model output as untrusted input and requires validate-before-use; defensive design prose
+S175	structured-output-validator	5	126-150	CLEAN	none	126	validation ladder and checklist; "never silently repaired" forbids quiet handling of failures
+S176	structured-output-validator	8	201-225	CLEAN	none	201	gotchas and stop conditions hand sink and tool concerns to other skills; no payload
+S177	sunset-deprecation-communicator	1	26-50	CLEAN	none	26	Use When and Do NOT use for product sunset communications; routing only
+S178	sunset-deprecation-communicator	2	51-75	CLEAN	none	51	sunset inputs require a decided rationale and a dependency map; ordinary planning prose
+S179	sunset-deprecation-communicator	9	226-232	CLEAN	none	226	supporting-files list names evals and discrimination targets; documentation only
+S180	supply-chain-security-reviewer	1	26-50	CLEAN	none	26	supply-chain purpose names a "postinstall" script pulling a remote blob as a finding to review
+S181	synthetic-monitoring-architect	1	26-50	CLEAN	none	26	synthetic monitoring scope; probes must not execute "against production"; safety limit only
+S182	systematic-debugger	4	101-125	CLEAN	none	102	debugging checklist and gotchas about flaky verification; ordinary engineering guidance
+S183	tdd-engineer	1	26-50	CLEAN	none	27	TDD use-when and inputs; "tests first" describes a methodology, not a directive to the model
+S184	tech-spec-writer	3	76-100	CLEAN	none	76	spec workflow on cross-cutting concerns and one atomic owner question; ordinary design prose
+S185	technical-debt-classifier	2	51-75	CLEAN	none	51	debt classifier checklist and stop conditions; evidence-integrity rules, no addressee payload
+S186	tenant-isolation-reviewer	1	26-50	CLEAN	none	26	tenant-isolation scope routing, including delegating full security review to a named subagent skill
+S187	tenant-modeler	2	51-75	CLEAN	none	52	tenant-modeler inputs and workflow; ask-one-question discipline, no execution authority
+S188	tenant-modeler	7	176-186	CLEAN	none	177	supporting-files list for tenant-modeler; evals and sibling-skill discrimination only
+S189	tenant-provisioning-designer	4	101-114	CLEAN	none	101	validation and stop conditions refuse live provisioning and destructive action; design-only boundary
+S190	test-data-architect	6	151-167	CLEAN	none	151	test-data stop conditions and supporting files; seed implementation handed to engineer skills
+S191	test-plan-designer	4	101-125	CLEAN	none	101	test-plan output and checklist requiring traceability and objective exit criteria
+S192	threat-modeler	1	26-50	CLEAN	none	27	threat-modeler scope routing; prompt injection named only as ai-threat-modeler's remit
+S193	threat-modeler	3	76-100	CLEAN	none	76	threat workflow quotes an abuse case "wrong-tenant authenticated user calls export" as a scenario to model
+S194	threat-modeler	6	151-175	CLEAN	none	151	threat-model gotchas and stop conditions; refuse requests to delete threats so the model looks clean
+S195	transaction-scope-designer	0	1-25	CLEAN	none	1	frontmatter and purpose fix the transaction-scope artifact; advisory design-only, no code edits
+S196	transaction-scope-designer	2	51-75	CLEAN	none	51	transaction checklist and stop conditions route implementation elsewhere; no model directive
+S197	url-state-architect	0	1-25	CLEAN	none	1	url-state purpose states the skill does not edit code, is advisory and uses no network
+S198	ux-design-iteration	2	51-75	CLEAN	none	51	UX iteration inputs list request, records and hard constraints; ordinary professional workflow
+S199	ux-design-iteration	12	301-325	CLEAN	none	301	readiness checklist binds evidence to the candidate and reports unrun checks; integrity controls
+S200	validation-boundary-designer	2	51-75	CLEAN	none	51	boundary-validation output template routes policies to named owners; documentation only
+S201	vite-build-qa-engineer	7	176-191	CLEAN	none	176	Vite QA gotchas: rotate leaked credentials and hand env restructuring to a manual-only skill
+S202	warehouse-lake-architect	0	1-25	CLEAN	none	1	warehouse-lake purpose contrasts swamp and sprawl and names neighbouring skills; ordinary scope prose
