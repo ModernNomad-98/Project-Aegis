@@ -21,7 +21,7 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **129,488 B**, LF-normalized sha256 `2cc6329141423811abe7137e56cd04c429aa4dad31f22b282ebc6c9293cf5b7c`, Git blob `2937521e9f74508755b67f82be80bfdcda89436c` |
+| Page after the section 7.3 insert and review revisions | **130,370 B**, LF-normalized sha256 `63655954183c03bf434beacbc87a491cb531c9ac1ddc985c6af3e41461eceb2e`, Git blob `9550f37470f9b03d725c4570941adf006ef0037d` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
@@ -204,8 +204,8 @@ contract itself is Item 6's and is cited, not duplicated:
 The v1 record Git blob `f16e720894a27f75d74ae188c6365f242dd9eb63` and the v2
 record Git blob `dd63e7690ddca7d305949b11c1cbf7bfbdd28d1e` are unchanged at every
 pin where each exists, including the accepted main. These are **Git object IDs**,
-not working-file SHA-256 values; C1's generated v2 file hash `d6db86a3...` is a
-different object (the committed example record's bytes). No v1 path is removed or
+not working-file SHA-256 values; The committed example record's Git blob is `dd63e769...`;
+C1's generated working-file SHA-256 is `d6db86a3...`; they are different objects. No v1 path is removed or
 modified by the v2 profile, so v1 history is preserved by construction rather
 than by a migration step.
 
@@ -229,8 +229,8 @@ behaviour requests (atomic record write, a new fail-closed code for an existing
 record path, testing `agent-commit`) are recorded as out of scope / **UNRUN**
 rather than claimed. `tools-tests-linux`, `tools-tests-windows` and
 `windows-offline-checks` were **skipped** by design for a docs-only change and
-are UNRUN, never passes. This acceptance is bound to the page **working-file** sha256
-the LF-normalized sha256 `2cc63291...5b7c` (Git blob `2937521e...`) and the installer at `2a7e9c06`; a later page edit invalidates
+are UNRUN, never passes. This acceptance is bound to the page's LF-normalized working-file sha256
+`63655954...eceb2e` (Git blob `9550f374...`) and the installer at `2a7e9c06`; a later page edit invalidates
 it and requires a rerun. The commit that carries this record re-triggers CI;
 that later run is delivery-stage evidence and is not claimed here.
 
@@ -257,7 +257,8 @@ that later run is delivery-stage evidence and is not claimed here.
   remediation is tracked as [issue #966](https://github.com/ModernNomad-98/Project-Aegis/issues/966).
 - **An external `-RecordPath`** - the harness supports it (S4-6), but it is not an
   in-repository v2 receipt and does not satisfy this transition's completion
-  rule; no external-path transition was accepted.
+  rule; no external-path transition was accepted. An external v1 record is
+  likewise not a valid starting point; the v1 record must be inside the target.
 - **Review, CI and merge** - delivery-stage work; a PR is opened, not merged.
   Skipped or pending jobs are never counted as passes. Advisory review
   findings are dispositioned in the PR body, not silently absorbed.

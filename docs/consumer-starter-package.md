@@ -1392,8 +1392,9 @@ substitution of the old record.
 **Prerequisites.** The target is the consumer repository already described in P1;
 its 39 v1 files are byte-identical to the pin `ffb040c7a363648856475280646bbd142dfabe4e`
 (tree `88a5aee4ad928a49c2fb945032585843ec652da7`) and its v1 install record is
-intact at the path the v1 procedure wrote (by default
-`docs/consumer-install-record.md`). Every already-existing selected skill directory
+intact **inside the target repository** at the path the v1 procedure wrote (by default
+`docs/consumer-install-record.md`); a v1 record kept outside the target is not a
+valid starting point for this completion rule. Every already-existing selected skill directory
 must contain **only** that skill's packaged files and every one of those must be
 byte-identical to the pin: a foreign file (for example
 `.claude/skills/code-reviewer/notes.md`) is refused with exit **20**, and a
@@ -1426,15 +1427,21 @@ $Tgt = 'C:\path\to\product'
 $OwnerAuthorization = Read-Host -MaskInput 'Owner authorization (non-secret attestation)'
 $RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md'
 if (Test-Path -LiteralPath $RecordPath) { throw "Record path already exists: $RecordPath" }
-if (-not ([IO.Path]::GetFullPath($RecordPath)).StartsWith([IO.Path]::GetFullPath($Tgt), [StringComparison]::OrdinalIgnoreCase)) { throw "Record path is outside the target: $RecordPath" }
+$TgtFull = [IO.Path]::GetFullPath($Tgt).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+$RecFull = [IO.Path]::GetFullPath($RecordPath)
+if (-not $RecFull.StartsWith($TgtFull, [StringComparison]::OrdinalIgnoreCase)) { throw "Record path is outside the target: $RecordPath" }
 pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
 ```
 
-For the **identical rerun only**, after verifying the existing record, omit the
-guard and pass the same, already-verified path:
+For the **identical rerun only**, after verifying the existing record, omit only
+the existence guard and keep the containment check (run in the same session, or
+repeat the `$Mode`, `$Tgt` and `$OwnerAuthorization` setup above):
 
 ```powershell
 $RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md' # verified existing record
+$TgtFull = [IO.Path]::GetFullPath($Tgt).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+$RecFull = [IO.Path]::GetFullPath($RecordPath)
+if (-not $RecFull.StartsWith($TgtFull, [StringComparison]::OrdinalIgnoreCase)) { throw "Record path is outside the target: $RecordPath" }
 pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
 ```
 
@@ -1444,7 +1451,9 @@ optional guidance. The whole snippet requires PowerShell 7.1+ (`pwsh`), because
 path stops the script before the harness runs. `Read-Host -MaskInput` keeps the
 authorization off the console only; it is **non-secret attestation text** because
 the harness receives it as a command-line argument (visible to process listings
-and audit), so run on a host where that exposure is acceptable. Quote every path
+and audit), so run on a host where that exposure is acceptable. Masking is
+shoulder-surfing protection only: quotes or a leading hyphen in the words can be
+mangled or parsed as a parameter by the harness's parameter binder. Quote every path
 because real paths may contain spaces.
 
 Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
