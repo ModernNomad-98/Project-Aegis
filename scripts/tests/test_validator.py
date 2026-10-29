@@ -8750,9 +8750,9 @@ def _dest_junction(link: Path, target: Path) -> None:
 
 
 def test_consumer_install_destination_links():
-    """S4-1..S4-11: destination reparse points are refused before any write, and
-    the install record is refused when it already exists unless the caller asks to
-    resume, with an atomic record write (AEP3-I9)."""
+    """S4-1..S4-11 and S4-19..S4-22: destination reparse points are refused
+    before any write, and the install record is refused when it already exists
+    unless the caller asks to resume, with an atomic record write (AEP3-I9)."""
     if sys.platform != "win32":
         # Junctions are a Windows kernel object. This case is required on
         # Windows and is an expected platform boundary on POSIX, not missing
@@ -8994,7 +8994,7 @@ def test_consumer_install_destination_links():
                 proc = install(target, raced, extra=list(extra), sh_path=wrapper)
                 return target, raced, proc
 
-            # S4-12: a record file that appears between the preflight and P9 is
+            # S4-19: a record file that appears between the preflight and P9 is
             # refused at 24 without the switch, and the appearing file is kept.
             raced_target, raced_record, proc = racing_install("d-raced-noswitch")
             assert proc.returncode == 24, (proc.returncode, proc.stdout, proc.stderr)
@@ -9006,11 +9006,11 @@ def test_consumer_install_destination_links():
             assert len([row for row in raced_rows if row[1] == "FILE"]) == 42, raced_rows
             assert not [row for row in raced_rows if row[0].endswith(".tmp")], (
                 "the refused run left a temp file: %s" % (raced_rows,))
-            ok("S4-12: a record that appears between the preflight and P9 exits 24 "
+            ok("S4-19: a record that appears between the preflight and P9 exits 24 "
                "without the switch, names the path, preserves its bytes and leaves "
                "no temp")
 
-            # S4-13: the same mid-run record with -AllowExistingRecord. The switch
+            # S4-20: the same mid-run record with -AllowExistingRecord. The switch
             # keeps only a record that was already a regular file at the
             # preflight; one that appears later is refused at 24, never skipped.
             raced_target, raced_record, proc = racing_install(
@@ -9024,11 +9024,11 @@ def test_consumer_install_destination_links():
             assert len([row for row in raced_rows if row[1] == "FILE"]) == 42, raced_rows
             assert not [row for row in raced_rows if row[0].endswith(".tmp")], (
                 "the refused run left a temp file: %s" % (raced_rows,))
-            ok("S4-13: -AllowExistingRecord no longer skips a record that appears "
+            ok("S4-20: -AllowExistingRecord no longer skips a record that appears "
                "mid-run - it exits 24, preserves the appearing bytes and writes no "
                "receipt")
 
-            # S4-14: a reparse point at the record path itself. The containment
+            # S4-21: a reparse point at the record path itself. The containment
             # walk runs before the record checks, so this is code 23 (not 24); the
             # outside directory stays empty and the switch changes nothing.
             junction_target = _install_mode_repo(tmp / "d-record-junction", env)
@@ -9054,10 +9054,10 @@ def test_consumer_install_destination_links():
                 "the page does not state the observed 23 for a reparse-point record path")
             assert "a record path that is not an existing regular file" not in flat_page, (
                 "the page still claims 24 for every non-regular-file record path")
-            ok("S4-14: a junction at -RecordPath exits 23 with and without the "
+            ok("S4-21: a junction at -RecordPath exits 23 with and without the "
                "switch, writes nothing through the link, and the page states 23")
 
-            # S4-15: the file-symlink form of the same record-path reparse point
+            # S4-22: the file-symlink form of the same record-path reparse point
             # needs file-symlink privilege on this host. UNRUN if it cannot be
             # created; never counted as a pass.
             symlink_target = _install_mode_repo(tmp / "d-record-symlink", env)
@@ -9078,8 +9078,82 @@ def test_consumer_install_destination_links():
                 assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
                 assert hashlib.sha256(sentinel.read_bytes()).hexdigest() == digest_before, (
                     "a write passed through the record-path file symlink")
-                ok("S4-15: a file symbolic link at -RecordPath exits 23 and the "
+                ok("S4-22: a file symbolic link at -RecordPath exits 23 and the "
                    "external sentinel is unchanged")
+
+            # S4-23: the record leaf is re-checked at P9. With the switch, a record
+            # that existed at the preflight as a regular file and is replaced by a
+            # directory junction after the preflight is refused at 23 instead of
+            # being kept ("left unchanged") or failing late at 25.
+            swap_target = _install_mode_repo(tmp / "d-record-swap", env)
+            swap_record = swap_target / "docs" / "consumer-install-record.md"
+            swap_record.parent.mkdir(parents=True, exist_ok=True)
+            swap_record.write_bytes(b"preflight-record\n")
+            swap_outside = tmp / "d-record-swap-outside"
+            swap_outside.mkdir()
+            swap_wrapper = tmp / "d-record-swap-sh.cmd"
+            swap_wrapper.write_bytes(
+                b"@echo off\r\n"
+                + ('del /f /q "%s"\r\n' % swap_record).encode("ascii")
+                + ('mklink /J "%s" "%s" >nul\r\n' % (swap_record, swap_outside)).encode("ascii")
+                + b"echo ok\r\n")
+            proc = install(swap_target, swap_record,
+                           extra=["-AllowExistingRecord"], sh_path=swap_wrapper)
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert "reparse point appeared after the preflight" in proc.stderr, proc.stderr
+            assert "left unchanged" not in proc.stdout, proc.stdout
+            assert os.path.isjunction(swap_record), (
+                "the fixture junction was replaced instead of refused")
+            assert _dest_snapshot(swap_outside) == [], (
+                "a write passed through the record-path junction")
+            swap_rows = _dest_snapshot(swap_target)
+            assert not [row for row in swap_rows if row[0].endswith(".tmp")], (
+                "the refused run left a temp file: %s" % (swap_rows,))
+            ok("S4-23: a junction swapped in at -RecordPath after the preflight is "
+               "refused at 23 under -AllowExistingRecord, not kept and not a late 25")
+
+            # S4-24: the exact DS4 #1 branch needs a FILE symbolic link (a leaf at
+            # P9 that Test-Path -PathType Leaf accepts). Creating one needs
+            # SeCreateSymbolicLinkPrivilege/Developer Mode, which this host lacks,
+            # so the behavioural case is UNRUN. The code path is inspected instead.
+            assert "install record reparse point appeared after the preflight" in harness_text, (
+                "P9 does not re-check the record leaf for a reparse point")
+            probe_link = tmp / "d-record-symlink-probe-link"
+            probe_target = tmp / "d-record-symlink-probe-target"
+            probe_target.write_bytes(b"probe\n")
+            try:
+                os.symlink(probe_target, probe_link)
+            except OSError as exc:
+                skip("UNRUN: file symbolic link at -RecordPath unavailable on this "
+                     "host (%s); the reparse re-check is exercised by S4-23 and its "
+                     "code path by the harness text marker, never counted as a pass"
+                     % str(exc)[:120])
+            else:
+                probe_link.unlink()
+                sym_swap_target = _install_mode_repo(tmp / "d-record-symlink-swap", env)
+                sym_swap_record = sym_swap_target / "docs" / "consumer-install-record.md"
+                sym_swap_record.parent.mkdir(parents=True, exist_ok=True)
+                sym_swap_record.write_bytes(b"preflight-record\n")
+                sym_outside = tmp / "d-record-symlink-swap-sentinel.txt"
+                sym_outside.write_bytes(b"external-record-sentinel\n")
+                sym_digest = hashlib.sha256(sym_outside.read_bytes()).hexdigest()
+                sym_wrapper = tmp / "d-record-symlink-swap-sh.cmd"
+                sym_wrapper.write_bytes(
+                    b"@echo off\r\n"
+                    + ('del /f /q "%s"\r\n' % sym_swap_record).encode("ascii")
+                    + ('mklink "%s" "%s" >nul\r\n' % (sym_swap_record, sym_outside)).encode("ascii")
+                    + b"echo ok\r\n")
+                proc = install(sym_swap_target, sym_swap_record,
+                               extra=["-AllowExistingRecord"], sh_path=sym_wrapper)
+                assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+                assert "left unchanged" not in proc.stdout, proc.stdout
+                assert os.path.islink(sym_swap_record), (
+                    "the fixture file symlink was replaced instead of refused")
+                assert hashlib.sha256(sym_outside.read_bytes()).hexdigest() == sym_digest, (
+                    "a write passed through the record-path file symlink")
+                ok("S4-24: a file symlink swapped in at -RecordPath after the "
+                   "preflight is refused at 23 under -AllowExistingRecord, keeping "
+                   "the external sentinel unchanged")
 
         finally:
             subprocess.run(
@@ -9638,6 +9712,8 @@ def test_consumer_install_record_temp_collision():
                 "the record write truncated the pre-existing .tmp leaf")
             files = [row for row in _dest_snapshot(stale) if row[1] == "FILE"]
             assert len(files) == 43, files  # 41 package + record + stale .tmp
+            assert not list(stale_record.parent.glob("consumer-install-record.md.*.tmp")), (
+                "the record write left a unique GUID temp behind")
             ok("S4-12: a stale file at the old predictable <record>.tmp leaf is "
                "neither truncated nor consumed; the record is written through a "
                "unique temp")
@@ -9661,6 +9737,11 @@ def test_consumer_install_record_temp_collision():
                 assert hashlib.sha256(external.read_bytes()).hexdigest() == digest_before, (
                     "the record write followed the hardlink and rewrote its external peer")
                 assert hard.is_file(), "the pre-existing hardlink leaf was consumed"
+                assert os.path.samefile(hard, external), (
+                    "the pre-existing hardlink no longer names its external peer")
+                assert not list(linked_record.parent.glob(
+                    "consumer-install-record.md.*.tmp")), (
+                    "the record write left a unique GUID temp behind")
                 ok("S4-13: a hardlink at <record>.tmp keeps its external bytes; the "
                    "record is written through a unique temp")
 
@@ -9684,6 +9765,9 @@ def test_consumer_install_record_temp_collision():
                 assert hashlib.sha256(sym_external.read_bytes()).hexdigest() == digest_before, (
                     "the record write followed the symlink outside the verified directory")
                 assert os.path.islink(sym), "the pre-existing symlink leaf was consumed"
+                assert not list(sym_record.parent.glob(
+                    "consumer-install-record.md.*.tmp")), (
+                    "the record write left a unique GUID temp behind")
                 ok("S4-14: a file symlink at <record>.tmp does not redirect the "
                    "write; the external sentinel hash is unchanged")
 
@@ -9810,8 +9894,9 @@ def test_consumer_install_record_nonfile_switch():
 
 
 def test_consumer_install_record_package_overlap():
-    """S4-17: a -RecordPath equal to a package output is refused at 24 before P6
-    can create that output and P9 can mistake it for an existing record."""
+    """S4-17 and S4-25: a -RecordPath that equals a package output, or is nested
+    under one, is refused at 24 before P6 can create that output and before P9 can
+    fail late at 25."""
     if sys.platform != "win32":
         expected_platform_skip(
             "win32",
@@ -9847,6 +9932,21 @@ def test_consumer_install_record_package_overlap():
                 _dest_snapshot(overlap))
             ok("S4-17: a -RecordPath equal to a package output exits 24 before any "
                "package write instead of exit 0 with no receipt")
+
+            # S4-25: the reverse direction. A record path nested under a package
+            # output (AGENTS.md is a package file, not a directory) can never be
+            # written; it is refused at 24 before P6 instead of failing late at 25.
+            nested = _install_mode_repo(tmp / "d-nested-record", env)
+            nested_record = nested / "AGENTS.md" / "record.md"
+            proc = install(nested, nested_record)
+            assert proc.returncode == 24, (proc.returncode, proc.stdout, proc.stderr)
+            assert "overlaps a package output" in proc.stderr, proc.stderr
+            assert not (nested / "AGENTS.md").exists(), (
+                "the package output was written before the nested-overlap refusal")
+            assert not any(row[1] == "FILE" for row in _dest_snapshot(nested)), (
+                _dest_snapshot(nested))
+            ok("S4-25: a -RecordPath nested under a package output exits 24 before "
+               "any package write instead of a late exit 25")
 
             assert "overlaps a package output" in harness_text, (
                 "the published harness does not refuse a record path overlapping a "

@@ -21,13 +21,17 @@ The runnable block under `### 7.1` of the page gained four things:
    **exit 24** unless that switch is passed. This removes the observed C7 outcome
    (files installed, exit 0, no receipt) instead of re-labelling it. The same
    preflight refuses, at **24**, a record path that is an existing directory or
-   another non-file under `-AllowExistingRecord`, and a record path that equals or
-   contains one of the 41 package outputs. It also captures
+   another non-file under `-AllowExistingRecord`, and a record path that equals,
+   contains or is nested under one of the 41 package outputs. It also captures
    `$recordExistedAtPreflight` (`Test-Path -PathType Leaf`), which P9 requires
    before it may keep an existing record: a record file that appears after this
    point is refused at **24** with or without the switch, never silently skipped.
    A reparse point at `-RecordPath` never reaches these checks - the containment
-   walk refuses it at **23**.
+   walk refuses it at **23**. P9 also re-reads the record leaf's attributes
+   (`[IO.File]::GetAttributes`, never a follow) immediately before it keeps or
+   writes the record, so a junction or file symbolic link swapped in **after**
+   the preflight is refused at **23** instead of being kept by the switch or
+   failing late at 25.
 3. An atomic record write: P9 creates a unique create-new temp leaf
    (`<record>.<guid>.tmp`) in the record's own directory, passes that leaf
    through `Assert-DestinationPath` (a failure stops at **25**), opens it with
@@ -48,17 +52,20 @@ new record is written (the package copy has already completed by that point). Th
 switch does not read or verify the kept record's contents, so its "identical
 install" is the caller's attestation rather than an installer check. A reparse
 point at `-RecordPath` is refused by the containment walk at **23** before any
-record check runs, and is never followed.
+record check runs, and is never followed; the P9 leaf re-check covers a link that
+appears after that walk. Exit-25 text states the phase exactly: the 41 package
+files are already written ("the package copy is complete but no record was
+written"), no record is left at `-RecordPath`, and temp removal is best effort.
 
 ## 2. Published block identity
 
 Block = fenced body plus one trailing LF. Extraction is by heading with the same
 fence logic the validator suite and the audit use.
 
-| Block | At `e6947039` (base) | At `9b45b86a` (pre-fix head) | At this revision | Equal |
-| --- | --- | --- | --- | --- |
-| P2 gate | 6,493 B, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` | same | same | **yes** |
-| Section 7.1 harness | 21,977 B, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` | 23,366 B, 405 LF, sha256 `d00e886c5a1fb83d436e2055633094d46f1a85d1ef4da565b66466aa30384c48` | 25,942 B, 443 LF, sha256 `9f4a085a9c210d026735a73e8fe41eed16141337b66f86270857582f95068d8c` | **changed** |
+| Block | At `e6947039` (base) | At `9b45b86a` (pre-fix head) | At `0631d45e` (previous head) | At this revision | Equal |
+| --- | --- | --- | --- | --- | --- |
+| P2 gate | 6,493 B, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` | same | same | same | **yes** |
+| Section 7.1 harness | 21,977 B, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` | 23,366 B, 405 LF, sha256 `d00e886c5a1fb83d436e2055633094d46f1a85d1ef4da565b66466aa30384c48` | 25,942 B, 443 LF, sha256 `9f4a085a9c210d026735a73e8fe41eed16141337b66f86270857582f95068d8c` | 27,424 B, 464 LF, sha256 `0ed93f31e611c3535790791a04eec65c1302eb98759d1e0e714ceb854c0a00da` | **changed** |
 
 The base identities reproduce the P2 and section 7.1 values item 6 and item 7
 published (`destination-links-v1.md` section 1,
@@ -66,8 +73,10 @@ published (`destination-links-v1.md` section 1,
 the delivered blocks rather than a retyped copy. Exactly **2 of 9** fenced blocks
 differ from the base: block #7 (the section 7.1 harness) and block #8 (the section
 7.3 operator snippet). The R1/R2 fix changed only block #7; the N1/N2 fix changed
-only block #7 again (25,638 B / 438 LF at `2e9d61d6` to 25,942 B / 443 LF here),
-and block #8 plus the P2 gate are byte-identical to `2e9d61d6`. The other seven
+only block #7 again (25,638 B / 438 LF at `2e9d61d6` to 25,942 B / 443 LF at
+`0631d45e`, i.e. +304 B / +5 LF), and block #8 plus the P2 gate are byte-identical
+to `2e9d61d6`. The DS4 fix changed only block #7 for a third time (25,942 B / 443 LF
+at `0631d45e` to 27,424 B / 464 LF here, +1,482 B / +21 LF). The other seven
 blocks, including the P2 gate, remain byte-identical to the base.
 
 ## 3. Before and after, same cases
@@ -80,7 +89,7 @@ run red against the pre-fix block at `2e9d61d6` with an independent watcher prob
 (workspace record `item9-n1n2fix/evidence/probe.py`, which creates the record when
 the target's `.claude` directory appears): the switch case exited **0** with
 `left unchanged`, and the junction case exited **23** while the page said 24. The
-suite's S4-12..S4-15 reproduce the same branches with a deterministic `-Sh`
+suite's S4-19..S4-22 reproduce the same branches with a deterministic `-Sh`
 stand-in that writes the record at the end-of-P8 `sh` probe, so the mid-run branch
 has no timing race in CI.
 
@@ -97,6 +106,9 @@ has no timing race in CI.
 | A record file appears after the preflight, `-AllowExistingRecord` (N1) | exit **0**, `P9: ... left unchanged`, the appearing file kept, no receipt for this run | exit **24**, `install record appeared during the run`, the appearing bytes preserved, no temp, 42 files (41 package + the appearing record) |
 | The same, without the switch | exit **24** | exit **24**, same message and preservation |
 | A junction at `-RecordPath` itself (N2) | exit **23** (containment walk) while the page said a non-regular-file path was 24 | exit **23** with and without the switch, outside directory empty, page states 23 |
+| A junction swapped in at `-RecordPath` after the preflight under `-AllowExistingRecord` (DS4 #1) | exit **25** (the write path cannot rename onto the junction) | exit **23**, `install record reparse point appeared after the preflight`, the link kept and never entered, outside directory empty, no temp |
+| The same swap with a **file symbolic link** (the exact DS4 #1 kept-leaf branch) | not run on this host | **UNRUN** for lack of file-symlink privilege; the code path is asserted present by S4-24 and the executable junction form by S4-23 |
+| `-RecordPath <target>/AGENTS.md/record.md` (nested under a package output, DS4 #2) | exit **25** after all 41 package files were copied | exit **24** before any package write |
 
 The R1/R2 red run is retained in the fix package
 (`_A/work-package-3/item9-r1r2fix/evidence/logs/`); each case fails on the
@@ -104,17 +116,22 @@ pre-fix block at the assertion shown above and passes at this revision.
 
 ## 4. Validator suite
 
-`python -P scripts/tests/test_validator.py` at this revision: **OK: 361**
-gate self-test assertion(s), exit 0 (358 at `2e9d61d6`; three assertions added).
-S4-12..S4-15 in the destination-links case add the mid-run record branch without
+`python -P scripts/tests/test_validator.py` at this revision: **OK: 363**
+gate self-test assertion(s), exit 0 (361 at `0631d45e`; two `ok()` cases added,
+S4-23 and S4-25, plus the S4-24 static marker).
+S4-19..S4-22 in the destination-links case add the mid-run record branch without
 the switch, the same branch with `-AllowExistingRecord` (N1), the junction at
 `-RecordPath` plus the page's 23 statement (N2), and the file-symlink form. The
-earlier record cases from the R1/R2 fix remain: the unique temp leaf, the hardlink,
-the directory-creation failure, the non-file switch refusal, the package-overlap
-refusal and the switch-with-no-record write. The result of each case is in the fix
-package; S4-15 (file symlink at `-RecordPath`) and the earlier file-symlink case
-are **UNRUN** on this host because creating a file symlink needs administrator
-privilege or Developer Mode, as in item 6 and item 7.
+earlier record cases from the R1/R2 fix remain (S4-12..S4-18): the unique temp
+leaf, the hardlink, the directory-creation failure, the non-file switch refusal,
+the package-overlap refusal and the switch-with-no-record write. The DS4 fix adds
+S4-23 (a junction swapped in after the preflight, refused at 23), S4-24 (the
+file-symlink form; **UNRUN** for lack of privilege, with the code-path marker
+asserted) and S4-25 (a record path nested under a package output, refused at 24).
+The result of each case is in the fix package; the two file-symlink cases (S4-14
+temp leaf, S4-22 record path, S4-24 swap) are **UNRUN** on this host because
+creating a file symlink needs administrator privilege or Developer Mode, as in
+item 6 and item 7.
 
 ## 5. Other checks
 
@@ -135,9 +152,10 @@ privilege or Developer Mode, as in item 6 and item 7.
   is left to the audit rather than claimed.
 - **The file-symlink collision case (S4-14) is UNRUN** for lack of the
   `SeCreateSymbolicLinkPrivilege`/Developer Mode on this host; the ordinary-file
-  and hardlink collision cases (S4-12, S4-13) run and pass. **S4-15**, a file
+  and hardlink collision cases (S4-12, S4-13) run and pass. **S4-22**, a file
   symbolic link at `-RecordPath`, is UNRUN for the same reason; the directory
-  junction form of that reparse point (S4-14) runs and exits **23**.
+  junction form of that reparse point (S4-21) runs and exits **23**, and the
+  swapped-in junction (S4-23) also runs and exits **23**.
 - **The mid-run branch is injected through `-Sh`.** S4-12/S4-13 write the
   appearing record from a `sh` stand-in at the end of P8 rather than from a second
   concurrent process; the watcher probe recorded in the N1/N2 fix package
