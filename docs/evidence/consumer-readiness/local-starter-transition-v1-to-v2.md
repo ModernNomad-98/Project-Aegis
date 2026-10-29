@@ -1,6 +1,8 @@
 # Consumer starter transition: v1 (39 files) to v2 (41 files)
 
-Status: **FINAL ACCEPTANCE - PASS on one Windows host.** This record covers AEP3
+Status: **FINAL ACCEPTANCE - PASS for the `human-only` route on one Windows host;
+`agent-commit` and the file-symbolic-link leaf are UNRUN, and the evidence is a
+local self-attested observation.** This record covers AEP3
 work item 7, "Prove the bounded 39-file to 41-file starter transition". It was
 produced against the accepted Item 6 installer after PR #964 merged, so the
 destination-containment preflight and the section 7.1 harness it re-extracts are
@@ -19,7 +21,7 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **127,466 B**, sha256 `2959c7221f7fa8aac4b3b5dfe2d607b32add1e25314babbf8cb12ecbd8dca6d1` |
+| Page after the section 7.3 insert and review revisions | **127,525 B**, working-file sha256 `9400d586b6b11f6f77bde1f51268c0968a5e9ed8f73252987a929012a08e92a5` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
@@ -122,7 +124,7 @@ All six cases ran against `2a7e9c06` with the extracted blocks. "Added" and
 | Case | Exit | Observed |
 | --- | --- | --- |
 | C1 - valid transition, fresh record | **0** | 41 package files; added exactly the two package files plus the new record; 0 removed, 0 changed; new record **41 rows, 7,025 B**, sha256 `d6db86a31c07e00b6f41cf0323ef5eeedb05740821ed0a1648bd959bbd246820`; old record hash unchanged; fixture commit and local Git config unchanged (config file sha256 `c4454039...f433`, `git config --local --list` identical) |
-| C2 - conflicting selected file | **31** | `existing installed file differs from the pinned source: .claude/skills/code-reviewer/SKILL.md`; conflicting bytes preserved; no record written; old record unchanged |
+| C2 - conflicting selected file | **31** | `existing installed file differs from the pinned source: .claude/skills/code-reviewer/SKILL.md`; conflicting bytes preserved; no package write (empty delta); no record written; old record unchanged |
 | C3 - reused old record path | **0** | 41 package files installed; `P9: install record already present, left unchanged`; the old record is still 39 rows / 6,738 B and unchanged; no "record written" claim |
 | C4 - constructed matching partial (40/41) | **0** | resumed; added `register-format.md` and the fresh record; 41 package files; record 41 rows |
 | C5 - constructed divergent partial (40/41) | **31** | `register-format.md` refused as a pin mismatch; divergent bytes preserved; no record written; no package write |
@@ -217,8 +219,8 @@ than by a migration step.
 | DCO on the commits | signed off; verified with `scripts/check_dco.py` over `origin/main..HEAD` |
 | PR-body bound fields (`check_pr_body_skills.py`) | OK on the draft and on the live body read back |
 
-Hosted CI at `1b63544b`, `8fc806d3`, `844a1261` and `47336d06` completed with
-**all required checks green**: `gate-guard`, `validate-skills`, `changes` and both review-switch
+Hosted CI at `1b63544b`, `8fc806d3`, `844a1261`, `47336d06` and `79529ede`
+completed with **all required checks green**: `gate-guard`, `validate-skills`, `changes` and both review-switch
 jobs. Four DeepSeek review rounds and one Codex round posted 41 advisory findings;
 all were read and dispositioned in the PR body. The documentation
 findings are fixed in the commit that carries this record; the installer-
@@ -226,8 +228,8 @@ behaviour requests (atomic record write, a new fail-closed code for an existing
 record path, testing `agent-commit`) are recorded as out of scope / **UNRUN**
 rather than claimed. `tools-tests-linux`, `tools-tests-windows` and
 `windows-offline-checks` were **skipped** by design for a docs-only change and
-are UNRUN, never passes. This acceptance is bound to the page blob sha256
-`fd39337e...2902` and the installer at `2a7e9c06`; a later page edit invalidates
+are UNRUN, never passes. This acceptance is bound to the page **working-file** sha256
+`9400d586...92a5` and the installer at `2a7e9c06`; a later page edit invalidates
 it and requires a rerun. The commit that carries this record re-triggers CI;
 that later run is delivery-stage evidence and is not claimed here.
 

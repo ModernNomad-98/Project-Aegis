@@ -1433,24 +1433,24 @@ contain spaces.
 Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
 run that reuses it installs the two files but cannot produce a v2 receipt: the
 retained 39-row file still describes the v1 result and must not be presented as the
-new one. For the **initial** transition the new path must not exist. An
-**identical rerun** of a completed transition may point at the existing record
-(that is case C6 in the evidence record, the only case that can satisfy the
-completion rule with an existing file at the new path). The installer does not
+new one. For the **initial** transition the new path must not exist. The only
+exception is the **identical rerun** of a completed transition, which may point
+at the existing record (case C6 in the evidence record). The installer does not
 bind a record to a run ID, target or nonce, so "fresh" versus "a copied
-identical record" is **operator-attested**, not installer-enforced; fail-closed
-refusal is requested in issue #966.; any
-other existing file there - stale, partial, or copied from another run - must be
-inspected and removed before the run. C3 and C7 deliberately exercise exit-0
+identical record" is **operator-attested**, not installer-enforced; a record
+copied from another target or run must be declared invalid. Fail-closed refusal
+is requested in [issue #966](https://github.com/ModernNomad-98/Project-Aegis/issues/966).
+Any other existing file there - stale, partial, or copied from another run - must
+be inspected and removed before the run. C3 and C7 deliberately exercise exit-0
 paths that leave an existing record unchanged; neither satisfies the completion
-rule below. That preservation is observed, not
-hypothetical: with a stale file at the new path the harness installed the two
-package files, exited **0**, printed `P9: install record already present, left
-unchanged`, and left the stale file byte-identical. A kill that lands during P9
-itself can therefore leave a partial record behind; that window is **UNRUN**, and
-the operator must verify or delete the file before rerunning (tracked as [issue #966](https://github.com/ModernNomad-98/Project-Aegis/issues/966)). Fail-closed refusal of an
-existing `-RecordPath`, and an atomic temp-file-plus-rename record write, are
-installer changes this documentation item does not make.
+rule below. That preservation is observed, not hypothetical: with a stale file at
+the new path the harness installed the two package files, exited **0**, printed
+`P9: install record already present, left unchanged`, and left the stale file
+byte-identical. A kill that lands during P9 itself can therefore leave a partial
+record behind; that window is **UNRUN**, and the operator must verify or delete
+the file before rerunning. Fail-closed refusal of an existing `-RecordPath`, and
+an atomic temp-file-plus-rename record write, are installer changes this
+documentation item does not make.
 
 **Expected result (the tested `human-only` route).** Exit 0; 41 selected paths
 present; from a clean 39-file start exactly the two added package files are new
@@ -1501,15 +1501,15 @@ universal constant);
 4. all 41 selected paths are present and byte-identical to the pin;
 5. unrelated product files, the local Git configuration and the commit are
 unchanged, and the v1 record is intact (39 rows with the published v1 aggregate
-`0c885bcd...a5a7`).
+`0c885bcd07d62d244da06748e81f006c0f4f93b3fae3cc54f611c7c72218a5a7`).
 
 If the file is missing, is not 41 rows, or does not reproduce the aggregate, the
 transition is not complete - check for a stale file at the path, remove it, and
 rerun. Adding the two files while reusing the old record path is not a completed
 transition. Keep the v1 record: after success the repository holds both
-`docs/consumer-install-record.md` (39 rows, the v1 receipt) and
-`docs/consumer-install-record-v2.md` (41 rows, the only v2 receipt); never
-overwrite or rename the v1 file.
+the existing v1 record path (39 rows, the v1 receipt) and the chosen new record
+path, for example `docs/consumer-install-record-v2.md` (41 rows, the only v2
+receipt); never overwrite or rename the v1 file.
 
 The native results for this exact case are in
 [local-starter-transition-v1-to-v2](evidence/consumer-readiness/local-starter-transition-v1-to-v2.md).
