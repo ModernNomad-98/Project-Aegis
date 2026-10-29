@@ -1,8 +1,8 @@
 # Consumer starter transition: v1 (39 files) to v2 (41 files)
 
-Status: **FINAL ACCEPTANCE - PASS for the `human-only` route on one Windows host;
-`agent-commit` and the file-symbolic-link leaf are UNRUN, and the evidence is a
-local self-attested observation.** This record covers AEP3
+Status: **LOCAL ACCEPTANCE PASS for the `human-only` route on one Windows host,
+not independently verified from the repository; `agent-commit` and the
+file-symbolic-link leaf are UNRUN.** This record covers AEP3
 work item 7, "Prove the bounded 39-file to 41-file starter transition". It was
 produced against the accepted Item 6 installer after PR #964 merged, so the
 destination-containment preflight and the section 7.1 harness it re-extracts are
@@ -21,7 +21,7 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **127,525 B**, working-file sha256 `9400d586b6b11f6f77bde1f51268c0968a5e9ed8f73252987a929012a08e92a5` |
+| Page after the section 7.3 insert and review revisions | **128,013 B**, working-file sha256 `774410d1736f13edd640c619dbb220b362021a019f83d69d14a64a591aaa5b74` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
@@ -219,8 +219,8 @@ than by a migration step.
 | DCO on the commits | signed off; verified with `scripts/check_dco.py` over `origin/main..HEAD` |
 | PR-body bound fields (`check_pr_body_skills.py`) | OK on the draft and on the live body read back |
 
-Hosted CI at `1b63544b`, `8fc806d3`, `844a1261`, `47336d06` and `79529ede`
-completed with **all required checks green**: `gate-guard`, `validate-skills`, `changes` and both review-switch
+Hosted CI at `1b63544b`, `8fc806d3`, `844a1261`, `47336d06`, `79529ede` and
+`9108cd51` completed with **all required checks green**: `gate-guard`, `validate-skills`, `changes` and both review-switch
 jobs. Four DeepSeek review rounds and one Codex round posted 41 advisory findings;
 all were read and dispositioned in the PR body. The documentation
 findings are fixed in the commit that carries this record; the installer-
@@ -229,7 +229,7 @@ record path, testing `agent-commit`) are recorded as out of scope / **UNRUN**
 rather than claimed. `tools-tests-linux`, `tools-tests-windows` and
 `windows-offline-checks` were **skipped** by design for a docs-only change and
 are UNRUN, never passes. This acceptance is bound to the page **working-file** sha256
-`9400d586...92a5` and the installer at `2a7e9c06`; a later page edit invalidates
+`774410d1...5b74` and the installer at `2a7e9c06`; a later page edit invalidates
 it and requires a rerun. The commit that carries this record re-triggers CI;
 that later run is delivery-stage evidence and is not claimed here.
 
@@ -237,8 +237,8 @@ that later run is delivery-stage evidence and is not claimed here.
 
 - **Other operating systems**, a second Windows host, a real consumer repository
   and J1 - not run here. Hosted CI itself ran at `1b63544b`, `8fc806d3`,
-  `844a1261` and `47336d06` (all required checks green); the commit carrying
-  this record re-runs it.
+  `844a1261`, `47336d06`, `79529ede` and `9108cd51` (all required checks green);
+  the commit carrying this record re-runs it.
 - **Concurrent writers** and replacement of a checked directory between
   preflight and write - not covered; the guarantee is the inspected quiescent
   tree (sections 1.3 and 12 of the page).

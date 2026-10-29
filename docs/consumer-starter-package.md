@@ -1419,16 +1419,19 @@ the owner-selected mode and `-RecordPath` naming the new path:
 
 ```powershell
 $Mode = 'human-only' # or 'agent-commit'; must be the mode the owner authorized
-$OwnerAuthorization = Read-Host -MaskInput 'Owner authorization (masked on screen)'
-pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath 'C:\path\to\product\docs\consumer-install-record-v2.md'
+$OwnerAuthorization = Read-Host -MaskInput 'Owner authorization (non-secret attestation)'
+$RecordPath = 'C:\path\to\product\docs\consumer-install-record-v2.md'
+if (Test-Path -LiteralPath $RecordPath) { throw "Record path already exists: $RecordPath" }
+pwsh -NoProfile -File .\install-starter.ps1 -Src 'C:\path\to\pinned-clone' -Tgt 'C:\path\to\product' -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
 ```
 
 Replace the `C:\path\to\...` values and select one mode; the comment is
-optional guidance. `Read-Host -MaskInput` keeps the text off the console, but the
-harness receives it as a command-line argument, so treat the authorization as
-non-secret or run on a host where that argument exposure (process listings,
-audit, scrollback) is acceptable. Quote every path because real paths may
-contain spaces.
+optional guidance. The guard makes the initial-run rule mechanical: an existing
+path stops the script before the harness runs. `Read-Host -MaskInput` keeps the
+authorization off the console only; it is **non-secret attestation text** because
+the harness receives it as a command-line argument (visible to process listings
+and audit), so run on a host where that exposure is acceptable. Quote every path
+because real paths may contain spaces.
 
 Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
 run that reuses it installs the two files but cannot produce a v2 receipt: the
@@ -1467,15 +1470,18 @@ a commit that route would make.
 exit **31**; a foreign file in a selected skill directory with exit **20**; a
 differing startup file (`AGENTS.md`/`CLAUDE.md`, exit **22** in section 7.2); a
 destination link with exit **23** (section 7.2 is the authoritative code table). Each refusal names the file, preserves its
-bytes and writes no record. Any reparse point on the target root, an existing
-intermediate directory, one of the 41 leaf paths, or the record path and its parents
-- a junction, symbolic link or other link type - is refused before any write by
-inspecting attributes only. That attribute check is not a defence against concurrent
+bytes and writes no record. A reparse point at the target root, at an existing
+intermediate directory, at one of the 41 leaf paths, or at the record path or one of
+its parents - a junction, symbolic link or other link type - is refused before any
+write by inspecting attributes only. That attribute check is not a defence against concurrent
 replacement of a checked directory (section 1.3). Native evidence covers directory
 junctions; creating a file symbolic link was not available under the recorded host's
 privileges (Developer Mode or `SeCreateSymbolicLinkPrivilege` can allow it), so
-that leaf case is **UNRUN**, not claimed. Remediation: restore the named file from the
-pin (or move the local edit aside with the human's approval), then rerun. If the copy
+that leaf case is **UNRUN**, not claimed. Remediation depends on the code: for **31**, restore the named file from the
+pin or move the local edit aside with the human's approval; for **20**, quarantine
+the foreign file; for **22**, reconcile `AGENTS.md`/`CLAUDE.md`; for **23**, remove
+or repoint the link. Quarantine (move aside) rather than delete, so audit evidence
+survives; then rerun. If the copy
 is interrupted, an unchanged rerun resumes under P5's identical-byte policy and
 writes the fresh record when the interruption happened before P9; a partial file that
 differs from the pin is refused with exit **31** and preserved. Real process kills
@@ -1503,9 +1509,9 @@ universal constant);
 unchanged, and the v1 record is intact (39 rows with the published v1 aggregate
 `0c885bcd07d62d244da06748e81f006c0f4f93b3fae3cc54f611c7c72218a5a7`).
 
-If the file is missing, is not 41 rows, or does not reproduce the aggregate, the
-transition is not complete - check for a stale file at the path, remove it, and
-rerun. Adding the two files while reusing the old record path is not a completed
+If the record is present but invalid, quarantine it (move it aside) and rerun; if
+it is missing, rerun to generate it; if it has 41 rows and the aggregate matches,
+proceed. Adding the two files while reusing the old record path is not a completed
 transition. Keep the v1 record: after success the repository holds both
 the existing v1 record path (39 rows, the v1 receipt) and the chosen new record
 path, for example `docs/consumer-install-record-v2.md` (41 rows, the only v2
