@@ -7300,29 +7300,39 @@ def _starter_skill_dirs(rows) -> list[str]:
     })
 
 
+def _starter_declared_skills(text: str) -> set[str]:
+    """Return the skill names section 2.2 declares for the package."""
+    section = text[text.find("### 2.2"):text.find("### 2.3")]
+    return set(re.findall(r"^\| `([^`]+)` \|", section, re.M))
+
+
 def _starter_selected_for(rows, skill: str) -> list[str]:
     """Return the selector rows that belong to one skill directory."""
     prefix = ".claude/skills/" + skill + "/"
     return [path for path in rows if path.startswith(prefix)]
 
 
-_STARTER_GIT_REPO_VARS = (
-    "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
-    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
-    "GIT_NAMESPACE", "GIT_CEILING_DIRECTORIES", "GIT_PREFIX",
-)
-
-
 def _starter_git(repo_root: Path, *args: str) -> subprocess.CompletedProcess:
-    """Run Git with repository-selection variables removed and a timeout."""
-    cmd = ["git", "-C", str(repo_root)] + list(args)
-    env = {k: v for k, v in os.environ.items()
-           if k not in _STARTER_GIT_REPO_VARS}
-    env.setdefault("GIT_TERMINAL_PROMPT", "0")
+    """Run Git hermetically against the committed objects.
+
+    All inherited GIT_* variables are removed, system/global config is
+    disabled, replace refs are ignored, and a synthetic safe.directory entry
+    keeps a read-only checkout usable. The timeout turns a hung Git into a
+    PIN-UNAVAILABLE classification instead of a hung test.
+    """
+    cmd = ["git", "--no-replace-objects", "-c", "safe.directory=*",
+           "-C", str(repo_root)] + list(args)
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    env.update({
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_NO_REPLACE_OBJECTS": "1",
+        "GIT_TERMINAL_PROMPT": "0",
+    })
     try:
         return subprocess.run(
             cmd, capture_output=True, text=True, encoding="utf-8",
-            errors="replace", env=env, timeout=60,
+            errors="surrogateescape", env=env, timeout=60,
         )
     except subprocess.TimeoutExpired:
         return subprocess.CompletedProcess(
@@ -7357,15 +7367,22 @@ def load_starter_pin(repo_root: Path, commit: str, tree: str):
                         (resolved.stderr or resolved.stdout).strip()[:160],
                         shallow_hint)
         )
+    resolved_commit = resolved.stdout.strip()
     resolved_tree = _starter_git(repo_root, "rev-parse", "--verify", "--quiet",
-                                 commit + "^{tree}")
+                                 resolved_commit + "^{tree}")
+    if resolved_tree.returncode != 0:
+        return None, (
+            "PIN-UNAVAILABLE: cannot resolve the tree of %s (%s)"
+            % (commit, (resolved_tree.stderr or resolved_tree.stdout).strip()[:160])
+        )
     actual_tree = resolved_tree.stdout.strip()
-    if resolved_tree.returncode != 0 or actual_tree != tree:
+    if actual_tree != tree:
         return None, (
             "PIN-MALFORMED: %s resolves to tree %s, the package declares %s"
-            % (commit, actual_tree or "<none>", tree)
+            % (resolved_commit, actual_tree or "<none>", tree)
         )
-    listing = _starter_git(repo_root, "ls-tree", "-r", "-z", "--name-only", commit)
+    listing = _starter_git(repo_root, "ls-tree", "-r", "-z", "--name-only",
+                           resolved_commit)
     if listing.returncode != 0:
         return None, (
             "PIN-UNAVAILABLE: cannot enumerate the pinned tree %s (%s)"
@@ -7400,6 +7417,20 @@ def _starter_pin_unrun(label: str) -> None:
     REQUIRED_SKIPS.append(label)
     skip("UNRUN: required starter-pin closure unavailable on "
          + sys.platform + ": " + label)
+
+
+def _starter_pin_refusal(refusal: str) -> None:
+    """Classify a pin refusal: malformed is a defect on every platform.
+
+    Only PIN-UNAVAILABLE (missing object, shallow clone, missing Git) is an
+    environment limitation that may be UNRUN on a non-required host. A
+    PIN-MALFORMED tree is a deterministic repository defect and must fail
+    everywhere.
+    """
+    if refusal.startswith("PIN-MALFORMED"):
+        raise AssertionError(
+            "required starter-pin closure is malformed: " + refusal)
+    _starter_pin_unrun(refusal)
 
 
 def parse_starter_selectors(text: str):
@@ -7573,7 +7604,7 @@ def test_consumer_starter_selectors():
     pinned, pin_refusal = load_starter_pin(
         REPO_ROOT, STARTER_PIN_COMMIT, STARTER_PIN_TREE)
     if pin_refusal:
-        _starter_pin_unrun(pin_refusal)
+        _starter_pin_refusal(pin_refusal)
         return
     assert pinned is not None
     problems += check_starter_selection(
@@ -7582,6 +7613,15 @@ def test_consumer_starter_selectors():
     ok("S1-1: the table and the executable array select the same %d rows" % len(table))
     ok("S1-1: both selectors carry the two scoped-approval-register paths")
     skill_dirs = _starter_skill_dirs(table)
+    declared_skills = _starter_declared_skills(text)
+    assert set(skill_dirs) == declared_skills, (
+        "S1-1: the selectors' skill set differs from the %d skills declared in "
+        "section 2.2: selector-only %s, declared-only %s"
+        % (len(declared_skills),
+           sorted(set(skill_dirs) - declared_skills),
+           sorted(declared_skills - set(skill_dirs))))
+    ok("S1-1: the selected skill set matches the %d skills declared in section 2.2"
+       % len(declared_skills))
     selected_skill_rows = sorted(
         path for path in table if path.startswith(".claude/skills/"))
     pinned_closure = sorted(
@@ -7771,9 +7811,8 @@ def test_consumer_starter_selector_pin_closure():
         table, array, problems = parse_starter_selectors(
             _starter_fixture_page(table_rows, pin_rows))
         assert table == table_rows and array == pin_rows
-        # The fixture total is consistent, so the row difference is the only
-        # problem; assert it by content, never by parser ordering.
-        assert len(problems) == 1, problems
+        # Assert the row difference by content, never by parser ordering.
+        assert problems, problems
         assert any("select different rows" in p for p in problems), problems
         bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
         assert ("the section 2.3 table is missing the selected skill's SKILL.md: "
@@ -7885,6 +7924,17 @@ def test_consumer_starter_selector_pin_closure():
         ok("S1-1 fixture: an unavailable pin and a wrong declared tree both "
            "refuse explicitly instead of falling back to the checkout")
 
+        # PIN-MALFORMED is a deterministic repository defect on every platform;
+        # only PIN-UNAVAILABLE may become an environment UNRUN.
+        try:
+            _starter_pin_refusal("PIN-MALFORMED: synthetic")
+        except AssertionError as exc:
+            assert "synthetic" in str(exc)
+        else:
+            raise AssertionError(
+                "a PIN-MALFORMED refusal must fail on every platform")
+        ok("S1-1 fixture: a PIN-MALFORMED refusal fails on every platform")
+
         # A shallow clone lacks the pin object. The closure read must refuse,
         # never fall back to the checkout; test_consumer_starter_selectors runs
         # its Git-independent checks before this refusal can skip them.
@@ -7905,6 +7955,19 @@ def test_consumer_starter_selector_pin_closure():
         assert "shallow" in refusal.lower(), refusal
         ok("S1-1 fixture: a shallow clone refuses the pinned closure explicitly, "
            "with no checkout fallback")
+
+        # A checkout-local replace ref must not change the pinned oracle.
+        replaced = subprocess.run(
+            ["git", "-C", str(repo), "replace", pin_commit, checkout_commit],
+            env=_install_mode_env(tmp), capture_output=True, text=True)
+        assert replaced.returncode == 0, replaced.stderr
+        pinned_after, refusal = load_starter_pin(repo, pin_commit, pin_tree)
+        assert refusal is None, refusal
+        assert two in pinned_after["alpha"]
+        assert (".claude/skills/alpha/references/checkout-only.md"
+                not in pinned_after["alpha"])
+        assert sorted(p for paths in pinned_after.values() for p in paths) == pin_rows
+        ok("S1-1 fixture: a replace ref cannot change the pinned closure")
 
 
 # --- consumer starter package: explicit install mode (S3-1..S3-6) -----------
