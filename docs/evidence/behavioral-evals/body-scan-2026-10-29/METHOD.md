@@ -239,11 +239,13 @@ sections 2–4 above (`25` lines, seed `20261029`, 10%). Reimplementing the rule
 table from section 3.3 must reproduce 44 hits and 33 flagged chunks exactly;
 that equality is the reproducibility test, and it does not require this script.
 
-The scanner was invoked twice. The first invocation aborted before writing any
-output, on a manifest-shape bug (`skills` is a list, not a mapping) in setup
-code that reads `tools/skills-manifest.json`; no matching rule was touched. The
-second invocation produced the counts published here. There is therefore one
-authoritative execution, not two.
+The scanner was invoked three times. The first invocation aborted before
+writing any output, on a manifest-shape bug (`skills` is a list, not a mapping)
+in setup code that reads `tools/skills-manifest.json`; no matching rule was
+touched. The second invocation produced the counts published here. The third
+was a post-publication determinism check and produced a byte-identical
+`tier1-raw.json` (same sha256), so the published counts come from a
+reproducing execution, not a lucky one.
 
 ## 9. Limits
 
