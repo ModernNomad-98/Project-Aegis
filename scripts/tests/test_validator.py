@@ -8750,7 +8750,9 @@ def _dest_junction(link: Path, target: Path) -> None:
 
 
 def test_consumer_install_destination_links():
-    """S4-1..S4-9: destination reparse points are refused before any write."""
+    """S4-1..S4-12: destination reparse points are refused before any write, and
+    the install record is refused when it already exists unless the caller asks to
+    resume, with an atomic record write (AEP3-I9)."""
     if sys.platform != "win32":
         # Junctions are a Windows kernel object. This case is required on
         # Windows and is an expected platform boundary on POSIX, not missing
@@ -8776,6 +8778,15 @@ def test_consumer_install_destination_links():
     assert "Stop-Step 23" in harness_text, (
         "the published harness does not refuse a destination reparse point at 23"
     )
+    assert "AllowExistingRecord" in harness_text, (
+        "the published harness has no explicit allow-existing-record switch"
+    )
+    assert "Stop-Step 24" in harness_text, (
+        "the published harness does not refuse an existing install record at 24"
+    )
+    assert "Stop-Step 25" in harness_text, (
+        "the published harness has no atomic-record-write refusal at 25"
+    )
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
         env = _install_mode_env(tmp)
@@ -8790,12 +8801,13 @@ def test_consumer_install_destination_links():
                 % (STARTER_PIN_COMMIT, (proc.stderr or proc.stdout).strip()[:160]))
             return
         try:
-            def install(target, record=None):
+            def install(target, record=None, extra=()):
                 args = [pwsh, "-NoProfile", "-File", str(harness),
                         "-Src", str(source), "-Tgt", str(target), "-Sh", sh,
                         "-Mode", "human-only", "-OwnerAuthorization", "I will commit myself."]
                 if record is not None:
                     args += ["-RecordPath", str(record)]
+                args += list(extra)
                 return subprocess.run(
                     args, env=env, capture_output=True, text=True,
                     encoding="utf-8", errors="replace", timeout=600,
@@ -8929,6 +8941,57 @@ def test_consumer_install_destination_links():
                 assert hashlib.sha256(sentinel.read_bytes()).hexdigest() == digest_before
                 ok("S4-9: an existing linked file leaf exits 23 and the external "
                    "sentinel hash is unchanged")
+
+            # S4-10: an existing -RecordPath is refused before any package write
+            # unless the caller asks to resume (AEP3-I9 gap 1, the C7 footgun:
+            # previously this exited 0, installed the files and produced no
+            # fresh receipt).
+            existing = _install_mode_repo(tmp / "d-existing", env)
+            first_record = existing / "docs" / "consumer-install-record.md"
+            proc = install(existing, first_record)
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            assert first_record.is_file(), "the fixture's first record was not written"
+            record_digest = hashlib.sha256(first_record.read_bytes()).hexdigest()
+            settled = _dest_snapshot(existing)
+            proc = install(existing, first_record)
+            assert proc.returncode == 24, (proc.returncode, proc.stdout, proc.stderr)
+            assert "install record already exists" in proc.stderr, proc.stderr
+            assert hashlib.sha256(first_record.read_bytes()).hexdigest() == record_digest, (
+                "the refused run changed the existing record")
+            assert _dest_snapshot(existing) == settled, (
+                "a package file was written before the exit-24 record refusal")
+            ok("S4-10: an existing -RecordPath exits 24 before any package write, with "
+               "the record byte-identical; no silent exit 0 and no missing receipt")
+
+            # S4-11: the explicit switch keeps the documented identical-resume
+            # semantics: exit 0, the existing record preserved, no overwrite.
+            proc = install(existing, first_record, extra=["-AllowExistingRecord"])
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            assert "already present, left unchanged" in proc.stdout, proc.stdout
+            assert hashlib.sha256(first_record.read_bytes()).hexdigest() == record_digest, (
+                "the resume overwrote the existing record")
+            assert _dest_snapshot(existing) == settled, (
+                "the resume changed the installed package files")
+            ok("S4-11: -AllowExistingRecord keeps the identical-resume behaviour - exit 0, "
+               "the existing record byte-identical, no package change")
+
+            # S4-12: the record is written through a same-directory temp file and
+            # renamed. A blocked temp path stops the run with no record at
+            # -RecordPath, so a failed record write cannot leave a partial receipt
+            # that a later run or an online check could read as one.
+            atomic = _install_mode_repo(tmp / "d-atomic", env)
+            atomic_record = atomic / "docs" / "consumer-install-record.md"
+            atomic_record.parent.mkdir(parents=True, exist_ok=True)
+            (atomic / "docs" / "consumer-install-record.md.tmp").mkdir()
+            proc = install(atomic, atomic_record)
+            assert proc.returncode == 25, (proc.returncode, proc.stdout, proc.stderr)
+            assert "atomically" in proc.stderr, proc.stderr
+            assert not atomic_record.exists(), "a partial record was left at the record path"
+            assert len([row for row in _dest_snapshot(atomic) if row[1] == "FILE"]) == 41, (
+                _dest_snapshot(atomic))
+            ok("S4-12: a blocked temp path exits 25 with no record at -RecordPath, so a "
+               "failed record write cannot leave a partial receipt")
+
         finally:
             subprocess.run(
                 ["git", "-C", str(REPO_ROOT), "worktree", "remove", "--force", str(source)],

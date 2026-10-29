@@ -830,7 +830,11 @@ pass.
 
 ### P9 — Write the consumer install record
 
-The harness writes `docs/consumer-install-record.md` when given `-RecordPath`.
+The harness writes `docs/consumer-install-record.md` when given `-RecordPath`. It
+refuses an existing record there with **exit 24** before it writes anything, unless
+`-AllowExistingRecord` asks to resume an identical install; the write itself goes
+to a temp file that is renamed into place, so an interrupted or failed write leaves
+no partial record (**exit 25**, section 7.2).
 The record contains the source commit and tree; the date; the PowerShell, Git and
 `sh` versions; the owner record's **presence only** (never its value); the install
 mode P2 accepted, and the statement that a `human-only` install made no agent
@@ -858,7 +862,12 @@ It is a complete, runnable form of the P2 gate invocation and P5-P9: the failure
 paths write to stderr and `exit`, never `Write-Error`, so an inherited
 `$ErrorActionPreference = 'Stop'` cannot turn a documented code into exit 1. It
 defines `$package` (the 41 paths) and takes `$Src`, `$Tgt`, `$Mode`,
-`-OwnerAuthorization`, `$ModeGate`, `$Sh` and `-RecordPath` as parameters. It
+`-OwnerAuthorization`, `$ModeGate`, `$Sh`, `-RecordPath` and `-AllowExistingRecord` as
+parameters. An existing `-RecordPath` is refused at **exit 24** before the first
+package write unless `-AllowExistingRecord` asks to resume an identical install and
+keep that record, and the record is written through a same-directory temp file that
+is renamed into place, so a failed or interrupted record write leaves either no
+record or the whole record (**exit 25**), never a partial file. It
 runs P2's `install-mode.ps1` as a child process before it reads a source pin or
 writes a file, and exits with that gate's code; `-ModeGate` overrides the default
 location beside the harness. After the gate accepts, the harness trims the mode
@@ -881,7 +890,8 @@ param(
   [string]$OwnerAuthorization,
   [string]$ModeGate,
   [string]$Sh = 'C:\Program Files\Git\bin\sh.exe',
-  [string]$RecordPath
+  [string]$RecordPath,
+  [switch]$AllowExistingRecord
 )
 # Published P2-gate + P5-P9 harness for docs/consumer-starter-package.md (v2).
 # Requires PowerShell 7. Failure paths write to stderr and exit; they never use
@@ -1073,6 +1083,14 @@ if ($RecordPath) {
   $RecordPath = [IO.Path]::GetFullPath($RecordPath)
   Assert-DestinationPath $RecordPath $null
 }
+# P5c - the install record is the receipt for THIS run. An existing file at
+# -RecordPath would let P9 skip the receipt silently (the C7 footgun: exit 0 with
+# package files installed and no fresh record), so the run stops here, before the
+# first package write, unless the caller explicitly asks to resume an identical
+# install and keep the existing record.
+if ($RecordPath -and -not $AllowExistingRecord -and (Test-Path -LiteralPath $RecordPath)) {
+  Stop-Step 24 "install record already exists: $RecordPath; nothing was written. Pass -AllowExistingRecord to resume an identical install and leave the existing record unchanged"
+}
 foreach ($rel in $skillDirs) {
   $dst = Join-Path $Tgt ($rel -replace '/', [IO.Path]::DirectorySeparatorChar)
   if (-not (Test-Path -LiteralPath $dst)) { continue }
@@ -1253,7 +1271,18 @@ if ($RecordPath) {
     }
     $recordDir = Split-Path -Parent $RecordPath
     if (-not (Test-Path -LiteralPath $recordDir)) { New-Item -ItemType Directory -Path $recordDir | Out-Null }
-    [IO.File]::WriteAllText($RecordPath, $record.ToString(), (New-Object Text.UTF8Encoding($false)))
+    # Atomic record write. The bytes land in a temp file in the record's own
+    # directory and are renamed into place only once complete, so a kill during
+    # this write leaves either no record or the whole record - never a partial
+    # file at -RecordPath. A failed write removes the temp file and stops at 25.
+    $recordTemp = $RecordPath + '.tmp'
+    try {
+      [IO.File]::WriteAllText($recordTemp, $record.ToString(), (New-Object Text.UTF8Encoding($false)))
+      [IO.File]::Move($recordTemp, $RecordPath, $false)
+    } catch {
+      if (Test-Path -LiteralPath $recordTemp -PathType Leaf) { Remove-Item -LiteralPath $recordTemp -Force -ErrorAction SilentlyContinue }
+      Stop-Step 25 ("install record could not be written atomically: {0} ({1}); no record was written" -f $RecordPath, $_.Exception.Message)
+    }
     Write-Output "P9: install record written: $RecordPath"
   }
 }
@@ -1261,8 +1290,15 @@ Write-Output 'OK: 41 installed files; closure, pins, siblings, eval and aggregat
 exit 0
 ```
 
-If `-RecordPath` already exists, the block prints the path and leaves the file
-unchanged - it never overwrites a record - so choose a new path for a fresh one.
+If `-RecordPath` already exists, the block stops with **exit 24** before it writes
+any package file or any record, and names the path. Pass `-AllowExistingRecord`
+to resume an identical install instead: the block then prints the path, leaves the
+existing file unchanged - it never overwrites a record - and exits 0. A fresh
+receipt needs a fresh path. The record write itself is a temp file renamed into
+place, so a kill during P9 leaves no partial record (section 7.2, codes 24 and 25).
+The pre-I9 measurement recorded in this section observed the older behaviour (exit
+0 and the record left unchanged); that observation is historical, not the current
+contract.
 
 **Verified for v1, not for this revision.** The block was extracted from this page
 and run on 2026-10-27 against (a) a fresh local clone of the pinned commit `ffb040c7` and
@@ -1303,7 +1339,9 @@ eval-answer file in an installed skill -> **exit 20** naming it (P5 refuses befo
 P7); a conflicting `AGENTS.md` -> **exit 22**, existing bytes unchanged; a source
 missing a required reference -> **exit 21**; a changed source byte -> **exit 31**
 on the aggregate comparison; a second run on the completed target -> **exit 0**,
-48/48 destination files identical, existing record left unchanged. A fresh
+48/48 destination files identical, existing record left unchanged (that rerun
+observation predates AEP3-I9: the current block refuses an existing record at
+**exit 24** unless `-AllowExistingRecord` is passed, section 7.2). A fresh
 isolated consumer context read the installed lifecycle material and distinguished
 a valid scope from a late-recorded revocation, a malformed target and a
 duplicate-ID history, refusing the invalid ones without performing any action. The
@@ -1374,6 +1412,8 @@ Each code stops; none warns and continues.
 | 21 | Unsafe or missing source path | The `..`/reparse-point segment or the missing file; nothing written |
 | 22 | Startup-file conflict | The differing file; existing bytes unchanged |
 | 23 | Unsafe destination path (junction, symbolic link or other reparse point) | The exact path and the link type/target; refused before any package or record write |
+| 24 | Install record already present at `-RecordPath` | The exact path; refused before any package or record write, so no run installs files and then silently keeps an older record. `-AllowExistingRecord` resumes an identical install and leaves the existing record unchanged |
+| 25 | The install record could not be written atomically | The record path and the underlying error; the temp file is removed and no record is left at `-RecordPath`, so a partial receipt cannot be read as one |
 | 30 | Closure, count or eval-material failure | The offending path or the count found |
 | 31 | Pin or byte mismatch (including a CRLF checkout or an aggregate mismatch) | The exact file, or the aggregate comparison that failed |
 | 32 | Missing sibling dependency | The installed skill that links it and the absent sibling it names, as `<skill> links <sibling>/SKILL.md` |
@@ -1428,13 +1468,13 @@ run, check the three preconditions the installer does not check for you:
   5,152 serialized bytes. Confirm that now: the run installs the two package files
   before any completion check, so a missing, invalid or outside-the-target v1
   record is a stop here, not a discovery after the install.
-- **The v2 record path.** It must not exist. P9 does not refuse an existing file
-  there: it prints `P9: install record already present, left unchanged`, exits
-  **0**, installs the two package files and produces **no v2 receipt** (case C7).
-  The `Test-Path` guard in the block below is what stops that, and it is an
-  operator pre-check, not an installer control. If a file is already there -
-  stale, partial, or copied from another run - quarantine it (move it aside)
-  before the run, so audit evidence survives.
+- **The v2 record path.** It must not exist for the initial run. Since AEP3-I9
+  the installer enforces this: an existing file there stops the run with **exit
+  24** before any package file or record is written (section 7.2). The
+  `Test-Path` guard in the block below still stops earlier, which is only a
+  faster failure. If a file is already there - stale, partial, or copied from
+  another run - quarantine it (move it aside) before the run, so audit evidence
+  survives.
 - **The harness directory.** It holds the section 7.1 harness and the
   `install-mode.ps1` saved beside it (section 7.1).
 
@@ -1460,7 +1500,9 @@ if (-not (Test-Path -LiteralPath $V1Record -PathType Leaf)) { throw "v1 record i
 $V1Sha256Before = (Get-FileHash -Algorithm SHA256 -LiteralPath $V1Record).Hash  # completion rule 5 requires this unchanged
 if ($IdenticalRerun) { if (-not (Test-Path -LiteralPath $RecordPath -PathType Leaf)) { throw "rerun needs the existing record: $RecordPath" } }
 elseif (Test-Path -LiteralPath $RecordPath) { throw "Record path already exists: $RecordPath" }
-pwsh -NoProfile -File $Harness -Src $Src -Tgt $Tgt -Sh $Sh -Mode $Mode -OwnerAuthorization $OwnerAuthorization -RecordPath $RecordPath
+$HarnessArgs = @('-NoProfile', '-File', $Harness, '-Src', $Src, '-Tgt', $Tgt, '-Sh', $Sh, '-Mode', $Mode, '-OwnerAuthorization', $OwnerAuthorization, '-RecordPath', $RecordPath)
+if ($IdenticalRerun) { $HarnessArgs += '-AllowExistingRecord' }   # the record must already exist on an identical rerun
+pwsh @HarnessArgs
 ```
 
 The `$IdenticalRerun = $true` path is the **identical rerun** of a completed
@@ -1473,7 +1515,8 @@ a "the record must exist" check.
 The prefix comparison is the Windows, case-insensitive form; on a case-sensitive
 host use `[StringComparison]::Ordinal`. The existence guard is a **pre-check**,
 not an atomic guarantee (the TOCTOU window is section 1.3): an existing path
-stops the script before the harness runs.
+stops the script before the harness runs, and the harness itself now refuses one
+at **exit 24**, so the guarantee no longer depends on this pre-check.
 
 The whole block requires PowerShell 7.1+ (`pwsh`), because `Read-Host -MaskInput`
 is not available in Windows PowerShell 5.1. `Read-Host -MaskInput` keeps the
@@ -1498,27 +1541,29 @@ the quote-safe mode explicitly (this host's 7.6.6 defaults to `Windows`, which
 also delivered a trailing backslash intact). Keep the guard on every version - it
 costs nothing above 7.3 and it is the only protection at or below 7.2.
 
-Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
-run that reuses it installs the two files but cannot produce a v2 receipt: the
-retained 39-row file still describes the v1 result and must not be presented as the
-new one. For the **initial** transition the new path must not exist. The only
-exception is the **identical rerun** of a completed transition, which may point
-at the existing record (case C6 in the evidence record). The installer does not
+Do **not** pass the old record path. An existing record is refused at **exit 24**,
+so the run stops instead of installing the two files and keeping a 39-row record
+that still describes the v1 result and must not be presented as the new one. For
+the **initial** transition the new path must not exist. The only exception is the
+**identical rerun** of a completed transition, which points at the existing record
+and passes `-AllowExistingRecord` (case C6 in the evidence record); the harness
+then leaves the record byte-identical and writes no new one. The installer does not
 bind a record to a run ID, target or nonce, so "fresh" versus "a copied
 identical record" is **operator-attested**, not installer-enforced; a record
-copied from another target or run must be declared invalid. Fail-closed refusal
-is requested in [issue #966](https://github.com/ModernNomad-98/Project-Aegis/issues/966).
-Any other existing file there - stale, partial, or copied from another run - must
-be quarantined (moved aside) before the run, so audit evidence survives. C3 and C7 deliberately exercise exit-0
-paths that leave an existing record unchanged; neither satisfies the completion
-rule below. That preservation is observed, not hypothetical: with a stale file at
-the new path the harness installed the two package files, exited **0**, printed
-`P9: install record already present, left unchanged`, and left the stale file
-byte-identical. A kill that lands during P9 itself can therefore leave a partial
-record behind; that window is **UNRUN**, and the operator must verify the file and
-quarantine it (move it aside) before rerunning. Fail-closed refusal of an existing `-RecordPath`, and
-an atomic temp-file-plus-rename record write, are installer changes this
-documentation item does not make.
+copied from another target or run must be declared invalid. Any existing file there
+- stale, partial, or copied from another run - must be quarantined (moved aside)
+before the run, so audit evidence survives.
+
+Case C7 in the v1-to-v2 evidence record is the observed form of the old behaviour:
+with a stale file at the new path the pre-I9 harness installed the two package
+files, exited **0**, printed `P9: install record already present, left unchanged`,
+and left the stale file byte-identical. Case C3 is the same preservation for the
+old path. Both are retained as history and neither satisfies the completion rule
+below; on the current harness the same run stops at exit 24 before any package
+write. AEP3-I9 also removed the partial-record window this page previously recorded
+as UNRUN: the record is written to a temp file and renamed into place, so a kill
+during P9 leaves no record at `-RecordPath` rather than a partial one (code 25 is
+the failed-write stop).
 
 **Expected result (the tested `human-only` route).** Exit 0; 41 selected paths
 present; from a clean 39-file start exactly the two added package files are new
@@ -1554,7 +1599,8 @@ reproduced both outcomes: a 40-of-41 all-matching partial resumed to 41 files pl
 the fresh record, and a partial with a 0-byte last file (41 paths present) was
 refused at 31 with the bytes preserved and no record. An identical rerun after a
 completed transition changes no package file and leaves an existing record at the
-same path unchanged.
+same path unchanged; it must pass `-AllowExistingRecord`, because an existing
+record is otherwise refused at **exit 24**.
 
 **Completion rule.** The transition is complete only when **all** of these hold:
 
