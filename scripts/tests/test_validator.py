@@ -8801,9 +8801,9 @@ def test_consumer_install_destination_links():
                 % (STARTER_PIN_COMMIT, (proc.stderr or proc.stdout).strip()[:160]))
             return
         try:
-            def install(target, record=None, extra=()):
+            def install(target, record=None, extra=(), sh_path=None):
                 args = [pwsh, "-NoProfile", "-File", str(harness),
-                        "-Src", str(source), "-Tgt", str(target), "-Sh", sh,
+                        "-Src", str(source), "-Tgt", str(target), "-Sh", str(sh_path or sh),
                         "-Mode", "human-only", "-OwnerAuthorization", "I will commit myself."]
                 if record is not None:
                     args += ["-RecordPath", str(record)]
@@ -8974,6 +8974,112 @@ def test_consumer_install_destination_links():
                 "the resume changed the installed package files")
             ok("S4-11: -AllowExistingRecord keeps the identical-resume behaviour - exit 0, "
                "the existing record byte-identical, no package change")
+
+            def racing_install(name, extra=()):
+                """Run the harness with a record that appears after the preflight.
+
+                The -Sh stand-in writes the record when the harness probes sh at
+                the end of P8 and then answers 'ok'. That point is after P5's
+                record preflight and before P9, so the branch under test is
+                deterministic: no polling and no timing window.
+                """
+                target = _install_mode_repo(tmp / name, env)
+                raced = target / "docs" / "consumer-install-record.md"
+                raced.parent.mkdir(parents=True, exist_ok=True)
+                wrapper = tmp / (name + "-sh.cmd")
+                wrapper.write_bytes(
+                    b"@echo off\r\n"
+                    + ('echo raced-record>"%s"\r\n' % raced).encode("ascii")
+                    + b"echo ok\r\n")
+                proc = install(target, raced, extra=list(extra), sh_path=wrapper)
+                return target, raced, proc
+
+            # S4-12: a record file that appears between the preflight and P9 is
+            # refused at 24 without the switch, and the appearing file is kept.
+            raced_target, raced_record, proc = racing_install("d-raced-noswitch")
+            assert proc.returncode == 24, (proc.returncode, proc.stdout, proc.stderr)
+            assert "install record appeared during the run" in proc.stderr, proc.stderr
+            assert raced_record.name in proc.stderr, proc.stderr
+            assert raced_record.read_bytes().startswith(b"raced-record"), (
+                "the appearing record was overwritten: %r" % raced_record.read_bytes()[:80])
+            raced_rows = _dest_snapshot(raced_target)
+            assert len([row for row in raced_rows if row[1] == "FILE"]) == 42, raced_rows
+            assert not [row for row in raced_rows if row[0].endswith(".tmp")], (
+                "the refused run left a temp file: %s" % (raced_rows,))
+            ok("S4-12: a record that appears between the preflight and P9 exits 24 "
+               "without the switch, names the path, preserves its bytes and leaves "
+               "no temp")
+
+            # S4-13: the same mid-run record with -AllowExistingRecord. The switch
+            # keeps only a record that was already a regular file at the
+            # preflight; one that appears later is refused at 24, never skipped.
+            raced_target, raced_record, proc = racing_install(
+                "d-raced-switch", extra=["-AllowExistingRecord"])
+            assert proc.returncode == 24, (proc.returncode, proc.stdout, proc.stderr)
+            assert "install record appeared during the run" in proc.stderr, proc.stderr
+            assert "left unchanged" not in proc.stdout, proc.stdout
+            assert raced_record.read_bytes().startswith(b"raced-record"), (
+                "the switch overwrote the record that appeared during the run")
+            raced_rows = _dest_snapshot(raced_target)
+            assert len([row for row in raced_rows if row[1] == "FILE"]) == 42, raced_rows
+            assert not [row for row in raced_rows if row[0].endswith(".tmp")], (
+                "the refused run left a temp file: %s" % (raced_rows,))
+            ok("S4-13: -AllowExistingRecord no longer skips a record that appears "
+               "mid-run - it exits 24, preserves the appearing bytes and writes no "
+               "receipt")
+
+            # S4-14: a reparse point at the record path itself. The containment
+            # walk runs before the record checks, so this is code 23 (not 24); the
+            # outside directory stays empty and the switch changes nothing.
+            junction_target = _install_mode_repo(tmp / "d-record-junction", env)
+            outside = tmp / "d-record-junction-outside"
+            outside.mkdir()
+            junction_record = junction_target / "docs" / "consumer-install-record.md"
+            junction_record.parent.mkdir(parents=True, exist_ok=True)
+            _dest_junction(junction_record, outside)
+            junction_before = _dest_snapshot(junction_target)
+            proc = install(junction_target, junction_record)
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert "destination reparse point" in proc.stderr, proc.stderr
+            assert "Junction" in proc.stderr, proc.stderr
+            proc = install(junction_target, junction_record, extra=["-AllowExistingRecord"])
+            assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+            assert _dest_snapshot(outside) == [], (
+                "a write passed through the record-path junction")
+            assert _dest_snapshot(junction_target) == junction_before, (
+                "a package file was written after the 23 refusal")
+            flat_page = " ".join(page.split())
+            assert ("A reparse point at `-RecordPath` is refused earlier, at **exit 23**"
+                    in flat_page), (
+                "the page does not state the observed 23 for a reparse-point record path")
+            assert "a record path that is not an existing regular file" not in flat_page, (
+                "the page still claims 24 for every non-regular-file record path")
+            ok("S4-14: a junction at -RecordPath exits 23 with and without the "
+               "switch, writes nothing through the link, and the page states 23")
+
+            # S4-15: the file-symlink form of the same record-path reparse point
+            # needs file-symlink privilege on this host. UNRUN if it cannot be
+            # created; never counted as a pass.
+            symlink_target = _install_mode_repo(tmp / "d-record-symlink", env)
+            symlink_record = symlink_target / "docs" / "consumer-install-record.md"
+            symlink_record.parent.mkdir(parents=True, exist_ok=True)
+            sentinel = tmp / "d-record-symlink-sentinel.txt"
+            sentinel.write_bytes(b"sentinel-bytes")
+            made = subprocess.run(
+                ["cmd", "/c", "mklink", str(symlink_record), str(sentinel)],
+                capture_output=True, text=True, encoding="utf-8", errors="replace",
+            )
+            if made.returncode != 0:
+                skip("UNRUN: file symbolic link at -RecordPath unavailable on this "
+                     "host: " + (made.stderr or made.stdout).strip()[:160])
+            else:
+                digest_before = hashlib.sha256(sentinel.read_bytes()).hexdigest()
+                proc = install(symlink_target, symlink_record)
+                assert proc.returncode == 23, (proc.returncode, proc.stdout, proc.stderr)
+                assert hashlib.sha256(sentinel.read_bytes()).hexdigest() == digest_before, (
+                    "a write passed through the record-path file symlink")
+                ok("S4-15: a file symbolic link at -RecordPath exits 23 and the "
+                   "external sentinel is unchanged")
 
         finally:
             subprocess.run(
@@ -9691,9 +9797,14 @@ def test_consumer_install_record_nonfile_switch():
             assert "is not a regular file" in harness_text, (
                 "the published harness does not require a regular file when "
                 "-AllowExistingRecord is used")
-            assert ("if ($AllowExistingRecord -and (Test-Path -LiteralPath $RecordPath "
-                    "-PathType Leaf))") in harness_text, (
-                "P9 can still skip the receipt without the explicit switch")
+            assert ("$recordExistedAtPreflight = Test-Path -LiteralPath $RecordPath "
+                    "-PathType Leaf") in harness_text, (
+                "the preflight no longer captures whether the record existed, so P9 "
+                "cannot tell a kept record from one that appeared mid-run")
+            assert ("if ($AllowExistingRecord -and $recordExistedAtPreflight -and\n"
+                    "      (Test-Path -LiteralPath $RecordPath -PathType Leaf))") in harness_text, (
+                "P9 can still skip the receipt without the explicit switch and a "
+                "record that existed at the preflight")
         finally:
             _starter_guard_cleanup(source)
 
