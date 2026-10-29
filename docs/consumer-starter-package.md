@@ -27,6 +27,17 @@ acceptance result, with every retained UNRUN listed there. The derived numbers i
 sections 2.3, 7.1 and 9.2 are recomputed from the pinned commit's bytes, not
 copied from the v1 record.
 
+**Revision (2026-10-28, install mode).** The procedure now takes an explicit
+`-Mode`. `human-only` installs for an owner who makes their own commits: the
+install makes no commit and changes no Git identity. `agent-commit` is the route
+for an agent that will commit, and its effective author and committer must be
+valid non-owner identities; an owner match still stops at exit 42. The mode is
+the owner's explicit statement, is checked before any copy and is recorded in the
+install record; an unstated or unrecognised mode stops at exit 43 when the target
+is usable. The missing-owner stop (exit 41), the startup gate, the 41-file set, its
+pins and its aggregate are unchanged. Native before/after evidence is in
+[human-commit-install-v1](evidence/consumer-readiness/human-commit-install-v1.md).
+
 **Reading key.** **Role A** is the Project Aegis source repository; **Role B** is
 your own consumer/product repository, which copies Aegis files into its workspace.
 **J1** is the first consumer journey this package supports (below). **MANUAL-ONLY**
@@ -103,9 +114,10 @@ silently skip a gate.
   in its report (`SKILL.md:143-169`); no automation is claimed for it.
 - The solo-owner commit-identity policy is **decided** (section 8.3): a solo
   owner may commit under their own identity; only agent-authored commits must use
-  the documented repository-local agent identity. The gate's fail-closed check for
-  agent commits is unchanged, and the package still makes no consumer-readiness
-  claim.
+  the documented repository-local agent identity. The install mode is explicit
+  (P2): `human-only` lets the owner install without an agent commit or any Git
+  identity change, and `agent-commit` keeps the gate's fail-closed check for
+  agent commits. The package still makes no consumer-readiness claim.
 - A destination `AGENTS.md`/`CLAUDE.md` that differs by any byte stops the
   install (exit 22), and this package documents no in-place merge: reconcile the two files
   to the pinned bytes before installing, or install into a tree that has neither.
@@ -390,7 +402,7 @@ so it cannot carry a local "not installed" note.
   CLAUDE.md                                  copied, byte-identical, never overwritten
   .claude/skills/<18 skill directories>/      SKILL.md + references/*.md only
   docs/project-state.md                      created by project-orchestrator at Stage 0 (not copied)
-  docs/consumer-install-record.md            written by install step P9 (path/bytes/LF/sha256 x41 + aggregate + source commit)
+  docs/consumer-install-record.md            written by install step P9 (path/bytes/LF/sha256 x41 + aggregate + source commit + install mode)
   docs/consumer-authority-register.md        only if a manual-only override is ever recorded
 ```
 
@@ -493,23 +505,161 @@ not an exception. The decision is exhaustive:
 | **1-3** | Genuinely ambiguous | **Ask exactly one role/location question and write nothing**; then act on the answer: "library/fork" -> exit 40; "my product repository" -> continue to P2; no clear answer -> stop | "This workspace has <N> of the four Project Aegis source-package landmarks (<the ones present>). Is it (a) a copy of the Project Aegis source library or a fork of it, or (b) your own product repository? Nothing has been written." |
 | **0** | Role B — the consumer/product repository | Continue to P2 | none |
 
-### P2 — Record and verify the two identity records
+### P2 — State the install mode, then verify the two identity records
 
-They are different records with different jobs (section 8).
+The two identity records are different records with different jobs (section 8).
+Before either is checked, the human states one **explicit install mode**, and the
+installing agent neither chooses it nor invents the words that accompany it:
+
+| `-Mode` | What the owner asserts | What this install may then do |
+| --- | --- | --- |
+| `human-only` | "I will make my own commits; this install authorizes no agent commit." | Copy and verify the 41 files and write the install record, recording the mode. It makes no commit and changes no Git configuration. |
+| `agent-commit` | "An agent will commit in this repository." | The same copy and record, but the effective author and committer must be valid non-owner identities; an owner match stops at exit 42. |
+
+There is no default and no inference from the identity values. Pass the token as
+`-Mode` and the owner's exact words as `-OwnerAuthorization`; the words are
+required for both modes, are used only to establish that the owner stated the
+mode, and are never written to a file (they may contain the owner's name, which
+section 8 keeps out of records). The mode and authorization are checked
+**before either identity record** (exit 43), then the owner record (exit 41),
+then the effective identity (exit 42). With an otherwise-valid target, an
+unstated mode therefore exits 43; an unusable target is refused earlier at its
+own documented exit 1 (missing target or not a Git repository). Nothing is
+written on either path, and a missing, empty or unrecognised mode, or a missing
+authorization, stops before anything is written.
+
+Save the block below as `install-mode.ps1` beside the section 7.1 harness. The
+harness runs it as its first step and copies nothing when it stops.
 
 ```powershell
-$ownerName  = (git -C $TGT config --local --get aegis.ownerName)  2>$null
-$ownerEmail = (git -C $TGT config --local --get aegis.ownerEmail) 2>$null
-if ([string]::IsNullOrWhiteSpace($ownerName) -or [string]::IsNullOrWhiteSpace($ownerEmail)) {
-  # print the exact section 8.2 remediation text; write nothing
+param(
+  [Parameter(Mandatory)][string]$Tgt,
+  [string]$Mode,
+  [string]$OwnerAuthorization
+)
+# Published P2 install-mode gate for docs/consumer-starter-package.md (v2).
+# Requires PowerShell 7 and Git. It reads the two identity records and the stated
+# install mode; it writes nothing, makes no commit and changes no Git configuration.
+# Exit codes: 0 accepted; 1 target unusable; 41 owner record missing or incomplete;
+# 42 commit identity missing/unparsable, or an agent-commit attempt under the owner
+# identity; 43 install mode or owner authorization not stated or not recognised.
+$ErrorActionPreference = 'Stop'
+
+function Stop-Gate([int]$Code, [string]$Message) {
+  [Console]::Error.WriteLine(('exit {0}: {1}' -f $Code, $Message))
+  exit $Code
+}
+
+$Tgt = [IO.Path]::GetFullPath($Tgt).TrimEnd([IO.Path]::DirectorySeparatorChar)
+if (-not (Test-Path -LiteralPath $Tgt -PathType Container)) { Stop-Gate 1 "target not found: $Tgt" }
+$null = (& git -C $Tgt rev-parse --git-dir 2>$null)
+if ($LASTEXITCODE -ne 0) { Stop-Gate 1 "target is not a git repository: $Tgt" }
+
+# P2.1 - state and validate the mode and the owner's authorization FIRST. The mode
+# is a decision the human states before either identity record is read; the token
+# is trimmed once and every later test uses that normalized value, so a padded
+# token cannot take a branch its trimmed form would not.
+$modeGiven = ''
+if ($null -ne $Mode) { $modeGiven = $Mode.Trim() }
+$authGiven = ''
+if ($null -ne $OwnerAuthorization) { $authGiven = $OwnerAuthorization.Trim() }
+if ($modeGiven -cnotin @('human-only', 'agent-commit')) {
+  Stop-Gate 43 ("install mode not stated or not recognised: Will an agent commit in this repository, or will you commit yourself? State exactly one of -Mode human-only (you commit yourself) or -Mode agent-commit (an agent commits), and pass the owner's words as -OwnerAuthorization. Nothing was written.")
+}
+if (-not $authGiven) {
+  Stop-Gate 43 "owner authorization missing: pass the owner's exact words that stated the mode as -OwnerAuthorization. Nothing was written."
+}
+
+# P2.2 - the owner record is read from --local only. Its values are not printed,
+# except when the effective identity is reported as matching them at exit 42.
+$ownerName  = ((& git -C $Tgt config --local --get aegis.ownerName)  2>$null | Out-String).Trim()
+$ownerEmail = ((& git -C $Tgt config --local --get aegis.ownerEmail) 2>$null | Out-String).Trim()
+if (-not $ownerName -or -not $ownerEmail) {
+  [Console]::Error.WriteLine(@'
+The starter package records who owns this repository, because every approval in
+docs/project-state.md names the person who authorized it. No owner record exists in
+this repository's local Git configuration.
+
+Set it for this repository only (it is never committed):
+  git config --local aegis.ownerName  "Your Name"
+  git config --local aegis.ownerEmail "you@example.com"
+
+These two keys are the record the startup gate reads before your first commit.
+Your user.name and user.email are a different record: they sign the commits, and the
+gate refuses a commit whose identity matches the owner on either name or email.
+
+Then run the installation again. Nothing was changed by this attempt.
+'@)
   exit 41
 }
-$authorLine    = (git -C $TGT var GIT_AUTHOR_IDENT)    2>$null
-$committerLine = (git -C $TGT var GIT_COMMITTER_IDENT) 2>$null
-# parse 'Name <email> <epoch> <tz>' from each; empty or unparsable -> exit 42
-# if either parsed name/email equals the owner record -> print the resolved values,
-# ask exactly ONE question, write nothing, exit 42
+
+# P2.3 - the effective identity is whatever git var reports, from any scope.
+$authorLine    = ((& git -C $Tgt var GIT_AUTHOR_IDENT)    2>$null | Out-String).Trim()
+$committerLine = ((& git -C $Tgt var GIT_COMMITTER_IDENT) 2>$null | Out-String).Trim()
+$rx = '^(.*) <([^>]*)> (\d+) ([+-]\d{4})$'
+$author = $null
+$committer = $null
+if ($authorLine -match $rx) { $author = [pscustomobject]@{ Name = $Matches[1].Trim(); Email = $Matches[2].Trim() } }
+if ($committerLine -match $rx) { $committer = [pscustomobject]@{ Name = $Matches[1].Trim(); Email = $Matches[2].Trim() } }
+if ($null -eq $author -or $null -eq $committer -or
+    -not $author.Name -or -not $author.Email -or -not $committer.Name -or -not $committer.Email) {
+  $identityHint = 'set user.name and user.email in a scope git var reads (or the GIT_AUTHOR_* and GIT_COMMITTER_* variables) and re-run'
+  if ($modeGiven -ceq 'human-only') {
+    Stop-Gate 42 ("commit identity missing or unparsable: git var GIT_AUTHOR_IDENT and GIT_COMMITTER_IDENT must each report 'Name <email> <epoch> <tz>'. This human-only install makes no commit and needs no agent commit, but P2 still measures the effective identity so its owner-match report is accurate; $identityHint. Nothing was written.")
+  }
+  Stop-Gate 42 ("commit identity missing or unparsable: git var GIT_AUTHOR_IDENT and GIT_COMMITTER_IDENT must each report 'Name <email> <epoch> <tz>'; $identityHint. Nothing was written.")
+}
+# The startup gate's own check is exact equality on either name or email (section 8.1).
+$matchFields = @()
+if ($author.Name -ceq $ownerName) { $matchFields += ('author name "{0}"' -f $author.Name) }
+if ($author.Email -ceq $ownerEmail) { $matchFields += ('author email "{0}"' -f $author.Email) }
+if ($committer.Name -ceq $ownerName) { $matchFields += ('committer name "{0}"' -f $committer.Name) }
+if ($committer.Email -ceq $ownerEmail) { $matchFields += ('committer email "{0}"' -f $committer.Email) }
+$ownerMatch = $matchFields.Count -gt 0
+
+# P2.4 - the mode decides which identity is acceptable. A human-only install makes
+# no commit; an agent-commit route keeps the unchanged non-owner requirement.
+if ($ownerMatch -and ($modeGiven -ceq 'agent-commit')) {
+  $matched = $matchFields -join '; '
+  [Console]::Error.WriteLine(('matched={0}' -f $matched))
+  [Console]::Error.WriteLine(('author={0} <{1}>' -f $author.Name, $author.Email))
+  [Console]::Error.WriteLine(('committer={0} <{1}>' -f $committer.Name, $committer.Email))
+  [Console]::Error.WriteLine(('Git reports this repository''s commit identity as matching the recorded owner on {0}. Will an agent commit in this repository, or will you commit yourself?' -f $matched))
+  exit 42
+}
+if ($modeGiven -ceq 'human-only') {
+  $ownerFlag = 'no'
+  if ($ownerMatch) { $ownerFlag = 'yes' }
+  Write-Output ('P2: mode=human-only owner_match={0} identity=not-recorded install_commit=none identity_mutation=none' -f $ownerFlag)
+  Write-Output 'P2: accepted; this install makes no commit and changes no Git configuration; a later agent commit is re-gated by this same check'
+  exit 0
+}
+Write-Output ('P2: mode=agent-commit owner_match=no identity={0} <{1}>' -f $author.Name, $author.Email)
+Write-Output 'P2: accepted; every agent commit additionally needs current commit authority and a DCO Signed-off-by trailer'
+exit 0
 ```
+
+- **`human-only` is accepted when the effective identity matches the owner
+  record**, because this install makes no commit and writes no Git
+  configuration. That is the decided solo-owner policy (section 8.3): a mode
+  decision, not a relaxed agent check.
+- **`agent-commit` with an owner-matching effective identity still exits 42**,
+  before any copy, printing the matched field and value, the resolved author and
+  committer, and exactly one question on **stderr** (section 8.3). The previous
+  stop is preserved for the route it was written for.
+- **Mode tokens are trimmed once.** `-Mode ' agent-commit '` is validated and
+  branched on exactly as `agent-commit`, and `-Mode ' human-only '` exactly as
+  `human-only`; padding never changes the decision or the recorded mode.
+- **The mode and authorization are checked first (exit 43), then the owner record
+  (exit 41), then the effective identity (exit 42)**, so a missing owner or a
+  malformed identity cannot pre-empt the mode question. All three stop before the
+  copy; the gate writes nothing, makes no commit and never runs `git config` in
+  write mode.
+- **A later agent commit is re-gated.** `human-only` is not a standing
+  permission: before an agent commits, this same procedure must accept
+  `agent-commit` with current commit authority, an effective non-owner identity
+  and the mandatory provenance step (section 8.3). The startup gate's own check
+  is unchanged.
 
 Scope is part of the contract, not an implementation detail: the **owner record is
 read with `--local` only** (the gate's own check does the same,
@@ -520,9 +670,11 @@ owner-record side. Do not substitute the installing agent's identity, the source
 repository's author, or a placeholder.
 
 The gate's own snippet is a **different layer**: it exits 1 when the commit
-identity matches the owner record (`SKILL.md:137-138`), while this procedure's
-prerequisite layer exits 42 (section 7.2). A consumer who sees exit 1 from the
-gate has a gate refusal, not an install failure.
+identity matches the owner record (`SKILL.md:137-138`), and it is run by the host
+agent before an agent-authored commit; this procedure's prerequisite layer exits
+42 for the `agent-commit` route (section 7.2). A consumer who sees exit 1 from
+the gate has a gate refusal, not an install failure, and a `human-only` install
+runs neither an agent commit nor the gate's own check.
 
 ### P3 — Clone the source at a pinned commit, and prove the checkout
 
@@ -650,39 +802,54 @@ pass.
 
 The harness writes `docs/consumer-install-record.md` when given `-RecordPath`.
 The record contains the source commit and tree; the date; the PowerShell, Git and
-`sh` versions; the owner record's **presence only** (never its value); the 41
-rows (path, bytes, LF, SHA-256) in ordinal order; the aggregate with its row count
-and serialized byte length; the five disclosed non-resolving repo-root links
-(section 3); and the rule that a later mismatch is a stop. Without `-RecordPath`
-the harness still prints the three aggregate numbers. Then hand over to your host
-agent: the front door reads `docs/project-state.md` first, finds none, proposes
-the cold-start document, and begins Stage 0.
+`sh` versions; the owner record's **presence only** (never its value); the install
+mode P2 accepted, and the statement that a `human-only` install made no agent
+commit and changed no Git identity (or, for `agent-commit`, that every agent
+commit needs the accepted non-owner identity, current authority and a DCO
+`Signed-off-by` trailer); the 41 rows (path, bytes, LF, SHA-256) in ordinal
+order; the aggregate with its row count and serialized byte length; the five
+disclosed non-resolving repo-root links (section 3); and the rule that a later
+mismatch is a stop. Without `-RecordPath` the harness still prints the three
+aggregate numbers. Then hand over to your host agent: the front door reads
+`docs/project-state.md` first, finds none, proposes the cold-start document, and
+begins Stage 0.
 
-### 7.1 The published harness (P5-P9, runnable as written)
+### 7.1 The published harness (P2 gate + P5-P9, runnable as written)
 
-Save the block below as `install-starter.ps1` and run it under PowerShell 7:
+Save P2's block as `install-mode.ps1` and the block below as
+`install-starter.ps1` in the same directory, then run the harness under
+PowerShell 7:
 
 ```powershell
-pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -RecordPath C:\path\to\product\docs\consumer-install-record.md
+pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode human-only -OwnerAuthorization '<the owner''s words>' -RecordPath C:\path\to\product\docs\consumer-install-record.md
 ```
 
-It is a complete, runnable form of P5-P9: the failure paths write to stderr and
-`exit`, never `Write-Error`, so an inherited `$ErrorActionPreference = 'Stop'`
-cannot turn a documented code into exit 1. It defines `$package` (the 41 paths)
-and takes `$Src`, `$Tgt`, `$Sh` and `-RecordPath` as parameters. In a target
-tree with no junction or symlink on a destination path, it writes nothing
-outside the 41 package paths and the install record. A destination reparse point
-is outside this package's guarantee: the harness does not detect it, and a write can pass
-through it to a location outside the target (section 1.3).
+It is a complete, runnable form of the P2 gate invocation and P5-P9: the failure
+paths write to stderr and `exit`, never `Write-Error`, so an inherited
+`$ErrorActionPreference = 'Stop'` cannot turn a documented code into exit 1. It
+defines `$package` (the 41 paths) and takes `$Src`, `$Tgt`, `$Mode`,
+`-OwnerAuthorization`, `$ModeGate`, `$Sh` and `-RecordPath` as parameters. It
+runs P2's `install-mode.ps1` as a child process before it reads a source pin or
+writes a file, and exits with that gate's code; `-ModeGate` overrides the default
+location beside the harness. After the gate accepts, the harness trims the mode
+once and uses that normalized value for the install record and every later branch,
+so a padded token cannot record a policy it did not authorize. In a target tree with no junction or symlink on a
+destination path, it writes nothing outside the 41 package paths and the install
+record. A destination reparse point is outside this package's guarantee: the
+harness does not detect it, and a write can pass through it to a location outside
+the target (section 1.3).
 
 ```powershell
 param(
   [Parameter(Mandatory)][string]$Src,
   [Parameter(Mandatory)][string]$Tgt,
+  [string]$Mode,
+  [string]$OwnerAuthorization,
+  [string]$ModeGate,
   [string]$Sh = 'C:\Program Files\Git\bin\sh.exe',
   [string]$RecordPath
 )
-# Published P5-P9 harness for docs/consumer-starter-package.md (v2).
+# Published P2-gate + P5-P9 harness for docs/consumer-starter-package.md (v2).
 # Requires PowerShell 7. Failure paths write to stderr and exit; they never use
 # Write-Error, so an inherited $ErrorActionPreference = 'Stop' cannot turn a
 # documented exit code into exit 1.
@@ -702,6 +869,24 @@ $Tgt = [IO.Path]::GetFullPath($Tgt).TrimEnd([IO.Path]::DirectorySeparatorChar)
 $Src = [IO.Path]::GetFullPath($Src).TrimEnd([IO.Path]::DirectorySeparatorChar)
 if (-not (Test-Path -LiteralPath $Tgt -PathType Container)) { Stop-Step 1 "target not found: $Tgt" }
 if (-not (Test-Path -LiteralPath $Src -PathType Container)) { Stop-Step 1 "source clone not found: $Src" }
+
+# P2 - the install-mode gate from section P2 is the separate published block. It
+# runs as a child process before any pin is read or any file is written, and this
+# harness exits with the gate's own code.
+if (-not $ModeGate) {
+  if (-not $PSScriptRoot) { Stop-Step 43 "no -ModeGate given and this script has no directory: save P2's block as install-mode.ps1 beside the harness, or pass -ModeGate" }
+  $ModeGate = Join-Path $PSScriptRoot 'install-mode.ps1'
+}
+if (-not (Test-Path -LiteralPath $ModeGate -PathType Leaf)) { Stop-Step 43 "install-mode.ps1 not found at $ModeGate; save P2's block beside the harness, or pass -ModeGate" }
+$pwshExe = (Get-Process -Id $PID).Path
+if (-not $pwshExe) { $pwshExe = Join-Path $PSHOME 'pwsh' }
+if (-not (Test-Path -LiteralPath $pwshExe)) { $pwshExe = Join-Path $PSHOME 'pwsh.exe' }
+& $pwshExe -NoProfile -File $ModeGate -Tgt $Tgt -Mode $Mode -OwnerAuthorization $OwnerAuthorization
+$gateCode = $LASTEXITCODE
+if ($gateCode -ne 0) { Stop-Step $gateCode "the P2 install-mode gate refused; nothing was copied" }
+# The gate accepted this mode after trimming; use that same normalized value for
+# the install record and every later branch, never the raw argument.
+$Mode = $Mode.Trim()
 
 # P4 - the 41-path package list, transcribed from section 2.3 (ordinal order).
 $package = @(
@@ -940,9 +1125,9 @@ if ($RecordPath) {
     $record = New-Object System.Text.StringBuilder
     $ownerName = (& git -C $Tgt config --local --get aegis.ownerName 2>$null)
     $ownerEmail = (& git -C $Tgt config --local --get aegis.ownerEmail 2>$null)
-    $ownerPresent = 'absent - P2 (exit 41) stops before an install; this harness does not enforce P2; values never recorded'
+    $ownerPresent = 'absent - the P2 gate (exit 41) stops before any copy; values never recorded'
     if ($ownerName -and $ownerEmail) { $ownerPresent = 'present on both keys (values not recorded)' }
-    elseif ($ownerName -or $ownerEmail) { $ownerPresent = 'incomplete - one key missing; P2 (exit 41) stops before an install; values never recorded' }
+    elseif ($ownerName -or $ownerEmail) { $ownerPresent = 'incomplete - one key missing; the P2 gate (exit 41) stops before any copy; values never recorded' }
     $branch = (& git -C $Src symbolic-ref -q --short HEAD 2>$null)
     $headState = 'detached HEAD'
     if ($branch) { $headState = 'on branch ' + $branch }
@@ -952,6 +1137,12 @@ if ($RecordPath) {
     [void]$record.AppendLine('- Installed: ' + (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssK'))
     [void]$record.AppendLine('- Tools: PowerShell ' + $PSVersionTable.PSVersion.ToString() + '; ' + ((& git --version) -join '').Trim() + '; sh ' + $Sh)
     [void]$record.AppendLine('- Owner record: ' + $ownerPresent)
+    [void]$record.AppendLine('- Install mode: ' + $Mode + ' (owner-stated; the P2 gate accepted it before the copy)')
+    if ($Mode -ceq 'human-only') {
+      [void]$record.AppendLine('- Agent commit: none made by this install; no Git identity was written. A later agent commit is re-gated by the same check.')
+    } else {
+      [void]$record.AppendLine('- Agent commit: only under the accepted non-owner identity, with current authority and a DCO Signed-off-by trailer on every commit.')
+    }
     [void]$record.AppendLine('- Rows: 41; serialized bytes: ' + $serialized.Length + '; aggregate: ' + $aggregate)
     [void]$record.AppendLine('- Result: P5-P8 exit 0. A later mismatch in any row is a stop, not a warning.')
     [void]$record.AppendLine('- Five non-resolving source-repo citations are disclosed in docs/consumer-starter-package.md section 3: docs/skills-catalog.md, docs/paths/design-and-build-ui.md, docs/paths/add-ai-safely.md, docs/paths/release-with-agents.md, docs/acceptance/scenario-a-runbook.md')
@@ -995,16 +1186,18 @@ carries its own executable form, so a reader does not have to take the checks on
 trust.
 
 That measured run covers the **39-file v1 definition**; it remains the v1
-measurement. The v2 block differs from it only in the two added `$package` rows
-and the values and labels derived from them: the counts (`41`, `18`, `39`,
-`18/23`, the record's row count), the `$AggSha`/`$AggRows`/`$AggBytes`
-constants, and the comment and install-record header text that names the row
-count.
+measurement. The v2 block differs from it in the two added `$package` rows, the
+values and labels derived from them (the counts `41`, `18`, `39`, `18/23`,
+the record's row count, the `$AggSha`/`$AggRows`/`$AggBytes` constants, and
+the comment and install-record header text that names the row count), and — since
+the 2026-10-28 install-mode revision — the P2 gate invocation and the install
+record's mode lines.
 
-**Verified for v2 on 2026-10-28.** The block was extracted from this page exactly
-(17,305 B / 294 LF, sha256 `78f8a2f93bb46f274d6bc59027e69108bd1ebd416b9b0661d521a69c5753bf86`)
-and run as written under PowerShell 7.6.6 against a fresh clone of `ffb040c7`
-and an isolated consumer destination outside this repository. Result: **exit 0**;
+**Verified for v2 on 2026-10-28 (the block before the install-mode revision).**
+The block then on this page was extracted exactly (17,305 B / 294 LF, sha256
+`78f8a2f93bb46f274d6bc59027e69108bd1ebd416b9b0661d521a69c5753bf86`) and run as
+written under PowerShell 7.6.6 against a fresh clone of `ffb040c7` and an
+isolated consumer destination outside this repository. Result: **exit 0**;
 41 installed files; 18/18 manifest pins; 23/23 source pins; 0 missing siblings;
 aggregate `fcff1124…b699` over 5,420 serialized bytes; install record **6,816 B**.
 Negative fixtures: a changed destination byte -> **exit 31** naming the file; an
@@ -1019,6 +1212,38 @@ duplicate-ID history, refusing the invalid ones without performing any action. T
 commands, outputs, host versions and retained UNRUNs are in
 [the v2 evidence record](evidence/consumer-readiness/local-starter-v2.md); the v1
 measurement above is unchanged.
+
+**Verified for the install-mode revision on 2026-10-28** (re-verified after the
+Stage D correction of the same date). P2's block and the section 7.1 block were
+re-extracted exactly (P2 `install-mode.ps1` **6,493 B / 105 LF**, sha256
+`fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea`; harness
+`install-starter.ps1` **19,076 B / 321 LF**, sha256
+`435c7b64db3cfb8df0645525422bc6781e60108a24f46c1327f997c516c91a6c`) and run on
+the same measured host against a worktree of `ffb040c7` and isolated consumer
+fixtures. Results: a `human-only` install with `owner_match=yes` exited **0**
+with 41 installed files, 18/18 manifest pins, 23/23 source pins and the published
+aggregate; it wrote a **7,025 B** record whose mode lines record that no agent
+commit was made and no Git identity was written, and left the fixture at **0
+commits** with its local Git configuration byte-identical. An `agent-commit`
+route exited **0**, and its fixture commit carried the measured non-owner author
+and committer plus a DCO `Signed-off-by`. An owner identity on the
+`agent-commit` route exited **42** before any commit, writing the matched field
+and value plus the question to **stderr**; a padded `-Mode ' agent-commit '` was
+refused identically (before this correction it was wrongly accepted with exit 0
+and `owner_match=no`). A padded `-Mode ' human-only '` was accepted as
+`human-only`, and the harness recorded that normalized mode and the human-only
+policy, not the raw token. A missing owner exited **41**; a missing, empty or
+malformed mode and a missing authorization exited **43**; a missing owner or a
+malformed identity **with no mode** exited **43** (the mode is checked first); a
+malformed effective identity with `human-only` exited **42**; and the section
+7.1 harness with no mode exited **43** with **0 files** written. A later
+`agent-commit` proposal on the installed `human-only` tree exited **42** until
+the human stated the distinct agent identity. Restoring the old unconditional
+owner-match branch made the same `human-only` fixture exit **42**. A
+command-scoped `git -c` identity that the gate's separate `git var` cannot see
+was refused **42** on the identity it measured, rather than approved. The
+commands, outputs, exit codes and retained UNRUNs are in
+[human-commit-install-v1](evidence/consumer-readiness/human-commit-install-v1.md).
 
 ### 7.2 Exit codes
 
@@ -1035,7 +1260,8 @@ Each code stops; none warns and continues.
 | 32 | Missing sibling dependency | The installed skill that links it and the absent sibling it names, as `<skill> links <sibling>/SKILL.md` |
 | 40 | Wrong repository role | The four-landmark stop message (P1) |
 | 41 | Owner record missing | The exact `aegis.*` remediation text (section 8.2) |
-| 42 | Commit identity missing or owner-matching | The resolved author/committer values and one question (section 8.3). This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
+| 42 | Commit identity missing or owner-matching on the `agent-commit` route | On **stderr**: the parse failure, or the matched field and value plus the resolved author/committer and one question (section 8.3). A `human-only` install does not exit 42 on an owner match, because it makes no commit; it is not a relaxed agent check. Both modes still need a parsable identity, because P2 reports `owner_match=` in its acceptance line. This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
+| 43 | Install mode or owner authorization not stated, empty or unrecognised | The exact question and the two valid `-Mode` tokens (P2). Nothing written; no package file copied |
 
 ## 8. The two identity records
 
@@ -1048,7 +1274,18 @@ The human who authorizes: the person the Aegis route calls "you" and the actor a
 | Record | Keys | Scope that counts | What it is for | Who reads it |
 | --- | --- | --- | --- | --- |
 | **Owner record** | `aegis.ownerName`, `aegis.ownerEmail` | `--local` **only** — the gate reads these with `git config --local` (`SKILL.md:117-120, 126-127`) | Names the human every approval belongs to; never committed; the identity the gate refuses to see commit | The gate's presence/owner check before the first commit (`SKILL.md:126-141`) |
-| **Commit identity** | `user.name`, `user.email` (any scope; `git var` is authoritative) | local, global, `GIT_AUTHOR_*`/`GIT_COMMITTER_*`, `GIT_CONFIG_*`, or `git -c` (`SKILL.md:99-110`) | Signs the commit | Git, and the gate, which compares it with the owner record and **refuses a match on either name or email** (`SKILL.md:105-110, 137, 209-211`) |
+| **Commit identity** | `user.name`, `user.email` (any scope; `git var` is authoritative) | local, global, `GIT_AUTHOR_*`/`GIT_COMMITTER_*`, `GIT_CONFIG_*` (`SKILL.md:99-110`) | Signs the commit | Git, and the gate, which compares it with the owner record and **refuses a match on either name or email** (`SKILL.md:105-110, 137, 209-211`) |
+
+A command-scoped `git -c user.name=…` given only to a later `git commit` is **not
+visible** to P2's separate `git var` process. P2 measures the fallback/default
+identity, not that override, so a `git -c` identity used for the commit is
+**unobserved** by the gate. It is therefore **unsupported** on this route and
+**must not be used for commits**; the route does not claim to fail closed on it.
+Set the identity in a scope `git var` reads (local or global config, or the
+`GIT_AUTHOR_*`/`GIT_COMMITTER_*` variables) before P2; keep the startup gate's
+own check and the mandatory manual provenance step, and verify the identity the
+commit actually records. The same rule applies to the harness, which invokes the
+gate as its own process and records only what that process measured.
 
 The approval record stays separate from both: `docs/project-state.md` carries the
 role ("project owner") and the approval ID, because the schema forbids identifying
@@ -1081,25 +1318,60 @@ Never proceed with an invented identity; never reuse the source repository's
 committer; never write the installing agent's name; never set identity on the
 human's behalf without their words.
 
-### 8.3 If the commit identity is missing or matches the owner (exit 42)
+### 8.3 If the agent-commit identity is missing or matches the owner (exit 42)
 
-Show the resolved values and ask **exactly one** question:
+The 42 stop has two forms, both written to **stderr**.
 
-> Git reports this repository's author and committer as `<name> <email>`, which is the recorded owner. Will an agent commit in this repository, or will you commit yourself?
+When the effective author or committer is missing/unparsable, the gate prints the
+parse failure and the identity hint; on the `human-only` route the hint says
+explicitly that the install makes no commit and needs no agent commit, and only
+requires a parsable identity for the owner-match report.
+
+When an `agent-commit` attempt matches the owner record on name or email, the
+gate prints the matched field and value, the resolved author and committer, and
+asks **exactly one** question:
+
+> Git reports this repository's commit identity as matching the recorded owner on `<matched>`. Will an agent commit in this repository, or will you commit yourself?
+
+`<matched>` is the field/value list that actually matched (`author name "…"`,
+`author email "…"`, `committer name "…"` or `committer email "…"`), printed as
+a `matched=` line; the gate never labels the author as the owner when only the
+committer matched.
 
 Then:
 
 - If an agent will commit and the human names a distinct agent identity, set it
   **only with their words**, for that repository (`git config --local user.name` /
-  `user.email`), and re-run P2; a passing run prints the resolved author and
-  committer and continues.
-- If the human says they will commit themselves, record that answer: a solo owner
-  may commit under their own identity (the decided policy below). The install's P2
-  check still stops at exit 42 because the shipped check is unchanged and cannot
-  tell an owner's commit from an agent's; that stop is the check's behaviour, not a
-  finding that the owner's commit is disallowed. This page does not claim a bypass.
-  Only agent-authored commits must use the separate agent identity.
-- If the answer is unclear, do not guess and do not write.
+  `user.email`), and re-run P2 with `-Mode agent-commit`; a passing run prints
+  the resolved author identity in its `identity=<name> <email>` field and
+  continues (the gate does not print the committer on success).
+- If the human says they will commit themselves, that is the **`human-only`
+  mode**: re-run P2 with `-Mode human-only` and the owner's words as
+  `-OwnerAuthorization`. A solo owner may commit under their own identity (the
+  decided policy below), and the `human-only` install is accepted even when the
+  effective identity is the owner's, because it makes **no commit** and writes no
+  Git configuration. The recorded mode is the answer; nothing about the identity
+  is changed or hidden. This page claims no bypass of the agent check: the
+  `agent-commit` route still refuses the same identity.
+- If the answer is unclear, do not guess and do not write: the gate exits 43 and
+  copies nothing.
+
+**A `human-only` install still needs a parsable Git identity**, even though it
+makes no commit: P2's acceptance line reports `owner_match=`, which is the same
+exact-equality check a later agent commit will apply, and an unparsable identity
+would make that report meaningless. It does **not** require the human to let an
+agent commit, choose an agent identity, or change any Git configuration. Set
+`user.name` and `user.email` for the repository (or the `GIT_AUTHOR_*`/
+`GIT_COMMITTER_*` variables) and re-run the same `-Mode human-only` command.
+
+**A `human-only` install does not authorize a later agent commit.** Before an
+agent-authored commit in that repository, run this procedure again with
+`-Mode agent-commit` (or the startup gate's own presence/owner check, which is
+unchanged). That re-gate needs the current commit authority, an effective
+non-owner author and committer, and the gate's mandatory manual provenance step
+(`.claude/skills/agent-startup-context-gate/SKILL.md:143-169`); every agent
+commit also carries a DCO `Signed-off-by` trailer. The owner's statement about
+who commits is not a reusable authorization for an agent to commit.
 
 **A solo consumer is the normal case.** If the owner's name and email are the same
 as the machine's Git identity, an agent commit under that identity is refused by
@@ -1130,10 +1402,12 @@ owner's own commits to use a separate identity is removed.
 The gate's shipped check is unchanged: it compares the effective author and
 committer with the owner record and exits 1 on a name or email match
 (`.claude/skills/agent-startup-context-gate/SKILL.md:137-138`), and this
-prerequisite layer exits 42 on the same condition. The check cannot distinguish
-an agent's commit from the owner's; the policy decides which commits must use the
-agent identity, and the check remains the fail-closed guard that an agent commit
-must satisfy. No gate change is made or claimed.
+prerequisite layer exits 42 on the same condition for the `agent-commit` route.
+The check cannot distinguish an agent's commit from the owner's; the policy
+decides which commits must use the agent identity, and the check remains the
+fail-closed guard that an agent commit must satisfy. A `human-only` install makes
+no commit, so it never reaches that check, and it does not weaken it. No gate
+change is made or claimed.
 
 This decision does not make the package consumer-ready: the 9 Stage E acceptance
 rows listed in the evidence record remain UNRUN, and none is converted by this
@@ -1152,6 +1426,9 @@ repository's evidence and does not replace the separate acceptance record.
 - The aggregate and its three published numbers (rows, serialized bytes, SHA-256).
 - The five non-resolving repo-root links disclosed in section 3.
 - The owner record's presence (not its value).
+- The install mode P2 accepted and what it did or did not authorize (no agent
+  commit and no identity change for `human-only`; the non-owner identity and
+  provenance rule for `agent-commit`).
 - The statement that a later mismatch is a stop.
 
 The section 7.1 harness writes this file when given `-RecordPath`, so the record
@@ -1241,8 +1518,10 @@ Highest first, applied in your product repository:
   stands in for independent verification - human confirmation, not a second
   independent agent - and the DECISION entry records it as human confirmation.
   An agent's self-verification is never recorded as one.
-- **Missing owner is a stop, not a default.** No owner record -> exit 41; no
-  acceptable commit identity -> exit 42 (section 8). No covering grant -> stop and
+- **Missing owner, missing mode and malformed identity are stops, not
+  defaults.** No owner record -> exit 41; an unstated or unrecognised install mode,
+  or a missing owner authorization -> exit 43; no acceptable commit identity on the
+  `agent-commit` route -> exit 42 (section 8). No covering grant -> stop and
   request one. No owning skill -> stop and name the install (section 4.2).
 
 ### 10.3 Two records, one domain split
@@ -1318,6 +1597,11 @@ a pass.
   may commit under their own identity; only agent-authored commits must use the
   documented repository-local agent identity. The gate's fail-closed check for
   agent commits is unchanged; the package still makes no consumer-readiness claim.
+- **The install mode is an owner statement, not a verified identity.** The P2 gate
+  requires an explicit mode and the owner's words and refuses an unclear answer,
+  but it cannot prove who supplied them (section 1.3). It is a decision procedure
+  with documented refusals, not a security boundary, and it never edits Git
+  configuration.
 - **The startup gate is behaviour, not a boundary** (section 1.3): it can be
   bypassed by anyone who chooses to, and its Windows lock lane is SKIP/UNRUN.
 - **The install record is evidence of identity, not a signature or a tamper-proof

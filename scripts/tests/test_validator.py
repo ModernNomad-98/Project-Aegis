@@ -7172,6 +7172,656 @@ def test_consumer_starter_selectors():
             )
 
 
+# --- consumer starter package: explicit install mode (S3-1..S3-6) -----------
+# Item 3 of the owner's four-priority plan. The oracle is the PUBLISHED procedure:
+# both blocks below are extracted from docs/consumer-starter-package.md exactly as
+# a reader would save them, and executed with pwsh and Git against disposable
+# repositories. Nothing here re-implements the mode decision.
+
+STARTER_MODE_HEADING = "### P2 "
+STARTER_HARNESS_HEADING = "### 7.1 "
+STARTER_PIN_COMMIT = "ffb040c7a363648856475280646bbd142dfabe4e"
+STARTER_PIN_TREE = "88a5aee4ad928a49c2fb945032585843ec652da7"
+STARTER_SOLO = ("Peter Nguyen", "263130032+ModernNomad-98@users.noreply.github.com")
+STARTER_AGENT = ("Aegis Agent (DeepSeek V4 Flash)", "agent@example.invalid")
+STARTER_OWNER = ("Owner Person", "owner@example.invalid")
+# F1: the four padding shapes a -Mode token can carry. Each must behave
+# exactly as its trimmed form; none may skip the owner-identity refusal.
+STARTER_PADDED_MODES = (
+    ("leading space", " agent-commit"),
+    ("trailing space", "agent-commit "),
+    ("leading and trailing space", " agent-commit "),
+    ("TAB", "\tagent-commit\t"),
+)
+
+
+def _starter_fenced_block(text: str, heading: str, ordinal: int = 0) -> str:
+    """Return the exact body of one fenced block under a heading (LF, no final LF).
+
+    Same semantics as the extraction used for the evidence record: the first
+    fence after the heading opens block 0, its closing fence ends it, and the
+    body is joined with LF. A heading with too few fences is a test failure.
+    """
+    lines = text.split("\n")
+    start = next((i for i, line in enumerate(lines) if line.startswith(heading)), None)
+    assert start is not None, "the starter page has no heading " + heading
+    # Bound the scan at the next heading of the same level, so a missing closing
+    # fence fails here instead of silently consuming a later section. Code
+    # comments inside the blocks start with "# " or "# P2...", never "### ", so
+    # the heading marker cannot mistake a comment for the section boundary.
+    level = len(heading) - len(heading.lstrip("#"))
+    marker = "#" * level + " "
+    end = next(
+        (i for i in range(start + 1, len(lines)) if lines[i].startswith(marker)),
+        len(lines),
+    )
+    fences = [i for i in range(start + 1, end) if lines[i].startswith("```")]
+    assert len(fences) >= 2 * (ordinal + 1), (
+        "the %s section bounded at line %d has %d fence lines, not enough for block %d"
+        % (heading, end + 1, len(fences), ordinal)
+    )
+    assert fences[2 * ordinal + 1] < end, (
+        "the %s block %d does not close inside its own section" % (heading, ordinal)
+    )
+    return "\n".join(lines[fences[2 * ordinal] + 1:fences[2 * ordinal + 1]])
+
+
+def _install_mode_pwsh() -> str | None:
+    """Locate PowerShell 7 for the published blocks (required in CI on both hosts)."""
+    exe = shutil.which("pwsh") or shutil.which("pwsh.exe")
+    if exe:
+        return exe
+    for candidate in (
+        Path(r"C:\Program Files\PowerShell\7\pwsh.exe"),
+        Path("/usr/bin/pwsh"),
+        Path("/opt/microsoft/powershell/7/pwsh"),
+    ):
+        if candidate.is_file():
+            return str(candidate)
+    return None
+
+
+def _install_mode_sh() -> str | None:
+    """Locate the POSIX sh the harness verifies; Windows uses Git's own shell."""
+    if sys.platform == "win32":
+        candidates = [
+            Path(r"C:\Program Files\Git\bin\sh.exe"),
+            Path(r"C:\Program Files\Git\usr\bin\sh.exe"),
+        ]
+        git = shutil.which("git")
+        if git:
+            root = Path(git).resolve().parent.parent
+            candidates += [root / "bin" / "sh.exe", root / "usr" / "bin" / "sh.exe"]
+        return next((str(c) for c in candidates if c.is_file()), None)
+    return shutil.which("sh")
+
+
+def _install_mode_unrun(label: str) -> None:
+    """Required on Linux; an unsupported host is UNRUN, never a pass."""
+    if sys.platform.startswith("linux"):
+        raise AssertionError("required install-mode case unavailable on Linux: " + label)
+    REQUIRED_SKIPS.append(label)
+    skip("UNRUN: required install-mode lane unavailable on " + sys.platform + ": " + label)
+
+
+def _install_mode_env(home: Path) -> dict:
+    """Isolate Git configuration so only each fixture's local config can answer."""
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    env.update({
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_GLOBAL": str(home / "gitconfig"),
+        "HOME": str(home),
+        "XDG_CONFIG_HOME": str(home / "xdg"),
+        "GIT_TERMINAL_PROMPT": "0",
+        "PYTHONIOENCODING": "utf-8",
+    })
+    return env
+
+
+def _install_mode_git(repo: Path, *args: str, env=None) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["git", "-C", str(repo)] + list(args), env=env,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+
+
+def _install_mode_repo(path: Path, env, owner=STARTER_SOLO, ident=STARTER_SOLO) -> Path:
+    """Create a zero-commit fixture repository with the requested records only."""
+    path.mkdir(parents=True, exist_ok=True)
+    proc = subprocess.run(
+        ["git", "init", "-q", "--initial-branch=main", str(path)],
+        env=env, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    if owner is not None:
+        assert _install_mode_git(path, "config", "--local", "aegis.ownerName", owner[0], env=env).returncode == 0
+        assert _install_mode_git(path, "config", "--local", "aegis.ownerEmail", owner[1], env=env).returncode == 0
+    if ident is not None:
+        assert _install_mode_git(path, "config", "--local", "user.name", ident[0], env=env).returncode == 0
+        assert _install_mode_git(path, "config", "--local", "user.email", ident[1], env=env).returncode == 0
+    return path
+
+
+def _install_mode_files(repo: Path) -> list[str]:
+    return sorted(
+        item.relative_to(repo).as_posix() for item in repo.rglob("*")
+        if item.is_file() and ".git" not in item.relative_to(repo).parts
+    )
+
+
+def _install_mode_config(repo: Path, env) -> list[str]:
+    return _install_mode_git(repo, "config", "--local", "--list", env=env).stdout.splitlines()
+
+
+def _install_mode_commits(repo: Path, env) -> int:
+    return int((_install_mode_git(repo, "rev-list", "--all", "--count", env=env).stdout or "0").strip() or 0)
+
+
+def _install_mode_gate(pwsh: str, script: Path, repo: Path, env, mode=None, authorization=None):
+    args = [pwsh, "-NoProfile", "-File", str(script), "-Tgt", str(repo)]
+    if mode is not None:
+        args += ["-Mode", mode]
+    if authorization is not None:
+        args += ["-OwnerAuthorization", authorization]
+    return subprocess.run(
+        args, env=env, capture_output=True, text=True,
+        encoding="utf-8", errors="replace", timeout=180,
+    )
+
+
+def test_consumer_install_mode_gate():
+    """S3-1..S3-6: the published P2 install-mode gate is executed as the oracle."""
+    assert STARTER_DOC.is_file(), "the starter package page is missing: %s" % STARTER_DOC
+    page = STARTER_DOC.read_text(encoding="utf-8")
+    gate_text = _starter_fenced_block(page, STARTER_MODE_HEADING)
+    assert "param(" in gate_text and "Stop-Gate" in gate_text, (
+        "the P2 section does not publish a runnable block"
+    )
+    assert "$ownerMatch -and ($modeGiven -ceq 'agent-commit')" in gate_text, (
+        "the P2 block does not branch on the normalized mode"
+    )
+    assert "$Mode -ceq 'agent-commit'" not in gate_text, (
+        "the P2 block still branches on the raw -Mode value"
+    )
+    # F9: the fence scan is bounded by the section heading, so a missing closing
+    # fence is a test failure rather than a silent read into the next section.
+    unbounded = (
+        "### P2 \n\n```powershell\nparam()\n\n"
+        "### P3 \n\n```powershell\nWrite-Output 'x'\n```\n"
+    )
+    try:
+        _starter_fenced_block(unbounded, "### P2 ")
+    except AssertionError:
+        ok("F9: a missing P2 closing fence fails at the section boundary")
+    else:
+        raise AssertionError(
+            "F9: the fence extractor accepted a block that never closed"
+        )
+    pwsh = _install_mode_pwsh()
+    if pwsh is None:
+        _install_mode_unrun("pwsh 7 is not available to run the published P2 block")
+        return
+    if shutil.which("git") is None:
+        _install_mode_unrun("git is required to build the install-mode fixtures")
+        return
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        env = _install_mode_env(tmp)
+        gate = tmp / "install-mode.ps1"
+        gate.write_text(gate_text, encoding="utf-8", newline="\n")
+
+        # S3-1: a valid human-only install is accepted even when the effective
+        # author and committer ARE the owner, and nothing is committed or written.
+        solo = _install_mode_repo(tmp / "s3-1", env)
+        config_before = _install_mode_config(solo, env)
+        files_before = _install_mode_files(solo)
+        proc = _install_mode_gate(pwsh, gate, solo, env, "human-only", "I will commit myself.")
+        assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+        out = proc.stdout
+        assert "mode=human-only" in out, out
+        assert "owner_match=yes" in out, out
+        assert "install_commit=none" in out and "identity_mutation=none" in out, out
+        assert _install_mode_config(solo, env) == config_before, "the gate changed local Git config"
+        assert _install_mode_files(solo) == files_before, "the gate wrote into the target"
+        assert _install_mode_commits(solo, env) == 0, "the gate made a commit"
+        ok("S3-1: human-only with owner-matching identity exits 0, with 0 commits, "
+           "0 files written and byte-identical local Git config")
+
+        # S3-2: an explicit non-owner agent route is accepted, the measured
+        # identity is what a fixture commit carries, and the gate changed nothing.
+        agent = _install_mode_repo(tmp / "s3-2", env, owner=STARTER_OWNER, ident=STARTER_AGENT)
+        config_before = _install_mode_config(agent, env)
+        proc = _install_mode_gate(pwsh, gate, agent, env, "agent-commit",
+                                  "The agent will commit as the recorded agent identity.")
+        assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+        assert ("identity=%s <%s>" % STARTER_AGENT) in proc.stdout, proc.stdout
+        assert _install_mode_config(agent, env) == config_before, "the gate changed local Git config"
+        measured = _install_mode_git(agent, "var", "GIT_AUTHOR_IDENT", env=env).stdout.strip()
+        assert measured.startswith("%s <%s> " % STARTER_AGENT), measured
+        (agent / "NOTICE.txt").write_text("fixture commit\n", encoding="utf-8")
+        assert _install_mode_git(agent, "add", "--", "NOTICE.txt", env=env).returncode == 0
+        commit = _install_mode_git(
+            agent, "commit", "-q", "-s", "-m", "test: fixture commit by the agent route", env=env)
+        assert commit.returncode == 0, commit.stderr
+        log = _install_mode_git(agent, "log", "-1", "--format=%an%n%ae%n%cn%n%ce%n%B", env=env).stdout
+        fields = log.splitlines()
+        assert fields[:4] == [STARTER_AGENT[0], STARTER_AGENT[1], STARTER_AGENT[0], STARTER_AGENT[1]], fields[:4]
+        assert "Signed-off-by: %s <%s>" % STARTER_AGENT in log, log
+        assert _install_mode_git(agent, "config", "--local", "--get", "aegis.ownerName", env=env).stdout.strip() == STARTER_OWNER[0]
+        ok("S3-2: agent-commit exits 0 for the measured non-owner identity, and an "
+           "isolated fixture commit carries that author and committer plus Signed-off-by")
+
+        # S3-3: the same route under the owner identity is refused before a commit.
+        owner_agent = _install_mode_repo(tmp / "s3-3", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        config_before = _install_mode_config(owner_agent, env)
+        proc = _install_mode_gate(pwsh, gate, owner_agent, env, "agent-commit", "The agent will commit.")
+        assert proc.returncode == 42, (proc.returncode, proc.stdout, proc.stderr)
+        assert proc.stdout == "", "exit 42 must write only to stderr: %r" % proc.stdout
+        assert "matched=" in proc.stderr, proc.stderr
+        assert 'matched=author name "Owner Person"' in proc.stderr, proc.stderr
+        assert "author=Owner Person <owner@example.invalid>" in proc.stderr, proc.stderr
+        assert "committer=Owner Person <owner@example.invalid>" in proc.stderr, proc.stderr
+        assert "which is the recorded owner" not in proc.stderr, proc.stderr
+        assert "Will an agent commit in this repository, or will you commit yourself?" in proc.stderr
+        assert _install_mode_commits(owner_agent, env) == 0, "a commit exists after the refusal"
+        assert _install_mode_files(owner_agent) == []
+        assert _install_mode_config(owner_agent, env) == config_before
+        ok("S3-3: agent-commit under the owner identity exits 42 on stderr before any "
+           "commit, with the matched field, resolved values, one question and 0 files")
+
+        # F5: a committer-only match names the committer, not the author.
+        committer_only = _install_mode_repo(
+            tmp / "f5-committer-only", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        author_env = dict(env)
+        author_env["GIT_AUTHOR_NAME"] = STARTER_AGENT[0]
+        author_env["GIT_AUTHOR_EMAIL"] = STARTER_AGENT[1]
+        proc = _install_mode_gate(pwsh, gate, committer_only, author_env, "agent-commit",
+                                  "The agent will commit.")
+        assert proc.returncode == 42, (proc.returncode, proc.stdout, proc.stderr)
+        assert proc.stdout == "", proc.stdout
+        assert 'matched=committer name "Owner Person"' in proc.stderr, proc.stderr
+        assert 'Git reports this repository\'s commit identity as matching the recorded ' \
+               'owner on committer name "Owner Person"' in proc.stderr, proc.stderr
+        assert ("author=%s <%s>" % STARTER_AGENT) in proc.stderr, proc.stderr
+        assert ("committer=%s <%s>" % STARTER_OWNER) in proc.stderr, proc.stderr
+        assert "author name" not in proc.stderr, proc.stderr
+        assert _install_mode_commits(committer_only, env) == 0
+        assert _install_mode_files(committer_only) == []
+        ok("F5: a committer-only owner match prints the committer field and value, "
+           "not a claim that the author is the owner")
+
+        # F1: the gate trims -Mode once into $modeGiven and every mode branch uses
+        # that value, so whitespace padding can never take a branch its trimmed
+        # form would not. Each padded agent-commit token under an owner-matching
+        # identity must still be refused at 42 before any commit, with no file
+        # written and no Git configuration change.
+        for index, (label, token) in enumerate(STARTER_PADDED_MODES, start=1):
+            shown = token.replace("\t", "<TAB>").replace(" ", "<SP>")
+            case_repo = _install_mode_repo(
+                tmp / ("f1-padded-%d-%s" % (index, label.split()[0])), env,
+                owner=STARTER_OWNER, ident=STARTER_OWNER)
+            case_config = _install_mode_config(case_repo, env)
+            proc = _install_mode_gate(pwsh, gate, case_repo, env, token,
+                                      "The agent will commit.")
+            assert proc.returncode == 42, (
+                "F1: -Mode %s (%s) under the owner identity was not refused: exit %s, %s"
+                % (shown, label, proc.returncode, proc.stdout + proc.stderr))
+            assert proc.stdout == "", "exit 42 must write only to stderr: %r" % proc.stdout
+            assert "matched=author name" in proc.stderr, proc.stderr
+            assert ("Will an agent commit in this repository, or will you commit yourself?"
+                    in proc.stderr), (label, proc.stderr)
+            assert _install_mode_commits(case_repo, env) == 0, (
+                "a commit exists after the %s refusal" % label)
+            assert _install_mode_files(case_repo) == [], (label, _install_mode_files(case_repo))
+            assert _install_mode_config(case_repo, env) == case_config
+            ok("F1: padded agent-commit token %s (%s) under the owner identity is "
+               "refused at 42 on stderr before any commit, with 0 files and "
+               "byte-identical config" % (shown, label))
+
+        padded_human = _install_mode_repo(
+            tmp / "f1-padded-human", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        proc = _install_mode_gate(pwsh, gate, padded_human, env, " human-only ",
+                                  "I will commit myself.")
+        assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+        assert "mode=human-only" in proc.stdout and "owner_match=yes" in proc.stdout, proc.stdout
+        assert _install_mode_files(padded_human) == []
+        assert _install_mode_commits(padded_human, env) == 0
+        ok("F1: padded ' human-only ' is accepted as human-only with 0 files and "
+           "0 commits")
+
+        # F4: a command-scoped `git -c` identity is visible to that one git
+        # invocation but not to the gate's separate `git var`; the route fails
+        # closed on the measured owner identity instead of approving it.
+        scoped = _install_mode_repo(
+            tmp / "f4-command-scoped", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        scoped_var = _install_mode_git(
+            scoped, "-c", "user.name=Scoped Agent", "-c",
+            "user.email=scoped@example.invalid", "var", "GIT_AUTHOR_IDENT", env=env)
+        assert scoped_var.returncode == 0, scoped_var.stderr
+        assert "Scoped Agent" in scoped_var.stdout, scoped_var.stdout
+        proc = _install_mode_gate(pwsh, gate, scoped, env, "agent-commit", "The agent will commit.")
+        assert proc.returncode == 42, (proc.returncode, proc.stdout, proc.stderr)
+        assert 'matched=author name "Owner Person"' in proc.stderr, proc.stderr
+        assert _install_mode_commits(scoped, env) == 0
+        ok("F4: the gate cannot see a later command-scoped git -c identity and "
+           "fails closed on the identity it measured (42, no commit)")
+
+        # S3-4: missing owner, unclear/malformed mode, missing authorization and
+        # a malformed effective identity all stop before a package write.
+        missing_owner = _install_mode_repo(tmp / "s3-4-owner", env, owner=None, ident=STARTER_AGENT)
+        proc = _install_mode_gate(pwsh, gate, missing_owner, env, "human-only", "I will commit myself.")
+        assert proc.returncode == 41, (proc.returncode, proc.stdout, proc.stderr)
+        assert "Set it for this repository only" in (proc.stdout + proc.stderr)
+        assert _install_mode_files(missing_owner) == []
+
+        # F2: the mode/authorization check runs before either identity record, so
+        # a missing owner with no mode is 43, not 41.
+        proc = _install_mode_gate(pwsh, gate, missing_owner, env, None, "I will commit myself.")
+        assert proc.returncode == 43, (proc.returncode, proc.stdout, proc.stderr)
+        assert "install mode not stated" in proc.stderr, proc.stderr
+
+        mode_repo = _install_mode_repo(tmp / "s3-4-mode", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        config_before = _install_mode_config(mode_repo, env)
+        cases = [
+            (dict(authorization="I will commit myself."), 43, "install mode not stated"),
+            (dict(mode="human_only", authorization="I will commit myself."), 43, "install mode not stated"),
+            (dict(mode="human-only"), 43, "owner authorization missing"),
+            (dict(mode="human-only", authorization="   "), 43, "owner authorization missing"),
+            (dict(mode=" human_only ", authorization="I will commit myself."), 43,
+             "install mode not stated"),
+        ]
+        for kwargs, expected, needle in cases:
+            proc = _install_mode_gate(pwsh, gate, mode_repo, env, **kwargs)
+            assert proc.returncode == expected, (kwargs, proc.returncode, proc.stdout, proc.stderr)
+            assert needle in (proc.stdout + proc.stderr), (kwargs, proc.stdout, proc.stderr)
+        assert _install_mode_config(mode_repo, env) == config_before
+        assert _install_mode_files(mode_repo) == []
+        assert _install_mode_commits(mode_repo, env) == 0
+
+        malformed_env = dict(env)
+        malformed_env["GIT_AUTHOR_DATE"] = "not-a-date"
+        proc = _install_mode_gate(pwsh, gate, mode_repo, malformed_env, "human-only", "I will commit myself.")
+        assert proc.returncode == 42, (proc.returncode, proc.stdout, proc.stderr)
+        assert "commit identity missing or unparsable" in proc.stderr, proc.stderr
+        assert "makes no commit and needs no agent commit" in proc.stderr, proc.stderr
+        assert proc.stdout == "", proc.stdout
+        assert _install_mode_files(mode_repo) == []
+
+        # F2: a malformed identity with no mode is also 43, not 42.
+        proc = _install_mode_gate(pwsh, gate, mode_repo, malformed_env, None, "I will commit myself.")
+        assert proc.returncode == 43, (proc.returncode, proc.stdout, proc.stderr)
+        assert "install mode not stated" in proc.stderr, proc.stderr
+
+        # F9: no user identity at all (ident=None) is an explicit 42, not a crash.
+        no_identity = _install_mode_repo(
+            tmp / "s3-4-no-ident", env, owner=STARTER_OWNER, ident=None)
+        empty_ident_env = dict(env)
+        empty_ident_env.update({
+            "GIT_CONFIG_COUNT": "2",
+            "GIT_CONFIG_KEY_0": "user.name", "GIT_CONFIG_VALUE_0": "",
+            "GIT_CONFIG_KEY_1": "user.email", "GIT_CONFIG_VALUE_1": "",
+        })
+        proc = _install_mode_gate(pwsh, gate, no_identity, empty_ident_env, "human-only",
+                                  "I will commit myself.")
+        assert proc.returncode == 42, (proc.returncode, proc.stdout, proc.stderr)
+        assert "commit identity missing or unparsable" in proc.stderr, proc.stderr
+        assert _install_mode_files(no_identity) == []
+
+        # F9: a non-git target is the documented exit 1, with nothing written.
+        not_git = tmp / "s3-4-not-git"
+        not_git.mkdir()
+        proc = _install_mode_gate(pwsh, gate, not_git, env, "human-only", "I will commit myself.")
+        assert proc.returncode == 1, (proc.returncode, proc.stdout, proc.stderr)
+        assert "not a git repository" in proc.stderr, proc.stderr
+        assert _install_mode_files(not_git) == []
+        ok("F2: missing owner/no mode and malformed identity/no mode both exit 43; "
+           "the mode check precedes both identity records")
+        ok("F9: ident=None exits 42 and a non-git target exits 1, with 0 files")
+        ok("S3-4: missing owner (41), absent/malformed mode and missing authorization "
+           "(43) and a malformed effective identity (42) all refuse with 0 package files")
+
+        # S3-5: the human-only answer is not reusable for a later agent commit.
+        later = _install_mode_repo(tmp / "s3-5", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        assert _install_mode_gate(pwsh, gate, later, env, "human-only",
+                                  "I will commit myself.").returncode == 0
+        proc = _install_mode_gate(pwsh, gate, later, env, "agent-commit", "The agent will commit now.")
+        assert proc.returncode == 42, (proc.returncode, proc.stdout, proc.stderr)
+        assert _install_mode_commits(later, env) == 0
+        assert _install_mode_git(later, "config", "--local", "user.name", STARTER_AGENT[0], env=env).returncode == 0
+        assert _install_mode_git(later, "config", "--local", "user.email", STARTER_AGENT[1], env=env).returncode == 0
+        proc = _install_mode_gate(pwsh, gate, later, env, "agent-commit",
+                                  "The agent will commit as the agent identity.")
+        assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+        assert _install_mode_commits(later, env) == 0, "re-gating itself made a commit"
+        ok("S3-5: after a human-only acceptance a later agent-commit proposal is "
+           "re-gated: exit 42 under the owner identity, exit 0 only after the "
+           "explicit distinct identity, and no commit is made by the check")
+
+        # S3-6: restoring the old unconditional owner-match branch fails the
+        # same human-only behavioral check (the pre-change behaviour, proved).
+        old_branch = "if ($ownerMatch -and ($modeGiven -ceq 'agent-commit'))"
+        assert gate_text.count(old_branch) == 1, "the published mode branch is not uniquely editable"
+        mutated = gate_text.replace(old_branch, "if ($ownerMatch)", 1)
+        assert mutated != gate_text
+        old_gate = tmp / "install-mode-old-branch.ps1"
+        old_gate.write_text(mutated, encoding="utf-8", newline="\n")
+        control = _install_mode_repo(tmp / "s3-6-control", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        assert _install_mode_gate(pwsh, gate, control, env, "human-only",
+                                  "I will commit myself.").returncode == 0
+        old = _install_mode_repo(tmp / "s3-6-old", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+        proc = _install_mode_gate(pwsh, old_gate, old, env, "human-only", "I will commit myself.")
+        assert proc.returncode == 42, (
+            "S3-6: restoring the old owner-match branch did not fail the human-only "
+            "check: exit %s, %s" % (proc.returncode, proc.stdout)
+        )
+        assert proc.stdout == "", proc.stdout
+        assert "matched=" in proc.stderr, proc.stderr
+        assert _install_mode_commits(old, env) == 0 and _install_mode_files(old) == []
+        ok("S3-6: restoring the old unconditional owner-match branch makes the same "
+           "human-only fixture fail (exit 42 on stderr) while the published branch "
+           "exits 0")
+
+
+def _starter_pinned_source(tmp: Path):
+    """Materialise the pinned commit from this clone's history, with no network."""
+    target = tmp / "pinned-src"
+    proc = subprocess.run(
+        ["git", "-C", str(REPO_ROOT), "worktree", "add", "--detach", "--force",
+         str(target), STARTER_PIN_COMMIT],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    return target, proc
+
+
+def test_consumer_install_mode_native():
+    """S3-1/S3-4/S3-5: the published harness installs human-only, then re-gates."""
+    pwsh = _install_mode_pwsh()
+    sh = _install_mode_sh()
+    if pwsh is None or sh is None:
+        _install_mode_unrun("pwsh 7 and a POSIX sh are required for the published harness")
+        return
+    if shutil.which("git") is None:
+        _install_mode_unrun("git is required to build the install-mode fixtures")
+        return
+    page = STARTER_DOC.read_text(encoding="utf-8")
+    gate_text = _starter_fenced_block(page, STARTER_MODE_HEADING)
+    harness_text = _starter_fenced_block(page, STARTER_HARNESS_HEADING, 1)
+    assert "Stop-Step" in harness_text and "$package = @" in harness_text
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        env = _install_mode_env(tmp)
+        gate = tmp / "install-mode.ps1"
+        harness = tmp / "install-starter.ps1"
+        gate.write_text(gate_text, encoding="utf-8", newline="\n")
+        harness.write_text(harness_text, encoding="utf-8", newline="\n")
+
+        source, proc = _starter_pinned_source(tmp)
+        if proc.returncode != 0:
+            _install_mode_unrun(
+                "the pinned commit %s is not in this clone's history: %s"
+                % (STARTER_PIN_COMMIT, (proc.stderr or proc.stdout).strip()[:160]))
+            return
+        try:
+            head = _install_mode_git(source, "rev-parse", "HEAD", env=env).stdout.strip()
+            tree = _install_mode_git(source, "rev-parse", "HEAD^{tree}", env=env).stdout.strip()
+            assert head == STARTER_PIN_COMMIT and tree == STARTER_PIN_TREE, (head, tree)
+
+            target = _install_mode_repo(tmp / "consumer", env, owner=STARTER_SOLO, ident=STARTER_SOLO)
+            config_before = _install_mode_config(target, env)
+            proc = subprocess.run(
+                [pwsh, "-NoProfile", "-File", str(harness),
+                 "-Src", str(source), "-Tgt", str(target), "-Sh", sh,
+                 "-Mode", "human-only", "-OwnerAuthorization", "I will commit myself.",
+                 "-RecordPath", str(target / "docs" / "consumer-install-record.md")],
+                env=env, capture_output=True, text=True,
+                encoding="utf-8", errors="replace", timeout=600,
+            )
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            files = _install_mode_files(target)
+            assert len(files) == 42, "expected 41 package files plus the record, got %d" % len(files)
+            assert "docs/consumer-install-record.md" in files
+            record = (target / "docs" / "consumer-install-record.md").read_text(encoding="utf-8")
+            assert "Install mode: human-only" in record, record[:400]
+            assert "none made by this install" in record, record[:600]
+            assert STARTER_SOLO[1] not in record and STARTER_SOLO[0] not in record, (
+                "the install record must not store owner values"
+            )
+            assert _install_mode_commits(target, env) == 0, "the human-only install made a commit"
+            assert _install_mode_config(target, env) == config_before, (
+                "the human-only install changed local Git config"
+            )
+            ok("S3-1: the published harness completes a human-only install with 41 "
+               "files, the mode in the record, 0 commits and byte-identical config")
+
+            # F3: a padded human-only token installs as human-only and the record
+            # states the normalized mode, not the raw padded argument.
+            padded_target = _install_mode_repo(
+                tmp / "consumer-padded", env, owner=STARTER_SOLO, ident=STARTER_SOLO)
+            padded_config = _install_mode_config(padded_target, env)
+            padded_record = padded_target / "docs" / "consumer-install-record.md"
+            proc = subprocess.run(
+                [pwsh, "-NoProfile", "-File", str(harness),
+                 "-Src", str(source), "-Tgt", str(padded_target), "-Sh", sh,
+                 "-Mode", " human-only ", "-OwnerAuthorization", "I will commit myself.",
+                 "-RecordPath", str(padded_record)],
+                env=env, capture_output=True, text=True,
+                encoding="utf-8", errors="replace", timeout=600,
+            )
+            assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
+            padded_files = _install_mode_files(padded_target)
+            assert len(padded_files) == 42, len(padded_files)
+            padded_text = padded_record.read_text(encoding="utf-8")
+            assert "- Install mode: human-only (owner-stated;" in padded_text, padded_text[:400]
+            assert "Install mode:  human-only" not in padded_text, padded_text[:400]
+            assert "none made by this install" in padded_text, padded_text[:600]
+            assert "only under the accepted non-owner identity" not in padded_text, (
+                "a padded human-only install recorded the agent-commit policy"
+            )
+            assert _install_mode_commits(padded_target, env) == 0
+            assert _install_mode_config(padded_target, env) == padded_config
+            ok("F3: a padded ' human-only ' install records the normalized mode and "
+               "the human-only policy, with 0 commits and byte-identical config")
+
+            gate_proc = _install_mode_gate(pwsh, gate, target, env, "agent-commit",
+                                           "The agent will commit now.")
+            assert gate_proc.returncode == 42, (gate_proc.returncode, gate_proc.stdout, gate_proc.stderr)
+            assert _install_mode_commits(target, env) == 0
+            ok("S3-5: on the installed human-only tree, a later agent-commit "
+               "proposal exits 42 and creates no commit")
+
+            refusal_target = _install_mode_repo(tmp / "no-mode", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+            dummy = tmp / "dummy-src"
+            dummy.mkdir()
+            refusal = subprocess.run(
+                [pwsh, "-NoProfile", "-File", str(harness),
+                 "-Src", str(dummy), "-Tgt", str(refusal_target), "-Sh", sh,
+                 "-OwnerAuthorization", "I will commit myself."],
+                env=env, capture_output=True, text=True,
+                encoding="utf-8", errors="replace", timeout=300,
+            )
+            assert refusal.returncode == 43, (refusal.returncode, refusal.stdout, refusal.stderr)
+            assert _install_mode_files(refusal_target) == [], "a package file was written before the mode check"
+            assert _install_mode_commits(refusal_target, env) == 0
+            ok("S3-4: the published harness with no -Mode exits 43 before reading a "
+               "source pin, with 0 package files and 0 commits")
+
+            # F1 end-to-end: the published harness passes each padded agent-commit
+            # token to the real gate. The owner identity is refused before the
+            # source is read, the record is written or a file is created; a wrongly
+            # accepted token would fail later on this dummy source, never at 42.
+            for index, (label, token) in enumerate(STARTER_PADDED_MODES, start=1):
+                shown = token.replace("\t", "<TAB>").replace(" ", "<SP>")
+                exploit_target = _install_mode_repo(
+                    tmp / ("consumer-padded-%d-%s" % (index, label.split()[0])), env,
+                    owner=STARTER_OWNER, ident=STARTER_OWNER)
+                exploit_config = _install_mode_config(exploit_target, env)
+                exploit_record = exploit_target / "docs" / "consumer-install-record.md"
+                exploit = subprocess.run(
+                    [pwsh, "-NoProfile", "-File", str(harness),
+                     "-Src", str(dummy), "-Tgt", str(exploit_target), "-Sh", sh,
+                     "-Mode", token,
+                     "-OwnerAuthorization", "The agent will commit.",
+                     "-RecordPath", str(exploit_record)],
+                    env=env, capture_output=True, text=True,
+                    encoding="utf-8", errors="replace", timeout=300,
+                )
+                assert exploit.returncode == 42, (
+                    "F1: the harness did not refuse padded %s (%s): exit %s, %s"
+                    % (shown, label, exploit.returncode,
+                       exploit.stdout + exploit.stderr))
+                assert exploit.stdout == "", exploit.stdout
+                assert "matched=" in exploit.stderr, exploit.stderr
+                assert ("Will an agent commit in this repository, or will you commit yourself?"
+                        in exploit.stderr), (label, exploit.stderr)
+                assert not exploit_record.exists(), (
+                    "F1: the harness wrote the install record for %s" % shown)
+                assert _install_mode_files(exploit_target) == [], (
+                    label, _install_mode_files(exploit_target))
+                assert _install_mode_commits(exploit_target, env) == 0
+                assert _install_mode_config(exploit_target, env) == exploit_config
+                ok("F1: the published harness refuses padded %s (%s) under the owner "
+                   "identity at 42 on stderr before any source read, record write or "
+                   "commit" % (shown, label))
+
+            # F9: -ModeGate points the harness at the gate explicitly, from a
+            # directory that has no adjacent install-mode.ps1.
+            gate_dir = tmp / "gate-dir"
+            harness_dir = tmp / "harness-dir"
+            gate_dir.mkdir()
+            harness_dir.mkdir()
+            explicit_gate = gate_dir / "install-mode.ps1"
+            explicit_gate.write_text(gate_text, encoding="utf-8", newline="\n")
+            explicit_harness = harness_dir / "install-starter.ps1"
+            explicit_harness.write_text(harness_text, encoding="utf-8", newline="\n")
+            modegate_target = _install_mode_repo(
+                tmp / "consumer-modegate", env, owner=STARTER_OWNER, ident=STARTER_OWNER)
+            proc = subprocess.run(
+                [pwsh, "-NoProfile", "-File", str(explicit_harness),
+                 "-Src", str(dummy), "-Tgt", str(modegate_target), "-Sh", sh,
+                 "-ModeGate", str(explicit_gate),
+                 "-Mode", " agent-commit ",
+                 "-OwnerAuthorization", "The agent will commit."],
+                env=env, capture_output=True, text=True,
+                encoding="utf-8", errors="replace", timeout=300,
+            )
+            assert proc.returncode == 42, (proc.returncode, proc.stdout, proc.stderr)
+            assert "install-mode.ps1 not found" not in proc.stderr, proc.stderr
+            assert "matched=" in proc.stderr, proc.stderr
+            assert _install_mode_files(modegate_target) == []
+            assert _install_mode_commits(modegate_target, env) == 0
+            ok("F9: -ModeGate runs the gate from an explicit path and refuses the "
+               "padded agent-commit owner identity at 42")
+        finally:
+            subprocess.run(
+                ["git", "-C", str(REPO_ROOT), "worktree", "remove", "--force", str(source)],
+                capture_output=True, text=True,
+            )
+            subprocess.run(
+                ["git", "-C", str(REPO_ROOT), "worktree", "prune"],
+                capture_output=True, text=True,
+            )
+
 TESTS = [
     test_fix942_total_guard_regressions,
     test_ds7cfixb_coverage_detector_matrix,
@@ -7280,6 +7930,8 @@ TESTS = [
     test_ds7cb_prewrite_narrowness,
     test_ds7cb_non_readme_failure_refuses,
     test_consumer_starter_selectors,
+    test_consumer_install_mode_gate,
+    test_consumer_install_mode_native,
 ]
 
 
