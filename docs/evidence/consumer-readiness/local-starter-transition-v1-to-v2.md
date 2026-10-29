@@ -19,7 +19,7 @@ claim is made.
 | Accepted main base | `2a7e9c064276baad1a45fe80f7b0acbf615f822b`, tree `7514484935a5e6993700b919ee7844ee7db2764f`, merge parents `8c4dc764` + `d66406c1` |
 | Package pin | `ffb040c7a363648856475280646bbd142dfabe4e`, tree `88a5aee4ad928a49c2fb945032585843ec652da7` |
 | Page before this record's change | `docs/consumer-starter-package.md`, **118,444 B**, sha256 `36547d9a906c9feec9afa337815f3ab655168b01a28256ca42609ad12d44700b` |
-| Page after the section 7.3 insert and review revisions | **123,373 B**, sha256 `6488c6754a20915639e672b3818f37c45fda6b2104ca0c447e00660045e3b607` |
+| Page after the section 7.3 insert and review revisions | **125,163 B**, sha256 `d79889c8a75bbc08d0ac8b08d914e940b2b90c449d74901afee18552d7adbc05` |
 | Published P2 block (**unchanged**) | **6,493 B / 105 LF**, sha256 `fd01fce7806c74e92f0fdf877c1cb58ed7704e8f24a316cccbce91b1dd7398ea` |
 | Section 7.1 harness (**unchanged**) | **21,977 B / 385 LF**, sha256 `5b0393cc40ee7d2518299cff49e25a02f77aca970a4a6ce61d8c4bb061f0a0a0` |
 | Frozen constants | `PinCommit ffb040c7`, `PinTree 88a5aee4`, `AggSha fcff1124...b699`, `AggRows 41`, `AggBytes 5420` |
@@ -110,13 +110,27 @@ All six cases ran against `2a7e9c06` with the extracted blocks. "Added" and
 | C5 - constructed divergent partial (40/41) | **31** | `register-format.md` refused as a pin mismatch; divergent bytes preserved; no record written; no package write |
 | C6 - identical completed rerun | **0** | no file delta; the existing 41-row record is left unchanged (same sha256 as C1) |
 
+### 5.1 Additional refusal and stale-record cases
+
+Two cases that the review asked to be explicit about were executed natively:
+
+| Case | Exit | Observed |
+| --- | --- | --- |
+| C7 - stale record already at the new path | **0** | 41 package files installed; the stale 31-byte file was **left unchanged** (`P9: install record already present, left unchanged`); the new receipt was **not** produced. This is the observed footgun the page warns about: completion needs the 41-row/5,420-byte check in sections 9.1-9.2, not just exit 0 |
+| C8 - foreign file in a selected skill directory | **20** | `.claude/skills/code-reviewer/notes.md` named on stderr, bytes preserved, no record, no package write |
+
+Kill during P9 itself (a partial record at the new path) is **UNRUN**; the
+stale-record consequence is what C7 observes. Atomic record write and a
+fail-closed refusal of an existing `-RecordPath` would be installer changes
+outside this documentation item and are not claimed.
+
 The C1 record's parsed rows equal the published v2 path set in ordinal order,
 and its rows independently aggregate to
 `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over 5,420
 serialized bytes - matching both its own header and the published value.
 
-A 59-check assertion record over the case JSON, record text, real-kill runs and
-published tables (`verify_native.py`) is **59/59 PASS**, including: the 39 published v1 paths are
+A 63-check assertion record over the case JSON, record text, real-kill runs and
+published tables (`verify_native.py`) is **63/63 PASS**, including: the 39 published v1 paths are
 byte-identical at the destination after C1; the four product files, the old
 record, the commit and the local Git config are unchanged; C3 adds exactly the
 two package files but produces no v2 receipt; C4's starting state is exactly 40
@@ -183,14 +197,18 @@ than by a migration step.
 | DCO on the commits | signed off; verified with `scripts/check_dco.py` over `origin/main..HEAD` |
 | PR-body bound fields (`check_pr_body_skills.py`) | OK on the draft and on the live body read back |
 
-Hosted CI at the first commit `1b63544b` completed with **all required checks
-green**: `gate-guard`, `validate-skills`, `changes` and both review-switch
-jobs; the DeepSeek review posted six advisory findings and Codex posted four,
-all dispositioned in the PR body. `tools-tests-linux`,
-`tools-tests-windows` and `windows-offline-checks` were **skipped** by design
-for a docs-only change and are UNRUN, never passes. The review-fix commit
-re-triggers CI; that later run is delivery-stage evidence and is not claimed
-here.
+Hosted CI at `1b63544b` and at the review-fix commit `8fc806d3` completed with
+**all required checks green**: `gate-guard`, `validate-skills`, `changes` and
+both review-switch jobs. The first DeepSeek review posted six advisory findings
+and Codex four; a second DeepSeek review at `8fc806d3` posted sixteen more. All
+were read and dispositioned in the PR body: the documentation findings are
+fixed in the commit that carries this record, and the installer-behaviour
+requests (atomic record write, a new fail-closed code for an existing record
+path, testing `agent-commit`) are recorded as out of scope / **UNRUN** rather
+than claimed. `tools-tests-linux`, `tools-tests-windows` and
+`windows-offline-checks` were **skipped** by design for a docs-only change and
+are UNRUN, never passes. The final head re-triggers CI; that run is delivery
+stage evidence and is not claimed here.
 
 ## 10. UNRUN and limits
 
@@ -203,6 +221,13 @@ here.
   scope; this record proves only 39 -> 41 at the recorded pin.
 - **File symbolic-link leaf** - UNRUN on this host (administrator privilege);
   only directory junctions were exercised natively.
+- **Kill during the P9 record write** - UNRUN; a partial record at the new path
+  would be left unchanged by a rerun (C7 observes the stale-record outcome).
+  Atomic record writing is not implemented.
+- **`agent-commit` transition route** - UNRUN; every accepted case used
+  `human-only`. P2's identity contract is unchanged and not re-proven here.
+- **A fail-closed refusal of an existing `-RecordPath`** - not implemented; the
+  documented operator check and C7 are the current state.
 - **Review, CI and merge** - delivery-stage work; a PR is opened, not merged.
   Skipped or pending jobs are never counted as passes. Advisory review
   findings are dispositioned in the PR body, not silently absorbed.
