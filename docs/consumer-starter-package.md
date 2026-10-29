@@ -1382,6 +1382,60 @@ Each code stops; none warns and continues.
 | 42 | Commit identity missing or owner-matching on the `agent-commit` route | On **stderr**: the parse failure, or the matched field and value plus the resolved author/committer and one question (section 8.3). A `human-only` install does not exit 42 on an owner match, because it makes no commit; it is not a relaxed agent check. Both modes still need a parsable identity, because P2 reports `owner_match=` in its acceptance line. This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
 | 43 | Install mode or owner authorization not stated, empty or unrecognised | The exact question and the two valid `-Mode` tokens (P2). Nothing written; no package file copied |
 
+### 7.3 Transitioning an installed v1 package to v2
+
+A consumer repository that already holds the published 39-file v1 starter moves to
+the 41-file v2 starter by running the **same** procedure in sections P0-P9 with the
+current profile. There is no updater, no downgrade engine and no in-place
+substitution of the old record.
+
+**Prerequisites.** The target is the consumer repository already described in P1;
+its 39 v1 files are byte-identical to the pin and its v1 install record is intact at
+the path the v1 procedure wrote (by default `docs/consumer-install-record.md`); the
+owner states an install mode P2 accepts; and the caller supplies a **new, nonexisting**
+record path, for example `docs/consumer-install-record-v2.md`. The v2 profile adds
+exactly two skill files - `.claude/skills/scoped-approval-register/SKILL.md` and
+`.claude/skills/scoped-approval-register/references/register-format.md` - because v2
+expands the selected profile from 17 to 18 skills over the same package pin.
+
+**Procedure.** Run the section 7.1 harness as written, with `-RecordPath` naming the
+new path:
+
+```powershell
+pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode human-only -OwnerAuthorization '<the owner''s words>' -RecordPath C:\path\to\product\docs\consumer-install-record-v2.md
+```
+
+Do **not** pass the old record path. P9 leaves an existing record unchanged, so a
+run that reuses it installs the two files but cannot produce a v2 receipt: the
+retained 39-row file still describes the v1 result and must not be presented as the
+new one.
+
+**Expected result.** Exit 0; 41 selected paths present; exactly the two added package
+files new; the 39 v1 rows byte-identical at the destination; unrelated product files,
+the old record, the local Git configuration and the commit unchanged; a fresh 41-row
+record whose aggregate is `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699`
+over 5,420 serialized bytes.
+
+**Refusals and interruption.** A changed pre-existing selected file is refused with
+exit **31**, the file is named and its bytes are preserved, and no record is written.
+A destination link anywhere on the 41 paths or the record path is refused with exit
+**23** before any write. A differing startup file is refused with exit **22**. If the
+copy is interrupted, an unchanged rerun resumes under P5's identical-byte policy and
+writes the fresh record when the interruption happened before P9; a partial file that
+differs from the pin is refused with exit **31** and preserved. An identical rerun
+after a completed transition changes no package file and leaves an existing record at
+the same path unchanged.
+
+**Completion rule.** The transition is complete only when the new record exists with
+41 measured rows and the published aggregate. Adding the two files while reusing the
+old record path is not a completed transition.
+
+The native results for this exact case are in
+[local-starter-transition-v1-to-v2](evidence/consumer-readiness/local-starter-transition-v1-to-v2.md).
+They cover only this 39-to-41 transition at the recorded pin; downgrade, arbitrary
+future versions, other operating systems and concurrent writers remain out of scope
+(section 12).
+
 ## 8. The two identity records
 
 ### 8.1 What "owner" means
