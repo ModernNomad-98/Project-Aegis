@@ -7285,6 +7285,12 @@ _STARTER_TOTAL_ROW = re.compile(
 _STARTER_EVAL_BASENAMES = ("evals.json", "trigger-evals.json")
 
 
+def _starter_is_eval_path(path: str) -> bool:
+    """True when a path is evaluation answer content by segment or basename."""
+    return ("evals" in Path(path).parts
+            or Path(path).name in _STARTER_EVAL_BASENAMES)
+
+
 def _starter_skill_dirs(rows) -> list[str]:
     """Return the selected skill directory names, sorted."""
     return sorted({
@@ -7300,11 +7306,27 @@ def _starter_selected_for(rows, skill: str) -> list[str]:
     return [path for path in rows if path.startswith(prefix)]
 
 
+_STARTER_GIT_REPO_VARS = (
+    "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
+    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_NAMESPACE", "GIT_CEILING_DIRECTORIES", "GIT_PREFIX",
+)
+
+
 def _starter_git(repo_root: Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        ["git", "-C", str(repo_root)] + list(args), capture_output=True,
-        text=True, encoding="utf-8", errors="replace",
-    )
+    """Run Git with repository-selection variables removed and a timeout."""
+    cmd = ["git", "-C", str(repo_root)] + list(args)
+    env = {k: v for k, v in os.environ.items()
+           if k not in _STARTER_GIT_REPO_VARS}
+    env.setdefault("GIT_TERMINAL_PROMPT", "0")
+    try:
+        return subprocess.run(
+            cmd, capture_output=True, text=True, encoding="utf-8",
+            errors="replace", env=env, timeout=60,
+        )
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess(
+            cmd, 124, "", "git timed out after 60 seconds")
 
 
 def load_starter_pin(repo_root: Path, commit: str, tree: str):
@@ -7312,17 +7334,28 @@ def load_starter_pin(repo_root: Path, commit: str, tree: str):
 
     allowed_by_skill maps every skill directory in the pinned Git tree to the
     exact paths the package's allow-list rule copies for it: its SKILL.md plus
-    every file under references/. The closure is read from the committed
-    object, never from the working tree, so a checkout that differs from the
-    pin cannot change the oracle. Any failure returns (None, classification)
-    and never falls back to the checkout.
+    every non-evaluation file under references/. Evaluation answer content is
+    excluded from the required closure because the selector check forbids
+    installing it. The closure is read from the committed object, never from
+    the working tree, so a checkout that differs from the pin cannot change the
+    oracle. Any failure returns (None, classification) and never falls back to
+    the checkout.
     """
     resolved = _starter_git(repo_root, "rev-parse", "--verify", "--quiet",
                             commit + "^{commit}")
     if resolved.returncode != 0:
+        shallow = _starter_git(repo_root, "rev-parse", "--is-shallow-repository")
+        shallow_hint = ""
+        if shallow.returncode == 0 and shallow.stdout.strip() == "true":
+            shallow_hint = (
+                "; this is a shallow clone, so fetch the pin or the full history "
+                "(git fetch --unshallow) and retry"
+            )
         return None, (
             "PIN-UNAVAILABLE: %s is not a commit in this checkout's object store "
-            "(%s)" % (commit, (resolved.stderr or resolved.stdout).strip()[:160])
+            "(%s)%s" % (commit,
+                        (resolved.stderr or resolved.stdout).strip()[:160],
+                        shallow_hint)
         )
     resolved_tree = _starter_git(repo_root, "rev-parse", "--verify", "--quiet",
                                  commit + "^{tree}")
@@ -7345,6 +7378,12 @@ def load_starter_pin(repo_root: Path, commit: str, tree: str):
             continue
         relative = "/".join(parts[3:])
         if relative == "SKILL.md" or relative.startswith("references/"):
+            # A pinned package must not install evaluation answer content even
+            # when the pin carries it under references/. Excluding it from the
+            # required closure keeps the selector satisfiable; selecting it is
+            # still refused by check_starter_selection.
+            if _starter_is_eval_path(path):
+                continue
             allowed.setdefault(parts[2], set()).add(path)
     if not allowed:
         return None, (
@@ -7378,15 +7417,26 @@ def parse_starter_selectors(text: str):
     if start < 0 or end < 0:
         return [], [], ["sections 2.3 and 3 could not both be located"]
     section = text[start:end]
-    table = [m.group(1) for m in _STARTER_TABLE_ROW.finditer(section)]
+    table_matches = list(_STARTER_TABLE_ROW.finditer(section))
+    table = [m.group(1) for m in table_matches]
+    table_bytes = sum(int(m.group(2)) for m in table_matches)
+    table_lf = sum(int(m.group(3)) for m in table_matches)
     total = _STARTER_TOTAL_ROW.search(section)
     if total is None:
         problems.append("the section 2.3 total row is missing")
-    elif int(total.group(1)) != len(table):
-        problems.append(
-            "the section 2.3 total says %s files but the table lists %d"
-            % (total.group(1), len(table))
-        )
+    else:
+        if int(total.group(1)) != len(table):
+            problems.append(
+                "the section 2.3 total says %s files but the table lists %d"
+                % (total.group(1), len(table))
+            )
+        if (int(total.group(2)) != table_bytes
+                or int(total.group(3)) != table_lf):
+            problems.append(
+                "the section 2.3 total says %s bytes / %s LF but the table "
+                "rows sum to %d / %d"
+                % (total.group(2), total.group(3), table_bytes, table_lf)
+            )
 
     array_match = re.search(r"\$package = @\((.*?)\n\)", text, re.S)
     if array_match is None:
@@ -7447,8 +7497,7 @@ def check_starter_selection(table, array, required, pinned=None,
     )
     for label, rows in selectors:
         for path in rows:
-            if ("evals" in Path(path).parts
-                    or Path(path).name in _STARTER_EVAL_BASENAMES):
+            if _starter_is_eval_path(path):
                 problems.append(
                     "evaluation content must not be installed (%s): %s"
                     % (label, path)
@@ -7510,6 +7559,14 @@ def test_consumer_starter_selectors():
             "S1-1: the starter page yielded no selection at all: "
             + ("; ".join(problems) or "both selectors parsed empty")
         )
+    # These checks do not need the pin, so run them before any Git resolution.
+    # A shallow clone can make the pin unavailable; that must not hide a page
+    # defect in the selectors themselves.
+    if problems:
+        raise AssertionError("S1-1 (Git-independent): " + "; ".join(problems))
+    gitless = check_starter_selection(table, array, STARTER_REQUIRED_PATHS)
+    assert not gitless, "S1-1 (Git-independent): " + "; ".join(gitless)
+    ok("S1-1: the Git-independent selector checks pass before pin resolution")
     if shutil.which("git") is None:
         _starter_pin_unrun("git is required to resolve the declared package pin")
         return
@@ -7529,11 +7586,16 @@ def test_consumer_starter_selectors():
         path for path in table if path.startswith(".claude/skills/"))
     pinned_closure = sorted(
         path for skill in skill_dirs for path in pinned.get(skill, ()))
+    duplicates = sorted({
+        path for path in selected_skill_rows
+        if selected_skill_rows.count(path) > 1
+    })
     assert selected_skill_rows == pinned_closure, (
         "S1-1: the selectors do not select exactly the pinned allow-list closure: "
-        "selector-only %s, pin-only %s"
+        "selector-only %s, pin-only %s, duplicates %s"
         % (sorted(set(selected_skill_rows) - set(pinned_closure)),
-           sorted(set(pinned_closure) - set(selected_skill_rows))))
+           sorted(set(pinned_closure) - set(selected_skill_rows)),
+           duplicates))
     ok(
         "S1-1: the selection closes over %d skill directories and matches the "
         "%d skill files in the pinned allow-list closure at %s"
@@ -7597,6 +7659,10 @@ def _starter_fixture_repo(tmp: Path):
         ".claude/skills/beta/references/guide.md": "guide\n",
         ".claude/skills/beta/references/evals-guide.md": "ordinary name\n",
         ".claude/skills/beta/evals/evals.json": "{}\n",
+        # A pinned package may carry evaluation answer content under
+        # references/; the allow-list closure must not require it, because the
+        # selector check forbids installing it.
+        ".claude/skills/beta/references/trigger-evals.json": "{}\n",
     }
     for relative, content in pin_files.items():
         target = repo / relative
@@ -7625,9 +7691,13 @@ def _starter_fixture_page(table_rows, array_rows=None) -> str:
         array_rows = list(table_rows)
     lines = ["### 2.3 The file list", ""]
     lines += ["| `%s` | 1 | 1 |" % path for path in table_rows]
+    # Every rendered row carries one byte and one LF, so the aggregate columns
+    # are the row count. The real page's totals are validated against its own
+    # rows by parse_starter_selectors(); the fixture must satisfy the same rule.
+    total = len(table_rows)
     lines += [
         "",
-        "| **Total: %d files** | **1** | **1** |" % len(table_rows),
+        "| **Total: %d files** | **%d** | **%d** |" % (total, total, total),
         "",
         "## 3. How the closure was derived",
         "",
@@ -7660,6 +7730,8 @@ def test_consumer_starter_selector_pin_closure():
         assert (".claude/skills/alpha/references/checkout-only.md"
                 not in pinned["alpha"])
         assert ".claude/skills/beta/evals/evals.json" not in pinned["beta"]
+        pinned_eval = ".claude/skills/beta/references/trigger-evals.json"
+        assert pinned_eval not in pinned["beta"], pinned["beta"]
         ok("S1-1 fixture: the frozen pin %s and checkout %s have distinct commit "
            "and tree identities" % (pin_commit[:12], checkout_commit[:12]))
         ok("S1-1 fixture: the allow-list closure is read from the pinned tree, "
@@ -7669,9 +7741,13 @@ def test_consumer_starter_selector_pin_closure():
         assert len(pin_rows) == 6, pin_rows
 
         # A valid pinned package passes even though the checkout adds a reference.
-        table, array, problems = parse_starter_selectors(
-            _starter_fixture_page(pin_rows))
+        page = _starter_fixture_page(pin_rows)
+        table, array, problems = parse_starter_selectors(page)
         assert not problems, problems
+        totals = _STARTER_TOTAL_ROW.search(page)
+        assert totals is not None
+        assert tuple(int(g) for g in totals.groups()) == (
+            len(table), len(table), len(table)), totals.groups()
         bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
         assert not bproblems, bproblems
         assert not [p for p in bproblems if "evals-guide" in p]
@@ -7695,7 +7771,10 @@ def test_consumer_starter_selector_pin_closure():
         table, array, problems = parse_starter_selectors(
             _starter_fixture_page(table_rows, pin_rows))
         assert table == table_rows and array == pin_rows
-        assert problems and "select different rows" in problems[0], problems
+        # The fixture total is consistent, so the row difference is the only
+        # problem; assert it by content, never by parser ordering.
+        assert len(problems) == 1, problems
+        assert any("select different rows" in p for p in problems), problems
         bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
         assert ("the section 2.3 table is missing the selected skill's SKILL.md: "
                 + skill_md) in bproblems, bproblems
@@ -7740,15 +7819,53 @@ def test_consumer_starter_selector_pin_closure():
             ok("S1-1 fixture: %s outside evals/ is rejected in both selectors"
                % name)
 
-        # The existing evals/ directory rejection is unchanged.
-        eval_dir_path = ".claude/skills/beta/evals/evals.json"
+        # The evals/ directory rule must fire on a path the basename rule
+        # cannot catch, or the basename rule would mask it (review finding 3).
+        eval_dir_path = ".claude/skills/beta/evals/notes.md"
+        assert Path(eval_dir_path).name not in _STARTER_EVAL_BASENAMES
+        assert "evals" in Path(eval_dir_path).parts
         table, array, problems = parse_starter_selectors(
             _starter_fixture_page(pin_rows + [eval_dir_path]))
         assert not problems, problems
         bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
         assert any("evaluation content must not be installed" in p
                    and eval_dir_path in p for p in bproblems), bproblems
+        ok("S1-1 fixture: the evals/ directory rule fires on a non-eval basename")
+
+        # A sibling path with the same basename is not evaluation content; the
+        # segment rule alone must not over-generalise.
+        control = ".claude/skills/beta/references/notes.md"
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows + [control]))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any(control in p and "not in the allow-list closure" in p
+                   for p in bproblems), bproblems
+        assert not [p for p in bproblems
+                    if p.startswith("evaluation content") and control in p]
+        ok("S1-1 fixture: references/notes.md is not falsely refused as eval content")
+
+        # The historical evals/evals.json path is still rejected by both rules.
+        eval_json_dir_path = ".claude/skills/beta/evals/evals.json"
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows + [eval_json_dir_path]))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any("evaluation content must not be installed" in p
+                   and eval_json_dir_path in p for p in bproblems), bproblems
         ok("S1-1 fixture: the existing evals/ directory rejection still fires")
+
+        # Eval content carried by the pin itself is excluded from the required
+        # closure, so a valid selector need not include it; selecting it is
+        # still refused (review finding 6).
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows + [pinned_eval]))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any(p.startswith("evaluation content must not be installed")
+                   and pinned_eval in p for p in bproblems), bproblems
+        ok("S1-1 fixture: eval content in the pinned tree is excluded from the "
+           "closure and refused only when selected")
 
         # An ordinary name that merely contains the word evals is not rejected.
         guide = ".claude/skills/beta/references/evals-guide.md"
@@ -7767,6 +7884,27 @@ def test_consumer_starter_selector_pin_closure():
         assert malformed is None and refusal.startswith("PIN-MALFORMED"), refusal
         ok("S1-1 fixture: an unavailable pin and a wrong declared tree both "
            "refuse explicitly instead of falling back to the checkout")
+
+        # A shallow clone lacks the pin object. The closure read must refuse,
+        # never fall back to the checkout; test_consumer_starter_selectors runs
+        # its Git-independent checks before this refusal can skip them.
+        shallow = tmp / "shallow-clone"
+        clone = subprocess.run(
+            ["git", "clone", "--quiet", "--depth", "1", repo.as_uri(),
+             str(shallow)],
+            env=_install_mode_env(tmp), capture_output=True, text=True,
+            encoding="utf-8", errors="replace")
+        assert clone.returncode == 0, clone.stderr
+        assert _starter_git(
+            shallow, "rev-parse", "--is-shallow-repository").stdout.strip() == "true"
+        assert _starter_git(
+            shallow, "cat-file", "-e", pin_commit + "^{commit}").returncode != 0
+        missing, refusal = load_starter_pin(shallow, pin_commit, pin_tree)
+        assert missing is None, missing
+        assert refusal.startswith("PIN-UNAVAILABLE"), refusal
+        assert "shallow" in refusal.lower(), refusal
+        ok("S1-1 fixture: a shallow clone refuses the pinned closure explicitly, "
+           "with no checkout fallback")
 
 
 # --- consumer starter package: explicit install mode (S3-1..S3-6) -----------
