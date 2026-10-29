@@ -7,7 +7,7 @@ target tree. Nothing here is hosted CI, and no merge claim is made.
 | Field | Value |
 | --- | --- |
 | Change commits | `44556a91` (record guard), `75a54a92` (this evidence page), and the R1/R2 and N1/N2 fix commits on this branch, the last of which carries this revision |
-| Files | `docs/consumer-starter-package.md` (+177/-48), `docs/evidence/consumer-readiness/local-starter-record-guard.md` (+158/-0), `scripts/tests/test_validator.py` (+464/-4); 3 files, +799/-52 against base `e6947039` |
+| Files | `docs/consumer-starter-package.md` (+177/-48), `docs/evidence/consumer-readiness/local-starter-record-guard.md` (+160/-0), `scripts/tests/test_validator.py` (+464/-4); 3 files, +801/-52 against base `e6947039` |
 | Host | Windows, PowerShell 7, Git for Windows `sh`, Python 3 |
 | Model | DeepSeek V4 Flash (configured route `deepseek-flash`, DeepSeek Harness); the serving model is not observable from inside the session |
 
@@ -123,7 +123,7 @@ privilege or Developer Mode, as in item 6 and item 7.
 | Skills validator | `python -P scripts/validate-skills.py` | **OK: 254** skill(s) valid, 0 warning(s), exit 0 |
 | Markdown links | `check-markdown-links.py` over the CI page set (`git ls-files`, fixtures excluded) | 880 pages in 3 batches: 4,162 links, 1,135 anchors, **0 broken, 0 dead**, exit 0 |
 | Whitespace | `git diff --check origin/main..HEAD` | clean, exit 0 |
-| DCO | `python scripts/check_dco.py --range origin/main..HEAD` | **OK: 5** commits, all signed off, exit 0 |
+| DCO | `python scripts/check_dco.py --range origin/main..HEAD` | **OK: 6** commits, all signed off, exit 0 |
 | PR-body bound fields | `python -P scripts/ci/check_pr_body_skills.py --body-file` | **OK**, exit 0 |
 
 ## 6. Limits and UNRUN
