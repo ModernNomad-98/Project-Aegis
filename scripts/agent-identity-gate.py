@@ -8,8 +8,11 @@ a security boundary: --no-verify, later --author/amend changes and commands
 that never run this script are outside its control.
 
 Design requirements: strict raw git var validation; key-exact config reads
-with duplicate rejection; same-scope/same-role config pairing; clean fallback
-probes; per-field justification; dedicated aegis.ownerName/aegis.ownerEmail.
+with duplicate rejection; same-scope/same-role config pairing; per-field
+justification where 'inherited_fallback' is used only when the global value
+equals the effective one; command-scope config decoded by Git itself; dedicated
+aegis.ownerName/aegis.ownerEmail owner separation, where the owner email is
+compared case-insensitively and a name-only match is advisory output.
 """
 from __future__ import annotations
 
@@ -29,11 +32,6 @@ REASON_OWNER_EFFECTIVE = "E_OWNER_EFFECTIVE"
 REASON_UNJUSTIFIED_FIELD = "E_UNJUSTIFIED_FIELD"
 REASON_INTERNAL = "E_INTERNAL"
 
-IDENTITY_ENV = (
-    "GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL",
-    "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL",
-)
-COMMAND_ENV = ("GIT_CONFIG_COUNT", "GIT_CONFIG_PARAMETERS")
 IDENT_RE = re.compile(
     r"^(?P<name>[^<>\n\r]+) <(?P<email>[^<>\n\r]+)> "
     r"(?P<time>[0-9]+) (?P<tz>[+-][0-9]{4})$"
@@ -49,19 +47,6 @@ class GateStop(Exception):
 
 
 Identity = namedtuple("Identity", "name email")
-
-
-def _clean_env(env, drop_ident=False, drop_command=False):
-    clean = dict(env)
-    if drop_ident:
-        for key in IDENTITY_ENV + ("EMAIL",):
-            clean.pop(key, None)
-    if drop_command:
-        for key in tuple(clean):
-            if (key in COMMAND_ENV or key.startswith("GIT_CONFIG_KEY_")
-                    or key.startswith("GIT_CONFIG_VALUE_")):
-                clean.pop(key, None)
-    return clean
 
 
 def _git(args, cwd, env):
@@ -107,10 +92,8 @@ def validate_ident(raw, role):
     return Identity(name, email)
 
 
-def read_identity(cwd, env=None, clean=False):
+def read_identity(cwd, env=None):
     env = dict(os.environ if env is None else env)
-    if clean:
-        env = _clean_env(env, drop_ident=True, drop_command=True)
     out = {}
     for role, key in (("author", "GIT_AUTHOR_IDENT"),
                       ("committer", "GIT_COMMITTER_IDENT")):
@@ -128,6 +111,8 @@ def _read_all_config(cwd, env, scope, key):
         args.append("--local")
     elif scope == "worktree":
         args.append("--worktree")
+    elif scope == "global":
+        args.append("--global")
     else:
         raise GateStop(REASON_INTERNAL, "unknown config scope")
     proc = _git(args + ["--null", "--get-all", key], cwd, env)
@@ -142,70 +127,48 @@ def _read_all_config(cwd, env, scope, key):
     return chunks
 
 
-def _decode_git_parameter(text):
-    """Decode Git's single-quoted C-style escapes; reject unknown/dangling."""
-    out = []
-    index = 0
-    mapping = {"n": "\n", "t": "\t", "b": "\b",
-               "\\": "\\", "'": "'", '"': '"'}
-    while index < len(text):
-        char = text[index]
-        if char != "\\":
-            out.append(char)
-            index += 1
-            continue
-        index += 1
-        if index >= len(text):
-            raise GateStop(REASON_CONFIG_ERROR,
-                           "GIT_CONFIG_PARAMETERS has a dangling escape")
-        escape = text[index]
-        if escape not in mapping:
-            raise GateStop(REASON_CONFIG_ERROR,
-                           "GIT_CONFIG_PARAMETERS has an unsupported escape")
-        out.append(mapping[escape])
-        index += 1
-    return "".join(out)
+def _config_entries(cwd, env, key):
+    """[(scope, value)] for key, exactly as Git itself reports them.
 
-
-def _collect_command_config(env):
-    """Read visible command-scope user.name/email from env forms only.
-
-    Keys are case-insensitive (Git config keys are case-insensitive), and the
-    GIT_CONFIG_PARAMETERS value must be fully consumed; trailing garbage,
-    malformed quotes or unrecognized tokens are a config error. Duplicate
-    user.name/user.email keys in either form, or across forms, STOP.
+    The command scope is the only scope this gate cannot read with a
+    --local/--worktree/--global flag, and Git's internal
+    GIT_CONFIG_PARAMETERS format is shell-quoted. Delegating the decode to
+    Git's own --show-scope/--null output removes a hand-written parser that was
+    narrower than Git: both the 'key=value' and 'key'='value' forms, quoted
+    apostrophes, literal backslashes, '=' inside a value and Git's
+    case-insensitive key matching behave exactly as Git behaves. A malformed
+    value makes Git fail, which STOPs as E_CONFIG_ERROR instead of being
+    silently tolerated. Requires Git >= 2.26 for --show-scope; an older Git
+    fails closed as E_CONFIG_ERROR.
     """
-    values = {"user.name": [], "user.email": []}
-    count = env.get("GIT_CONFIG_COUNT", "")
-    if count:
-        if not count.isdigit() or int(count) <= 0:
-            raise GateStop(REASON_CONFIG_ERROR,
-                           "GIT_CONFIG_COUNT is not a positive integer")
-        for index in range(int(count)):
-            key = env.get("GIT_CONFIG_KEY_" + str(index))
-            value = env.get("GIT_CONFIG_VALUE_" + str(index))
-            if key is None or value is None:
-                raise GateStop(REASON_CONFIG_ERROR,
-                               "GIT_CONFIG_COUNT entry is incomplete")
-            norm = key.casefold()
-            if norm in values:
-                values[norm].append(value)
-    params = env.get("GIT_CONFIG_PARAMETERS", "")
-    if params:
-        token_re = re.compile(
-            r"\s*'((?:[^'\\]|\\.)*)'='((?:[^'\\]|\\.)*)'")
-        position = 0
-        while position < len(params):
-            match = token_re.match(params, position)
-            if match is None:
-                raise GateStop(REASON_CONFIG_ERROR,
-                               "GIT_CONFIG_PARAMETERS is malformed or has trailing content")
-            key = _decode_git_parameter(match.group(1))
-            value = _decode_git_parameter(match.group(2))
-            norm = key.casefold()
-            if norm in values:
-                values[norm].append(value)
-            position = match.end()
+    proc = _git(["config", "--show-scope", "--null", "--get-all", key],
+                cwd, env)
+    if proc.returncode == 1:
+        return []
+    if proc.returncode != 0:
+        raise GateStop(REASON_CONFIG_ERROR, "config read failed for " + key)
+    chunks = proc.stdout.split("\x00")
+    if chunks and chunks[-1] == "":
+        chunks = chunks[:-1]
+    if len(chunks) % 2:
+        raise GateStop(REASON_CONFIG_ERROR,
+                       "config scope output is malformed for " + key)
+    return list(zip(chunks[0::2], chunks[1::2]))
+
+
+def _collect_command_config(cwd, env):
+    """Command-scope user.name/email values, decoded by Git itself.
+
+    Only the 'command' scope is kept, so explicit local/worktree identity is
+    never reclassified as command scope. Duplicate keys in either
+    GIT_CONFIG_PARAMETERS or GIT_CONFIG_COUNT form are rejected, including
+    case-variant spellings, because Git matches config keys case-insensitively
+    and --get-all returns every command-scope value for the key.
+    """
+    values = {}
+    for key in ("user.name", "user.email"):
+        values[key] = [value for scope, value in _config_entries(cwd, env, key)
+                       if scope == "command"]
     for key, found in values.items():
         if len(found) > 1:
             raise GateStop(REASON_CONFIG_DUPLICATE,
@@ -221,6 +184,18 @@ def _check_value_text(value, label):
     if "\n" in value or "\r" in value or CONTROL_RE.search(value):
         raise GateStop(REASON_CONFIG_ERROR,
                        label + " contains newline/control characters")
+
+
+def _check_owner_text(value, label, is_email):
+    """Validate the RAW owner value; trimming never precedes validation."""
+    if not value.strip():
+        raise GateStop(REASON_NO_OWNER, label + " is empty/whitespace")
+    _check_value_text(value, label)
+    if value != value.strip():
+        raise GateStop(REASON_CONFIG_ERROR,
+                       label + " has leading/trailing whitespace")
+    if is_email and re.search(r"\s", value):
+        raise GateStop(REASON_CONFIG_ERROR, label + " contains whitespace")
 
 
 def _worktree_config_enabled(cwd, env):
@@ -240,38 +215,34 @@ def _worktree_config_enabled(cwd, env):
                    "worktree config detection returned a non-boolean value")
 
 
-def _owner_value(cwd, env, key, label):
+def _owner_value(cwd, env, key, label, is_email):
     values = _read_all_config(cwd, env, "local", key)
     if len(values) == 0:
         raise GateStop(REASON_NO_OWNER, label + " is missing")
     if len(values) > 1:
-        raise GateStop(REASON_CONFIG_DUPLICATE, label + " has duplicate values")
-    value = values[0].strip()
-    if not value:
-        raise GateStop(REASON_NO_OWNER, label + " is empty/whitespace")
-    _check_value_text(value, label)
-    return value
+        raise GateStop(REASON_CONFIG_DUPLICATE,
+                       label + " has duplicate values")
+    raw = values[0]
+    _check_owner_text(raw, label, is_email)
+    return raw
 
 
 def _global_identity_fields(cwd, env):
-    """Fallback = global config only; local/worktree explicit config excluded."""
+    """Fallback = global config only; local/worktree explicit config excluded.
+
+    Fallback values are validated with the same rule as local config values,
+    so the equality test in evaluate() compares like with like.
+    """
     fields = {}
     for label, key in (("name", "user.name"), ("email", "user.email")):
-        proc = _git(["config", "--global", "--null", "--get-all", key],
-                    cwd, env)
-        if proc.returncode == 1:
-            fields[label] = ""
-            continue
-        if proc.returncode != 0:
-            raise GateStop(REASON_CONFIG_ERROR,
-                           "global config read failed for " + key)
-        chunks = proc.stdout.split("\x00")
-        if chunks and chunks[-1] == "":
-            chunks = chunks[:-1]
+        chunks = _read_all_config(cwd, env, "global", key)
         if len(chunks) > 1:
             raise GateStop(REASON_CONFIG_DUPLICATE,
                            "global config duplicate " + key)
-        fields[label] = chunks[0] if chunks else ""
+        value = chunks[0] if chunks else ""
+        if value:
+            _check_value_text(value, "global " + label)
+        fields[label] = value
     return fields
 
 
@@ -293,12 +264,9 @@ def config_pairs(cwd, env, effective):
                 _check_value_text(found[0], scope + " " + label)
         if names and emails:
             scopes.append((scope, names[0], emails[0]))
-    commands = _collect_command_config(env)
+    commands = _collect_command_config(cwd, env)
     for label, found in (("name", commands["user.name"]),
                          ("email", commands["user.email"])):
-        if len(found) > 1:
-            raise GateStop(REASON_CONFIG_DUPLICATE,
-                           "command " + label + " has duplicate values")
         if found:
             _check_value_text(found[0], "command " + label)
     if commands["user.name"] and commands["user.email"]:
@@ -307,8 +275,6 @@ def config_pairs(cwd, env, effective):
     author = effective["author"]
     committer = effective["committer"]
     for scope, name, email in scopes:
-        _check_value_text(name, scope + " name")
-        _check_value_text(email, scope + " email")
         if name == author.name and email == author.email:
             pairs.append((scope, "author", name, email))
         elif name == committer.name and email == committer.email:
@@ -330,16 +296,13 @@ def _env_field(env, key, effective_field, fallback_field, role, field):
     return raw
 
 
-def evaluate(cwd, env=None, clean_fallback=True):
+def evaluate(cwd, env=None):
     env = dict(os.environ if env is None else env)
-    owner_name = _owner_value(cwd, env, "aegis.ownerName", "owner name")
-    owner_email = _owner_value(cwd, env, "aegis.ownerEmail", "owner email")
+    owner_name = _owner_value(cwd, env, "aegis.ownerName", "owner name", False)
+    owner_email = _owner_value(cwd, env, "aegis.ownerEmail", "owner email", True)
     effective = read_identity(cwd, env)
     pairs = config_pairs(cwd, env, effective)
-    try:
-        global_fields = _global_identity_fields(cwd, env)
-    except GateStop:
-        raise
+    global_fields = _global_identity_fields(cwd, env)
     author = effective["author"]
     committer = effective["committer"]
     fields = {
@@ -378,19 +341,29 @@ def evaluate(cwd, env=None, clean_fallback=True):
             reasons[(role, field)] = explicit_pairs[(role, field)]
         elif env_val is not None:
             reasons[(role, field)] = "env"
-        elif fb:
+        elif fb and fb == value:
             reasons[(role, field)] = "inherited_fallback"
         else:
             raise GateStop(REASON_UNJUSTIFIED_FIELD,
-                           role + " " + field + " is not justified by fallback or explicit field")
+                           role + " " + field + " is not justified by an "
+                           "explicit source or an equal global fallback")
     has_source = bool(pairs) or any(value is not None for value in explicit.values())
     if not has_source:
         raise GateStop(REASON_NO_EXPLICIT_SOURCE,
                        "no supported explicit source; inherited-global-only/auto identity is not a pass")
+    # Owner decision (2026-10-29): STOP when the effective email equals the
+    # recorded owner email case-insensitively, or when name AND email both
+    # match. The conjunction is subsumed by the email comparison, so it is
+    # implemented once here; a name-only match is advisory output, never STOP.
+    owner_email_key = owner_email.casefold()
+    owner_name_key = owner_name.casefold()
+    advisories = []
     for role, ident in effective.items():
-        if ident.name == owner_name or ident.email == owner_email:
+        if ident.email.casefold() == owner_email_key:
             raise GateStop(REASON_OWNER_EFFECTIVE,
-                           role + " effective identity matches the recorded owner")
+                           role + " effective email matches the recorded owner email")
+        if ident.name.casefold() == owner_name_key:
+            advisories.append(role + "-name-matches-owner")
     provenance = []
     for scope, role, name, email in pairs:
         provenance.append("config:" + scope + ":" + role)
@@ -402,6 +375,7 @@ def evaluate(cwd, env=None, clean_fallback=True):
         "author": author,
         "committer": committer,
         "provenance": provenance,
+        "advisories": sorted(set(advisories)),
         "justification": sorted(
             role + "-" + field + ":" + reasons[(role, field)]
             for role, field in reasons),
@@ -409,10 +383,16 @@ def evaluate(cwd, env=None, clean_fallback=True):
 
 
 def format_accept(result):
-    return ("ACCEPT effective_author=" + repr(result["author"].name + " <" + result["author"].email + ">")
-            + " effective_committer=" + repr(result["committer"].name + " <" + result["committer"].email + ">")
+    author = result["author"]
+    committer = result["committer"]
+    advisories = ",".join(result["advisories"]) or "none"
+    return ("ACCEPT effective_author="
+            + repr(author.name + " <" + author.email + ">")
+            + " effective_committer="
+            + repr(committer.name + " <" + committer.email + ">")
             + " provenance=" + ",".join(result["provenance"])
-            + " justification=" + ",".join(result["justification"]))
+            + " justification=" + ",".join(result["justification"])
+            + " advisories=" + advisories)
 
 
 def format_stop(reason, detail):
