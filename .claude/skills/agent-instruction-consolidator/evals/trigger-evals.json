@@ -1,0 +1,232 @@
+{
+  "skill": "agent-instruction-consolidator",
+  "description": "Trigger discrimination for agent-instruction-consolidator against the nearest shipped owners.",
+  "overlaps_with": [
+    "aegis-setup",
+    "agent-authorization-matrix",
+    "agent-goal-hijack-defender",
+    "agent-harness-architect",
+    "agent-memory-governance",
+    "agent-startup-context-gate",
+    "code-reviewer",
+    "contribution-guide-author",
+    "diataxis-doc-organizer",
+    "docs-as-code-architect",
+    "memory-context-poisoning-reviewer",
+    "model-context-designer",
+    "prompt-injection-defender",
+    "readme-craftsman",
+    "reviewable-diff-discipline",
+    "source-of-truth-reconciler"
+  ],
+  "cases": [
+    {
+      "id": "agent-instruction-consolidator-positive-1",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. Our root CLAUDE.md and AGENTS.md disagree about the test command; consolidate them to one canonical source.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "source-of-truth-reconciler"
+      ],
+      "reason": "Both files are agent-instruction files, which is this skill's scope; source-of-truth-reconciler reconciles documents against code, which this skill's Do NOT use when excludes."
+    },
+    {
+      "id": "agent-instruction-consolidator-positive-2",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. We just adopted Cursor; inventory every instruction file and propose one canonical source.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "docs-as-code-architect"
+      ],
+      "reason": "Adopting a new AI tool is a named trigger in Use When; docs-as-code-architect builds the documentation pipeline, not the per-tool instruction map."
+    },
+    {
+      "id": "agent-instruction-consolidator-positive-3",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. Our Cursor rules and AGENTS.md carry duplicated content that has drifted apart.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "agent-memory-governance"
+      ],
+      "reason": "The duplication is between instruction files; agent-memory-governance governs what an agent retains, not what it is told before it starts."
+    },
+    {
+      "id": "agent-instruction-consolidator-positive-4",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. Audit our agent instruction files for drift and duplication before we add another tool.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "agent-startup-context-gate"
+      ],
+      "reason": "The deliverable is the inventory, conflict matrix and consolidation proposal; the startup gate decides what is loaded, not whether the files agree."
+    },
+    {
+      "id": "agent-instruction-consolidator-positive-5",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. We have root and nested CLAUDE.md overrides plus Copilot instructions; consolidate to one canonical file with thin pointers.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "model-context-designer"
+      ],
+      "reason": "Nested overrides are instruction-file precedence, which this skill's Gotchas own; context-window packing is a different design task."
+    },
+    {
+      "id": "agent-instruction-consolidator-positive-6",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. Build the rule-by-file conflict matrix across AGENTS.md, CLAUDE.md, the Cursor rules and the Copilot instructions.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "agent-harness-architect"
+      ],
+      "reason": "The conflict matrix is this skill's own artifact; agent-harness-architect designs the tool surface, permissions and loop instead."
+    },
+    {
+      "id": "agent-instruction-consolidator-positive-7",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. Two instruction files now contradict each other on style rules after a merge.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "code-reviewer"
+      ],
+      "reason": "The merge left no damaged tree, only disagreeing instruction files; code-reviewer assesses a diff and cannot choose a canonical instruction source."
+    },
+    {
+      "id": "agent-instruction-consolidator-positive-8",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. Show me the rule-preservation diff for every rule before you edit any instruction file.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "reviewable-diff-discipline"
+      ],
+      "reason": "The rule-preservation diff is this skill's proposal artifact; reviewable-diff-discipline shapes commits for review, not a rule inventory."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-1",
+      "prompt": "The documentation claims the API retries three times and the code retries five; reconcile the documentation to the code.",
+      "expected_skill": "source-of-truth-reconciler",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Docs-versus-code reconciliation is the boundary named in this skill's Do NOT use when, which routes it to source-of-truth-reconciler."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-2",
+      "prompt": "Set up our docs-as-code pipeline: linting, review gates and generated reference pages.",
+      "expected_skill": "docs-as-code-architect",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "This builds documentation tooling; it does not touch agent instruction files."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-3",
+      "prompt": "Rewrite the repository README front page so a newcomer can start in five minutes.",
+      "expected_skill": "readme-craftsman",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "A README for humans is not an agent instruction file and has no cross-tool consolidation surface."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-4",
+      "prompt": "Decide what context an agent should load at session start, and in what order.",
+      "expected_skill": "agent-startup-context-gate",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "The question is what is loaded and when, not whether several instruction files agree with each other."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-5",
+      "prompt": "Design the agent harness: tool surface, permission model and loop termination.",
+      "expected_skill": "agent-harness-architect",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Harness design is runtime capability, not instruction text."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-6",
+      "prompt": "Design the context-window budget and packing strategy for long sessions.",
+      "expected_skill": "model-context-designer",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Context budgeting is a separate design task; no instruction file is inventoried or merged."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-7",
+      "prompt": "Audit our agent memory store for poisoning and stale entries.",
+      "expected_skill": "memory-context-poisoning-reviewer",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Memory content is runtime state, not the instruction files this skill consolidates."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-8",
+      "prompt": "Explicitly invoke prompt-injection-defender. Our AGENTS.md contains a suspicious instruction payload; assess whether it is an injection attempt.",
+      "expected_skill": "prompt-injection-defender",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "The nearest boundary here: the file is an instruction file, but the finding is hostile content, and consolidation would carry the payload into the canonical copy. Security assessment comes first."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-9",
+      "prompt": "Explicitly invoke agent-goal-hijack-defender. The agent's goal drifted away from the assigned task during a long run.",
+      "expected_skill": "agent-goal-hijack-defender",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Drift inside a run is a runtime goal-integrity problem; the instruction files may be perfectly consistent."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-10",
+      "prompt": "Explicitly invoke agent-memory-governance. Define what an agent may store, for how long, and who may change it.",
+      "expected_skill": "agent-memory-governance",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Retention and change authority over memory is a governance ruleset, not a consolidation of instruction files."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-11",
+      "prompt": "Write the CONTRIBUTING guide for outside contributors.",
+      "expected_skill": "contribution-guide-author",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "A contributor guide is human-facing process documentation, not tool instruction files."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-12",
+      "prompt": "Restructure the documentation into tutorials, how-to guides, reference and explanation.",
+      "expected_skill": "diataxis-doc-organizer",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Documentation taxonomy is not agent-instruction consolidation, even though both act on prose files."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-13",
+      "prompt": "Review this pull request diff for correctness and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "A code review is not an instruction-file audit, and consolidation is additionally manual-only."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-14",
+      "prompt": "Explicitly invoke agent-authorization-matrix. Define what each agent role is allowed to do.",
+      "expected_skill": "agent-authorization-matrix",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Permissions per role are an authorization matrix; instruction files may describe them but this skill does not define authority."
+    },
+    {
+      "id": "agent-instruction-consolidator-negative-15",
+      "prompt": "Explicitly invoke aegis-setup. Install the Aegis skills and instruction files into this consumer repository for the first time.",
+      "expected_skill": "aegis-setup",
+      "should_not_trigger": [
+        "agent-instruction-consolidator"
+      ],
+      "reason": "Found by the topic sweep of all 255 shipped descriptions rather than by picking a convenient strawman: it also writes AGENTS.md and CLAUDE.md. A first install CREATES one truth; consolidation reconciles several already-present ones, which is why the skill's Do NOT use when excludes a repo with no instruction file."
+    }
+  ],
+  "seam_note": "agent-instruction-consolidator <-> agent-failure-recovery: the two manual-only skills shipped together in this batch. A bad merge whose only residue is DISAGREEING INSTRUCTION FILES is consolidation (this file's positive-1 and positive-7); a bad merge that left a DAMAGED TREE is recovery. Both directions are pinned: agent-failure-recovery-negative-14 pins the reciprocal boundary. Manual-only, so every case expecting either skill uses the strict prefix 'Explicitly invoke <skill>. '."
+}

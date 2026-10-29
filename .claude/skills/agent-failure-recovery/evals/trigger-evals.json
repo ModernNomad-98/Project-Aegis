@@ -1,0 +1,232 @@
+{
+  "skill": "agent-failure-recovery",
+  "description": "Trigger discrimination for agent-failure-recovery against the nearest shipped owners.",
+  "overlaps_with": [
+    "agent-instruction-consolidator",
+    "branching-strategy-designer",
+    "code-reviewer",
+    "data-migration-runbook-author",
+    "database-backup-verifier",
+    "flaky-test-detective",
+    "incident-response-runbook",
+    "local-ci-mirror-preflight",
+    "merge-is-deploy-governance",
+    "phased-work-handoff-designer",
+    "reviewable-diff-discipline",
+    "rollback-runbook-author",
+    "secrets-identity-hardener",
+    "sharded-validation-with-resume",
+    "source-of-truth-reconciler",
+    "systematic-debugger"
+  ],
+  "cases": [
+    {
+      "id": "agent-failure-recovery-positive-1",
+      "prompt": "Explicitly invoke agent-failure-recovery. A rebase was interrupted half way and the tree is conflicted; get me back to a known-good state without losing work.",
+      "expected_skill": "agent-failure-recovery",
+      "should_not_trigger": [
+        "systematic-debugger"
+      ],
+      "reason": "The damage is working-state damage, not a defect to diagnose; systematic-debugger owns code-cause investigation, which this skill's Do NOT use when excludes."
+    },
+    {
+      "id": "agent-failure-recovery-positive-2",
+      "prompt": "Explicitly invoke agent-failure-recovery. A previous run died mid-merge and left the tree dirty, with untracked and ignored build artifacts that are in no stash.",
+      "expected_skill": "agent-failure-recovery",
+      "should_not_trigger": [
+        "branching-strategy-designer"
+      ],
+      "reason": "Nothing here asks for a branch model; the ask is to inventory and preserve ignored as well as untracked paths before any cleanup."
+    },
+    {
+      "id": "agent-failure-recovery-positive-3",
+      "prompt": "Explicitly invoke agent-failure-recovery. A commit captured the wrong files and I need the working state recovered to what it should have been.",
+      "expected_skill": "agent-failure-recovery",
+      "should_not_trigger": [
+        "source-of-truth-reconciler"
+      ],
+      "reason": "The mismatch is between the commit and the intended state, not between two written sources; reconciliation belongs to source-of-truth-reconciler."
+    },
+    {
+      "id": "agent-failure-recovery-positive-4",
+      "prompt": "Explicitly invoke agent-failure-recovery. A blocked permission left half-written files that look committed; diagnose the state before touching anything.",
+      "expected_skill": "agent-failure-recovery",
+      "should_not_trigger": [
+        "local-ci-mirror-preflight"
+      ],
+      "reason": "A half-written tree is state recovery; local-versus-CI parity is a different question and cannot repair it."
+    },
+    {
+      "id": "agent-failure-recovery-positive-5",
+      "prompt": "Explicitly invoke agent-failure-recovery. The branch is broken and mis-based after a bad reset; preserve everything first, then name the rescue refs.",
+      "expected_skill": "agent-failure-recovery",
+      "should_not_trigger": [
+        "rollback-runbook-author"
+      ],
+      "reason": "The request needs rescue refs for existing work, not a documented rollback procedure for a release."
+    },
+    {
+      "id": "agent-failure-recovery-positive-6",
+      "prompt": "Explicitly invoke agent-failure-recovery. My last run was killed and I am about to clean the tree; save the generated files that exist only in the working tree.",
+      "expected_skill": "agent-failure-recovery",
+      "should_not_trigger": [
+        "reviewable-diff-discipline"
+      ],
+      "reason": "Preservation precedes any review-shaped concern; reviewable-diff-discipline curates commits and cannot rescue untracked bytes."
+    },
+    {
+      "id": "agent-failure-recovery-positive-7",
+      "prompt": "Explicitly invoke agent-failure-recovery. Someone force-pushed over my branch; recover the pre-force state and keep the evidence.",
+      "expected_skill": "agent-failure-recovery",
+      "should_not_trigger": [
+        "merge-is-deploy-governance"
+      ],
+      "reason": "Recovering a rewritten ref is state recovery; whether a merge deploys is a governance decision, not a restoration step."
+    },
+    {
+      "id": "agent-failure-recovery-positive-8",
+      "prompt": "Explicitly invoke agent-failure-recovery. A wrong commit included a secret; recover the working state and flag the exposure separately.",
+      "expected_skill": "agent-failure-recovery",
+      "should_not_trigger": [
+        "secrets-identity-hardener"
+      ],
+      "reason": "The skill's own Gotchas make this two incidents: recovery here, with credential hardening and rotation flagged as a follow-up owned elsewhere."
+    },
+    {
+      "id": "agent-failure-recovery-negative-1",
+      "prompt": "Explicitly invoke systematic-debugger. Our tests started failing after my change; find the root cause and fix the code.",
+      "expected_skill": "systematic-debugger",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "The failure is code-caused, which this skill's Do NOT use when excludes; recovery would mutate git state to no purpose."
+    },
+    {
+      "id": "agent-failure-recovery-negative-2",
+      "prompt": "The documentation says the retry policy is three attempts and the code does five; reconcile them to one truth.",
+      "expected_skill": "source-of-truth-reconciler",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "Two written sources disagree; no working state was lost and no git state is damaged."
+    },
+    {
+      "id": "agent-failure-recovery-negative-3",
+      "prompt": "Design our branching model: trunk-based or release branches, and how hotfixes flow between them.",
+      "expected_skill": "branching-strategy-designer",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "This designs a branch model for the future; no existing state needs rescuing."
+    },
+    {
+      "id": "agent-failure-recovery-negative-4",
+      "prompt": "Payments are failing in production right now; run the incident process and coordinate the response.",
+      "expected_skill": "incident-response-runbook",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "The shared word is failure, but the subject is a live service incident, not a damaged local working state."
+    },
+    {
+      "id": "agent-failure-recovery-negative-5",
+      "prompt": "Write the rollback runbook for the next release, with the decision owner and the verification steps.",
+      "expected_skill": "rollback-runbook-author",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "The deliverable is a runbook document, not a recovered tree; nothing is currently broken."
+    },
+    {
+      "id": "agent-failure-recovery-negative-6",
+      "prompt": "Explicitly invoke local-ci-mirror-preflight. Our local checks do not match what CI runs; make them mirror each other.",
+      "expected_skill": "local-ci-mirror-preflight",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "Local-versus-CI drift is a parity gap, not a failed run that lost work."
+    },
+    {
+      "id": "agent-failure-recovery-negative-7",
+      "prompt": "A long validation batch stopped part way; resume it from where it left off without repeating the finished shards.",
+      "expected_skill": "sharded-validation-with-resume",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "The nearest boundary in this file: an interrupted run here resumes a logical batch from recorded progress rather than rescuing git state."
+    },
+    {
+      "id": "agent-failure-recovery-negative-8",
+      "prompt": "Explicitly invoke reviewable-diff-discipline. Split this sprawling uncommitted change into reviewable commits.",
+      "expected_skill": "reviewable-diff-discipline",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "The tree is dirty by intent and nothing was lost; the work is commit curation, which is a different owner."
+    },
+    {
+      "id": "agent-failure-recovery-negative-9",
+      "prompt": "Decide whether merging to main should deploy automatically, and record the rule.",
+      "expected_skill": "merge-is-deploy-governance",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "This sets a deployment policy; it neither diagnoses nor restores a working state."
+    },
+    {
+      "id": "agent-failure-recovery-negative-10",
+      "prompt": "Write the data migration runbook, including the backout steps if the migration fails.",
+      "expected_skill": "data-migration-runbook-author",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "Backout steps are planned procedure for a future failure, not recovery of an already-damaged state."
+    },
+    {
+      "id": "agent-failure-recovery-negative-11",
+      "prompt": "Design the handoff so another agent can resume this work next session without losing context.",
+      "expected_skill": "phased-work-handoff-designer",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "Resume without losing context is a planned handoff artifact; no working state is broken and no rescue is needed."
+    },
+    {
+      "id": "agent-failure-recovery-negative-12",
+      "prompt": "Explicitly invoke flaky-test-detective. This test fails intermittently and I cannot tell why.",
+      "expected_skill": "flaky-test-detective",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "Intermittent test failure is a code and environment investigation; the tree itself is healthy."
+    },
+    {
+      "id": "agent-failure-recovery-negative-13",
+      "prompt": "Review this pull request diff for correctness, readability and missing tests.",
+      "expected_skill": "code-reviewer",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "A review of a clean diff is not state recovery, and recovery is additionally manual-only."
+    },
+    {
+      "id": "agent-failure-recovery-negative-14",
+      "prompt": "Explicitly invoke agent-instruction-consolidator. Our AGENTS.md and the nested CLAUDE.md now disagree after a bad merge; sort the instruction files out.",
+      "expected_skill": "agent-instruction-consolidator",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "The merge already succeeded; what remains is instruction-file drift, which this skill's sibling owner consolidates."
+    },
+    {
+      "id": "agent-failure-recovery-negative-15",
+      "prompt": "Explicitly invoke database-backup-verifier. Verify our database backups actually restore, with a restore drill and retained evidence.",
+      "expected_skill": "database-backup-verifier",
+      "should_not_trigger": [
+        "agent-failure-recovery"
+      ],
+      "reason": "Found by the topic sweep of all 255 shipped descriptions rather than by picking a convenient strawman: it shares the recovery skill's safe-copy and verified-restore vocabulary. The substrate differs - a database backup and a restore drill, not a git working state and a rescue ref."
+    }
+  ],
+  "seam_note": "agent-failure-recovery <-> agent-instruction-consolidator: the two manual-only skills shipped together in this batch. A bad merge that left a DAMAGED TREE is recovery (this file's positive cases); a bad merge whose only residue is DISAGREEING INSTRUCTION FILES is consolidation (negative-14). Both directions are pinned: agent-instruction-consolidator-positive-1 pins the reciprocal boundary. Manual-only, so every case expecting either skill uses the strict prefix 'Explicitly invoke <skill>. '."
+}
