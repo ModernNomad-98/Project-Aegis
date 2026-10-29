@@ -7283,12 +7283,19 @@ _STARTER_TOTAL_ROW = re.compile(
 # segment: an evals/ segment was already forbidden, and the two published
 # answer-file names must not slip through when they sit under references/.
 _STARTER_EVAL_BASENAMES = ("evals.json", "trigger-evals.json")
+_STARTER_EVAL_BASENAMES_FOLDED = frozenset(
+    name.casefold() for name in _STARTER_EVAL_BASENAMES)
 
 
 def _starter_is_eval_path(path: str) -> bool:
-    """True when a path is evaluation answer content by segment or basename."""
-    return ("evals" in Path(path).parts
-            or Path(path).name in _STARTER_EVAL_BASENAMES)
+    """True when a path is evaluation answer content by segment or basename.
+
+    Matching is case-insensitive so an uppercase name cannot bypass the rule
+    on a case-insensitive consumer filesystem.
+    """
+    candidate = Path(path)
+    return (any(part.casefold() == "evals" for part in candidate.parts)
+            or candidate.name.casefold() in _STARTER_EVAL_BASENAMES_FOLDED)
 
 
 def _starter_skill_dirs(rows) -> list[str]:
@@ -7302,8 +7309,12 @@ def _starter_skill_dirs(rows) -> list[str]:
 
 def _starter_declared_skills(text: str) -> set[str]:
     """Return the skill names section 2.2 declares for the package."""
-    section = text[text.find("### 2.2"):text.find("### 2.3")]
-    return set(re.findall(r"^\| `([^`]+)` \|", section, re.M))
+    start = text.find("### 2.2")
+    end = text.find("### 2.3", start)
+    if start < 0 or end <= start:
+        return set()
+    section = text[start:end]
+    return set(re.findall(r"^\| `([^`]+)` \| ", section, re.M))
 
 
 def _starter_selected_for(rows, skill: str) -> list[str]:
@@ -7420,17 +7431,17 @@ def _starter_pin_unrun(label: str) -> None:
 
 
 def _starter_pin_refusal(refusal: str) -> None:
-    """Classify a pin refusal: malformed is a defect on every platform.
+    """Classify a pin refusal: only PIN-UNAVAILABLE may be an environment skip.
 
-    Only PIN-UNAVAILABLE (missing object, shallow clone, missing Git) is an
-    environment limitation that may be UNRUN on a non-required host. A
-    PIN-MALFORMED tree is a deterministic repository defect and must fail
-    everywhere.
+    PIN-UNAVAILABLE (missing object, shallow clone, missing Git) may be UNRUN
+    on a non-required host. PIN-MALFORMED and any unknown classification are
+    deterministic defects and must fail on every platform.
     """
-    if refusal.startswith("PIN-MALFORMED"):
-        raise AssertionError(
-            "required starter-pin closure is malformed: " + refusal)
-    _starter_pin_unrun(refusal)
+    if refusal.startswith("PIN-UNAVAILABLE"):
+        _starter_pin_unrun(refusal)
+        return
+    raise AssertionError(
+        "required starter-pin closure is not usable: " + refusal)
 
 
 def parse_starter_selectors(text: str):
@@ -7473,6 +7484,11 @@ def parse_starter_selectors(text: str):
     if array_match is None:
         return table, [], problems + ["the $package array is missing"]
     array = re.findall(r"^  '([^']+)'$", array_match.group(1), re.M)
+
+    for label, rows in (("section 2.3 table", table),
+                        ("executable array", array)):
+        if len(rows) != len(set(rows)):
+            problems.append("the %s lists duplicate paths" % label)
 
     agg_rows = re.search(r"\$AggRows\s*=\s*(\d+)", text)
     if agg_rows is None:
@@ -7598,6 +7614,20 @@ def test_consumer_starter_selectors():
     gitless = check_starter_selection(table, array, STARTER_REQUIRED_PATHS)
     assert not gitless, "S1-1 (Git-independent): " + "; ".join(gitless)
     ok("S1-1: the Git-independent selector checks pass before pin resolution")
+    assert STARTER_PIN_COMMIT in text, (
+        "S1-1: the page does not name the declared pin " + STARTER_PIN_COMMIT)
+    skill_dirs = _starter_skill_dirs(table)
+    declared_skills = _starter_declared_skills(text)
+    assert declared_skills, "S1-1: section 2.2 declares no skills"
+    assert set(skill_dirs) == declared_skills, (
+        "S1-1: the selectors' skill set differs from the %d skills declared in "
+        "section 2.2: selector-only %s, declared-only %s"
+        % (len(declared_skills),
+           sorted(set(skill_dirs) - declared_skills),
+           sorted(declared_skills - set(skill_dirs))))
+    ok("S1-1: the selected skill set matches the %d skills declared in section 2.2"
+       % len(declared_skills))
+    ok("S1-1: the page names the declared pin %s" % STARTER_PIN_COMMIT)
     if shutil.which("git") is None:
         _starter_pin_unrun("git is required to resolve the declared package pin")
         return
@@ -7612,16 +7642,6 @@ def test_consumer_starter_selectors():
     assert not problems, "S1-1: " + "; ".join(problems)
     ok("S1-1: the table and the executable array select the same %d rows" % len(table))
     ok("S1-1: both selectors carry the two scoped-approval-register paths")
-    skill_dirs = _starter_skill_dirs(table)
-    declared_skills = _starter_declared_skills(text)
-    assert set(skill_dirs) == declared_skills, (
-        "S1-1: the selectors' skill set differs from the %d skills declared in "
-        "section 2.2: selector-only %s, declared-only %s"
-        % (len(declared_skills),
-           sorted(set(skill_dirs) - declared_skills),
-           sorted(declared_skills - set(skill_dirs))))
-    ok("S1-1: the selected skill set matches the %d skills declared in section 2.2"
-       % len(declared_skills))
     selected_skill_rows = sorted(
         path for path in table if path.startswith(".claude/skills/"))
     pinned_closure = sorted(
@@ -7788,9 +7808,17 @@ def test_consumer_starter_selector_pin_closure():
         assert totals is not None
         assert tuple(int(g) for g in totals.groups()) == (
             len(table), len(table), len(table)), totals.groups()
+        bad_total = page.replace(
+            "| **Total: %d files** | **%d** | **%d** |"
+            % (len(pin_rows), len(pin_rows), len(pin_rows)),
+            "| **Total: %d files** | **0** | **0** |" % len(pin_rows))
+        assert bad_total != page
+        _, _, bad_total_problems = parse_starter_selectors(bad_total)
+        assert any("bytes /" in p and "LF" in p for p in bad_total_problems), (
+            bad_total_problems)
+        ok("S1-1 fixture: a wrong total byte/LF value is rejected")
         bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
         assert not bproblems, bproblems
-        assert not [p for p in bproblems if "evals-guide" in p]
         ok("S1-1 fixture: a valid selector pair passes against the pinned closure "
            "while the checkout carries a reference the pin does not")
 
@@ -7853,10 +7881,23 @@ def test_consumer_starter_selector_pin_closure():
                 _starter_fixture_page(pin_rows + [path]))
             assert not problems, problems
             bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
-            assert any(p.startswith("evaluation content must not be installed")
-                       and path in p for p in bproblems), bproblems
+            for label in ("section 2.3 table", "executable array"):
+                assert any(
+                    p.startswith("evaluation content must not be installed")
+                    and label in p and path in p for p in bproblems), bproblems
             ok("S1-1 fixture: %s outside evals/ is rejected in both selectors"
                % name)
+
+        # Case-insensitive matching must refuse uppercase spellings too.
+        for upper in (".claude/skills/beta/references/EVALS.JSON",
+                      ".claude/skills/beta/EVALS/notes.md"):
+            table, array, problems = parse_starter_selectors(
+                _starter_fixture_page(pin_rows + [upper]))
+            assert not problems, problems
+            bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+            assert any(p.startswith("evaluation content must not be installed")
+                       and upper in p for p in bproblems), bproblems
+        ok("S1-1 fixture: uppercase eval basenames and segments are refused")
 
         # The evals/ directory rule must fire on a path the basename rule
         # cannot catch, or the basename rule would mask it (review finding 3).
@@ -7924,16 +7965,17 @@ def test_consumer_starter_selector_pin_closure():
         ok("S1-1 fixture: an unavailable pin and a wrong declared tree both "
            "refuse explicitly instead of falling back to the checkout")
 
-        # PIN-MALFORMED is a deterministic repository defect on every platform;
-        # only PIN-UNAVAILABLE may become an environment UNRUN.
-        try:
-            _starter_pin_refusal("PIN-MALFORMED: synthetic")
-        except AssertionError as exc:
-            assert "synthetic" in str(exc)
-        else:
-            raise AssertionError(
-                "a PIN-MALFORMED refusal must fail on every platform")
-        ok("S1-1 fixture: a PIN-MALFORMED refusal fails on every platform")
+        # PIN-MALFORMED and any unknown classification are deterministic
+        # defects on every platform; only PIN-UNAVAILABLE may become UNRUN.
+        for refusal in ("PIN-MALFORMED: synthetic", "PIN-UNKNOWN: synthetic"):
+            try:
+                _starter_pin_refusal(refusal)
+            except AssertionError as exc:
+                assert "synthetic" in str(exc)
+            else:
+                raise AssertionError(
+                    "a %s refusal must fail on every platform" % refusal)
+        ok("S1-1 fixture: malformed and unknown pin refusals fail on every platform")
 
         # A shallow clone lacks the pin object. The closure read must refuse,
         # never fall back to the checkout; test_consumer_starter_selectors runs
