@@ -9359,10 +9359,20 @@ def test_dsr1b_identity_gate_command_config():
                 text, result.stdout)
     # Case-variant duplicate keys are still a duplicate: Git matches config
     # keys case-insensitively and --get-all returns both command-scope values.
+    # Issue #970: this case used to depend on the host having an ambient Git
+    # identity. On an identity-less Windows runner git var failed before the
+    # gate ever read the command scope, so the run stopped at E_MALFORMED_IDENT
+    # instead of reaching the duplicate rejection under test. The repo carries
+    # its own local identity so identity resolution is independent of the
+    # runner's global/user config, and the assertion below proves it.
     with tempfile.TemporaryDirectory() as tmp:
         home = Path(tmp)
         env = _identity_gate_env(home)
-        repo = _identity_gate_repo(home, env)
+        repo = _identity_gate_repo(
+            home, env, local=("DupAgentLocal", "dup-local@example.invalid"))
+        seeded = _identity_gate_git(repo, env, "var", "GIT_AUTHOR_IDENT")
+        assert seeded.returncode == 0, (seeded.stdout, seeded.stderr)
+        assert "DupAgentLocal" in seeded.stdout, seeded.stdout
         duplicate = {
             "GIT_CONFIG_COUNT": "2",
             "GIT_CONFIG_KEY_0": "user.name",
