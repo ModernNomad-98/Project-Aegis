@@ -1,5 +1,7 @@
 # Limitations — what this export does not claim, and what it withholds
 
+single app, single host, single owner, same-vendor agents, single browser engine — "proves the lifecycle once under observation; does not prove portability."
+
 **Applies to the whole bundle.** Every statement in `README.md` and in `rows/` is bounded by this file. Nothing here is a defect discovered after the fact; each limitation is part of the record.
 
 ## 1. Manual-only

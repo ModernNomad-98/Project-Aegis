@@ -107,6 +107,8 @@ The R-RB2 results recorded here were taken **inside** the window; the announced 
 
 ## 6. What this export does not claim
 
+single app, single host, single owner, same-vendor agents, single browser engine — "proves the lifecycle once under observation; does not prove portability."
+
 - **Rendered behaviour is observed in one engine only, and recorded from an owner summary.** CP-11, CP-15 and CP-20 rest on the owner-run session described in §4; no screenshot, DOM snapshot or capture is carried, the batch files the owner named did not reach the Lead session, and the runner used a persistent pane profile rather than the announced fresh private window. CP-17's second-engine property is UNRUN. HTTP bytes are not a rendering, and one engine's rendering is not another engine's.
 - **No security-boundary claim.** The evidence covers publication integrity and recovery, not the security of the workflow, the host, the account or the consumer application.
 - **No CI-green claim.** Checks recorded here are the named per-row observations; no CI provider status is asserted as a pass, and skipped hosted jobs are recorded as **UNRUN**, never as a hosted pass.
