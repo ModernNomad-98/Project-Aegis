@@ -232,6 +232,20 @@ startup files. Fifteen skills carry 2 files each; `project-orchestrator`,
 `test-plan-designer` and `agent-startup-context-gate` carry 3. There are zero
 `assets/`, zero `scripts/` and zero `evals/` files in the list.
 
+The selector self-test enforces this list twice over: each selected skill's
+`SKILL.md` must appear in both the table and the executable array, and each
+skill's rows are compared with the `SKILL.md` plus `references/` files that
+exist at `ffb040c7` in the committed tree, not with a working checkout, with
+evaluation answer files excluded from the required closure. A checkout that
+adds or omits a reference therefore cannot change the oracle. The same check
+refuses `evals.json` and `trigger-evals.json` by case-insensitive basename
+wherever they occur, in addition to any `evals/` directory segment. The two
+startup files are covered by the row count and the install aggregate rather
+than by the per-skill closure, and a skill absent from both the selectors and
+the section 2.2 declared list remains a human semantic-minimum review
+obligation. The self-test needs the pin object in the local Git object store;
+the repository's CI checks out full history.
+
 Aggregate over these 41 rows, using the algorithm in section 9.2:
 `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699` over
 **5,420 serialized bytes** for **41 rows**. That is the measurement at the pin;

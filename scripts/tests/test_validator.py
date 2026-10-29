@@ -7279,6 +7279,169 @@ _STARTER_TABLE_ROW = re.compile(r"^\| `([^`]+)` \| (\d+) \| (\d+) \|$", re.M)
 _STARTER_TOTAL_ROW = re.compile(
     r"^\| \*\*Total: (\d+) files\*\* \| \*\*(\d+)\*\* \| \*\*(\d+)\*\* \|$", re.M
 )
+# Evaluation answer files are refused by basename as well as by directory
+# segment: an evals/ segment was already forbidden, and the two published
+# answer-file names must not slip through when they sit under references/.
+_STARTER_EVAL_BASENAMES = ("evals.json", "trigger-evals.json")
+_STARTER_EVAL_BASENAMES_FOLDED = frozenset(
+    name.casefold() for name in _STARTER_EVAL_BASENAMES)
+
+
+def _starter_is_eval_path(path: str) -> bool:
+    """True when a path is evaluation answer content by segment or basename.
+
+    Matching is case-insensitive so an uppercase name cannot bypass the rule
+    on a case-insensitive consumer filesystem.
+    """
+    candidate = Path(path)
+    return (any(part.casefold() == "evals" for part in candidate.parts)
+            or candidate.name.casefold() in _STARTER_EVAL_BASENAMES_FOLDED)
+
+
+def _starter_skill_dirs(rows) -> list[str]:
+    """Return the selected skill directory names, sorted."""
+    return sorted({
+        path.split("/")[2]
+        for path in rows
+        if path.startswith(".claude/skills/") and len(path.split("/")) >= 4
+    })
+
+
+def _starter_declared_skills(text: str) -> set[str]:
+    """Return the skill names section 2.2 declares for the package."""
+    start = text.find("### 2.2")
+    end = text.find("### 2.3", start)
+    if start < 0 or end <= start:
+        return set()
+    section = text[start:end]
+    return set(re.findall(r"^\| `([^`]+)` \| ", section, re.M))
+
+
+def _starter_selected_for(rows, skill: str) -> list[str]:
+    """Return the selector rows that belong to one skill directory."""
+    prefix = ".claude/skills/" + skill + "/"
+    return [path for path in rows if path.startswith(prefix)]
+
+
+def _starter_git(repo_root: Path, *args: str) -> subprocess.CompletedProcess:
+    """Run Git hermetically against the committed objects.
+
+    All inherited GIT_* variables are removed, system/global config is
+    disabled, replace refs are ignored, and a synthetic safe.directory entry
+    keeps a read-only checkout usable. The timeout turns a hung Git into a
+    PIN-UNAVAILABLE classification instead of a hung test.
+    """
+    cmd = ["git", "--no-replace-objects", "-c", "safe.directory=*",
+           "-C", str(repo_root)] + list(args)
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    env.update({
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_NO_REPLACE_OBJECTS": "1",
+        "GIT_TERMINAL_PROMPT": "0",
+    })
+    try:
+        return subprocess.run(
+            cmd, capture_output=True, text=True, encoding="utf-8",
+            errors="surrogateescape", env=env, timeout=60,
+        )
+    except subprocess.TimeoutExpired:
+        return subprocess.CompletedProcess(
+            cmd, 124, "", "git timed out after 60 seconds")
+
+
+def load_starter_pin(repo_root: Path, commit: str, tree: str):
+    """Return (allowed_by_skill, refusal) for the declared package pin.
+
+    allowed_by_skill maps every skill directory in the pinned Git tree to the
+    exact paths the package's allow-list rule copies for it: its SKILL.md plus
+    every non-evaluation file under references/. Evaluation answer content is
+    excluded from the required closure because the selector check forbids
+    installing it. The closure is read from the committed object, never from
+    the working tree, so a checkout that differs from the pin cannot change the
+    oracle. Any failure returns (None, classification) and never falls back to
+    the checkout.
+    """
+    resolved = _starter_git(repo_root, "rev-parse", "--verify", "--quiet",
+                            commit + "^{commit}")
+    if resolved.returncode != 0:
+        shallow = _starter_git(repo_root, "rev-parse", "--is-shallow-repository")
+        shallow_hint = ""
+        if shallow.returncode == 0 and shallow.stdout.strip() == "true":
+            shallow_hint = (
+                "; this is a shallow clone, so fetch the pin or the full history "
+                "(git fetch --unshallow) and retry"
+            )
+        return None, (
+            "PIN-UNAVAILABLE: %s is not a commit in this checkout's object store "
+            "(%s)%s" % (commit,
+                        (resolved.stderr or resolved.stdout).strip()[:160],
+                        shallow_hint)
+        )
+    resolved_commit = resolved.stdout.strip()
+    resolved_tree = _starter_git(repo_root, "rev-parse", "--verify", "--quiet",
+                                 resolved_commit + "^{tree}")
+    if resolved_tree.returncode != 0:
+        return None, (
+            "PIN-UNAVAILABLE: cannot resolve the tree of %s (%s)"
+            % (commit, (resolved_tree.stderr or resolved_tree.stdout).strip()[:160])
+        )
+    actual_tree = resolved_tree.stdout.strip()
+    if actual_tree != tree:
+        return None, (
+            "PIN-MALFORMED: %s resolves to tree %s, the package declares %s"
+            % (resolved_commit, actual_tree or "<none>", tree)
+        )
+    listing = _starter_git(repo_root, "ls-tree", "-r", "-z", "--name-only",
+                           resolved_commit)
+    if listing.returncode != 0:
+        return None, (
+            "PIN-UNAVAILABLE: cannot enumerate the pinned tree %s (%s)"
+            % (tree, (listing.stderr or listing.stdout).strip()[:160])
+        )
+    allowed: dict[str, set[str]] = {}
+    for path in listing.stdout.split("\0"):
+        parts = path.split("/")
+        if len(parts) < 4 or parts[0] != ".claude" or parts[1] != "skills":
+            continue
+        relative = "/".join(parts[3:])
+        if relative == "SKILL.md" or relative.startswith("references/"):
+            # A pinned package must not install evaluation answer content even
+            # when the pin carries it under references/. Excluding it from the
+            # required closure keeps the selector satisfiable; selecting it is
+            # still refused by check_starter_selection.
+            if _starter_is_eval_path(path):
+                continue
+            allowed.setdefault(parts[2], set()).add(path)
+    if not allowed:
+        return None, (
+            "PIN-MALFORMED: tree %s carries no SKILL.md or references/ file" % tree
+        )
+    return {skill: tuple(sorted(paths)) for skill, paths in allowed.items()}, None
+
+
+def _starter_pin_unrun(label: str) -> None:
+    """Required on Linux; an unresolvable pin here is UNRUN, never a pass."""
+    if sys.platform.startswith("linux"):
+        raise AssertionError(
+            "required starter-pin closure unavailable on Linux: " + label)
+    REQUIRED_SKIPS.append(label)
+    skip("UNRUN: required starter-pin closure unavailable on "
+         + sys.platform + ": " + label)
+
+
+def _starter_pin_refusal(refusal: str) -> None:
+    """Classify a pin refusal: only PIN-UNAVAILABLE may be an environment skip.
+
+    PIN-UNAVAILABLE (missing object, shallow clone, missing Git) may be UNRUN
+    on a non-required host. PIN-MALFORMED and any unknown classification are
+    deterministic defects and must fail on every platform.
+    """
+    if refusal.startswith("PIN-UNAVAILABLE"):
+        _starter_pin_unrun(refusal)
+        return
+    raise AssertionError(
+        "required starter-pin closure is not usable: " + refusal)
 
 
 def parse_starter_selectors(text: str):
@@ -7296,20 +7459,36 @@ def parse_starter_selectors(text: str):
     if start < 0 or end < 0:
         return [], [], ["sections 2.3 and 3 could not both be located"]
     section = text[start:end]
-    table = [m.group(1) for m in _STARTER_TABLE_ROW.finditer(section)]
+    table_matches = list(_STARTER_TABLE_ROW.finditer(section))
+    table = [m.group(1) for m in table_matches]
+    table_bytes = sum(int(m.group(2)) for m in table_matches)
+    table_lf = sum(int(m.group(3)) for m in table_matches)
     total = _STARTER_TOTAL_ROW.search(section)
     if total is None:
         problems.append("the section 2.3 total row is missing")
-    elif int(total.group(1)) != len(table):
-        problems.append(
-            "the section 2.3 total says %s files but the table lists %d"
-            % (total.group(1), len(table))
-        )
+    else:
+        if int(total.group(1)) != len(table):
+            problems.append(
+                "the section 2.3 total says %s files but the table lists %d"
+                % (total.group(1), len(table))
+            )
+        if (int(total.group(2)) != table_bytes
+                or int(total.group(3)) != table_lf):
+            problems.append(
+                "the section 2.3 total says %s bytes / %s LF but the table "
+                "rows sum to %d / %d"
+                % (total.group(2), total.group(3), table_bytes, table_lf)
+            )
 
     array_match = re.search(r"\$package = @\((.*?)\n\)", text, re.S)
     if array_match is None:
         return table, [], problems + ["the $package array is missing"]
     array = re.findall(r"^  '([^']+)'$", array_match.group(1), re.M)
+
+    for label, rows in (("section 2.3 table", table),
+                        ("executable array", array)):
+        if len(rows) != len(set(rows)):
+            problems.append("the %s lists duplicate paths" % label)
 
     agg_rows = re.search(r"\$AggRows\s*=\s*(\d+)", text)
     if agg_rows is None:
@@ -7338,39 +7517,69 @@ def parse_starter_selectors(text: str):
     return table, array, problems
 
 
-def check_starter_selection(table, array, required) -> list[str]:
-    """Return every S1-1 problem the two selectors have for this page."""
+def check_starter_selection(table, array, required, pinned=None,
+                            pin_label=None) -> list[str]:
+    """Return every S1-1 problem the two selectors have for this page.
+
+    Both selectors must carry every required path, every selected skill's
+    SKILL.md, and exactly the allow-list closure the declared pin names for
+    that skill. `pinned` is load_starter_pin's allow-list map; when it is None
+    the closure comparison is skipped, which keeps the pure selector checks
+    usable without Git. Evaluation answer files are rejected by directory
+    segment and by basename, so the two published names are refused even
+    outside an `evals/` directory.
+    """
     problems: list[str] = []
+    if pin_label is None:
+        pin_label = STARTER_PIN_COMMIT
     for path in required:
         if path not in table:
             problems.append("the section 2.3 table is missing required path " + path)
         if path not in array:
             problems.append("the executable array is missing required path " + path)
-    for path in list(table) + list(array):
-        if "evals" in Path(path).parts:
-            problems.append("evaluation content must not be installed: " + path)
 
-    skill_dirs = sorted(
-        {p.split("/")[2] for p in table if p.startswith(".claude/skills/")}
+    selectors = (
+        ("section 2.3 table", table),
+        ("executable array", array),
     )
+    for label, rows in selectors:
+        for path in rows:
+            if _starter_is_eval_path(path):
+                problems.append(
+                    "evaluation content must not be installed (%s): %s"
+                    % (label, path)
+                )
+
+    skill_dirs = _starter_skill_dirs(list(table) + list(array))
     for skill in skill_dirs:
-        directory = REPO_ROOT / ".claude" / "skills" / skill
-        if not (directory / "SKILL.md").is_file():
-            problems.append("the selected skill directory has no SKILL.md: " + skill)
-            continue
-        references = directory / "references"
-        if not references.is_dir():
-            continue
-        for item in sorted(references.rglob("*")):
-            if item.is_file():
-                rel = item.relative_to(REPO_ROOT).as_posix()
-                if rel not in table:
+        skill_md = ".claude/skills/" + skill + "/SKILL.md"
+        for label, rows in selectors:
+            if skill_md not in rows:
+                problems.append(
+                    "the %s is missing the selected skill's SKILL.md: %s"
+                    % (label, skill_md)
+                )
+
+    if pinned is not None:
+        for skill in skill_dirs:
+            allowed = set(pinned.get(skill, ()))
+            if not allowed:
+                problems.append(
+                    "the selected skill directory %s has no allow-list closure "
+                    "at the pin %s" % (skill, pin_label)
+                )
+                continue
+            for label, rows in selectors:
+                selected = set(_starter_selected_for(rows, skill))
+                for path in sorted(allowed - selected):
                     problems.append(
-                        skill
-                        + " carries "
-                        + rel
-                        + " under references/ but no selector lists it (the "
-                        "allow-list rule copies every reference)"
+                        "the %s is missing %s, which the allow-list closure at "
+                        "the pin %s requires" % (label, path, pin_label)
+                    )
+                for path in sorted(selected - allowed):
+                    problems.append(
+                        "the %s lists %s, which is not in the allow-list closure "
+                        "at the pin %s" % (label, path, pin_label)
                     )
     return problems
 
@@ -7397,16 +7606,60 @@ def test_consumer_starter_selectors():
             "S1-1: the starter page yielded no selection at all: "
             + ("; ".join(problems) or "both selectors parsed empty")
         )
-    problems += check_starter_selection(table, array, STARTER_REQUIRED_PATHS)
+    # These checks do not need the pin, so run them before any Git resolution.
+    # A shallow clone can make the pin unavailable; that must not hide a page
+    # defect in the selectors themselves.
+    if problems:
+        raise AssertionError("S1-1 (Git-independent): " + "; ".join(problems))
+    gitless = check_starter_selection(table, array, STARTER_REQUIRED_PATHS)
+    assert not gitless, "S1-1 (Git-independent): " + "; ".join(gitless)
+    ok("S1-1: the Git-independent selector checks pass before pin resolution")
+    assert STARTER_PIN_COMMIT in text, (
+        "S1-1: the page does not name the declared pin " + STARTER_PIN_COMMIT)
+    skill_dirs = _starter_skill_dirs(table)
+    declared_skills = _starter_declared_skills(text)
+    assert declared_skills, "S1-1: section 2.2 declares no skills"
+    assert set(skill_dirs) == declared_skills, (
+        "S1-1: the selectors' skill set differs from the %d skills declared in "
+        "section 2.2: selector-only %s, declared-only %s"
+        % (len(declared_skills),
+           sorted(set(skill_dirs) - declared_skills),
+           sorted(declared_skills - set(skill_dirs))))
+    ok("S1-1: the selected skill set matches the %d skills declared in section 2.2"
+       % len(declared_skills))
+    ok("S1-1: the page names the declared pin %s" % STARTER_PIN_COMMIT)
+    if shutil.which("git") is None:
+        _starter_pin_unrun("git is required to resolve the declared package pin")
+        return
+    pinned, pin_refusal = load_starter_pin(
+        REPO_ROOT, STARTER_PIN_COMMIT, STARTER_PIN_TREE)
+    if pin_refusal:
+        _starter_pin_refusal(pin_refusal)
+        return
+    assert pinned is not None
+    problems += check_starter_selection(
+        table, array, STARTER_REQUIRED_PATHS, pinned, STARTER_PIN_COMMIT)
     assert not problems, "S1-1: " + "; ".join(problems)
     ok("S1-1: the table and the executable array select the same %d rows" % len(table))
     ok("S1-1: both selectors carry the two scoped-approval-register paths")
-    skill_count = len(
-        {p.split("/")[2] for p in table if p.startswith(".claude/skills/")}
-    )
+    selected_skill_rows = sorted(
+        path for path in table if path.startswith(".claude/skills/"))
+    pinned_closure = sorted(
+        path for skill in skill_dirs for path in pinned.get(skill, ()))
+    duplicates = sorted({
+        path for path in selected_skill_rows
+        if selected_skill_rows.count(path) > 1
+    })
+    assert selected_skill_rows == pinned_closure, (
+        "S1-1: the selectors do not select exactly the pinned allow-list closure: "
+        "selector-only %s, pin-only %s, duplicates %s"
+        % (sorted(set(selected_skill_rows) - set(pinned_closure)),
+           sorted(set(pinned_closure) - set(selected_skill_rows)),
+           duplicates))
     ok(
-        "S1-1: the selection closes over %d skill directories and every "
-        "references/ file each of them carries" % skill_count
+        "S1-1: the selection closes over %d skill directories and matches the "
+        "%d skill files in the pinned allow-list closure at %s"
+        % (len(skill_dirs), len(pinned_closure), STARTER_PIN_COMMIT)
     )
 
     for path in STARTER_REQUIRED_PATHS:
@@ -7416,7 +7669,8 @@ def test_consumer_starter_selectors():
         ):
             broken = _starter_without(text, needle, label + "-row")
             btable, barray, bproblems = parse_starter_selectors(broken)
-            bproblems += check_starter_selection(btable, barray, STARTER_REQUIRED_PATHS)
+            bproblems += check_starter_selection(
+                btable, barray, STARTER_REQUIRED_PATHS, pinned, STARTER_PIN_COMMIT)
             assert bproblems, (
                 "S1-1: removing %s from the %s selector produced no failure"
                 % (path, label)
@@ -7429,6 +7683,333 @@ def test_consumer_starter_selectors():
                 "S1-1: removing %s from the %s selector fails deliberately"
                 % (path, label)
             )
+
+
+def _starter_fixture_repo(tmp: Path):
+    """Create the frozen pin/checkout fixture with distinct Git object identities.
+
+    The pin commit carries the package a selector should reproduce. The later
+    checkout commit adds one reference and deletes another, so the working tree
+    and the pin disagree in both directions: a checkout walk would reject a
+    valid pinned package, and a pin file missing from the checkout would hide a
+    selector omission if the checkout were the oracle.
+    """
+    env = _install_mode_env(tmp)
+    repo = tmp / "selector-pin-fixture"
+    proc = subprocess.run(
+        ["git", "init", "-q", "--initial-branch=main", str(repo)],
+        env=env, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+
+    def run(*args):
+        return subprocess.run(
+            ["git", "-C", str(repo)] + list(args), env=env,
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+        )
+
+    assert run("config", "user.name", "Fixture Author").returncode == 0
+    assert run("config", "user.email", "fixture@example.invalid").returncode == 0
+
+    pin_files = {
+        ".claude/skills/alpha/SKILL.md": "# alpha\n",
+        ".claude/skills/alpha/references/one.md": "one\n",
+        ".claude/skills/alpha/references/two.md": "two\n",
+        ".claude/skills/beta/SKILL.md": "# beta\n",
+        ".claude/skills/beta/references/guide.md": "guide\n",
+        ".claude/skills/beta/references/evals-guide.md": "ordinary name\n",
+        ".claude/skills/beta/evals/evals.json": "{}\n",
+        # A pinned package may carry evaluation answer content under
+        # references/; the allow-list closure must not require it, because the
+        # selector check forbids installing it.
+        ".claude/skills/beta/references/trigger-evals.json": "{}\n",
+    }
+    for relative, content in pin_files.items():
+        target = repo / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content, encoding="utf-8", newline="\n")
+    assert run("add", "-A").returncode == 0
+    proc = run("commit", "-q", "-m", "pin: the declared package source")
+    assert proc.returncode == 0, proc.stderr
+    pin_commit = run("rev-parse", "HEAD").stdout.strip()
+    pin_tree = run("rev-parse", "HEAD^{tree}").stdout.strip()
+
+    (repo / ".claude/skills/alpha/references/checkout-only.md").write_text(
+        "checkout only\n", encoding="utf-8", newline="\n")
+    (repo / ".claude/skills/alpha/references/two.md").unlink()
+    assert run("add", "-A").returncode == 0
+    proc = run("commit", "-q", "-m", "checkout: add one reference, delete one")
+    assert proc.returncode == 0, proc.stderr
+    checkout_commit = run("rev-parse", "HEAD").stdout.strip()
+    checkout_tree = run("rev-parse", "HEAD^{tree}").stdout.strip()
+    return repo, (pin_commit, pin_tree), (checkout_commit, checkout_tree)
+
+
+def _starter_fixture_page(table_rows, array_rows=None) -> str:
+    """Render the two selectors plus their count controls for a fixture page."""
+    if array_rows is None:
+        array_rows = list(table_rows)
+    lines = ["### 2.3 The file list", ""]
+    lines += ["| `%s` | 1 | 1 |" % path for path in table_rows]
+    # Every rendered row carries one byte and one LF, so the aggregate columns
+    # are the row count. The real page's totals are validated against its own
+    # rows by parse_starter_selectors(); the fixture must satisfy the same rule.
+    total = len(table_rows)
+    lines += [
+        "",
+        "| **Total: %d files** | **%d** | **%d** |" % (total, total, total),
+        "",
+        "## 3. How the closure was derived",
+        "",
+        "$AggRows   = %d" % len(array_rows),
+        "$package = @(",
+    ]
+    lines += ["  '%s'" % path for path in array_rows]
+    lines += [")", "if ($package.Count -ne %d) { exit 31 }" % len(array_rows)]
+    return "\n".join(lines) + "\n"
+
+
+def test_consumer_starter_selector_pin_closure():
+    """S1-1: pinned closure, SKILL.md membership and eval basenames, frozen."""
+    if shutil.which("git") is None:
+        _starter_pin_unrun("git is required to build the pinned selector fixture")
+        return
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        repo, (pin_commit, pin_tree), (checkout_commit, checkout_tree) = (
+            _starter_fixture_repo(tmp))
+        assert pin_commit != checkout_commit and pin_tree != checkout_tree
+        assert (repo / ".claude/skills/alpha/references/checkout-only.md").is_file()
+        assert not (repo / ".claude/skills/alpha/references/two.md").exists()
+
+        pinned, refusal = load_starter_pin(repo, pin_commit, pin_tree)
+        assert refusal is None, refusal
+        assert pinned is not None
+        two = ".claude/skills/alpha/references/two.md"
+        assert two in pinned["alpha"]
+        assert (".claude/skills/alpha/references/checkout-only.md"
+                not in pinned["alpha"])
+        assert ".claude/skills/beta/evals/evals.json" not in pinned["beta"]
+        pinned_eval = ".claude/skills/beta/references/trigger-evals.json"
+        assert pinned_eval not in pinned["beta"], pinned["beta"]
+        ok("S1-1 fixture: the frozen pin %s and checkout %s have distinct commit "
+           "and tree identities" % (pin_commit[:12], checkout_commit[:12]))
+        ok("S1-1 fixture: the allow-list closure is read from the pinned tree, "
+           "not from the differing checkout")
+
+        pin_rows = sorted(path for paths in pinned.values() for path in paths)
+        assert len(pin_rows) == 6, pin_rows
+
+        # A valid pinned package passes even though the checkout adds a reference.
+        page = _starter_fixture_page(pin_rows)
+        table, array, problems = parse_starter_selectors(page)
+        assert not problems, problems
+        totals = _STARTER_TOTAL_ROW.search(page)
+        assert totals is not None
+        assert tuple(int(g) for g in totals.groups()) == (
+            len(table), len(table), len(table)), totals.groups()
+        bad_total = page.replace(
+            "| **Total: %d files** | **%d** | **%d** |"
+            % (len(pin_rows), len(pin_rows), len(pin_rows)),
+            "| **Total: %d files** | **0** | **0** |" % len(pin_rows))
+        assert bad_total != page
+        _, _, bad_total_problems = parse_starter_selectors(bad_total)
+        assert any("bytes /" in p and "LF" in p for p in bad_total_problems), (
+            bad_total_problems)
+        ok("S1-1 fixture: a wrong total byte/LF value is rejected")
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert not bproblems, bproblems
+        ok("S1-1 fixture: a valid selector pair passes against the pinned closure "
+           "while the checkout carries a reference the pin does not")
+
+        # A checkout-only reference cannot be forced into the package.
+        extra = pin_rows + [".claude/skills/alpha/references/checkout-only.md"]
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(extra))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any("checkout-only.md" in p and "not in the allow-list closure" in p
+                   for p in bproblems), bproblems
+        ok("S1-1 fixture: a checkout-only reference is rejected as outside the "
+           "pinned closure")
+
+        # Missing SKILL.md from the table only names the path and selector.
+        skill_md = ".claude/skills/alpha/SKILL.md"
+        table_rows = [p for p in pin_rows if p != skill_md]
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(table_rows, pin_rows))
+        assert table == table_rows and array == pin_rows
+        # Assert the row difference by content, never by parser ordering.
+        assert problems, problems
+        assert any("select different rows" in p for p in problems), problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert ("the section 2.3 table is missing the selected skill's SKILL.md: "
+                + skill_md) in bproblems, bproblems
+        ok("S1-1 fixture: a SKILL.md missing from the table alone is named with "
+           "its exact path and selector")
+
+        # Missing SKILL.md from both selectors, with its reference retained.
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(table_rows))
+        assert not problems, problems
+        assert ".claude/skills/alpha/references/one.md" in table
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert ("the section 2.3 table is missing the selected skill's SKILL.md: "
+                + skill_md) in bproblems, bproblems
+        assert ("the executable array is missing the selected skill's SKILL.md: "
+                + skill_md) in bproblems, bproblems
+        ok("S1-1 fixture: a SKILL.md missing from both selectors still fails and "
+           "names each selector")
+
+        # A pin reference deleted from the checkout is still required.
+        rows = [p for p in pin_rows if p != two]
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(rows))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any(two in p and "the section 2.3 table" in p
+                   and "allow-list closure" in p for p in bproblems), bproblems
+        assert any(two in p and "the executable array" in p
+                   and "allow-list closure" in p for p in bproblems), bproblems
+        ok("S1-1 fixture: a pinned reference absent from the checkout is still "
+           "required in both selectors")
+
+        # Evaluation basenames outside evals/ are rejected in both selectors.
+        for name in _STARTER_EVAL_BASENAMES:
+            path = ".claude/skills/beta/references/" + name
+            table, array, problems = parse_starter_selectors(
+                _starter_fixture_page(pin_rows + [path]))
+            assert not problems, problems
+            bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+            for label in ("section 2.3 table", "executable array"):
+                assert any(
+                    p.startswith("evaluation content must not be installed")
+                    and label in p and path in p for p in bproblems), bproblems
+            ok("S1-1 fixture: %s outside evals/ is rejected in both selectors"
+               % name)
+
+        # Case-insensitive matching must refuse uppercase spellings too.
+        for upper in (".claude/skills/beta/references/EVALS.JSON",
+                      ".claude/skills/beta/EVALS/notes.md"):
+            table, array, problems = parse_starter_selectors(
+                _starter_fixture_page(pin_rows + [upper]))
+            assert not problems, problems
+            bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+            assert any(p.startswith("evaluation content must not be installed")
+                       and upper in p for p in bproblems), bproblems
+        ok("S1-1 fixture: uppercase eval basenames and segments are refused")
+
+        # The evals/ directory rule must fire on a path the basename rule
+        # cannot catch, or the basename rule would mask it (review finding 3).
+        eval_dir_path = ".claude/skills/beta/evals/notes.md"
+        assert Path(eval_dir_path).name not in _STARTER_EVAL_BASENAMES
+        assert "evals" in Path(eval_dir_path).parts
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows + [eval_dir_path]))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any("evaluation content must not be installed" in p
+                   and eval_dir_path in p for p in bproblems), bproblems
+        ok("S1-1 fixture: the evals/ directory rule fires on a non-eval basename")
+
+        # A sibling path with the same basename is not evaluation content; the
+        # segment rule alone must not over-generalise.
+        control = ".claude/skills/beta/references/notes.md"
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows + [control]))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any(control in p and "not in the allow-list closure" in p
+                   for p in bproblems), bproblems
+        assert not [p for p in bproblems
+                    if p.startswith("evaluation content") and control in p]
+        ok("S1-1 fixture: references/notes.md is not falsely refused as eval content")
+
+        # The historical evals/evals.json path is still rejected by both rules.
+        eval_json_dir_path = ".claude/skills/beta/evals/evals.json"
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows + [eval_json_dir_path]))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any("evaluation content must not be installed" in p
+                   and eval_json_dir_path in p for p in bproblems), bproblems
+        ok("S1-1 fixture: the existing evals/ directory rejection still fires")
+
+        # Eval content carried by the pin itself is excluded from the required
+        # closure, so a valid selector need not include it; selecting it is
+        # still refused (review finding 6).
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows + [pinned_eval]))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        assert any(p.startswith("evaluation content must not be installed")
+                   and pinned_eval in p for p in bproblems), bproblems
+        ok("S1-1 fixture: eval content in the pinned tree is excluded from the "
+           "closure and refused only when selected")
+
+        # An ordinary name that merely contains the word evals is not rejected.
+        guide = ".claude/skills/beta/references/evals-guide.md"
+        assert guide in pin_rows
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows))
+        assert not [p for p in
+                    check_starter_selection(table, array, (), pinned, pin_commit)
+                    if "evals-guide" in p]
+        ok("S1-1 fixture: references/evals-guide.md is not rejected for its name")
+
+        # Unavailable and malformed pins refuse explicitly, with no fallback.
+        missing, refusal = load_starter_pin(repo, "0" * 40, pin_tree)
+        assert missing is None and refusal.startswith("PIN-UNAVAILABLE"), refusal
+        malformed, refusal = load_starter_pin(repo, pin_commit, "0" * 40)
+        assert malformed is None and refusal.startswith("PIN-MALFORMED"), refusal
+        ok("S1-1 fixture: an unavailable pin and a wrong declared tree both "
+           "refuse explicitly instead of falling back to the checkout")
+
+        # PIN-MALFORMED and any unknown classification are deterministic
+        # defects on every platform; only PIN-UNAVAILABLE may become UNRUN.
+        for refusal in ("PIN-MALFORMED: synthetic", "PIN-UNKNOWN: synthetic"):
+            try:
+                _starter_pin_refusal(refusal)
+            except AssertionError as exc:
+                assert "synthetic" in str(exc)
+            else:
+                raise AssertionError(
+                    "a %s refusal must fail on every platform" % refusal)
+        ok("S1-1 fixture: malformed and unknown pin refusals fail on every platform")
+
+        # A shallow clone lacks the pin object. The closure read must refuse,
+        # never fall back to the checkout; test_consumer_starter_selectors runs
+        # its Git-independent checks before this refusal can skip them.
+        shallow = tmp / "shallow-clone"
+        clone = subprocess.run(
+            ["git", "clone", "--quiet", "--depth", "1", repo.as_uri(),
+             str(shallow)],
+            env=_install_mode_env(tmp), capture_output=True, text=True,
+            encoding="utf-8", errors="replace")
+        assert clone.returncode == 0, clone.stderr
+        assert _starter_git(
+            shallow, "rev-parse", "--is-shallow-repository").stdout.strip() == "true"
+        assert _starter_git(
+            shallow, "cat-file", "-e", pin_commit + "^{commit}").returncode != 0
+        missing, refusal = load_starter_pin(shallow, pin_commit, pin_tree)
+        assert missing is None, missing
+        assert refusal.startswith("PIN-UNAVAILABLE"), refusal
+        assert "shallow" in refusal.lower(), refusal
+        ok("S1-1 fixture: a shallow clone refuses the pinned closure explicitly, "
+           "with no checkout fallback")
+
+        # A checkout-local replace ref must not change the pinned oracle.
+        replaced = subprocess.run(
+            ["git", "-C", str(repo), "replace", pin_commit, checkout_commit],
+            env=_install_mode_env(tmp), capture_output=True, text=True)
+        assert replaced.returncode == 0, replaced.stderr
+        pinned_after, refusal = load_starter_pin(repo, pin_commit, pin_tree)
+        assert refusal is None, refusal
+        assert two in pinned_after["alpha"]
+        assert (".claude/skills/alpha/references/checkout-only.md"
+                not in pinned_after["alpha"])
+        assert sorted(p for paths in pinned_after.values() for p in paths) == pin_rows
+        ok("S1-1 fixture: a replace ref cannot change the pinned closure")
 
 
 # --- consumer starter package: explicit install mode (S3-1..S3-6) -----------
@@ -8190,6 +8771,7 @@ TESTS = [
     test_ds7cb_prewrite_narrowness,
     test_ds7cb_non_readme_failure_refuses,
     test_consumer_starter_selectors,
+    test_consumer_starter_selector_pin_closure,
     test_consumer_install_mode_gate,
     test_consumer_install_mode_native,
 ]
