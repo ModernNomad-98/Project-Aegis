@@ -1,0 +1,47 @@
+{
+  "adjudicated_flagged": 33,
+  "adjudicated_sample": 202,
+  "base_revision": "501dff1f57246c25ae099b7b21d40915e373e9a3",
+  "bytes": 2962866,
+  "categories": {
+    "credential-request": 10,
+    "external-url": 3,
+    "instruction-override": 21,
+    "invisible-markup": 1,
+    "role-play": 7,
+    "tool-call": 2
+  },
+  "ceiling_usd": 10,
+  "chunk_lines": 25,
+  "chunks": 2058,
+  "clean_chunks": 2025,
+  "date": "2026-10-29",
+  "external_spend_usd": 0,
+  "false_positive_rate_pct": 100,
+  "files_scanned": 255,
+  "flagged_chunks": 33,
+  "lines": 48478,
+  "manifest_shipped": 254,
+  "package_script_sha256": "948ea1b04111ad13152a26c7a439439a20618d8f553fba53553daea04654e499",
+  "rubric_sha256": "8bb0bf78a425f67cba37a73a09c84879688689cc56e94a4757ea6d0d5fa6e304",
+  "rules": {
+    "CR-REQUEST": 10,
+    "MK-IMG": 1,
+    "OV-IGNORE-ANY": 2,
+    "OV-SYSTEM-PROMPT": 19,
+    "RP-ACT-AS": 1,
+    "RP-JAILBREAK": 4,
+    "RP-ROLEPLAY": 2,
+    "TC-EXEC": 2,
+    "URL-HTTP": 3
+  },
+  "sample_chunks": 202,
+  "sample_pct_of_clean": 9.98,
+  "scan_script_sha256": "d7c106cee2186efb8adce9b7bc9d7d48e29ce77fd12f137bc2a17893ea7bc3eb",
+  "seed": 20261029,
+  "tier1_hit_skills": 16,
+  "tier1_hits": 44,
+  "verdicts": {
+    "CLEAN": 235
+  }
+}
