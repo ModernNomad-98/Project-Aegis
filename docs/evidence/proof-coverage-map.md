@@ -17,8 +17,11 @@ exercised family was exercised well.
 
 **Reading key.**
 - **EXERCISED** — the proof bundle contains a primary record stating that a named skill
-  from the family was invoked, loaded or followed by the performing session, at a cited
+  from the family was invoked, consulted or followed by the performing session, at a cited
   bundle-relative `file:line`.
+- **SURFACED, NOT INVOKED** — the bundle shows the skill was loaded or exposed (for example
+  in a `system/init` event) but not that the session selected, consulted or followed it. It
+  is recorded for traceability and does not make a family EXERCISED.
 - **NOT EXERCISED** — no such record was found in the bundle. A skill named in an install
   manifest, an exclusion ledger, a review, or an ownership mapping is a mention, not an
   invocation; see [What counts as a recorded invocation](#what-counts-as-a-recorded-invocation).
@@ -29,7 +32,7 @@ All evidence paths are relative to `docs/evidence/aep3-item2-consumer-proof-2026
 
 | # | Family | Skills | Proof #1 | Recorded invocation (bundle-relative) | Date · commit |
 | --- | --- | ---: | --- | --- | --- |
-| 1 | Operating discipline | 9 | **EXERCISED** | `records/CP-01-RECORD.md:90` — `agent-startup-context-gate`; `records/CP-01-RECORD.md:91` — `human-approval-boundary`; `records/CP-05-ROW-UPDATE.md:99-100` — `source-of-truth-reconciler` (loaded by the harness) | 2026-10-29 · `501dff1f` |
+| 1 | Operating discipline | 9 | **EXERCISED** | `records/CP-01-RECORD.md:90` — `agent-startup-context-gate` (read and followed); `records/CP-01-RECORD.md:91` — `human-approval-boundary` (read and used for the authority/merge rules); `records/CP-05-ROW-UPDATE.md:99-100` — `source-of-truth-reconciler` surfaced at `system/init`, **not counted** as an invocation | 2026-10-29 · `501dff1f` |
 | 2 | AI-SDLC governance | 7 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
 | 3 | Core architecture & engineering | 30 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
 | 4 | SaaS & tenant isolation | 20 | NOT EXERCISED | no recorded invocation found | 2026-10-29 · `501dff1f` |
@@ -66,7 +69,8 @@ All evidence paths are relative to `docs/evidence/aep3-item2-consumer-proof-2026
 | EXERCISED | 1 (family 1, Operating discipline) |
 | NOT EXERCISED | 22 |
 | Skills in the 23 families | 253 |
-| Skills with a recorded invocation | 3 (all in family 1) |
+| Skills with a recorded invocation | 2 (both in family 1) |
+| Skills surfaced but not shown invoked | 1 (`source-of-truth-reconciler`, family 1) |
 | Recorded invocations in families 2–23 | 0 |
 
 ## What counts as a recorded invocation
@@ -75,7 +79,7 @@ The rule is the one in the 15:59 STATUS proposal (Block 2a): *EXERCISED only whe
 in the family was actually invoked in the consumer proof with a recorded invocation;
 everything else NOT EXERCISED — not inflated.*
 
-Counted, because the record states the session read, loaded or followed the named skill:
+Counted, because the record states the session read or followed the named skill:
 
 - `agent-startup-context-gate` — `records/CP-01-RECORD.md:90`: the session "read
   `agent-startup-context-gate/SKILL.md` from line 270, its checklist reference,
@@ -83,9 +87,14 @@ Counted, because the record states the session read, loaded or followed the name
 - `human-approval-boundary` — `records/CP-01-RECORD.md:91`: the session "read `AGENTS.md`
   lines 86–145, skill lines 230–273, `human-approval-boundary` … found the authority/merge
   rules and the manual-only policy".
-- `source-of-truth-reconciler` — `records/CP-05-ROW-UPDATE.md:99-100`: "the CLI loaded its
-  own user-level plugins and one user-level skill (`source-of-truth-reconciler`, visible in
-  the `system/init` event)".
+
+**Surfaced, not counted.** `source-of-truth-reconciler` — `records/CP-05-ROW-UPDATE.md:99-100`:
+"the CLI loaded its own user-level plugins and one user-level skill
+(`source-of-truth-reconciler`, visible in the `system/init` event)". The record shows the
+harness exposed the skill; it does not show the session selected, consulted or followed it.
+The 15:59 proposal listed this item as "loaded", and this map keeps the trace while not
+counting it as an invocation. Counting it would inflate the recorded-invocation total from
+two to three (Codex review, comment 4419015504, fixed in the follow-up commit).
 
 Not counted, because none of these records states that a skill was invoked:
 
@@ -102,7 +111,8 @@ Not counted, because none of these records states that a skill was invoked:
 
 **Absence check.** Every skill name under `.claude/skills/` was searched against the
 bundle's 93 files. 41 names occur somewhere in the bundle; each occurrence was read and
-classified into the two groups above. Only the three family-1 records state an invocation.
+classified into the groups above. Only the two CP-01 records state an invocation; the CP-05
+record states a harness load.
 This is a text-and-records check, not a telemetry capture: the bundle cannot show a skill
 that a session consulted without naming it, and a skill named once as background is still
 not an invocation.
@@ -194,3 +204,4 @@ entries, counts summing to 253, one family with a recorded invocation and 22 wit
 | Date | Change | Basis |
 | --- | --- | --- |
 | 2026-10-29 | Initial map: 23 families × Proof #1; 1 EXERCISED, 22 NOT EXERCISED | Base `501dff1f`; bundle `63eb9179`; proposal in the 15:59 STATUS, Block 2 |
+| 2026-10-29 | Review correction: `source-of-truth-reconciler` moved from "counted invocation" to "surfaced, not invoked"; recorded invocations 3 → 2. Family 1 stays EXERCISED on the two CP-01 records. | Codex review comment 4419015504 on `0eb7229d`; `records/CP-05-ROW-UPDATE.md:99-100` says only that the CLI loaded the skill |
