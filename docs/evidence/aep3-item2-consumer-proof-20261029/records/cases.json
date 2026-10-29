@@ -1,0 +1,184 @@
+{
+  "artifact": "twenty-two-case-freeze",
+  "revision": "R1",
+  "work_item": "Item 2 - hosted consumer journey proof",
+  "frozen_at": "2026-10-28T14:16:00-07:00",
+  "frozen_by": "item2 design-prep agent (DeepSeek V4 Flash @ deepseek-account, DeepSeek Harness)",
+  "authority": "PLAN-HANDOFF-FOUR-PRIORITIES-2026-10-28.md section 4; OWNER-DECISION-ITEM2-2026-10-28.md. Planning only; no execution.",
+  "status": "FROZEN - NOT EXECUTED",
+  "case_set": {
+    "count": 22,
+    "ids_are_ordered": true,
+    "id_pattern": "CP-NN",
+    "top_level_verdicts_allowed": [
+      "PASS",
+      "FAIL",
+      "NOT-RUN",
+      "BLOCKED"
+    ],
+    "not_applicable_at_top_level": false,
+    "not_applicable_subcase_rule": "An evidenced conditional subcase may be preclassified not-applicable without deleting its parent case; the parent keeps a verdict of its own."
+  },
+  "result_format": {
+    "version": "RF-1",
+    "record_fields_required": [
+      "case_id",
+      "attempt",
+      "supersedes",
+      "run_id",
+      "actor",
+      "environment",
+      "setup",
+      "action",
+      "inputs",
+      "started_at",
+      "ended_at",
+      "observed_outcome",
+      "exit_code",
+      "evidence",
+      "verdict",
+      "reviewer"
+    ],
+    "field_notes": {
+      "case_id": "One of the 22 frozen IDs. No other value is accepted by the roll-up.",
+      "attempt": "Integer >= 1 for this case_id at this run_id; a retry is a new attempt, never an edit.",
+      "supersedes": "Prior attempt id for a retry, otherwise null. Retried attempts remain in history.",
+      "run_id": "Identifier of the execution run that produced the record.",
+      "actor": "role, identity (human or agent session id) and the host that performed the action.",
+      "environment": "OS/host, tool versions actually used, target URL and provider account where applicable.",
+      "setup": "State established before the action, including fixture or seed identity.",
+      "action": "kind (command|browser|console|read|dispatch), the exact command or console steps, and the working directory.",
+      "inputs": "Array of {path_or_url, sha256} for every input actually consumed.",
+      "started_at / ended_at": "ISO 8601 with UTC offset, observed clock.",
+      "observed_outcome": "What was actually seen, in plain language, including refusals and error text.",
+      "exit_code": "Process exit code where meaningful; null for browser-only observation.",
+      "evidence": "Array of {path, sha256, bytes} for retained, accessible evidence; a URL alone is not evidence.",
+      "verdict": "PASS | FAIL | NOT-RUN | BLOCKED. PASS requires at least one evidence entry and one independent reviewer.",
+      "reviewer": "identity and the independence basis (separate context from the actor)."
+    },
+    "roll_up_rules": [
+      "Exactly one final verdict per frozen case_id is authoritative; earlier attempts remain visible as history.",
+      "A top-level case cannot be NOT-APPLICABLE; an unrun case is NOT-RUN or BLOCKED, never a pass.",
+      "A missing, duplicate or unknown final case_id fails the matrix (CP-22 control).",
+      "A PASS with no accessible hashed evidence, or with self-review only, is rejected.",
+      "The matrix denominator is the 22 frozen IDs. Changing it after any result exists requires a disclosed new revision plus independent review."
+    ]
+  },
+  "hash_recipe": {
+    "case_set": "sha256 over canonical UTF-8 JSON of .cases: sorted keys, separators ',' and ':', no trailing newline, ensure_ascii=false.",
+    "result_format": "sha256 over canonical UTF-8 JSON of .result_format with the same canonicalization rules.",
+    "note": "Both digests are recorded outside this file (TWENTY-TWO-CASE-FREEZE.md). This file contains no digest of itself."
+  },
+  "cases": [
+    {
+      "id": "CP-01",
+      "name": "host capability",
+      "acceptance": "Actual instruction discovery/readback, independent review contexts and a new coding session are demonstrated before investing in the build."
+    },
+    {
+      "id": "CP-02",
+      "name": "actual target and authority",
+      "acceptance": "Real repository, exposure, budget and planned effects reconcile to applicable consumer scope; no source or synthetic grant is inherited."
+    },
+    {
+      "id": "CP-03",
+      "name": "package integrity/closure",
+      "acceptance": "Correct profile passes; missing reference, changed byte and stale-pin variants fail. Semantic completeness is independently checked."
+    },
+    {
+      "id": "CP-04",
+      "name": "install collisions",
+      "acceptance": "Unrelated files are preserved; conflicting startup bytes stop; repeated identical install follows the documented behavior, with before/after evidence."
+    },
+    {
+      "id": "CP-05",
+      "name": "fresh consumer startup",
+      "acceptance": "Correct consumer Role B and Stage 0 in the intended repository; no redirect to a sibling app or inherited source authority."
+    },
+    {
+      "id": "CP-06",
+      "name": "requirements/stage progression",
+      "acceptance": "Product acceptance and all four Stage 2 owner outcomes are recorded in required order from real answers; no manufactured decision."
+    },
+    {
+      "id": "CP-07",
+      "name": "hosted/UI routing",
+      "acceptance": "Required owners/content are reachable and actual applicable manual-only triggers are recorded before invocation."
+    },
+    {
+      "id": "CP-08",
+      "name": "independent plan review",
+      "acceptance": "Final captured consumer plan/spec/design accepted by a non-author before implementation; changed inputs receive affected re-review."
+    },
+    {
+      "id": "CP-09",
+      "name": "implementation/provenance",
+      "acceptance": "Scoped A/B commits and actual author/committer/provenance checks match the consumer policy and permission."
+    },
+    {
+      "id": "CP-10",
+      "name": "independent code/pipeline review",
+      "acceptance": "Material findings from available providers are dispositioned at the exact candidate; self-review is not independent evidence."
+    },
+    {
+      "id": "CP-11",
+      "name": "state/input rules",
+      "acceptance": "Create/toggle/delete, trimming, empty/duplicate/stale IDs, reload, missing/corrupt/unsupported storage, explicit reset and B count match the accepted spec; A can read B-compatible state."
+    },
+    {
+      "id": "CP-12",
+      "name": "build/publication boundary",
+      "acceptance": "Only allowed app output is built/published; symlinks/path escapes and forbidden materials are rejected; content/provenance manifest is noncircular."
+    },
+    {
+      "id": "CP-13",
+      "name": "delivery configuration",
+      "acceptance": "Actual pinned dependencies/actions, permissions, build-to-deploy ordering, environment and explicit trigger are reviewed; untrusted input cannot silently select an unreviewed artifact."
+    },
+    {
+      "id": "CP-14",
+      "name": "recovery readiness",
+      "acceptance": "Initial empty-target recovery is real; retained A bytes/access and concrete restore primitive are available before B. No fictional predecessor."
+    },
+    {
+      "id": "CP-15",
+      "name": "baseline A deployed",
+      "acceptance": "Candidate-bound independent review, readiness and release authority precede A dispatch. Provider receipt/URL, every served asset hash and browser behavior establish retained known-good A."
+    },
+    {
+      "id": "CP-16",
+      "name": "candidate B deployed",
+      "acceptance": "Candidate-bound readiness/authority precedes dispatch; terminal provider result and exact B identity are recorded without blind retries."
+    },
+    {
+      "id": "CP-17",
+      "name": "external identity/function oracle",
+      "acceptance": "First reject expected B against A bytes, missing asset, altered asset and B metadata over A assets in isolated controls. Then verify actual B assets, origin/status/redirects and public browser journey from a clean external client."
+    },
+    {
+      "id": "CP-18",
+      "name": "new coding-agent recovery",
+      "acceptance": "A genuinely new context derives correct state, decisions, authority and next action from durable records, avoids repeating settled questions and completes the authorized read-only continuation."
+    },
+    {
+      "id": "CP-19",
+      "name": "invalid authority refusal",
+      "acceptance": "Isolated missing, out-of-scope, altered-content, expired, revoked, duplicate, contradictory and late-recorded histories produce correct refusal/no action; a valid read-only control succeeds. Examiner answers are withheld; fixtures never authorize a real target."
+    },
+    {
+      "id": "CP-20",
+      "name": "retained rollback/restoration",
+      "acceptance": "Before each transition confirm review/readiness/applicable authority; B -> retained A -> retained B at the same target without rebuild, with exact asset/behavior and compatible-state checks."
+    },
+    {
+      "id": "CP-21",
+      "name": "deployment serialization",
+      "acceptance": "Controlled stale/uncertain-operation cases and actual queue/provider observations prove no delayed release can overwrite restoration; retry follows reconciliation."
+    },
+    {
+      "id": "CP-22",
+      "name": "accessible independent closeout",
+      "acceptance": "Reviewer opens/hashes decisive evidence; exactly one final PASS for each required ID. Missing, duplicate or unknown final IDs and evidence-free PASS controls are rejected; retries remain separate history."
+    }
+  ]
+}

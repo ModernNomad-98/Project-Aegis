@@ -1,0 +1,179 @@
+{
+ "review": "CP-22 round 7 (final cycle)",
+ "bundle": "RF1-DRAFT-v8.json",
+ "bundle_sha256": "9b595c241679f6bbb1da66dcc1a547cf53f0dc1f6ce1ca0b861edfd30d07aeb0",
+ "case_set_sha256_recomputed": "48a28ba14e0d589757d6be1269202631ca15fa6631677ca4ed1175ed473c1de9",
+ "t2_hash_sweep": "checker.py + sweep_hashes.py: 261 path+sha256 citations measured (evidence, inputs, attempt_history evidence, observed_batches evidence, supersedes/record paths, excerpts); 0 missing, 0 mismatched",
+ "controls": {
+  "baseline": "exit 0",
+  "C-MISSING": "rejected",
+  "C-DUPLICATE": "rejected",
+  "C-UNKNOWN": "rejected",
+  "C-EVIDENCE-FREE": "rejected",
+  "C-HASH-TAMPER": "rejected"
+ },
+ "clocks": "accepted as documented deviation",
+ "rows": [
+  {
+   "case_id": "CP-01",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "No execution claimed, evidence empty; gap names the missing observation (a genuinely new coding session).",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-02",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "No reconciliation exists; gap names the missing effect-by-effect reconciliation and the E3 owner confirmation.",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-03",
+   "bundle_verdict": "FAIL",
+   "decision": "ACCEPT",
+   "reason": "install-controls.json: N1 exit 0, files_before 40 -> files_after 41, tree_after = P0 tree 3ef7568c (healed, no stop) against the N1 case note 'expect a stop'; V1 aggregate 12b66ae8..., aggregate_matches false; N2 exit 22; N3 exit 31. The frozen sentence requires the missing-reference variant to fail; the executed control did not stop, so FAIL is supported. CP03-VARIANTS.json top-level verdict UNRUN is disclosed by evidence_annotations as a pre-retype tabulation, and its values match. Actor/time are the closeout's, matching install-controls.json.",
+   "file_opened": "_A/work-package-3/item2-cp-closeout/FIXTURE-RUNS/install-controls/install-controls.json (.N1, .N2, .N3); verify/V1-missing-file.json; cases/N1-missing-reference.json:3; item2-cp22-revision4/evidence/cp03/CP03-VARIANTS.json"
+  },
+  {
+   "case_id": "CP-04",
+   "bundle_verdict": "PASS",
+   "decision": "ACCEPT",
+   "reason": "N4 exit 0, tree 3706ca79 before = after (43/43); N5 exit 22, tree unchanged; N6 exit 0, tree 3ef7568c before = after. Claim visible. reviewer null (rule 4, disclosed draft deviation).",
+   "file_opened": "_A/work-package-3/item2-cp-closeout/FIXTURE-RUNS/install-controls/cases/N4-*, N5-*, N6-*.json (exit, tree_before, tree_after)"
+  },
+  {
+   "case_id": "CP-05",
+   "bundle_verdict": "BLOCKED",
+   "decision": "ACCEPT",
+   "reason": "Names decision U8 and the decision-maker (owner); next need follows from it.",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-06",
+   "bundle_verdict": "BLOCKED",
+   "decision": "ACCEPT",
+   "reason": "Names A-13 + four Stage 2 outcomes and the owner as decision-maker.",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-07",
+   "bundle_verdict": "BLOCKED",
+   "decision": "ACCEPT",
+   "reason": "Names decision U8 and the owner.",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-08",
+   "bundle_verdict": "PASS",
+   "decision": "ACCEPT",
+   "reason": "AUDIT-SUMMARY-v4.md:12 'ACCEPTED at plan level - all conditions discharged'; :14 scope limit. Reviewer is a separate audit session. reviewer null (rule 4, disclosed).",
+   "file_opened": "_A/remediation/handshake/item2-plan-audit-r4/AUDIT-SUMMARY-v4.md:12,14"
+  },
+  {
+   "case_id": "CP-09",
+   "bundle_verdict": "FAIL",
+   "decision": "ACCEPT",
+   "reason": "Attempt 2 (scan) is the final FAIL; attempt 1 (closeout provenance, concluded PASS, CP-CLOSEOUT-RECORD.md:48 and :240) is in attempt_history with supersedes. Scan JSON: generated_at_utc 2026-10-29T13:46:47.691432Z; repository.head 390363f = argv[2] (py:105); merged_main 4f31293 from 'git -C repo rev-parse HEAD' (py:152); 15a83b20 message hits Project-Aegis, APR-140, APR-143; added-line #943/#959; authors 11 '<name withheld>' / 2 'ModernNomad-98'. Outputs argv[3]/argv[4] are opened relatively (py:156,193), patch_file.path is relative, and every git call uses -C <repo>. cwd is marked inferred/unmeasured. Revision-8 sentence verified: CP-CLOSEOUT-RECORD.md:14 and CP19-FIX-RECORD.md:7 name a different clone (rb-prereq-work/consumer) at 390363f; provenance.json has no clone path; MERGED-MAIN-MATRIX.md:22-23 shows a fresh clone at HEAD 4f31293; I ran 'git rev-parse 4f31293^' in the consumer-merged clone and got 390363f (4f31293 has a single parent). Plan :368/:376/:378/:380/:391/:440 say what fail_basis quotes. v7->v8 diff: only setup and prep_review changed. Non-blocking: record-level correction.fields_with_revision was not extended to revision 8 (the rev-8 change is recorded in the bundle corrections array).",
+   "file_opened": "_A/work-package-3/item2-cp22-remediation/evidence/CP09-COMMIT-IDENTIFIER-SCAN.json and .py; item2-cp-closeout/CP-CLOSEOUT-RECORD.md:14,48,240; item2-cp19-fix/CP19-FIX-RECORD.md:7; item2-cp12-merge/MERGED-MAIN-MATRIX.md:22-23; item2-cp-closeout/FIXTURE-RUNS/CP-09/provenance.json; CONSUMER-RELEASE-PLAN-v4.md"
+  },
+  {
+   "case_id": "CP-10",
+   "bundle_verdict": "PASS",
+   "decision": "ACCEPT",
+   "reason": "PREDEPLOY-DELTA-REVIEW.md:18 F1 'PASS - CLOSED'; CP10-REVIEW.md:22 material findings 0; build-review REVISE is documentation-only (REVIEW-SUMMARY.md:3). Reviews are non-author sessions separate from the implementing task. reviewer null (rule 4, disclosed).",
+   "file_opened": "_A/remediation/handshake/item2-predeploy-review/PREDEPLOY-DELTA-REVIEW.md:7,18; _A/work-package-3/item2-rb-prereq/CP10-REVIEW.md:22"
+  },
+  {
+   "case_id": "CP-11",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "No rendered observation; gap names browser plan O1-O14.",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-12",
+   "bundle_verdict": "PASS",
+   "decision": "ACCEPT",
+   "reason": "Attempt 3 matrix: S0 0 (aggregate 36bc4407), S3 1 'retained site path is a symlink', M1 1 and M2 1 'manifest path is a symlink'; M2 stdout has no manifest_verified, no aggregate= and no d33d487d; all 13 exits match exit_codes; stderr empty. _harness.txt:2-3 absolute gate/tar paths match action.command and the run_matrix.sh:5-7,15-18 argument order; cwd marked inferred/unmeasured; 'verbatim' not claimed. gate-67c1562.py is a dedented byte-equal slice of pages-67c1562.yml from line 161. File mtimes 07:14:59/07:15:00-07:00 match time_basis. Attempt 1 S3 exit 0 (FAIL); attempt 2 gap disclosed (CP12-REVIEW.md:186-197, M1/M2 exit 0). reviewer null (rule 4, disclosed).",
+   "file_opened": "_A/work-package-3/item2-cp22-revision4/evidence/cp12-current-main/matrix-67c1562/{S0,S3,M1,M2}.*, _harness.txt:1-6, run_matrix.sh, RUN-LOG.txt:24-31, pages-67c1562.yml; item2-cp-closeout/FIXTURE-RUNS/CP-12/S3-dir-symlink.exit.txt; item2-cp12-review/CP12-REVIEW.md:186-197"
+  },
+  {
+   "case_id": "CP-13",
+   "bundle_verdict": "PASS",
+   "decision": "ACCEPT",
+   "reason": "17b-pre-dispatch-pages.yml: on: workflow_dispatch only (:7-8); top-level permissions contents: read (:25-26); build job contents: read; deploy job contents/pages/id-token (:138-141); deploy guarded by event_name == 'workflow_dispatch' && inputs.mode == 'deploy' (:133); 5 uses: lines, all 40-hex SHA pins. reviewer null (rule 4, disclosed).",
+   "file_opened": "_A/work-package-3/item2-releaseB/evidence/17b-pre-dispatch-pages.yml"
+  },
+  {
+   "case_id": "CP-14",
+   "bundle_verdict": "PASS",
+   "decision": "ACCEPT",
+   "reason": "A-RESTORABLE.md:21-24: retained A bundle/manifest readable, gate replay PASS exit 0, deployment 7401326753 success; CONSUMER-STAGE-0-v4.md section 2.1 pre-push capture. reviewer null (rule 4, disclosed).",
+   "file_opened": "_A/work-package-3/item2-rb-prereq/A-RESTORABLE.md:21-24; _A/remediation/handshake/item2-consumer-plan/v4/CONSUMER-STAGE-0-v4.md:36"
+  },
+  {
+   "case_id": "CP-15",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "Provider/bytes half observed, browser rollback-window half not; the gap names it. No executed failure.",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-16",
+   "bundle_verdict": "PASS",
+   "decision": "ACCEPT",
+   "reason": "live-summary.json: manifest.aggregate_equal true, all_files_match_manifest_and_bundle true, live and committed aggregate 36bc4407514265db..., 3x HTTP 200; provider-facts.json deployment 7402303270, run 40805535198. reviewer null (rule 4, disclosed).",
+   "file_opened": "_A/work-package-3/item2-cp-acceptance/evidence/02-live-fetch/live-summary.json; evidence/03-cp16/provider-facts.json"
+  },
+  {
+   "case_id": "CP-17",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "controls-summary.json: 18 cases, 16 closed, 2 passed (no failure); CP17-CONTROLS.md:5 browser journey UNRUN. The executed parts succeeded; the unobserved browser half is the named gap.",
+   "file_opened": "_A/work-package-3/item2-cp-acceptance/evidence/04-cp17/controls-summary.json; CP17-CONTROLS.md:5"
+  },
+  {
+   "case_id": "CP-18",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "No genuinely new session; fork disqualified; gap names it.",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-19",
+   "bundle_verdict": "FAIL",
+   "decision": "ACCEPT",
+   "reason": "Attempt 1 CP19B scoring.json 11/3 FAIL; attempt 2 CP19C scoring.json 13/1 FAIL; F2 response.md resolves the chronology ('A-FX-11 was not in force') and never reports authority_state=unresolved. Actor/setup/action/time are the CP19C artifacts: batch-manifest generated_utc 05:45:00Z, run-meta cwd under CORRECTED-FIXTURES, model claude-opus-5-5, the CP19-FIX-RECORD.md:5 window, the :148-152 oracle command and the :220-230 reproduction block; prompt.txt is present in the root. Matches the owner rescore RUN=FAIL 13/14, F2 failing. scoring.json's own cp19_verdict 'UNRUN' is superseded by the owner rescore.",
+   "file_opened": "_A/work-package-3/item2-cp19-fix/evidence/{scoring.json,batch-manifest.json,runs-index.json}, run/F2-late-revocation/{prompt.txt,run-meta.json,response.md}; CP19-FIX-RECORD.md; item2-cp-closeout/FIXTURE-RUNS/CP-19/scoring.json"
+  },
+  {
+   "case_id": "CP-20",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "rb1post2/rb2post summaries 35/35 all_pass; the visible-behaviour and compatible-state half is unobserved and named.",
+   "file_opened": "_A/work-package-3/item2-rb1-rb2/evidence/rb1post2-summary.json, rb2post-summary.json"
+  },
+  {
+   "case_id": "CP-21",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "No controlled stale-run case; the gap names the grant needed.",
+   "file_opened": null
+  },
+  {
+   "case_id": "CP-22",
+   "bundle_verdict": "UNRUN",
+   "decision": "ACCEPT",
+   "reason": "Claims no CP-22 verdict; types the record set. Counts I recomputed: 7 PASS, 3 FAIL, 9 UNRUN, 3 BLOCKED; 15 non-PASS, 12 open. setup, observed_outcome, gap.next_need and prep_review name revision 8 and the seventh review / round 7; the CP-19 sentence matches the owner rescore. v7->v8 diff is limited to setup, gap, correction, prep_review and observed_outcome. Non-blocking: actor/run_id/time_basis remain those of the closeout session that registered the row, while the tally is the revision-8 prep's; for an unexecuted row this misattributes no run.",
+   "file_opened": "RF1-DRAFT-v8.json records[21]; _A/work-package-3/item2-cp22-revision7/RF1-DRAFT-v7.json"
+  }
+ ],
+ "summary": {
+  "ACCEPT": 22,
+  "REJECT": 0
+ },
+ "outcome": "SIGNED",
+ "cp22": "PASS",
+ "signature_block": "CP-22 INDEPENDENT REVIEW — SIGNATURE (ROUND 7, FINAL CYCLE)\n\nReviewer identity: CP22-REVIEWER round 7 — fresh Claude Agent SDK session (single session, no resume/fork), role: independent record reviewer; vendor/model Anthropic, claude-opus-5-5\nSigned at:        2026-10-29T10:17:46-07:00 (2026-10-29T17:17:47Z)\nBundle:           RF1-DRAFT-v8.json revision 8, sha256 <measured by me: 9b595c241679f6bbb1da66dcc1a547cf53f0dc1f6ce1ca0b861edfd30d07aeb0> (190645 bytes; re-measured unchanged at signing)\nCase set:         recomputed by me -> 48a28ba14e0d589757d6be1269202631ca15fa6631677ca4ed1175ed473c1de9 (22 IDs, CP-01..CP-22 in order)\n\nIndependence: I did not produce any of the 22 records, the plan, or the fixture\nruns; I am not the producer session; I am a different vendor from the producer;\nnobody told me which verdict to reach.\n  (Producer/implementer sessions are DeepSeek Harness / deepseek-flash per the records'\n   own model lines. Disclosure: the 14 CP-19 oracle sessions under test were Claude Code\n   sessions reporting claude-opus-5-5, the same model as this reviewer; they were test\n   subjects, not record producers, and I was not one of them.)\n\nControls:  C-MISSING rejected / C-DUPLICATE rejected / C-UNKNOWN rejected /\n           C-EVIDENCE-FREE rejected / C-HASH-TAMPER rejected\n           (clean baseline: exit 0)\n\nClocks:    accepted as documented deviation\n\nRow decisions: 22 rows: ACCEPT 22, REJECT 0\n\nOutcome:   SIGNED\nOpen rows at signing: 12 (9 UNRUN + 3 BLOCKED, CP-22 among the UNRUN)  — CP-22 gate: MET\n"
+}

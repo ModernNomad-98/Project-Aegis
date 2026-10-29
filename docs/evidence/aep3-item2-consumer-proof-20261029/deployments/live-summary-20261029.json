@@ -1,0 +1,167 @@
+{
+  "fetched_utc": "2026-10-29T02:28:19Z",
+  "base": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+  "files": {
+    "index.html": {
+      "url": "https://modernnomad-98.github.io/aegis-consumer-proof/?cpcold=1793240899738",
+      "status": 200,
+      "bytes": 1666,
+      "lf": 42,
+      "sha256": "27d54db89978ea1e9677ac953689a04ed077991f6dc35cf00a713e413fc385a2",
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": "1666",
+        "ETag": "\"6ae2acf0-682\"",
+        "Last-Modified": "Thu, 29 Oct 2026 02:18:24 GMT",
+        "Server": "GitHub.com",
+        "X-Cache": "HIT",
+        "Age": "57",
+        "Cache-Control": "max-age=600",
+        "Accept-Ranges": "bytes",
+        "Via": "1.1 varnish"
+      }
+    },
+    "app.js": {
+      "url": "https://modernnomad-98.github.io/aegis-consumer-proof/app.js?cpcold=1793240899738",
+      "status": 200,
+      "bytes": 11776,
+      "lf": 452,
+      "sha256": "4ae8bf8ede12a97627c63696f4b99172ba9cdbead519696a282035c4eab8d733",
+      "headers": {
+        "Content-Type": "application/javascript; charset=utf-8",
+        "Content-Length": "11776",
+        "ETag": "\"6ae2acf0-2e00\"",
+        "Last-Modified": "Thu, 29 Oct 2026 02:18:24 GMT",
+        "Server": "GitHub.com",
+        "X-Cache": "MISS",
+        "Age": "0",
+        "Cache-Control": "max-age=600",
+        "Accept-Ranges": "bytes",
+        "Via": "1.1 varnish"
+      }
+    },
+    "styles.css": {
+      "url": "https://modernnomad-98.github.io/aegis-consumer-proof/styles.css?cpcold=1793240899738",
+      "status": 200,
+      "bytes": 3914,
+      "lf": 252,
+      "sha256": "94c4ee228c4e192c07e1794e6abe957bd3506a66235e8573842d39a4cf8b84f8",
+      "headers": {
+        "Content-Type": "text/css; charset=utf-8",
+        "Content-Length": "3914",
+        "ETag": "\"6ae2acf0-f4a\"",
+        "Last-Modified": "Thu, 29 Oct 2026 02:18:24 GMT",
+        "Server": "GitHub.com",
+        "X-Cache": "MISS",
+        "Age": "0",
+        "Cache-Control": "max-age=600",
+        "Accept-Ranges": "bytes",
+        "Via": "1.1 varnish"
+      }
+    }
+  },
+  "manifest": {
+    "committed_at_390363f": {
+      "aggregate": "36bc4407514265db0bd0fcaa9dde87ad2db18373ed5646fd178ec97af5a9ba4a",
+      "serialized_bytes": 251,
+      "rows": [
+        [
+          "app.js",
+          11776,
+          452,
+          "4ae8bf8ede12a97627c63696f4b99172ba9cdbead519696a282035c4eab8d733"
+        ],
+        [
+          "index.html",
+          1666,
+          42,
+          "27d54db89978ea1e9677ac953689a04ed077991f6dc35cf00a713e413fc385a2"
+        ],
+        [
+          "styles.css",
+          3914,
+          252,
+          "94c4ee228c4e192c07e1794e6abe957bd3506a66235e8573842d39a4cf8b84f8"
+        ]
+      ],
+      "manifest_self_consistent": true
+    },
+    "live_recomputed": {
+      "aggregate": "36bc4407514265db0bd0fcaa9dde87ad2db18373ed5646fd178ec97af5a9ba4a",
+      "serialized_bytes": 251,
+      "rows": [
+        [
+          "app.js",
+          11776,
+          452,
+          "4ae8bf8ede12a97627c63696f4b99172ba9cdbead519696a282035c4eab8d733"
+        ],
+        [
+          "index.html",
+          1666,
+          42,
+          "27d54db89978ea1e9677ac953689a04ed077991f6dc35cf00a713e413fc385a2"
+        ],
+        [
+          "styles.css",
+          3914,
+          252,
+          "94c4ee228c4e192c07e1794e6abe957bd3506a66235e8573842d39a4cf8b84f8"
+        ]
+      ]
+    },
+    "aggregate_equal": true,
+    "serialized_bytes_equal": true
+  },
+  "per_file": {
+    "app.js": {
+      "manifest_row": {
+        "bytes": 11776,
+        "lf": 452,
+        "sha256": "4ae8bf8ede12a97627c63696f4b99172ba9cdbead519696a282035c4eab8d733"
+      },
+      "live": {
+        "bytes": 11776,
+        "lf": 452,
+        "sha256": "4ae8bf8ede12a97627c63696f4b99172ba9cdbead519696a282035c4eab8d733",
+        "status": 200
+      },
+      "matches_manifest": true,
+      "matches_committed_bundle": true,
+      "matches_A_bytes": false
+    },
+    "index.html": {
+      "manifest_row": {
+        "bytes": 1666,
+        "lf": 42,
+        "sha256": "27d54db89978ea1e9677ac953689a04ed077991f6dc35cf00a713e413fc385a2"
+      },
+      "live": {
+        "bytes": 1666,
+        "lf": 42,
+        "sha256": "27d54db89978ea1e9677ac953689a04ed077991f6dc35cf00a713e413fc385a2",
+        "status": 200
+      },
+      "matches_manifest": true,
+      "matches_committed_bundle": true,
+      "matches_A_bytes": false
+    },
+    "styles.css": {
+      "manifest_row": {
+        "bytes": 3914,
+        "lf": 252,
+        "sha256": "94c4ee228c4e192c07e1794e6abe957bd3506a66235e8573842d39a4cf8b84f8"
+      },
+      "live": {
+        "bytes": 3914,
+        "lf": 252,
+        "sha256": "94c4ee228c4e192c07e1794e6abe957bd3506a66235e8573842d39a4cf8b84f8",
+        "status": 200
+      },
+      "matches_manifest": true,
+      "matches_committed_bundle": true,
+      "matches_A_bytes": false
+    }
+  },
+  "all_files_match_manifest_and_bundle": true
+}

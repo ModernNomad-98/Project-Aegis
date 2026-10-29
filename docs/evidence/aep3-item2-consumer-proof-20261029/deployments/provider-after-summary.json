@@ -1,0 +1,207 @@
+{
+  "artifacts": {
+    "items": [
+      {
+        "expired": false,
+        "id": 12876425865,
+        "name": "github-pages",
+        "size_in_bytes": 5222
+      },
+      {
+        "expired": false,
+        "id": 12869560301,
+        "name": "github-pages",
+        "size_in_bytes": 4975
+      },
+      {
+        "expired": false,
+        "id": 12869007668,
+        "name": "github-pages",
+        "size_in_bytes": 5221
+      },
+      {
+        "expired": false,
+        "id": 12867822997,
+        "name": "github-pages",
+        "size_in_bytes": 5221
+      },
+      {
+        "expired": false,
+        "id": 12865394868,
+        "name": "github-pages",
+        "size_in_bytes": 5221
+      },
+      {
+        "expired": false,
+        "id": 12864139450,
+        "name": "github-pages",
+        "size_in_bytes": 4974
+      },
+      {
+        "expired": false,
+        "id": 12863007897,
+        "name": "github-pages",
+        "size_in_bytes": 4975
+      }
+    ],
+    "total_count": 7
+  },
+  "branch_main": {
+    "protected": false,
+    "sha": "4f3129319e78884fdc9f66702735cb7b168e0edd"
+  },
+  "deployments": {
+    "count": 4,
+    "items": [
+      {
+        "created_at": "2026-10-29T02:45:43Z",
+        "environment": "github-pages",
+        "id": 7402685306,
+        "ref": "main",
+        "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+        "task": "deploy"
+      },
+      {
+        "created_at": "2026-10-29T02:43:09Z",
+        "environment": "github-pages",
+        "id": 7402651775,
+        "ref": "main",
+        "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+        "task": "deploy"
+      },
+      {
+        "created_at": "2026-10-29T02:18:10Z",
+        "environment": "github-pages",
+        "id": 7402303270,
+        "ref": "main",
+        "sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+        "task": "deploy"
+      },
+      {
+        "created_at": "2026-10-29T01:07:53Z",
+        "environment": "github-pages",
+        "id": 7401326753,
+        "ref": "main",
+        "sha": "7591c657010685fa5fe158fb73828f73a26bbb98",
+        "task": "deploy"
+      }
+    ]
+  },
+  "files": {
+    "artifacts.json": {
+      "bytes": 5008,
+      "sha256": "f884f35bf75680a2ae19485e4dfc4470c91175f42cb8295c3cb4eede66febd93"
+    },
+    "branch-main.json": {
+      "bytes": 5384,
+      "sha256": "17cf0197e7d88b532e7d369fa303728578e4414a425addb99fcf38add05b49d6"
+    },
+    "deployments.json": {
+      "bytes": 15769,
+      "sha256": "6c9b1b34b4f84e1408a79cb0a0da19c75db7f2c5c08631a9b761db0f6e8439a9"
+    },
+    "pages.json": {
+      "bytes": 358,
+      "sha256": "cccf75cf3a71fce72e2173ebd3e60cbd1bad4fa70534776bbcbea16289b27839"
+    },
+    "ref-main.json": {
+      "bytes": 368,
+      "sha256": "a53a3d8597f79abcc65976dd7095ca5d431cb10a8f92ed74517d2eda8e34da15"
+    },
+    "rulesets.json": {
+      "bytes": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "runs.json": {
+      "bytes": 100601,
+      "sha256": "1b018d1d6b4c84e60026ec15cceb682ab4fb1e649e4e0b6b5f8edabc089dea25"
+    }
+  },
+  "normalization_notes": [],
+  "pages": {
+    "build_type": "workflow",
+    "cname": null,
+    "custom_404": false,
+    "html_url": "https://modernnomad-98.github.io/aegis-consumer-proof/",
+    "https_certificate": null,
+    "pending_domain_unverified_at": null,
+    "protected_domain_state": null,
+    "status": null
+  },
+  "pages_source": {
+    "branch": "main",
+    "path": "/"
+  },
+  "ref_main": {
+    "sha": "4f3129319e78884fdc9f66702735cb7b168e0edd"
+  },
+  "rulesets": [],
+  "runs": {
+    "items": [
+      {
+        "conclusion": "success",
+        "created_at": "2026-10-29T05:43:14Z",
+        "event": "workflow_dispatch",
+        "head_branch": "aep3-i2/cp12-guard",
+        "head_sha": "8ac4f732c471ed9636810879c95ddd8576ff9077",
+        "id": 40825008292,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "created_at": "2026-10-29T02:45:41Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+        "id": 40808262509,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "created_at": "2026-10-29T02:43:07Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+        "id": 40808009410,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "created_at": "2026-10-29T02:18:09Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_sha": "390363f66c72f81834b9d910b6859ff82ea45bda",
+        "id": 40805535198,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "created_at": "2026-10-29T01:41:49Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_sha": "d248d7cc666e68dc689e51f34b1a152c367d1af5",
+        "id": 40801962008,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "created_at": "2026-10-29T01:07:52Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_sha": "7591c657010685fa5fe158fb73828f73a26bbb98",
+        "id": 40798505740,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "created_at": "2026-10-29T00:33:15Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main",
+        "head_sha": "8c5eaf0f4b852cc7456d0a69b4cf08fd241126f3",
+        "id": 40794805183,
+        "status": "completed"
+      }
+    ],
+    "total_count": 7
+  }
+}
