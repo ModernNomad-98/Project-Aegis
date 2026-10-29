@@ -92,7 +92,7 @@ jobs:
           # against display-quoting bypass; this is a boolean skip filter on an
           # advisory lane, and no tracked path in this repo contains a newline).
           git diff --no-renames --name-only "origin/${BASE_REF}...HEAD" > "$RUNNER_TEMP/aegis-changed-paths"
-          if grep -Eq '^tools/' "$RUNNER_TEMP/aegis-changed-paths"; then
+          if grep -Eq '^(tools/|docs/instrumentation/workflow-outcomes-v1\.schema\.json$)' "$RUNNER_TEMP/aegis-changed-paths"; then
             echo 'tools=true' >> "$GITHUB_OUTPUT"
           else
             echo 'tools=false' >> "$GITHUB_OUTPUT"
