@@ -20,6 +20,13 @@ review. No live Scenario A or general corpus run is available. The
 current gates; the [design](../../docs/design/behavioral-eval-runner-v1.md)
 contains the complete contract.
 
+A **gated live-adapter enablement package** now exists under `live/` (2026-10-29,
+build-only). It is **GATED, not enabled by default**: it ships the subject and
+cross-vendor judge adapters, a spend ceiling with a proven hard halt, an owner
+gate for real-host facts, and the `live-preflight`, `live-dry-run` and
+`live-run` verbs. No live provider request has been made, no key was used and
+the build spent $0; see [Live adapters are gated](#live-adapters-are-gated-not-enabled-by-default).
+
 In this guide, a **manifest** lists prepared files or test cases and their
 expected properties. A **hash** is a fingerprint calculated from file or
 record bytes to detect changes; a matching hash does not approve the content.
@@ -80,6 +87,9 @@ live assistant or sends a request to a model provider:
 | `schedule` | Required `--selection` JSON and optional work and cost caps. | Prints a deterministic queue and budget accounting; it does not dispatch the queue. |
 | `grade-fixture` | A required `--grader` selector, trusted grading `--plan`, and recorded `--evidence`. | Prints one deterministic Scenario A grader result. |
 | `verify-evidence` | Bundles below required `--root`; optional `--stage` selects input, final, or both reports. Final verification also checks the linked input bundle. | Prints integrity results for the supplied evidence; it does not execute cases. |
+| `live-preflight` | A live configuration, an owner gate record, and committed case data. | Prints the gate/dataset/model/ceiling/allowlist/key-presence report. **No network call and no credential value read.** |
+| `live-dry-run` | The same inputs plus an empty evidence root and a cost-ledger path. | Runs the whole pipeline over mock adapters, writes the evidence bundle and cost ledger, and marks every result MOCK / SYNTHETIC_NOT_CITABLE. Zero network calls. |
+| `live-run` | The same inputs, a **REAL_HOST** gate record and the two credential environment variables. | Refuses without the gate or keys. When authorized, dispatches through the vendor software development kit and halts on a model-pin mismatch or a spend-ceiling denial. |
 
 The optional `--verify-baseline` flag checks one pinned historical census (882
 behavioral cases and 858 trigger cases), counted from commit `e2f1da0` and set on
@@ -99,7 +109,8 @@ and options.
 | `budget.py`, `scheduler.py` | Reserve bounded work before dispatch and build a deterministic queue. Unknown costs, absent caps or deadline violations close the gate. |
 | `aggregation.py`, `reporting.py`, `evidence.py`, `evidence_policy.py`, `evidence_policy_preflight.py` | Combine attempts without an unearned pass, report coverage, write and verify a two-stage evidence chain, and optionally check its synthetic complete-bundle policy and caller-supplied host facts. |
 | `graders/`, `judge/` | Grade recorded Scenario A controls against trusted plans. Deterministic graders cannot decide semantic assertions; the generic judge provider denies live dispatch. |
-| `cli.py` | Expose offline inventory, preparation, grading, evidence and status commands. There is no general live-run command. |
+| `live/` | Gated live enablement: strict subject pins, the cross-vendor judge adapter behind the owner allowlist, the cost meter with a hard ceiling halt, the owner gate and the preflight/dry-run/run pipeline. All of it refuses without the gate; the default transport denies dispatch. |
+| `cli.py` | Expose offline inventory, preparation, grading, evidence and status commands, plus the three gated live verbs. No live verb runs without an owner gate record. |
 
 The command-line interface also offers `validate-record`, `aggregate-fixture`,
 `validate-grading-contract`, `build-judge-envelope`,
@@ -233,6 +244,63 @@ measured result.
   isolation still require separate evidence. Consult `capabilities` before
   making a claim about them.
 
+## Live adapters are gated (not enabled by default)
+
+The `live/` subpackage is the enablement surface for pilot A. **Live capability
+state is GATED**: importing the package starts nothing, the default transport
+denies every dispatch, and every live verb requires an owner gate record.
+
+**Strict model pinning.** The subject pins are `claude-sonnet-5-5` (Anthropic)
+and `gpt-6-astra` (OpenAI). The adapter requests exactly that string and records
+the exact `served_model` string the provider returns. A mismatch — including a
+missing served-model field — is a HALT with a structured `MODEL_PIN_MISMATCH`
+error: the response is discarded, nothing is retried and no alternative model is
+substituted. The same rule applies to the judge.
+
+**Credentials.** `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` are read from the
+environment only. A missing value fails closed with `CREDENTIAL_MISSING` before
+any transport object is built. Values are never logged: structured records carry
+the variable name and presence, and `repr`/`str` mask the value.
+
+**Cross-vendor judge.** The judge route is pinned by subject: an Anthropic
+subject is judged by `gpt-6-astra` and an OpenAI subject by
+`claude-sonnet-5-5`. A judge that shares the subject vendor is refused
+structurally. Judge dispatch also requires the judge model to be listed in the
+owner allowlist (`judge_allowlist` in the live configuration); an empty
+allowlist authorizes no judgment. The judge's rubric input comes only from
+committed case data, and every verdict must echo the rubric and response SHA-256
+values or it is recorded as `JUDGE_ERROR`.
+
+**Cost meter and hard halt.** Every call reserves a conservative integer-cent
+upper bound before dispatch and is reconciled against provider-reported usage
+afterwards. When the next reservation would exceed the effective ceiling, the
+meter refuses, records the halt and raises `BUDGET_CAP`. The caller marks every
+remaining case `UNRUN` with reason `BUDGET_CAP` and never PASS, stops
+dispatching, writes `halt.json`, and finalizes the bundle with status
+`HALTED`. The proof — simulated usage reaching the ceiling, the refused
+reservation, the dispatched-call count and the UNRUN tail — is
+`tests/test_live_cost_meter.py`; the work-package record cites it as the
+pilot-A required evidence.
+
+**Owner gate and fact provenance.** A live verb needs a committed/gated owner
+record with the dataset revision and digest, the pinned model identifiers, the
+model-terms acknowledgment, the spend ceiling and a `fact_origin`. `SYNTHETIC`
+records can exercise `live-dry-run` only; `live-run` requires `REAL_HOST`.
+Synthetic and real results are labeled differently (`SYNTHETIC_NOT_CITABLE` vs
+`REAL_HOST`), and the evidence bundle carries its provenance.
+
+**Deterministic graders are primary.** A committed case may carry
+`must_include`/`must_not_include` checks. A deterministic failure is recorded
+as FAIL even when the semantic judge returns PASS; the judge cannot overrule a
+deterministic grader.
+
+**Pilot A run plan (owner pre-granted; subject to a fresh PASS review and the
+pilot keys/gate).** 20 skills, 3 runs per case, with and without baseline,
+ceiling $150 subject to the owner's $120 provider cap, structured publication,
+no raw transcripts. The build itself used no keys and made no provider call.
+The live path **defers to the owner allowlist and the cost meter**: enablement is
+a recorded owner decision, not a code default.
+
 ## Tests and further reading
 
 The [offline continuous-integration guide](../../docs/offline-ci.md) gives the
@@ -240,6 +308,13 @@ pinned Python environment and prerequisites. Its runner suite command is:
 
 ```bash
 python -m unittest discover -s tools/behavioral_eval_runner/tests -p "test_*.py" -v
+```
+
+The gated live package has its own offline suite (mock transports and fake
+environment values only; no network call and no real key):
+
+```bash
+python -B -m unittest tools.behavioral_eval_runner.tests.test_live_adapters tools.behavioral_eval_runner.tests.test_live_cost_meter tools.behavioral_eval_runner.tests.test_live_gate tools.behavioral_eval_runner.tests.test_live_pipeline
 ```
 
 Tests use synthetic fixtures, local Git and temporary directories. Some need

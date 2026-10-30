@@ -1,0 +1,184 @@
+"""Run limits, the owner allowlist and the live configuration record.
+
+The strict model pins, judge routes and credential environment-variable names
+live in exactly one module, live/providers.py, and are re-exported here. The
+price table is a configuration input, not an observed bill: the ceiling is
+enforced against it in integer cents, rounded up per call.
+
+The judge allowlist is an owner artifact. An empty allowlist authorizes no judge
+dispatch, and the gate record is the only source that can populate it.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Mapping
+
+from . import LIVE_SCHEMA_VERSION
+from .errors import LiveError
+from .providers import (  # re-exported: the single provider-naming module
+    CREDENTIAL_ENV_VARS,
+    JUDGE_PINS,
+    SUBJECT_PINS,
+    ModelPin,
+    judge_pin_for,
+)
+
+#: Owner pilot limits (2026-10-29 brief): $150 subject to a $120 provider cap.
+OWNER_PILOT_CEILING_CENTS = 15000
+OWNER_PROVIDER_CAP_CENTS = 12000
+#: Pilot A shape: 20 skills, 3 runs per case, with and without baseline.
+OWNER_PILOT_CASE_COUNT = 20
+OWNER_PILOT_RUNS_PER_CASE = 3
+
+DEFAULT_MAX_OUTPUT_TOKENS = 2048
+DEFAULT_REQUEST_TIMEOUT_SECONDS = 300
+#: Per-request input bound (bytes). An uncapped request is an open-ended bill;
+#: a request over this bound is refused BEFORE any reservation or dispatch.
+DEFAULT_MAX_INPUT_BYTES = 200_000
+
+
+@dataclass(frozen=True, slots=True)
+class OwnerAllowlist:
+    """Owner-authorized judge models. Empty means no judge dispatch."""
+
+    entries: tuple[tuple[str, str], ...] = ()
+
+    def permits(self, vendor: str, model: str) -> bool:
+        return (vendor, model) in self.entries
+
+    def validate(self) -> None:
+        for vendor, model in self.entries:
+            if not isinstance(vendor, str) or not vendor:
+                raise LiveError("allowlist vendor must be a non-empty string")
+            if not isinstance(model, str) or not model:
+                raise LiveError("allowlist model must be a non-empty string")
+        if len(set(self.entries)) != len(self.entries):
+            raise LiveError("allowlist contains a duplicate judge entry")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "judge_models": [
+                {"vendor": vendor, "model": model}
+                for vendor, model in sorted(self.entries)
+            ]
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class LiveConfig:
+    """Runtime configuration for the gated verbs (owner artifact, JSON file)."""
+
+    spend_ceiling_cents: int
+    judge_allowlist: OwnerAllowlist
+    max_output_tokens: int = DEFAULT_MAX_OUTPUT_TOKENS
+    max_input_bytes: int = DEFAULT_MAX_INPUT_BYTES
+    runs_per_case: int = OWNER_PILOT_RUNS_PER_CASE
+    request_timeout_seconds: int = DEFAULT_REQUEST_TIMEOUT_SECONDS
+    subject_vendors: tuple[str, ...] = tuple(SUBJECT_PINS)
+    schema_version: str = LIVE_SCHEMA_VERSION
+
+    def validate(self) -> None:
+        if self.schema_version != LIVE_SCHEMA_VERSION:
+            raise LiveError(
+                f"config schema_version must be {LIVE_SCHEMA_VERSION}, got "
+                f"{self.schema_version!r}"
+            )
+        if not isinstance(self.spend_ceiling_cents, int) or isinstance(
+            self.spend_ceiling_cents, bool
+        ):
+            raise LiveError("spend_ceiling_cents must be an int")
+        if not 0 < self.spend_ceiling_cents <= OWNER_PILOT_CEILING_CENTS:
+            raise LiveError(
+                "spend_ceiling_cents must be > 0 and <= the owner ceiling "
+                f"{OWNER_PILOT_CEILING_CENTS}"
+            )
+        if not isinstance(self.max_output_tokens, int) or self.max_output_tokens < 1:
+            raise LiveError("max_output_tokens must be an int >= 1")
+        if not isinstance(self.max_input_bytes, int) or self.max_input_bytes < 1:
+            raise LiveError("max_input_bytes must be an int >= 1")
+        if not isinstance(self.runs_per_case, int) or self.runs_per_case < 1:
+            raise LiveError("runs_per_case must be an int >= 1")
+        if self.runs_per_case > OWNER_PILOT_RUNS_PER_CASE:
+            raise LiveError(
+                f"runs_per_case must be <= {OWNER_PILOT_RUNS_PER_CASE} (owner shape)"
+            )
+        if (
+            not isinstance(self.request_timeout_seconds, int)
+            or self.request_timeout_seconds < 1
+        ):
+            raise LiveError("request_timeout_seconds must be an int >= 1")
+        if not self.subject_vendors or len(set(self.subject_vendors)) != len(
+            self.subject_vendors
+        ):
+            raise LiveError("subject_vendors must be a non-empty unique tuple")
+        for vendor in self.subject_vendors:
+            if vendor not in SUBJECT_PINS:
+                raise LiveError(f"subject vendor {vendor!r} has no pinned model")
+        self.judge_allowlist.validate()
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "spend_ceiling_cents": self.spend_ceiling_cents,
+            "max_output_tokens": self.max_output_tokens,
+            "max_input_bytes": self.max_input_bytes,
+            "runs_per_case": self.runs_per_case,
+            "request_timeout_seconds": self.request_timeout_seconds,
+            "subject_vendors": list(self.subject_vendors),
+            "judge_allowlist": self.judge_allowlist.to_dict(),
+            "price_table": {
+                vendor: pin.to_dict() for vendor, pin in sorted(SUBJECT_PINS.items())
+            },
+            "owner_limits": {
+                "pilot_ceiling_cents": OWNER_PILOT_CEILING_CENTS,
+                "provider_cap_cents": OWNER_PROVIDER_CAP_CENTS,
+                "pilot_case_count": OWNER_PILOT_CASE_COUNT,
+                "pilot_runs_per_case": OWNER_PILOT_RUNS_PER_CASE,
+            },
+        }
+
+    _KEYS = frozenset(
+        {
+            "schema_version",
+            "spend_ceiling_cents",
+            "max_output_tokens",
+            "max_input_bytes",
+            "runs_per_case",
+            "request_timeout_seconds",
+            "subject_vendors",
+            "judge_allowlist",
+        }
+    )
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "LiveConfig":
+        unknown = set(payload) - cls._KEYS
+        if unknown:
+            raise LiveError(f"LiveConfig: unknown keys {sorted(unknown)}")
+        raw_allow = payload.get("judge_allowlist", {})
+        if not isinstance(raw_allow, Mapping):
+            raise LiveError("judge_allowlist must be an object")
+        entries: list[tuple[str, str]] = []
+        for item in raw_allow.get("judge_models", []):
+            if not isinstance(item, Mapping) or set(item) != {"vendor", "model"}:
+                raise LiveError("judge_allowlist entries need exactly vendor and model")
+            entries.append((item["vendor"], item["model"]))
+        config = cls(
+            spend_ceiling_cents=payload.get("spend_ceiling_cents", 0),
+            judge_allowlist=OwnerAllowlist(tuple(sorted(set(entries)))),
+            max_output_tokens=payload.get(
+                "max_output_tokens", DEFAULT_MAX_OUTPUT_TOKENS
+            ),
+            max_input_bytes=payload.get("max_input_bytes", DEFAULT_MAX_INPUT_BYTES),
+            runs_per_case=payload.get("runs_per_case", OWNER_PILOT_RUNS_PER_CASE),
+            request_timeout_seconds=payload.get(
+                "request_timeout_seconds", DEFAULT_REQUEST_TIMEOUT_SECONDS
+            ),
+            subject_vendors=tuple(
+                payload.get("subject_vendors", tuple(SUBJECT_PINS))
+            ),
+            schema_version=payload.get("schema_version", ""),
+        )
+        config.validate()
+        return config

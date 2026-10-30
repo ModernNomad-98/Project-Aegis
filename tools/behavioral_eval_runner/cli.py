@@ -134,6 +134,17 @@ from .judge.calibration_errors import (
     LabelLeakError,
 )
 
+# Gated live enablement (2026-10-29). Importing these modules loads no network
+# machinery and no vendor SDK; the live verbs refuse without an owner gate.
+from .live import LIVE_CAPABILITY_STATE, LIVE_PACKAGE_VERSION, LIVE_SCHEMA_VERSION
+from .live.config import SUBJECT_PINS as LIVE_SUBJECT_PINS
+from .live.pipeline import LivePaths
+from .live.pipeline import dry_run as _live_dry_run
+from .live.pipeline import live_run as _live_run
+from .live.pipeline import preflight as _live_preflight
+from .live.providers import judge_routes_by_subject
+from .live.transport import transport_capability_report
+
 #: The full command surface. Live/run/dispatch verbs are deliberately absent.
 COMMANDS = (
     "census",
@@ -156,6 +167,11 @@ COMMANDS = (
     # WP-2B-3 measured-calibration controls (offline-only; BER-DEC-008).
     "validate-calibration-dataset",
     "calibration-status",
+    # Gated live enablement (2026-10-29): every verb is gated; live is not
+    # enabled by default and no command dispatches without an owner gate.
+    "live-preflight",
+    "live-dry-run",
+    "live-run",
 )
 
 #: Top-level module names the package must never import (network / arbitrary
@@ -534,6 +550,33 @@ def _cmd_capabilities(_args: argparse.Namespace) -> int:
             "materialization_write_integrity": dict(materialization_write_capability()),
             "evidence_writer_integrity": dict(evidence_write_capability()),
             "process_descendant_cleanup": dict(descendant_cleanup_capability()),
+            "live_adapters": {
+                "capability_state": LIVE_CAPABILITY_STATE,
+                "enabled_by_default": False,
+                "gate_required": True,
+                "package_version": LIVE_PACKAGE_VERSION,
+                "schema_version": LIVE_SCHEMA_VERSION,
+                "subject_models": {
+                    vendor: pin.model
+                    for vendor, pin in sorted(LIVE_SUBJECT_PINS.items())
+                },
+                "judge_routes": judge_routes_by_subject(),
+                "strict_model_pinning": (
+                    "served model string must equal the pin or the run halts "
+                    "(no silent substitution)"
+                ),
+                "judge_allowlist_required": True,
+                "judge_cross_vendor_enforced": True,
+                "credentials": (
+                    "environment only; a missing key fails closed and no value "
+                    "is ever logged"
+                ),
+                "cost_meter": (
+                    "pre-call reservation; hard halt at the ceiling; remaining "
+                    "cases UNRUN/BUDGET_CAP and never PASS"
+                ),
+                "transport": transport_capability_report(),
+            },
             "dispatch_budget": {
                 "model_provider_dispatches": 0,
                 "live_sessions": 0,
@@ -552,9 +595,54 @@ def _cmd_version(_args: argparse.Namespace) -> int:
             "scheduling_policy_version": SCHEDULING_POLICY_VERSION,
             "work_package": WORK_PACKAGE,
             "authorization_id": AUTHORIZATION_ID,
+            "live": {
+                "package_version": LIVE_PACKAGE_VERSION,
+                "schema_version": LIVE_SCHEMA_VERSION,
+                "capability_state": LIVE_CAPABILITY_STATE,
+                "enabled_by_default": False,
+                "gate_required": True,
+                "commands": ["live-preflight", "live-dry-run", "live-run"],
+                "build_dispatches": 0,
+                "build_spend_usd": "$0",
+            },
         }
     )
     return 0
+
+
+# ------------------------------------------------ gated live enablement verbs
+#: Live is GATED: every verb below refuses without the owner gate, and live-run
+#: additionally refuses without resolved environment credentials. No command
+#: dispatches during preflight; dry-run uses mock adapters only.
+def _live_paths(args: argparse.Namespace) -> LivePaths:
+    return LivePaths(
+        config_path=args.config,
+        gate_path=args.gate,
+        cases_root=args.cases,
+        evidence_root=getattr(args, "evidence_root", "") or "",
+        cost_ledger_path=getattr(args, "cost_ledger", "") or "",
+        run_id=getattr(args, "run_id", None) or "ber-live-run",
+    )
+
+
+def _cmd_live_preflight(args: argparse.Namespace) -> int:
+    report = _live_preflight(
+        _live_paths(args), expected_revision=args.expected_revision
+    )
+    _emit(report)
+    return 0 if report.get("status") != "REFUSED" else 2
+
+
+def _cmd_live_dry_run(args: argparse.Namespace) -> int:
+    result = _live_dry_run(_live_paths(args))
+    _emit(result)
+    return 0 if result.get("status") != "HALTED" else 3
+
+
+def _cmd_live_run(args: argparse.Namespace) -> int:
+    result = _live_run(_live_paths(args))
+    _emit(result)
+    return 0 if result.get("status") == "COMPLETED" else 3
 
 
 # -------------------------------------------- WP-2B-2 grading-stack commands
@@ -1149,6 +1237,11 @@ def run_self_check() -> dict[str, Any]:
             # Stage A2 (BER-DEC-008): the dedicated DEVELOPMENT driver is
             # the third and only other module permitted to name the provider.
             "judge/calibration_development_driver.py",
+            # Gated live enablement (2026-10-29): exactly ONE new module, the
+            # single provider-naming module of the gated live package. Every
+            # other live module is vendor-agnostic; the live test suite pins
+            # that confinement.
+            "live/providers.py",
         }
         package_root = os.path.dirname(os.path.abspath(__file__))
         needle = _caltransport.AUTHORIZED_SDK_NAME  # never a literal here
@@ -1392,6 +1485,41 @@ def build_parser() -> argparse.ArgumentParser:
     cstat.add_argument("--approval", default=None)
     cstat.set_defaults(func=_cmd_calibration_status)
 
+    # Gated live enablement (2026-10-29): live is GATED, not enabled by default.
+    lp = subparsers.add_parser(
+        "live-preflight",
+        help="gated live preflight (no network, no credential value read)",
+    )
+    lp.add_argument("--config", required=True)
+    lp.add_argument("--gate", required=True)
+    lp.add_argument("--cases", required=True)
+    lp.add_argument("--expected-revision", default=None)
+    lp.set_defaults(func=_cmd_live_preflight)
+
+    ld = subparsers.add_parser(
+        "live-dry-run",
+        help="gated live dry run over mock adapters (zero network)",
+    )
+    ld.add_argument("--config", required=True)
+    ld.add_argument("--gate", required=True)
+    ld.add_argument("--cases", required=True)
+    ld.add_argument("--evidence-root", required=True)
+    ld.add_argument("--cost-ledger", required=True)
+    ld.add_argument("--run-id", default=None)
+    ld.set_defaults(func=_cmd_live_dry_run)
+
+    lr = subparsers.add_parser(
+        "live-run",
+        help="gated live run; refuses without an owner gate and environment keys",
+    )
+    lr.add_argument("--config", required=True)
+    lr.add_argument("--gate", required=True)
+    lr.add_argument("--cases", required=True)
+    lr.add_argument("--evidence-root", required=True)
+    lr.add_argument("--cost-ledger", required=True)
+    lr.add_argument("--run-id", default=None)
+    lr.set_defaults(func=_cmd_live_run)
+
     return parser
 
 
@@ -1404,6 +1532,9 @@ def main(argv: list[str] | None = None) -> int:
         payload = {"error": type(exc).__name__, "detail": str(exc)}
         if exc.reason_code:
             payload["reason_code"] = exc.reason_code
+        context = getattr(exc, "context", None)
+        if context:
+            payload["context"] = dict(context)
         sys.stdout.write(json.dumps(payload, sort_keys=True, indent=2) + "\n")
         return 2
     except (ValueError, KeyError, TypeError, OSError) as exc:

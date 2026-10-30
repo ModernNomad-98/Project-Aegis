@@ -94,6 +94,9 @@ class TestStaticSafety(unittest.TestCase):
                 # composes the two adapter modules and is the THIRD and only
                 # other module permitted to name the provider.
                 "judge/calibration_development_driver.py",
+                # Gated live enablement (2026-10-29): the single
+                # provider-naming module of the gated live package.
+                "live/providers.py",
             }
         }
         for directory, _dirs, files in os.walk(PACKAGE_ROOT):
