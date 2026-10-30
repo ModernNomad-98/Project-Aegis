@@ -36,11 +36,13 @@ class LiveCase:
     skill: str
     prompt: str
     baseline_prompt: str
+    skill_instructions: str
     rubric: Mapping[str, Any]
     rubric_sha256: str
     deterministic_checks: Mapping[str, tuple[str, ...]]
     record_sha256: str
     source_path: str
+    raw: Mapping[str, Any]
 
     def to_record(self) -> dict[str, Any]:
         return {
@@ -77,6 +79,7 @@ def load_case(path: str) -> LiveCase:
         "skill",
         "prompt",
         "baseline_prompt",
+        "skill_instructions",
         "rubric",
         "rubric_sha256",
         "deterministic_checks",
@@ -90,6 +93,7 @@ def load_case(path: str) -> LiveCase:
     skill = payload.get("skill")
     prompt = payload.get("prompt")
     baseline_prompt = payload.get("baseline_prompt")
+    skill_instructions = payload.get("skill_instructions")
     rubric = payload.get("rubric")
     declared = payload.get("rubric_sha256")
     checks = payload.get("deterministic_checks", {})
@@ -99,6 +103,10 @@ def load_case(path: str) -> LiveCase:
     _require(
         isinstance(baseline_prompt, str) and bool(baseline_prompt),
         "baseline_prompt must be non-empty (the without-baseline arm is explicit)",
+    )
+    _require(
+        isinstance(skill_instructions, str) and bool(skill_instructions),
+        "skill_instructions must be non-empty (the WITH_SKILL arm loads it)",
     )
     _require(isinstance(rubric, Mapping) and bool(rubric), "rubric must be an object")
     _require(
@@ -132,11 +140,13 @@ def load_case(path: str) -> LiveCase:
         skill=skill,
         prompt=prompt,
         baseline_prompt=baseline_prompt,
+        skill_instructions=skill_instructions,
         rubric=dict(rubric),
         rubric_sha256=declared,
         deterministic_checks=normalized,
         record_sha256=sha256_hex(raw),
         source_path=os.path.basename(os.path.dirname(path)) + "/" + CASE_FILE_NAME,
+        raw=dict(payload),
     )
 
 

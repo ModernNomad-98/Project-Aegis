@@ -29,6 +29,7 @@ class SubjectResult:
     """Repository-safe outcome of one subject call (no raw transcript)."""
 
     request_id: str
+    response_id: str
     vendor: str
     requested_model: str
     served_model: str
@@ -40,6 +41,7 @@ class SubjectResult:
     def to_record(self) -> dict[str, Any]:
         return {
             "request_id": self.request_id,
+            "response_id": self.response_id,
             "vendor": self.vendor,
             "requested_model": self.requested_model,
             "served_model": self.served_model,
@@ -73,11 +75,25 @@ class SubjectAdapter:
         self.timeout_seconds = timeout_seconds
 
     def build_request(
-        self, *, request_id: str, prompt: str, arm: str
+        self, *, request_id: str, prompt: str, arm: str, skill_instructions: str | None = None
     ) -> ProviderRequest:
         if not isinstance(prompt, str) or not prompt:
             raise ValueError("subject prompt must be a non-empty string")
-        system = SUBJECT_SYSTEM_PREAMBLE + f" Evaluation arm: {arm}."
+        if arm == "WITH_SKILL":
+            # The skill arm must actually load the skill instructions; a bare
+            # arm label is not a with-skill condition.
+            if not isinstance(skill_instructions, str) or not skill_instructions:
+                raise ValueError(
+                    "the WITH_SKILL arm requires committed skill instructions"
+                )
+            system = (
+                SUBJECT_SYSTEM_PREAMBLE
+                + " Follow the skill guidance below.\n"
+                + "SKILL GUIDANCE:\n"
+                + skill_instructions
+            )
+        else:
+            system = SUBJECT_SYSTEM_PREAMBLE
         return ProviderRequest(
             request_id=request_id,
             vendor=self.pin.vendor,
@@ -116,6 +132,7 @@ class SubjectAdapter:
             )
         result = SubjectResult(
             request_id=request.request_id,
+            response_id=response.response_id,
             vendor=self.pin.vendor,
             requested_model=self.pin.model,
             served_model=response.served_model,

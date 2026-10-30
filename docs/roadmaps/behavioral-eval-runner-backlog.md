@@ -4510,6 +4510,12 @@ pins that no other live module names the provider. New tests were added for the
 adapters, credentials, judge guard, cost halt, gate refusals and the dry-run
 end-to-end path.
 
+**Provenance binding.** A live run refuses when the checkout revision cannot be
+resolved or differs from the gate's dataset revision, and when the cases root is
+not the gate's dataset path; only PASS/FAIL from a real-host gate over the
+vendor SDK transport are citable, and the judge envelope is blind to the arm and
+the subject vendor.
+
 **Pilot A plan (owner pre-granted, subject to a fresh PASS review and the pilot
 keys/gate).** 20 skills, 3 runs per case, with and without baseline, ceiling
 $150 subject to the owner's $120 provider cap, pinned model identifiers,

@@ -347,6 +347,7 @@ def require_live_gate(
             "no owner gate record was supplied; a live verb is refused",
             context={"required": ["dataset revision", "model pins", "model terms", "spend ceiling"]},
         )
+    gate.validate()  # defense in depth: never trust a directly built record
     now = now or dt.datetime.now(dt.timezone.utc)
     if gate.fact_origin not in allowed_origins:
         raise LiveGateRefusedError(

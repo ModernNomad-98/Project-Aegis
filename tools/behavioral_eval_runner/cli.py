@@ -629,20 +629,26 @@ def _live_paths(args: argparse.Namespace) -> LivePaths:
 
 def _cmd_live_preflight(args: argparse.Namespace) -> int:
     report = _live_preflight(
-        _live_paths(args), expected_revision=args.expected_revision
+        _live_paths(args),
+        repo_root=args.repo_root or os.getcwd(),
+        expected_revision=args.expected_revision,
     )
     _emit(report)
     return 0 if report.get("status") != "REFUSED" else 2
 
 
 def _cmd_live_dry_run(args: argparse.Namespace) -> int:
-    result = _live_dry_run(_live_paths(args))
+    result = _live_dry_run(
+        _live_paths(args), repo_root=args.repo_root or os.getcwd()
+    )
     _emit(result)
     return 0 if result.get("status") != "HALTED" else 3
 
 
 def _cmd_live_run(args: argparse.Namespace) -> int:
-    result = _live_run(_live_paths(args))
+    result = _live_run(
+        _live_paths(args), repo_root=args.repo_root or os.getcwd()
+    )
     _emit(result)
     return 0 if result.get("status") == "COMPLETED" else 3
 
@@ -1495,6 +1501,7 @@ def build_parser() -> argparse.ArgumentParser:
     lp.add_argument("--config", required=True)
     lp.add_argument("--gate", required=True)
     lp.add_argument("--cases", required=True)
+    lp.add_argument("--repo-root", default=None)
     lp.add_argument("--expected-revision", default=None)
     lp.set_defaults(func=_cmd_live_preflight)
 
@@ -1505,6 +1512,7 @@ def build_parser() -> argparse.ArgumentParser:
     ld.add_argument("--config", required=True)
     ld.add_argument("--gate", required=True)
     ld.add_argument("--cases", required=True)
+    ld.add_argument("--repo-root", default=None)
     ld.add_argument("--evidence-root", required=True)
     ld.add_argument("--cost-ledger", required=True)
     ld.add_argument("--run-id", default=None)
@@ -1517,6 +1525,7 @@ def build_parser() -> argparse.ArgumentParser:
     lr.add_argument("--config", required=True)
     lr.add_argument("--gate", required=True)
     lr.add_argument("--cases", required=True)
+    lr.add_argument("--repo-root", default=None)
     lr.add_argument("--evidence-root", required=True)
     lr.add_argument("--cost-ledger", required=True)
     lr.add_argument("--run-id", default=None)

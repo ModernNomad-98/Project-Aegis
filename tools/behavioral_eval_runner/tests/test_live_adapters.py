@@ -6,6 +6,7 @@ credential value is a fake literal that is not a provider key.
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
@@ -69,6 +70,7 @@ class SubjectPinningTests(unittest.TestCase):
             request_id="case:WITH_SKILL:run-1:subject:anthropic",
             prompt="hello",
             arm="WITH_SKILL",
+            skill_instructions="owner approval rule",
         )
         self.assertEqual(request.model, "claude-sonnet-5-5")
         self.assertEqual(request.vendor, "anthropic")
@@ -88,6 +90,7 @@ class SubjectPinningTests(unittest.TestCase):
             request_id="case:WITH_SKILL:run-1:subject:anthropic",
             prompt="hello",
             arm="WITH_SKILL",
+            skill_instructions="owner approval rule",
         )
         with self.assertRaises(ModelPinMismatchError) as caught:
             adapter.dispatch(request)
@@ -161,6 +164,7 @@ class JudgeGuardTests(unittest.TestCase):
 
         return SubjectResult(
             request_id="rid",
+            response_id="resp-1",
             vendor="anthropic",
             requested_model="claude-sonnet-5-5",
             served_model="claude-sonnet-5-5",
@@ -220,16 +224,10 @@ class JudgeGuardTests(unittest.TestCase):
 
     def test_rubric_must_match_committed_hash(self):
         case = self._case()
-        broken = type(case)(
-            case_id=case.case_id,
-            skill=case.skill,
-            prompt=case.prompt,
-            baseline_prompt=case.baseline_prompt,
-            rubric={"rubric_id": "tampered"},
-            rubric_sha256=case.rubric_sha256,
-            deterministic_checks=case.deterministic_checks,
-            record_sha256=case.record_sha256,
-            source_path=case.source_path,
+        import dataclasses
+
+        broken = dataclasses.replace(
+            case, rubric={"rubric_id": "tampered"}
         )
         adapter = JudgeAdapter(
             JUDGE_PINS[("anthropic", "claude-sonnet-5-5")],
@@ -300,6 +298,100 @@ class JudgeGuardTests(unittest.TestCase):
             judge_model="gpt-6-astra",
         )
         self.assertEqual(error, "SCHEMA_INVALID")
+
+
+class SkillArmTests(unittest.TestCase):
+    def test_with_skill_loads_committed_instructions_and_baseline_does_not(self):
+        transport = _fixed_transport("claude-sonnet-5-5")
+        adapter = SubjectAdapter(
+            SUBJECT_PINS["anthropic"], transport, max_output_tokens=64, timeout_seconds=30
+        )
+        with_skill = adapter.build_request(
+            request_id="c:WITH_SKILL:run-1:subject:anthropic",
+            prompt="hello",
+            arm="WITH_SKILL",
+            skill_instructions="OWNER APPROVAL RULE TEXT",
+        )
+        baseline = adapter.build_request(
+            request_id="c:BASELINE:run-1:subject:anthropic",
+            prompt="hello",
+            arm="BASELINE",
+        )
+        self.assertIn("OWNER APPROVAL RULE TEXT", with_skill.system)
+        self.assertNotIn("OWNER APPROVAL RULE TEXT", baseline.system)
+        with self.assertRaises(ValueError):
+            adapter.build_request(
+                request_id="c:WITH_SKILL:run-2:subject:anthropic",
+                prompt="hello",
+                arm="WITH_SKILL",
+            )
+
+
+class MalformedJudgeOutputTests(unittest.TestCase):
+    def test_unhashable_enum_values_fail_closed(self):
+        rubric = "a" * 64
+        response = "b" * 64
+        for bad in (
+            {"verdict": []},
+            {"reason_code": []},
+            {"failure_mode": []},
+            {"verdict": 3},
+            {"rubric_sha256": None},
+        ):
+            payload = {
+                "verdict": "PASS",
+                "reason_code": "MEETS_RUBRIC",
+                "failure_mode": None,
+                "rubric_sha256": rubric,
+                "response_sha256": response,
+                "judge_model": "gpt-6-astra",
+                "evidence_refs": ["response"],
+            }
+            payload.update(bad)
+            verdict, error = parse_live_verdict(
+                canonical_json(payload),
+                rubric_sha256=rubric,
+                response_sha256=response,
+                judge_model="gpt-6-astra",
+            )
+            self.assertIsNone(verdict, bad)
+            self.assertEqual(error, "SCHEMA_INVALID", bad)
+
+    def test_judge_envelope_is_blind_to_arm_and_subject_vendor(self):
+        from tools.behavioral_eval_runner.live.judge_adapter import JudgeAdapter
+        from tools.behavioral_eval_runner.live.providers import JUDGE_PINS
+        from tools.behavioral_eval_runner.live.subject import SubjectResult
+
+        case = load_cases(helpers.CASES_ROOT)[0]
+        subject = SubjectResult(
+            request_id="rid",
+            response_id="resp",
+            vendor="anthropic",
+            requested_model="claude-sonnet-5-5",
+            served_model="claude-sonnet-5-5",
+            response_sha256=sha256_hex_text("answer"),
+            response_chars=6,
+            usage=ProviderUsage(3, 2),
+            stop_reason="end_turn",
+        )
+        adapter = JudgeAdapter(
+            JUDGE_PINS[("anthropic", "claude-sonnet-5-5")],
+            OwnerAllowlist((("openai", "gpt-6-astra"),)),
+            _fixed_transport("gpt-6-astra"),
+            max_output_tokens=64,
+            timeout_seconds=30,
+        )
+        request = adapter.build_request(
+            request_id="jid",
+            case=case,
+            arm="WITH_SKILL",
+            subject_vendor="anthropic",
+            subject_result=subject,
+            subject_text="answer",
+        )
+        payload = json.loads(request.user_content)
+        self.assertNotIn("arm", payload)
+        self.assertNotIn("subject_vendor", payload)
 
 
 class ProviderConfinementTests(unittest.TestCase):

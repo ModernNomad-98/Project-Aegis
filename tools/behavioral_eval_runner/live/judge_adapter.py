@@ -78,6 +78,7 @@ class JudgeResult:
     """Repository-safe outcome of one judge call (no raw judge output)."""
 
     request_id: str
+    response_id: str
     served_model: str
     response_sha256: str
     usage: ProviderUsage
@@ -91,6 +92,7 @@ class JudgeResult:
     def to_record(self) -> dict[str, Any]:
         record: dict[str, Any] = {
             "request_id": self.request_id,
+            "response_id": self.response_id,
             "served_model": self.served_model,
             "response_sha256": self.response_sha256,
             "usage": self.usage.to_dict(),
@@ -120,13 +122,27 @@ def parse_live_verdict(
         return None, "MALFORMED_JSON"
     if set(payload) != _ERROR_KEYS:
         return None, "SCHEMA_INVALID"
+    if not isinstance(payload["verdict"], str) or not isinstance(
+        payload["reason_code"], str
+    ):
+        return None, "SCHEMA_INVALID"
+    if payload["failure_mode"] is not None and not isinstance(
+        payload["failure_mode"], str
+    ):
+        return None, "SCHEMA_INVALID"
+    if not isinstance(payload["rubric_sha256"], str) or not isinstance(
+        payload["response_sha256"], str
+    ) or not isinstance(payload["judge_model"], str):
+        return None, "SCHEMA_INVALID"
     try:
         verdict = JudgeVerdictState(payload["verdict"])
         reason = JudgeVerdictReason(payload["reason_code"])
         failure_mode = (
-            FailureMode(payload["failure_mode"]) if payload["failure_mode"] is not None else None
+            FailureMode(payload["failure_mode"])
+            if payload["failure_mode"] is not None
+            else None
         )
-    except ValueError:
+    except (ValueError, TypeError):
         return None, "SCHEMA_INVALID"
     refs = payload["evidence_refs"]
     if (
@@ -216,10 +232,10 @@ class JudgeAdapter:
                 "the committed rubric does not match its recorded hash",
                 context={"case_id": case.case_id},
             )
+        # The judge is blind to the arm and the subject vendor: those fields
+        # could bias a semantic verdict toward or against the baseline.
         payload = {
             "case_id": case.case_id,
-            "arm": arm,
-            "subject_vendor": subject_vendor,
             "rubric": rubric,
             "rubric_sha256": case.rubric_sha256,
             "response_sha256": subject_result.response_sha256,
@@ -239,6 +255,15 @@ class JudgeAdapter:
     def dispatch(
         self, request: ProviderRequest, *, case: LiveCase, subject_text: str
     ) -> JudgeResult:
+        if (request.vendor, request.model) != (self.pin.vendor, self.pin.model):
+            raise ModelPinMismatchError(
+                "the judge request does not carry the judge pin",
+                context={
+                    "vendor": request.vendor,
+                    "requested_model": request.model,
+                    "pinned_model": self.pin.model,
+                },
+            )
         response = self.transport.complete(request)
         response.validate(require_model=False)
         if response.served_model != self.pin.model:
@@ -262,6 +287,7 @@ class JudgeAdapter:
         )
         return JudgeResult(
             request_id=request.request_id,
+            response_id=response.response_id,
             served_model=response.served_model,
             response_sha256=sha256_hex_text(response.text),
             usage=response.usage,

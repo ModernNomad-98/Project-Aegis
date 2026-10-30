@@ -90,11 +90,30 @@ class _RunState:
             self.halt = dict(payload)
 
 
-def _load_inputs(paths: LivePaths) -> tuple[LiveConfig, OwnerGateRecord, list[LiveCase]]:
-    with open(paths.config_path, encoding="utf-8") as handle:
-        config = LiveConfig.from_dict(json.load(handle))
+def _load_inputs(
+    paths: LivePaths, repo_root: str | None = None
+) -> tuple[LiveConfig, OwnerGateRecord, list[LiveCase]]:
+    repo_root = repo_root or os.getcwd()
+    try:
+        with open(paths.config_path, encoding="utf-8") as handle:
+            config = LiveConfig.from_dict(json.load(handle))
+    except LiveError:
+        raise
+    except (OSError, ValueError) as exc:
+        raise LiveError(
+            f"the live configuration is unreadable: {exc}",
+            context={"config_path": paths.config_path},
+            reason_code="LIVE_CONFIG_INVALID",
+        ) from exc
     gate = load_gate(paths.gate_path)
     cases = load_cases(paths.cases_root)
+    expected_root = os.path.realpath(os.path.join(repo_root, gate.dataset_path))
+    actual_root = os.path.realpath(paths.cases_root)
+    if expected_root != actual_root:
+        raise LiveGateRefusedError(
+            "the cases root does not match the gate's dataset_path",
+            context={"gate_dataset_path": gate.dataset_path, "cases_root": actual_root},
+        )
     digest = dataset_digest(cases)
     if len(cases) != gate.case_count:
         raise LiveGateRefusedError(
@@ -126,6 +145,59 @@ def _require_fresh_evidence_root(root: str) -> None:
             context={"evidence_root": root},
             reason_code="EVIDENCE_ROOT_NOT_FRESH",
         )
+
+
+def read_checkout_revision(repo_root: str) -> str | None:
+    """Best-effort read of the checkout's HEAD revision without a subprocess.
+
+    Supports a normal .git directory, a worktree .git file, a symbolic HEAD and
+    packed refs. Returns None when the revision cannot be determined, in which
+    case a live run refuses rather than assuming a revision.
+    """
+    git = os.path.join(repo_root, ".git")
+    if os.path.isfile(git):
+        try:
+            with open(git, encoding="utf-8") as handle:
+                line = handle.read().strip()
+        except OSError:
+            return None
+        if not line.lower().startswith("gitdir:"):
+            return None
+        git = os.path.normpath(os.path.join(repo_root, line.split(":", 1)[1].strip()))
+    head_path = os.path.join(git, "HEAD")
+    if not os.path.isfile(head_path):
+        return None
+    try:
+        with open(head_path, encoding="utf-8") as handle:
+            head = handle.read().strip()
+    except OSError:
+        return None
+    if not head.startswith("ref:"):
+        return head if _is_commit(head) else None
+    ref = head.split(":", 1)[1].strip()
+    ref_path = os.path.join(git, *ref.split("/"))
+    if os.path.isfile(ref_path):
+        try:
+            with open(ref_path, encoding="utf-8") as handle:
+                value = handle.read().strip()
+        except OSError:
+            return None
+        return value if _is_commit(value) else None
+    packed = os.path.join(git, "packed-refs")
+    if os.path.isfile(packed):
+        try:
+            with open(packed, encoding="utf-8") as handle:
+                for line in handle:
+                    parts = line.strip().split()
+                    if len(parts) == 2 and parts[1] == ref and _is_commit(parts[0]):
+                        return parts[0]
+        except OSError:
+            return None
+    return None
+
+
+def _is_commit(value: str) -> bool:
+    return len(value) == 40 and set(value) <= set("0123456789abcdef")
 
 
 def _required_credential_vendors(config: LiveConfig) -> list[str]:
@@ -165,6 +237,7 @@ def _validate_output_paths(paths: LivePaths) -> None:
 def preflight(
     paths: LivePaths,
     *,
+    repo_root: str | None = None,
     environ: Mapping[str, str] | None = None,
     now: dt.datetime | None = None,
     expected_revision: str | None = None,
@@ -177,8 +250,9 @@ def preflight(
         "capability_state": LIVE_CAPABILITY_STATE,
         "status": "REFUSED",
     }
+    repo_root = repo_root or os.getcwd()
     try:
-        config, gate, cases = _load_inputs(paths)
+        config, gate, cases = _load_inputs(paths, repo_root)
     except LiveError as exc:
         report["blockers"] = [exc.to_dict()]
         return report
@@ -220,15 +294,13 @@ def preflight(
             }
         )
     try:
-        authorize_judges(gate, config)
-    except JudgeVendorGuardError as exc:
-        blockers.append(exc.to_dict())
-    try:
         require_live_gate(
             gate, config, now=now, allowed_origins=frozenset({gate.fact_origin})
         )
-    except LiveGateRefusedError as exc:
+    except LiveError as exc:
         blockers.append(exc.to_dict())
+    seen_blockers = {json.dumps(b, sort_keys=True) for b in blockers}
+    report["checkout_revision"] = read_checkout_revision(repo_root)
     required_vendors = _required_credential_vendors(config)
     missing = missing_credential_env_vars(required_vendors, environ)
     report["credentials"] = {
@@ -240,7 +312,9 @@ def preflight(
         "value_emitted": False,
         "note": "presence check only; no value is logged, stored or emitted",
     }
-    report["blockers"] = blockers
+    report["blockers"] = [
+        b for b in blockers if json.dumps(b, sort_keys=True) in seen_blockers
+    ]
     if blockers:
         report["status"] = "REFUSED"
     elif gate.fact_origin != REAL_HOST:
@@ -252,12 +326,21 @@ def preflight(
     return report
 
 
-def _citability(fact_origin: str, transport_class: str) -> str:
-    """Only a real-host gate AND the vendor SDK transport are citable."""
+CITABLE_STATES = frozenset({"PASS", "FAIL"})
+
+
+def _citability(fact_origin: str, transport_class: str, result_state: str) -> str:
+    """Only a real rule state, a real-host gate and the SDK transport are citable.
+
+    An UNRUN, ERROR, JUDGE_ERROR or MOCK record produced no usable rule state;
+    it is never citable evidence, even in an otherwise real-host run.
+    """
     if fact_origin != REAL_HOST:
         return "SYNTHETIC_NOT_CITABLE"
     if transport_class != "VENDOR_SDK":
         return "INJECTED_TRANSPORT_NOT_CITABLE"
+    if result_state not in CITABLE_STATES:
+        return "NO_RULE_STATE_NOT_CITABLE"
     return "REAL_HOST"
 
 
@@ -287,7 +370,7 @@ def _result_record(
         "subject_vendor": subject_vendor,
         "result_state": state,
         "reason_code": reason_code,
-        "citability": _citability(fact_origin, transport_class),
+        "citability": _citability(fact_origin, transport_class, state),
         "transport_class": transport_class,
         "mode": mode,
         "raw_transcript_included": False,
@@ -337,6 +420,7 @@ def _execute(
         gate.effective_ceiling_cents(config),
         max_calls=planned + 1,
         max_output_tokens=config.max_output_tokens,
+        snapshot_path=paths.cost_ledger_path or None,
     )
     judge_pins = authorize_judges(gate, config)
     stop_reason: str | None = None
@@ -360,6 +444,7 @@ def _execute(
                             )
                         )
                         continue
+                    attempts_before = meter.attempts
                     try:
                         outcome = _execute_one(
                             case=case,
@@ -385,6 +470,9 @@ def _execute(
                         halt_payload["ceiling_cents"] = meter.ceiling_cents
                         state.add_halt(halt_payload)
                         stop_reason = exc.reason_code
+                        # A call that actually reached the transport is a
+                        # partially executed attempt: ERROR, not UNRUN.
+                        attempted = meter.attempts > attempts_before
                         state.results.append(
                             _result_record(
                                 case=case,
@@ -394,7 +482,7 @@ def _execute(
                                 mode=mode,
                                 fact_origin=gate.fact_origin,
                                 transport_class=transport_class,
-                                state="UNRUN",
+                                state="ERROR" if attempted else "UNRUN",
                                 reason_code=exc.reason_code,
                             )
                         )
@@ -465,7 +553,10 @@ def _execute_one(
     )
     subject_request_id = f"{case.case_id}:{arm}:run-{run_index}:subject:{subject_vendor}"
     request = adapter.build_request(
-        request_id=subject_request_id, prompt=prompt, arm=arm
+        request_id=subject_request_id,
+        prompt=prompt,
+        arm=arm,
+        skill_instructions=case.skill_instructions if arm == "WITH_SKILL" else None,
     )
     _enforce_input_bound(request, config)
     handle = meter.reserve(
@@ -589,7 +680,10 @@ def _write_evidence(
             canonical_json(
                 {
                     "dataset_digest": dataset_digest(cases),
-                    "cases": [case.to_record() for case in cases],
+                    "cases": [
+                        {**case.to_record(), "committed_case": dict(case.raw)}
+                        for case in cases
+                    ],
                 }
             ).encode("utf-8"),
             metadata,
@@ -641,7 +735,9 @@ def _write_evidence(
         "created_at": _utc_now(),
         "final_status": outcome["status"],
         "fact_origin": gate.fact_origin,
+        "record_family": "ber-live",
         "live": {
+            "live_schema_version": LIVE_SCHEMA_VERSION,
             "package_version": LIVE_PACKAGE_VERSION,
             "capability_state": LIVE_CAPABILITY_STATE,
             "enabled_by_default": False,
@@ -674,6 +770,12 @@ def _write_evidence(
         outcome["status"],
     )
     verification = verify_final_bundle(paths.evidence_root)
+    if verification.get("final_report_sha256") != final_bundle.final_report_sha256:
+        raise LiveError(
+            "the evidence bundle did not verify against the finalized hashes",
+            context={"verification": dict(verification)},
+            reason_code="EVIDENCE_VERIFICATION_FAILED",
+        )
     return {
         "root": paths.evidence_root,
         "input_evidence_manifest_sha256": input_bundle.input_evidence_manifest_sha256,
@@ -688,13 +790,14 @@ def _write_evidence(
 def dry_run(
     paths: LivePaths,
     *,
+    repo_root: str | None = None,
     environ: Mapping[str, str] | None = None,
     now: dt.datetime | None = None,
     subject_transport_factory: Callable[[], SubjectTransport] | None = None,
     judge_transport_factory: Callable[[], SubjectTransport] | None = None,
 ) -> dict[str, Any]:
     """Exercise the whole pipeline with mock adapters (zero network)."""
-    config, gate, cases = _load_inputs(paths)
+    config, gate, cases = _load_inputs(paths, repo_root)
     require_live_gate(
         gate, config, now=now, allowed_origins=frozenset({SYNTHETIC})
     )
@@ -707,6 +810,16 @@ def dry_run(
     judge_transports = {
         vendor: judge_factory() for vendor in config.subject_vendors
     }
+    # A dry run is mock-only by construction: an SDK transport here would make
+    # real network calls under a MOCK label.
+    for transport in (*subject_transports.values(), *judge_transports.values()):
+        if not isinstance(transport, MockTransport):
+            raise LiveError(
+                "a dry run accepts only the mock transport; refusing a "
+                "non-mock transport",
+                context={"transport": getattr(transport, "name", type(transport).__name__)},
+                reason_code="DRY_RUN_REQUIRES_MOCK",
+            )
     outcome = _execute(
         paths,
         mode="DRY_RUN",
@@ -728,6 +841,8 @@ def dry_run(
 def live_run(
     paths: LivePaths,
     *,
+    repo_root: str | None = None,
+    repo_revision: str | None = None,
     environ: Mapping[str, str] | None = None,
     now: dt.datetime | None = None,
     subject_transport_factory: Callable[[CredentialSet], SubjectTransport] | None = None,
@@ -740,11 +855,28 @@ def live_run(
     INJECTED_TRANSPORT_NOT_CITABLE, so an injected run can never produce
     citable real-host evidence.
     """
-    config, gate, cases = _load_inputs(paths)
+    config, gate, cases = _load_inputs(paths, repo_root)
     require_live_gate(
         gate, config, now=now, allowed_origins=frozenset({REAL_HOST})
     )
     _validate_output_paths(paths)
+    resolved_revision = repo_revision or read_checkout_revision(
+        repo_root or os.getcwd()
+    )
+    if resolved_revision is None:
+        raise LiveGateRefusedError(
+            "the checkout revision cannot be determined; refusing a live run "
+            "that cannot bind its dataset revision",
+            context={"gate_dataset_revision": gate.dataset_revision},
+        )
+    if resolved_revision != gate.dataset_revision:
+        raise LiveGateRefusedError(
+            "the checkout revision does not match the gate's dataset revision",
+            context={
+                "checkout_revision": resolved_revision,
+                "gate_dataset_revision": gate.dataset_revision,
+            },
+        )
     credentials = resolve_credentials(
         _required_credential_vendors(config), environ
     )

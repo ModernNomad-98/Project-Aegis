@@ -43,12 +43,15 @@ def expected_price_table() -> dict[str, Any]:
     return {vendor: pin.to_dict() for vendor, pin in sorted(SUBJECT_PINS.items())}
 
 
-def expected_owner_limits() -> dict[str, int]:
+def expected_owner_limits() -> dict[str, Any]:
     return {
         "pilot_ceiling_cents": OWNER_PILOT_CEILING_CENTS,
         "provider_cap_cents": OWNER_PROVIDER_CAP_CENTS,
         "pilot_case_count": OWNER_PILOT_CASE_COUNT,
         "pilot_runs_per_case": OWNER_PILOT_RUNS_PER_CASE,
+        # Descriptive owner-pilot shape; the gate enforces the spend ceiling,
+        # the pinned models, the terms and the dataset, not a fixed case count.
+        "pilot_case_count_is_descriptive": True,
     }
 
 
@@ -168,11 +171,21 @@ class LiveConfig:
         raw_allow = payload.get("judge_allowlist", {})
         if not isinstance(raw_allow, Mapping):
             raise LiveError("judge_allowlist must be an object")
+        if set(raw_allow) - {"judge_models"}:
+            raise LiveError(
+                f"judge_allowlist has unknown keys {sorted(set(raw_allow) - {'judge_models'})}"
+            )
+        raw_models = raw_allow.get("judge_models", [])
+        if not isinstance(raw_models, list):
+            raise LiveError("judge_allowlist.judge_models must be a list")
         entries: list[tuple[str, str]] = []
-        for item in raw_allow.get("judge_models", []):
+        for item in raw_models:
             if not isinstance(item, Mapping) or set(item) != {"vendor", "model"}:
                 raise LiveError("judge_allowlist entries need exactly vendor and model")
-            entries.append((item["vendor"], item["model"]))
+            vendor, model = item["vendor"], item["model"]
+            if not isinstance(vendor, str) or not isinstance(model, str):
+                raise LiveError("judge_allowlist vendor and model must be strings")
+            entries.append((vendor, model))
         if "price_table" in payload and payload["price_table"] != expected_price_table():
             raise LiveError("config price_table does not match the pinned price table")
         if "owner_limits" in payload and payload["owner_limits"] != expected_owner_limits():

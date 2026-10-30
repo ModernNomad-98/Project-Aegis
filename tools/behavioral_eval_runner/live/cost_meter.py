@@ -67,6 +67,7 @@ class CostMeter:
         max_calls: int,
         max_output_tokens: int,
         clock=None,
+        snapshot_path: str | None = None,
     ) -> None:
         if not isinstance(ceiling_cents, int) or isinstance(ceiling_cents, bool):
             raise ValueError("ceiling_cents must be an int")
@@ -80,6 +81,7 @@ class CostMeter:
         self.max_calls = max_calls
         self.max_output_tokens = max_output_tokens
         self._clock = clock
+        self.snapshot_path = snapshot_path
         self._ledger = BudgetLedger(
             BudgetCaps(limits={"calls": max_calls, "monetary_cents": ceiling_cents}),
             clock=clock,
@@ -201,8 +203,10 @@ class CostMeter:
                 "input_tokens": int(input_tokens),
                 "output_tokens": int(output_tokens),
                 "reserved_cents": handle.reserved_cents,
-                "cost_cents": handle.reserved_cents,
-                "cumulative_cents": self.spent_cents() + handle.reserved_cents,
+                "actual_cents": actual,
+                "cost_cents": max(actual, handle.reserved_cents),
+                "cumulative_cents": self.spent_cents()
+                + max(actual, handle.reserved_cents),
                 "ceiling_cents": self.ceiling_cents,
                 "reconciled": False,
                 "reason_code": "BUDGET_CAP",
@@ -238,7 +242,26 @@ class CostMeter:
             "reason_code": None,
         }
         self._entries.append(entry)
+        self._snapshot()
         return dict(entry)
+
+    def _snapshot(self) -> None:
+        """Write the ledger after every accounted call (atomic replace).
+
+        A terminated process can then still leave a ledger of what has already
+        been charged, instead of losing the whole run's accounting.
+        """
+        if not self.snapshot_path:
+            return
+        parent = os.path.dirname(os.path.abspath(self.snapshot_path))
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        temp = f"{self.snapshot_path}.tmp-{os.getpid()}"
+        with open(temp, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(canonical_json(self.to_dict()))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp, self.snapshot_path)
 
     def release_unreconciled(
         self, handle: ReservationHandle, *, reason_code: str, detail: str
@@ -282,6 +305,7 @@ class CostMeter:
             "detail": detail,
         }
         self._entries.append(entry)
+        self._snapshot()
         return dict(entry)
 
     def _record_halt(

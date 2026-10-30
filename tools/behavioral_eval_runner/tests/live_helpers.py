@@ -8,9 +8,28 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 
 from tools.behavioral_eval_runner.live.dataset import dataset_digest, load_cases
 from tools.behavioral_eval_runner.tests.helpers import REPO_ROOT
+
+def _head_revision() -> str:
+    """The current checkout revision, so a real-host gate can bind to it."""
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=REPO_ROOT,
+            shell=False,
+            capture_output=True,
+            timeout=30,
+        )
+        value = completed.stdout.decode("utf-8", "replace").strip()
+        if completed.returncode == 0 and len(value) == 40:
+            return value
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return "575e4586ef0f5213474cbe6909a418a06b387105"
+
 
 PACKAGE_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -46,6 +65,7 @@ def gate_payload(
     judge_override=None,
     dataset_sha: str | None = None,
     case_count: int | None = None,
+    revision: str | None = None,
 ) -> dict:
     cases = committed_cases()
     return {
@@ -55,7 +75,7 @@ def gate_payload(
         "owner_decision_ref": "test fixture: no owner authority claimed",
         "fact_origin": fact_origin,
         "dataset": {
-            "revision": "575e4586ef0f5213474cbe6909a418a06b387105",
+            "revision": revision or _head_revision(),
             "path": "tools/behavioral_eval_runner/live/cases",
             "sha256": dataset_sha or dataset_digest(cases),
             "case_count": case_count if case_count is not None else len(cases),

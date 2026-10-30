@@ -255,7 +255,13 @@ and `gpt-6-astra` (OpenAI). The adapter requests exactly that string and records
 the exact `served_model` string the provider returns. A mismatch — including a
 missing served-model field — is a HALT with a structured `MODEL_PIN_MISMATCH`
 error: the response is discarded, nothing is retried and no alternative model is
-substituted. The same rule applies to the judge.
+substituted. The same rule applies to the judge. A truncated or filtered
+response, or a response without usable usage telemetry, is a transport failure
+and is never graded.
+
+**The two arms.** `WITH_SKILL` loads the case's committed skill instructions in
+the system prompt; `BASELINE` does not. The judge never sees the arm or the
+subject vendor, so its verdict is blind to them.
 
 **Credentials.** `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` are read from the
 environment only. A missing value fails closed with `CREDENTIAL_MISSING` before
@@ -278,7 +284,9 @@ afterwards. When the next reservation would exceed the effective ceiling, the
 meter refuses, records the halt and raises `BUDGET_CAP`. The caller marks every
 remaining case `UNRUN` with reason `BUDGET_CAP` and never PASS, stops
 dispatching, writes `halt.json`, and finalizes the bundle with status
-`HALTED`. The proof — simulated usage reaching the ceiling, the refused
+`HALTED`. A call that reached the transport and then failed is charged its full
+reservation and recorded as an unreconciled entry, so a failure never restores
+headroom. The proof — simulated usage reaching the ceiling, the refused
 reservation, the dispatched-call count and the UNRUN tail — is
 `tests/test_live_cost_meter.py`; the work-package record cites it as the
 pilot-A required evidence.

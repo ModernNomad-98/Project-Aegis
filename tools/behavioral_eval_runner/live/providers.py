@@ -91,9 +91,52 @@ def judge_routes_by_subject() -> dict[str, dict[str, str]]:
     return routes
 
 
+#: Stop reasons that mean the provider did not finish the response; a partial
+#: answer must never be graded or judged.
+INCOMPLETE_STOP_REASONS = frozenset(
+    {"max_tokens", "length", "incomplete", "content_filter"}
+)
+
+
+def extract_usage(usage: Any, *, vendor: str) -> "ProviderUsage":
+    """Require usable usage telemetry; a missing field is a STOP, not zero."""
+    from .transport import ProviderUsage
+
+    if usage is None:
+        raise ProviderTransportError(
+            "the provider returned no usage telemetry; the spend cannot be "
+            "accounted, so the call is a transport failure",
+            context={"vendor": vendor},
+        )
+    input_tokens = getattr(usage, "input_tokens", None)
+    output_tokens = getattr(usage, "output_tokens", None)
+    if not isinstance(input_tokens, int) or not isinstance(output_tokens, int):
+        raise ProviderTransportError(
+            "the provider usage telemetry is missing or malformed",
+            context={"vendor": vendor},
+        )
+    if input_tokens < 0 or output_tokens < 0:
+        raise ProviderTransportError(
+            "the provider usage telemetry is negative",
+            context={"vendor": vendor},
+        )
+    return ProviderUsage(input_tokens, output_tokens)
+
+
+def ensure_complete_response(stop_reason: str, *, vendor: str) -> None:
+    """A truncated or filtered response is a transport failure, never a grade."""
+    lowered = (stop_reason or "").lower()
+    if lowered in INCOMPLETE_STOP_REASONS:
+        raise ProviderTransportError(
+            f"the provider response is incomplete (stop reason {stop_reason!r}); "
+            "a partial answer is not graded or judged",
+            context={"vendor": vendor, "stop_reason": stop_reason},
+        )
+
+
 def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderResponse":
     """One lazy-import SDK call. The key is never logged or stored."""
-    from .transport import ProviderResponse, ProviderUsage
+    from .transport import ProviderResponse
 
     if not isinstance(api_key, str) or not api_key:
         raise LiveTransportUnavailableError(
@@ -125,23 +168,31 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
                 f"anthropic transport failure: {type(exc).__name__}",
                 context={"vendor": request.vendor, "request_id": request.request_id},
             ) from exc
-        blocks = getattr(response, "content", []) or []
-        text = "".join(
-            getattr(block, "text", "")
-            for block in blocks
-            if getattr(block, "type", "") == "text"
-        )
-        usage = getattr(response, "usage", None)
-        return ProviderResponse(
-            response_id=str(getattr(response, "id", "")),
-            served_model=str(getattr(response, "model", "")),
-            text=text,
-            usage=ProviderUsage(
-                int(getattr(usage, "input_tokens", 0)),
-                int(getattr(usage, "output_tokens", 0)),
-            ),
-            stop_reason=str(getattr(response, "stop_reason", "UNKNOWN")),
-        )
+        try:
+            blocks = getattr(response, "content", []) or []
+            text = "".join(
+                getattr(block, "text", "")
+                for block in blocks
+                if getattr(block, "type", "") == "text"
+            )
+            stop_reason = str(getattr(response, "stop_reason", "UNKNOWN"))
+            ensure_complete_response(stop_reason, vendor=request.vendor)
+            return ProviderResponse(
+                response_id=str(getattr(response, "id", "")),
+                served_model=str(getattr(response, "model", "")),
+                text=text,
+                usage=extract_usage(
+                    getattr(response, "usage", None), vendor=request.vendor
+                ),
+                stop_reason=stop_reason,
+            )
+        except ProviderTransportError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - conversion must fail closed
+            raise ProviderTransportError(
+                f"anthropic response conversion failed: {type(exc).__name__}",
+                context={"vendor": request.vendor, "request_id": request.request_id},
+            ) from exc
     if request.vendor == "openai":
         try:
             import openai  # noqa: PLC0415 - deliberate lazy import
@@ -169,17 +220,25 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
                 f"openai transport failure: {type(exc).__name__}",
                 context={"vendor": request.vendor, "request_id": request.request_id},
             ) from exc
-        usage = getattr(response, "usage", None)
-        return ProviderResponse(
-            response_id=str(getattr(response, "id", "")),
-            served_model=str(getattr(response, "model", "")),
-            text=str(getattr(response, "output_text", "")),
-            usage=ProviderUsage(
-                int(getattr(usage, "input_tokens", 0)),
-                int(getattr(usage, "output_tokens", 0)),
-            ),
-            stop_reason=str(getattr(response, "status", "UNKNOWN")),
-        )
+        try:
+            stop_reason = str(getattr(response, "status", "UNKNOWN"))
+            ensure_complete_response(stop_reason, vendor=request.vendor)
+            return ProviderResponse(
+                response_id=str(getattr(response, "id", "")),
+                served_model=str(getattr(response, "model", "")),
+                text=str(getattr(response, "output_text", "")),
+                usage=extract_usage(
+                    getattr(response, "usage", None), vendor=request.vendor
+                ),
+                stop_reason=stop_reason,
+            )
+        except ProviderTransportError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - conversion must fail closed
+            raise ProviderTransportError(
+                f"openai response conversion failed: {type(exc).__name__}",
+                context={"vendor": request.vendor, "request_id": request.request_id},
+            ) from exc
     raise LiveDispatchDisabledError(
         "no SDK call shape exists for the requested vendor",
     )

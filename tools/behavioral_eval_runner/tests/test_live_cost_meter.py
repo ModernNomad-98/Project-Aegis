@@ -98,6 +98,7 @@ class CostHaltIntegrationTests(unittest.TestCase):
             self.assertIn("UNRUN", states)
             self.assertEqual(len(states), 24)
             first_unrun = states.index("UNRUN")
+            self.assertEqual(states[first_unrun - 1], "ERROR")
             self.assertTrue(
                 all(state == "UNRUN" for state in states[first_unrun:]),
                 "every result after the halt must be UNRUN",
@@ -185,9 +186,28 @@ class CostHaltIntegrationTests(unittest.TestCase):
             self.assertEqual(entry["reason_code"], "MODEL_PIN_MISMATCH")
             self.assertEqual(entry["cost_cents"], entry["reserved_cents"])
             self.assertGreaterEqual(entry["cost_cents"], 1)
-            self.assertTrue(all(
-                record["result_state"] == "UNRUN" for record in result["results"]
-            ))
+            states = [record["result_state"] for record in result["results"]]
+            self.assertEqual(states[0], "ERROR")
+            self.assertTrue(all(state == "UNRUN" for state in states[1:]))
+
+    def test_drift_records_the_actual_cost_not_the_reservation(self):
+        meter = CostMeter(100, max_calls=10, max_output_tokens=10)
+        pin = SUBJECT_PINS["anthropic"]
+        handle = meter.reserve(
+            call_ref="drift", pin=pin, system_bytes=10, user_bytes=10
+        )
+        with self.assertRaises(CostCeilingHaltError):
+            meter.reconcile(
+                handle,
+                input_tokens=10_000_000,
+                output_tokens=10_000_000,
+                served_model=pin.model,
+            )
+        entry = meter.calls[0]
+        self.assertFalse(entry["reconciled"])
+        self.assertGreater(entry["actual_cents"], entry["reserved_cents"])
+        self.assertEqual(entry["cost_cents"], entry["actual_cents"])
+        self.assertTrue(meter.halted)
 
     def test_halt_without_the_cap_still_completes(self):
         with tempfile.TemporaryDirectory() as tmp:

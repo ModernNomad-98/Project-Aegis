@@ -3120,7 +3120,9 @@ keys are rejected. The effective ceiling is
 the response must carry exactly that string in its served-model field, or the
 run halts with `MODEL_PIN_MISMATCH` and records the requested and served values
 in the error context. There is no alias table, no fallback model and no retry on
-mismatch. The judge is subject to the same rule.
+mismatch. The judge is subject to the same rule. An incomplete or filtered
+response, or one without usable usage telemetry, is a transport failure; it is
+never graded.
 
 **Judge contract.** Judge input is a canonical JSON envelope built from the
 committed rubric (and its SHA-256) plus the in-memory subject response (and its
@@ -3136,6 +3138,18 @@ reservation. A denial records the halt and raises `BUDGET_CAP`; the run marks
 the remaining cases `UNRUN` with that reason, writes `halt.json`, and finalizes
 with status `HALTED`. The cost ledger artifact lists every call's vendor, model,
 served model, tokens, reserved cents, actual cents and cumulative spend.
+
+**Provenance binding.** A live run resolves the checkout revision and refuses
+when it cannot be determined or differs from the gate's dataset revision, and it
+refuses a cases root that is not the real path of the gate's dataset path. The
+gate remains an owner process artifact, not a cryptographic signature. The
+judge envelope is blind to the arm and the subject vendor.
+
+**Result states and citability.** `WITH_SKILL` loads the case's committed skill
+instructions; `BASELINE` does not. Only `PASS` and `FAIL` from a real-host gate
+over the vendor SDK transport are citable. `UNRUN`, `ERROR`, `JUDGE_ERROR` and
+`MOCK` are never citable, and a partially executed attempt is `ERROR`, not
+`UNRUN`.
 
 **Evidence.** The existing two-stage writer is reused. Stage A holds the gate
 echo and digest, the sanitized configuration, the committed case records and the

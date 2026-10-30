@@ -137,6 +137,45 @@ class DryRunEndToEndTests(unittest.TestCase):
             )
 
 
+class CitabilityTests(unittest.TestCase):
+    def test_unrun_and_error_are_never_citable(self):
+        from tools.behavioral_eval_runner.live.pipeline import _citability
+
+        for state in ("UNRUN", "ERROR", "JUDGE_ERROR", "MOCK"):
+            self.assertEqual(
+                _citability("REAL_HOST", "VENDOR_SDK", state),
+                "NO_RULE_STATE_NOT_CITABLE",
+                state,
+            )
+        self.assertEqual(_citability("REAL_HOST", "VENDOR_SDK", "PASS"), "REAL_HOST")
+        self.assertEqual(_citability("REAL_HOST", "VENDOR_SDK", "FAIL"), "REAL_HOST")
+        self.assertEqual(
+            _citability("REAL_HOST", "INJECTED", "PASS"),
+            "INJECTED_TRANSPORT_NOT_CITABLE",
+        )
+        self.assertEqual(
+            _citability("SYNTHETIC", "VENDOR_SDK", "PASS"),
+            "SYNTHETIC_NOT_CITABLE",
+        )
+
+    def test_dry_run_refuses_a_non_mock_transport(self):
+        from tools.behavioral_eval_runner.live.errors import LiveError
+        from tools.behavioral_eval_runner.live.transport import DeniedTransport
+
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = helpers.make_paths(tmp)
+            with self.assertRaises(LiveError) as caught:
+                dry_run(
+                    paths,
+                    subject_transport_factory=DeniedTransport,
+                    judge_transport_factory=lambda: helpers.mock_judge_transport(),
+                )
+            self.assertEqual(
+                getattr(caught.exception, "reason_code", None),
+                "DRY_RUN_REQUIRES_MOCK",
+            )
+
+
 class VersionRegistrationTests(unittest.TestCase):
     def test_live_version_family_is_pinned(self):
         from tools.behavioral_eval_runner.live import (

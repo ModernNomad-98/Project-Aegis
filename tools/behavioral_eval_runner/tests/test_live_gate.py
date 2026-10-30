@@ -288,6 +288,62 @@ class ConfigStrictnessTests(unittest.TestCase):
             self.assertIn("future", str(caught.exception).lower())
 
 
+class ProvenanceBindingTests(unittest.TestCase):
+    def test_live_run_refuses_a_revision_that_is_not_the_checkout(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _paths(tmp, gate=helpers.gate_payload(fact_origin="REAL_HOST"))
+            with self.assertRaises(LiveGateRefusedError) as caught:
+                live_run(
+                    paths,
+                    repo_revision="f" * 40,
+                    environ={
+                        "ANTHROPIC_API_KEY": helpers.FAKE_ANTHROPIC_KEY,
+                        "OPENAI_API_KEY": helpers.FAKE_OPENAI_KEY,
+                    },
+                )
+            self.assertIn("revision", str(caught.exception).lower())
+
+    def test_live_run_refuses_a_cases_root_outside_the_gate_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = helpers.make_paths(tmp, gate=helpers.gate_payload(fact_origin="REAL_HOST"))
+            import shutil
+
+            other_cases = os.path.join(tmp, "other-cases")
+            shutil.copytree(helpers.CASES_ROOT, other_cases)
+            object.__setattr__(paths, "cases_root", other_cases)
+            with self.assertRaises(LiveGateRefusedError) as caught:
+                live_run(
+                    paths,
+                    repo_revision=helpers.gate_payload()["dataset"]["revision"],
+                    environ={},
+                )
+            self.assertIn("dataset_path", str(caught.exception))
+
+
+class PreflightRefusalTests(unittest.TestCase):
+    def test_empty_allowlist_is_a_refusal_report_not_a_crash(self):
+        config = helpers.config_payload()
+        config["judge_allowlist"] = {"judge_models": []}
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _paths(tmp, config=config)
+            report = preflight(paths, environ={})
+            self.assertEqual(report["status"], "REFUSED")
+            self.assertEqual(
+                report["blockers"][0]["reason_code"], "JUDGE_VENDOR_GUARD"
+            )
+
+    def test_malformed_config_is_a_refusal_report(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _paths(tmp)
+            with open(paths.config_path, "w", encoding="utf-8") as handle:
+                handle.write("{not json")
+            report = preflight(paths, environ={})
+            self.assertEqual(report["status"], "REFUSED")
+            self.assertEqual(
+                report["blockers"][0]["reason_code"], "LIVE_CONFIG_INVALID"
+            )
+
+
 class GateCliRefusalTests(unittest.TestCase):
     def test_live_run_cli_refuses_a_synthetic_gate_with_structured_output(self):
         with tempfile.TemporaryDirectory() as tmp:
