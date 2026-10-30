@@ -975,6 +975,10 @@ Linux (three expected Linux skips). All 28 transition, 9 crash-boundary, and
 records the exact test and review history. No real delivery integration or
 deployment is implemented or authorized.
 
+The [proof coverage map](docs/evidence/proof-coverage-map.md) sets the 23 discipline
+families against Proof #1 — 1 EXERCISED, 22 NOT EXERCISED — and names the recorded
+invocation behind every EXERCISED mark.
+
 The version 4 (v4) references below record the library's construction
 history. Here, "canonical" describes that earlier planning context; the
 generation prompts are not current work orders. For current status and
