@@ -7323,6 +7323,10 @@ STARTER_REQUIRED_PATHS = (
     ".claude/skills/scoped-approval-register/SKILL.md",
     ".claude/skills/scoped-approval-register/references/register-format.md",
 )
+# The only non-skill rows the selectors may carry: the two root startup files.
+# Every other row must be a file under .claude/skills/, so an extra non-skill
+# row cannot ride along in the selector (I4 advisory F1).
+STARTER_STARTUP_PATHS = ("AGENTS.md", "CLAUDE.md")
 
 _STARTER_TABLE_ROW = re.compile(r"^\| `([^`]+)` \| (\d+) \| (\d+) \|$", re.M)
 _STARTER_TOTAL_ROW = re.compile(
@@ -7377,8 +7381,11 @@ def _starter_git(repo_root: Path, *args: str) -> subprocess.CompletedProcess:
 
     All inherited GIT_* variables are removed, system/global config is
     disabled, replace refs are ignored, and a synthetic safe.directory entry
-    keeps a read-only checkout usable. The timeout turns a hung Git into a
-    PIN-UNAVAILABLE classification instead of a hung test.
+    keeps a read-only checkout usable. A hung Git (timeout) and a Git that
+    cannot be started at all (OSError: missing, not executable, or refused by
+    the process) both become a PIN-UNAVAILABLE classification instead of a
+    hung test or an uncaught exception, so the caller's failure contract holds
+    even when the shutil.which pre-check and this call disagree.
     """
     cmd = ["git", "--no-replace-objects", "-c", "safe.directory=*",
            "-C", str(repo_root)] + list(args)
@@ -7397,6 +7404,12 @@ def _starter_git(repo_root: Path, *args: str) -> subprocess.CompletedProcess:
     except subprocess.TimeoutExpired:
         return subprocess.CompletedProcess(
             cmd, 124, "", "git timed out after 60 seconds")
+    except OSError as exc:
+        # A Git that cannot be started is a classification, not an escape: the
+        # call sites pre-check shutil.which, and a check-to-run race or a broken
+        # PATH entry must still reach the callers' PIN-UNAVAILABLE refusal.
+        return subprocess.CompletedProcess(
+            cmd, 127, "", "git could not be run: %s" % exc)
 
 
 def load_starter_pin(repo_root: Path, commit: str, tree: str):
@@ -7538,6 +7551,19 @@ def parse_starter_selectors(text: str):
                         ("executable array", array)):
         if len(rows) != len(set(rows)):
             problems.append("the %s lists duplicate paths" % label)
+        # A consumer filesystem is not case-sensitive, so two spellings of one
+        # path are one installed file. Detect the collision on the folded form;
+        # the report lists every spelling in sorted order, so the finding is
+        # deterministic and names the exact rows.
+        folded: dict[str, set[str]] = {}
+        for path in rows:
+            folded.setdefault(path.casefold(), set()).add(path)
+        for key in sorted(folded):
+            spellings = sorted(folded[key])
+            if len(spellings) > 1:
+                problems.append(
+                    "the %s lists %s more than once when case is ignored"
+                    % (label, " and ".join(spellings)))
 
     agg_rows = re.search(r"\$AggRows\s*=\s*(\d+)", text)
     if agg_rows is None:
@@ -7576,7 +7602,11 @@ def check_starter_selection(table, array, required, pinned=None,
     the closure comparison is skipped, which keeps the pure selector checks
     usable without Git. Evaluation answer files are rejected by directory
     segment and by basename, so the two published names are refused even
-    outside an `evals/` directory.
+    outside an `evals/` directory. Every row must also be a file under
+    `.claude/skills/`, one of the two declared root startup files, or a
+    required package path: a stray row that is none of these is refused here,
+    so the selector layer cannot carry an extra non-skill row that only the
+    native install test would notice.
     """
     problems: list[str] = []
     if pin_label is None:
@@ -7598,6 +7628,25 @@ def check_starter_selection(table, array, required, pinned=None,
                     "evaluation content must not be installed (%s): %s"
                     % (label, path)
                 )
+
+    # The selector is a skill manifest, not a copy list: a row that is neither a
+    # skill file, one of the two declared startup files, nor a required path
+    # would install an arbitrary file. Refuse it by name in both selectors (I4
+    # advisory F1). The startup files are the only lawful non-skill rows.
+    declared = set(required) | set(STARTER_STARTUP_PATHS)
+    for label, rows in selectors:
+        for path in rows:
+            if path in declared:
+                continue
+            parts = path.split("/")
+            if (len(parts) >= 4 and parts[0] == ".claude"
+                    and parts[1] == "skills"):
+                continue
+            problems.append(
+                "the %s lists %s, which is not a skill file under "
+                ".claude/skills/, a declared startup file or a required "
+                "package path" % (label, path)
+            )
 
     skill_dirs = _starter_skill_dirs(list(table) + list(array))
     for skill in skill_dirs:
@@ -7871,6 +7920,44 @@ def test_consumer_starter_selector_pin_closure():
         ok("S1-1 fixture: a valid selector pair passes against the pinned closure "
            "while the checkout carries a reference the pin does not")
 
+        # C1 (issue #966, I4 advisory F1): an extra non-skill row is refused by
+        # name in both selectors. The valid skill-only page above is the accept
+        # control for the same rule.
+        stray = "docs/consumer-starter-package.md"
+        table, array, problems = parse_starter_selectors(
+            _starter_fixture_page(pin_rows + [stray]))
+        assert not problems, problems
+        bproblems = check_starter_selection(table, array, (), pinned, pin_commit)
+        for label in ("section 2.3 table", "executable array"):
+            assert ("the %s lists %s, which is not a skill file under "
+                    ".claude/skills/, a declared startup file or a required "
+                    "package path" % (label, stray)) in bproblems, bproblems
+        ok("S1-1 fixture: an extra non-skill row is refused by both selectors "
+           "and named exactly")
+
+        # C3 (issue #966, I4 advisory F6): two spellings of one non-skill path
+        # are one installed file on a consumer filesystem, so the collision is
+        # refused even though no exact duplicate exists.
+        pair = ["docs/consumer-starter-package.md",
+                "docs/Consumer-Starter-Package.md"]
+        page = _starter_fixture_page(pin_rows + pair)
+        table, array, problems = parse_starter_selectors(page)
+        assert len(table) == len(pin_rows) + 2, table
+        assert table == array, (table, array)
+        for label in ("section 2.3 table", "executable array"):
+            assert ("the %s lists %s more than once when case is ignored"
+                    % (label, " and ".join(sorted(pair)))) in problems, problems
+        ok("S1-1 fixture: a case-differing non-skill duplicate is refused "
+           "deterministically and names both spellings")
+        # Either spelling on its own is accepted, so what is refused is the
+        # collision, not the case of a single row.
+        for spelling in pair:
+            single, single_array, single_problems = parse_starter_selectors(
+                _starter_fixture_page(pin_rows + [spelling]))
+            assert single and single_array, (single, single_array)
+            assert not single_problems, single_problems
+        ok("S1-1 fixture: either spelling on its own is accepted as the control")
+
         # A checkout-only reference cannot be forced into the package.
         extra = pin_rows + [".claude/skills/alpha/references/checkout-only.md"]
         table, array, problems = parse_starter_selectors(
@@ -8059,6 +8146,50 @@ def test_consumer_starter_selector_pin_closure():
                 not in pinned_after["alpha"])
         assert sorted(p for paths in pinned_after.values() for p in paths) == pin_rows
         ok("S1-1 fixture: a replace ref cannot change the pinned closure")
+
+
+def test_consumer_starter_git_failure_classes():
+    """S1-1 (C2): a Git that cannot be started is classified, never raised."""
+    original = subprocess.run
+
+    def missing_git(*args, **kwargs):
+        raise FileNotFoundError("git fixture: no such file or directory")
+
+    def hung_git(*args, **kwargs):
+        raise subprocess.TimeoutExpired(cmd="git", timeout=60)
+
+    try:
+        subprocess.run = missing_git
+        try:
+            completed = _starter_git(REPO_ROOT, "rev-parse", "HEAD")
+        except OSError as exc:
+            raise AssertionError(
+                "the helper let OSError escape instead of classifying it: %r"
+                % (exc,))
+        assert completed.returncode == 127, completed.returncode
+        assert "git could not be run" in completed.stderr, completed.stderr
+        assert "no such file" in completed.stderr, completed.stderr
+        ok("C2: an OSError from Git is returned as a 127 classification, "
+           "not raised")
+
+        subprocess.run = hung_git
+        completed = _starter_git(REPO_ROOT, "rev-parse", "HEAD")
+        assert completed.returncode == 124, completed.returncode
+        assert completed.stderr == "git timed out after 60 seconds"
+        ok("C2: the timeout classification (124) is unchanged")
+
+        # The regression the narrow catch allowed: a spawn failure escaped
+        # load_starter_pin instead of reaching its documented refusal.
+        subprocess.run = missing_git
+        pinned, refusal = load_starter_pin(
+            REPO_ROOT, STARTER_PIN_COMMIT, STARTER_PIN_TREE)
+        assert pinned is None, pinned
+        assert refusal.startswith("PIN-UNAVAILABLE"), refusal
+        assert "git could not be run" in refusal, refusal
+        ok("C2: the OSError path reaches the PIN-UNAVAILABLE refusal with no "
+           "checkout fallback")
+    finally:
+        subprocess.run = original
 
 
 # --- consumer starter package: explicit install mode (S3-1..S3-6) -----------
@@ -8537,6 +8668,25 @@ def test_consumer_install_mode_native():
     gate_text = _starter_fenced_block(page, STARTER_MODE_HEADING)
     harness_text = _starter_fenced_block(page, STARTER_HARNESS_HEADING, 1)
     assert "Stop-Step" in harness_text and "$package = @" in harness_text
+    # C4 (issue #966, I7 carried advisory): the published harness states the
+    # native-argument mode explicitly, and does so before its first native call.
+    # The invocation snippet states it too, before the call it hardens.
+    assignment = "$PSNativeCommandArgumentPassing = 'Standard'"
+    assert assignment in harness_text, (
+        "the published harness does not set $PSNativeCommandArgumentPassing"
+    )
+    assert harness_text.index(assignment) < harness_text.index("& $pwshExe"), (
+        "the harness sets $PSNativeCommandArgumentPassing after its first native call"
+    )
+    invocation = _starter_fenced_block(page, STARTER_HARNESS_HEADING)
+    assert assignment in invocation, (
+        "the section 7.1 invocation does not set $PSNativeCommandArgumentPassing"
+    )
+    assert invocation.index(assignment) < invocation.index("pwsh -NoProfile -File"), (
+        "the invocation sets $PSNativeCommandArgumentPassing after the call"
+    )
+    ok("C4: the published harness and its invocation state "
+       "$PSNativeCommandArgumentPassing = 'Standard' before the first native call")
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td)
         env = _install_mode_env(tmp)
@@ -8917,8 +9067,37 @@ def test_consumer_install_destination_links():
             assert package_rows == resumed_rows, (
                 "the resume changed an installed package file")
             assert (clean / "docs" / "consumer-install-record.md").is_file()
+            # The block's own branch flag for this path: the write branch ran,
+            # rather than the keep-existing branch silently producing no record.
+            # Compare the declared leaf, not the absolute path: Windows may
+            # spell the temp directory's 8.3 name in str(path) while the block
+            # prints the long form from [IO.Path]::GetFullPath.
+            written = [line for line in proc.stdout.splitlines()
+                       if line.startswith("P9: install record written: ")]
+            assert len(written) == 1, written
+            assert written[0].endswith(
+                os.sep + os.sep.join(("docs", "second-install-record.md"))), written
             ok("S4-8: an identical resume still exits 0, preserves the package files "
                "and the prior record, and writes the second record")
+
+            # S4-8b (issue #966, I7 carried advisory): the second declared
+            # record path is not exempt from the record guard. Declaring the
+            # same path again without -AllowExistingRecord must be refused at
+            # 24 and leave that record byte-identical, exactly as the first
+            # path is (a negative case; before this assertion the second path
+            # was only ever exercised on the success branch).
+            second_bytes = second_record.read_bytes()
+            refused_before = _dest_snapshot(clean)
+            proc = install(clean, second_record)
+            assert proc.returncode == 24, (proc.returncode, proc.stdout, proc.stderr)
+            assert "install record already exists" in proc.stderr, proc.stderr
+            assert second_record.read_bytes() == second_bytes, (
+                "the refused run changed the second declared record")
+            assert _dest_snapshot(clean) == refused_before, (
+                "the refused run changed the target tree")
+            ok("S4-8b: the second declared record path is refused at 24 when it "
+               "already exists, is left byte-identical, and no package file is "
+               "written")
 
             # S4-9: the required file-symlink fixture needs administrator privilege
             # on this host. Record that as UNRUN; never count it as a pass.
@@ -10068,6 +10247,7 @@ TESTS = [
     test_ds7cb_non_readme_failure_refuses,
     test_consumer_starter_selectors,
     test_consumer_starter_selector_pin_closure,
+    test_consumer_starter_git_failure_classes,
     test_consumer_install_mode_gate,
     test_consumer_install_mode_native,
     test_consumer_install_destination_links,

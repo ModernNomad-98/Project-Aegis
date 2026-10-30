@@ -871,6 +871,7 @@ Save P2's block as `install-mode.ps1` and the block below as
 PowerShell 7:
 
 ```powershell
+$PSNativeCommandArgumentPassing = 'Standard'   # 7.3+: quote-safe native arguments for the call below (inert at or below 7.2)
 pwsh -NoProfile -File .\install-starter.ps1 -Src C:\path\to\pinned-clone -Tgt C:\path\to\product -Sh 'C:\Program Files\Git\bin\sh.exe' -Mode human-only -OwnerAuthorization '<the owner''s words>' -RecordPath C:\path\to\product\docs\consumer-install-record.md
 ```
 
@@ -926,6 +927,11 @@ param(
 # Write-Error, so an inherited $ErrorActionPreference = 'Stop' cannot turn a
 # documented exit code into exit 1.
 $ErrorActionPreference = 'Stop'
+# State the native-argument mode explicitly (PowerShell 7.3+; inert at or below
+# 7.2). Every native call below - the P2 child pwsh, git and sh - receives a path
+# or owner text, and Standard is the quote-safe mode; the invocation guard stays
+# the only control at or below 7.2.
+$PSNativeCommandArgumentPassing = 'Standard'
 $PinCommit = 'ffb040c7a363648856475280646bbd142dfabe4e'
 $PinTree   = '88a5aee4ad928a49c2fb945032585843ec652da7'
 $AggSha    = 'fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699'
@@ -1643,9 +1649,11 @@ the backslash immediately before the closing quote. The quote is then escaped an
 the child `pwsh -File` can absorb the following argument (`-RecordPath`, for
 example). On those versions the guard is the control that makes the invocation
 safe; do not weaken it to `[\r\n"]`. PowerShell 7.3+ adds
-`$PSNativeCommandArgumentPassing`: set it to `Standard` before the call to state
-the quote-safe mode explicitly (this host's 7.6.6 defaults to `Windows`, which
-also delivered a trailing backslash intact). Keep the guard on every version - it
+`$PSNativeCommandArgumentPassing`: the published harness sets it to `Standard`
+before its first native call and the section 7.1 invocation sets it before the
+call, so the quote-safe mode is stated explicitly rather than inherited (this
+host's 7.6.6 defaults to `Windows`, which also delivered a trailing backslash
+intact). Keep the guard on every version - it
 costs nothing above 7.3 and it is the only protection at or below 7.2.
 
 Do **not** pass the old record path. An existing record is refused at **exit 24**,
