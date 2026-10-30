@@ -27,14 +27,14 @@ two evidence rows that must not be rewritten; the explanation is in
 
 | # | Finding (as raised) | Disposition | Evidence for the fix |
 | --- | --- | --- | --- |
-| 1 | README "from the rule table alone" and METHOD "does not require this script" overclaim what the committed repo reproduces | **FIXED** | `README.md:135-147`; `METHOD.md:362-443` (§8 rewritten around an explicit what-is/what-is-not list); `METHOD.md:163-196` (§3.4 now publishes the `ENC-B64` post-filter as pseudocode) |
-| 2 | `false_positive_rate_pct` is a dismissal / false-discovery rate, not an FPR; the sample conclusion overreaches | **FIXED** | `evidence/summary.json:48-50` (caveat, definition, value); `METHOD.md:201-207`; `RESULTS.md:135-145`; `RESULTS.md:114-116` |
-| 3 | "invisible markup produced zero hits" contradicted by `MK-IMG` = 1 | **FIXED** | `RESULTS.md:174-182` |
-| 4 | "all 44 hits were adjudicated" vs 33 chunk verdicts; F24/F33 rationales do not address the rule that fired | **FIXED** + **HERE-CARRIED** | `METHOD.md:211-216`; `RESULTS.md:129-133`; `evidence/flagged-hit-map.tsv` (44 rows, notes at `:35` and `:45`) |
-| 5 | Rubric category vocabulary omits `control-char`, which METHOD §3.2 assigns to `UNI-CONTROL` | **FIXED** | `evidence/RUBRIC.md:85-91`; `METHOD.md:255-262`; `METHOD.md:430-437` |
+| 1 | README "from the rule table alone" and METHOD "does not require this script" overclaim what the committed repo reproduces | **FIXED** | `README.md:142-154`; `METHOD.md:384-473` (§8 rewritten around an explicit what-is/what-is-not list); `METHOD.md:163-196` (§3.4 now publishes the `ENC-B64` post-filter as pseudocode) |
+| 2 | `false_positive_rate_pct` is a dismissal / false-discovery rate, not an FPR; the sample conclusion overreaches | **FIXED** | `evidence/summary.json:48-50` (caveat, definition, value); `METHOD.md:209-217`; `RESULTS.md:135-145`; `RESULTS.md:114-116` |
+| 3 | "invisible markup produced zero hits" contradicted by `MK-IMG` = 1 | **FIXED** | `RESULTS.md:181-191` |
+| 4 | "all 44 hits were adjudicated" vs 33 chunk verdicts; F24/F33 rationales do not address the rule that fired | **FIXED** + **HERE-CARRIED** | `METHOD.md:219-224`; `RESULTS.md:129-133`; `evidence/flagged-hit-map.tsv` (44 rows, notes at `:35` and `:45`) |
+| 5 | Rubric category vocabulary omits `control-char`, which METHOD §3.2 assigns to `UNI-CONTROL` | **FIXED** | `evidence/RUBRIC.md:85-91`; `METHOD.md:270-278`; `METHOD.md:456-467` |
 | 6 | "Pipes are literal here" is wrong — the bars are regex alternation | **FIXED** | `METHOD.md:128-130` |
-| 7 | "No network access and no external model call" conflicts with the four DeepSeek sessions | **FIXED** | `METHOD.md:336-342` |
-| 8 | `n = round(2025 * 10 / 100)` is Python-version-specific; no interpreter recorded | **FIXED** | `METHOD.md:223-234` |
+| 7 | "No network access and no external model call" conflicts with the four DeepSeek sessions | **FIXED** | `METHOD.md:358-368` |
+| 8 | `n = round(2025 * 10 / 100)` is Python-version-specific; no interpreter recorded | **FIXED** | `METHOD.md:239-253` |
 | 9 | Tag characters "both produced 0 hits" claims evidence that cannot exist | **FIXED** | `METHOD.md:124-125` |
 | 10 | Regenerate the hashes after any edits | **FIXED** | `HASHES.sha256` — 9 of 9 entries recomputed on the repaired bytes; see the manifest below |
 
@@ -77,7 +77,7 @@ That matches `evidence/summary.json:10` (`"invisible-markup": 1`),
 **4 — 44 hits and 33 verdicts — HERE-CARRIED for the two rows.** Three things
 were wrong and are fixed differently:
 
-- The wording. `METHOD.md:211` now says **"all 33 flagged chunks covering those
+- The wording. `METHOD.md:221` now says **"all 33 flagged chunks covering those
   44 hits were adjudicated"**, which is what the evidence actually contains.
 - The auditability gap. `evidence/flagged-verdicts.tsv` is chunk-level and has no
   rule column, so a reader could not connect a hit to a verdict. The new
@@ -104,7 +104,7 @@ were wrong and are fixed differently:
 `control-char`, with a note that it is `UNI-CONTROL`'s category, that no verdict
 uses it, and that the token was added after adjudication. Because
 `evidence/RUBRIC.md` is the instrument the four sessions read, both digests are
-published: the reviewed bytes (`METHOD.md:430`) and the repaired bytes
+published: the reviewed bytes (`METHOD.md:460`) and the repaired bytes
 (`HASHES.sha256`). The decision tests, verdict definitions and evidence fields
 are unchanged; no verdict depends on the added token, because the family
 produced 0 hits.
