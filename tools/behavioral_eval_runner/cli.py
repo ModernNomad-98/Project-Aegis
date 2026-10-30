@@ -136,7 +136,13 @@ from .judge.calibration_errors import (
 
 # Gated live enablement (2026-10-29). Importing these modules loads no network
 # machinery and no vendor SDK; the live verbs refuse without an owner gate.
-from .live import LIVE_CAPABILITY_STATE, LIVE_PACKAGE_VERSION, LIVE_SCHEMA_VERSION
+from .live import (
+    LIVE_CAPABILITY_STATE,
+    LIVE_ENABLED_BY_DEFAULT,
+    LIVE_GATE_REQUIRED,
+    LIVE_PACKAGE_VERSION,
+    LIVE_SCHEMA_VERSION,
+)
 from .live.errors import LiveError as LiveVerbError
 from .live.config import SUBJECT_PINS as LIVE_SUBJECT_PINS
 from .live.pipeline import LivePaths
@@ -554,8 +560,8 @@ def _cmd_capabilities(_args: argparse.Namespace) -> int:
             "process_descendant_cleanup": dict(descendant_cleanup_capability()),
             "live_adapters": {
                 "capability_state": LIVE_CAPABILITY_STATE,
-                "enabled_by_default": False,
-                "gate_required": True,
+                "enabled_by_default": LIVE_ENABLED_BY_DEFAULT,
+                "gate_required": LIVE_GATE_REQUIRED,
                 "package_version": LIVE_PACKAGE_VERSION,
                 "schema_version": LIVE_SCHEMA_VERSION,
                 "subject_models": {
@@ -601,8 +607,8 @@ def _cmd_version(_args: argparse.Namespace) -> int:
                 "package_version": LIVE_PACKAGE_VERSION,
                 "schema_version": LIVE_SCHEMA_VERSION,
                 "capability_state": LIVE_CAPABILITY_STATE,
-                "enabled_by_default": False,
-                "gate_required": True,
+                "enabled_by_default": LIVE_ENABLED_BY_DEFAULT,
+                "gate_required": LIVE_GATE_REQUIRED,
                 "commands": ["live-preflight", "live-dry-run", "live-run"],
                 "build_dispatches": 0,
                 "build_spend_usd": "$0",

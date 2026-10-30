@@ -16,7 +16,10 @@ from ..canonical import canonical_bytes, sha256_hex
 from . import LIVE_SCHEMA_VERSION
 from .errors import LiveDatasetError
 
+import re
+
 CASE_FILE_NAME = "case.json"
+_CASE_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
 
 
 def _require(condition: bool, message: str) -> None:
@@ -35,7 +38,6 @@ class LiveCase:
     case_id: str
     skill: str
     prompt: str
-    baseline_prompt: str
     skill_instructions: str
     rubric: Mapping[str, Any]
     rubric_sha256: str
@@ -83,7 +85,6 @@ def load_case(path: str) -> LiveCase:
         "case_id",
         "skill",
         "prompt",
-        "baseline_prompt",
         "skill_instructions",
         "rubric",
         "rubric_sha256",
@@ -97,18 +98,16 @@ def load_case(path: str) -> LiveCase:
     case_id = payload.get("case_id")
     skill = payload.get("skill")
     prompt = payload.get("prompt")
-    baseline_prompt = payload.get("baseline_prompt")
     skill_instructions = payload.get("skill_instructions")
     rubric = payload.get("rubric")
     declared = payload.get("rubric_sha256")
     checks = payload.get("deterministic_checks", {})
-    _require(isinstance(case_id, str) and bool(case_id), "case_id must be non-empty")
+    _require(
+        isinstance(case_id, str) and bool(case_id) and _CASE_ID.fullmatch(case_id) is not None,
+        "case_id must be a bounded identifier of [A-Za-z0-9._-]",
+    )
     _require(isinstance(skill, str) and bool(skill), "skill must be non-empty")
     _require(isinstance(prompt, str) and bool(prompt), "prompt must be non-empty")
-    _require(
-        isinstance(baseline_prompt, str) and bool(baseline_prompt),
-        "baseline_prompt must be non-empty (the without-baseline arm is explicit)",
-    )
     _require(
         isinstance(skill_instructions, str) and bool(skill_instructions),
         "skill_instructions must be non-empty (the WITH_SKILL arm loads it)",
@@ -144,7 +143,6 @@ def load_case(path: str) -> LiveCase:
         case_id=case_id,
         skill=skill,
         prompt=prompt,
-        baseline_prompt=baseline_prompt,
         skill_instructions=skill_instructions,
         rubric=dict(rubric),
         rubric_sha256=declared,

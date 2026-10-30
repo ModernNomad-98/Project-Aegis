@@ -7,7 +7,7 @@
   "dataset": {
     "revision": "575e4586ef0f5213474cbe6909a418a06b387105",
     "path": "tools/behavioral_eval_runner/live/cases",
-    "sha256": "5655de6f5dff283a47b698d6d0bbf0f6d2a1f717f31d0094aea3c95f1ba8d7f3",
+    "sha256": "f1094554f85ad11d33268236cc7d85d27e29d2d265dba7e5518a52859f1bb066",
     "case_count": 2
   },
   "models": {

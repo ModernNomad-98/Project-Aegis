@@ -69,10 +69,29 @@ JUDGE_PINS: Mapping[tuple[str, str], ModelPin] = {
     ),
 }
 
+#: The vendor SDK module names (the only place they are written).
+SDK_MODULES: Mapping[str, str] = {
+    "anthropic": "anthropic",
+    "openai": "openai",
+}
+
 #: The only accepted credential environment variables, by vendor.
 CREDENTIAL_ENV_VARS: Mapping[str, str] = {
     vendor: pin.credential_env_var for vendor, pin in SUBJECT_PINS.items()
 }
+
+
+def sdk_importability() -> dict[str, bool]:
+    """Report whether the pinned SDK packages can be located (no import)."""
+    import importlib.util
+
+    result: dict[str, bool] = {}
+    for vendor, module in SDK_MODULES.items():
+        try:
+            result[vendor] = importlib.util.find_spec(module) is not None
+        except (ImportError, ValueError):
+            result[vendor] = False
+    return result
 
 
 def judge_pin_for(subject_pin: ModelPin) -> ModelPin | None:
@@ -93,11 +112,6 @@ def judge_routes_by_subject() -> dict[str, dict[str, str]]:
 
 #: Stop reasons that mean the provider did not finish the response; a partial
 #: answer must never be graded or judged.
-#: Only these provider stop statuses mean the response is complete enough to
-#: grade. Anything else (truncation, filtering, failure, cancellation, an
-#: unknown or missing status) is a transport failure.
-COMPLETE_STOP_REASONS = frozenset({"end_turn", "stop_sequence", "completed"})
-
 #: The OpenAI base URL is pinned explicitly. The Anthropic host is left at the
 #: SDK default because this package's static-safety rule bans the provider host
 #: literal everywhere; instead, every base-URL, proxy and TLS environment
@@ -170,6 +184,8 @@ def extract_usage(usage: Any, *, vendor: str) -> "ProviderUsage":
 
 def ensure_complete_response(stop_reason: str, *, vendor: str) -> None:
     """Only an allowlisted complete status is graded; all else fails closed."""
+    from .transport import COMPLETE_STOP_REASONS
+
     lowered = (stop_reason or "").lower()
     if lowered not in COMPLETE_STOP_REASONS:
         raise ProviderTransportError(

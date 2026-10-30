@@ -64,7 +64,7 @@ class SubjectAdapter:
         max_output_tokens: int,
         timeout_seconds: int,
     ) -> None:
-        if pin.vendor not in SUBJECT_PINS or SUBJECT_PINS[pin.vendor].model != pin.model:
+        if pin != SUBJECT_PINS.get(pin.vendor):
             raise ModelPinMismatchError(
                 f"{pin.vendor}/{pin.model} is not the pinned subject identifier",
                 context={"vendor": pin.vendor, "requested_model": pin.model},

@@ -31,7 +31,13 @@ from ..evidence import (
     EvidenceWriter,
     verify_final_bundle,
 )
-from . import LIVE_CAPABILITY_STATE, LIVE_PACKAGE_VERSION, LIVE_SCHEMA_VERSION
+from . import (
+    LIVE_CAPABILITY_STATE,
+    LIVE_ENABLED_BY_DEFAULT,
+    LIVE_GATE_REQUIRED,
+    LIVE_PACKAGE_VERSION,
+    LIVE_SCHEMA_VERSION,
+)
 from .config import JUDGE_PINS, SUBJECT_PINS, LiveConfig
 from .cost_meter import CostMeter
 from .credentials import (
@@ -135,9 +141,6 @@ def _planned_calls(config: LiveConfig, cases: Sequence[LiveCase]) -> int:
         * len(config.subject_vendors)
         * 2
     )
-
-
-RUN_ID_PATTERN = None
 
 
 def _validate_run_id(run_id: str) -> None:
@@ -322,6 +325,9 @@ def preflight(
         },
     }
     report["judge_policy_sha256"] = LIVE_JUDGE_POLICY_SHA256
+    from .providers import sdk_importability
+
+    report["sdk_importable"] = sdk_importability()
     report["allowlist"] = config.judge_allowlist.to_dict()
     report["effective_ceiling_cents"] = gate.effective_ceiling_cents(config)
     report["planned_calls"] = _planned_calls(config, cases)
@@ -364,6 +370,21 @@ def preflight(
             )
     required_vendors = _required_credential_vendors(config)
     missing = missing_credential_env_vars(required_vendors, environ)
+    from .providers import detect_transport_env_violations
+
+    transport_violations = detect_transport_env_violations(environ)
+    report["transport_environment"] = {
+        "violations": transport_violations,
+        "policy": "no base-URL, proxy or TLS override is approved",
+    }
+    if transport_violations:
+        blockers.append(
+            {
+                "reason_code": "TRANSPORT_ENV_REFUSED",
+                "detail": "transport environment overrides are refused",
+                "context": {"violations": transport_violations},
+            }
+        )
     report["credentials"] = {
         "required_vendors": required_vendors,
         "required_env_vars": [
@@ -476,7 +497,6 @@ def _execute(
     judge_transports: Mapping[str, SubjectTransport],
     transport_class: str,
 ) -> dict[str, Any]:
-    case_hashes = frozenset(case.record_sha256 for case in cases)
     state = _RunState()
     planned = _planned_calls(config, cases)
     meter = CostMeter(
@@ -489,7 +509,9 @@ def _execute(
     stop_reason: str | None = None
     for case in cases:
         for arm in ARMS:
-            prompt = case.prompt if arm == "WITH_SKILL" else case.baseline_prompt
+            # Both arms receive the SAME user prompt; only the skill
+            # instructions differ, so the comparison is not confounded.
+            prompt = case.prompt
             for run_index in range(1, config.runs_per_case + 1):
                 for subject_vendor in config.subject_vendors:
                     if stop_reason is not None:
@@ -519,7 +541,6 @@ def _execute(
                             config=config,
                             gate=gate,
                             transport_class=transport_class,
-                            case_hashes=case_hashes,
                             meter=meter,
                             subject_transport=subject_transports[subject_vendor],
                             judge_transport=judge_transports[subject_vendor],
@@ -595,17 +616,11 @@ def _execute_one(
     config: LiveConfig,
     gate: OwnerGateRecord,
     transport_class: str,
-    case_hashes: frozenset[str],
     meter: CostMeter,
     subject_transport: SubjectTransport,
     judge_transport: SubjectTransport,
     judge_pins: Mapping[str, Any],
 ) -> dict[str, Any]:
-    if case.record_sha256 not in case_hashes:
-        raise JudgeRubricSourceError(
-            "the case did not come from the verified committed dataset",
-            context={"case_id": case.case_id},
-        )
     subject_pin = SUBJECT_PINS[subject_vendor]
     judge_pin = judge_pins[subject_vendor]
     adapter = SubjectAdapter(
@@ -635,6 +650,17 @@ def _execute_one(
             handle, reason_code=exc.reason_code, detail=str(exc)
         )
         raise
+    except Exception as exc:  # noqa: BLE001 - a foreign transport must not bypass the halt path
+        from .errors import ProviderTransportError
+
+        error = ProviderTransportError(
+            f"subject transport raised {type(exc).__name__}",
+            context={"request_id": request.request_id},
+        )
+        meter.release_unreconciled(
+            handle, reason_code=error.reason_code, detail=str(error)
+        )
+        raise error from exc
     meter.reconcile(
         handle,
         input_tokens=subject_result.usage.input_tokens,
@@ -674,6 +700,17 @@ def _execute_one(
             judge_handle, reason_code=exc.reason_code, detail=str(exc)
         )
         raise
+    except Exception as exc:  # noqa: BLE001 - a foreign transport must not bypass the halt path
+        from .errors import ProviderTransportError
+
+        error = ProviderTransportError(
+            f"judge transport raised {type(exc).__name__}",
+            context={"request_id": judge_request.request_id},
+        )
+        meter.release_unreconciled(
+            judge_handle, reason_code=error.reason_code, detail=str(error)
+        )
+        raise error from exc
     meter.reconcile(
         judge_handle,
         input_tokens=judge_result.usage.input_tokens,
@@ -833,10 +870,20 @@ def _write_evidence(
         outcome["status"],
     )
     verification = verify_final_bundle(paths.evidence_root)
-    if verification.get("final_report_sha256") != final_bundle.final_report_sha256:
+    expected_hashes = {
+        "final_report_sha256": final_bundle.final_report_sha256,
+        "final_evidence_manifest_sha256": final_bundle.final_evidence_manifest_sha256,
+        "input_evidence_manifest_sha256": input_bundle.input_evidence_manifest_sha256,
+    }
+    mismatched = {
+        key: {"expected": expected, "observed": verification.get(key)}
+        for key, expected in expected_hashes.items()
+        if verification.get(key) != expected
+    }
+    if mismatched:
         raise LiveError(
             "the evidence bundle did not verify against the finalized hashes",
-            context={"verification": dict(verification)},
+            context={"mismatched": mismatched},
             reason_code="EVIDENCE_VERIFICATION_FAILED",
         )
     return {
@@ -948,6 +995,9 @@ def live_run(
                 "gate_dataset_revision": gate.dataset_revision,
             },
         )
+    from .providers import require_clean_transport_environment
+
+    require_clean_transport_environment(environ)
     credentials = resolve_credentials(
         _required_credential_vendors(config), environ
     )

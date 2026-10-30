@@ -167,6 +167,7 @@ class CostHaltIntegrationTests(unittest.TestCase):
                 served_model="not-the-pin",
                 text="x",
                 usage=ProviderUsage(10, 10),
+                stop_reason="end_turn",
             )
 
         with tempfile.TemporaryDirectory() as tmp:

@@ -97,8 +97,3 @@ class ProviderTransportError(LiveError):
 
     reason_code = "TRANSPORT_ERROR"
 
-
-class LiveRunHaltError(LiveError):
-    """A run halted and the remaining work is UNRUN (never PASS)."""
-
-    reason_code = "RUN_HALTED"

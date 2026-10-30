@@ -49,6 +49,7 @@ def _response(model: str, text: str = "ok", *, served: str | None = None):
         served_model=served if served is not None else model,
         text=text,
         usage=ProviderUsage(10, 5),
+        stop_reason="end_turn",
     )
 
 
@@ -108,6 +109,7 @@ class SubjectPinningTests(unittest.TestCase):
                 served_model="",
                 text="x",
                 usage=ProviderUsage(1, 1),
+                stop_reason="end_turn",
             )
         )
         adapter = self._adapter("openai", transport)

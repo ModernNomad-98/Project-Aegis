@@ -247,8 +247,10 @@ measured result.
 ## Live adapters are gated (not enabled by default)
 
 The `live/` subpackage is the enablement surface for pilot A. **Live capability
-state is GATED**: importing the package starts nothing, the default transport
-denies every dispatch, and every live verb requires an owner gate record.
+state is GATED**: importing the package starts nothing, the abstract default
+transport denies every dispatch, no live verb constructs the vendor SDK
+transport without a real-host gate and keys, and every live verb requires an
+owner gate record.
 
 **Strict model pinning.** The subject pins are `claude-sonnet-5-5` (Anthropic)
 and `gpt-6-astra` (OpenAI). The adapter requests exactly that string and records

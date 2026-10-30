@@ -74,6 +74,12 @@ class ProviderUsage:
         }
 
 
+#: Only these provider stop statuses mean the response is complete enough to
+#: grade. Anything else (truncation, filtering, failure, cancellation, unknown)
+#: is a transport failure.
+COMPLETE_STOP_REASONS = frozenset({"end_turn", "stop_sequence", "completed"})
+
+
 @dataclass(frozen=True, slots=True)
 class ProviderResponse:
     """One provider response. served_model is what the provider returned."""
@@ -97,8 +103,18 @@ class ProviderResponse:
                 "a model identifier cannot be pin-verified",
                 context={"response_id": self.response_id},
             )
-        if not isinstance(self.text, str):
-            raise ProviderTransportError("response text must be a string")
+        if not isinstance(self.text, str) or not self.text.strip():
+            raise ProviderTransportError(
+                "the provider returned empty or non-string response text",
+                context={"response_id": self.response_id},
+            )
+        if not isinstance(self.stop_reason, str) or self.stop_reason.lower() not in COMPLETE_STOP_REASONS:
+            raise ProviderTransportError(
+                f"the provider response is not clearly complete (status "
+                f"{self.stop_reason!r}); a partial, failed or unknown response "
+                "is not graded or judged",
+                context={"response_id": self.response_id, "stop_reason": self.stop_reason},
+            )
         if not isinstance(self.usage, ProviderUsage):
             raise ProviderTransportError("response usage must be ProviderUsage")
         self.usage.validate()

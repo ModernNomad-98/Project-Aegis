@@ -166,6 +166,7 @@ def mock_subject_transport():
             served_model=request.model,
             text=text,
             usage=ProviderUsage(input_tokens=len(request.user_content), output_tokens=32),
+            stop_reason="end_turn",
         )
 
     return MockTransport(handler, name="mock-subject")
@@ -197,6 +198,7 @@ def mock_judge_transport():
             served_model=request.model,
             text=canonical_json(verdict),
             usage=ProviderUsage(input_tokens=len(request.user_content), output_tokens=64),
+            stop_reason="end_turn",
         )
 
     return MockTransport(handler, name="mock-judge")

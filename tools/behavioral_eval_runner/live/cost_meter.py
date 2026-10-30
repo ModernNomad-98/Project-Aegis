@@ -141,7 +141,7 @@ class CostMeter:
                 call_ref,
                 {"calls": 1, "monetary_cents": reserved},
             )
-        except ReservationDeniedError as exc:
+        except BudgetError as exc:
             self._record_halt(
                 reason_code="BUDGET_CAP",
                 detail=str(exc),
