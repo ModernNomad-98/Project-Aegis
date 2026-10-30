@@ -12,6 +12,8 @@
 # AUTHORIZED_SDK_SDIST_SHA256 (checked by scripts/tests/test_offline_ci.py).
 # Tests use fake transports and synthetic credentials, never a real provider call.
 openai==3.0.0
+# Anthropic Python SDK, pinned per owner grant AEGIS-APR-160 (one-time).
+anthropic==2.3.0
 # tqdm needs colorama on Windows only. Pin it on every platform so a lock
 # compiled on Linux (for example by Dependabot) still installs on windows-latest.
 colorama
