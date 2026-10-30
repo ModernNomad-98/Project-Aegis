@@ -13,7 +13,8 @@ re-run, or argued with, without access to the script that executed it.
 | Of which manifest-shipped (`tools/skills-manifest.json`) | 254 |
 | Of which excluded from the manifest (`_template`) | 1 |
 | Total bytes | 2,962,866 |
-| Total lines | 48,478 |
+| Total lines (this record's convention — see below) | 48,478 |
+| Total lines by the conventional `wc -l` count | 48,224 |
 | Files modified | 0 |
 
 The unit of work is the whole file, not the frontmatter and not the body
@@ -27,6 +28,18 @@ the working tree of a `git worktree add --detach` checkout of that commit.
 `OK: 254 skill(s) valid, 0 warning(s)` — that is the validator's 254, which
 excludes `_template`. The scan covers all 255.
 
+**Line convention — `L` defined.** A file's line count `L` in this record is
+`len(text.split("\n"))` on the decoded text, the Python split convention: a
+file that ends with a newline contributes one extra, empty trailing element.
+254 of the 255 files end with a newline, so summing `L` gives **48,478**, while
+the conventional `wc -l` count (newline-terminated lines) gives **48,224** —
+exactly 254 fewer. Every line-derived figure inherits the convention: 2,058
+chunks under the split count versus **2,051** conventional, and 2,025 clean
+chunks versus **2,018**. The `lines` column of `PER-SKILL.tsv` is `L` per file
+under the same convention. The conventional alternatives are published beside
+the counts so a reader using `wc -l` can reconcile them; they are not the basis
+of any figure in this record.
+
 ## 2. Chunking
 
 Both tiers operate on the same fixed grid so that "flagged" and "clean" are
@@ -34,13 +47,17 @@ comparable and the sample is reproducible:
 
 - Chunk size: **25 lines**, 0-based index `chunk = floor((line - 1) / 25)`.
 - A file of `L` lines has `ceil(L / 25)` chunks (minimum 1).
-- Total chunks: 2,058. Flagged: 33. Clean: 2,025.
+- Total chunks: 2,058 (2,051 by the conventional `wc -l` count; §1).
+  Flagged: 33 (the same 33 either way). Clean: 2,025 (2,018 conventional).
 - A chunk is **flagged** if any Tier-1 rule matched a line inside it.
 
 ## 3. Tier 1 — deterministic rules
 
 Tier 1 is a pure function of file bytes: no model, no network, no judgement.
 Each rule reports `(rule, category, line, column, redacted snippet)`.
+
+The pass applies **35 tests**: **28 named regex rules** in §3.1 plus 7
+per-character families in §3.2.
 
 ### 3.1 Regex rules
 
@@ -84,8 +101,20 @@ Each rule reports `(rule, category, line, column, redacted snippet)`.
 | UNI-SOFT-HYPHEN | U+00AD | invisible-unicode |
 | UNI-NBSP | U+00A0 | invisible-unicode |
 | UNI-CONTROL | C0 except TAB/LF/VT/FF/CR, DEL, C1 | control-char |
-| UNI-HOMOGLYPH | one token mixing Latin with Cyrillic or Greek letters | invisible-unicode |
+| UNI-HOMOGLYPH | one whitespace-delimited token (punctuation stripped) mixing a **non-ASCII** Latin letter with a Cyrillic or Greek letter | invisible-unicode |
 | UNI-BOM | U+FEFF at byte offset 0 | invisible-unicode |
+
+**Coverage limit (published in the Stage F rework).** These seven families are
+the complete Tier-1 character coverage. **Tag characters (U+E0000–U+E007F) are
+not tested by any family**, and neither is any other Unicode character class or
+confusable family outside the list above; the Tier-2 rubric's concealment test
+names tag characters, but no Tier-1 rule tests them, and this record makes no
+claim about them. `UNI-HOMOGLYPH` is also narrower than "a homoglyph": its
+Latin side must be a **non-ASCII** Latin letter, so a token mixing ASCII Latin
+with Cyrillic lookalikes (for example `pаypal` with U+0430) is not flagged. Both
+limits are published rather than repaired — changing the rule table after the
+run would invalidate the published counts — and neither changes a result: both
+produced 0 hits.
 
 ### 3.3 Exact regular expressions
 
@@ -121,6 +150,24 @@ Case-insensitive unless the pattern has no letters. Pipes are literal here
     MK-IMG             <img\b
     MK-EMPTY-LINK      \[\s*\]\(
 
+### 3.4 Implementation notes
+
+Two details of the executed pass are not expressible in the tables above; both
+are published so that a reimplementation from §3.1–3.3 alone behaves the same.
+
+- **The `ENC-B64` class filter is `scan.py`-only.** The pattern in §3.3 matches
+  a 60+ character base64 run; the requirement that the run contain a lower-case
+  letter, an upper-case letter and a digit is applied as a **post-filter on each
+  regex match** in `scan.py` (lines 99–102), not inside the pattern. A
+  reimplementation must add that filter after matching, or it will flag
+  homogeneous runs that this pass skipped. The rule produced 0 published rows,
+  so no count depends on it, but the published rule is reproducible only with
+  this note.
+- **Category label.** `scan.py` carries the internal category
+  `tool-call-request` for `TC-EXEC`, `TC-PIPE-SHELL` and `TC-CHAT-TEMPLATE`; the
+  published tables use `tool-call`, the vocabulary of §3.1. The two published
+  `TC-EXEC` rows are relabelled only; no hit, line or verdict changes.
+
 The rules are deliberately over-broad. That is the point of Tier 1: it is a
 recall machine whose output is then adjudicated, not a classifier whose output
 is trusted. A 100% Tier-1 false-positive rate was the expected outcome on a
@@ -140,9 +187,14 @@ Mersenne Twister, fixed seed — over the clean list sorted by `(skill, chunk)`:
     n = round(2025 * 10 / 100) = 202
     sample = sorted(Random(20261029).sample(clean, 202))
 
-That is 9.98% of the clean chunks and 9.8% of all chunks. The sampled pairs are
-published in `evidence/sample-verdicts.tsv` with their chunk index and absolute
-line range, so the draw can be checked without rerunning it.
+That is 202 / 2,025 = **9.98%** of the clean chunks and 202 / 2,058 = 9.8% of
+all chunks, under this record's line convention. The conventional clean count
+is 2,018, which gives **202 / 2,018 = 10.01%**, and the conventional
+2,051-chunk grid draws a *different* sample from the same seed: **10.01% and
+the conventional draw are explicitly not the basis of the published sample**.
+The split-convention draw is the one published in
+`evidence/sample-verdicts.tsv` with chunk index and absolute line range, so it
+can be checked without rerunning it.
 
 ## 5. Tier 2 — adjudication rubric
 
@@ -201,7 +253,14 @@ six words.
   `{CLEAN, SUSPECT, INJECTION}`, every line an integer, every rationale ≤200
   characters. Zero format defects.
 - The merge is mechanical: the four TSVs are joined on the chunk id and sorted
-  by id. It cannot reorder or relabel a verdict.
+  by id. It cannot reorder or relabel a verdict. The join enriches each
+  five-field adjudicator line (`id`, `verdict`, `category`, `line`, `why`) into
+  the eight published columns: `id`, `verdict`, `category` and `why` pass
+  through unchanged, the rubric's `line` is published as `evidence_line` (the
+  same integer), and `skill`, `chunk_index` and `lines` are joined from the
+  chunk manifest. `lines` is the chunk's absolute range (for example
+  `176-200`) and is not the adjudicator's `line`. No rubric field is dropped or
+  reinterpreted, and `evidence/RUBRIC.md` is published unchanged.
 - Each session read the chunk text with blank lines removed and absolute line
   gutters; the packaging script is deterministic and its sha256 is recorded in
   section 8. Nothing was summarised, filtered or paraphrased before
@@ -214,10 +273,14 @@ six words.
 ## 7. Redaction
 
 Published snippets are cut to 200 characters, tabs are flattened, and every
-non-printable or non-ASCII character is rendered as a `\uXXXX` escape. Long
-base64 runs are replaced by an 8-character prefix plus a byte count; 40+ char
-hex runs the same way; any `key: value` where the key names a credential is
-replaced with `[REDACTED]`. The flag list therefore shows where a payload is
+non-printable or non-ASCII character is rendered as a `\uXXXX` escape. A
+snippet is the first 200 characters of the redacted line, except for the four
+hits whose match starts beyond column 200: those publish a 200-character window
+that starts at the first word boundary at or after 60 characters before the
+match, so the matched token is visible. The `col` column gives the exact
+1-based position in the source line in every row. Long base64 runs are replaced
+by an 8-character prefix plus a byte count; 40+ char hex runs the same way; any
+`key: value` where the key names a credential is replaced with `[REDACTED]`. The flag list therefore shows where a payload is
 without republishing it. No live secret was found, so nothing had to be
 withheld from the published tables.
 

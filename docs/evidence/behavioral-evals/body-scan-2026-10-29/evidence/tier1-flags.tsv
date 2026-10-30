@@ -9,7 +9,7 @@ TC-EXEC	tool-call	lexical	contribution-guide-author	77	22	formatter/linter (run 
 CR-REQUEST	credential-request	lexical	environment-parity-reviewer	279	12	- Asked to paste, show, compare or print secret values ("paste the
 OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	3	99	description: 'Review an LLM feature for hidden context exposure (OWASP LLM08:2026, formerly LLM07 System Prompt Leakage) across every non-user-facing input the model sees: system prompt, developer ins
 OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	3	173	description: 'Review an LLM feature for hidden context exposure (OWASP LLM08:2026, formerly LLM07 System Prompt Leakage) across every non-user-facing input the model sees: system prompt, developer ins
-OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	3	697	description: 'Review an LLM feature for hidden context exposure (OWASP LLM08:2026, formerly LLM07 System Prompt Leakage) across every non-user-facing input the model sees: system prompt, developer ins
+OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	3	697	secrets to secrets-identity-hardener. Use when facing a system prompt leak, tool schema exposure, retrieved policy leak, developer-instruction exposure, or security that depends on prompt secrecy. Do
 OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	12	37	end users are not meant to see: the system prompt, developer instructions,
 OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	22	38	kind of hidden context, not just the system prompt. First, CONTENTS: hidden
 OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	36	25	- Use when: reviewing a system prompt or developer instructions for leaked
@@ -26,7 +26,7 @@ OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	2
 OV-SYSTEM-PROMPT	instruction-override	lexical	hidden-context-exposure-reviewer	256	31	the per-type contents scan (system prompt, developer instructions,
 MK-IMG	invisible-markup	structural	llm-output-safety-reviewer	210	4	`<img onerror=\u2026>` inside markdown becomes XSS unless raw HTML is disabled or
 CR-REQUEST	credential-request	lexical	notification-webhook-ux-designer	22	35	surface with a delivery log, test-send, replay, and secret rotation. It
-RP-JAILBREAK	role-play	lexical	prompt-injection-defender	3	680	description: MANUAL-ONLY; never auto-invoke. Design the layered defense against prompt injection (OWASP LLM01) for an LLM feature or agent \u2014 establish trust zones (trusted rules vs untrusted user
+RP-JAILBREAK	role-play	lexical	prompt-injection-defender	3	680	Use when hardening an AI feature against injection or jailbreaks, or after ai-threat-modeler flags an injection risk. Do NOT use for the whole AI threat model (ai-threat-modeler), retrieval authorizat
 RP-JAILBREAK	role-play	lexical	prompt-injection-defender	44	23	prompt injection or jailbreaks.
 OV-IGNORE-ANY	instruction-override	lexical	prompt-injection-defender	79	5	"ignore instructions in documents" prompt lines (note: not enforcement).
 OV-IGNORE-ANY	instruction-override	lexical	prompt-injection-defender	151	13	direct ("ignore instructions\u2026"), indirect (payload in a retrieved doc),
@@ -35,11 +35,11 @@ OV-SYSTEM-PROMPT	instruction-override	lexical	prompt-injection-defender	211	7	- 
 CR-REQUEST	credential-request	lexical	resilience-architecture-reviewer	235	18	- Never ask for, print or store a credential value. Name credentials by
 URL-HTTP	external-url	lexical	rls-policy-auditor	18	29	PostgreSQL's [row-security](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
 URL-HTTP	external-url	lexical	rls-policy-auditor	19	14	and [policy](https://www.postgresql.org/docs/current/sql-createpolicy.html)
-CR-REQUEST	credential-request	lexical	secrets-identity-hardener	47	302	- Stored-credential rows and their migration state (password hashes, API-key/token hashes or envelopes, active rotation versions) when the ask is stored-credential hardening or legacy-hash migration;
+CR-REQUEST	credential-request	lexical	secrets-identity-hardener	47	302	needed to verify zero legacy rows - never read, print or output hashes or secret values.
 CR-REQUEST	credential-request	lexical	secrets-identity-hardener	95	4	print the secret values themselves.
 CR-REQUEST	credential-request	lexical	secrets-identity-hardener	139	9	- Never print, log, echo, or commit secret VALUES; operate on names and
 OV-SYSTEM-PROMPT	instruction-override	lexical	sensitive-disclosure-guard	31	44	- Do NOT use when: the secret lives in the system prompt or other hidden context
 URL-HTTP	external-url	lexical	supply-chain-security-reviewer	288	36	See [PyTorch's loading guidance](https://docs.pytorch.org/docs/stable/generated/torch.load.html).
-CR-REQUEST	credential-request	lexical	vite-build-qa-engineer	3	223	description: MANUAL-ONLY; never auto-invoke. QA the Vite build itself \u2014 run the production build and check the client bundle for known secret exposure by named, redacted checks (audit configured
+CR-REQUEST	credential-request	lexical	vite-build-qa-engineer	3	223	checks (audit configured env prefixes, inspect dist output without printing secret values, check define/import.meta.env usage), verify build/preview parity, output size and sourcemap policy, assets an
 CR-REQUEST	credential-request	lexical	vite-build-qa-engineer	31	26	- Use when: adding build-output checks (bundle budget, secret grep,
 CR-REQUEST	credential-request	lexical	vite-build-qa-engineer	76	25	what shipped. Do not print secret values or matching bundle excerpts;

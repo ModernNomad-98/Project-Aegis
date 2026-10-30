@@ -10,11 +10,13 @@ SKILL.md body in this repository at base commit
 `501dff1f57246c25ae099b7b21d40915e373e9a3` (== `origin/main` at the time of
 the run), the deterministic rules that produced 44 candidate hits, the written
 rubric used to adjudicate them, and the adjudicated result — including the
-finding that there is no prompt injection in the corpus.
+finding that none of the 33 flagged chunks nor the 202 sampled clean chunks
+contains an injection.
 
 ## Result in one line
 
-255 files scanned (`2,962,866` bytes, `48,478` lines); 44 Tier-1 deterministic
+255 files scanned (`2,962,866` bytes, `48,478` lines by the `split("\n")`
+convention — `48,224` by `wc -l`; METHOD.md §1); 44 Tier-1 deterministic
 hits across 16 skills; 33 flagged chunks and 202 randomly sampled clean chunks
 adjudicated (`235` of `235`); **0 INJECTION, 0 SUSPECT**; every
 Tier-1 flag dismissed as a false positive (`44 of 44 hits; 33 of 33 chunks`); external spend **$0.00**
@@ -33,15 +35,32 @@ plus `_template/SKILL.md`, the skill-authoring template, which the validator
 and the manifest exclude.
 
 This scan covers **all 255** — the 254 shipped skills and the template — so the
-superset requirement is met and the owner's 254 is accounted for exactly. Every
-table in this directory carries both counts, and `PER-SKILL.tsv` marks each row
-`shipped=yes|no`.
+superset requirement is met and the owner's 254 is accounted for exactly. Both
+counts are stated wherever a count is given (the Result line above and
+`RESULTS.md` §2), and `PER-SKILL.tsv` marks each row `shipped=yes|no`. Not every
+table in this directory carries both counts: the Files, Spend and per-rule
+tables do not.
+
+## Deviations recorded here
+
+- **255 scanned, not the decision's 254.** Deliberate superset; see the scope
+  note above.
+- **No row was added to `docs/evidence/README.md`.** That index is a curated
+  **19-row** set created 2026-09-23 that states its own row count and that
+  "exactly four rows post-date it". Adding this publication would change both
+  that count and its provenance paragraph — a separate index change with its own
+  evidence — so the row is deliberately omitted. The omission is recorded here,
+  in the committed publication, rather than only in the lane's out-of-tree
+  record.
+- **The Tier-1 and packaging scripts are not committed.** They are retained
+  out-of-tree with their sha256 recorded (METHOD.md §8).
 
 ## What this record is
 
-- A complete, reproducible Tier-1 pass over every body: 29 named regex rules
-  plus hidden-Unicode, control-character, homoglyph and byte-order-mark
-  families (METHOD.md, "Tier 1").
+- A complete, reproducible Tier-1 pass over every body: **28** named regex
+  rules plus 7 per-character families — zero-width, bidi, soft hyphen, NBSP,
+  C0/C1 control characters, homoglyphs and byte-order mark (METHOD.md
+  §3.1–3.2, which also states what the families do **not** cover).
 - A Tier-2 adjudication of every flagged 25-line chunk and of a fixed 10%
   random sample of the clean chunks, against a rubric written before any
   verdict was recorded (METHOD.md, "Tier 2").
@@ -70,8 +89,11 @@ table in this directory carries both counts, and `PER-SKILL.tsv` marks each row
   disjoint batches; no chunk was independently re-adjudicated (METHOD.md,
   "Limits").
 - **Excerpts are redacted.** Published snippets are capped at 200 characters
-  and non-printable characters are escaped (METHOD.md, "Redaction"), so a
-  reader cannot re-check every byte from this directory alone.
+  and non-printable characters are escaped (METHOD.md, "Redaction"); the four
+  hits that start beyond column 200 publish a 200-character window around the
+  match instead of the line head, so the token is visible but the snippet is
+  not a verbatim line prefix. A reader cannot re-check every byte from this
+  directory alone.
 - **No SKILL.md was modified.** The scan is read-only. This record fixes no
   skill, and any repair needs a separate GO.
 

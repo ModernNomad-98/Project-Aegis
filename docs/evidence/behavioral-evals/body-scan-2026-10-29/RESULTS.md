@@ -23,12 +23,12 @@ quotation, refusal and threat-model prose, not injection.
 | SKILL.md files scanned | 255 |
 | Manifest-shipped skills (validator's "254") | 254 |
 | Non-shipped file (`_template/SKILL.md`) | 1 |
-| Lines | 48,478 |
+| Lines (split convention; `wc -l` gives 48,224) | 48,478 |
 | Bytes | 2,962,866 |
-| 25-line chunks | 2,058 |
+| 25-line chunks (split convention; `wc -l` gives 2,051) | 2,058 |
 | Chunks flagged by Tier 1 | 33 |
-| Clean chunks | 2,025 |
-| Clean chunks sampled (10%, seed 20261029) | 202 (9.98%) |
+| Clean chunks (split convention; `wc -l` gives 2,018) | 2,025 |
+| Clean chunks sampled (10%, seed 20261029) | 202 (9.98% of 2,025; 10.01% of 2,018 is **not** the basis) |
 | Files modified | 0 |
 
 ## 3. Tier 1 — deterministic flags
@@ -74,16 +74,30 @@ quotation, refusal and threat-model prose, not injection.
 | UNI-BOM | invisible-unicode | 0 |
 
 The zero rows matter as much as the non-zero ones: **no file in the corpus
-contains a zero-width character, a bidi control, a tag character, a C0/C1
-control character, a homoglyph token, a BOM, an HTML comment, hidden CSS, a
-collapsible block, an empty-text link, a long base64 or hex blob, an escape
-run, a percent-encoded run, a `data:` URI or an email address.** The one
+matched any of the seven published per-character families — zero-width, bidi,
+soft hyphen, NBSP, C0/C1 control characters, the published homoglyph test or a
+BOM — and none matched an HTML comment, hidden CSS, a collapsible block, an
+empty-text link, a long base64 or hex blob, an escape run, a percent-encoded
+run, a `data:` URI or an email address.** That is the exact scope of the claim.
+**Tag characters (U+E0000–U+E007F) are not covered by Tier 1 and no claim is
+made about them**: the rubric's concealment test names them, but no published
+rule tests them (METHOD.md §3.2). The published `UNI-HOMOGLYPH` test is also
+narrower than "a homoglyph" — it fires only on a token mixing a Cyrillic or
+Greek letter with a **non-ASCII** Latin letter — and it produced 0 hits. The one
 structural-class match is a quoted `<img onerror=…>` example inside
 `llm-output-safety-reviewer` (`MK-IMG`), adjudicated CLEAN as a quotation: 43
 of the 44 hits are lexical. **Structural findings: 0.**
 
 The three `URL-HTTP` hits are links to the PostgreSQL and PyTorch project
 documentation; there is no other external link anywhere in the 255 bodies.
+
+Four of the 44 hits start beyond column 200: `hidden-context-exposure-reviewer`
+L3 col 697, `prompt-injection-defender` L3 col 680,
+`secrets-identity-hardener` L47 col 302 and `vite-build-qa-engineer` L3
+col 223. For those four rows `evidence/tier1-flags.tsv` publishes a
+200-character window starting at the first word boundary at or after 60
+characters before the match, instead of the line head, so the matched token is
+visible; `col` gives the exact 1-based source position in every row.
 
 ## 4. Tier 2 — adjudication
 
@@ -99,13 +113,18 @@ Verdicts: **CLEAN 235 / SUSPECT 0 / INJECTION 0**.
 Every sampled clean chunk came back CLEAN, which is the expected direction: the
 sample exists to test whether Tier 1 misses anything, and it did not.
 
-The sample is complete: 202 of 202 drawn chunks adjudicated, 9.98% of the
-clean set. The 235 verdicts came from four parallel DeepSeek V4 Flash
-sessions, one batch each, none able to see another's output, and passed a
+The sample is complete: 202 of 202 drawn chunks adjudicated, 202 / 2,025 =
+9.98% of the clean set under this record's line convention (10.01% of the
+conventional 2,018 is not the basis; METHOD.md §4). The 235 verdicts came from
+four parallel DeepSeek V4 Flash sessions, one batch each, none able to see
+another's output, and passed a
 format validation before use: 235 of 235 expected ids, no duplicates, no
 unknown ids, every verdict in range, every line an integer, zero defects.
 Batch-01 carried the 33 flagged chunks and 26 sampled chunks; batches 02–04
-carried 59, 59 and 58 sampled chunks.
+carried 59, 59 and 58 sampled chunks. Both verdict tables are the merged
+eight-column form: `id`, `skill`, `chunk_index`, `lines` (the chunk's absolute
+range), `verdict`, `category`, `evidence_line` (the rubric's single `line`,
+unchanged) and `why` (METHOD.md §6).
 
 ## 5. False-positive handling
 
@@ -140,9 +159,11 @@ expect to be findings:
 
 Five rule families produced **zero** hits and therefore cost no adjudication:
 encoded blobs (base64/hex/escape/percent), invisible markup (comments, hidden
-CSS, `<details>`, empty links), invisible Unicode (zero-width, bidi, tag,
-homoglyph, BOM), control characters, and email addresses. Their zero counts are
-structural evidence, not a coverage gap.
+CSS, `<details>`, empty links), invisible Unicode (zero-width, bidi, soft
+hyphen, NBSP, homoglyph, BOM — tag characters are **not** tested; see §3),
+control characters, and email addresses. Their zero counts are structural
+evidence for the rules that exist, not a claim that every character class was
+tested.
 
 ## 6. Spend
 
@@ -172,8 +193,9 @@ and is unused, so a later re-scan or a bead on an expanded corpus can spend it.
 - The four adjudication TSVs were validated for id coverage, duplicates,
   verdict vocabulary, integer line numbers and rationale length before merging:
   235/235 ids, 0 format defects.
-- The scan was re-run end to end after the one setup-code fix and reproduced the
-  same file count, hit count and flagged-chunk set.
+- The single authoritative execution followed one aborted invocation that
+  wrote no output (METHOD.md §8). There was no second run and therefore no
+  re-run comparison.
 
 ## 8. UNRUN
 
@@ -188,11 +210,13 @@ and is unused, so a later re-scan or a bead on an expanded corpus can spend it.
 
 ## 9. LIMITATIONS — what a zero result does and does not mean
 
-It means: at `501dff1f`, across all 255 SKILL.md bodies, there is no text that
-addresses a consuming model, overrides its instructions, conceals itself from a
-human reader, exfiltrates data, or smuggles an encoded payload — according to a
-published rule table and a published rubric, read by four adjudicator sessions,
-one batch each (235 of 235 chunks).
+It means: at `501dff1f`, in the 235 chunks that were read — all 33 flagged
+chunks and the 202 sampled clean chunks — none contained text that addresses a
+consuming model, overrides its instructions, conceals itself from a human
+reader, exfiltrates data, or smuggles an encoded payload, according to a
+published rule table and a published rubric. That is a statement about the 235
+adjudicated chunks, not about all 2,025 clean chunks, and not about all 255
+bodies.
 
 It does not mean: that every skill is well-written, in scope, or safe to
 auto-invoke; that the corpus will stay clean; that a determined attacker could
