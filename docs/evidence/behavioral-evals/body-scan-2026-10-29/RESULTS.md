@@ -129,8 +129,10 @@ range), `verdict`, `category`, `evidence_line` (the rubric's single `line`,
 unchanged) and `why` (METHOD.md §6). Because that form is chunk-level and
 carries no rule column, `evidence/flagged-hit-map.tsv` publishes the other
 direction — each of the 44 hits with its `chunk_id`, `rule_id`, `skill`,
-`line` and the chunk's `verdict` — so the 44-hits-to-33-verdicts relationship
-can be audited row by row.
+`line`, `col`, the chunk's `verdict`, and a `note` (the F24/F33 post-hoc
+commentary, `-` elsewhere), unique on `(rule_id, skill, line, col)` — so the
+44-hits-to-33-verdicts relationship can be audited row by row, including the
+three hits that share one line.
 
 ## 5. Tier-1 dismissal handling (not a false-positive rate)
 
@@ -142,7 +144,14 @@ carries that definition beside the value. It is a dismissal
 (false-discovery) rate, **not a false-positive rate**: its denominator is the
 44 flagged items, not the corpus's actual negatives. A true FPR would need all
 2,025 clean chunks adjudicated; 202 were sampled (§4). The 0 of 202 in that
-sample is a statement about the sample, not an estimate of a corpus-wide FPR.
+sample does not establish that the clean set has zero misses: it is consistent
+with a corpus-wide miss rate of up to about **1.5%** at 95% confidence (rule of
+three, 3/202), so it bounds the question loosely rather than answering it, and
+it is not itself a corpus-wide FPR.
+
+The 100% dismissal rate is conditional on the recorded CLEAN verdicts,
+including F24 and F33, whose frozen rationales do not address the rule that
+fired; for those two rows it is not independent assurance.
 
 A 100% dismissal rate is not a failure of the rules — it is what over-broad
 recall rules must produce on a corpus of security skills, and the run is
@@ -154,7 +163,7 @@ of the 33 dismissals carries a line number and a one-clause rationale in
 | Why it fired | Chunks | What the text actually is |
 | --- | --- | --- |
 | Quoted attack string or taxonomy label | 19 | A security or eval skill naming the attack it defends against: `"ignore instructions"` inside a red-team taxonomy, `"system prompt"` as an OWASP category name, a placeholder row in an output template. Rubric test 1 (quotation) → CLEAN. |
-| Refusal, prohibition, or security rule | 5 | The skill forbids exactly what the rule matched: "never ask for, print or store a credential value" (`CR-REQUEST`), "do not print secret values" (`CR-REQUEST`). Rubric test 2 (addressee) → CLEAN. |
+| Refusal, prohibition, or security rule | 5 | The skill forbids exactly what the rule matched: "never ask for, print or store a credential value" (`CR-REQUEST`), "do not print secret values" (`CR-REQUEST`). Rubric test 2 (addressee) disposes of the operator-directed rows; the two model-addressed prohibitions (`F24`, `F33`) answer YES at test 2, so CLEAN is only reached at test 5, and their frozen rationales address other sentences — carried as an open rationale gap in `evidence/flagged-hit-map.tsv`. |
 | Descriptive prose about a risk | 9 | Third-person description of an attack or failure mode — impersonation, prompt text as non-control, bundle secret exposure, vendor documentation links. Nothing is addressed to the consuming model. Rubric test 2 → CLEAN. |
 
 Three specific calls worth showing, because they are the ones a reader would
@@ -169,7 +178,7 @@ expect to be findings:
   `torch.load(..., weights_only=False)` with a link to PyTorch's own hardening
   guide. A supply-chain warning about untrusted checkpoints, not a recipe.
 
-### Rules that were dismissed with no work to do
+### Rule families at or near zero hits
 
 Four rule families produced **zero** hits and therefore cost no adjudication:
 encoded blobs (base64/hex/escape/percent), invisible Unicode (zero-width, bidi,
@@ -189,25 +198,28 @@ every character class was tested.
 | Ceiling reserved | 10.00 |
 | Ceiling drawn | 0.00 |
 
-No paid API call was made. Tier 1 is local and free. Tier 2 re-used
-existing DeepSeek V4 Flash agent capacity (four adjudicator sessions); no
-provider request, no vendor key and no per-token billing left the harness. The `$10` ceiling was reserved for the run
-and is unused, so a later re-scan or a bead on an expanded corpus can spend it.
+No new paid API call, vendor key or per-token billing was created for this
+run. Tier 1 is local and free. Tier 2 re-used existing DeepSeek V4 Flash agent
+capacity (four adjudicator sessions); **provider contact is not claimed**:
+whether those sessions reach a provider is a property of the harness and is not
+established here. The `$10` ceiling was reserved for the run and is unused, so a
+later re-scan or a bead on an expanded corpus can spend it.
 
 ## 7. Verification performed
 
-- `git diff --name-status origin/main...HEAD` lists only files under
-  `docs/evidence/behavioral-evals/body-scan-2026-10-29/` — the publication's
-  ten files added by its own pull request, and the six modified plus two added
-  by the post-merge repair pass it records in `REVIEW-DISPOSITION.md`.
-  Docs-only.
+- `git diff --name-status 575e4586..HEAD` lists only the eight paths this
+  repair pass touches under docs/evidence/behavioral-evals/body-scan-2026-10-29/
+  (six modified, two added). The publication's ten original files were added by
+  PR #976 at 575e4586, not by this branch. Docs-only.
 - `python -P scripts/validate-skills.py` on the branch: `OK: 254 skill(s) valid`.
   (Run for assurance; it is unaffected by documentation.)
-- Each of the nine reviewed files' sha256 is in `HASHES.sha256` — the two
-  files the repair pass added are outside that manifest, and their digests are
-  in `REVIEW-DISPOSITION.md` — and the corpus hashes are in `PER-SKILL.tsv`,
-  so a reader can confirm the scan read the same bytes it reports on.
-- The 44 hit rows (42 distinct lines) and 33 flagged chunk ranges are published
+- Each of the nine reviewed files' sha256 is in `HASHES.sha256` at this
+  head. The two files the repair pass added are outside that manifest: the
+  map's digest is in `REVIEW-DISPOSITION.md`, and `REVIEW-DISPOSITION.md`'s own
+  digest is recorded in the pull request body. The corpus hashes are in
+  `PER-SKILL.tsv`, so a reader can confirm the scan read the same bytes it
+  reports on.
+- The 44 hit rows (42 distinct (skill, line) pairs) and 33 flagged chunk ranges are published
   with absolute line numbers; `evidence/sample-verdicts.tsv` states the chunk
   index and line range of every sampled chunk, and
   `evidence/flagged-hit-map.tsv` names the chunk verdict for each of the 44

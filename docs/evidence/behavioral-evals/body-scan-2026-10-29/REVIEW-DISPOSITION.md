@@ -28,7 +28,7 @@ two evidence rows that must not be rewritten; the explanation is in
 | # | Finding (as raised) | Disposition | Evidence for the fix |
 | --- | --- | --- | --- |
 | 1 | README "from the rule table alone" and METHOD "does not require this script" overclaim what the committed repo reproduces | **FIXED** | `README.md:135-147`; `METHOD.md:362-443` (§8 rewritten around an explicit what-is/what-is-not list); `METHOD.md:163-196` (§3.4 now publishes the `ENC-B64` post-filter as pseudocode) |
-| 2 | `false_positive_rate_pct` is a dismissal / false-discovery rate, not an FPR; the sample conclusion overreaches | **FIXED** | `evidence/summary.json:45-46` (renamed + definition); `METHOD.md:201-207`; `RESULTS.md:135-145`; `RESULTS.md:114-116` |
+| 2 | `false_positive_rate_pct` is a dismissal / false-discovery rate, not an FPR; the sample conclusion overreaches | **FIXED** | `evidence/summary.json:48-50` (caveat, definition, value); `METHOD.md:201-207`; `RESULTS.md:135-145`; `RESULTS.md:114-116` |
 | 3 | "invisible markup produced zero hits" contradicted by `MK-IMG` = 1 | **FIXED** | `RESULTS.md:174-182` |
 | 4 | "all 44 hits were adjudicated" vs 33 chunk verdicts; F24/F33 rationales do not address the rule that fired | **FIXED** + **HERE-CARRIED** | `METHOD.md:211-216`; `RESULTS.md:129-133`; `evidence/flagged-hit-map.tsv` (44 rows, notes at `:35` and `:45`) |
 | 5 | Rubric category vocabulary omits `control-char`, which METHOD §3.2 assigns to `UNI-CONTROL` | **FIXED** | `evidence/RUBRIC.md:85-91`; `METHOD.md:255-262`; `METHOD.md:430-437` |
@@ -82,21 +82,23 @@ were wrong and are fixed differently:
 - The auditability gap. `evidence/flagged-verdicts.tsv` is chunk-level and has no
   rule column, so a reader could not connect a hit to a verdict. The new
   `evidence/flagged-hit-map.tsv` publishes all 44 hit rows as
-  `chunk_id, rule_id, skill, line, verdict` (`note` is `-` except where one is
-  needed), derived mechanically from the chunk geometry in §2 and the existing
-  tables. It adds no verdict and changes none.
+  `chunk_id, rule_id, skill, line, col, verdict` plus a `note` (`note` is `-`
+  except on the two F24/F33 rows), unique on `(rule_id, skill, line, col)` and
+  derived mechanically from the chunk geometry in §2 and the existing tables.
+  It adds no verdict and changes none.
 - The F24 / F33 rationales. **These cells were not edited.** They are evidence
   data recorded by the adjudicators, and rewriting a rationale after the fact
-  would destroy the property that makes the table evidence. What the map does
-  instead is name the mismatch on those two rows: F24's published `why` argues
+  would destroy the property that makes the table evidence. The original frozen
+  rationales do not address the rule that fired: F24's published `why` argues
   the chunk's fault-injection restraint while the rule fired on `CR-REQUEST` at
   line 235 ("Never ask for, print or store a credential value"); F33's argues the
   sourcemap advice while the rule fired at line 76 ("Do not print secret values
-  or matching bundle excerpts"). In both cases the CLEAN verdict is *supported by
-  the sentence that fired* — each is a prohibition, the reading RESULTS §5
-  already groups as "Refusal, prohibition, or security rule" — so the defect is
-  the written rationale, not the verdict. The note says exactly that, on the row
-  where a reader looks.
+  or matching bundle excerpts"). Both sentences are model-addressed imperatives,
+  so rubric test 2 (addressee) answers YES and cannot reach CLEAN; CLEAN would
+  only be reached at test 5. **No replacement reading is adjudicated here.** The
+  map labels the two notes as post-hoc commentary and carries the mismatch as an
+  **open rationale gap** on the fired rule; the verdict stays CLEAN because that
+  is the recorded verdict, not because this repair supplies its missing reason.
 
 **5 — `control-char`.** The rubric's enumerated vocabulary now includes
 `control-char`, with a note that it is `UNI-CONTROL`'s category, that no verdict
@@ -122,12 +124,14 @@ claim README "Provenance" and RESULTS §6 already made; the strong form is gone.
 
 **8 — Sampling.** The draw is now `n = 202` literally, with the reason: `202.5`
 rounds to 202 under round-half-to-even and 203 under half-up, so the expression
-could not carry the published draw. The interpreter is named as **CPython
-3.12.14**, and it is established by **reproduction rather than assertion**:
-rebuilding the 2,058-chunk grid and the 33 flagged chunks from the committed
-`PER-SKILL.tsv` and `evidence/tier1-flags.tsv`, then drawing, reproduces
-`evidence/sample-verdicts.tsv` exactly — 202 of 202 ids, same skill and chunk
-index. The 202 / 2,025 = 9.98% basis is unchanged.
+could not carry the published draw. **The original interpreter is unknown** — no
+environment record was retained — so the record publishes **reproduction
+runtimes** instead: rebuilding the 2,058-chunk grid and the 33 flagged chunks
+from the committed `PER-SKILL.tsv` and `evidence/tier1-flags.tsv`, then drawing,
+reproduces `evidence/sample-verdicts.tsv` exactly under **CPython 3.12.14** (202
+of 202 ids, same skill and chunk index) and again under **CPython 3.14.7** (202
+of 202). Those runs demonstrate compatibility, not the interpreter of record.
+The 202 / 2,025 = 9.98% basis is unchanged.
 
 **9 — Tag characters.** The "both produced 0 hits" sentence is gone. §3.2 now
 says that `UNI-HOMOGLYPH` produced 0 hits and that **no rule tested tag
@@ -154,18 +158,21 @@ data.
 ## Manifest — digests before and after
 
 The first twelve hex characters of each digest, before (reviewed head
-`4ad07562`) and after (this repair). Full values: `HASHES.sha256` for the
-after column, and `git show 575e4586:docs/evidence/behavioral-evals/body-scan-2026-10-29/HASHES.sha256`
-for the before column.
+`4ad07562`) and after (this branch's current head, after both repair passes).
+Full values: `HASHES.sha256` for the after column, and
+`git show 575e4586:docs/evidence/behavioral-evals/body-scan-2026-10-29/HASHES.sha256`
+for the before column. `HASHES.sha256` is byte-identical at the reviewed head
+`4ad07562` and at `575e4586` (verified with `git diff --quiet`), so the before
+column is the reviewed file set.
 
 | File | Before | After |
 | --- | --- | --- |
-| `README.md` | `ab4293b3c1c0` | `e19ad07c67b7` |
-| `METHOD.md` | `4089c8839a30` | `8c02b6d24d24` |
-| `RESULTS.md` | `9a727ecd4ff3` | `7be0a078c847` |
+| `README.md` | `ab4293b3c1c0` | `ed828fe1ae3f` |
+| `METHOD.md` | `4089c8839a30` | `985660e08a63` |
+| `RESULTS.md` | `9a727ecd4ff3` | `3f42fc93042c` |
 | `evidence/RUBRIC.md` | `8bb0bf78a425` | `5e0a5c0828f6` |
-| `evidence/summary.json` | `b29a9e5110f8` | `d990484bf29c` |
-| `HASHES.sha256` | `763` bytes (9 entries) | 9 entries, regenerated |
+| `evidence/summary.json` | `b29a9e5110f8` | `15ace14ec4e3` |
+| `HASHES.sha256` | `764` bytes (9 entries) | 9 entries, 764 bytes |
 | `PER-SKILL.tsv` | `db6c886da590` | `db6c886da590` — unchanged |
 | `evidence/tier1-flags.tsv` | `7414e2f2d5bb` | `7414e2f2d5bb` — unchanged |
 | `evidence/flagged-verdicts.tsv` | `a1267116c6b1` | `a1267116c6b1` — unchanged |
@@ -174,13 +181,15 @@ for the before column.
 Two files are added, and both are deliberately **outside** `HASHES.sha256`: that
 manifest is the integrity check of the nine files the review examined, and
 extending it would stop it being a like-for-like comparison between the reviewed
-bytes and these. Their digests are recorded here instead, so nothing in the
-directory is unhashed:
+bytes and these. Their digests are recorded here instead, so every file the
+review examined and both added files have a published digest. `HASHES.sha256`
+itself has no self-entry — a manifest cannot hash itself — and this file's own
+digest is recorded in the pull request body:
 
 | Added file | sha256 |
 | --- | --- |
-| `evidence/flagged-hit-map.tsv` | `4ce14c282cf3ee6ef4644645ff1a0478b79984ebbfd0a04fb50975ef824a4048` |
-| `REVIEW-DISPOSITION.md` | this file cannot carry its own digest; it is recorded in the pull request that adds it |
+| `evidence/flagged-hit-map.tsv` | `fbeb51192e23263a1a98198b6e95f574ef558ef424f108289511195bfea0c943` |
+| `REVIEW-DISPOSITION.md` | this file cannot carry its own digest; its sha256 is recorded in the signed commit message for this pass and in the pull request body |
 
 ## Verification performed
 
@@ -191,7 +200,7 @@ directory is unhashed:
 | Diff surface | only files under this directory; 0 skills, 0 scripts, 0 workflows |
 | `evidence/summary.json` parses | yes; `tier1_dismissal_rate_pct` = 100, definition present, `false_positive_rate_pct` absent |
 | Counts unchanged | 44 hits / 33 flagged chunks / 2,058 / 2,025 — verified against the untouched evidence tables |
-| Sample re-draw | 202 of 202 ids match `evidence/sample-verdicts.tsv` (CPython 3.12.14) |
+| Sample re-draw | 202 of 202 ids match `evidence/sample-verdicts.tsv` (CPython 3.12.14; CPython 3.14.7 also reproduces 202 of 202) |
 | Rule-table reimplementation | 44 of 44 rows match `(rule, skill, line, col)`; 33 of 33 chunks |
 | Hosted CI | recorded in the pull request, not here: this file is committed before the run |
 

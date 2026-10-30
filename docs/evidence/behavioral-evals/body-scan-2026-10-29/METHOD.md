@@ -160,8 +160,8 @@ alternation operators; this block is not a Markdown table.
 
 ### 3.4 Implementation notes
 
-Three details of the executed pass are not carried by the §3.1–§3.3 tables
-alone. All three are published here, in full, so that a reimplementation from
+Four details of the executed pass are not carried by the §3.1–§3.3 tables
+alone. All four are published here, in full, so that a reimplementation from
 **§3.2–§3.4 plus the constants in §2 and §4** reproduces the published counts;
 §8 states exactly what that does and does not establish.
 
@@ -179,8 +179,10 @@ alone. All three are published here, in full, so that a reimplementation from
                   and any(c.isdigit() for c in matched_text))
 
   Without the filter a reimplementation will flag homogeneous runs this pass
-  skipped. The rule produced **0 published rows**, so no published count depends
-  on the filter: it matters for matching the rule table, not the totals.
+  skipped. The rule produced **0 published rows**, so no published row or verdict
+  depends on the filter; a faithful reproduction still needs it, because without
+  it a reimplementation flags homogeneous runs this pass skipped and the hit
+  totals no longer match.
 
 - **`UNI-HOMOGLYPH` is a token test, not a character range.** §3.2 states it as
   prose because the test is structural. It is fixed here: take each
@@ -196,6 +198,14 @@ alone. All three are published here, in full, so that a reimplementation from
   published tables use `tool-call`, the vocabulary of §3.1. The two published
   `TC-EXEC` rows are relabelled only; no hit, line or verdict changes.
 
+- **Match multiplicity.** For each rule and each line the pass reports **every
+  non-overlapping match** (`finditer`), not only the first (`re.search`). This is
+  load-bearing: first-match-only reporting yields **42** distinct
+  `(rule, skill, line)` rows, not the published 44, because three
+  `OV-SYSTEM-PROMPT` matches fall on `hidden-context-exposure-reviewer` line 3 at
+  columns 99, 173 and 697. A reimplementation must iterate matches, not stop at
+  the first.
+
 The rules are deliberately over-broad. That is the point of Tier 1: it is a
 recall machine whose output is then adjudicated, not a classifier whose output
 is trusted. A 100% **dismissal** rate was the expected outcome on a corpus of
@@ -210,9 +220,12 @@ Of the 44 hits, 43 are lexical rule matches and one is a structural-class
 match — `MK-IMG` on a quoted `<img onerror=…>` example in
 `llm-output-safety-reviewer` — and **all 33 flagged chunks covering those 44
 hits were adjudicated**. The hit-to-verdict mapping is published row by row in
-`evidence/flagged-hit-map.tsv` (`chunk_id`, `rule_id`, `skill`, `line`,
+`evidence/flagged-hit-map.tsv` (`chunk_id`, `rule_id`, `skill`, `line`, `col`,
 `verdict`), because the chunk verdict table carries no rule column of its own.
-No structural finding survived adjudication.
+Its 44 rows are unique on `(rule_id, skill, line, col)`; `col` is carried
+through from `evidence/tier1-flags.tsv` because three `OV-SYSTEM-PROMPT` hits
+fall on one line at columns 99, 173 and 697, so without it those three rows
+would be indistinguishable. No structural finding survived adjudication.
 
 ## 4. Sampling
 
@@ -226,14 +239,18 @@ Mersenne Twister, fixed seed — over the clean list sorted by `(skill, chunk)`:
 `n` is written as the literal **202**, not derived by rounding 10% of 2,025:
 that derivation lands on exactly `202.5`, and rounding it is
 interpreter-dependent — 202 under Python 3's round-half-to-even, 203 under
-half-up rounding — so it cannot carry a published draw. The draw is named here
-as **CPython 3.12.14**; that is established by reproducing it, not by a
-retained log: reconstructing the 2,058-chunk grid and the 33 flagged chunks
-from the committed `PER-SKILL.tsv` and `evidence/tier1-flags.tsv`, then running
-the two lines above under CPython 3.12.14, reproduces
-`evidence/sample-verdicts.tsv` exactly — 202 of 202 ids, same skill and chunk
-index. A reader on another interpreter should compare the drawn ids against
-that file rather than assume the same draw.
+half-up rounding — so it cannot carry a published draw. **The interpreter that
+produced the published draw is unknown**: no interpreter or environment record
+was retained with the run, and this record does not infer one from a successful
+reproduction. What is established is **compatibility, not history**:
+reconstructing the 2,058-chunk grid and the 33 flagged chunks from the committed
+`PER-SKILL.tsv` and `evidence/tier1-flags.tsv`, then running the two lines above
+under **CPython 3.12.14**, reproduces `evidence/sample-verdicts.tsv` exactly —
+202 of 202 ids, same skill and chunk index. That makes 3.12.14 a **reproduction
+runtime**, not the original one; **CPython 3.14.7** also reproduced the same 202
+of 202 draw, so the result is not peculiar to 3.12.14. The interpreter of record
+stays unknown. A reader on another interpreter should compare the drawn ids
+against that file rather than assume the same draw.
 
 That is 202 / 2,025 = **9.98%** of the clean chunks and 202 / 2,058 = 9.8% of
 all chunks, under this record's line convention. The conventional clean count
@@ -325,10 +342,15 @@ six words.
 - The **hit-to-verdict map** (`evidence/flagged-hit-map.tsv`) is derived, not
   adjudicated: for each of the 44 hit rows, `chunk_id` is the chunk containing
   `line` under the §2 geometry, matched to the verdict row with the same
-  `skill` and `chunk_index`. It adds no verdict and changes none. It exists
-  because `evidence/flagged-verdicts.tsv` is chunk-level and carries no rule
-  column, so the 44-hits-to-33-verdicts relationship is otherwise not auditable
-  from the publication.
+  `skill` and `chunk_index`, `col` is carried through unchanged from
+  `evidence/tier1-flags.tsv`, and a `note` carries the F24/F33 post-hoc
+  commentary (`-` on every other row). Its 44 rows are unique on
+  `(rule_id, skill, line, col)`, so the map reconciles one-to-one with the 44
+  hit rows of `tier1-flags.tsv`; `line` alone does not distinguish the three
+  `OV-SYSTEM-PROMPT` hits at columns 99, 173 and 697 of one line. It adds no
+  verdict and changes none. It exists because `evidence/flagged-verdicts.tsv`
+  is chunk-level and carries no rule column, so the 44-hits-to-33-verdicts
+  relationship is otherwise not auditable from the publication.
 - Each session read the chunk text with blank lines removed and absolute line
   gutters; the packaging script is deterministic and its sha256 is recorded in
   section 8. Nothing was summarised, filtered or paraphrased before
@@ -336,14 +358,14 @@ six words.
 - **The scanner made no network calls at any point.** Tier 1 is a local
   pure-function pass over a checkout and the packager is local; neither opens a
   socket and no external service was queried for the scan.
-- **The adjudication used existing agent capacity, not a new provider
-  request.** The four adjudicator sessions were ordinary harness child sessions
-  run by the lane coordinator on the model family the owner decision named. No
-  paid API call, vendor key or per-token billing was created for this run
-  (RESULTS.md §6; README.md, "Provenance"). Whether those harness sessions
-  contact a provider is a property of the harness the work ran in, and this
-  record makes no claim about it either way. The publisher merged and verified
-  their TSVs and recorded no verdict of its own.
+- **The adjudication used existing agent capacity, with no new spend.** The
+  four adjudicator sessions were ordinary harness child sessions run by the lane
+  coordinator on the model family the owner decision named. No paid API call,
+  vendor key or per-token billing was created for this run (RESULTS.md §6;
+  README.md, "Provenance"). **Provider contact is not claimed either way**:
+  whether those harness sessions contact a provider is a property of the harness
+  the work ran in, and this record does not establish it. The publisher merged
+  and verified their TSVs and recorded no verdict of its own.
 
 ## 7. Redaction
 
@@ -366,15 +388,16 @@ retained out-of-tree in the lane work-package record. What that means for a
 reader is stated here in full, because "reproducible" is used loosely elsewhere
 and this section is the precise version.
 
-**Reproducible from this repository — the counts.** 44 hits, 42 distinct hit
-lines, 16 skills, 9 distinct rules, 33 flagged chunks, 2,058 chunks and 2,025
-clean chunks all follow from four things, every one of them in this directory or
-in the corpus:
+**Reproducible from this repository — the counts.** 44 hits, 42 distinct
+`(skill, line)` pairs, 16 skills, 9 distinct rules, 33 flagged chunks, 2,058 chunks and 2,025
+clean chunks all follow from five things, every one of them in this directory
+or in the corpus:
 
 - the rule table — §3.2 (the seven per-character families), §3.3 (the 28
-  regular expressions) and §3.4 (the three details that are not one regex each);
+  regular expressions) and §3.4 (the four details that are not one regex each);
 - the constants — the 25-line grid and `floor((line - 1) / 25)` (§2), the seed
   `20261029` and `n = 202` (§4);
+- the match multiplicity — every non-overlapping match per rule per line (§3.4);
 - the corpus — the 255 `SKILL.md` bodies at `501dff1f`, whose sha256 values are
   in `PER-SKILL.tsv`;
 - `evidence/tier1-flags.tsv` itself, from which every per-rule and per-skill
@@ -403,7 +426,7 @@ compared it to the published tables:
 | Hit rows on `(rule, skill, line, col)` | 44 of 44 identical — 0 extra, 0 missing |
 | Flagged chunks | 33 of 33 identical |
 | Chunk and clean-chunk counts | 2,058 and 2,025 identical |
-| Sample draw | 202 of 202 ids and chunk indices identical |
+| Sample draw | 202 of 202 ids and chunk indices identical under CPython 3.12.14; CPython 3.14.7 reproduces the same 202 |
 
 That reimplementation is not committed either; it is short, and §3.2–§3.4 plus
 the constants are its whole specification. What the comparison establishes is
@@ -419,9 +442,16 @@ The commands were:
     python package.py               # chunks, samples, packages
 
 `scan.py` is a pure function of the checkout: `os.listdir` over
-`.claude/skills`, one `re.search` pass per rule per line, no state, no network,
-no clock. Its only inputs are the corpus and the constants published in
-sections 2–4 above (`25` lines, seed `20261029`, 10%).
+`.claude/skills`; for each rule and each line it reports **every non-overlapping
+match** (`finditer` semantics), not only the first (`re.search` semantics); no
+state, no network, no clock. The distinction is load-bearing: first-match-only
+reporting yields **42** distinct `(rule, skill, line)` rows, not the published
+44, because three `OV-SYSTEM-PROMPT` matches fall on
+`hidden-context-exposure-reviewer` line 3 at columns 99, 173 and 697. The
+reimplementation used for the §8 reproduction applies `finditer` for the same
+reason. Its only inputs are the corpus and the constants published in sections
+2–4 above (`25` lines, seed `20261029`, `n = 202`); the `10%` is a description
+of the 2,025-chunk clean set, not an executed constant.
 
 **Digests of the uncommitted inputs.**
 
