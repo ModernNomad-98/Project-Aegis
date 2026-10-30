@@ -3090,3 +3090,63 @@ fact — but its evidentiary status is **owner-attested, not repository-verifiab
 It is **not** a general automated behavioral eval runner — **no such runner exists yet**,
 and this document is its design, not its output. The census in §3 is evidence for the
 design, not an eval result.
+
+## 25. Addendum — gated live-adapter enablement (2026-10-29, build-only)
+
+This addendum records the implemented contract of the gated live package
+(`tools/behavioral_eval_runner/live/`). It changes no earlier section and grants
+no execution authority; sections 11 (cost controls), 13 (evidence) and 14
+(architecture) remain the governing design, and this addendum narrows them for
+the live path.
+
+**Enabling conditions.** A live verb requires (1) an owner gate record, (2) a
+live configuration whose `judge_allowlist` permits the judge model, (3) resolved
+environment credentials, and (4) for `live-run` specifically a gate record whose
+`fact_origin` is `REAL_HOST`. A `SYNTHETIC` record can exercise `live-dry-run`
+only. Missing inputs fail closed with a typed error and a reason code; no verb
+falls back to a default provider, model or budget.
+
+**Gate record.** `schema_version`, `gate_kind=ber-live-owner-gate`, a gate id and
+owner-decision reference, `fact_origin` (`SYNTHETIC` | `REAL_HOST`), a dataset
+block (40-hex commit revision, repository-relative path, SHA-256 digest of the
+ordered case set, case count), a models block whose subject entries must equal
+the pinned identifiers and whose judge entries must equal the pinned
+cross-vendor route, a model-terms acknowledgment (flag, reference, date), a
+spend block (ceiling and provider cap) and creation/expiry timestamps. Unknown
+keys are rejected. The effective ceiling is
+`min(config ceiling, gate ceiling, provider cap)` in integer cents.
+
+**Pins and served-model verification.** The request carries the pinned string;
+the response must carry exactly that string in its served-model field, or the
+run halts with `MODEL_PIN_MISMATCH` and records the requested and served values
+in the error context. There is no alias table, no fallback model and no retry on
+mismatch. The judge is subject to the same rule.
+
+**Judge contract.** Judge input is a canonical JSON envelope built from the
+committed rubric (and its SHA-256) plus the in-memory subject response (and its
+SHA-256). A verdict is a closed-enum record with a bounded failure mode, no
+free-form prose, and the echoed rubric hash, response hash and judge model; any
+mismatch is a fail-closed `JUDGE_ERROR`, never PASS. The judge vendor must
+differ from the subject vendor, and the model must be inside the owner allowlist.
+
+**Cost meter.** Per call: reserve an upper bound = (prompt bytes + output cap)
+priced in integer cents (rounded up, minimum one cent), dispatch only after the
+reservation succeeds, reconcile against reported usage, and release the unused
+reservation. A denial records the halt and raises `BUDGET_CAP`; the run marks
+the remaining cases `UNRUN` with that reason, writes `halt.json`, and finalizes
+with status `HALTED`. The cost ledger artifact lists every call's vendor, model,
+served model, tokens, reserved cents, actual cents and cumulative spend.
+
+**Evidence.** The existing two-stage writer is reused. Stage A holds the gate
+echo and digest, the sanitized configuration, the committed case records and the
+model pins; Stage B holds the results, the cost ledger and any halt record. The
+final report carries the run binding, the fact origin, the live capability state
+(GATED), the state counts, the dispatched/spent figures and explicit
+`raw_transcripts_included: false` and `unrun_is_never_pass: true` flags.
+
+**Pilot A.** 20 skills, 3 runs per case, with and without baseline, ceiling $150
+subject to the owner's $120 provider cap, pinned identifiers, structured
+publication, no raw transcripts. The run starts only after the fresh independent
+review passes at the PR head and the pilot environment supplies the gate and
+keys. Results are published structurally (state counts, cost ledger, per-case
+hashes), never as raw transcripts.

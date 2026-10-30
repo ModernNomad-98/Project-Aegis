@@ -4469,3 +4469,55 @@ WP-2B-4 and later work remain unauthorized, and OD-1 remains open.
 **Dated correction — 2026-10-25 (REV-3): census documented-route registration and fail-closed hardening (PKG-04).** The previous correction's additive census shape was not version-registered; REV-3 corrects that and the review findings on the same change: the census record family is registered at schema `1.1.0-census-wp2b1` (minor, additive census shape) and runner `0.2.0-census-wp2b1` in `docs/behavioral-eval-runner-schema-compatibility.md` (the WP-2B-1 result/evidence family and scheduling policy stay `1.0.0-wp2b1`/`0.1.0-wp2b1` because no other published record shape changed), pinned by `TestVersionRegistration`; the pinned baseline comparator now also expects `documentation_route_cases: 0` because the pinned `fc98ee6b` snapshot has no route case. The resolver now requires exactly one of `expected_skill`/`expected_route` to be present and non-blank (a present-but-blank counterpart fails closed with a SchemaValidationError naming the owning trigger-evals file and case id), returns the authored route string exactly as authored with no trimming, and rejects a bare identifier as a route (a route must name a document location containing `/`); malformed `expected_skill` diagnostics carry the owning file/case id. Documented-route cases, which have no activation target, are excluded from the proposed-empty-consumer-runnable denominator and the census note says so. This supersedes shadow `f3bd39f4`/tree `07eb58fb` and PR #912 head `55fc9da5`; the case file is unchanged and stays negative, and no design text or TargetKind change is made.
 
 **Dated correction — 2026-10-25 (REV-4): dead documentation anchor fixed and PR #912 new-head review findings incorporated (PKG-04).** The REV-3 policy doc linked to the registered-shape heading while wrapping the version in inline code; the repository link checker blanks inline code spans before slugging headings, so CI run 40163007227 validate-skills step 15 reported that link DEAD. The heading now carries 1.1.0-census-wp2b1 without backticks (version strings in constants and tests are unchanged), and the repo-wide pages set checks clean with 0 broken / 0 dead. The same revision incorporates the new-head review findings: malformed non-blank expected_skill now fails through the owning-file/case-id diagnostic; a census.validate_census_record version gate accepts only the registered census family and rejects missing/old/unknown versions (round-trip plus gating tests); the old 1.0.0-wp2b1 census artifact is registered as intentionally not loadable by current tooling with its path/SHA-256 in the compatibility policy's historical-evidence section (no archival reader in this change); the registered-shape section states that route cases are counted as non-activation discrimination cases and excluded from the proposed-empty-consumer-runnable denominator, documents the route-shape heuristic and its limits, states that expected_skill keeps the existing parse_target trimming with reverse-index keys on the parsed name, and clarifies that only additive fields plus route-derived counts changed. Small cleanups: missing case ids print as <missing id>, and the two trigger-case test classes share one helper instead of shadowing private helpers. The accepted REV-3 registered census family (schema 1.1.0-census-wp2b1 / runner 0.2.0-census-wp2b1), pinned comparator, exactly-one resolver, denominator decision, unchanged case file, and protected-path/authority analysis are preserved.
+
+## Gated live-adapter enablement package — 2026-10-29 (build-only; live remains GATED)
+
+**Status:** BUILT for review, not merged and not enabled. Nothing in this record
+authorizes a provider request: the build made zero provider calls, used no key
+and spent $0.
+
+**Base:** main `575e4586ef0f5213474cbe6909a418a06b387105` (recorded, not asserted
+as current beyond the build clone). The package is
+`tools/behavioral_eval_runner/live/`. Its only protected paths are under
+`tools/behavioral_eval_runner/`, so the recorded merge route is **AEGIS-APR-142**
+(the AEGIS-APR-140 conditions (a)-(f) apply, with (a) specialized to: the Stage F
+verdict states which runner checks, schema validations or scoring rules the PR
+adds, removes or weakens, and nothing is removed or weakened). The builder does
+not merge; a fresh independent review binds to the PR head, then a fresh merger
+uses the applicable tools-path authority. The gate-guard check will fail on the
+protected path and is recorded as failed with that authorized disposition, never
+as green.
+
+**What exists.** Subject adapters with strict model pinning for
+`claude-sonnet-5-5` and `gpt-6-astra` (the exact served-model string is recorded;
+a mismatch halts, no substitution); environment-only credentials with fail-closed
+absence and non-logging records; a cross-vendor judge behind the owner allowlist
+with rubric input only from committed case data; a cost meter with pre-call
+reservation, per-call usage and a hard ceiling halt (remaining cases UNRUN /
+BUDGET_CAP, never PASS) with a proven halt test; an owner gate for real-host
+facts (dataset revision, model IDs, model-terms acknowledgment, spend ceiling)
+that separates synthetic from real records; the `live-preflight`,
+`live-dry-run` and `live-run` verbs, with `version`/`capabilities` reporting live
+as GATED and not enabled by default.
+
+**Checks added or changed (disclosure under AEGIS-APR-142 condition (a)).** One
+allowlist entry, `live/providers.py`, is added to the provider-fragment
+confinement check (the BER self-check and the two static-safety tests) so that
+exactly one new runtime module may name a vendor SDK. No check, schema validation
+or scoring rule is removed or weakened: the AST network/install/subprocess bans
+are unchanged, the default transport still denies dispatch, and a new live test
+pins that no other live module names the provider. New tests were added for the
+adapters, credentials, judge guard, cost halt, gate refusals and the dry-run
+end-to-end path.
+
+**Pilot A plan (owner pre-granted, subject to a fresh PASS review and the pilot
+keys/gate).** 20 skills, 3 runs per case, with and without baseline, ceiling
+$150 subject to the owner's $120 provider cap, pinned model identifiers,
+structured publication, no raw transcripts. The live path defers to the owner
+allowlist and the cost meter; deterministic graders remain primary, so a
+semantic judge cannot turn a deterministic failure into a PASS.
+
+**Evidence.** The work package is recorded at
+`_A/work-package-3/ber-live-enablement/` (workspace-local, not repository
+content) with the build record, the cost-meter halt proof, the exact model-pin
+configuration and the captured gate-refusal outputs.
