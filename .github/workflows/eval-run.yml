@@ -886,7 +886,9 @@ jobs:
               seen_run_ids.add(run_id)
               ordered_runs.append(str(run_id))
 
-          for run_id in ordered_runs:
+          # Process oldest to newest so a newer completion/attempt record
+          # overwrites an older one; the listing itself is newest-first.
+          for run_id in reversed(ordered_runs):
               target = RESTORE_DIR / run_id
               shutil.rmtree(target, ignore_errors=True)
               # Distinguish "this run published no resume artifact" from "the artifact
@@ -996,12 +998,15 @@ jobs:
               if not isinstance(prior_plan, dict):
                   refuse("run " + run_id + " manifest has no plan object")
               same_config = prior_plan.get("config_sha256") == plan.get("config_sha256")
-              if (
-                  prior_plan.get("dataset_sha256") != plan["dataset_sha256"]
-                  or prior_plan.get("template_gate_sha256") != plan["template_gate_sha256"]
-              ):
+              same_template = (
+                  prior_plan.get("template_gate_sha256")
+                  == plan["template_gate_sha256"]
+              )
+              if prior_plan.get("dataset_sha256") != plan["dataset_sha256"]:
+                  # A different frozen dataset is a different budget: nothing
+                  # here can be attributed to this dataset's cases.
                   skipped.append(
-                      {"run_id": run_id, "reason": "different frozen dataset or gate template"}
+                      {"run_id": run_id, "reason": "different frozen dataset"}
                   )
                   continue
               source_runs.append(run_id)
@@ -1102,10 +1107,11 @@ jobs:
                       }
                   if entry.get("status") != "COMPLETED":
                       continue
-                  if not same_config:
+                  if not (same_config and same_template):
                       skipped.append(
                           {"run_id": run_id, "case_id": case_id,
-                           "reason": "different built config; completion not reused"}
+                           "reason": "different gate template or built config; "
+                                     "completion not reused"}
                       )
                       continue
                   result_path = target / "cases" / (case_id + ".json")
@@ -1141,6 +1147,21 @@ jobs:
                   (CASES_DIR / (case_id + ".json")).write_bytes(payload)
                   completed[case_id] = {"result_sha256": digest, "source_run_id": run_id}
 
+          # An attempt that reached live-run but left no readable ledger has
+          # unknown spend. Re-running it could spend twice, so a resume refuses
+          # until an owner intervenes.
+          for case_id, attempts in merged.items():
+              for attempt, payload in attempts.items():
+                  if (
+                      isinstance(payload, dict)
+                      and payload.get("status") == "LEDGER_INVALID"
+                      and payload.get("spent_cents") is None
+                  ):
+                      refuse(
+                          "case " + str(case_id) + " attempt " + str(attempt)
+                          + " reached live-run with no readable ledger; spend is "
+                          "unknown and the dispatch is not resumable"
+                      )
           prior_attempts = 0
           for case_id in plan["case_ids"]:
               attempts = merged[case_id]
@@ -1152,8 +1173,13 @@ jobs:
                   entry["status"] = "COMPLETED"
                   entry["result_sha256"] = completed[case_id]["result_sha256"]
                   entry["completed_in_run"] = completed[case_id]["source_run_id"]
-              elif ordered:
-                  entry["status"] = str(ordered[-1].get("status") or "PENDING")
+              else:
+                  if ordered:
+                      entry["status"] = str(ordered[-1].get("status") or "PENDING")
+                  if entry["status"] == "COMPLETED":
+                      # An attempt record can say COMPLETED only when its result
+                      # was actually copied; otherwise the case stays runnable.
+                      entry["status"] = "CONFIG_CHANGED"
               if entry["status"] == "IN_FLIGHT":
                   # A killed attempt leaves IN_FLIGHT behind; it is not a claim
                   # that the case is still running, so the resume marks it.
@@ -1491,7 +1517,6 @@ jobs:
                   for key in (
                       "halted",
                       "reason_code",
-                      "error",
                       "spent_cents",
                       "ceiling_cents",
                       "calls_dispatched",
@@ -1547,9 +1572,21 @@ jobs:
                   entry = {"case_id": case_id, "status": "PENDING", "attempts": []}
                   state["cases"][case_id] = entry
               if entry.get("status") == "COMPLETED":
-                  skipped_cases.append(case_id)
-                  print(f"SKIP {case_id}: completed by an earlier dispatch")
-                  continue
+                  completed_result = CASES_DIR / (case_id + ".json")
+                  try:
+                      completed_digest = hashlib.sha256(
+                          completed_result.read_bytes()
+                      ).hexdigest()
+                  except OSError:
+                      completed_digest = None
+                  if completed_digest == entry.get("result_sha256"):
+                      skipped_cases.append(case_id)
+                      print(f"SKIP {case_id}: completed by an earlier dispatch")
+                      continue
+                  # A COMPLETED status without its recorded result is not
+                  # complete; run it rather than skipping a case the summary
+                  # could not verify.
+                  entry["status"] = "PENDING"
               # Cumulative first: the budget still unspent is what every
               # prior dispatch already charged, not just this manifest's.
               enforce_ceiling()
@@ -1966,7 +2003,9 @@ jobs:
         with:
           name: ber-resume-manifest
           path: ${{ runner.temp }}/ber-manifest/
-          retention-days: 14
+          # 90 days covers the gate's 7-day validity and leaves a wide margin:
+          # a 14-day artifact that expired would make the dataset unresumable.
+          retention-days: 90
           # The manifest is the spend and resume record: a run that executed the
           # case step but produced no manifest must fail the workflow, never
           # publish an empty artifact that later dispatches would trust.
@@ -2119,15 +2158,9 @@ jobs:
               effective_ceiling = HARD_CEILING_CENTS
           gate_ceiling = plan.get("gate_spend_ceiling_cents")
           gate_provider_cap = plan.get("gate_spend_provider_cap_cents")
-          if (
-              type(gate_ceiling) is not int
-              or not 0 < gate_ceiling <= HARD_CEILING_CENTS
-          ):
+          if type(gate_ceiling) is not int or gate_ceiling <= 0:
               ceiling_failures.append("the run plan has no valid gate spend ceiling")
-          elif (
-              type(gate_provider_cap) is not int
-              or not 0 < gate_provider_cap <= HARD_CEILING_CENTS
-          ):
+          elif type(gate_provider_cap) is not int or gate_provider_cap <= 0:
               ceiling_failures.append("the run plan has no valid gate provider cap")
           elif effective_ceiling != min(
               HARD_CEILING_CENTS, gate_ceiling, gate_provider_cap
@@ -2259,7 +2292,6 @@ jobs:
           HALT_VIEW_KEYS = (
               "halted",
               "reason_code",
-              "error",
               "spent_cents",
               "ceiling_cents",
               "calls_dispatched",
@@ -2553,6 +2585,22 @@ jobs:
               verification_failures.append(
                   "a result record says a raw transcript was included"
               )
+          if status == "COMPLETED":
+              # A manifest that recorded a failure cannot be published COMPLETED,
+              # even when the recomputed status looks complete.
+              verification_failures.extend(state.get("failures") or [])
+              totals = state.get("totals")
+              totals = totals if isinstance(totals, dict) else {}
+              if integer(totals.get("spent_cents")) != spent_total:
+                  verification_failures.append(
+                      "the manifest spend total does not match the recomputed "
+                      "ledger total"
+                  )
+              if integer(totals.get("cases_completed")) != len(completed):
+                  verification_failures.append(
+                      "the manifest completed-case count does not match the "
+                      "restored cases"
+                  )
           if verification_failures:
               # unrun_is_never_pass, extended: a record that failed verification
               # is never published as COMPLETED or PASS. The status written to
