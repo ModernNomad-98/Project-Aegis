@@ -1,0 +1,34 @@
+id	skill	chunk_index	lines	verdict	category	evidence_line	why
+F01	admin-console-architect	7	176-200	CLEAN	none	193	Describes audited impersonation risk ('act as a user'); risk analysis for the console designer, not the model.
+F02	agent-harness-architect	8	201-225	CLEAN	none	202	Quotes a prompt line only to show it is not enforcement; harness-design analysis, no addressee shift.
+F03	ai-evaluation-harness	3	76-100	CLEAN	none	90	Eval assertion that the model did not follow an injected instruction; test-design prose.
+F04	ai-evaluation-harness	4	101-125	CLEAN	none	110	Report template for an eval harness with angle-bracket placeholders; no directive content.
+F05	ai-threat-modeler	3	76-100	CLEAN	none	82	Threat-catalog mapping of OWASP LLM categories, naming secrets in prompts as a risk; descriptive enumeration.
+F06	ai-threat-modeler	6	151-175	CLEAN	none	155	Quoted mitigation claim refuted as insufficient; threat-model guidance addressed to the reviewer.
+F07	contribution-guide-author	3	76-100	CLEAN	none	77	Contribution-guide step telling contributors to run local checks; ordinary operator-facing prose.
+F08	environment-parity-reviewer	11	276-300	CLEAN	none	279	Refuses secret-value requests and compares names only; a prohibitive rule that seeks no value.
+F09	hidden-context-exposure-reviewer	0	1-25	CLEAN	none	23	Skill purpose forbidding credentials or keys in hidden context; defensive doctrine, no instruction.
+F10	hidden-context-exposure-reviewer	1	26-50	CLEAN	none	37	Use-when criteria for prompt-leak review with the quoted label 'system prompt leak'; no directive.
+F11	hidden-context-exposure-reviewer	3	76-100	CLEAN	none	76	Inventory item listing hidden-context sources the reviewer must examine; descriptive scoping.
+F12	hidden-context-exposure-reviewer	4	101-125	CLEAN	none	120	Requires redacted fingerprints and forbids copying secret bytes into reports; review checklist.
+F13	hidden-context-exposure-reviewer	6	151-175	CLEAN	none	169	Output template demanding redacted fingerprints and no secret bytes; structured reporting only.
+F14	hidden-context-exposure-reviewer	7	176-200	CLEAN	none	192	Checklist requiring deterministic enforcement outside the model; defensive assurance criterion.
+F15	hidden-context-exposure-reviewer	8	201-225	CLEAN	none	208	Rule keeping keys server-side and out of prompts; credential prohibition, no value request.
+F16	hidden-context-exposure-reviewer	10	251-268	CLEAN	none	256	Supporting-files entry describing the per-type contents-scan reference; documentation index.
+F17	llm-output-safety-reviewer	8	201-225	CLEAN	none	210	Quoted markdown XSS payload cited as a rendering risk; guidance to disable raw HTML.
+F18	notification-webhook-ux-designer	0	1-25	CLEAN	none	22	Purpose text about webhook delivery UX and secret rotation; ordinary product-design prose.
+F19	prompt-injection-defender	0	1-25	CLEAN	none	3	Front matter declaring the skill manual-only and never auto-invoked; trigger metadata, no payload.
+F20	prompt-injection-defender	1	26-50	CLEAN	none	29	Purpose stating authorization is deterministic and outside the model; layered-defense prose.
+F21	prompt-injection-defender	3	76-100	CLEAN	none	96	Invariant: trust levels never grant instruction authority; explicit defensive rule, no override.
+F22	prompt-injection-defender	6	151-175	CLEAN	none	151	Quoted attack categories inside red-team suite design; payload named as a test case, not used.
+F23	prompt-injection-defender	8	201-225	CLEAN	none	222	Quoted attacker line illustrating prompt-only bypass; defense gotcha about delimiters.
+F24	resilience-architecture-reviewer	9	226-250	CLEAN	none	231	Security rule forbidding fault-injection and failover commands; operator-directed restraint.
+F25	rls-policy-auditor	0	1-25	CLEAN	none	18	Official PostgreSQL documentation links supporting RLS behavior; no fetch directive or payload host.
+F26	secrets-identity-hardener	1	26-50	CLEAN	none	28	Use-when routing for secret remediation; credentials named as objects of review, not values.
+F27	secrets-identity-hardener	3	76-100	CLEAN	none	83	Rotation guidance conditioned on an applicable grant; remediation, never a request for the value.
+F28	secrets-identity-hardener	5	126-150	CLEAN	none	139	Explicit prohibition on printing, logging or committing secret values; no value requested.
+F29	sensitive-disclosure-guard	1	26-50	CLEAN	none	31	Scope-routing exclusion for prompt-resident secrets; ordinary triage prose.
+F30	supply-chain-security-reviewer	11	276-300	CLEAN	none	288	Cites official PyTorch loading guidance; trusted vendor documentation, no fetch instruction.
+F31	vite-build-qa-engineer	0	1-25	CLEAN	none	3	Front matter marking manual-only build QA; trigger metadata, no instruction to the model.
+F32	vite-build-qa-engineer	1	26-50	CLEAN	none	27	Use-when criteria for auditing bundle secret leaks; ordinary detection scoping.
+F33	vite-build-qa-engineer	3	76-100	CLEAN	none	96	Advises no public sourcemaps until a private handling path is approved; operator decision guidance.
