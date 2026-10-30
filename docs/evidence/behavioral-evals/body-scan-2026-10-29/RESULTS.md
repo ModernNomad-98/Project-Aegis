@@ -23,7 +23,7 @@ quotation, refusal and threat-model prose, not injection.
 | SKILL.md files scanned | 255 |
 | Manifest-shipped skills (validator's "254") | 254 |
 | Non-shipped file (`_template/SKILL.md`) | 1 |
-| Lines (split convention; `wc -l` gives 48,224) | 48,478 |
+| Lines (split convention; `wc -l` gives 48,223) | 48,478 |
 | Bytes | 2,962,866 |
 | 25-line chunks (split convention; `wc -l` gives 2,051) | 2,058 |
 | Chunks flagged by Tier 1 | 33 |

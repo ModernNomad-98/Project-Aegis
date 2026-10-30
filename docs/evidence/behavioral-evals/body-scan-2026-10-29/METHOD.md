@@ -14,7 +14,7 @@ re-run, or argued with, without access to the script that executed it.
 | Of which excluded from the manifest (`_template`) | 1 |
 | Total bytes | 2,962,866 |
 | Total lines (this record's convention — see below) | 48,478 |
-| Total lines by the conventional `wc -l` count | 48,224 |
+| Total lines by the conventional `wc -l` count | 48,223 |
 | Files modified | 0 |
 
 The unit of work is the whole file, not the frontmatter and not the body
@@ -29,16 +29,22 @@ the working tree of a `git worktree add --detach` checkout of that commit.
 excludes `_template`. The scan covers all 255.
 
 **Line convention — `L` defined.** A file's line count `L` in this record is
-`len(text.split("\n"))` on the decoded text, the Python split convention: a
-file that ends with a newline contributes one extra, empty trailing element.
-254 of the 255 files end with a newline, so summing `L` gives **48,478**, while
-the conventional `wc -l` count (newline-terminated lines) gives **48,224** —
-exactly 254 fewer. Every line-derived figure inherits the convention: 2,058
-chunks under the split count versus **2,051** conventional, and 2,025 clean
-chunks versus **2,018**. The `lines` column of `PER-SKILL.tsv` is `L` per file
-under the same convention. The conventional alternatives are published beside
-the counts so a reader using `wc -l` can reconcile them; they are not the basis
-of any figure in this record.
+`len(text.split("\n"))` on the decoded text, the Python split convention: it
+returns one element more than the file has newline characters, for every file,
+because the split yields `newlines + 1` elements whether or not the text ends
+with a newline. Summing `L` gives **48,478**, while the conventional `wc -l`
+count — newline characters, what GNU `wc -l` prints — gives **48,223**,
+exactly **255** fewer: one per file, the file count, not the 254 files that
+end with a newline. For those 254 the extra element is the empty string after
+the final newline. For the 255th, `feature-flag-architect/SKILL.md`, which
+does not end with a newline, the extra element is its final line, and `wc -l`
+does not count that line either, so that file too differs by exactly one.
+Every line-derived figure inherits the convention: 2,058 chunks under the
+split count versus **2,051** conventional, and 2,025 clean chunks versus
+**2,018**. The `lines` column of `PER-SKILL.tsv` is `L` per file under the same
+convention. The conventional alternatives are published beside the counts so
+a reader using `wc -l` can reconcile them; they are not the basis of any
+figure in this record.
 
 ## 2. Chunking
 

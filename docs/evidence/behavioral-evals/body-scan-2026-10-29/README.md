@@ -16,7 +16,7 @@ contains an injection.
 ## Result in one line
 
 255 files scanned (`2,962,866` bytes, `48,478` lines by the `split("\n")`
-convention — `48,224` by `wc -l`; METHOD.md §1); 44 Tier-1 deterministic
+convention — `48,223` by `wc -l`; METHOD.md §1); 44 Tier-1 deterministic
 hits across 16 skills; 33 flagged chunks and 202 randomly sampled clean chunks
 adjudicated (`235` of `235`); **0 INJECTION, 0 SUSPECT**; every
 Tier-1 flag dismissed as a false positive (`44 of 44 hits; 33 of 33 chunks`); external spend **$0.00**
