@@ -8,24 +8,40 @@
 # judge IDs as arguments with no defaults, enforce the $120 cost cap by halting,
 # publish structured output only and never echo secret values.
 #
-# AEGIS-APR-161 (OWNER DECISION 2026-10-30 10:50 PDT, items 1, 3 and 4) adds
-# exactly four capabilities to this file and nothing else:
+# AEGIS-APR-161 (OWNER DECISION 2026-10-30 10:50 PDT, items 1, 3 and 4; amended
+# by the owner on 2026-10-30 13:35 PDT: the S1 per-case chunk-gate amendment is
+# approved and S3 preflight_only is ratified as APR-161) adds exactly four
+# capabilities to this file and nothing else:
 #   1. the owner gate TEMPLATE is committed with the 40-zero revision
 #      placeholder and staged at dispatch to $RUNNER_TEMP/live-gate.json with
-#      dataset.revision = $GITHUB_SHA; that staged path is passed to preflight
-#      and to every live-run invocation. A committed file cannot name the commit
-#      that contains it (SHA-1 fixed point, APR-159 design note), so the one
-#      field that is only knowable at dispatch is written at dispatch.
+#      dataset.revision = $GITHUB_SHA; that staged path is passed to preflight.
+#      A committed file cannot name the commit that contains it (SHA-1 fixed
+#      point, APR-159 design note), so the one field that is only knowable at
+#      dispatch is written at dispatch.
+#      S1 amendment: the runner package requires len(cases) == gate.case_count
+#      and a matching dataset digest, so each live-run receives a per-case GATE
+#      derived from the same staged template: the same owner fields and
+#      revision, with dataset.path/case_count/sha256 re-derived for exactly that
+#      one committed case. The frozen full-set digest and count are asserted
+#      against the committed bytes before any chunk is built, the chunk case is
+#      re-hashed against the committed case, and the chunk gate's sha256 and
+#      record digest are written into that attempt's record in the resume
+#      manifest (the run record), not only into a log.
 #   2. the job timeout is 360 minutes (was 240).
 #   3. the run is resumable and chunked: one case per live-run invocation, each
 #      case result persisted to a resume manifest the moment it completes, the
 #      manifest uploaded as an artifact even when the step times out, and a
 #      re-dispatch restoring that manifest and running only the cases that are
-#      not already complete. A completed case is never dispatched twice.
-#   4. a preflight_only dispatch (item 4): the same committed-template staging
-#      and the same offline live-preflight, then a fail-closed stop. It maps no
+#      not already complete. A completed case is never dispatched twice; a
+#      re-run of the same run id ("Re-run failed jobs") is refused outright, so
+#      a fresh dispatch is the only resume path.
+#   4. a preflight_only dispatch (item 4, ratified as S3): only the exact
+#      literal boolean true selects it. The same committed-template staging and
+#      the same offline live-preflight run, then a fail-closed stop. It maps no
 #      key, runs no live-run or chunk step, makes no provider call and costs
-#      $0; the stop step refuses unless that preflight was clean.
+#      $0; the run step is the only step that maps provider secrets and it is
+#      skipped, so a provider call is structurally impossible in this mode. The
+#      stop step refuses unless that preflight was clean.
 # No runner logic changed: the staged gate, the chunks and the manifest are
 # built from the merged package's own loaders and digests, invoked unmodified.
 #
@@ -38,23 +54,35 @@
 #   * no secret value is echoed, traced, dumped or written to a file.
 #
 # Cost containment is layered and fail-closed:
-#   1. the config step rebuilds the committed config template with
-#      spend_ceiling_cents = 12000 (the $120 owner provider cap; the package's
-#      owner pilot ceiling is 15000) and a ONE-entry cross-vendor judge
-#      allowlist, then validates the result with the package's own validator;
-#      each per-case invocation is rebuilt with spend_ceiling_cents equal to the
-#      budget still unspent, so the sum over all invocations cannot cross $120;
+#   1. the config step rebuilds the committed config template with the
+#      EFFECTIVE ceiling, min(12000 owner provider cap, the committed gate
+#      template's spend.ceiling_cents; the package's owner pilot ceiling is
+#      15000) and a ONE-entry cross-vendor judge allowlist, then validates the
+#      result with the package's own validator; each per-case invocation is
+#      rebuilt with spend_ceiling_cents equal to the budget still unspent, so
+#      the sum over all invocations cannot cross the effective ceiling;
 #      the budget is CUMULATIVE across every prior dispatch of the same frozen
-#      dataset: all prior resume artifacts are merged, every prior attempt keeps
-#      its own ledger (copied under a run-scoped name and de-duplicated), the
-#      next attempt number continues past every attempt any dispatch used, and
-#      the spend total is recomputed from the ledgers rather than from the
-#      current manifest, so a HALTED or timed-out dispatch can neither lose
-#      spend nor charge the same attempt twice;
+#      dataset: the complete run list is paginated (an incomplete listing is a
+#      refusal), a resume artifact that exists but cannot be downloaded or
+#      parsed is a refusal (never "no artifact"), every ledger is validated and
+#      copied under a run-scoped name, an unparseable or charge-less ledger is a
+#      refusal (never zero), the next attempt number continues past every
+#      attempt any dispatch used, and the spend total is recomputed from the
+#      ledgers rather than from the current manifest, so a HALTED or timed-out
+#      dispatch can neither lose spend nor charge the same attempt twice. A
+#      re-run of the same run id is refused: the resume artifact is run-scoped,
+#      so a fresh dispatch is required to resume, never "Re-run failed jobs";
 #   2. the merged BER live package checks its cost meter before every call and
 #      halts on the first reservation that would cross the configured ceiling.
 #      A halted case and every case after it are recorded UNRUN, and an UNRUN
 #      case is never PASS.
+#   3. the structured summary cannot publish a false green: any verification
+#      failure (a ceiling breach, counted spend above the effective ceiling, an
+#      unreadable or charge-less ledger, missing evidence, a result hash or
+#      result-count mismatch, an unreconciled cost entry, a raw transcript) is
+#      recorded and forces status VERIFICATION_FAILED and verdict UNRUN before
+#      the record is written. The step still exits 1, so a red run is never
+#      published as COMPLETED/PASS.
 #
 # Secret containment: ANTHROPIC_API_KEY and OPENAI_API_KEY are injected from
 # the eval-run environment only, mapped only in the single env: block of the
@@ -308,10 +336,32 @@ jobs:
           if not isinstance(template, dict):
               fail("the config template must be a JSON object")
 
-          # The owner cap and the one permitted cross-vendor judge replace the
-          # template's broader values. Everything else stays as committed and
-          # is validated by the package, never hand-accepted here.
-          template["spend_ceiling_cents"] = PILOT_CEILING_CENTS
+          # The owner gate may set a STRICTER ceiling than the workflow's $120
+          # owner cap. The effective ceiling is the lower of the two; a gate
+          # ceiling that is missing, non-integer or non-positive is refused
+          # rather than silently treated as the workflow cap.
+          try:
+              gate_template_preview = json.loads(
+                  template_gate_path.read_text(encoding="utf-8")
+              )
+          except (OSError, ValueError) as exc:
+              fail(f"the gate template is not readable JSON: {type(exc).__name__}")
+          if not isinstance(gate_template_preview, dict):
+              fail("the gate template must be a JSON object")
+          gate_spend = gate_template_preview.get("spend")
+          if not isinstance(gate_spend, dict):
+              fail("the gate template has no spend object")
+          gate_spend_ceiling_cents = gate_spend.get("ceiling_cents")
+          if type(gate_spend_ceiling_cents) is not int or gate_spend_ceiling_cents <= 0:
+              fail("the gate template has no positive integer spend ceiling")
+          EFFECTIVE_CEILING_CENTS = min(PILOT_CEILING_CENTS, gate_spend_ceiling_cents)
+          if EFFECTIVE_CEILING_CENTS <= 0:
+              fail("the effective ceiling is not positive")
+
+          # The effective cap and the one permitted cross-vendor judge replace
+          # the template's broader values. Everything else stays as committed
+          # and is validated by the package, never hand-accepted here.
+          template["spend_ceiling_cents"] = EFFECTIVE_CEILING_CENTS
           template["subject_vendors"] = [EXPECTED_SUBJECT_VENDOR]
           template["judge_allowlist"] = {
               "judge_models": [
@@ -329,8 +379,11 @@ jobs:
               fail("the built judge allowlist is not exactly the owner-pinned judge")
           if list(config.subject_vendors) != [EXPECTED_SUBJECT_VENDOR]:
               fail("the built subject_vendors is not exactly the owner-pinned subject")
-          if config.spend_ceiling_cents != PILOT_CEILING_CENTS:
-              fail("the built spend_ceiling_cents is not the $120 owner cap")
+          if config.spend_ceiling_cents != EFFECTIVE_CEILING_CENTS:
+              fail(
+                  "the built spend_ceiling_cents is not the effective owner cap "
+                  "(min of $120 and the gate template ceiling)"
+              )
 
           out_path = RUNNER_TEMP / "live-config.json"
           out_path.write_text(
@@ -363,6 +416,11 @@ jobs:
               fail(f"the committed gate template is not a valid owner gate: {type(exc).__name__}")
           if gate_template.fact_origin != "REAL_HOST":
               fail("the committed gate template must be a REAL_HOST owner gate")
+          if gate_template.spend_ceiling_cents != gate_spend_ceiling_cents:
+              fail(
+                  "the gate template spend ceiling does not match the preview that "
+                  "set the effective ceiling"
+              )
 
           # The freeze binding: the committed case bytes must reproduce exactly
           # the digest and count the owner gate template declares.
@@ -399,9 +457,14 @@ jobs:
           except Exception as exc:  # noqa: BLE001
               fail(f"the staged gate is not a valid owner gate: {type(exc).__name__}")
           staged_gate_path = RUNNER_TEMP / "live-gate.json"
-          staged_text = json.dumps(staged_payload, indent=2, sort_keys=True) + "\n"
-          staged_gate_path.write_text(staged_text, encoding="utf-8")
-          staged_gate_sha256 = hashlib.sha256(staged_text.encode("utf-8")).hexdigest()
+          # Write bytes, not text: the recorded hash must describe exactly the
+          # bytes on disk on every platform (a text-mode newline translation
+          # would otherwise make the plan's hash and the file disagree).
+          staged_bytes = (
+              json.dumps(staged_payload, indent=2, sort_keys=True) + "\n"
+          ).encode("utf-8")
+          staged_gate_path.write_bytes(staged_bytes)
+          staged_gate_sha256 = hashlib.sha256(staged_bytes).hexdigest()
 
           case_ids = [case.case_id for case in frozen_cases]
           planned_calls_per_case = (
@@ -425,7 +488,8 @@ jobs:
               "staged_gate_sha256": staged_gate_sha256,
               "staged_gate_digest": staged_gate.digest(),
               "staged_gate_revision": staged_gate.dataset_revision,
-              "spend_ceiling_cents": PILOT_CEILING_CENTS,
+              "spend_ceiling_cents": EFFECTIVE_CEILING_CENTS,
+              "gate_spend_ceiling_cents": gate_spend_ceiling_cents,
               "runs_per_case": config.runs_per_case,
               "subject_vendors": list(config.subject_vendors),
               "planned_calls_per_case": planned_calls_per_case,
@@ -500,6 +564,7 @@ jobs:
             --expected-revision "$GITHUB_SHA" \
             | tee "$RUNNER_TEMP/ber-preflight.json"
           python -P - <<'PY'
+          import hashlib
           import json
           import os
           import sys
@@ -513,6 +578,18 @@ jobs:
           dataset = report.get("dataset") or {}
           blockers = report.get("blockers")
           failures = []
+          # Recompute the staged gate's hash from the file the preflight read
+          # rather than echoing the plan, and require the package's own record
+          # digest to be the one the plan staged: a swapped file fails here.
+          try:
+              staged_bytes = (RUNNER_TEMP / "live-gate.json").read_bytes()
+          except OSError:
+              staged_bytes = b""
+          staged_sha256 = hashlib.sha256(staged_bytes).hexdigest()
+          if staged_sha256 != plan["staged_gate_sha256"]:
+              failures.append("the staged gate file is not the bytes the plan recorded")
+          if gate.get("digest") != plan["staged_gate_digest"]:
+              failures.append("the preflight gate digest is not the staged record digest")
           if report.get("status") not in {"READY", "READY_NEEDS_KEYS"}:
               failures.append(f"preflight status is {report.get('status')!r}")
           if blockers:
@@ -568,7 +645,7 @@ jobs:
               ),
               "checkout_equals_dispatch_sha": report.get("checkout_revision") == dispatch_sha,
               "staged_gate_path": plan["staged_gate_path"],
-              "staged_gate_sha256": plan["staged_gate_sha256"],
+              "staged_gate_sha256": staged_sha256,
               "staged_gate_record_digest": gate.get("digest"),
               "template_gate_revision_placeholder": plan["template_gate_revision"],
               "dataset_sha256": dataset.get("digest"),
@@ -585,11 +662,16 @@ jobs:
           PY
 
       - name: Restore every prior dispatch's resume state for this dataset
-        # Cumulative across dispatches: every prior manifest for this frozen
-        # dataset and gate template is merged, so a HALTED, timed-out or
-        # interrupted attempt never loses its spend and a case that already
-        # completed is never dispatched a second time.
-        if: ${{ !inputs.preflight_only }}
+        id: restore
+        # Fail closed: this step refuses rather than resuming blind whenever a
+        # prior run's artifact, manifest, ledger or result cannot be read, the
+        # listing is incomplete, the ledger charge is not a non-negative
+        # integer, or the dispatch is a re-run. The run step below only executes
+        # when this step succeeded, so a refusal can never re-dispatch completed
+        # cases (and never re-spends their budget). Only the exact literal
+        # boolean true selects preflight-only mode; any other value, or no
+        # value, runs the live path with every live gate in force.
+        if: ${{ inputs.preflight_only != true }}
         env:
           GH_TOKEN: ${{ github.token }}
           PYTHONPATH: ${{ github.workspace }}
@@ -614,8 +696,16 @@ jobs:
               directory.mkdir(parents=True, exist_ok=True)
           plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
           repository = os.environ.get("REPOSITORY", "")
-          current_run = str(os.environ.get("GITHUB_RUN_ID", ""))
-          PRIOR_RUN_LIMIT = 30
+          current_run = str(os.environ.get("GITHUB_RUN_ID", "")).strip()
+          run_attempt = str(os.environ.get("GITHUB_RUN_ATTEMPT", "1")).strip() or "1"
+          ARTIFACT_NAME = "ber-resume-manifest"
+
+
+          def refuse(message):
+              # Fail closed: an unreadable or unverifiable prior charge must stop the
+              # dispatch rather than silently shrink the spend baseline.
+              print("RESUME REFUSED: " + message, flush=True)
+              raise SystemExit(1)
 
 
           def gh(*args):
@@ -624,7 +714,7 @@ jobs:
                       ["gh", *args],
                       capture_output=True,
                       text=True,
-                      timeout=180,
+                      timeout=300,
                   )
               except (OSError, subprocess.SubprocessError):
                   return None
@@ -639,11 +729,18 @@ jobs:
 
 
           def ledger_spend(path):
+              # A ledger that cannot be read or does not carry a non-negative integer
+              # charge is a refusal, never zero: dropping it would understate spend.
               try:
                   payload = json.loads(path.read_text(encoding="utf-8"))
               except (OSError, ValueError):
-                  return None
-              return integer(payload.get("spent_cents"))
+                  refuse("ledger " + path.name + " is unreadable")
+              if not isinstance(payload, dict):
+                  refuse("ledger " + path.name + " is not a JSON object")
+              spent = payload.get("spent_cents")
+              if type(spent) is not int or spent < 0:
+                  refuse("ledger " + path.name + " has no non-negative integer spent_cents")
+              return spent
 
 
           def attempt_of(name):
@@ -657,6 +754,20 @@ jobs:
                   return None, None
               return stem[:marker], int(tail)
 
+
+          if not current_run.isdigit():
+              refuse("GITHUB_RUN_ID is missing, so prior state cannot be identified")
+          if run_attempt != "1":
+              # A re-run of the same run id would reuse the same run-scoped resume
+              # artifact name, so its previous attempt cannot be read back reliably.
+              # Instead of starting from a fresh baseline and losing that attempt's
+              # spend (or double counting it), this dispatch refuses; a fresh dispatch
+              # resumes the uploaded manifest of every completed run.
+              refuse(
+                  "run " + current_run + " attempt " + run_attempt + " is a re-run; "
+                  "re-runs are not resumed because the resume artifact is run-scoped. "
+                  "Dispatch a fresh run instead."
+              )
 
           state = {
               "schema": "ber-resume-manifest/1.1.0",
@@ -674,62 +785,128 @@ jobs:
           completed = {}
           source_runs = []
           skipped = []
-          ignored_artifacts = 0
-          # No --branch filter: a dispatch of this workflow from a feature
-          # branch is recorded against that branch, and every dispatch of the
-          # same frozen dataset must be counted whatever ref it ran on.
+          without_artifact = []
+          # Full listing, paginated: the previous fixed 30-run window silently forgot
+          # the spend of anything older. A listing this step cannot read completely is
+          # a refusal, because an unseen run may have spent.
           listing = gh(
-              "run", "list",
-              "--repo", repository,
-              "--workflow", "eval-run.yml",
-              "--limit", str(PRIOR_RUN_LIMIT),
-              "--json", "databaseId,createdAt,status,conclusion,headBranch",
+              "api", "--paginate", "--slurp",
+              "repos/" + repository + "/actions/workflows/eval-run.yml/runs?per_page=100",
           )
           if listing is None:
-              raise SystemExit(
-                  "the prior-run listing could not be executed; refusing to resume blind"
-              )
+              refuse("the prior-run listing could not be executed")
           if listing.returncode != 0:
-              print(listing.stderr.strip(), flush=True)
-              raise SystemExit("the prior-run listing failed; refusing to resume blind")
+              print((listing.stderr or "").strip(), flush=True)
+              refuse("the prior-run listing failed with exit code " + str(listing.returncode))
           try:
-              prior_runs = json.loads(listing.stdout or "[]")
+              listing_pages = json.loads(listing.stdout or "[]")
           except ValueError:
-              raise SystemExit("the prior-run listing was not JSON; refusing to resume blind")
-          if not isinstance(prior_runs, list):
-              raise SystemExit("the prior-run listing was not a list; refusing to resume blind")
-          prior_runs = [
-              run for run in prior_runs if str(run.get("databaseId")) != current_run
-          ]
+              refuse("the prior-run listing was not JSON")
+          if not isinstance(listing_pages, list):
+              refuse("the prior-run listing was not a list of pages")
+          declared_total = None
+          prior_runs = []
+          for page in listing_pages:
+              if not isinstance(page, dict):
+                  refuse("a prior-run listing page was not a JSON object")
+              if declared_total is None:
+                  declared_total = page.get("total_count")
+              page_runs = page.get("workflow_runs")
+              if not isinstance(page_runs, list):
+                  refuse("a prior-run listing page has no workflow_runs list")
+              prior_runs.extend(page_runs)
+          if type(declared_total) is not int or declared_total < 0:
+              refuse("the prior-run listing did not report an integer total_count")
+          if len(prior_runs) < declared_total:
+              refuse(
+                  "the prior-run listing is incomplete ("
+                  + str(len(prior_runs))
+                  + " of "
+                  + str(declared_total)
+                  + " runs); refusing to resume against a partial spend history"
+              )
+          ordered_runs = []
+          seen_run_ids = set()
           for run in prior_runs:
-              run_id = str(run.get("databaseId"))
+              if not isinstance(run, dict):
+                  refuse("a prior-run listing entry was not a JSON object")
+              run_id = run.get("id")
+              if type(run_id) is not int:
+                  refuse("a prior-run listing entry has no integer run id")
+              if str(run_id) == current_run:
+                  continue
+              if run_id in seen_run_ids:
+                  continue
+              seen_run_ids.add(run_id)
+              ordered_runs.append(str(run_id))
+
+          for run_id in ordered_runs:
               target = RESTORE_DIR / run_id
               shutil.rmtree(target, ignore_errors=True)
+              # Distinguish "this run published no resume artifact" from "the artifact
+              # exists but could not be downloaded": only the former is a legitimate
+              # empty resume, and even then the run is recorded, never silently dropped.
+              artifacts = gh(
+                  "api", "--paginate", "--slurp",
+                  "repos/" + repository + "/actions/runs/" + run_id + "/artifacts?per_page=100",
+              )
+              if artifacts is None:
+                  refuse("the artifact listing for run " + run_id + " could not be executed")
+              if artifacts.returncode != 0:
+                  print((artifacts.stderr or "").strip(), flush=True)
+                  refuse("the artifact listing for run " + run_id + " failed")
+              try:
+                  artifact_pages = json.loads(artifacts.stdout or "[]")
+              except ValueError:
+                  refuse("the artifact listing for run " + run_id + " was not JSON")
+              if not isinstance(artifact_pages, list):
+                  refuse("the artifact listing for run " + run_id + " was not a page list")
+              published = False
+              for page in artifact_pages:
+                  if not isinstance(page, dict):
+                      refuse("an artifact listing page for run " + run_id + " was not an object")
+                  page_artifacts = page.get("artifacts")
+                  if not isinstance(page_artifacts, list):
+                      refuse("an artifact listing page for run " + run_id + " has no artifacts list")
+                  for artifact in page_artifacts:
+                      if isinstance(artifact, dict) and artifact.get("name") == ARTIFACT_NAME:
+                          published = True
+              if not published:
+                  # A preflight-only dispatch, or a run that failed before the restore
+                  # step, publishes nothing and can have spent nothing: the run step
+                  # always uploads its manifest when it executes.
+                  without_artifact.append(run_id)
+                  continue
               download = gh(
                   "run", "download", run_id,
                   "--repo", repository,
-                  "--name", "ber-resume-manifest",
+                  "--name", ARTIFACT_NAME,
                   "--dir", str(target),
               )
               if download is None:
-                  raise SystemExit(
-                      f"the prior-run artifact download for {run_id} could not be executed"
-                  )
+                  refuse("the resume artifact download for run " + run_id + " could not be executed")
               if download.returncode != 0:
-                  # A run with no resume artifact never reached the restore
-                  # step; that is normal and is not a resume refusal.
-                  ignored_artifacts += 1
-                  continue
+                  print((download.stderr or "").strip(), flush=True)
+                  refuse(
+                      "run " + run_id + " published a resume artifact but its download "
+                      "failed with exit code " + str(download.returncode)
+                      + "; refusing to forget that run's spend"
+                  )
               manifest_path = target / "manifest.json"
               if not manifest_path.is_file():
-                  ignored_artifacts += 1
-                  continue
+                  refuse("run " + run_id + " published a resume artifact with no manifest.json")
               try:
                   prior = json.loads(manifest_path.read_text(encoding="utf-8"))
               except (OSError, ValueError):
-                  skipped.append({"run_id": run_id, "reason": "manifest is not readable JSON"})
-                  continue
-              prior_plan = prior.get("plan") or {}
+                  # The ledgers are the spend record, but without a manifest this step
+                  # cannot prove the artifact belongs to this frozen dataset; refusing
+                  # is safer than importing an unidentified charge history.
+                  refuse("run " + run_id + " has an unreadable manifest; refusing to resume")
+              if not isinstance(prior, dict):
+                  refuse("run " + run_id + " manifest is not a JSON object")
+              prior_plan = prior.get("plan")
+              if not isinstance(prior_plan, dict):
+                  refuse("run " + run_id + " manifest has no plan object")
               if (
                   prior_plan.get("dataset_sha256") != plan["dataset_sha256"]
                   or prior_plan.get("template_gate_sha256") != plan["template_gate_sha256"]
@@ -739,47 +916,55 @@ jobs:
                   )
                   continue
               source_runs.append(run_id)
-              # 1. Every ledger in the artifact is copied under a run-scoped
-              #    name: two dispatches may both hold "<case>-attempt1.json",
-              #    and each charge must survive with its own file. Each later
-              #    artifact also carries copies of the earlier ledgers it was
-              #    itself resumed from, so a charge is identified by its
-              #    un-prefixed name plus its bytes and copied exactly once.
+              # 1. Every ledger in the artifact is copied under a run-scoped name: two
+              #    dispatches may both hold "<case>-attempt1.json", and each charge must
+              #    survive with its own file. A nested copy of an earlier ledger (same
+              #    un-prefixed name and bytes) is copied exactly once, so no charge is
+              #    counted twice and none is lost.
               by_original = {}
               ledger_source = target / "ledgers"
               if ledger_source.is_dir():
                   for ledger in sorted(ledger_source.glob("*.json")):
-                      identity = re.sub(r"^(?:[0-9]+-)+", "", ledger.name)
-                      content = hashlib.sha256(ledger.read_bytes()).hexdigest()
-                      known = seen_ledgers.get(identity)
-                      if known is not None and known[0] == content:
-                          by_original[ledger.name] = {
-                              "ledger_name": known[1],
-                              "spent_cents": ledger_spend(LEDGER_DIR / known[1]),
-                          }
+                      if not ledger.is_file():
                           continue
-                      unique = f"{run_id}-{ledger.name}"
-                      shutil.copyfile(ledger, LEDGER_DIR / unique)
-                      observed = ledger_spend(LEDGER_DIR / unique)
-                      seen_ledgers[identity] = (content, unique)
+                      spent = ledger_spend(ledger)
+                      try:
+                          content = hashlib.sha256(ledger.read_bytes()).hexdigest()
+                      except OSError:
+                          refuse("ledger " + ledger.name + " from run " + run_id + " is unreadable")
+                      identity = re.sub(r"^(?:[0-9]+-)+", "", ledger.name)
+                      key = (identity, content)
+                      unique = seen_ledgers.get(key)
+                      if unique is None:
+                          unique = run_id + "-" + ledger.name
+                          shutil.copyfile(ledger, LEDGER_DIR / unique)
+                          copied_spent = ledger_spend(LEDGER_DIR / unique)
+                          if copied_spent != spent:
+                              refuse("the copied ledger " + unique + " does not match its source")
+                          seen_ledgers[key] = unique
                       by_original[ledger.name] = {
                           "ledger_name": unique,
-                          "spent_cents": observed,
+                          "spent_cents": spent,
                       }
                       case_id, attempt = attempt_of(ledger.name)
                       if case_id in merged and attempt is not None:
-                          merged[case_id].setdefault(attempt, {})
-                          merged[case_id][attempt].update({
-                              "attempt": attempt,
-                              "status": "PRIOR_LEDGER_ONLY",
-                              "spent_cents": observed,
-                              "ledger_name": unique,
-                              "source_run_id": run_id,
-                          })
-              # 2. The manifest's attempt records add status, hashes and any
-              #    spend that the artifact's ledger did not carry. A recorded
-              #    spend never overrides an observed ledger charge.
-              prior_cases = prior.get("cases") or {}
+                          known = merged[case_id].get(attempt) or {}
+                          if not known.get("ledger_name"):
+                              merged[case_id].setdefault(attempt, {})
+                              merged[case_id][attempt].update({
+                                  "attempt": attempt,
+                                  "status": "PRIOR_LEDGER_ONLY",
+                                  "spent_cents": spent,
+                                  "ledger_name": unique,
+                                  "source_run_id": run_id,
+                              })
+              # 2. The manifest's attempt records add status, hashes and any spend the
+              #    artifact's ledger did not carry. A recorded charge never overrides an
+              #    observed ledger charge, and a recorded charge with no ledger is a
+              #    refusal rather than a number this step would have to trust.
+              prior_cases = prior.get("cases")
+              if not isinstance(prior_cases, dict):
+                  refuse("run " + run_id + " manifest has no cases object")
               for case_id, entry in prior_cases.items():
                   if case_id not in merged or not isinstance(entry, dict):
                       continue
@@ -789,38 +974,52 @@ jobs:
                       attempt = integer(record.get("attempt"))
                       if attempt is None:
                           continue
-                      original = record.get("ledger_name") or f"{case_id}-attempt{attempt}.json"
-                      found = by_original.get(original) or {}
-                      observed = found.get("spent_cents")
+                      original = record.get("ledger_name")
+                      found = by_original.get(original) if isinstance(original, str) else None
+                      observed = found.get("spent_cents") if found else None
                       recorded = integer(record.get("spent_cents"))
+                      if observed is None and recorded is not None and recorded > 0:
+                          refuse(
+                              "run " + run_id + " case " + str(case_id) + " attempt "
+                              + str(attempt) + " records " + str(recorded)
+                              + "c but its ledger is missing from the artifact"
+                          )
                       merged[case_id][attempt] = {
                           "attempt": attempt,
                           "status": record.get("status"),
                           "spent_cents": observed if observed is not None else recorded,
-                          "ledger_name": found.get("ledger_name"),
+                          "ledger_name": found.get("ledger_name") if found else None,
                           "source_run_id": run_id,
                           "started_at": record.get("started_at"),
                           "finished_at": record.get("finished_at"),
                           "dispatched_calls": integer(record.get("dispatched_calls")),
                           "result_sha256": record.get("result_sha256"),
+                          # The per-case chunk gate is part of the run record:
+                          # a resumed manifest keeps the digest each live-run
+                          # was dispatched with, not only the newest one.
+                          "chunk_dataset_sha256": record.get("chunk_dataset_sha256"),
+                          "chunk_gate_sha256": record.get("chunk_gate_sha256"),
+                          "chunk_gate_digest": record.get("chunk_gate_digest"),
                       }
                   if entry.get("status") != "COMPLETED":
                       continue
-                  result_path = target / "cases" / f"{case_id}.json"
+                  result_path = target / "cases" / (case_id + ".json")
                   if not result_path.is_file():
-                      continue
+                      refuse(
+                          "run " + run_id + " marks " + str(case_id)
+                          + " COMPLETED but its result file is missing"
+                      )
                   payload = result_path.read_bytes()
                   digest = hashlib.sha256(payload).hexdigest()
                   declared = entry.get("result_sha256")
-                  if declared is not None and declared != digest:
-                      skipped.append(
-                          {"run_id": run_id, "case_id": case_id, "reason": "result hash mismatch"}
+                  if not isinstance(declared, str) or declared != digest:
+                      refuse(
+                          "run " + run_id + " marks " + str(case_id)
+                          + " COMPLETED but its result hash is missing or does not match"
                       )
-                      continue
-                  (CASES_DIR / f"{case_id}.json").write_bytes(payload)
+                  (CASES_DIR / (case_id + ".json")).write_bytes(payload)
                   completed[case_id] = {"result_sha256": digest, "source_run_id": run_id}
 
-          prior_spend = 0
           prior_attempts = 0
           for case_id in plan["case_ids"]:
               attempts = merged[case_id]
@@ -828,19 +1027,21 @@ jobs:
               entry = state["cases"][case_id]
               entry["attempts"] = ordered
               prior_attempts += len(ordered)
-              for record in ordered:
-                  spent = integer(record.get("spent_cents"))
-                  if spent is not None:
-                      prior_spend += spent
               if case_id in completed:
                   entry["status"] = "COMPLETED"
                   entry["result_sha256"] = completed[case_id]["result_sha256"]
                   entry["completed_in_run"] = completed[case_id]["source_run_id"]
               elif ordered:
                   entry["status"] = str(ordered[-1].get("status") or "PENDING")
+          # The spend baseline is the set of copied ledgers itself, each counted once,
+          # so it cannot drift from the run step's total_spent().
+          prior_spend = 0
+          for ledger in sorted(LEDGER_DIR.glob("*.json")):
+              prior_spend += ledger_spend(ledger)
           state["restored_from"] = (
               {
                   "runs": source_runs,
+                  "runs_without_artifact": without_artifact,
                   "completed_cases": sorted(completed),
                   "completed_case_sources": [
                       {"case_id": case_id, "run_id": completed[case_id]["source_run_id"]}
@@ -848,7 +1049,6 @@ jobs:
                   ],
                   "prior_attempts": prior_attempts,
                   "prior_spend_cents": prior_spend,
-                  "ignored_artifacts": ignored_artifacts,
                   "restored_at": utc_now(),
               }
               if source_runs
@@ -860,11 +1060,14 @@ jobs:
           )
           outcome = {
               "resume": "restored" if source_runs else "none",
+              "run_attempt": run_attempt,
+              "runs_listed": len(ordered_runs),
+              "runs_listed_total": declared_total,
+              "runs_without_artifact": without_artifact,
               "source_run_ids": source_runs,
               "completed_cases": sorted(completed),
               "prior_attempts": prior_attempts,
               "prior_spend_cents": prior_spend,
-              "ignored_artifacts": ignored_artifacts,
               "skipped_manifests": skipped,
               "reason": (
                   None if source_runs
@@ -874,9 +1077,11 @@ jobs:
           print(json.dumps(outcome, indent=2, sort_keys=True))
           PY
       - name: Run the remaining cases as resumable per-case chunks
-        # Never runs in a preflight-only dispatch: that mode maps no key and
-        # makes no provider call.
-        if: ${{ !inputs.preflight_only }}
+        # Never runs in a preflight-only dispatch (that mode maps no key and
+        # makes no provider call), and never after a failed restore: running
+        # with no prior state would re-dispatch completed cases and forget
+        # their spend.
+        if: ${{ inputs.preflight_only != true && steps.restore.outcome == 'success' }}
         # Stops below the 360-minute job timeout so the always() steps that
         # persist and publish the manifest still run when this step times out.
         timeout-minutes: 330
@@ -951,17 +1156,33 @@ jobs:
 
 
           def ledger_spent(path):
-              """The charge the package recorded, or None.
+              """The charge the package recorded, or None when no ledger exists.
 
               The package snapshots its ledger after every accounted call, so
               a killed or timed-out attempt still leaves the charges it made.
+              A ledger that exists but cannot be read, is not an object, or does
+              not carry a non-negative integer charge is a refusal: a malformed
+              ledger must never be counted as zero.
               """
+              if not path.exists():
+                  return None
               try:
                   payload = json.loads(path.read_text(encoding="utf-8"))
               except (OSError, ValueError):
-                  return None
+                  print(f"REFUSED: ledger {path.name} is unreadable", flush=True)
+                  raise SystemExit(1)
+              if not isinstance(payload, dict):
+                  print(f"REFUSED: ledger {path.name} is not a JSON object", flush=True)
+                  raise SystemExit(1)
               spent = payload.get("spent_cents")
-              return spent if type(spent) is int else None
+              if type(spent) is not int or spent < 0:
+                  print(
+                      f"REFUSED: ledger {path.name} has no non-negative "
+                      "integer spent_cents",
+                      flush=True,
+                  )
+                  raise SystemExit(1)
+              return spent
 
 
           def ledger_charges():
@@ -993,11 +1214,20 @@ jobs:
                           continue
                       name = record.get("ledger_name")
                       if isinstance(name, str) and name in observed:
-                          total += observed[name]
-                          attributed.add(name)
+                          # Count each ledger exactly once: a record naming an
+                          # already attributed ledger adds nothing.
+                          if name not in attributed:
+                              total += observed[name]
+                              attributed.add(name)
                           continue
                       spent = record.get("spent_cents")
                       if type(spent) is int:
+                          if spent > 0:
+                              print(
+                                  f"REFUSED: an attempt records {spent}c with no ledger",
+                                  flush=True,
+                              )
+                              raise SystemExit(1)
                           total += spent
               for name, spent in observed.items():
                   if name not in attributed:
@@ -1253,13 +1483,28 @@ jobs:
                   result_path.read_bytes()
               ).hexdigest()
               record["spent_cents"] = ledger_spent(ledger_path)
-              if record["spent_cents"] is None:
-                  spent = result.get("spent_cents")
-                  record["spent_cents"] = spent if type(spent) is int else 0
               record["dispatched_calls"] = result.get("dispatched_calls")
-              record["status"] = result.get("status")
               record["finished_at"] = utc_now()
-              if completed.returncode != 0 or result.get("status") != "COMPLETED":
+              if completed.returncode != 0 and result.get("status") == "COMPLETED":
+                  # A non-zero return code never sets a case COMPLETED, whatever
+                  # the JSON on stdout claims. A legitimate halt (the package
+                  # exits 3 with status HALTED) is handled by the halt branch
+                  # below, not relabelled as an error.
+                  record["status"] = "ERROR"
+                  record["returncode"] = completed.returncode
+                  record["halt_view"] = halt_view_of(result.get("halt"))
+                  record["halt_reason_code"] = result.get("halt_reason_code")
+                  record["error"] = result.get("error")
+                  entry["status"] = "ERROR"
+                  failures.append(
+                      f"{case_id}: live-run exited with return code "
+                      f"{completed.returncode}"
+                  )
+                  write_state()
+                  enforce_ceiling()
+                  break
+              record["status"] = result.get("status")
+              if result.get("status") != "COMPLETED":
                   # The manifest is itself an uploaded artifact, so a halt is
                   # published through the same closed allowlist as the
                   # structured summary, never as the package's raw object.
@@ -1274,6 +1519,19 @@ jobs:
                   write_state()
                   enforce_ceiling()
                   break
+              if record["spent_cents"] is None:
+                  spent = result.get("spent_cents")
+                  if type(spent) is not int or spent < 0:
+                      # A completed run without a readable ledger cannot be
+                      # counted, so it is refused rather than counted as zero.
+                      failures.append(
+                          f"{case_id}: completed live-run has no readable cost ledger"
+                      )
+                      record["status"] = "LEDGER_INVALID"
+                      entry["status"] = "LEDGER_INVALID"
+                      write_state()
+                      raise SystemExit(1)
+                  record["spent_cents"] = spent
               entry["status"] = "COMPLETED"
               entry["result_sha256"] = record["result_sha256"]
               ran_cases.append(case_id)
@@ -1339,7 +1597,9 @@ jobs:
         # A preflight-only dispatch never runs a case, so it must not publish an
         # empty manifest that a later dispatch could mistake for the newest
         # resume state and re-dispatch completed cases.
-        if: always() && !inputs.preflight_only
+        # A failed restore must not publish a partial (empty) manifest that a
+        # later dispatch could mistake for this dataset's resume state.
+        if: always() && inputs.preflight_only != true && steps.restore.outcome == 'success'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: ber-resume-manifest
@@ -1354,7 +1614,7 @@ jobs:
         # clean: READY or READY_NEEDS_KEYS, zero blockers, checkout revision ==
         # staged gate revision == dispatched commit, the frozen dataset, and
         # proof that this job held no model key and made no network call.
-        if: ${{ inputs.preflight_only }}
+        if: ${{ inputs.preflight_only == true }}
         run: |
           python -P - <<'PY'
           import json
@@ -1439,7 +1699,7 @@ jobs:
         # Runs after a halt, a timeout or a refusal too: a failed dispatch still
         # owes a structured record, and the job conclusion stays failed because
         # this step is not allowed to mask the per-case run step.
-        if: always() && !inputs.preflight_only
+        if: always() && inputs.preflight_only != true
         run: |
           python -P - <<'PY'
           import datetime as dt
@@ -1456,7 +1716,10 @@ jobs:
           CASES_DIR = RUNNER_TEMP / "ber-manifest" / "cases"
           LEDGER_DIR = RUNNER_TEMP / "ber-manifest" / "ledgers"
           PUBLISH_DIR = RUNNER_TEMP / "publish"
-          EXPECTED_CEILING_CENTS = 12000
+          # The owner provider cap; the effective ceiling for this dispatch is
+          # min(this, the committed gate template's spend.ceiling_cents), which
+          # the config step computed and wrote into the plan.
+          HARD_CEILING_CENTS = 12000
 
 
           def load_json(path):
@@ -1478,6 +1741,25 @@ jobs:
           entries = entries if isinstance(entries, dict) else {}
           config = load_json(CONFIG_PATH)
           config = config if isinstance(config, dict) else {}
+          effective_ceiling = plan.get("spend_ceiling_cents")
+          ceiling_failures = []
+          if (
+              type(effective_ceiling) is not int
+              or not 0 < effective_ceiling <= HARD_CEILING_CENTS
+          ):
+              ceiling_failures.append(
+                  "the run plan has no positive integer effective ceiling at or below $120"
+              )
+              effective_ceiling = HARD_CEILING_CENTS
+          gate_ceiling = plan.get("gate_spend_ceiling_cents")
+          if (
+              type(gate_ceiling) is int
+              and gate_ceiling > 0
+              and effective_ceiling != min(HARD_CEILING_CENTS, gate_ceiling)
+          ):
+              ceiling_failures.append(
+                  "the effective ceiling is not min($120, the gate template ceiling)"
+              )
 
           # Spend and reconciliation come from the ledgers: they are the only
           # record that survives a kill, and every prior dispatch's ledger is
@@ -1485,10 +1767,26 @@ jobs:
           # a manifest record is used only for an attempt with no ledger, so a
           # resumed dispatch cannot lose a prior charge or count one twice.
           ledgers = {}
+          ledger_failures = []
           for path in sorted(LEDGER_DIR.glob("*.json")):
-              payload = load_json(path)
-              if isinstance(payload, dict):
-                  ledgers[path.name] = payload
+              # Every *.json in the ledger directory is spend evidence: one that
+              # cannot be read, is not an object or carries no non-negative
+              # integer spend is a verification failure, never zero.
+              try:
+                  payload = json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, ValueError):
+                  ledger_failures.append(f"ledger {path.name} is unreadable")
+                  continue
+              if not isinstance(payload, dict):
+                  ledger_failures.append(f"ledger {path.name} is not a JSON object")
+                  continue
+              spent = payload.get("spent_cents")
+              if type(spent) is not int or spent < 0:
+                  ledger_failures.append(
+                      f"ledger {path.name} has no non-negative integer spent_cents"
+                  )
+                  continue
+              ledgers[path.name] = payload
 
           case_ids = plan.get("case_ids") or []
           records = []
@@ -1517,12 +1815,15 @@ jobs:
               for attempt in attempts:
                   name = attempt.get("ledger_name")
                   ledger = ledgers.get(name) if isinstance(name, str) else None
-                  if isinstance(ledger, dict) and name not in attributed:
-                      spent = integer(ledger.get("spent_cents"))
-                      if spent is not None:
+                  if isinstance(ledger, dict):
+                      # A ledger is counted exactly once even when two attempt
+                      # records name it; the record's fallback spend is used
+                      # only when no ledger was observed at all.
+                      if name not in attributed:
+                          spent = ledger["spent_cents"]
                           case_spend += spent
                           spent_total += spent
-                      attributed.add(name)
+                          attributed.add(name)
                       continue
                   spent = integer(attempt.get("spent_cents"))
                   if spent is not None:
@@ -1545,6 +1846,11 @@ jobs:
                           attempt.get("ledger_name")
                           for attempt in attempts
                           if isinstance(attempt.get("ledger_name"), str)
+                      ],
+                      "chunk_gate_digests": [
+                          attempt.get("chunk_gate_digest")
+                          for attempt in attempts
+                          if isinstance(attempt.get("chunk_gate_digest"), str)
                       ],
                   }
               )
@@ -1729,6 +2035,8 @@ jobs:
           # publish an incomplete, unverified or over-budget record. The files
           # are written first and the step then exits 1, so the artifact exists.
           verification_failures = []
+          verification_failures.extend(ceiling_failures)
+          verification_failures.extend(ledger_failures)
           if not plan:
               verification_failures.append(
                   "the run plan file is missing or not valid JSON"
@@ -1737,16 +2045,18 @@ jobs:
               verification_failures.append(
                   "the resume manifest is missing or not valid JSON"
               )
-          if type(configured) is not int or configured != EXPECTED_CEILING_CENTS:
+          if type(configured) is not int or configured != effective_ceiling:
               verification_failures.append(
-                  "the built config ceiling is not the $120 owner cap"
+                  "the built config ceiling is not the plan's effective ceiling"
               )
           if state.get("ceiling_breach"):
               verification_failures.append(
                   "the run recorded a cumulative spend ceiling breach"
               )
-          if spent_total > EXPECTED_CEILING_CENTS:
-              verification_failures.append("the counted spend is above $120")
+          if spent_total > effective_ceiling:
+              verification_failures.append(
+                  "the counted spend is above the effective ceiling"
+              )
           for name, payload in ledgers.items():
               spent = integer(payload.get("spent_cents"))
               ceiling = integer(payload.get("ceiling_cents"))
@@ -1755,9 +2065,10 @@ jobs:
                   continue
               if spent < 0:
                   verification_failures.append(f"ledger {name} has a negative spend")
-              if type(ceiling) is not int or not 0 < ceiling <= EXPECTED_CEILING_CENTS:
+              if type(ceiling) is not int or not 0 < ceiling <= effective_ceiling:
                   verification_failures.append(
-                      f"ledger {name} has a missing, non-positive or above-$120 ceiling"
+                      f"ledger {name} has a missing, non-positive or "
+                      "above-effective-ceiling ceiling"
                   )
               elif spent > ceiling:
                   verification_failures.append(
@@ -1815,9 +2126,18 @@ jobs:
                       name = attempt.get("ledger_name")
                       payload = ledgers.get(name) if isinstance(name, str) else None
                       if not isinstance(payload, dict):
-                          verification_failures.append(
-                              f"{case_id}: a completed attempt has no ledger"
-                          )
+                          # A preflight-only or killed-before-first-charge attempt
+                          # has no ledger and no charge, and must not poison a case
+                          # a later attempt completed. A recorded charge with no
+                          # ledger, and a COMPLETED attempt with no ledger, are
+                          # still refused.
+                          recorded = integer(attempt.get("spent_cents"))
+                          if attempt.get("status") == "COMPLETED" or (
+                              recorded is not None and recorded > 0
+                          ):
+                              verification_failures.append(
+                                  f"{case_id}: a completed attempt has no ledger"
+                              )
                           continue
                       if integer(payload.get("unreconciled_count")) != 0:
                           verification_failures.append(
@@ -1828,6 +2148,12 @@ jobs:
               verification_failures.append(
                   "a result record says a raw transcript was included"
               )
+          if verification_failures:
+              # unrun_is_never_pass, extended: a record that failed verification
+              # is never published as COMPLETED or PASS. The status written to
+              # the artifact and the step's exit code agree.
+              status = "VERIFICATION_FAILED"
+              verdict = "UNRUN"
 
           summary = {
               "schema_version": "apr161-eval-run-summary/1.0.0",
@@ -1871,9 +2197,9 @@ jobs:
               "cost": {
                   "configured_ceiling_cents": configured,
                   "owner_limits": owner_limits,
-                  "ceiling_cents": EXPECTED_CEILING_CENTS,
+                  "ceiling_cents": effective_ceiling,
                   "spent_cents": spent_total,
-                  "remaining_cents": max(0, EXPECTED_CEILING_CENTS - spent_total),
+                  "remaining_cents": max(0, effective_ceiling - spent_total),
                   "ledger_spend_cents": spent_total,
                   "unreconciled_count": unreconciled_total,
                   "call_count": ledger_call_count,
@@ -1959,7 +2285,7 @@ jobs:
           ledger_out.write_text(
               json.dumps(
                   {"schema": "ber-pilot-a-ledgers/1.0.0", "ledgers": ledgers_out,
-                   "spent_cents": spent_total, "ceiling_cents": EXPECTED_CEILING_CENTS},
+                   "spent_cents": spent_total, "ceiling_cents": effective_ceiling},
                   indent=2,
                   sort_keys=True,
               )
