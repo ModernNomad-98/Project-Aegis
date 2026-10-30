@@ -98,10 +98,44 @@ def judge_routes_by_subject() -> dict[str, dict[str, str]]:
 #: unknown or missing status) is a transport failure.
 COMPLETE_STOP_REASONS = frozenset({"end_turn", "stop_sequence", "completed"})
 
-#: The vendor API base URLs are pinned; an environment override cannot redirect
-#: the key to another host.
-ANTHROPIC_BASE_URL = "https://api.anthropic.com"
+#: The OpenAI base URL is pinned explicitly. The Anthropic host is left at the
+#: SDK default because this package's static-safety rule bans the provider host
+#: literal everywhere; instead, every base-URL, proxy and TLS environment
+#: override is refused before a client is constructed, so neither key can be
+#: redirected to another host.
 OPENAI_BASE_URL = "https://api.openai.com/v1"
+_BASE_URL_ENV_VARS = (
+    "ANTHROPIC_BASE_URL",
+    "OPENAI_BASE_URL",
+)
+_PROXY_ENV_VARS = ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "OPENAI_PROXY", "ANTHROPIC_PROXY")
+_TLS_OVERRIDE_ENV_VARS = ("SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE", "CURL_CA_BUNDLE")
+
+
+def detect_transport_env_violations(environ: Any = None) -> list[str]:
+    """Environment settings that could redirect or weaken the transport.
+
+    No proxy, base-URL redirection or TLS trust override is approved; a
+    non-empty value fails closed instead of being silently ignored.
+    """
+    import os
+
+    environ = os.environ if environ is None else environ
+    violations: list[str] = []
+    for name in (*_BASE_URL_ENV_VARS, *_PROXY_ENV_VARS, *_TLS_OVERRIDE_ENV_VARS):
+        if environ.get(name):
+            violations.append(name)
+    return sorted(set(violations))
+
+
+def require_clean_transport_environment(environ: Any = None) -> None:
+    violations = detect_transport_env_violations(environ)
+    if violations:
+        raise ProviderTransportError(
+            "provider transport environment overrides are refused: "
+            + ", ".join(violations),
+            context={"violations": violations},
+        )
 
 
 def extract_usage(usage: Any, *, vendor: str) -> "ProviderUsage":
@@ -150,6 +184,8 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
     """One lazy-import SDK call. The key is never logged or stored."""
     from .transport import ProviderResponse
 
+    require_clean_transport_environment()
+
     if not isinstance(api_key, str) or not api_key:
         raise LiveTransportUnavailableError(
             "no credential value available for the SDK call",
@@ -166,7 +202,6 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
         try:
             client = anthropic.Anthropic(
                 api_key=api_key,
-                base_url=ANTHROPIC_BASE_URL,
                 timeout=request.timeout_seconds,
                 max_retries=0,
             )

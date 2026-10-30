@@ -424,6 +424,22 @@ class ProviderContractTests(unittest.TestCase):
             with self.assertRaises(ProviderTransportError):
                 extract_usage(usage, vendor="openai")
 
+    def test_transport_environment_overrides_are_refused(self):
+        from tools.behavioral_eval_runner.live.errors import ProviderTransportError
+        from tools.behavioral_eval_runner.live.providers import (
+            detect_transport_env_violations,
+            require_clean_transport_environment,
+        )
+
+        self.assertEqual(detect_transport_env_violations({}), [])
+        self.assertEqual(
+            detect_transport_env_violations({"OPENAI_BASE_URL": "https://elsewhere"}),
+            ["OPENAI_BASE_URL"],
+        )
+        with self.assertRaises(ProviderTransportError):
+            require_clean_transport_environment({"HTTPS_PROXY": "http://proxy"})
+        require_clean_transport_environment({"OPENAI_API_KEY": "present"})
+
     def test_unknown_arm_is_rejected(self):
         adapter = SubjectAdapter(
             SUBJECT_PINS["anthropic"],
