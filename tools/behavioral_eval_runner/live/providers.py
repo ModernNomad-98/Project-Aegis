@@ -93,9 +93,15 @@ def judge_routes_by_subject() -> dict[str, dict[str, str]]:
 
 #: Stop reasons that mean the provider did not finish the response; a partial
 #: answer must never be graded or judged.
-INCOMPLETE_STOP_REASONS = frozenset(
-    {"max_tokens", "length", "incomplete", "content_filter"}
-)
+#: Only these provider stop statuses mean the response is complete enough to
+#: grade. Anything else (truncation, filtering, failure, cancellation, an
+#: unknown or missing status) is a transport failure.
+COMPLETE_STOP_REASONS = frozenset({"end_turn", "stop_sequence", "completed"})
+
+#: The vendor API base URLs are pinned; an environment override cannot redirect
+#: the key to another host.
+ANTHROPIC_BASE_URL = "https://api.anthropic.com"
+OPENAI_BASE_URL = "https://api.openai.com/v1"
 
 
 def extract_usage(usage: Any, *, vendor: str) -> "ProviderUsage":
@@ -110,7 +116,12 @@ def extract_usage(usage: Any, *, vendor: str) -> "ProviderUsage":
         )
     input_tokens = getattr(usage, "input_tokens", None)
     output_tokens = getattr(usage, "output_tokens", None)
-    if not isinstance(input_tokens, int) or not isinstance(output_tokens, int):
+    if (
+        not isinstance(input_tokens, int)
+        or isinstance(input_tokens, bool)
+        or not isinstance(output_tokens, int)
+        or isinstance(output_tokens, bool)
+    ):
         raise ProviderTransportError(
             "the provider usage telemetry is missing or malformed",
             context={"vendor": vendor},
@@ -124,12 +135,13 @@ def extract_usage(usage: Any, *, vendor: str) -> "ProviderUsage":
 
 
 def ensure_complete_response(stop_reason: str, *, vendor: str) -> None:
-    """A truncated or filtered response is a transport failure, never a grade."""
+    """Only an allowlisted complete status is graded; all else fails closed."""
     lowered = (stop_reason or "").lower()
-    if lowered in INCOMPLETE_STOP_REASONS:
+    if lowered not in COMPLETE_STOP_REASONS:
         raise ProviderTransportError(
-            f"the provider response is incomplete (stop reason {stop_reason!r}); "
-            "a partial answer is not graded or judged",
+            f"the provider response is not clearly complete (status "
+            f"{stop_reason!r}); a partial, failed or unknown response is not "
+            "graded or judged",
             context={"vendor": vendor, "stop_reason": stop_reason},
         )
 
@@ -154,6 +166,7 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
         try:
             client = anthropic.Anthropic(
                 api_key=api_key,
+                base_url=ANTHROPIC_BASE_URL,
                 timeout=request.timeout_seconds,
                 max_retries=0,
             )
@@ -204,6 +217,7 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
         try:
             client = openai.OpenAI(
                 api_key=api_key,
+                base_url=OPENAI_BASE_URL,
                 timeout=request.timeout_seconds,
                 max_retries=0,
             )

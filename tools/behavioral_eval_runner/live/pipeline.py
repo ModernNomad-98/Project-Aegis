@@ -43,7 +43,6 @@ from .credentials import (
 from .dataset import LiveCase, dataset_digest, evaluate_deterministic, load_cases
 from .errors import (
     JudgeRubricSourceError,
-    JudgeVendorGuardError,
     LiveError,
     LiveGateRefusedError,
 )
@@ -138,6 +137,22 @@ def _planned_calls(config: LiveConfig, cases: Sequence[LiveCase]) -> int:
     )
 
 
+RUN_ID_PATTERN = None
+
+
+def _validate_run_id(run_id: str) -> None:
+    import re
+
+    if not isinstance(run_id, str) or not re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", run_id
+    ):
+        raise LiveError(
+            "run_id must be a bounded identifier of [A-Za-z0-9._-]",
+            context={"run_id": run_id},
+            reason_code="RUN_ID_INVALID",
+        )
+
+
 def _require_fresh_evidence_root(root: str) -> None:
     if os.path.exists(root) and os.listdir(root):
         raise LiveError(
@@ -210,8 +225,31 @@ def _required_credential_vendors(config: LiveConfig) -> list[str]:
     return sorted(vendors)
 
 
+def _probe_writable(path: str, what: str) -> None:
+    """Create/append-probe a destination, so a write failure cannot follow spend."""
+    directory = path if os.path.isdir(path) else os.path.dirname(os.path.abspath(path))
+    probe = os.path.join(directory, f".ber-live-write-probe-{os.getpid()}")
+    try:
+        os.makedirs(directory, exist_ok=True)
+        with open(probe, "w", encoding="utf-8") as handle:
+            handle.write("probe")
+        os.unlink(probe)
+    except OSError as exc:
+        raise LiveError(
+            f"the {what} destination is not writable: {directory}",
+            context={"path": directory},
+            reason_code="OUTPUT_PATH_UNAVAILABLE",
+        ) from exc
+
+
 def _validate_output_paths(paths: LivePaths) -> None:
     """Validate output destinations BEFORE any call can spend money."""
+    if os.path.exists(paths.evidence_root) and not os.path.isdir(paths.evidence_root):
+        raise LiveError(
+            "the evidence root exists and is not a directory",
+            context={"evidence_root": paths.evidence_root},
+            reason_code="OUTPUT_PATH_UNAVAILABLE",
+        )
     _require_fresh_evidence_root(paths.evidence_root)
     root = os.path.abspath(paths.evidence_root)
     ledger = os.path.abspath(paths.cost_ledger_path)
@@ -225,13 +263,15 @@ def _validate_output_paths(paths: LivePaths) -> None:
             context={"evidence_root": root, "cost_ledger": ledger},
             reason_code="EVIDENCE_PATH_CONFLICT",
         )
-    parent = os.path.dirname(ledger)
-    if not parent or not os.path.isdir(parent):
+    if os.path.exists(ledger):
         raise LiveError(
-            "the cost ledger parent directory does not exist",
-            context={"cost_ledger": ledger, "parent": parent},
+            "the cost ledger path already exists; refusing to overwrite a "
+            "prior ledger",
+            context={"cost_ledger": ledger},
             reason_code="OUTPUT_PATH_UNAVAILABLE",
         )
+    _probe_writable(root, "evidence root")
+    _probe_writable(ledger, "cost ledger")
 
 
 def preflight(
@@ -300,7 +340,28 @@ def preflight(
     except LiveError as exc:
         blockers.append(exc.to_dict())
     seen_blockers = {json.dumps(b, sort_keys=True) for b in blockers}
-    report["checkout_revision"] = read_checkout_revision(repo_root)
+    checkout_revision = read_checkout_revision(repo_root)
+    report["checkout_revision"] = checkout_revision
+    if gate.fact_origin == REAL_HOST:
+        if checkout_revision is None:
+            blockers.append(
+                {
+                    "reason_code": "LIVE_GATE_REFUSED",
+                    "detail": "the checkout revision cannot be determined",
+                    "context": {"gate_dataset_revision": gate.dataset_revision},
+                }
+            )
+        elif checkout_revision != gate.dataset_revision:
+            blockers.append(
+                {
+                    "reason_code": "LIVE_GATE_REFUSED",
+                    "detail": "the checkout revision differs from the gate dataset revision",
+                    "context": {
+                        "checkout_revision": checkout_revision,
+                        "gate_dataset_revision": gate.dataset_revision,
+                    },
+                }
+            )
     required_vendors = _required_credential_vendors(config)
     missing = missing_credential_env_vars(required_vendors, environ)
     report["credentials"] = {
@@ -312,9 +373,10 @@ def preflight(
         "value_emitted": False,
         "note": "presence check only; no value is logged, stored or emitted",
     }
-    report["blockers"] = [
-        b for b in blockers if json.dumps(b, sort_keys=True) in seen_blockers
-    ]
+    deduped: dict[str, dict[str, Any]] = {}
+    for blocker in blockers:
+        deduped[json.dumps(blocker, sort_keys=True)] = blocker
+    report["blockers"] = list(deduped.values())
     if blockers:
         report["status"] = "REFUSED"
     elif gate.fact_origin != REAL_HOST:
@@ -362,6 +424,7 @@ def _result_record(
 ) -> dict[str, Any]:
     record: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
+        "record_family": "ber-live",
         "live_schema_version": LIVE_SCHEMA_VERSION,
         "case_id": case.case_id,
         "skill": case.skill,
@@ -801,6 +864,7 @@ def dry_run(
     require_live_gate(
         gate, config, now=now, allowed_origins=frozenset({SYNTHETIC})
     )
+    _validate_run_id(paths.run_id)
     _validate_output_paths(paths)
     subject_factory = subject_transport_factory or _dry_run_subject_transport
     judge_factory = judge_transport_factory or _dry_run_judge_transport
@@ -859,15 +923,22 @@ def live_run(
     require_live_gate(
         gate, config, now=now, allowed_origins=frozenset({REAL_HOST})
     )
+    _validate_run_id(paths.run_id)
     _validate_output_paths(paths)
-    resolved_revision = repo_revision or read_checkout_revision(
-        repo_root or os.getcwd()
-    )
+    resolved_revision = read_checkout_revision(repo_root or os.getcwd())
     if resolved_revision is None:
         raise LiveGateRefusedError(
             "the checkout revision cannot be determined; refusing a live run "
             "that cannot bind its dataset revision",
             context={"gate_dataset_revision": gate.dataset_revision},
+        )
+    if repo_revision is not None and repo_revision != resolved_revision:
+        raise LiveGateRefusedError(
+            "the expected revision does not match the checkout revision",
+            context={
+                "expected_revision": repo_revision,
+                "checkout_revision": resolved_revision,
+            },
         )
     if resolved_revision != gate.dataset_revision:
         raise LiveGateRefusedError(
@@ -880,7 +951,15 @@ def live_run(
     credentials = resolve_credentials(
         _required_credential_vendors(config), environ
     )
-    if subject_transport_factory is None or judge_transport_factory is None:
+    if (subject_transport_factory is None) != (judge_transport_factory is None):
+        raise LiveError(
+            "supply both transport factories or neither; a single factory "
+            "would silently fall back to the vendor SDK",
+            context={"subject_supplied": subject_transport_factory is not None,
+                     "judge_supplied": judge_transport_factory is not None},
+            reason_code="TRANSPORT_FACTORY_PAIR_REQUIRED",
+        )
+    if subject_transport_factory is None:
         from .transport import SdkSubjectTransport
 
         subject_factory = SdkSubjectTransport

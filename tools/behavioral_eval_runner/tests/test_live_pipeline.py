@@ -137,6 +137,61 @@ class DryRunEndToEndTests(unittest.TestCase):
             )
 
 
+class OperationGuardTests(unittest.TestCase):
+    def test_partial_transport_factory_injection_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = helpers.make_paths(tmp, gate=helpers.gate_payload(fact_origin="REAL_HOST"))
+            environ = {
+                "ANTHROPIC_API_KEY": helpers.FAKE_ANTHROPIC_KEY,
+                "OPENAI_API_KEY": helpers.FAKE_OPENAI_KEY,
+            }
+            from tools.behavioral_eval_runner.live.pipeline import live_run
+
+            with self.assertRaises(LiveError) as caught:
+                live_run(
+                    paths,
+                    environ=environ,
+                    subject_transport_factory=lambda credentials: helpers.mock_subject_transport(),
+                )
+            self.assertEqual(
+                getattr(caught.exception, "reason_code", None),
+                "TRANSPORT_FACTORY_PAIR_REQUIRED",
+            )
+
+    def test_invalid_run_id_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = helpers.make_paths(tmp, run_id="../escape")
+            with self.assertRaises(LiveError) as caught:
+                dry_run(paths)
+            self.assertEqual(
+                getattr(caught.exception, "reason_code", None), "RUN_ID_INVALID"
+            )
+
+    def test_evidence_root_as_a_file_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = helpers.make_paths(tmp)
+            with open(paths.evidence_root, "w", encoding="utf-8") as handle:
+                handle.write("not a directory")
+            with self.assertRaises(LiveError) as caught:
+                dry_run(paths)
+            self.assertEqual(
+                getattr(caught.exception, "reason_code", None),
+                "OUTPUT_PATH_UNAVAILABLE",
+            )
+
+    def test_existing_cost_ledger_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = helpers.make_paths(tmp)
+            with open(paths.cost_ledger_path, "w", encoding="utf-8") as handle:
+                handle.write("{}")
+            with self.assertRaises(LiveError) as caught:
+                dry_run(paths)
+            self.assertEqual(
+                getattr(caught.exception, "reason_code", None),
+                "OUTPUT_PATH_UNAVAILABLE",
+            )
+
+
 class CitabilityTests(unittest.TestCase):
     def test_unrun_and_error_are_never_citable(self):
         from tools.behavioral_eval_runner.live.pipeline import _citability

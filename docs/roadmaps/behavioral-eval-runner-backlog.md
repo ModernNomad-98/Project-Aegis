@@ -4503,10 +4503,13 @@ as GATED and not enabled by default.
 **Checks added or changed (disclosure under AEGIS-APR-142 condition (a)).** One
 allowlist entry, `live/providers.py`, is added to the provider-fragment
 confinement check (the BER self-check and the two static-safety tests) so that
-exactly one new runtime module may name a vendor SDK. No check, schema validation
-or scoring rule is removed or weakened: the AST network/install/subprocess bans
-are unchanged, the default transport still denies dispatch, and a new live test
-pins that no other live module names the provider. New tests were added for the
+exactly one new runtime module may name a vendor SDK. The three command-surface
+tests that asserted "no live verb exists" were **replaced** by checks of the
+stronger gated-verb property (the only live verbs are the gated trio and each
+requires `--gate`) — a deliberate policy change, disclosed rather than described
+as no change. The AST network/install/subprocess bans are unchanged, the default
+transport still denies dispatch, and a new live test pins that no other live
+module names the provider. New tests were added for the
 adapters, credentials, judge guard, cost halt, gate refusals and the dry-run
 end-to-end path.
 

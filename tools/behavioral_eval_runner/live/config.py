@@ -165,6 +165,8 @@ class LiveConfig:
 
     @classmethod
     def from_dict(cls, payload: Mapping[str, Any]) -> "LiveConfig":
+        if not isinstance(payload, Mapping):
+            raise LiveError("the live configuration must be a JSON object")
         unknown = set(payload) - cls._KEYS
         if unknown:
             raise LiveError(f"LiveConfig: unknown keys {sorted(unknown)}")
@@ -190,6 +192,11 @@ class LiveConfig:
             raise LiveError("config price_table does not match the pinned price table")
         if "owner_limits" in payload and payload["owner_limits"] != expected_owner_limits():
             raise LiveError("config owner_limits do not match the owner limits")
+        raw_vendors = payload.get("subject_vendors", tuple(SUBJECT_PINS))
+        if not isinstance(raw_vendors, (list, tuple)) or not all(
+            isinstance(item, str) for item in raw_vendors
+        ):
+            raise LiveError("subject_vendors must be a list of vendor strings")
         config = cls(
             spend_ceiling_cents=payload.get("spend_ceiling_cents", 0),
             judge_allowlist=OwnerAllowlist(tuple(sorted(entries))),
@@ -201,9 +208,7 @@ class LiveConfig:
             request_timeout_seconds=payload.get(
                 "request_timeout_seconds", DEFAULT_REQUEST_TIMEOUT_SECONDS
             ),
-            subject_vendors=tuple(
-                payload.get("subject_vendors", tuple(SUBJECT_PINS))
-            ),
+            subject_vendors=tuple(raw_vendors),
             schema_version=payload.get("schema_version", ""),
         )
         config.validate()

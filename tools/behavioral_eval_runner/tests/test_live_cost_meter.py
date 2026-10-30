@@ -115,6 +115,7 @@ class CostHaltIntegrationTests(unittest.TestCase):
             self.assertEqual(ledger["halt"]["reason_code"], "BUDGET_CAP")
             self.assertEqual(ledger["halt"]["calls_dispatched"], result["dispatched_calls"])
             for entry in ledger["calls"]:
+                self.assertIn("actual_cents", entry)
                 self.assertEqual(entry["pinned_match"], True)
                 self.assertGreaterEqual(entry["cost_cents"], 1)
                 self.assertLessEqual(entry["cost_cents"], entry["reserved_cents"])
@@ -183,6 +184,7 @@ class CostHaltIntegrationTests(unittest.TestCase):
             self.assertEqual(result["cost_ledger"]["unreconciled_count"], 1)
             entry = result["cost_ledger"]["calls"][0]
             self.assertFalse(entry["reconciled"])
+            self.assertIsNone(entry["actual_cents"])
             self.assertEqual(entry["reason_code"], "MODEL_PIN_MISMATCH")
             self.assertEqual(entry["cost_cents"], entry["reserved_cents"])
             self.assertGreaterEqual(entry["cost_cents"], 1)

@@ -193,6 +193,16 @@ class JudgeAdapter:
         max_output_tokens: int,
         timeout_seconds: int,
     ) -> None:
+        from .config import JUDGE_PINS
+
+        if not any(
+            route.vendor == pin.vendor and route.model == pin.model
+            for route in JUDGE_PINS.values()
+        ):
+            raise ModelPinMismatchError(
+                f"{pin.vendor}/{pin.model} is not a pinned cross-vendor judge route",
+                context={"vendor": pin.vendor, "model": pin.model},
+            )
         self.pin = pin
         self.allowlist = allowlist
         self.transport = transport

@@ -213,6 +213,7 @@ class CostMeter:
                 "detail": "reservation drift: actual usage exceeded the reservation",
             }
             self._entries.append(entry)
+            self._snapshot()
             self._record_halt(
                 reason_code="BUDGET_CAP",
                 detail=f"reservation drift: {exc}",
@@ -235,6 +236,7 @@ class CostMeter:
             "input_tokens": int(input_tokens),
             "output_tokens": int(output_tokens),
             "reserved_cents": handle.reserved_cents,
+            "actual_cents": actual,
             "cost_cents": actual,
             "cumulative_cents": self.spent_cents() + actual,
             "ceiling_cents": self.ceiling_cents,
@@ -297,6 +299,7 @@ class CostMeter:
             "input_tokens": None,
             "output_tokens": None,
             "reserved_cents": handle.reserved_cents,
+            "actual_cents": None,
             "cost_cents": handle.reserved_cents,
             "cumulative_cents": self.spent_cents() + handle.reserved_cents,
             "ceiling_cents": self.ceiling_cents,
@@ -351,10 +354,14 @@ class CostMeter:
         }
 
     def write(self, path: str) -> str:
-        """Write the cost ledger artifact (canonical JSON) and return the path."""
+        """Atomically write the cost ledger artifact and return the path."""
         parent = os.path.dirname(os.path.abspath(path))
         if parent:
             os.makedirs(parent, exist_ok=True)
-        with open(path, "w", encoding="utf-8", newline="\n") as handle:
+        temp = f"{path}.tmp-{os.getpid()}"
+        with open(temp, "w", encoding="utf-8", newline="\n") as handle:
             handle.write(canonical_json(self.to_dict()))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp, path)
         return path

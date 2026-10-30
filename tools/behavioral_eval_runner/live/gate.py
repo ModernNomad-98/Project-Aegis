@@ -153,6 +153,12 @@ class OwnerGateRecord:
         _require(self.model_terms.acknowledged is True, "model terms must be explicitly acknowledged")
         _require_str(self.model_terms.terms_ref, "model terms reference")
         _require_str(self.model_terms.acknowledged_on, "model terms date")
+        try:
+            dt.date.fromisoformat(self.model_terms.acknowledged_on)
+        except ValueError as exc:
+            raise LiveGateRefusedError(
+                "model terms date must be an ISO-8601 calendar date"
+            ) from exc
         _require(
             isinstance(self.spend_ceiling_cents, int)
             and not isinstance(self.spend_ceiling_cents, bool)
@@ -310,7 +316,7 @@ def load_gate(path: str) -> OwnerGateRecord:
 def authorize_judges(gate: OwnerGateRecord, config: LiveConfig) -> dict[str, ModelPin]:
     """Every gate judge route must be inside the owner allowlist."""
     authorized: dict[str, ModelPin] = {}
-    for subject_vendor in sorted(gate.judge_models):
+    for subject_vendor in sorted(set(config.subject_vendors)):
         pin = gate.judge_pin(subject_vendor)
         if pin.vendor == subject_vendor:
             raise JudgeVendorGuardError(
@@ -349,6 +355,8 @@ def require_live_gate(
         )
     gate.validate()  # defense in depth: never trust a directly built record
     now = now or dt.datetime.now(dt.timezone.utc)
+    if now.tzinfo is None:
+        raise LiveGateRefusedError("the gate clock must be timezone-aware")
     if gate.fact_origin not in allowed_origins:
         raise LiveGateRefusedError(
             f"gate fact_origin {gate.fact_origin} cannot authorize this verb "

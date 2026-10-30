@@ -64,8 +64,13 @@ def load_case(path: str) -> LiveCase:
         raise LiveDatasetError(
             f"case file not found: {path}", context={"path": path}
         )
-    with open(path, "rb") as handle:
-        raw = handle.read()
+    try:
+        with open(path, "rb") as handle:
+            raw = handle.read()
+    except OSError as exc:
+        raise LiveDatasetError(
+            f"the case file is unreadable: {path}: {exc}", context={"path": path}
+        ) from exc
     try:
         payload = json.loads(raw.decode("utf-8"))
     except (ValueError, UnicodeDecodeError) as exc:
@@ -156,8 +161,15 @@ def load_cases(cases_root: str) -> list[LiveCase]:
         raise LiveDatasetError(
             f"cases root not found: {cases_root}", context={"path": cases_root}
         )
+    try:
+        entries = sorted(os.listdir(cases_root))
+    except OSError as exc:
+        raise LiveDatasetError(
+            f"the cases root is unreadable: {cases_root}: {exc}",
+            context={"path": cases_root},
+        ) from exc
     cases: list[LiveCase] = []
-    for name in sorted(os.listdir(cases_root)):
+    for name in entries:
         directory = os.path.join(cases_root, name)
         if not os.path.isdir(directory):
             continue

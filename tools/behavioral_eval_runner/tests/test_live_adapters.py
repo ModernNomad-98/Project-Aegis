@@ -394,6 +394,60 @@ class MalformedJudgeOutputTests(unittest.TestCase):
         self.assertNotIn("subject_vendor", payload)
 
 
+class ProviderContractTests(unittest.TestCase):
+    def test_only_allowlisted_complete_statuses_are_graded(self):
+        from tools.behavioral_eval_runner.live.errors import ProviderTransportError
+        from tools.behavioral_eval_runner.live.providers import ensure_complete_response
+
+        for status in ("end_turn", "stop_sequence", "completed"):
+            ensure_complete_response(status, vendor="anthropic")
+        for status in ("max_tokens", "length", "content_filter", "failed",
+                       "cancelled", "incomplete", "", "UNKNOWN"):
+            with self.assertRaises(ProviderTransportError):
+                ensure_complete_response(status, vendor="openai")
+
+    def test_usage_telemetry_is_required_and_typed(self):
+        from tools.behavioral_eval_runner.live.errors import ProviderTransportError
+        from tools.behavioral_eval_runner.live.providers import extract_usage
+        from tools.behavioral_eval_runner.live.transport import ProviderUsage
+
+        self.assertEqual(
+            extract_usage(ProviderUsage(3, 4), vendor="anthropic").to_dict(),
+            {"input_tokens": 3, "output_tokens": 4},
+        )
+        class NoUsage:
+            input_tokens = 1
+        class BoolUsage:
+            input_tokens = True
+            output_tokens = 1
+        for usage in (None, NoUsage(), BoolUsage()):
+            with self.assertRaises(ProviderTransportError):
+                extract_usage(usage, vendor="openai")
+
+    def test_unknown_arm_is_rejected(self):
+        adapter = SubjectAdapter(
+            SUBJECT_PINS["anthropic"],
+            _fixed_transport("claude-sonnet-5-5"),
+            max_output_tokens=64,
+            timeout_seconds=30,
+        )
+        with self.assertRaises(ValueError):
+            adapter.build_request(request_id="r", prompt="p", arm="SOMETHING_ELSE")
+
+    def test_judge_adapter_rejects_a_non_route_pin(self):
+        from tools.behavioral_eval_runner.live.config import ModelPin
+        from tools.behavioral_eval_runner.live.judge_adapter import JudgeAdapter
+
+        with self.assertRaises(ModelPinMismatchError):
+            JudgeAdapter(
+                ModelPin("openai", "not-a-route", "OPENAI_API_KEY", 1, 1),
+                OwnerAllowlist((("openai", "not-a-route"),)),
+                _fixed_transport("not-a-route"),
+                max_output_tokens=64,
+                timeout_seconds=30,
+            )
+
+
 class ProviderConfinementTests(unittest.TestCase):
     def test_only_the_provider_module_names_either_provider(self):
         # Both vendor SDK names, and the dotted API host form for Anthropic,

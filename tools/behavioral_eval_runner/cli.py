@@ -1496,7 +1496,7 @@ def build_parser() -> argparse.ArgumentParser:
     # Gated live enablement (2026-10-29): live is GATED, not enabled by default.
     lp = subparsers.add_parser(
         "live-preflight",
-        help="gated live preflight (no network, no credential value read)",
+        help="gated live preflight (no network; no credential value logged or emitted)",
     )
     lp.add_argument("--config", required=True)
     lp.add_argument("--gate", required=True)

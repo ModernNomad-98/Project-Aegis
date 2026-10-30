@@ -92,8 +92,10 @@ class SubjectAdapter:
                 + "SKILL GUIDANCE:\n"
                 + skill_instructions
             )
-        else:
+        elif arm == "BASELINE":
             system = SUBJECT_SYSTEM_PREAMBLE
+        else:
+            raise ValueError(f"unknown arm {arm!r}; expected WITH_SKILL or BASELINE")
         return ProviderRequest(
             request_id=request_id,
             vendor=self.pin.vendor,

@@ -35,6 +35,6 @@
     "ceiling_cents": 15000,
     "provider_cap_cents": 12000
   },
-  "created_at": "2026-10-29T00:00:00Z",
-  "expires_at": "2030-12-31T00:00:00Z"
+  "created_at": "2020-01-01T00:00:00Z",
+  "expires_at": "2035-12-31T00:00:00Z"
 }

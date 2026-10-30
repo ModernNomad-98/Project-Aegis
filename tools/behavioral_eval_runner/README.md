@@ -284,7 +284,9 @@ afterwards. When the next reservation would exceed the effective ceiling, the
 meter refuses, records the halt and raises `BUDGET_CAP`. The caller marks every
 remaining case `UNRUN` with reason `BUDGET_CAP` and never PASS, stops
 dispatching, writes `halt.json`, and finalizes the bundle with status
-`HALTED`. A call that reached the transport and then failed is charged its full
+`HALTED`. Any live error — not only a ceiling denial or a pin mismatch — halts
+the run the same way; the attempt that partially executed is `ERROR`, and later
+attempts are `UNRUN`. A call that reached the transport and then failed is charged its full
 reservation and recorded as an unreconciled entry, so a failure never restores
 headroom. The proof — simulated usage reaching the ceiling, the refused
 reservation, the dispatched-call count and the UNRUN tail — is

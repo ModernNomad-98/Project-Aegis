@@ -8,7 +8,6 @@ with fake environment credentials still runs offline through mock transports.
 
 from __future__ import annotations
 
-import datetime as dt
 import json
 import os
 import subprocess
@@ -22,12 +21,8 @@ from tools.behavioral_eval_runner.live.errors import (
     LiveGateRefusedError,
     MissingCredentialError,
 )
-from tools.behavioral_eval_runner.live.gate import (
-    OwnerGateRecord,
-    load_gate,
-    require_live_gate,
-)
-from tools.behavioral_eval_runner.live.pipeline import LivePaths, live_run, preflight
+from tools.behavioral_eval_runner.live.gate import OwnerGateRecord, load_gate
+from tools.behavioral_eval_runner.live.pipeline import live_run, preflight
 from tools.behavioral_eval_runner.live.config import LiveConfig
 from tools.behavioral_eval_runner.tests import live_helpers as helpers
 
@@ -302,6 +297,7 @@ class ProvenanceBindingTests(unittest.TestCase):
                     },
                 )
             self.assertIn("revision", str(caught.exception).lower())
+            self.assertTrue(caught.exception.context["expected_revision"])
 
     def test_live_run_refuses_a_cases_root_outside_the_gate_path(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -341,6 +337,78 @@ class PreflightRefusalTests(unittest.TestCase):
             self.assertEqual(report["status"], "REFUSED")
             self.assertEqual(
                 report["blockers"][0]["reason_code"], "LIVE_CONFIG_INVALID"
+            )
+
+
+class MalformedConfigTests(unittest.TestCase):
+    def test_non_object_config_shapes_are_refused(self):
+        cases = ([], None, {"subject_vendors": None}, {"subject_vendors": [["x"]]})
+        with tempfile.TemporaryDirectory() as tmp:
+            for index, payload in enumerate(cases):
+                paths = _paths(os.path.join(tmp, str(index)))
+                with open(paths.config_path, "w", encoding="utf-8") as handle:
+                    json.dump(payload, handle)
+                report = preflight(paths, environ={})
+                self.assertEqual(report["status"], "REFUSED", payload)
+                self.assertIn(
+                    report["blockers"][0]["reason_code"],
+                    {"LIVE_CONFIG_INVALID", "LIVE_ERROR"},
+                    payload,
+                )
+
+
+class SingleVendorTests(unittest.TestCase):
+    def test_single_vendor_config_needs_only_its_own_judge_allowlisted(self):
+        config = helpers.config_payload()
+        config["subject_vendors"] = ["anthropic"]
+        config["judge_allowlist"] = {"judge_models": [{"vendor": "openai", "model": "gpt-6-astra"}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _paths(
+                tmp,
+                config=config,
+                gate=helpers.gate_payload(fact_origin="REAL_HOST"),
+            )
+            report = preflight(
+                paths,
+                environ={
+                    "ANTHROPIC_API_KEY": helpers.FAKE_ANTHROPIC_KEY,
+                    "OPENAI_API_KEY": helpers.FAKE_OPENAI_KEY,
+                },
+            )
+            self.assertEqual(report["status"], "READY", report.get("blockers"))
+            result = live_run(
+                paths,
+                environ={
+                    "ANTHROPIC_API_KEY": helpers.FAKE_ANTHROPIC_KEY,
+                    "OPENAI_API_KEY": helpers.FAKE_OPENAI_KEY,
+                },
+                subject_transport_factory=lambda credentials: helpers.mock_subject_transport(),
+                judge_transport_factory=lambda credentials: helpers.mock_judge_transport(),
+            )
+            self.assertEqual(result["status"], "COMPLETED")
+            self.assertEqual(result["dispatched_calls"], 24)
+
+
+class PreflightRevisionTests(unittest.TestCase):
+    def test_real_host_preflight_refuses_a_revision_mismatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gate = helpers.gate_payload(
+                fact_origin="REAL_HOST", revision="f" * 40
+            )
+            paths = _paths(tmp, gate=gate)
+            report = preflight(
+                paths,
+                environ={
+                    "ANTHROPIC_API_KEY": helpers.FAKE_ANTHROPIC_KEY,
+                    "OPENAI_API_KEY": helpers.FAKE_OPENAI_KEY,
+                },
+            )
+            self.assertEqual(report["status"], "REFUSED")
+            self.assertTrue(
+                any(
+                    "revision" in blocker.get("detail", "")
+                    for blocker in report["blockers"]
+                )
             )
 
 
