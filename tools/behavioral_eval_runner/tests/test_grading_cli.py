@@ -46,8 +46,12 @@ class CommandSurfaceTests(unittest.TestCase):
         ):
             self.assertIn(command, COMMANDS)
 
-    def test_no_live_verbs_exist(self) -> None:
-        for command in COMMANDS:
+    def test_only_gated_live_verbs_exist(self) -> None:
+        # Gated live enablement (2026-10-29): exactly three gated live verbs are
+        # registered; no other command may carry a live-execution verb.
+        gated = {"live-preflight", "live-dry-run", "live-run"}
+        self.assertEqual({c for c in COMMANDS if "live" in c}, gated)
+        for command in sorted(set(COMMANDS) - gated):
             for banned in ("run", "live", "dispatch", "session", "deploy"):
                 self.assertNotIn(banned, command)
 

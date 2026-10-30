@@ -24,6 +24,20 @@ and WP-2B-3 calibration contracts have
 their own version families. A value from one family never substitutes for
 another, even if its numeric prefix matches.
 
+## Gated live package version family (build-only, GATED)
+
+The gated live enablement package (`tools/behavioral_eval_runner/live/`)
+introduces its own constants: `LIVE_SCHEMA_VERSION = "1.0.0-ber-live"` and
+`LIVE_PACKAGE_VERSION = "0.1.0-ber-live"`. They are a **separate family**. A
+value from this family never substitutes for the WP-2B-1 result/evidence family,
+and no WP-2B-1 reader treats a live record as one of its own. The live case
+records, configuration, gate record and cost ledger declare
+`1.0.0-ber-live`; the evidence bundle's final report keeps the WP-2B-1
+`schema_version` and carries the live detail under its `live` object. The
+family is pinned by `tests/test_live_pipeline.py` (`VersionRegistrationTests`)
+and is intentionally build-only: it publishes no measured result and grants no
+execution authority.
+
 ## How to use this policy
 
 1. When writing a new external record, include its exact `schema_version`.

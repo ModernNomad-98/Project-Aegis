@@ -35,8 +35,12 @@ class CommandSurfaceTests(unittest.TestCase):
         self.assertIn("validate-calibration-dataset", COMMANDS)
         self.assertIn("calibration-status", COMMANDS)
 
-    def test_still_no_live_verbs(self) -> None:
-        for command in COMMANDS:
+    def test_still_only_gated_live_verbs(self) -> None:
+        # Gated live enablement (2026-10-29): the calibration surface still has
+        # no live verb; the only live verbs are the three gated ones.
+        gated = {"live-preflight", "live-dry-run", "live-run"}
+        self.assertEqual({c for c in COMMANDS if "live" in c}, gated)
+        for command in sorted(set(COMMANDS) - gated):
             for banned in ("run", "live", "dispatch", "session", "deploy"):
                 self.assertNotIn(banned, command)
 

@@ -31,6 +31,9 @@ PROVIDER_FRAGMENT_ALLOWLIST = frozenset(
         # Stage A2 (BER-DEC-008): the dedicated DEVELOPMENT driver composes
         # the two adapter modules and may therefore name the provider.
         "judge/calibration_development_driver.py",
+        # Gated live enablement (2026-10-29): the single provider-naming module
+        # of the gated live package.
+        "live/providers.py",
     }
 )
 

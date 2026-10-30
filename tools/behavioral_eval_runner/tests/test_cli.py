@@ -44,14 +44,36 @@ class TestCommandSurface(unittest.TestCase):
                 choices = list(action.choices)
         self.assertEqual(sorted(choices), sorted(COMMANDS))
 
-    def test_no_live_run_command_exists(self) -> None:
+    def test_only_the_gated_live_commands_exist(self) -> None:
+        # Gated live enablement (2026-10-29): the only live verbs are the three
+        # gated ones, and each structurally requires an owner gate argument.
+        gated = {"live-preflight", "live-dry-run", "live-run"}
+        self.assertEqual({c for c in COMMANDS if "live" in c}, gated)
         for command in COMMANDS:
+            if command in gated:
+                continue
             for verb in FORBIDDEN_COMMAND_VERBS:
                 self.assertNotEqual(command, verb)
                 self.assertFalse(
                     command.startswith(f"{verb}-") or command.endswith(f"-{verb}"),
-                    f"command {command!r} looks like a live-execution verb",
+                    f"command {command!r} looks like an ungated live-execution verb",
                 )
+        parser = build_parser()
+        subparsers = next(
+            action
+            for action in parser._actions  # noqa: SLF001 - argparse introspection
+            if getattr(action, "choices", None)
+        )
+        for command in sorted(gated):
+            gate_option = next(
+                option
+                for option in subparsers.choices[command]._actions  # noqa: SLF001
+                if "--gate" in option.option_strings
+            )
+            self.assertTrue(
+                gate_option.required,
+                f"{command} must require --gate (no live verb without the gate)",
+            )
 
     def test_version_deterministic(self) -> None:
         code_a, first = _run_cli(["version"])

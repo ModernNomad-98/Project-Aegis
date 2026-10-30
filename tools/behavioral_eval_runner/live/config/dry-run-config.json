@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "spend_ceiling_cents": 15000,
+  "max_output_tokens": 512,
+  "runs_per_case": 3,
+  "request_timeout_seconds": 300,
+  "subject_vendors": [
+    "anthropic",
+    "openai"
+  ],
+  "judge_allowlist": {
+    "judge_models": [
+      {
+        "vendor": "anthropic",
+        "model": "claude-sonnet-5-5"
+      },
+      {
+        "vendor": "openai",
+        "model": "gpt-6-astra"
+      }
+    ]
+  }
+}
