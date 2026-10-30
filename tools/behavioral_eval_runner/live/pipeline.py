@@ -31,12 +31,18 @@ from ..evidence import (
     EvidenceWriter,
     verify_final_bundle,
 )
-from . import LIVE_CAPABILITY_STATE, LIVE_PACKAGE_VERSION
-from .config import SUBJECT_PINS, LiveConfig
+from . import LIVE_CAPABILITY_STATE, LIVE_PACKAGE_VERSION, LIVE_SCHEMA_VERSION
+from .config import JUDGE_PINS, SUBJECT_PINS, LiveConfig
 from .cost_meter import CostMeter
-from .credentials import CredentialSet, missing_credential_env_vars, resolve_credentials
+from .credentials import (
+    CREDENTIAL_ENV_VARS,
+    CredentialSet,
+    missing_credential_env_vars,
+    resolve_credentials,
+)
 from .dataset import LiveCase, dataset_digest, evaluate_deterministic, load_cases
 from .errors import (
+    JudgeRubricSourceError,
     JudgeVendorGuardError,
     LiveError,
     LiveGateRefusedError,
@@ -122,6 +128,40 @@ def _require_fresh_evidence_root(root: str) -> None:
         )
 
 
+def _required_credential_vendors(config: LiveConfig) -> list[str]:
+    """Subject vendors plus every judge-route vendor (the judge needs its key)."""
+    vendors = set(config.subject_vendors)
+    for vendor in config.subject_vendors:
+        route = JUDGE_PINS.get((vendor, SUBJECT_PINS[vendor].model))
+        if route is not None:
+            vendors.add(route.vendor)
+    return sorted(vendors)
+
+
+def _validate_output_paths(paths: LivePaths) -> None:
+    """Validate output destinations BEFORE any call can spend money."""
+    _require_fresh_evidence_root(paths.evidence_root)
+    root = os.path.abspath(paths.evidence_root)
+    ledger = os.path.abspath(paths.cost_ledger_path)
+    try:
+        inside = os.path.commonpath([root, ledger]) == root
+    except ValueError:
+        inside = False
+    if inside:
+        raise LiveError(
+            "the cost ledger must not be written inside the evidence root",
+            context={"evidence_root": root, "cost_ledger": ledger},
+            reason_code="EVIDENCE_PATH_CONFLICT",
+        )
+    parent = os.path.dirname(ledger)
+    if not parent or not os.path.isdir(parent):
+        raise LiveError(
+            "the cost ledger parent directory does not exist",
+            context={"cost_ledger": ledger, "parent": parent},
+            reason_code="OUTPUT_PATH_UNAVAILABLE",
+        )
+
+
 def preflight(
     paths: LivePaths,
     *,
@@ -129,7 +169,7 @@ def preflight(
     now: dt.datetime | None = None,
     expected_revision: str | None = None,
 ) -> dict[str, Any]:
-    """Structural preflight: no network, no credential value read."""
+    """Structural preflight: no network; no credential value is logged or emitted."""
     report: dict[str, Any] = {
         "command": "live-preflight",
         "network_calls": 0,
@@ -189,13 +229,16 @@ def preflight(
         )
     except LiveGateRefusedError as exc:
         blockers.append(exc.to_dict())
-    missing = missing_credential_env_vars(sorted(SUBJECT_PINS), environ)
+    required_vendors = _required_credential_vendors(config)
+    missing = missing_credential_env_vars(required_vendors, environ)
     report["credentials"] = {
-        "required_env_vars": sorted(
-            {pin.credential_env_var for pin in SUBJECT_PINS.values()}
-        ),
+        "required_vendors": required_vendors,
+        "required_env_vars": [
+            CREDENTIAL_ENV_VARS[vendor] for vendor in required_vendors
+        ],
         "missing_env_vars": missing,
-        "values_read": False,
+        "value_emitted": False,
+        "note": "presence check only; no value is logged, stored or emitted",
     }
     report["blockers"] = blockers
     if blockers:
@@ -209,6 +252,15 @@ def preflight(
     return report
 
 
+def _citability(fact_origin: str, transport_class: str) -> str:
+    """Only a real-host gate AND the vendor SDK transport are citable."""
+    if fact_origin != REAL_HOST:
+        return "SYNTHETIC_NOT_CITABLE"
+    if transport_class != "VENDOR_SDK":
+        return "INJECTED_TRANSPORT_NOT_CITABLE"
+    return "REAL_HOST"
+
+
 def _result_record(
     *,
     case: LiveCase,
@@ -217,6 +269,7 @@ def _result_record(
     subject_vendor: str,
     mode: str,
     fact_origin: str,
+    transport_class: str,
     state: str,
     reason_code: str | None = None,
     subject: Mapping[str, Any] | None = None,
@@ -226,7 +279,7 @@ def _result_record(
 ) -> dict[str, Any]:
     record: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
-        "live_schema_version": "1.0.0-ber-live",
+        "live_schema_version": LIVE_SCHEMA_VERSION,
         "case_id": case.case_id,
         "skill": case.skill,
         "arm": arm,
@@ -234,7 +287,8 @@ def _result_record(
         "subject_vendor": subject_vendor,
         "result_state": state,
         "reason_code": reason_code,
-        "citability": "REAL_HOST" if fact_origin == REAL_HOST else "SYNTHETIC_NOT_CITABLE",
+        "citability": _citability(fact_origin, transport_class),
+        "transport_class": transport_class,
         "mode": mode,
         "raw_transcript_included": False,
     }
@@ -274,7 +328,9 @@ def _execute(
     cases: Sequence[LiveCase],
     subject_transports: Mapping[str, SubjectTransport],
     judge_transports: Mapping[str, SubjectTransport],
+    transport_class: str,
 ) -> dict[str, Any]:
+    case_hashes = frozenset(case.record_sha256 for case in cases)
     state = _RunState()
     planned = _planned_calls(config, cases)
     meter = CostMeter(
@@ -298,6 +354,7 @@ def _execute(
                                 subject_vendor=subject_vendor,
                                 mode=mode,
                                 fact_origin=gate.fact_origin,
+                                transport_class=transport_class,
                                 state="UNRUN",
                                 reason_code=stop_reason,
                             )
@@ -313,6 +370,8 @@ def _execute(
                             mode=mode,
                             config=config,
                             gate=gate,
+                            transport_class=transport_class,
+                            case_hashes=case_hashes,
                             meter=meter,
                             subject_transport=subject_transports[subject_vendor],
                             judge_transport=judge_transports[subject_vendor],
@@ -321,7 +380,7 @@ def _execute(
                     except LiveError as exc:
                         halt_payload = exc.to_dict()
                         halt_payload["halted"] = True
-                        halt_payload["calls_dispatched"] = len(meter.calls)
+                        halt_payload["calls_dispatched"] = meter.attempts
                         halt_payload["spent_cents"] = meter.spent_cents()
                         halt_payload["ceiling_cents"] = meter.ceiling_cents
                         state.add_halt(halt_payload)
@@ -334,6 +393,7 @@ def _execute(
                                 subject_vendor=subject_vendor,
                                 mode=mode,
                                 fact_origin=gate.fact_origin,
+                                transport_class=transport_class,
                                 state="UNRUN",
                                 reason_code=exc.reason_code,
                             )
@@ -354,6 +414,7 @@ def _execute(
         "results": state.results,
         "meter": meter,
         "planned_calls": planned,
+        "transport_class": transport_class,
     }
 
 
@@ -382,11 +443,18 @@ def _execute_one(
     mode: str,
     config: LiveConfig,
     gate: OwnerGateRecord,
+    transport_class: str,
+    case_hashes: frozenset[str],
     meter: CostMeter,
     subject_transport: SubjectTransport,
     judge_transport: SubjectTransport,
     judge_pins: Mapping[str, Any],
 ) -> dict[str, Any]:
+    if case.record_sha256 not in case_hashes:
+        raise JudgeRubricSourceError(
+            "the case did not come from the verified committed dataset",
+            context={"case_id": case.case_id},
+        )
     subject_pin = SUBJECT_PINS[subject_vendor]
     judge_pin = judge_pins[subject_vendor]
     adapter = SubjectAdapter(
@@ -406,7 +474,13 @@ def _execute_one(
         system_bytes=len(request.system.encode("utf-8")),
         user_bytes=len(request.user_content.encode("utf-8")),
     )
-    subject_result, subject_text = adapter.dispatch(request)
+    try:
+        subject_result, subject_text = adapter.dispatch(request)
+    except LiveError as exc:
+        meter.release_unreconciled(
+            handle, reason_code=exc.reason_code, detail=str(exc)
+        )
+        raise
     meter.reconcile(
         handle,
         input_tokens=subject_result.usage.input_tokens,
@@ -437,9 +511,15 @@ def _execute_one(
         system_bytes=len(judge_request.system.encode("utf-8")),
         user_bytes=len(judge_request.user_content.encode("utf-8")),
     )
-    judge_result = judge_adapter.dispatch(
-        judge_request, case=case, subject_text=subject_text
-    )
+    try:
+        judge_result = judge_adapter.dispatch(
+            judge_request, case=case, subject_text=subject_text
+        )
+    except LiveError as exc:
+        meter.release_unreconciled(
+            judge_handle, reason_code=exc.reason_code, detail=str(exc)
+        )
+        raise
     meter.reconcile(
         judge_handle,
         input_tokens=judge_result.usage.input_tokens,
@@ -455,6 +535,7 @@ def _execute_one(
             subject_vendor=subject_vendor,
             mode=mode,
             fact_origin=gate.fact_origin,
+            transport_class=transport_class,
             state="MOCK",
             reason_code="SYNTHETIC_MOCK_RUN",
             subject=subject_result.to_record(),
@@ -469,6 +550,7 @@ def _execute_one(
         subject_vendor=subject_vendor,
         mode=mode,
         fact_origin=gate.fact_origin,
+        transport_class=transport_class,
         state=rule_state,
         reason_code=rule_reason,
         subject=subject_result.to_record(),
@@ -566,8 +648,12 @@ def _write_evidence(
             "gate_id": gate.gate_id,
             "gate_digest": gate.digest(),
             "results_by_state": dict(sorted(by_state.items())),
+            "transport_class": outcome.get("transport_class"),
+            "results_citable": sum(
+                1 for record in results if record["citability"] == REAL_HOST
+            ),
             "planned_calls": outcome["planned_calls"],
-            "dispatched_calls": len(meter.calls),
+            "dispatched_calls": meter.attempts,
             "spent_cents": meter.spent_cents(),
             "ceiling_cents": meter.ceiling_cents,
             "halt_reason_code": outcome.get("halt_reason_code"),
@@ -612,6 +698,7 @@ def dry_run(
     require_live_gate(
         gate, config, now=now, allowed_origins=frozenset({SYNTHETIC})
     )
+    _validate_output_paths(paths)
     subject_factory = subject_transport_factory or _dry_run_subject_transport
     judge_factory = judge_transport_factory or _dry_run_judge_transport
     subject_transports = {
@@ -628,6 +715,7 @@ def dry_run(
         cases=cases,
         subject_transports=subject_transports,
         judge_transports=judge_transports,
+        transport_class="MOCK",
     )
     meter = outcome["meter"]
     meter.write(paths.cost_ledger_path)
@@ -645,20 +733,31 @@ def live_run(
     subject_transport_factory: Callable[[CredentialSet], SubjectTransport] | None = None,
     judge_transport_factory: Callable[[CredentialSet], SubjectTransport] | None = None,
 ) -> dict[str, Any]:
-    """Gated live run: refuses without a REAL_HOST gate and resolved keys."""
+    """Gated live run: refuses without a REAL_HOST gate and resolved keys.
+
+    The transport factories exist for offline tests. A run that injects them is
+    recorded with transport_class INJECTED and every result is labeled
+    INJECTED_TRANSPORT_NOT_CITABLE, so an injected run can never produce
+    citable real-host evidence.
+    """
     config, gate, cases = _load_inputs(paths)
     require_live_gate(
         gate, config, now=now, allowed_origins=frozenset({REAL_HOST})
     )
-    credentials = resolve_credentials(sorted(config.subject_vendors), environ)
+    _validate_output_paths(paths)
+    credentials = resolve_credentials(
+        _required_credential_vendors(config), environ
+    )
     if subject_transport_factory is None or judge_transport_factory is None:
         from .transport import SdkSubjectTransport
 
         subject_factory = SdkSubjectTransport
         judge_factory = SdkSubjectTransport
+        transport_class = "VENDOR_SDK"
     else:
         subject_factory = subject_transport_factory
         judge_factory = judge_transport_factory
+        transport_class = "INJECTED"
     subject_transports = {
         vendor: subject_factory(credentials) for vendor in config.subject_vendors
     }
@@ -673,6 +772,7 @@ def live_run(
         cases=cases,
         subject_transports=subject_transports,
         judge_transports=judge_transports,
+        transport_class=transport_class,
     )
     meter = outcome["meter"]
     meter.write(paths.cost_ledger_path)
@@ -700,7 +800,11 @@ def _summary(
         "fact_origin": gate.fact_origin,
         "gate_id": gate.gate_id,
         "planned_calls": outcome["planned_calls"],
-        "dispatched_calls": len(meter.calls),
+        "dispatched_calls": meter.attempts,
+        "transport_class": outcome.get("transport_class"),
+        "citable_results": sum(
+            1 for record in outcome["results"] if record["citability"] == REAL_HOST
+        ),
         "results_by_state": dict(sorted(by_state.items())),
         "spent_cents": meter.spent_cents(),
         "ceiling_cents": meter.ceiling_cents,

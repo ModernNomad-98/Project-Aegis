@@ -102,15 +102,67 @@ class DryRunEndToEndTests(unittest.TestCase):
                 os.path.exists(os.path.join(paths.evidence_root, "cost_ledger.json"))
             )
 
-    def test_evidence_root_must_be_fresh(self):
+    def test_evidence_root_is_validated_before_any_dispatch(self):
         with tempfile.TemporaryDirectory() as tmp:
             paths = helpers.make_paths(tmp)
-            dry_run(paths)
+            os.makedirs(paths.evidence_root)
+            with open(os.path.join(paths.evidence_root, "existing.txt"), "w") as handle:
+                handle.write("keep me")
+            calls: list[str] = []
+            with self.assertRaises(LiveError) as caught:
+                dry_run(
+                    paths,
+                    subject_transport_factory=lambda: calls.append("subject")
+                    or helpers.mock_subject_transport(),
+                    judge_transport_factory=lambda: calls.append("judge")
+                    or helpers.mock_judge_transport(),
+                )
+            self.assertEqual(
+                getattr(caught.exception, "reason_code", None),
+                "EVIDENCE_ROOT_NOT_FRESH",
+            )
+            self.assertEqual(calls, [])
+
+    def test_cost_ledger_inside_the_evidence_root_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = helpers.make_paths(tmp)
+            object.__setattr__(
+                paths, "cost_ledger_path", os.path.join(paths.evidence_root, "cost.json")
+            )
             with self.assertRaises(LiveError) as caught:
                 dry_run(paths)
             self.assertEqual(
                 getattr(caught.exception, "reason_code", None),
-                "EVIDENCE_ROOT_NOT_FRESH",
+                "EVIDENCE_PATH_CONFLICT",
+            )
+
+
+class VersionRegistrationTests(unittest.TestCase):
+    def test_live_version_family_is_pinned(self):
+        from tools.behavioral_eval_runner.live import (
+            LIVE_PACKAGE_VERSION,
+            LIVE_SCHEMA_VERSION,
+        )
+
+        self.assertEqual(LIVE_SCHEMA_VERSION, "1.0.0-ber-live")
+        self.assertEqual(LIVE_PACKAGE_VERSION, "0.1.0-ber-live")
+        cases = helpers.committed_cases()
+        self.assertTrue(cases)
+        for case in cases:
+            with open(
+                os.path.join(helpers.CASES_ROOT, case.case_id, "case.json"),
+                encoding="utf-8",
+            ) as handle:
+                self.assertEqual(
+                    json.load(handle)["schema_version"], LIVE_SCHEMA_VERSION
+                )
+        with open(helpers.DRY_CONFIG, encoding="utf-8") as handle:
+            self.assertEqual(
+                json.load(handle)["schema_version"], LIVE_SCHEMA_VERSION
+            )
+        with open(helpers.SYNTHETIC_GATE, encoding="utf-8") as handle:
+            self.assertEqual(
+                json.load(handle)["schema_version"], LIVE_SCHEMA_VERSION
             )
 
 

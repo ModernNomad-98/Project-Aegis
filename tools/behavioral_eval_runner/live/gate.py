@@ -38,6 +38,11 @@ def _require(condition: bool, message: str) -> None:
         raise LiveGateRefusedError(message)
 
 
+def _require_str(value: Any, where: str) -> str:
+    _require(isinstance(value, str) and value.strip() != "", f"{where} must be a non-empty string")
+    return value
+
+
 def _is_hex(value: Any, length: int) -> bool:
     return isinstance(value, str) and len(value) == length and set(value) <= set("0123456789abcdef")
 
@@ -91,11 +96,11 @@ class OwnerGateRecord:
     # ------------------------------------------------------------- validation
     def validate(self) -> None:
         _require(self.schema_version == LIVE_SCHEMA_VERSION, "gate schema_version mismatch")
-        _require(self.gate_id.strip() != "", "gate_id must be non-empty")
-        _require(self.owner_decision_ref.strip() != "", "owner_decision_ref must be non-empty")
+        _require_str(self.gate_id, "gate_id")
+        _require_str(self.owner_decision_ref, "owner_decision_ref")
         _require(self.fact_origin in FACT_ORIGINS, f"fact_origin must be one of {sorted(FACT_ORIGINS)}")
         _require(_is_hex(self.dataset_revision, 40), "dataset_revision must be a 40-hex commit")
-        _require(self.dataset_path.strip() != "", "dataset_path must be non-empty")
+        _require_str(self.dataset_path, "dataset_path")
         _require(
             not os.path.isabs(self.dataset_path) and ".." not in self.dataset_path.replace("\\", "/").split("/"),
             "dataset_path must be repository-relative with no parent traversal",
@@ -106,15 +111,24 @@ class OwnerGateRecord:
             "case_count must be a positive int",
         )
         _require(
+            isinstance(self.subject_models, Mapping),
+            "subject_models must be an object",
+        )
+        _require(
             set(self.subject_models) == set(SUBJECT_PINS),
             f"subject_models must pin exactly {sorted(SUBJECT_PINS)}",
         )
         for vendor, model in self.subject_models.items():
+            _require_str(model, f"subject_models[{vendor}]")
             _require(
                 model == SUBJECT_PINS[vendor].model,
                 f"subject_models[{vendor}] must be the pinned {SUBJECT_PINS[vendor].model!r}, "
                 f"got {model!r} (strict model pinning: no substitution)",
             )
+        _require(
+            isinstance(self.judge_models, Mapping),
+            "judge_models must be an object",
+        )
         _require(
             set(self.judge_models) == set(SUBJECT_PINS),
             "judge_models must route exactly the pinned subject vendors",
@@ -122,6 +136,8 @@ class OwnerGateRecord:
         for subject_vendor, route in self.judge_models.items():
             _require(isinstance(route, Mapping), f"judge_models[{subject_vendor}] must be an object")
             _require(set(route) == {"vendor", "model"}, "judge route needs exactly vendor and model")
+            _require_str(route.get("vendor"), f"judge_models[{subject_vendor}].vendor")
+            _require_str(route.get("model"), f"judge_models[{subject_vendor}].model")
             expected = JUDGE_PINS.get((subject_vendor, SUBJECT_PINS[subject_vendor].model))
             _require(expected is not None, f"no pinned judge route for {subject_vendor}")
             _require(
@@ -135,8 +151,8 @@ class OwnerGateRecord:
                 f"{expected.vendor}/{expected.model}",
             )
         _require(self.model_terms.acknowledged is True, "model terms must be explicitly acknowledged")
-        _require(self.model_terms.terms_ref.strip() != "", "model terms reference must be non-empty")
-        _require(self.model_terms.acknowledged_on.strip() != "", "model terms date must be non-empty")
+        _require_str(self.model_terms.terms_ref, "model terms reference")
+        _require_str(self.model_terms.acknowledged_on, "model terms date")
         _require(
             isinstance(self.spend_ceiling_cents, int)
             and not isinstance(self.spend_ceiling_cents, bool)
@@ -241,6 +257,8 @@ class OwnerGateRecord:
         ):
             if not isinstance(value, Mapping) or set(value) != keys:
                 raise LiveGateRefusedError(f"gate {name} must contain exactly {sorted(keys)}")
+        if not isinstance(models.get("subjects"), Mapping):
+            raise LiveGateRefusedError("gate models.subjects must be an object")
         judges = models.get("judges", {})
         if not isinstance(judges, Mapping):
             raise LiveGateRefusedError("gate models.judges must be an object")
@@ -253,7 +271,10 @@ class OwnerGateRecord:
             dataset_sha256=dataset.get("sha256", ""),
             case_count=dataset.get("case_count", 0),
             subject_models=dict(models.get("subjects", {})),
-            judge_models={key: dict(value) for key, value in judges.items() if isinstance(value, Mapping)},
+            judge_models={
+                key: dict(value) if isinstance(value, Mapping) else value
+                for key, value in judges.items()
+            },
             model_terms=ModelTermsAcknowledgment(
                 acknowledged=terms.get("acknowledged", False),
                 terms_ref=terms.get("terms_ref", ""),
@@ -332,6 +353,11 @@ def require_live_gate(
             f"gate fact_origin {gate.fact_origin} cannot authorize this verb "
             f"(allowed: {sorted(allowed_origins)})",
             context={"fact_origin": gate.fact_origin, "allowed_origins": sorted(allowed_origins)},
+        )
+    if _parse_time(gate.created_at, "created_at") > now:
+        raise LiveGateRefusedError(
+            "the owner gate was created in the future",
+            context={"created_at": gate.created_at, "now": now.isoformat()},
         )
     if now >= _parse_time(gate.expires_at, "expires_at"):
         raise LiveGateRefusedError(

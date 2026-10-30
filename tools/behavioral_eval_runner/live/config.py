@@ -2,8 +2,9 @@
 
 The strict model pins, judge routes and credential environment-variable names
 live in exactly one module, live/providers.py, and are re-exported here. The
-price table is a configuration input, not an observed bill: the ceiling is
-enforced against it in integer cents, rounded up per call.
+price table is a PINNED configuration input, not an observed bill: the ceiling
+is enforced against it in integer cents, rounded up per call, and a config file
+that declares a different price table is refused rather than silently used.
 
 The judge allowlist is an owner artifact. An empty allowlist authorizes no judge
 dispatch, and the gate record is the only source that can populate it.
@@ -36,6 +37,19 @@ DEFAULT_REQUEST_TIMEOUT_SECONDS = 300
 #: Per-request input bound (bytes). An uncapped request is an open-ended bill;
 #: a request over this bound is refused BEFORE any reservation or dispatch.
 DEFAULT_MAX_INPUT_BYTES = 200_000
+
+
+def expected_price_table() -> dict[str, Any]:
+    return {vendor: pin.to_dict() for vendor, pin in sorted(SUBJECT_PINS.items())}
+
+
+def expected_owner_limits() -> dict[str, int]:
+    return {
+        "pilot_ceiling_cents": OWNER_PILOT_CEILING_CENTS,
+        "provider_cap_cents": OWNER_PROVIDER_CAP_CENTS,
+        "pilot_case_count": OWNER_PILOT_CASE_COUNT,
+        "pilot_runs_per_case": OWNER_PILOT_RUNS_PER_CASE,
+    }
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,21 +107,18 @@ class LiveConfig:
                 "spend_ceiling_cents must be > 0 and <= the owner ceiling "
                 f"{OWNER_PILOT_CEILING_CENTS}"
             )
-        if not isinstance(self.max_output_tokens, int) or self.max_output_tokens < 1:
-            raise LiveError("max_output_tokens must be an int >= 1")
-        if not isinstance(self.max_input_bytes, int) or self.max_input_bytes < 1:
-            raise LiveError("max_input_bytes must be an int >= 1")
-        if not isinstance(self.runs_per_case, int) or self.runs_per_case < 1:
-            raise LiveError("runs_per_case must be an int >= 1")
+        for name, value in (
+            ("max_output_tokens", self.max_output_tokens),
+            ("max_input_bytes", self.max_input_bytes),
+            ("runs_per_case", self.runs_per_case),
+            ("request_timeout_seconds", self.request_timeout_seconds),
+        ):
+            if not isinstance(value, int) or isinstance(value, bool) or value < 1:
+                raise LiveError(f"{name} must be an int >= 1 (bool is not accepted)")
         if self.runs_per_case > OWNER_PILOT_RUNS_PER_CASE:
             raise LiveError(
                 f"runs_per_case must be <= {OWNER_PILOT_RUNS_PER_CASE} (owner shape)"
             )
-        if (
-            not isinstance(self.request_timeout_seconds, int)
-            or self.request_timeout_seconds < 1
-        ):
-            raise LiveError("request_timeout_seconds must be an int >= 1")
         if not self.subject_vendors or len(set(self.subject_vendors)) != len(
             self.subject_vendors
         ):
@@ -127,15 +138,8 @@ class LiveConfig:
             "request_timeout_seconds": self.request_timeout_seconds,
             "subject_vendors": list(self.subject_vendors),
             "judge_allowlist": self.judge_allowlist.to_dict(),
-            "price_table": {
-                vendor: pin.to_dict() for vendor, pin in sorted(SUBJECT_PINS.items())
-            },
-            "owner_limits": {
-                "pilot_ceiling_cents": OWNER_PILOT_CEILING_CENTS,
-                "provider_cap_cents": OWNER_PROVIDER_CAP_CENTS,
-                "pilot_case_count": OWNER_PILOT_CASE_COUNT,
-                "pilot_runs_per_case": OWNER_PILOT_RUNS_PER_CASE,
-            },
+            "price_table": expected_price_table(),
+            "owner_limits": expected_owner_limits(),
         }
 
     _KEYS = frozenset(
@@ -148,6 +152,11 @@ class LiveConfig:
             "request_timeout_seconds",
             "subject_vendors",
             "judge_allowlist",
+            # Evidence views emitted by to_dict; accepted only if they match
+            # the code constants exactly, so a config round-trips and a tampered
+            # price table is refused.
+            "price_table",
+            "owner_limits",
         }
     )
 
@@ -164,9 +173,13 @@ class LiveConfig:
             if not isinstance(item, Mapping) or set(item) != {"vendor", "model"}:
                 raise LiveError("judge_allowlist entries need exactly vendor and model")
             entries.append((item["vendor"], item["model"]))
+        if "price_table" in payload and payload["price_table"] != expected_price_table():
+            raise LiveError("config price_table does not match the pinned price table")
+        if "owner_limits" in payload and payload["owner_limits"] != expected_owner_limits():
+            raise LiveError("config owner_limits do not match the owner limits")
         config = cls(
             spend_ceiling_cents=payload.get("spend_ceiling_cents", 0),
-            judge_allowlist=OwnerAllowlist(tuple(sorted(set(entries)))),
+            judge_allowlist=OwnerAllowlist(tuple(sorted(entries))),
             max_output_tokens=payload.get(
                 "max_output_tokens", DEFAULT_MAX_OUTPUT_TOKENS
             ),

@@ -84,10 +84,14 @@ class ProviderResponse:
     usage: ProviderUsage
     stop_reason: str = "UNKNOWN"
 
-    def validate(self) -> None:
+    def validate(self, *, require_model: bool = True) -> None:
         if not isinstance(self.response_id, str):
             raise ProviderTransportError("response_id must be a string")
-        if not isinstance(self.served_model, str) or not self.served_model:
+        if not isinstance(self.served_model, str):
+            raise ProviderTransportError(
+                "the served model field must be a string", context={"response_id": self.response_id}
+            )
+        if require_model and not self.served_model:
             raise ProviderTransportError(
                 "the provider returned no served model string; a response without "
                 "a model identifier cannot be pin-verified",

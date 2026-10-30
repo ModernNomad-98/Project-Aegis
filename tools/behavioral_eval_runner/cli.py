@@ -137,6 +137,7 @@ from .judge.calibration_errors import (
 # Gated live enablement (2026-10-29). Importing these modules loads no network
 # machinery and no vendor SDK; the live verbs refuse without an owner gate.
 from .live import LIVE_CAPABILITY_STATE, LIVE_PACKAGE_VERSION, LIVE_SCHEMA_VERSION
+from .live.errors import LiveError as LiveVerbError
 from .live.config import SUBJECT_PINS as LIVE_SUBJECT_PINS
 from .live.pipeline import LivePaths
 from .live.pipeline import dry_run as _live_dry_run
@@ -145,7 +146,8 @@ from .live.pipeline import preflight as _live_preflight
 from .live.providers import judge_routes_by_subject
 from .live.transport import transport_capability_report
 
-#: The full command surface. Live/run/dispatch verbs are deliberately absent.
+#: The full command surface. There is no ungated live/run/dispatch verb: the
+#: only live verbs are the gated live-preflight / live-dry-run / live-run trio.
 COMMANDS = (
     "census",
     "validate-record",
@@ -1532,9 +1534,12 @@ def main(argv: list[str] | None = None) -> int:
         payload = {"error": type(exc).__name__, "detail": str(exc)}
         if exc.reason_code:
             payload["reason_code"] = exc.reason_code
-        context = getattr(exc, "context", None)
-        if context:
-            payload["context"] = dict(context)
+        # Only the gated live errors carry a structured, non-secret context;
+        # serializing an arbitrary RunnerError context could leak input data.
+        if isinstance(exc, LiveVerbError):
+            context = getattr(exc, "context", None)
+            if context:
+                payload["context"] = dict(context)
         sys.stdout.write(json.dumps(payload, sort_keys=True, indent=2) + "\n")
         return 2
     except (ValueError, KeyError, TypeError, OSError) as exc:

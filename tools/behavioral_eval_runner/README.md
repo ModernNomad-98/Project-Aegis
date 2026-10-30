@@ -87,7 +87,7 @@ live assistant or sends a request to a model provider:
 | `schedule` | Required `--selection` JSON and optional work and cost caps. | Prints a deterministic queue and budget accounting; it does not dispatch the queue. |
 | `grade-fixture` | A required `--grader` selector, trusted grading `--plan`, and recorded `--evidence`. | Prints one deterministic Scenario A grader result. |
 | `verify-evidence` | Bundles below required `--root`; optional `--stage` selects input, final, or both reports. Final verification also checks the linked input bundle. | Prints integrity results for the supplied evidence; it does not execute cases. |
-| `live-preflight` | A live configuration, an owner gate record, and committed case data. | Prints the gate/dataset/model/ceiling/allowlist/key-presence report. **No network call and no credential value read.** |
+| `live-preflight` | A live configuration, an owner gate record, and committed case data. | Prints the gate/dataset/model/ceiling/allowlist/key-presence report. **No network call; a credential presence check only, and no value is logged or emitted.** |
 | `live-dry-run` | The same inputs plus an empty evidence root and a cost-ledger path. | Runs the whole pipeline over mock adapters, writes the evidence bundle and cost ledger, and marks every result MOCK / SYNTHETIC_NOT_CITABLE. Zero network calls. |
 | `live-run` | The same inputs, a **REAL_HOST** gate record and the two credential environment variables. | Refuses without the gate or keys. When authorized, dispatches through the vendor software development kit and halts on a model-pin mismatch or a spend-ceiling denial. |
 
@@ -268,8 +268,9 @@ subject is judged by `gpt-6-astra` and an OpenAI subject by
 structurally. Judge dispatch also requires the judge model to be listed in the
 owner allowlist (`judge_allowlist` in the live configuration); an empty
 allowlist authorizes no judgment. The judge's rubric input comes only from
-committed case data, and every verdict must echo the rubric and response SHA-256
-values or it is recorded as `JUDGE_ERROR`.
+committed case data: the pipeline refuses a case whose record hash is not in the
+dataset the gate verified, and every verdict must echo the rubric and response
+SHA-256 values or it is recorded as `JUDGE_ERROR`.
 
 **Cost meter and hard halt.** Every call reserves a conservative integer-cent
 upper bound before dispatch and is reconciled against provider-reported usage
@@ -287,7 +288,9 @@ record with the dataset revision and digest, the pinned model identifiers, the
 model-terms acknowledgment, the spend ceiling and a `fact_origin`. `SYNTHETIC`
 records can exercise `live-dry-run` only; `live-run` requires `REAL_HOST`.
 Synthetic and real results are labeled differently (`SYNTHETIC_NOT_CITABLE` vs
-`REAL_HOST`), and the evidence bundle carries its provenance.
+`REAL_HOST`); a run that injects a test transport is labeled
+`INJECTED_TRANSPORT_NOT_CITABLE` even behind a real-host gate, and the evidence
+bundle records its transport class and its citable-result count.
 
 **Deterministic graders are primary.** A committed case may carry
 `must_include`/`must_not_include` checks. A deterministic failure is recorded

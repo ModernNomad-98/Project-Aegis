@@ -21,6 +21,7 @@ from typing import Any, Mapping
 from ..budget import BudgetCaps, BudgetLedger, Reservation
 from ..canonical import canonical_json
 from ..errors import BudgetError, ReservationDeniedError
+from . import LIVE_SCHEMA_VERSION
 from .config import ModelPin
 from .errors import CostCeilingHaltError
 
@@ -99,6 +100,11 @@ class CostMeter:
     @property
     def calls(self) -> tuple[Mapping[str, Any], ...]:
         return tuple(dict(entry) for entry in self._entries)
+
+    @property
+    def attempts(self) -> int:
+        """Every reservation that reached dispatch, reconciled or not."""
+        return len(self._entries)
 
     def spent_cents(self) -> int:
         return sum(int(entry["cost_cents"]) for entry in self._entries)
@@ -185,6 +191,24 @@ class CostMeter:
                 {"calls": 1, "monetary_cents": actual},
             )
         except BudgetError as exc:
+            entry = {
+                "call_index": handle.call_index,
+                "call_ref": handle.call_ref,
+                "vendor": handle.vendor,
+                "model": handle.model,
+                "served_model": served_model,
+                "pinned_match": served_model == handle.model,
+                "input_tokens": int(input_tokens),
+                "output_tokens": int(output_tokens),
+                "reserved_cents": handle.reserved_cents,
+                "cost_cents": handle.reserved_cents,
+                "cumulative_cents": self.spent_cents() + handle.reserved_cents,
+                "ceiling_cents": self.ceiling_cents,
+                "reconciled": False,
+                "reason_code": "BUDGET_CAP",
+                "detail": "reservation drift: actual usage exceeded the reservation",
+            }
+            self._entries.append(entry)
             self._record_halt(
                 reason_code="BUDGET_CAP",
                 detail=f"reservation drift: {exc}",
@@ -210,6 +234,52 @@ class CostMeter:
             "cost_cents": actual,
             "cumulative_cents": self.spent_cents() + actual,
             "ceiling_cents": self.ceiling_cents,
+            "reconciled": True,
+            "reason_code": None,
+        }
+        self._entries.append(entry)
+        return dict(entry)
+
+    def release_unreconciled(
+        self, handle: ReservationHandle, *, reason_code: str, detail: str
+    ) -> dict[str, Any]:
+        """Charge a call that was dispatched but produced no usage report.
+
+        A call that reached the transport and then failed (model-pin mismatch,
+        transport error, malformed response) can still have cost money, so the
+        full reservation is charged conservatively and recorded. The ceiling is
+        never restored by a failure, and the ledger never omits the attempt.
+        """
+        try:
+            self._ledger.reconcile(
+                Reservation(
+                    handle.reservation_id,
+                    {"calls": 1, "monetary_cents": handle.reserved_cents},
+                ),
+                {"calls": 1, "monetary_cents": handle.reserved_cents},
+            )
+        except BudgetError as exc:  # pragma: no cover - defensive
+            raise CostCeilingHaltError(
+                f"could not charge the unreconciled reservation for "
+                f"{handle.call_ref!r}: {exc}",
+                context=dict(self._halt or {}),
+            ) from exc
+        entry = {
+            "call_index": handle.call_index,
+            "call_ref": handle.call_ref,
+            "vendor": handle.vendor,
+            "model": handle.model,
+            "served_model": None,
+            "pinned_match": None,
+            "input_tokens": None,
+            "output_tokens": None,
+            "reserved_cents": handle.reserved_cents,
+            "cost_cents": handle.reserved_cents,
+            "cumulative_cents": self.spent_cents() + handle.reserved_cents,
+            "ceiling_cents": self.ceiling_cents,
+            "reconciled": False,
+            "reason_code": reason_code,
+            "detail": detail,
         }
         self._entries.append(entry)
         return dict(entry)
@@ -243,11 +313,14 @@ class CostMeter:
     def to_dict(self) -> dict[str, Any]:
         return {
             "ledger_kind": "ber-live-cost-ledger",
-            "schema_version": "1.0.0-ber-live",
+            "schema_version": LIVE_SCHEMA_VERSION,
             "ceiling_cents": self.ceiling_cents,
             "max_calls": self.max_calls,
             "calls": [dict(entry) for entry in self._entries],
             "call_count": len(self._entries),
+            "attempt_count": len(self._entries),
+            "reconciled_count": sum(1 for e in self._entries if e["reconciled"]),
+            "unreconciled_count": sum(1 for e in self._entries if not e["reconciled"]),
             "spent_cents": self.spent_cents(),
             "remaining_cents": self.remaining_cents(),
             "halt": dict(self._halt) if self._halt is not None else None,

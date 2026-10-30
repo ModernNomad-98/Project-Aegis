@@ -98,7 +98,7 @@ class SubjectPinningTests(unittest.TestCase):
         self.assertEqual(error.context["requested_model"], "claude-sonnet-5-5")
         self.assertEqual(transport.call_count, 1)
 
-    def test_empty_served_model_halts_instead_of_being_trusted(self):
+    def test_empty_served_model_is_a_pin_mismatch_halt(self):
         transport = MockTransport(
             lambda request: ProviderResponse(
                 response_id="r",
@@ -111,9 +111,10 @@ class SubjectPinningTests(unittest.TestCase):
         request = adapter.build_request(
             request_id="rid", prompt="hello", arm="BASELINE"
         )
-        with self.assertRaises(Exception) as caught:
+        with self.assertRaises(ModelPinMismatchError) as caught:
             adapter.dispatch(request)
-        self.assertEqual(getattr(caught.exception, "reason_code", None), "TRANSPORT_ERROR")
+        self.assertEqual(caught.exception.reason_code, "MODEL_PIN_MISMATCH")
+        self.assertEqual(caught.exception.context["served_model"], "")
 
 
 class CredentialTests(unittest.TestCase):
@@ -302,7 +303,10 @@ class JudgeGuardTests(unittest.TestCase):
 
 
 class ProviderConfinementTests(unittest.TestCase):
-    def test_only_the_provider_module_names_the_provider(self):
+    def test_only_the_provider_module_names_either_provider(self):
+        # Both vendor SDK names, and the dotted API host form for Anthropic,
+        # are confined to the single provider-naming module.
+        fragments = ("openai", "import anthropic", "from anthropic", "api.anthropic")
         offenders = []
         for directory, dirs, files in os.walk(LIVE_ROOT):
             dirs[:] = [name for name in dirs if name not in ("cases",)]
@@ -312,8 +316,12 @@ class ProviderConfinementTests(unittest.TestCase):
                 path = os.path.join(directory, name)
                 relative = os.path.relpath(path, PACKAGE_ROOT).replace("\\", "/")
                 with open(path, encoding="utf-8") as handle:
-                    if "openai" in handle.read().lower() and relative != "live/providers.py":
-                        offenders.append(relative)
+                    lowered = handle.read().lower()
+                if relative == "live/providers.py":
+                    continue
+                for fragment in fragments:
+                    if fragment in lowered:
+                        offenders.append(f"{relative}: {fragment}")
         self.assertEqual(offenders, [])
 
     def test_importing_the_live_package_loads_no_network_or_sdk_module(self):

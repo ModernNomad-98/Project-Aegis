@@ -240,7 +240,7 @@ class JudgeAdapter:
         self, request: ProviderRequest, *, case: LiveCase, subject_text: str
     ) -> JudgeResult:
         response = self.transport.complete(request)
-        response.validate()
+        response.validate(require_model=False)
         if response.served_model != self.pin.model:
             raise ModelPinMismatchError(
                 f"judge served model {response.served_model!r} differs from the pinned "

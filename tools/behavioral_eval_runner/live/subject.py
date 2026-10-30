@@ -100,10 +100,11 @@ class SubjectAdapter:
                 },
             )
         response = self.transport.complete(request)
-        response.validate()
+        response.validate(require_model=False)
         if response.served_model != self.pin.model:
             raise ModelPinMismatchError(
-                f"served model {response.served_model!r} differs from the pinned "
+                f"served model {response.served_model!r} (missing or different) "
+                f"does not equal the pinned "
                 f"{self.pin.model!r}: run halted, response discarded, no substitution",
                 context={
                     "vendor": self.pin.vendor,

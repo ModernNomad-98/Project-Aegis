@@ -18,6 +18,7 @@ import unittest
 
 from tools.behavioral_eval_runner.live.errors import (
     JudgeVendorGuardError,
+    LiveError,
     LiveGateRefusedError,
     MissingCredentialError,
 )
@@ -134,7 +135,10 @@ class PreflightTests(unittest.TestCase):
                 report["credentials"]["missing_env_vars"],
                 ["ANTHROPIC_API_KEY", "OPENAI_API_KEY"],
             )
-            self.assertFalse(report["credentials"]["values_read"])
+            self.assertFalse(report["credentials"]["value_emitted"])
+            self.assertEqual(
+                report["credentials"]["required_vendors"], ["anthropic", "openai"]
+            )
             self.assertEqual(report["effective_ceiling_cents"], 12000)
             self.assertEqual(report["planned_calls"], 48)
             self.assertEqual(report["blockers"], [])
@@ -188,8 +192,14 @@ class RealGatePathTests(unittest.TestCase):
             self.assertEqual(result["dispatched_calls"], 48)
             self.assertEqual(result["results_by_state"], {"FAIL": 12, "PASS": 12})
             self.assertTrue(result["evidence"]["verified"])
+            # Injected mock transports can never produce citable real-host
+            # evidence, even behind a REAL_HOST gate with fake keys.
+            self.assertEqual(result["transport_class"], "INJECTED")
+            self.assertEqual(result["citable_results"], 0)
             for record in result["results"]:
-                self.assertEqual(record["citability"], "REAL_HOST")
+                self.assertEqual(
+                    record["citability"], "INJECTED_TRANSPORT_NOT_CITABLE"
+                )
                 self.assertNotIn("text", record["subject"])
 
     def test_preflight_reports_ready_when_keys_are_present(self):
@@ -203,6 +213,79 @@ class RealGatePathTests(unittest.TestCase):
             self.assertEqual(report["status"], "READY")
             self.assertEqual(report["credentials"]["missing_env_vars"], [])
             self.assertEqual(report["network_calls"], 0)
+
+
+class CredentialUnionTests(unittest.TestCase):
+    def test_single_subject_vendor_still_requires_the_judge_vendor_key(self):
+        config = helpers.config_payload()
+        config["subject_vendors"] = ["anthropic"]
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _paths(
+                tmp,
+                config=config,
+                gate=helpers.gate_payload(fact_origin="REAL_HOST"),
+            )
+            report = preflight(paths, environ={})
+            self.assertEqual(
+                report["credentials"]["required_vendors"], ["anthropic", "openai"]
+            )
+            with self.assertRaises(MissingCredentialError) as caught:
+                live_run(
+                    paths,
+                    environ={"ANTHROPIC_API_KEY": helpers.FAKE_ANTHROPIC_KEY},
+                )
+            self.assertEqual(
+                caught.exception.context["missing_env_vars"], ["OPENAI_API_KEY"]
+            )
+
+
+class ConfigStrictnessTests(unittest.TestCase):
+    def test_config_round_trips_through_its_evidence_view(self):
+        config = helpers.config_payload()
+        config["schema_version"] = "1.0.0-ber-live"
+        loaded = LiveConfig.from_dict(config)
+        view = loaded.to_dict()
+        self.assertEqual(LiveConfig.from_dict(view).to_dict(), view)
+
+    def test_tampered_price_table_is_refused(self):
+        config = helpers.config_payload()
+        config["price_table"] = {
+            "anthropic": {
+                "vendor": "anthropic",
+                "model": "claude-sonnet-5-5",
+                "credential_env_var": "ANTHROPIC_API_KEY",
+                "input_cents_per_mtok": 0,
+                "output_cents_per_mtok": 0,
+            }
+        }
+        with self.assertRaises(LiveError):
+            LiveConfig.from_dict(config)
+
+    def test_duplicate_allowlist_entry_is_refused(self):
+        config = helpers.config_payload()
+        config["judge_allowlist"]["judge_models"].append(
+            {"vendor": "openai", "model": "gpt-6-astra"}
+        )
+        with self.assertRaises(LiveError):
+            LiveConfig.from_dict(config)
+
+    def test_bool_is_not_an_integer_setting(self):
+        config = helpers.config_payload()
+        config["max_output_tokens"] = True
+        with self.assertRaises(LiveError):
+            LiveConfig.from_dict(config)
+
+    def test_gate_created_in_the_future_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gate = helpers.gate_payload(
+                fact_origin="REAL_HOST",
+                created_at="2030-01-01T00:00:00Z",
+                expires_at="2031-01-01T00:00:00Z",
+            )
+            paths = _paths(tmp, gate=gate)
+            with self.assertRaises(LiveGateRefusedError) as caught:
+                live_run(paths, environ={})
+            self.assertIn("future", str(caught.exception).lower())
 
 
 class GateCliRefusalTests(unittest.TestCase):

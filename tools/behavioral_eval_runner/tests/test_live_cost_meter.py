@@ -150,6 +150,45 @@ class CostHaltIntegrationTests(unittest.TestCase):
                 )
             )
 
+    def test_failed_dispatch_is_charged_and_recorded(self):
+        # A call that reaches the transport and then fails (model-pin mismatch)
+        # must still consume its reservation and appear in the ledger.
+        from tools.behavioral_eval_runner.live.mock_transport import MockTransport
+        from tools.behavioral_eval_runner.live.transport import (
+            ProviderResponse,
+            ProviderUsage,
+        )
+
+        def wrong_model(request):
+            return ProviderResponse(
+                response_id="bad",
+                served_model="not-the-pin",
+                text="x",
+                usage=ProviderUsage(10, 10),
+            )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = helpers.make_paths(tmp)
+            subject = MockTransport(wrong_model, name="bad-subject")
+            result = dry_run(
+                paths,
+                subject_transport_factory=lambda: subject,
+                judge_transport_factory=lambda: helpers.mock_judge_transport(),
+            )
+            self.assertEqual(result["status"], "HALTED")
+            self.assertEqual(result["halt_reason_code"], "MODEL_PIN_MISMATCH")
+            self.assertEqual(result["dispatched_calls"], 1)
+            self.assertEqual(subject.call_count, 1)
+            self.assertEqual(result["cost_ledger"]["unreconciled_count"], 1)
+            entry = result["cost_ledger"]["calls"][0]
+            self.assertFalse(entry["reconciled"])
+            self.assertEqual(entry["reason_code"], "MODEL_PIN_MISMATCH")
+            self.assertEqual(entry["cost_cents"], entry["reserved_cents"])
+            self.assertGreaterEqual(entry["cost_cents"], 1)
+            self.assertTrue(all(
+                record["result_state"] == "UNRUN" for record in result["results"]
+            ))
+
     def test_halt_without_the_cap_still_completes(self):
         with tempfile.TemporaryDirectory() as tmp:
             paths = helpers.make_paths(tmp)
