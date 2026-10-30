@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "gate_kind": "ber-live-owner-gate",
+  "gate_id": "BER-LIVE-PILOT-A-APR161",
+  "owner_decision_ref": "OWNER-DECISION-2026-10-30T1050PDT.md sha256 4c04a56fdfda0771ee5da2af578f55c566aa8438590656db70e74388adcd1e0a",
+  "fact_origin": "REAL_HOST",
+  "dataset": {
+    "revision": "0000000000000000000000000000000000000000",
+    "path": "tools/behavioral_eval_runner/live/pilot-a/cases",
+    "sha256": "a842403313a087753bdd35d8302a77ddc947e1498bff1ed5f632b4ce0681c596",
+    "case_count": 20
+  },
+  "models": {
+    "subjects": {
+      "anthropic": "claude-sonnet-5-5",
+      "openai": "gpt-6-astra"
+    },
+    "judges": {
+      "anthropic": {
+        "vendor": "openai",
+        "model": "gpt-6-astra"
+      },
+      "openai": {
+        "vendor": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    }
+  },
+  "model_terms": {
+    "acknowledged": true,
+    "terms_ref": "Anthropic Commercial Terms of Service https://www.anthropic.com/legal/commercial-terms ; OpenAI Service Terms https://openai.com/policies/service-terms/ ; acknowledged by the owner in OWNER-DECISION-2026-10-30T1050PDT.md item 2",
+    "acknowledged_on": "2026-10-30"
+  },
+  "spend": {
+    "ceiling_cents": 12000,
+    "provider_cap_cents": 12000
+  },
+  "created_at": "2026-10-30T17:50:00Z",
+  "expires_at": "2026-11-06T17:50:00Z"
+}
