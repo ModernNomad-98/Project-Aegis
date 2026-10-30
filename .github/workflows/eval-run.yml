@@ -50,14 +50,18 @@
 #   * no repository write, commit, tag, release, settings or protection change;
 #   * no raw evidence, prompt, response or transcript is uploaded. The package
 #     writes its own evidence under RUNNER_TEMP; only the structured publish
-#     directory and the resume manifest (hashes, states, costs) are retained;
+#     directory and the resume manifest (hashes, states, costs) are retained.
+#     Each case record in the manifest is written through a closed shape: the
+#     package's free-form error text is dropped, a halt is stored as its closed
+#     allowlist view, and an unparseable stdout is replaced by a marker;
 #   * no secret value is echoed, traced, dumped or written to a file.
 #
 # Cost containment is layered and fail-closed:
 #   1. the config step rebuilds the committed config template with the
 #      EFFECTIVE ceiling, min(12000 owner provider cap, the committed gate
-#      template's spend.ceiling_cents; the package's owner pilot ceiling is
-#      15000) and a ONE-entry cross-vendor judge allowlist, then validates the
+#      template's spend.ceiling_cents and spend.provider_cap_cents; the
+#      package's owner pilot ceiling is 15000) and a ONE-entry cross-vendor
+#      judge allowlist, then validates the
 #      result with the package's own validator; each per-case invocation is
 #      rebuilt with spend_ceiling_cents equal to the budget still unspent, so
 #      the sum over all invocations cannot cross the effective ceiling;
@@ -82,7 +86,12 @@
 #      result-count mismatch, an unreconciled cost entry, a raw transcript) is
 #      recorded and forces status VERIFICATION_FAILED and verdict UNRUN before
 #      the record is written. The step still exits 1, so a red run is never
-#      published as COMPLETED/PASS.
+#      published as COMPLETED/PASS;
+#   4. a case is marked COMPLETED in the run record only when its live-run
+#      returned COMPLETED with a readable ledger, verified evidence and the
+#      planned per-case result count. The restore step refuses a prior
+#      COMPLETED entry that has no attempt ledger, so an unrepairable
+#      completion cannot permanently wedge later dispatches.
 #
 # Secret containment: ANTHROPIC_API_KEY and OPENAI_API_KEY are injected from
 # the eval-run environment only, mapped only in the single env: block of the
@@ -354,7 +363,20 @@ jobs:
           gate_spend_ceiling_cents = gate_spend.get("ceiling_cents")
           if type(gate_spend_ceiling_cents) is not int or gate_spend_ceiling_cents <= 0:
               fail("the gate template has no positive integer spend ceiling")
-          EFFECTIVE_CEILING_CENTS = min(PILOT_CEILING_CENTS, gate_spend_ceiling_cents)
+          gate_spend_provider_cap_cents = gate_spend.get("provider_cap_cents")
+          if (
+              type(gate_spend_provider_cap_cents) is not int
+              or gate_spend_provider_cap_cents <= 0
+          ):
+              fail("the gate template has no positive integer provider cap")
+          # The package's own binding ceiling is min(config, gate ceiling,
+          # gate provider cap); the workflow uses the same value so its
+          # cumulative accounting cannot be looser than the package's.
+          EFFECTIVE_CEILING_CENTS = min(
+              PILOT_CEILING_CENTS,
+              gate_spend_ceiling_cents,
+              gate_spend_provider_cap_cents,
+          )
           if EFFECTIVE_CEILING_CENTS <= 0:
               fail("the effective ceiling is not positive")
 
@@ -419,6 +441,11 @@ jobs:
           if gate_template.spend_ceiling_cents != gate_spend_ceiling_cents:
               fail(
                   "the gate template spend ceiling does not match the preview that "
+                  "set the effective ceiling"
+              )
+          if gate_template.provider_cap_cents != gate_spend_provider_cap_cents:
+              fail(
+                  "the gate template provider cap does not match the preview that "
                   "set the effective ceiling"
               )
 
@@ -490,6 +517,7 @@ jobs:
               "staged_gate_revision": staged_gate.dataset_revision,
               "spend_ceiling_cents": EFFECTIVE_CEILING_CENTS,
               "gate_spend_ceiling_cents": gate_spend_ceiling_cents,
+              "gate_spend_provider_cap_cents": gate_spend_provider_cap_cents,
               "runs_per_case": config.runs_per_case,
               "subject_vendors": list(config.subject_vendors),
               "planned_calls_per_case": planned_calls_per_case,
@@ -555,7 +583,7 @@ jobs:
           CASES_PATH: ${{ inputs.cases_path }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          set -o pipefail
+          set -euo pipefail
           python -P -m tools.behavioral_eval_runner live-preflight \
             --config "$RUNNER_TEMP/live-config.json" \
             --gate "$RUNNER_TEMP/live-gate.json" \
@@ -752,7 +780,14 @@ jobs:
               tail = stem[marker + len("-attempt"):]
               if not tail.isdigit():
                   return None, None
-              return stem[:marker], int(tail)
+              # Match the owner against the plan's case ids so a ledger copied
+              # under a run-scoped name ("<run-id>-<case>-attempt<N>.json") is
+              # attributed to its case instead of becoming an orphan charge.
+              owner = stem[:marker]
+              for candidate in plan["case_ids"]:
+                  if owner == candidate or owner.endswith("-" + candidate):
+                      return candidate, int(tail)
+              return None, None
 
 
           if not current_run.isdigit():
@@ -1017,6 +1052,22 @@ jobs:
                           "run " + run_id + " marks " + str(case_id)
                           + " COMPLETED but its result hash is missing or does not match"
                       )
+                  # A COMPLETED entry is trusted only when at least one of its
+                  # attempts has a ledger in the artifact: the run step refuses
+                  # a completion without one, and a manifest that claims it
+                  # anyway must not be resumed as done.
+                  prior_attempts = entry.get("attempts") or []
+                  has_ledger = any(
+                      isinstance(record, dict)
+                      and isinstance(record.get("ledger_name"), str)
+                      and record.get("ledger_name") in by_original
+                      for record in prior_attempts
+                  )
+                  if not has_ledger:
+                      refuse(
+                          "run " + run_id + " marks " + str(case_id)
+                          + " COMPLETED but no attempt has a ledger"
+                      )
                   (CASES_DIR / (case_id + ".json")).write_bytes(payload)
                   completed[case_id] = {"result_sha256": digest, "source_run_id": run_id}
 
@@ -1110,8 +1161,20 @@ jobs:
           EVIDENCE_DIR = RUNNER_TEMP / "ber-evidence"
           CHUNK_ROOT = WORKSPACE / ".ber-run" / "chunks"
           MANIFEST_PATH = MANIFEST_DIR / "manifest.json"
+          # The chunk root is generated inside the checkout. Refuse a symlinked
+          # .ber-run in the dispatched ref, and prove after creation that the
+          # resolved root is still inside the workspace, so a tracked symlink
+          # cannot redirect the writes.
+          if (WORKSPACE / ".ber-run").is_symlink():
+              print("REFUSED: .ber-run is a symlink in the dispatched ref", flush=True)
+              raise SystemExit(1)
           for directory in (CASES_DIR, LEDGER_DIR, GATE_DIR, EVIDENCE_DIR, CHUNK_ROOT):
               directory.mkdir(parents=True, exist_ok=True)
+          try:
+              CHUNK_ROOT.resolve().relative_to(WORKSPACE)
+          except ValueError:
+              print("REFUSED: the chunk root is outside the workspace", flush=True)
+              raise SystemExit(1)
 
           sys.path.insert(0, str(WORKSPACE))
           from tools.behavioral_eval_runner.live.config import LiveConfig  # noqa: E402
@@ -1128,6 +1191,15 @@ jobs:
               case.case_id: case
               for case in load_cases(str(WORKSPACE / plan["dataset_path"]))
           }
+          # Re-assert the frozen set in this step, not only in the config step:
+          # a change between the steps must stop the run before any chunk is
+          # built from bytes the gate did not freeze.
+          if len(COMMITTED_CASES) != plan["case_count"]:
+              print("REFUSED: the committed case count changed during the run", flush=True)
+              raise SystemExit(1)
+          if dataset_digest(list(COMMITTED_CASES.values())) != plan["dataset_sha256"]:
+              print("REFUSED: the committed dataset digest changed during the run", flush=True)
+              raise SystemExit(1)
           # One case per invocation: a timeout can therefore lose at most the
           # case in flight, and a completed case is never dispatched again.
           PER_CASE_TIMEOUT_SECONDS = 1500
@@ -1138,6 +1210,9 @@ jobs:
 
 
           def write_state():
+              # Every persisted record carries the refusal reasons, including a
+              # record written just before a fail-fast SystemExit.
+              state["failures"] = list(failures)
               # Atomic replace; a concurrent reader must never make the
               # persisted record fail (Windows can deny a rename while the
               # destination is open, Linux never does).
@@ -1325,7 +1400,9 @@ jobs:
               remaining = CEILING - total_spent()
               if remaining <= 0:
                   entry["status"] = "NOT_RUN_BUDGET"
-                  failures.append(f"{case_id}: the $120 ceiling is exhausted before dispatch")
+                  failures.append(
+                      f"{case_id}: the {CEILING}c ceiling is exhausted before dispatch"
+                  )
                   write_state()
                   break
               # One past every attempt any dispatch used for this case, so a
@@ -1404,17 +1481,25 @@ jobs:
               record["remaining_ceiling_cents"] = remaining
               write_state()
 
-              preflight = run_cli(
-                  [
-                      "live-preflight",
-                      "--config", str(config_path),
-                      "--gate", str(gate_path),
-                      "--cases", str(chunk_root),
-                      "--repo-root", str(WORKSPACE),
-                      "--expected-revision", plan["dispatch_sha"],
-                  ],
-                  timeout=120,
-              )
+              try:
+                  preflight = run_cli(
+                      [
+                          "live-preflight",
+                          "--config", str(config_path),
+                          "--gate", str(gate_path),
+                          "--cases", str(chunk_root),
+                          "--repo-root", str(WORKSPACE),
+                          "--expected-revision", plan["dispatch_sha"],
+                      ],
+                      timeout=120,
+                  )
+              except subprocess.TimeoutExpired:
+                  failures.append(f"{case_id}: the chunk preflight timed out")
+                  record["status"] = "PREFLIGHT_TIMEOUT"
+                  entry["status"] = "PREFLIGHT_TIMEOUT"
+                  write_state()
+                  enforce_ceiling()
+                  break
               if preflight.returncode != 0:
                   failures.append(f"{case_id}: chunk preflight failed")
                   record["status"] = "PREFLIGHT_FAILED"
@@ -1434,6 +1519,7 @@ jobs:
                   record["preflight_status"] = report.get("status")
                   entry["status"] = "PREFLIGHT_REFUSED"
                   write_state()
+                  enforce_ceiling()
                   break
 
               try:
@@ -1465,20 +1551,50 @@ jobs:
                   write_state()
                   enforce_ceiling()
                   break
-              result_path = CASES_DIR / f"{case_id}.json"
-              result_path.write_text(completed.stdout, encoding="utf-8")
+              result_path = CASES_DIR / (case_id + ".json")
               try:
                   result = json.loads(completed.stdout)
               except ValueError:
                   result = None
               if not isinstance(result, dict):
+                  # Never upload the raw stdout of an unparseable result: a closed
+                  # marker is written instead, so the resume artifact carries no
+                  # free-form package output.
+                  result_path.write_text(
+                      json.dumps(
+                          {
+                              "command": "live-run",
+                              "status": "RESULT_INVALID",
+                              "raw_stdout_withheld": True,
+                          },
+                          indent=2,
+                          sort_keys=True,
+                      )
+                      + "\n",
+                      encoding="utf-8",
+                  )
                   failures.append(f"{case_id}: live-run produced no parseable result")
+                  record["result_sha256"] = hashlib.sha256(
+                      result_path.read_bytes()
+                  ).hexdigest()
                   record["status"] = "RESULT_INVALID"
                   record["spent_cents"] = ledger_spent(ledger_path)
                   entry["status"] = "RESULT_INVALID"
                   write_state()
                   enforce_ceiling()
                   break
+              result_error_present = bool(result.get("error"))
+              # The resume artifact is uploaded, so the case result is written
+              # through a closed shape: free-form error text is dropped and a
+              # halt is stored as its closed allowlist view, never the package's
+              # raw object with detail/context.
+              result.pop("error", None)
+              if isinstance(result.get("halt"), dict):
+                  result["halt"] = halt_view_of(result["halt"])
+              result_path.write_text(
+                  json.dumps(result, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
               record["result_sha256"] = hashlib.sha256(
                   result_path.read_bytes()
               ).hexdigest()
@@ -1494,7 +1610,7 @@ jobs:
                   record["returncode"] = completed.returncode
                   record["halt_view"] = halt_view_of(result.get("halt"))
                   record["halt_reason_code"] = result.get("halt_reason_code")
-                  record["error"] = result.get("error")
+                  record["error_present"] = result_error_present
                   entry["status"] = "ERROR"
                   failures.append(
                       f"{case_id}: live-run exited with return code "
@@ -1510,7 +1626,7 @@ jobs:
                   # structured summary, never as the package's raw object.
                   record["halt_view"] = halt_view_of(result.get("halt"))
                   record["halt_reason_code"] = result.get("halt_reason_code")
-                  record["error"] = result.get("error")
+                  record["error_present"] = result_error_present
                   entry["status"] = str(result.get("status") or "ERROR")
                   failures.append(
                       f"{case_id}: live-run finished with status "
@@ -1520,18 +1636,50 @@ jobs:
                   enforce_ceiling()
                   break
               if record["spent_cents"] is None:
-                  spent = result.get("spent_cents")
-                  if type(spent) is not int or spent < 0:
-                      # A completed run without a readable ledger cannot be
-                      # counted, so it is refused rather than counted as zero.
-                      failures.append(
-                          f"{case_id}: completed live-run has no readable cost ledger"
-                      )
-                      record["status"] = "LEDGER_INVALID"
-                      entry["status"] = "LEDGER_INVALID"
-                      write_state()
-                      raise SystemExit(1)
-                  record["spent_cents"] = spent
+                  # The package writes its ledger before it returns a result, so
+                  # a COMPLETED result with no readable ledger cannot be counted.
+                  # It is refused rather than trusted from stdout, because a case
+                  # marked COMPLETED here would be skipped by every later dispatch.
+                  failures.append(
+                      f"{case_id}: completed live-run has no readable cost ledger"
+                  )
+                  record["status"] = "LEDGER_INVALID"
+                  entry["status"] = "LEDGER_INVALID"
+                  write_state()
+                  raise SystemExit(1)
+              evidence = result.get("evidence")
+              evidence = evidence if isinstance(evidence, dict) else {}
+              if evidence.get("verified") is not True:
+                  # A COMPLETED case must satisfy the same evidence invariant the
+                  # summary checks; otherwise the manifest would permanently mark
+                  # an unverifiable case as done and a later dispatch could not
+                  # repair it.
+                  failures.append(
+                      f"{case_id}: live-run returned COMPLETED without verified evidence"
+                  )
+                  record["status"] = "EVIDENCE_UNVERIFIED"
+                  entry["status"] = "EVIDENCE_UNVERIFIED"
+                  write_state()
+                  enforce_ceiling()
+                  break
+              results = result.get("results")
+              planned = plan.get("planned_calls_per_case")
+              expected_results = (
+                  planned // 2 if type(planned) is int and planned % 2 == 0 else None
+              )
+              if not isinstance(results, list) or (
+                  expected_results is not None and len(results) != expected_results
+              ):
+                  failures.append(
+                      f"{case_id}: live-run returned "
+                      f"{len(results) if isinstance(results, list) else 'no'} "
+                      f"results, expected {expected_results}"
+                  )
+                  record["status"] = "RESULT_COUNT_INVALID"
+                  entry["status"] = "RESULT_COUNT_INVALID"
+                  write_state()
+                  enforce_ceiling()
+                  break
               entry["status"] = "COMPLETED"
               entry["result_sha256"] = record["result_sha256"]
               ran_cases.append(case_id)
@@ -1554,6 +1702,9 @@ jobs:
               "skipped_as_complete": skipped_cases,
               "ran_in_this_dispatch": ran_cases,
           }
+          # Every refusal reason is part of the run record, so a later reader
+          # does not have to scrape the step log to learn why a case stopped.
+          state["failures"] = list(failures)
           cumulative = total_spent()
           if cumulative > CEILING:
               failures.append(
@@ -1605,7 +1756,10 @@ jobs:
           name: ber-resume-manifest
           path: ${{ runner.temp }}/ber-manifest/
           retention-days: 14
-          if-no-files-found: warn
+          # The manifest is the spend and resume record: a run that executed the
+          # case step but produced no manifest must fail the workflow, never
+          # publish an empty artifact that later dispatches would trust.
+          if-no-files-found: error
 
       - name: Preflight-only stop ($0, no provider call, no key mapped)
         # Owner decision item 4: one preflight-only dispatch costs nothing. This
@@ -1752,13 +1906,23 @@ jobs:
               )
               effective_ceiling = HARD_CEILING_CENTS
           gate_ceiling = plan.get("gate_spend_ceiling_cents")
+          gate_provider_cap = plan.get("gate_spend_provider_cap_cents")
           if (
-              type(gate_ceiling) is int
-              and gate_ceiling > 0
-              and effective_ceiling != min(HARD_CEILING_CENTS, gate_ceiling)
+              type(gate_ceiling) is not int
+              or not 0 < gate_ceiling <= HARD_CEILING_CENTS
+          ):
+              ceiling_failures.append("the run plan has no valid gate spend ceiling")
+          elif (
+              type(gate_provider_cap) is not int
+              or not 0 < gate_provider_cap <= HARD_CEILING_CENTS
+          ):
+              ceiling_failures.append("the run plan has no valid gate provider cap")
+          elif effective_ceiling != min(
+              HARD_CEILING_CENTS, gate_ceiling, gate_provider_cap
           ):
               ceiling_failures.append(
-                  "the effective ceiling is not min($120, the gate template ceiling)"
+                  "the effective ceiling is not min($120, the gate ceiling, the "
+                  "provider cap)"
               )
 
           # Spend and reconciliation come from the ledgers: they are the only
@@ -1851,6 +2015,17 @@ jobs:
                           attempt.get("chunk_gate_digest")
                           for attempt in attempts
                           if isinstance(attempt.get("chunk_gate_digest"), str)
+                      ],
+                      "failed_attempts": [
+                          {
+                              "attempt": attempt.get("attempt"),
+                              "status": attempt.get("status"),
+                              "returncode": attempt.get("returncode"),
+                              "halt_reason_code": attempt.get("halt_reason_code"),
+                              "halt_view": attempt.get("halt_view"),
+                          }
+                          for attempt in attempts
+                          if attempt.get("status") not in (None, "COMPLETED")
                       ],
                   }
               )
@@ -2060,6 +2235,10 @@ jobs:
           for name, payload in ledgers.items():
               spent = integer(payload.get("spent_cents"))
               ceiling = integer(payload.get("ceiling_cents"))
+              if integer(payload.get("unreconciled_count")) is None:
+                  verification_failures.append(
+                      f"ledger {name} has no integer unreconciled_count"
+                  )
               if spent is None:
                   verification_failures.append(f"ledger {name} has no integer spend")
                   continue
@@ -2193,6 +2372,7 @@ jobs:
                       else None
                   ),
                   "config_loaded": bool(config),
+                  "failures": state.get("failures") or [],
               },
               "cost": {
                   "configured_ceiling_cents": configured,
