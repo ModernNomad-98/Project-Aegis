@@ -1,0 +1,689 @@
+# AEGIS-APR-158 - gated pilot eval workflow.
+#
+# Owner grant (exact scope, 2026-10-30): ONE new file,
+# .github/workflows/eval-run.yml, workflow_dispatch only, bound to environment
+# eval-run, no other trigger, no edit to any existing workflow, gate-guard,
+# CODEOWNERS, protection or required check. The workflow must pin the model and
+# judge IDs as arguments with no defaults, enforce the $120 cost cap by halting,
+# publish structured output only and never echo secret values.
+#
+# What this file deliberately does NOT do:
+#   * no push, pull_request, schedule or workflow_run trigger;
+#   * no repository write, commit, tag, release, settings or protection change;
+#   * no raw evidence, prompt, response or transcript is uploaded. The package
+#     writes its own evidence under RUNNER_TEMP; only the structured publish
+#     directory is retained;
+#   * no secret value is echoed, traced, dumped or written to a file.
+#
+# Cost containment is layered and fail-closed:
+#   1. the config step rebuilds the committed config template with
+#      spend_ceiling_cents = 12000 (the $120 owner provider cap; the package's
+#      owner pilot ceiling is 15000) and a ONE-entry cross-vendor judge
+#      allowlist, then validates the result with the package's own validator;
+#   2. the merged BER live package checks its cost meter before every call and
+#      halts on the first reservation that would cross the configured ceiling
+#      (the halt was proven in the live-enablement review). A halted case and
+#      every case after it are recorded UNRUN, and an UNRUN case is never PASS.
+#
+# Secret containment: ANTHROPIC_API_KEY and OPENAI_API_KEY are injected from
+# the eval-run environment only, mapped only in the single env: block of the
+# live-run step, and never printed. There is no shell tracing, no environment
+# dump and no read of a key file anywhere in this workflow.
+#
+# Package-compatibility notes for this exact main (1443a7ae):
+#   * "python -P -m tools.behavioral_eval_runner ..." cannot find the package
+#     with -P alone (the checkout root is not prepended), so the two CLI steps
+#     set PYTHONPATH to the checkout. -P is kept so the current directory is
+#     still never prepended implicitly.
+#   * the live package refuses a cost ledger written INSIDE the evidence root
+#     (reason code EVIDENCE_PATH_CONFLICT), so the ledger is written beside the
+#     evidence root and copied into the publish directory after the run.
+#
+name: eval-run
+
+on:
+  workflow_dispatch:
+    inputs:
+      subject_model:
+        description: "Subject model id (required, no default). Must equal the package pin claude-sonnet-5-5; any other value fails closed."
+        required: true
+        type: string
+      judge_model:
+        description: "Judge model id (required, no default). Must equal the package pinned cross-vendor judge gpt-6-astra; any other value fails closed."
+        required: true
+        type: string
+      gate_path:
+        description: "Repository-relative path to the committed owner gate record JSON. Its dataset.revision must equal the dispatched commit SHA."
+        required: true
+        type: string
+      cases_path:
+        description: "Repository-relative path to the committed live case dataset; it must equal the gate's dataset.path."
+        required: true
+        type: string
+      config_template_path:
+        description: "Repository-relative path to the committed live config template. This workflow sets the ceiling and judge allowlist."
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  eval-run:
+    name: eval-run
+    runs-on: ubuntu-latest
+    environment: eval-run
+    timeout-minutes: 240
+
+    # Serialize dispatches so two runs cannot spend at the same time. This
+    # edits no state and stores no state; the provider-side prepaid credit
+    # remains the cumulative hard cap across runs.
+    concurrency:
+      group: eval-run
+      cancel-in-progress: false
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONIOENCODING: utf-8
+      NoDefaultCurrentDirectoryInExePath: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.14"
+
+      - name: Install hash-locked dependencies
+        run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
+
+      - name: Assert pinned models and build the $120 live config
+        env:
+          SUBJECT_MODEL: ${{ inputs.subject_model }}
+          JUDGE_MODEL: ${{ inputs.judge_model }}
+          CONFIG_TEMPLATE_PATH: ${{ inputs.config_template_path }}
+          GATE_PATH: ${{ inputs.gate_path }}
+          CASES_PATH: ${{ inputs.cases_path }}
+        run: |
+          python -P - <<'PY'
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          # -P keeps the checkout root off sys.path. Add it explicitly, after
+          # the workspace path has been resolved, so the package imports from
+          # the reviewed checkout and nowhere else.
+          sys.path.insert(0, str(WORKSPACE))
+
+          from tools.behavioral_eval_runner.live.config import (  # noqa: E402
+              OWNER_PILOT_CEILING_CENTS,
+              OWNER_PROVIDER_CAP_CENTS,
+              LiveConfig,
+          )
+          from tools.behavioral_eval_runner.live.providers import (  # noqa: E402
+              JUDGE_PINS,
+              SUBJECT_PINS,
+          )
+
+          # The owner pin is literal here as well as in the package. Both must
+          # agree, so a package pin change cannot silently move the pilot.
+          PILOT_CEILING_CENTS = 12000
+          EXPECTED_SUBJECT_VENDOR = "anthropic"
+          EXPECTED_SUBJECT_MODEL = "claude-sonnet-5-5"
+          EXPECTED_JUDGE_VENDOR = "openai"
+          EXPECTED_JUDGE_MODEL = "gpt-6-astra"
+
+
+          def fail(message):
+              # Clear, non-secret refusal: no model substitution is ever made.
+              print(f"ERROR: {message}", file=sys.stderr)
+              raise SystemExit(1)
+
+
+          def workspace_path(raw, label, expect_dir=False):
+              """Resolve a dispatch path inside the checkout and prove it is tracked."""
+              candidate = (WORKSPACE / raw).resolve()
+              try:
+                  candidate.relative_to(WORKSPACE)
+              except ValueError:
+                  fail(f"{label} resolves outside the repository workspace")
+              if expect_dir:
+                  if not candidate.is_dir():
+                      fail(f"{label} is not a committed directory: {raw!r}")
+              elif not candidate.is_file():
+                  fail(f"{label} is not a committed file: {raw!r}")
+              try:
+                  tracked = subprocess.run(
+                      [
+                          "git",
+                          "-C",
+                          str(WORKSPACE),
+                          "ls-files",
+                          "--error-unmatch",
+                          "--",
+                          str(candidate.relative_to(WORKSPACE)),
+                      ],
+                      capture_output=True,
+                      timeout=30,
+                  )
+              except (OSError, subprocess.SubprocessError) as exc:
+                  fail(f"{label} could not be checked against git: {type(exc).__name__}")
+              if tracked.returncode != 0:
+                  fail(f"{label} is not tracked in this checkout: {raw!r}")
+              return candidate
+
+
+          if PILOT_CEILING_CENTS > min(
+              OWNER_PROVIDER_CAP_CENTS, OWNER_PILOT_CEILING_CENTS
+          ):
+              fail("the workflow ceiling is above a package owner limit")
+
+          try:
+              subject_pin = SUBJECT_PINS[EXPECTED_SUBJECT_VENDOR]
+              judge_pin = JUDGE_PINS[(subject_pin.vendor, subject_pin.model)]
+          except KeyError:
+              fail("the package pins no route for the pilot subject vendor")
+          if (
+              subject_pin.vendor != EXPECTED_SUBJECT_VENDOR
+              or subject_pin.model != EXPECTED_SUBJECT_MODEL
+          ):
+              fail(
+                  "the package subject pin is not the owner-pinned "
+                  f"{EXPECTED_SUBJECT_VENDOR}/{EXPECTED_SUBJECT_MODEL} route"
+              )
+          if (
+              judge_pin.vendor != EXPECTED_JUDGE_VENDOR
+              or judge_pin.model != EXPECTED_JUDGE_MODEL
+          ):
+              fail(
+                  "the package judge pin is not the owner-pinned cross-vendor "
+                  f"{EXPECTED_JUDGE_VENDOR}/{EXPECTED_JUDGE_MODEL} route"
+              )
+          if judge_pin.vendor == subject_pin.vendor:
+              fail("the package route is not cross-vendor")
+
+          subject_input = os.environ["SUBJECT_MODEL"]
+          judge_input = os.environ["JUDGE_MODEL"]
+          if subject_input != EXPECTED_SUBJECT_MODEL:
+              fail(
+                  "subject_model must equal the owner pin "
+                  f"{EXPECTED_SUBJECT_MODEL!r}; refusing {subject_input!r}"
+              )
+          if judge_input != EXPECTED_JUDGE_MODEL:
+              fail(
+                  "judge_model must equal the owner cross-vendor pin "
+                  f"{EXPECTED_JUDGE_MODEL!r}; refusing {judge_input!r}"
+              )
+
+          workspace_path(os.environ["GATE_PATH"], "gate_path")
+          workspace_path(os.environ["CASES_PATH"], "cases_path", expect_dir=True)
+          template_path = workspace_path(
+              os.environ["CONFIG_TEMPLATE_PATH"], "config_template_path"
+          )
+          try:
+              template = json.loads(template_path.read_text(encoding="utf-8"))
+          except (OSError, ValueError) as exc:
+              fail(f"the config template is not readable JSON: {type(exc).__name__}")
+          if not isinstance(template, dict):
+              fail("the config template must be a JSON object")
+
+          # The owner cap and the one permitted cross-vendor judge replace the
+          # template's broader values. Everything else stays as committed and
+          # is validated by the package, never hand-accepted here.
+          template["spend_ceiling_cents"] = PILOT_CEILING_CENTS
+          template["subject_vendors"] = [EXPECTED_SUBJECT_VENDOR]
+          template["judge_allowlist"] = {
+              "judge_models": [
+                  {"vendor": EXPECTED_JUDGE_VENDOR, "model": EXPECTED_JUDGE_MODEL}
+              ]
+          }
+          config = LiveConfig.from_dict(template)
+          config.validate()
+
+          allowed = config.judge_allowlist.to_dict()["judge_models"]
+          expected_allowed = [
+              {"vendor": EXPECTED_JUDGE_VENDOR, "model": EXPECTED_JUDGE_MODEL}
+          ]
+          if allowed != expected_allowed:
+              fail("the built judge allowlist is not exactly the owner-pinned judge")
+          if list(config.subject_vendors) != [EXPECTED_SUBJECT_VENDOR]:
+              fail("the built subject_vendors is not exactly the owner-pinned subject")
+          if config.spend_ceiling_cents != PILOT_CEILING_CENTS:
+              fail("the built spend_ceiling_cents is not the $120 owner cap")
+
+          out_path = RUNNER_TEMP / "live-config.json"
+          out_path.write_text(
+              json.dumps(config.to_dict(), indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          structure = {
+              "config": str(out_path),
+              "schema_version": config.schema_version,
+              "spend_ceiling_cents": config.spend_ceiling_cents,
+              "package_owner_limits": config.to_dict()["owner_limits"],
+              "subject_vendors": list(config.subject_vendors),
+              "judge_allowlist": allowed,
+              "max_output_tokens": config.max_output_tokens,
+              "max_input_bytes": config.max_input_bytes,
+              "runs_per_case": config.runs_per_case,
+              "request_timeout_seconds": config.request_timeout_seconds,
+              "subject_pin": {
+                  "vendor": subject_pin.vendor,
+                  "model": subject_pin.model,
+              },
+              "judge_pin": {
+                  "vendor": judge_pin.vendor,
+                  "model": judge_pin.model,
+              },
+              "owner_pins": {
+                  "subject": f"{EXPECTED_SUBJECT_VENDOR}/{EXPECTED_SUBJECT_MODEL}",
+                  "judge": f"{EXPECTED_JUDGE_VENDOR}/{EXPECTED_JUDGE_MODEL}",
+              },
+              "secret_values_emitted": False,
+          }
+          # Structure only: no credential value is present in this config.
+          print(json.dumps(structure, indent=2, sort_keys=True))
+          PY
+
+      - name: Live preflight (no network, no credential value read)
+        env:
+          GATE_PATH: ${{ inputs.gate_path }}
+          CASES_PATH: ${{ inputs.cases_path }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P -m tools.behavioral_eval_runner live-preflight \
+            --config "$RUNNER_TEMP/live-config.json" \
+            --gate "$GATE_PATH" \
+            --cases "$CASES_PATH" \
+            --repo-root "$GITHUB_WORKSPACE" \
+            --expected-revision "$GITHUB_SHA"
+
+      - name: Live run (owner gate, $120 hard halt, environment secrets only)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GATE_PATH: ${{ inputs.gate_path }}
+          CASES_PATH: ${{ inputs.cases_path }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          # The package writes its machine-readable result to stdout. Capture it
+          # for the structured-summary step; it contains verdicts, states, hashes
+          # and costs, never raw prompts, responses or transcripts.
+          python -P -m tools.behavioral_eval_runner live-run \
+            --config "$RUNNER_TEMP/live-config.json" \
+            --gate "$GATE_PATH" \
+            --cases "$CASES_PATH" \
+            --repo-root "$GITHUB_WORKSPACE" \
+            --evidence-root "$RUNNER_TEMP/live-evidence" \
+            --cost-ledger "$RUNNER_TEMP/live-cost-ledger.json" \
+            --run-id "eval-run-${{ github.run_id }}" \
+            > "$RUNNER_TEMP/live-run-result.json"
+
+      - name: Build structured summary and publish directory
+        # Runs after a halt or refusal too: a failed run still owes a structured
+        # record, and the job conclusion stays failed because this step is not
+        # allowed to mask the live-run step.
+        if: always()
+        run: |
+          python -P - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          EVIDENCE_ROOT = RUNNER_TEMP / "live-evidence"
+          CONFIG_PATH = RUNNER_TEMP / "live-config.json"
+          RESULT_PATH = RUNNER_TEMP / "live-run-result.json"
+          LEDGER_PATH = RUNNER_TEMP / "live-cost-ledger.json"
+          PUBLISH_DIR = RUNNER_TEMP / "publish"
+          EXPECTED_CEILING_CENTS = 12000
+
+
+          def load_json(path):
+              try:
+                  return json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, ValueError):
+                  return None
+
+
+          result = load_json(RESULT_PATH)
+          if not isinstance(result, dict):
+              result = {}
+          config = load_json(CONFIG_PATH)
+          if not isinstance(config, dict):
+              config = {}
+          ledger = load_json(LEDGER_PATH)
+          if not isinstance(ledger, dict):
+              bundled = load_json(EVIDENCE_ROOT / "cost_ledger.json")
+              ledger = bundled if isinstance(bundled, dict) else None
+
+          records = result.get("results")
+          if not isinstance(records, list):
+              records = []
+          records = [r for r in records if isinstance(r, dict)]
+
+          status = result.get("status")
+          if not isinstance(status, str) or not status:
+              status = "REFUSED" if result.get("error") else "UNRUN"
+          halt = result.get("halt")
+          if not isinstance(halt, dict):
+              halt = (ledger or {}).get("halt")
+          if not isinstance(halt, dict):
+              halt = None
+          halt_view = None
+          if halt is not None:
+              # Publish closed, typed fields only: no free-form detail or context.
+              context = halt.get("context")
+              context = context if isinstance(context, dict) else {}
+              halt_view = {
+                  key: halt.get(key)
+                  for key in (
+                      "halted",
+                      "reason_code",
+                      "error",
+                      "spent_cents",
+                      "ceiling_cents",
+                      "calls_dispatched",
+                      "requested_cents",
+                  )
+              }
+              halt_view["vendor"] = context.get("vendor")
+              halt_view["model"] = context.get("model")
+
+
+          def state_of(record):
+              value = record.get("result_state")
+              return value if isinstance(value, str) and value else "UNRUN"
+
+
+          def verdict_of(states):
+              # An unrun or errored iteration is never a PASS. FAIL is a real
+              # negative, so it outranks every incomplete state.
+              if not states:
+                  return "UNRUN"
+              if "FAIL" in states:
+                  return "FAIL"
+              if "ERROR" in states or "JUDGE_ERROR" in states:
+                  return "ERROR"
+              if "UNRUN" in states:
+                  return "UNRUN"
+              if "MOCK" in states:
+                  return "MOCK"
+              if set(states) == {"PASS"}:
+                  return "PASS"
+              return "UNRUN"
+
+
+          def counts(states):
+              out = {}
+              for state in states:
+                  out[state] = out.get(state, 0) + 1
+              return dict(sorted(out.items()))
+
+
+          def one_result(record):
+              judge = record.get("judge")
+              judge = judge if isinstance(judge, dict) else {}
+              verdict = judge.get("verdict")
+              verdict = verdict if isinstance(verdict, dict) else {}
+              subject = record.get("subject")
+              subject = subject if isinstance(subject, dict) else {}
+              deterministic = record.get("deterministic")
+              deterministic = (
+                  deterministic if isinstance(deterministic, dict) else {}
+              )
+              failures = deterministic.get("failures")
+              return {
+                  "case_id": str(record.get("case_id") or "UNKNOWN"),
+                  "skill": str(record.get("skill") or "UNKNOWN"),
+                  "arm": record.get("arm"),
+                  "run_index": record.get("run_index"),
+                  "subject_vendor": record.get("subject_vendor"),
+                  "result_state": state_of(record),
+                  "reason_code": record.get("reason_code"),
+                  "citability": record.get("citability"),
+                  "rule_state_if_citable": record.get("rule_state_if_citable"),
+                  "deterministic_status": deterministic.get("status"),
+                  "deterministic_checks": deterministic.get("checks"),
+                  "deterministic_failures": (
+                      len(failures) if isinstance(failures, list) else 0
+                  ),
+                  "served_model": subject.get("served_model"),
+                  "pinned_match": subject.get("pinned_match"),
+                  "judge_verdict": verdict.get("verdict"),
+                  "judge_reason_code": verdict.get("reason_code"),
+                  "judge_failure_mode": verdict.get("failure_mode"),
+                  "judge_error_kind": judge.get("judge_error_kind"),
+              }
+
+
+          details = [one_result(record) for record in records]
+
+          cases = {}
+          skills = {}
+          for item in details:
+              case_id = str(item.get("case_id") or "UNKNOWN")
+              skill = str(item.get("skill") or "UNKNOWN")
+              cases.setdefault(case_id, {"case_id": case_id, "skill": skill,
+                                         "runs": [], "states": []})
+              cases[case_id]["runs"].append(item)
+              cases[case_id]["states"].append(item["result_state"])
+              skills.setdefault(skill, {"skill": skill, "case_ids": set(),
+                                        "states": []})
+              skills[skill]["case_ids"].add(case_id)
+              skills[skill]["states"].append(item["result_state"])
+
+          case_rows = []
+          for case_id in sorted(cases):
+              row = cases[case_id]
+              case_rows.append({
+                  "case_id": case_id,
+                  "skill": row["skill"],
+                  "verdict": verdict_of(row["states"]),
+                  "results_by_state": counts(row["states"]),
+                  "runs": row["runs"],
+              })
+          skill_rows = []
+          for skill in sorted(skills):
+              row = skills[skill]
+              skill_rows.append({
+                  "skill": skill,
+                  "verdict": verdict_of(row["states"]),
+                  "case_count": len(row["case_ids"]),
+                  "results_by_state": counts(row["states"]),
+              })
+
+          all_states = [item["result_state"] for item in details]
+          unrun_items = [item for item in details if item["result_state"] == "UNRUN"]
+          citable = sum(1 for item in details if item.get("citability") == "REAL_HOST")
+
+          spent = result.get("spent_cents")
+          if type(spent) is not int:
+              spent = (ledger or {}).get("spent_cents")
+          ceiling = result.get("ceiling_cents")
+          if type(ceiling) is not int:
+              ceiling = (ledger or {}).get("ceiling_cents")
+          configured = config.get("spend_ceiling_cents")
+          owner_limits = config.get("owner_limits")
+          if not isinstance(owner_limits, dict):
+              owner_limits = None
+
+          evidence = result.get("evidence")
+          evidence = evidence if isinstance(evidence, dict) else {}
+
+          # Fail-closed verification: a green live-run step must not be able to
+          # publish an incomplete or over-budget record. The files are written
+          # first and the step then exits 1, so the artifact still exists.
+          verification_failures = []
+          if not result:
+              verification_failures.append(
+                  "the live-run result file is missing or not valid JSON"
+              )
+          elif status not in {"COMPLETED", "HALTED", "REFUSED"}:
+              verification_failures.append("unknown run status")
+          if type(configured) is not int or configured != EXPECTED_CEILING_CENTS:
+              verification_failures.append(
+                  "the built config ceiling is not the $120 owner cap"
+              )
+          if status in {"COMPLETED", "HALTED"}:
+              # A gate may set a STRICTER ceiling; it may never exceed $120.
+              if type(ceiling) is not int or not 0 < ceiling <= EXPECTED_CEILING_CENTS:
+                  verification_failures.append(
+                      "the metered ceiling is missing, non-positive or above $120"
+                  )
+              if type(spent) is not int or (
+                  type(ceiling) is int and spent > ceiling
+              ):
+                  verification_failures.append(
+                      "the metered spend is missing or above the binding ceiling"
+                  )
+          if status == "COMPLETED":
+              if unrun_items:
+                  verification_failures.append(
+                      "a COMPLETED run contains UNRUN results"
+                  )
+              if (ledger or {}).get("unreconciled_count") != 0:
+                  verification_failures.append(
+                      "a COMPLETED run has unreconciled cost entries"
+                  )
+              if evidence.get("verified") is not True:
+                  verification_failures.append(
+                      "a COMPLETED run has no verified evidence bundle"
+                  )
+          if any(record.get("raw_transcript_included") is not False for record in records):
+              verification_failures.append(
+                  "a result record says a raw transcript was included"
+              )
+
+          summary = {
+              "schema_version": "apr158-eval-run-summary/1.0.0",
+              "generated_at": dt.datetime.now(dt.timezone.utc)
+              .isoformat()
+              .replace("+00:00", "Z"),
+              "workflow": {
+                  "name": "eval-run",
+                  "repository": os.environ.get("GITHUB_REPOSITORY"),
+                  "run_id": os.environ.get("GITHUB_RUN_ID"),
+                  "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+                  "event": os.environ.get("GITHUB_EVENT_NAME"),
+                  "ref": os.environ.get("GITHUB_REF"),
+                  "sha": os.environ.get("GITHUB_SHA"),
+                  "environment": "eval-run",
+              },
+              "run": {
+                  "status": status,
+                  "verdict": verdict_of(all_states),
+                  "result_parse_ok": bool(result),
+                  "halted": status == "HALTED" or halt is not None,
+                  "halt": halt_view,
+                  "halt_reason_code": result.get("halt_reason_code"),
+                  "error": result.get("error"),
+                  "error_reason_code": result.get("reason_code"),
+                  "config_loaded": bool(config),
+              },
+              "cost": {
+                  "configured_ceiling_cents": configured,
+                  "owner_limits": owner_limits,
+                  "ceiling_cents": ceiling,
+                  "spent_cents": spent,
+                  "remaining_cents": (ledger or {}).get("remaining_cents"),
+                  "planned_calls": result.get("planned_calls"),
+                  "dispatched_calls": result.get("dispatched_calls"),
+                  "call_count": (ledger or {}).get("call_count"),
+                  "reconciled_count": (ledger or {}).get("reconciled_count"),
+                  "unreconciled_count": (ledger or {}).get("unreconciled_count"),
+              },
+              "counts": {
+                  "results": len(details),
+                  "results_by_state": counts(all_states),
+                  "citable_results": citable,
+                  "unrun_results": len(unrun_items),
+              },
+              "skills": skill_rows,
+              "cases": case_rows,
+              "unrun": {
+                  "count": len(unrun_items),
+                  "case_ids": sorted({item["case_id"] for item in unrun_items}),
+                  "skills": sorted({item["skill"] for item in unrun_items}),
+                  "reason_codes": sorted(
+                      {item["reason_code"] for item in unrun_items
+                       if item.get("reason_code")}
+                  ),
+              },
+              "evidence": {
+                  "verified": evidence.get("verified"),
+                  "input_evidence_manifest_sha256": evidence.get(
+                      "input_evidence_manifest_sha256"
+                  ),
+                  "final_report_sha256": evidence.get("final_report_sha256"),
+                  "final_evidence_manifest_sha256": evidence.get(
+                      "final_evidence_manifest_sha256"
+                  ),
+              },
+              "policy": {
+                  "unrun_is_never_pass": True,
+                  "deterministic_graders_primary": True,
+                  "raw_prompts_included": False,
+                  "raw_responses_included": False,
+                  "raw_transcripts_included": False,
+                  "cost_ledger_published": ledger is not None,
+              },
+              "verification": {
+                  "passed": not verification_failures,
+                  "failures": verification_failures,
+              },
+          }
+
+          text = json.dumps(summary, indent=2, sort_keys=True) + "\n"
+          EVIDENCE_ROOT.mkdir(parents=True, exist_ok=True)
+          (EVIDENCE_ROOT / "structured-summary.json").write_text(
+              text, encoding="utf-8"
+          )
+          PUBLISH_DIR.mkdir(parents=True, exist_ok=True)
+          (PUBLISH_DIR / "structured-summary.json").write_text(
+              text, encoding="utf-8"
+          )
+          if ledger is not None:
+              (PUBLISH_DIR / "cost-ledger.json").write_text(
+                  json.dumps(ledger, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+
+          print(json.dumps({
+              "structured_summary": str(EVIDENCE_ROOT / "structured-summary.json"),
+              "publish_dir": str(PUBLISH_DIR),
+              "status": status,
+              "results_by_state": counts(all_states),
+              "spent_cents": spent,
+              "unrun_results": len(unrun_items),
+              "verification": {
+                  "passed": not verification_failures,
+                  "failures": verification_failures,
+              },
+          }, indent=2, sort_keys=True))
+          if verification_failures:
+              raise SystemExit(1)
+          PY
+
+      - name: Upload structured summary and cost ledger (no raw evidence)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: eval-run-structured-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/publish/
+          retention-days: 14
+          if-no-files-found: error
