@@ -96,4 +96,3 @@ class ProviderTransportError(LiveError):
     """A provider call failed at the transport boundary (no verdict produced)."""
 
     reason_code = "TRANSPORT_ERROR"
-
