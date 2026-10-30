@@ -111,7 +111,9 @@ visible; `col` gives the exact 1-based source position in every row.
 Verdicts: **CLEAN 235 / SUSPECT 0 / INJECTION 0**.
 
 Every sampled clean chunk came back CLEAN, which is the expected direction: the
-sample exists to test whether Tier 1 misses anything, and it did not.
+sample exists to test whether Tier 1 misses anything, and it **found no misses
+in the 202 sampled clean chunks**. That is a result about those 202 chunks, not
+about the 2,025-chunk clean set and not about the corpus (§9).
 
 The sample is complete: 202 of 202 drawn chunks adjudicated, 202 / 2,025 =
 9.98% of the clean set under this record's line convention (10.01% of the
@@ -124,11 +126,23 @@ Batch-01 carried the 33 flagged chunks and 26 sampled chunks; batches 02–04
 carried 59, 59 and 58 sampled chunks. Both verdict tables are the merged
 eight-column form: `id`, `skill`, `chunk_index`, `lines` (the chunk's absolute
 range), `verdict`, `category`, `evidence_line` (the rubric's single `line`,
-unchanged) and `why` (METHOD.md §6).
+unchanged) and `why` (METHOD.md §6). Because that form is chunk-level and
+carries no rule column, `evidence/flagged-hit-map.tsv` publishes the other
+direction — each of the 44 hits with its `chunk_id`, `rule_id`, `skill`,
+`line` and the chunk's `verdict` — so the 44-hits-to-33-verdicts relationship
+can be audited row by row.
 
-## 5. False-positive handling
+## 5. Tier-1 dismissal handling (not a false-positive rate)
 
-**Rate: 44 of 44 Tier-1 hits dismissed (100%); 33 of 33 flagged chunks CLEAN.**
+**`tier1_dismissal_rate_pct` = 100: 44 of 44 Tier-1 hits dismissed; 33 of 33
+flagged chunks CLEAN.**
+
+The metric is *adjudicated-dismissed of flagged*, and `evidence/summary.json`
+carries that definition beside the value. It is a dismissal
+(false-discovery) rate, **not a false-positive rate**: its denominator is the
+44 flagged items, not the corpus's actual negatives. A true FPR would need all
+2,025 clean chunks adjudicated; 202 were sampled (§4). The 0 of 202 in that
+sample is a statement about the sample, not an estimate of a corpus-wide FPR.
 
 A 100% dismissal rate is not a failure of the rules — it is what over-broad
 recall rules must produce on a corpus of security skills, and the run is
@@ -157,13 +171,15 @@ expect to be findings:
 
 ### Rules that were dismissed with no work to do
 
-Five rule families produced **zero** hits and therefore cost no adjudication:
-encoded blobs (base64/hex/escape/percent), invisible markup (comments, hidden
-CSS, `<details>`, empty links), invisible Unicode (zero-width, bidi, soft
-hyphen, NBSP, homoglyph, BOM — tag characters are **not** tested; see §3),
-control characters, and email addresses. Their zero counts are structural
-evidence for the rules that exist, not a claim that every character class was
-tested.
+Four rule families produced **zero** hits and therefore cost no adjudication:
+encoded blobs (base64/hex/escape/percent), invisible Unicode (zero-width, bidi,
+soft hyphen, NBSP, homoglyph, BOM — tag characters are **not** tested; see §3),
+control characters, and email addresses. The fifth family, invisible markup,
+produced **one** hit: four of its five rules (`MK-HTML-COMMENT`,
+`MK-HIDDEN-CSS`, `MK-DETAILS`, `MK-EMPTY-LINK`) produced zero, and `MK-IMG`
+matched one quoted `<img onerror=…>` example, adjudicated CLEAN (§3). Those
+zero counts are structural evidence for the rules that exist, not a claim that
+every character class was tested.
 
 ## 6. Spend
 
@@ -180,16 +196,22 @@ and is unused, so a later re-scan or a bead on an expanded corpus can spend it.
 
 ## 7. Verification performed
 
-- `git diff --name-status origin/main...HEAD` lists only added files under
-  `docs/evidence/behavioral-evals/body-scan-2026-10-29/`. Docs-only.
+- `git diff --name-status origin/main...HEAD` lists only files under
+  `docs/evidence/behavioral-evals/body-scan-2026-10-29/` — the publication's
+  ten files added by its own pull request, and the six modified plus two added
+  by the post-merge repair pass it records in `REVIEW-DISPOSITION.md`.
+  Docs-only.
 - `python -P scripts/validate-skills.py` on the branch: `OK: 254 skill(s) valid`.
   (Run for assurance; it is unaffected by documentation.)
-- Each published file's sha256 is in `HASHES.sha256`; the corpus hashes are in
-  `PER-SKILL.tsv`, so a reader can confirm the scan read the same bytes it
-  reports on.
+- Each of the nine reviewed files' sha256 is in `HASHES.sha256` — the two
+  files the repair pass added are outside that manifest, and their digests are
+  in `REVIEW-DISPOSITION.md` — and the corpus hashes are in `PER-SKILL.tsv`,
+  so a reader can confirm the scan read the same bytes it reports on.
 - The 44 hit rows (42 distinct lines) and 33 flagged chunk ranges are published
-  with absolute line numbers; `evidence/sample-verdicts.tsv` states the chunk index and line range
-  of every sampled chunk.
+  with absolute line numbers; `evidence/sample-verdicts.tsv` states the chunk
+  index and line range of every sampled chunk, and
+  `evidence/flagged-hit-map.tsv` names the chunk verdict for each of the 44
+  hits.
 - The four adjudication TSVs were validated for id coverage, duplicates,
   verdict vocabulary, integer line numbers and rationale length before merging:
   235/235 ids, 0 format defects.
