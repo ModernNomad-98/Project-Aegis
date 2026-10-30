@@ -1,4 +1,5 @@
 # AEGIS-APR-158 - gated pilot eval workflow.
+# AEGIS-APR-161 - dispatch-time gate staging and resumable per-case chunks.
 #
 # Owner grant (exact scope, 2026-10-30): ONE new file,
 # .github/workflows/eval-run.yml, workflow_dispatch only, bound to environment
@@ -7,12 +8,29 @@
 # judge IDs as arguments with no defaults, enforce the $120 cost cap by halting,
 # publish structured output only and never echo secret values.
 #
+# AEGIS-APR-161 (OWNER DECISION 2026-10-30 10:50 PDT, item 1 and item 3) adds
+# exactly three capabilities to this file and nothing else:
+#   1. the owner gate TEMPLATE is committed with the 40-zero revision
+#      placeholder and staged at dispatch to $RUNNER_TEMP/live-gate.json with
+#      dataset.revision = $GITHUB_SHA; that staged path is passed to preflight
+#      and to every live-run invocation. A committed file cannot name the commit
+#      that contains it (SHA-1 fixed point, APR-159 design note), so the one
+#      field that is only knowable at dispatch is written at dispatch.
+#   2. the job timeout is 360 minutes (was 240).
+#   3. the run is resumable and chunked: one case per live-run invocation, each
+#      case result persisted to a resume manifest the moment it completes, the
+#      manifest uploaded as an artifact even when the step times out, and a
+#      re-dispatch restoring that manifest and running only the cases that are
+#      not already complete. A completed case is never dispatched twice.
+# No runner logic changed: the staged gate, the chunks and the manifest are
+# built from the merged package's own loaders and digests, invoked unmodified.
+#
 # What this file deliberately does NOT do:
 #   * no push, pull_request, schedule or workflow_run trigger;
 #   * no repository write, commit, tag, release, settings or protection change;
 #   * no raw evidence, prompt, response or transcript is uploaded. The package
 #     writes its own evidence under RUNNER_TEMP; only the structured publish
-#     directory is retained;
+#     directory and the resume manifest (hashes, states, costs) are retained;
 #   * no secret value is echoed, traced, dumped or written to a file.
 #
 # Cost containment is layered and fail-closed:
@@ -20,25 +38,42 @@
 #      spend_ceiling_cents = 12000 (the $120 owner provider cap; the package's
 #      owner pilot ceiling is 15000) and a ONE-entry cross-vendor judge
 #      allowlist, then validates the result with the package's own validator;
+#      each per-case invocation is rebuilt with spend_ceiling_cents equal to the
+#      budget still unspent, so the sum over all invocations cannot cross $120
+#      even across resumed dispatches (every attempt keeps its own ledger);
 #   2. the merged BER live package checks its cost meter before every call and
-#      halts on the first reservation that would cross the configured ceiling
-#      (the halt was proven in the live-enablement review). A halted case and
-#      every case after it are recorded UNRUN, and an UNRUN case is never PASS.
+#      halts on the first reservation that would cross the configured ceiling.
+#      A halted case and every case after it are recorded UNRUN, and an UNRUN
+#      case is never PASS.
 #
 # Secret containment: ANTHROPIC_API_KEY and OPENAI_API_KEY are injected from
 # the eval-run environment only, mapped only in the single env: block of the
-# live-run step, and never printed. There is no shell tracing, no environment
-# dump and no read of a key file anywhere in this workflow.
+# per-case run step, and never printed. There is no shell tracing, no
+# environment dump and no read of a key file anywhere in this workflow. The
+# resume-restore step receives only the ephemeral GITHUB_TOKEN with the
+# actions: read permission declared below, so it can download this
+# repository's own prior resume artifact and nothing else.
 #
-# Package-compatibility notes for this exact main (1443a7ae):
+# Package-compatibility notes for this exact main (db6fa24e):
 #   * "python -P -m tools.behavioral_eval_runner ..." cannot find the package
-#     with -P alone (the checkout root is not prepended), so the two CLI steps
-#     set PYTHONPATH to the checkout. -P is kept so the current directory is
+#     with -P alone (the checkout root is not prepended), so every CLI step
+#     sets PYTHONPATH to the checkout. -P is kept so the current directory is
 #     still never prepended implicitly.
 #   * the live package refuses a cost ledger written INSIDE the evidence root
-#     (reason code EVIDENCE_PATH_CONFLICT), so the ledger is written beside the
-#     evidence root and copied into the publish directory after the run.
-#
+#     (reason code EVIDENCE_PATH_CONFLICT), so each attempt writes its ledger
+#     beside that attempt's evidence root, inside the resume manifest directory.
+#   * the package refuses an existing cost ledger path, so every attempt gets a
+#     new attempt-numbered ledger; the attempt's spend is never overwritten and
+#     never forgotten in the running budget.
+#   * the package requires len(cases) == gate.case_count and the dataset digest
+#     to match the gate, so a one-case chunk is run with a chunk gate derived
+#     from the committed template: same owner fields, same revision, and a
+#     dataset section that names exactly that one committed case. The frozen
+#     full-set digest is asserted before any chunk is built.
+#   * gate.dataset.path must be repository-relative (live/gate.py:104-107), so
+#     each chunk root is generated under the checkout at .ber-run/ (untracked,
+#     never committed, never part of a gate record in the repository). The
+#     committed case bytes are copied unchanged and re-hashed before the run.
 name: eval-run
 
 on:
@@ -53,11 +88,11 @@ on:
         required: true
         type: string
       gate_path:
-        description: "Repository-relative path to the committed owner gate record JSON. Its dataset.revision must equal the dispatched commit SHA."
+        description: "Repository-relative path to the committed owner gate TEMPLATE JSON. Its dataset.revision must be the 40-zero placeholder; this workflow stages it with dataset.revision = the dispatched commit SHA."
         required: true
         type: string
       cases_path:
-        description: "Repository-relative path to the committed live case dataset; it must equal the gate's dataset.path."
+        description: "Repository-relative path to the committed live case dataset; it must equal the gate template's dataset.path."
         required: true
         type: string
       config_template_path:
@@ -67,13 +102,17 @@ on:
 
 permissions:
   contents: read
+  # The resume-restore step reads this repository's own prior run artifacts.
+  actions: read
 
 jobs:
   eval-run:
     name: eval-run
     runs-on: ubuntu-latest
     environment: eval-run
-    timeout-minutes: 240
+    # AEGIS-APR-161 item 3: 360 minutes. The per-case run step below stops at
+    # 330 minutes so its always() persistence steps still execute.
+    timeout-minutes: 360
 
     # Serialize dispatches so two runs cannot spend at the same time. This
     # edits no state and stores no state; the provider-side prepaid credit
@@ -106,7 +145,7 @@ jobs:
       - name: Install hash-locked dependencies
         run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
 
-      - name: Assert pinned models and build the $120 live config
+      - name: Assert pinned models, verify the frozen dataset, stage the owner gate
         env:
           SUBJECT_MODEL: ${{ inputs.subject_model }}
           JUDGE_MODEL: ${{ inputs.judge_model }}
@@ -115,6 +154,7 @@ jobs:
           CASES_PATH: ${{ inputs.cases_path }}
         run: |
           python -P - <<'PY'
+          import hashlib
           import json
           import os
           import subprocess
@@ -123,6 +163,7 @@ jobs:
 
           WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
           RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          DISPATCH_SHA = os.environ["GITHUB_SHA"].strip()
           # -P keeps the checkout root off sys.path. Add it explicitly, after
           # the workspace path has been resolved, so the package imports from
           # the reviewed checkout and nowhere else.
@@ -133,6 +174,12 @@ jobs:
               OWNER_PROVIDER_CAP_CENTS,
               LiveConfig,
           )
+          from tools.behavioral_eval_runner.live.dataset import (  # noqa: E402
+              dataset_digest,
+              load_cases,
+          )
+          from tools.behavioral_eval_runner.live.gate import OwnerGateRecord  # noqa: E402
+          from tools.behavioral_eval_runner.live.pipeline import ARMS  # noqa: E402
           from tools.behavioral_eval_runner.live.providers import (  # noqa: E402
               JUDGE_PINS,
               SUBJECT_PINS,
@@ -145,6 +192,10 @@ jobs:
           EXPECTED_SUBJECT_MODEL = "claude-sonnet-5-5"
           EXPECTED_JUDGE_VENDOR = "openai"
           EXPECTED_JUDGE_MODEL = "gpt-6-astra"
+          # A committed gate cannot name the commit that contains it, so the
+          # committed template must carry the placeholder and this workflow
+          # writes the dispatch SHA into the staged copy only.
+          TEMPLATE_REVISION_PLACEHOLDER = "0" * 40
 
 
           def fail(message):
@@ -228,13 +279,15 @@ jobs:
                   f"{EXPECTED_JUDGE_MODEL!r}; refusing {judge_input!r}"
               )
 
-          workspace_path(os.environ["GATE_PATH"], "gate_path")
-          workspace_path(os.environ["CASES_PATH"], "cases_path", expect_dir=True)
-          template_path = workspace_path(
+          template_gate_path = workspace_path(os.environ["GATE_PATH"], "gate_path")
+          cases_dir = workspace_path(
+              os.environ["CASES_PATH"], "cases_path", expect_dir=True
+          )
+          config_template_path = workspace_path(
               os.environ["CONFIG_TEMPLATE_PATH"], "config_template_path"
           )
           try:
-              template = json.loads(template_path.read_text(encoding="utf-8"))
+              template = json.loads(config_template_path.read_text(encoding="utf-8"))
           except (OSError, ValueError) as exc:
               fail(f"the config template is not readable JSON: {type(exc).__name__}")
           if not isinstance(template, dict):
@@ -269,6 +322,104 @@ jobs:
               json.dumps(config.to_dict(), indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
+
+          # ---------------------------------------------------- gate template
+          gate_bytes = template_gate_path.read_bytes()
+          gate_template_sha256 = hashlib.sha256(gate_bytes).hexdigest()
+          try:
+              gate_template_payload = json.loads(gate_bytes.decode("utf-8"))
+          except (UnicodeDecodeError, ValueError) as exc:
+              fail(f"the gate template is not readable JSON: {type(exc).__name__}")
+          if not isinstance(gate_template_payload, dict):
+              fail("the gate template must be a JSON object")
+          template_dataset = gate_template_payload.get("dataset")
+          if not isinstance(template_dataset, dict):
+              fail("the gate template has no dataset object")
+          placeholder = template_dataset.get("revision")
+          if placeholder != TEMPLATE_REVISION_PLACEHOLDER:
+              fail(
+                  "the committed gate template must carry the 40-zero revision "
+                  f"placeholder, got {placeholder!r}; a real revision in the "
+                  "template could shadow the dispatch-time value"
+              )
+          try:
+              gate_template = OwnerGateRecord.from_dict(gate_template_payload)
+          except Exception as exc:  # noqa: BLE001 - the package's refusal is the gate
+              fail(f"the committed gate template is not a valid owner gate: {type(exc).__name__}")
+          if gate_template.fact_origin != "REAL_HOST":
+              fail("the committed gate template must be a REAL_HOST owner gate")
+
+          # The freeze binding: the committed case bytes must reproduce exactly
+          # the digest and count the owner gate template declares.
+          try:
+              frozen_cases = load_cases(str(cases_dir))
+          except Exception as exc:  # noqa: BLE001
+              fail(f"the committed case dataset does not load: {type(exc).__name__}")
+          frozen_digest = dataset_digest(frozen_cases)
+          declared_root = os.path.realpath(
+              os.path.join(str(WORKSPACE), gate_template.dataset_path)
+          )
+          if declared_root != os.path.realpath(str(cases_dir)):
+              fail(
+                  "the gate template dataset.path does not resolve to cases_path: "
+                  f"{gate_template.dataset_path!r}"
+              )
+          if gate_template.case_count != len(frozen_cases):
+              fail(
+                  f"the gate template declares {gate_template.case_count} cases "
+                  f"but the committed dataset has {len(frozen_cases)}"
+              )
+          if gate_template.dataset_sha256 != frozen_digest:
+              fail(
+                  "the committed case dataset no longer matches the frozen gate "
+                  "digest; the frozen set may not be edited without a new owner "
+                  "decision"
+              )
+
+          # Stage the owner gate for THIS dispatch. Only dataset.revision moves.
+          staged_payload = gate_template.to_dict()
+          staged_payload["dataset"]["revision"] = DISPATCH_SHA
+          try:
+              staged_gate = OwnerGateRecord.from_dict(staged_payload)
+          except Exception as exc:  # noqa: BLE001
+              fail(f"the staged gate is not a valid owner gate: {type(exc).__name__}")
+          staged_gate_path = RUNNER_TEMP / "live-gate.json"
+          staged_text = json.dumps(staged_payload, indent=2, sort_keys=True) + "\n"
+          staged_gate_path.write_text(staged_text, encoding="utf-8")
+          staged_gate_sha256 = hashlib.sha256(staged_text.encode("utf-8")).hexdigest()
+
+          case_ids = [case.case_id for case in frozen_cases]
+          planned_calls_per_case = (
+              len(ARMS) * config.runs_per_case * len(config.subject_vendors) * 2
+          )
+          plan = {
+              "schema": "ber-pilot-a-plan/1.0.0",
+              "dispatch_sha": DISPATCH_SHA,
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "dataset_path": gate_template.dataset_path,
+              "dataset_sha256": frozen_digest,
+              "case_count": len(frozen_cases),
+              "case_ids": case_ids,
+              "gate_id": gate_template.gate_id,
+              "fact_origin": gate_template.fact_origin,
+              "template_gate_path": str(template_gate_path.relative_to(WORKSPACE)),
+              "template_gate_sha256": gate_template_sha256,
+              "template_gate_revision": placeholder,
+              "staged_gate_path": str(staged_gate_path),
+              "staged_gate_sha256": staged_gate_sha256,
+              "staged_gate_digest": staged_gate.digest(),
+              "staged_gate_revision": staged_gate.dataset_revision,
+              "spend_ceiling_cents": PILOT_CEILING_CENTS,
+              "runs_per_case": config.runs_per_case,
+              "subject_vendors": list(config.subject_vendors),
+              "planned_calls_per_case": planned_calls_per_case,
+              "planned_calls": planned_calls_per_case * len(frozen_cases),
+          }
+          (RUNNER_TEMP / "ber-plan.json").write_text(
+              json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+
           structure = {
               "config": str(out_path),
               "schema_version": config.schema_version,
@@ -292,50 +443,589 @@ jobs:
                   "subject": f"{EXPECTED_SUBJECT_VENDOR}/{EXPECTED_SUBJECT_MODEL}",
                   "judge": f"{EXPECTED_JUDGE_VENDOR}/{EXPECTED_JUDGE_MODEL}",
               },
+              "gate": {
+                  "gate_id": gate_template.gate_id,
+                  "fact_origin": gate_template.fact_origin,
+                  "template_path": plan["template_gate_path"],
+                  "template_revision": placeholder,
+                  "template_sha256": gate_template_sha256,
+                  "staged_path": str(staged_gate_path),
+                  "staged_revision": staged_gate.dataset_revision,
+                  "staged_sha256": staged_gate_sha256,
+                  "staged_record_digest": staged_gate.digest(),
+                  "dataset_path": gate_template.dataset_path,
+                  "dataset_sha256": frozen_digest,
+                  "case_count": len(frozen_cases),
+                  "spend_ceiling_cents": gate_template.spend_ceiling_cents,
+                  "provider_cap_cents": gate_template.provider_cap_cents,
+                  "model_terms_acknowledged": gate_template.model_terms.acknowledged,
+                  "expires_at": gate_template.expires_at,
+              },
+              "planned_calls": plan["planned_calls"],
               "secret_values_emitted": False,
           }
           # Structure only: no credential value is present in this config.
           print(json.dumps(structure, indent=2, sort_keys=True))
           PY
 
-      - name: Live preflight (no network, no credential value read)
+      - name: Live preflight (staged gate; checkout must equal the gate revision)
         env:
-          GATE_PATH: ${{ inputs.gate_path }}
-          CASES_PATH: ${{ inputs.cases_path }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
           python -P -m tools.behavioral_eval_runner live-preflight \
             --config "$RUNNER_TEMP/live-config.json" \
-            --gate "$GATE_PATH" \
-            --cases "$CASES_PATH" \
+            --gate "$RUNNER_TEMP/live-gate.json" \
+            --cases "$${{ inputs.cases_path }}" \
             --repo-root "$GITHUB_WORKSPACE" \
-            --expected-revision "$GITHUB_SHA"
+            --expected-revision "$GITHUB_SHA" \
+            | tee "$RUNNER_TEMP/ber-preflight.json"
+          python -P - <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
 
-      - name: Live run (owner gate, $120 hard halt, environment secrets only)
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          report = json.loads((RUNNER_TEMP / "ber-preflight.json").read_text(encoding="utf-8"))
+          plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
+          dispatch_sha = os.environ["GITHUB_SHA"].strip()
+          gate = report.get("gate") or {}
+          dataset = report.get("dataset") or {}
+          blockers = report.get("blockers")
+          failures = []
+          if report.get("status") not in {"READY", "READY_NEEDS_KEYS"}:
+              failures.append(f"preflight status is {report.get('status')!r}")
+          if blockers:
+              failures.append(f"preflight reported {len(blockers)} blocker(s)")
+          if report.get("checkout_revision") != dispatch_sha:
+              failures.append("the checkout revision is not the dispatched commit")
+          if gate.get("dataset_revision") != dispatch_sha:
+              failures.append("the staged gate revision is not the dispatched commit")
+          if not (
+              report.get("checkout_revision")
+              == gate.get("dataset_revision")
+              == dispatch_sha
+          ):
+              failures.append("checkout revision != gate revision")
+          if dataset.get("digest") != plan["dataset_sha256"]:
+              failures.append("the preflight dataset digest is not the frozen digest")
+          if dataset.get("case_count") != plan["case_count"]:
+              failures.append("the preflight case count is not the frozen count")
+          if report.get("planned_calls") != plan["planned_calls"]:
+              failures.append("preflight planned_calls differs from the plan")
+          proof = {
+              "status": report.get("status"),
+              "checkout_revision": report.get("checkout_revision"),
+              "gate_dataset_revision": gate.get("dataset_revision"),
+              "checkout_equals_gate_revision": (
+                  report.get("checkout_revision") == gate.get("dataset_revision")
+              ),
+              "checkout_equals_dispatch_sha": report.get("checkout_revision") == dispatch_sha,
+              "staged_gate_path": plan["staged_gate_path"],
+              "staged_gate_sha256": plan["staged_gate_sha256"],
+              "staged_gate_record_digest": gate.get("digest"),
+              "template_gate_revision_placeholder": plan["template_gate_revision"],
+              "dataset_sha256": dataset.get("digest"),
+              "case_count": dataset.get("case_count"),
+              "planned_calls": report.get("planned_calls"),
+              "effective_ceiling_cents": report.get("effective_ceiling_cents"),
+              "blockers": blockers,
+              "network_calls": report.get("network_calls"),
+              "failures": failures,
+          }
+          print(json.dumps(proof, indent=2, sort_keys=True))
+          if failures:
+              raise SystemExit(1)
+          PY
+
+      - name: Restore the resume manifest from the most recent prior dispatch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONPATH: ${{ github.workspace }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python -P - <<'PY'
+          import json
+          import os
+          import shutil
+          import subprocess
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          MANIFEST_DIR = RUNNER_TEMP / "ber-manifest"
+          CASES_DIR = MANIFEST_DIR / "cases"
+          LEDGER_DIR = MANIFEST_DIR / "ledgers"
+          RESTORE_DIR = RUNNER_TEMP / "ber-restore"
+          for directory in (MANIFEST_DIR, CASES_DIR, LEDGER_DIR):
+              directory.mkdir(parents=True, exist_ok=True)
+          plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
+          repository = os.environ.get("REPOSITORY", "")
+          current_run = str(os.environ.get("GITHUB_RUN_ID", ""))
+
+
+          def gh(*args):
+              try:
+                  return subprocess.run(
+                      ["gh", *args],
+                      capture_output=True,
+                      text=True,
+                      timeout=180,
+                  )
+              except (OSError, subprocess.SubprocessError):
+                  return None
+
+
+          def utc_now():
+              return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+          state = {
+              "schema": "ber-resume-manifest/1.0.0",
+              "plan": plan,
+              "created_at": utc_now(),
+              "restored_from": None,
+              "resume_refusal": None,
+              "cases": {},
+          }
+          outcome = {"resume": "none", "reason": "no prior resume manifest was found"}
+          listing = gh(
+              "run", "list",
+              "--repo", repository,
+              "--workflow", "eval-run.yml",
+              "--branch", "main",
+              "--limit", "20",
+              "--json", "databaseId,createdAt,status,conclusion",
+          )
+          prior_runs = []
+          if listing is not None and listing.returncode == 0 and listing.stdout.strip():
+              try:
+                  prior_runs = json.loads(listing.stdout)
+              except ValueError:
+                  prior_runs = []
+          prior_runs = [
+              run for run in prior_runs if str(run.get("databaseId")) != current_run
+          ]
+          for run in prior_runs:
+              run_id = str(run.get("databaseId"))
+              target = RESTORE_DIR / run_id
+              shutil.rmtree(target, ignore_errors=True)
+              download = gh(
+                  "run", "download", run_id,
+                  "--repo", repository,
+                  "--name", "ber-resume-manifest",
+                  "--dir", str(target),
+              )
+              if download is None or download.returncode != 0:
+                  continue
+              manifest_path = target / "manifest.json"
+              if not manifest_path.is_file():
+                  continue
+              try:
+                  prior = json.loads(manifest_path.read_text(encoding="utf-8"))
+              except (OSError, ValueError):
+                  continue
+              prior_plan = prior.get("plan") or {}
+              if prior_plan.get("dataset_sha256") != plan["dataset_sha256"]:
+                  outcome = {
+                      "resume": "refused",
+                      "reason": "the prior manifest was produced for a different frozen dataset",
+                      "prior_run_id": run_id,
+                  }
+                  break
+              if prior_plan.get("template_gate_sha256") != plan["template_gate_sha256"]:
+                  outcome = {
+                      "resume": "refused",
+                      "reason": "the prior manifest was produced for a different gate template",
+                      "prior_run_id": run_id,
+                  }
+                  break
+              accepted = []
+              for case_id, entry in sorted((prior.get("cases") or {}).items()):
+                  if case_id not in plan["case_ids"]:
+                      continue
+                  if not isinstance(entry, dict) or entry.get("status") != "COMPLETED":
+                      continue
+                  result_path = target / "cases" / f"{case_id}.json"
+                  if not result_path.is_file():
+                      continue
+                  payload = result_path.read_bytes()
+                  import hashlib
+
+                  if hashlib.sha256(payload).hexdigest() != entry.get("result_sha256"):
+                      continue
+                  (CASES_DIR / f"{case_id}.json").write_bytes(payload)
+                  state["cases"][case_id] = entry
+                  accepted.append(case_id)
+              ledger_source = target / "ledgers"
+              if ledger_source.is_dir():
+                  for ledger in sorted(ledger_source.glob("*.json")):
+                      shutil.copyfile(ledger, LEDGER_DIR / ledger.name)
+              outcome = {
+                  "resume": "restored",
+                  "prior_run_id": run_id,
+                  "accepted_completed_cases": accepted,
+                  "accepted_count": len(accepted),
+              }
+              state["restored_from"] = {
+                  "run_id": run_id,
+                  "accepted_cases": accepted,
+                  "restored_at": utc_now(),
+              }
+              break
+          if outcome["resume"] == "refused":
+              state["resume_refusal"] = outcome
+          (MANIFEST_DIR / "manifest.json").write_text(
+              json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          print(json.dumps(outcome, indent=2, sort_keys=True))
+          PY
+
+      - name: Run the remaining cases as resumable per-case chunks
+        # Stops below the 360-minute job timeout so the always() steps that
+        # persist and publish the manifest still run when this step times out.
+        timeout-minutes: 330
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GATE_PATH: ${{ inputs.gate_path }}
-          CASES_PATH: ${{ inputs.cases_path }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          # The package writes its machine-readable result to stdout. Capture it
-          # for the structured-summary step; it contains verdicts, states, hashes
-          # and costs, never raw prompts, responses or transcripts.
-          python -P -m tools.behavioral_eval_runner live-run \
-            --config "$RUNNER_TEMP/live-config.json" \
-            --gate "$GATE_PATH" \
-            --cases "$CASES_PATH" \
-            --repo-root "$GITHUB_WORKSPACE" \
-            --evidence-root "$RUNNER_TEMP/live-evidence" \
-            --cost-ledger "$RUNNER_TEMP/live-cost-ledger.json" \
-            --run-id "eval-run-${{ github.run_id }}" \
-            > "$RUNNER_TEMP/live-run-result.json"
+          python -P - <<'PY'
+          import hashlib
+          import json
+          import os
+          import shutil
+          import subprocess
+          import sys
+          import time
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          MANIFEST_DIR = RUNNER_TEMP / "ber-manifest"
+          CASES_DIR = MANIFEST_DIR / "cases"
+          LEDGER_DIR = MANIFEST_DIR / "ledgers"
+          GATE_DIR = RUNNER_TEMP / "ber-gates"
+          EVIDENCE_DIR = RUNNER_TEMP / "ber-evidence"
+          CHUNK_ROOT = WORKSPACE / ".ber-run" / "chunks"
+          MANIFEST_PATH = MANIFEST_DIR / "manifest.json"
+          for directory in (CASES_DIR, LEDGER_DIR, GATE_DIR, EVIDENCE_DIR, CHUNK_ROOT):
+              directory.mkdir(parents=True, exist_ok=True)
+
+          sys.path.insert(0, str(WORKSPACE))
+          from tools.behavioral_eval_runner.live.config import LiveConfig  # noqa: E402
+          from tools.behavioral_eval_runner.live.dataset import (  # noqa: E402
+              dataset_digest,
+              load_cases,
+          )
+          from tools.behavioral_eval_runner.live.gate import OwnerGateRecord  # noqa: E402
+
+          plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
+          state = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+          CEILING = int(plan["spend_ceiling_cents"])
+          COMMITTED_CASES = {
+              case.case_id: case
+              for case in load_cases(str(WORKSPACE / plan["dataset_path"]))
+          }
+          # One case per invocation: a timeout can therefore lose at most the
+          # case in flight, and a completed case is never dispatched again.
+          PER_CASE_TIMEOUT_SECONDS = 1500
+
+
+          def utc_now():
+              return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+          def write_state():
+              # Atomic replace; a concurrent reader must never make the
+              # persisted record fail (Windows can deny a rename while the
+              # destination is open, Linux never does).
+              temporary = MANIFEST_PATH.with_suffix(".json.tmp")
+              temporary.write_text(
+                  json.dumps(state, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+              for _ in range(50):
+                  try:
+                      os.replace(temporary, MANIFEST_PATH)
+                      return
+                  except OSError:
+                      time.sleep(0.02)
+              os.replace(temporary, MANIFEST_PATH)
+
+
+          def ledger_spent(case_id, attempt):
+              path = LEDGER_DIR / f"{case_id}-attempt{attempt}.json"
+              try:
+                  payload = json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, ValueError):
+                  return None
+              spent = payload.get("spent_cents")
+              return spent if isinstance(spent, int) else None
+
+
+          def attempt_spend(case_id, record):
+              spent = record.get("spent_cents")
+              if isinstance(spent, int):
+                  return spent
+              observed = ledger_spent(case_id, record.get("attempt"))
+              return observed if isinstance(observed, int) else 0
+
+
+          def total_spent():
+              total = 0
+              for case_id, entry in state["cases"].items():
+                  for record in entry.get("attempts", []):
+                      total += attempt_spend(case_id, record)
+              return total
+
+
+          def run_cli(args, timeout):
+              environment = dict(os.environ)
+              environment["PYTHONPATH"] = str(WORKSPACE)
+              return subprocess.run(
+                  [sys.executable, "-P", "-m", "tools.behavioral_eval_runner", *args],
+                  capture_output=True,
+                  text=True,
+                  timeout=timeout,
+                  cwd=str(WORKSPACE),
+                  env=environment,
+              )
+
+
+          failures = []
+          skipped_cases = []
+          ran_cases = []
+          for case_id in plan["case_ids"]:
+              entry = state["cases"].get(case_id)
+              if entry is None:
+                  entry = {"case_id": case_id, "status": "PENDING", "attempts": []}
+                  state["cases"][case_id] = entry
+              if entry.get("status") == "COMPLETED":
+                  skipped_cases.append(case_id)
+                  print(f"SKIP {case_id}: completed by an earlier dispatch")
+                  continue
+              remaining = CEILING - total_spent()
+              if remaining <= 0:
+                  entry["status"] = "NOT_RUN_BUDGET"
+                  failures.append(f"{case_id}: the $120 ceiling is exhausted before dispatch")
+                  write_state()
+                  break
+              attempt = len(entry.get("attempts", [])) + 1
+              record = {
+                  "attempt": attempt,
+                  "started_at": utc_now(),
+                  "status": "IN_FLIGHT",
+                  "spent_cents": None,
+              }
+              entry.setdefault("attempts", []).append(record)
+              entry["status"] = "IN_FLIGHT"
+              write_state()
+
+              source_case = COMMITTED_CASES[case_id]
+              source_path = WORKSPACE / plan["dataset_path"] / case_id / "case.json"
+              # load_cases reads immediate child directories that hold a
+              # case.json, so one case is one child directory under its own
+              # chunk root: .ber-run/chunks/<case>/<case>/case.json
+              chunk_root = CHUNK_ROOT / case_id
+              chunk_case_dir = chunk_root / case_id
+              chunk_case_dir.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(source_path, chunk_case_dir / "case.json")
+              chunk_cases = load_cases(str(chunk_root))
+              if len(chunk_cases) != 1 or chunk_cases[0].case_id != case_id:
+                  failures.append(f"{case_id}: the chunk did not load exactly one case")
+                  entry["status"] = "CHUNK_INVALID"
+                  write_state()
+                  break
+              if chunk_cases[0].record_sha256 != source_case.record_sha256:
+                  failures.append(f"{case_id}: the chunk bytes differ from the committed case")
+                  entry["status"] = "CHUNK_INVALID"
+                  write_state()
+                  break
+              chunk_digest = dataset_digest(chunk_cases)
+
+              staged = json.loads(
+                  (RUNNER_TEMP / "live-gate.json").read_text(encoding="utf-8")
+              )
+              staged["dataset"] = {
+                  "revision": plan["dispatch_sha"],
+                  "path": f".ber-run/chunks/{case_id}",
+                  "sha256": chunk_digest,
+                  "case_count": 1,
+              }
+              chunk_gate = OwnerGateRecord.from_dict(staged)
+              gate_path = GATE_DIR / f"{case_id}.json"
+              gate_path.write_text(
+                  json.dumps(staged, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+              )
+              record["chunk_dataset_sha256"] = chunk_digest
+              record["chunk_gate_sha256"] = hashlib.sha256(
+                  gate_path.read_bytes()
+              ).hexdigest()
+              record["chunk_gate_digest"] = chunk_gate.digest()
+
+              config = json.loads(
+                  (RUNNER_TEMP / "live-config.json").read_text(encoding="utf-8")
+              )
+              config["spend_ceiling_cents"] = remaining
+              LiveConfig.from_dict(config).validate()
+              config_path = GATE_DIR / f"{case_id}-attempt{attempt}-config.json"
+              config_path.write_text(
+                  json.dumps(config, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+              )
+              evidence_root = EVIDENCE_DIR / f"{case_id}-attempt{attempt}"
+              ledger_path = LEDGER_DIR / f"{case_id}-attempt{attempt}.json"
+              run_id = f"ber-{plan['run_id']}-{case_id}-a{attempt}"
+              record["remaining_ceiling_cents"] = remaining
+              write_state()
+
+              preflight = run_cli(
+                  [
+                      "live-preflight",
+                      "--config", str(config_path),
+                      "--gate", str(gate_path),
+                      "--cases", str(chunk_root),
+                      "--repo-root", str(WORKSPACE),
+                      "--expected-revision", plan["dispatch_sha"],
+                  ],
+                  timeout=120,
+              )
+              if preflight.returncode != 0:
+                  failures.append(f"{case_id}: chunk preflight failed")
+                  record["status"] = "PREFLIGHT_FAILED"
+                  entry["status"] = "PREFLIGHT_FAILED"
+                  write_state()
+                  break
+              try:
+                  report = json.loads(preflight.stdout)
+              except ValueError:
+                  report = {}
+              if report.get("status") not in {"READY", "READY_NEEDS_KEYS"} or report.get(
+                  "blockers"
+              ):
+                  failures.append(f"{case_id}: chunk preflight reported blockers")
+                  record["status"] = "PREFLIGHT_REFUSED"
+                  record["preflight_status"] = report.get("status")
+                  entry["status"] = "PREFLIGHT_REFUSED"
+                  write_state()
+                  break
+
+              try:
+                  completed = run_cli(
+                      [
+                          "live-run",
+                          "--config", str(config_path),
+                          "--gate", str(gate_path),
+                          "--cases", str(chunk_root),
+                          "--repo-root", str(WORKSPACE),
+                          "--evidence-root", str(evidence_root),
+                          "--cost-ledger", str(ledger_path),
+                          "--run-id", run_id,
+                      ],
+                      timeout=PER_CASE_TIMEOUT_SECONDS,
+                  )
+              except subprocess.TimeoutExpired:
+                  failures.append(
+                      f"{case_id}: the per-case invocation exceeded "
+                      f"{PER_CASE_TIMEOUT_SECONDS}s and was killed"
+                  )
+                  record["status"] = "ATTEMPT_TIMEOUT"
+                  entry["status"] = "ATTEMPT_TIMEOUT"
+                  write_state()
+                  break
+              result_path = CASES_DIR / f"{case_id}.json"
+              result_path.write_text(completed.stdout, encoding="utf-8")
+              try:
+                  result = json.loads(completed.stdout)
+              except ValueError:
+                  result = None
+              if not isinstance(result, dict):
+                  failures.append(f"{case_id}: live-run produced no parseable result")
+                  record["status"] = "RESULT_INVALID"
+                  record["spent_cents"] = ledger_spent(case_id, attempt)
+                  entry["status"] = "RESULT_INVALID"
+                  write_state()
+                  break
+              record["result_sha256"] = hashlib.sha256(
+                  result_path.read_bytes()
+              ).hexdigest()
+              record["spent_cents"] = ledger_spent(case_id, attempt)
+              if record["spent_cents"] is None:
+                  spent = result.get("spent_cents")
+                  record["spent_cents"] = spent if isinstance(spent, int) else 0
+              record["dispatched_calls"] = result.get("dispatched_calls")
+              record["status"] = result.get("status")
+              record["finished_at"] = utc_now()
+              if completed.returncode != 0 or result.get("status") != "COMPLETED":
+                  record["halt"] = result.get("halt")
+                  record["halt_reason_code"] = result.get("halt_reason_code")
+                  record["error"] = result.get("error")
+                  entry["status"] = str(result.get("status") or "ERROR")
+                  failures.append(
+                      f"{case_id}: live-run finished with status "
+                      f"{result.get('status')!r}"
+                  )
+                  write_state()
+                  break
+              entry["status"] = "COMPLETED"
+              entry["result_sha256"] = record["result_sha256"]
+              ran_cases.append(case_id)
+              write_state()
+              print(
+                f"DONE {case_id}: attempt {attempt}, spent "
+                f"{record['spent_cents']}c, total {total_spent()}c"
+              )
+
+          missing = [
+              case_id
+              for case_id in plan["case_ids"]
+              if (state["cases"].get(case_id) or {}).get("status") != "COMPLETED"
+          ]
+          state["updated_at"] = utc_now()
+          state["last_dispatch"] = {
+              "run_id": plan.get("run_id"),
+              "run_attempt": plan.get("run_attempt"),
+              "skipped_as_complete": skipped_cases,
+              "ran_in_this_dispatch": ran_cases,
+          }
+          state["totals"] = {
+              "cases_completed": len(plan["case_ids"]) - len(missing),
+              "cases_missing": len(missing),
+              "spent_cents": total_spent(),
+              "ceiling_cents": CEILING,
+          }
+          write_state()
+          print(
+              json.dumps(
+                  {
+                      "cases_completed": state["totals"]["cases_completed"],
+                      "cases_missing": missing,
+                      "spent_cents": state["totals"]["spent_cents"],
+                      "ceiling_cents": CEILING,
+                      "failures": failures,
+                  },
+                  indent=2,
+                  sort_keys=True,
+              )
+          )
+          if missing or failures:
+              raise SystemExit(1)
+          PY
+
+      - name: Upload resume manifest (always; completed cases survive a timeout)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-resume-manifest
+          path: ${{ runner.temp }}/ber-manifest/
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Build structured summary and publish directory
-        # Runs after a halt or refusal too: a failed run still owes a structured
-        # record, and the job conclusion stays failed because this step is not
-        # allowed to mask the live-run step.
+        # Runs after a halt, a timeout or a refusal too: a failed dispatch still
+        # owes a structured record, and the job conclusion stays failed because
+        # this step is not allowed to mask the per-case run step.
         if: always()
         run: |
           python -P - <<'PY'
@@ -347,8 +1037,9 @@ jobs:
           RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
           EVIDENCE_ROOT = RUNNER_TEMP / "live-evidence"
           CONFIG_PATH = RUNNER_TEMP / "live-config.json"
-          RESULT_PATH = RUNNER_TEMP / "live-run-result.json"
-          LEDGER_PATH = RUNNER_TEMP / "live-cost-ledger.json"
+          PLAN_PATH = RUNNER_TEMP / "ber-plan.json"
+          MANIFEST_PATH = RUNNER_TEMP / "ber-manifest" / "manifest.json"
+          CASES_DIR = RUNNER_TEMP / "ber-manifest" / "cases"
           PUBLISH_DIR = RUNNER_TEMP / "publish"
           EXPECTED_CEILING_CENTS = 12000
 
@@ -360,50 +1051,55 @@ jobs:
                   return None
 
 
-          result = load_json(RESULT_PATH)
-          if not isinstance(result, dict):
-              result = {}
+          plan = load_json(PLAN_PATH) or {}
+          plan = plan if isinstance(plan, dict) else {}
+          state = load_json(MANIFEST_PATH) or {}
+          state = state if isinstance(state, dict) else {}
+          entries = state.get("cases") or {}
+          entries = entries if isinstance(entries, dict) else {}
           config = load_json(CONFIG_PATH)
-          if not isinstance(config, dict):
-              config = {}
-          ledger = load_json(LEDGER_PATH)
-          if not isinstance(ledger, dict):
-              bundled = load_json(EVIDENCE_ROOT / "cost_ledger.json")
-              ledger = bundled if isinstance(bundled, dict) else None
+          config = config if isinstance(config, dict) else {}
 
-          records = result.get("results")
-          if not isinstance(records, list):
-              records = []
-          records = [r for r in records if isinstance(r, dict)]
-
-          status = result.get("status")
-          if not isinstance(status, str) or not status:
-              status = "REFUSED" if result.get("error") else "UNRUN"
-          halt = result.get("halt")
-          if not isinstance(halt, dict):
-              halt = (ledger or {}).get("halt")
-          if not isinstance(halt, dict):
-              halt = None
-          halt_view = None
-          if halt is not None:
-              # Publish closed, typed fields only: no free-form detail or context.
-              context = halt.get("context")
-              context = context if isinstance(context, dict) else {}
-              halt_view = {
-                  key: halt.get(key)
-                  for key in (
-                      "halted",
-                      "reason_code",
-                      "error",
-                      "spent_cents",
-                      "ceiling_cents",
-                      "calls_dispatched",
-                      "requested_cents",
-                  )
-              }
-              halt_view["vendor"] = context.get("vendor")
-              halt_view["model"] = context.get("model")
-
+          case_ids = plan.get("case_ids") or []
+          records = []
+          per_case = []
+          spent_total = 0
+          completed = []
+          halted = None
+          for case_id in case_ids:
+              entry = entries.get(case_id) or {}
+              result = load_json(CASES_DIR / f"{case_id}.json")
+              result = result if isinstance(result, dict) else {}
+              case_records = result.get("results")
+              case_records = (
+                  [item for item in case_records if isinstance(item, dict)]
+                  if isinstance(case_records, list)
+                  else []
+              )
+              records.extend(case_records)
+              for attempt in entry.get("attempts") or []:
+                  spent = attempt.get("spent_cents")
+                  if isinstance(spent, int):
+                      spent_total += spent
+              status = entry.get("status")
+              if status == "COMPLETED":
+                  completed.append(case_id)
+              if isinstance(result.get("halt"), dict):
+                  halted = halted or result.get("halt")
+              per_case.append(
+                  {
+                      "case_id": case_id,
+                      "status": status,
+                      "attempts": len(entry.get("attempts") or []),
+                      "result_sha256": entry.get("result_sha256"),
+                      "spent_cents": sum(
+                          attempt.get("spent_cents") or 0
+                          for attempt in entry.get("attempts") or []
+                          if isinstance(attempt.get("spent_cents"), int)
+                      ),
+                      "results": len(case_records),
+                  }
+              )
 
           def state_of(record):
               value = record.get("result_state")
@@ -411,8 +1107,6 @@ jobs:
 
 
           def verdict_of(states):
-              # An unrun or errored iteration is never a PASS. FAIL is a real
-              # negative, so it outranks every incomplete state.
               if not states:
                   return "UNRUN"
               if "FAIL" in states:
@@ -472,25 +1166,22 @@ jobs:
 
 
           details = [one_result(record) for record in records]
-
-          cases = {}
+          case_rows = {}
           skills = {}
           for item in details:
               case_id = str(item.get("case_id") or "UNKNOWN")
               skill = str(item.get("skill") or "UNKNOWN")
-              cases.setdefault(case_id, {"case_id": case_id, "skill": skill,
-                                         "runs": [], "states": []})
-              cases[case_id]["runs"].append(item)
-              cases[case_id]["states"].append(item["result_state"])
-              skills.setdefault(skill, {"skill": skill, "case_ids": set(),
-                                        "states": []})
+              case_rows.setdefault(case_id, {"case_id": case_id, "skill": skill,
+                                             "runs": [], "states": []})
+              case_rows[case_id]["runs"].append(item)
+              case_rows[case_id]["states"].append(item["result_state"])
+              skills.setdefault(skill, {"skill": skill, "case_ids": set(), "states": []})
               skills[skill]["case_ids"].add(case_id)
               skills[skill]["states"].append(item["result_state"])
-
-          case_rows = []
-          for case_id in sorted(cases):
-              row = cases[case_id]
-              case_rows.append({
+          case_rows_out = []
+          for case_id in sorted(case_rows):
+              row = case_rows[case_id]
+              case_rows_out.append({
                   "case_id": case_id,
                   "skill": row["skill"],
                   "verdict": verdict_of(row["states"]),
@@ -510,67 +1201,55 @@ jobs:
           all_states = [item["result_state"] for item in details]
           unrun_items = [item for item in details if item["result_state"] == "UNRUN"]
           citable = sum(1 for item in details if item.get("citability") == "REAL_HOST")
+          missing_cases = [case_id for case_id in case_ids if case_id not in completed]
+          if not case_ids:
+              status = "REFUSED"
+          elif halted is not None:
+              status = "HALTED"
+          elif missing_cases:
+              status = "INCOMPLETE"
+          else:
+              status = "COMPLETED"
 
-          spent = result.get("spent_cents")
-          if type(spent) is not int:
-              spent = (ledger or {}).get("spent_cents")
-          ceiling = result.get("ceiling_cents")
-          if type(ceiling) is not int:
-              ceiling = (ledger or {}).get("ceiling_cents")
           configured = config.get("spend_ceiling_cents")
           owner_limits = config.get("owner_limits")
-          if not isinstance(owner_limits, dict):
-              owner_limits = None
+          owner_limits = owner_limits if isinstance(owner_limits, dict) else None
+          evidence_bundles = []
+          for item in per_case:
+              if item["status"] != "COMPLETED":
+                  continue
+              result = load_json(CASES_DIR / f"{item['case_id']}.json") or {}
+              bundle = result.get("evidence") if isinstance(result, dict) else None
+              bundle = bundle if isinstance(bundle, dict) else {}
+              evidence_bundles.append({
+                  "case_id": item["case_id"],
+                  "verified": bundle.get("verified"),
+                  "final_report_sha256": bundle.get("final_report_sha256"),
+                  "final_evidence_manifest_sha256": bundle.get(
+                      "final_evidence_manifest_sha256"
+                  ),
+              })
 
-          evidence = result.get("evidence")
-          evidence = evidence if isinstance(evidence, dict) else {}
-
-          # Fail-closed verification: a green live-run step must not be able to
-          # publish an incomplete or over-budget record. The files are written
-          # first and the step then exits 1, so the artifact still exists.
           verification_failures = []
-          if not result:
-              verification_failures.append(
-                  "the live-run result file is missing or not valid JSON"
-              )
-          elif status not in {"COMPLETED", "HALTED", "REFUSED"}:
-              verification_failures.append("unknown run status")
           if type(configured) is not int or configured != EXPECTED_CEILING_CENTS:
               verification_failures.append(
                   "the built config ceiling is not the $120 owner cap"
               )
-          if status in {"COMPLETED", "HALTED"}:
-              # A gate may set a STRICTER ceiling; it may never exceed $120.
-              if type(ceiling) is not int or not 0 < ceiling <= EXPECTED_CEILING_CENTS:
-                  verification_failures.append(
-                      "the metered ceiling is missing, non-positive or above $120"
-                  )
-              if type(spent) is not int or (
-                  type(ceiling) is int and spent > ceiling
-              ):
-                  verification_failures.append(
-                      "the metered spend is missing or above the binding ceiling"
-                  )
-          if status == "COMPLETED":
-              if unrun_items:
-                  verification_failures.append(
-                      "a COMPLETED run contains UNRUN results"
-                  )
-              if (ledger or {}).get("unreconciled_count") != 0:
-                  verification_failures.append(
-                      "a COMPLETED run has unreconciled cost entries"
-                  )
-              if evidence.get("verified") is not True:
-                  verification_failures.append(
-                      "a COMPLETED run has no verified evidence bundle"
-                  )
+          if plan.get("planned_calls") is not None and not case_ids:
+              verification_failures.append("the run plan is empty")
+          if spent_total > EXPECTED_CEILING_CENTS:
+              verification_failures.append("the attempted spend is above $120")
+          if status == "COMPLETED" and unrun_items:
+              verification_failures.append("a COMPLETED run contains UNRUN results")
+          if status == "COMPLETED" and missing_cases:
+              verification_failures.append("a COMPLETED run has unfinished cases")
           if any(record.get("raw_transcript_included") is not False for record in records):
               verification_failures.append(
                   "a result record says a raw transcript was included"
               )
 
           summary = {
-              "schema_version": "apr158-eval-run-summary/1.0.0",
+              "schema_version": "apr161-eval-run-summary/1.0.0",
               "generated_at": dt.datetime.now(dt.timezone.utc)
               .isoformat()
               .replace("+00:00", "Z"),
@@ -584,37 +1263,61 @@ jobs:
                   "sha": os.environ.get("GITHUB_SHA"),
                   "environment": "eval-run",
               },
+              "owner_gate": {
+                  "gate_id": plan.get("gate_id"),
+                  "template_revision": plan.get("template_gate_revision"),
+                  "staged_revision": plan.get("staged_gate_revision"),
+                  "template_sha256": plan.get("template_gate_sha256"),
+                  "staged_sha256": plan.get("staged_gate_sha256"),
+                  "staged_record_digest": plan.get("staged_gate_digest"),
+                  "dataset_path": plan.get("dataset_path"),
+                  "dataset_sha256": plan.get("dataset_sha256"),
+                  "case_count": plan.get("case_count"),
+              },
               "run": {
                   "status": status,
                   "verdict": verdict_of(all_states),
-                  "result_parse_ok": bool(result),
-                  "halted": status == "HALTED" or halt is not None,
-                  "halt": halt_view,
-                  "halt_reason_code": result.get("halt_reason_code"),
-                  "error": result.get("error"),
-                  "error_reason_code": result.get("reason_code"),
+                  "halted": halted is not None,
+                  "halt": halted if isinstance(halted, dict) else None,
                   "config_loaded": bool(config),
               },
               "cost": {
                   "configured_ceiling_cents": configured,
                   "owner_limits": owner_limits,
-                  "ceiling_cents": ceiling,
-                  "spent_cents": spent,
-                  "remaining_cents": (ledger or {}).get("remaining_cents"),
-                  "planned_calls": result.get("planned_calls"),
-                  "dispatched_calls": result.get("dispatched_calls"),
-                  "call_count": (ledger or {}).get("call_count"),
-                  "reconciled_count": (ledger or {}).get("reconciled_count"),
-                  "unreconciled_count": (ledger or {}).get("unreconciled_count"),
+                  "ceiling_cents": EXPECTED_CEILING_CENTS,
+                  "spent_cents": spent_total,
+                  "planned_calls": plan.get("planned_calls"),
+                  "dispatched_calls": sum(
+                      attempt.get("dispatched_calls")
+                      for case_id in case_ids
+                      for attempt in (entries.get(case_id) or {}).get("attempts") or []
+                      if isinstance(attempt, dict)
+                      and isinstance(attempt.get("dispatched_calls"), int)
+                  ),
               },
               "counts": {
                   "results": len(details),
                   "results_by_state": counts(all_states),
                   "citable_results": citable,
                   "unrun_results": len(unrun_items),
+                  "cases_completed": len(completed),
+                  "cases_missing": len(missing_cases),
+              },
+              "resume": {
+                  "restored_from": state.get("restored_from"),
+                  "resume_refusal": state.get("resume_refusal"),
+                  "cases_skipped_as_complete": (state.get("last_dispatch") or {}).get(
+                      "skipped_as_complete", []
+                  ),
+                  "cases_ran_in_this_dispatch": (state.get("last_dispatch") or {}).get(
+                      "ran_in_this_dispatch", []
+                  ),
+                  "attempts_total": sum(item["attempts"] for item in per_case),
               },
               "skills": skill_rows,
-              "cases": case_rows,
+              "cases": case_rows_out,
+              "case_status": per_case,
+              "missing_cases": missing_cases,
               "unrun": {
                   "count": len(unrun_items),
                   "case_ids": sorted({item["case_id"] for item in unrun_items}),
@@ -625,14 +1328,8 @@ jobs:
                   ),
               },
               "evidence": {
-                  "verified": evidence.get("verified"),
-                  "input_evidence_manifest_sha256": evidence.get(
-                      "input_evidence_manifest_sha256"
-                  ),
-                  "final_report_sha256": evidence.get("final_report_sha256"),
-                  "final_evidence_manifest_sha256": evidence.get(
-                      "final_evidence_manifest_sha256"
-                  ),
+                  "case_bundles": evidence_bundles,
+                  "raw_transcripts_included": False,
               },
               "policy": {
                   "unrun_is_never_pass": True,
@@ -640,7 +1337,8 @@ jobs:
                   "raw_prompts_included": False,
                   "raw_responses_included": False,
                   "raw_transcripts_included": False,
-                  "cost_ledger_published": ledger is not None,
+                  "one_case_per_invocation": True,
+                  "completed_case_is_never_redispatched": True,
               },
               "verification": {
                   "passed": not verification_failures,
@@ -650,32 +1348,41 @@ jobs:
 
           text = json.dumps(summary, indent=2, sort_keys=True) + "\n"
           EVIDENCE_ROOT.mkdir(parents=True, exist_ok=True)
-          (EVIDENCE_ROOT / "structured-summary.json").write_text(
-              text, encoding="utf-8"
-          )
+          (EVIDENCE_ROOT / "structured-summary.json").write_text(text, encoding="utf-8")
           PUBLISH_DIR.mkdir(parents=True, exist_ok=True)
-          (PUBLISH_DIR / "structured-summary.json").write_text(
-              text, encoding="utf-8"
-          )
-          if ledger is not None:
-              (PUBLISH_DIR / "cost-ledger.json").write_text(
-                  json.dumps(ledger, indent=2, sort_keys=True) + "\n",
-                  encoding="utf-8",
+          (PUBLISH_DIR / "structured-summary.json").write_text(text, encoding="utf-8")
+          ledger_out = PUBLISH_DIR / "cost-ledger.json"
+          ledgers = []
+          for path in sorted((RUNNER_TEMP / "ber-manifest" / "ledgers").glob("*.json")):
+              payload = load_json(path)
+              if isinstance(payload, dict):
+                  ledgers.append({"ledger": path.name, "spent_cents": payload.get("spent_cents")})
+          ledger_out.write_text(
+              json.dumps(
+                  {"schema": "ber-pilot-a-ledgers/1.0.0", "ledgers": ledgers,
+                   "spent_cents": spent_total, "ceiling_cents": EXPECTED_CEILING_CENTS},
+                  indent=2,
+                  sort_keys=True,
               )
+              + "\n",
+              encoding="utf-8",
+          )
 
           print(json.dumps({
               "structured_summary": str(EVIDENCE_ROOT / "structured-summary.json"),
               "publish_dir": str(PUBLISH_DIR),
               "status": status,
               "results_by_state": counts(all_states),
-              "spent_cents": spent,
+              "spent_cents": spent_total,
               "unrun_results": len(unrun_items),
+              "cases_completed": len(completed),
+              "cases_missing": len(missing_cases),
               "verification": {
                   "passed": not verification_failures,
                   "failures": verification_failures,
               },
           }, indent=2, sort_keys=True))
-          if verification_failures:
+          if status == "REFUSED" or verification_failures:
               raise SystemExit(1)
           PY
 
