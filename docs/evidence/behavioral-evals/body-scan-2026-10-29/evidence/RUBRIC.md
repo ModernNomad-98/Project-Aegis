@@ -84,7 +84,11 @@ Exactly one TSV line, five fields, tab-separated:
 - **verdict** — CLEAN, SUSPECT or INJECTION (uppercase).
 - **category** — one of: none, instruction-override, role-play,
   credential-request, tool-call, external-url, encoded-blob, invisible-unicode,
-  invisible-markup, other.
+  invisible-markup, control-char, other. `control-char` is the `UNI-CONTROL`
+  family's category (METHOD.md §3.2); it is listed so that the vocabulary and
+  the rule table agree, and no verdict uses it — the family produced no hits.
+  This token was added by the post-merge repair pass; the decision tests,
+  verdicts and fields in this file are otherwise unchanged (METHOD.md §5, §8).
 - **line** — the absolute line number (as printed in the excerpt gutter) of the
   single line that drove the verdict, or the first line of the chunk when the
   verdict rests on the chunk as a whole. Integer, no range.

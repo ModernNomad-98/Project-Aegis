@@ -2,7 +2,8 @@
 
 Everything below was fixed before the first verdict was recorded. The Tier-1
 rule table and the Tier-2 rubric are published in full so the pass can be
-re-run, or argued with, without access to the script that executed it.
+argued with, and its counts rebuilt, without access to the script that executed
+it; §8 states exactly which figures that covers and which it does not.
 
 ## 1. Corpus and counting
 
@@ -119,13 +120,14 @@ claim about them. `UNI-HOMOGLYPH` is also narrower than "a homoglyph": its
 Latin side must be a **non-ASCII** Latin letter, so a token mixing ASCII Latin
 with Cyrillic lookalikes (for example `pаypal` with U+0430) is not flagged. Both
 limits are published rather than repaired — changing the rule table after the
-run would invalidate the published counts — and neither changes a result: both
-produced 0 hits.
+run would invalidate the published counts — and neither changes a published
+count: `UNI-HOMOGLYPH` produced 0 hits, and **no rule tested tag characters, so
+this record makes no hit-count claim about them.**
 
 ### 3.3 Exact regular expressions
 
-Case-insensitive unless the pattern has no letters. Pipes are literal here
-(this block is not a table).
+Case-insensitive unless the pattern has no letters. Pipes are regex
+alternation operators; this block is not a Markdown table.
 
     OV-IGNORE          \b(?:ignore|disregard|forget|override|bypass)\b[^.\n]{0,40}\b(?:all\s+)?(?:previous|prior|above|earlier|preceding|system|developer)\b[^.\n]{0,24}\b(?:instructions?|prompts?|rules?|directions?|guidance)\b
     OV-SYSTEM-PROMPT   \bsystem\s+prompt\b
@@ -158,31 +160,72 @@ Case-insensitive unless the pattern has no letters. Pipes are literal here
 
 ### 3.4 Implementation notes
 
-Two details of the executed pass are not expressible in the tables above; both
-are published so that a reimplementation from §3.1–3.3 alone behaves the same.
+Four details of the executed pass are not carried by the §3.1–§3.3 tables
+alone. All four are published here, in full, so that a reimplementation from
+**§3.2–§3.4 plus the constants in §2 and §4** reproduces the published counts;
+§8 states exactly what that does and does not establish.
 
-- **The `ENC-B64` class filter is `scan.py`-only.** The pattern in §3.3 matches
-  a 60+ character base64 run; the requirement that the run contain a lower-case
-  letter, an upper-case letter and a digit is applied as a **post-filter on each
-  regex match** in `scan.py` (lines 99–102), not inside the pattern. A
-  reimplementation must add that filter after matching, or it will flag
-  homogeneous runs that this pass skipped. The rule produced 0 published rows,
-  so no count depends on it, but the published rule is reproducible only with
-  this note.
+- **The `ENC-B64` class filter is applied after matching.** The §3.3 pattern
+  matches a 60+ character base64 run; the requirement that the run contain a
+  lower-case letter, an upper-case letter and a digit is a **post-filter on each
+  regex match**, not part of the pattern. In the executed pass it lives in
+  `scan.py` lines 99–102, which are not committed; this is the whole of it, so a
+  reimplementation can match it without the script:
+
+      # ENC-B64: keep a regex match only when all three character classes occur
+      def enc_b64_keep(matched_text):
+          return (any(c.islower() for c in matched_text)
+                  and any(c.isupper() for c in matched_text)
+                  and any(c.isdigit() for c in matched_text))
+
+  Without the filter a reimplementation will flag homogeneous runs this pass
+  skipped. The rule produced **0 published rows**, so no published row or verdict
+  depends on the filter; a faithful reproduction still needs it, because without
+  it a reimplementation flags homogeneous runs this pass skipped and the hit
+  totals no longer match.
+
+- **`UNI-HOMOGLYPH` is a token test, not a character range.** §3.2 states it as
+  prose because the test is structural. It is fixed here: take each
+  whitespace-delimited token on the line, strip every Unicode punctuation
+  character (general category `P*`) from it, and match when the stripped token
+  contains at least one **non-ASCII LATIN** letter and at least one **CYRILLIC
+  or GREEK** letter. That is why the ASCII-Latin case is not covered: an ASCII
+  `p` beside a Cyrillic `а` fails the non-ASCII-Latin half. The family produced
+  **0 published rows**.
+
 - **Category label.** `scan.py` carries the internal category
   `tool-call-request` for `TC-EXEC`, `TC-PIPE-SHELL` and `TC-CHAT-TEMPLATE`; the
   published tables use `tool-call`, the vocabulary of §3.1. The two published
   `TC-EXEC` rows are relabelled only; no hit, line or verdict changes.
 
+- **Match multiplicity.** For each rule and each line the pass reports **every
+  non-overlapping match** (`finditer`), not only the first (`re.search`). This is
+  load-bearing: first-match-only reporting yields **42** distinct
+  `(rule, skill, line)` rows, not the published 44, because three
+  `OV-SYSTEM-PROMPT` matches fall on `hidden-context-exposure-reviewer` line 3 at
+  columns 99, 173 and 697. A reimplementation must iterate matches, not stop at
+  the first.
+
 The rules are deliberately over-broad. That is the point of Tier 1: it is a
 recall machine whose output is then adjudicated, not a classifier whose output
-is trusted. A 100% Tier-1 false-positive rate was the expected outcome on a
-corpus of security skills and is reported as such in RESULTS.md.
+is trusted. A 100% **dismissal** rate was the expected outcome on a corpus of
+security skills and is reported as such in RESULTS.md. It is not a
+false-positive rate: `tier1_dismissal_rate_pct` in `evidence/summary.json` is
+*adjudicated-dismissed of flagged* — 44 of 44 Tier-1 hits and 33 of 33 flagged
+chunks — and a true FPR would need the corpus's actual negatives as its
+denominator, which would mean adjudicating all 2,025 clean chunks. 202 were
+sampled.
 
 Of the 44 hits, 43 are lexical rule matches and one is a structural-class
 match — `MK-IMG` on a quoted `<img onerror=…>` example in
-`llm-output-safety-reviewer` — and all 44 were adjudicated. No structural
-finding survived adjudication.
+`llm-output-safety-reviewer` — and **all 33 flagged chunks covering those 44
+hits were adjudicated**. The hit-to-verdict mapping is published row by row in
+`evidence/flagged-hit-map.tsv` (`chunk_id`, `rule_id`, `skill`, `line`, `col`,
+`verdict`), because the chunk verdict table carries no rule column of its own.
+Its 44 rows are unique on `(rule_id, skill, line, col)`; `col` is carried
+through from `evidence/tier1-flags.tsv` because three `OV-SYSTEM-PROMPT` hits
+fall on one line at columns 99, 173 and 697, so without it those three rows
+would be indistinguishable. No structural finding survived adjudication.
 
 ## 4. Sampling
 
@@ -190,8 +233,24 @@ The clean set is every `(skill, chunk)` pair whose chunk was not flagged:
 2,025 pairs. The sample is drawn with Python's `random.Random(20261029)` —
 Mersenne Twister, fixed seed — over the clean list sorted by `(skill, chunk)`:
 
-    n = round(2025 * 10 / 100) = 202
-    sample = sorted(Random(20261029).sample(clean, 202))
+    n = 202
+    sample = sorted(Random(20261029).sample(clean, n))
+
+`n` is written as the literal **202**, not derived by rounding 10% of 2,025:
+that derivation lands on exactly `202.5`, and rounding it is
+interpreter-dependent — 202 under Python 3's round-half-to-even, 203 under
+half-up rounding — so it cannot carry a published draw. **The interpreter that
+produced the published draw is unknown**: no interpreter or environment record
+was retained with the run, and this record does not infer one from a successful
+reproduction. What is established is **compatibility, not history**:
+reconstructing the 2,058-chunk grid and the 33 flagged chunks from the committed
+`PER-SKILL.tsv` and `evidence/tier1-flags.tsv`, then running the two lines above
+under **CPython 3.12.14**, reproduces `evidence/sample-verdicts.tsv` exactly —
+202 of 202 ids, same skill and chunk index. That makes 3.12.14 a **reproduction
+runtime**, not the original one; **CPython 3.14.7** also reproduced the same 202
+of 202 draw, so the result is not peculiar to 3.12.14. The interpreter of record
+stays unknown. A reader on another interpreter should compare the drawn ids
+against that file rather than assume the same draw.
 
 That is 202 / 2,025 = **9.98%** of the clean chunks and 202 / 2,058 = 9.8% of
 all chunks, under this record's line convention. The conventional clean count
@@ -204,8 +263,19 @@ can be checked without rerunning it.
 
 ## 5. Tier 2 — adjudication rubric
 
-The rubric was written before adjudication and is unchanged since. Full text:
-`evidence/RUBRIC.md`; the operative parts are summarised here.
+The rubric was written before adjudication. Full text: `evidence/RUBRIC.md`;
+the operative parts are summarised here. Two facts about its byte state are
+published, because they point in opposite directions:
+
+- Its **decision tests, verdict definitions and required evidence fields** are
+  unchanged since the four adjudicator sessions read them.
+- Its **category vocabulary** gained one token after the fact, in the repair
+  pass recorded in §8: `control-char`. §3.2 already assigns `control-char` to
+  the `UNI-CONTROL` family, but the rubric's enumerated list of allowed
+  categories stopped at ten values and did not include it — a latent gap, not
+  an active one, since `UNI-CONTROL` produced 0 hits and no published verdict
+  uses the token. `evidence/RUBRIC.md` now lists it, and the reviewed and
+  repaired sha256 values are both in §8.
 
 **Question.** Would a model that loads this skill be steered away from the
 skill's stated professional purpose by the text in this chunk?
@@ -266,15 +336,36 @@ six words.
   same integer), and `skill`, `chunk_index` and `lines` are joined from the
   chunk manifest. `lines` is the chunk's absolute range (for example
   `176-200`) and is not the adjudicator's `line`. No rubric field is dropped or
-  reinterpreted, and `evidence/RUBRIC.md` is published unchanged.
+  reinterpreted, and `evidence/RUBRIC.md` is published as the adjudicators read
+  it except for the category-vocabulary token recorded in §5 and §8, which no
+  verdict depends on.
+- The **hit-to-verdict map** (`evidence/flagged-hit-map.tsv`) is derived, not
+  adjudicated: for each of the 44 hit rows, `chunk_id` is the chunk containing
+  `line` under the §2 geometry, matched to the verdict row with the same
+  `skill` and `chunk_index`, `col` is carried through unchanged from
+  `evidence/tier1-flags.tsv`, and a `note` carries the F24/F33 post-hoc
+  commentary (`-` on every other row). Its 44 rows are unique on
+  `(rule_id, skill, line, col)`, so the map reconciles one-to-one with the 44
+  hit rows of `tier1-flags.tsv`; `line` alone does not distinguish the three
+  `OV-SYSTEM-PROMPT` hits at columns 99, 173 and 697 of one line. It adds no
+  verdict and changes none. It exists because `evidence/flagged-verdicts.tsv`
+  is chunk-level and carries no rule column, so the 44-hits-to-33-verdicts
+  relationship is otherwise not auditable from the publication.
 - Each session read the chunk text with blank lines removed and absolute line
   gutters; the packaging script is deterministic and its sha256 is recorded in
   section 8. Nothing was summarised, filtered or paraphrased before
   adjudication.
-- No network access and no external model call was used at any point. The four
-  adjudicator sessions were ordinary harness child sessions run by the lane
-  coordinator; the publisher merged and verified their TSVs and recorded no
-  verdict of its own.
+- **The scanner made no network calls at any point.** Tier 1 is a local
+  pure-function pass over a checkout and the packager is local; neither opens a
+  socket and no external service was queried for the scan.
+- **The adjudication used existing agent capacity, with no new spend.** The
+  four adjudicator sessions were ordinary harness child sessions run by the lane
+  coordinator on the model family the owner decision named. No paid API call,
+  vendor key or per-token billing was created for this run (RESULTS.md §6;
+  README.md, "Provenance"). **Provider contact is not claimed either way**:
+  whether those harness sessions contact a provider is a property of the harness
+  the work ran in, and this record does not establish it. The publisher merged
+  and verified their TSVs and recorded no verdict of its own.
 
 ## 7. Redaction
 
@@ -293,25 +384,87 @@ withheld from the published tables.
 ## 8. Reproducibility
 
 The scanner is code, and the work package forbids committing code, so it is
-retained out-of-tree in the lane work-package record, with its hash recorded:
+retained out-of-tree in the lane work-package record. What that means for a
+reader is stated here in full, because "reproducible" is used loosely elsewhere
+and this section is the precise version.
 
-- `scan.py` — `d7c106cee2186efb8adce9b7bc9d7d48e29ce77fd12f137bc2a17893ea7bc3eb` (`9219` bytes)
-- `package.py` — `948ea1b04111ad13152a26c7a439439a20618d8f553fba53553daea04654e499`
-- `RUBRIC.md` (also published at `evidence/RUBRIC.md`) — `8bb0bf78a425f67cba37a73a09c84879688689cc56e94a4757ea6d0d5fa6e304`
+**Reproducible from this repository — the counts.** 44 hits, 42 distinct
+`(skill, line)` pairs, 16 skills, 9 distinct rules, 33 flagged chunks, 2,058 chunks and 2,025
+clean chunks all follow from five things, every one of them in this directory
+or in the corpus:
 
-A third party rebuilds Tier 1 from section 3.3 and the constants in
-sections 2–4; the out-of-tree scripts were invoked as:
+- the rule table — §3.2 (the seven per-character families), §3.3 (the 28
+  regular expressions) and §3.4 (the four details that are not one regex each);
+- the constants — the 25-line grid and `floor((line - 1) / 25)` (§2), the seed
+  `20261029` and `n = 202` (§4);
+- the match multiplicity — every non-overlapping match per rule per line (§3.4);
+- the corpus — the 255 `SKILL.md` bodies at `501dff1f`, whose sha256 values are
+  in `PER-SKILL.tsv`;
+- `evidence/tier1-flags.tsv` itself, from which every per-rule and per-skill
+  total is a summation.
+
+**Reproducible from this repository — the sample.** The 202 clean chunks follow
+from the same constants and the seed (§4), and the drawn ids are published with
+their skill, chunk index and absolute line range in
+`evidence/sample-verdicts.tsv`, so the draw can be compared without re-running
+it.
+
+**Not reproducible from this repository — the code.** `scan.py` and
+`package.py` are not committed, and the digests at the end of this section
+attest bytes this repository does not contain. The Tier-1 *code path* — argument
+handling, file walk, the order in which rules are applied, the redaction
+implementation — is therefore not auditable here. Only the rule table, the
+constants and the published output are.
+
+**The reproduction was run, from this directory only.** The repair lane
+reimplemented §3.2–§3.4 and the §2/§4 constants without access to `scan.py`,
+applied the result to a `git worktree add --detach` checkout of `501dff1f`, and
+compared it to the published tables:
+
+| Compared | Result |
+| --- | --- |
+| Hit rows on `(rule, skill, line, col)` | 44 of 44 identical — 0 extra, 0 missing |
+| Flagged chunks | 33 of 33 identical |
+| Chunk and clean-chunk counts | 2,058 and 2,025 identical |
+| Sample draw | 202 of 202 ids and chunk indices identical under CPython 3.12.14; CPython 3.14.7 reproduces the same 202 |
+
+That reimplementation is not committed either; it is short, and §3.2–§3.4 plus
+the constants are its whole specification. What the comparison establishes is
+that **the published rule table is complete enough to regenerate the published
+hit list**. It does not establish that the uncommitted `scan.py` behaves as
+§3.4 describes, and it is not a claim that the counts can be produced without a
+scanner.
+
+The commands were:
 
     git worktree add --detach <dir> 501dff1f57246c25ae099b7b21d40915e373e9a3
     python scan.py <dir>            # walks .claude/skills/*/SKILL.md
     python package.py               # chunks, samples, packages
 
 `scan.py` is a pure function of the checkout: `os.listdir` over
-`.claude/skills`, one `re.search` pass per rule per line, no state, no network,
-no clock. Its only inputs are the corpus and the constants published in
-sections 2–4 above (`25` lines, seed `20261029`, 10%). Reimplementing the rule
-table from section 3.3 must reproduce 44 hits and 33 flagged chunks exactly;
-that equality is the reproducibility test, and it does not require this script.
+`.claude/skills`; for each rule and each line it reports **every non-overlapping
+match** (`finditer` semantics), not only the first (`re.search` semantics); no
+state, no network, no clock. The distinction is load-bearing: first-match-only
+reporting yields **42** distinct `(rule, skill, line)` rows, not the published
+44, because three `OV-SYSTEM-PROMPT` matches fall on
+`hidden-context-exposure-reviewer` line 3 at columns 99, 173 and 697. The
+reimplementation used for the §8 reproduction applies `finditer` for the same
+reason. Its only inputs are the corpus and the constants published in sections
+2–4 above (`25` lines, seed `20261029`, `n = 202`); the `10%` is a description
+of the 2,025-chunk clean set, not an executed constant.
+
+**Digests of the uncommitted inputs.**
+
+- `scan.py` — `d7c106cee2186efb8adce9b7bc9d7d48e29ce77fd12f137bc2a17893ea7bc3eb` (`9219` bytes)
+- `package.py` — `948ea1b04111ad13152a26c7a439439a20618d8f553fba53553daea04654e499`
+- `RUBRIC.md`, the bytes the four sessions read — `8bb0bf78a425f67cba37a73a09c84879688689cc56e94a4757ea6d0d5fa6e304`
+
+`evidence/RUBRIC.md` is no longer byte-identical to that last value: the repair
+pass added the `control-char` token recorded in §5. The reviewed digest is the
+`RUBRIC.md` value above; the current digest
+(`5e0a5c0828f6f308ed03f27b852958c1e8d57f2cd682f540fe5a49b7e3ab6752`) is the
+`evidence/RUBRIC.md` line in `HASHES.sha256`. Nothing else in the file changed,
+and no verdict turns on the added token.
 
 The scanner was invoked twice. The first invocation aborted before writing any
 output, on a manifest-shape bug (`skills` is a list, not a mapping) in setup

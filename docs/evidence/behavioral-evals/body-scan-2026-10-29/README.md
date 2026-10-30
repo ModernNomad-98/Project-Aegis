@@ -36,10 +36,9 @@ and the manifest exclude.
 
 This scan covers **all 255** — the 254 shipped skills and the template — so the
 superset requirement is met and the owner's 254 is accounted for exactly. Both
-counts are stated wherever a count is given (the Result line above and
-`RESULTS.md` §2), and `PER-SKILL.tsv` marks each row `shipped=yes|no`. Not every
-table in this directory carries both counts: the Files, Spend and per-rule
-tables do not.
+counts are given in the Result line above and in `RESULTS.md` §2, and
+`PER-SKILL.tsv` marks each row `shipped=yes|no`. Not every table in this
+directory carries both counts: the Files, Spend and per-rule tables do not.
 
 ## Deviations recorded here
 
@@ -53,7 +52,25 @@ tables do not.
   in the committed publication, rather than only in the lane's out-of-tree
   record.
 - **The Tier-1 and packaging scripts are not committed.** They are retained
-  out-of-tree with their sha256 recorded (METHOD.md §8).
+  out-of-tree with their sha256 recorded (METHOD.md §8); §8 also states, in one
+  place, which figures a reader can and cannot rebuild from this repository.
+- **This publication was corrected after merge.** Advisory review
+  **5706899461** raised 10 items at the reviewed head `4ad07562`; this
+  directory now carries the corrections, with a per-item disposition in
+  `REVIEW-DISPOSITION.md`. **No count, verdict or evidence row changed.** The
+  edits are wording and naming: one metric renamed
+  (`false_positive_rate_pct` → `tier1_dismissal_rate_pct`, with its
+  definition), one unused category token added to the rubric vocabulary
+  (METHOD.md §5, §8), one new mapping table
+  (`evidence/flagged-hit-map.tsv`), and `HASHES.sha256` regenerated. A second
+  repair pass then corrected five record-integrity findings from the fresh
+  Stage F review at `4e73efed`: the map gains a `col` column and unique
+  `(rule_id, skill, line, col)` key, its two F24/F33 notes are labelled
+  post-hoc commentary and carried as an open rationale gap, the sampling
+  statement names reproduction runtimes instead of an original interpreter,
+  the provider-contact wording is limited to no new spend, and `summary.json`
+  separates the applied rubric digest from the current one. That pass moves no
+  count and no verdict; its per-item disposition is in the pull request body.
 
 ## What this record is
 
@@ -103,35 +120,46 @@ tables do not.
 | --- | --- |
 | `README.md` | This page: scope, result, reading order. |
 | `METHOD.md` | Corpus and counting rules, the full Tier-1 rule table, chunking and sampling, the Tier-2 rubric, adjudication execution, redaction, reproducibility, limits. |
-| `RESULTS.md` | Raw counts, verdict tables, false-positive handling, spend, UNRUN list. |
+| `RESULTS.md` | Raw counts, verdict tables, dismissal handling (not a false-positive rate), spend, UNRUN list. |
 | `PER-SKILL.tsv` | One row per skill: shipped flag, bytes, lines, sha256, Tier-1 hits, rules matched, flagged chunks, chunk verdicts. |
 | `evidence/tier1-flags.tsv` | Every Tier-1 hit, one row each, with redacted snippet. |
 | `evidence/flagged-verdicts.tsv` | The 33 flagged chunks: verdict, category, evidence line, one-clause rationale. |
+| `evidence/flagged-hit-map.tsv` | Every one of the 44 Tier-1 hits mapped to its chunk verdict — `chunk_id`, `rule_id`, `skill`, `line`, `col`, `verdict` — keyed uniquely on `(rule_id, skill, line, col)` so the three hits that share one line stay distinguishable; plus a `note` marking the two rows whose published rationale does not address the rule that fired (post-hoc commentary, carried as an open gap rather than re-adjudicated). |
 | `evidence/sample-verdicts.tsv` | The 202 sampled clean chunks: same fields. |
-| `evidence/RUBRIC.md` | The frozen Tier-2 rubric the four sessions applied. |
+| `evidence/RUBRIC.md` | The Tier-2 rubric the four sessions applied — frozen except for the one category token the repair pass added (METHOD.md §5, §8). |
 | `evidence/summary.json` | The counts in machine-readable form. |
-| `HASHES.sha256` | sha256 of every file above. |
+| `HASHES.sha256` | sha256 of the nine reviewed files it lists — nine of the twelve rows above — **on the current repaired bytes**. It checks the same nine-file set at this head; it is not a manifest of the reviewed head's bytes (both sides are in `REVIEW-DISPOSITION.md`). The two files this repair pass added are outside it by design; `evidence/flagged-hit-map.tsv`'s digest is in `REVIEW-DISPOSITION.md`, and `REVIEW-DISPOSITION.md`'s own digest is recorded in the signed commit message for this pass and in the pull request body. |
+| `REVIEW-DISPOSITION.md` | Disposition of the 10 findings in advisory review 5706899461, each with the `file:line` evidence for its fix. |
 
 ## Reading order
 
 1. `RESULTS.md` for the numbers.
 2. `METHOD.md` for how the numbers were produced and where the method is weak.
 3. `PER-SKILL.tsv` or `evidence/` when you need the per-file detail.
+4. `REVIEW-DISPOSITION.md` when you need to know what the post-merge repair
+   changed and why.
 
 ## Reproduction
 
 The corpus, the rule table, the chunk geometry, the sampling seed (`20261029`)
-and the exact commands are in METHOD.md. A third party can rebuild the Tier-1
-pass from the rule table alone and must obtain the same 44 hits and the same 33
-flagged chunks; the sample is fixed by the seed and the documented sampling
-call, not by hand.
+and the exact commands are in METHOD.md. What a third party can rebuild from
+**this repository** is narrower than the whole pass, and METHOD.md §8 states it
+exactly: the **counts** (44 hits, 16 skills, 9 distinct rules, 33 flagged
+chunks, 2,058 chunks, 2,025 clean chunks, and the per-rule and per-skill
+totals) follow from the rule table in METHOD.md §3.2–§3.4 plus the constants in
+§2 and §4, applied to the corpus at `501dff1f`; the **sample** follows from the
+seed and the documented sampling call. The scanner and packager that produced
+them are **not committed**, so the Tier-1 code path is not auditable from here
+— only the rule table, the constants, and the counts they are stated to
+produce.
 
 ## Provenance
 
 - Base: `501dff1f57246c25ae099b7b21d40915e373e9a3` (merge of PR #973).
 - Run date: 2026-10-29, America/Los_Angeles.
 - Executing session: DeepSeek V4 Flash (`deepseek-account/deepseek-flash`).
-- External spend: `$0.00`. Ceiling `$10` reserved and unused; no paid API call
-  was made — the adjudication used existing agent capacity.
+- External spend: `$0.00`. Ceiling `$10` reserved and unused; no new paid API
+  call, vendor key or billing was created for the run — the adjudication used
+  existing agent capacity. Provider contact is not claimed (METHOD.md §6).
 - This publication is documentation only. It changes no skill, no script and no
   workflow, and it grants no approval.
