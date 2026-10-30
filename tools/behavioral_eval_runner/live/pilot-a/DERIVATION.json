@@ -1,0 +1,554 @@
+{
+  "cases": [
+    {
+      "assertion_count": 3,
+      "case_id": "pilot-a-01-agent-startup-context-gate",
+      "deterministic_check_count": 0,
+      "family": "Phase 1 - operating discipline",
+      "selected_eval_case_id": "positive-verified-repo-proceed",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 1,
+      "skill": "agent-startup-context-gate",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/agent-startup-context-gate/evals/evals.json",
+          "sha256": "8b8a0ca8d34d1d5f4911002135d441b27cb02b2c869f70b18d1d5b5345356515"
+        },
+        "skill_md": {
+          "path": ".claude/skills/agent-startup-context-gate/SKILL.md",
+          "sha256": "a157d30d5b8eac48243906d2e46716e6bc37a0591e648b062a0430f7da3c35ee"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/agent-startup-context-gate/evals/trigger-evals.json",
+          "sha256": "f53241d8ba7e75eeb625f3eb2f375b1a2ce0edf3260c4d2fc76f4ab6a662dcad"
+        }
+      },
+      "trigger_discriminator_case_id": "task-start-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-02-human-approval-boundary",
+      "deterministic_check_count": 0,
+      "family": "Phase 1 - operating discipline",
+      "selected_eval_case_id": "positive-destructive-migration-halt",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 2,
+      "skill": "human-approval-boundary",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/human-approval-boundary/evals/evals.json",
+          "sha256": "748a01754e22ed768c0578e86ac403b222746f8d8c16642ae60acd0f25e49241"
+        },
+        "skill_md": {
+          "path": ".claude/skills/human-approval-boundary/SKILL.md",
+          "sha256": "4efcb7251333c9da12b1d1909c4a7e0d7c09de73220e230519cceadb6af648a8"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/human-approval-boundary/evals/trigger-evals.json",
+          "sha256": "217e80f122815bc11daf2f101be01fec90c2eb5782570b4c8ca3201b6f525b9f"
+        }
+      },
+      "trigger_discriminator_case_id": "imminent-risky-action-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-03-agent-failure-recovery",
+      "deterministic_check_count": 0,
+      "family": "Phase 1 - operating discipline",
+      "selected_eval_case_id": "positive-interrupted-rebase",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 3,
+      "skill": "agent-failure-recovery",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/agent-failure-recovery/evals/evals.json",
+          "sha256": "3c868177d852c8d711240941ff8dd29e8cc13245fea6ae0fb93585d5630c1749"
+        },
+        "skill_md": {
+          "path": ".claude/skills/agent-failure-recovery/SKILL.md",
+          "sha256": "50065813995a74596012450a684236ef9d83b50494679d0c6f9a6733b4c0dfc8"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/agent-failure-recovery/evals/trigger-evals.json",
+          "sha256": "73d05faa156de33b2885997318b578bd3734e11eeb745d17931e24ce529b9abf"
+        }
+      },
+      "trigger_discriminator_case_id": "agent-failure-recovery-positive-1"
+    },
+    {
+      "assertion_count": 5,
+      "case_id": "pilot-a-04-skill-usage-ledger",
+      "deterministic_check_count": 0,
+      "family": "Phase 1 - operating discipline",
+      "selected_eval_case_id": "positive-two-skill-record",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 4,
+      "skill": "skill-usage-ledger",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/skill-usage-ledger/evals/evals.json",
+          "sha256": "8b65eace80b552d0879d847db6ff1e68917adb3a665376ee8519b8c0d1124760"
+        },
+        "skill_md": {
+          "path": ".claude/skills/skill-usage-ledger/SKILL.md",
+          "sha256": "43d57d1037c2b48f3853649d4ddf9c6b082ac23cddf58f990412cdc9bf4f7b41"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/skill-usage-ledger/evals/trigger-evals.json",
+          "sha256": "26a7acd33f0eafa76e9588ec44bce8ded900663a40a8d5bced7e16577f82e820"
+        }
+      },
+      "trigger_discriminator_case_id": "which-skills-record-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-05-plan-audit-reviewer",
+      "deterministic_check_count": 0,
+      "family": "Phase 1.5 - AI-SDLC governance",
+      "selected_eval_case_id": "complete-plan-audit",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 5,
+      "skill": "plan-audit-reviewer",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/plan-audit-reviewer/evals/evals.json",
+          "sha256": "8f84588080b7cf91db9753379766ed47cc1515014223cfd47ebbf12612ef2f58"
+        },
+        "skill_md": {
+          "path": ".claude/skills/plan-audit-reviewer/SKILL.md",
+          "sha256": "e055fce01fc55371c331ce71af4b0721397d78ec1ba2ca2fe013899846b1af86"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/plan-audit-reviewer/evals/trigger-evals.json",
+          "sha256": "b4e527f85f6765cef911fc3df4194f2d5f60aee3bc4c4092e2a05f9e67501010"
+        }
+      },
+      "trigger_discriminator_case_id": "plan-verdict-request"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-06-agent-governance-audit",
+      "deterministic_check_count": 0,
+      "family": "Phase 1.5 - AI-SDLC governance",
+      "selected_eval_case_id": "positive-audit-merged-pr-end-to-end",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 6,
+      "skill": "agent-governance-audit",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/agent-governance-audit/evals/evals.json",
+          "sha256": "a6b302f8dd5c4b880eb6fa1533a1c61486c8f793ca0c4b00e7004da2ffa23cb1"
+        },
+        "skill_md": {
+          "path": ".claude/skills/agent-governance-audit/SKILL.md",
+          "sha256": "1e27920f52c61377d07be3d3a2ed8c13b9140fd1c82a94c1037c3b507da7d8ea"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/agent-governance-audit/evals/trigger-evals.json",
+          "sha256": "b742803e4fed7613b29e419b8b0b2bb7fdc9c63fd9dc2e3ab94627f6c1f70707"
+        }
+      },
+      "trigger_discriminator_case_id": "did-it-follow-process-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-07-code-reviewer",
+      "deterministic_check_count": 0,
+      "family": "Phase 2 - architecture & engineering",
+      "selected_eval_case_id": "positive-pr-review",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 7,
+      "skill": "code-reviewer",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/code-reviewer/evals/evals.json",
+          "sha256": "ffde244b8e998192fdb2f19acc5eaed3abd9bc3770e78674f26870ec8e1630e5"
+        },
+        "skill_md": {
+          "path": ".claude/skills/code-reviewer/SKILL.md",
+          "sha256": "6238b67b7b90fcbb26fcc45300562efa9e290a9d3870548e37bedaabbc76449a"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/code-reviewer/evals/trigger-evals.json",
+          "sha256": "f7c4420caa23b4f4f3ccc757080db16a3ff421b1bf4a0801f9f3e4feba23470d"
+        }
+      },
+      "trigger_discriminator_case_id": "diff-review-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-08-tdd-engineer",
+      "deterministic_check_count": 0,
+      "family": "Phase 2 - architecture & engineering",
+      "selected_eval_case_id": "positive-new-behavior-tdd",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 8,
+      "skill": "tdd-engineer",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/tdd-engineer/evals/evals.json",
+          "sha256": "6765744b884c1301e646953d846da216e3172d2714542f631ff4d5e63bd58a6b"
+        },
+        "skill_md": {
+          "path": ".claude/skills/tdd-engineer/SKILL.md",
+          "sha256": "d48c7907f480ab2b97dedb75b6473759a6c3ff9c1be02b4aa4d979d06a7e969e"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/tdd-engineer/evals/trigger-evals.json",
+          "sha256": "da145a1de5f0dbe353da0db0a27d785ddaff42cd042ec5500859e19eb8a9ec14"
+        }
+      },
+      "trigger_discriminator_case_id": "tests-first-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-09-systematic-debugger",
+      "deterministic_check_count": 0,
+      "family": "Phase 2 - architecture & engineering",
+      "selected_eval_case_id": "positive-regression-unknown-cause",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 9,
+      "skill": "systematic-debugger",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/systematic-debugger/evals/evals.json",
+          "sha256": "57d8c20bbb77c8aecc2deb30046727c05d73ecd017ba5746ed8e028dc746070d"
+        },
+        "skill_md": {
+          "path": ".claude/skills/systematic-debugger/SKILL.md",
+          "sha256": "cec373dbaf47d3d445cf90b558bcbae833013702842ff9ac9eb36b3cbb205ddf"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/systematic-debugger/evals/trigger-evals.json",
+          "sha256": "dce8f75d1610cac7852d7a827dbf8b1a435be0e80215949164444192c7f11500"
+        }
+      },
+      "trigger_discriminator_case_id": "unknown-cause-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-10-saas-platform-architect",
+      "deterministic_check_count": 0,
+      "family": "Phase 3 - SaaS & tenant isolation",
+      "selected_eval_case_id": "positive-single-tenant-conversion",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 10,
+      "skill": "saas-platform-architect",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/saas-platform-architect/evals/evals.json",
+          "sha256": "f22ae6c89ed61691976e0c541695b2b201cdccc2f7bc71ec6cff67f1a619c6be"
+        },
+        "skill_md": {
+          "path": ".claude/skills/saas-platform-architect/SKILL.md",
+          "sha256": "910e24c734ba7e0253436c7aa75eb7bcd814c659e9f1533425c09885b8ab8be7"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/saas-platform-architect/evals/trigger-evals.json",
+          "sha256": "69bf195f16034d5e08519019958be5e2ec55aca5afa7f69fed4b3e13e12b94bd"
+        }
+      },
+      "trigger_discriminator_case_id": "platform-structure-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-11-tenant-isolation-reviewer",
+      "deterministic_check_count": 0,
+      "family": "Phase 3 - SaaS & tenant isolation",
+      "selected_eval_case_id": "positive-pre-onboarding-audit",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 11,
+      "skill": "tenant-isolation-reviewer",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/tenant-isolation-reviewer/evals/evals.json",
+          "sha256": "9f3d1d62f7c3befd1b2a793148c40506245f6d633ab7efdc586b122bd9188a91"
+        },
+        "skill_md": {
+          "path": ".claude/skills/tenant-isolation-reviewer/SKILL.md",
+          "sha256": "9904d87360685e21a179b246c05b5e0c951c8cec72b5ff6dc707c08573692f13"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/tenant-isolation-reviewer/evals/trigger-evals.json",
+          "sha256": "63a6aeb32cfbeed622bed50949f4e09bed50f9d74efd051b96bdd943d9cecff7"
+        }
+      },
+      "trigger_discriminator_case_id": "review-wins-here"
+    },
+    {
+      "assertion_count": 6,
+      "case_id": "pilot-a-12-feature-flag-architect",
+      "deterministic_check_count": 0,
+      "family": "Phase 3 - SaaS & tenant isolation",
+      "selected_eval_case_id": "positive-multi-service-flag-system",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 12,
+      "skill": "feature-flag-architect",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/feature-flag-architect/evals/evals.json",
+          "sha256": "8ab75bb1ffe4d3f1311973e08c5a82537be8da79c99311df9f4a3cf60341833c"
+        },
+        "skill_md": {
+          "path": ".claude/skills/feature-flag-architect/SKILL.md",
+          "sha256": "2a096adff8239e675ece16cde87c8534ea1e96cd344f427ea2f7c82d1d86689a"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/feature-flag-architect/evals/trigger-evals.json",
+          "sha256": "b6909181945d2daa3d53af49b29c26d794ea19eed808fd82a25c130389a41337"
+        }
+      },
+      "trigger_discriminator_case_id": "flag-system-design-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-13-rls-policy-auditor",
+      "deterministic_check_count": 0,
+      "family": "Phase 4 - security, RLS & supply chain",
+      "selected_eval_case_id": "positive-audit-policies",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 13,
+      "skill": "rls-policy-auditor",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/rls-policy-auditor/evals/evals.json",
+          "sha256": "d7233d963c46212d60ee9b7731d730233b9bcf00aad0021f8ca33a7c34f437a5"
+        },
+        "skill_md": {
+          "path": ".claude/skills/rls-policy-auditor/SKILL.md",
+          "sha256": "8cf131fed74b9a12a2687a01c26024e0220a7b10c9c83f36c743c08216d8bac2"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/rls-policy-auditor/evals/trigger-evals.json",
+          "sha256": "e45435124bbb2e645ce67693955b6f650723fc8b00d3a243c7313f9937a23eb2"
+        }
+      },
+      "trigger_discriminator_case_id": "rls-audit-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-14-appsec-implementer",
+      "deterministic_check_count": 0,
+      "family": "Phase 4 - security, RLS & supply chain",
+      "selected_eval_case_id": "positive-parameterize-query",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 14,
+      "skill": "appsec-implementer",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/appsec-implementer/evals/evals.json",
+          "sha256": "71d2dd8a593371f6150a01bb7b683ccb8368c86d916ba8286912554085da2971"
+        },
+        "skill_md": {
+          "path": ".claude/skills/appsec-implementer/SKILL.md",
+          "sha256": "19ae5c576a452cc29613c15a83a5f1ac52f6d5a25c22fe955c10a1cd2ddd4297"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/appsec-implementer/evals/trigger-evals.json",
+          "sha256": "39dbe08d642204fd25d52a4c62b1704f54d30d9bb7bb050c91e206d0d760924e"
+        }
+      },
+      "trigger_discriminator_case_id": "build-decided-control-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-15-secrets-identity-hardener",
+      "deterministic_check_count": 0,
+      "family": "Phase 4 - security, RLS & supply chain",
+      "selected_eval_case_id": "positive-move-hardcoded-secrets",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 15,
+      "skill": "secrets-identity-hardener",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/secrets-identity-hardener/evals/evals.json",
+          "sha256": "d1954ed327a9f0e1ee12ef3db3b26490ad42c74ed1978f680a7b70bc482ecc5b"
+        },
+        "skill_md": {
+          "path": ".claude/skills/secrets-identity-hardener/SKILL.md",
+          "sha256": "a205ae643a74d86a4a0e35751980f455f0679d3027d2445412149f2597c0eed3"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/secrets-identity-hardener/evals/trigger-evals.json",
+          "sha256": "009dd24b27ae7353319f7b26b19f5be0b4ed06199a293daff643b684d31ba7ef"
+        }
+      },
+      "trigger_discriminator_case_id": "secrets-hardening-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-16-test-coverage-mapper",
+      "deterministic_check_count": 0,
+      "family": "Phase 5 - QA/E2E/evidence",
+      "selected_eval_case_id": "positive-what-is-untested",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 16,
+      "skill": "test-coverage-mapper",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/test-coverage-mapper/evals/evals.json",
+          "sha256": "30956c9a2fd42a6d79f1344a081753e5b1c1b9b98b69a825fd60d4e7bd938194"
+        },
+        "skill_md": {
+          "path": ".claude/skills/test-coverage-mapper/SKILL.md",
+          "sha256": "1b11e44913e0dd85e0de2ac3a5d4a830c5b6c1f96b99ac876cd4186222c5843f"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/test-coverage-mapper/evals/trigger-evals.json",
+          "sha256": "a0d6b75539032708cd5c95a348f1ba7220b3d55ab075127fd4d836052b7851c5"
+        }
+      },
+      "trigger_discriminator_case_id": "coverage-audit-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-17-playwright-e2e-engineer",
+      "deterministic_check_count": 0,
+      "family": "Phase 5 - QA/E2E/evidence",
+      "selected_eval_case_id": "positive-critical-journey",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 17,
+      "skill": "playwright-e2e-engineer",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/playwright-e2e-engineer/evals/evals.json",
+          "sha256": "c91f0e8cccaffcc8eee0a680c88c2c1db8c5dc450ad48e6443375ffd06b41ae7"
+        },
+        "skill_md": {
+          "path": ".claude/skills/playwright-e2e-engineer/SKILL.md",
+          "sha256": "73672430848b54354baa0e7a419c538e77dd916a4d6efc21eec0f46db6d997be"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/playwright-e2e-engineer/evals/trigger-evals.json",
+          "sha256": "f569c35082d5ac55c20252d19638c172944cb2e788c49a8f5f4fb491b944022e"
+        }
+      },
+      "trigger_discriminator_case_id": "scripted-journey-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-18-release-readiness-reviewer",
+      "deterministic_check_count": 0,
+      "family": "Phase 6 - cloud/DevOps/reliability",
+      "selected_eval_case_id": "positive-release-gate",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 18,
+      "skill": "release-readiness-reviewer",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/release-readiness-reviewer/evals/evals.json",
+          "sha256": "15e062eacbff52a3f99f495f9b1fcb6f797ca707d95ad3a34dca628831daa1e3"
+        },
+        "skill_md": {
+          "path": ".claude/skills/release-readiness-reviewer/SKILL.md",
+          "sha256": "9d1cd8091385e537f823c6b8d78be4b180f2599fc354129ec8f735389dd5d305"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/release-readiness-reviewer/evals/trigger-evals.json",
+          "sha256": "7633f53376b9c10c0a470dee814e13ccbe4de4f26ad4e5e0abf6c99f465478ee"
+        }
+      },
+      "trigger_discriminator_case_id": "ship-gate-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-19-rollback-runbook-author",
+      "deterministic_check_count": 0,
+      "family": "Phase 6 - cloud/DevOps/reliability",
+      "selected_eval_case_id": "positive-release-rollback-plan",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 19,
+      "skill": "rollback-runbook-author",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/rollback-runbook-author/evals/evals.json",
+          "sha256": "57dcdc3d3fa94263ed1e212e6dc476c230952e27ccca57a69416e9204f3c32d4"
+        },
+        "skill_md": {
+          "path": ".claude/skills/rollback-runbook-author/SKILL.md",
+          "sha256": "3f727f3cfc548633d76bcc4ad4e35f5c72f471f77b513c9d351cbc7df8641e9a"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/rollback-runbook-author/evals/trigger-evals.json",
+          "sha256": "6c58229218b10de5330a3b382e615b688aa7bf630f491cc1901048b96c2e1114"
+        }
+      },
+      "trigger_discriminator_case_id": "rollback-authoring-wins-here"
+    },
+    {
+      "assertion_count": 4,
+      "case_id": "pilot-a-20-prompt-injection-defender",
+      "deterministic_check_count": 0,
+      "family": "AI security (LLM06 / phase-7 family)",
+      "selected_eval_case_id": "positive-harden-agent",
+      "selected_eval_case_type": "should_trigger",
+      "selection_index": 20,
+      "skill": "prompt-injection-defender",
+      "sources": {
+        "evals": {
+          "path": ".claude/skills/prompt-injection-defender/evals/evals.json",
+          "sha256": "65abe589c8a96925d4b4e7f625b87660d31910f4caf6cb9c385a6ddd39eba543"
+        },
+        "skill_md": {
+          "path": ".claude/skills/prompt-injection-defender/SKILL.md",
+          "sha256": "6c1d86db455a2d18ae0b672aea1063d274d5473aee9eb8fe144fb83f692d1a0d"
+        },
+        "trigger_evals": {
+          "path": ".claude/skills/prompt-injection-defender/evals/trigger-evals.json",
+          "sha256": "edc190802e153152a6a0f5920ab7d310a31824023eb17ce31579e918c025cd40"
+        }
+      },
+      "trigger_discriminator_case_id": "injection-defense-wins-here"
+    }
+  ],
+  "dataset": {
+    "case_count": 20,
+    "digest": "a842403313a087753bdd35d8302a77ddc947e1498bff1ed5f632b4ce0681c596",
+    "digest_recipe": "sha256(canonical_json([{case_id, sha256(case.json bytes)}])) with sorted case ids",
+    "path": "tools/behavioral_eval_runner/live/pilot-a/cases"
+  },
+  "frozen_selection": {
+    "sha256": "414e887d20c58e3c6c54b71f9fc9ce8391e8b45a9f1e2f1579f3af7a4c2e5537",
+    "skill_count": 20,
+    "skills": [
+      "agent-startup-context-gate",
+      "human-approval-boundary",
+      "agent-failure-recovery",
+      "skill-usage-ledger",
+      "plan-audit-reviewer",
+      "agent-governance-audit",
+      "code-reviewer",
+      "tdd-engineer",
+      "systematic-debugger",
+      "saas-platform-architect",
+      "tenant-isolation-reviewer",
+      "feature-flag-architect",
+      "rls-policy-auditor",
+      "appsec-implementer",
+      "secrets-identity-hardener",
+      "test-coverage-mapper",
+      "playwright-e2e-engineer",
+      "release-readiness-reviewer",
+      "rollback-runbook-author",
+      "prompt-injection-defender"
+    ],
+    "source": "_A/work-package-3/PILOT-A-CASE-MANIFEST-DRAFT.md"
+  },
+  "generated_by": "tools/behavioral_eval_runner/live/pilot-a/derive_cases.py",
+  "owner_decision_ref": "OWNER-DECISION-2026-10-30T1050PDT.md sha256 4c04a56fdfda0771ee5da2af578f55c566aa8438590656db70e74388adcd1e0a",
+  "rules": {
+    "case_count": "one case per frozen skill (20)",
+    "case_id": "pilot-a-<NN>-<skill> in frozen selection order",
+    "deterministic_checks": "conservative literal rule; empty when no assertion states a machine-checkable literal (all 20 cases are judge-graded)",
+    "fail_criteria": "any pass criterion unmet; plus the frozen trigger near-miss",
+    "pass_criteria": "verbatim primary-case assertions, numbered E01..",
+    "prompt": "verbatim primary should_trigger behaviour case prompt",
+    "skill_instructions": "provenance header + verbatim SKILL.md body"
+  },
+  "schema": "ber-pilot-a-derivation/1.0.0",
+  "totals": {
+    "assertions_in_selected_cases": 82,
+    "case_count": 20,
+    "deterministic_checks": 0
+  }
+}
