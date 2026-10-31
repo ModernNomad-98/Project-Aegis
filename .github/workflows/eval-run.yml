@@ -1645,6 +1645,11 @@ jobs:
           from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
               smoke_spend_total,
           )
+          from tools.behavioral_eval_runner.live.reservations import (  # noqa: E402
+              cancel as cancel_reservation,
+              reserve as reserve_spend,
+              true_up as true_up_spend,
+          )
           from tools.behavioral_eval_runner.live.dataset import (  # noqa: E402
               dataset_digest,
               load_cases,
@@ -2110,6 +2115,18 @@ jobs:
                   enforce_ceiling()
                   break
 
+              reservation_state_path = RUNNER_TEMP / "ber-reservation-state" / "allowance-state.json"
+              reserve_amount = max(0, CEILING - total_spent())
+              reserve_spend(
+                  reservation_state_path,
+                  allowance_id="pilot-a-recovery-20261031",
+                  workflow_run_id=plan.get("run_id"),
+                  identity=run_id,
+                  amount_cents=reserve_amount,
+                  ledger_spend_cents=total_spent() - smoke_spent(),
+                  smoke_spend_cents=smoke_spent(),
+                  ceiling_cents=CEILING,
+              )
               try:
                   completed = run_cli(
                       [
@@ -2125,6 +2142,10 @@ jobs:
                       timeout=PER_CASE_TIMEOUT_SECONDS,
                   )
               except subprocess.TimeoutExpired:
+                  try:
+                      cancel_reservation(reservation_state_path)
+                  except ValueError:
+                      pass
                   failures.append(
                       f"{case_id}: the per-case invocation exceeded "
                       f"{PER_CASE_TIMEOUT_SECONDS}s and was killed"
@@ -2139,6 +2160,11 @@ jobs:
                   write_state()
                   enforce_ceiling()
                   break
+              try:
+                  settled = ledger_spent(ledger_path)
+                  true_up_spend(reservation_state_path, spent_cents=settled if settled is not None else 0)
+              except ValueError:
+                  cancel_reservation(reservation_state_path)
               result_path = CASES_DIR / (case_id + ".json")
 
 
