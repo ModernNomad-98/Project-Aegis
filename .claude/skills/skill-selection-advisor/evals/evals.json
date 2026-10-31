@@ -129,6 +129,34 @@
           "Does not claim the named skill was invoked and does not treat a recommendation as permission."
         ]
       }
+    },
+    {
+      "id": "edge-more-than-five-controls-mandatory-separated",
+      "type": "should_trigger",
+      "prompt": "We're preparing a multi-tenant release. Six controls seem relevant: RLS policy review, tenant-isolation testing, classification/approval depth, accessibility evidence, a clickthrough pass, and release readiness. Which Aegis skills should we use, and in what order?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps the optional recommendation shortlist at most five, ordered as a working sequence.",
+          "Lists every applicable mandatory obligation separately from the shortlist and never places a mandatory control under 'Not recommended' or caps it away.",
+          "For each mandatory obligation, names its governing source (e.g. change-classification-gate output or a consumer policy/decision record), the stage, the owning method where established, the evidence required, and the owner disposition when unmet.",
+          "Does not re-classify the change or waive a required control; the selector consumes existing classification/policy output."
+        ]
+      }
+    },
+    {
+      "id": "edge-consumer-availability-classes-no-install",
+      "type": "should_trigger",
+      "prompt": "We copied only some Aegis skills into our product repo. Is accessibility-test-harness available here, and what do we need for launch accessibility evidence?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies accessibility-test-harness as source-shipped using the manifest entry with its path, sha256 and the manifest source_revision, and does not treat the source manifest as proof it is installed in the user's tree.",
+          "Reports consumer-local resolution separately (not found/unknown) and keeps the mandatory accessibility obligation INCOMPLETE with an owner disposition instead of claiming a PASS.",
+          "Does not install, sync, re-pin or override the consumer's copies; states that consumer-owned pinned copies and a deliberate authorised resync are the consumer's decision.",
+          "Does not fabricate an accessibility PASS and does not count external/advisory-only guidance as an installed Aegis control or a required gate."
+        ]
+      }
     }
   ]
 }

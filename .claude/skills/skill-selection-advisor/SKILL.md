@@ -69,14 +69,18 @@ backlog — never an installed capability.
    matches. In a consumer installation, users may have copied only selected
    skill directories: verify a candidate's directory exists where the user
    actually works, and say plainly when the source manifest and the local
-   copy disagree (the inventory is then a partial one).
+   copy disagree (the inventory is then a partial one). Consumer copies are
+   consumer-owned and pinned: never install, sync, re-pin or override them; a
+   deliberate, authorised resync is the consumer's decision, and this skill only
+   reports the divergence.
 4. [`docs/skills/coverage-map.json`](../../../docs/skills/coverage-map.json) —
    **optional but authoritative reference status** for the 300 historical
    roadmap candidates: status, `evidence_grade`, `covering_skills`, GAP
    rationale and its `basis.repo_commit` provenance snapshot. GAP rows are
    optional backlog candidates, not installed capabilities; only the shipped
-   manifest proves what is installed at its recorded revision. If the file is unreadable or stale, record that limitation
-   rather than guessing.
+   manifest proves what the library **ships** at its recorded revision — it is
+   not proof of a consumer installation. If the file is unreadable or stale,
+   record that limitation rather than guessing.
 5. **Each candidate skill's `SKILL.md` frontmatter and `## Use When`** —
    description, the situations, the counter-examples, and
    `disable-model-invocation: true` (manual-only posture). A named skill
@@ -88,6 +92,28 @@ backlog — never an installed capability.
    `source_revision` from the manifest and `basis.repo_commit` from the
    coverage map when read. Quote the artifact and value; never report a
    remembered revision.
+
+## Candidate availability classes (resolve per candidate, read-only)
+
+A candidate's availability is a separate claim from shipping. Resolve and report
+one class per candidate:
+
+- **source-shipped** — the name is in `tools/skills-manifest.json`; quote that
+  entry's `path`, `sha256` and the manifest's `source_revision`.
+- **consumer-local-resolved** — the candidate's `SKILL.md` exists in the tree
+  where the user actually works. Record its local path and a sha256 comparison
+  with the source manifest as `match | mismatch | source-revision-unknown`. A
+  source-manifest entry alone never proves this class.
+- **external-advisory-only** — the capability exists only as host/third-party
+  guidance or service. Mention it **as advisory only**, name the source and its
+  limits, and never count it as an installed Aegis control, a required gate or a
+  PASS.
+- **unavailable** — no evidence of the above. For a mandatory capability, record
+  the obligation as `INCOMPLETE` with the owner disposition and the consumer's
+  own fail-closed route (name the step/owning skill; exact allow-list copy
+  command per the consumer package; a recorded consumer decision before use; no
+  substitution and no `n/a` to pass a gate). Never install, sync, re-pin or
+  override a consumer copy as this skill's action.
 
 ## Workflow
 
@@ -108,7 +134,10 @@ backlog — never an installed capability.
    unverified rather than assuming the artifacts describe one tree. If a
    constraint that would change the shortlist is missing (a hard technology
    limit or a non-negotiable scope boundary), ask ONE focused question before
-   ranking instead of guessing; skip the question when a default is safe.
+   ranking instead of guessing; skip the question when a default is safe. After
+   loading the inputs, resolve each serious candidate's availability in the tree
+   where the user works (see Candidate availability classes): the source
+   manifest alone never proves a consumer installation.
 3. **Build the candidate set from the manifest only.** Take every candidate
    name from `tools/skills-manifest.json`. Exclude anything not in the
    manifest — a catalog mention, a roadmap candidate, a GAP, or a name that
@@ -127,11 +156,23 @@ backlog — never an installed capability.
    next step?); and whether it is already the canonical owner rather than an
    overlapping neighbor. Prefer the canonical owner; drop near-duplicates
    rather than listing both.
-6. **Cap at five and order the set.** A shortlist is at most **5** skills.
-   If more than five genuinely fit, keep the five that carry the goal and
-   name the rest under **Not recommended** with the reason. Order the picks as
-   a working sequence and make each handoff explicit ("A leaves X; B consumes
-   X"). Do not present a set when one skill is the honest answer.
+6. **Separate mandatory obligations from the optional shortlist.** Classify the
+   answer into TWO populations before emitting it:
+   - **Mandatory obligations** — every control/step that is required for this
+     goal by an existing governing artifact (the `change-classification-gate`
+     output, a consumer policy/decision record, a stage-gate row, an acceptance
+     gate). This list is **uncapped**, not ranked as optional, and **never**
+     placed under "Not recommended". For each, record: the obligation, its
+     governing source, the stage, the owning method where one is established,
+     the evidence required, and the owner disposition while unmet
+     (`INCOMPLETE`; never `n/a` to pass a gate). Consume existing
+     classification/policy output — do not re-classify and do not waive.
+   - **Optional recommendation shortlist** — at most **5** skills, ordered as a
+     working sequence, each with a role and the handoff it makes/receives. If
+     more than five genuinely fit, keep the five that carry the goal and name
+     the optional near-misses under **Not recommended** with the reason.
+   A cap on the optional shortlist is never a waiver of a mandatory obligation.
+   Do not present a set when one skill is the honest answer.
 7. **Record the coverage answer.** State what the installed library does and
    does not cover for this goal. A GAP is an optional backlog candidate
    (if the coverage map is readable), never a planned or installed skill. If
@@ -153,8 +194,17 @@ Shortlist (<=5):
      <its place and the handoff it makes/receives>; posture: auto |
      MANUAL-ONLY — human must invoke
   2. ...
-Not recommended: <near-miss skills and the one-line reason each was not picked,
-  or "none">
+Mandatory obligations (never capped, never "Not recommended"):
+  - <obligation/control> — source: <governing artifact/classification/policy>;
+    stage: <stage>; owner method: <skill | not established>; evidence:
+    <required>; disposition: <met | INCOMPLETE — owner decision needed>
+Availability per candidate:
+  <skill> — source-shipped | consumer-local-resolved | external-advisory-only |
+    unavailable — contract <path> @ <sha256> (manifest source_revision=<rev>);
+    local <path | not found> hash <match | mismatch | unknown>; limit:
+    <consumer-pinned-copy / manual-only / advisory limits>
+Not recommended: <optional near-miss skills and the one-line reason each was not
+  picked, or "none">
 Gaps: <installed-library gaps for this goal; coverage-map GAP rows are optional
   backlog only — not installed> | none | unknown (coverage map not read)
 Unknowns: <unreadable/stale inputs, missing constraints, assumptions refused>
@@ -168,7 +218,11 @@ Keep the whole block scannable: one short line per skill, no code, no
 numbered workflow restatement. If the answer is "one skill", output a
 one-entry shortlist and say why the rest were not needed; if the answer is
 "no fit", an empty shortlist with Gaps and Not recommended is the correct
-output.
+output. "Not recommended" holds only optional near-misses — a mandatory
+obligation never appears there. If the user has no consumer installation of a
+required capability, say so explicitly and keep the obligation INCOMPLETE with
+the owner disposition; never present an external/advisory substitute as an
+installed control or a PASS.
 
 ## Validation Checklist
 
@@ -188,6 +242,19 @@ output.
 - [ ] The output states that no recommended skill was invoked and nothing was written or executed.
 - [ ] The selected skills' own contracts were read (description + Use When),
       not just their names.
+- [ ] Every applicable mandatory obligation is listed separately from the <=5
+      optional shortlist; none is capped, ranked as optional, or placed under
+      "Not recommended".
+- [ ] Each mandatory obligation names its governing source (classification/
+      policy/gate record), stage, owning method where established, required
+      evidence and owner disposition; this advisor did not re-classify.
+- [ ] Every candidate carries an availability class, with contract path/sha256/
+      manifest source_revision where source-shipped; consumer-local resolution is
+      reported separately from the source manifest.
+- [ ] No consumer copy is installed, synced, re-pinned or overridden (and none is
+      recommended as this skill's action); consumer-pinned-copy limits are
+      stated; an unavailable mandatory capability stays INCOMPLETE with no
+      fabricated a11y/external-advisory PASS.
 
 ## Gotchas
 
@@ -201,14 +268,25 @@ output.
 - **Catalog lookup is not selection.** "List the shipped meta skills and where
   each is documented" is answered by the catalog document; ranking a set is
   the different job this skill owns.
-- **The manifest is the installed set.** A catalog row or a roadmap row can
-  exist while the skill is not shipped. Never promote a GAP because it is the
-  only thing that fits.
+- **The manifest is the shipped set, not the installed set.** A catalog row or
+  a roadmap row can exist while the skill is not shipped; a manifest entry never
+  proves a consumer installed that directory. Report source-shipped and
+  consumer-local-resolved separately with the contract identity, and never
+  install, sync, re-pin or override a consumer copy.
+- **Availability classes are not decoration.** Source-shipped,
+  consumer-local-resolved, external/advisory-only and unavailable are different
+  claims; external/advisory guidance is never an installed Aegis control, a
+  required gate or a PASS.
 - **Manual-only is a boundary, not a note.** Recommending a manual-only skill
   without the human-invokes label is the failure this skill exists to
   prevent.
-- **Five is a hard cap.** A longer list stops being a shortlist; move the
-  tail to Not recommended with reasons.
+- **Five caps the optional shortlist, not the obligations.** More than five
+  genuinely optional picks -> keep five and move the optional tail to Not
+  recommended. Mandatory obligations are never capped and never moved there; a
+  cap is not a waiver.
+- **More than five mandatory controls is a normal answer.** Do not keep the
+  answer short by dropping a required control; the mandatory-obligations block
+  grows while the optional shortlist stays at most five.
 - **Stale inputs are the quiet failure.** A manifest or coverage map from a
   different revision yields a confident, wrong answer. Quote the revision you
   actually read, and state when one is missing.
@@ -236,6 +314,14 @@ output.
   → refuse; it stays in Gaps with its status.
 - Asked to **auto-invoke or recommend as automatic** a manual-only skill →
   refuse; label it `MANUAL-ONLY — human must invoke` only.
+- Asked to **hide, drop, downgrade or "keep it short" by omitting a mandatory
+  obligation** → refuse; required controls are never shortlist padding and stay
+  in the mandatory-obligations block with their owner and evidence.
+- Asked to **install, sync, re-pin or override a consumer copy**, or to present an
+  unavailable capability / external-advisory-only guidance as installed → refuse;
+  state the consumer-owned pinned-copy and deliberate authorised resync limit,
+  keep an unavailable mandatory capability INCOMPLETE with the owner disposition,
+  and fabricate no PASS.
 - An input needed for a trustworthy answer (manifest, catalog, candidate
   `SKILL.md`) is missing, unreadable or inconsistent → state the unknown and
   stop short of a definitive shortlist; do not fill the gap from memory.
@@ -258,6 +344,7 @@ output.
 - [`docs/skills-catalog.md`](../../../docs/skills-catalog.md) — the catalog this
   answer cites and the source of family placement.
 - [`tools/skills-manifest.json`](../../../tools/skills-manifest.json) — the
-  installed-set proof and source revision.
+  source-shipped set proof (path, sha256, source_revision); never proof of a
+  consumer installation.
 - [`docs/skills/coverage-map.json`](../../../docs/skills/coverage-map.json) —
   optional reference status and GAP evidence.
