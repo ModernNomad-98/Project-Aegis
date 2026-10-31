@@ -49,23 +49,24 @@ class ModelPin:
 
 
 #: The two subject pins. These strings are the ONLY accepted identifiers; a
-#: served model string that differs halts the run. The price table is a
-#: configuration input, not an observed bill.
+#: served model string that differs halts the run. The price table is the
+#: documented standard list for the exact models (owner-approved 2026-10-31
+#: pricing repair): a conservative reservation basis, not an observed bill.
 SUBJECT_PINS: Mapping[str, ModelPin] = {
     "anthropic": ModelPin(
-        "anthropic", "claude-sonnet-5-5", "ANTHROPIC_API_KEY", 300, 1500
+        "anthropic", "claude-sonnet-5-5", "ANTHROPIC_API_KEY", 200, 1000
     ),
-    "openai": ModelPin("openai", "gpt-6-astra", "OPENAI_API_KEY", 250, 1000),
+    "openai": ModelPin("openai", "gpt-6-astra", "OPENAI_API_KEY", 1000, 5000),
 }
 
 #: Cross-vendor judge routes, keyed by the SUBJECT (vendor, model). The judge
 #: vendor must differ from the subject vendor for every route.
 JUDGE_PINS: Mapping[tuple[str, str], ModelPin] = {
     ("anthropic", "claude-sonnet-5-5"): ModelPin(
-        "openai", "gpt-6-astra", "OPENAI_API_KEY", 250, 1000
+        "openai", "gpt-6-astra", "OPENAI_API_KEY", 1000, 5000
     ),
     ("openai", "gpt-6-astra"): ModelPin(
-        "anthropic", "claude-sonnet-5-5", "ANTHROPIC_API_KEY", 300, 1500
+        "anthropic", "claude-sonnet-5-5", "ANTHROPIC_API_KEY", 200, 1000
     ),
 }
 
@@ -182,6 +183,32 @@ def extract_usage(usage: Any, *, vendor: str) -> "ProviderUsage":
     return ProviderUsage(input_tokens, output_tokens)
 
 
+def _envelope_evidence(
+    response: Any,
+    *,
+    vendor: str,
+    text: Any = None,
+    stop_reason: Any = None,
+) -> dict[str, Any]:
+    """Repository-safe evidence available on a provider response envelope.
+
+    This is populated even when the usage telemetry cannot be parsed: the
+    termination evidence (response id, served model, raw stop/status string and
+    response length) must not disappear together with the usage failure. It
+    never includes the raw response text.
+    """
+    evidence: dict[str, Any] = {
+        "vendor": vendor,
+        "response_id": str(getattr(response, "id", "")),
+        "served_model": str(getattr(response, "model", "")),
+    }
+    if stop_reason is not None:
+        evidence["stop_reason"] = str(stop_reason)
+    if isinstance(text, str):
+        evidence["response_chars"] = len(text)
+    return evidence
+
+
 def ensure_complete_response(stop_reason: str, *, vendor: str) -> None:
     """Only an allowlisted complete status is graded; all else fails closed."""
     from .transport import COMPLETE_STOP_REASONS
@@ -240,16 +267,40 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
                 if getattr(block, "type", "") == "text"
             )
             stop_reason = str(getattr(response, "stop_reason", "UNKNOWN"))
-            ensure_complete_response(stop_reason, vendor=request.vendor)
-            return ProviderResponse(
+            try:
+                usage = extract_usage(
+                    getattr(response, "usage", None), vendor=request.vendor
+                )
+            except ProviderTransportError as exc:
+                # Usage that cannot be parsed keeps the call conservatively
+                # charged, but the termination evidence must survive the failure:
+                # the raised context still says what the provider returned.
+                raise ProviderTransportError(
+                    str(exc),
+                    context={
+                        **exc.context,
+                        **_envelope_evidence(
+                            response,
+                            vendor=request.vendor,
+                            text=text,
+                            stop_reason=stop_reason,
+                        ),
+                    },
+                ) from None
+            # Build the envelope (including the provider usage telemetry) BEFORE
+            # validating it: an incomplete or empty response must fail closed and
+            # never be graded, but the usage the provider reported on the same
+            # envelope belongs in the ledger, so the call can be accounted at its
+            # actual cost instead of losing the telemetry with the failure.
+            converted = ProviderResponse(
                 response_id=str(getattr(response, "id", "")),
                 served_model=str(getattr(response, "model", "")),
                 text=text,
-                usage=extract_usage(
-                    getattr(response, "usage", None), vendor=request.vendor
-                ),
+                usage=usage,
                 stop_reason=stop_reason,
             )
+            converted.validate(require_model=False)
+            return converted
         except ProviderTransportError:
             raise
         except Exception as exc:  # noqa: BLE001 - conversion must fail closed
@@ -286,17 +337,39 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
                 context={"vendor": request.vendor, "request_id": request.request_id},
             ) from exc
         try:
+            text = str(getattr(response, "output_text", ""))
             stop_reason = str(getattr(response, "status", "UNKNOWN"))
-            ensure_complete_response(stop_reason, vendor=request.vendor)
-            return ProviderResponse(
+            try:
+                usage = extract_usage(
+                    getattr(response, "usage", None), vendor=request.vendor
+                )
+            except ProviderTransportError as exc:
+                # Conservatively charged (no usable usage) but the termination
+                # evidence is preserved in the raised context.
+                raise ProviderTransportError(
+                    str(exc),
+                    context={
+                        **exc.context,
+                        **_envelope_evidence(
+                            response,
+                            vendor=request.vendor,
+                            text=text,
+                            stop_reason=stop_reason,
+                        ),
+                    },
+                ) from None
+            # Build the envelope (including usage) BEFORE validating it: a
+            # response that is not clearly complete is never graded, but its
+            # provider-reported usage must still be captured for accounting.
+            converted = ProviderResponse(
                 response_id=str(getattr(response, "id", "")),
                 served_model=str(getattr(response, "model", "")),
-                text=str(getattr(response, "output_text", "")),
-                usage=extract_usage(
-                    getattr(response, "usage", None), vendor=request.vendor
-                ),
+                text=text,
+                usage=usage,
                 stop_reason=stop_reason,
             )
+            converted.validate(require_model=False)
+            return converted
         except ProviderTransportError:
             raise
         except Exception as exc:  # noqa: BLE001 - conversion must fail closed

@@ -21,14 +21,14 @@
 # this workflow exists at the SAME exact head SHA.
 #
 # Cost containment (layered, fail-closed):
-#   1. the committed smoke config template sets spend_ceiling_cents 50; this
+#   1. the committed smoke config template sets spend_ceiling_cents 200; this
 #      workflow rebuilds it with min(template, gate ceiling, provider cap,
-#      50-cent ($0.50 = 50 integer cents) smoke cap, and REFUSES a template
-#      above 50 cents rather than clamping it) and validates it with the package
+#      200-cent ($2.00 = 200 integer cents) smoke cap, and REFUSES a template
+#      above 200 cents rather than clamping it) and validates it with the package
 #      validator;
-#   2. the package meter clamps the smoke ceiling to min(effective, 50) and
+#   2. the package meter clamps the smoke ceiling to min(effective, 200) and
 #      refuses the next reservation that would cross the ceiling;
-#   3. the verify step fails closed unless spent_cents <= ceiling_cents <= 50
+#   3. the verify step fails closed unless spent_cents <= ceiling_cents <= 200
 #      and the ledger shows exactly two reconciled calls.
 #
 # Fail-closed surface: no artifact is published unless the smoke COMPLETED with
@@ -212,10 +212,10 @@ jobs:
           if type(template_ceiling) is not int or template_ceiling <= 0:
               fail("the smoke config has no positive integer spend ceiling")
           if template_ceiling > SMOKE_CEILING_CENTS:
-              # The cap is 50 integer cents ($0.50), not a clamp target: a
+              # The cap is 200 integer cents ($2.00), not a clamp target: a
               # 51-cent template is refused before any plan or call exists.
               fail(
-                  "the smoke config spend ceiling is above the 50-cent ($0.50) "
+                  "the smoke config spend ceiling is above the 200-cent ($2.00) "
                   f"hard cap: {template_ceiling} cents"
               )
           effective_ceiling = min(
@@ -234,7 +234,7 @@ jobs:
           if config.spend_ceiling_cents != effective_ceiling:
               fail("the built smoke ceiling is not the effective smoke ceiling")
           if config.spend_ceiling_cents > SMOKE_CEILING_CENTS:
-              fail("the built smoke ceiling exceeds the 50-cent ($0.50) smoke cap")
+              fail("the built smoke ceiling exceeds the 200-cent ($2.00) smoke cap")
           if config.max_output_tokens < MIN_LIVE_MAX_OUTPUT_TOKENS:
               fail("the built smoke output budget is below the live floor")
           if config.runs_per_case != 1:
@@ -502,7 +502,7 @@ jobs:
           require(type(spent) is int and spent >= 0, "spent_cents is not a non-negative int")
           require(
               type(ceiling) is int and 0 < ceiling <= SMOKE_CEILING_CENTS,
-              "ceiling_cents is outside the 50-cent ($0.50) smoke cap",
+              "ceiling_cents is outside the 200-cent ($2.00) smoke cap",
           )
           require(type(spent) is int and type(ceiling) is int and spent <= ceiling, "spent exceeds the smoke ceiling")
           require(ceiling == plan["spend_ceiling_cents"], "the smoke ceiling is not the built smoke ceiling")

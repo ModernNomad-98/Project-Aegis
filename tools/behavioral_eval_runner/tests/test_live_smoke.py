@@ -2,14 +2,14 @@
 
 This file is the author-lane proof for the 2026-10-30 Pilot A fix:
 
-* the committed live config template is the justified 4096-token setting and
-  the committed smoke config is single-case shaped with a 50-cent ceiling;
+* the committed live config template is the justified 16,384-token setting and
+  the committed smoke config is single-case shaped with a 200-cent ceiling;
 * the build-only dry-run template (512 tokens) is refused when fed into the
   LIVE path by path/name and, as a renamed staged copy, by the output floor;
 * the one-case dry run dispatches exactly two mock calls (one subject, one
   judge) and records the JUDGE terminal finish reason in the run evidence;
-* the smoke ceiling is 50 integer cents ($0.50) even when a larger gate ceiling
-  is involved, a config above 50 is refused, and a smoke-shaped violation is
+* the smoke ceiling is 200 integer cents ($2.00) even when a larger gate ceiling
+  is involved, a config above 200 is refused, and a smoke-shaped violation is
   refused before dispatch.
 
 No test performs a network call. The dry-run path uses the mock transport;
@@ -54,8 +54,8 @@ class CommittedTemplateTests(unittest.TestCase):
     def test_live_template_is_the_justified_live_setting(self):
         template = _load_json(helpers.LIVE_CONFIG)
         config = LiveConfig.from_dict(template)
-        self.assertEqual(config.max_output_tokens, 4096)
-        self.assertEqual(config.max_output_tokens, MIN_LIVE_MAX_OUTPUT_TOKENS)
+        self.assertEqual(config.max_output_tokens, 16384)
+        self.assertEqual(config.max_output_tokens, 16384)
         self.assertGreater(config.max_output_tokens, DEFAULT_MAX_OUTPUT_TOKENS)
         self.assertEqual(config.spend_ceiling_cents, OWNER_PROVIDER_CAP_CENTS)
         self.assertEqual(config.runs_per_case, 3)
@@ -77,8 +77,8 @@ class CommittedTemplateTests(unittest.TestCase):
     def test_smoke_template_is_single_case_shaped_and_hard_capped(self):
         template = _load_json(helpers.SMOKE_CONFIG)
         config = LiveConfig.from_dict(template)
-        self.assertEqual(config.max_output_tokens, MIN_LIVE_MAX_OUTPUT_TOKENS)
-        self.assertEqual(config.spend_ceiling_cents, 50)
+        self.assertEqual(config.max_output_tokens, 16384)
+        self.assertEqual(config.spend_ceiling_cents, 200)
         self.assertLessEqual(config.spend_ceiling_cents, SMOKE_CEILING_CENTS)
         self.assertEqual(config.runs_per_case, 1)
         self.assertEqual(list(config.subject_vendors), ["anthropic"])
@@ -199,11 +199,11 @@ class LiveSettingGuardTests(unittest.TestCase):
             report = preflight(paths, environ={})
             self.assertNotEqual(report["status"], "REFUSED", report.get("blockers"))
             settings = report["live_settings"]
-            self.assertEqual(settings["max_output_tokens"], MIN_LIVE_MAX_OUTPUT_TOKENS)
+            self.assertEqual(settings["max_output_tokens"], 16384)
             self.assertEqual(
                 settings["max_output_tokens_floor"], MIN_LIVE_MAX_OUTPUT_TOKENS
             )
-            self.assertEqual(settings["spend_ceiling_cents"], 50)
+            self.assertEqual(settings["spend_ceiling_cents"], 200)
             self.assertFalse(settings["config_source_is_build_only_dry_run_template"])
             self.assertEqual(settings["subject_vendors"], ["anthropic"])
 
@@ -246,10 +246,10 @@ class OneCaseDryRunTests(unittest.TestCase):
             self.assertEqual(report["smoke"]["judge_finish_reasons"], ["end_turn"])
             self.assertTrue(report["live"]["unrun_is_never_pass"])
 
-    def test_smoke_ceiling_is_fifty_cents_even_with_a_larger_gate(self):
-        # Positive case: the committed smoke config is exactly 50 cents, and a
-        # $150 gate cannot raise it. The unit is INTEGER CENTS: 50 = $0.50.
-        self.assertEqual(SMOKE_CEILING_CENTS, 50)
+    def test_smoke_ceiling_is_two_hundred_cents_even_with_a_larger_gate(self):
+        # Positive case: the committed smoke config is exactly 200 cents, and a
+        # $150 gate cannot raise it. The unit is INTEGER CENTS: 200 = $2.00.
+        self.assertEqual(SMOKE_CEILING_CENTS, 200)
         with tempfile.TemporaryDirectory() as tmp:
             paths = _custom_paths(
                 tmp,
@@ -257,12 +257,12 @@ class OneCaseDryRunTests(unittest.TestCase):
                 gate=helpers.gate_payload(ceiling=15000, provider_cap=12000),
             )
             result = dry_run(paths, smoke=True)
-            self.assertEqual(result["smoke"]["ceiling_cents"], 50)
-            self.assertEqual(result["ceiling_cents"], 50)
-            self.assertEqual(result["cost_ledger"]["ceiling_cents"], 50)
-            self.assertLessEqual(result["smoke"]["spent_cents"], 50)
+            self.assertEqual(result["smoke"]["ceiling_cents"], 200)
+            self.assertEqual(result["ceiling_cents"], 200)
+            self.assertEqual(result["cost_ledger"]["ceiling_cents"], 200)
+            self.assertLessEqual(result["smoke"]["spent_cents"], 200)
 
-    def test_smoke_config_at_exactly_fifty_cents_is_accepted(self):
+    def test_smoke_config_at_exactly_two_hundred_cents_is_accepted(self):
         config = helpers.config_payload(
             ceiling=SMOKE_CEILING_CENTS, runs=1, max_out=MIN_LIVE_MAX_OUTPUT_TOKENS
         )
@@ -273,13 +273,13 @@ class OneCaseDryRunTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             paths = _custom_paths(tmp, config=config, gate=helpers.gate_payload())
             result = dry_run(paths, smoke=True)
-            self.assertEqual(result["smoke"]["ceiling_cents"], 50)
-            self.assertLessEqual(result["smoke"]["spent_cents"], 50)
+            self.assertEqual(result["smoke"]["ceiling_cents"], 200)
+            self.assertLessEqual(result["smoke"]["spent_cents"], 200)
 
-    def test_smoke_config_above_fifty_cents_is_refused_before_dispatch(self):
-        # Negative case: 51 cents is REFUSED, not silently clamped to 50.
+    def test_smoke_config_above_two_hundred_cents_is_refused_before_dispatch(self):
+        # Negative case: 201 cents is REFUSED, not silently clamped to 200.
         config = helpers.config_payload(
-            ceiling=51, runs=1, max_out=MIN_LIVE_MAX_OUTPUT_TOKENS
+            ceiling=201, runs=1, max_out=MIN_LIVE_MAX_OUTPUT_TOKENS
         )
         config["subject_vendors"] = ["anthropic"]
         config["judge_allowlist"] = {
@@ -293,14 +293,14 @@ class OneCaseDryRunTests(unittest.TestCase):
             self.assertEqual(
                 caught.exception.context["required_calls"], 2
             )
-            self.assertIn("50", str(caught.exception))
+            self.assertIn("200", str(caught.exception))
             self.assertFalse(os.path.exists(paths.cost_ledger_path))
 
     def test_smoke_refuses_a_multi_run_config_before_dispatch(self):
         with tempfile.TemporaryDirectory() as tmp:
             paths = _custom_paths(
                 tmp,
-                config=helpers.config_payload(ceiling=50, runs=3),
+                config=helpers.config_payload(ceiling=200, runs=3),
                 gate=helpers.gate_payload(),
             )
             with self.assertRaises(LiveConfigRefusedError) as caught:
@@ -312,7 +312,7 @@ class OneCaseDryRunTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             paths = _custom_paths(
                 tmp,
-                config=helpers.config_payload(ceiling=50, runs=1),
+                config=helpers.config_payload(ceiling=200, runs=1),
                 gate=helpers.gate_payload(),
             )
             with self.assertRaises(LiveConfigRefusedError) as caught:
@@ -343,11 +343,11 @@ class OneCaseDryRunTests(unittest.TestCase):
             self.assertEqual(result["status"], "COMPLETED")
             self.assertEqual(result["planned_calls"], 2)
             self.assertEqual(result["dispatched_calls"], 2)
-            self.assertEqual(result["ceiling_cents"], 50)
+            self.assertEqual(result["ceiling_cents"], 200)
             self.assertEqual(result["smoke"]["subject_calls"], 1)
             self.assertEqual(result["smoke"]["judge_calls"], 1)
             self.assertEqual(result["smoke"]["judge_finish_reasons"], ["end_turn"])
-            self.assertLessEqual(result["smoke"]["spent_cents"], 50)
+            self.assertLessEqual(result["smoke"]["spent_cents"], 200)
             self.assertTrue(result["evidence"]["verified"])
             self.assertEqual(result["transport_class"], "INJECTED")
             record = result["results"][0]

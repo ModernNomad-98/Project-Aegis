@@ -890,7 +890,7 @@ jobs:
           require(type(spent) is int and spent >= 0, "proof spend is not a non-negative int")
           require(
               type(ceiling) is int and 0 < ceiling <= SMOKE_CEILING_CENTS,
-              "proof ceiling is outside the 50-cent ($0.50) smoke cap",
+              "proof ceiling is outside the 200-cent ($2.00) smoke cap",
           )
           require(type(spent) is int and type(ceiling) is int and spent <= ceiling, "proof spend exceeds its ceiling")
           require(proof.get("max_output_tokens") == plan.get("max_output_tokens"), "proof output budget is not this dispatch config")
