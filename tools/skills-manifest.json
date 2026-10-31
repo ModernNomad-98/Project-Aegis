@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "68a58626dd598829bf324721b887a4f2b9cfa48a",
+  "source_revision": "9747f78a8be0ca15a41925721ec1be18a2d3c537",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -276,7 +276,7 @@
     {
       "name": "clickthrough-test-engineer",
       "path": ".claude/skills/clickthrough-test-engineer/SKILL.md",
-      "sha256": "638d24070c68604644eba1851b75b7573ebbf9437ea88f9f8e57d5acb3a0c89e"
+      "sha256": "7d6c25a2c0e803e670e954881b229d8e1f0402d019a5553a89b80c91bd8825ef"
     },
     {
       "name": "client-state-boundary-reviewer",
@@ -991,7 +991,7 @@
     {
       "name": "screenshot-evidence-planner",
       "path": ".claude/skills/screenshot-evidence-planner/SKILL.md",
-      "sha256": "ac03eb34c62483349f2f9b185843c1fe3e0c957f0de5e77775e6ece59f55f498"
+      "sha256": "4f03a057160509eeb89529242415ab0e8be244cc34dcb2b558c3a4d170c9b46e"
     },
     {
       "name": "search-architecture-designer",
@@ -1071,7 +1071,7 @@
     {
       "name": "skill-selection-advisor",
       "path": ".claude/skills/skill-selection-advisor/SKILL.md",
-      "sha256": "d3de46bc8eacf08718e9dfb0045b0ceae22e2b5e1f01de13d7deae87808ef6da"
+      "sha256": "9046bf0d0995188f58eba50d73e27c01f47dae42d69ea2b8fe38345ab87aac21"
     },
     {
       "name": "skill-usage-instrumenter",
