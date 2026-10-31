@@ -95,6 +95,20 @@ def sdk_importability() -> dict[str, bool]:
     return result
 
 
+def proof_provenance_pins() -> dict[str, str]:
+    """Typed pins used by proof/manifest provenance validation.
+
+    Kept here so non-provider modules never hardcode a provider/model name.
+    """
+    subject = SUBJECT_PINS["anthropic"]
+    judge = JUDGE_PINS[(subject.vendor, subject.model)]
+    return {
+        "subject_vendor": subject.vendor,
+        "judge_vendor": judge.vendor,
+        "judge_model": judge.model,
+    }
+
+
 def judge_pin_for(subject_pin: ModelPin) -> ModelPin | None:
     """The cross-vendor judge pin for one subject pin (None when unmapped)."""
     return JUDGE_PINS.get((subject_pin.vendor, subject_pin.model))

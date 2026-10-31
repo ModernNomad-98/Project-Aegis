@@ -16,6 +16,7 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from .providers import proof_provenance_pins
 from .cumulative import (
     ACCOUNTING_SCHEMA,
     add_smoke_spend,
@@ -30,9 +31,6 @@ SMOKE_PROOF_SCHEMA = "ber-live-smoke-proof/1.0.0"
 RESUME_MANIFEST_SCHEMA = "ber-resume-manifest/1.2.0"
 ALLOWANCE_HISTORY_SCHEMA = "ber-allowance-history/1.0.0"
 SMOKE_ARTIFACT_NAME = "ber-live-smoke-proof"
-EXPECTED_SUBJECT_VENDOR = "anthropic"
-EXPECTED_JUDGE_VENDOR = "openai"
-EXPECTED_JUDGE_MODEL = "gpt-6-astra"
 SMOKE_ARTIFACT_MEMBER = "smoke-proof.json"
 TRIAL_ARTIFACT_NAME = "ber-resume-manifest"
 TRIAL_ARTIFACT_MEMBER = "manifest.json"
@@ -182,6 +180,7 @@ def _validate_run_provenance(run: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) -> dict[str, Any]:
+    pins = proof_provenance_pins()
     provenance = _validate_run_provenance(run)
     if payload.get("schema") != SMOKE_PROOF_SCHEMA:
         raise ValueError("unsupported smoke proof schema: " + repr(payload.get("schema")))
@@ -197,11 +196,11 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
     _require_hex(payload, "built_config_sha256", HEX64, "smoke proof")
     _require_hex(payload, "config_template_sha256", HEX64, "smoke proof")
     _require_text(payload, "gate_id", "smoke proof")
-    if _require_text(payload, "subject_vendor", "smoke proof") != EXPECTED_SUBJECT_VENDOR:
+    if _require_text(payload, "subject_vendor", "smoke proof") != pins["subject_vendor"]:
         raise ValueError("smoke proof subject vendor is not pinned")
-    if _require_text(payload, "judge_vendor", "smoke proof") != EXPECTED_JUDGE_VENDOR:
+    if _require_text(payload, "judge_vendor", "smoke proof") != pins["judge_vendor"]:
         raise ValueError("smoke proof judge vendor is not pinned")
-    if _require_text(payload, "judge_model", "smoke proof") != EXPECTED_JUDGE_MODEL:
+    if _require_text(payload, "judge_model", "smoke proof") != pins["judge_model"]:
         raise ValueError("smoke proof judge model is not pinned")
     if payload.get("max_output_tokens") != 16_384:
         raise ValueError("smoke proof max_output_tokens is not the pinned 16384")
@@ -230,7 +229,7 @@ def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any])
     _require_hex(plan, "config_sha256", HEX64, "trial plan")
     _require_hex(plan, "dataset_sha256", HEX64, "trial plan")
     _require_text(plan, "gate_id", "trial plan")
-    if plan.get("subject_vendors") != [EXPECTED_SUBJECT_VENDOR]:
+    if plan.get("subject_vendors") != [proof_provenance_pins()["subject_vendor"]]:
         raise ValueError("trial plan subject vendor is not the pinned single vendor")
     if plan.get("max_output_tokens") != 16_384:
         raise ValueError("trial plan output cap is not the pinned 16384")
