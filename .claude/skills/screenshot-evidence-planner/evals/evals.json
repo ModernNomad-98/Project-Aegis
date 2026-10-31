@@ -66,6 +66,47 @@
           "Selects checkpoints justified by a named consumer or risk, and sets retention windows instead of keep-forever."
         ]
       }
+    },
+    {
+      "id": "edge-cold-captures-do-not-prove-interaction",
+      "type": "should_trigger",
+      "prompt": "Plan our release evidence. Every screen already has a cold home-page screenshot that passes; can we treat the interaction coverage as complete?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects cold captures as interaction-behavior evidence: the policy requires visible-control transitions (defined visible control state -> action -> exercised state) with pre/post state where relevant.",
+          "Requires capture_mode, entry_path and behavior_ref so each capture is reproducible and bound to the behavior it proves.",
+          "States that all cold screenshots passing does not make interaction coverage complete and that a screen whose transition throws/stales fails the relevant checkpoint."
+        ]
+      }
+    },
+    {
+      "id": "edge-current-candidate-set-membership",
+      "type": "should_trigger",
+      "prompt": "Our evidence folder has the current build's screenshots and their sidecars, one leftover image from the previous build, a reused capture from the previous candidate with a dependency justification, and the folder README. Is the evidence set complete for review?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Matches expected member patterns (captures plus sidecars/evidence-set record) and treats the README as an allowed non-evidence file, not contamination or coverage.",
+          "Reports the leftover image as an unexpected member (contamination, not extra coverage) and does not claim review completeness while it remains unresolved.",
+          "Listens for a justified-reuse representation: the reused capture records captured_at_candidate_id + reuse_ref (dependency justification), stays in the expected list as reused, and is exempt from contamination while the justification holds.",
+          "States that an unexpected member is cleared only by a recorded disposition (owner authorization/acceptance reference) or reuse justification, and that the planner does not move, archive, delete or overwrite evidence."
+        ]
+      }
+    },
+    {
+      "id": "edge-metadata-privacy-sanitization",
+      "type": "should_trigger",
+      "prompt": "Plan evidence for a checkout flow where the confirmation URL contains a session token and the form has a password field. What metadata may we store?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Requires entry_path to be a parameterized route template: every path segment that can carry an email/tenant/name/token becomes a placeholder, URLs are parsed with a URL parser rather than ad-hoc stripping, and query strings/tokens are masked.",
+          "Requires pre_state/post_state descriptions to be masked/placeholder values with no PII, tenant data or secrets, reusing the masking classes and enforcing masking before storage.",
+          "Requires candidate_id to keep its canonical value after strict allowlist validation (unsafe values rejected, never masked/rewritten; a separate candidate_slug may be stored for path use) and validates it before any path use.",
+          "States that if metadata cannot be masked (for example a restricted M2/M3 field), it is not stored in the evidence metadata."
+        ]
+      }
     }
   ]
 }

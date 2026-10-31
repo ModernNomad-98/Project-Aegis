@@ -65,7 +65,9 @@ not exploratory wandering.
 3. **Drive each route:** navigate (direct URL and in-app nav), exercise each
    planned interaction — forms with valid AND invalid input, dialogs
    open/close/escape, permission-gated controls per persona, empty/loading/
-   error states where reachable.
+   error states where reachable. For tables and sortable/filterable lists,
+   exercise the sorting and filter-result checks against an independently
+   derived expected order/membership (catalog section "Table interactions").
 4. **Observe like an instrument:** per step record expected vs observed;
    capture the browser console for errors on every route (silent console
    errors are findings); screenshot at plan-named checkpoints and at every
@@ -73,9 +75,9 @@ not exploratory wandering.
 5. **Rate and file defects:** severity (blocker/major/minor/cosmetic) +
    reproduction steps + evidence reference. A defect without repro steps and
    a screenshot is a rumor, not a finding.
-6. **Report coverage honestly:** routes/interactions completed vs planned vs
-   skipped (with why — auth wall, data unavailable, time). Unvisited ≠
-   passing.
+6. **Report coverage honestly:** routes, table-interaction states and individual
+   interactions completed vs planned vs skipped (with why — auth wall, data
+   unavailable, time). Unvisited ≠ passing.
 7. **Hand off:** blockers → `systematic-debugger`/owner immediately; recurring
    passes worth automating → `playwright-e2e-engineer` candidates (with the
    journey named); evidence bundle → release closeout (`ai-closeout-reporter`).
@@ -88,11 +90,14 @@ Session: <persona(s)/roles used, viewport(s)>
 Plan: <routes × interaction checklist — written before execution>
 Results per route:
   <route> — <steps executed> — <pass | defects found> — console <clean|errors>
+Table states: <route> — sorted <asc+desc verified | N/A>; filtered <states verified>
+  ; empty <verified | N/A>; N/A (no tables on this route)
 Defects:
   <id> — <severity> — <route/step> — expected vs observed — repro steps
        — evidence <screenshot ref>
 Checkpoints captured: <named screenshots per evidence rules, masked>
-Coverage: executed <n/n routes, n/n interactions> | skipped <what + why>
+Coverage: executed <n/n routes, n/n interactions, n/n table-interaction states>
+  | skipped <what + why>
 Automation candidates: <journeys worth a permanent Playwright spec + why>
 Handoffs: <blockers → owner/systematic-debugger; evidence → closeout>
 ```
@@ -107,6 +112,15 @@ Handoffs: <blockers → owner/systematic-debugger; evidence → closeout>
 - [ ] Every defect has severity, repro steps, and evidence.
 - [ ] Screenshots follow naming/masking rules; sensitive data masked.
 - [ ] Skipped items listed with reasons — no silent coverage inflation.
+- [ ] Tables/lists: sorting checked against an independently derived whole-list
+      order in BOTH directions (unsorted fixture, nulls/ties exercised), filter
+      membership/counts checked, pagination consistency where present, and
+      empty-result recovery verified; the report's `Table states:` line itemises
+      sorted/filtered/empty states per table route (or `N/A (no tables)`).
+- [ ] Table interaction coverage is reported separately from route-level coverage
+      (sorted/filtered/empty-result states itemised), not folded into a route pass.
+- [ ] Filter+sort composition checked in both orders; one control does not reset
+      the other.
 - [ ] No permanent spec files written (that's Playwright's lane).
 
 ## Safety Rules

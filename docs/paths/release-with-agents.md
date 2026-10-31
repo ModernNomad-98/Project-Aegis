@@ -85,6 +85,60 @@ actual risks instead of repeating the same review to spend more tokens.
    issues in the product's release record. Post-merge checks confirm what
    shipped; on merge-to-deploy platforms they cannot prevent that deployment.
 
+## Keep one candidate stable through review
+
+The reviewers above must inspect one frozen candidate, not a moving target.
+
+1. **Write the readiness/acceptance matrix first.** Before collecting the
+   first-pass findings, record the small matrix of required acceptance dimensions
+   and the evidence each needs; later findings map to dimensions and any dimension
+   still missing stays visible.
+2. **Run the first pass on the same candidate.** Collect the first-pass
+   functional findings and the UX findings on the SAME candidate; record its
+   identity (candidate commit/tree or artifact digest, environment) and the
+   evidence-set identity once.
+3. **Batch known repairs, with one write holder.** Batch the known repairs for
+   the candidate and name ONE write holder for the candidate **source/artifact
+   files** (code, configuration, build artifacts); evidence files stay with the
+   evidence holder under the evidence policy. Reviewers stay read-only, and no one
+   edits the candidate while independent review is running. Reuse/evidence detail:
+   [`screenshot-evidence-planner`](../../.claude/skills/screenshot-evidence-planner/SKILL.md)
+   and the source-repository [delivery workflow](../delivery-workflow.md).
+4. **Freeze before independent final review.** Freeze and record the candidate's
+   tree, artifact and evidence-set identity (expected members) before the final
+   independent review; that review's verdict binds the frozen identity. The
+   expected-member, contamination and historical-archive rules are owned by
+   [`screenshot-evidence-planner`](../../.claude/skills/screenshot-evidence-planner/SKILL.md) — use
+   its evidence-set membership check here rather than re-inventing it.
+5. **A necessary change supersedes the old candidate.** If review requires a
+   change, state the new candidate identity explicitly (new tree/artifact and
+   affected dimensions). The old verdict never authorizes the new identity; a new
+   verdict is required for it. **Summary of the owning rule:** reuse unaffected
+   evidence only with a dependency justification (which changed files/behaviors,
+   why the evidence is unaffected, and the identity it was captured at). A reused
+   capture from an earlier candidate records `captured_at_candidate_id` + the
+   `reuse_ref` dependency justification, is listed in the current expected-member
+   list as reused, and is exempt from contamination while the justification holds
+   (the evidence owner's membership rules). Ordinary record-only corrections that
+   leave the frozen tree/artifact bytes unchanged do not force a full functional
+   recapture — recheck only what actually depends on the changed records. The
+   detailed reuse rule is owned by
+   [`ux-design-iteration`](../../.claude/skills/ux-design-iteration/references/iteration-record-and-readiness.md)
+   and the source repository's delivery workflow; this section is the handoff
+   summary only.
+6. **Review coverage is part of the verdict.** Each independent review states
+   what it covered. A review cut short by provider length or usage limits is
+   incomplete coverage, not a PASS; partition the review or re-dispatch it, and
+   never present partial coverage as final approval.
+7. **No cosmetic waivers.** Never waive a mandatory gate or an
+   evidence-integrity defect by calling it cosmetic. **This is a summary, not a
+   second rule source:** the exact-candidate evidence rules are owned by
+   [`release-readiness-reviewer`](../../.claude/skills/release-readiness-reviewer/SKILL.md)
+   and the unaffected-evidence reuse rule by
+   [`ux-design-iteration`](../../.claude/skills/ux-design-iteration/references/iteration-record-and-readiness.md);
+   if this summary and an owning skill differ, the owning skill wins and this
+   section must be updated.
+
 This path does not automatically invoke manual-only skills such as
 [`ci-pipeline-architect`](../../.claude/skills/ci-pipeline-architect/SKILL.md)
 or [`observability-operator`](../../.claude/skills/observability-operator/SKILL.md).

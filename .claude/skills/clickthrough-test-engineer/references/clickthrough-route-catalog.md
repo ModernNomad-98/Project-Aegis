@@ -25,6 +25,26 @@ Apply the rows that exist on the route; mark N/A explicitly.
 | Back/refresh | browser back after submit; F5 mid-flow | resubmission, lost state, auth loop |
 | Console | check on every route | errors/warnings on "working" pages |
 
+## Table interactions (sorting, filtering, result sets)
+
+Apply this section whenever a route shows a data table or a sortable/filterable
+list. Each result set is checked against an independent expected answer derived
+from the fixture data, never against what the screen currently shows.
+
+| Check | What to do | Common failures |
+| --- | --- | --- |
+| Sort — whole-list order | derive the expected order of EVERY row from the fixture, then compare the rendered order row-by-row | only first/last row checked, sampled rows, order trusted from the view |
+| Sort — text, locale, case and accents | sort a text column with mixed case, locale-specific letters/accents and punctuation; state the expected collation (locale + case/accent handling) and compare the whole list. If the product states no collation rule, document the assumed/default collation explicitly and mark it an open question to confirm, then compare against that assumption | lexicographic byte order where locale order is expected, case groups not matching the stated rule, accents sorted inconsistently, unstated default silently assumed |
+| Sort — multi-column | sort by two columns (for example date then amount) and compare the full expected order; change the secondary column and re-derive | secondary column ignored, unstable order, one column's direction applied to both |
+| Sort — formatted values | sort a column rendered as formatted display text (currency, date, percentages) and assert it sorts by the underlying value, not the string | 10 before 9 because '10' < '9', dates sorted by weekday/month name, currency symbols affecting order |
+| Sort — both directions | exercise ascending AND descending, and re-derive the expected list for each | one direction untested, direction silently ignored |
+| Sort — fixture shape | use a deliberately unsorted/mixed fixture; an already-sorted fixture cannot prove the comparator runs | sorted fixture masks a broken/absent sort |
+| Sort — nulls and ties | apply the product's stated null rule (first/last/excluded) and tie rule (deterministic tie-break, or explicitly documented undefined order) with at least one null and one tie case | nulls crash or land inconsistently, ties reorder between renders |
+| Filter — membership and count | for each filter derive the expected member set and count independently; assert no stale rows remain after changing filters | stale rows, wrong count, filter silently ignored |
+| Filter + sort composition | apply a filter after sorting (and the reverse) and assert both semantics hold | one control resets the other |
+| Pagination/total count | where pagination exists, check the count and boundary behavior of filtered/sorted sets | count reflects unfiltered data, boundary duplicates/omissions |
+| Empty-result recovery | trigger a filter with zero matches; confirm the empty state explains the result, filter/query state stays visible or is clearly reset, and a recovery path (clear/reset) exists | blank page, crash, filter cannot be cleared, state lost |
+
 ## Viewport set
 
 Default: desktop 1280×800 + one mobile width (375×812) on customer-facing

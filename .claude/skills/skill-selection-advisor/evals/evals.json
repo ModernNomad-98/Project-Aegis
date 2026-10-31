@@ -129,6 +129,62 @@
           "Does not claim the named skill was invoked and does not treat a recommendation as permission."
         ]
       }
+    },
+    {
+      "id": "edge-more-than-five-controls-mandatory-separated",
+      "type": "should_trigger",
+      "prompt": "We're preparing a multi-tenant release. Six controls seem relevant: RLS policy review, tenant-isolation testing, classification/approval depth, accessibility evidence, a clickthrough pass, and release readiness. Here are the governing artifacts I can provide: change-classification-gate output classifies this as AI/agentic with required RLS review, tenant-isolation testing and release-readiness evidence, and the consumer policy/decision record requires accessibility evidence for launch. Which Aegis skills should we use, and in what order?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Keeps the optional recommendation shortlist at most five, ordered as a working sequence.",
+          "Lists every applicable mandatory obligation separately from the shortlist and never places a mandatory control under 'Not recommended' or caps it away.",
+          "For each mandatory obligation, cites the provided governing source with its revision/identity (the change-classification-gate output or the consumer policy/decision record), the stage, the owning method where established, the owner disposition when unmet, and the method's posture including not-established/advisory-only where applicable.",
+          "Does not re-classify the change or waive a required control; it consumes the provided classification/policy output instead of inferring one."
+        ]
+      }
+    },
+    {
+      "id": "edge-consumer-availability-classes-no-install",
+      "type": "should_trigger",
+      "prompt": "We copied only some Aegis skills into our product repo. Is accessibility-test-harness available here, and what do we need for launch accessibility evidence?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Identifies accessibility-test-harness as source-shipped using the manifest entry with its path, sha256 and the manifest source_revision, and does not treat the source manifest as proof it is installed in the user's tree.",
+          "Reports the local facts separately and orthogonally: present/absent/unknown with hash match/mismatch/unknown, noting that a candidate can be both source-shipped and consumer-local-present and that mismatch means a differing copy, not an absent capability.",
+          "Keeps the mandatory accessibility obligation INCOMPLETE with an owner disposition instead of claiming a PASS, and does not install, sync, re-pin or override the consumer's copies; states that consumer-owned pinned copies and a deliberate authorised resync are the consumer's decision.",
+          "Does not fabricate an accessibility PASS and does not count external/advisory-only guidance as an installed Aegis control or a required gate; uses the standard unknown state (unknown = unread/unhashable, not source-revision-unknown)."
+        ]
+      }
+    },
+    {
+      "id": "edge-manual-only-mandatory-obligation-posture",
+      "type": "should_trigger",
+      "prompt": "For our release the required security review is owned by a manual-only Aegis skill. Which skills should we use, and what must a human run?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Lists the required security review in the mandatory-obligations block, uncapped and never under 'Not recommended', separate from the at-most-five optional shortlist.",
+          "Records the owning method's posture as 'MANUAL-ONLY — human must invoke' (never auto or auto-invoked) together with the governing source, stage, required evidence and owner disposition.",
+          "States that the manual-only owner must be invoked by the human; the selector does not invoke or run it.",
+          "Keeps the optional shortlist at most five while the mandatory obligation remains listed even if more than five optional candidates fit."
+        ]
+      }
+    },
+    {
+      "id": "edge-missing-governing-artifacts-mandatory-unknown",
+      "type": "should_trigger",
+      "prompt": "We're preparing a release and I want the exact mandatory controls. I don't have a change-classification-gate output, consumer policy or acceptance gate to give you. Can you list the mandatory obligations anyway?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reports that the mandatory obligations are Unknown/INCOMPLETE because no governing artifact was readable, rather than fabricating a definitive mandatory list.",
+          "May offer optional recommendations at most five, clearly separated, without turning inferred controls into mandatory obligations.",
+          "States exactly what governing artifact(s) are needed to complete the mandatory list and records the missing inputs under Unknowns.",
+          "Does not re-classify the change or invent a policy to fill the gap."
+        ]
+      }
     }
   ]
 }
