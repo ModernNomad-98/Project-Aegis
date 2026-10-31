@@ -173,8 +173,40 @@ Adoption: <which producers follow this (manual/clickthrough/playwright) +
 - Asked to also capture the evidence now → hand to
   `clickthrough-test-engineer` *(manual-only)* / the executing pass.
 
+## Capture mode, entry path, behavior binding and current-candidate evidence set
+
+These additions extend the evidence policy; the detail schema and membership
+rules live in [references/evidence-rules.md](references/evidence-rules.md).
+
+- **Capture mode.** Every capture records `capture_mode`: `cold_fixture_direct`
+  (clean state reached by direct URL with seeded data, no prior UI action) or
+  `visible_control_transition` (a defined visible control state -> action ->
+  exercised state, with `pre_state`/`post_state`). An interaction-behavior
+  capture MUST show the visible-control transition; cold captures are the
+  pre-state baseline, never a substitute for the transition.
+- **Entry path.** Record the URL/route, seed fixture id, persona and the action
+  sequence that reached the state, so the capture is reproducible.
+- **Behavior binding.** Record the `behavior_ref`: the checkpoint/behavior/
+  acceptance expectation the frame proves. A capture with no behavior binding is
+  context, not evidence.
+- **Current-candidate evidence set.** For the current candidate (build/commit/
+  artifact identity) define the expected member list from the checkpoint plan
+  and tag each capture with `candidate_id`. Stale or superseded images under the
+  current evidence root are **unexpected members = contamination, not extra
+  coverage**. Preserve historical evidence in a candidate-scoped archive/record
+  with its retention class and a superseded marker; never delete or overwrite
+  historical evidence without authorisation. Report expected members, unexpected
+  members and historical archive separately.
+- **Validation.** Capture-quality is not met by a set of cold screenshots alone:
+  interaction coverage requires the visible-control transitions, and stale
+  superseded images are reported as contamination rather than counted as
+  coverage.
+
 ## Supporting Files
 
+- See the **Capture mode, entry path, behavior binding and current-candidate
+  evidence set** section above for the policy additions; the metadata schema and
+  membership rules are in [references/evidence-rules.md](references/evidence-rules.md).
 - [references/evidence-rules.md](references/evidence-rules.md) — checkpoint
   selection catalog, naming token table, masking classes, metadata schema,
   and storage-class matrix.

@@ -66,6 +66,32 @@
           "Selects checkpoints justified by a named consumer or risk, and sets retention windows instead of keep-forever."
         ]
       }
+    },
+    {
+      "id": "edge-cold-captures-do-not-prove-interaction",
+      "type": "should_trigger",
+      "prompt": "Plan our release evidence. Every screen already has a cold home-page screenshot that passes; can we treat the interaction coverage as complete?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Rejects cold captures as interaction-behavior evidence: the policy requires visible-control transitions (defined visible control state -> action -> exercised state) with pre/post state where relevant.",
+          "Requires capture_mode, entry_path and behavior_ref so each capture is reproducible and bound to the behavior it proves.",
+          "States that all cold screenshots passing does not make interaction coverage complete and that a screen whose transition throws/stales fails the relevant checkpoint."
+        ]
+      }
+    },
+    {
+      "id": "edge-current-candidate-set-membership",
+      "type": "should_trigger",
+      "prompt": "Our evidence folder has the current build's screenshots plus one leftover image from the previous build. Is the evidence set complete for review?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Checks membership against the current candidate's expected member list and candidate_id, reporting the leftover image as an unexpected member (contamination, not extra coverage).",
+          "Preserves historical evidence in a candidate-scoped archive/record with a superseded marker and does not delete or overwrite it without authorisation.",
+          "Reports expected members, unexpected members and the historical archive separately, and does not claim review completeness while contamination is present."
+        ]
+      }
     }
   ]
 }
