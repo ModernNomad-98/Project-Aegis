@@ -5,15 +5,10 @@
   "runs_per_case": 1,
   "request_timeout_seconds": 300,
   "subject_vendors": [
-    "anthropic",
-    "openai"
+    "anthropic"
   ],
   "judge_allowlist": {
     "judge_models": [
-      {
-        "vendor": "anthropic",
-        "model": "claude-sonnet-5-5"
-      },
       {
         "vendor": "openai",
         "model": "gpt-6-astra"

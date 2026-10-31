@@ -148,7 +148,8 @@ class DocumentedRateReservationTests(unittest.TestCase):
         self.assertEqual(trial.runs_per_case, 1)
         self.assertEqual(trial.spend_ceiling_cents, OWNER_PROVIDER_CAP_CENTS)
         self.assertEqual(list(smoke.subject_vendors), ["anthropic"])
-        self.assertEqual(len(trial.subject_vendors), 2)
+        self.assertEqual(list(trial.subject_vendors), ["anthropic"])
+        self.assertEqual(list(trial.judge_allowlist.entries), [("openai", "gpt-6-astra")])
 
     def test_old_under_reserving_price_table_is_refused(self) -> None:
         payload = json.loads((CONFIG_DIR / "pilot-a-live-config.json").read_text())

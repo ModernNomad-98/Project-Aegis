@@ -27,7 +27,7 @@ from pathlib import Path
 
 from tools.behavioral_eval_runner.live.config import (
     DEFAULT_MAX_INPUT_BYTES,
-    MAX_SUBJECT_RESPONSE_BYTES,
+    MAX_JUDGE_REQUEST_BYTES,
     OWNER_PROVIDER_CAP_CENTS,
     SMOKE_CEILING_CENTS,
     OwnerAllowlist,
@@ -38,6 +38,7 @@ from tools.behavioral_eval_runner.live.cumulative import (
     actual_byte_reservation_cents,
     actual_byte_smoke_bounds,
     add_smoke_spend,
+    merge_smoke_gate_spend,
     remaining_cumulative_cents,
     safe_reservation_bounds,
     smoke_safe_reservation_bounds,
@@ -78,6 +79,30 @@ class SmokeSpendAccountingTests(unittest.TestCase):
         self.assertEqual(smoke_spend_total(records), SMOKE_SPEND + 50)
         with self.assertRaises(ValueError):
             add_smoke_spend(records, "smoke-run-2", 51)
+
+    def test_merge_smoke_gate_accepts_numeric_github_run_id(self) -> None:
+        # GitHub plan values carry smoke_run_id as a numeric REST id; the
+        # workflow restore helper must normalize it rather than refuse.
+        records = merge_smoke_gate_spend(
+            {},
+            {"smoke_run_id": 4123456789, "spent_cents": SMOKE_SPEND},
+        )
+        self.assertEqual(records, {"4123456789": SMOKE_SPEND})
+        # The same numeric id in a prior record (JSON keys are strings) dedups.
+        again = merge_smoke_gate_spend(
+            records,
+            {"smoke_run_id": "4123456789", "spent_cents": SMOKE_SPEND},
+        )
+        self.assertEqual(again, records)
+        # A numeric id and a differently-numbered smoke are distinct.
+        both = merge_smoke_gate_spend(again, {"smoke_run_id": 4123456790, "spent_cents": 50})
+        self.assertEqual(smoke_spend_total(both), SMOKE_SPEND + 50)
+        with self.assertRaises(ValueError):
+            merge_smoke_gate_spend(both, {"smoke_run_id": 4123456790, "spent_cents": 51})
+        with self.assertRaises(ValueError):
+            merge_smoke_gate_spend(both, {"spent_cents": 1})
+        with self.assertRaises(ValueError):
+            merge_smoke_gate_spend(both, {"smoke_run_id": "", "spent_cents": 1})
 
     def test_smoke_spend_records_are_validated(self) -> None:
         for bad in (-1, True, "174", None, 1.5):
@@ -273,8 +298,7 @@ class ActualByteBasisTests(unittest.TestCase):
         smoke = self.rows[0]
         bound = actual_byte_smoke_bounds(
             subject_request_bytes=smoke[0],
-            judge_scaffold_bytes=smoke[1],
-            max_subject_response_bytes=MAX_SUBJECT_RESPONSE_BYTES,
+            max_judge_request_bytes=MAX_JUDGE_REQUEST_BYTES,
             max_output_tokens=OUTPUT_TOKENS,
             subject_input_cents_per_mtok=SUBJECT_PIN.input_cents_per_mtok,
             subject_output_cents_per_mtok=SUBJECT_PIN.output_cents_per_mtok,
@@ -284,8 +308,8 @@ class ActualByteBasisTests(unittest.TestCase):
         self.assertEqual(smoke[0], SMOKE_SUBJECT_REQUEST_BYTES)
         self.assertEqual(smoke[1], 4_050)
         self.assertEqual(bound["subject_cents"], 21)
-        self.assertEqual(bound["judge_cents"], 176)
-        self.assertEqual(bound["smoke_cents"], 197)
+        self.assertEqual(bound["judge_cents"], 172)
+        self.assertEqual(bound["smoke_cents"], 193)
         self.assertLessEqual(bound["smoke_cents"], SMOKE_CEILING_CENTS)
 
     def test_actual_byte_trial_bound_fits_shared_ceiling_with_prior(self) -> None:
@@ -298,24 +322,55 @@ class ActualByteBasisTests(unittest.TestCase):
             output_cents_per_mtok=SUBJECT_PIN.output_cents_per_mtok,
         )
         judge_cents = actual_byte_reservation_cents(
-            input_bytes=judge_scaffold_max + MAX_SUBJECT_RESPONSE_BYTES,
+            input_bytes=MAX_JUDGE_REQUEST_BYTES,
             input_cents_per_mtok=JUDGE_PIN.input_cents_per_mtok,
             output_tokens=OUTPUT_TOKENS,
             output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
         )
         self.assertEqual(subject_cents, 24)
         self.assertEqual(judge_scaffold_max, 5_304)
-        self.assertEqual(judge_cents, 178)
+        self.assertEqual(judge_cents, 172)
         trial = 40 * (subject_cents + judge_cents)
-        self.assertEqual(trial, 8_080)
-        self.assertEqual(PRIOR_SPENT_CENTS + trial, 8_302)
+        self.assertEqual(trial, 7_840)
+        self.assertEqual(PRIOR_SPENT_CENTS + trial, 8_062)
         self.assertLessEqual(PRIOR_SPENT_CENTS + trial, CEILING)
         full = 120 * (subject_cents + judge_cents)
-        self.assertEqual(full, 24_240)
+        self.assertEqual(full, 23_520)
         self.assertGreater(PRIOR_SPENT_CENTS + full, CEILING)
 
-    def test_response_byte_guard_is_enforced_before_judge(self) -> None:
-        self.assertEqual(MAX_SUBJECT_RESPONSE_BYTES, 90_000)
+    def test_json_escaping_newline_emoji_c0_cjk(self) -> None:
+        adapter = JudgeAdapter(
+            self.judge_pin, self.allowlist, None,
+            max_output_tokens=OUTPUT_TOKENS, timeout_seconds=300,
+        )
+        samples = {
+            "cjk": "漢" * 100,
+            "newline": "\n" * 100,
+            "emoji": "U0001f600" * 100,
+            "c0": "\x00" * 100,
+        }
+        for label, text in samples.items():
+            request = adapter.build_request(
+                request_id="special-" + label,
+                case=self.cases[0], arm="WITH_SKILL",
+                subject_vendor="anthropic", subject_result=self.result,
+                subject_text=text,
+            )
+            raw = len(text.encode("utf-8"))
+            encoded = len(request.system.encode("utf-8")) + len(request.user_content.encode("utf-8"))
+            self.assertGreater(encoded, raw, label)
+        huge = adapter.build_request(
+            request_id="special-huge",
+            case=self.cases[0], arm="WITH_SKILL",
+            subject_vendor="anthropic", subject_result=self.result,
+            subject_text="漢" * 16_384,
+        )
+        huge_encoded = len(huge.system.encode("utf-8")) + len(huge.user_content.encode("utf-8"))
+        self.assertGreater(huge_encoded, MAX_JUDGE_REQUEST_BYTES)
+        self.assertLess(len(("漢" * 16_384).encode("utf-8")), MAX_JUDGE_REQUEST_BYTES)
+
+    def test_encoded_judge_request_guard_is_enforced_before_judge(self) -> None:
+        self.assertEqual(MAX_JUDGE_REQUEST_BYTES, 90_000)
         with tempfile.TemporaryDirectory() as tmp:
             config = helpers.config_payload(ceiling=SMOKE_CEILING_CENTS, runs=1, max_out=OUTPUT_TOKENS)
             config["subject_vendors"] = ["anthropic"]
@@ -326,7 +381,7 @@ class ActualByteBasisTests(unittest.TestCase):
                 return ProviderResponse(
                     response_id="huge-subject",
                     served_model=self.subject_pin.model,
-                    text="x" * (MAX_SUBJECT_RESPONSE_BYTES + 1),
+                    text="漢" * 16_384,
                     usage=ProviderUsage(1, 1),
                     stop_reason="end_turn",
                 )
@@ -337,7 +392,7 @@ class ActualByteBasisTests(unittest.TestCase):
             ))
             result = dry_run(paths, smoke=True, subject_transport_factory=lambda: MockTransport(huge_subject), judge_transport_factory=lambda: judge)
             self.assertEqual(result["status"], "HALTED")
-            self.assertEqual(result["halt_reason_code"], "SUBJECT_RESPONSE_BYTES_EXCEEDED")
+            self.assertEqual(result["halt_reason_code"], "JUDGE_REQUEST_BYTES_EXCEEDED")
             self.assertEqual(judge.calls, [])
             self.assertLessEqual(result["spent_cents"], SMOKE_CEILING_CENTS)
 

@@ -30,6 +30,17 @@ def _non_negative_int(value: Any, label: str) -> int:
     return value
 
 
+def normalize_smoke_run_id(value: Any) -> str:
+    """Smoke run ids may arrive as GitHub numeric ids or strings; normalize to
+    a non-empty string so the same run dedups across manifests/API shapes."""
+    if isinstance(value, bool) or not isinstance(value, (int, str)):
+        raise ValueError("smoke run id must be a non-empty string or integer")
+    text = str(value).strip()
+    if not text:
+        raise ValueError("smoke run id must be non-empty")
+    return text
+
+
 def validate_smoke_spend(records: Any) -> dict[str, int]:
     """Return a normalized {smoke_run_id: spent_cents} map or raise ValueError.
 
@@ -44,15 +55,15 @@ def validate_smoke_spend(records: Any) -> dict[str, int]:
     for run_id, spent in records.items():
         if not isinstance(run_id, str) or not run_id.strip():
             raise ValueError("smoke spend record has no non-empty smoke run id")
-        out[run_id] = _non_negative_int(spent, "smoke spend for " + run_id)
+        normalized = normalize_smoke_run_id(run_id)
+        out[normalized] = _non_negative_int(spent, "smoke spend for " + normalized)
     return out
 
 
 def add_smoke_spend(records: Any, smoke_run_id: Any, spent_cents: Any) -> dict[str, int]:
     """Add one smoke run's recorded spend; a conflicting duplicate is refused."""
     current = validate_smoke_spend(records)
-    if not isinstance(smoke_run_id, str) or not smoke_run_id.strip():
-        raise ValueError("smoke run id must be a non-empty string")
+    smoke_run_id = normalize_smoke_run_id(smoke_run_id)
     spent = _non_negative_int(spent_cents, "smoke spend")
     if smoke_run_id in current and current[smoke_run_id] != spent:
         raise ValueError(
@@ -168,29 +179,41 @@ def actual_byte_reservation_cents(
 def actual_byte_smoke_bounds(
     *,
     subject_request_bytes: int,
-    judge_scaffold_bytes: int,
-    max_subject_response_bytes: int,
+    max_judge_request_bytes: int,
     max_output_tokens: int,
     subject_input_cents_per_mtok: int,
     subject_output_cents_per_mtok: int,
     judge_input_cents_per_mtok: int,
     judge_output_cents_per_mtok: int,
 ) -> dict[str, int]:
-    """Safe smoke two-call bound from actual builder bytes plus the enforced
-    subject-response byte cap (judge input bytes <= scaffolding + response cap)."""
+    """Safe smoke two-call bound from actual builder bytes and the ENCODED
+    judge-request byte cap (the adapter JSON-escapes subject text, so the cap is
+    applied to the encoded judge request, not the raw subject response)."""
     subject = actual_byte_reservation_cents(
         input_bytes=subject_request_bytes,
         input_cents_per_mtok=subject_input_cents_per_mtok,
         output_tokens=max_output_tokens,
         output_cents_per_mtok=subject_output_cents_per_mtok,
     )
-    judge_bytes = _non_negative_int(judge_scaffold_bytes, "judge_scaffold_bytes") + _non_negative_int(
-        max_subject_response_bytes, "max_subject_response_bytes"
-    )
     judge = actual_byte_reservation_cents(
-        input_bytes=judge_bytes,
+        input_bytes=max_judge_request_bytes,
         input_cents_per_mtok=judge_input_cents_per_mtok,
         output_tokens=max_output_tokens,
         output_cents_per_mtok=judge_output_cents_per_mtok,
     )
     return {"subject_cents": subject, "judge_cents": judge, "smoke_cents": subject + judge}
+
+
+def merge_smoke_gate_spend(records: Any, smoke_gate: Any) -> dict[str, int]:
+    """Merge a same-head smoke-gate record into the smoke-spend map.
+
+    The workflow's restore step calls this with the plan's smoke_gate and every
+    prior manifest's smoke_spend map; numeric GitHub run ids are normalized and
+    a resumed trial dedups the same run id to one charge.
+    """
+    merged = validate_smoke_spend(records)
+    if not isinstance(smoke_gate, Mapping):
+        raise ValueError("smoke gate record must be a mapping")
+    if "smoke_run_id" not in smoke_gate or "spent_cents" not in smoke_gate:
+        raise ValueError("smoke gate record must carry smoke_run_id and spent_cents")
+    return add_smoke_spend(merged, smoke_gate.get("smoke_run_id"), smoke_gate.get("spent_cents"))

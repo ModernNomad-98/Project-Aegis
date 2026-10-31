@@ -213,7 +213,7 @@ jobs:
               fail("the smoke config has no positive integer spend ceiling")
           if template_ceiling > SMOKE_CEILING_CENTS:
               # The cap is 200 integer cents ($2.00), not a clamp target: a
-              # 51-cent template is refused before any plan or call exists.
+              # 201-cent template is refused before any plan or call exists.
               fail(
                   "the smoke config spend ceiling is above the 200-cent ($2.00) "
                   f"hard cap: {template_ceiling} cents"

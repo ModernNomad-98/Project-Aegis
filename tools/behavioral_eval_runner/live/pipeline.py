@@ -42,7 +42,7 @@ from .config import (
     DRY_RUN_CONFIG_TEMPLATE_RELPATH,
     JUDGE_PINS,
     MIN_LIVE_MAX_OUTPUT_TOKENS,
-    MAX_SUBJECT_RESPONSE_BYTES,
+    MAX_JUDGE_REQUEST_BYTES,
     SMOKE_CEILING_CENTS,
     SUBJECT_PINS,
     LiveConfig,
@@ -947,20 +947,6 @@ def _execute_one(
         output_tokens=subject_result.usage.output_tokens,
         served_model=subject_result.served_model,
     )
-    subject_response_bytes = len(subject_text.encode("utf-8"))
-    if subject_response_bytes > MAX_SUBJECT_RESPONSE_BYTES:
-        # Fail closed BEFORE the judge request is built or reserved: the
-        # actual-byte safe bound requires the judge input (scaffolding + subject
-        # response) to stay within the enforced cap. The subject's accounted
-        # cost remains in the ledger, and the run halts; no judge dispatch.
-        raise LiveError(
-            "the subject response exceeds the safe encoded-byte bound",
-            context={
-                "subject_response_bytes": subject_response_bytes,
-                "max_subject_response_bytes": MAX_SUBJECT_RESPONSE_BYTES,
-            },
-            reason_code="SUBJECT_RESPONSE_BYTES_EXCEEDED",
-        )
     deterministic = evaluate_deterministic(case, subject_text)
     judge_adapter = JudgeAdapter(
         judge_pin,
@@ -978,6 +964,22 @@ def _execute_one(
         subject_result=subject_result,
         subject_text=subject_text,
     )
+    judge_request_bytes = len(judge_request.system.encode("utf-8")) + len(
+        judge_request.user_content.encode("utf-8")
+    )
+    if judge_request_bytes > MAX_JUDGE_REQUEST_BYTES:
+        # The judge adapter JSON-embeds the subject text (ensure_ascii=True), so
+        # the raw subject-response byte cap is not a safe bound. Fail closed on
+        # the ENCODED judge request before any judge reservation or dispatch;
+        # the subject charge remains and the run halts.
+        raise LiveError(
+            "the encoded judge request exceeds the safe encoded-byte bound",
+            context={
+                "judge_request_bytes": judge_request_bytes,
+                "max_judge_request_bytes": MAX_JUDGE_REQUEST_BYTES,
+            },
+            reason_code="JUDGE_REQUEST_BYTES_EXCEEDED",
+        )
     _enforce_input_bound(judge_request, config)
     judge_handle = meter.reserve(
         call_ref=judge_request_id,
