@@ -120,6 +120,7 @@ jobs:
 
           from tools.behavioral_eval_runner.live.allowance_history import (  # noqa: E402
               collect_allowance_history,
+              collect_latest_allowance_state,
           )
           from tools.behavioral_eval_runner.live.config import (  # noqa: E402
               OWNER_PROVIDER_CAP_CENTS,
@@ -129,6 +130,7 @@ jobs:
               admit_paid_call,
           )
           from tools.behavioral_eval_runner.live.reservations import (  # noqa: E402
+              cancel,
               reserve,
           )
 
@@ -142,11 +144,19 @@ jobs:
                   work_dir=RUNNER_TEMP / "ber-shared-allowance-history",
                   current_run_id=os.environ.get("GITHUB_RUN_ID"),
               )
+              incoming_state = collect_latest_allowance_state(
+                  gh=gh,
+                  repository=os.environ["GITHUB_REPOSITORY"],
+                  work_dir=RUNNER_TEMP / "ber-allowance-state",
+                  current_run_id=os.environ.get("GITHUB_RUN_ID"),
+              )
+              incoming_outstanding = 0 if incoming_state is None else incoming_state["outstanding_reservations_cents"]
               admission = admit_paid_call(
                   ceiling_cents=OWNER_PROVIDER_CAP_CENTS,
                   prior_ledger_spend_cents=history["ledger_spend_cents"],
                   prior_smoke_spend_records=history["smoke_spend"],
                   reservation_cents=SMOKE_CEILING_CENTS,
+                  outstanding_reservations_cents=incoming_outstanding,
               )
           except Exception as exc:  # noqa: BLE001 - fail closed before keys
               print(
@@ -164,23 +174,25 @@ jobs:
               "admission": admission,
               "reservation_cents": SMOKE_CEILING_CENTS,
               "ceiling_cents": OWNER_PROVIDER_CAP_CENTS,
+              "incoming_outstanding_reservations_cents": incoming_outstanding,
           }
-          reserve(
-              RUNNER_TEMP / "ber-shared-allowance-state" / "allowance-state.json",
-              allowance_id="pilot-a-recovery-20261031",
-              workflow_run_id=os.environ.get("GITHUB_RUN_ID"),
-              identity="eval-smoke-admission",
-              amount_cents=SMOKE_CEILING_CENTS,
-              ledger_spend_cents=history["ledger_spend_cents"],
-              smoke_spend_cents=history["smoke_spend_cents"],
-              ceiling_cents=OWNER_PROVIDER_CAP_CENTS,
-          )
           (RUNNER_TEMP / "ber-shared-allowance.json").write_text(
               json.dumps(snapshot, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
           )
           print(json.dumps(snapshot, indent=2, sort_keys=True))
-          if not admission["admitted"]:
+          if admission["admitted"]:
+              reserve(
+                  RUNNER_TEMP / "ber-shared-allowance-state" / "allowance-state.json",
+                  allowance_id="pilot-a-recovery-20261031",
+                  workflow_run_id=os.environ.get("GITHUB_RUN_ID"),
+                  identity="eval-smoke-admission",
+                  amount_cents=SMOKE_CEILING_CENTS,
+                  ledger_spend_cents=history["ledger_spend_cents"],
+                  smoke_spend_cents=history["smoke_spend_cents"],
+                  ceiling_cents=OWNER_PROVIDER_CAP_CENTS,
+              )
+          else:
               print(
                   "REFUSED: the smoke reservation would exceed the shared "
                   + str(OWNER_PROVIDER_CAP_CENTS) + "-cent allowance",

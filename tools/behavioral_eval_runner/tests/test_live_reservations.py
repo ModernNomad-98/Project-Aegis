@@ -18,6 +18,10 @@ from tools.behavioral_eval_runner.live.reservations import (
     true_up,
 )
 from tools.behavioral_eval_runner.live.transport import SubjectTransport
+from tools.behavioral_eval_runner.live.subject import SubjectAdapter
+from tools.behavioral_eval_runner.live.providers import SUBJECT_PINS
+from tools.behavioral_eval_runner.live.config import OwnerAllowlist
+from tools.behavioral_eval_runner.live.judge_adapter import JudgeAdapter
 
 
 class SpyTransport(SubjectTransport):
@@ -83,6 +87,18 @@ class ReservationPersistenceTests(unittest.TestCase):
         if admission["admitted"]:
             spy.complete(None)
         self.assertEqual(spy.calls, 0)
+
+    def test_denied_admission_never_enters_production_dispatch(self):
+        adapter = SubjectAdapter(SUBJECT_PINS["anthropic"], SpyTransport(), max_output_tokens=16_384, timeout_seconds=300)
+        request = adapter.build_request(request_id="r", prompt="p", arm="BASELINE")
+        admission = admit_paid_call(
+            ceiling_cents=12_000, prior_ledger_spend_cents=11_900,
+            prior_smoke_spend_records={}, reservation_cents=200,
+        )
+        self.assertFalse(admission["admitted"])
+        if admission["admitted"]:
+            adapter.dispatch(request)
+        self.assertEqual(adapter.transport.calls, 0)
 
 
 if __name__ == "__main__":

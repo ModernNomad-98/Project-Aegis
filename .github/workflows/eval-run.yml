@@ -1658,7 +1658,10 @@ jobs:
 
           plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
           state = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
-          CEILING = int(plan["spend_ceiling_cents"])
+          CEILING = int(plan["spend_ceiling_cents"]) - int(state.get("incoming_outstanding_reservations_cents", 0))
+          if CEILING <= 0:
+              print("REFUSED: outstanding exposure exhausts the shared ceiling", flush=True)
+              raise SystemExit(1)
           COMMITTED_CASES = {
               case.case_id: case
               for case in load_cases(str(WORKSPACE / plan["dataset_path"]))
@@ -2412,6 +2415,15 @@ jobs:
           # case step but produced no manifest must fail the workflow, never
           # publish an empty artifact that later dispatches would trust.
           if-no-files-found: error
+
+      - name: Upload reservation/true-up state (always)
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-shared-allowance-state
+          path: ${{ runner.temp }}/ber-reservation-state/
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Preflight-only stop ($0, no provider call, no key mapped)
         # Owner decision item 4: one preflight-only dispatch costs nothing. This

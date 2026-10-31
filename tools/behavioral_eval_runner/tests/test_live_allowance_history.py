@@ -80,6 +80,7 @@ class FakeGH:
                     plan.setdefault("config_sha256", "e" * 64)
                     plan.setdefault("dataset_sha256", "f" * 64)
                     plan.setdefault("gate_id", "gate-1")
+                    plan.setdefault("subject_vendors", ["anthropic"])
                     plan.setdefault("max_output_tokens", 16384)
             payload.pop("__no_defaults__", None)
             (out_dir / member).write_text(json.dumps(payload), encoding="utf-8")
@@ -244,6 +245,27 @@ class AllowanceHistoryTests(unittest.TestCase):
             collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
         self.assertIn("unsupported", str(caught.exception))
 
+    def test_multiple_trial_manifests_with_different_totals_fail_closed(self):
+        fake = FakeGH(
+            {"smoke": [page([])], "trial": [page([run(900), run(901)])]},
+            {"900": [artifact("ber-resume-manifest")],
+             "901": [artifact("ber-resume-manifest")]},
+            {
+                ("900", "ber-resume-manifest"): (
+                    "manifest.json",
+                    {"schema": "ber-resume-manifest/1.2.0",
+                     "totals": {"spent_cents": 100}, "smoke_spend": {}},
+                ),
+                ("901", "ber-resume-manifest"): (
+                    "manifest.json",
+                    {"schema": "ber-resume-manifest/1.2.0",
+                     "totals": {"spent_cents": 200}, "smoke_spend": {}},
+                ),
+            },
+        )
+        with self.assertRaises(ValueError):
+            collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
+
     def test_missing_trial_manifest_refuses(self):
         fake = FakeGH(
             {"smoke": [page([])], "trial": [page([run(900)])]},
@@ -307,6 +329,9 @@ class AllowanceHistoryTests(unittest.TestCase):
             {"citability": "SYNTHETIC"},
             {"status": "UNKNOWN"},
             {"judge_model": ""},
+            {"judge_model": "evil-model"},
+            {"subject_vendor": "evil"},
+            {"judge_vendor": "evil"},
             {"proof_sha256": "0" * 64},
         ]
         for overrides in cases:
