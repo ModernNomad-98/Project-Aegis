@@ -18,7 +18,7 @@
       "reserved_cents": 8,
       "charged_cents": 8,
       "disposition": "PRESERVED_AND_ACCEPTED",
-      "evidence_ref": "PENDING OWNER ATTESTATION"
+      "evidence_ref": "Owner attestation 2026-10-30 21:02 PDT (Pilot A run record for run 41145221349 and the PR #986 post-merge note, comment 6538805513): $0.08 spent on this run, no other paid dispatch under eval-run.yml, 11,992 cents remaining of the unchanged $120 cap."
     }
   ],
   "budget_impact": {
@@ -27,13 +27,13 @@
     "cumulative_ceiling_cents_unchanged": true,
     "refunded_cents": 0
   },
-  "status": "PENDING",
-  "attested_by": "",
-  "attested_on": "",
-  "attestation_ref": "",
+  "status": "ATTESTED",
+  "attested_by": "Peter Nguyen (ModernNomad-98)",
+  "attested_on": "2026-10-30T21:02:00-07:00",
+  "attestation_ref": "Owner attestation 2026-10-30 21:02 PDT, re-issued with source (the owner's 20:57 PDT statement of spend to date). Sources: (1) the Pilot A run record for run 41145221349 - eval-run workflow_dispatch, head 877d6a27a36923cbdeff88a324640ec8cd8a7783, attempt 1, conclusion failure, one charged call of 8 cents; (2) the PR #986 post-merge note - merge receipt comment 6538805513 posted 2026-10-31T04:07:48Z at merge commit 88fdec73453ca460a45376a70b9bdbd08ea28d10. Figures: $0.08 (8 cents) spent on run 41145221349; no other paid dispatch under eval-run.yml (the only other eval-run dispatch, run 41145124808, was a preflight-only $0 stop that mapped no provider key); 11,992 cents remaining of the unchanged 12,000-cent ($120) cap. The owner accepted this as the statement of spend to date. The charge is preserved: no refund, no deletion, no repricing.",
   "limitations": [
-    "PENDING: no owner attestation exists yet for the provider usage of this call; the reservation charge is recorded as charged and is not deleted or refunded.",
-    "No paid retry is authorized until this record is ATTESTED with the owner evidence reference.",
-    "The prior $0.08 cost acceptance does not mechanically clear the unreconciled count; only an ATTESTED record covering ledger sha256 d9390d5a98483e0ac7abb24bb959af9f3e6ad927b1a2a75e5eb1bfe73fb0c989 does."
+    "The owner attestation is the owner's accepted statement of spend to date for run 41145221349; it is not provider usage telemetry, which never arrived for this call (the response was truncated at the old 512-token cap), so the exact token usage remains unknown. The 8-cent reservation charge stays recorded as charged and is not deleted, refunded, reset or repriced.",
+    "This ATTESTED record clears only the reconciliation gate for this preserved ledger point; it does not by itself authorize any further paid dispatch. Any next paid step (for example the bounded $0.50 single-case smoke) requires its own owner authorization.",
+    "The record covers only ledger sha256 d9390d5a98483e0ac7abb24bb959af9f3e6ad927b1a2a75e5eb1bfe73fb0c989; a different, edited or re-serialised ledger is not covered. The earlier acceptance of the $0.08 cost alone did not mechanically clear the unreconciled count; this ATTESTED record does."
   ]
 }
