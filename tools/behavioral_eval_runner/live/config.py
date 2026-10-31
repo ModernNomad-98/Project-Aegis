@@ -58,6 +58,16 @@ MIN_LIVE_MAX_OUTPUT_TOKENS = 4096
 #: pilot gate/config, and its spend counts against the shared 12,000c aggregate.
 SMOKE_CEILING_CENTS = 200
 
+#: Safe bound on a subject response's encoded UTF-8 bytes, derived from the $2
+#: smoke cap and the documented judge rates/scaffolding (see live/cumulative.py
+#: and the actual-byte basis tests). A subject response above this bound is
+#: refused fail-closed BEFORE any judge request is built or reserved, so it can
+#: never exceed the shared smoke/trial allowance; the subject's accounted cost
+#: remains, and the judge is not dispatched. 90,000 bytes gives smoke
+#: 21c + 176c = 197c <= 200c and trial 40 x (24c + 178c) + 222c = 8,302c <=
+#: 12,000c under the documented standard rates.
+MAX_SUBJECT_RESPONSE_BYTES = 90_000
+
 #: The committed build-only/no-spend dry-run config template, relative to the
 #: repository root. A live verb refuses this source: its spend-affecting values
 #: were authored for a synthetic mock run and never had a live-setting review.

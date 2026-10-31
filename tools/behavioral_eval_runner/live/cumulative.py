@@ -6,12 +6,15 @@ ledgers must not create separate allowances. The smoke spend is recorded by
 smoke run id so a resume counts it exactly once; the trial's runtime ceiling is
 `12,000 - prior ledger spend - cumulative smoke spend`.
 
-The reservation helpers in this module deliberately use only bounds the live
-package actually enforces: an input request is at most `max_input_bytes` UTF-8
-bytes and an input token cannot be smaller than one UTF-8 byte, so the byte
-count is a safe (conservative) input-token upper bound; the output cap is the
-configured `max_output_tokens`. No `bytes-per-output-token` scenario factor is
-used for a safe bound.
+The reservation helpers use only bounds the live package actually enforces: an
+input token cannot be smaller than one UTF-8 byte, so the ACTUAL request-builder
+byte count is a safe input-token upper bound; the output cap is the configured
+`max_output_tokens`. For the judge call the input bytes are the judge scaffolding
+(the builder's bytes with an empty subject text) plus the subject response bytes,
+and the pipeline enforces a hard `MAX_SUBJECT_RESPONSE_BYTES` response-byte cap
+before building or reserving the judge request. No `bytes-per-output-token`
+scenario factor is used for a safe bound; the global `max_input_bytes` bound is
+only a fallback for when actual builder bytes are unavailable.
 """
 
 from __future__ import annotations
@@ -138,3 +141,56 @@ def smoke_safe_reservation_bounds(
         "judge_max_cents": judge_cents,
         "smoke_max_cents": subject_cents + judge_cents,
     }
+
+
+def actual_byte_reservation_cents(
+    *,
+    input_bytes: int,
+    input_cents_per_mtok: int,
+    output_tokens: int,
+    output_cents_per_mtok: int,
+) -> int:
+    """Conservative reservation for a call from its ACTUAL request bytes.
+
+    Input tokens are bounded by the request's UTF-8 byte count (a token cannot
+    encode fewer than one byte), so this is safe without a tokenizer or a
+    bytes-per-output-token factor. The caller must supply the request bytes the
+    request builder actually produced.
+    """
+    return ceil_cents(
+        _non_negative_int(input_bytes, "input_bytes"),
+        _non_negative_int(input_cents_per_mtok, "input_cents_per_mtok"),
+        _non_negative_int(output_tokens, "output_tokens"),
+        _non_negative_int(output_cents_per_mtok, "output_cents_per_mtok"),
+    )
+
+
+def actual_byte_smoke_bounds(
+    *,
+    subject_request_bytes: int,
+    judge_scaffold_bytes: int,
+    max_subject_response_bytes: int,
+    max_output_tokens: int,
+    subject_input_cents_per_mtok: int,
+    subject_output_cents_per_mtok: int,
+    judge_input_cents_per_mtok: int,
+    judge_output_cents_per_mtok: int,
+) -> dict[str, int]:
+    """Safe smoke two-call bound from actual builder bytes plus the enforced
+    subject-response byte cap (judge input bytes <= scaffolding + response cap)."""
+    subject = actual_byte_reservation_cents(
+        input_bytes=subject_request_bytes,
+        input_cents_per_mtok=subject_input_cents_per_mtok,
+        output_tokens=max_output_tokens,
+        output_cents_per_mtok=subject_output_cents_per_mtok,
+    )
+    judge_bytes = _non_negative_int(judge_scaffold_bytes, "judge_scaffold_bytes") + _non_negative_int(
+        max_subject_response_bytes, "max_subject_response_bytes"
+    )
+    judge = actual_byte_reservation_cents(
+        input_bytes=judge_bytes,
+        input_cents_per_mtok=judge_input_cents_per_mtok,
+        output_tokens=max_output_tokens,
+        output_cents_per_mtok=judge_output_cents_per_mtok,
+    )
+    return {"subject_cents": subject, "judge_cents": judge, "smoke_cents": subject + judge}

@@ -42,6 +42,7 @@ from .config import (
     DRY_RUN_CONFIG_TEMPLATE_RELPATH,
     JUDGE_PINS,
     MIN_LIVE_MAX_OUTPUT_TOKENS,
+    MAX_SUBJECT_RESPONSE_BYTES,
     SMOKE_CEILING_CENTS,
     SUBJECT_PINS,
     LiveConfig,
@@ -946,6 +947,20 @@ def _execute_one(
         output_tokens=subject_result.usage.output_tokens,
         served_model=subject_result.served_model,
     )
+    subject_response_bytes = len(subject_text.encode("utf-8"))
+    if subject_response_bytes > MAX_SUBJECT_RESPONSE_BYTES:
+        # Fail closed BEFORE the judge request is built or reserved: the
+        # actual-byte safe bound requires the judge input (scaffolding + subject
+        # response) to stay within the enforced cap. The subject's accounted
+        # cost remains in the ledger, and the run halts; no judge dispatch.
+        raise LiveError(
+            "the subject response exceeds the safe encoded-byte bound",
+            context={
+                "subject_response_bytes": subject_response_bytes,
+                "max_subject_response_bytes": MAX_SUBJECT_RESPONSE_BYTES,
+            },
+            reason_code="SUBJECT_RESPONSE_BYTES_EXCEEDED",
+        )
     deterministic = evaluate_deterministic(case, subject_text)
     judge_adapter = JudgeAdapter(
         judge_pin,
