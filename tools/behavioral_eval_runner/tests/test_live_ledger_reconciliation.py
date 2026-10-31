@@ -33,6 +33,7 @@ import unittest
 from pathlib import Path
 
 from tools.behavioral_eval_runner.live.ledger_reconciliation import (
+    RECORD_KEYS,
     STATUS_ATTESTED,
     STATUS_PENDING,
     LedgerReconciliationRefusedError,
@@ -55,10 +56,11 @@ COMMITTED_RECORD = (
 CALL_REF = (
     "pilot-a-01-agent-startup-context-gate:WITH_SKILL:run-1:subject:anthropic"
 )
-# Every attestation field the record schema defines. Keeping the list explicit
-# means a synthetic PENDING copy clears all of them, and a future field cannot
-# silently leak into the unattested fixture.
-ATTESTATION_FIELDS = ("attested_by", "attested_on", "attestation_ref")
+# Every attestation field the record schema defines, derived from the schema's
+# own key set instead of a hand-written list: if the record schema gains a new
+# attestation key, this tuple grows with it and the synthetic PENDING copy
+# clears the new field too (a test pins the derivation and the expected set).
+ATTESTATION_FIELDS = tuple(sorted(key for key in RECORD_KEYS if "attest" in key))
 
 
 def _ledger():
@@ -74,8 +76,9 @@ def _pending_record():
 
     The committed record is now ATTESTED, but the fail-closed rule for an
     unattested record still has to be proven. This copy carries no attestation
-    fields and an explicitly synthetic evidence_ref, so it can never be
-    mistaken for the owner's attestation.
+    fields (every field derived from the record schema, see
+    ATTESTATION_FIELDS) and an explicitly synthetic evidence_ref, so it can
+    never be mistaken for the owner's attestation.
     """
     record = _committed()
     record["status"] = STATUS_PENDING
@@ -117,7 +120,27 @@ class FailedRunFixtureTests(unittest.TestCase):
                          "d9390d5a98483e0ac7abb24bb959af9f3e6ad927b1a2a75e5eb1bfe73fb0c989")
 
 
+class SchemaDerivationTests(unittest.TestCase):
+    def test_attestation_fields_are_derived_from_the_record_schema(self):
+        self.assertEqual(
+            ATTESTATION_FIELDS,
+            ("attestation_ref", "attested_by", "attested_on"),
+        )
+        self.assertEqual(
+            set(ATTESTATION_FIELDS),
+            {key for key in RECORD_KEYS if "attest" in key},
+        )
+
+
 class CommittedRecordTests(unittest.TestCase):
+    """Committed-state snapshot tests.
+
+    The expected owner identity, exact attestation instant and corroborating
+    comment id deliberately mirror the committed record: this test pins the
+    committed state so a silent content change fails. A legitimate
+    re-attestation updates the record and these expectations together.
+    """
+
     def test_committed_record_is_attested_and_reconciles_preserving_spend(self):
         record = load_record(COMMITTED_RECORD)
         self.assertEqual(record["status"], STATUS_ATTESTED)
@@ -146,11 +169,15 @@ class CommittedRecordTests(unittest.TestCase):
         self.assertEqual(
             record["budget_impact"]["remaining_ceiling_cents_preserved"], 11992
         )
-        self.assertIs(record["budget_impact"]["cumulative_ceiling_cents_unchanged"], True)
+        self.assertIs(
+            record["budget_impact"]["cumulative_ceiling_cents_unchanged"], True
+        )
         self.assertEqual(record["budget_impact"]["refunded_cents"], 0)
         self.assertEqual(record["reconciles"][0]["reserved_cents"], 8)
         self.assertEqual(record["reconciles"][0]["charged_cents"], 8)
-        self.assertEqual(record["reconciles"][0]["disposition"], "PRESERVED_AND_ACCEPTED")
+        self.assertEqual(
+            record["reconciles"][0]["disposition"], "PRESERVED_AND_ACCEPTED"
+        )
 
         ledger = _ledger()
         ledger_copy = copy.deepcopy(ledger)
@@ -205,7 +232,6 @@ class CommittedRecordTests(unittest.TestCase):
         # Plausible values are used for every field so the refusal cannot be an
         # accidental type/format rejection: a PENDING record must refuse the
         # presence of attested_by, attested_on or attestation_ref as such.
-        self.assertEqual(set(ATTESTATION_FIELDS), {"attested_by", "attested_on", "attestation_ref"})
         plausible = {
             "attested_by": "Peter Nguyen (ModernNomad-98)",
             "attested_on": "2026-10-30T21:02:00-07:00",
@@ -369,7 +395,7 @@ class FailClosedTests(unittest.TestCase):
             validate_record(record)
         self.assertEqual(caught.exception.reason_code, "RECONCILIATION_RECORD_INVALID")
 
-    def test_an_attested_record_without_any_attestation_field_is_refused(self):
+    def test_an_attested_record_with_any_blank_attestation_field_is_refused(self):
         # validate_record already enforces the invariant this exercises: a
         # PENDING record must carry all three attestation fields empty, and an
         # ATTESTED record requires each of them non-empty after stripping.
