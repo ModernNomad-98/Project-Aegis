@@ -965,6 +965,7 @@ jobs:
               directory.mkdir(parents=True, exist_ok=True)
           sys.path.insert(0, str(WORKSPACE))
           from tools.behavioral_eval_runner.live.allowance_history import (  # noqa: E402
+              collect_latest_allowance_state,
               collect_smoke_proof_spends,
           )
           from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
@@ -1515,6 +1516,17 @@ jobs:
               refuse("standalone smoke history is not restorable: " + str(exc))
           if standalone_smoke:
               prior_smoke_manifests.append(standalone_smoke)
+          try:
+              incoming_state = collect_latest_allowance_state(
+                  gh=lambda args: gh(*args),
+                  repository=repository,
+                  work_dir=RUNNER_TEMP / "ber-allowance-state",
+                  current_run_id=current_run,
+              )
+          except ValueError as exc:
+              refuse("shared allowance state is not restorable: " + str(exc))
+          incoming_outstanding = 0 if incoming_state is None else incoming_state["outstanding_reservations_cents"]
+          state["incoming_outstanding_reservations_cents"] = incoming_outstanding
           try:
               prior_smoke_spends = restore_smoke_spend(prior_smoke_manifests)
           except ValueError as exc:
@@ -3116,7 +3128,7 @@ jobs:
               "accounting": versioned_accounting_fields(
                   ledger_spend_cents=spent_total - smoke_spend,
                   smoke_spend_records=smoke_records,
-                  outstanding_reservations_cents=0,
+                  outstanding_reservations_cents=state.get("incoming_outstanding_reservations_cents", 0),
                   ceiling_cents=effective_ceiling,
               ),
               "cost": {

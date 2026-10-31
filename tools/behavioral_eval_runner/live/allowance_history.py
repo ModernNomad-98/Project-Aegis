@@ -32,6 +32,8 @@ SMOKE_ARTIFACT_NAME = "ber-live-smoke-proof"
 SMOKE_ARTIFACT_MEMBER = "smoke-proof.json"
 TRIAL_ARTIFACT_NAME = "ber-resume-manifest"
 TRIAL_ARTIFACT_MEMBER = "manifest.json"
+STATE_ARTIFACT_NAME = "ber-shared-allowance-state"
+STATE_ARTIFACT_MEMBER = "allowance-state.json"
 PRESERVED_HISTORICAL_LEDGER_CENTS = 222
 PRESERVED_HISTORICAL_SMOKE_CENTS = 18
 
@@ -285,3 +287,39 @@ def collect_allowance_history(
         "smoke_spend_cents": smoke_spend_total(smoke_records),
         "source_schema": {"trial": trial["schema"], "accounting": ACCOUNTING_SCHEMA},
     }
+
+
+def collect_latest_allowance_state(
+    *, gh: Callable[..., Any], repository: str, work_dir: Path,
+    current_run_id: Any = None,
+) -> dict[str, Any] | None:
+    """Consume the newest uploaded reservation/admission state from either
+    workflow. A present-but-unreadable latest state refuses; absent state is
+    reported as None (no fabricated zero)."""
+    from .reservations import validate_state
+
+    chosen: tuple[int, dict[str, Any]] | None = None
+    for workflow_file in ("eval-smoke.yml", "eval-run.yml"):
+        for run in list_workflow_runs(gh, repository, workflow_file):
+            if not isinstance(run, Mapping):
+                raise ValueError("a state workflow-run entry was not an object")
+            run_id = run.get("id")
+            if run_id is None:
+                raise ValueError("a state workflow-run entry has no id")
+            if current_run_id is not None and str(run_id) == str(current_run_id):
+                continue
+            if not _run_has_ended(run):
+                continue
+            artifacts = list_run_artifacts(gh, repository, run_id)
+            names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
+            if STATE_ARTIFACT_NAME not in names:
+                continue
+            payload = download_artifact_json(
+                gh, repository, run_id, STATE_ARTIFACT_NAME,
+                STATE_ARTIFACT_MEMBER, Path(work_dir) / "state",
+            )
+            validated = validate_state(payload)
+            numeric_id = int(run_id) if isinstance(run_id, int) else 0
+            if chosen is None or numeric_id > chosen[0]:
+                chosen = (numeric_id, validated)
+    return None if chosen is None else chosen[1]
