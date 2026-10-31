@@ -11,9 +11,9 @@ Turn a stated goal into a **ranked shortlist of at most five existing, shipped
 Aegis skills** — each with the role it plays, why it fits this goal, the order
 to use it in, and the source revision the answer was built from. This is the
 **selection** layer above the catalog: the catalog lists what exists, the
-coverage map records campaign status, the shipped-skill manifest proves what is
-installed, and this skill composes those three read-only artifacts into one
-answer a human can act on.
+coverage map records campaign status, the shipped-skill manifest proves what the
+library **ships** at its recorded revision, and this skill composes those three
+read-only artifacts into one answer a human can act on.
 
 It is deliberately narrow: **read-only**, **advisory-only**, **never
 inventing**. It recommends; it does not invoke, install, edit, write, deploy,
@@ -93,27 +93,41 @@ backlog — never an installed capability.
    coverage map when read. Quote the artifact and value; never report a
    remembered revision.
 
-## Candidate availability classes (resolve per candidate, read-only)
+## Candidate availability (orthogonal facts, resolve per candidate, read-only)
 
-A candidate's availability is a separate claim from shipping. Resolve and report
-one class per candidate:
+Availability is **not one mutually exclusive four-way bucket**. Resolve and
+report these orthogonal facts for every serious candidate; a normal resolved
+candidate is both source-shipped AND consumer-local-present, and both facts must
+be reported:
 
-- **source-shipped** — the name is in `tools/skills-manifest.json`; quote that
-  entry's `path`, `sha256` and the manifest's `source_revision`.
-- **consumer-local-resolved** — the candidate's `SKILL.md` exists in the tree
-  where the user actually works. Record its local path and a sha256 comparison
-  with the source manifest as `match | mismatch | source-revision-unknown`. A
-  source-manifest entry alone never proves this class.
-- **external-advisory-only** — the capability exists only as host/third-party
-  guidance or service. Mention it **as advisory only**, name the source and its
+- **source facts** — is the name in `tools/skills-manifest.json`? If yes, quote
+  that entry's `path`, `sha256` and the manifest's `source_revision`; if no,
+  say "not in the shipped manifest" (a catalog/roadmap/GAP mention is not
+  shipped). This is a claim about the source library only, never proof of a
+  consumer copy.
+- **local facts (consumer tree)** — does the candidate's `SKILL.md` exist in the
+  tree where the user actually works? Report `present <path>`, `absent` or
+  `unknown`. For a present copy report `hash: match | mismatch | unknown`
+  against the source manifest: `mismatch` means the local copy differs (for
+  example a pinned or edited copy), **not** that the capability is absent;
+  `unknown` means the file exists but could not be read/hashed this session. A
+  source-manifest entry alone never proves a local copy.
+- **advisory facts** — is the capability available only as host/third-party
+  guidance or service? If so label it `advisory-only`, name the source and its
   limits, and never count it as an installed Aegis control, a required gate or a
   PASS.
-- **unavailable** — no evidence of the above. For a mandatory capability, record
-  the obligation as `INCOMPLETE` with the owner disposition and the consumer's
-  own fail-closed route (name the step/owning skill; exact allow-list copy
-  command per the consumer package; a recorded consumer decision before use; no
+- **mandatory status** — is a required control unavailable locally? Record the
+  obligation as `INCOMPLETE` with the owner disposition and the consumer's own
+  fail-closed route (name the step/owning skill; exact allow-list copy command
+  per the consumer package; a recorded consumer decision before use; no
   substitution and no `n/a` to pass a gate). Never install, sync, re-pin or
   override a consumer copy as this skill's action.
+
+Do not force these facts into one class. Standardize the unknown states:
+`unknown` means unread/unhashable this session; a local copy that differs from
+the source is `mismatch`, never "unknown"; `source-revision-unknown` is not a
+separate state — quote the manifest `source_revision` whenever the manifest is
+readable and report a missing/unreadable manifest under Unknowns.
 
 ## Workflow
 
@@ -135,8 +149,8 @@ one class per candidate:
    constraint that would change the shortlist is missing (a hard technology
    limit or a non-negotiable scope boundary), ask ONE focused question before
    ranking instead of guessing; skip the question when a default is safe. After
-   loading the inputs, resolve each serious candidate's availability in the tree
-   where the user works (see Candidate availability classes): the source
+   loading the inputs, resolve each serious candidate's availability facts in
+   the tree where the user works (see Candidate availability): the source
    manifest alone never proves a consumer installation.
 3. **Build the candidate set from the manifest only.** Take every candidate
    name from `tools/skills-manifest.json`. Exclude anything not in the
@@ -164,8 +178,9 @@ one class per candidate:
      gate). This list is **uncapped**, not ranked as optional, and **never**
      placed under "Not recommended". For each, record: the obligation, its
      governing source, the stage, the owning method where one is established,
-     the evidence required, and the owner disposition while unmet
-     (`INCOMPLETE`; never `n/a` to pass a gate). Consume existing
+     that method's posture (`auto` or `MANUAL-ONLY — human must invoke`), the
+     evidence required, and the owner disposition while unmet (`INCOMPLETE`;
+     never `n/a` to pass a gate). Consume existing
      classification/policy output — do not re-classify and do not waive.
    - **Optional recommendation shortlist** — at most **5** skills, ordered as a
      working sequence, each with a role and the handoff it makes/receives. If
@@ -173,9 +188,9 @@ one class per candidate:
      the optional near-misses under **Not recommended** with the reason.
    A cap on the optional shortlist is never a waiver of a mandatory obligation.
    Do not present a set when one skill is the honest answer.
-7. **Record the coverage answer.** State what the installed library does and
+7. **Record the coverage answer.** State what the shipped library does and
    does not cover for this goal. A GAP is an optional backlog candidate
-   (if the coverage map is readable), never a planned or installed skill. If
+   (if the coverage map is readable), never a planned or shipped capability. If
    no candidate fits, return an explicit "no fit in the shipped library" plus
    the closest near-misses — do not invent.
 8. **Emit the output block below and stop.** Name the artifacts and revisions
@@ -189,24 +204,28 @@ SKILL SELECTION — <goal in one line>
 Inputs read: catalog <read|missing>; manifest <source_revision> (<N> shipped
   skills); coverage map <basis.repo_commit | not read/missing>; project-state
   <present|absent>
+Mandatory obligations (never capped, never "Not recommended"):
+  - <obligation/control> — source: <governing artifact/classification/policy>;
+    stage: <stage>; owner method: <skill | not established>; posture: auto |
+    MANUAL-ONLY — human must invoke; evidence: <required>;
+    disposition: <met | INCOMPLETE — owner decision needed>
 Shortlist (<=5):
   1. <skill> — role: <what it owns>; why: <fit for this goal>; order:
      <its place and the handoff it makes/receives>; posture: auto |
      MANUAL-ONLY — human must invoke
   2. ...
-Mandatory obligations (never capped, never "Not recommended"):
-  - <obligation/control> — source: <governing artifact/classification/policy>;
-    stage: <stage>; owner method: <skill | not established>; evidence:
-    <required>; disposition: <met | INCOMPLETE — owner decision needed>
-Availability per candidate:
-  <skill> — source-shipped | consumer-local-resolved | external-advisory-only |
-    unavailable — contract <path> @ <sha256> (manifest source_revision=<rev>);
-    local <path | not found> hash <match | mismatch | unknown>; limit:
-    <consumer-pinned-copy / manual-only / advisory limits>
+Availability per candidate (orthogonal facts; a candidate can be both
+source-shipped and consumer-local-present):
+  <skill> — source: shipped <path> @ <sha256> (manifest
+    source_revision=<rev>) | not in manifest; local: present <path> hash
+    <match | mismatch | unknown> | absent | unknown; advisory-only: <no |
+    yes — source + limits>; mandatory: <met | INCOMPLETE — owner disposition>
+    <!-- contract path/sha256 fields appear only for source-shipped entries;
+         omit them for advisory-only/unavailable -->
 Not recommended: <optional near-miss skills and the one-line reason each was not
   picked, or "none">
-Gaps: <installed-library gaps for this goal; coverage-map GAP rows are optional
-  backlog only — not installed> | none | unknown (coverage map not read)
+Gaps: <shipped-library gaps for this goal; coverage-map GAP rows are optional
+  backlog only — not shipped> | none | unknown (coverage map not read)
 Unknowns: <unreadable/stale inputs, missing constraints, assumptions refused>
 Source revision: manifest source_revision=<value>; coverage map
   basis.repo_commit=<value | not read>
@@ -246,15 +265,18 @@ installed control or a PASS.
       optional shortlist; none is capped, ranked as optional, or placed under
       "Not recommended".
 - [ ] Each mandatory obligation names its governing source (classification/
-      policy/gate record), stage, owning method where established, required
-      evidence and owner disposition; this advisor did not re-classify.
-- [ ] Every candidate carries an availability class, with contract path/sha256/
-      manifest source_revision where source-shipped; consumer-local resolution is
-      reported separately from the source manifest.
+      policy/gate record), stage, owning method where established, that method's
+      posture (including `MANUAL-ONLY — human must invoke`), required evidence
+      and owner disposition; this advisor did not re-classify.
+- [ ] Every candidate reports the orthogonal availability facts (source facts,
+      local present/absent/unknown + hash match/mismatch/unknown, advisory-only,
+      mandatory status); a candidate can be both source-shipped and
+      consumer-local-present, and contract path/sha256 appear only for
+      source-shipped entries.
 - [ ] No consumer copy is installed, synced, re-pinned or overridden (and none is
       recommended as this skill's action); consumer-pinned-copy limits are
       stated; an unavailable mandatory capability stays INCOMPLETE with no
-      fabricated a11y/external-advisory PASS.
+      fabricated accessibility/external-advisory PASS.
 
 ## Gotchas
 
@@ -270,13 +292,14 @@ installed control or a PASS.
   the different job this skill owns.
 - **The manifest is the shipped set, not the installed set.** A catalog row or
   a roadmap row can exist while the skill is not shipped; a manifest entry never
-  proves a consumer installed that directory. Report source-shipped and
-  consumer-local-resolved separately with the contract identity, and never
-  install, sync, re-pin or override a consumer copy.
-- **Availability classes are not decoration.** Source-shipped,
-  consumer-local-resolved, external/advisory-only and unavailable are different
-  claims; external/advisory guidance is never an installed Aegis control, a
-  required gate or a PASS.
+  proves a consumer installed that directory. Report source facts and local facts
+  separately with the contract identity, and never install, sync, re-pin or
+  override a consumer copy.
+- **Availability facts are orthogonal, not one bucket.** Source-shipped and
+  consumer-local-present can both be true (the normal resolved case); a local
+  hash mismatch means a differing copy, not an absent capability. Report the
+  facts separately; external/advisory guidance is never an installed Aegis
+  control, a required gate or a PASS.
 - **Manual-only is a boundary, not a note.** Recommending a manual-only skill
   without the human-invokes label is the failure this skill exists to
   prevent.

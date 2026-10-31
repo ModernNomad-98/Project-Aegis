@@ -160,6 +160,9 @@ Adoption: <which producers follow this (manual/clickthrough/playwright) +
   captures — stable/seeded data is a capture-quality rule, not a nicety.
 - A policy nobody can follow in-flow (20 manual fields per capture) will be
   ignored — metadata that can be auto-derived (build, timestamp) must be.
+- Metadata is evidence and leaks like evidence: a raw URL in `entry_path` can
+  carry tokens/PII, and a typed value in an action sequence can be a secret.
+  Sanitize the metadata before storage, not after.
 
 ## Stop Conditions
 
@@ -181,35 +184,54 @@ rules live in [references/evidence-rules.md](references/evidence-rules.md).
 - **Capture mode.** Every capture records `capture_mode`: `cold_fixture_direct`
   (clean state reached by direct URL with seeded data, no prior UI action) or
   `visible_control_transition` (a defined visible control state -> action ->
-  exercised state, with `pre_state`/`post_state`). An interaction-behavior
+  exercised state, with **required** `pre_state`/`post_state` for that
+transition). An interaction-behavior
   capture MUST show the visible-control transition; cold captures are the
   pre-state baseline, never a substitute for the transition.
-- **Entry path.** Record the URL/route, seed fixture id, persona and the action
-  sequence that reached the state, so the capture is reproducible.
+- **Entry path.** Record the route template (not raw query values), seed fixture
+  id, persona and the action TYPES that reached the state, so the capture is
+  reproducible. Mask/sanitize tokens, query parameters and typed values per the
+  metadata privacy rule in the reference before storage.
 - **Behavior binding.** Record the `behavior_ref`: the checkpoint/behavior/
   acceptance expectation the frame proves. A capture with no behavior binding is
   context, not evidence.
 - **Current-candidate evidence set.** For the current candidate (build/commit/
   artifact identity) define the expected member list from the checkpoint plan
-  and tag each capture with `candidate_id`. Stale or superseded images under the
-  current evidence root are **unexpected members = contamination, not extra
-  coverage**. Preserve historical evidence in a candidate-scoped archive/record
-  with its retention class and a superseded marker; never delete or overwrite
-  historical evidence without authorisation. Report expected members, unexpected
-  members and historical archive separately.
+  and tag each capture with `candidate_id` (validated as a safe path token
+  before any path use). Stale or superseded images under the current evidence
+  root are **unexpected members = contamination, not extra coverage**. Report
+  expected members, unexpected members and the historical archive separately.
+  This planner **reports contamination only**: it does not move, archive, delete
+  or overwrite evidence files itself. Preserving/archiving historical evidence in
+  a candidate-scoped archive/record requires **explicit recorded owner
+  authorisation** and is performed by the evidence holder, not this planner.
+- **Privacy.** Metadata is evidence: `entry_path` action types, `pre_state`/
+  `post_state` descriptions and `candidate_id` must be masked/sanitized before
+  storage using the masking classes (no raw query tokens, PII, tenant data or
+  typed secrets).
 - **Validation.** Capture-quality is not met by a set of cold screenshots alone:
   interaction coverage requires the visible-control transitions, and stale
   superseded images are reported as contamination rather than counted as
-  coverage.
+  coverage. Review completeness is **not** claimed while unexpected members
+  remain — list them as unresolved until dispositioned.
+- **Checklist for this policy revision.**
+  - [ ] Metadata (entry-path action types, pre/post state descriptions,
+        candidate_id) is masked/sanitized before storage; no tokens, PII, tenant
+        data or typed secrets appear in metadata or the sidecar.
+  - [ ] Expected members, unexpected members and the historical archive are
+        reported separately; review completeness is not claimed while unexpected
+        members (contamination) remain unresolved.
+  - [ ] The planner reports contamination only — it does not move, archive,
+        delete or overwrite evidence; any archival/removal requires explicit
+        recorded owner authorisation by the evidence holder.
 
 ## Supporting Files
 
-- See the **Capture mode, entry path, behavior binding and current-candidate
-  evidence set** section above for the policy additions; the metadata schema and
-  membership rules are in [references/evidence-rules.md](references/evidence-rules.md).
 - [references/evidence-rules.md](references/evidence-rules.md) — checkpoint
-  selection catalog, naming token table, masking classes, metadata schema,
-  and storage-class matrix.
+  selection catalog, naming token table, masking classes (including metadata
+  masking/sanitization), metadata schema, capture-mode/entry-path rules,
+  current-candidate membership, and storage-class matrix; the additions above
+  are detailed there.
 - `evals/evals.json` — trigger + behavior cases.
 - `evals/trigger-evals.json` — discrimination within the UI/manual cluster
   and against the shipped `ai-closeout-reporter`.

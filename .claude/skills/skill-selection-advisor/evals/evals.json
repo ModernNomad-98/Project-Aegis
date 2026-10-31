@@ -152,9 +152,23 @@
         "triggers": true,
         "assertions": [
           "Identifies accessibility-test-harness as source-shipped using the manifest entry with its path, sha256 and the manifest source_revision, and does not treat the source manifest as proof it is installed in the user's tree.",
-          "Reports consumer-local resolution separately (not found/unknown) and keeps the mandatory accessibility obligation INCOMPLETE with an owner disposition instead of claiming a PASS.",
-          "Does not install, sync, re-pin or override the consumer's copies; states that consumer-owned pinned copies and a deliberate authorised resync are the consumer's decision.",
-          "Does not fabricate an accessibility PASS and does not count external/advisory-only guidance as an installed Aegis control or a required gate."
+          "Reports the local facts separately and orthogonally: present/absent/unknown with hash match/mismatch/unknown, noting that a candidate can be both source-shipped and consumer-local-present and that mismatch means a differing copy, not an absent capability.",
+          "Keeps the mandatory accessibility obligation INCOMPLETE with an owner disposition instead of claiming a PASS, and does not install, sync, re-pin or override the consumer's copies; states that consumer-owned pinned copies and a deliberate authorised resync are the consumer's decision.",
+          "Does not fabricate an accessibility PASS and does not count external/advisory-only guidance as an installed Aegis control or a required gate; uses the standard unknown state (unknown = unread/unhashable, not source-revision-unknown)."
+        ]
+      }
+    },
+    {
+      "id": "edge-manual-only-mandatory-obligation-posture",
+      "type": "should_trigger",
+      "prompt": "For our release the required security review is owned by a manual-only Aegis skill. Which skills should we use, and what must a human run?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Lists the required security review in the mandatory-obligations block, uncapped and never under 'Not recommended', separate from the at-most-five optional shortlist.",
+          "Records the owning method's posture as 'MANUAL-ONLY — human must invoke' (never auto or auto-invoked) together with the governing source, stage, required evidence and owner disposition.",
+          "States that the manual-only owner must be invoked by the human; the selector does not invoke or run it.",
+          "Keeps the optional shortlist at most five while the mandatory obligation remains listed even if more than five optional candidates fit."
         ]
       }
     }

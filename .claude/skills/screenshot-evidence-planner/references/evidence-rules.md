@@ -52,27 +52,54 @@ context. Masking happens before the file reaches storage.
 
 `{capture_id, checkpoint_id, case_or_session_id, build, environment,
 persona, viewport, captured_at, masked: bool, storage_class, capture_mode,
-entry_path, behavior_ref, candidate_id}`
+entry_path, behavior_ref, candidate_id, pre_state?, post_state?}`
 
 Field notes: `capture_mode` is `cold_fixture_direct` (clean state reached by
 direct URL with seeded data, no prior UI action) or
 `visible_control_transition` (defined visible control state -> action ->
-exercised state; also record `pre_state`/`post_state`). `entry_path` is the
-URL/route + seed fixture id + persona + action sequence that reached the state.
-`behavior_ref` names the checkpoint/behavior/acceptance expectation the frame
-proves. `candidate_id` is the current candidate identity (build/commit/artifact).
+exercised state). For `visible_control_transition`, `pre_state` and
+`post_state` are **required** (describe the visible states with masked/
+placeholder values); for `cold_fixture_direct` they are optional/not applicable.
+`entry_path` is the route template + seed fixture id + persona + action TYPES
+(not typed values) that reached the state. `behavior_ref` names the
+checkpoint/behavior/acceptance expectation the frame proves. `candidate_id` is
+the current candidate identity (build/commit/artifact token, validated as a safe
+path token before path use).
 
-Auto-derive everything derivable (build, timestamp, viewport); humans only
-supply the checkpoint/case linkage.
+**Auto-derived / human-supplied:** auto-derive everything derivable (build,
+timestamp, viewport, assembled candidate id); humans supply the non-derivable
+fields — checkpoint/case linkage, `capture_mode`, the `entry_path` action
+sequence, `behavior_ref`, and the `pre_state`/`post_state` descriptions.
+Those human-supplied fields are masked/sanitized before storage (next section).
 
 ## Capture mode and entry path
 
 Interaction behavior evidence must show a **visible-control transition**: start
 from a defined visible control state, perform the action, capture the exercised
-state (also record the pre-state when context matters). `cold_fixture_direct`
-captures are the baseline/pre-state by default and never substitute for the
-transition. Every capture must be reproducible from its `entry_path`; a capture
-whose entry path is unknown is context, not proof.
+state, and record both `pre_state` and `post_state` (required for this mode).
+`cold_fixture_direct` captures are the baseline/pre-state by default and never
+substitute for the transition. Every capture must be reproducible from its
+`entry_path` (route template + action types); a capture whose entry path is
+unknown is context, not proof.
+
+## Metadata privacy, masking and sanitization (before storage)
+
+Metadata is evidence and follows the masking classes above; masking is enforced
+**before storage**, like frame masking.
+
+- `entry_path`: store the route template, not raw URLs; strip or mask query
+  strings/fragments (tokens, session ids, emails, names) and record action
+  **types** (`clicked sort`, `selected status filter`) rather than typed values.
+  If a flow types a secret or PII, record `typed <field> (masked)` — never the
+  value.
+- `pre_state`/`post_state`: describe states with masked/placeholder values; no
+  PII, tenant data, tokens or typed secrets. M2/M3 metadata follows the restricted
+  store; if it cannot be masked, it is not stored.
+- `candidate_id`: derive it from the immutable build/commit/artifact identity and
+  validate it against a safe path-token allowlist before it is used in archive
+  paths; never derive it from user-supplied text (path-traversal risk).
+- `behavior_ref`/`checkpoint_id`/`case_or_session_id`: stable ids only; never a
+  raw user string.
 
 ## Storage-class matrix
 
@@ -97,5 +124,9 @@ Compare the current evidence root against that expected list:
 - **historical archive** — earlier-candidate evidence kept in a candidate-scoped
   archive/record with its retention class and a superseded marker.
 
-Report the three lists separately. Membership check detects contamination; it
-never deletes, overwrites or silently prunes historical evidence.
+Report the three lists separately. **The planner reports contamination only: it
+does not move, archive, delete, overwrite or silently prune evidence files.**
+Archiving or removing historical evidence requires **explicit recorded owner
+authorisation** (named owner + authorization record) and is performed by the
+evidence holder, not by this planner. Review completeness is not claimed while
+unexpected members remain unresolved.

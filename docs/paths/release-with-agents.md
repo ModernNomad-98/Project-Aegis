@@ -102,7 +102,10 @@ The reviewers above must inspect one frozen candidate, not a moving target.
    read-only, and no one edits the candidate while independent review is running.
 4. **Freeze before independent final review.** Freeze and record the candidate's
    tree, artifact and evidence-set identity (expected members) before the final
-   independent review; that review's verdict binds the frozen identity.
+   independent review; that review's verdict binds the frozen identity. The
+   expected-member, contamination and historical-archive rules are owned by
+   [`screenshot-evidence-planner`](../../.claude/skills/screenshot-evidence-planner/SKILL.md) — use
+   its evidence-set membership check here rather than re-inventing it.
 5. **A necessary change supersedes the old candidate.** If review requires a
    change, state the new candidate identity explicitly (new tree/artifact and
    affected dimensions). The old verdict never authorizes the new identity; a

@@ -75,9 +75,9 @@ not exploratory wandering.
 5. **Rate and file defects:** severity (blocker/major/minor/cosmetic) +
    reproduction steps + evidence reference. A defect without repro steps and
    a screenshot is a rumor, not a finding.
-6. **Report coverage honestly:** routes/interactions completed vs planned vs
-   skipped (with why — auth wall, data unavailable, time). Unvisited ≠
-   passing.
+6. **Report coverage honestly:** routes, table-interaction states and individual
+   interactions completed vs planned vs skipped (with why — auth wall, data
+   unavailable, time). Unvisited ≠ passing.
 7. **Hand off:** blockers → `systematic-debugger`/owner immediately; recurring
    passes worth automating → `playwright-e2e-engineer` candidates (with the
    journey named); evidence bundle → release closeout (`ai-closeout-reporter`).
@@ -94,7 +94,8 @@ Defects:
   <id> — <severity> — <route/step> — expected vs observed — repro steps
        — evidence <screenshot ref>
 Checkpoints captured: <named screenshots per evidence rules, masked>
-Coverage: executed <n/n routes, n/n interactions> | skipped <what + why>
+Coverage: executed <n/n routes, n/n interactions, n/n table-interaction states>
+  | skipped <what + why>
 Automation candidates: <journeys worth a permanent Playwright spec + why>
 Handoffs: <blockers → owner/systematic-debugger; evidence → closeout>
 ```
@@ -113,6 +114,10 @@ Handoffs: <blockers → owner/systematic-debugger; evidence → closeout>
       order in BOTH directions (unsorted fixture, nulls/ties exercised), filter
       membership/counts checked, pagination consistency where present, and
       empty-result recovery verified.
+- [ ] Table interaction coverage is reported separately from route-level coverage
+      (sorted/filtered/empty-result states itemised), not folded into a route pass.
+- [ ] Filter+sort composition checked in both orders; one control does not reset
+      the other.
 - [ ] No permanent spec files written (that's Playwright's lane).
 
 ## Safety Rules
