@@ -38,6 +38,32 @@ DEFAULT_REQUEST_TIMEOUT_SECONDS = 300
 #: a request over this bound is refused BEFORE any reservation or dispatch.
 DEFAULT_MAX_INPUT_BYTES = 200_000
 
+#: Live-setting floor for the output budget. The first Pilot A live dispatch
+#: halted fail-closed after one call because the build-only dry-run template
+#: (max_output_tokens 512) had never been raised for live: the subject response
+#: was truncated at the provider stop reason. A live verb refuses any config
+#: below this floor BEFORE it resolves a credential or reserves a call. 4096 is
+#: the owner-directed live value: twice the build-only package default (2048),
+#: with headroom for the longest committed case prompt and long-form answer,
+#: and a worst-case reservation bound that stays under the unchanged $120 cap
+#: (see live/config/pilot-a-live-config.json and the fix PR cost table).
+MIN_LIVE_MAX_OUTPUT_TOKENS = 4096
+
+#: The single-case live smoke HARD ceiling, in INTEGER CENTS: 50 cents = $0.50.
+#: The committed smoke config template must not exceed it (a 51-cent template is
+#: refused, not clamped), the runner clamps the meter to min(this, config
+#: ceiling, gate ceiling, provider cap), and the smoke workflow re-verifies the
+#: cap. A smoke therefore cannot spend more than 50 cents even when handed the
+#: full pilot gate/config.
+SMOKE_CEILING_CENTS = 50
+
+#: The committed build-only/no-spend dry-run config template, relative to the
+#: repository root. A live verb refuses this source: its spend-affecting values
+#: were authored for a synthetic mock run and never had a live-setting review.
+DRY_RUN_CONFIG_TEMPLATE_RELPATH = (
+    "tools/behavioral_eval_runner/live/config/dry-run-config.json"
+)
+
 
 def expected_price_table() -> dict[str, Any]:
     return {vendor: pin.to_dict() for vendor, pin in sorted(SUBJECT_PINS.items())}

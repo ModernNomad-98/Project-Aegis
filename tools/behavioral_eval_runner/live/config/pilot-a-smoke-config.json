@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "spend_ceiling_cents": 50,
+  "max_output_tokens": 4096,
+  "runs_per_case": 1,
+  "request_timeout_seconds": 300,
+  "subject_vendors": [
+    "anthropic"
+  ],
+  "judge_allowlist": {
+    "judge_models": [
+      {
+        "vendor": "openai",
+        "model": "gpt-6-astra"
+      }
+    ]
+  }
+}

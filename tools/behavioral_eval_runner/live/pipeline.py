@@ -38,7 +38,14 @@ from . import (
     LIVE_PACKAGE_VERSION,
     LIVE_SCHEMA_VERSION,
 )
-from .config import JUDGE_PINS, SUBJECT_PINS, LiveConfig
+from .config import (
+    DRY_RUN_CONFIG_TEMPLATE_RELPATH,
+    JUDGE_PINS,
+    MIN_LIVE_MAX_OUTPUT_TOKENS,
+    SMOKE_CEILING_CENTS,
+    SUBJECT_PINS,
+    LiveConfig,
+)
 from .cost_meter import CostMeter
 from .credentials import (
     CREDENTIAL_ENV_VARS,
@@ -49,6 +56,7 @@ from .credentials import (
 from .dataset import LiveCase, dataset_digest, evaluate_deterministic, load_cases
 from .errors import (
     JudgeRubricSourceError,
+    LiveConfigRefusedError,
     LiveError,
     LiveGateRefusedError,
 )
@@ -67,6 +75,160 @@ from .transport import ProviderResponse, ProviderUsage, SubjectTransport
 
 ARMS = ("WITH_SKILL", "BASELINE")
 ACCESS_POLICY_REF = "BER-LIVE-1.0.0-owner-gate"
+
+#: The one arm a single-case smoke executes. The smoke exists to prove that the
+#: judge completes against a real subject response, not to compare arms, so it
+#: makes exactly one subject call and exactly one judge call (WITH_SKILL arm).
+SMOKE_ARM = ARMS[0]
+SMOKE_RUNS = 1
+SMOKE_CALLS = 2
+
+
+def _is_dry_run_config_source(config_path: str, repo_root: str) -> bool:
+    """True when a live verb was handed the committed build-only dry-run template.
+
+    The dry-run template is a build-only/no-spend artifact: its spend-affecting
+    values (512 max_output_tokens among them) were authored for a synthetic mock
+    run and were never reviewed as live settings. The first Pilot A dispatch used
+    it and halted after one call, so a live verb refuses it by resolved identity
+    AND by its template filename - a staged copy that keeps the filename is
+    refused as well. This guard is deliberately independent of the value floor:
+    the floor catches a renamed copy whose values are still build-only, and this
+    guard names the build-only source itself.
+    """
+    if not isinstance(config_path, str) or not config_path:
+        return False
+    if os.path.basename(os.path.normpath(config_path)).lower() == "dry-run-config.json":
+        return True
+    packaged = os.path.realpath(
+        os.path.join(repo_root, *DRY_RUN_CONFIG_TEMPLATE_RELPATH.split("/"))
+    )
+    return os.path.realpath(config_path) == packaged
+
+
+def _require_smoke_config(config: LiveConfig) -> None:
+    """A smoke run is exactly one attempt: one subject vendor and one run."""
+    problems: list[str] = []
+    if config.runs_per_case != 1:
+        problems.append(
+            f"runs_per_case must be {SMOKE_RUNS}, got {config.runs_per_case}"
+        )
+    if len(config.subject_vendors) != 1:
+        problems.append(
+            "subject_vendors must name exactly one vendor, got "
+            f"{list(config.subject_vendors)}"
+        )
+    if config.spend_ceiling_cents > SMOKE_CEILING_CENTS:
+        # The $0.50 cap is a ceiling, not a clamp target: a config above it is
+        # refused, so the committed template cannot drift above the cap.
+        problems.append(
+            "spend_ceiling_cents must be <= "
+            f"{SMOKE_CEILING_CENTS} (the 50-cent smoke cap), got "
+            f"{config.spend_ceiling_cents}"
+        )
+    if problems:
+        raise LiveConfigRefusedError(
+            "the smoke config is not a single-case smoke shape and would "
+            "dispatch more than one subject call: " + "; ".join(problems),
+            context={
+                "runs_per_case": config.runs_per_case,
+                "subject_vendors": list(config.subject_vendors),
+                "required_calls": SMOKE_CALLS,
+            },
+            reason_code="SMOKE_CONFIG_INVALID",
+        )
+
+
+def _require_live_config_values(
+    config: LiveConfig, *, config_path: str, repo_root: str, smoke: bool
+) -> None:
+    """Live-setting guards: fail closed before any credential or call.
+
+    The gate, the config validator and the cost meter each independently bound
+    spend; these guards bound the OUTPUT-BUDGET value and the config SOURCE, so
+    a build-only template or a value below the observed-failure floor can never
+    reach a live dispatch.
+    """
+    if _is_dry_run_config_source(config_path, repo_root):
+        raise LiveConfigRefusedError(
+            "the committed build-only dry-run config template is refused as a "
+            "live setting; dispatch a live config template instead (its "
+            "spend-affecting values have not had a live-setting review)",
+            context={
+                "config_path": config_path,
+                "dry_run_template": DRY_RUN_CONFIG_TEMPLATE_RELPATH,
+                "live_setting_floor_tokens": MIN_LIVE_MAX_OUTPUT_TOKENS,
+            },
+            reason_code="DRY_RUN_CONFIG_REFUSED",
+        )
+    if config.max_output_tokens < MIN_LIVE_MAX_OUTPUT_TOKENS:
+        raise LiveConfigRefusedError(
+            "the live config max_output_tokens is below the live-setting floor; "
+            "the Pilot A dispatch was already halted after one call because 512 "
+            "tokens truncated the subject response",
+            context={
+                "max_output_tokens": config.max_output_tokens,
+                "live_setting_floor_tokens": MIN_LIVE_MAX_OUTPUT_TOKENS,
+                "config_path": config_path,
+            },
+            reason_code="LIVE_OUTPUT_TOKENS_TOO_LOW",
+        )
+    if smoke:
+        _require_smoke_config(config)
+
+
+def _planned_calls(
+    config: LiveConfig, cases: Sequence[LiveCase], *, smoke: bool = False
+) -> int:
+    if smoke:
+        # Exactly one attempt: one subject call plus one judge call.
+        return SMOKE_CALLS
+    return (
+        len(cases)
+        * len(ARMS)
+        * config.runs_per_case
+        * len(config.subject_vendors)
+        * 2
+    )
+
+
+def _smoke_view(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
+    """The closed smoke record written into the run evidence and the summary.
+
+    The judge terminal finish reason is recorded here, not only the subject
+    stop reason: a smoke whose judge did not finish has not proved its purpose.
+    """
+    if not outcome.get("smoke"):
+        return None
+    results = outcome["results"]
+    meter: CostMeter = outcome["meter"]
+    judge_reasons = [
+        record["judge"].get("stop_reason")
+        for record in results
+        if isinstance(record.get("judge"), Mapping)
+    ]
+    subject_reasons = [
+        record["subject"].get("stop_reason")
+        for record in results
+        if isinstance(record.get("subject"), Mapping)
+    ]
+    return {
+        "enabled": True,
+        "selection": {
+            "cases": 1,
+            "arm": SMOKE_ARM,
+            "runs_per_case": SMOKE_RUNS,
+            "subject_vendors": 1,
+        },
+        "planned_calls": outcome["planned_calls"],
+        "dispatched_calls": meter.attempts,
+        "subject_calls": len(subject_reasons),
+        "judge_calls": len(judge_reasons),
+        "subject_stop_reasons": subject_reasons,
+        "judge_finish_reasons": judge_reasons,
+        "ceiling_cents": meter.ceiling_cents,
+        "spent_cents": meter.spent_cents(),
+    }
 
 
 def _utc_now() -> str:
@@ -131,16 +293,6 @@ def _load_inputs(
             context={"gate_sha256": gate.dataset_sha256, "dataset_sha256": digest},
         )
     return config, gate, cases
-
-
-def _planned_calls(config: LiveConfig, cases: Sequence[LiveCase]) -> int:
-    return (
-        len(cases)
-        * len(ARMS)
-        * config.runs_per_case
-        * len(config.subject_vendors)
-        * 2
-    )
 
 
 def _validate_run_id(run_id: str) -> None:
@@ -284,8 +436,13 @@ def preflight(
     environ: Mapping[str, str] | None = None,
     now: dt.datetime | None = None,
     expected_revision: str | None = None,
+    smoke: bool = False,
 ) -> dict[str, Any]:
-    """Structural preflight: no network; no credential value is logged or emitted."""
+    """Structural preflight: no network; no credential value is logged or emitted.
+
+    ``smoke=True`` preflights the single-case live smoke shape: one committed
+    case, one arm, one run, one vendor, one subject call and one judge call.
+    """
     report: dict[str, Any] = {
         "command": "live-preflight",
         "network_calls": 0,
@@ -296,6 +453,8 @@ def preflight(
     repo_root = repo_root or os.getcwd()
     try:
         config, gate, cases = _load_inputs(paths, repo_root)
+        if smoke:
+            _require_smoke_config(config)
     except LiveError as exc:
         report["blockers"] = [exc.to_dict()]
         return report
@@ -329,8 +488,27 @@ def preflight(
 
     report["sdk_importable"] = sdk_importability()
     report["allowlist"] = config.judge_allowlist.to_dict()
-    report["effective_ceiling_cents"] = gate.effective_ceiling_cents(config)
-    report["planned_calls"] = _planned_calls(config, cases)
+    effective_ceiling_cents = gate.effective_ceiling_cents(config)
+    if smoke:
+        effective_ceiling_cents = min(effective_ceiling_cents, SMOKE_CEILING_CENTS)
+    report["effective_ceiling_cents"] = effective_ceiling_cents
+    report["planned_calls"] = _planned_calls(config, cases, smoke=smoke)
+    report["smoke"] = smoke
+    # The live-setting values a reviewer must see before a dispatch: the
+    # spend-affecting config values and the source class of the config file.
+    report["live_settings"] = {
+        "max_output_tokens": config.max_output_tokens,
+        "max_output_tokens_floor": MIN_LIVE_MAX_OUTPUT_TOKENS,
+        "max_input_bytes": config.max_input_bytes,
+        "runs_per_case": config.runs_per_case,
+        "request_timeout_seconds": config.request_timeout_seconds,
+        "spend_ceiling_cents": config.spend_ceiling_cents,
+        "subject_vendors": list(config.subject_vendors),
+        "judge_allowlist": config.judge_allowlist.to_dict(),
+        "config_source_is_build_only_dry_run_template": _is_dry_run_config_source(
+            paths.config_path, repo_root
+        ),
+    }
     if expected_revision is not None and expected_revision != gate.dataset_revision:
         blockers.append(
             {
@@ -496,24 +674,38 @@ def _execute(
     subject_transports: Mapping[str, SubjectTransport],
     judge_transports: Mapping[str, SubjectTransport],
     transport_class: str,
+    smoke: bool = False,
 ) -> dict[str, Any]:
     state = _RunState()
-    planned = _planned_calls(config, cases)
+    planned = _planned_calls(config, cases, smoke=smoke)
+    # The smoke ceiling is the SMALLER of the binding gate/config/provider-cap
+    # minimum and the $0.50 smoke cap (50 integer cents), so a smoke cannot
+    # spend more than 50 cents even when handed the full pilot gate and config.
+    ceiling_cents = gate.effective_ceiling_cents(config)
+    if smoke:
+        ceiling_cents = min(ceiling_cents, SMOKE_CEILING_CENTS)
     meter = CostMeter(
-        gate.effective_ceiling_cents(config),
+        ceiling_cents,
         max_calls=planned + 1,
         max_output_tokens=config.max_output_tokens,
         snapshot_path=paths.cost_ledger_path or None,
     )
     judge_pins = authorize_judges(gate, config)
     stop_reason: str | None = None
-    for case in cases:
-        for arm in ARMS:
+    # A smoke is exactly one attempt on the first committed case, in one arm:
+    # one subject call plus one judge call. The meter, evidence and halt paths
+    # are the shared execution core, unchanged.
+    exec_cases = cases[:1] if smoke else cases
+    exec_arms = ARMS[:1] if smoke else ARMS
+    exec_vendors = config.subject_vendors[:1] if smoke else config.subject_vendors
+    run_indexes = (1,) if smoke else range(1, config.runs_per_case + 1)
+    for case in exec_cases:
+        for arm in exec_arms:
             # Both arms receive the SAME user prompt; only the skill
             # instructions differ, so the comparison is not confounded.
             prompt = case.prompt
-            for run_index in range(1, config.runs_per_case + 1):
-                for subject_vendor in config.subject_vendors:
+            for run_index in run_indexes:
+                for subject_vendor in exec_vendors:
                     if stop_reason is not None:
                         state.results.append(
                             _result_record(
@@ -587,6 +779,7 @@ def _execute(
         "meter": meter,
         "planned_calls": planned,
         "transport_class": transport_class,
+        "smoke": smoke,
     }
 
 
@@ -863,6 +1056,12 @@ def _write_evidence(
             "input_evidence_manifest_sha256": input_bundle.input_evidence_manifest_sha256,
         },
     }
+    smoke = _smoke_view(outcome)
+    if smoke is not None:
+        # The smoke record is part of the verified final evidence, so the judge
+        # terminal finish reason cannot be lost even when only the evidence
+        # bundle is retained.
+        final_report["smoke"] = smoke
     final_bundle = writer.finalize_final_bundle(
         final_report,
         final_artifacts,
@@ -905,12 +1104,19 @@ def dry_run(
     now: dt.datetime | None = None,
     subject_transport_factory: Callable[[], SubjectTransport] | None = None,
     judge_transport_factory: Callable[[], SubjectTransport] | None = None,
+    smoke: bool = False,
 ) -> dict[str, Any]:
-    """Exercise the whole pipeline with mock adapters (zero network)."""
+    """Exercise the whole pipeline with mock adapters (zero network).
+
+    ``smoke=True`` selects the one-case dry run: exactly one subject call and
+    one judge call on the first committed case, using the same execution core.
+    """
     config, gate, cases = _load_inputs(paths, repo_root)
     require_live_gate(
         gate, config, now=now, allowed_origins=frozenset({SYNTHETIC})
     )
+    if smoke:
+        _require_smoke_config(config)
     _validate_run_id(paths.run_id)
     _validate_output_paths(paths)
     subject_factory = subject_transport_factory or _dry_run_subject_transport
@@ -940,6 +1146,7 @@ def dry_run(
         subject_transports=subject_transports,
         judge_transports=judge_transports,
         transport_class="MOCK",
+        smoke=smoke,
     )
     meter = outcome["meter"]
     meter.write(paths.cost_ledger_path)
@@ -958,6 +1165,7 @@ def live_run(
     now: dt.datetime | None = None,
     subject_transport_factory: Callable[[CredentialSet], SubjectTransport] | None = None,
     judge_transport_factory: Callable[[CredentialSet], SubjectTransport] | None = None,
+    smoke: bool = False,
 ) -> dict[str, Any]:
     """Gated live run: refuses without a REAL_HOST gate and resolved keys.
 
@@ -965,10 +1173,21 @@ def live_run(
     recorded with transport_class INJECTED and every result is labeled
     INJECTED_TRANSPORT_NOT_CITABLE, so an injected run can never produce
     citable real-host evidence.
+
+    ``smoke=True`` runs the single-case live smoke: exactly one subject call and
+    one judge call, hard-capped at SMOKE_CEILING_CENTS (50 integer cents = $0.50)
+    in addition to the gate/config/provider-cap minimum. The live-setting guards
+    refuse a
+    build-only dry-run config source and any output budget below the live
+    floor BEFORE a credential is resolved or a call is reserved.
     """
+    repo_root = repo_root or os.getcwd()
     config, gate, cases = _load_inputs(paths, repo_root)
     require_live_gate(
         gate, config, now=now, allowed_origins=frozenset({REAL_HOST})
+    )
+    _require_live_config_values(
+        config, config_path=paths.config_path, repo_root=repo_root, smoke=smoke
     )
     _validate_run_id(paths.run_id)
     _validate_output_paths(paths)
@@ -1034,6 +1253,7 @@ def live_run(
         subject_transports=subject_transports,
         judge_transports=judge_transports,
         transport_class=transport_class,
+        smoke=smoke,
     )
     meter = outcome["meter"]
     meter.write(paths.cost_ledger_path)
@@ -1054,7 +1274,7 @@ def _summary(
     for record in outcome["results"]:
         key = str(record["result_state"])
         by_state[key] = by_state.get(key, 0) + 1
-    return {
+    payload: dict[str, Any] = {
         "command": command,
         "status": outcome["status"],
         "capability_state": LIVE_CAPABILITY_STATE,
@@ -1077,6 +1297,10 @@ def _summary(
         "network_calls": 0 if command == "live-dry-run" else None,
         "raw_transcripts_included": False,
     }
+    smoke = _smoke_view(outcome)
+    if smoke is not None:
+        payload["smoke"] = smoke
+    return payload
 
 
 def _dry_run_subject_transport() -> MockTransport:

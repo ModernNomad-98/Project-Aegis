@@ -638,6 +638,7 @@ def _cmd_live_preflight(args: argparse.Namespace) -> int:
         _live_paths(args),
         repo_root=args.repo_root or os.getcwd(),
         expected_revision=args.expected_revision,
+        smoke=getattr(args, "smoke", False),
     )
     _emit(report)
     return 0 if report.get("status") != "REFUSED" else 2
@@ -645,7 +646,9 @@ def _cmd_live_preflight(args: argparse.Namespace) -> int:
 
 def _cmd_live_dry_run(args: argparse.Namespace) -> int:
     result = _live_dry_run(
-        _live_paths(args), repo_root=args.repo_root or os.getcwd()
+        _live_paths(args),
+        repo_root=args.repo_root or os.getcwd(),
+        smoke=getattr(args, "smoke", False),
     )
     _emit(result)
     return 0 if result.get("status") != "HALTED" else 3
@@ -653,7 +656,9 @@ def _cmd_live_dry_run(args: argparse.Namespace) -> int:
 
 def _cmd_live_run(args: argparse.Namespace) -> int:
     result = _live_run(
-        _live_paths(args), repo_root=args.repo_root or os.getcwd()
+        _live_paths(args),
+        repo_root=args.repo_root or os.getcwd(),
+        smoke=getattr(args, "smoke", False),
     )
     _emit(result)
     return 0 if result.get("status") == "COMPLETED" else 3
@@ -1509,6 +1514,11 @@ def build_parser() -> argparse.ArgumentParser:
     lp.add_argument("--cases", required=True)
     lp.add_argument("--repo-root", default=None)
     lp.add_argument("--expected-revision", default=None)
+    lp.add_argument(
+        "--smoke",
+        action="store_true",
+        help="preflight the single-case smoke shape (one subject call + one judge call)",
+    )
     lp.set_defaults(func=_cmd_live_preflight)
 
     ld = subparsers.add_parser(
@@ -1522,6 +1532,12 @@ def build_parser() -> argparse.ArgumentParser:
     ld.add_argument("--evidence-root", required=True)
     ld.add_argument("--cost-ledger", required=True)
     ld.add_argument("--run-id", default=None)
+    ld.add_argument(
+        "--smoke",
+        action="store_true",
+        help="one-case dry run: exactly one mock subject call and one mock "
+        "judge call; requires a config with one subject vendor and runs_per_case 1",
+    )
     ld.set_defaults(func=_cmd_live_dry_run)
 
     lr = subparsers.add_parser(
@@ -1535,6 +1551,12 @@ def build_parser() -> argparse.ArgumentParser:
     lr.add_argument("--evidence-root", required=True)
     lr.add_argument("--cost-ledger", required=True)
     lr.add_argument("--run-id", default=None)
+    lr.add_argument(
+        "--smoke",
+        action="store_true",
+        help="single-case live smoke: exactly one subject call and one judge "
+        "call, hard-capped at 50 cents ($0.50); requires a smoke-shaped config",
+    )
     lr.set_defaults(func=_cmd_live_run)
 
     return parser

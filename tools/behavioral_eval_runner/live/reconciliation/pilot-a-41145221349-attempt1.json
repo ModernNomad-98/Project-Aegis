@@ -1,0 +1,39 @@
+{
+  "schema": "ber-live-ledger-reconciliation/1.0.0",
+  "kind": "ber-live-ledger-reconciliation",
+  "run_id": "41145221349",
+  "run_attempt": "1",
+  "dataset_path": "tools/behavioral_eval_runner/live/pilot-a/cases",
+  "dataset_sha256": "a842403313a087753bdd35d8302a77ddc947e1498bff1ed5f632b4ce0681c596",
+  "ledger_name": "pilot-a-01-agent-startup-context-gate-attempt1.json",
+  "ledger_sha256": "d9390d5a98483e0ac7abb24bb959af9f3e6ad927b1a2a75e5eb1bfe73fb0c989",
+  "case_id": "pilot-a-01-agent-startup-context-gate",
+  "attempt": 1,
+  "unreconciled_before": 1,
+  "spent_cents_preserved": 8,
+  "ceiling_cents_preserved": 12000,
+  "reconciles": [
+    {
+      "call_ref": "pilot-a-01-agent-startup-context-gate:WITH_SKILL:run-1:subject:anthropic",
+      "reserved_cents": 8,
+      "charged_cents": 8,
+      "disposition": "PRESERVED_AND_ACCEPTED",
+      "evidence_ref": "PENDING OWNER ATTESTATION"
+    }
+  ],
+  "budget_impact": {
+    "charged_cents_preserved": 8,
+    "remaining_ceiling_cents_preserved": 11992,
+    "cumulative_ceiling_cents_unchanged": true,
+    "refunded_cents": 0
+  },
+  "status": "PENDING",
+  "attested_by": "",
+  "attested_on": "",
+  "attestation_ref": "",
+  "limitations": [
+    "PENDING: no owner attestation exists yet for the provider usage of this call; the reservation charge is recorded as charged and is not deleted or refunded.",
+    "No paid retry is authorized until this record is ATTESTED with the owner evidence reference.",
+    "The prior $0.08 cost acceptance does not mechanically clear the unreconciled count; only an ATTESTED record covering ledger sha256 d9390d5a98483e0ac7abb24bb959af9f3e6ad927b1a2a75e5eb1bfe73fb0c989 does."
+  ]
+}
