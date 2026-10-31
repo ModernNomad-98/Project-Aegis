@@ -12,7 +12,8 @@ These tests prove the committed state and the transition it depends on:
   refuse a further paid dispatch (this is the block raising max_tokens cannot
   clear);
 * the committed record binds to the exact ledger and is ATTESTED by the owner
-  (attestation 2026-10-30 21:02 PDT), so it reconciles the entry while
+  (attestation 2026-10-30 21:02 PDT, corroborated after the merge by the PR #986
+  post-merge note, comment 6538805513), so it reconciles the entry while
   preserving the ledger bytes, the charge (8 cents), the remaining ceiling
   (11,992 cents) and the attempt history: nothing is deleted, reset or
   repriced;
@@ -24,6 +25,7 @@ These tests prove the committed state and the transition it depends on:
 from __future__ import annotations
 
 import copy
+import datetime as dt
 import json
 import tempfile
 import unittest
@@ -79,6 +81,13 @@ def _pending_record():
         "SYNTHETIC TEST RECORD ONLY: the committed ATTESTED record reversed to "
         "PENDING to prove the guard still refuses an unattested record"
     )
+    # The limitations prose must match the synthetic record's own status: a
+    # PENDING copy cannot carry text that claims an owner attestation exists.
+    record["limitations"] = [
+        "SYNTHETIC TEST RECORD ONLY: a PENDING copy derived from the committed "
+        "ATTESTED record to prove the guard still refuses an unattested record; "
+        "it is not an owner attestation and carries no evidence."
+    ]
     return record
 
 
@@ -110,10 +119,14 @@ class CommittedRecordTests(unittest.TestCase):
         self.assertTrue(record["attested_by"].strip())
         self.assertTrue(record["attested_on"].strip())
         self.assertTrue(record["attestation_ref"].strip())
-        # The attestation names the run it settles and the preserved figures.
+        # The attestation names the run it settles in a structured, parseable form.
         self.assertIn("41145221349", record["attestation_ref"])
-        self.assertIn("11,992", record["attestation_ref"])
-        self.assertIn("no other paid dispatch", record["attestation_ref"])
+        attested_on = dt.datetime.fromisoformat(record["attested_on"])
+        self.assertIsNotNone(attested_on.tzinfo)
+        self.assertEqual(
+            attested_on.astimezone(dt.timezone.utc),
+            dt.datetime(2026, 10, 31, 4, 2, tzinfo=dt.timezone.utc),
+        )
         self.assertEqual(
             record["ledger_sha256"],
             ledger_sha256(LEDGER_FIXTURE.read_bytes()),
@@ -157,6 +170,7 @@ class CommittedRecordTests(unittest.TestCase):
     def test_a_synthetic_pending_record_binds_to_the_ledger_and_is_refused(self):
         pending = _pending_record()
         self.assertEqual(validate_record(pending)["status"], STATUS_PENDING)
+        self.assertIn("SYNTHETIC", pending["limitations"][0])
         self.assertEqual(
             pending["ledger_sha256"],
             ledger_sha256(LEDGER_FIXTURE.read_bytes()),
@@ -173,12 +187,16 @@ class CommittedRecordTests(unittest.TestCase):
             caught.exception.reason_code, "RECONCILIATION_NOT_ATTESTED"
         )
 
-    def test_a_pending_record_cannot_carry_attestation_fields(self):
-        record = _pending_record()
-        record["attested_by"] = "not allowed while pending"
-        with self.assertRaises(LedgerReconciliationRefusedError) as caught:
-            validate_record(record)
-        self.assertEqual(caught.exception.reason_code, "RECONCILIATION_RECORD_INVALID")
+    def test_a_pending_record_cannot_carry_any_attestation_field(self):
+        for field in ("attested_by", "attested_on", "attestation_ref"):
+            with self.subTest(field=field):
+                record = _pending_record()
+                record[field] = "not allowed while pending"
+                with self.assertRaises(LedgerReconciliationRefusedError) as caught:
+                    validate_record(record)
+                self.assertEqual(
+                    caught.exception.reason_code, "RECONCILIATION_RECORD_INVALID"
+                )
 
     def test_no_record_means_the_guard_stays_blocked(self):
         ledger = _ledger()
@@ -189,10 +207,13 @@ class CommittedRecordTests(unittest.TestCase):
             1,
         )
 
-    def test_committed_attested_record_is_the_only_record_for_that_ledger(self):
+    def test_committed_attested_record_is_looked_up_by_its_ledger_sha256(self):
         records = load_records(Path(PACKAGE_ROOT) / "live" / "reconciliation")
-        self.assertEqual(len(records), 1)
-        committed = records[ledger_sha256(LEDGER_FIXTURE.read_bytes())]
+        ledger_sha = ledger_sha256(LEDGER_FIXTURE.read_bytes())
+        # Look the record up by the ledger it binds, not by a global record
+        # count: an unrelated future reconciliation record must not break this.
+        self.assertIn(ledger_sha, records)
+        committed = records[ledger_sha]
         self.assertEqual(committed["status"], STATUS_ATTESTED)
         self.assertEqual(
             remaining_unreconciled(
@@ -325,12 +346,16 @@ class FailClosedTests(unittest.TestCase):
             validate_record(record)
         self.assertEqual(caught.exception.reason_code, "RECONCILIATION_RECORD_INVALID")
 
-    def test_an_attested_record_without_an_attestor_is_refused(self):
-        record = _attested()
-        record["attested_by"] = ""
-        with self.assertRaises(LedgerReconciliationRefusedError) as caught:
-            validate_record(record)
-        self.assertEqual(caught.exception.reason_code, "RECONCILIATION_RECORD_INVALID")
+    def test_an_attested_record_without_any_attestation_field_is_refused(self):
+        for field in ("attested_by", "attested_on", "attestation_ref"):
+            with self.subTest(field=field):
+                record = _attested()
+                record[field] = ""
+                with self.assertRaises(LedgerReconciliationRefusedError) as caught:
+                    validate_record(record)
+                self.assertEqual(
+                    caught.exception.reason_code, "RECONCILIATION_RECORD_INVALID"
+                )
 
     def test_two_records_claiming_one_ledger_are_refused(self):
         with tempfile.TemporaryDirectory() as tmp:

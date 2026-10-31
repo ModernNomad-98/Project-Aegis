@@ -45,10 +45,12 @@ it, and neither did the earlier acceptance of the $0.08 cost on its own.
 2026-10-30 21:02 PDT, re-issued with source; the owner's 20:57 PDT statement of
 spend to date). It binds to ledger sha256
 `d9390d5a98483e0ac7abb24bb959af9f3e6ad927b1a2a75e5eb1bfe73fb0c989`, preserves
-the 8-cent charge, and cites the Pilot A run record for run 41145221349 and the
-PR #986 post-merge note (comment 6538805513). A new `eval-run` dispatch may
-therefore carry this preserved ledger point through the restore gate with the
-charge counted once. The attestation is the owner's statement of spend; it is
+the 8-cent charge, and cites the Pilot A run record for run 41145221349; the
+PR #986 post-merge note (comment 6538805513, posted after the attestation)
+corroborates the same figures. A new `eval-run` dispatch may therefore carry
+this preserved ledger point through the restore gate with the charge counted
+once, subject to its own separate owner authorization to spend. The attestation
+is the owner's statement of spend; it is
 not provider usage telemetry, so the exact token usage of the truncated call
 remains unknown. Do not delete the record, the ledger or the attempt history,
 and do not refund or reprice the charge.
