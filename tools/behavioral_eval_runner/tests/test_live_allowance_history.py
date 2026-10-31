@@ -190,6 +190,26 @@ class AllowanceHistoryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             allowance_history.list_run_artifacts(Incomplete({}, {}, {}), "o/r", 1)
 
+    def test_old_resume_and_proof_schemas_fail_closed_explicitly(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([run(900)])]},
+            {"42": [artifact("ber-live-smoke-proof")],
+             "900": [artifact("ber-resume-manifest")]},
+            {
+                ("42", "ber-live-smoke-proof"): (
+                    "smoke-proof.json",
+                    {"schema": "ber-live-smoke-proof/0.9.0", "spent_cents": 1},
+                ),
+                ("900", "ber-resume-manifest"): (
+                    "manifest.json",
+                    {"schema": "ber-resume-manifest/1.1.0", "totals": {"spent_cents": 1}},
+                ),
+            },
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("unsupported schema", str(caught.exception))
+
     def test_missing_trial_manifest_refuses(self):
         fake = FakeGH(
             {"smoke": [page([])], "trial": [page([run(900)])]},
