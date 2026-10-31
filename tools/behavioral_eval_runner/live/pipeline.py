@@ -223,19 +223,25 @@ def _smoke_view(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
         for record in results
         if isinstance(record.get("subject"), Mapping)
     ]
-    judge_errors = [
+    all_judge_errors = [
         {
+            # Diagnostic object FIRST, so the record identity below can never be
+            # overwritten by a future judge_error key of the same name.
+            **dict(record["judge"]["judge_error"]),
             "case_id": record.get("case_id"),
             "arm": record.get("arm"),
             "run_index": record.get("run_index"),
             "result_state": record.get("result_state"),
             "reason_code": record.get("reason_code"),
-            **dict(record["judge"]["judge_error"]),
         }
         for record in results
         if isinstance(record.get("judge"), Mapping)
         and isinstance(record["judge"].get("judge_error"), Mapping)
     ]
+    # The smoke view is bounded: a fixed maximum detail list plus the true count,
+    # so a many-case run cannot grow the summary without limit.
+    max_judge_error_details = 20
+    judge_errors = all_judge_errors[:max_judge_error_details]
     return {
         "enabled": True,
         "selection": {
@@ -253,7 +259,9 @@ def _smoke_view(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
         # A failed smoke keeps the explicit parse classification + finish reason
         # in the retained smoke record, so the failure is diagnosable from the
         # verified evidence bundle even when the raw judge output is not kept.
+        "judge_error_count": len(all_judge_errors),
         "judge_parse_errors": judge_errors,
+        "judge_error_details_limit": max_judge_error_details,
         "complete_stop_reasons": sorted(COMPLETE_STOP_REASONS),
         "ceiling_cents": meter.ceiling_cents,
         "spent_cents": meter.spent_cents(),

@@ -401,12 +401,15 @@ class ProviderContractTests(unittest.TestCase):
         from tools.behavioral_eval_runner.live.errors import ProviderTransportError
         from tools.behavioral_eval_runner.live.providers import ensure_complete_response
 
-        # The owner-named provider terminal values, plus the Anthropic
-        # stop_sequence alias, are complete. "stop" is the OpenAI Chat
-        # Completions finish_reason; the raw value seen is recorded on the
-        # result and never normalized away (see the judge output contract).
-        for status in ("end_turn", "stop", "stop_sequence", "completed"):
+        # The complete-status allowlist is vendor-INDEPENDENT (one package
+        # source of truth); the value the provider returned is recorded raw and
+        # never normalized away. "end_turn"/"stop_sequence" are the messages-API
+        # vocabulary, "completed" the responses-API status, "stop" the
+        # chat-completions-API finish_reason.
+        for status in ("end_turn", "stop_sequence", "completed"):
             ensure_complete_response(status, vendor="anthropic")
+        for status in ("stop", "completed"):
+            ensure_complete_response(status, vendor="openai")
         for status in ("max_tokens", "length", "content_filter", "failed",
                        "cancelled", "incomplete", "", "UNKNOWN"):
             with self.assertRaises(ProviderTransportError):

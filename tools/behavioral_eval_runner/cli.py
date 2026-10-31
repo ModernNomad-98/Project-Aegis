@@ -633,15 +633,16 @@ def _live_paths(args: argparse.Namespace) -> LivePaths:
     )
 
 
-def _judge_failure_diagnostics(result: dict[str, Any]) -> list[dict[str, Any]]:
-    """Non-content judge failure diagnostics for the retained stderr channel.
+def _judge_failure_diagnostics(result: dict[str, Any]) -> dict[str, Any]:
+    """Bounded, non-content judge failure diagnostics for the stderr channel.
 
     A failed smoke publishes no artifact by design, but the workflow leaves the
-    process stderr in the retained job log. Emitting the explicit
-    JUDGE_PARSE_ERROR classification, the raw provider finish reason and the
-    non-content fingerprint there keeps a paid judge failure diagnosable from
-    the job log without retaining any judge output or transcript.
+    process stderr in the retained job log. The explicit JUDGE_PARSE_ERROR
+    classification, the raw provider finish reason and the content-free
+    fingerprint are emitted there, capped at a fixed number of detail records
+    plus the true count, so a many-case run cannot produce an unbounded line.
     """
+    max_details = 8
     diagnostics: list[dict[str, Any]] = []
     for record in result.get("results") or ():
         if not isinstance(record, dict):
@@ -669,13 +670,17 @@ def _judge_failure_diagnostics(result: dict[str, Any]) -> list[dict[str, Any]]:
                 "output_recorded": error.get("output_recorded"),
             }
         )
-    return diagnostics
+    return {
+        "judge_error_count": len(diagnostics),
+        "judge_error_details_limit": max_details,
+        "judge_errors": diagnostics[:max_details],
+    }
 
 
 def _emit_judge_failure_diagnostics(result: dict[str, Any]) -> None:
     """Write one bounded diagnostics line to stderr when a judge failed."""
     diagnostics = _judge_failure_diagnostics(result)
-    if not diagnostics:
+    if not diagnostics["judge_error_count"]:
         return
     sys.stderr.write(
         canonical_json(
@@ -685,7 +690,7 @@ def _emit_judge_failure_diagnostics(result: dict[str, Any]) -> None:
                     "non-content diagnostics; the raw judge output is not retained"
                 ),
                 "run_status": result.get("status"),
-                "judge_errors": diagnostics,
+                **diagnostics,
             }
         )
         + "\n"

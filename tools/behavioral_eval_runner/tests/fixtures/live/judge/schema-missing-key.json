@@ -14,8 +14,8 @@
     "outcome": "PARSE_ERROR",
     "parse_reason": "SCHEMA_INVALID",
     "missing_expected_keys": [
-        "evidence_refs"
-      ],
-      "observed_key_count": 6
+      "evidence_refs"
+    ],
+    "observed_key_count": 6
   }
 }

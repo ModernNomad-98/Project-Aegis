@@ -14,6 +14,6 @@
     "outcome": "PARSE_ERROR",
     "parse_reason": "SCHEMA_INVALID",
     "observed_key_count": 8,
-      "unexpected_key_count": 1
+    "unexpected_key_count": 1
   }
 }

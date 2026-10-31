@@ -165,12 +165,16 @@ def _diagnose_output(raw_output: Any) -> _OutputShape:
     OWN fixed keys are absent, and how many keys are extra. Those are
     diagnostic, bounded and cannot carry model content.
     """
-    if not isinstance(raw_output, str) or not raw_output.strip():
+    if not isinstance(raw_output, str):
+        return _OutputShape("NON_STRING")
+    if not raw_output.strip():
         return _OutputShape("EMPTY")
     candidate, fenced = _unfence_json(raw_output.strip())
     try:
         payload = _loads_strict_json(candidate)
-    except ValueError:
+    except (ValueError, RecursionError):
+        # Untrusted output can nest deeply enough to exhaust the JSON decoder's
+        # recursion budget; that is a malformed output, never a run crash.
         return _OutputShape("NOT_JSON")
     if not isinstance(payload, Mapping):
         return _OutputShape(
@@ -229,12 +233,18 @@ class JudgeParseError:
 def build_judge_parse_error(
     raw_output: Any, *, parse_reason: str, finish_reason: str
 ) -> JudgeParseError:
-    """Build the explicit JUDGE_PARSE_ERROR record for unusable judge output."""
+    """Build the explicit JUDGE_PARSE_ERROR record for unusable judge output.
+
+    The raw provider `finish_reason` is preserved exactly as received (it is
+    never replaced with a placeholder: an empty value stays visibly empty), and
+    a non-string provider output is recorded with the distinct NON_STRING shape
+    rather than being coerced to an empty string.
+    """
     text = raw_output if isinstance(raw_output, str) else ""
-    shape = _diagnose_output(text)
+    shape = _diagnose_output(raw_output)
     return JudgeParseError(
         parse_reason=parse_reason,
-        finish_reason=finish_reason or "UNKNOWN",
+        finish_reason=finish_reason,
         output_sha256=sha256_hex_text(text),
         output_chars=len(text),
         output_shape=shape.output_shape,
@@ -337,12 +347,16 @@ def parse_live_verdict(
     partially uses output: any deviation is a named parse reason for the caller
     to record as an explicit JUDGE_PARSE_ERROR.
     """
-    if not isinstance(raw_output, str) or not raw_output.strip():
+    if not isinstance(raw_output, str):
+        return None, "NON_STRING_OUTPUT"
+    if not raw_output.strip():
         return None, "EMPTY_OUTPUT"
     candidate, _fenced = _unfence_json(raw_output.strip())
     try:
         payload = _loads_strict_json(candidate)
-    except ValueError:
+    except (ValueError, RecursionError):
+        # Fail closed on any parser failure, including a recursion-depth abort
+        # caused by untrusted deeply nested output.
         return None, "MALFORMED_JSON"
     if not isinstance(payload, Mapping):
         return None, "MALFORMED_JSON"

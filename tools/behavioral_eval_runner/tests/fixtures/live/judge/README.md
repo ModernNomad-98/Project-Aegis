@@ -16,7 +16,12 @@ The fixtures cover the validation ladder: parse (`EMPTY_OUTPUT`,
 `MALFORMED_JSON`), strict schema (missing key, extra key, wrong type,
 out-of-range enum, incoherent verdict), and semantic binding
 (`RUBRIC_MISMATCH`, `CONTRADICTORY_EVIDENCE`, `REQUEST_MISMATCH`), plus the
-accepted verdict shapes and the tolerated single enclosing JSON code fence.
+accepted verdict shapes, the tolerated single enclosing JSON code fence, and
+the strict-JSON rejections (duplicate keys and non-standard NaN/Infinity
+constants). Deeply nested output that exhausts the JSON decoder recursion budget
+is covered by a unit test that forces that condition deterministically, because
+depth-dependent parser behaviour varies between Python versions and is not
+fixture-stable.
 `tests/test_live_judge_contract.py` runs every fixture. A recorded local
 mutation check (workspace evidence for this PR, not a committed test) proves the
 fixtures can fail: reverting the prompt contract or relaxing the parser's exact

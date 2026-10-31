@@ -269,7 +269,7 @@ class RecordedShapeFixtureTests(unittest.TestCase):
 class StrictJsonInputTests(unittest.TestCase):
     """Reject duplicate keys and non-standard constants (review 5721557725 #4)."""
 
-    def _parse(self, raw_output: str):
+    def _parse(self, raw_output):
         return parse_live_verdict(
             raw_output,
             rubric_sha256=RUBRIC_SHA,
@@ -304,19 +304,43 @@ class StrictJsonInputTests(unittest.TestCase):
         self.assertIsNone(verdict)
         self.assertEqual(error, "MALFORMED_JSON")
 
-    def test_duplicate_key_shape_is_recorded_as_not_json(self):
-        raw = (
-            '{"verdict": "PASS", "verdict": "PASS", "reason_code": '
-            '"MEETS_RUBRIC", "failure_mode": null, "rubric_sha256": "'
-            + RUBRIC_SHA + '", "response_sha256": "' + RESPONSE_SHA + '", '
-            '"judge_model": "' + JUDGE_MODEL + '", "evidence_refs": ["response"]}'
-        )
-        error = self._parse(raw)[1]
-        record = build_judge_parse_error(
-            raw, parse_reason=error, finish_reason="completed"
-        ).to_dict()
-        self.assertEqual(record["parse_reason"], "MALFORMED_JSON")
+    def test_decoder_recursion_failure_is_mapped_to_malformed_json(self):
+        # Depth-dependent decoder behaviour varies between Python versions, so
+        # the recursion failure is forced deterministically at the decode
+        # boundary: untrusted deeply nested output must become MALFORMED_JSON,
+        # never a run crash.
+        from unittest import mock
+
+        from tools.behavioral_eval_runner.live import judge_adapter
+
+        raw = '{"verdict": ' + "[" * 10 + "]" * 10 + "}"
+        with mock.patch.object(
+            judge_adapter,
+            "_loads_strict_json",
+            side_effect=RecursionError("decoder recursion budget exhausted"),
+        ):
+            verdict, error = self._parse(raw)
+            record = build_judge_parse_error(
+                raw, parse_reason=error, finish_reason="completed"
+            ).to_dict()
+        self.assertIsNone(verdict)
+        self.assertEqual(error, "MALFORMED_JSON")
         self.assertEqual(record["output_shape"], "NOT_JSON")
+
+    def test_non_string_provider_output_gets_a_distinct_shape(self):
+        verdict, error = self._parse(None)
+        self.assertIsNone(verdict)
+        self.assertEqual(error, "NON_STRING_OUTPUT")
+        record = build_judge_parse_error(
+            None, parse_reason=error, finish_reason="completed"
+        ).to_dict()
+        self.assertEqual(record["output_shape"], "NON_STRING")
+
+    def test_raw_finish_reason_is_preserved_not_placeholder_normalized(self):
+        record = build_judge_parse_error(
+            "not json", parse_reason="MALFORMED_JSON", finish_reason=""
+        ).to_dict()
+        self.assertEqual(record["finish_reason"], "")
 
 
 class JudgeDispatchRecordTests(unittest.TestCase):
@@ -559,8 +583,10 @@ class FailureDiagnosticsChannelTests(unittest.TestCase):
         from tools.behavioral_eval_runner.cli import _judge_failure_diagnostics
 
         diagnostics = _judge_failure_diagnostics(self._summary())
-        self.assertEqual(len(diagnostics), 1)
-        item = diagnostics[0]
+        self.assertEqual(diagnostics["judge_error_count"], 1)
+        self.assertEqual(diagnostics["judge_error_details_limit"], 8)
+        self.assertEqual(len(diagnostics["judge_errors"]), 1)
+        item = diagnostics["judge_errors"][0]
         self.assertEqual(item["kind"], "JUDGE_PARSE_ERROR")
         self.assertEqual(item["parse_reason"], "MALFORMED_JSON")
         self.assertEqual(item["finish_reason"], "completed")
@@ -582,6 +608,7 @@ class FailureDiagnosticsChannelTests(unittest.TestCase):
         self.assertTrue(line)
         payload = json.loads(line)
         self.assertEqual(payload["event"], "judge_failure_diagnostics")
+        self.assertEqual(payload["judge_error_count"], 1)
         self.assertEqual(
             payload["judge_errors"][0]["kind"], "JUDGE_PARSE_ERROR"
         )
@@ -589,6 +616,44 @@ class FailureDiagnosticsChannelTests(unittest.TestCase):
             payload["judge_errors"][0]["finish_reason"], "completed"
         )
         self.assertNotIn(MALFORMED_RAW, line)
+
+    def test_stderr_diagnostics_are_bounded_for_many_cases(self):
+        import contextlib
+        import io
+
+        from tools.behavioral_eval_runner.cli import (
+            _emit_judge_failure_diagnostics,
+        )
+
+        records = []
+        for index in range(25):
+            records.append(
+                {
+                    "case_id": "case-%02d" % index,
+                    "arm": "WITH_SKILL",
+                    "run_index": 1,
+                    "result_state": "JUDGE_ERROR",
+                    "reason_code": "MALFORMED_JSON",
+                    "judge": {
+                        "stop_reason": "completed",
+                        "judge_error": {
+                            "kind": "JUDGE_PARSE_ERROR",
+                            "parse_reason": "MALFORMED_JSON",
+                            "finish_reason": "completed",
+                            "output_recorded": False,
+                        },
+                    },
+                }
+            )
+        stream = io.StringIO()
+        with contextlib.redirect_stderr(stream):
+            _emit_judge_failure_diagnostics(
+                {"status": "COMPLETED", "results": records}
+            )
+        payload = json.loads(stream.getvalue().strip())
+        self.assertEqual(payload["judge_error_count"], 25)
+        self.assertEqual(payload["judge_error_details_limit"], 8)
+        self.assertEqual(len(payload["judge_errors"]), 8)
 
     def test_no_diagnostics_line_for_a_passing_run(self):
         import contextlib
