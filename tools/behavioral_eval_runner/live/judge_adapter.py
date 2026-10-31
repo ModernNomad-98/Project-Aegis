@@ -14,7 +14,6 @@ JUDGE_ERROR, never a PASS.
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass
 from typing import Any, Mapping
 
@@ -92,6 +91,36 @@ JUDGE_PARSE_ERROR_KIND = "JUDGE_PARSE_ERROR"
 _EXPECTED_KEYS = tuple(sorted(_ERROR_KEYS))
 
 
+def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    """object_pairs_hook: a duplicate JSON key makes the output non-conformant."""
+    seen: set[str] = set()
+    for key, _value in pairs:
+        if key in seen:
+            raise ValueError(f"duplicate JSON key: {key!r}")
+        seen.add(key)
+    return dict(pairs)
+
+
+def _reject_nonstandard_constant(value: str) -> Any:
+    """parse_constant: NaN/Infinity are not standard JSON values."""
+    raise ValueError(f"non-standard JSON constant: {value}")
+
+
+def _loads_strict_json(text: str) -> Any:
+    """Parse JSON, refusing duplicate keys and NaN/Infinity constants.
+
+    The contract is "exactly one JSON object with exactly seven keys"; a
+    duplicate key would silently collapse under a plain json.loads and let a
+    non-conformant output present the expected key set. Non-standard constants
+    are rejected for the same reason.
+    """
+    return json.loads(
+        text,
+        object_pairs_hook=_reject_duplicate_keys,
+        parse_constant=_reject_nonstandard_constant,
+    )
+
+
 def _unfence_json(text: str) -> tuple[str, bool]:
     """Return (candidate, fenced): tolerate exactly ONE enclosing JSON fence.
 
@@ -140,7 +169,7 @@ def _diagnose_output(raw_output: Any) -> _OutputShape:
         return _OutputShape("EMPTY")
     candidate, fenced = _unfence_json(raw_output.strip())
     try:
-        payload = json.loads(candidate)
+        payload = _loads_strict_json(candidate)
     except ValueError:
         return _OutputShape("NOT_JSON")
     if not isinstance(payload, Mapping):
@@ -259,6 +288,16 @@ class JudgeResult:
     #: call is diagnosable even when the raw output is not retained.
     parse_error: JudgeParseError | None = None
 
+    def __post_init__(self) -> None:
+        # Invariant enforced at CONSTRUCTION, never during evidence
+        # serialization: a verdict-less judge result is only ever produced by
+        # the parse-error path, which always carries explicit diagnostics.
+        if self.verdict is None and self.parse_error is None:
+            raise ValueError(
+                "a judge result without a verdict must carry explicit "
+                "JUDGE_PARSE_ERROR diagnostics"
+            )
+
     @property
     def is_verdict(self) -> bool:
         return self.verdict is not None
@@ -278,14 +317,7 @@ class JudgeResult:
             # Workflow-compatible key (the smoke proof gate reads its presence,
             # not its value) plus the explicit fail-closed classification.
             record["judge_error_kind"] = self.judge_error_kind or "UNKNOWN"
-            if self.parse_error is None:
-                # Invariant: a verdict-less result is only ever produced by the
-                # parse-error path, which always carries explicit diagnostics.
-                # Never fabricate an "UNKNOWN" fingerprint record here.
-                raise ValueError(
-                    "a judge result without a verdict must carry explicit "
-                    "JUDGE_PARSE_ERROR diagnostics"
-                )
+            assert self.parse_error is not None  # __post_init__ invariant
             record["judge_error"] = self.parse_error.to_dict()
         return record
 
@@ -309,7 +341,7 @@ def parse_live_verdict(
         return None, "EMPTY_OUTPUT"
     candidate, _fenced = _unfence_json(raw_output.strip())
     try:
-        payload = json.loads(candidate)
+        payload = _loads_strict_json(candidate)
     except ValueError:
         return None, "MALFORMED_JSON"
     if not isinstance(payload, Mapping):

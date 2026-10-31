@@ -50,14 +50,18 @@ fingerprint (`output_sha256`, `output_chars`, `output_shape`,
 `unexpected_key_count`, `output_recorded: false`). No arbitrary judge-output
 key names are published: only counts and the contract's own fixed key names.
 The pre-existing `judge_error_kind` key and the result-level `reason_code`
-semantics are retained unchanged (the specific parse branch still appears as the
-result-level reason code), so readers are not affected. No accepted verdict
-shape, field meaning, required field or enum changed, so
-`LIVE_SCHEMA_VERSION` stays `1.0.0-ber-live`; the additive published shape
-moves `LIVE_PACKAGE_VERSION` from `0.1.0-ber-live` to `0.2.0-ber-live`
-(minor: additive compatible shape). The family stays pinned by
-`tests/test_live_pipeline.py`, and the new shape is covered by
-`tests/test_live_judge_contract.py`.
+semantics are retained unchanged (the specific parse branch — or `NO_VERDICT`
+as before — still appears as the result-level reason code), so readers are not
+affected. No accepted verdict shape, field meaning, required field or
+RECORD-schema enum changed, so `LIVE_SCHEMA_VERSION` stays
+`1.0.0-ber-live`; the additive published record detail and the additive
+package-level transport complete-status vocabulary (which includes `stop`)
+move `LIVE_PACKAGE_VERSION` from `0.1.0-ber-live` to `0.2.0-ber-live`
+(minor: additive compatible shape). The workflow-side literal status sets are a
+separately owned surface and are NOT changed by this package version; they
+remain a tracked owner-line follow-up. The family stays pinned by
+`tests/test_live_pipeline.py`, and the new shape and strict-JSON rejection
+rules are covered by `tests/test_live_judge_contract.py`.
 
 ## How to use this policy
 

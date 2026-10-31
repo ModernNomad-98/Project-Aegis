@@ -26,7 +26,7 @@ import tempfile
 import unittest
 
 from tools.behavioral_eval_runner.canonical import canonical_json, sha256_hex_text
-from tools.behavioral_eval_runner.live.config import SUBJECT_PINS, OwnerAllowlist
+from tools.behavioral_eval_runner.live.config import OwnerAllowlist
 from tools.behavioral_eval_runner.live.dataset import load_cases
 from tools.behavioral_eval_runner.live.judge_adapter import (
     JUDGE_PARSE_ERROR_KIND,
@@ -39,7 +39,6 @@ from tools.behavioral_eval_runner.live.judge_adapter import (
     parse_live_verdict,
 )
 from tools.behavioral_eval_runner.live.mock_transport import MockTransport
-from tools.behavioral_eval_runner.live.pipeline import dry_run
 from tools.behavioral_eval_runner.live.providers import (
     JUDGE_PINS,
     ensure_complete_response,
@@ -240,8 +239,21 @@ class RecordedShapeFixtureTests(unittest.TestCase):
                     self.assertEqual(
                         record["output_shape"], expected["expected_shape"]
                     )
-                for key in expected.get("observed_keys_include", []):
-                    self.assertIn(key, record["observed_keys"])
+                if "missing_expected_keys" in expected:
+                    self.assertEqual(
+                        record["missing_expected_keys"],
+                        expected["missing_expected_keys"],
+                    )
+                if "unexpected_key_count" in expected:
+                    self.assertEqual(
+                        record["unexpected_key_count"],
+                        expected["unexpected_key_count"],
+                    )
+                if "observed_key_count" in expected:
+                    self.assertEqual(
+                        record["observed_key_count"],
+                        expected["observed_key_count"],
+                    )
 
     def test_parse_error_is_never_a_verdict(self):
         # A parse failure must NEVER be coerced into PASS or FAIL.
@@ -252,6 +264,59 @@ class RecordedShapeFixtureTests(unittest.TestCase):
                 verdict, error = _parse_fixture(payload)
                 self.assertIsNone(verdict)
                 self.assertIsNotNone(error)
+
+
+class StrictJsonInputTests(unittest.TestCase):
+    """Reject duplicate keys and non-standard constants (review 5721557725 #4)."""
+
+    def _parse(self, raw_output: str):
+        return parse_live_verdict(
+            raw_output,
+            rubric_sha256=RUBRIC_SHA,
+            response_sha256=RESPONSE_SHA,
+            judge_model=JUDGE_MODEL,
+        )
+
+    def test_duplicate_keys_are_rejected_even_when_the_unique_set_matches(self):
+        payload = {
+            "verdict": "PASS",
+            "reason_code": "MEETS_RUBRIC",
+            "failure_mode": None,
+            "rubric_sha256": RUBRIC_SHA,
+            "response_sha256": RESPONSE_SHA,
+            "judge_model": JUDGE_MODEL,
+            "evidence_refs": ["response"],
+        }
+        raw = json.dumps(payload)[:-1] + ', "verdict": "PASS"}'
+        verdict, error = self._parse(raw)
+        self.assertIsNone(verdict)
+        self.assertEqual(error, "MALFORMED_JSON")
+
+    def test_non_standard_json_constants_are_rejected(self):
+        raw = (
+            '{"verdict": "PASS", "reason_code": "MEETS_RUBRIC", '
+            '"failure_mode": null, "rubric_sha256": "' + RUBRIC_SHA + '", '
+            '"response_sha256": "' + RESPONSE_SHA + '", '
+            '"judge_model": "' + JUDGE_MODEL + '", '
+            '"evidence_refs": ["response"], "extra": NaN}'
+        )
+        verdict, error = self._parse(raw)
+        self.assertIsNone(verdict)
+        self.assertEqual(error, "MALFORMED_JSON")
+
+    def test_duplicate_key_shape_is_recorded_as_not_json(self):
+        raw = (
+            '{"verdict": "PASS", "verdict": "PASS", "reason_code": '
+            '"MEETS_RUBRIC", "failure_mode": null, "rubric_sha256": "'
+            + RUBRIC_SHA + '", "response_sha256": "' + RESPONSE_SHA + '", '
+            '"judge_model": "' + JUDGE_MODEL + '", "evidence_refs": ["response"]}'
+        )
+        error = self._parse(raw)[1]
+        record = build_judge_parse_error(
+            raw, parse_reason=error, finish_reason="completed"
+        ).to_dict()
+        self.assertEqual(record["parse_reason"], "MALFORMED_JSON")
+        self.assertEqual(record["output_shape"], "NOT_JSON")
 
 
 class JudgeDispatchRecordTests(unittest.TestCase):
@@ -417,23 +482,22 @@ class StopReasonVocabularyTests(unittest.TestCase):
 class JudgeResultInvariantTests(unittest.TestCase):
     """Fix for advisory review 5721522067 finding 4: no synthesized record."""
 
-    def test_a_verdict_less_result_without_diagnostics_is_not_written(self):
+    def test_a_verdict_less_result_without_diagnostics_is_refused_at_construction(self):
         from tools.behavioral_eval_runner.live.judge_adapter import JudgeResult
         from tools.behavioral_eval_runner.live.transport import ProviderUsage
 
-        result = JudgeResult(
-            request_id="rid",
-            response_id="resp",
-            served_model="gpt-6-astra",
-            response_sha256="0" * 64,
-            usage=ProviderUsage(1, 1),
-            verdict=None,
-            judge_error_kind="MALFORMED_JSON",
-            stop_reason="completed",
-            parse_error=None,
-        )
         with self.assertRaises(ValueError):
-            result.to_record()
+            JudgeResult(
+                request_id="rid",
+                response_id="resp",
+                served_model="gpt-6-astra",
+                response_sha256="0" * 64,
+                usage=ProviderUsage(1, 1),
+                verdict=None,
+                judge_error_kind="MALFORMED_JSON",
+                stop_reason="completed",
+                parse_error=None,
+            )
 
     def test_a_verdict_less_result_with_diagnostics_is_written(self):
         from tools.behavioral_eval_runner.live.judge_adapter import JudgeResult

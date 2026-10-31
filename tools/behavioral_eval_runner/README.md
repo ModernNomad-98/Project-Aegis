@@ -284,15 +284,23 @@ SHA-256 values or it is recorded as `JUDGE_ERROR`.
 JSON object the parser requires (no markdown fence, no prose, no extra keys):
 `verdict`, `reason_code`, `failure_mode`, the echoed `rubric_sha256` and
 `response_sha256`, `judge_model`, and `evidence_refs: ["response"]`. The
-parser tolerates exactly one enclosing JSON code fence and applies the same
-strict schema, closed-enum coherence and hash echoes. Any deviation is recorded
-as an explicit `JUDGE_PARSE_ERROR` (never a bare null and never PASS/FAIL)
-carrying the raw provider `finish_reason` and a content-free shape fingerprint
-(counts and the contract's own missing/extra key set; arbitrary output key names
-are never published) — the raw judge output is not retained, and the
-result-level `reason_code` keeps its pre-existing specific parse branch. Accepted provider terminal statuses are
+parser deliberately tolerates exactly one enclosing JSON code fence as a
+formatting deviation (the prompt still asks for no fence), and applies the same
+strict schema, closed-enum coherence, hash echoes, and strict-JSON rules
+(duplicate keys and NaN/Infinity are rejected). Any NON-TOLERATED deviation is
+recorded as an explicit `JUDGE_PARSE_ERROR` (never a bare null and never
+PASS/FAIL) carrying the raw provider `finish_reason` and a content-free shape
+fingerprint (counts and the contract's own missing/extra key set; arbitrary
+output key names are never published) — the raw judge output is not retained,
+and the result-level `reason_code` keeps its pre-existing specific parse branch. The package accepts the provider terminal statuses
 `end_turn`, `stop_sequence`, `completed` and `stop`, and the value the
-provider returned is recorded rather than normalized. A live run also writes one
+provider returned is recorded rather than normalized. This is package-scope:
+the workflow-side literal sets are a tracked owner-line follow-up (a workflow
+edit needs an owner line) and currently list `end_turn`, `stop_sequence`,
+`completed`; `stop` is not reachable through the pinned call shapes (the
+judge uses the responses API, which reports `completed`; the subject uses the
+messages API, which reports `end_turn`/`stop_sequence`), so the two surfaces
+must be aligned before any route that can emit `stop` is used. A live run also writes one
 bounded, non-content `judge_failure_diagnostics` line to stderr when the judge
 failed, so a failed smoke's explicit classification and finish reason stay in the
 retained job log even though the workflow publishes no artifact for a failed

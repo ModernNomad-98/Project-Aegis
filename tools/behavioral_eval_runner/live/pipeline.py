@@ -689,7 +689,7 @@ def _rule_state(
         # unaffected; the judge record additionally carries judge_error.kind =
         # JUDGE_PARSE_ERROR with the raw provider finish reason. The result state
         # stays JUDGE_ERROR and is never PASS/FAIL.
-        return "JUDGE_ERROR", (judge_result.judge_error_kind or "UNKNOWN")
+        return "JUDGE_ERROR", (judge_result.judge_error_kind or "NO_VERDICT")
     verdict = judge_result.verdict.verdict.value
     if verdict == "PASS":
         return "PASS", None
