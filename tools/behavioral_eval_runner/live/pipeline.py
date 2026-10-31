@@ -68,10 +68,21 @@ from .gate import (
     load_gate,
     require_live_gate,
 )
-from .judge_adapter import LIVE_JUDGE_POLICY, LIVE_JUDGE_POLICY_SHA256, JudgeAdapter, JudgeResult
+from .judge_adapter import (
+    JUDGE_PARSE_ERROR_KIND,
+    LIVE_JUDGE_POLICY,
+    LIVE_JUDGE_POLICY_SHA256,
+    JudgeAdapter,
+    JudgeResult,
+)
 from .mock_transport import MockTransport
 from .subject import SubjectAdapter
-from .transport import ProviderResponse, ProviderUsage, SubjectTransport
+from .transport import (
+    COMPLETE_STOP_REASONS,
+    ProviderResponse,
+    ProviderUsage,
+    SubjectTransport,
+)
 
 ARMS = ("WITH_SKILL", "BASELINE")
 ACCESS_POLICY_REF = "BER-LIVE-1.0.0-owner-gate"
@@ -212,6 +223,25 @@ def _smoke_view(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
         for record in results
         if isinstance(record.get("subject"), Mapping)
     ]
+    all_judge_errors = [
+        {
+            # Diagnostic object FIRST, so the record identity below can never be
+            # overwritten by a future judge_error key of the same name.
+            **dict(record["judge"]["judge_error"]),
+            "case_id": record.get("case_id"),
+            "arm": record.get("arm"),
+            "run_index": record.get("run_index"),
+            "result_state": record.get("result_state"),
+            "reason_code": record.get("reason_code"),
+        }
+        for record in results
+        if isinstance(record.get("judge"), Mapping)
+        and isinstance(record["judge"].get("judge_error"), Mapping)
+    ]
+    # The smoke view is bounded: a fixed maximum detail list plus the true count,
+    # so a many-case run cannot grow the summary without limit.
+    max_judge_error_details = 20
+    judge_errors = all_judge_errors[:max_judge_error_details]
     return {
         "enabled": True,
         "selection": {
@@ -226,6 +256,13 @@ def _smoke_view(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
         "judge_calls": len(judge_reasons),
         "subject_stop_reasons": subject_reasons,
         "judge_finish_reasons": judge_reasons,
+        # A failed smoke keeps the explicit parse classification + finish reason
+        # in the retained smoke record, so the failure is diagnosable from the
+        # verified evidence bundle even when the raw judge output is not kept.
+        "judge_error_count": len(all_judge_errors),
+        "judge_parse_errors": judge_errors,
+        "judge_error_details_limit": max_judge_error_details,
+        "complete_stop_reasons": sorted(COMPLETE_STOP_REASONS),
         "ceiling_cents": meter.ceiling_cents,
         "spent_cents": meter.spent_cents(),
     }
@@ -655,6 +692,11 @@ def _rule_state(
     if deterministic.get("status") == "FAIL":
         return "FAIL", "DETERMINISTIC_FAIL"
     if not judge_result.is_verdict:
+        # The result-level reason_code keeps the pre-existing specific parse
+        # branch (MALFORMED_JSON, SCHEMA_INVALID, ...) so existing readers are
+        # unaffected; the judge record additionally carries judge_error.kind =
+        # JUDGE_PARSE_ERROR with the raw provider finish reason. The result state
+        # stays JUDGE_ERROR and is never PASS/FAIL.
         return "JUDGE_ERROR", (judge_result.judge_error_kind or "NO_VERDICT")
     verdict = judge_result.verdict.verdict.value
     if verdict == "PASS":
@@ -991,6 +1033,8 @@ def _write_evidence(
                     },
                     "judge_policy_sha256": LIVE_JUDGE_POLICY_SHA256,
                     "judge_policy_chars": len(LIVE_JUDGE_POLICY),
+                    "judge_parse_error_kind": JUDGE_PARSE_ERROR_KIND,
+                    "complete_stop_reasons": sorted(COMPLETE_STOP_REASONS),
                     "pinning": "strict: served model string must equal the pin",
                 }
             ).encode("utf-8"),

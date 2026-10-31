@@ -28,7 +28,7 @@ another, even if its numeric prefix matches.
 
 The gated live enablement package (`tools/behavioral_eval_runner/live/`)
 introduces its own constants: `LIVE_SCHEMA_VERSION = "1.0.0-ber-live"` and
-`LIVE_PACKAGE_VERSION = "0.1.0-ber-live"`. They are a **separate family**. A
+`LIVE_PACKAGE_VERSION = "0.2.0-ber-live"`. They are a **separate family**. A
 value from this family never substitutes for the WP-2B-1 result/evidence family,
 and no WP-2B-1 reader treats a live record as one of its own. The live case
 records, configuration, gate record and cost ledger declare
@@ -37,6 +37,31 @@ records, configuration, gate record and cost ledger declare
 family is pinned by `tests/test_live_pipeline.py` (`VersionRegistrationTests`)
 and is intentionally build-only: it publishes no measured result and grants no
 execution authority.
+
+### Registered additive shape: live judge error detail (0.2.0-ber-live)
+
+The live judge-output-contract correction (2026-10-30; run 41167546138) adds an
+**error-only additive detail object** to each live result record's `judge` entry
+and to the smoke view: when no verdict is produced, the record carries
+`judge_error` with the explicit `kind` `JUDGE_PARSE_ERROR`, the specific
+`parse_reason`, the raw provider `finish_reason`, and a content-free shape
+fingerprint (`output_sha256`, `output_chars`, `output_shape`,
+`observed_key_count`, the contract's own `missing_expected_keys`,
+`unexpected_key_count`, `output_recorded: false`). No arbitrary judge-output
+key names are published: only counts and the contract's own fixed key names.
+The pre-existing `judge_error_kind` key and the result-level `reason_code`
+semantics are retained unchanged (the specific parse branch — or `NO_VERDICT`
+as before — still appears as the result-level reason code), so readers are not
+affected. No accepted verdict shape, field meaning, required field or
+RECORD-schema enum changed, so `LIVE_SCHEMA_VERSION` stays
+`1.0.0-ber-live`; the additive published record detail and the additive
+package-level transport complete-status vocabulary (which includes `stop`)
+move `LIVE_PACKAGE_VERSION` from `0.1.0-ber-live` to `0.2.0-ber-live`
+(minor: additive compatible shape). The workflow-side literal status sets are a
+separately owned surface and are NOT changed by this package version; they
+remain a tracked owner-line follow-up. The family stays pinned by
+`tests/test_live_pipeline.py`, and the new shape and strict-JSON rejection
+rules are covered by `tests/test_live_judge_contract.py`.
 
 ## How to use this policy
 

@@ -77,7 +77,17 @@ class ProviderUsage:
 #: Only these provider stop statuses mean the response is complete enough to
 #: grade. Anything else (truncation, filtering, failure, cancellation, unknown)
 #: is a transport failure.
-COMPLETE_STOP_REASONS = frozenset({"end_turn", "stop_sequence", "completed"})
+#:
+#: The set covers the provider status vocabularies reachable through the pinned
+#: call shapes and their legacy/alternate surfaces: "end_turn" and
+#: "stop_sequence" (messages-API stop_reason), "completed" (responses-API
+#: status, observed on the run-41167546138 judge) and "stop"
+#: (chat-completions-API finish_reason). The RAW value the provider returned is
+#: recorded on the result; it is never normalized away, so evidence says which
+#: vocabulary was seen. Lives here as the single package source of truth; the
+#: matching workflow-side literal sets are a separately owned surface (a
+#: workflow edit needs an owner line) and are listed as a tracked follow-up.
+COMPLETE_STOP_REASONS = frozenset({"end_turn", "stop_sequence", "completed", "stop"})
 
 
 @dataclass(frozen=True, slots=True)
