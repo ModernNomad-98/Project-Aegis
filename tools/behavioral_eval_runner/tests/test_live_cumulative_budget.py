@@ -21,6 +21,7 @@ safe basis is an incompatibility recorded below, not a paid-plan claim.
 
 from __future__ import annotations
 
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -315,7 +316,7 @@ class ActualByteBasisTests(unittest.TestCase):
 
     def test_response_byte_guard_is_enforced_before_judge(self) -> None:
         self.assertEqual(MAX_SUBJECT_RESPONSE_BYTES, 90_000)
-        with __import__("tempfile").TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             config = helpers.config_payload(ceiling=SMOKE_CEILING_CENTS, runs=1, max_out=OUTPUT_TOKENS)
             config["subject_vendors"] = ["anthropic"]
             config["judge_allowlist"] = {"judge_models": [{"vendor": "openai", "model": "gpt-6-astra"}]}
