@@ -7,15 +7,19 @@ builders and the live config templates. They pin:
     models (anthropic 200/1000, openai 1000/5000 cents per MTok);
   * SMOKE_CEILING_CENTS is 200 and the committed smoke/live/trial configs carry
     16,384 output tokens (smoke: 200c ceiling, trial: runs_per_case=1);
-  * the documented-rate conservative smoke bound is subject 21c + judge 153c =
-    174c <= 200c (the first-case reservation is 173c);
-  * trial documented-rate bounds are measured 6,808c / uniform 7,080c, whose
-    cumulative bounds with the preserved 222c prior spend are 7,030c / 7,302c;
-    the plan-approved conservative 7,156c bound gives 7,378c;
-  * aggregate smoke+trial+prior bounds are 7,204c / 7,476c / 7,552c, all inside
-    the unchanged 12,000c shared ceiling (no separate per-workflow allowance);
-  * full Pilot A documented-rate uniform is 21,240c > 12,000c: exact
-    incompatibility; it is not authorized/dispatched.
+  * the documented-rate SCENARIO ESTIMATE (historical 4-bytes-per-output-token
+    assumption, NOT a safe bound) is subject 21c + judge 153c = 174c (first case
+    173c); trial scenario estimates are measured 6,808c / uniform 7,080c, whose
+    cumulative estimates with the preserved 222c prior spend are 7,030c / 7,302c;
+    the plan-approved conservative 7,156c estimate gives 7,378c;
+  * aggregate smoke+trial+prior scenario estimates are 7,204c / 7,476c / 7,552c,
+    all inside the unchanged 12,000c shared ceiling (no separate allowance);
+  * full Pilot A scenario estimate is 21,240c > 12,000c: exact
+    incompatibility; it is not authorized/dispatched. The SAFE reservation basis
+  (enforced 200,000-byte request limit + 16,384 output cap, no bytes-per-token
+  factor) is tested in test_live_cumulative_budget.py: smoke safe reservation
+  21c + 282c = 303c > 200c and trial safe bound 13,560c > 12,000c -- recorded
+  there as exact incompatibilities, not a paid-plan claim.
 """
 
 from __future__ import annotations
@@ -111,8 +115,8 @@ class DocumentedRateReservationTests(unittest.TestCase):
                     subject_text="",
                 )
                 judge_base = len(judge_request.system.encode()) + len(judge_request.user_content.encode())
-                # The judge input upper bound uses the same 4-bytes-per-output-token
-                # scenario term the package reserves with; it is a conservative bound.
+                # Scenario estimate only: the historical 4-bytes-per-output-token term is
+                # used for planning comparisons; it is NOT a safe reservation bound.
                 judge_cents = ceil_cents(
                     judge_base + 4 * OUTPUT_TOKENS,
                     cls.judge_pin.input_cents_per_mtok,
@@ -167,7 +171,7 @@ class DocumentedRateReservationTests(unittest.TestCase):
         with self.assertRaises(LiveError):
             LiveConfig.from_dict(payload)
 
-    def test_smoke_documented_rate_bound_fits_two_dollar_cap(self) -> None:
+    def test_smoke_scenario_estimate_is_173c(self) -> None:
         smoke_case = self.cases[0]
         subject = SubjectAdapter(
             self.subject_pin, None, max_output_tokens=OUTPUT_TOKENS, timeout_seconds=300
@@ -212,7 +216,7 @@ class DocumentedRateReservationTests(unittest.TestCase):
         self.assertEqual(subject_cents + max_judge, SMOKE_BOUND_CENTS)
         self.assertLessEqual(SMOKE_BOUND_CENTS, SMOKE_CEILING_CENTS)
 
-    def test_trial_documented_rate_bounds_and_shared_cumulative(self) -> None:
+    def test_trial_scenario_estimates_and_shared_cumulative(self) -> None:
         measured = sum(row[2] + row[3] for row in self.rows)
         uniform = 40 * (max(row[2] for row in self.rows) + max(row[3] for row in self.rows))
         self.assertEqual(measured, 6_808)
@@ -233,7 +237,7 @@ class DocumentedRateReservationTests(unittest.TestCase):
         self.assertEqual(PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + uniform, 7_476)
         self.assertEqual(PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + TRIAL_CONSERVATIVE_CENTS, 7_552)
 
-    def test_full_pilot_documented_rate_is_incompatible_with_ceiling(self) -> None:
+    def test_full_pilot_scenario_estimate_is_incompatible_with_ceiling(self) -> None:
         measured = sum(row[2] + row[3] for row in self.rows)
         uniform = 40 * (max(row[2] for row in self.rows) + max(row[3] for row in self.rows))
         full_measured = 3 * measured

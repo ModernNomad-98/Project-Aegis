@@ -960,6 +960,11 @@ jobs:
           for directory in (MANIFEST_DIR, CASES_DIR, LEDGER_DIR, RESTORE_DIR):
               directory.mkdir(parents=True, exist_ok=True)
           sys.path.insert(0, str(WORKSPACE))
+          from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
+              add_smoke_spend,
+              smoke_spend_total,
+              validate_smoke_spend,
+          )
           from tools.behavioral_eval_runner.live.ledger_reconciliation import (  # noqa: E402
               LedgerReconciliationRefusedError,
               load_records,
@@ -1064,6 +1069,7 @@ jobs:
           source_runs = []
           skipped = []
           without_artifact = []
+          prior_smoke_spends = {}
           # Full listing, paginated: the previous fixed 30-run window silently forgot
           # the spend of anything older. A listing this step cannot read completely is
           # a refusal, because an unseen run may have spent.
@@ -1242,6 +1248,19 @@ jobs:
                   )
                   continue
               source_runs.append(run_id)
+              prior_smoke = prior.get("smoke_spend")
+              if prior_smoke is not None:
+                  try:
+                      prior_smoke_records = validate_smoke_spend(prior_smoke)
+                  except ValueError as exc:
+                      refuse("run " + run_id + " has invalid smoke spend records: " + str(exc))
+                  for prior_smoke_run_id, prior_smoke_spent in prior_smoke_records.items():
+                      try:
+                          prior_smoke_spends = add_smoke_spend(
+                              prior_smoke_spends, prior_smoke_run_id, prior_smoke_spent
+                          )
+                      except ValueError as exc:
+                          refuse("run " + run_id + " smoke spend conflict: " + str(exc))
               # 1. Every ledger in the artifact is copied under a run-scoped name: two
               #    dispatches may both hold "<case>-attempt1.json", and each charge must
               #    survive with its own file. A nested copy of an earlier ledger (same
@@ -1467,6 +1486,19 @@ jobs:
                   "ledger_name": ledger_path.name,
                   **view,
               })
+          smoke_records = dict(prior_smoke_spends)
+          current_smoke = plan.get("smoke_gate")
+          if isinstance(current_smoke, dict) and current_smoke:
+              try:
+                  smoke_records = add_smoke_spend(
+                      smoke_records,
+                      current_smoke.get("smoke_run_id"),
+                      current_smoke.get("spent_cents"),
+                  )
+              except ValueError as exc:
+                  refuse("the current smoke-gate spend record is invalid: " + str(exc))
+          state["smoke_spend"] = smoke_records
+          state["smoke_spend_cents"] = smoke_spend_total(smoke_records)
           state["restored_from"] = (
               {
                   "runs": source_runs,
@@ -1478,6 +1510,8 @@ jobs:
                   ],
                   "prior_attempts": prior_attempts,
                   "prior_spend_cents": prior_spend,
+                  "smoke_spend_cents": smoke_spend_total(smoke_records),
+                  "prior_smoke_spend_cents": smoke_spend_total(prior_smoke_spends),
                   "reconciled_ledgers": reconciled_ledgers,
                   "restored_at": utc_now(),
               }
@@ -1559,6 +1593,9 @@ jobs:
 
           sys.path.insert(0, str(WORKSPACE))
           from tools.behavioral_eval_runner.live.config import LiveConfig  # noqa: E402
+          from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
+              smoke_spend_total,
+          )
           from tools.behavioral_eval_runner.live.dataset import (  # noqa: E402
               dataset_digest,
               load_cases,
@@ -1720,6 +1757,15 @@ jobs:
               return observed
 
 
+          def smoke_spent():
+              """The cumulative smoke spend, exactly once per smoke run id."""
+              try:
+                  return smoke_spend_total(state.get("smoke_spend"))
+              except ValueError as exc:
+                  print("REFUSED: invalid recorded smoke spend: " + str(exc), flush=True)
+                  raise SystemExit(1)
+
+
           def total_spent():
               """Cumulative spend over every dispatch, counted exactly once.
 
@@ -1764,7 +1810,7 @@ jobs:
               for name, spent in observed.items():
                   if name not in attributed:
                       total += spent
-              return total
+              return total + smoke_spent()
 
 
           def attempt_floor(case_id, entry):
@@ -2247,6 +2293,7 @@ jobs:
               "cases_completed": len(plan["case_ids"]) - len(missing),
               "cases_missing": len(missing),
               "spent_cents": cumulative,
+              "smoke_spend_cents": smoke_spent(),
               "ceiling_cents": CEILING,
               "prior_spend_cents": (state.get("restored_from") or {}).get(
                   "prior_spend_cents"
@@ -2396,6 +2443,11 @@ jobs:
           RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
           WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
           sys.path.insert(0, str(WORKSPACE))
+          from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
+              add_smoke_spend,
+              smoke_spend_total,
+              validate_smoke_spend,
+          )
           from tools.behavioral_eval_runner.live.ledger_reconciliation import (  # noqa: E402
               LedgerReconciliationRefusedError,
               load_records,
@@ -2589,6 +2641,25 @@ jobs:
               if spent is not None:
                   spent_total += spent
               attributed.add(name)
+          # Smoke spend is a separate workflow's charge but part of the SAME
+          # cumulative allowance: it is added exactly once per smoke run id and
+          # reduces the trial's ceiling before any trial call can reserve.
+          try:
+              smoke_records = validate_smoke_spend(state.get("smoke_spend"))
+              smoke_spend = smoke_spend_total(smoke_records)
+          except ValueError as exc:
+              ledger_failures.append("invalid recorded smoke spend: " + str(exc))
+              smoke_records = {}
+              smoke_spend = 0
+          spent_total += smoke_spend
+          gate_smoke = plan.get("smoke_gate")
+          if isinstance(gate_smoke, dict) and gate_smoke:
+              gate_smoke_id = str(gate_smoke.get("smoke_run_id"))
+              gate_smoke_spent = gate_smoke.get("spent_cents")
+              if smoke_records.get(gate_smoke_id) != gate_smoke_spent:
+                  ledger_failures.append(
+                      "the recorded smoke spend does not match the same-head smoke gate"
+                  )
           # Publish a closed, typed halt view: never the package's raw object,
           # which can carry free-form detail and context.
           HALT_VIEW_KEYS = (
@@ -3001,7 +3072,8 @@ jobs:
                   "ceiling_cents": effective_ceiling,
                   "spent_cents": spent_total,
                   "remaining_cents": max(0, effective_ceiling - spent_total),
-                  "ledger_spend_cents": spent_total,
+                  "ledger_spend_cents": spent_total - smoke_spend,
+                  "smoke_spend_cents": smoke_spend,
                   "unreconciled_count": unreconciled_total,
                   "reconciled_total": reconciled_total,
                   "reconciliation": reconciled_ledgers,
@@ -3030,6 +3102,10 @@ jobs:
                   "prior_spend_cents": (state.get("restored_from") or {}).get(
                       "prior_spend_cents"
                   ),
+                  "prior_smoke_spend_cents": (state.get("restored_from") or {}).get(
+                      "prior_smoke_spend_cents"
+                  ),
+                  "smoke_spend_cents": smoke_spend,
                   "cases_skipped_as_complete": (state.get("last_dispatch") or {}).get(
                       "skipped_as_complete", []
                   ),
@@ -3090,7 +3166,10 @@ jobs:
           ledger_out.write_text(
               json.dumps(
                   {"schema": "ber-pilot-a-ledgers/1.0.0", "ledgers": ledgers_out,
-                   "spent_cents": spent_total, "ceiling_cents": effective_ceiling},
+                   "spent_cents": spent_total,
+                   "ledger_spend_cents": spent_total - smoke_spend,
+                   "smoke_spend_cents": smoke_spend,
+                   "ceiling_cents": effective_ceiling},
                   indent=2,
                   sort_keys=True,
               )
