@@ -35,11 +35,17 @@ from tools.behavioral_eval_runner.live.config import (
 from tools.behavioral_eval_runner.live.cost_meter import CostMeter
 from tools.behavioral_eval_runner.live.pipeline import dry_run
 from tools.behavioral_eval_runner.live.cumulative import (
+    ACCOUNTING_SCHEMA,
     actual_byte_reservation_cents,
     actual_byte_smoke_bounds,
     add_smoke_spend,
+    admit_paid_call,
     merge_smoke_gate_spend,
     remaining_cumulative_cents,
+    restore_smoke_spend,
+    smoke_record_identity,
+    strict_cents,
+    versioned_accounting_fields,
     safe_reservation_bounds,
     smoke_safe_reservation_bounds,
     smoke_spend_total,
@@ -87,7 +93,8 @@ class SmokeSpendAccountingTests(unittest.TestCase):
             {},
             {"smoke_run_id": 4123456789, "spent_cents": SMOKE_SPEND},
         )
-        self.assertEqual(records, {"4123456789": SMOKE_SPEND})
+        self.assertEqual(smoke_spend_total(records), SMOKE_SPEND)
+        self.assertEqual(len(records), 1)
         # The same numeric id in a prior record (JSON keys are strings) dedups.
         again = merge_smoke_gate_spend(
             records,
@@ -252,6 +259,197 @@ class SafeReservationBasisTests(unittest.TestCase):
             )
         self.assertLessEqual(meter.spent_cents(), SMOKE_CEILING_CENTS)
 
+
+
+class S2AccountingProtocolTests(unittest.TestCase):
+    def test_authoritative_p02_distinct_attempts_counted(self) -> None:
+        records = merge_smoke_gate_spend(
+            {}, {"smoke_run_id": 42, "smoke_run_attempt": 1, "spent_cents": 10}
+        )
+        records = merge_smoke_gate_spend(
+            records, {"smoke_run_id": 42, "smoke_run_attempt": 2, "spent_cents": 10}
+        )
+        self.assertEqual(smoke_spend_total(records), 20)
+
+    def test_authoritative_p03_single_map_alias_conflict_refused(self) -> None:
+        with self.assertRaises(ValueError):
+            validate_smoke_spend({" 42 ": 10, "42": 20})
+
+    def test_strict_integer_cents_rejects_bool_float_negative_string(self) -> None:
+        for bad in (True, 1.5, -1, "10", None):
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError):
+                    strict_cents(bad)
+        self.assertEqual(strict_cents(0), 0)
+
+    def test_immutable_spend_identity_fields(self) -> None:
+        identity = smoke_record_identity(workflow_run_id=42, run_attempt=2)
+        self.assertEqual(identity["allowance_id"], "pilot-a-recovery-20261031")
+        self.assertEqual(identity["workflow_run_id"], "42")
+        self.assertEqual(identity["run_attempt"], 2)
+        self.assertEqual(identity["phase"], "smoke-proof")
+
+    def test_admission_denies_before_any_dispatch(self) -> None:
+        smoke = merge_smoke_gate_spend({}, {"smoke_run_id": 42, "spent_cents": 174})
+        calls = {"dispatch": 0}
+        def dispatch():
+            calls["dispatch"] += 1
+            raise AssertionError("dispatch must not be reached on denied admission")
+        admitted = admit_paid_call(
+            ceiling_cents=12_000,
+            prior_ledger_spend_cents=11_700,
+            prior_smoke_spend_records=smoke,
+            reservation_cents=127,
+        )
+        self.assertFalse(admitted["admitted"])
+        self.assertLess(admitted["snapshot"]["remaining_cents"], 0)
+        if admitted["admitted"]:
+            dispatch()
+        self.assertEqual(calls["dispatch"], 0)
+        accepted = admit_paid_call(
+            ceiling_cents=12_000,
+            prior_ledger_spend_cents=11_700,
+            prior_smoke_spend_records=smoke,
+            reservation_cents=126,
+        )
+        self.assertTrue(accepted["admitted"])
+        self.assertEqual(accepted["snapshot"]["remaining_cents"], 0)
+
+    def test_interrupted_true_up_state_blocks_next_admission(self) -> None:
+        import json
+        # Producer state after an interrupted true-up: ledger + smoke + an
+        # outstanding reservation; JSON artifact restore then next admission.
+        state = {
+            "schema": ACCOUNTING_SCHEMA,
+            "ledger_spend_cents": 11_700,
+            "smoke_spend_records": {"42": 174},
+            "outstanding_reservations_cents": 100,
+            "ceiling_cents": 12_000,
+        }
+        restored = json.loads(json.dumps(state))
+        next_small = admit_paid_call(
+            ceiling_cents=restored["ceiling_cents"],
+            prior_ledger_spend_cents=restored["ledger_spend_cents"],
+            prior_smoke_spend_records=restored["smoke_spend_records"],
+            reservation_cents=26,
+            outstanding_reservations_cents=restored["outstanding_reservations_cents"],
+        )
+        self.assertTrue(next_small["admitted"])
+        next_large = admit_paid_call(
+            ceiling_cents=restored["ceiling_cents"],
+            prior_ledger_spend_cents=restored["ledger_spend_cents"],
+            prior_smoke_spend_records=restored["smoke_spend_records"],
+            reservation_cents=27,
+            outstanding_reservations_cents=restored["outstanding_reservations_cents"],
+        )
+        # ledger 11700 + smoke 174 + outstanding/next 100/27 = 12001 -> deny.
+        self.assertFalse(next_large["admitted"])
+
+
+    def test_shared_ceiling_boundary_and_identity_allowance_phase(self) -> None:
+        shared = admit_paid_call(
+            ceiling_cents=12_000, prior_ledger_spend_cents=11_900,
+            prior_smoke_spend_records={}, reservation_cents=200,
+        )
+        self.assertFalse(shared["admitted"])
+        from tools.behavioral_eval_runner.live.cumulative import smoke_record_identity, add_smoke_spend
+        a = smoke_record_identity(workflow_run_id="42", run_attempt=1, allowance_id="A", phase="smoke")
+        b = smoke_record_identity(workflow_run_id="42", run_attempt=1, allowance_id="B", phase="trial")
+        records = add_smoke_spend({}, "42", 10, run_attempt=1, allowance_id="A", phase="smoke")
+        records = add_smoke_spend(records, "42", 20, run_attempt=1, allowance_id="B", phase="trial")
+        self.assertEqual(len(records), 2)
+        self.assertEqual(smoke_spend_total(records), 30)
+
+    def test_numeric_smoke_id_must_be_positive(self) -> None:
+        from tools.behavioral_eval_runner.live.cumulative import normalize_smoke_run_id
+        for bad in (0, -1, "0", "-1"):
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError):
+                    normalize_smoke_run_id(bad)
+
+
+    def test_versioned_accounting_fields(self) -> None:
+        records = merge_smoke_gate_spend(
+            {}, {"smoke_run_id": 42, "smoke_run_attempt": 1, "spent_cents": 10}
+        )
+        records = merge_smoke_gate_spend(
+            records, {"smoke_run_id": 42, "smoke_run_attempt": 2, "spent_cents": 10}
+        )
+        fields = versioned_accounting_fields(
+            ledger_spend_cents=11_700,
+            smoke_spend_records=records,
+            outstanding_reservations_cents=100,
+            ceiling_cents=12_000,
+        )
+        self.assertEqual(fields["schema"], ACCOUNTING_SCHEMA)
+        self.assertEqual(fields["ledger_spend_cents"], 11_700)
+        self.assertEqual(fields["smoke_spend_cents"], 20)
+        self.assertEqual(fields["outstanding_reservations_cents"], 100)
+        self.assertEqual(fields["combined_exposure_cents"], 11_820)
+        self.assertEqual(fields["remaining_cents"], 180)
+        self.assertEqual(fields["smoke_identity_count"], 2)
+
+    def test_producer_artifact_restore_and_resume_dedup(self) -> None:
+        prior_manifests = [{"42": 10}, {"42#2": 10}]
+        current = {"smoke_run_id": 43, "smoke_run_attempt": 1, "spent_cents": 5}
+        records = restore_smoke_spend(prior_manifests, current)
+        self.assertEqual(smoke_spend_total(records), 25)
+        # Artifact JSON round-trip and same-receipt replay count once.
+        import json
+        restored = json.loads(json.dumps(records))
+        replay = restore_smoke_spend([restored], current)
+        self.assertEqual(smoke_spend_total(replay), 25)
+
+    def test_missing_legacy_smoke_history_is_unknown_not_zero(self) -> None:
+        current = {"smoke_run_id": 43, "spent_cents": 5}
+        with self.assertRaises(ValueError):
+            restore_smoke_spend(None, current)
+        with self.assertRaises(ValueError):
+            restore_smoke_spend([None], current)
+        with self.assertRaises(ValueError):
+            restore_smoke_spend([{"bad": True}], current)
+
+    def test_malformed_proof_refused(self) -> None:
+        for gate in (None, {}, [], {"smoke_run_id": 42, "spent_cents": True}):
+            with self.subTest(gate=gate):
+                with self.assertRaises(ValueError):
+                    merge_smoke_gate_spend({}, gate)
+
+    def test_standalone_earlier_smokes_and_near_exhausted_allowance(self) -> None:
+        prior = [{"42": 174}, {"43": 50}]
+        current = {"smoke_run_id": 44, "spent_cents": 25}
+        records = restore_smoke_spend(prior, current)
+        self.assertEqual(smoke_spend_total(records), 249)
+        fields = versioned_accounting_fields(
+            ledger_spend_cents=11_700,
+            smoke_spend_records=records,
+            outstanding_reservations_cents=0,
+            ceiling_cents=12_000,
+        )
+        self.assertEqual(fields["combined_exposure_cents"], 11_949)
+        self.assertEqual(fields["remaining_cents"], 51)
+
+    def test_schema_migration_json_roundtrip_and_interrupted_true_up(self) -> None:
+        import json
+        records = merge_smoke_gate_spend(
+            {}, {"smoke_run_id": 42, "smoke_run_attempt": 1, "spent_cents": 10}
+        )
+        payload = {
+            "schema": ACCOUNTING_SCHEMA,
+            "ledger_spend_cents": 11_700,
+            "smoke_spend_records": records,
+            "outstanding_reservations_cents": 60,
+            "ceiling_cents": 12_000,
+        }
+        migrated = json.loads(json.dumps(payload))
+        fields = versioned_accounting_fields(
+            ledger_spend_cents=migrated["ledger_spend_cents"],
+            smoke_spend_records=migrated["smoke_spend_records"],
+            outstanding_reservations_cents=migrated["outstanding_reservations_cents"],
+            ceiling_cents=migrated["ceiling_cents"],
+        )
+        self.assertEqual(fields["combined_exposure_cents"], 11_770)
+        self.assertEqual(fields["remaining_cents"], 230)
 
 
 class ActualByteBasisTests(unittest.TestCase):

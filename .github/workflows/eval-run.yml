@@ -166,6 +166,10 @@ permissions:
   # The resume-restore step reads this repository's own prior run artifacts.
   actions: read
 
+concurrency:
+  group: pilot-a-shared-allowance
+  cancel-in-progress: false
+
 jobs:
   eval-run:
     name: eval-run
@@ -960,10 +964,14 @@ jobs:
           for directory in (MANIFEST_DIR, CASES_DIR, LEDGER_DIR, RESTORE_DIR):
               directory.mkdir(parents=True, exist_ok=True)
           sys.path.insert(0, str(WORKSPACE))
+          from tools.behavioral_eval_runner.live.allowance_history import (  # noqa: E402
+              collect_smoke_proof_spends,
+          )
           from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
               add_smoke_spend,
               merge_smoke_gate_spend,
               normalize_smoke_run_id,
+              restore_smoke_spend,
               smoke_spend_total,
               validate_smoke_spend,
           )
@@ -1072,6 +1080,7 @@ jobs:
           skipped = []
           without_artifact = []
           prior_smoke_spends = {}
+          prior_smoke_manifests = []
           legacy_smoke_manifests = []
           # Full listing, paginated: the previous fixed 30-run window silently forgot
           # the spend of anything older. A listing this step cannot read completely is
@@ -1260,13 +1269,7 @@ jobs:
                   prior_smoke_records = validate_smoke_spend(prior_smoke)
               except ValueError as exc:
                   refuse("run " + run_id + " has invalid smoke spend records: " + str(exc))
-              for prior_smoke_run_id, prior_smoke_spent in prior_smoke_records.items():
-                  try:
-                      prior_smoke_spends = add_smoke_spend(
-                          prior_smoke_spends, prior_smoke_run_id, prior_smoke_spent
-                      )
-                  except ValueError as exc:
-                      refuse("run " + run_id + " smoke spend conflict: " + str(exc))
+              prior_smoke_manifests.append(prior_smoke_records)
               # 1. Every ledger in the artifact is copied under a run-scoped name: two
               #    dispatches may both hold "<case>-attempt1.json", and each charge must
               #    survive with its own file. A nested copy of an earlier ledger (same
@@ -1498,6 +1501,24 @@ jobs:
                   + ", ".join(legacy_smoke_manifests)
                   + "; smoke spend history cannot be proven (no silent zero)"
               )
+          # Standalone historical eval-smoke proofs are part of the same
+          # allowance; a successful smoke run without a readable proof is
+          # UNKNOWN and refuses rather than counting as zero.
+          try:
+              standalone_smoke = collect_smoke_proof_spends(
+                  gh=lambda args: gh(*args),
+                  repository=repository,
+                  work_dir=RUNNER_TEMP / "ber-standalone-smoke-history",
+                  current_run_id=current_run,
+              )
+          except ValueError as exc:
+              refuse("standalone smoke history is not restorable: " + str(exc))
+          if standalone_smoke:
+              prior_smoke_manifests.append(standalone_smoke)
+          try:
+              prior_smoke_spends = restore_smoke_spend(prior_smoke_manifests)
+          except ValueError as exc:
+              refuse("prior smoke history is not restorable: " + str(exc))
           current_smoke = plan.get("smoke_gate")
           if not isinstance(current_smoke, dict) or not current_smoke:
               # F-A-5: a live trial plan must carry the same-head smoke gate.
@@ -2461,8 +2482,10 @@ jobs:
           sys.path.insert(0, str(WORKSPACE))
           from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
               add_smoke_spend,
+              smoke_gate_identity_key,
               smoke_spend_total,
               validate_smoke_spend,
+              versioned_accounting_fields,
           )
           from tools.behavioral_eval_runner.live.ledger_reconciliation import (  # noqa: E402
               LedgerReconciliationRefusedError,
@@ -2674,9 +2697,13 @@ jobs:
                   "the run plan has no same-head smoke gate record"
               )
           else:
-              gate_smoke_id = str(gate_smoke.get("smoke_run_id"))
+              try:
+                  gate_smoke_id = smoke_gate_identity_key(gate_smoke)
+              except ValueError as exc:
+                  ledger_failures.append("the smoke gate identity is invalid: " + str(exc))
+                  gate_smoke_id = None
               gate_smoke_spent = gate_smoke.get("spent_cents")
-              if smoke_records.get(gate_smoke_id) != gate_smoke_spent:
+              if gate_smoke_id is None or smoke_records.get(gate_smoke_id) != gate_smoke_spent:
                   ledger_failures.append(
                       "the recorded smoke spend does not match the same-head smoke gate"
                   )
@@ -3086,6 +3113,12 @@ jobs:
                   "config_loaded": bool(config),
                   "failures": state.get("failures") or [],
               },
+              "accounting": versioned_accounting_fields(
+                  ledger_spend_cents=spent_total - smoke_spend,
+                  smoke_spend_records=smoke_records,
+                  outstanding_reservations_cents=0,
+                  ceiling_cents=effective_ceiling,
+              ),
               "cost": {
                   "configured_ceiling_cents": configured,
                   "owner_limits": owner_limits,
