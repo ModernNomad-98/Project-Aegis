@@ -280,6 +280,22 @@ committed case data: the pipeline refuses a case whose record hash is not in the
 dataset the gate verified, and every verdict must echo the rubric and response
 SHA-256 values or it is recorded as `JUDGE_ERROR`.
 
+**Judge output contract.** The judge system policy states the exact seven-key
+JSON object the parser requires (no markdown fence, no prose, no extra keys):
+`verdict`, `reason_code`, `failure_mode`, the echoed `rubric_sha256` and
+`response_sha256`, `judge_model`, and `evidence_refs: ["response"]`. The
+parser tolerates exactly one enclosing JSON code fence and applies the same
+strict schema, closed-enum coherence and hash echoes. Any deviation is recorded
+as an explicit `JUDGE_PARSE_ERROR` (never a bare null and never PASS/FAIL)
+carrying the raw provider `finish_reason` and a non-content fingerprint — the
+raw judge output is not retained. Accepted provider terminal statuses are
+`end_turn`, `stop_sequence`, `completed` and `stop`, and the value the
+provider returned is recorded rather than normalized. A live run also writes one
+bounded, non-content `judge_failure_diagnostics` line to stderr when the judge
+failed, so a failed smoke's explicit classification and finish reason stay in the
+retained job log even though the workflow publishes no artifact for a failed
+run. The contract is covered by `tests/test_live_judge_contract.py`.
+
 **Cost meter and hard halt.** Every call reserves a conservative integer-cent
 upper bound before dispatch and is reconciled against provider-reported usage
 afterwards. When the next reservation would exceed the effective ceiling, the
@@ -329,7 +345,7 @@ The gated live package has its own offline suite (mock transports and fake
 environment values only; no network call and no real key):
 
 ```bash
-python -B -m unittest tools.behavioral_eval_runner.tests.test_live_adapters tools.behavioral_eval_runner.tests.test_live_cost_meter tools.behavioral_eval_runner.tests.test_live_gate tools.behavioral_eval_runner.tests.test_live_pipeline
+python -B -m unittest tools.behavioral_eval_runner.tests.test_live_adapters tools.behavioral_eval_runner.tests.test_live_cost_meter tools.behavioral_eval_runner.tests.test_live_gate tools.behavioral_eval_runner.tests.test_live_judge_contract tools.behavioral_eval_runner.tests.test_live_pipeline tools.behavioral_eval_runner.tests.test_live_smoke
 ```
 
 Tests use synthetic fixtures, local Git and temporary directories. Some need

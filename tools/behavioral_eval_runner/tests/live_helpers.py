@@ -39,6 +39,7 @@ DRY_CONFIG = os.path.join(PACKAGE_ROOT, "live", "config", "dry-run-config.json")
 LIVE_CONFIG = os.path.join(PACKAGE_ROOT, "live", "config", "pilot-a-live-config.json")
 SMOKE_CONFIG = os.path.join(PACKAGE_ROOT, "live", "config", "pilot-a-smoke-config.json")
 SYNTHETIC_GATE = os.path.join(PACKAGE_ROOT, "live", "gates", "synthetic-dry-run.json")
+JUDGE_FIXTURES_ROOT = os.path.join(PACKAGE_ROOT, "tests", "fixtures", "live", "judge")
 
 FAKE_ANTHROPIC_KEY = "fake-anthropic-value-for-tests-only"
 FAKE_OPENAI_KEY = "fake-openai-value-for-tests-only"

@@ -24,7 +24,7 @@ mock transport and use fake environment values; the build used no keys and made
 no provider call.
 """
 
-LIVE_PACKAGE_VERSION = "0.1.0-ber-live"
+LIVE_PACKAGE_VERSION = "0.2.0-ber-live"
 LIVE_SCHEMA_VERSION = "1.0.0-ber-live"
 LIVE_CAPABILITY_STATE = "GATED"
 LIVE_ENABLED_BY_DEFAULT = False

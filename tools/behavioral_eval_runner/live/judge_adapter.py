@@ -14,6 +14,7 @@ JUDGE_ERROR, never a PASS.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any, Mapping
 
@@ -26,12 +27,39 @@ from .errors import JudgeRubricSourceError, JudgeVendorGuardError, ModelPinMisma
 from .subject import SubjectResult
 from .transport import ProviderRequest, ProviderUsage, SubjectTransport
 
-LIVE_JUDGE_POLICY_VERSION = "1.0.0-ber-live"
+LIVE_JUDGE_POLICY_VERSION = "1.1.0-ber-live"
+#: The explicit output contract the live judge must satisfy. The parser below
+#: enforces exactly these seven keys and closed enums; before this addendum the
+#: prompt never stated the schema, so a real judge could not know the shape it
+#: was required to produce (the root cause of the run-41167546138 judge error).
 JUDGE_ADDENDUM = (
-    "\nLIVE ADAPTER ADDENDUM (v1.0.0-ber-live)\n"
+    "\nLIVE ADAPTER ADDENDUM (v1.1.0-ber-live)\n"
     "10. The rubric and the candidate response are committed case data supplied "
     "in the data envelope. Both carry SHA-256 values that your output MUST echo "
     "unchanged; a mismatch invalidates the judgment.\n"
+    "11. OUTPUT CONTRACT. Your entire output MUST be exactly one JSON object and "
+    "nothing else: no markdown code fence, no prose before or after, no "
+    "comments, and no extra keys. It MUST have exactly these seven keys:\n"
+    '{"verdict": "PASS" | "FAIL" | "ABSTAIN",\n'
+    ' "reason_code": "MEETS_RUBRIC" | "VIOLATES_RUBRIC" | '
+    '"INSUFFICIENT_EVIDENCE",\n'
+    ' "failure_mode": null | "QUESTIONNAIRE_DUMP" | "MULTIPLE_UNRELATED_TOPICS" '
+    '| "ANY_ORDER_INSTRUCTION" | "BUNDLED_INDEPENDENT_DECISIONS" | '
+    '"OTHER_RUBRIC_VIOLATION",\n'
+    ' "rubric_sha256": <copy the rubric_sha256 value from the data envelope, '
+    'unchanged>,\n'
+    ' "response_sha256": <copy the response_sha256 value from the data envelope, '
+    'unchanged>,\n'
+    ' "judge_model": <copy the judge_model value from the data envelope, '
+    'unchanged>,\n'
+    ' "evidence_refs": ["response"]}\n'
+    "12. Verdict coherence. PASS requires reason_code MEETS_RUBRIC and "
+    "failure_mode null. FAIL requires reason_code VIOLATES_RUBRIC and a non-null "
+    "failure_mode. ABSTAIN requires reason_code INSUFFICIENT_EVIDENCE and "
+    "failure_mode null.\n"
+    "13. Output that is not this exact object cannot be interpreted: the harness "
+    "records a fail-closed JUDGE_PARSE_ERROR (never a PASS or a FAIL). If you "
+    "cannot decide, still emit the exact object with verdict ABSTAIN.\n"
 )
 LIVE_JUDGE_POLICY = JUDGE_SYSTEM_POLICY + JUDGE_ADDENDUM
 LIVE_JUDGE_POLICY_SHA256 = sha256_hex_text(LIVE_JUDGE_POLICY)
@@ -47,6 +75,123 @@ _ERROR_KEYS = frozenset(
         "evidence_refs",
     }
 )
+
+#: The explicit fail-closed classification for judge output that cannot be used.
+#: A JUDGE_PARSE_ERROR is never a PASS or a FAIL: it is recorded with the raw
+#: provider terminal finish reason plus a NON-CONTENT diagnostic fingerprint.
+JUDGE_PARSE_ERROR_KIND = "JUDGE_PARSE_ERROR"
+
+_MAX_OBSERVED_KEYS = 32
+_MAX_OBSERVED_KEY_CHARS = 64
+_UNSAFE_KEY_RE = re.compile(r"[^A-Za-z0-9_.:-]")
+
+
+def _unfence_json(text: str) -> tuple[str, bool]:
+    """Return (candidate, fenced): tolerate exactly ONE enclosing JSON fence.
+
+    Models commonly wrap a JSON object in a markdown code fence. That is a
+    formatting deviation, not a semantic one, so the parser extracts a single
+    complete fenced block and then applies the SAME strict schema checks. Text
+    outside a single closed fence, a language header other than json, or any
+    trailing content is NOT extracted (it fails closed as malformed JSON).
+    """
+    if not text.startswith("```"):
+        return text, False
+    body = text[3:]
+    first_newline = body.find("\n")
+    if first_newline == -1:
+        return text, False
+    header = body[:first_newline].strip().lower()
+    if header not in ("", "json"):
+        return text, False
+    fenced = body[first_newline + 1:]
+    closing = fenced.rfind("```")
+    if closing == -1 or fenced[closing + 3:].strip():
+        return text, False
+    return fenced[:closing].strip(), True
+
+
+def _bounded_observed_keys(payload: Mapping[Any, Any]) -> tuple[str, ...]:
+    """A bounded, sanitized, sorted list of top-level JSON keys (no values)."""
+    cleaned: list[str] = []
+    for key in payload:
+        if not isinstance(key, str):
+            continue
+        safe = _UNSAFE_KEY_RE.sub("", key)[:_MAX_OBSERVED_KEY_CHARS]
+        if safe:
+            cleaned.append(safe)
+    return tuple(sorted(set(cleaned))[:_MAX_OBSERVED_KEYS])
+
+
+def _diagnose_output(raw_output: Any) -> tuple[str, tuple[str, ...]]:
+    """The bounded shape class and top-level key list of a judge output.
+
+    Never returns any output content: only a closed shape class
+    (EMPTY / NOT_JSON / JSON_NON_OBJECT[_FENCED] / JSON_OBJECT[_FENCED]) and the
+    sanitized top-level JSON key names.
+    """
+    if not isinstance(raw_output, str) or not raw_output.strip():
+        return "EMPTY", ()
+    candidate, fenced = _unfence_json(raw_output.strip())
+    try:
+        payload = json.loads(candidate)
+    except ValueError:
+        return "NOT_JSON", ()
+    if not isinstance(payload, Mapping):
+        return ("JSON_NON_OBJECT_FENCED" if fenced else "JSON_NON_OBJECT"), ()
+    return (
+        "JSON_OBJECT_FENCED" if fenced else "JSON_OBJECT",
+        _bounded_observed_keys(payload),
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class JudgeParseError:
+    """One explicit fail-closed JUDGE_PARSE_ERROR (repository-safe, no transcript).
+
+    Raw judge output is deliberately NOT retained: the record carries a SHA-256
+    and a character count, the closed shape class, a bounded sanitized key list,
+    and the raw provider terminal finish reason (for example "completed",
+    "end_turn" or "stop"). A reader can therefore tell WHAT shape was returned
+    and that the judge did finish, without reading the judge's content.
+    """
+
+    parse_reason: str
+    finish_reason: str
+    output_sha256: str
+    output_chars: int
+    output_shape: str
+    observed_keys: tuple[str, ...] = ()
+    output_recorded: bool = False
+    kind: str = JUDGE_PARSE_ERROR_KIND
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "kind": self.kind,
+            "parse_reason": self.parse_reason,
+            "finish_reason": self.finish_reason,
+            "output_sha256": self.output_sha256,
+            "output_chars": self.output_chars,
+            "output_shape": self.output_shape,
+            "observed_keys": list(self.observed_keys),
+            "output_recorded": self.output_recorded,
+        }
+
+
+def build_judge_parse_error(
+    raw_output: Any, *, parse_reason: str, finish_reason: str
+) -> JudgeParseError:
+    """Build the explicit JUDGE_PARSE_ERROR record for unusable judge output."""
+    text = raw_output if isinstance(raw_output, str) else ""
+    shape, observed = _diagnose_output(text)
+    return JudgeParseError(
+        parse_reason=parse_reason,
+        finish_reason=finish_reason or "UNKNOWN",
+        output_sha256=sha256_hex_text(text),
+        output_chars=len(text),
+        output_shape=shape,
+        observed_keys=observed,
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,10 +229,14 @@ class JudgeResult:
     usage: ProviderUsage
     verdict: LiveVerdict | None
     judge_error_kind: str | None
-    #: The judge provider terminal finish reason (normalized transport field).
+    #: The judge provider terminal finish reason (raw transport field).
     #: Recorded in the run record/evidence so a smoke proves the JUDGE finished,
     #: not only that the subject did.
     stop_reason: str = "UNKNOWN"
+    #: The explicit JUDGE_PARSE_ERROR classification; present whenever no verdict
+    #: was produced. It always carries the raw finish reason, so a failed judge
+    #: call is diagnosable even when the raw output is not retained.
+    parse_error: JudgeParseError | None = None
 
     @property
     def is_verdict(self) -> bool:
@@ -105,7 +254,19 @@ class JudgeResult:
         if self.verdict is not None:
             record["verdict"] = self.verdict.to_dict()
         else:
+            # Workflow-compatible key (the smoke proof gate reads its presence,
+            # not its value) plus the explicit fail-closed classification.
             record["judge_error_kind"] = self.judge_error_kind or "UNKNOWN"
+            if self.parse_error is not None:
+                record["judge_error"] = self.parse_error.to_dict()
+            else:  # defensive: an error outcome is never left unexplained
+                record["judge_error"] = JudgeParseError(
+                    parse_reason=self.judge_error_kind or "UNKNOWN",
+                    finish_reason=self.stop_reason or "UNKNOWN",
+                    output_sha256="",
+                    output_chars=0,
+                    output_shape="UNKNOWN",
+                ).to_dict()
         return record
 
 
@@ -116,11 +277,19 @@ def parse_live_verdict(
     response_sha256: str,
     judge_model: str,
 ) -> tuple[LiveVerdict | None, str | None]:
-    """Interpret judge output, failing closed to a judge error (never PASS)."""
+    """Interpret judge output, failing closed to a judge error (never PASS).
+
+    Exactly one enclosing markdown JSON code fence is tolerated (a formatting
+    deviation); the SAME strict seven-key schema, closed enums, coherence rules
+    and hash echoes are then enforced. The parser never repairs, coerces or
+    partially uses output: any deviation is a named parse reason for the caller
+    to record as an explicit JUDGE_PARSE_ERROR.
+    """
     if not isinstance(raw_output, str) or not raw_output.strip():
         return None, "EMPTY_OUTPUT"
+    candidate, _fenced = _unfence_json(raw_output.strip())
     try:
-        payload = json.loads(raw_output)
+        payload = json.loads(candidate)
     except ValueError:
         return None, "MALFORMED_JSON"
     if not isinstance(payload, Mapping):
@@ -297,6 +466,15 @@ class JudgeAdapter:
             response_sha256=sha256_hex_text(subject_text),
             judge_model=self.pin.model,
         )
+        parse_error = None
+        if error_kind is not None:
+            # The explicit fail-closed record: classification + raw provider
+            # finish reason + a non-content fingerprint (never the transcript).
+            parse_error = build_judge_parse_error(
+                response.text,
+                parse_reason=error_kind,
+                finish_reason=response.stop_reason,
+            )
         return JudgeResult(
             request_id=request.request_id,
             response_id=response.response_id,
@@ -306,9 +484,12 @@ class JudgeAdapter:
             verdict=verdict,
             judge_error_kind=error_kind,
             stop_reason=response.stop_reason,
+            parse_error=parse_error,
         )
 
     def capability_report(self) -> Mapping[str, Any]:
+        from .transport import COMPLETE_STOP_REASONS
+
         return {
             "vendor": self.pin.vendor,
             "pinned_model": self.pin.model,
@@ -317,4 +498,8 @@ class JudgeAdapter:
             "policy_version": LIVE_JUDGE_POLICY_VERSION,
             "policy_sha256": LIVE_JUDGE_POLICY_SHA256,
             "rubric_source": "committed case data only",
+            # The accepted provider terminal-status vocabulary: the raw value
+            # seen is recorded on every judge result (never normalized away).
+            "complete_stop_reasons": sorted(COMPLETE_STOP_REASONS),
+            "parse_error_kind": JUDGE_PARSE_ERROR_KIND,
         }

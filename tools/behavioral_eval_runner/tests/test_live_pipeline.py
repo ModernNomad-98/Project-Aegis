@@ -243,7 +243,7 @@ class VersionRegistrationTests(unittest.TestCase):
         )
 
         self.assertEqual(LIVE_SCHEMA_VERSION, "1.0.0-ber-live")
-        self.assertEqual(LIVE_PACKAGE_VERSION, "0.1.0-ber-live")
+        self.assertEqual(LIVE_PACKAGE_VERSION, "0.2.0-ber-live")
         cases = helpers.committed_cases()
         self.assertTrue(cases)
         for case in cases:

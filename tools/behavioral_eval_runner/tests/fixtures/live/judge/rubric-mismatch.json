@@ -1,0 +1,17 @@
+{
+  "fixture_id": "rubric-mismatch",
+  "fixture_kind": "contract-shaped-synthetic",
+  "not_a_provider_transcript": true,
+  "provenance": "Synthetic fixture shaped exactly as the v1.1.0-ber-live live-judge OUTPUT CONTRACT in the judge system policy states. It is NOT a provider transcript: the raw judge output of run 41167546138 was not retained (0 artifacts; raw_transcripts_included false), so no real response could be recorded.",
+  "finish_reason": "completed",
+  "request": {
+    "rubric_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "response_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "judge_model": "gpt-6-astra"
+  },
+  "raw_output": "{\"evidence_refs\":[\"response\"],\"failure_mode\":null,\"judge_model\":\"gpt-6-astra\",\"reason_code\":\"MEETS_RUBRIC\",\"response_sha256\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"rubric_sha256\":\"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\",\"verdict\":\"PASS\"}",
+  "expected": {
+    "outcome": "PARSE_ERROR",
+    "parse_reason": "RUBRIC_MISMATCH"
+  }
+}

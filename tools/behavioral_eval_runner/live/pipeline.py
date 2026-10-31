@@ -68,10 +68,21 @@ from .gate import (
     load_gate,
     require_live_gate,
 )
-from .judge_adapter import LIVE_JUDGE_POLICY, LIVE_JUDGE_POLICY_SHA256, JudgeAdapter, JudgeResult
+from .judge_adapter import (
+    JUDGE_PARSE_ERROR_KIND,
+    LIVE_JUDGE_POLICY,
+    LIVE_JUDGE_POLICY_SHA256,
+    JudgeAdapter,
+    JudgeResult,
+)
 from .mock_transport import MockTransport
 from .subject import SubjectAdapter
-from .transport import ProviderResponse, ProviderUsage, SubjectTransport
+from .transport import (
+    COMPLETE_STOP_REASONS,
+    ProviderResponse,
+    ProviderUsage,
+    SubjectTransport,
+)
 
 ARMS = ("WITH_SKILL", "BASELINE")
 ACCESS_POLICY_REF = "BER-LIVE-1.0.0-owner-gate"
@@ -212,6 +223,12 @@ def _smoke_view(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
         for record in results
         if isinstance(record.get("subject"), Mapping)
     ]
+    judge_errors = [
+        dict(record["judge"]["judge_error"])
+        for record in results
+        if isinstance(record.get("judge"), Mapping)
+        and isinstance(record["judge"].get("judge_error"), Mapping)
+    ]
     return {
         "enabled": True,
         "selection": {
@@ -226,6 +243,11 @@ def _smoke_view(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
         "judge_calls": len(judge_reasons),
         "subject_stop_reasons": subject_reasons,
         "judge_finish_reasons": judge_reasons,
+        # A failed smoke keeps the explicit parse classification + finish reason
+        # in the retained smoke record, so the failure is diagnosable from the
+        # verified evidence bundle even when the raw judge output is not kept.
+        "judge_parse_errors": judge_errors,
+        "complete_stop_reasons": sorted(COMPLETE_STOP_REASONS),
         "ceiling_cents": meter.ceiling_cents,
         "spent_cents": meter.spent_cents(),
     }
@@ -655,7 +677,10 @@ def _rule_state(
     if deterministic.get("status") == "FAIL":
         return "FAIL", "DETERMINISTIC_FAIL"
     if not judge_result.is_verdict:
-        return "JUDGE_ERROR", (judge_result.judge_error_kind or "NO_VERDICT")
+        # Explicit, never a bare null: the precise parse branch and the raw
+        # provider finish reason are carried in the judge record's
+        # judge_error object; the result state stays JUDGE_ERROR (never PASS/FAIL).
+        return "JUDGE_ERROR", JUDGE_PARSE_ERROR_KIND
     verdict = judge_result.verdict.verdict.value
     if verdict == "PASS":
         return "PASS", None
@@ -991,6 +1016,8 @@ def _write_evidence(
                     },
                     "judge_policy_sha256": LIVE_JUDGE_POLICY_SHA256,
                     "judge_policy_chars": len(LIVE_JUDGE_POLICY),
+                    "judge_parse_error_kind": JUDGE_PARSE_ERROR_KIND,
+                    "complete_stop_reasons": sorted(COMPLETE_STOP_REASONS),
                     "pinning": "strict: served model string must equal the pin",
                 }
             ).encode("utf-8"),

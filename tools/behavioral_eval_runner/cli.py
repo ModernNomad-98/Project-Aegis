@@ -633,6 +633,64 @@ def _live_paths(args: argparse.Namespace) -> LivePaths:
     )
 
 
+def _judge_failure_diagnostics(result: dict[str, Any]) -> list[dict[str, Any]]:
+    """Non-content judge failure diagnostics for the retained stderr channel.
+
+    A failed smoke publishes no artifact by design, but the workflow leaves the
+    process stderr in the retained job log. Emitting the explicit
+    JUDGE_PARSE_ERROR classification, the raw provider finish reason and the
+    non-content fingerprint there keeps a paid judge failure diagnosable from
+    the job log without retaining any judge output or transcript.
+    """
+    diagnostics: list[dict[str, Any]] = []
+    for record in result.get("results") or ():
+        if not isinstance(record, dict):
+            continue
+        judge = record.get("judge")
+        error = judge.get("judge_error") if isinstance(judge, dict) else None
+        if not isinstance(error, dict):
+            continue
+        diagnostics.append(
+            {
+                "case_id": record.get("case_id"),
+                "arm": record.get("arm"),
+                "run_index": record.get("run_index"),
+                "result_state": record.get("result_state"),
+                "reason_code": record.get("reason_code"),
+                "kind": error.get("kind"),
+                "parse_reason": error.get("parse_reason"),
+                "finish_reason": error.get("finish_reason"),
+                "output_sha256": error.get("output_sha256"),
+                "output_chars": error.get("output_chars"),
+                "output_shape": error.get("output_shape"),
+                "observed_keys": error.get("observed_keys"),
+                "output_recorded": error.get("output_recorded"),
+            }
+        )
+    return diagnostics
+
+
+def _emit_judge_failure_diagnostics(result: dict[str, Any]) -> None:
+    """Write one bounded diagnostics line to stderr when a judge failed."""
+    diagnostics = _judge_failure_diagnostics(result)
+    if not diagnostics:
+        return
+    sys.stderr.write(
+        canonical_json(
+            {
+                "event": "judge_failure_diagnostics",
+                "note": (
+                    "non-content diagnostics; the raw judge output is not retained"
+                ),
+                "run_status": result.get("status"),
+                "judge_errors": diagnostics,
+            }
+        )
+        + "\n"
+    )
+    sys.stderr.flush()
+
+
 def _cmd_live_preflight(args: argparse.Namespace) -> int:
     report = _live_preflight(
         _live_paths(args),
@@ -661,6 +719,9 @@ def _cmd_live_run(args: argparse.Namespace) -> int:
         smoke=getattr(args, "smoke", False),
     )
     _emit(result)
+    # The paid failure path keeps its diagnostics in the retained job log even
+    # when no evidence artifact is published.
+    _emit_judge_failure_diagnostics(result)
     return 0 if result.get("status") == "COMPLETED" else 3
 
 
