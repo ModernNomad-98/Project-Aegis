@@ -301,7 +301,7 @@ class JudgeDispatchRecordTests(unittest.TestCase):
         )
         return adapter, subject, subject_text
 
-    def _contract_shaped_raw(self, case, subject_text: str, finish_reason: str = "completed") -> str:
+    def _contract_shaped_raw(self, case, subject_text: str) -> str:
         return canonical_json(
             {
                 "verdict": "PASS",
@@ -414,6 +414,51 @@ class StopReasonVocabularyTests(unittest.TestCase):
                     ensure_complete_response(value, vendor="judge")
 
 
+class JudgeResultInvariantTests(unittest.TestCase):
+    """Fix for advisory review 5721522067 finding 4: no synthesized record."""
+
+    def test_a_verdict_less_result_without_diagnostics_is_not_written(self):
+        from tools.behavioral_eval_runner.live.judge_adapter import JudgeResult
+        from tools.behavioral_eval_runner.live.transport import ProviderUsage
+
+        result = JudgeResult(
+            request_id="rid",
+            response_id="resp",
+            served_model="gpt-6-astra",
+            response_sha256="0" * 64,
+            usage=ProviderUsage(1, 1),
+            verdict=None,
+            judge_error_kind="MALFORMED_JSON",
+            stop_reason="completed",
+            parse_error=None,
+        )
+        with self.assertRaises(ValueError):
+            result.to_record()
+
+    def test_a_verdict_less_result_with_diagnostics_is_written(self):
+        from tools.behavioral_eval_runner.live.judge_adapter import JudgeResult
+        from tools.behavioral_eval_runner.live.transport import ProviderUsage
+
+        result = JudgeResult(
+            request_id="rid",
+            response_id="resp",
+            served_model="gpt-6-astra",
+            response_sha256="0" * 64,
+            usage=ProviderUsage(1, 1),
+            verdict=None,
+            judge_error_kind="MALFORMED_JSON",
+            stop_reason="completed",
+            parse_error=build_judge_parse_error(
+                MALFORMED_RAW,
+                parse_reason="MALFORMED_JSON",
+                finish_reason="completed",
+            ),
+        )
+        record = result.to_record()
+        self.assertEqual(record["judge_error"]["kind"], "JUDGE_PARSE_ERROR")
+        self.assertEqual(record["judge_error"]["output_shape"], "NOT_JSON")
+
+
 class FailureDiagnosticsChannelTests(unittest.TestCase):
     """The retained job-log channel carries the explicit failure diagnostics."""
 
@@ -436,7 +481,9 @@ class FailureDiagnosticsChannelTests(unittest.TestCase):
                             "output_sha256": sha256_hex_text(MALFORMED_RAW),
                             "output_chars": len(MALFORMED_RAW),
                             "output_shape": "NOT_JSON",
-                            "observed_keys": [],
+                            "observed_key_count": 0,
+                            "missing_expected_keys": [],
+                            "unexpected_key_count": 0,
                             "output_recorded": False,
                         },
                     },
@@ -553,7 +600,7 @@ class FailClosedEndToEndTests(unittest.TestCase):
             self.assertEqual(result["results_by_state"], {"JUDGE_ERROR": 1})
             record = result["results"][0]
             self.assertEqual(record["result_state"], "JUDGE_ERROR")
-            self.assertEqual(record["reason_code"], "JUDGE_PARSE_ERROR")
+            self.assertEqual(record["reason_code"], "MALFORMED_JSON")
             self.assertEqual(record["citability"], "INJECTED_TRANSPORT_NOT_CITABLE")
             judge = record["judge"]
             self.assertEqual(judge["stop_reason"], "completed")
@@ -563,9 +610,13 @@ class FailClosedEndToEndTests(unittest.TestCase):
             self.assertIs(judge["judge_error"]["output_recorded"], False)
             smoke = result["smoke"]
             self.assertEqual(smoke["judge_finish_reasons"], ["completed"])
-            self.assertEqual(
-                smoke["judge_parse_errors"][0]["kind"], "JUDGE_PARSE_ERROR"
-            )
+            smoke_error = smoke["judge_parse_errors"][0]
+            self.assertEqual(smoke_error["kind"], "JUDGE_PARSE_ERROR")
+            self.assertEqual(smoke_error["case_id"], record["case_id"])
+            self.assertEqual(smoke_error["arm"], record["arm"])
+            self.assertEqual(smoke_error["run_index"], record["run_index"])
+            self.assertEqual(smoke_error["result_state"], "JUDGE_ERROR")
+            self.assertEqual(smoke_error["reason_code"], "MALFORMED_JSON")
             for value in ("end_turn", "stop", "completed"):
                 self.assertIn(value, smoke["complete_stop_reasons"])
             # The retained evidence carries the explicit classification and the

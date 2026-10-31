@@ -44,11 +44,15 @@ The live judge-output-contract correction (2026-10-30; run 41167546138) adds an
 **error-only additive detail object** to each live result record's `judge` entry
 and to the smoke view: when no verdict is produced, the record carries
 `judge_error` with the explicit `kind` `JUDGE_PARSE_ERROR`, the specific
-`parse_reason`, the raw provider `finish_reason`, and a non-content
+`parse_reason`, the raw provider `finish_reason`, and a content-free shape
 fingerprint (`output_sha256`, `output_chars`, `output_shape`,
-`observed_keys`, `output_recorded: false`). The pre-existing
-`judge_error_kind` key is retained for reader compatibility. No accepted
-verdict shape, field meaning, required field or enum changed, so
+`observed_key_count`, the contract's own `missing_expected_keys`,
+`unexpected_key_count`, `output_recorded: false`). No arbitrary judge-output
+key names are published: only counts and the contract's own fixed key names.
+The pre-existing `judge_error_kind` key and the result-level `reason_code`
+semantics are retained unchanged (the specific parse branch still appears as the
+result-level reason code), so readers are not affected. No accepted verdict
+shape, field meaning, required field or enum changed, so
 `LIVE_SCHEMA_VERSION` stays `1.0.0-ber-live`; the additive published shape
 moves `LIVE_PACKAGE_VERSION` from `0.1.0-ber-live` to `0.2.0-ber-live`
 (minor: additive compatible shape). The family stays pinned by

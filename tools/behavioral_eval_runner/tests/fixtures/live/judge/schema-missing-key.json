@@ -13,13 +13,9 @@
   "expected": {
     "outcome": "PARSE_ERROR",
     "parse_reason": "SCHEMA_INVALID",
-    "observed_keys_include": [
-      "failure_mode",
-      "judge_model",
-      "reason_code",
-      "response_sha256",
-      "rubric_sha256",
-      "verdict"
-    ]
+    "missing_expected_keys": [
+        "evidence_refs"
+      ],
+      "observed_key_count": 6
   }
 }

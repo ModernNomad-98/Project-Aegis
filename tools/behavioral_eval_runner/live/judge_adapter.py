@@ -25,7 +25,12 @@ from .config import ModelPin, OwnerAllowlist
 from .dataset import LiveCase
 from .errors import JudgeRubricSourceError, JudgeVendorGuardError, ModelPinMismatchError
 from .subject import SubjectResult
-from .transport import ProviderRequest, ProviderUsage, SubjectTransport
+from .transport import (
+    COMPLETE_STOP_REASONS,
+    ProviderRequest,
+    ProviderUsage,
+    SubjectTransport,
+)
 
 LIVE_JUDGE_POLICY_VERSION = "1.1.0-ber-live"
 #: The explicit output contract the live judge must satisfy. The parser below
@@ -81,9 +86,10 @@ _ERROR_KEYS = frozenset(
 #: provider terminal finish reason plus a NON-CONTENT diagnostic fingerprint.
 JUDGE_PARSE_ERROR_KIND = "JUDGE_PARSE_ERROR"
 
-_MAX_OBSERVED_KEYS = 32
-_MAX_OBSERVED_KEY_CHARS = 64
-_UNSAFE_KEY_RE = re.compile(r"[^A-Za-z0-9_.:-]")
+#: The record never publishes judge-output key NAMES (a model could place
+#: content in a key name). It publishes only counts and the presence/absence of
+#: the contract's OWN fixed key set, which is diagnostic and content-free.
+_EXPECTED_KEYS = tuple(sorted(_ERROR_KEYS))
 
 
 def _unfence_json(text: str) -> tuple[str, bool]:
@@ -111,37 +117,44 @@ def _unfence_json(text: str) -> tuple[str, bool]:
     return fenced[:closing].strip(), True
 
 
-def _bounded_observed_keys(payload: Mapping[Any, Any]) -> tuple[str, ...]:
-    """A bounded, sanitized, sorted list of top-level JSON keys (no values)."""
-    cleaned: list[str] = []
-    for key in payload:
-        if not isinstance(key, str):
-            continue
-        safe = _UNSAFE_KEY_RE.sub("", key)[:_MAX_OBSERVED_KEY_CHARS]
-        if safe:
-            cleaned.append(safe)
-    return tuple(sorted(set(cleaned))[:_MAX_OBSERVED_KEYS])
+@dataclass(frozen=True, slots=True)
+class _OutputShape:
+    """Content-free shape fingerprint of one judge output."""
+
+    output_shape: str
+    observed_key_count: int = 0
+    missing_expected_keys: tuple[str, ...] = ()
+    unexpected_key_count: int = 0
 
 
-def _diagnose_output(raw_output: Any) -> tuple[str, tuple[str, ...]]:
-    """The bounded shape class and top-level key list of a judge output.
+def _diagnose_output(raw_output: Any) -> _OutputShape:
+    """The bounded, content-free shape of a judge output.
 
-    Never returns any output content: only a closed shape class
-    (EMPTY / NOT_JSON / JSON_NON_OBJECT[_FENCED] / JSON_OBJECT[_FENCED]) and the
-    sanitized top-level JSON key names.
+    Never returns judge output content or arbitrary key names: only a closed
+    shape class (EMPTY / NOT_JSON / JSON_NON_OBJECT[_FENCED] /
+    JSON_OBJECT[_FENCED]), the number of top-level keys, which of the CONTRACT's
+    OWN fixed keys are absent, and how many keys are extra. Those are
+    diagnostic, bounded and cannot carry model content.
     """
     if not isinstance(raw_output, str) or not raw_output.strip():
-        return "EMPTY", ()
+        return _OutputShape("EMPTY")
     candidate, fenced = _unfence_json(raw_output.strip())
     try:
         payload = json.loads(candidate)
     except ValueError:
-        return "NOT_JSON", ()
+        return _OutputShape("NOT_JSON")
     if not isinstance(payload, Mapping):
-        return ("JSON_NON_OBJECT_FENCED" if fenced else "JSON_NON_OBJECT"), ()
-    return (
+        return _OutputShape(
+            "JSON_NON_OBJECT_FENCED" if fenced else "JSON_NON_OBJECT"
+        )
+    present = {key for key in payload if isinstance(key, str)}
+    missing = tuple(key for key in _EXPECTED_KEYS if key not in present)
+    unexpected = len(present - set(_EXPECTED_KEYS))
+    return _OutputShape(
         "JSON_OBJECT_FENCED" if fenced else "JSON_OBJECT",
-        _bounded_observed_keys(payload),
+        observed_key_count=len(payload),
+        missing_expected_keys=missing,
+        unexpected_key_count=unexpected,
     )
 
 
@@ -150,10 +163,12 @@ class JudgeParseError:
     """One explicit fail-closed JUDGE_PARSE_ERROR (repository-safe, no transcript).
 
     Raw judge output is deliberately NOT retained: the record carries a SHA-256
-    and a character count, the closed shape class, a bounded sanitized key list,
-    and the raw provider terminal finish reason (for example "completed",
-    "end_turn" or "stop"). A reader can therefore tell WHAT shape was returned
-    and that the judge did finish, without reading the judge's content.
+    and a character count, the closed shape class, COUNTS over the top-level key
+    set (never arbitrary key names, which a model could use to smuggle content),
+    which of the contract's own fixed keys are missing, and the raw provider
+    terminal finish reason (for example "completed", "end_turn" or "stop"). A
+    reader can therefore tell WHAT shape was returned and that the judge did
+    finish, without reading the judge's content.
     """
 
     parse_reason: str
@@ -161,7 +176,9 @@ class JudgeParseError:
     output_sha256: str
     output_chars: int
     output_shape: str
-    observed_keys: tuple[str, ...] = ()
+    observed_key_count: int = 0
+    missing_expected_keys: tuple[str, ...] = ()
+    unexpected_key_count: int = 0
     output_recorded: bool = False
     kind: str = JUDGE_PARSE_ERROR_KIND
 
@@ -173,7 +190,9 @@ class JudgeParseError:
             "output_sha256": self.output_sha256,
             "output_chars": self.output_chars,
             "output_shape": self.output_shape,
-            "observed_keys": list(self.observed_keys),
+            "observed_key_count": self.observed_key_count,
+            "missing_expected_keys": list(self.missing_expected_keys),
+            "unexpected_key_count": self.unexpected_key_count,
             "output_recorded": self.output_recorded,
         }
 
@@ -183,14 +202,16 @@ def build_judge_parse_error(
 ) -> JudgeParseError:
     """Build the explicit JUDGE_PARSE_ERROR record for unusable judge output."""
     text = raw_output if isinstance(raw_output, str) else ""
-    shape, observed = _diagnose_output(text)
+    shape = _diagnose_output(text)
     return JudgeParseError(
         parse_reason=parse_reason,
         finish_reason=finish_reason or "UNKNOWN",
         output_sha256=sha256_hex_text(text),
         output_chars=len(text),
-        output_shape=shape,
-        observed_keys=observed,
+        output_shape=shape.output_shape,
+        observed_key_count=shape.observed_key_count,
+        missing_expected_keys=shape.missing_expected_keys,
+        unexpected_key_count=shape.unexpected_key_count,
     )
 
 
@@ -257,16 +278,15 @@ class JudgeResult:
             # Workflow-compatible key (the smoke proof gate reads its presence,
             # not its value) plus the explicit fail-closed classification.
             record["judge_error_kind"] = self.judge_error_kind or "UNKNOWN"
-            if self.parse_error is not None:
-                record["judge_error"] = self.parse_error.to_dict()
-            else:  # defensive: an error outcome is never left unexplained
-                record["judge_error"] = JudgeParseError(
-                    parse_reason=self.judge_error_kind or "UNKNOWN",
-                    finish_reason=self.stop_reason or "UNKNOWN",
-                    output_sha256="",
-                    output_chars=0,
-                    output_shape="UNKNOWN",
-                ).to_dict()
+            if self.parse_error is None:
+                # Invariant: a verdict-less result is only ever produced by the
+                # parse-error path, which always carries explicit diagnostics.
+                # Never fabricate an "UNKNOWN" fingerprint record here.
+                raise ValueError(
+                    "a judge result without a verdict must carry explicit "
+                    "JUDGE_PARSE_ERROR diagnostics"
+                )
+            record["judge_error"] = self.parse_error.to_dict()
         return record
 
 
@@ -488,8 +508,6 @@ class JudgeAdapter:
         )
 
     def capability_report(self) -> Mapping[str, Any]:
-        from .transport import COMPLETE_STOP_REASONS
-
         return {
             "vendor": self.pin.vendor,
             "pinned_model": self.pin.model,

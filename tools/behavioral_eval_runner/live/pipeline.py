@@ -224,7 +224,14 @@ def _smoke_view(outcome: Mapping[str, Any]) -> dict[str, Any] | None:
         if isinstance(record.get("subject"), Mapping)
     ]
     judge_errors = [
-        dict(record["judge"]["judge_error"])
+        {
+            "case_id": record.get("case_id"),
+            "arm": record.get("arm"),
+            "run_index": record.get("run_index"),
+            "result_state": record.get("result_state"),
+            "reason_code": record.get("reason_code"),
+            **dict(record["judge"]["judge_error"]),
+        }
         for record in results
         if isinstance(record.get("judge"), Mapping)
         and isinstance(record["judge"].get("judge_error"), Mapping)
@@ -677,10 +684,12 @@ def _rule_state(
     if deterministic.get("status") == "FAIL":
         return "FAIL", "DETERMINISTIC_FAIL"
     if not judge_result.is_verdict:
-        # Explicit, never a bare null: the precise parse branch and the raw
-        # provider finish reason are carried in the judge record's
-        # judge_error object; the result state stays JUDGE_ERROR (never PASS/FAIL).
-        return "JUDGE_ERROR", JUDGE_PARSE_ERROR_KIND
+        # The result-level reason_code keeps the pre-existing specific parse
+        # branch (MALFORMED_JSON, SCHEMA_INVALID, ...) so existing readers are
+        # unaffected; the judge record additionally carries judge_error.kind =
+        # JUDGE_PARSE_ERROR with the raw provider finish reason. The result state
+        # stays JUDGE_ERROR and is never PASS/FAIL.
+        return "JUDGE_ERROR", (judge_result.judge_error_kind or "UNKNOWN")
     verdict = judge_result.verdict.verdict.value
     if verdict == "PASS":
         return "PASS", None

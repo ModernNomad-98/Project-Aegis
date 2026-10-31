@@ -287,8 +287,10 @@ JSON object the parser requires (no markdown fence, no prose, no extra keys):
 parser tolerates exactly one enclosing JSON code fence and applies the same
 strict schema, closed-enum coherence and hash echoes. Any deviation is recorded
 as an explicit `JUDGE_PARSE_ERROR` (never a bare null and never PASS/FAIL)
-carrying the raw provider `finish_reason` and a non-content fingerprint — the
-raw judge output is not retained. Accepted provider terminal statuses are
+carrying the raw provider `finish_reason` and a content-free shape fingerprint
+(counts and the contract's own missing/extra key set; arbitrary output key names
+are never published) — the raw judge output is not retained, and the
+result-level `reason_code` keeps its pre-existing specific parse branch. Accepted provider terminal statuses are
 `end_turn`, `stop_sequence`, `completed` and `stop`, and the value the
 provider returned is recorded rather than normalized. A live run also writes one
 bounded, non-content `judge_failure_diagnostics` line to stderr when the judge

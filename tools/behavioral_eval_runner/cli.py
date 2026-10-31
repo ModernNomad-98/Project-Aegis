@@ -663,7 +663,9 @@ def _judge_failure_diagnostics(result: dict[str, Any]) -> list[dict[str, Any]]:
                 "output_sha256": error.get("output_sha256"),
                 "output_chars": error.get("output_chars"),
                 "output_shape": error.get("output_shape"),
-                "observed_keys": error.get("observed_keys"),
+                "observed_key_count": error.get("observed_key_count"),
+                "missing_expected_keys": error.get("missing_expected_keys"),
+                "unexpected_key_count": error.get("unexpected_key_count"),
                 "output_recorded": error.get("output_recorded"),
             }
         )

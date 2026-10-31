@@ -13,8 +13,7 @@
   "expected": {
     "outcome": "PARSE_ERROR",
     "parse_reason": "SCHEMA_INVALID",
-    "observed_keys_include": [
-      "rationale"
-    ]
+    "observed_key_count": 8,
+      "unexpected_key_count": 1
   }
 }
