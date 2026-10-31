@@ -133,14 +133,14 @@
     {
       "id": "edge-more-than-five-controls-mandatory-separated",
       "type": "should_trigger",
-      "prompt": "We're preparing a multi-tenant release. Six controls seem relevant: RLS policy review, tenant-isolation testing, classification/approval depth, accessibility evidence, a clickthrough pass, and release readiness. Which Aegis skills should we use, and in what order?",
+      "prompt": "We're preparing a multi-tenant release. Six controls seem relevant: RLS policy review, tenant-isolation testing, classification/approval depth, accessibility evidence, a clickthrough pass, and release readiness. Here are the governing artifacts I can provide: change-classification-gate output classifies this as AI/agentic with required RLS review, tenant-isolation testing and release-readiness evidence, and the consumer policy/decision record requires accessibility evidence for launch. Which Aegis skills should we use, and in what order?",
       "expect": {
         "triggers": true,
         "assertions": [
           "Keeps the optional recommendation shortlist at most five, ordered as a working sequence.",
           "Lists every applicable mandatory obligation separately from the shortlist and never places a mandatory control under 'Not recommended' or caps it away.",
-          "For each mandatory obligation, names its governing source (e.g. change-classification-gate output or a consumer policy/decision record), the stage, the owning method where established, the evidence required, and the owner disposition when unmet.",
-          "Does not re-classify the change or waive a required control; the selector consumes existing classification/policy output."
+          "For each mandatory obligation, cites the provided governing source with its revision/identity (the change-classification-gate output or the consumer policy/decision record), the stage, the owning method where established, the owner disposition when unmet, and the method's posture including not-established/advisory-only where applicable.",
+          "Does not re-classify the change or waive a required control; it consumes the provided classification/policy output instead of inferring one."
         ]
       }
     },
@@ -169,6 +169,20 @@
           "Records the owning method's posture as 'MANUAL-ONLY — human must invoke' (never auto or auto-invoked) together with the governing source, stage, required evidence and owner disposition.",
           "States that the manual-only owner must be invoked by the human; the selector does not invoke or run it.",
           "Keeps the optional shortlist at most five while the mandatory obligation remains listed even if more than five optional candidates fit."
+        ]
+      }
+    },
+    {
+      "id": "edge-missing-governing-artifacts-mandatory-unknown",
+      "type": "should_trigger",
+      "prompt": "We're preparing a release and I want the exact mandatory controls. I don't have a change-classification-gate output, consumer policy or acceptance gate to give you. Can you list the mandatory obligations anyway?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Reports that the mandatory obligations are Unknown/INCOMPLETE because no governing artifact was readable, rather than fabricating a definitive mandatory list.",
+          "May offer optional recommendations at most five, clearly separated, without turning inferred controls into mandatory obligations.",
+          "States exactly what governing artifact(s) are needed to complete the mandatory list and records the missing inputs under Unknowns.",
+          "Does not re-classify the change or invent a policy to fill the gap."
         ]
       }
     }

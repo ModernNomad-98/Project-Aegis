@@ -90,6 +90,8 @@ Session: <persona(s)/roles used, viewport(s)>
 Plan: <routes × interaction checklist — written before execution>
 Results per route:
   <route> — <steps executed> — <pass | defects found> — console <clean|errors>
+Table states: <route> — sorted <asc+desc verified | N/A>; filtered <states verified>
+  ; empty <verified | N/A>; N/A (no tables on this route)
 Defects:
   <id> — <severity> — <route/step> — expected vs observed — repro steps
        — evidence <screenshot ref>
@@ -113,7 +115,8 @@ Handoffs: <blockers → owner/systematic-debugger; evidence → closeout>
 - [ ] Tables/lists: sorting checked against an independently derived whole-list
       order in BOTH directions (unsorted fixture, nulls/ties exercised), filter
       membership/counts checked, pagination consistency where present, and
-      empty-result recovery verified.
+      empty-result recovery verified; the report's `Table states:` line itemises
+      sorted/filtered/empty states per table route (or `N/A (no tables)`).
 - [ ] Table interaction coverage is reported separately from route-level coverage
       (sorted/filtered/empty-result states itemised), not folded into a route pass.
 - [ ] Filter+sort composition checked in both orders; one control does not reset

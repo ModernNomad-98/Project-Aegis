@@ -188,45 +188,59 @@ rules live in [references/evidence-rules.md](references/evidence-rules.md).
   transition). An interaction-behavior capture MUST show the visible-control
   transition; cold captures are the pre-state baseline, never a substitute for
   the transition.
-- **Entry path.** Record the route template (not raw query values), seed fixture
-  id, persona and the action TYPES that reached the state, so the capture is
-  reproducible. Mask/sanitize tokens, query parameters and typed values per the
-  metadata privacy rule in the reference before storage.
+- **Entry path.** Record the **parameterized** route template (replace path
+  segments that can carry emails, tenant ids, names or tokens with
+  `{placeholders}`; use a URL parser, not ad-hoc stripping), seed fixture id,
+  persona **reference** (the separate metadata `persona` field, not a duplicate
+  free-text value) and the action TYPES that reached the state, so the capture is
+  reproducible. Mask/sanitize tokens, query parameters, path parameters and typed
+  values per the metadata privacy rule in the reference before storage.
 - **Behavior binding.** Record the `behavior_ref`: the checkpoint/behavior/
   acceptance expectation the frame proves. A capture with no behavior binding is
   context, not evidence.
 - **Current-candidate evidence set.** For the current candidate (build/commit/
-  artifact identity) define the expected member list from the checkpoint plan
-  and tag each capture with `candidate_id` (validated as a safe path token
-  before any path use). Stale or superseded images under the current evidence
-  root are **unexpected members = contamination, not extra coverage**. Report
-  expected members, unexpected members and the historical archive separately.
-  This planner **reports contamination only**: it does not move, archive, delete
-  or overwrite evidence files itself. Preserving/archiving historical evidence in
-  a candidate-scoped archive/record requires **explicit recorded owner
-  authorisation** and is performed by the evidence holder, not this planner.
-- **Privacy.** Metadata is evidence: `entry_path` action types and
-  `pre_state`/`post_state` descriptions (user-derived components) must be
-  masked/sanitized before storage using the masking classes (no raw query
-  tokens, PII, tenant data or typed secrets). `candidate_id` is **validated as
-  a safe path token and sanitized, never masked** — masking the identity would
-  destroy the membership check.
+  artifact identity) define the expected member patterns from the checkpoint plan
+  (captures plus sidecars, with allowed non-evidence files excluded) and keep each
+  capture's canonical `candidate_id` unchanged (strict allowlist validation;
+  reject unsafe values; validate before **any path use**). Stale or superseded
+  evidence files/captures under the current root are **unexpected members =
+  contamination, not extra coverage**; a justified reuse records
+  `captured_at_candidate_id` + `reuse_ref` and is listed as expected and
+  exempt, and a recorded disposition (owner authorization/acceptance reference)
+  clears contamination without deleting evidence. Context captures are declared
+  `context: true` or kept outside the evidence root. Report expected,
+  unexpected, allowed-excluded and historical separately. This planner
+  **reports contamination only**: it does not move, archive, delete or overwrite
+  evidence files itself. Preserving/archiving historical evidence in a
+  candidate-scoped archive/record requires **explicit recorded owner
+  authorization** and is performed by the evidence holder, not this planner.
+- **Privacy.** Metadata is evidence: `entry_path` action types, path
+  parameters and `pre_state`/`post_state` descriptions (user-derived
+  components) must be masked/sanitized before storage using the masking classes
+  (no raw query tokens, PII, tenant data or typed secrets). `candidate_id` is
+  **validated against a strict path-token allowlist, unsafe values rejected, and
+  the canonical value never masked or rewritten** (a separate `candidate_slug`
+  may be stored if a path-safe form is needed).
 - **Validation.** Capture-quality is not met by a set of cold screenshots alone:
   interaction coverage requires the visible-control transitions, and stale
-  superseded images are reported as contamination rather than counted as
+  superseded evidence files/captures are reported as contamination rather than counted as
   coverage. Review completeness is **not** claimed while unexpected members
   remain — list them as unresolved until dispositioned.
 - **Checklist for this policy revision.**
-  - [ ] User-derived metadata (entry-path action types, pre/post state
-        descriptions) is masked/sanitized before storage; no tokens, PII, tenant
-        data or typed secrets appear in metadata or the sidecar. `candidate_id`
-        is validated/sanitized as a safe path token and never masked.
-  - [ ] Expected members, unexpected members and the historical archive are
-        reported separately; review completeness is not claimed while unexpected
-        members (contamination) remain unresolved.
+  - [ ] User-derived metadata (entry-path action types/path parameters, pre/post
+        state descriptions) is masked/sanitized before storage; no tokens, PII,
+        tenant data or typed secrets appear in metadata or the sidecar.
+        `candidate_id` keeps its canonical value, passes strict allowlist
+        validation, and is never masked/rewritten (optional @candidate_slug` for
+        path use).
+  - [ ] Expected member patterns (captures + sidecars), allowed non-evidence
+        files, justified-reuse entries (@captured_at_candidate_id` + `reuse_ref`),
+        context captures and unexpected members are reported separately; a
+        recorded disposition clears contamination without deletion, and review
+        completeness is not claimed while unresolved unexpected members remain.
   - [ ] The planner reports contamination only — it does not move, archive,
         delete or overwrite evidence; any archival/removal requires explicit
-        recorded owner authorisation by the evidence holder.
+        recorded owner authorization by the evidence holder.
 
 ## Supporting Files
 

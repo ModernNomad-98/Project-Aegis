@@ -83,13 +83,14 @@
     {
       "id": "edge-current-candidate-set-membership",
       "type": "should_trigger",
-      "prompt": "Our evidence folder has the current build's screenshots plus one leftover image from the previous build. Is the evidence set complete for review?",
+      "prompt": "Our evidence folder has the current build's screenshots and their sidecars, one leftover image from the previous build, a reused capture from the previous candidate with a dependency justification, and the folder README. Is the evidence set complete for review?",
       "expect": {
         "triggers": true,
         "assertions": [
-          "Checks membership against the current candidate's expected member list and candidate_id, reporting the leftover image as an unexpected member (contamination, not extra coverage).",
-          "Reports contamination only: does not move, archive, delete or overwrite the leftover image, and states that archiving/removal requires explicit recorded owner authorisation performed by the evidence holder.",
-          "Reports expected members, unexpected members and the historical archive separately, and does not claim review completeness while contamination is present."
+          "Matches expected member patterns (captures plus sidecars/evidence-set record) and treats the README as an allowed non-evidence file, not contamination or coverage.",
+          "Reports the leftover image as an unexpected member (contamination, not extra coverage) and does not claim review completeness while it remains unresolved.",
+          "Listens for a justified-reuse representation: the reused capture records captured_at_candidate_id + reuse_ref (dependency justification), stays in the expected list as reused, and is exempt from contamination while the justification holds.",
+          "States that an unexpected member is cleared only by a recorded disposition (owner authorization/acceptance reference) or reuse justification, and that the planner does not move, archive, delete or overwrite evidence."
         ]
       }
     },
@@ -100,9 +101,9 @@
       "expect": {
         "triggers": true,
         "assertions": [
-          "Requires the entry_path to use a route template and action types, with query strings/tokens stripped or masked and typed secrets/PII recorded only as 'typed <field> (masked)' — never raw values.",
-          "Requires pre_state/post_state descriptions to be masked/placeholder values with no PII, tenant data or secrets, reusing the defined masking classes and enforcing masking before storage.",
-          "Requires candidate_id to be derived from the immutable build/commit/artifact identity and validated as a safe path token before any archive path use.",
+          "Requires entry_path to be a parameterized route template: every path segment that can carry an email/tenant/name/token becomes a placeholder, URLs are parsed with a URL parser rather than ad-hoc stripping, and query strings/tokens are masked.",
+          "Requires pre_state/post_state descriptions to be masked/placeholder values with no PII, tenant data or secrets, reusing the masking classes and enforcing masking before storage.",
+          "Requires candidate_id to keep its canonical value after strict allowlist validation (unsafe values rejected, never masked/rewritten; a separate candidate_slug may be stored for path use) and validates it before any path use.",
           "States that if metadata cannot be masked (for example a restricted M2/M3 field), it is not stored in the evidence metadata."
         ]
       }

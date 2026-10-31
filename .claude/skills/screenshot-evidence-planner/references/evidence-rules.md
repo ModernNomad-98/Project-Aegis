@@ -91,19 +91,25 @@ unknown is context, not proof.
 Metadata is evidence and follows the masking classes above; masking is enforced
 **before storage**, like frame masking.
 
-- `entry_path`: store the route template, not raw URLs; strip or mask query
-  strings/fragments (tokens, session ids, emails, names) and record action
+- `entry_path`: store the parameterized route template (for example
+  `/users/{userId}/orders/{orderId}`), not raw URLs: replace **every path segment**
+  that can carry an email, tenant id, name or token with a `{placeholder}`, and
+  parse URLs with a URL parser rather than ad-hoc string stripping. Strip or mask
+  query strings/fragments (tokens, session ids, emails, names) and record action
   **types** (`clicked sort`, `selected status filter`) rather than typed values.
   If a flow types a secret or PII, record `typed <field> (masked)` — never the
-  value.
+  value. `persona` in `entry_path` is a **reference to the separate metadata
+  `persona` field**, not a duplicated free-text value.
 - `pre_state`/`post_state`: describe states with masked/placeholder values; no
   PII, tenant data, tokens or typed secrets. M2/M3 metadata follows the restricted
   store; if it cannot be masked, it is not stored.
-- `candidate_id`: derive it from the immutable build/commit/artifact identity and
-  validate it against a safe path-token allowlist before it is used in archive
-  paths; never derive it from user-supplied text (path-traversal risk). It is
-  sanitized for path safety and is **never masked** — the identity is required
-  for the current-candidate membership check.
+- `candidate_id`: derive it from the immutable build/commit/artifact identity.
+  **Validate it against a strict path-token allowlist and reject unsafe values;**
+  keep the canonical `candidate_id` **unchanged** (never mask or silently rewrite
+  it — the identity is required for the membership check). If a path-safe form is
+  needed, store a separate `candidate_slug`; validate the canonical value before
+  **any path use**, not only archive paths. Never derive it from user-supplied
+  text (path-traversal risk).
 - `behavior_ref`/`checkpoint_id`/`case_or_session_id`: stable ids only; never a
   raw user string.
 
@@ -119,20 +125,42 @@ Metadata is evidence and follows the masking classes above; masking is enforced
 ## Current-candidate evidence set membership
 
 For the current candidate, the checkpoint plan defines the **expected member
-list** of evidence; each capture carries the candidate's `candidate_id`.
-Compare the current evidence root against that expected list:
+list** of evidence; each capture carries the candidate's canonical
+`candidate_id`. Compare the current evidence root against the declared expected
+patterns:
 
-- **expected members** — listed in the evidence-set record for this candidate;
-- **unexpected members** — files under the current root that are not in the
-  expected list, including stale/superseded images from an earlier candidate.
-  They are **contamination, not extra coverage**; do not count them, and do not
-  delete them without authorisation;
+- **expected members** — evidence captures plus their sidecars/metadata files and
+  the evidence-set record/report table for this candidate, matched by the declared
+  patterns (not by directory listing).
+- **allowed non-evidence files** — an evidence-directory index/README, ignore
+  files and OS metadata (for example `.DS_Store`, `Thumbs.db`) are allowed;
+  list them as excluded, not as coverage and not as contamination. Do not delete
+  them.
+- **unexpected members** — files under the current root that match no expected
+  pattern and are not allowed non-evidence files, including stale/superseded
+  evidence files/captures from an earlier candidate. They are **contamination,
+  not extra coverage**; do not count them.
+- **justified-reuse exemption** — a capture from an earlier candidate that is
+  intentionally reused for the current candidate records
+  `captured_at_candidate_id` (the candidate it was captured at) and `reuse_ref`
+  (the dependency justification tying it to the current candidate). Its canonical
+  `candidate_id` is **not** re-tagged (that would lose provenance); it is listed
+  in the current expected-member list as `reused` and is **exempt from
+  contamination** while the justification holds.
+- **context captures** — broader context captures do not belong in the
+  current-candidate evidence root by default; if stored there, declare them in the
+  expected list with `context: true` and exclude them from coverage counting.
+- **disposition record** — when unexpected members are found, record a
+  disposition row naming the evidence file, the owner, the authorization/acceptance
+  reference and the resolution (reused via `reuse_ref`, archived by the evidence
+  holder, or explicitly accepted as contamination). A recorded disposition clears
+  the contamination **without deleting evidence**.
 - **historical archive** — earlier-candidate evidence kept in a candidate-scoped
   archive/record with its retention class and a superseded marker.
 
-Report the three lists separately. **The planner reports contamination only: it
-does not move, archive, delete, overwrite or silently prune evidence files.**
-Archiving or removing historical evidence requires **explicit recorded owner
-authorisation** (named owner + authorization record) and is performed by the
-evidence holder, not by this planner. Review completeness is not claimed while
-unexpected members remain unresolved.
+Report expected, unexpected, allowed-excluded and historical separately. **The
+planner reports contamination only: it does not move, archive, delete, overwrite
+or silently prune evidence files.** Archiving or removing historical evidence
+requires **explicit recorded owner authorization** (named owner + authorization
+record) and is performed by the evidence holder, not by this planner. Review
+completeness is not claimed while unresolved unexpected members remain.
