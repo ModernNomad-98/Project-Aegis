@@ -55,6 +55,10 @@ COMMITTED_RECORD = (
 CALL_REF = (
     "pilot-a-01-agent-startup-context-gate:WITH_SKILL:run-1:subject:anthropic"
 )
+# Every attestation field the record schema defines. Keeping the list explicit
+# means a synthetic PENDING copy clears all of them, and a future field cannot
+# silently leak into the unattested fixture.
+ATTESTATION_FIELDS = ("attested_by", "attested_on", "attestation_ref")
 
 
 def _ledger():
@@ -75,9 +79,8 @@ def _pending_record():
     """
     record = _committed()
     record["status"] = STATUS_PENDING
-    record["attested_by"] = ""
-    record["attested_on"] = ""
-    record["attestation_ref"] = ""
+    for field in ATTESTATION_FIELDS:
+        record[field] = ""
     for entry in record["reconciles"]:
         entry["evidence_ref"] = (
             "SYNTHETIC TEST RECORD ONLY: the committed ATTESTED record reversed "
@@ -202,6 +205,7 @@ class CommittedRecordTests(unittest.TestCase):
         # Plausible values are used for every field so the refusal cannot be an
         # accidental type/format rejection: a PENDING record must refuse the
         # presence of attested_by, attested_on or attestation_ref as such.
+        self.assertEqual(set(ATTESTATION_FIELDS), {"attested_by", "attested_on", "attestation_ref"})
         plausible = {
             "attested_by": "Peter Nguyen (ModernNomad-98)",
             "attested_on": "2026-10-30T21:02:00-07:00",
@@ -366,7 +370,10 @@ class FailClosedTests(unittest.TestCase):
         self.assertEqual(caught.exception.reason_code, "RECONCILIATION_RECORD_INVALID")
 
     def test_an_attested_record_without_any_attestation_field_is_refused(self):
-        for field in ("attested_by", "attested_on", "attestation_ref"):
+        # validate_record already enforces the invariant this exercises: a
+        # PENDING record must carry all three attestation fields empty, and an
+        # ATTESTED record requires each of them non-empty after stripping.
+        for field in ATTESTATION_FIELDS:
             for value in ("", "   "):
                 with self.subTest(field=field, value=repr(value)):
                     record = _attested()
