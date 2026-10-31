@@ -89,10 +89,10 @@ actual risks instead of repeating the same review to spend more tokens.
 
 The reviewers above must inspect one frozen candidate, not a moving target.
 
-1. **Write the readiness/acceptance matrix first.** Before the first-pass
-   findings, record the small matrix of required acceptance dimensions and the
-   evidence each needs; later findings map to dimensions and any dimension still
-   missing stays visible.
+1. **Write the readiness/acceptance matrix first.** Before collecting the
+   first-pass findings, record the small matrix of required acceptance dimensions
+   and the evidence each needs; later findings map to dimensions and any dimension
+   still missing stays visible.
 2. **Run the first pass on the same candidate.** Collect the first-pass
    functional findings and the UX findings on the SAME candidate; record its
    identity (candidate commit/tree or artifact digest, environment) and the
@@ -108,23 +108,28 @@ The reviewers above must inspect one frozen candidate, not a moving target.
    its evidence-set membership check here rather than re-inventing it.
 5. **A necessary change supersedes the old candidate.** If review requires a
    change, state the new candidate identity explicitly (new tree/artifact and
-   affected dimensions). The old verdict never authorizes the new identity; a
-   new verdict is required for it. Reuse unaffected evidence only with a
-   dependency justification (which changed files/behaviors, why the evidence is
-   unaffected, and the identity it was captured at). Ordinary record-only
-   corrections that leave the frozen tree/artifact bytes unchanged do not force
-   a full functional recapture — recheck only what actually depends on the
-   changed records.
+   affected dimensions). The old verdict never authorizes the new identity; a new
+   verdict is required for it. **Summary of the owning rule:** reuse unaffected
+   evidence only with a dependency justification (which changed files/behaviors,
+   why the evidence is unaffected, and the identity it was captured at);
+   ordinary record-only corrections that leave the frozen tree/artifact bytes
+   unchanged do not force a full functional recapture — recheck only what
+   actually depends on the changed records. The detailed reuse rule is owned by
+   [`ux-design-iteration`](../../.claude/skills/ux-design-iteration/references/iteration-record-and-readiness.md)
+   and the source repository's delivery workflow; this section is the handoff
+   summary only.
 6. **Review coverage is part of the verdict.** Each independent review states
    what it covered. A review cut short by provider length or usage limits is
    incomplete coverage, not a PASS; partition the review or re-dispatch it, and
    never present partial coverage as final approval.
 7. **No cosmetic waivers.** Never waive a mandatory gate or an
-   evidence-integrity defect by calling it cosmetic. The exact-candidate evidence
-   rules in [`release-readiness-reviewer`](../../.claude/skills/release-readiness-reviewer/SKILL.md)
-   and the unaffected-evidence reuse rule in
-   [`ux-design-iteration`](../../.claude/skills/ux-design-iteration/references/iteration-record-and-readiness.md)
-   remain the detail owners; this section is the handoff between them.
+   evidence-integrity defect by calling it cosmetic. **This is a summary, not a
+   second rule source:** the exact-candidate evidence rules are owned by
+   [`release-readiness-reviewer`](../../.claude/skills/release-readiness-reviewer/SKILL.md)
+   and the unaffected-evidence reuse rule by
+   [`ux-design-iteration`](../../.claude/skills/ux-design-iteration/references/iteration-record-and-readiness.md);
+   if this summary and an owning skill differ, the owning skill wins and this
+   section must be updated.
 
 This path does not automatically invoke manual-only skills such as
 [`ci-pipeline-architect`](../../.claude/skills/ci-pipeline-architect/SKILL.md)

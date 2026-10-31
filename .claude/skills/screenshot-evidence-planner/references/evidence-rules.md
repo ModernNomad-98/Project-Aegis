@@ -52,7 +52,11 @@ context. Masking happens before the file reaches storage.
 
 `{capture_id, checkpoint_id, case_or_session_id, build, environment,
 persona, viewport, captured_at, masked: bool, storage_class, capture_mode,
-entry_path, behavior_ref, candidate_id, pre_state?, post_state?}`
+entry_path, behavior_ref, candidate_id, pre_state, post_state}`
+
+`pre_state` and `post_state` are **required when
+`capture_mode=visible_control_transition`** and omitted for
+`cold_fixture_direct`; every other field above is always present.
 
 Field notes: `capture_mode` is `cold_fixture_direct` (clean state reached by
 direct URL with seeded data, no prior UI action) or
@@ -97,7 +101,9 @@ Metadata is evidence and follows the masking classes above; masking is enforced
   store; if it cannot be masked, it is not stored.
 - `candidate_id`: derive it from the immutable build/commit/artifact identity and
   validate it against a safe path-token allowlist before it is used in archive
-  paths; never derive it from user-supplied text (path-traversal risk).
+  paths; never derive it from user-supplied text (path-traversal risk). It is
+  sanitized for path safety and is **never masked** — the identity is required
+  for the current-candidate membership check.
 - `behavior_ref`/`checkpoint_id`/`case_or_session_id`: stable ids only; never a
   raw user string.
 

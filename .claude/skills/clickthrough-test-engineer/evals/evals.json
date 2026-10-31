@@ -75,7 +75,7 @@
         "triggers": true,
         "assertions": [
           "Derives the expected whole-list order of every row independently from the fixture and tests both sort directions, not a sampled first/last row or the view's own order.",
-          "Uses a deliberately unsorted/mixed fixture so a pre-sorted view cannot mask a broken comparator, and exercises at least one null and one tie against the product's stated rules.",
+          "Uses a deliberately unsorted/mixed fixture so a pre-sorted view cannot mask a broken comparator, and exercises at least one null and one tie against the product's stated null/tie rule, or against an explicitly documented undefined order when the product states no rule.",
           "Checks filter result membership and counts independently, checks filter+sort composition in both orders (one control does not reset the other), and verifies the empty-result state explains the result and offers a recovery path.",
           "Reports table interaction coverage separately from route-level coverage (sorted/filtered/empty-result states itemised) and files any defect with repro steps and evidence."
         ]

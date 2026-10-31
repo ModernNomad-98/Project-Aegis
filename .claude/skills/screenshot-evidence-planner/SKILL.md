@@ -185,9 +185,9 @@ rules live in [references/evidence-rules.md](references/evidence-rules.md).
   (clean state reached by direct URL with seeded data, no prior UI action) or
   `visible_control_transition` (a defined visible control state -> action ->
   exercised state, with **required** `pre_state`/`post_state` for that
-transition). An interaction-behavior
-  capture MUST show the visible-control transition; cold captures are the
-  pre-state baseline, never a substitute for the transition.
+  transition). An interaction-behavior capture MUST show the visible-control
+  transition; cold captures are the pre-state baseline, never a substitute for
+  the transition.
 - **Entry path.** Record the route template (not raw query values), seed fixture
   id, persona and the action TYPES that reached the state, so the capture is
   reproducible. Mask/sanitize tokens, query parameters and typed values per the
@@ -205,19 +205,22 @@ transition). An interaction-behavior
   or overwrite evidence files itself. Preserving/archiving historical evidence in
   a candidate-scoped archive/record requires **explicit recorded owner
   authorisation** and is performed by the evidence holder, not this planner.
-- **Privacy.** Metadata is evidence: `entry_path` action types, `pre_state`/
-  `post_state` descriptions and `candidate_id` must be masked/sanitized before
-  storage using the masking classes (no raw query tokens, PII, tenant data or
-  typed secrets).
+- **Privacy.** Metadata is evidence: `entry_path` action types and
+  `pre_state`/`post_state` descriptions (user-derived components) must be
+  masked/sanitized before storage using the masking classes (no raw query
+  tokens, PII, tenant data or typed secrets). `candidate_id` is **validated as
+  a safe path token and sanitized, never masked** — masking the identity would
+  destroy the membership check.
 - **Validation.** Capture-quality is not met by a set of cold screenshots alone:
   interaction coverage requires the visible-control transitions, and stale
   superseded images are reported as contamination rather than counted as
   coverage. Review completeness is **not** claimed while unexpected members
   remain — list them as unresolved until dispositioned.
 - **Checklist for this policy revision.**
-  - [ ] Metadata (entry-path action types, pre/post state descriptions,
-        candidate_id) is masked/sanitized before storage; no tokens, PII, tenant
-        data or typed secrets appear in metadata or the sidecar.
+  - [ ] User-derived metadata (entry-path action types, pre/post state
+        descriptions) is masked/sanitized before storage; no tokens, PII, tenant
+        data or typed secrets appear in metadata or the sidecar. `candidate_id`
+        is validated/sanitized as a safe path token and never masked.
   - [ ] Expected members, unexpected members and the historical archive are
         reported separately; review completeness is not claimed while unexpected
         members (contamination) remain unresolved.
