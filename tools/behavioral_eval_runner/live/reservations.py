@@ -111,3 +111,15 @@ def cancel(path: Any) -> dict[str, Any]:
     state["status"] = STATUS_CANCELLED
     atomic_write_json(path, state)
     return validate_state(state)
+
+
+def dispatch_if_admitted(admission: Any, dispatch: Any, *args: Any, **kwargs: Any) -> Any:
+    """Production admission gate for a spend-bearing dispatch.
+
+    Only an admission object explicitly carrying admitted=True may cross to the
+    caller's dispatch. A missing/malformed/False admission returns None without
+    calling dispatch, so a bypass would be observable as an actual transport call.
+    """
+    if not isinstance(admission, Mapping) or admission.get("admitted") is not True:
+        return None
+    return dispatch(*args, **kwargs)

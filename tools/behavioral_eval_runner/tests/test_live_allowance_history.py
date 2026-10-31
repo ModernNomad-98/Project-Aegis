@@ -163,7 +163,7 @@ class AllowanceHistoryTests(unittest.TestCase):
         history = collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
         self.assertEqual(history["schema"], ALLOWANCE_HISTORY_SCHEMA)
         self.assertEqual(history["ledger_spend_cents"], 1_950)
-        self.assertEqual(history["smoke_spend_cents"], 242)
+        self.assertEqual(history["smoke_spend_cents"], 224)
 
     def test_smoke_after_near_exhausted_trial_helper(self):
         fake = FakeGH(
@@ -188,13 +188,13 @@ class AllowanceHistoryTests(unittest.TestCase):
             ceiling_cents=12_000,
             prior_ledger_spend_cents=history["ledger_spend_cents"],
             prior_smoke_spend_records=history["smoke_spend"],
-            reservation_cents=108,
+            reservation_cents=126,
         )
         denied = admit_paid_call(
             ceiling_cents=12_000,
             prior_ledger_spend_cents=history["ledger_spend_cents"],
             prior_smoke_spend_records=history["smoke_spend"],
-            reservation_cents=109,
+            reservation_cents=127,
         )
         self.assertTrue(admitted["admitted"])
         self.assertFalse(denied["admitted"])
@@ -210,7 +210,7 @@ class AllowanceHistoryTests(unittest.TestCase):
         )
         history = collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
         self.assertEqual(history["ledger_spend_cents"], 222)
-        self.assertEqual(history["smoke_spend_cents"], 168)
+        self.assertEqual(history["smoke_spend_cents"], 150)
 
     def test_artifact_pagination_incomplete_refuses(self):
         from tools.behavioral_eval_runner.live import allowance_history
@@ -262,6 +262,33 @@ class AllowanceHistoryTests(unittest.TestCase):
                      "totals": {"spent_cents": 200}, "smoke_spend": {}},
                 ),
             },
+        )
+        with self.assertRaises(ValueError):
+            collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
+
+    def test_preserved_18c_not_doubled_when_history_present(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([])]},
+            {"42": [artifact("ber-live-smoke-proof")]},
+            {("42", "ber-live-smoke-proof"): (
+                "smoke-proof.json",
+                {"schema": "ber-live-smoke-proof/1.0.0", "spent_cents": 150},
+            )},
+        )
+        history = collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertEqual(history["smoke_spend_cents"], 150)
+        empty = FakeGH({"smoke": [page([])], "trial": [page([])]}, {}, {})
+        preserved = collect_allowance_history(gh=empty, repository="o/r", work_dir=self.tmp)
+        self.assertEqual(preserved["smoke_spend_cents"], 18)
+
+    def test_smoke_history_below_preserved_floor_fails_closed(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([])]},
+            {"42": [artifact("ber-live-smoke-proof")]},
+            {("42", "ber-live-smoke-proof"): (
+                "smoke-proof.json",
+                {"schema": "ber-live-smoke-proof/1.0.0", "spent_cents": 10},
+            )},
         )
         with self.assertRaises(ValueError):
             collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)

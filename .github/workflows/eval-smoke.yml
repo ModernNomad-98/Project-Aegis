@@ -175,6 +175,7 @@ jobs:
               "reservation_cents": SMOKE_CEILING_CENTS,
               "ceiling_cents": OWNER_PROVIDER_CAP_CENTS,
               "incoming_outstanding_reservations_cents": incoming_outstanding,
+              "evidence_only": True,
           }
           (RUNNER_TEMP / "ber-shared-allowance.json").write_text(
               json.dumps(snapshot, indent=2, sort_keys=True) + "\n",

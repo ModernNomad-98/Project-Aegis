@@ -9,6 +9,7 @@ from pathlib import Path
 
 from tools.behavioral_eval_runner.live.cumulative import admit_paid_call
 from tools.behavioral_eval_runner.live.reservations import (
+    dispatch_if_admitted,
     RESERVATION_STATE_SCHEMA,
     STATUS_CANCELLED,
     STATUS_TRUE_UP,
@@ -96,8 +97,8 @@ class ReservationPersistenceTests(unittest.TestCase):
             prior_smoke_spend_records={}, reservation_cents=200,
         )
         self.assertFalse(admission["admitted"])
-        if admission["admitted"]:
-            adapter.dispatch(request)
+        result = dispatch_if_admitted(admission, adapter.dispatch, request)
+        self.assertIsNone(result)
         self.assertEqual(adapter.transport.calls, 0)
 
 

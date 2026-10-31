@@ -360,9 +360,16 @@ def collect_allowance_history(
         smoke_records = add_smoke_spend(
             smoke_records, run_id, spent, run_attempt=attempt
         )
-    smoke_records = add_smoke_spend(
-        smoke_records, "preserved-historical-20261031", PRESERVED_HISTORICAL_SMOKE_CENTS
-    )
+    recorded_smoke = smoke_spend_total(smoke_records)
+    if recorded_smoke == 0:
+        smoke_records = add_smoke_spend(
+            smoke_records, "preserved-historical-20261031", PRESERVED_HISTORICAL_SMOKE_CENTS
+        )
+    elif recorded_smoke < PRESERVED_HISTORICAL_SMOKE_CENTS:
+        raise ValueError(
+            "observed smoke history is below the preserved historical floor and "
+            "cannot be deduplicated without double counting; fail closed"
+        )
     return {
         "schema": ALLOWANCE_HISTORY_SCHEMA,
         "ledger_spend_cents": strict_cents(
