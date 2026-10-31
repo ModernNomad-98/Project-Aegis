@@ -12,6 +12,7 @@ This module performs no network, provider, credential or paid action itself.
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -146,6 +147,88 @@ def download_artifact_json(
     return payload
 
 
+HEX40 = re.compile(r"^[0-9a-f]{40}$")
+HEX64 = re.compile(r"^[0-9a-f]{64}$")
+
+
+def _require_text(payload: Mapping[str, Any], key: str, label: str) -> str:
+    value = payload.get(key)
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(label + " missing or not a non-empty string: " + key)
+    return value
+
+
+def _require_hex(payload: Mapping[str, Any], key: str, pattern, label: str) -> str:
+    value = _require_text(payload, key, label)
+    if not pattern.match(value):
+        raise ValueError(label + " has malformed provenance: " + key)
+    return value
+
+
+def _validate_run_provenance(run: Mapping[str, Any]) -> dict[str, Any]:
+    run_id = run.get("id")
+    if isinstance(run_id, bool) or not isinstance(run_id, (int, str)):
+        raise ValueError("run entry has no positive id")
+    if isinstance(run_id, int) and run_id <= 0:
+        raise ValueError("run entry id must be positive")
+    attempt = run.get("run_attempt", 1)
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt <= 0:
+        raise ValueError("run attempt must be a positive integer")
+    head = _require_hex(run, "head_sha", HEX40, "run entry")
+    return {"run_id": run_id, "attempt": attempt, "head_sha": head}
+
+
+def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) -> dict[str, Any]:
+    provenance = _validate_run_provenance(run)
+    if payload.get("schema") != SMOKE_PROOF_SCHEMA:
+        raise ValueError("unsupported smoke proof schema: " + repr(payload.get("schema")))
+    if payload.get("status") not in {"PASS", "FAIL"}:
+        raise ValueError("smoke proof status is missing or untrusted")
+    if payload.get("workflow") != "eval-smoke":
+        raise ValueError("smoke proof workflow is not eval-smoke")
+    if payload.get("citability") != "REAL_HOST":
+        raise ValueError("smoke proof citability is not REAL_HOST")
+    if _require_hex(payload, "head_sha", HEX40, "smoke proof") != provenance["head_sha"]:
+        raise ValueError("smoke proof head does not match the workflow run head")
+    _require_hex(payload, "dataset_sha256", HEX64, "smoke proof")
+    _require_hex(payload, "built_config_sha256", HEX64, "smoke proof")
+    _require_hex(payload, "config_template_sha256", HEX64, "smoke proof")
+    _require_text(payload, "gate_id", "smoke proof")
+    _require_text(payload, "subject_vendor", "smoke proof")
+    _require_text(payload, "judge_vendor", "smoke proof")
+    _require_text(payload, "judge_model", "smoke proof")
+    if payload.get("max_output_tokens") != 16_384:
+        raise ValueError("smoke proof max_output_tokens is not the pinned 16384")
+    if payload.get("planned_calls") != 2 or payload.get("dispatched_calls") != 2:
+        raise ValueError("smoke proof call shape is not exactly two calls")
+    supplied = _require_hex(payload, "proof_sha256", HEX64, "smoke proof")
+    import hashlib
+    recomputed = hashlib.sha256(json.dumps(
+        {k: v for k, v in payload.items() if k != "proof_sha256"},
+        sort_keys=True, separators=(",", ":"),
+    ).encode("utf-8")).hexdigest()
+    if supplied != recomputed:
+        raise ValueError("smoke proof hash does not verify")
+    return {**provenance, "proof_sha256": supplied}
+
+
+def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any]) -> dict[str, Any]:
+    provenance = _validate_run_provenance(run)
+    if payload.get("schema") != RESUME_MANIFEST_SCHEMA:
+        raise ValueError("unsupported trial manifest schema: " + repr(payload.get("schema")))
+    plan = payload.get("plan")
+    if not isinstance(plan, Mapping):
+        raise ValueError("trial manifest has no plan provenance")
+    if _require_hex(plan, "dispatch_sha", HEX40, "trial plan") != provenance["head_sha"]:
+        raise ValueError("trial plan dispatch head does not match the workflow run head")
+    _require_hex(plan, "config_sha256", HEX64, "trial plan")
+    _require_hex(plan, "dataset_sha256", HEX64, "trial plan")
+    _require_text(plan, "gate_id", "trial plan")
+    if plan.get("max_output_tokens") != 16_384:
+        raise ValueError("trial plan output cap is not the pinned 16384")
+    return provenance
+
+
 def _run_has_ended(run: Mapping[str, Any]) -> bool:
     # Enumerate every ended run regardless of conclusion: failed/cancelled runs
     # can still have spent money and must not be skipped.
@@ -173,6 +256,7 @@ def collect_smoke_proof_spends(
             continue
         if not _run_has_ended(run):
             continue
+        _validate_run_provenance(run)
         artifacts = list_run_artifacts(gh, repository, run_id)
         names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
         if SMOKE_ARTIFACT_NAME not in names:
@@ -181,11 +265,7 @@ def collect_smoke_proof_spends(
             gh, repository, run_id, SMOKE_ARTIFACT_NAME,
             SMOKE_ARTIFACT_MEMBER, work_dir,
         )
-        if payload.get("schema") != SMOKE_PROOF_SCHEMA:
-            raise ValueError(
-                "smoke proof " + str(run_id) + " has unsupported schema "
-                + repr(payload.get("schema"))
-            )
+        _validate_smoke_proof(payload, run)
         spent = strict_cents(payload.get("spent_cents"), "smoke proof spent_cents")
         attempt = run.get("run_attempt", 1)
         records = merge_smoke_gate_spend(
@@ -213,6 +293,7 @@ def collect_latest_trial_spend(
             continue
         if not _run_has_ended(run):
             continue
+        _validate_run_provenance(run)
         artifacts = list_run_artifacts(gh, repository, run_id)
         names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
         if TRIAL_ARTIFACT_NAME not in names:
@@ -221,11 +302,7 @@ def collect_latest_trial_spend(
             gh, repository, run_id, TRIAL_ARTIFACT_NAME,
             TRIAL_ARTIFACT_MEMBER, work_dir,
         )
-        if payload.get("schema") != RESUME_MANIFEST_SCHEMA:
-            raise ValueError(
-                "trial manifest " + str(run_id) + " has unsupported schema "
-                + repr(payload.get("schema"))
-            )
+        _validate_trial_manifest(payload, run)
         totals = payload.get("totals")
         if not isinstance(totals, Mapping):
             _fail_unknown("trial manifest " + str(run_id) + " has no totals")

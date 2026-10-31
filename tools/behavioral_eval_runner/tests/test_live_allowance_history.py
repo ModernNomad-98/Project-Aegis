@@ -51,13 +51,47 @@ class FakeGH:
             out_dir = Path(args[args.index("--dir") + 1])
             out_dir.mkdir(parents=True, exist_ok=True)
             member, payload = self.payloads[(run_id, name)]
+            payload = dict(payload)
+            if not payload.get("__no_defaults__"):
+                if name == "ber-live-smoke-proof" and payload.get("schema") == "ber-live-smoke-proof/1.0.0":
+                    payload.setdefault("status", "PASS")
+                    payload.setdefault("workflow", "eval-smoke")
+                    payload.setdefault("citability", "REAL_HOST")
+                    payload.setdefault("head_sha", HEAD_SHA)
+                    payload.setdefault("dataset_sha256", "b" * 64)
+                    payload.setdefault("built_config_sha256", "c" * 64)
+                    payload.setdefault("config_template_sha256", "d" * 64)
+                    payload.setdefault("gate_id", "gate-1")
+                    payload.setdefault("subject_vendor", "anthropic")
+                    payload.setdefault("judge_vendor", "openai")
+                    payload.setdefault("judge_model", "gpt-6-astra")
+                    payload.setdefault("max_output_tokens", 16384)
+                    payload.setdefault("planned_calls", 2)
+                    payload.setdefault("dispatched_calls", 2)
+                    if "proof_sha256" not in payload:
+                        import hashlib
+                        payload["proof_sha256"] = hashlib.sha256(json.dumps(
+                            {k: v for k, v in payload.items() if k != "proof_sha256"},
+                            sort_keys=True, separators=(",", ":"),
+                        ).encode("utf-8")).hexdigest()
+                if name == "ber-resume-manifest" and payload.get("schema") == "ber-resume-manifest/1.2.0":
+                    plan = payload.setdefault("plan", {})
+                    plan.setdefault("dispatch_sha", HEAD_SHA)
+                    plan.setdefault("config_sha256", "e" * 64)
+                    plan.setdefault("dataset_sha256", "f" * 64)
+                    plan.setdefault("gate_id", "gate-1")
+                    plan.setdefault("max_output_tokens", 16384)
+            payload.pop("__no_defaults__", None)
             (out_dir / member).write_text(json.dumps(payload), encoding="utf-8")
             return SimpleNamespace(returncode=0, stdout="", stderr="")
         return SimpleNamespace(returncode=1, stdout="", stderr="unexpected")
 
 
+HEAD_SHA = "a" * 40
+
+
 def run(run_id, attempt=1, conclusion="success"):
-    return {"id": run_id, "run_attempt": attempt, "status": "completed", "conclusion": conclusion}
+    return {"id": run_id, "run_attempt": attempt, "status": "completed", "conclusion": conclusion, "head_sha": HEAD_SHA}
 
 
 def page(items, total=None):
@@ -107,12 +141,12 @@ class AllowanceHistoryTests(unittest.TestCase):
 
     def test_unicode_fixture_and_shared_history(self):
         fake = FakeGH(
-            {"smoke": [page([run("smoke-☃", attempt=2)])],
+            {"smoke": [page([run(77, attempt=2)])],
              "trial": [page([run(900)])]},
-            {"smoke-☃": [artifact("ber-live-smoke-proof")],
+            {"77": [artifact("ber-live-smoke-proof")],
              "900": [artifact("ber-resume-manifest")]},
             {
-                ("smoke-☃", "ber-live-smoke-proof"): (
+                ("77", "ber-live-smoke-proof"): (
                     "smoke-proof.json",
                     {"schema": "ber-live-smoke-proof/1.0.0", "spent_cents": 174,
                      "note": "smoke ☃ déjà vu"},
@@ -208,7 +242,7 @@ class AllowanceHistoryTests(unittest.TestCase):
         )
         with self.assertRaises(ValueError) as caught:
             collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
-        self.assertIn("unsupported schema", str(caught.exception))
+        self.assertIn("unsupported", str(caught.exception))
 
     def test_missing_trial_manifest_refuses(self):
         fake = FakeGH(
@@ -217,6 +251,71 @@ class AllowanceHistoryTests(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
+
+    def _proof_with(self, **overrides):
+        payload = {
+            "__no_defaults__": True,
+            "schema": "ber-live-smoke-proof/1.0.0",
+            "status": "PASS",
+            "workflow": "eval-smoke",
+            "citability": "REAL_HOST",
+            "head_sha": HEAD_SHA,
+            "dataset_sha256": "b" * 64,
+            "built_config_sha256": "c" * 64,
+            "config_template_sha256": "d" * 64,
+            "gate_id": "gate-1",
+            "subject_vendor": "anthropic",
+            "judge_vendor": "openai",
+            "judge_model": "gpt-6-astra",
+            "max_output_tokens": 16384,
+            "planned_calls": 2,
+            "dispatched_calls": 2,
+            "spent_cents": 150,
+        }
+        payload.update(overrides)
+        import hashlib
+        payload["proof_sha256"] = hashlib.sha256(json.dumps(
+            {k: v for k, v in payload.items() if k != "proof_sha256"},
+            sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8")).hexdigest()
+        return payload
+
+    def _history_with_proof(self, payload):
+        return FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([])]},
+            {"42": [artifact("ber-live-smoke-proof")]},
+            {("42", "ber-live-smoke-proof"): ("smoke-proof.json", payload)},
+        )
+
+    def test_provenance_required_fields_missing_reject(self):
+        required = ["head_sha", "workflow", "dataset_sha256", "built_config_sha256",
+                    "config_template_sha256", "gate_id", "subject_vendor", "judge_vendor",
+                    "judge_model", "status", "citability"]
+        for key in required:
+            payload = self._proof_with()
+            del payload[key]
+            with self.subTest(key=key):
+                with self.assertRaises(ValueError):
+                    collect_smoke_proof_spends(
+                        gh=self._history_with_proof(payload), repository="o/r", work_dir=self.tmp
+                    )
+
+    def test_provenance_mismatch_and_untrusted_reject(self):
+        cases = [
+            {"head_sha": "f" * 40},
+            {"workflow": "other-workflow"},
+            {"citability": "SYNTHETIC"},
+            {"status": "UNKNOWN"},
+            {"judge_model": ""},
+            {"proof_sha256": "0" * 64},
+        ]
+        for overrides in cases:
+            payload = self._proof_with(**overrides)
+            with self.subTest(overrides=overrides):
+                with self.assertRaises(ValueError):
+                    collect_smoke_proof_spends(
+                        gh=self._history_with_proof(payload), repository="o/r", work_dir=self.tmp
+                    )
 
 class WorkflowWiringTests(unittest.TestCase):
     def test_eval_smoke_admission_precedes_config_and_keys(self):
