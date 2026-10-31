@@ -65,7 +65,9 @@ not exploratory wandering.
 3. **Drive each route:** navigate (direct URL and in-app nav), exercise each
    planned interaction — forms with valid AND invalid input, dialogs
    open/close/escape, permission-gated controls per persona, empty/loading/
-   error states where reachable.
+   error states where reachable. For tables and sortable/filterable lists,
+   exercise the sorting and filter-result checks against an independently
+   derived expected order/membership (catalog section "Table interactions").
 4. **Observe like an instrument:** per step record expected vs observed;
    capture the browser console for errors on every route (silent console
    errors are findings); screenshot at plan-named checkpoints and at every
@@ -107,6 +109,10 @@ Handoffs: <blockers → owner/systematic-debugger; evidence → closeout>
 - [ ] Every defect has severity, repro steps, and evidence.
 - [ ] Screenshots follow naming/masking rules; sensitive data masked.
 - [ ] Skipped items listed with reasons — no silent coverage inflation.
+- [ ] Tables/lists: sorting checked against an independently derived whole-list
+      order in BOTH directions (unsorted fixture, nulls/ties exercised), filter
+      membership/counts checked, pagination consistency where present, and
+      empty-result recovery verified.
 - [ ] No permanent spec files written (that's Playwright's lane).
 
 ## Safety Rules
