@@ -65,7 +65,8 @@ authorization, so total exposure remains at most $120.50.
 ## Limits
 
 The offline transition proof in `tests/test_live_ledger_reconciliation.py` uses
-the real failed-run ledger as a fixture plus synthetic PENDING and ATTESTED
-records; it proves the decision function and the spend preservation, not the
-real provider usage. The committed record's attestation is an owner action; the
+the real failed-run ledger as a fixture, the committed ATTESTED record, and
+synthetic PENDING and ATTESTED records; it proves the decision function and the
+spend preservation, not that the owner actually acted and not the real provider
+usage. The committed record's attestation is an owner action; the
 record does not make the exact usage of the truncated call known.

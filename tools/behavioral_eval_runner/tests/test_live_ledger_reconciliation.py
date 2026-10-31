@@ -11,9 +11,10 @@ These tests prove the committed state and the transition it depends on:
 * before reconciliation the summary guard sees 1 unreconciled entry and would
   refuse a further paid dispatch (this is the block raising max_tokens cannot
   clear);
-* the committed record binds to the exact ledger and is ATTESTED by the owner
-  (attestation 2026-10-30 21:02 PDT, corroborated after the merge by the PR #986
-  post-merge note, comment 6538805513), so it reconciles the entry while
+* the committed record binds to the exact ledger and carries the owner
+  attestation (2026-10-30 21:02 PDT, re-issued with source; corroborated after
+  the merge by the PR #986 post-merge note, comment 6538805513), so it
+  reconciles the entry while
   preserving the ledger bytes, the charge (8 cents), the remaining ceiling
   (11,992 cents) and the attempt history: nothing is deleted, reset or
   repriced;
@@ -77,10 +78,11 @@ def _pending_record():
     record["attested_by"] = ""
     record["attested_on"] = ""
     record["attestation_ref"] = ""
-    record["reconciles"][0]["evidence_ref"] = (
-        "SYNTHETIC TEST RECORD ONLY: the committed ATTESTED record reversed to "
-        "PENDING to prove the guard still refuses an unattested record"
-    )
+    for entry in record["reconciles"]:
+        entry["evidence_ref"] = (
+            "SYNTHETIC TEST RECORD ONLY: the committed ATTESTED record reversed "
+            "to PENDING to prove the guard still refuses an unattested record"
+        )
     # The limitations prose must match the synthetic record's own status: a
     # PENDING copy cannot carry text that claims an owner attestation exists.
     record["limitations"] = [
@@ -116,11 +118,15 @@ class CommittedRecordTests(unittest.TestCase):
     def test_committed_record_is_attested_and_reconciles_preserving_spend(self):
         record = load_record(COMMITTED_RECORD)
         self.assertEqual(record["status"], STATUS_ATTESTED)
-        self.assertTrue(record["attested_by"].strip())
+        self.assertEqual(record["attested_by"], "Peter Nguyen (ModernNomad-98)")
         self.assertTrue(record["attested_on"].strip())
         self.assertTrue(record["attestation_ref"].strip())
-        # The attestation names the run it settles in a structured, parseable form.
+        # The attestation names the run it settles by its identifier and the
+        # attested-on instant is a parseable ISO-8601 value.
         self.assertIn("41145221349", record["attestation_ref"])
+        evidence_ref = record["reconciles"][0]["evidence_ref"]
+        self.assertNotIn("PENDING", evidence_ref)
+        self.assertIn("6538805513", evidence_ref)
         attested_on = dt.datetime.fromisoformat(record["attested_on"])
         self.assertIsNotNone(attested_on.tzinfo)
         self.assertEqual(
@@ -169,8 +175,13 @@ class CommittedRecordTests(unittest.TestCase):
 
     def test_a_synthetic_pending_record_binds_to_the_ledger_and_is_refused(self):
         pending = _pending_record()
-        self.assertEqual(validate_record(pending)["status"], STATUS_PENDING)
+        validated = validate_record(pending)
+        self.assertIsInstance(validated, dict)
+        self.assertEqual(validated["status"], STATUS_PENDING)
         self.assertIn("SYNTHETIC", pending["limitations"][0])
+        self.assertTrue(pending["reconciles"])
+        for entry in pending["reconciles"]:
+            self.assertIn("SYNTHETIC", entry["evidence_ref"])
         self.assertEqual(
             pending["ledger_sha256"],
             ledger_sha256(LEDGER_FIXTURE.read_bytes()),
@@ -188,10 +199,18 @@ class CommittedRecordTests(unittest.TestCase):
         )
 
     def test_a_pending_record_cannot_carry_any_attestation_field(self):
-        for field in ("attested_by", "attested_on", "attestation_ref"):
+        # Plausible values are used for every field so the refusal cannot be an
+        # accidental type/format rejection: a PENDING record must refuse the
+        # presence of attested_by, attested_on or attestation_ref as such.
+        plausible = {
+            "attested_by": "Peter Nguyen (ModernNomad-98)",
+            "attested_on": "2026-10-30T21:02:00-07:00",
+            "attestation_ref": "synthetic-attestation-reference",
+        }
+        for field, value in plausible.items():
             with self.subTest(field=field):
                 record = _pending_record()
-                record[field] = "not allowed while pending"
+                record[field] = value
                 with self.assertRaises(LedgerReconciliationRefusedError) as caught:
                     validate_record(record)
                 self.assertEqual(
@@ -348,14 +367,16 @@ class FailClosedTests(unittest.TestCase):
 
     def test_an_attested_record_without_any_attestation_field_is_refused(self):
         for field in ("attested_by", "attested_on", "attestation_ref"):
-            with self.subTest(field=field):
-                record = _attested()
-                record[field] = ""
-                with self.assertRaises(LedgerReconciliationRefusedError) as caught:
-                    validate_record(record)
-                self.assertEqual(
-                    caught.exception.reason_code, "RECONCILIATION_RECORD_INVALID"
-                )
+            for value in ("", "   "):
+                with self.subTest(field=field, value=repr(value)):
+                    record = _attested()
+                    record[field] = value
+                    with self.assertRaises(LedgerReconciliationRefusedError) as caught:
+                        validate_record(record)
+                    self.assertEqual(
+                        caught.exception.reason_code,
+                        "RECONCILIATION_RECORD_INVALID",
+                    )
 
     def test_two_records_claiming_one_ledger_are_refused(self):
         with tempfile.TemporaryDirectory() as tmp:
