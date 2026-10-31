@@ -8,8 +8,9 @@ This file is the author-lane proof for the 2026-10-30 Pilot A fix:
   LIVE path by path/name and, as a renamed staged copy, by the output floor;
 * the one-case dry run dispatches exactly two mock calls (one subject, one
   judge) and records the JUDGE terminal finish reason in the run evidence;
-* the smoke ceiling is clamped to 5000 cents even when the gate/config permit
-  more, and a smoke-shaped violation is refused before dispatch.
+* the smoke ceiling is 50 integer cents ($0.50) even when a larger gate ceiling
+  is involved, a config above 50 is refused, and a smoke-shaped violation is
+  refused before dispatch.
 
 No test performs a network call. The dry-run path uses the mock transport;
 the live-path guard tests never reach a transport because the guard fires
@@ -317,6 +318,40 @@ class OneCaseDryRunTests(unittest.TestCase):
             with self.assertRaises(LiveConfigRefusedError) as caught:
                 dry_run(paths, smoke=True)
             self.assertEqual(caught.exception.reason_code, "SMOKE_CONFIG_INVALID")
+
+    def test_live_run_smoke_completes_offline_and_records_the_judge_finish_reason(self):
+        # Direct live_run --smoke assertion (review N3): the same smoke shape on
+        # the LIVE verb with injected mock transports and a current-head REAL_HOST
+        # gate. No network call is made; the evidence is transient.
+        environ = {
+            "ANTHROPIC_API_KEY": helpers.FAKE_ANTHROPIC_KEY,
+            "OPENAI_API_KEY": helpers.FAKE_OPENAI_KEY,
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _custom_paths(
+                tmp,
+                config=_load_json(helpers.SMOKE_CONFIG),
+                gate=helpers.gate_payload(fact_origin="REAL_HOST"),
+            )
+            result = live_run(
+                paths,
+                environ=environ,
+                subject_transport_factory=lambda credentials: helpers.mock_subject_transport(),
+                judge_transport_factory=lambda credentials: helpers.mock_judge_transport(),
+                smoke=True,
+            )
+            self.assertEqual(result["status"], "COMPLETED")
+            self.assertEqual(result["planned_calls"], 2)
+            self.assertEqual(result["dispatched_calls"], 2)
+            self.assertEqual(result["ceiling_cents"], 50)
+            self.assertEqual(result["smoke"]["subject_calls"], 1)
+            self.assertEqual(result["smoke"]["judge_calls"], 1)
+            self.assertEqual(result["smoke"]["judge_finish_reasons"], ["end_turn"])
+            self.assertLessEqual(result["smoke"]["spent_cents"], 50)
+            self.assertTrue(result["evidence"]["verified"])
+            self.assertEqual(result["transport_class"], "INJECTED")
+            record = result["results"][0]
+            self.assertEqual(record["judge"]["stop_reason"], "end_turn")
 
     def test_one_case_dry_run_cli_is_a_documented_command(self):
         with tempfile.TemporaryDirectory() as tmp:
