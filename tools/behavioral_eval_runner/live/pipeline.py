@@ -118,6 +118,14 @@ def _require_smoke_config(config: LiveConfig) -> None:
             "subject_vendors must name exactly one vendor, got "
             f"{list(config.subject_vendors)}"
         )
+    if config.spend_ceiling_cents > SMOKE_CEILING_CENTS:
+        # The $0.50 cap is a ceiling, not a clamp target: a config above it is
+        # refused, so the committed template cannot drift above the cap.
+        problems.append(
+            "spend_ceiling_cents must be <= "
+            f"{SMOKE_CEILING_CENTS} (the 50-cent smoke cap), got "
+            f"{config.spend_ceiling_cents}"
+        )
     if problems:
         raise LiveConfigRefusedError(
             "the smoke config is not a single-case smoke shape and would "
@@ -671,8 +679,8 @@ def _execute(
     state = _RunState()
     planned = _planned_calls(config, cases, smoke=smoke)
     # The smoke ceiling is the SMALLER of the binding gate/config/provider-cap
-    # minimum and the $0.50 smoke cap, so a smoke cannot spend more than 5000
-    # cents even when it is handed the full pilot gate and config.
+    # minimum and the $0.50 smoke cap (50 integer cents), so a smoke cannot
+    # spend more than 50 cents even when handed the full pilot gate and config.
     ceiling_cents = gate.effective_ceiling_cents(config)
     if smoke:
         ceiling_cents = min(ceiling_cents, SMOKE_CEILING_CENTS)
@@ -1167,8 +1175,9 @@ def live_run(
     citable real-host evidence.
 
     ``smoke=True`` runs the single-case live smoke: exactly one subject call and
-    one judge call, hard-capped at SMOKE_CEILING_CENTS (5000 cents) in addition
-    to the gate/config/provider-cap minimum. The live-setting guards refuse a
+    one judge call, hard-capped at SMOKE_CEILING_CENTS (50 integer cents = $0.50)
+    in addition to the gate/config/provider-cap minimum. The live-setting guards
+    refuse a
     build-only dry-run config source and any output budget below the live
     floor BEFORE a credential is resolved or a call is reserved.
     """

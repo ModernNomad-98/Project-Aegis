@@ -49,10 +49,13 @@ DEFAULT_MAX_INPUT_BYTES = 200_000
 #: (see live/config/pilot-a-live-config.json and the fix PR cost table).
 MIN_LIVE_MAX_OUTPUT_TOKENS = 4096
 
-#: The single-case live smoke hard ceiling, in cents ($0.50). The smoke meter
-#: uses min(this, config ceiling, gate ceiling, provider cap), so a smoke cannot
-#: spend more than 5000 cents even when handed the full pilot gate and config.
-SMOKE_CEILING_CENTS = 5000
+#: The single-case live smoke HARD ceiling, in INTEGER CENTS: 50 cents = $0.50.
+#: The committed smoke config template must not exceed it (a 51-cent template is
+#: refused, not clamped), the runner clamps the meter to min(this, config
+#: ceiling, gate ceiling, provider cap), and the smoke workflow re-verifies the
+#: cap. A smoke therefore cannot spend more than 50 cents even when handed the
+#: full pilot gate/config.
+SMOKE_CEILING_CENTS = 50
 
 #: The committed build-only/no-spend dry-run config template, relative to the
 #: repository root. A live verb refuses this source: its spend-affecting values

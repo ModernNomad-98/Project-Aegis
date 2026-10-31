@@ -1555,7 +1555,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--smoke",
         action="store_true",
         help="single-case live smoke: exactly one subject call and one judge "
-        "call, hard-capped at 5000 cents; requires a smoke-shaped config",
+        "call, hard-capped at 50 cents ($0.50); requires a smoke-shaped config",
     )
     lr.set_defaults(func=_cmd_live_run)
 

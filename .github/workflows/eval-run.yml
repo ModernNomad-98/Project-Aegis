@@ -93,7 +93,14 @@
 #      returned COMPLETED with a readable ledger, verified evidence and the
 #      planned per-case result count. The restore step refuses a prior
 #      COMPLETED entry that has no attempt ledger, so an unrepairable
-#      completion cannot permanently wedge later dispatches.
+#      completion cannot permanently wedge later dispatches;
+#   5. evidence-preserving ledger reconciliation (owner 2026-10-30): a prior
+#      ledger with unreconciled cost entries blocks a new paid dispatch until a
+#      committed owner-attested record in
+#      tools/behavioral_eval_runner/live/reconciliation/ covers it. The ledger
+#      bytes, attempt history and cumulative ceiling are never modified; the
+#      charge stays counted exactly once, and a PENDING, mismatched, repriced or
+#      incomplete record refuses before the run step maps a provider key.
 #
 # Secret containment: ANTHROPIC_API_KEY and OPENAI_API_KEY are injected from
 # the eval-run environment only, mapped only in the single env: block of the
@@ -752,7 +759,13 @@ jobs:
           import json
           import os
           import subprocess
+          import sys
           from pathlib import Path
+
+          sys.path.insert(0, os.environ["GITHUB_WORKSPACE"])
+          from tools.behavioral_eval_runner.live.config import (  # noqa: E402
+              SMOKE_CEILING_CENTS,
+          )
 
           RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
           plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
@@ -875,7 +888,10 @@ jobs:
           spent = proof.get("spent_cents")
           ceiling = proof.get("ceiling_cents")
           require(type(spent) is int and spent >= 0, "proof spend is not a non-negative int")
-          require(type(ceiling) is int and 0 < ceiling <= 5000, "proof ceiling is outside the 5000-cent smoke cap")
+          require(
+              type(ceiling) is int and 0 < ceiling <= SMOKE_CEILING_CENTS,
+              "proof ceiling is outside the 50-cent ($0.50) smoke cap",
+          )
           require(type(spent) is int and type(ceiling) is int and spent <= ceiling, "proof spend exceeds its ceiling")
           require(proof.get("max_output_tokens") == plan.get("max_output_tokens"), "proof output budget is not this dispatch config")
           require(type(proof.get("max_output_tokens")) is int and proof["max_output_tokens"] >= plan.get("live_setting_floor_tokens", 0), "proof output budget is below the live floor")
@@ -931,16 +947,24 @@ jobs:
           import re
           import shutil
           import subprocess
+          import sys
           from datetime import datetime, timezone
           from pathlib import Path
 
           RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
           MANIFEST_DIR = RUNNER_TEMP / "ber-manifest"
           CASES_DIR = MANIFEST_DIR / "cases"
           LEDGER_DIR = MANIFEST_DIR / "ledgers"
           RESTORE_DIR = RUNNER_TEMP / "ber-restore"
           for directory in (MANIFEST_DIR, CASES_DIR, LEDGER_DIR, RESTORE_DIR):
               directory.mkdir(parents=True, exist_ok=True)
+          sys.path.insert(0, str(WORKSPACE))
+          from tools.behavioral_eval_runner.live.ledger_reconciliation import (  # noqa: E402
+              LedgerReconciliationRefusedError,
+              load_records,
+              reconcile_ledger,
+          )
           plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
           repository = os.environ.get("REPOSITORY", "")
           current_run = str(os.environ.get("GITHUB_RUN_ID", "")).strip()
@@ -1397,6 +1421,52 @@ jobs:
           prior_spend = 0
           for ledger in sorted(LEDGER_DIR.glob("*.json")):
               prior_spend += ledger_spend(ledger)
+          # Evidence-preserving reconciliation gate (owner 2026-10-30): a prior
+          # ledger with unreconciled cost entries blocks a new paid dispatch
+          # until a committed, owner-attested reconciliation record covers it.
+          # The ledger bytes, the attempt history and the cumulative ceiling are
+          # never modified; the recorded charge stays counted exactly once. The
+          # check runs BEFORE the run step maps a provider key, so an
+          # unreconciled point cannot be retried at cost. A missing record, a
+          # PENDING record, a ledger mismatch, a repriced entry, an uncovered
+          # entry, a duplicate claim or a budget mismatch all refuse.
+          try:
+              reconciliation_records = load_records(
+                  WORKSPACE / "tools" / "behavioral_eval_runner" / "live" / "reconciliation"
+              )
+          except LedgerReconciliationRefusedError as exc:
+              refuse("the committed reconciliation records are invalid: " + exc.reason_code)
+          reconciled_ledgers = []
+          for ledger_path in sorted(LEDGER_DIR.glob("*.json")):
+              try:
+                  payload = json.loads(ledger_path.read_text(encoding="utf-8"))
+                  raw = ledger_path.read_bytes()
+              except (OSError, ValueError):
+                  refuse("ledger " + ledger_path.name + " is unreadable during reconciliation")
+              unreconciled = payload.get("unreconciled_count")
+              if type(unreconciled) is not int or unreconciled < 0:
+                  refuse("ledger " + ledger_path.name + " has no non-negative integer unreconciled_count")
+              if unreconciled == 0:
+                  continue
+              record = reconciliation_records.get(hashlib.sha256(raw).hexdigest())
+              if record is None:
+                  refuse(
+                      "ledger " + ledger_path.name + " has " + str(unreconciled)
+                      + " unreconciled cost entry(ies) and no committed"
+                      " owner-attested reconciliation record; no paid retry is"
+                      " authorized until the ledger point is reconciled"
+                  )
+              try:
+                  view = reconcile_ledger(payload, record, ledger_bytes=raw)
+              except LedgerReconciliationRefusedError as exc:
+                  refuse(
+                      "ledger " + ledger_path.name + " reconciliation refused: "
+                      + exc.reason_code
+                  )
+              reconciled_ledgers.append({
+                  "ledger_name": ledger_path.name,
+                  **view,
+              })
           state["restored_from"] = (
               {
                   "runs": source_runs,
@@ -1408,6 +1478,7 @@ jobs:
                   ],
                   "prior_attempts": prior_attempts,
                   "prior_spend_cents": prior_spend,
+                  "reconciled_ledgers": reconciled_ledgers,
                   "restored_at": utc_now(),
               }
               if source_runs
@@ -1427,6 +1498,7 @@ jobs:
               "completed_cases": sorted(completed),
               "prior_attempts": prior_attempts,
               "prior_spend_cents": prior_spend,
+              "reconciled_ledgers": reconciled_ledgers,
               "skipped_manifests": skipped,
               "reason": (
                   None if source_runs
@@ -2318,9 +2390,17 @@ jobs:
           import hashlib
           import json
           import os
+          import sys
           from pathlib import Path
 
           RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          sys.path.insert(0, str(WORKSPACE))
+          from tools.behavioral_eval_runner.live.ledger_reconciliation import (  # noqa: E402
+              LedgerReconciliationRefusedError,
+              load_records,
+              reconcile_ledger,
+          )
           EVIDENCE_ROOT = RUNNER_TEMP / "live-evidence"
           CONFIG_PATH = RUNNER_TEMP / "live-config.json"
           PLAN_PATH = RUNNER_TEMP / "ber-plan.json"
@@ -2404,6 +2484,20 @@ jobs:
                   )
                   continue
               ledgers[path.name] = payload
+          # Committed, owner-attested reconciliation records for prior ledgers.
+          # An invalid committed record fails the summary closed.
+          try:
+              reconciliation_records = load_records(
+                  WORKSPACE / "tools" / "behavioral_eval_runner" / "live" / "reconciliation"
+              )
+              reconciliation_load_failure = None
+          except LedgerReconciliationRefusedError as exc:
+              reconciliation_records = {}
+              reconciliation_load_failure = (
+                  "the committed reconciliation records are invalid: "
+                  + exc.reason_code
+              )
+              ledger_failures.append(reconciliation_load_failure)
 
           case_ids = plan.get("case_ids") or []
           records = []
@@ -2648,11 +2742,50 @@ jobs:
                   "the run plan has no valid planned_calls_per_case"
               )
           unreconciled_total = 0
+          reconciled_total = 0
+          reconciled_ledgers = []
           ledger_call_count = 0
-          for payload in ledgers.values():
+          for name, payload in sorted(ledgers.items()):
               unreconciled = integer(payload.get("unreconciled_count"))
-              if unreconciled is not None:
-                  unreconciled_total += unreconciled
+              if unreconciled is not None and unreconciled > 0:
+                  # Evidence-preserving reconciliation: the original ledger is
+                  # never edited; a committed ATTESTED record that binds its exact
+                  # sha256 can clear the block, with the charge still counted.
+                  raw = b""
+                  try:
+                      raw = (LEDGER_DIR / name).read_bytes()
+                  except OSError:
+                      ledger_failures.append(
+                          f"ledger {name} is unreadable during reconciliation"
+                      )
+                      unreconciled_total += unreconciled
+                  else:
+                      record = reconciliation_records.get(
+                          hashlib.sha256(raw).hexdigest()
+                      )
+                      if record is None:
+                          unreconciled_total += unreconciled
+                          ledger_failures.append(
+                              f"ledger {name} has {unreconciled} unreconciled cost "
+                              "entry(ies) and no committed owner-attested "
+                              "reconciliation record"
+                          )
+                      else:
+                          try:
+                              view = reconcile_ledger(
+                                  payload, record, ledger_bytes=raw
+                              )
+                          except LedgerReconciliationRefusedError as exc:
+                              unreconciled_total += unreconciled
+                              ledger_failures.append(
+                                  f"ledger {name} reconciliation refused: "
+                                  + exc.reason_code
+                              )
+                          else:
+                              reconciled_total += view["unreconciled_before"]
+                              reconciled_ledgers.append(
+                                  {"ledger_name": name, **view}
+                              )
               calls = integer(payload.get("call_count"))
               if calls is not None:
                   ledger_call_count += calls
@@ -2722,7 +2855,10 @@ jobs:
                       f"ledger {name} spend is above its binding ceiling"
                   )
           if unreconciled_total != 0:
-              verification_failures.append("the run has unreconciled cost entries")
+              verification_failures.append(
+                  "the run has unreconciled cost entries not covered by an "
+                  "owner-attested reconciliation record"
+              )
           if status == "COMPLETED":
               if unrun_items:
                   verification_failures.append(
@@ -2867,6 +3003,8 @@ jobs:
                   "remaining_cents": max(0, effective_ceiling - spent_total),
                   "ledger_spend_cents": spent_total,
                   "unreconciled_count": unreconciled_total,
+                  "reconciled_total": reconciled_total,
+                  "reconciliation": reconciled_ledgers,
                   "call_count": ledger_call_count,
                   "planned_calls": plan.get("planned_calls"),
                   "dispatched_calls": sum(
@@ -2968,6 +3106,7 @@ jobs:
               "results_by_state": counts(all_states),
               "spent_cents": spent_total,
               "unreconciled_count": unreconciled_total,
+              "reconciled_total": reconciled_total,
               "unrun_results": len(unrun_items),
               "cases_completed": len(completed),
               "cases_missing": len(missing_cases),

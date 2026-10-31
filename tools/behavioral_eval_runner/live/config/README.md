@@ -60,7 +60,7 @@ round-trips against (`price_table`, `owner_limits`).
 
 `eval-smoke` (`.github/workflows/eval-smoke.yml`, `workflow_dispatch` only) runs
 exactly one subject call and one judge call on one committed case, hard-capped
-at 5000 cents, and publishes a proof artifact only when the judge finishes
+at 50 integer cents ($0.50), and publishes a proof artifact only when the judge finishes
 (judge terminal finish reason recorded in the run evidence). A full Pilot A
 `eval-run` dispatch is required to run only after `eval-smoke` passed on the
 same exact head; the full dispatch refuses when no passing proof at that head

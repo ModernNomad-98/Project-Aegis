@@ -245,34 +245,61 @@ class OneCaseDryRunTests(unittest.TestCase):
             self.assertEqual(report["smoke"]["judge_finish_reasons"], ["end_turn"])
             self.assertTrue(report["live"]["unrun_is_never_pass"])
 
-    def test_one_case_smoke_ceiling_is_clamped_to_five_thousand_cents(self):
+    def test_smoke_ceiling_is_fifty_cents_even_with_a_larger_gate(self):
+        # Positive case: the committed smoke config is exactly 50 cents, and a
+        # $150 gate cannot raise it. The unit is INTEGER CENTS: 50 = $0.50.
+        self.assertEqual(SMOKE_CEILING_CENTS, 50)
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _custom_paths(
+                tmp,
+                config=_load_json(helpers.SMOKE_CONFIG),
+                gate=helpers.gate_payload(ceiling=15000, provider_cap=12000),
+            )
+            result = dry_run(paths, smoke=True)
+            self.assertEqual(result["smoke"]["ceiling_cents"], 50)
+            self.assertEqual(result["ceiling_cents"], 50)
+            self.assertEqual(result["cost_ledger"]["ceiling_cents"], 50)
+            self.assertLessEqual(result["smoke"]["spent_cents"], 50)
+
+    def test_smoke_config_at_exactly_fifty_cents_is_accepted(self):
         config = helpers.config_payload(
-            ceiling=15000, runs=1, max_out=MIN_LIVE_MAX_OUTPUT_TOKENS
+            ceiling=SMOKE_CEILING_CENTS, runs=1, max_out=MIN_LIVE_MAX_OUTPUT_TOKENS
         )
         config["subject_vendors"] = ["anthropic"]
         config["judge_allowlist"] = {
             "judge_models": [{"vendor": "openai", "model": "gpt-6-astra"}]
         }
         with tempfile.TemporaryDirectory() as tmp:
-            paths = _custom_paths(
-                tmp,
-                config=config,
-                gate=helpers.gate_payload(ceiling=15000, provider_cap=12000),
-            )
+            paths = _custom_paths(tmp, config=config, gate=helpers.gate_payload())
             result = dry_run(paths, smoke=True)
-            # Even with a $150 gate and config, the smoke ceiling is $0.50.
-            self.assertEqual(result["smoke"]["ceiling_cents"], SMOKE_CEILING_CENTS)
-            self.assertEqual(result["ceiling_cents"], SMOKE_CEILING_CENTS)
-            self.assertEqual(result["cost_ledger"]["ceiling_cents"], SMOKE_CEILING_CENTS)
-            self.assertLessEqual(
-                result["smoke"]["spent_cents"], SMOKE_CEILING_CENTS
+            self.assertEqual(result["smoke"]["ceiling_cents"], 50)
+            self.assertLessEqual(result["smoke"]["spent_cents"], 50)
+
+    def test_smoke_config_above_fifty_cents_is_refused_before_dispatch(self):
+        # Negative case: 51 cents is REFUSED, not silently clamped to 50.
+        config = helpers.config_payload(
+            ceiling=51, runs=1, max_out=MIN_LIVE_MAX_OUTPUT_TOKENS
+        )
+        config["subject_vendors"] = ["anthropic"]
+        config["judge_allowlist"] = {
+            "judge_models": [{"vendor": "openai", "model": "gpt-6-astra"}]
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _custom_paths(tmp, config=config, gate=helpers.gate_payload())
+            with self.assertRaises(LiveConfigRefusedError) as caught:
+                dry_run(paths, smoke=True)
+            self.assertEqual(caught.exception.reason_code, "SMOKE_CONFIG_INVALID")
+            self.assertEqual(
+                caught.exception.context["required_calls"], 2
             )
+            self.assertIn("50", str(caught.exception))
+            self.assertFalse(os.path.exists(paths.cost_ledger_path))
 
     def test_smoke_refuses_a_multi_run_config_before_dispatch(self):
         with tempfile.TemporaryDirectory() as tmp:
             paths = _custom_paths(
                 tmp,
-                config=helpers.config_payload(runs=3),
+                config=helpers.config_payload(ceiling=50, runs=3),
                 gate=helpers.gate_payload(),
             )
             with self.assertRaises(LiveConfigRefusedError) as caught:
@@ -284,7 +311,7 @@ class OneCaseDryRunTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             paths = _custom_paths(
                 tmp,
-                config=helpers.config_payload(runs=1),
+                config=helpers.config_payload(ceiling=50, runs=1),
                 gate=helpers.gate_payload(),
             )
             with self.assertRaises(LiveConfigRefusedError) as caught:

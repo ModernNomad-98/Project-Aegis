@@ -23,10 +23,12 @@
 # Cost containment (layered, fail-closed):
 #   1. the committed smoke config template sets spend_ceiling_cents 50; this
 #      workflow rebuilds it with min(template, gate ceiling, provider cap,
-#      5000-cent smoke cap) and validates it with the package validator;
-#   2. the package meter clamps the smoke ceiling to min(effective, 5000) and
+#      50-cent ($0.50 = 50 integer cents) smoke cap, and REFUSES a template
+#      above 50 cents rather than clamping it) and validates it with the package
+#      validator;
+#   2. the package meter clamps the smoke ceiling to min(effective, 50) and
 #      refuses the next reservation that would cross the ceiling;
-#   3. the verify step fails closed unless spent_cents <= ceiling_cents <= 5000
+#   3. the verify step fails closed unless spent_cents <= ceiling_cents <= 50
 #      and the ledger shows exactly two reconciled calls.
 #
 # Fail-closed surface: no artifact is published unless the smoke COMPLETED with
@@ -209,6 +211,13 @@ jobs:
           template_ceiling = config_payload.get("spend_ceiling_cents")
           if type(template_ceiling) is not int or template_ceiling <= 0:
               fail("the smoke config has no positive integer spend ceiling")
+          if template_ceiling > SMOKE_CEILING_CENTS:
+              # The cap is 50 integer cents ($0.50), not a clamp target: a
+              # 51-cent template is refused before any plan or call exists.
+              fail(
+                  "the smoke config spend ceiling is above the 50-cent ($0.50) "
+                  f"hard cap: {template_ceiling} cents"
+              )
           effective_ceiling = min(
               template_ceiling,
               staged_gate.spend_ceiling_cents,
@@ -225,7 +234,7 @@ jobs:
           if config.spend_ceiling_cents != effective_ceiling:
               fail("the built smoke ceiling is not the effective smoke ceiling")
           if config.spend_ceiling_cents > SMOKE_CEILING_CENTS:
-              fail("the built smoke ceiling exceeds the 5000-cent smoke cap")
+              fail("the built smoke ceiling exceeds the 50-cent ($0.50) smoke cap")
           if config.max_output_tokens < MIN_LIVE_MAX_OUTPUT_TOKENS:
               fail("the built smoke output budget is below the live floor")
           if config.runs_per_case != 1:
@@ -428,9 +437,14 @@ jobs:
           import hashlib
           import json
           import os
+          import sys
           from pathlib import Path
 
           RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          sys.path.insert(0, os.environ["GITHUB_WORKSPACE"])
+          from tools.behavioral_eval_runner.live.config import (  # noqa: E402
+              SMOKE_CEILING_CENTS,
+          )
           result = json.loads(
               (RUNNER_TEMP / "ber-smoke-run.json").read_text(encoding="utf-8")
           )
@@ -486,7 +500,10 @@ jobs:
           spent = result.get("spent_cents")
           ceiling = result.get("ceiling_cents")
           require(type(spent) is int and spent >= 0, "spent_cents is not a non-negative int")
-          require(type(ceiling) is int and 0 < ceiling <= 5000, "ceiling_cents is outside the 5000-cent smoke cap")
+          require(
+              type(ceiling) is int and 0 < ceiling <= SMOKE_CEILING_CENTS,
+              "ceiling_cents is outside the 50-cent ($0.50) smoke cap",
+          )
           require(type(spent) is int and type(ceiling) is int and spent <= ceiling, "spent exceeds the smoke ceiling")
           require(ceiling == plan["spend_ceiling_cents"], "the smoke ceiling is not the built smoke ceiling")
           require(smoke.get("spent_cents") == spent, "the smoke record spend differs from the summary")
