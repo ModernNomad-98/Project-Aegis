@@ -154,7 +154,11 @@ class RealGatePathTests(unittest.TestCase):
     def test_real_gate_without_keys_fails_closed_before_any_transport(self):
         calls: list[str] = []
         with tempfile.TemporaryDirectory() as tmp:
-            paths = _paths(tmp, gate=helpers.gate_payload(fact_origin="REAL_HOST"))
+            paths = _paths(
+                tmp,
+                config=helpers.live_config_payload(),
+                gate=helpers.gate_payload(fact_origin="REAL_HOST"),
+            )
             with self.assertRaises(MissingCredentialError) as caught:
                 live_run(
                     paths,
@@ -174,7 +178,10 @@ class RealGatePathTests(unittest.TestCase):
         }
         with tempfile.TemporaryDirectory() as tmp:
             paths = _paths(
-                tmp, gate=helpers.gate_payload(fact_origin="REAL_HOST"), run_id="real-gate"
+                tmp,
+                config=helpers.live_config_payload(),
+                gate=helpers.gate_payload(fact_origin="REAL_HOST"),
+                run_id="real-gate",
             )
             result = live_run(
                 paths,
@@ -212,7 +219,7 @@ class RealGatePathTests(unittest.TestCase):
 
 class CredentialUnionTests(unittest.TestCase):
     def test_single_subject_vendor_still_requires_the_judge_vendor_key(self):
-        config = helpers.config_payload()
+        config = helpers.live_config_payload()
         config["subject_vendors"] = ["anthropic"]
         with tempfile.TemporaryDirectory() as tmp:
             paths = _paths(
@@ -286,7 +293,11 @@ class ConfigStrictnessTests(unittest.TestCase):
 class ProvenanceBindingTests(unittest.TestCase):
     def test_live_run_refuses_a_revision_that_is_not_the_checkout(self):
         with tempfile.TemporaryDirectory() as tmp:
-            paths = _paths(tmp, gate=helpers.gate_payload(fact_origin="REAL_HOST"))
+            paths = _paths(
+                tmp,
+                config=helpers.live_config_payload(),
+                gate=helpers.gate_payload(fact_origin="REAL_HOST"),
+            )
             with self.assertRaises(LiveGateRefusedError) as caught:
                 live_run(
                     paths,
@@ -359,7 +370,7 @@ class MalformedConfigTests(unittest.TestCase):
 
 class SingleVendorTests(unittest.TestCase):
     def test_single_vendor_config_needs_only_its_own_judge_allowlisted(self):
-        config = helpers.config_payload()
+        config = helpers.live_config_payload()
         config["subject_vendors"] = ["anthropic"]
         config["judge_allowlist"] = {"judge_models": [{"vendor": "openai", "model": "gpt-6-astra"}]}
         with tempfile.TemporaryDirectory() as tmp:

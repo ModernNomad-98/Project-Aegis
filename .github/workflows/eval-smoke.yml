@@ -1,0 +1,592 @@
+# AEGIS-APR-161 / Pilot A fix (owner directive 2026-10-30 16:43/16:48 PDT) -
+# the single-case live smoke gate.
+#
+# What this workflow is for. The first Pilot A live dispatch halted fail-closed
+# after one call ($0.08) because it reused the build-only dry-run config
+# template (max_output_tokens 512), which had never been reviewed as a live
+# setting. Preflight makes no call by design, so it could not catch this. This
+# workflow is the REQUIRED gate before any full Pilot A dispatch: it spends on
+# exactly two calls and proves the judge completes against a real subject
+# response.
+#
+# Shape (fixed, no dispatch inputs):
+#   * one committed case (the first case of the frozen 20-case dataset,
+#     deterministic by case_id);
+#   * one arm (WITH_SKILL);
+#   * one run;
+#   * one subject vendor (anthropic) and its pinned cross-vendor judge
+#     (openai/gpt-6-astra);
+#   * exactly ONE subject call and ONE judge call, recorded as planned_calls 2.
+# The full-data run (eval-run.yml) refuses to start until a passing proof from
+# this workflow exists at the SAME exact head SHA.
+#
+# Cost containment (layered, fail-closed):
+#   1. the committed smoke config template sets spend_ceiling_cents 50; this
+#      workflow rebuilds it with min(template, gate ceiling, provider cap,
+#      5000-cent smoke cap) and validates it with the package validator;
+#   2. the package meter clamps the smoke ceiling to min(effective, 5000) and
+#      refuses the next reservation that would cross the ceiling;
+#   3. the verify step fails closed unless spent_cents <= ceiling_cents <= 5000
+#      and the ledger shows exactly two reconciled calls.
+#
+# Fail-closed surface: no artifact is published unless the smoke COMPLETED with
+# a PASS/FAIL rule state, the judge returned a complete terminal finish reason,
+# the evidence bundle verified, and the spend stayed inside the cap. A failed
+# smoke uploads nothing, so the full-dispatch gate cannot be satisfied by a
+# partial run.
+#
+# Secret containment: ANTHROPIC_API_KEY and OPENAI_API_KEY are mapped only in
+# the single env: block of the smoke run step, are never printed, and no
+# environment dump, shell tracing or key-file read exists anywhere here.
+#
+# Authority/limits: workflow_dispatch only; no push, pull_request, schedule or
+# workflow_run trigger; no repository write, merge, tag, release, settings or
+# protection change; no dispatch of another workflow. The workflow itself
+# dispatches nothing - it only proves the setting. The author of the fix PR
+# does not dispatch it.
+name: eval-smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  eval-smoke:
+    name: eval-smoke
+    runs-on: ubuntu-latest
+    # The same environment that holds the two provider keys for eval-run.
+    environment: eval-run
+    timeout-minutes: 30
+
+    # Serialize with eval-run so two spend-bearing dispatches cannot overlap.
+    # This edits no state and stores no state.
+    concurrency:
+      group: eval-run
+      cancel-in-progress: false
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONIOENCODING: utf-8
+      NoDefaultCurrentDirectoryInExePath: "1"
+      # Fixed repository-relative inputs. There are no dispatch inputs: the
+      # smoke shape and the setting it proves must not be operator-selectable.
+      GATE_TEMPLATE_PATH: tools/behavioral_eval_runner/live/gates/pilot-a-apr161.json
+      CONFIG_TEMPLATE_PATH: tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json
+      CASES_PATH: tools/behavioral_eval_runner/live/pilot-a/cases
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.14"
+
+      - name: Install hash-locked dependencies
+        run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
+
+      - name: Stage and verify the single-case smoke settings
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          DISPATCH_SHA = os.environ["GITHUB_SHA"].strip()
+          sys.path.insert(0, str(WORKSPACE))
+
+          from tools.behavioral_eval_runner.live.config import (  # noqa: E402
+              JUDGE_PINS,
+              MIN_LIVE_MAX_OUTPUT_TOKENS,
+              OWNER_PILOT_CEILING_CENTS,
+              SMOKE_CEILING_CENTS,
+              SUBJECT_PINS,
+              LiveConfig,
+          )
+          from tools.behavioral_eval_runner.live.dataset import (  # noqa: E402
+              dataset_digest,
+              load_cases,
+          )
+          from tools.behavioral_eval_runner.live.gate import (  # noqa: E402
+              OwnerGateRecord,
+          )
+
+          def fail(message: str) -> None:
+              print("REFUSED: " + message, flush=True)
+              raise SystemExit(1)
+
+          def tracked(relative: str) -> Path:
+              completed = subprocess.run(
+                  ["git", "ls-files", "--error-unmatch", "--", relative],
+                  cwd=WORKSPACE,
+                  capture_output=True,
+                  text=True,
+              )
+              if completed.returncode != 0:
+                  fail("path is not tracked in the dispatched checkout: " + relative)
+              return WORKSPACE / relative
+
+          gate_template_path = tracked(os.environ["GATE_TEMPLATE_PATH"])
+          config_template_path = tracked(os.environ["CONFIG_TEMPLATE_PATH"])
+          cases_root = WORKSPACE / os.environ["CASES_PATH"]
+          if not cases_root.is_dir():
+              fail("the committed cases root is not a directory")
+          for name in sorted(os.listdir(cases_root)):
+              case_dir = cases_root / name
+              if case_dir.is_dir():
+                  tracked(os.environ["CASES_PATH"] + "/" + name + "/case.json")
+
+          try:
+              gate_payload = json.loads(gate_template_path.read_text(encoding="utf-8"))
+          except (OSError, ValueError) as exc:
+              fail("the committed gate template is not readable JSON: " + type(exc).__name__)
+          if not isinstance(gate_payload, dict):
+              fail("the committed gate template must be a JSON object")
+          dataset = gate_payload.get("dataset")
+          if not isinstance(dataset, dict):
+              fail("the committed gate template has no dataset object")
+          if dataset.get("revision") != "0" * 40:
+              fail("the committed gate template must carry the 40-zero revision placeholder")
+          try:
+              gate_template = OwnerGateRecord.from_dict(gate_payload)
+          except Exception as exc:  # noqa: BLE001 - the package refusal is the gate
+              fail("the committed gate template is not a valid owner gate: " + type(exc).__name__)
+          if gate_template.fact_origin != "REAL_HOST":
+              fail("the committed gate template must be a REAL_HOST owner gate")
+          if gate_template.dataset_path != os.environ["CASES_PATH"]:
+              fail("the cases path is not the gate template dataset.path")
+
+          cases = load_cases(str(cases_root))
+          frozen_digest = dataset_digest(cases)
+          if frozen_digest != gate_template.dataset_sha256:
+              fail("the committed cases do not reproduce the gate dataset digest")
+          if len(cases) != gate_template.case_count:
+              fail("the committed case count is not the gate case count")
+
+          # Stage the one field that is only knowable at dispatch: the revision.
+          staged_payload = json.loads(gate_template_path.read_text(encoding="utf-8"))
+          staged_payload["dataset"]["revision"] = DISPATCH_SHA
+          staged_path = RUNNER_TEMP / "live-smoke-gate.json"
+          staged_path.write_text(
+              json.dumps(staged_payload, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          staged_gate = OwnerGateRecord.from_dict(
+              json.loads(staged_path.read_text(encoding="utf-8"))
+          )
+
+          # Rebuild the committed smoke config with the binding ceiling and
+          # validate it with the package validator; nothing is hand-accepted.
+          try:
+              config_payload = json.loads(config_template_path.read_text(encoding="utf-8"))
+          except (OSError, ValueError) as exc:
+              fail("the committed smoke config is not readable JSON: " + type(exc).__name__)
+          if not isinstance(config_payload, dict):
+              fail("the committed smoke config must be a JSON object")
+          raw_max = config_payload.get("max_output_tokens")
+          if type(raw_max) is not int or raw_max < MIN_LIVE_MAX_OUTPUT_TOKENS:
+              fail(
+                  "the smoke config max_output_tokens is below the live-setting "
+                  f"floor {MIN_LIVE_MAX_OUTPUT_TOKENS}: {raw_max!r}"
+              )
+          template_ceiling = config_payload.get("spend_ceiling_cents")
+          if type(template_ceiling) is not int or template_ceiling <= 0:
+              fail("the smoke config has no positive integer spend ceiling")
+          effective_ceiling = min(
+              template_ceiling,
+              staged_gate.spend_ceiling_cents,
+              staged_gate.provider_cap_cents,
+              OWNER_PILOT_CEILING_CENTS,
+              SMOKE_CEILING_CENTS,
+          )
+          config_payload["spend_ceiling_cents"] = effective_ceiling
+          try:
+              config = LiveConfig.from_dict(config_payload)
+              config.validate()
+          except Exception as exc:  # noqa: BLE001 - the package refusal is the gate
+              fail("the rebuilt smoke config is invalid: " + type(exc).__name__)
+          if config.spend_ceiling_cents != effective_ceiling:
+              fail("the built smoke ceiling is not the effective smoke ceiling")
+          if config.spend_ceiling_cents > SMOKE_CEILING_CENTS:
+              fail("the built smoke ceiling exceeds the 5000-cent smoke cap")
+          if config.max_output_tokens < MIN_LIVE_MAX_OUTPUT_TOKENS:
+              fail("the built smoke output budget is below the live floor")
+          if config.runs_per_case != 1:
+              fail("the smoke config must set runs_per_case 1")
+          if len(config.subject_vendors) != 1:
+              fail("the smoke config must name exactly one subject vendor")
+          subject_vendor = config.subject_vendors[0]
+          judge_route = JUDGE_PINS.get(
+              (subject_vendor, SUBJECT_PINS[subject_vendor].model)
+          )
+          if judge_route is None:
+              fail("the smoke subject has no pinned cross-vendor judge route")
+          if config.judge_allowlist.entries != ((judge_route.vendor, judge_route.model),):
+              fail("the smoke config allowlist must be exactly its pinned judge")
+
+          built_config_path = RUNNER_TEMP / "live-smoke-config.json"
+          built_config_path.write_text(
+              json.dumps(config.to_dict(), indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          plan = {
+              "schema": "ber-live-smoke-plan/1.0.0",
+              "dispatch_sha": DISPATCH_SHA,
+              "gate_template_path": os.environ["GATE_TEMPLATE_PATH"],
+              "gate_template_sha256": hashlib.sha256(
+                  gate_template_path.read_bytes()
+              ).hexdigest(),
+              "staged_gate_path": str(staged_path),
+              "staged_gate_sha256": hashlib.sha256(staged_path.read_bytes()).hexdigest(),
+              "staged_gate_digest": staged_gate.digest(),
+              "gate_id": staged_gate.gate_id,
+              "dataset_path": staged_gate.dataset_path,
+              "dataset_sha256": frozen_digest,
+              "case_count": len(cases),
+              "first_case_id": cases[0].case_id,
+              "config_template_path": os.environ["CONFIG_TEMPLATE_PATH"],
+              "config_template_sha256": hashlib.sha256(
+                  config_template_path.read_bytes()
+              ).hexdigest(),
+              "built_config_path": str(built_config_path),
+              "built_config_sha256": hashlib.sha256(
+                  built_config_path.read_bytes()
+              ).hexdigest(),
+              "max_output_tokens": config.max_output_tokens,
+              "min_live_max_output_tokens": MIN_LIVE_MAX_OUTPUT_TOKENS,
+              "spend_ceiling_cents": config.spend_ceiling_cents,
+              "smoke_ceiling_cents_cap": SMOKE_CEILING_CENTS,
+              "runs_per_case": config.runs_per_case,
+              "subject_vendor": subject_vendor,
+              "judge_vendor": judge_route.vendor,
+              "judge_model": judge_route.model,
+              "planned_calls": 2,
+          }
+          (RUNNER_TEMP / "ber-smoke-plan.json").write_text(
+              json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          structure = {
+              "config": str(built_config_path),
+              "schema_version": config.schema_version,
+              "max_output_tokens": config.max_output_tokens,
+              "spend_ceiling_cents": config.spend_ceiling_cents,
+              "smoke_ceiling_cents_cap": SMOKE_CEILING_CENTS,
+              "runs_per_case": config.runs_per_case,
+              "subject_vendors": list(config.subject_vendors),
+              "judge_allowlist": config.judge_allowlist.to_dict(),
+              "gate_id": staged_gate.gate_id,
+              "gate_origin": staged_gate.fact_origin,
+              "staged_gate_revision": staged_gate.dataset_revision,
+              "dataset_sha256": frozen_digest,
+              "case_count": len(cases),
+              "planned_calls": plan["planned_calls"],
+              "secret_values_emitted": False,
+          }
+          print(json.dumps(structure, indent=2, sort_keys=True))
+          PY
+
+      - name: Offline preflight of the staged smoke (no call; fail closed)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          python -P -m tools.behavioral_eval_runner live-preflight \
+            --smoke \
+            --config "$RUNNER_TEMP/live-smoke-config.json" \
+            --gate "$RUNNER_TEMP/live-smoke-gate.json" \
+            --cases "$CASES_PATH" \
+            --repo-root "$GITHUB_WORKSPACE" \
+            --expected-revision "$GITHUB_SHA" \
+            | tee "$RUNNER_TEMP/ber-smoke-preflight.json"
+          python -P - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          report = json.loads(
+              (RUNNER_TEMP / "ber-smoke-preflight.json").read_text(encoding="utf-8")
+          )
+          plan = json.loads(
+              (RUNNER_TEMP / "ber-smoke-plan.json").read_text(encoding="utf-8")
+          )
+          dispatch_sha = os.environ["GITHUB_SHA"].strip()
+          gate = report.get("gate") or {}
+          dataset = report.get("dataset") or {}
+          settings = report.get("live_settings") or {}
+          failures = []
+          if report.get("status") not in {"READY", "READY_NEEDS_KEYS"}:
+              failures.append("preflight status is " + repr(report.get("status")))
+          if report.get("blockers"):
+              failures.append("preflight reported blockers")
+          if report.get("network_calls") != 0:
+              failures.append("preflight reported a network call")
+          if report.get("checkout_revision") != dispatch_sha:
+              failures.append("the checkout revision is not the dispatched commit")
+          if gate.get("dataset_revision") != dispatch_sha:
+              failures.append("the staged gate revision is not the dispatched commit")
+          if gate.get("digest") != plan["staged_gate_digest"]:
+              failures.append("the preflight gate digest is not the staged record digest")
+          if dataset.get("digest") != plan["dataset_sha256"]:
+              failures.append("the preflight dataset digest is not the frozen digest")
+          if dataset.get("case_count") != plan["case_count"]:
+              failures.append("the preflight case count is not the frozen count")
+          if report.get("planned_calls") != 2:
+              failures.append("the preflight planned calls is not the smoke two calls")
+          effective = report.get("effective_ceiling_cents")
+          if effective != plan["spend_ceiling_cents"]:
+              failures.append("the preflight effective ceiling is not the smoke ceiling")
+          if not (type(effective) is int and effective <= plan["smoke_ceiling_cents_cap"]):
+              failures.append("the preflight effective ceiling exceeds the smoke cap")
+          if settings.get("max_output_tokens") != plan["max_output_tokens"]:
+              failures.append("the preflight output budget is not the smoke config value")
+          if settings.get("max_output_tokens_floor") != plan["min_live_max_output_tokens"]:
+              failures.append("the preflight output floor is not the live floor")
+          if settings.get("config_source_is_build_only_dry_run_template") is not False:
+              failures.append("the smoke config is sourced from the build-only dry-run template")
+          proof = {
+              "status": report.get("status"),
+              "checkout_revision": report.get("checkout_revision"),
+              "gate_dataset_revision": gate.get("dataset_revision"),
+              "staged_gate_digest": gate.get("digest"),
+              "dataset_sha256": dataset.get("digest"),
+              "case_count": dataset.get("case_count"),
+              "planned_calls": report.get("planned_calls"),
+              "effective_ceiling_cents": report.get("effective_ceiling_cents"),
+              "max_output_tokens": settings.get("max_output_tokens"),
+              "max_output_tokens_floor": settings.get("max_output_tokens_floor"),
+              "network_calls": report.get("network_calls"),
+              "failures": failures,
+          }
+          print(json.dumps(proof, indent=2, sort_keys=True))
+          if failures:
+              raise SystemExit(1)
+          PY
+
+      - name: Run the single-case live smoke (one subject call + one judge call)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          set -uo pipefail
+          code=0
+          python -P -m tools.behavioral_eval_runner live-run \
+            --smoke \
+            --config "$RUNNER_TEMP/live-smoke-config.json" \
+            --gate "$RUNNER_TEMP/live-smoke-gate.json" \
+            --cases "$CASES_PATH" \
+            --repo-root "$GITHUB_WORKSPACE" \
+            --evidence-root "$RUNNER_TEMP/ber-smoke-evidence" \
+            --cost-ledger "$RUNNER_TEMP/ber-smoke-ledger.json" \
+            --run-id "ber-live-smoke-$GITHUB_RUN_ID" \
+            > "$RUNNER_TEMP/ber-smoke-run.json" || code=$?
+          echo "live-run smoke exit code: $code"
+          if [ "$code" -ne 0 ]; then
+            python -P - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          path = Path(os.environ["RUNNER_TEMP"]) / "ber-smoke-run.json"
+          try:
+              payload = json.loads(path.read_text(encoding="utf-8"))
+          except (OSError, ValueError):
+              payload = {}
+          print(json.dumps({
+              "status": payload.get("status"),
+              "halt_reason_code": payload.get("halt_reason_code"),
+              "dispatched_calls": payload.get("dispatched_calls"),
+              "spent_cents": payload.get("spent_cents"),
+          }, indent=2, sort_keys=True))
+          PY
+            echo "SMOKE FAILED fail-closed: the package did not complete the run" >&2
+            exit 1
+          fi
+      - name: Verify the smoke and publish the proof artifact
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import datetime as dt
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          result = json.loads(
+              (RUNNER_TEMP / "ber-smoke-run.json").read_text(encoding="utf-8")
+          )
+          plan = json.loads(
+              (RUNNER_TEMP / "ber-smoke-plan.json").read_text(encoding="utf-8")
+          )
+          evidence_dir = RUNNER_TEMP / "ber-smoke-evidence"
+          final_report = json.loads(
+              (evidence_dir / "final_report.json").read_text(encoding="utf-8")
+          )
+          results = json.loads(
+              (evidence_dir / "results.json").read_text(encoding="utf-8")
+          )["results"]
+          ledger = json.loads(
+              (RUNNER_TEMP / "ber-smoke-ledger.json").read_text(encoding="utf-8")
+          )
+          dispatch_sha = os.environ["GITHUB_SHA"].strip()
+          complete_stop_reasons = {"end_turn", "stop_sequence", "completed"}
+          failures = []
+
+          def require(condition, message):
+              if not condition:
+                  failures.append(message)
+
+          smoke = result.get("smoke") or {}
+          require(result.get("status") == "COMPLETED", "the run did not COMPLETE")
+          require(result.get("planned_calls") == 2, "planned_calls is not 2")
+          require(result.get("dispatched_calls") == 2, "dispatched_calls is not 2")
+          require(result.get("transport_class") == "VENDOR_SDK", "the transport is not the vendor SDK")
+          require(result.get("fact_origin") == "REAL_HOST", "the run is not a real-host run")
+          require(result.get("gate_id") == plan["gate_id"], "the run gate id differs from the plan")
+          require(len(results) == 1, "the smoke did not return exactly one result record")
+          record = results[0] if results else {}
+          require(record.get("result_state") in {"PASS", "FAIL"}, "the smoke has no rule state")
+          require(record.get("citability") == "REAL_HOST", "the smoke result is not citable real-host evidence")
+          require(record.get("case_id") == plan["first_case_id"], "the smoke case is not the first committed case")
+          subject = record.get("subject") or {}
+          judge = record.get("judge") or {}
+          require(subject.get("stop_reason") in complete_stop_reasons, "the subject finish reason is not complete")
+          require(judge.get("stop_reason") in complete_stop_reasons, "the JUDGE finish reason is not complete or missing")
+          require(isinstance(judge.get("verdict"), dict), "the judge returned no verdict")
+          require("judge_error_kind" not in judge, "the judge returned an error instead of a verdict")
+          require("text" not in subject and "text" not in judge, "a raw transcript leaked into the record")
+          require(smoke.get("enabled") is True, "the summary does not carry the smoke record")
+          require(smoke.get("planned_calls") == 2, "the smoke record planned_calls is not 2")
+          require(smoke.get("dispatched_calls") == 2, "the smoke record dispatched_calls is not 2")
+          require(smoke.get("subject_calls") == 1, "the smoke did not make exactly one subject call")
+          require(smoke.get("judge_calls") == 1, "the smoke did not make exactly one judge call")
+          require(
+              smoke.get("judge_finish_reasons") == [judge.get("stop_reason")],
+              "the smoke record does not carry the judge finish reason",
+          )
+          spent = result.get("spent_cents")
+          ceiling = result.get("ceiling_cents")
+          require(type(spent) is int and spent >= 0, "spent_cents is not a non-negative int")
+          require(type(ceiling) is int and 0 < ceiling <= 5000, "ceiling_cents is outside the 5000-cent smoke cap")
+          require(type(spent) is int and type(ceiling) is int and spent <= ceiling, "spent exceeds the smoke ceiling")
+          require(ceiling == plan["spend_ceiling_cents"], "the smoke ceiling is not the built smoke ceiling")
+          require(smoke.get("spent_cents") == spent, "the smoke record spend differs from the summary")
+          require(smoke.get("ceiling_cents") == ceiling, "the smoke record ceiling differs from the summary")
+          evidence = result.get("evidence") or {}
+          require(evidence.get("verified") is True, "the evidence bundle did not verify")
+          require(result.get("raw_transcripts_included") is False, "the summary claims raw transcripts")
+          smoke_report = final_report.get("smoke") or {}
+          require(
+              smoke_report.get("judge_finish_reasons") == [judge.get("stop_reason")],
+              "the evidence final report does not carry the judge finish reason",
+          )
+          retained_judge = (results[0].get("judge") if results else {}) or {}
+          require(
+              retained_judge.get("stop_reason") == judge.get("stop_reason"),
+              "the retained results evidence does not carry the judge finish reason",
+          )
+          require(ledger.get("ledger_kind") == "ber-live-cost-ledger", "the cost ledger is not the live ledger")
+          require(ledger.get("halt") is None, "the cost ledger records a halt")
+          calls = ledger.get("calls") or []
+          require(len(calls) == 2, "the cost ledger does not show exactly two calls")
+          require(all(entry.get("reconciled") is True for entry in calls), "the cost ledger has an unreconciled call")
+          require(all(entry.get("pinned_match") is True for entry in calls), "a served model did not match its pin")
+          require(
+              sum(entry.get("cost_cents") or 0 for entry in calls) == spent,
+              "the cost ledger total is not the summary spend",
+          )
+          require(ledger.get("ceiling_cents") == ceiling, "the ledger ceiling is not the smoke ceiling")
+
+          proof = {
+              "schema": "ber-live-smoke-proof/1.0.0",
+              "status": "PASS" if not failures else "FAIL",
+              "created_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "required_gate_before_full_pilot_a": True,
+              "head_sha": dispatch_sha,
+              "workflow": "eval-smoke",
+              "workflow_run_id": os.environ.get("GITHUB_RUN_ID"),
+              "workflow_run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "workflow_ref": os.environ.get("GITHUB_REF"),
+              "gate_id": plan["gate_id"],
+              "gate_template_path": plan["gate_template_path"],
+              "gate_template_sha256": plan["gate_template_sha256"],
+              "staged_gate_sha256": plan["staged_gate_sha256"],
+              "staged_gate_revision": dispatch_sha,
+              "dataset_path": plan["dataset_path"],
+              "dataset_sha256": plan["dataset_sha256"],
+              "case_count": plan["case_count"],
+              "config_template_path": plan["config_template_path"],
+              "config_template_sha256": plan["config_template_sha256"],
+              "built_config_sha256": plan["built_config_sha256"],
+              "max_output_tokens": plan["max_output_tokens"],
+              "min_live_max_output_tokens": plan["min_live_max_output_tokens"],
+              "case_id": plan["first_case_id"],
+              "arm": record.get("arm"),
+              "run_index": record.get("run_index"),
+              "subject_vendor": plan["subject_vendor"],
+              "judge_vendor": plan["judge_vendor"],
+              "judge_model": plan["judge_model"],
+              "planned_calls": 2,
+              "dispatched_calls": result.get("dispatched_calls"),
+              "subject_calls": smoke.get("subject_calls"),
+              "judge_calls": smoke.get("judge_calls"),
+              "subject_stop_reason": subject.get("stop_reason"),
+              "judge_finish_reason": judge.get("stop_reason"),
+              "judge_verdict": (judge.get("verdict") or {}).get("verdict"),
+              "result_state": record.get("result_state"),
+              "citability": record.get("citability"),
+              "spent_cents": spent,
+              "ceiling_cents": ceiling,
+              "evidence": {
+                  "final_report_sha256": evidence.get("final_report_sha256"),
+                  "final_evidence_manifest_sha256": evidence.get("final_evidence_manifest_sha256"),
+                  "input_evidence_manifest_sha256": evidence.get("input_evidence_manifest_sha256"),
+                  "verified": evidence.get("verified"),
+              },
+              "raw_transcripts_included": False,
+              "secret_values_emitted": False,
+              "failures": failures,
+          }
+          proof["proof_sha256"] = hashlib.sha256(
+              json.dumps({k: v for k, v in proof.items() if k != "proof_sha256"},
+                         sort_keys=True, separators=(",", ":")).encode("utf-8")
+          ).hexdigest()
+          out_dir = RUNNER_TEMP / "ber-smoke-proof"
+          out_dir.mkdir(parents=True, exist_ok=True)
+          (out_dir / "smoke-proof.json").write_text(
+              json.dumps(proof, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          print(json.dumps(proof, indent=2, sort_keys=True))
+          if failures:
+              print("SMOKE PROOF REFUSED: " + "; ".join(failures), flush=True)
+              raise SystemExit(1)
+          PY
+
+      - name: Upload the single-case live smoke proof
+        if: success()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-live-smoke-proof
+          path: ${{ runner.temp }}/ber-smoke-proof/
+          retention-days: 14
+          if-no-files-found: error
+

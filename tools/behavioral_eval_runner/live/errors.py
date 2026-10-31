@@ -42,6 +42,19 @@ class LiveGateRefusedError(LiveError):
     reason_code = "LIVE_GATE_REFUSED"
 
 
+class LiveConfigRefusedError(LiveError):
+    """A live verb refused the configuration before any call.
+
+    Used for the two fail-closed live-setting guards: a build-only dry-run
+    config source (reason code DRY_RUN_CONFIG_REFUSED) and an output budget
+    below the live floor (reason code LIVE_OUTPUT_TOKENS_TOO_LOW). The specific
+    reason code is passed by the raiser so the caller can halt on the exact
+    boundary that broke.
+    """
+
+    reason_code = "LIVE_CONFIG_REFUSED"
+
+
 class MissingCredentialError(LiveError):
     """A required credential environment variable is absent: fail closed."""
 

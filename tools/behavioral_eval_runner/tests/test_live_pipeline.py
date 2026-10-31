@@ -140,7 +140,11 @@ class DryRunEndToEndTests(unittest.TestCase):
 class OperationGuardTests(unittest.TestCase):
     def test_partial_transport_factory_injection_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp:
-            paths = helpers.make_paths(tmp, gate=helpers.gate_payload(fact_origin="REAL_HOST"))
+            paths = helpers.make_paths(
+                tmp,
+                config=helpers.live_config_payload(),
+                gate=helpers.gate_payload(fact_origin="REAL_HOST"),
+            )
             environ = {
                 "ANTHROPIC_API_KEY": helpers.FAKE_ANTHROPIC_KEY,
                 "OPENAI_API_KEY": helpers.FAKE_OPENAI_KEY,

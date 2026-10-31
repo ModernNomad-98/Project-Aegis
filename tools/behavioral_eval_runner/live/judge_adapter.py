@@ -84,6 +84,10 @@ class JudgeResult:
     usage: ProviderUsage
     verdict: LiveVerdict | None
     judge_error_kind: str | None
+    #: The judge provider terminal finish reason (normalized transport field).
+    #: Recorded in the run record/evidence so a smoke proves the JUDGE finished,
+    #: not only that the subject did.
+    stop_reason: str = "UNKNOWN"
 
     @property
     def is_verdict(self) -> bool:
@@ -96,6 +100,7 @@ class JudgeResult:
             "served_model": self.served_model,
             "response_sha256": self.response_sha256,
             "usage": self.usage.to_dict(),
+            "stop_reason": self.stop_reason,
         }
         if self.verdict is not None:
             record["verdict"] = self.verdict.to_dict()
@@ -300,6 +305,7 @@ class JudgeAdapter:
             usage=response.usage,
             verdict=verdict,
             judge_error_kind=error_kind,
+            stop_reason=response.stop_reason,
         )
 
     def capability_report(self) -> Mapping[str, Any]:

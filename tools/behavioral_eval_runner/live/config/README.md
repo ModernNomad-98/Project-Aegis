@@ -1,0 +1,68 @@
+# Gated live configuration templates
+
+This directory holds the JSON runtime configuration templates for the gated
+Behavioral Eval Runner (BER) live package. A template is a *setting record*, not
+a bill: the package validates it, the committed owner gate bounds it, and the
+cost meter enforces the smallest of the config ceiling, the gate ceiling and the
+provider cap in integer cents before every call.
+
+## The templates
+
+| File | Used by | Spend class | `max_output_tokens` | Ceiling | Shape |
+| --- | --- | --- | --- | --- | --- |
+| `dry-run-config.json` | `live-dry-run` (synthetic gate, mock transport) | build-only / no-spend | 512 | 15000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
+| `pilot-a-live-config.json` | `eval-run` full Pilot A dispatch | live | 4096 | 12000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
+| `pilot-a-smoke-config.json` | `eval-smoke` single-case gate | live | 4096 | 50 cents ($0.50 hard cap) | one case, one arm, one run, one vendor |
+
+## Build-only and live settings are different classes
+
+A template authored for a build-only or dry-run package has **never** had its
+spend-affecting values reviewed as live settings. The 2026-10-30 Pilot A
+failure is the proof: the first live dispatch reused the build-only
+`dry-run-config.json` with `max_output_tokens` 512, the subject response was
+truncated at the provider stop reason, and the run halted fail-closed after one
+call ($0.08). Preflight made no call by design, so it could not catch this.
+
+Two independent guards now fail closed before any credential is resolved or any
+call is reserved (`live/pipeline.py`):
+
+1. a live verb refuses the build-only dry-run template **by resolved path and by
+   the `dry-run-config.json` filename** (`DRY_RUN_CONFIG_REFUSED`);
+2. a live verb refuses any config whose `max_output_tokens` is below
+   `MIN_LIVE_MAX_OUTPUT_TOKENS` = 4096 (`LIVE_OUTPUT_TOKENS_TOO_LOW`). The floor
+   also catches a renamed or staged copy of a build-only template.
+
+## Required live-setting review before the first live dispatch
+
+Any file merged under a build-only/no-spend label and later referenced by a live
+dispatch must receive a fresh **live-setting review** before that first dispatch.
+Preflight does not satisfy this review, because preflight makes no call.
+
+A review record must contain:
+
+- the named reviewer (a fresh independent reviewer, not the author);
+- the review date and the exact 40-character candidate head SHA;
+- every reviewed config path with its sha256 and its source class;
+- an explicit **PASS or REVISE on each spend-affecting value**, never a single
+  overall PASS;
+- the reasoning that binds the values to the unchanged owner caps;
+- the reviewer signature/disposition.
+
+The spend-affecting values are:
+
+`spend_ceiling_cents`, `max_output_tokens`, `runs_per_case`, `subject_vendors`
+(the number of billed subject routes), `max_input_bytes`,
+`request_timeout_seconds`, the `judge_allowlist` entries (which vendor/model is
+allowed to be billed as a judge), and the pinned model/price table the config
+round-trips against (`price_table`, `owner_limits`).
+
+## Required gate before a full Pilot A dispatch
+
+`eval-smoke` (`.github/workflows/eval-smoke.yml`, `workflow_dispatch` only) runs
+exactly one subject call and one judge call on one committed case, hard-capped
+at 5000 cents, and publishes a proof artifact only when the judge finishes
+(judge terminal finish reason recorded in the run evidence). A full Pilot A
+`eval-run` dispatch is required to run only after `eval-smoke` passed on the
+same exact head; the full dispatch refuses when no passing proof at that head
+exists.
+

@@ -224,6 +224,8 @@ jobs:
           sys.path.insert(0, str(WORKSPACE))
 
           from tools.behavioral_eval_runner.live.config import (  # noqa: E402
+              DRY_RUN_CONFIG_TEMPLATE_RELPATH,
+              MIN_LIVE_MAX_OUTPUT_TOKENS,
               OWNER_PILOT_CEILING_CENTS,
               OWNER_PROVIDER_CAP_CENTS,
               LiveConfig,
@@ -346,6 +348,34 @@ jobs:
               fail(f"the config template is not readable JSON: {type(exc).__name__}")
           if not isinstance(template, dict):
               fail("the config template must be a JSON object")
+
+          # A build-only/no-spend template is never a live setting. The first
+          # Pilot A live dispatch (run 41145221349) halted fail-closed after one
+          # call because the committed dry-run template was reused live with
+          # max_output_tokens 512. Refuse the SOURCE and the VALUE before the
+          # spend plan exists; the live package enforces the same two guards.
+          dry_run_template_path = (
+              WORKSPACE / DRY_RUN_CONFIG_TEMPLATE_RELPATH
+          ).resolve()
+          if (
+              config_template_path.resolve() == dry_run_template_path
+              or config_template_path.name.lower() == "dry-run-config.json"
+          ):
+              fail(
+                  "the build-only dry-run config template is refused as a live "
+                  "setting; dispatch a live config template that has had a "
+                  "live-setting review"
+              )
+          template_max_out = template.get("max_output_tokens")
+          if (
+              type(template_max_out) is not int
+              or template_max_out < MIN_LIVE_MAX_OUTPUT_TOKENS
+          ):
+              fail(
+                  "the live config template max_output_tokens is below the "
+                  f"live-setting floor {MIN_LIVE_MAX_OUTPUT_TOKENS}: "
+                  f"{template_max_out!r}"
+              )
 
           # The owner gate may set a STRICTER ceiling than the workflow's $120
           # owner cap. The effective ceiling is the lower of the two; a gate
@@ -523,6 +553,8 @@ jobs:
               "staged_gate_digest": staged_gate.digest(),
               "staged_gate_revision": staged_gate.dataset_revision,
               "spend_ceiling_cents": EFFECTIVE_CEILING_CENTS,
+              "max_output_tokens": config.max_output_tokens,
+              "live_setting_floor_tokens": MIN_LIVE_MAX_OUTPUT_TOKENS,
               "gate_spend_ceiling_cents": gate_spend_ceiling_cents,
               "gate_spend_provider_cap_cents": gate_spend_provider_cap_cents,
               "runs_per_case": config.runs_per_case,
@@ -698,6 +730,182 @@ jobs:
           print(json.dumps(proof, indent=2, sort_keys=True))
           if failures:
               raise SystemExit(1)
+          PY
+
+      - name: Require a passing single-case live smoke at this exact head
+        # The owner-directed required gate before any full Pilot A dispatch:
+        # eval-smoke spends exactly one subject call and one judge call, records
+        # the JUDGE terminal finish reason in a PASS proof artifact, and the full
+        # dispatch refuses here unless a PASSING eval-smoke workflow_dispatch run
+        # exists at the SAME exact head SHA and that proof verifies against this
+        # dispatch's frozen gate/dataset plan. This step makes no provider call
+        # and maps no key.
+        if: ${{ inputs.preflight_only != true }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import datetime as dt
+          import hashlib
+          import json
+          import os
+          import subprocess
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
+          dispatch_sha = os.environ["GITHUB_SHA"].strip()
+          repository = os.environ["REPOSITORY"]
+
+          def fail(message):
+              print("REFUSED: " + message, flush=True)
+              raise SystemExit(1)
+
+          def gh(*args):
+              return subprocess.run(["gh", *args], capture_output=True, text=True)
+
+          listing = gh(
+              "api", "--paginate", "--slurp",
+              "repos/" + repository + "/actions/workflows/eval-smoke.yml/runs"
+              + "?head_sha=" + dispatch_sha + "&per_page=100",
+          )
+          if listing.returncode != 0:
+              fail("the eval-smoke run listing failed: " + listing.stderr.strip()[:400])
+          try:
+              pages = json.loads(listing.stdout or "[]")
+          except ValueError:
+              fail("the eval-smoke run listing was not JSON")
+          if not isinstance(pages, list):
+              fail("the eval-smoke run listing was not a page list")
+          runs = []
+          for page in pages:
+              if isinstance(page, dict):
+                  runs.extend(page.get("workflow_runs") or [])
+          candidates = [
+              run for run in runs
+              if isinstance(run, dict)
+              and run.get("head_sha") == dispatch_sha
+              and run.get("event") == "workflow_dispatch"
+              and run.get("status") == "completed"
+              and run.get("conclusion") == "success"
+              and run.get("path") == ".github/workflows/eval-smoke.yml"
+          ]
+          if not candidates:
+              fail(
+                  "no successful eval-smoke workflow_dispatch run exists at the "
+                  "dispatched head; run eval-smoke on this exact head first"
+              )
+          candidates.sort(key=lambda run: run.get("run_started_at") or "", reverse=True)
+          proof = None
+          selected = None
+          proof_path = None
+          for run in candidates:
+              artifacts = gh(
+                  "api", "repos/" + repository + "/actions/runs/"
+                  + str(run["id"]) + "/artifacts?per_page=100",
+              )
+              if artifacts.returncode != 0:
+                  continue
+              try:
+                  items = json.loads(artifacts.stdout or "{}").get("artifacts") or []
+              except ValueError:
+                  continue
+              if not any(
+                  item.get("name") == "ber-live-smoke-proof"
+                  and item.get("expired") is False
+                  for item in items
+                  if isinstance(item, dict)
+              ):
+                  continue
+              target = RUNNER_TEMP / "ber-smoke-gate" / str(run["id"])
+              download = gh(
+                  "run", "download", str(run["id"]),
+                  "--repo", repository,
+                  "--name", "ber-live-smoke-proof",
+                  "--dir", str(target),
+              )
+              if download.returncode != 0:
+                  continue
+              candidate_path = target / "smoke-proof.json"
+              if not candidate_path.is_file():
+                  continue
+              try:
+                  payload = json.loads(candidate_path.read_text(encoding="utf-8"))
+              except (OSError, ValueError):
+                  continue
+              proof = payload
+              selected = run
+              proof_path = candidate_path
+              break
+          if proof is None or selected is None or proof_path is None:
+              fail(
+                  "no readable ber-live-smoke-proof artifact was found at the "
+                  "dispatched head; the full Pilot A dispatch requires a passing "
+                  "single-case live smoke at this exact head"
+              )
+
+          complete_stop_reasons = {"end_turn", "stop_sequence", "completed"}
+          failures = []
+
+          def require(condition, message):
+              if not condition:
+                  failures.append(message)
+
+          require(proof.get("schema") == "ber-live-smoke-proof/1.0.0", "proof schema")
+          require(proof.get("status") == "PASS", "proof status is not PASS")
+          require(proof.get("required_gate_before_full_pilot_a") is True, "proof is not marked as the required gate")
+          require(proof.get("head_sha") == dispatch_sha, "proof head is not the dispatched head")
+          require(proof.get("workflow") == "eval-smoke", "proof workflow is not eval-smoke")
+          require(str(proof.get("workflow_run_id")) == str(selected.get("id")), "proof run id is not the selected run")
+          require(proof.get("gate_id") == plan.get("gate_id"), "proof gate id is not the dispatch gate")
+          require(proof.get("gate_template_path") == plan.get("template_gate_path"), "proof gate template is not the dispatch gate template")
+          require(proof.get("dataset_path") == plan.get("dataset_path"), "proof dataset path is not the dispatch dataset")
+          require(proof.get("dataset_sha256") == plan.get("dataset_sha256"), "proof dataset digest is not the frozen dataset")
+          require(proof.get("case_count") == plan.get("case_count"), "proof case count is not the frozen count")
+          require(proof.get("planned_calls") == 2, "proof planned calls is not 2")
+          require(proof.get("dispatched_calls") == 2, "proof dispatched calls is not 2")
+          require(proof.get("subject_calls") == 1, "proof did not make exactly one subject call")
+          require(proof.get("judge_calls") == 1, "proof did not make exactly one judge call")
+          require(proof.get("judge_finish_reason") in complete_stop_reasons, "proof lacks a complete JUDGE finish reason")
+          require(proof.get("subject_stop_reason") in complete_stop_reasons, "proof lacks a complete subject finish reason")
+          require(proof.get("result_state") in {"PASS", "FAIL"}, "proof has no rule state")
+          require(proof.get("citability") == "REAL_HOST", "proof is not real-host citable evidence")
+          spent = proof.get("spent_cents")
+          ceiling = proof.get("ceiling_cents")
+          require(type(spent) is int and spent >= 0, "proof spend is not a non-negative int")
+          require(type(ceiling) is int and 0 < ceiling <= 5000, "proof ceiling is outside the 5000-cent smoke cap")
+          require(type(spent) is int and type(ceiling) is int and spent <= ceiling, "proof spend exceeds its ceiling")
+          require(proof.get("max_output_tokens") == plan.get("max_output_tokens"), "proof output budget is not this dispatch config")
+          require(type(proof.get("max_output_tokens")) is int and proof["max_output_tokens"] >= plan.get("live_setting_floor_tokens", 0), "proof output budget is below the live floor")
+          require(not proof.get("failures"), "proof records verification failures")
+          require(selected.get("head_sha") == dispatch_sha, "selected smoke run head is not the dispatched head")
+          require(selected.get("conclusion") == "success", "selected smoke run did not succeed")
+          if failures:
+              print(json.dumps({"failures": failures, "proof": proof}, indent=2, sort_keys=True))
+              fail("the single-case live smoke proof does not satisfy the required gate")
+
+          plan["smoke_gate"] = {
+              "schema": "ber-live-smoke-gate/1.0.0",
+              "head_sha": dispatch_sha,
+              "smoke_workflow": ".github/workflows/eval-smoke.yml",
+              "smoke_run_id": selected.get("id"),
+              "smoke_run_attempt": selected.get("run_attempt"),
+              "smoke_artifact_name": "ber-live-smoke-proof",
+              "smoke_proof_sha256": hashlib.sha256(proof_path.read_bytes()).hexdigest(),
+              "judge_finish_reason": proof.get("judge_finish_reason"),
+              "subject_stop_reason": proof.get("subject_stop_reason"),
+              "spent_cents": spent,
+              "ceiling_cents": ceiling,
+              "max_output_tokens": proof.get("max_output_tokens"),
+              "checked_at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+          }
+          (RUNNER_TEMP / "ber-plan.json").write_text(
+              json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          print(json.dumps(plan["smoke_gate"], indent=2, sort_keys=True))
+          print("single-case live smoke gate SATISFIED at " + dispatch_sha)
           PY
 
       - name: Restore every prior dispatch's resume state for this dataset

@@ -36,6 +36,8 @@ PACKAGE_ROOT = os.path.abspath(
 )
 CASES_ROOT = os.path.join(PACKAGE_ROOT, "live", "cases")
 DRY_CONFIG = os.path.join(PACKAGE_ROOT, "live", "config", "dry-run-config.json")
+LIVE_CONFIG = os.path.join(PACKAGE_ROOT, "live", "config", "pilot-a-live-config.json")
+SMOKE_CONFIG = os.path.join(PACKAGE_ROOT, "live", "config", "pilot-a-smoke-config.json")
 SYNTHETIC_GATE = os.path.join(PACKAGE_ROOT, "live", "gates", "synthetic-dry-run.json")
 
 FAKE_ANTHROPIC_KEY = "fake-anthropic-value-for-tests-only"
@@ -100,6 +102,13 @@ def gate_payload(
 
 
 def config_payload(*, ceiling: int = 15000, runs: int = 3, max_out: int = 512) -> dict:
+    """A synthetic config fixture.
+
+    The default output budget is the build-only 512 value: a DRY-run test may
+    use it, and the pipeline deliberately accepts it on the synthetic mock path.
+    A test that drives the LIVE verb (which enforces the live-setting floor)
+    must use ``live_config_payload`` instead.
+    """
     return {
         "schema_version": "1.0.0-ber-live",
         "spend_ceiling_cents": ceiling,
@@ -114,6 +123,23 @@ def config_payload(*, ceiling: int = 15000, runs: int = 3, max_out: int = 512) -
             ]
         },
     }
+
+
+def live_config_payload(*, ceiling: int = 15000, runs: int = 3) -> dict:
+    """A synthetic config fixture at or above the live-setting output floor.
+
+    The live verb refuses any ``max_output_tokens`` below
+    ``MIN_LIVE_MAX_OUTPUT_TOKENS`` before a credential is resolved, so a test
+    that expects to reach a later live-path refusal (credentials, revision,
+    transport) must start from this shape rather than the build-only 512 value.
+    """
+    from tools.behavioral_eval_runner.live.config import (
+        MIN_LIVE_MAX_OUTPUT_TOKENS,
+    )
+
+    return config_payload(
+        ceiling=ceiling, runs=runs, max_out=MIN_LIVE_MAX_OUTPUT_TOKENS
+    )
 
 
 def make_paths(tmp_root: str, *, run_id: str = "live-test-run", config=None, gate=None):
