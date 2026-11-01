@@ -628,19 +628,23 @@ def collect_latest_allowance_state(
             if artifact_name is None:
                 if str(run_id) in LEGACY_MIGRATION_RUN_IDS:
                     continue
-                if run.get("conclusion") != "success":
-                    if str(run_id) in PROVEN_PRE_PROVIDER_RUN_IDS:
-                        continue
-                    if run_spend_step_executed(
-                        gh=gh, repository=repository, run_id=run_id,
-                        step_prefixes=_spend_prefixes_for_workflow(workflow_file),
-                    ):
-                        raise ValueError(
-                            "failed run " + str(run_id)
-                            + " has no reservation-state artifact; outstanding "
-                            "exposure cannot be excluded (unknown exposure fails closed)"
-                        )
+                if str(run_id) in PROVEN_PRE_PROVIDER_RUN_IDS:
                     continue
+                # This applies to SUCCESSFUL runs too (delta-review F2): a
+                # run that executed the spend-bearing step but lost its
+                # reservation-state artifact has unknown outstanding exposure.
+                # The run conclusion is not proof that its state is settled.
+                if run_spend_step_executed(
+                    gh=gh, repository=repository, run_id=run_id,
+                    step_prefixes=_spend_prefixes_for_workflow(workflow_file),
+                ):
+                    raise ValueError(
+                        "run " + str(run_id)
+                        + " has no reservation-state artifact; outstanding "
+                        "exposure cannot be excluded (unknown exposure fails closed)"
+                    )
+                # Producer-shaped proof that the spend step never executed:
+                # no spend-bearing reservation could exist.
                 continue
             payload = download_artifact_json(
                 gh, repository, run_id, artifact_name,

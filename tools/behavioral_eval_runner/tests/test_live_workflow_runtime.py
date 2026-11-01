@@ -1187,6 +1187,31 @@ class PostMergeAdvisoryFixTests(unittest.TestCase):
             collect_latest_allowance_state(gh=fake, repository="o/r", work_dir=self.tmp)
         )
 
+    def test_successful_run_missing_state_with_executed_spend_step_fails_closed(self):
+        # Delta-review F2: a SUCCESSFUL run is not proof that its reservation
+        # state settled. Missing state + producer-shaped evidence that the spend
+        # step executed is unknown outstanding exposure and must fail closed.
+        fake = FakeGH(
+            {"smoke": [page([run(44, conclusion="success")])], "trial": [page([])]},
+            {"44": []},
+            {},
+            jobs={"44": [job(step(SMOKE_STEP, "success"), conclusion="success")]},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_allowance_state(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("reservation-state", str(caught.exception))
+
+    def test_successful_run_missing_state_with_skipped_spend_step_is_no_spend(self):
+        fake = FakeGH(
+            {"smoke": [page([run(45, conclusion="success")])], "trial": [page([])]},
+            {"45": []},
+            {},
+            jobs={"45": [job(step(SMOKE_STEP, "skipped"), conclusion="success")]},
+        )
+        self.assertIsNone(
+            collect_latest_allowance_state(gh=fake, repository="o/r", work_dir=self.tmp)
+        )
+
     def test_unknown_provider_failure_blocks_later_admission(self):
         fake = FakeGH(
             {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
