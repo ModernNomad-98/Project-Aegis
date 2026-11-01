@@ -578,6 +578,26 @@ class TwoJobLayoutTests(unittest.TestCase):
         ):
             self.assertIn(needle, text, needle)
 
+    def test_run_step_records_selection_skips_in_the_job_layout(self):
+        # S4D2 execution proof found: when a resumed job has no case left to run
+        # (or skips some of its fixed ten), the run step must record the
+        # selection's already-completed ids in skipped_case_ids so the job
+        # layout partitions its fixed ten ids and job 2's verification does not
+        # refuse the resumed state.
+        _path, workflow = self._workflow()
+        job1 = workflow["jobs"]["eval-run-job-1"]
+        run_step = next(
+            step
+            for step in self._steps(job1)
+            if step.get("name") == "Run the remaining cases as resumable per-case chunks"
+        )
+        source = run_step["run"]
+        self.assertIn(
+            'skipped_cases = list(selection.get("already_completed_case_ids") or [])',
+            source,
+        )
+        self.assertIn("if case_id not in skipped_cases:", source)
+
     def test_both_job_run_steps_are_byte_identical(self):
         # The run step is duplicated for the two jobs; keep the copies in sync
         # except for their gating condition, so a fix cannot land in one job

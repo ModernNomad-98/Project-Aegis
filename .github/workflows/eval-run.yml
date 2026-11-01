@@ -2232,7 +2232,10 @@ jobs:
 
 
           failures = []
-          skipped_cases = []
+          # S4: the selection already names the cases that were complete before
+          # this job; they belong to the job's skipped set so the recorded job
+          # layout partitions its fixed ten ids even when no case is left to run.
+          skipped_cases = list(selection.get("already_completed_case_ids") or [])
           ran_cases = []
           if not EXECUTION_CASE_IDS:
               print(
@@ -2253,7 +2256,8 @@ jobs:
                   except OSError:
                       completed_digest = None
                   if completed_digest == entry.get("result_sha256"):
-                      skipped_cases.append(case_id)
+                      if case_id not in skipped_cases:
+                          skipped_cases.append(case_id)
                       print(f"SKIP {case_id}: completed by an earlier dispatch")
                       continue
                   # A COMPLETED status without its recorded result is not
@@ -3860,7 +3864,10 @@ jobs:
 
 
           failures = []
-          skipped_cases = []
+          # S4: the selection already names the cases that were complete before
+          # this job; they belong to the job's skipped set so the recorded job
+          # layout partitions its fixed ten ids even when no case is left to run.
+          skipped_cases = list(selection.get("already_completed_case_ids") or [])
           ran_cases = []
           if not EXECUTION_CASE_IDS:
               print(
@@ -3881,7 +3888,8 @@ jobs:
                   except OSError:
                       completed_digest = None
                   if completed_digest == entry.get("result_sha256"):
-                      skipped_cases.append(case_id)
+                      if case_id not in skipped_cases:
+                          skipped_cases.append(case_id)
                       print(f"SKIP {case_id}: completed by an earlier dispatch")
                       continue
                   # A COMPLETED status without its recorded result is not
