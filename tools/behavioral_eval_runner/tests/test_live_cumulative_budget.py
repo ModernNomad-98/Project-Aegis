@@ -514,6 +514,41 @@ class ActualByteBasisTests(unittest.TestCase):
         # planning bound, not the payable smoke cost.
         self.assertGreater(bound["smoke_cents"], SMOKE_CEILING_CENTS)
 
+    def test_no_safe_smoke_completion_under_the_200c_cap(self) -> None:
+        # A refusing meter proves the $2 spend STOP, not that the two-call smoke
+        # can COMPLETE. The minimum worst-case-safe reservation under the
+        # enforced judge-request limit is 204c > 200c, so no safe plan can be
+        # proven to complete at the current cap/limits.
+        smoke = self.rows[0]
+        bound = actual_byte_smoke_bounds(
+            subject_request_bytes=smoke[0],
+            max_judge_request_bytes=MAX_JUDGE_REQUEST_BYTES,
+            max_output_tokens=OUTPUT_TOKENS,
+            subject_input_cents_per_mtok=SUBJECT_PIN.input_cents_per_mtok,
+            subject_output_cents_per_mtok=SUBJECT_PIN.output_cents_per_mtok,
+            judge_input_cents_per_mtok=JUDGE_PIN.input_cents_per_mtok,
+            judge_output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
+        )
+        self.assertEqual(bound["subject_cents"], 32)
+        self.assertEqual(bound["judge_cents"], 172)
+        self.assertEqual(bound["smoke_cents"], 204)
+        self.assertGreater(bound["smoke_cents"], SMOKE_CEILING_CENTS)
+        # To fit 200c the judge input budget is 200 - 32 - ceil(output) = 86c,
+        # i.e. at most 86,080 input bytes; the enforced cap is 90,000 bytes.
+        self.assertEqual(MAX_JUDGE_REQUEST_BYTES, 90_000)
+        self.assertGreater(MAX_JUDGE_REQUEST_BYTES, 86_080)
+        # An actual short judge request can fit (~118c total), but that is an
+        # observed-path convenience, not a worst-case-safe completion proof.
+        actual_judge = actual_byte_reservation_cents(
+            input_bytes=4_050,
+            input_cents_per_mtok=JUDGE_PIN.input_cents_per_mtok,
+            output_tokens=OUTPUT_TOKENS,
+            output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
+        )
+        self.assertEqual(actual_judge, 86)
+        self.assertEqual(bound["subject_cents"] + actual_judge, 118)
+        self.assertLessEqual(bound["subject_cents"] + actual_judge, SMOKE_CEILING_CENTS)
+
     def test_actual_byte_trial_bound_fits_shared_ceiling_with_prior(self) -> None:
         subject_max = max(row[0] for row in self.rows)
         judge_scaffold_max = max(row[1] for row in self.rows)

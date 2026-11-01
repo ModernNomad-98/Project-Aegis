@@ -6,6 +6,21 @@ a bill: the package validates it, the committed owner gate bounds it, and the
 cost meter enforces the smallest of the config ceiling, the gate ceiling and the
 provider cap in integer cents before every call.
 
+## Smoke completion under the 200c cap - NOT PROVEN
+
+A refusing cost meter proves the $2 spend **stop**, not that the two-call smoke
+can **complete**. At the current max-of-old/documented reservation rates and the
+enforced judge-request limit, the minimum worst-case-safe smoke reservation is
+**204c** (subject 32c + judge 172c) and the fallback safe bound is **314c**
+(200,000-byte request limit); both exceed the 200c ceiling. For a safe bound to
+fit 200c, the judge input cap would need to be at most 86,080 bytes, below the
+enforced 90,000-byte cap; that is an owner decision and is not changed here.
+An actual short request path (~118c) can finish, but it is not a worst-case-safe
+completion proof. Paid-smoke readiness is therefore **NOT PROVEN**; this is a
+reservation/planning incompatibility for a later owner checkpoint, not a paid
+claim and not a silent cap change. The cap, the 16,384 output target and the
+reservation semantics remain unchanged.
+
 ## The templates
 
 | File | Used by | Spend class | `max_output_tokens` | Ceiling | Shape |

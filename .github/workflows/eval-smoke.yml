@@ -157,6 +157,10 @@ jobs:
                   work_dir=RUNNER_TEMP / "ber-allowance-state",
                   current_run_id=os.environ.get("GITHUB_RUN_ID"),
               )
+              # Missing reservation state is only legitimate when there is no
+              # prior ended run that could have created exposure. The collector
+              # fails closed for a failed run whose spend step executed but whose
+              # state/proof artifacts are absent; never coerce that to zero.
               incoming_outstanding = 0 if incoming_state is None else incoming_state["outstanding_reservations_cents"]
               admission = admit_paid_call(
                   ceiling_cents=OWNER_PROVIDER_CAP_CENTS,
@@ -182,6 +186,8 @@ jobs:
               "reservation_cents": SMOKE_CEILING_CENTS,
               "ceiling_cents": OWNER_PROVIDER_CAP_CENTS,
               "incoming_outstanding_reservations_cents": incoming_outstanding,
+              "incoming_state_present": incoming_state is not None,
+              "unknown_failed_run_policy": "fail_closed",
               "evidence_only": True,
           }
           (RUNNER_TEMP / "ber-shared-allowance.json").write_text(

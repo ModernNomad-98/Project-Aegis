@@ -43,10 +43,14 @@ from tools.behavioral_eval_runner.live.cumulative import admit_paid_call, smoke_
 
 
 class FakeGH:
-    def __init__(self, run_pages, artifacts, payloads):
+    def __init__(self, run_pages, artifacts, payloads, jobs=None):
         self.run_pages = run_pages
         self.artifacts = artifacts
         self.payloads = payloads
+        # Producer-shaped job/step evidence by run id (a list of job objects);
+        # an absent entry means a complete listing with zero jobs (a run whose
+        # spend step never executed).
+        self.jobs = jobs or {}
         self.calls = []
 
     def __call__(self, args):
@@ -60,6 +64,10 @@ class FakeGH:
             elif "/artifacts" in joined:
                 run_id = joined.split("/actions/runs/")[1].split("/artifacts")[0]
                 payload = [{"total_count": len(self.artifacts[run_id]), "artifacts": self.artifacts[run_id]}]
+            elif "/jobs" in joined:
+                run_id = joined.split("/actions/runs/")[1].split("/jobs")[0]
+                run_jobs = list(self.jobs.get(run_id, []))
+                payload = [{"total_count": len(run_jobs), "jobs": run_jobs}]
             else:
                 payload = []
             return SimpleNamespace(returncode=0, stdout=json.dumps(payload), stderr="")
@@ -125,6 +133,18 @@ def page(items, total=None):
 
 def artifact(name):
     return {"name": name}
+
+
+def step(name, conclusion, status="completed"):
+    return {"name": name, "status": status, "conclusion": conclusion}
+
+
+def job(*steps, conclusion="failure"):
+    return {"name": "eval-smoke", "status": "completed", "conclusion": conclusion, "steps": list(steps)}
+
+
+SMOKE_STEP = "Run the single-case live smoke (one subject call + one judge call)"
+TRIAL_STEP = "Run the remaining cases as resumable per-case chunks"
 
 
 class AllowanceHistoryTests(unittest.TestCase):
@@ -1097,6 +1117,121 @@ class PostMergeAdvisoryFixTests(unittest.TestCase):
                 plan_ceiling_cents=12000, job1_effective_ceiling_cents=13000
             )
 
+    def test_provider_called_failed_smoke_without_proof_fails_closed(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": []},
+            {},
+            jobs={"42": [job(step(SMOKE_STEP, "failure"))]},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("cannot be proven", str(caught.exception))
+
+    def test_pre_provider_failed_smoke_without_proof_is_skipped(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": []},
+            {},
+            jobs={"42": [job(step(SMOKE_STEP, "skipped"))]},
+        )
+        self.assertEqual(
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp),
+            {},
+        )
+
+    def test_provider_called_failed_trial_without_manifest_fails_closed(self):
+        fake = FakeGH(
+            {"smoke": [page([])], "trial": [page([run(900, conclusion="failure")])]},
+            {"900": []},
+            {},
+            jobs={"900": [job(step(TRIAL_STEP, "success"), conclusion="failure")]},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_trial_spend(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("cannot be proven", str(caught.exception))
+
+    def test_pre_provider_failed_trial_without_manifest_is_skipped(self):
+        fake = FakeGH(
+            {"smoke": [page([])], "trial": [page([run(900, conclusion="failure")])]},
+            {"900": []},
+            {},
+            jobs={"900": [job(step(TRIAL_STEP, "skipped"))]},
+        )
+        trial = collect_latest_trial_spend(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertEqual(trial["ledger_spend_cents"], 222)
+        self.assertEqual(trial["smoke_spend"], {})
+
+    def test_missing_reservation_state_for_provider_called_failed_run_fails_closed(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": []},
+            {},
+            jobs={"42": [job(step(SMOKE_STEP, "failure"))]},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_allowance_state(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("reservation-state", str(caught.exception))
+
+    def test_missing_reservation_state_for_proven_pre_provider_failure_is_not_zero(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": []},
+            {},
+            jobs={"42": [job(step(SMOKE_STEP, "skipped"))]},
+        )
+        # No state artifact is acceptable only because the run is proven to have
+        # never reached the spend step; the caller still gets None, not a
+        # fabricated state or a fabricated zero charge.
+        self.assertIsNone(
+            collect_latest_allowance_state(gh=fake, repository="o/r", work_dir=self.tmp)
+        )
+
+    def test_unknown_provider_failure_blocks_later_admission(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": []},
+            {},
+            jobs={"42": [job(step(SMOKE_STEP, "failure"))]},
+        )
+        with self.assertRaises(ValueError):
+            collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
+        # No later admission can be built from a refused history; no zero/charge
+        # record is invented for the unknown run and no missing artifact is
+        # downloaded as if it existed.
+        self.assertFalse(
+            any("run download" in " ".join(call) for call in fake.calls)
+        )
+
+    def test_pre_provider_failure_preserves_floors_and_allows_later_admission(self):
+        fake = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": []},
+            {},
+            jobs={"42": [job(step(SMOKE_STEP, "skipped"))]},
+        )
+        history = collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertEqual(history["ledger_spend_cents"], 222)
+        self.assertEqual(history["smoke_spend_cents"], 18)
+        admission = admit_paid_call(
+            ceiling_cents=12000,
+            prior_ledger_spend_cents=history["ledger_spend_cents"],
+            prior_smoke_spend_records=history["smoke_spend"],
+            reservation_cents=200,
+            outstanding_reservations_cents=0,
+        )
+        self.assertTrue(admission["admitted"])
+
+    def test_legacy_migration_run_without_artifacts_still_skipped(self):
+        fake = FakeGH(
+            {"smoke": [page([run(41213647310, conclusion="failure")])], "trial": [page([])]},
+            {"41213647310": []},
+            {},
+        )
+        history = collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertEqual(history["ledger_spend_cents"], 222)
+        self.assertEqual(history["smoke_spend_cents"], 18)
+
     def test_workflows_carry_advisory_fixes(self):
         root = Path(__file__).resolve().parents[3]
         run_text = (root / ".github/workflows/eval-run.yml").read_text()
@@ -1136,6 +1271,19 @@ class PostMergeAdvisoryFixTests(unittest.TestCase):
         readme = (root / "tools/behavioral_eval_runner/live/config/README.md").read_text()
         self.assertIn("NOT dispatchable", readme)
         self.assertIn("only accepted eval-run template", readme)
+        # Focused delta: unknown failed-run exposure must fail closed, using
+        # producer-shaped job/step evidence to distinguish a no-spend failure.
+        runtime = (
+            root / "tools/behavioral_eval_runner/live/workflow_runtime.py"
+        ).read_text()
+        self.assertIn("run_spend_step_executed", runtime)
+        self.assertIn("unknown exposure fails closed", runtime)
+        self.assertIn("reservation-state artifact", runtime)
+        self.assertIn('"unknown_failed_run_policy": "fail_closed"', smoke_text)
+        self.assertIn('"incoming_state_present"', smoke_text)
+        # Smoke-completion incompatibility is documented, not silently claimed.
+        self.assertIn("NOT PROVEN", readme)
+        self.assertIn("204c", readme)
         self.assertIn("Re-derive the committed gate template", run_text)
         self.assertIn("settled_on_timeout", run_text)
         self.assertIn("final_outstanding_reservations_cents", run_text)

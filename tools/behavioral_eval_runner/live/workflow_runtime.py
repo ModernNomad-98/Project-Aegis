@@ -56,6 +56,17 @@ JOB1_STATE_ARTIFACT_NAME = "ber-shared-allowance-state-job-1"
 STATE_ARTIFACT_NAMES = (STATE_ARTIFACT_NAME, JOB1_STATE_ARTIFACT_NAME)
 PRESERVED_HISTORICAL_LEDGER_CENTS = 222
 PRESERVED_HISTORICAL_SMOKE_CENTS = 18
+#: Producer-shaped evidence for a no-spend failure: GitHub Actions retains the
+#: workflow-run job/step inventory even when the runner is lost before artifact
+#: upload. A run whose spend-bearing step never executed (or was skipped) is a
+#: proven pre-provider/no-spend failure; a run whose step executed but lost its
+#: proof/manifest/state remains unknown and must fail closed or be conservatively
+#: retained as unknown exposure. These are the producer workflow step names.
+SMOKE_SPEND_STEP_PREFIXES = ("Run the single-case live smoke",)
+TRIAL_SPEND_STEP_PREFIXES = ("Run the remaining cases",)
+#: Evidence-reviewed no-spend failures may be skipped explicitly. Empty by
+#: default: no run is pre-provider-proven merely because an artifact is absent.
+PROVEN_PRE_PROVIDER_RUN_IDS = frozenset()
 #: Explicit migration allowlist for pre-change artifacts whose absent proof is
 #: an expected historical fact, not an UNKNOWN spend. The known prior halted
 #: eval-run (41213647310) is skipped here; its preserved 222c/18c floor is
@@ -321,6 +332,68 @@ def _fail_unknown(label: str) -> None:
     raise ValueError(label + ": UNKNOWN, not zero")
 
 
+def list_run_jobs(
+    gh: Callable[..., Any], repository: str, run_id: Any,
+) -> list[dict[str, Any]]:
+    """List every job (including steps) of one workflow run, refusing an
+    incomplete listing. This is producer-shaped GitHub Actions evidence, not
+    an inference from a run conclusion."""
+    pages = _json_pages(
+        gh,
+        ["api", "--paginate", "--slurp",
+         "repos/" + repository + "/actions/runs/" + str(run_id)
+         + "/jobs?per_page=100"],
+        "run job listing",
+    )
+    declared_total = None
+    jobs: list[dict[str, Any]] = []
+    for page in pages:
+        if declared_total is None:
+            declared_total = page.get("total_count")
+        page_jobs = page.get("jobs")
+        if not isinstance(page_jobs, list):
+            raise ValueError("a workflow job listing page has no jobs list")
+        jobs.extend(page_jobs)
+    if type(declared_total) is not int or declared_total < 0:
+        raise ValueError("the workflow job listing did not report an integer total_count")
+    if len(jobs) != declared_total:
+        raise ValueError("the workflow job listing is incomplete")
+    return jobs
+
+
+def run_spend_step_executed(
+    *, gh: Callable[..., Any], repository: str, run_id: Any,
+    step_prefixes: tuple[str, ...],
+) -> bool:
+    """Whether any spend-bearing step actually executed for this run.
+
+    Producer-shaped proof of no spend: the spend step is absent or explicitly
+    skipped. Unknown/ambiguous listings raise (fail closed); a missing jobs
+    response is never treated as no-spend.
+    """
+    executed = False
+    for job in list_run_jobs(gh, repository, run_id):
+        if not isinstance(job, Mapping):
+            raise ValueError("a workflow job entry was not an object")
+        for step in job.get("steps") or []:
+            if not isinstance(step, Mapping):
+                raise ValueError("a workflow job step was not an object")
+            name = step.get("name")
+            if not isinstance(name, str):
+                raise ValueError("a workflow job step has no readable name")
+            if name.startswith(step_prefixes) and step.get("conclusion") != "skipped":
+                executed = True
+    return executed
+
+
+def _spend_prefixes_for_workflow(workflow_file: str) -> tuple[str, ...]:
+    return (
+        SMOKE_SPEND_STEP_PREFIXES
+        if workflow_file == "eval-smoke.yml"
+        else TRIAL_SPEND_STEP_PREFIXES
+    )
+
+
 def collect_smoke_proof_spends(
     *, gh: Callable[..., Any], repository: str, work_dir: Path,
     current_run_id: Any = None, smoke_workflow_file: str = "eval-smoke.yml",
@@ -347,6 +420,18 @@ def collect_smoke_proof_spends(
         if SMOKE_ARTIFACT_NAME not in names:
             if success:
                 _fail_unknown("successful smoke run " + str(run_id) + " has no proof artifact")
+            if str(run_id) in PROVEN_PRE_PROVIDER_RUN_IDS:
+                continue
+            if run_spend_step_executed(
+                gh=gh, repository=repository, run_id=run_id,
+                step_prefixes=SMOKE_SPEND_STEP_PREFIXES,
+            ):
+                raise ValueError(
+                    "failed smoke run " + str(run_id)
+                    + " executed the single-case live smoke step but published no "
+                    "proof artifact; its spend cannot be proven (unknown exposure "
+                    "fails closed)"
+                )
             continue
         payload = download_artifact_json(
             gh, repository, run_id, SMOKE_ARTIFACT_NAME,
@@ -390,6 +475,17 @@ def collect_latest_trial_spend(
         if artifact_name is None:
             if success:
                 _fail_unknown("successful trial run " + str(run_id) + " has no resume manifest")
+            if str(run_id) in PROVEN_PRE_PROVIDER_RUN_IDS:
+                continue
+            if run_spend_step_executed(
+                gh=gh, repository=repository, run_id=run_id,
+                step_prefixes=TRIAL_SPEND_STEP_PREFIXES,
+            ):
+                raise ValueError(
+                    "failed trial run " + str(run_id)
+                    + " executed the case step but published no resume manifest; "
+                    "its spend cannot be proven (unknown exposure fails closed)"
+                )
             continue
         payload = download_artifact_json(
             gh, repository, run_id, artifact_name,
@@ -530,6 +626,21 @@ def collect_latest_allowance_state(
             names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
             artifact_name = _available_artifact_name(names, STATE_ARTIFACT_NAMES)
             if artifact_name is None:
+                if str(run_id) in LEGACY_MIGRATION_RUN_IDS:
+                    continue
+                if run.get("conclusion") != "success":
+                    if str(run_id) in PROVEN_PRE_PROVIDER_RUN_IDS:
+                        continue
+                    if run_spend_step_executed(
+                        gh=gh, repository=repository, run_id=run_id,
+                        step_prefixes=_spend_prefixes_for_workflow(workflow_file),
+                    ):
+                        raise ValueError(
+                            "failed run " + str(run_id)
+                            + " has no reservation-state artifact; outstanding "
+                            "exposure cannot be excluded (unknown exposure fails closed)"
+                        )
+                    continue
                 continue
             payload = download_artifact_json(
                 gh, repository, run_id, artifact_name,
