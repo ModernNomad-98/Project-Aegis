@@ -58,7 +58,13 @@ permissions:
 concurrency:
   group: pilot-a-shared-allowance
   cancel-in-progress: false
-
+# Durable-lock note (advisory item 9): GitHub concurrency is a queue, NOT a
+# durable mutual-exclusion lock. A later queued dispatch can replace a pending
+# one and a cancelled/timed-out run releases the group without writing state.
+# The durable accounting record is the reservation/allowance artifact, and the
+# operating rule is SINGLE-DISPATCH: never queue two spend-bearing dispatches
+# (eval-smoke or eval-run) at once. The workflow-level group name is shared by
+# both workflows so a queued extra dispatch cannot start while another holds it.
 jobs:
   eval-smoke:
     name: eval-smoke
@@ -66,12 +72,6 @@ jobs:
     # The same environment that holds the two provider keys for eval-run.
     environment: eval-run
     timeout-minutes: 30
-
-    # Serialize with eval-run so two spend-bearing dispatches cannot overlap.
-    # This edits no state and stores no state.
-    concurrency:
-      group: eval-run
-      cancel-in-progress: false
 
     defaults:
       run:
@@ -102,6 +102,17 @@ jobs:
       - name: Install hash-locked dependencies
         run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
 
+      - name: Refuse a re-run attempt before any reservation
+        # A rerun's prior-attempt proof/reservation is invisible to the history
+        # collectors (they skip the current run id), so a rerun could spend
+        # again. Refuse before any reservation is written and before any key is
+        # mapped. A fresh workflow run is the supported retry unit.
+        run: |
+          if [ "${GITHUB_RUN_ATTEMPT}" != "1" ]; then
+            echo "REFUSED: run attempt ${GITHUB_RUN_ATTEMPT} is a re-run; dispatch a fresh workflow run"
+            exit 1
+          fi
+
       - name: Shared allowance admission preflight
         env:
           GH_TOKEN: ${{ github.token }}
@@ -128,10 +139,6 @@ jobs:
           )
           from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
               admit_paid_call,
-          )
-          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
-              cancel,
-              reserve,
           )
 
           def gh(args):
@@ -182,24 +189,17 @@ jobs:
               encoding="utf-8",
           )
           print(json.dumps(snapshot, indent=2, sort_keys=True))
-          if admission["admitted"]:
-              reserve(
-                  RUNNER_TEMP / "ber-shared-allowance-state" / "allowance-state.json",
-                  allowance_id="pilot-a-recovery-20261031",
-                  workflow_run_id=os.environ.get("GITHUB_RUN_ID"),
-                  identity="eval-smoke-admission",
-                  amount_cents=SMOKE_CEILING_CENTS,
-                  ledger_spend_cents=history["ledger_spend_cents"],
-                  smoke_spend_cents=history["smoke_spend_cents"],
-                  ceiling_cents=OWNER_PROVIDER_CAP_CENTS,
-              )
-          else:
+          if not admission["admitted"]:
               print(
                   "REFUSED: the smoke reservation would exceed the shared "
                   + str(OWNER_PROVIDER_CAP_CENTS) + "-cent allowance",
                   flush=True,
               )
               raise SystemExit(1)
+          # The reservation is intentionally NOT written here (advisory item 10):
+          # it is written only after the committed gate/config are validated and
+          # the offline preflight passes, so an early validation failure cannot
+          # leave a phantom reservation behind.
           PY
 
       - name: Stage and verify the single-case smoke settings
@@ -492,6 +492,51 @@ jobs:
           print(json.dumps(proof, indent=2, sort_keys=True))
           if failures:
               raise SystemExit(1)
+          PY
+
+      - name: Reserve the validated smoke allowance
+        # Written only after the gate/config validation and the offline preflight
+        # succeeded, so a validation failure cannot leave a phantom reservation.
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          sys.path.insert(0, str(Path(os.environ["GITHUB_WORKSPACE"]).resolve()))
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
+              reserve,
+          )
+          from tools.behavioral_eval_runner.live.config import (  # noqa: E402
+              OWNER_PROVIDER_CAP_CENTS,
+              SMOKE_CEILING_CENTS,
+          )
+
+          snapshot = json.loads(
+              (RUNNER_TEMP / "ber-shared-allowance.json").read_text(encoding="utf-8")
+          )
+          if not snapshot.get("admission", {}).get("admitted"):
+              print("REFUSED: the validated smoke admission is not admitted", flush=True)
+              raise SystemExit(1)
+          try:
+              reserve(
+                  RUNNER_TEMP / "ber-shared-allowance-state" / "allowance-state.json",
+                  allowance_id="pilot-a-recovery-20261031",
+                  workflow_run_id=os.environ.get("GITHUB_RUN_ID"),
+                  identity="eval-smoke-admission",
+                  amount_cents=SMOKE_CEILING_CENTS,
+                  ledger_spend_cents=snapshot["ledger_spend_cents"],
+                  smoke_spend_cents=snapshot["smoke_spend_cents"],
+                  ceiling_cents=OWNER_PROVIDER_CAP_CENTS,
+              )
+          except ValueError as exc:
+              print("REFUSED: the validated smoke reservation was not written: " + str(exc), flush=True)
+              raise SystemExit(1)
+          print("RESERVED: smoke allowance reservation written after validation")
           PY
 
       - name: Run the single-case live smoke (one subject call + one judge call)

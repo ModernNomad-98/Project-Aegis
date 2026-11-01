@@ -11,9 +11,9 @@ provider cap in integer cents before every call.
 | File | Used by | Spend class | `max_output_tokens` | Ceiling | Shape |
 | --- | --- | --- | --- | --- | --- |
 | `dry-run-config.json` | `live-dry-run` (synthetic gate, mock transport) | build-only / no-spend | 512 | 15000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
-| `pilot-a-live-config.json` | `eval-run` full Pilot A dispatch | live | 16384 | 12000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
+| `pilot-a-live-config.json` | historical/full-pilot template - **NOT dispatchable** (exceeds the 12,000c aggregate; kept for reference only) | live | 16384 | 12000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
 | `pilot-a-smoke-config.json` | `eval-smoke` single-case gate | live | 16384 | 200 cents ($2.00 hard cap) | one case, one arm, one run, one vendor |
-| `pilot-a-trial-config.json` | bounded trial template (owner-approved) | live | 16384 | 12000 cents | 20 cases x 2 arms x 1 run x 2 vendors (workflow narrows) |
+| `pilot-a-trial-config.json` | **`eval-run` bounded trial dispatch** (owner-approved; the only accepted eval-run template) | live | 16384 | 12000 cents | 20 cases x 2 arms x 1 run x 2 vendors (workflow narrows) |
 
 ## Build-only and live settings are different classes
 
@@ -56,8 +56,10 @@ The spend-affecting values are:
 `request_timeout_seconds`, the `judge_allowlist` entries (which vendor/model is
 allowed to be billed as a judge), and the pinned model/price table the config
 round-trips against (`price_table`, `owner_limits`) — the owner-approved 2026-10-31
-pricing repair pins the documented standard rates (anthropic 200/1000, openai
-1000/5000 cents per MTok) as the conservative reservation basis.
+pricing repair uses the maximum of the pre-repair conservative values and the
+documented standard rates (anthropic 300/1500, openai 1000/5000 cents per MTok)
+as the conservative reservation basis. Over-reservation is intentional and safe;
+under-reservation is not.
 
 ## Required gate before a full Pilot A dispatch
 
