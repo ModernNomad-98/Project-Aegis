@@ -41,8 +41,17 @@ SMOKE_ARTIFACT_NAME = "ber-live-smoke-proof"
 SMOKE_ARTIFACT_MEMBER = "smoke-proof.json"
 TRIAL_ARTIFACT_NAME = "ber-resume-manifest"
 TRIAL_ARTIFACT_MEMBER = "manifest.json"
+# S4: a two-job dispatch publishes the canonical resume manifest only from job 2
+# after job 1 was verified. If job 1 succeeded but job 2 never ran (job-2
+# verification refused, or the run ended between the jobs), the durable state is
+# the job-1-scoped artifact; it is a valid resume record for a later dispatch and
+# must be consumed rather than treated as a missing (UNKNOWN) record.
+JOB1_TRIAL_ARTIFACT_NAME = "ber-resume-manifest-job-1"
+TRIAL_ARTIFACT_NAMES = (TRIAL_ARTIFACT_NAME, JOB1_TRIAL_ARTIFACT_NAME)
 STATE_ARTIFACT_NAME = "ber-shared-allowance-state"
 STATE_ARTIFACT_MEMBER = "allowance-state.json"
+JOB1_STATE_ARTIFACT_NAME = "ber-shared-allowance-state-job-1"
+STATE_ARTIFACT_NAMES = (STATE_ARTIFACT_NAME, JOB1_STATE_ARTIFACT_NAME)
 PRESERVED_HISTORICAL_LEDGER_CENTS = 222
 PRESERVED_HISTORICAL_SMOKE_CENTS = 18
 
@@ -243,6 +252,16 @@ def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any])
     return provenance
 
 
+def _available_artifact_name(
+    names: list[Any], candidates: tuple[str, ...],
+) -> str | None:
+    """First published artifact among the canonical and S4 job-scoped names."""
+    for candidate in candidates:
+        if candidate in names:
+            return candidate
+    return None
+
+
 def _run_has_ended(run: Mapping[str, Any]) -> bool:
     # Enumerate every ended run regardless of conclusion: failed/cancelled runs
     # can still have spent money and must not be skipped.
@@ -311,10 +330,11 @@ def collect_latest_trial_spend(
         _validate_run_provenance(run)
         artifacts = list_run_artifacts(gh, repository, run_id)
         names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
-        if TRIAL_ARTIFACT_NAME not in names:
+        artifact_name = _available_artifact_name(names, TRIAL_ARTIFACT_NAMES)
+        if artifact_name is None:
             _fail_unknown("ended trial run " + str(run_id) + " has no resume manifest")
         payload = download_artifact_json(
-            gh, repository, run_id, TRIAL_ARTIFACT_NAME,
+            gh, repository, run_id, artifact_name,
             TRIAL_ARTIFACT_MEMBER, work_dir,
         )
         _validate_trial_manifest(payload, run)
@@ -398,7 +418,6 @@ def collect_latest_allowance_state(
     """Consume the newest uploaded reservation/admission state from either
     workflow. A present-but-unreadable latest state refuses; absent state is
     reported as None (no fabricated zero)."""
-    from .reservations import validate_state
 
     chosen: tuple[int, dict[str, Any]] | None = None
     for workflow_file in ("eval-smoke.yml", "eval-run.yml"):
@@ -414,10 +433,11 @@ def collect_latest_allowance_state(
                 continue
             artifacts = list_run_artifacts(gh, repository, run_id)
             names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
-            if STATE_ARTIFACT_NAME not in names:
+            artifact_name = _available_artifact_name(names, STATE_ARTIFACT_NAMES)
+            if artifact_name is None:
                 continue
             payload = download_artifact_json(
-                gh, repository, run_id, STATE_ARTIFACT_NAME,
+                gh, repository, run_id, artifact_name,
                 STATE_ARTIFACT_MEMBER, Path(work_dir) / "state",
             )
             validated = validate_state(payload)

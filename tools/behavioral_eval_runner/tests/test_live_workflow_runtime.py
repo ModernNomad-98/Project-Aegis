@@ -6,12 +6,15 @@ budget-proof coverage; no assertions weakened.
 
 from __future__ import annotations
 
+import ast
 import json
 import socket
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+
+import yaml
 
 """Offline fake-GitHub tests for the shared allowance-history collector.
 
@@ -31,6 +34,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 from tools.behavioral_eval_runner.live.workflow_runtime import (
     ALLOWANCE_HISTORY_SCHEMA,
     collect_allowance_history,
+    collect_latest_allowance_state,
+    collect_latest_trial_spend,
     collect_smoke_proof_spends,
     list_run_artifacts,
     list_workflow_runs,
@@ -226,6 +231,68 @@ class AllowanceHistoryTests(unittest.TestCase):
         self.assertEqual(history["ledger_spend_cents"], 222)
         self.assertEqual(history["smoke_spend_cents"], 150)
 
+    def test_job1_scoped_trial_manifest_is_consumed_on_resume(self):
+        # S4: a two-job run that ended after job 1 published only the
+        # job-1-scoped manifest. A later dispatch must count that spend, not
+        # treat the run as a missing (UNKNOWN) record.
+        plan = {
+            "dispatch_sha": HEAD_SHA,
+            "config_sha256": "e" * 64,
+            "dataset_sha256": "f" * 64,
+            "gate_id": "gate-1",
+            "subject_vendors": ["anthropic"],
+            "max_output_tokens": 16384,
+        }
+        fake = FakeGH(
+            {"smoke": [page([])], "trial": [page([run(901, conclusion="failure")])]},
+            {"901": [artifact("ber-resume-manifest-job-1")]},
+            {("901", "ber-resume-manifest-job-1"): (
+                "manifest.json",
+                {
+                    "schema": "ber-resume-manifest/1.2.0",
+                    "plan": plan,
+                    "totals": {"spent_cents": 3_940},
+                    "smoke_spend": {},
+                },
+            )},
+        )
+        trial = collect_latest_trial_spend(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(trial["ledger_spend_cents"], 3_940)
+        history = collect_allowance_history(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(history["ledger_spend_cents"], 3_940)
+
+    def test_job1_scoped_allowance_state_is_consumed_for_outstanding(self):
+        # S4: a run that ended after job 1 (job 2 never ran) may hold only the
+        # job-1-scoped reservation state. Its outstanding exposure must be
+        # counted before the next dispatch, never silently dropped.
+        fake = FakeGH(
+            {"smoke": [page([])], "trial": [page([run(902, conclusion="failure")])]},
+            {
+                "902": [artifact("ber-shared-allowance-state-job-1")],
+                "other": [],
+            },
+            {("902", "ber-shared-allowance-state-job-1"): (
+                "allowance-state.json",
+                {
+                    "schema": "ber-reservation-state/1.0.0",
+                    "status": "CANCELLED",
+                    "outstanding_reservations_cents": 126,
+                    "ledger_spend_cents": 3940,
+                    "smoke_spend_cents": 18,
+                    "ceiling_cents": 12000,
+                },
+            )},
+        )
+        state = collect_latest_allowance_state(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertIsNotNone(state)
+        self.assertEqual(state["outstanding_reservations_cents"], 126)
+
     def test_artifact_pagination_incomplete_refuses(self):
         from tools.behavioral_eval_runner.live import workflow_runtime as allowance_history
         fake = FakeGH({"smoke": [page([])], "trial": [page([])]}, {}, {})
@@ -401,6 +468,165 @@ class WorkflowWiringTests(unittest.TestCase):
         self.assertIn("prior_smoke_manifests.append(standalone_smoke)", text)
 
 
+class TwoJobLayoutTests(unittest.TestCase):
+    """S4 acceptance tests for the two sequential ten-case jobs (static).
+
+    These tests are the offline, no-network proof that the reviewed workflow
+    defines the accepted layout: one G3 dispatch, two sequential jobs, fixed
+    first-ten/remaining-ten partitions represented separately from the full
+    twenty-case count, durable state passed from job 1 to job 2, job 2 requiring
+    job 1 success and mapping keys only in its gated run step, exactly 80
+    planned calls at 300s per call, and unchanged timeouts/retry/dispatch shape.
+    They do not run the workflow or a fake clock; S4 readiness still needs the
+    workflow-wrapper and BER rehearsals.
+    """
+
+    @staticmethod
+    def _workflow():
+        path = REPO_ROOT / ".github/workflows/eval-run.yml"
+        return path, yaml.safe_load(path.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def _steps(job):
+        return job.get("steps") or []
+
+    def test_two_sequential_ten_case_jobs_and_shared_lock(self):
+        path, workflow = self._workflow()
+        self.assertEqual(
+            list(workflow["jobs"]), ["eval-run-job-1", "eval-run-job-2"]
+        )
+        job1 = workflow["jobs"]["eval-run-job-1"]
+        job2 = workflow["jobs"]["eval-run-job-2"]
+        self.assertEqual(job2["needs"], ["eval-run-job-1"])
+        self.assertNotIn("needs", job1)
+        self.assertEqual(workflow["concurrency"]["group"], "pilot-a-shared-allowance")
+        self.assertNotIn("concurrency", job1)
+        self.assertNotIn("concurrency", job2)
+        self.assertEqual(job1["timeout-minutes"], 360)
+        self.assertEqual(job2["timeout-minutes"], 360)
+
+    def test_job2_gates_on_job1_and_maps_keys_only_in_its_run_step(self):
+        _path, workflow = self._workflow()
+        job1 = workflow["jobs"]["eval-run-job-1"]
+        job2 = workflow["jobs"]["eval-run-job-2"]
+        self.assertIn("eval-run-job-1", str(job2.get("if")))
+        self.assertIn("preflight_only", str(job2.get("if")))
+        names = [step.get("name") for step in self._steps(job2)]
+        verify_index = names.index(
+            "Verify job 1, merge its durable state, and select the remaining cases"
+        )
+        run_index = names.index("Run the remaining cases as resumable per-case chunks")
+        self.assertLess(verify_index, run_index)
+        for step in self._steps(job2)[:run_index]:
+            env = step.get("env") or {}
+            self.assertNotIn("ANTHROPIC_API_KEY", env)
+            self.assertNotIn("OPENAI_API_KEY", env)
+        run_step = self._steps(job2)[run_index]
+        self.assertIn("ANTHROPIC_API_KEY", run_step["env"])
+        self.assertIn("OPENAI_API_KEY", run_step["env"])
+        self.assertEqual(
+            run_step["if"],
+            "${{ steps.verify-job-1.outcome == 'success' }}",
+        )
+
+    def test_selected_sets_are_recorded_separately_from_the_full_count(self):
+        text = self._workflow()[0].read_text(encoding="utf-8")
+        for needle in (
+            "ber-two-job-layout/1.0.0",
+            "ber-job-case-selection/1.0.0",
+            "fixed_selected_case_ids",
+            "unexecuted_case_ids",
+            "full_case_count",
+            "full_planned_calls",
+            "job_planned_calls_capacity",
+            "per_call_timeout_seconds",
+            "the trial must keep exactly 20 frozen cases",
+            "the trial must be exactly 80 planned calls",
+            "the trial must stay one subject vendor",
+            "the per-call request timeout must stay 300s",
+            "the two job selections are not a disjoint partition of the plan",
+        ):
+            self.assertIn(needle, text, needle)
+
+    def test_durable_state_artifacts_and_job1_selection(self):
+        text = self._workflow()[0].read_text(encoding="utf-8")
+        for needle in (
+            "ber-dispatch-context-job-1",
+            "ber-resume-manifest-job-1",
+            "ber-shared-allowance-state-job-1",
+            "Select the ten cases for job 1",
+            "Publish the dispatch context for the second job (no secrets)",
+            "Upload resume manifest (always; completed cases survive a timeout)",
+            "Upload reservation/true-up state (always)",
+            "ber-resume-manifest",
+            "ber-shared-allowance-state",
+            "Build structured summary and publish directory",
+        ):
+            self.assertIn(needle, text, needle)
+        self.assertGreaterEqual(text.count("ber-resume-manifest-job-1"), 2)
+        self.assertGreaterEqual(text.count("ber-shared-allowance-state-job-1"), 2)
+
+    def test_unchanged_timeouts_retry_and_dispatch_shape(self):
+        text = self._workflow()[0].read_text(encoding="utf-8")
+        for needle in (
+            "timeout-minutes: 360",
+            "timeout-minutes: 330",
+            "PER_CASE_TIMEOUT_SECONDS = 1500",
+            "timeout=120,",
+            "re-runs are not resumed because the resume artifact is run-scoped",
+            "no retry, no second",
+        ):
+            self.assertIn(needle, text, needle)
+
+    def test_both_job_run_steps_are_byte_identical(self):
+        # The run step is duplicated for the two jobs; keep the copies in sync
+        # except for their gating condition, so a fix cannot land in one job
+        # only. Both copies must contain the same case-selection contract.
+        _path, workflow = self._workflow()
+        job1 = workflow["jobs"]["eval-run-job-1"]
+        job2 = workflow["jobs"]["eval-run-job-2"]
+        def run_steps(job):
+            return {
+                step.get("name"): step
+                for step in self._steps(job)
+                if step.get("name") == "Run the remaining cases as resumable per-case chunks"
+            }
+        first = run_steps(job1)
+        second = run_steps(job2)
+        self.assertEqual(len(first), 1)
+        self.assertEqual(len(second), 1)
+        name = "Run the remaining cases as resumable per-case chunks"
+        self.assertEqual(first[name]["timeout-minutes"], second[name]["timeout-minutes"])
+        self.assertEqual(
+            first[name]["env"], second[name]["env"],
+        )
+        self.assertEqual(
+            first[name]["run"], second[name]["run"],
+        )
+
+    def test_embedded_python_compiles(self):
+        _path, workflow = self._workflow()
+        failures = []
+        for job_name, job in workflow["jobs"].items():
+            for step in self._steps(job):
+                run = step.get("run")
+                if not isinstance(run, str):
+                    continue
+                lines = run.split("\n")
+                index = 0
+                while index < len(lines):
+                    if lines[index].strip() == "python -P - <<'PY'":
+                        code = []
+                        index += 1
+                        while index < len(lines) and lines[index].strip() != "PY":
+                            code.append(lines[index])
+                            index += 1
+                        try:
+                            ast.parse("\n".join(code))
+                        except SyntaxError as exc:
+                            failures.append(f"{job_name}/{step.get('name')}: {exc}")
+                    index += 1
+        self.assertEqual(failures, [])
 
 
 # ---- formerly test_live_reservations.py ----

@@ -47,6 +47,38 @@
 # No runner logic changed: the staged gate, the chunks and the manifest are
 # built from the merged package's own loaders and digests, invoked unmodified.
 #
+# AEGIS-RECOVERY-S4 (accepted recovery plan 2026-10-31, SPECS-ANNEX timing
+# decision): the single 20-case job is split into TWO SEQUENTIAL 10-CASE JOBS
+# inside ONE G3 dispatch, and nothing else about the trial changes.
+#   * The frozen dataset, digest and full case count stay 20: the gate template,
+#     the staged gate, the plan and every live-run invocation still require the
+#     unmodified committed bytes. Each job records its own ten-case selection
+#     SEPARATELY from the full count (job 1 = plan case ids[0:10], job 2 = the
+#     remaining ids[10:20]); the selection is validated before any key is mapped.
+#   * Job 1 validates the dispatch (same config/preflight/smoke gate as before),
+#     restores durable prior state, publishes the immutable dispatch context and
+#     its durable resume/allowance state, and runs ONLY its ten case ids.
+#   * Job 2 needs job 1 success, downloads job 1's dispatch context, resume
+#     manifest and allowance state from THIS run, verifies job 1 completed
+#     exactly its ten cases, merges that state, and runs ONLY the exact
+#     unexecuted cases in its own ten ids. A failed, cancelled, ambiguous or
+#     admission-denied job 1 skips job 2 entirely: job 2 maps no key and makes
+#     no call unless the verification step succeeded.
+#   * The shared durable accounting (resume manifest + allowance/reservation
+#     state) is persisted as artifacts between the jobs and is the only state
+#     source the second job trusts; the workflow-level concurrency group
+#     (pilot-a-shared-allowance) is the shared workflow-wide lock across both
+#     jobs and both workflows, so no job-level lock is relied on for atomicity.
+#   * Shape is unchanged: exactly 80 planned calls across the two jobs (40 per
+#     job capacity: 10 cases x 2 arms x 1 run x 1 vendor x 2 roles), 300s per
+#     call, the same 1500s per-case wrapper, the same 120s chunk preflight, the
+#     same 330min run step and 360min job timeout per job, no retry, no second
+#     dispatch and no call-count change. The per-job 40-call budget plus bounded
+#     IO fits the unchanged step/job budget (SPECS-ANNEX timing decision).
+#   * Static YAML/embedded-Python validation is executed now; the fake-clock,
+#     workflow-wrapper and BER rehearsals are NOT claimed by this change and
+#     S4 readiness stays NOT PROVEN until they run.
+#
 # What this file deliberately does NOT do:
 #   * no push, pull_request, schedule or workflow_run trigger;
 #   * no repository write, commit, tag, release, settings or protection change;
@@ -171,20 +203,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  eval-run:
-    name: eval-run
+  # S4 two-job layout, job 1 of 2: validate the dispatch, restore durable state,
+  # publish the dispatch context and durable state, then execute the FIRST ten
+  # frozen case ids (40-call capacity).
+  eval-run-job-1:
+    name: eval-run-job-1
     runs-on: ubuntu-latest
     environment: eval-run
     # AEGIS-APR-161 item 3: 360 minutes. The per-case run step below stops at
     # 330 minutes so its always() persistence steps still execute.
     timeout-minutes: 360
 
-    # Serialize dispatches so two runs cannot spend at the same time. This
-    # edits no state and stores no state; the provider-side prepaid credit
-    # remains the cumulative hard cap across runs.
-    concurrency:
-      group: eval-run
-      cancel-in-progress: false
+    # S4: the shared lock is the WORKFLOW-level 'pilot-a-shared-allowance'
+    # concurrency group above (the same group eval-smoke uses). It is held for
+    # the whole run, so the two sequential jobs cannot be interleaved with any
+    # other spend-bearing dispatch. The former job-level duplicate lock is
+    # removed here: a job lock alone is not the workflow-wide atomicity
+    # boundary, and two jobs in one run must not depend on it.
 
     defaults:
       run:
@@ -544,6 +579,52 @@ jobs:
           planned_calls_per_case = (
               len(ARMS) * config.runs_per_case * len(config.subject_vendors) * 2
           )
+          # S4: the trial shape is fixed by the accepted recovery plan and the
+          # owner's one-dispatch constraint. Assert it before any plan, state or
+          # spend exists so the two-job layout cannot drift from the shape.
+          if len(case_ids) != 20:
+              fail(
+                  f"the trial must keep exactly 20 frozen cases, got {len(case_ids)}"
+              )
+          if (
+              planned_calls_per_case != 4
+              or planned_calls_per_case * len(case_ids) != 80
+          ):
+              fail(
+                  "the trial must be exactly 80 planned calls (20 cases x 2 arms "
+                  "x 1 run x 1 vendor x 2 roles); got "
+                  f"{planned_calls_per_case} per case"
+              )
+          if config.runs_per_case != 1:
+              fail("the trial must stay one run per case")
+          if len(config.subject_vendors) != 1:
+              fail("the trial must stay one subject vendor")
+          if config.request_timeout_seconds != 300:
+              fail(
+                  "the per-call request timeout must stay 300s; got "
+                  f"{config.request_timeout_seconds}"
+              )
+          if config.max_output_tokens != 16384:
+              fail(
+                  "the trial output budget must stay 16384; got "
+                  f"{config.max_output_tokens}"
+              )
+          job_layout = {
+              "schema": "ber-two-job-layout/1.0.0",
+              "job_count": 2,
+              "cases_per_job": 10,
+              "case_partition": {
+                  "job1": case_ids[:10],
+                  "job2": case_ids[10:],
+              },
+              "full_case_count": len(case_ids),
+              "full_planned_calls": planned_calls_per_case * len(case_ids),
+              "job_planned_calls_capacity": planned_calls_per_case * 10,
+              "per_call_timeout_seconds": config.request_timeout_seconds,
+              "sequential_jobs": True,
+              "one_dispatch": True,
+              "retry_unchanged": True,
+          }
           plan = {
               "schema": "ber-pilot-a-plan/1.0.0",
               "dispatch_sha": DISPATCH_SHA,
@@ -554,6 +635,7 @@ jobs:
               "dataset_sha256": frozen_digest,
               "case_count": len(frozen_cases),
               "case_ids": case_ids,
+              "job_layout": job_layout,
               "gate_id": gate_template.gate_id,
               "fact_origin": gate_template.fact_origin,
               "template_gate_path": str(template_gate_path.relative_to(WORKSPACE)),
@@ -624,6 +706,22 @@ jobs:
           # Structure only: no credential value is present in this config.
           print(json.dumps(structure, indent=2, sort_keys=True))
           PY
+
+      - name: Publish the dispatch context for the second job (no secrets)
+        # The second job trusts only these immutable outputs of job 1's config
+        # step: the plan, the built config and the staged gate. They carry no
+        # credential value. Publishing them immediately means job 2 verifies the
+        # same dispatch context instead of rebuilding a second, possibly
+        # different one; a missing or mismatched context fails job 2 closed.
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-dispatch-context-job-1
+          path: |
+            ${{ runner.temp }}/ber-plan.json
+            ${{ runner.temp }}/live-config.json
+            ${{ runner.temp }}/live-gate.json
+          retention-days: 14
+          if-no-files-found: error
 
       - name: Live preflight (staged gate; checkout must equal the gate revision)
         env:
@@ -986,6 +1084,14 @@ jobs:
           current_run = str(os.environ.get("GITHUB_RUN_ID", "")).strip()
           run_attempt = str(os.environ.get("GITHUB_RUN_ATTEMPT", "1")).strip() or "1"
           ARTIFACT_NAME = "ber-resume-manifest"
+          # S4: a two-job dispatch may end with only job 1's durable manifest
+          # (job 2 never ran, or job 2's verification refused). Job 1's manifest
+          # is a valid resume record: it carries the same frozen dataset, config
+          # and gate bindings plus the completed first ten cases. Consume it
+          # rather than treating the run as a missing-spend UNKNOWN. The
+          # canonical name wins when both exist.
+          JOB1_ARTIFACT_NAME = "ber-resume-manifest-job-1"
+          ARTIFACT_CANDIDATES = (ARTIFACT_NAME, JOB1_ARTIFACT_NAME)
 
 
           def refuse(message):
@@ -1161,6 +1267,7 @@ jobs:
               if not isinstance(artifact_pages, list):
                   refuse("the artifact listing for run " + run_id + " was not a page list")
               published = False
+              published_artifact = None
               for page in artifact_pages:
                   if not isinstance(page, dict):
                       refuse("an artifact listing page for run " + run_id + " was not an object")
@@ -1168,7 +1275,12 @@ jobs:
                   if not isinstance(page_artifacts, list):
                       refuse("an artifact listing page for run " + run_id + " has no artifacts list")
                   for artifact in page_artifacts:
-                      if isinstance(artifact, dict) and artifact.get("name") == ARTIFACT_NAME:
+                      if not isinstance(artifact, dict):
+                          continue
+                      artifact_name = artifact.get("name")
+                      if artifact_name in ARTIFACT_CANDIDATES:
+                          if published_artifact is None or artifact_name == ARTIFACT_NAME:
+                              published_artifact = artifact_name
                           published = True
               if not published:
                   # "Published nothing" is legitimate only when the case step never
@@ -1221,7 +1333,7 @@ jobs:
               download = gh(
                   "run", "download", run_id,
                   "--repo", repository,
-                  "--name", ARTIFACT_NAME,
+                  "--name", published_artifact,
                   "--dir", str(target),
               )
               if download is None:
@@ -1590,6 +1702,108 @@ jobs:
           }
           print(json.dumps(outcome, indent=2, sort_keys=True))
           PY
+      - name: Select the ten cases for job 1
+        id: select
+        # S4 job 1 selection: the FIRST ten case ids of the unmodified frozen
+        # twenty-case plan, recorded SEPARATELY from the full count and digest.
+        # The selection names the job's fixed ten ids, the already-completed skip
+        # set and the exact unexecuted execution set. Every mismatch refuses
+        # before a key is mapped. The selection is copied into the resume
+        # manifest directory so the second job can re-derive and verify it.
+        if: ${{ inputs.preflight_only != true && steps.restore.outcome == 'success' }}
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          MANIFEST_DIR = RUNNER_TEMP / "ber-manifest"
+          CASES_DIR = MANIFEST_DIR / "cases"
+
+          def refuse(message):
+              print("SELECTION REFUSED: " + message, flush=True)
+              raise SystemExit(1)
+
+          plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
+          state = json.loads(
+              (MANIFEST_DIR / "manifest.json").read_text(encoding="utf-8")
+          )
+          layout = plan.get("job_layout") or {}
+          partition = layout.get("case_partition") or {}
+          case_ids = list(plan.get("case_ids") or [])
+          fixed = list(partition.get("job1") or [])
+          if layout.get("job_count") != 2 or layout.get("cases_per_job") != 10:
+              refuse("the plan does not carry the two-by-ten job layout")
+          if layout.get("full_case_count") != 20 or len(case_ids) != 20:
+              refuse("the full frozen case count is not 20")
+          if layout.get("full_planned_calls") != 80 or plan.get("planned_calls") != 80:
+              refuse("the plan is not the fixed 80-planned-call trial")
+          if layout.get("per_call_timeout_seconds") != 300:
+              refuse("the plan does not keep the 300s per-call timeout")
+          if fixed != case_ids[:10] or len(fixed) != 10 or len(set(fixed)) != 10:
+              refuse("job 1's fixed selection is not the first ten plan case ids")
+          job2_fixed = list(partition.get("job2") or [])
+          if job2_fixed != case_ids[10:] or len(job2_fixed) != 10:
+              refuse("job 2's fixed selection is not the remaining ten plan case ids")
+          if sorted(fixed + job2_fixed) != sorted(case_ids):
+              refuse("the two job selections are not a disjoint partition of the plan")
+          cases = state.get("cases") or {}
+          if not isinstance(cases, dict):
+              refuse("the restored manifest has no cases object")
+          unexecuted = []
+          already = []
+          for case_id in fixed:
+              entry = cases.get(case_id)
+              if not isinstance(entry, dict):
+                  refuse("the restored manifest has no case record for " + case_id)
+              if entry.get("status") == "COMPLETED":
+                  result_path = CASES_DIR / (case_id + ".json")
+                  try:
+                      observed = hashlib.sha256(result_path.read_bytes()).hexdigest()
+                  except OSError:
+                      observed = None
+                  if observed is None or observed != entry.get("result_sha256"):
+                      refuse(
+                          case_id + " is marked COMPLETED but its result is missing "
+                          "or hash-mismatched"
+                      )
+                  already.append(case_id)
+                  continue
+              if entry.get("status") in {"IN_FLIGHT", "ADMISSION_DENIED"}:
+                  refuse(case_id + " has ambiguous state " + str(entry.get("status")))
+              unexecuted.append(case_id)
+          selection = {
+              "schema": "ber-job-case-selection/1.0.0",
+              "job_index": 1,
+              "final_job": False,
+              "dispatch_sha": plan.get("dispatch_sha"),
+              "dataset_path": plan.get("dataset_path"),
+              "dataset_sha256": plan.get("dataset_sha256"),
+              "full_case_count": 20,
+              "full_planned_calls": 80,
+              "job_planned_calls_capacity": 40,
+              "per_call_timeout_seconds": 300,
+              "fixed_selected_case_ids": fixed,
+              "already_completed_case_ids": already,
+              "unexecuted_case_ids": unexecuted,
+              "execution_planned_calls": 4 * len(unexecuted),
+          }
+          selection_path = RUNNER_TEMP / "ber-selection-job.json"
+          selection_path.write_text(
+              json.dumps(selection, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          (MANIFEST_DIR / "job-selection-job-1.json").write_text(
+              json.dumps(selection, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(selection, indent=2, sort_keys=True))
+          PY
+
       - name: Run the remaining cases as resumable per-case chunks
         # Never runs in a preflight-only dispatch (that mode maps no key and
         # makes no provider call), and never after a failed restore: running
@@ -1659,6 +1873,75 @@ jobs:
 
           plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
           state = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+          # S4: the run step executes ONLY the exact case set the preceding
+          # selection step recorded, and re-derives every layout invariant here
+          # so a corrupted selection cannot dispatch an unselected case.
+          selection = json.loads(
+              (RUNNER_TEMP / "ber-selection-job.json").read_text(encoding="utf-8")
+          )
+          if not isinstance(selection, dict):
+              print("REFUSED: the job selection is not a JSON object", flush=True)
+              raise SystemExit(1)
+          if selection.get("schema") != "ber-job-case-selection/1.0.0":
+              print("REFUSED: the job selection schema is not recognised", flush=True)
+              raise SystemExit(1)
+          layout = plan.get("job_layout") or {}
+          partition = layout.get("case_partition") or {}
+          JOB_INDEX = selection.get("job_index")
+          FINAL_JOB = selection.get("final_job") is True
+          if JOB_INDEX not in (1, 2) or FINAL_JOB != (JOB_INDEX == 2):
+              print("REFUSED: the job selection has an invalid job index/final flag", flush=True)
+              raise SystemExit(1)
+          FIXED_CASE_IDS = list(selection.get("fixed_selected_case_ids") or [])
+          EXECUTION_CASE_IDS = list(selection.get("unexecuted_case_ids") or [])
+          expected_fixed = list(
+              partition.get("job1" if JOB_INDEX == 1 else "job2") or []
+          )
+          if len(FIXED_CASE_IDS) != 10 or FIXED_CASE_IDS != expected_fixed:
+              print("REFUSED: the job's fixed ten case ids are not the plan partition", flush=True)
+              raise SystemExit(1)
+          if (
+              len(set(FIXED_CASE_IDS)) != 10
+              or any(case_id not in plan["case_ids"] for case_id in FIXED_CASE_IDS)
+          ):
+              print("REFUSED: the job's fixed case ids are not unique plan case ids", flush=True)
+              raise SystemExit(1)
+          if len(set(EXECUTION_CASE_IDS)) != len(EXECUTION_CASE_IDS) or any(
+              case_id not in FIXED_CASE_IDS for case_id in EXECUTION_CASE_IDS
+          ):
+              print("REFUSED: the execution set is not a unique subset of the fixed set", flush=True)
+              raise SystemExit(1)
+          if (
+              selection.get("dispatch_sha") != plan.get("dispatch_sha")
+              or selection.get("dataset_sha256") != plan.get("dataset_sha256")
+              or selection.get("full_case_count") != plan.get("case_count")
+              or selection.get("full_planned_calls") != plan.get("planned_calls")
+              or selection.get("job_planned_calls_capacity") != 40
+              or selection.get("per_call_timeout_seconds") != 300
+              or selection.get("execution_planned_calls") != 4 * len(EXECUTION_CASE_IDS)
+          ):
+              print("REFUSED: the job selection does not bind the dispatch plan shape", flush=True)
+              raise SystemExit(1)
+          if (
+              layout.get("job_count") != 2
+              or layout.get("cases_per_job") != 10
+              or layout.get("full_case_count") != 20
+              or layout.get("full_planned_calls") != 80
+          ):
+              print("REFUSED: the plan does not carry the frozen two-by-ten layout", flush=True)
+              raise SystemExit(1)
+          for case_id in plan["case_ids"]:
+              if case_id not in state["cases"]:
+                  print("REFUSED: the manifest has no case record for " + case_id, flush=True)
+                  raise SystemExit(1)
+          for case_id in EXECUTION_CASE_IDS:
+              if (state["cases"].get(case_id) or {}).get("status") == "COMPLETED":
+                  print(
+                      "REFUSED: the execution selection includes a completed case: "
+                      + case_id,
+                      flush=True,
+                  )
+                  raise SystemExit(1)
           CEILING = int(plan["spend_ceiling_cents"]) - int(state.get("incoming_outstanding_reservations_cents", 0))
           if CEILING <= 0:
               print("REFUSED: outstanding exposure exhausts the shared ceiling", flush=True)
@@ -1950,7 +2233,12 @@ jobs:
           failures = []
           skipped_cases = []
           ran_cases = []
-          for case_id in plan["case_ids"]:
+          if not EXECUTION_CASE_IDS:
+              print(
+                  "NOTICE: this job has no unexecuted cases in its fixed ten-case set",
+                  flush=True,
+              )
+          for case_id in EXECUTION_CASE_IDS:
               entry = state["cases"].get(case_id)
               if entry is None:
                   entry = {"case_id": case_id, "status": "PENDING", "attempts": []}
@@ -2358,13 +2646,19 @@ jobs:
                 f"{record['spent_cents']}c, total {total_spent()}c"
               )
 
-          # A case the run never reached is recorded UNRUN, not left PENDING:
-          # the run record is what a later dispatch and the summary read.
-          for case_id in plan["case_ids"]:
+          # S4: only THIS job's fixed ten-case set is marked UNRUN. The other
+          # job's cases stay PENDING (job 1) so the next job owns them; job 2 is
+          # final and fails closed if any plan case is still not COMPLETED.
+          for case_id in FIXED_CASE_IDS:
               pending = state["cases"].get(case_id)
               if isinstance(pending, dict) and pending.get("status") == "PENDING":
                   pending["status"] = "UNRUN"
-          missing = [
+          missing_selected = [
+              case_id
+              for case_id in FIXED_CASE_IDS
+              if (state["cases"].get(case_id) or {}).get("status") != "COMPLETED"
+          ]
+          missing_full = [
               case_id
               for case_id in plan["case_ids"]
               if (state["cases"].get(case_id) or {}).get("status") != "COMPLETED"
@@ -2373,9 +2667,29 @@ jobs:
           state["last_dispatch"] = {
               "run_id": plan.get("run_id"),
               "run_attempt": plan.get("run_attempt"),
+              "job_index": JOB_INDEX,
+              "final_job": FINAL_JOB,
               "skipped_as_complete": skipped_cases,
               "ran_in_this_dispatch": ran_cases,
           }
+          layout_record = dict(selection)
+          layout_record.update(
+              {
+                  "executed_case_ids": list(ran_cases),
+                  "skipped_case_ids": list(skipped_cases),
+                  "job_missing_case_ids": list(missing_selected),
+                  "recorded_at": utc_now(),
+              }
+          )
+          layouts = [
+              item
+              for item in (state.get("job_layouts") or [])
+              if isinstance(item, dict) and item.get("job_index") != JOB_INDEX
+          ]
+          layouts.append(layout_record)
+          state["job_layouts"] = sorted(
+              layouts, key=lambda item: item.get("job_index")
+          )
           # Every refusal reason is part of the run record, so a later reader
           # does not have to scrape the step log to learn why a case stopped.
           state["failures"] = list(failures)
@@ -2390,8 +2704,9 @@ jobs:
                   "ceiling_cents": CEILING,
               }
           state["totals"] = {
-              "cases_completed": len(plan["case_ids"]) - len(missing),
-              "cases_missing": len(missing),
+              "cases_completed": len(plan["case_ids"]) - len(missing_full),
+              "cases_missing": len(missing_full),
+              "job_cases_missing": len(missing_selected),
               "spent_cents": cumulative,
               "smoke_spend_cents": smoke_spent(),
               "ceiling_cents": CEILING,
@@ -2403,8 +2718,15 @@ jobs:
           print(
               json.dumps(
                   {
+                      "job_index": JOB_INDEX,
+                      "final_job": FINAL_JOB,
+                      "fixed_case_ids": FIXED_CASE_IDS,
+                      "execution_case_ids": EXECUTION_CASE_IDS,
+                      "executed_case_ids": ran_cases,
+                      "skipped_case_ids": skipped_cases,
+                      "job_missing_case_ids": missing_selected,
                       "cases_completed": state["totals"]["cases_completed"],
-                      "cases_missing": missing,
+                      "cases_missing_full": missing_full,
                       "spent_cents": state["totals"]["spent_cents"],
                       "ceiling_cents": CEILING,
                       "prior_spend_cents": state["totals"]["prior_spend_cents"],
@@ -2415,7 +2737,12 @@ jobs:
                   sort_keys=True,
               )
           )
-          if missing or failures:
+          job_failed = (
+              bool(failures)
+              or bool(missing_selected)
+              or (FINAL_JOB and bool(missing_full))
+          )
+          if job_failed:
               raise SystemExit(1)
           PY
 
@@ -2425,10 +2752,10 @@ jobs:
         # resume state and re-dispatch completed cases.
         # A failed restore must not publish a partial (empty) manifest that a
         # later dispatch could mistake for this dataset's resume state.
-        if: always() && inputs.preflight_only != true && steps.restore.outcome == 'success'
+        if: always() && inputs.preflight_only != true && steps.restore.outcome == 'success' && steps.select.outcome == 'success'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
-          name: ber-resume-manifest
+          name: ber-resume-manifest-job-1
           path: ${{ runner.temp }}/ber-manifest/
           # 90 days covers the gate's 7-day validity and leaves a wide margin:
           # a 14-day artifact that expired would make the dataset unresumable.
@@ -2442,7 +2769,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
-          name: ber-shared-allowance-state
+          name: ber-shared-allowance-state-job-1
           path: ${{ runner.temp }}/ber-reservation-state/
           retention-days: 14
           if-no-files-found: warn
@@ -2535,6 +2862,1539 @@ jobs:
           if failures:
               raise SystemExit(1)
           PY
+  # S4 two-job layout, job 2 of 2: needs job 1 success, verifies job 1's
+  # immutable dispatch context and durable state from this same run, runs ONLY
+  # the exact unexecuted cases in the remaining ten case ids (40-call capacity),
+  # and publishes the final canonical resume manifest, allowance state and
+  # structured summary. A failed/cancelled/ambiguous/admission-denied job 1
+  # skips this job: no key is mapped and no call is made here.
+  eval-run-job-2:
+    name: eval-run-job-2
+    needs: [eval-run-job-1]
+    if: ${{ !cancelled() && needs.eval-run-job-1.result == 'success' && inputs.preflight_only != true }}
+    runs-on: ubuntu-latest
+    environment: eval-run
+    # Unchanged per-job budget: 360 minutes. The run step still stops at 330.
+    timeout-minutes: 360
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONIOENCODING: utf-8
+      NoDefaultCurrentDirectoryInExePath: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.14"
+
+      - name: Install hash-locked dependencies
+        run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
+
+      - name: Verify job 1, merge its durable state, and select the remaining cases
+        id: verify-job-1
+        # S4: this step is the ONLY path from job 1 to job 2's spend-bearing run
+        # step. It runs with the actions-read token only (no provider key is
+        # mapped here). It verifies job 1's job/step conclusions at THIS run,
+        # downloads job 1's immutable dispatch context, resume manifest and
+        # allowance state, re-derives the frozen dataset/digest/count and the
+        # two-job partition from the committed bytes, verifies job 1 completed
+        # exactly its ten cases and that none of job 2's ten cases were executed,
+        # merges job 1's durable state, and records job 2's exact unexecuted
+        # execution set. Any missing, ambiguous or mismatched input refuses
+        # before a key can be mapped.
+        if: ${{ needs.eval-run-job-1.result == 'success' && inputs.preflight_only != true }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import hashlib
+          import json
+          import os
+          import shutil
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          sys.path.insert(0, str(WORKSPACE))
+          from tools.behavioral_eval_runner.live.config import (  # noqa: E402
+              LiveConfig,
+          )
+          from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
+              smoke_spend_total,
+          )
+          from tools.behavioral_eval_runner.live.dataset import (  # noqa: E402
+              dataset_digest,
+              load_cases,
+          )
+          from tools.behavioral_eval_runner.live.gate import OwnerGateRecord  # noqa: E402
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
+              validate_state,
+          )
+
+          repository = os.environ.get("REPOSITORY", "")
+          run_id = str(os.environ.get("GITHUB_RUN_ID", "")).strip()
+          run_attempt = str(os.environ.get("GITHUB_RUN_ATTEMPT", "")).strip() or "1"
+          dispatch_sha = os.environ["GITHUB_SHA"].strip()
+
+          def refuse(message):
+              print("JOB2 VERIFY REFUSED: " + message, flush=True)
+              raise SystemExit(1)
+
+          def gh(*args):
+              try:
+                  return subprocess.run(
+                      ["gh", *args],
+                      capture_output=True,
+                      text=True,
+                      timeout=300,
+                  )
+              except (OSError, subprocess.SubprocessError):
+                  return None
+
+          def sha256_bytes(data):
+              return hashlib.sha256(data).hexdigest()
+
+          def download_artifact(name, destination, required=True):
+              target = RUNNER_TEMP / destination
+              if target.exists():
+                  shutil.rmtree(target)
+              target.mkdir(parents=True, exist_ok=True)
+              completed = gh(
+                  "run", "download", run_id,
+                  "--repo", repository,
+                  "--name", name,
+                  "--dir", str(target),
+              )
+              if completed is None or completed.returncode != 0:
+                  if required:
+                      refuse(
+                          "artifact " + name
+                          + " could not be downloaded from this dispatch"
+                      )
+                  return None
+              return target
+
+          # 1. Job 1 is in the same run; require its job-level and step-level
+          # success. A failed/cancelled job 1 never reaches this step because of
+          # the job-level needs, and an ambiguous one refuses here.
+          if not run_id.isdigit():
+              refuse("GITHUB_RUN_ID is missing, so the dispatch cannot be verified")
+          if run_attempt != "1":
+              refuse("a re-run attempt is not resumed; dispatch a fresh run")
+          jobs = gh(
+              "api", "--paginate", "--slurp",
+              "repos/" + repository + "/actions/runs/" + run_id + "/jobs?per_page=100",
+          )
+          if jobs is None or jobs.returncode != 0:
+              refuse("the dispatch job listing could not be read")
+          try:
+              job_pages = json.loads(jobs.stdout or "[]")
+          except ValueError:
+              refuse("the dispatch job listing was not JSON")
+          if not isinstance(job_pages, list):
+              refuse("the dispatch job listing was not a page list")
+          job1 = None
+          for page in job_pages:
+              if not isinstance(page, dict):
+                  refuse("the dispatch job listing contains a non-object page")
+              for item in page.get("jobs") or []:
+                  if isinstance(item, dict) and item.get("name") == "eval-run-job-1":
+                      if job1 is not None:
+                          refuse("the dispatch lists two job-1 jobs")
+                      job1 = item
+          if job1 is None:
+              refuse("the dispatch has no eval-run-job-1 job")
+          if job1.get("status") != "completed" or job1.get("conclusion") != "success":
+              refuse(
+                  "job 1 did not finish successfully: status="
+                  + str(job1.get("status")) + " conclusion=" + str(job1.get("conclusion"))
+              )
+          required_steps = [
+              "Assert pinned models, verify the frozen dataset, stage the owner gate",
+              "Publish the dispatch context for the second job (no secrets)",
+              "Live preflight (staged gate; checkout must equal the gate revision)",
+              "Require a passing single-case live smoke at this exact head",
+              "Restore every prior dispatch's resume state for this dataset",
+              "Select the ten cases for job 1",
+              "Run the remaining cases as resumable per-case chunks",
+              "Upload resume manifest (always; completed cases survive a timeout)",
+              "Upload reservation/true-up state (always)",
+          ]
+          step_by_name = {}
+          for item in job1.get("steps") or []:
+              if not isinstance(item, dict):
+                  refuse("job 1 has a non-object step record")
+              name = item.get("name")
+              if name in step_by_name:
+                  refuse("job 1 has a duplicated step name: " + str(name))
+              step_by_name[name] = item
+          for name in required_steps:
+              item = step_by_name.get(name)
+              if item is None:
+                  refuse("job 1 did not run the required step: " + name)
+              if item.get("conclusion") != "success":
+                  refuse(
+                      "job 1 step did not succeed: " + name
+                      + " (conclusion=" + str(item.get("conclusion")) + ")"
+                  )
+
+          # 2. Download job 1's immutable dispatch context and durable state.
+          context_dir = download_artifact("ber-dispatch-context-job-1", "ber-job1-context")
+          manifest_dir = download_artifact("ber-resume-manifest-job-1", "ber-job1-manifest")
+          state_dir = download_artifact(
+              "ber-shared-allowance-state-job-1", "ber-job1-state", required=False
+          )
+          plan_path = context_dir / "ber-plan.json"
+          config_path = context_dir / "live-config.json"
+          gate_path = context_dir / "live-gate.json"
+          for path in (plan_path, config_path, gate_path):
+              if not path.is_file():
+                  refuse("the dispatch context artifact is missing " + path.name)
+          plan = json.loads(plan_path.read_text(encoding="utf-8"))
+          config_payload = json.loads(config_path.read_text(encoding="utf-8"))
+          gate_payload = json.loads(gate_path.read_text(encoding="utf-8"))
+          if not isinstance(plan, dict):
+              refuse("the dispatch plan is not a JSON object")
+
+          # 3. Re-derive the frozen dataset, count and digest from committed bytes.
+          if plan.get("dispatch_sha") != dispatch_sha:
+              refuse("the dispatch plan is not bound to the dispatched commit")
+          if str(plan.get("run_id")) != run_id or str(plan.get("run_attempt")) != run_attempt:
+              refuse("the dispatch plan is not bound to this run/attempt")
+          dataset_path = plan.get("dataset_path")
+          if not isinstance(dataset_path, str) or not dataset_path:
+              refuse("the dispatch plan has no dataset path")
+          try:
+              frozen_cases = load_cases(str(WORKSPACE / dataset_path))
+          except Exception as exc:  # noqa: BLE001
+              refuse("the committed frozen dataset does not load: " + type(exc).__name__)
+          frozen_digest = dataset_digest(frozen_cases)
+          frozen_ids = [case.case_id for case in frozen_cases]
+          if len(frozen_cases) != 20 or plan.get("case_count") != 20:
+              refuse("the frozen dataset is not the unchanged twenty-case set")
+          if frozen_digest != plan.get("dataset_sha256"):
+              refuse("the committed dataset digest does not match the dispatch plan")
+          if frozen_ids != plan.get("case_ids"):
+              refuse("the committed case ids do not match the dispatch plan")
+          if plan.get("planned_calls") != 80 or plan.get("planned_calls_per_case") != 4:
+              refuse("the dispatch plan is not the fixed 80-planned-call trial")
+          if plan.get("runs_per_case") != 1 or plan.get("subject_vendors") != ["anthropic"]:
+              refuse("the dispatch plan trial shape changed")
+          job_layout = plan.get("job_layout")
+          partition = (job_layout or {}).get("case_partition") or {}
+          job1_fixed = list(partition.get("job1") or [])
+          job2_fixed = list(partition.get("job2") or [])
+          if (
+              not isinstance(job_layout, dict)
+              or job_layout.get("job_count") != 2
+              or job_layout.get("cases_per_job") != 10
+              or job_layout.get("full_case_count") != 20
+              or job_layout.get("full_planned_calls") != 80
+              or job_layout.get("job_planned_calls_capacity") != 40
+              or job_layout.get("per_call_timeout_seconds") != 300
+              or job_layout.get("sequential_jobs") is not True
+              or job_layout.get("one_dispatch") is not True
+              or job_layout.get("retry_unchanged") is not True
+              or job1_fixed != frozen_ids[:10]
+              or job2_fixed != frozen_ids[10:]
+              or len(job1_fixed) != 10
+              or len(job2_fixed) != 10
+              or sorted(job1_fixed + job2_fixed) != sorted(frozen_ids)
+          ):
+              refuse("the dispatch plan does not carry the fixed two-by-ten layout")
+          # The stored context hashes must describe the bytes we just read.
+          if sha256_bytes(gate_path.read_bytes()) != plan.get("staged_gate_sha256"):
+              refuse("the staged gate bytes do not match the dispatch plan hash")
+          if sha256_bytes(config_path.read_bytes()) != plan.get("config_sha256"):
+              refuse("the built config bytes do not match the dispatch plan hash")
+          try:
+              gate_record = OwnerGateRecord.from_dict(gate_payload)
+          except Exception as exc:  # noqa: BLE001
+              refuse("the staged gate is not a valid owner gate: " + type(exc).__name__)
+          if (
+              gate_record.dataset_revision != dispatch_sha
+              or gate_record.dataset_sha256 != frozen_digest
+              or gate_record.case_count != 20
+          ):
+              refuse("the staged gate is not bound to this dispatch and frozen dataset")
+          try:
+              built_config = LiveConfig.from_dict(config_payload)
+              built_config.validate()
+          except Exception as exc:  # noqa: BLE001
+              refuse("the built config is not valid: " + type(exc).__name__)
+          if built_config.request_timeout_seconds != 300:
+              refuse("the built config changed the 300s per-call timeout")
+          if built_config.max_output_tokens != 16384:
+              refuse("the built config changed the 16384 output budget")
+          if len(built_config.subject_vendors) != 1 or built_config.runs_per_case != 1:
+              refuse("the built config changed the trial shape")
+          if built_config.spend_ceiling_cents != plan.get("spend_ceiling_cents"):
+              refuse("the built config ceiling does not match the dispatch plan")
+
+          # 4. Verify job 1's resume manifest, selection and durable accounting.
+          manifest_file = manifest_dir / "manifest.json"
+          if not manifest_file.is_file():
+              refuse("job 1 published no resume manifest.json")
+          manifest_bytes = manifest_file.read_bytes()
+          try:
+              job1_state = json.loads(manifest_bytes.decode("utf-8"))
+          except (UnicodeDecodeError, ValueError):
+              refuse("job 1's resume manifest is not readable JSON")
+          if not isinstance(job1_state, dict):
+              refuse("job 1's resume manifest is not a JSON object")
+          if job1_state.get("schema") != "ber-resume-manifest/1.2.0":
+              refuse("job 1's resume manifest schema is not recognised")
+          stored_plan = job1_state.get("plan")
+          if not isinstance(stored_plan, dict):
+              refuse("job 1's resume manifest has no plan")
+          for key in (
+              "dispatch_sha", "config_sha256", "dataset_sha256", "dataset_path",
+              "case_count", "planned_calls", "planned_calls_per_case", "runs_per_case",
+              "subject_vendors", "staged_gate_sha256", "spend_ceiling_cents",
+          ):
+              if stored_plan.get(key) != plan.get(key):
+                  refuse("job 1's manifest plan field changed: " + key)
+          if stored_plan.get("job_layout") != job_layout:
+              refuse("job 1's manifest does not carry the dispatch two-job layout")
+          selection_file = manifest_dir / "job-selection-job-1.json"
+          if not selection_file.is_file():
+              refuse("job 1 published no job-selection record")
+          try:
+              job1_selection = json.loads(selection_file.read_text(encoding="utf-8"))
+          except ValueError:
+              refuse("job 1's selection record is not readable JSON")
+          if not isinstance(job1_selection, dict):
+              refuse("job 1's selection record is not a JSON object")
+          if job1_selection.get("schema") != "ber-job-case-selection/1.0.0":
+              refuse("job 1's selection schema is not recognised")
+          if (
+              job1_selection.get("job_index") != 1
+              or job1_selection.get("final_job") is not False
+              or job1_selection.get("fixed_selected_case_ids") != job1_fixed
+              or job1_selection.get("full_case_count") != 20
+              or job1_selection.get("full_planned_calls") != 80
+              or job1_selection.get("job_planned_calls_capacity") != 40
+              or job1_selection.get("per_call_timeout_seconds") != 300
+              or job1_selection.get("dispatch_sha") != dispatch_sha
+              or job1_selection.get("dataset_sha256") != frozen_digest
+          ):
+              refuse("job 1's selection does not bind the dispatch and the ten-case partition")
+          job1_executed = list(job1_selection.get("unexecuted_case_ids") or [])
+          job1_skipped = list(job1_selection.get("already_completed_case_ids") or [])
+          job1_layouts = job1_state.get("job_layouts")
+          if not isinstance(job1_layouts, list) or len(job1_layouts) != 1:
+              refuse("job 1's manifest does not carry exactly one job layout record")
+          job1_layout = job1_layouts[0]
+          if not isinstance(job1_layout, dict):
+              refuse("job 1's job layout record is not a JSON object")
+          if (
+              job1_layout.get("job_index") != 1
+              or job1_layout.get("final_job") is not False
+              or job1_layout.get("fixed_selected_case_ids") != job1_fixed
+              or job1_layout.get("executed_case_ids") != job1_executed
+              or job1_layout.get("skipped_case_ids") != job1_skipped
+              or job1_layout.get("job_missing_case_ids")
+          ):
+              refuse("job 1's executed layout does not match its pre-run selection")
+          last_dispatch = job1_state.get("last_dispatch") or {}
+          if not isinstance(last_dispatch, dict):
+              refuse("job 1's last_dispatch record is missing")
+          if last_dispatch.get("ran_in_this_dispatch") != job1_executed:
+              refuse("job 1's last_dispatch ran set is not the selection execution set")
+          if last_dispatch.get("skipped_as_complete") != job1_skipped:
+              refuse("job 1's last_dispatch skip set is not the selection skip set")
+          if last_dispatch.get("job_index") != 1 or last_dispatch.get("final_job") is not False:
+              refuse("job 1's last_dispatch is not marked as job 1 of 2")
+          if job1_state.get("failures"):
+              refuse("job 1's manifest records failures")
+          cases = job1_state.get("cases")
+          if not isinstance(cases, dict):
+              refuse("job 1's manifest has no cases object")
+          if sorted(cases) != sorted(frozen_ids):
+              refuse("job 1's manifest cases are not the full frozen set")
+          if set(job1_executed) & set(job2_fixed):
+              refuse("job 1 reports executing a case that belongs to job 2")
+          if set(job1_skipped) | set(job1_executed) != set(job1_fixed):
+              refuse("job 1's executed/skipped sets do not partition its ten ids")
+          case_dir = manifest_dir / "cases"
+          ledger_dir = manifest_dir / "ledgers"
+          copied_cases = {}
+          if case_dir.is_dir():
+              for path in sorted(case_dir.glob("*.json")):
+                  copied_cases[path.stem] = path
+          ledger_files = {}
+          if ledger_dir.is_dir():
+              for path in sorted(ledger_dir.glob("*.json")):
+                  ledger_files[path.name] = path
+          for case_id in frozen_ids:
+              entry = cases.get(case_id)
+              if not isinstance(entry, dict):
+                  refuse("job 1's manifest has a malformed case record: " + case_id)
+              status = entry.get("status")
+              if case_id in job1_fixed:
+                  if status != "COMPLETED":
+                      refuse("job 1 did not complete its fixed case: " + case_id)
+                  result_path = copied_cases.get(case_id)
+                  if result_path is None:
+                      refuse("job 1's artifact is missing the result for " + case_id)
+                  if sha256_bytes(result_path.read_bytes()) != entry.get("result_sha256"):
+                      refuse("job 1's result hash does not match for " + case_id)
+              else:
+                  if status not in {"PENDING", "COMPLETED"}:
+                      refuse(
+                          "job 2's case is not cleanly unexecuted: " + case_id
+                          + " status=" + str(status)
+                      )
+                  if status == "COMPLETED":
+                      result_path = copied_cases.get(case_id)
+                      if result_path is None:
+                          refuse("a prior completed case is missing its result: " + case_id)
+                      if sha256_bytes(result_path.read_bytes()) != entry.get("result_sha256"):
+                          refuse("a prior completed result hash does not match: " + case_id)
+          ledger_spend = 0
+          for name, path in ledger_files.items():
+              try:
+                  payload = json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, ValueError):
+                  refuse("job 1's ledger " + name + " is unreadable")
+              if not isinstance(payload, dict):
+                  refuse("job 1's ledger " + name + " is not a JSON object")
+              spent = payload.get("spent_cents")
+              if type(spent) is not int or spent < 0:
+                  refuse("job 1's ledger " + name + " has no non-negative spend")
+              ledger_spend += spent
+          smoke_records = job1_state.get("smoke_spend")
+          try:
+              smoke_spend = smoke_spend_total(smoke_records)
+          except ValueError:
+              refuse("job 1's manifest carries invalid smoke spend")
+          totals = job1_state.get("totals")
+          if not isinstance(totals, dict):
+              refuse("job 1's manifest has no totals")
+          if totals.get("spent_cents") != ledger_spend + smoke_spend:
+              refuse("job 1's manifest total is not its ledgers plus smoke spend")
+          ceiling = plan.get("spend_ceiling_cents")
+          if type(ceiling) is not int or ledger_spend + smoke_spend > ceiling:
+              refuse("job 1's cumulative spend exceeds the shared ceiling")
+
+          # 5. Verify job 1's shared allowance state and require zero outstanding.
+          state_file = (
+              state_dir / "allowance-state.json" if state_dir is not None else None
+          )
+          job1_ran = bool(job1_executed)
+          if state_file is None or not state_file.is_file():
+              if job1_ran:
+                  refuse("job 1 ran cases but published no allowance state")
+              allowance = {
+                  "outstanding_reservations_cents": 0,
+                  "ledger_spend_cents": 0,
+                  "smoke_spend_cents": smoke_spend,
+                  "ceiling_cents": ceiling,
+              }
+          else:
+              try:
+                  allowance = validate_state(
+                      json.loads(state_file.read_text(encoding="utf-8"))
+                  )
+              except (OSError, ValueError) as exc:
+                  refuse("job 1's allowance state is invalid: " + str(exc))
+          if allowance.get("outstanding_reservations_cents") != 0:
+              refuse(
+                  "job 1 left an unsettled reserved exposure; job 2 may not spend "
+                  "until it is resolved"
+              )
+          if allowance.get("ceiling_cents") != ceiling:
+              refuse("job 1's allowance state ceiling is not the shared ceiling")
+          if (
+              type(allowance.get("ledger_spend_cents")) is not int
+              or type(allowance.get("smoke_spend_cents")) is not int
+              or allowance["ledger_spend_cents"] + allowance["smoke_spend_cents"] > ceiling
+          ):
+              refuse("job 1's allowance state spend is invalid or over the ceiling")
+
+          # 6. Merge job 1's durable state into this job's RUNNER_TEMP.
+          target = RUNNER_TEMP / "ber-manifest"
+          if target.exists():
+              shutil.rmtree(target)
+          (target / "cases").mkdir(parents=True, exist_ok=True)
+          (target / "ledgers").mkdir(parents=True, exist_ok=True)
+          for path in copied_cases.values():
+              shutil.copyfile(path, target / "cases" / path.name)
+          for path in ledger_files.values():
+              shutil.copyfile(path, target / "ledgers" / path.name)
+          job1_state["incoming_outstanding_reservations_cents"] = (
+              allowance.get("outstanding_reservations_cents")
+          )
+          job1_state["restored_from"] = job1_state.get("restored_from")
+          (target / "manifest.json").write_text(
+              json.dumps(job1_state, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          (target / "job-selection-job-1.json").write_text(
+              json.dumps(job1_selection, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          # The run step reads only the immutable dispatch context and its selection.
+          shutil.copyfile(plan_path, RUNNER_TEMP / "ber-plan.json")
+          shutil.copyfile(config_path, RUNNER_TEMP / "live-config.json")
+          shutil.copyfile(gate_path, RUNNER_TEMP / "live-gate.json")
+
+          # 7. Job 2 selects ONLY the exact unexecuted cases in its ten ids.
+          unexecuted = []
+          skipped = []
+          for case_id in job2_fixed:
+              entry = cases.get(case_id) or {}
+              if entry.get("status") == "COMPLETED":
+                  skipped.append(case_id)
+              else:
+                  if entry.get("status") != "PENDING":
+                      refuse(
+                          "job 2's case is not cleanly unexecuted: " + case_id
+                          + " status=" + str(entry.get("status"))
+                      )
+                  unexecuted.append(case_id)
+          for case_id in frozen_ids:
+              if case_id in job2_fixed:
+                  continue
+              if (cases.get(case_id) or {}).get("status") != "COMPLETED":
+                  refuse(
+                      "a case outside job 2's ten ids is still unexecuted; the "
+                      "two-job layout would leave it missing: " + case_id
+                  )
+          if len(unexecuted) != 10 and not skipped:
+              refuse("job 2's unexecuted selection is not the expected ten cases")
+          if len(unexecuted) + len(skipped) != 10:
+              refuse("job 2's executed/skipped sets do not partition its ten ids")
+          job2_selection = {
+              "schema": "ber-job-case-selection/1.0.0",
+              "job_index": 2,
+              "final_job": True,
+              "dispatch_sha": dispatch_sha,
+              "dataset_path": dataset_path,
+              "dataset_sha256": frozen_digest,
+              "full_case_count": 20,
+              "full_planned_calls": 80,
+              "job_planned_calls_capacity": 40,
+              "per_call_timeout_seconds": 300,
+              "fixed_selected_case_ids": job2_fixed,
+              "already_completed_case_ids": skipped,
+              "unexecuted_case_ids": unexecuted,
+              "execution_planned_calls": 4 * len(unexecuted),
+          }
+          (RUNNER_TEMP / "ber-selection-job.json").write_text(
+              json.dumps(job2_selection, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          (target / "job-selection-job-2.json").write_text(
+              json.dumps(job2_selection, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          outcome = {
+              "schema": "ber-job2-verify/1.0.0",
+              "run_id": run_id,
+              "run_attempt": run_attempt,
+              "dispatch_sha": dispatch_sha,
+              "job1_conclusion": job1.get("conclusion"),
+              "job1_steps_verified": required_steps,
+              "full_case_count": 20,
+              "dataset_sha256": frozen_digest,
+              "planned_calls_full": 80,
+              "job1_executed_case_ids": job1_executed,
+              "job1_skipped_case_ids": job1_skipped,
+              "job1_ledger_spend_cents": ledger_spend,
+              "job1_smoke_spend_cents": smoke_spend,
+              "job1_outstanding_reservations_cents": allowance.get(
+                  "outstanding_reservations_cents"
+              ),
+              "job2_fixed_case_ids": job2_fixed,
+              "job2_unexecuted_case_ids": unexecuted,
+              "job2_skipped_case_ids": skipped,
+              "job2_execution_planned_calls": 4 * len(unexecuted),
+              "job_planned_calls_capacity": 40,
+              "per_call_timeout_seconds": 300,
+              "provider_key_mapped_in_this_step": False,
+              "failures": [],
+          }
+          print(json.dumps(outcome, indent=2, sort_keys=True))
+          PY
+      - name: Run the remaining cases as resumable per-case chunks
+        # Never runs in a preflight-only dispatch (that mode maps no key and
+        # makes no provider call), and never after a failed restore: running
+        # with no prior state would re-dispatch completed cases and forget
+        # their spend.
+        if: ${{ steps.verify-job-1.outcome == 'success' }}
+        # Stops below the 360-minute job timeout so the always() steps that
+        # persist and publish the manifest still run when this step times out.
+        timeout-minutes: 330
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import hashlib
+          import json
+          import os
+          import re
+          import shutil
+          import subprocess
+          import sys
+          import time
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          MANIFEST_DIR = RUNNER_TEMP / "ber-manifest"
+          CASES_DIR = MANIFEST_DIR / "cases"
+          LEDGER_DIR = MANIFEST_DIR / "ledgers"
+          GATE_DIR = RUNNER_TEMP / "ber-gates"
+          EVIDENCE_DIR = RUNNER_TEMP / "ber-evidence"
+          CHUNK_ROOT = WORKSPACE / ".ber-run" / "chunks"
+          MANIFEST_PATH = MANIFEST_DIR / "manifest.json"
+          # The chunk root is generated inside the checkout. Refuse a symlinked
+          # .ber-run in the dispatched ref, and prove after creation that the
+          # resolved root is still inside the workspace, so a tracked symlink
+          # cannot redirect the writes.
+          if (WORKSPACE / ".ber-run").is_symlink() or CHUNK_ROOT.is_symlink():
+              print("REFUSED: .ber-run or .ber-run/chunks is a symlink", flush=True)
+              raise SystemExit(1)
+          for directory in (CASES_DIR, LEDGER_DIR, GATE_DIR, EVIDENCE_DIR, CHUNK_ROOT):
+              directory.mkdir(parents=True, exist_ok=True)
+          try:
+              CHUNK_ROOT.resolve().relative_to(WORKSPACE)
+          except ValueError:
+              print("REFUSED: the chunk root is outside the workspace", flush=True)
+              raise SystemExit(1)
+
+          sys.path.insert(0, str(WORKSPACE))
+          from tools.behavioral_eval_runner.live.config import LiveConfig  # noqa: E402
+          from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
+              smoke_spend_total,
+          )
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
+              cancel as cancel_reservation,
+              dispatch_if_admitted,
+              reserve as reserve_spend,
+              true_up as true_up_spend,
+          )
+          from tools.behavioral_eval_runner.live.dataset import (  # noqa: E402
+              dataset_digest,
+              load_cases,
+          )
+          from tools.behavioral_eval_runner.live.gate import OwnerGateRecord  # noqa: E402
+
+          plan = json.loads((RUNNER_TEMP / "ber-plan.json").read_text(encoding="utf-8"))
+          state = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+          # S4: the run step executes ONLY the exact case set the preceding
+          # selection step recorded, and re-derives every layout invariant here
+          # so a corrupted selection cannot dispatch an unselected case.
+          selection = json.loads(
+              (RUNNER_TEMP / "ber-selection-job.json").read_text(encoding="utf-8")
+          )
+          if not isinstance(selection, dict):
+              print("REFUSED: the job selection is not a JSON object", flush=True)
+              raise SystemExit(1)
+          if selection.get("schema") != "ber-job-case-selection/1.0.0":
+              print("REFUSED: the job selection schema is not recognised", flush=True)
+              raise SystemExit(1)
+          layout = plan.get("job_layout") or {}
+          partition = layout.get("case_partition") or {}
+          JOB_INDEX = selection.get("job_index")
+          FINAL_JOB = selection.get("final_job") is True
+          if JOB_INDEX not in (1, 2) or FINAL_JOB != (JOB_INDEX == 2):
+              print("REFUSED: the job selection has an invalid job index/final flag", flush=True)
+              raise SystemExit(1)
+          FIXED_CASE_IDS = list(selection.get("fixed_selected_case_ids") or [])
+          EXECUTION_CASE_IDS = list(selection.get("unexecuted_case_ids") or [])
+          expected_fixed = list(
+              partition.get("job1" if JOB_INDEX == 1 else "job2") or []
+          )
+          if len(FIXED_CASE_IDS) != 10 or FIXED_CASE_IDS != expected_fixed:
+              print("REFUSED: the job's fixed ten case ids are not the plan partition", flush=True)
+              raise SystemExit(1)
+          if (
+              len(set(FIXED_CASE_IDS)) != 10
+              or any(case_id not in plan["case_ids"] for case_id in FIXED_CASE_IDS)
+          ):
+              print("REFUSED: the job's fixed case ids are not unique plan case ids", flush=True)
+              raise SystemExit(1)
+          if len(set(EXECUTION_CASE_IDS)) != len(EXECUTION_CASE_IDS) or any(
+              case_id not in FIXED_CASE_IDS for case_id in EXECUTION_CASE_IDS
+          ):
+              print("REFUSED: the execution set is not a unique subset of the fixed set", flush=True)
+              raise SystemExit(1)
+          if (
+              selection.get("dispatch_sha") != plan.get("dispatch_sha")
+              or selection.get("dataset_sha256") != plan.get("dataset_sha256")
+              or selection.get("full_case_count") != plan.get("case_count")
+              or selection.get("full_planned_calls") != plan.get("planned_calls")
+              or selection.get("job_planned_calls_capacity") != 40
+              or selection.get("per_call_timeout_seconds") != 300
+              or selection.get("execution_planned_calls") != 4 * len(EXECUTION_CASE_IDS)
+          ):
+              print("REFUSED: the job selection does not bind the dispatch plan shape", flush=True)
+              raise SystemExit(1)
+          if (
+              layout.get("job_count") != 2
+              or layout.get("cases_per_job") != 10
+              or layout.get("full_case_count") != 20
+              or layout.get("full_planned_calls") != 80
+          ):
+              print("REFUSED: the plan does not carry the frozen two-by-ten layout", flush=True)
+              raise SystemExit(1)
+          for case_id in plan["case_ids"]:
+              if case_id not in state["cases"]:
+                  print("REFUSED: the manifest has no case record for " + case_id, flush=True)
+                  raise SystemExit(1)
+          for case_id in EXECUTION_CASE_IDS:
+              if (state["cases"].get(case_id) or {}).get("status") == "COMPLETED":
+                  print(
+                      "REFUSED: the execution selection includes a completed case: "
+                      + case_id,
+                      flush=True,
+                  )
+                  raise SystemExit(1)
+          CEILING = int(plan["spend_ceiling_cents"]) - int(state.get("incoming_outstanding_reservations_cents", 0))
+          if CEILING <= 0:
+              print("REFUSED: outstanding exposure exhausts the shared ceiling", flush=True)
+              raise SystemExit(1)
+          COMMITTED_CASES = {
+              case.case_id: case
+              for case in load_cases(str(WORKSPACE / plan["dataset_path"]))
+          }
+          # Re-assert the frozen set in this step, not only in the config step:
+          # a change between the steps must stop the run before any chunk is
+          # built from bytes the gate did not freeze.
+          if len(COMMITTED_CASES) != plan["case_count"]:
+              print("REFUSED: the committed case count changed during the run", flush=True)
+              raise SystemExit(1)
+          if dataset_digest(list(COMMITTED_CASES.values())) != plan["dataset_sha256"]:
+              print("REFUSED: the committed dataset digest changed during the run", flush=True)
+              raise SystemExit(1)
+          # One case per invocation: a timeout can therefore lose at most the
+          # case in flight, and a completed case is never dispatched again.
+          PER_CASE_TIMEOUT_SECONDS = 1500
+
+          # The uploaded case record is a closed shape: these are the only
+          # package fields the summary needs, and nothing else from live-run
+          # stdout is written to the uploaded artifact.
+          RESULT_KEYS = (
+              "command",
+              "status",
+              "planned_calls",
+              "dispatched_calls",
+              "spent_cents",
+              "ceiling_cents",
+              "halt",
+              "halt_reason_code",
+              "results",
+              "evidence",
+              "network_calls",
+              "raw_transcript_included",
+              "cost_ledger",
+          )
+          RESULT_ITEM_KEYS = (
+              "case_id",
+              "skill",
+              "arm",
+              "run_index",
+              "subject_vendor",
+              "result_state",
+              "reason_code",
+              "citability",
+              "rule_state_if_citable",
+              "deterministic",
+              "subject",
+              "judge",
+              "raw_transcript_included",
+          )
+          EVIDENCE_KEYS = (
+              "verified",
+              "final_report_sha256",
+              "final_evidence_manifest_sha256",
+          )
+
+
+          def closed_result_item(item):
+              out = {key: item.get(key) for key in RESULT_ITEM_KEYS if key in item}
+              deterministic = out.get("deterministic")
+              if isinstance(deterministic, dict):
+                  out["deterministic"] = {
+                      key: deterministic.get(key)
+                      for key in ("status", "checks", "failures")
+                  }
+              subject = out.get("subject")
+              if isinstance(subject, dict):
+                  out["subject"] = {
+                      key: subject.get(key)
+                      for key in ("served_model", "pinned_match")
+                  }
+              judge = out.get("judge")
+              if isinstance(judge, dict):
+                  verdict = judge.get("verdict")
+                  out["judge"] = {
+                      "verdict": (
+                          {
+                              key: verdict.get(key)
+                              for key in ("verdict", "reason_code", "failure_mode")
+                          }
+                          if isinstance(verdict, dict)
+                          else None
+                      ),
+                      "judge_error_kind": judge.get("judge_error_kind"),
+                  }
+              return out
+
+
+          def utc_now():
+              return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+          def write_state():
+              # Every persisted record carries the refusal reasons, including a
+              # record written just before a fail-fast SystemExit.
+              state["failures"] = list(failures)
+              # Atomic replace; a concurrent reader must never make the
+              # persisted record fail (Windows can deny a rename while the
+              # destination is open, Linux never does).
+              temporary = MANIFEST_PATH.with_suffix(".json.tmp")
+              temporary.write_text(
+                  json.dumps(state, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+              for _ in range(50):
+                  try:
+                      os.replace(temporary, MANIFEST_PATH)
+                      return
+                  except OSError:
+                      time.sleep(0.02)
+              os.replace(temporary, MANIFEST_PATH)
+
+
+          def ledger_spent(path):
+              """The charge the package recorded, or None when no ledger exists.
+
+              The package snapshots its ledger after every accounted call, so
+              a killed or timed-out attempt still leaves the charges it made.
+              A ledger that exists but cannot be read, is not an object, or does
+              not carry a non-negative integer charge is a refusal: a malformed
+              ledger must never be counted as zero.
+              """
+              if not path.exists():
+                  return None
+              try:
+                  payload = json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, ValueError):
+                  print(f"REFUSED: ledger {path.name} is unreadable", flush=True)
+                  raise SystemExit(1)
+              if not isinstance(payload, dict):
+                  print(f"REFUSED: ledger {path.name} is not a JSON object", flush=True)
+                  raise SystemExit(1)
+              spent = payload.get("spent_cents")
+              if type(spent) is not int or spent < 0:
+                  print(
+                      f"REFUSED: ledger {path.name} has no non-negative "
+                      "integer spent_cents",
+                      flush=True,
+                  )
+                  raise SystemExit(1)
+              return spent
+
+
+          def ledger_charges():
+              observed = {}
+              for path in sorted(LEDGER_DIR.glob("*.json")):
+                  spent = ledger_spent(path)
+                  if spent is not None:
+                      observed[path.name] = spent
+              return observed
+
+
+          def smoke_spent():
+              """The cumulative smoke spend, exactly once per smoke run id."""
+              try:
+                  return smoke_spend_total(state.get("smoke_spend"))
+              except ValueError as exc:
+                  print("REFUSED: invalid recorded smoke spend: " + str(exc), flush=True)
+                  raise SystemExit(1)
+
+
+          def total_spent():
+              """Cumulative spend over every dispatch, counted exactly once.
+
+              Ledgers are the spend record that survives a timeout, and every
+              prior dispatch's ledger is copied in beside the new ones, so each
+              ledger is counted once by name. A manifest record's spent_cents
+              is used only for an attempt that has no ledger, so an attempt is
+              never charged twice and a HALTED or timed-out charge is never
+              lost. A ledger no record names (a killed attempt from an older
+              manifest) is still counted.
+              """
+              observed = ledger_charges()
+              total = 0
+              attributed = set()
+              for case_id, entry in state["cases"].items():
+                  for record in entry.get("attempts", []):
+                      if not isinstance(record, dict):
+                          continue
+                      name = record.get("ledger_name")
+                      if isinstance(name, str) and name in observed:
+                          # Count each ledger exactly once: a record naming an
+                          # already attributed ledger adds nothing.
+                          if name not in attributed:
+                              total += observed[name]
+                              attributed.add(name)
+                          continue
+                      spent = record.get("spent_cents")
+                      if type(spent) is int:
+                          if spent < 0:
+                              print(
+                                  f"REFUSED: an attempt records a negative {spent}c",
+                                  flush=True,
+                              )
+                              raise SystemExit(1)
+                          if spent > 0:
+                              print(
+                                  f"REFUSED: an attempt records {spent}c with no ledger",
+                                  flush=True,
+                              )
+                              raise SystemExit(1)
+                          total += spent
+              for name, spent in observed.items():
+                  if name not in attributed:
+                      total += spent
+              return total + smoke_spent()
+
+
+          def attempt_floor(case_id, entry):
+              """One past the highest attempt number any dispatch used."""
+              highest = 0
+              for record in entry.get("attempts", []):
+                  attempt = record.get("attempt") if isinstance(record, dict) else None
+                  if type(attempt) is int and attempt > highest:
+                      highest = attempt
+              for name in ledger_charges():
+                  stem = name[:-5] if name.endswith(".json") else name
+                  marker = stem.rfind("-attempt")
+                  if marker < 0:
+                      continue
+                  tail = stem[marker + len("-attempt"):]
+                  if not tail.isdigit():
+                      continue
+                  owner = stem[:marker]
+                  if owner == case_id or owner.endswith("-" + case_id):
+                      highest = max(highest, int(tail))
+              return highest + 1
+
+
+          def halt_view_of(halt):
+              """Publish closed, typed fields only: no free-form detail."""
+              if not isinstance(halt, dict):
+                  return None
+              view = {
+                  key: halt.get(key)
+                  for key in (
+                      "halted",
+                      "reason_code",
+                      "spent_cents",
+                      "ceiling_cents",
+                      "calls_dispatched",
+                      "requested_cents",
+                  )
+              }
+              view["vendor"] = halt.get("vendor")
+              view["model"] = halt.get("model")
+              return view
+
+
+          def enforce_ceiling():
+              """Fail closed before any further reservation can be made."""
+              spent = total_spent()
+              if spent > CEILING:
+                  failures.append(
+                      f"cumulative spend {spent}c across dispatches exceeds the "
+                      f"{CEILING}c ceiling"
+                  )
+                  state["ceiling_breach"] = {
+                      "spent_cents": spent,
+                      "ceiling_cents": CEILING,
+                  }
+                  write_state()
+                  raise SystemExit(1)
+              return spent
+
+
+          def run_cli(args, timeout, secret_free=False):
+              environment = dict(os.environ)
+              environment["PYTHONPATH"] = str(WORKSPACE)
+              if secret_free:
+                  # The offline preflight never needs a provider key: scrub it so
+                  # a key cannot reach that subprocess even by inheritance.
+                  for name in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
+                      environment.pop(name, None)
+              return subprocess.run(
+                  [sys.executable, "-P", "-m", "tools.behavioral_eval_runner", *args],
+                  capture_output=True,
+                  text=True,
+                  timeout=timeout,
+                  cwd=str(WORKSPACE),
+                  env=environment,
+              )
+
+
+          failures = []
+          skipped_cases = []
+          ran_cases = []
+          if not EXECUTION_CASE_IDS:
+              print(
+                  "NOTICE: this job has no unexecuted cases in its fixed ten-case set",
+                  flush=True,
+              )
+          for case_id in EXECUTION_CASE_IDS:
+              entry = state["cases"].get(case_id)
+              if entry is None:
+                  entry = {"case_id": case_id, "status": "PENDING", "attempts": []}
+                  state["cases"][case_id] = entry
+              if entry.get("status") == "COMPLETED":
+                  completed_result = CASES_DIR / (case_id + ".json")
+                  try:
+                      completed_digest = hashlib.sha256(
+                          completed_result.read_bytes()
+                      ).hexdigest()
+                  except OSError:
+                      completed_digest = None
+                  if completed_digest == entry.get("result_sha256"):
+                      skipped_cases.append(case_id)
+                      print(f"SKIP {case_id}: completed by an earlier dispatch")
+                      continue
+                  # A COMPLETED status without its recorded result is not
+                  # complete; run it rather than skipping a case the summary
+                  # could not verify.
+                  entry["status"] = "PENDING"
+              # Cumulative first: the budget still unspent is what every
+              # prior dispatch already charged, not just this manifest's.
+              enforce_ceiling()
+              remaining = CEILING - total_spent()
+              # S4c2b: run the production admission gate BEFORE the existing
+              # pre-check so a denied admission is a genuine, observable path
+              # (and cannot be masked by the ceiling pre-check).
+              gate_admission = {"admitted": remaining > 0}
+              if dispatch_if_admitted(gate_admission, lambda: "ADMITTED") is None:
+                  entry["status"] = "ADMISSION_DENIED"
+                  failures.append(
+                      f"{case_id}: admission denied before dispatch "
+                      f"(remaining={remaining}c)"
+                  )
+                  write_state()
+                  break
+              if remaining <= 0:
+                  entry["status"] = "NOT_RUN_BUDGET"
+                  failures.append(
+                      f"{case_id}: the {CEILING}c ceiling is exhausted before dispatch"
+                  )
+                  write_state()
+                  break
+              # One past every attempt any dispatch used for this case, so a
+              # copied prior ledger is never overwritten and the package never
+              # refuses an existing ledger path.
+              attempt = attempt_floor(case_id, entry)
+              ledger_name = f"{case_id}-attempt{attempt}.json"
+              while (LEDGER_DIR / ledger_name).exists():
+                  attempt += 1
+                  ledger_name = f"{case_id}-attempt{attempt}.json"
+              record = {
+                  "attempt": attempt,
+                  "ledger_name": ledger_name,
+                  "started_at": utc_now(),
+                  "status": "IN_FLIGHT",
+                  "spent_cents": None,
+              }
+              entry.setdefault("attempts", []).append(record)
+              entry["status"] = "IN_FLIGHT"
+              write_state()
+
+              if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", case_id):
+                  failures.append(f"{case_id}: the case id is not a safe path component")
+                  entry["status"] = "CHUNK_INVALID"
+                  write_state()
+                  break
+              source_case = COMMITTED_CASES[case_id]
+              source_path = WORKSPACE / plan["dataset_path"] / case_id / "case.json"
+              # load_cases reads immediate child directories that hold a
+              # case.json, so one case is one child directory under its own
+              # chunk root: .ber-run/chunks/<case>/<case>/case.json
+              chunk_root = CHUNK_ROOT / case_id
+              chunk_case_dir = chunk_root / case_id
+              if chunk_root.is_symlink() or chunk_case_dir.is_symlink():
+                  failures.append(f"{case_id}: the chunk path is a symlink")
+                  entry["status"] = "CHUNK_INVALID"
+                  write_state()
+                  break
+              if chunk_root.exists():
+                  shutil.rmtree(chunk_root)
+              chunk_case_dir.mkdir(parents=True, exist_ok=True)
+              try:
+                  chunk_case_dir.resolve().relative_to(WORKSPACE)
+              except ValueError:
+                  failures.append(f"{case_id}: the chunk case path is outside the workspace")
+                  entry["status"] = "CHUNK_INVALID"
+                  write_state()
+                  break
+              shutil.copyfile(source_path, chunk_case_dir / "case.json")
+              chunk_cases = load_cases(str(chunk_root))
+              if len(chunk_cases) != 1 or chunk_cases[0].case_id != case_id:
+                  failures.append(f"{case_id}: the chunk did not load exactly one case")
+                  entry["status"] = "CHUNK_INVALID"
+                  write_state()
+                  break
+              if chunk_cases[0].record_sha256 != source_case.record_sha256:
+                  failures.append(f"{case_id}: the chunk bytes differ from the committed case")
+                  entry["status"] = "CHUNK_INVALID"
+                  write_state()
+                  break
+              chunk_digest = dataset_digest(chunk_cases)
+
+              staged = json.loads(
+                  (RUNNER_TEMP / "live-gate.json").read_text(encoding="utf-8")
+              )
+              staged["dataset"] = {
+                  "revision": plan["dispatch_sha"],
+                  "path": f".ber-run/chunks/{case_id}",
+                  "sha256": chunk_digest,
+                  "case_count": 1,
+              }
+              chunk_gate = OwnerGateRecord.from_dict(staged)
+              gate_path = GATE_DIR / f"{case_id}.json"
+              gate_path.write_text(
+                  json.dumps(staged, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+              )
+              record["chunk_dataset_sha256"] = chunk_digest
+              record["chunk_gate_sha256"] = hashlib.sha256(
+                  gate_path.read_bytes()
+              ).hexdigest()
+              record["chunk_gate_digest"] = chunk_gate.digest()
+
+              config = json.loads(
+                  (RUNNER_TEMP / "live-config.json").read_text(encoding="utf-8")
+              )
+              config["spend_ceiling_cents"] = remaining
+              LiveConfig.from_dict(config).validate()
+              config_path = GATE_DIR / f"{case_id}-attempt{attempt}-config.json"
+              config_path.write_text(
+                  json.dumps(config, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+              )
+              evidence_root = EVIDENCE_DIR / f"{case_id}-attempt{attempt}"
+              ledger_path = LEDGER_DIR / ledger_name
+              run_id = f"ber-{plan['run_id']}-{case_id}-a{attempt}"
+              record["remaining_ceiling_cents"] = remaining
+              write_state()
+
+              try:
+                  preflight = run_cli(
+                      [
+                          "live-preflight",
+                          "--config", str(config_path),
+                          "--gate", str(gate_path),
+                          "--cases", str(chunk_root),
+                          "--repo-root", str(WORKSPACE),
+                          "--expected-revision", plan["dispatch_sha"],
+                      ],
+                      timeout=120,
+                      secret_free=True,
+                  )
+              except subprocess.TimeoutExpired:
+                  failures.append(f"{case_id}: the chunk preflight timed out")
+                  record["status"] = "PREFLIGHT_TIMEOUT"
+                  entry["status"] = "PREFLIGHT_TIMEOUT"
+                  write_state()
+                  enforce_ceiling()
+                  break
+              if preflight.returncode != 0:
+                  failures.append(f"{case_id}: chunk preflight failed")
+                  record["status"] = "PREFLIGHT_FAILED"
+                  entry["status"] = "PREFLIGHT_FAILED"
+                  write_state()
+                  enforce_ceiling()
+                  break
+              try:
+                  report = json.loads(preflight.stdout)
+              except ValueError:
+                  report = {}
+              if report.get("status") not in {"READY", "READY_NEEDS_KEYS"} or report.get(
+                  "blockers"
+              ):
+                  failures.append(f"{case_id}: chunk preflight reported blockers")
+                  record["status"] = "PREFLIGHT_REFUSED"
+                  record["preflight_status"] = report.get("status")
+                  entry["status"] = "PREFLIGHT_REFUSED"
+                  write_state()
+                  enforce_ceiling()
+                  break
+
+              reservation_state_path = RUNNER_TEMP / "ber-reservation-state" / "allowance-state.json"
+              reserve_amount = max(0, CEILING - total_spent())
+              reserve_spend(
+                  reservation_state_path,
+                  allowance_id="pilot-a-recovery-20261031",
+                  workflow_run_id=plan.get("run_id"),
+                  identity=run_id,
+                  amount_cents=reserve_amount,
+                  ledger_spend_cents=total_spent() - smoke_spent(),
+                  smoke_spend_cents=smoke_spent(),
+                  ceiling_cents=CEILING,
+              )
+              admission = {"admitted": reserve_amount > 0}
+              try:
+                  completed = dispatch_if_admitted(
+                      admission,
+                      run_cli,
+                      [
+                          "live-run",
+                          "--config", str(config_path),
+                          "--gate", str(gate_path),
+                          "--cases", str(chunk_root),
+                          "--repo-root", str(WORKSPACE),
+                          "--evidence-root", str(evidence_root),
+                          "--cost-ledger", str(ledger_path),
+                          "--run-id", run_id,
+                      ],
+                      timeout=PER_CASE_TIMEOUT_SECONDS,
+                  )
+                  if completed is None:
+                      record["status"] = "ADMISSION_DENIED"
+                      entry["status"] = "ADMISSION_DENIED"
+                      failures.append(f"{case_id}: admission denied before live-run")
+                      write_state()
+                      break
+              except subprocess.TimeoutExpired:
+                  try:
+                      cancel_reservation(reservation_state_path)
+                  except ValueError:
+                      pass
+                  failures.append(
+                      f"{case_id}: the per-case invocation exceeded "
+                      f"{PER_CASE_TIMEOUT_SECONDS}s and was killed"
+                  )
+                  record["status"] = "ATTEMPT_TIMEOUT"
+                  record["finished_at"] = utc_now()
+                  # The killed package still snapshotted what it charged, so
+                  # a timed-out attempt's spend is read from its ledger
+                  # instead of being recorded as None and forgotten.
+                  record["spent_cents"] = ledger_spent(ledger_path)
+                  entry["status"] = "ATTEMPT_TIMEOUT"
+                  write_state()
+                  enforce_ceiling()
+                  break
+              try:
+                  settled = ledger_spent(ledger_path)
+                  true_up_spend(reservation_state_path, spent_cents=settled if settled is not None else 0)
+              except ValueError:
+                  cancel_reservation(reservation_state_path)
+              result_path = CASES_DIR / (case_id + ".json")
+
+
+              def withhold_result():
+                  # An untrustworthy COMPLETED claim must not leave a result
+                  # file that says COMPLETED while the run record says otherwise.
+                  if result_path.exists():
+                      result_path.unlink()
+                  record["result_sha256"] = None
+
+
+              try:
+                  result = json.loads(completed.stdout)
+              except ValueError:
+                  result = None
+              if not isinstance(result, dict):
+                  # Never upload the raw stdout of an unparseable result: a closed
+                  # marker is written instead, so the resume artifact carries no
+                  # free-form package output.
+                  result_path.write_text(
+                      json.dumps(
+                          {
+                              "command": "live-run",
+                              "status": "RESULT_INVALID",
+                              "raw_stdout_withheld": True,
+                          },
+                          indent=2,
+                          sort_keys=True,
+                      )
+                      + "\n",
+                      encoding="utf-8",
+                  )
+                  failures.append(f"{case_id}: live-run produced no parseable result")
+                  record["result_sha256"] = hashlib.sha256(
+                      result_path.read_bytes()
+                  ).hexdigest()
+                  record["status"] = "RESULT_INVALID"
+                  record["spent_cents"] = ledger_spent(ledger_path)
+                  entry["status"] = "RESULT_INVALID"
+                  write_state()
+                  enforce_ceiling()
+                  break
+              result_error_present = bool(result.get("error"))
+              # The resume artifact is uploaded, so only the allowlisted fields
+              # are written: free-form error text and every unlisted package
+              # field are dropped, nested records are reduced to the fields the
+              # summary reads, and a halt is stored as its closed allowlist view.
+              sanitized = {
+                  key: result.get(key) for key in RESULT_KEYS if key in result
+              }
+              items = sanitized.get("results")
+              if isinstance(items, list):
+                  sanitized["results"] = [
+                      closed_result_item(item)
+                      for item in items
+                      if isinstance(item, dict)
+                  ]
+              evidence_view = sanitized.get("evidence")
+              if isinstance(evidence_view, dict):
+                  sanitized["evidence"] = {
+                      key: evidence_view.get(key) for key in EVIDENCE_KEYS
+                  }
+              if isinstance(sanitized.get("halt"), dict):
+                  sanitized["halt"] = halt_view_of(sanitized["halt"])
+              result = sanitized
+              result_path.write_text(
+                  json.dumps(result, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+              record["result_sha256"] = hashlib.sha256(
+                  result_path.read_bytes()
+              ).hexdigest()
+              record["spent_cents"] = ledger_spent(ledger_path)
+              record["dispatched_calls"] = result.get("dispatched_calls")
+              record["finished_at"] = utc_now()
+              if completed.returncode != 0 and result.get("status") == "COMPLETED":
+                  # A non-zero return code never sets a case COMPLETED, whatever
+                  # the JSON on stdout claims. A legitimate halt (the package
+                  # exits 3 with status HALTED) is handled by the halt branch
+                  # below, not relabelled as an error.
+                  record["status"] = "ERROR"
+                  record["returncode"] = completed.returncode
+                  record["halt_view"] = halt_view_of(result.get("halt"))
+                  record["halt_reason_code"] = result.get("halt_reason_code")
+                  record["error_present"] = result_error_present
+                  entry["status"] = "ERROR"
+                  withhold_result()
+                  failures.append(
+                      f"{case_id}: live-run exited with return code "
+                      f"{completed.returncode}"
+                  )
+                  write_state()
+                  enforce_ceiling()
+                  break
+              record["status"] = result.get("status")
+              if result.get("status") != "COMPLETED":
+                  # The manifest is itself an uploaded artifact, so a halt is
+                  # published through the same closed allowlist as the
+                  # structured summary, never as the package's raw object.
+                  record["halt_view"] = halt_view_of(result.get("halt"))
+                  record["halt_reason_code"] = result.get("halt_reason_code")
+                  record["error_present"] = result_error_present
+                  entry["status"] = str(result.get("status") or "ERROR")
+                  failures.append(
+                      f"{case_id}: live-run finished with status "
+                      f"{result.get('status')!r}"
+                  )
+                  write_state()
+                  enforce_ceiling()
+                  break
+              if record["spent_cents"] is None:
+                  # The package writes its ledger before it returns a result, so
+                  # a COMPLETED result with no readable ledger cannot be counted.
+                  # It is refused rather than trusted from stdout, because a case
+                  # marked COMPLETED here would be skipped by every later dispatch.
+                  failures.append(
+                      f"{case_id}: completed live-run has no readable cost ledger"
+                  )
+                  record["status"] = "LEDGER_INVALID"
+                  entry["status"] = "LEDGER_INVALID"
+                  withhold_result()
+                  write_state()
+                  raise SystemExit(1)
+              evidence = result.get("evidence")
+              evidence = evidence if isinstance(evidence, dict) else {}
+              if evidence.get("verified") is not True:
+                  # A COMPLETED case must satisfy the same evidence invariant the
+                  # summary checks; otherwise the manifest would permanently mark
+                  # an unverifiable case as done and a later dispatch could not
+                  # repair it.
+                  failures.append(
+                      f"{case_id}: live-run returned COMPLETED without verified evidence"
+                  )
+                  record["status"] = "EVIDENCE_UNVERIFIED"
+                  entry["status"] = "EVIDENCE_UNVERIFIED"
+                  withhold_result()
+                  write_state()
+                  enforce_ceiling()
+                  break
+              results = result.get("results")
+              planned = plan.get("planned_calls_per_case")
+              expected_results = (
+                  planned // 2 if type(planned) is int and planned % 2 == 0 else None
+              )
+              if not isinstance(results, list) or (
+                  expected_results is not None and len(results) != expected_results
+              ):
+                  failures.append(
+                      f"{case_id}: live-run returned "
+                      f"{len(results) if isinstance(results, list) else 'no'} "
+                      f"results, expected {expected_results}"
+                  )
+                  record["status"] = "RESULT_COUNT_INVALID"
+                  entry["status"] = "RESULT_COUNT_INVALID"
+                  withhold_result()
+                  write_state()
+                  enforce_ceiling()
+                  break
+              entry["status"] = "COMPLETED"
+              entry["result_sha256"] = record["result_sha256"]
+              ran_cases.append(case_id)
+              write_state()
+              enforce_ceiling()
+              print(
+                f"DONE {case_id}: attempt {attempt}, spent "
+                f"{record['spent_cents']}c, total {total_spent()}c"
+              )
+
+          # S4: only THIS job's fixed ten-case set is marked UNRUN. The other
+          # job's cases stay PENDING (job 1) so the next job owns them; job 2 is
+          # final and fails closed if any plan case is still not COMPLETED.
+          for case_id in FIXED_CASE_IDS:
+              pending = state["cases"].get(case_id)
+              if isinstance(pending, dict) and pending.get("status") == "PENDING":
+                  pending["status"] = "UNRUN"
+          missing_selected = [
+              case_id
+              for case_id in FIXED_CASE_IDS
+              if (state["cases"].get(case_id) or {}).get("status") != "COMPLETED"
+          ]
+          missing_full = [
+              case_id
+              for case_id in plan["case_ids"]
+              if (state["cases"].get(case_id) or {}).get("status") != "COMPLETED"
+          ]
+          state["updated_at"] = utc_now()
+          state["last_dispatch"] = {
+              "run_id": plan.get("run_id"),
+              "run_attempt": plan.get("run_attempt"),
+              "job_index": JOB_INDEX,
+              "final_job": FINAL_JOB,
+              "skipped_as_complete": skipped_cases,
+              "ran_in_this_dispatch": ran_cases,
+          }
+          layout_record = dict(selection)
+          layout_record.update(
+              {
+                  "executed_case_ids": list(ran_cases),
+                  "skipped_case_ids": list(skipped_cases),
+                  "job_missing_case_ids": list(missing_selected),
+                  "recorded_at": utc_now(),
+              }
+          )
+          layouts = [
+              item
+              for item in (state.get("job_layouts") or [])
+              if isinstance(item, dict) and item.get("job_index") != JOB_INDEX
+          ]
+          layouts.append(layout_record)
+          state["job_layouts"] = sorted(
+              layouts, key=lambda item: item.get("job_index")
+          )
+          # Every refusal reason is part of the run record, so a later reader
+          # does not have to scrape the step log to learn why a case stopped.
+          state["failures"] = list(failures)
+          cumulative = total_spent()
+          if cumulative > CEILING:
+              failures.append(
+                  f"cumulative spend {cumulative}c across dispatches exceeds the "
+                  f"{CEILING}c ceiling"
+              )
+              state["ceiling_breach"] = {
+                  "spent_cents": cumulative,
+                  "ceiling_cents": CEILING,
+              }
+          state["totals"] = {
+              "cases_completed": len(plan["case_ids"]) - len(missing_full),
+              "cases_missing": len(missing_full),
+              "job_cases_missing": len(missing_selected),
+              "spent_cents": cumulative,
+              "smoke_spend_cents": smoke_spent(),
+              "ceiling_cents": CEILING,
+              "prior_spend_cents": (state.get("restored_from") or {}).get(
+                  "prior_spend_cents"
+              ),
+          }
+          write_state()
+          print(
+              json.dumps(
+                  {
+                      "job_index": JOB_INDEX,
+                      "final_job": FINAL_JOB,
+                      "fixed_case_ids": FIXED_CASE_IDS,
+                      "execution_case_ids": EXECUTION_CASE_IDS,
+                      "executed_case_ids": ran_cases,
+                      "skipped_case_ids": skipped_cases,
+                      "job_missing_case_ids": missing_selected,
+                      "cases_completed": state["totals"]["cases_completed"],
+                      "cases_missing_full": missing_full,
+                      "spent_cents": state["totals"]["spent_cents"],
+                      "ceiling_cents": CEILING,
+                      "prior_spend_cents": state["totals"]["prior_spend_cents"],
+                      "ceiling_breach": state.get("ceiling_breach"),
+                      "failures": failures,
+                  },
+                  indent=2,
+                  sort_keys=True,
+              )
+          )
+          job_failed = (
+              bool(failures)
+              or bool(missing_selected)
+              or (FINAL_JOB and bool(missing_full))
+          )
+          if job_failed:
+              raise SystemExit(1)
+          PY
+
+      - name: Upload the final resume manifest (always; job 1 + job 2 state)
+        # The canonical resume-artifact name stays stable for later dispatches.
+        # It exists only after job 2's verification succeeded; a failed job 1 or
+        # an unverified context never publishes a canonical manifest.
+        if: always() && steps.verify-job-1.outcome == 'success' && inputs.preflight_only != true
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-resume-manifest
+          path: ${{ runner.temp }}/ber-manifest/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload the final reservation/true-up state (always)
+        if: always() && steps.verify-job-1.outcome == 'success'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-shared-allowance-state
+          path: ${{ runner.temp }}/ber-reservation-state/
+          retention-days: 14
+          if-no-files-found: warn
+
       - name: Build structured summary and publish directory
         # Runs after a halt, a timeout or a refusal too: a failed dispatch still
         # owes a structured record, and the job conclusion stays failed because
@@ -3002,6 +4862,204 @@ jobs:
           verification_failures.extend(ceiling_failures)
           verification_failures.extend(ledger_failures)
           verification_failures.extend(plan_failures)
+          # S4: the two sequential ten-case jobs are verified as a layout
+          # artifact SEPARATE from the full twenty-case count. The plan carries
+          # the fixed partition and the per-job capacity; the resume manifest
+          # carries one executed-layout record per job. A missing, duplicated,
+          # overlapping or capacity-changing record fails the summary closed.
+          plan_two_job_layout = plan.get("job_layout")
+          two_job_view = None
+          if not isinstance(plan_two_job_layout, dict):
+              verification_failures.append(
+                  "the run plan has no two-job layout record"
+              )
+          else:
+              two_partition = plan_two_job_layout.get("case_partition")
+              two_partition = two_partition if isinstance(two_partition, dict) else {}
+              job1_fixed = two_partition.get("job1")
+              job2_fixed = two_partition.get("job2")
+              all_case_ids = plan.get("case_ids") or []
+              expected_layout = {
+                  "job_count": 2,
+                  "cases_per_job": 10,
+                  "full_case_count": 20,
+                  "full_planned_calls": 80,
+                  "job_planned_calls_capacity": 40,
+                  "per_call_timeout_seconds": 300,
+                  "sequential_jobs": True,
+                  "one_dispatch": True,
+                  "retry_unchanged": True,
+              }
+              if not (
+                  isinstance(job1_fixed, list)
+                  and isinstance(job2_fixed, list)
+                  and job1_fixed == all_case_ids[:10]
+                  and job2_fixed == all_case_ids[10:]
+                  and len(job1_fixed) == len(job2_fixed) == 10
+                  and len(set(job1_fixed + job2_fixed)) == 20
+                  and sorted(job1_fixed + job2_fixed) == sorted(all_case_ids)
+              ):
+                  verification_failures.append(
+                      "the plan's two-job partition is not the fixed "
+                      "first-ten/remaining-ten split of the frozen case ids"
+                  )
+              if len(all_case_ids) != 20:
+                  verification_failures.append(
+                      "the plan does not carry the frozen twenty case ids"
+                  )
+              for key, expected in expected_layout.items():
+                  if plan_two_job_layout.get(key) != expected:
+                      verification_failures.append(
+                          "the plan two-job layout has an invalid " + key
+                      )
+              job_layouts = state.get("job_layouts")
+              if not isinstance(job_layouts, list) or len(job_layouts) != 2:
+                  verification_failures.append(
+                      "the resume manifest does not carry exactly two job "
+                      "layout records"
+                  )
+              else:
+                  record_by_index = {}
+                  for item in job_layouts:
+                      if not isinstance(item, dict):
+                          verification_failures.append(
+                              "a job layout record is not a JSON object"
+                          )
+                          continue
+                      index = item.get("job_index")
+                      if index not in (1, 2) or index in record_by_index:
+                          verification_failures.append(
+                              "the job layout records have an invalid or "
+                              "duplicated job_index"
+                          )
+                          continue
+                      record_by_index[index] = item
+                  if set(record_by_index) != {1, 2}:
+                      verification_failures.append(
+                          "the resume manifest is missing a job layout record"
+                      )
+                  else:
+                      capacity_total = 0
+                      executed_union = []
+                      jobs_view = []
+                      for index in (1, 2):
+                          item = record_by_index[index]
+                          fixed = job1_fixed if index == 1 else job2_fixed
+                          prefix = "job " + str(index) + ": "
+                          if item.get("fixed_selected_case_ids") != fixed:
+                              verification_failures.append(
+                                  prefix + "the fixed ten-case selection is not "
+                                  "the plan partition"
+                              )
+                          if item.get("final_job") is not (index == 2):
+                              verification_failures.append(
+                                  prefix + "the final_job flag is wrong"
+                              )
+                          if item.get("full_case_count") != 20:
+                              verification_failures.append(
+                                  prefix + "the full case count is not 20"
+                              )
+                          if item.get("full_planned_calls") != 80:
+                              verification_failures.append(
+                                  prefix + "the full planned-call count is not 80"
+                              )
+                          if item.get("job_planned_calls_capacity") != 40:
+                              verification_failures.append(
+                                  prefix + "the job planned-call capacity is not 40"
+                              )
+                          capacity_total += 40
+                          if item.get("per_call_timeout_seconds") != 300:
+                              verification_failures.append(
+                                  prefix + "the per-call timeout is not 300s"
+                              )
+                          if item.get("dataset_sha256") != plan.get("dataset_sha256"):
+                              verification_failures.append(
+                                  prefix + "the job layout does not bind the "
+                                  "frozen dataset digest"
+                              )
+                          executed = item.get("executed_case_ids")
+                          skipped = item.get("skipped_case_ids")
+                          pre_run = item.get("unexecuted_case_ids")
+                          if not isinstance(executed, list) or not isinstance(skipped, list):
+                              verification_failures.append(
+                                  prefix + "the executed/skipped sets are not lists"
+                              )
+                              continue
+                          if len(set(executed)) != len(executed) or any(
+                              case_id not in fixed for case_id in executed
+                          ):
+                              verification_failures.append(
+                                  prefix + "the executed set is not a unique "
+                                  "subset of its fixed ten ids"
+                              )
+                          if set(executed) | set(skipped) != set(fixed):
+                              verification_failures.append(
+                                  prefix + "the executed and skipped sets do "
+                                  "not partition the fixed ten ids"
+                              )
+                          if pre_run != executed:
+                              verification_failures.append(
+                                  prefix + "the executed set differs from the "
+                                  "pre-run unexecuted selection"
+                              )
+                          if item.get("job_missing_case_ids"):
+                              verification_failures.append(
+                                  prefix + "the job recorded missing cases"
+                              )
+                          executed_union.extend(executed)
+                          jobs_view.append(
+                              {
+                                  "job_index": index,
+                                  "final_job": item.get("final_job"),
+                                  "fixed_selected_case_ids": fixed,
+                                  "executed_case_ids": executed,
+                                  "skipped_case_ids": skipped,
+                                  "execution_planned_calls": item.get("execution_planned_calls"),
+                                  "job_planned_calls_capacity": item.get("job_planned_calls_capacity"),
+                                  "per_call_timeout_seconds": item.get("per_call_timeout_seconds"),
+                              }
+                          )
+                      if capacity_total != 80:
+                          verification_failures.append(
+                              "the summed job planned-call capacity is not 80"
+                          )
+                      if len(set(executed_union)) != len(executed_union):
+                          verification_failures.append(
+                              "the same case was executed by both jobs"
+                          )
+                      if not set(executed_union) <= set(all_case_ids):
+                          verification_failures.append(
+                              "an executed case is outside the frozen plan"
+                          )
+                      if (
+                          set(record_by_index[1].get("executed_case_ids") or [])
+                          & set(job2_fixed)
+                      ):
+                          verification_failures.append(
+                              "job 1 executed a case that belongs to job 2"
+                          )
+                      if (
+                          set(record_by_index[2].get("executed_case_ids") or [])
+                          & set(job1_fixed)
+                      ):
+                          verification_failures.append(
+                              "job 2 executed a case that belongs to job 1"
+                          )
+                      two_job_view = {
+                          "schema": "ber-two-job-layout/1.0.0",
+                          "job_count": 2,
+                          "cases_per_job": 10,
+                          "full_case_count": 20,
+                          "full_planned_calls": 80,
+                          "job_planned_calls_capacity": 40,
+                          "job_planned_calls_capacity_total": 80,
+                          "per_call_timeout_seconds": 300,
+                          "sequential_jobs": True,
+                          "one_dispatch": True,
+                          "retry_unchanged": True,
+                          "jobs": jobs_view,
+                      }
+          verification_failures.extend([])
           if not plan:
               verification_failures.append(
                   "the run plan file is missing or not valid JSON"
@@ -3256,6 +5314,7 @@ jobs:
                   "case_bundles": evidence_bundles,
                   "raw_transcripts_included": False,
               },
+              "job_layout": two_job_view,
               "policy": {
                   "unrun_is_never_pass": True,
                   "deterministic_graders_primary": True,
@@ -3265,6 +5324,9 @@ jobs:
                   "one_case_per_invocation": True,
                   "completed_case_is_never_redispatched": True,
                   "cross_dispatch_spend_is_cumulative": True,
+                  "two_sequential_ten_case_jobs": True,
+                  "two_job_layout_full_count_kept": True,
+                  "no_retry": True,
               },
               "verification": {
                   "passed": verification_passed,
