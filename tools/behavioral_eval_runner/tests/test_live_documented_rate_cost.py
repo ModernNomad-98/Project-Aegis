@@ -3,22 +3,23 @@ $2.00 smoke cap, shared $120 aggregate accounting, and full-Pilot incompatibilit
 
 These are offline, no-network regression tests over the committed request
 builders and the live config templates. They pin:
-  * the pinned price table equals the documented standard rates for the exact
-    models (anthropic 200/1000, openai 1000/5000 cents per MTok);
+  * the pinned price table is the MAXIMUM of the pre-repair conservative and
+    documented standard rates for the exact models (anthropic 300/1500, openai
+    1000/5000 cents per MTok; over-reserving is safe);
   * SMOKE_CEILING_CENTS is 200 and the committed smoke/live/trial configs carry
     16,384 output tokens (smoke: 200c ceiling, trial: runs_per_case=1);
-  * the documented-rate SCENARIO ESTIMATE (historical 4-bytes-per-output-token
-    assumption, NOT a safe bound) is subject 21c + judge 153c = 174c (first case
-    173c); trial scenario estimates are measured 6,808c / uniform 7,080c, whose
-    cumulative estimates with the preserved 222c prior spend are 7,030c / 7,302c;
-    the plan-approved conservative 7,156c estimate gives 7,378c;
-  * aggregate smoke+trial+prior scenario estimates are 7,204c / 7,476c / 7,552c,
+  * the max-rate SCENARIO ESTIMATE (historical 4-bytes-per-output-token
+    assumption, NOT a safe bound) is subject 32c + max judge 153c = 185c (first
+    case 184c); trial scenario estimates are measured 7,156c / uniform 7,560c,
+    whose cumulative estimates with the preserved 222c prior spend are
+    7,378c / 7,782c; the plan-approved conservative 7,156c estimate gives 7,378c;
+  * aggregate smoke+trial+prior scenario estimates are 7,563c / 7,967c,
     all inside the unchanged 12,000c shared ceiling (no separate allowance);
-  * full Pilot A scenario estimate is 21,240c > 12,000c: exact
+  * full Pilot A scenario estimate is 22,680c > 12,000c: exact
     incompatibility; it is not authorized/dispatched. The SAFE reservation basis
   (enforced 200,000-byte request limit + 16,384 output cap, no bytes-per-token
   factor) is tested in test_live_cumulative_budget.py: smoke safe reservation
-  21c + 282c = 303c > 200c and trial safe bound 13,560c > 12,000c -- recorded
+  32c + 282c = 314c > 200c and trial safe bound 14,680c > 12,000c -- recorded
   there as exact incompatibilities, not a paid-plan claim.
 """
 
@@ -51,7 +52,7 @@ CONFIG_DIR = ROOT / "tools/behavioral_eval_runner/live/config"
 OUTPUT_TOKENS = 16_384
 PRIOR_SPENT_CENTS = 222
 TRIAL_CONSERVATIVE_CENTS = 7_156  # plan §10.3 owner-approved conservative trial bound
-SMOKE_BOUND_CENTS = 174
+SMOKE_BOUND_CENTS = 185  # max-rates conservative smoke bound (subject 32 + max judge 153)
 
 
 class DocumentedRateReservationTests(unittest.TestCase):
@@ -126,10 +127,13 @@ class DocumentedRateReservationTests(unittest.TestCase):
                 rows.append((case.case_id, arm, subject_cents, judge_cents))
         return rows
 
-    def test_pins_are_the_documented_standard_rates(self) -> None:
+    def test_pins_are_the_max_of_old_conservative_and_documented_rates(self) -> None:
         table = expected_price_table()
-        self.assertEqual(table["anthropic"]["input_cents_per_mtok"], 200)
-        self.assertEqual(table["anthropic"]["output_cents_per_mtok"], 1000)
+        # Advisory item 7: the reservation basis may never be lowered below the
+        # older conservative table, so anthropic keeps 300/1500 while openai
+        # keeps the documented 1000/5000.
+        self.assertEqual(table["anthropic"]["input_cents_per_mtok"], 300)
+        self.assertEqual(table["anthropic"]["output_cents_per_mtok"], 1500)
         self.assertEqual(table["openai"]["input_cents_per_mtok"], 1000)
         self.assertEqual(table["openai"]["output_cents_per_mtok"], 5000)
         # Both judge routes use the cross-vendor pin, so the same table applies.
@@ -158,8 +162,8 @@ class DocumentedRateReservationTests(unittest.TestCase):
                 "vendor": "anthropic",
                 "model": "claude-sonnet-5-5",
                 "credential_env_var": "ANTHROPIC_API_KEY",
-                "input_cents_per_mtok": 300,
-                "output_cents_per_mtok": 1500,
+                "input_cents_per_mtok": 200,
+                "output_cents_per_mtok": 1000,
             },
             "openai": {
                 "vendor": "openai",
@@ -208,9 +212,9 @@ class DocumentedRateReservationTests(unittest.TestCase):
             OUTPUT_TOKENS,
             self.judge_pin.output_cents_per_mtok,
         )
-        self.assertEqual(subject_cents, 21)
+        self.assertEqual(subject_cents, 32)
         self.assertEqual(judge_cents, 152)
-        self.assertEqual(subject_cents + judge_cents, 173)
+        self.assertEqual(subject_cents + judge_cents, 184)
         # Conservative plan bound uses the largest judge reservation (153c).
         max_judge = max(row[3] for row in self.rows)
         self.assertEqual(max_judge, 153)
@@ -220,10 +224,10 @@ class DocumentedRateReservationTests(unittest.TestCase):
     def test_trial_scenario_estimates_and_shared_cumulative(self) -> None:
         measured = sum(row[2] + row[3] for row in self.rows)
         uniform = 40 * (max(row[2] for row in self.rows) + max(row[3] for row in self.rows))
-        self.assertEqual(measured, 6_808)
-        self.assertEqual(uniform, 7_080)
-        self.assertEqual(PRIOR_SPENT_CENTS + measured, 7_030)
-        self.assertEqual(PRIOR_SPENT_CENTS + uniform, 7_302)
+        self.assertEqual(measured, 7_156)
+        self.assertEqual(uniform, 7_560)
+        self.assertEqual(PRIOR_SPENT_CENTS + measured, 7_378)
+        self.assertEqual(PRIOR_SPENT_CENTS + uniform, 7_782)
         self.assertEqual(PRIOR_SPENT_CENTS + TRIAL_CONSERVATIVE_CENTS, 7_378)
         for trial_bound in (measured, uniform, TRIAL_CONSERVATIVE_CENTS):
             self.assertLessEqual(PRIOR_SPENT_CENTS + trial_bound, OWNER_PROVIDER_CAP_CENTS)
@@ -234,17 +238,17 @@ class DocumentedRateReservationTests(unittest.TestCase):
             )
             self.assertEqual(aggregate, PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + trial_bound)
             self.assertLessEqual(aggregate, OWNER_PROVIDER_CAP_CENTS)
-        self.assertEqual(PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + measured, 7_204)
-        self.assertEqual(PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + uniform, 7_476)
-        self.assertEqual(PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + TRIAL_CONSERVATIVE_CENTS, 7_552)
+        self.assertEqual(PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + measured, 7_563)
+        self.assertEqual(PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + uniform, 7_967)
+        self.assertEqual(PRIOR_SPENT_CENTS + SMOKE_BOUND_CENTS + TRIAL_CONSERVATIVE_CENTS, 7_563)
 
     def test_full_pilot_scenario_estimate_is_incompatible_with_ceiling(self) -> None:
         measured = sum(row[2] + row[3] for row in self.rows)
         uniform = 40 * (max(row[2] for row in self.rows) + max(row[3] for row in self.rows))
         full_measured = 3 * measured
         full_uniform = 3 * uniform
-        self.assertEqual(full_measured, 20_424)
-        self.assertEqual(full_uniform, 21_240)
+        self.assertEqual(full_measured, 21_468)
+        self.assertEqual(full_uniform, 22_680)
         self.assertGreater(full_uniform, OWNER_PROVIDER_CAP_CENTS)
         self.assertGreater(
             aggregate_pilot_a_bound_cents(

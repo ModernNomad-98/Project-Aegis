@@ -201,7 +201,13 @@ permissions:
 concurrency:
   group: pilot-a-shared-allowance
   cancel-in-progress: false
-
+# Durable-lock note (advisory item 9): GitHub concurrency is a queue, NOT a
+# durable mutual-exclusion lock. A later queued dispatch can replace a pending
+# one and a cancelled/timed-out run releases the group without writing state.
+# Durable accounting lives in the reservation/manifest artifacts; the operating
+# rule is SINGLE-DISPATCH: never queue two spend-bearing dispatches at once.
+# The workflow-level group is shared by eval-run and eval-smoke so a queued
+# extra dispatch cannot start while another holds it.
 jobs:
   # S4 two-job layout, job 1 of 2: validate the dispatch, restore durable state,
   # publish the dispatch context and durable state, then execute the FIRST ten
@@ -244,6 +250,18 @@ jobs:
 
       - name: Install hash-locked dependencies
         run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
+
+      - name: Refuse a re-run attempt before any reservation
+        # A rerun's prior-attempt reservation/state is invisible to the collectors
+        # (they skip the current run id), so a rerun could double-spend. Refuse
+        # before any config, reservation or provider key exists. A fresh run is
+        # the supported retry unit; prior attempts are accounted distinctly by
+        # the durable attempt/ledger records of the runs that ended themselves.
+        run: |
+          if [ "${GITHUB_RUN_ATTEMPT}" != "1" ]; then
+            echo "REFUSED: run attempt ${GITHUB_RUN_ATTEMPT} is a re-run; dispatch a fresh workflow run"
+            exit 1
+          fi
 
       - name: Assert pinned models, verify the frozen dataset, stage the owner gate
         env:
@@ -388,6 +406,22 @@ jobs:
           config_template_path = workspace_path(
               os.environ["CONFIG_TEMPLATE_PATH"], "config_template_path"
           )
+          # Advisory item 8: eval-run is the bounded TRIAL dispatch. The
+          # historical full-pilot live template is not dispatchable (3 runs and
+          # its own shape exceed the shared 12,000c aggregate). Wire the trial
+          # template explicitly so a mis-selected operator input fails closed
+          # before any plan/reservation/key exists.
+          TRIAL_CONFIG_RELPATH = (
+              "tools/behavioral_eval_runner/live/config/pilot-a-trial-config.json"
+          )
+          trial_config_path = (WORKSPACE / TRIAL_CONFIG_RELPATH).resolve()
+          if config_template_path.resolve() != trial_config_path:
+              fail(
+                  "eval-run must use the bounded trial config template "
+                  + TRIAL_CONFIG_RELPATH
+                  + "; the full-pilot live template is not dispatchable under "
+                  "the 12,000c aggregate"
+              )
           try:
               template = json.loads(config_template_path.read_text(encoding="utf-8"))
           except (OSError, ValueError) as exc:
@@ -1064,6 +1098,7 @@ jobs:
               directory.mkdir(parents=True, exist_ok=True)
           sys.path.insert(0, str(WORKSPACE))
           from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
+              PRESERVED_HISTORICAL_SMOKE_CENTS,
               collect_latest_allowance_state,
               collect_smoke_proof_spends,
           )
@@ -1609,12 +1644,7 @@ jobs:
                   "ledger_name": ledger_path.name,
                   **view,
               })
-          if legacy_smoke_manifests:
-              refuse(
-                  "prior resume manifest(s) without smoke-spend records: "
-                  + ", ".join(legacy_smoke_manifests)
-                  + "; smoke spend history cannot be proven (no silent zero)"
-              )
+          legacy_smoke_migrated = bool(legacy_smoke_manifests)
           # Standalone historical eval-smoke proofs are part of the same
           # allowance; a successful smoke run without a readable proof is
           # UNKNOWN and refuses rather than counting as zero.
@@ -1644,6 +1674,19 @@ jobs:
               prior_smoke_spends = restore_smoke_spend(prior_smoke_manifests)
           except ValueError as exc:
               refuse("prior smoke history is not restorable: " + str(exc))
+          if legacy_smoke_migrated:
+              # Advisory item 1: a pre-change manifest without smoke-spend records
+              # must not permanently block every future resume. Apply the
+              # preserved 18c historical smoke floor once under a dedicated
+              # identity; the identity dedups across later dispatches.
+              try:
+                  prior_smoke_spends = add_smoke_spend(
+                      prior_smoke_spends,
+                      "preserved-historical-legacy-20261031",
+                      PRESERVED_HISTORICAL_SMOKE_CENTS,
+                  )
+              except ValueError as exc:
+                  refuse("legacy smoke migration is not restorable: " + str(exc))
           current_smoke = plan.get("smoke_gate")
           if not isinstance(current_smoke, dict) or not current_smoke:
               # F-A-5: a live trial plan must carry the same-head smoke gate.
@@ -1659,6 +1702,7 @@ jobs:
               "current_gate_run_id": normalize_smoke_run_id(current_smoke.get("smoke_run_id")),
               "prior_manifest_records": dict(prior_smoke_spends),
               "legacy_manifests_without_smoke": legacy_smoke_manifests,
+              "legacy_smoke_migrated": legacy_smoke_migrated,
               "standalone_smoke_runs_counted": sorted(smoke_records),
           }
           state["restored_from"] = (
@@ -1774,8 +1818,24 @@ jobs:
                       )
                   already.append(case_id)
                   continue
-              if entry.get("status") in {"IN_FLIGHT", "ADMISSION_DENIED"}:
-                  refuse(case_id + " has ambiguous state " + str(entry.get("status")))
+              status = entry.get("status")
+              if status == "IN_FLIGHT":
+                  attempts = entry.get("attempts") or []
+                  last = attempts[-1] if attempts else None
+                  if not (
+                      isinstance(last, dict)
+                      and last.get("ledger_name")
+                      and type(last.get("spent_cents")) is int
+                  ):
+                      refuse(
+                          case_id
+                          + " is IN_FLIGHT without a ledger-backed attempt; retry "
+                          "would be ambiguous"
+                      )
+              # ADMISSION_DENIED/NOT_RUN_BUDGET/ERROR/TIMEOUT/UNRUN are retryable
+              # (advisory item 2): they record an ended attempt, not a concurrent
+              # claim, so the next dispatch runs the case again with a higher
+              # attempt number and a distinct ledger.
               unexecuted.append(case_id)
           selection = {
               "schema": "ber-job-case-selection/1.0.0",
@@ -2280,13 +2340,6 @@ jobs:
                   )
                   write_state()
                   break
-              if remaining <= 0:
-                  entry["status"] = "NOT_RUN_BUDGET"
-                  failures.append(
-                      f"{case_id}: the {CEILING}c ceiling is exhausted before dispatch"
-                  )
-                  write_state()
-                  break
               # One past every attempt any dispatch used for this case, so a
               # copied prior ledger is never overwritten and the package never
               # refuses an existing ledger path.
@@ -2460,20 +2513,30 @@ jobs:
                       write_state()
                       break
               except subprocess.TimeoutExpired:
-                  try:
-                      cancel_reservation(reservation_state_path)
-                  except ValueError:
-                      pass
+                  # Advisory item 13: reconcile the reservation with what the
+                  # ledger proves was charged. Leaving the whole remaining
+                  # allowance outstanding forever wedges the next resume; only a
+                  # truly unreadable/absent ledger keeps the cancelled exposure.
+                  settled_on_timeout = ledger_spent(ledger_path)
+                  if settled_on_timeout is not None:
+                      try:
+                          true_up_spend(
+                              reservation_state_path, spent_cents=settled_on_timeout
+                          )
+                      except ValueError:
+                          cancel_reservation(reservation_state_path)
+                  else:
+                      try:
+                          cancel_reservation(reservation_state_path)
+                      except ValueError:
+                          pass
                   failures.append(
                       f"{case_id}: the per-case invocation exceeded "
                       f"{PER_CASE_TIMEOUT_SECONDS}s and was killed"
                   )
                   record["status"] = "ATTEMPT_TIMEOUT"
                   record["finished_at"] = utc_now()
-                  # The killed package still snapshotted what it charged, so
-                  # a timed-out attempt's spend is read from its ledger
-                  # instead of being recorded as None and forgotten.
-                  record["spent_cents"] = ledger_spent(ledger_path)
+                  record["spent_cents"] = settled_on_timeout
                   entry["status"] = "ATTEMPT_TIMEOUT"
                   write_state()
                   enforce_ceiling()
@@ -2779,6 +2842,88 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
+      - name: Publish the job-1 status record (always; failure summary)
+        # Advisory item 3: a failed job 1 previously published no structured
+        # record because the full summary lives in job 2, which is skipped when
+        # job 1 fails. This always() record is the job-1 structured summary for
+        # success/failure; job 2 still publishes the canonical final summary.
+        if: always() && inputs.preflight_only != true
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          PLAN_PATH = RUNNER_TEMP / "ber-plan.json"
+          MANIFEST_PATH = RUNNER_TEMP / "ber-manifest" / "manifest.json"
+          STATE_PATH = RUNNER_TEMP / "ber-reservation-state" / "allowance-state.json"
+
+          def load(path):
+              try:
+                  return json.loads(path.read_text(encoding="utf-8"))
+              except (OSError, ValueError):
+                  return None
+
+          plan = load(PLAN_PATH) or {}
+          state = load(MANIFEST_PATH) or {}
+          allowance = load(STATE_PATH) or {}
+          status = "UNKNOWN"
+          missing = []
+          if state:
+              failures = state.get("failures") or []
+              missing = [
+                  case_id
+                  for case_id, entry in (state.get("cases") or {}).items()
+                  if (entry or {}).get("status") != "COMPLETED"
+              ]
+              status = "COMPLETED" if not failures and not missing else "FAILED"
+          record = {
+              "schema": "ber-job-1-status/1.0.0",
+              "generated_at": dt.datetime.now(dt.timezone.utc)
+              .isoformat()
+              .replace("+00:00", "Z"),
+              "job_index": 1,
+              "final_job": False,
+              "status": status,
+              "run_id": os.environ.get("GITHUB_RUN_ID"),
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
+              "dispatch_sha": plan.get("dispatch_sha"),
+              "dataset_sha256": plan.get("dataset_sha256"),
+              "case_count": plan.get("case_count"),
+              "planned_calls": plan.get("planned_calls"),
+              "job_layout": plan.get("job_layout"),
+              "failures": state.get("failures") or [],
+              "missing_case_ids": missing,
+              "last_dispatch": state.get("last_dispatch"),
+              "totals": state.get("totals"),
+              "allowance_state": allowance or None,
+              "note": (
+                  "Job 1 structured status record; job 2 publishes the canonical "
+                  "final structured summary when it runs."
+              ),
+          }
+          out = RUNNER_TEMP / "publish-job1"
+          out.mkdir(parents=True, exist_ok=True)
+          (out / "structured-summary-job1.json").write_text(
+              json.dumps(record, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(record, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload the job-1 status record (always; failure summary)
+        if: always() && inputs.preflight_only != true
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: eval-run-job-1-status-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/publish-job1/
+          retention-days: 14
+          if-no-files-found: warn
+
       - name: Preflight-only stop ($0, no provider call, no key mapped)
         # Owner decision item 4: one preflight-only dispatch costs nothing. This
         # step is the only step a preflight_only dispatch runs after the
@@ -2948,6 +3093,7 @@ jobs:
           )
           from tools.behavioral_eval_runner.live.gate import OwnerGateRecord  # noqa: E402
           from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
+              job2_effective_ceiling,
               validate_state,
           )
 
@@ -3137,6 +3283,34 @@ jobs:
               or gate_record.case_count != 20
           ):
               refuse("the staged gate is not bound to this dispatch and frozen dataset")
+          # Advisory item 11: do not trust the downloaded plan/gate pair alone.
+          # Re-derive the committed gate template from this checkout and require
+          # its bytes, id, origin and dataset binding to match the dispatch plan
+          # and the staged record. The committed template carries the 40-zero
+          # placeholder revision; only the staged copy carries the dispatch SHA.
+          template_gate_relpath = plan.get("template_gate_path")
+          if not isinstance(template_gate_relpath, str) or not template_gate_relpath:
+              refuse("the dispatch plan has no committed gate-template path")
+          try:
+              template_gate_bytes = (
+                  WORKSPACE / template_gate_relpath
+              ).read_bytes()
+              template_gate_payload = json.loads(template_gate_bytes.decode("utf-8"))
+          except (OSError, UnicodeDecodeError, ValueError):
+              refuse("the committed gate template is not readable from this checkout")
+          if sha256_bytes(template_gate_bytes) != plan.get("template_gate_sha256"):
+              refuse("the committed gate template bytes do not match the dispatch plan hash")
+          try:
+              committed_gate = OwnerGateRecord.from_dict(template_gate_payload)
+          except Exception as exc:  # noqa: BLE001
+              refuse("the committed gate template is not a valid owner gate: " + type(exc).__name__)
+          if (
+              committed_gate.gate_id != gate_record.gate_id
+              or committed_gate.fact_origin != gate_record.fact_origin
+              or committed_gate.dataset_sha256 != gate_record.dataset_sha256
+              or committed_gate.dataset_revision != "0" * 40
+          ):
+              refuse("the committed gate template is not the staged dispatch gate")
           try:
               built_config = LiveConfig.from_dict(config_payload)
               built_config.validate()
@@ -3260,7 +3434,37 @@ jobs:
                   if sha256_bytes(result_path.read_bytes()) != entry.get("result_sha256"):
                       refuse("job 1's result hash does not match for " + case_id)
               else:
-                  if status not in {"PENDING", "COMPLETED"}:
+                  # Advisory item 2: a previous job-2 failure marks cases
+                  # UNRUN/ERROR/TIMEOUT; those are retryable, not permanent
+                  # blockers. IN_FLIGHT is retryable only when the latest attempt
+                  # is ledger-backed (the spend is then known exactly once).
+                  if status == "IN_FLIGHT":
+                      attempts = entry.get("attempts") or []
+                      last = attempts[-1] if attempts else None
+                      if not (
+                          isinstance(last, dict)
+                          and last.get("ledger_name")
+                          and type(last.get("spent_cents")) is int
+                      ):
+                          refuse(
+                              "job 2's IN_FLIGHT case has no ledger-backed attempt: "
+                              + case_id
+                          )
+                  elif status not in {
+                      "PENDING",
+                      "UNRUN",
+                      "ERROR",
+                      "ATTEMPT_TIMEOUT",
+                      "PREFLIGHT_FAILED",
+                      "PREFLIGHT_REFUSED",
+                      "PREFLIGHT_TIMEOUT",
+                      "RESULT_INVALID",
+                      "LEDGER_INVALID",
+                      "EVIDENCE_UNVERIFIED",
+                      "RESULT_COUNT_INVALID",
+                      "CHUNK_INVALID",
+                      "NOT_RUN_BUDGET",
+                  }:
                       refuse(
                           "job 2's case is not cleanly unexecuted: " + case_id
                           + " status=" + str(status)
@@ -3323,14 +3527,33 @@ jobs:
                   "job 1 left an unsettled reserved exposure; job 2 may not spend "
                   "until it is resolved"
               )
-          if allowance.get("ceiling_cents") != ceiling:
-              refuse("job 1's allowance state ceiling is not the shared ceiling")
+          job1_effective_ceiling = allowance.get("ceiling_cents")
+          if (
+              type(job1_effective_ceiling) is not int
+              or not 0 < job1_effective_ceiling <= ceiling
+          ):
+              refuse("job 1's allowance state ceiling is not a valid effective ceiling")
+          if (
+              type(totals.get("ceiling_cents")) is not int
+              or totals["ceiling_cents"] != job1_effective_ceiling
+          ):
+              refuse(
+                  "job 1's manifest totals ceiling is not the job 1 effective ceiling"
+              )
           if (
               type(allowance.get("ledger_spend_cents")) is not int
               or type(allowance.get("smoke_spend_cents")) is not int
-              or allowance["ledger_spend_cents"] + allowance["smoke_spend_cents"] > ceiling
+              or allowance["ledger_spend_cents"] + allowance["smoke_spend_cents"]
+              > job1_effective_ceiling
           ):
-              refuse("job 1's allowance state spend is invalid or over the ceiling")
+              refuse("job 1's allowance state spend is invalid or over its effective ceiling")
+          try:
+              ceiling_handoff = job2_effective_ceiling(
+                  plan_ceiling_cents=ceiling,
+                  job1_effective_ceiling_cents=job1_effective_ceiling,
+              )
+          except ValueError as exc:
+              refuse("job 2 ceiling handoff is invalid: " + str(exc))
 
           # 6. Merge job 1's durable state into this job's RUNNER_TEMP.
           target = RUNNER_TEMP / "ber-manifest"
@@ -3343,9 +3566,11 @@ jobs:
           for path in ledger_files.values():
               shutil.copyfile(path, target / "ledgers" / path.name)
           job1_state["incoming_outstanding_reservations_cents"] = (
-              allowance.get("outstanding_reservations_cents")
+              ceiling_handoff["incoming_outstanding_reservations_cents"]
           )
-          job1_state["restored_from"] = job1_state.get("restored_from")
+          job1_state["job1_effective_ceiling_cents"] = (
+              ceiling_handoff["job1_effective_ceiling_cents"]
+          )
           (target / "manifest.json").write_text(
               json.dumps(job1_state, indent=2, sort_keys=True) + "\n",
               encoding="utf-8",
@@ -3364,13 +3589,40 @@ jobs:
           skipped = []
           for case_id in job2_fixed:
               entry = cases.get(case_id) or {}
-              if entry.get("status") == "COMPLETED":
+              status = entry.get("status")
+              if status == "COMPLETED":
                   skipped.append(case_id)
               else:
-                  if entry.get("status") != "PENDING":
+                  if status == "IN_FLIGHT":
+                      attempts = entry.get("attempts") or []
+                      last = attempts[-1] if attempts else None
+                      if not (
+                          isinstance(last, dict)
+                          and last.get("ledger_name")
+                          and type(last.get("spent_cents")) is int
+                      ):
+                          refuse(
+                              "job 2's IN_FLIGHT case has no ledger-backed attempt: "
+                              + case_id
+                          )
+                  elif status not in {
+                      "PENDING",
+                      "UNRUN",
+                      "ERROR",
+                      "ATTEMPT_TIMEOUT",
+                      "PREFLIGHT_FAILED",
+                      "PREFLIGHT_REFUSED",
+                      "PREFLIGHT_TIMEOUT",
+                      "RESULT_INVALID",
+                      "LEDGER_INVALID",
+                      "EVIDENCE_UNVERIFIED",
+                      "RESULT_COUNT_INVALID",
+                      "CHUNK_INVALID",
+                      "NOT_RUN_BUDGET",
+                  }:
                       refuse(
                           "job 2's case is not cleanly unexecuted: " + case_id
-                          + " status=" + str(entry.get("status"))
+                          + " status=" + str(status)
                       )
                   unexecuted.append(case_id)
           for case_id in frozen_ids:
@@ -3426,6 +3678,10 @@ jobs:
               "job1_outstanding_reservations_cents": allowance.get(
                   "outstanding_reservations_cents"
               ),
+              "job1_effective_ceiling_cents": job1_effective_ceiling,
+              "job2_incoming_outstanding_reservations_cents": ceiling_handoff[
+                  "incoming_outstanding_reservations_cents"
+              ],
               "job2_fixed_case_ids": job2_fixed,
               "job2_unexecuted_case_ids": unexecuted,
               "job2_skipped_case_ids": skipped,
@@ -3912,13 +4168,6 @@ jobs:
                   )
                   write_state()
                   break
-              if remaining <= 0:
-                  entry["status"] = "NOT_RUN_BUDGET"
-                  failures.append(
-                      f"{case_id}: the {CEILING}c ceiling is exhausted before dispatch"
-                  )
-                  write_state()
-                  break
               # One past every attempt any dispatch used for this case, so a
               # copied prior ledger is never overwritten and the package never
               # refuses an existing ledger path.
@@ -4092,20 +4341,30 @@ jobs:
                       write_state()
                       break
               except subprocess.TimeoutExpired:
-                  try:
-                      cancel_reservation(reservation_state_path)
-                  except ValueError:
-                      pass
+                  # Advisory item 13: reconcile the reservation with what the
+                  # ledger proves was charged. Leaving the whole remaining
+                  # allowance outstanding forever wedges the next resume; only a
+                  # truly unreadable/absent ledger keeps the cancelled exposure.
+                  settled_on_timeout = ledger_spent(ledger_path)
+                  if settled_on_timeout is not None:
+                      try:
+                          true_up_spend(
+                              reservation_state_path, spent_cents=settled_on_timeout
+                          )
+                      except ValueError:
+                          cancel_reservation(reservation_state_path)
+                  else:
+                      try:
+                          cancel_reservation(reservation_state_path)
+                      except ValueError:
+                          pass
                   failures.append(
                       f"{case_id}: the per-case invocation exceeded "
                       f"{PER_CASE_TIMEOUT_SECONDS}s and was killed"
                   )
                   record["status"] = "ATTEMPT_TIMEOUT"
                   record["finished_at"] = utc_now()
-                  # The killed package still snapshotted what it charged, so
-                  # a timed-out attempt's spend is read from its ledger
-                  # instead of being recorded as None and forgotten.
-                  record["spent_cents"] = ledger_spent(ledger_path)
+                  record["spent_cents"] = settled_on_timeout
                   entry["status"] = "ATTEMPT_TIMEOUT"
                   write_state()
                   enforce_ceiling()
@@ -4849,6 +5108,29 @@ jobs:
               if calls is not None:
                   ledger_call_count += calls
 
+          # Advisory item 14: report the FINAL reservation state separately from
+          # the incoming exposure. The job-2 verify handoff intentionally sets
+          # incoming_outstanding to the ceiling reduction (not a live debt), so
+          # the summary must not report that internal handoff as outstanding
+          # exposure.
+          final_allowance_path = (
+              RUNNER_TEMP / "ber-reservation-state" / "allowance-state.json"
+          )
+          final_allowance_state = None
+          final_outstanding = None
+          if final_allowance_path.is_file():
+              try:
+                  final_allowance_state = json.loads(
+                      final_allowance_path.read_text(encoding="utf-8")
+                  )
+                  final_outstanding = final_allowance_state.get(
+                      "outstanding_reservations_cents"
+                  )
+                  if type(final_outstanding) is not int or final_outstanding < 0:
+                      final_outstanding = None
+              except (OSError, ValueError):
+                  final_outstanding = None
+
           evidence_bundles = []
           for item in per_case:
               result = case_results.get(item["case_id"]) or {}
@@ -5068,7 +5350,6 @@ jobs:
                           "retry_unchanged": True,
                           "jobs": jobs_view,
                       }
-          verification_failures.extend([])
           if not plan:
               verification_failures.append(
                   "the run plan file is missing or not valid JSON"
@@ -5255,9 +5536,25 @@ jobs:
               "accounting": versioned_accounting_fields(
                   ledger_spend_cents=spent_total - smoke_spend,
                   smoke_spend_records=smoke_records,
-                  outstanding_reservations_cents=state.get("incoming_outstanding_reservations_cents", 0),
+                  outstanding_reservations_cents=(
+                      final_outstanding if final_outstanding is not None else 0
+                  ),
                   ceiling_cents=effective_ceiling,
               ),
+              "reservation": {
+                  "incoming_outstanding_reservations_cents": state.get(
+                      "incoming_outstanding_reservations_cents", 0
+                  ),
+                  "job1_effective_ceiling_cents": state.get(
+                      "job1_effective_ceiling_cents"
+                  ),
+                  "final_outstanding_reservations_cents": final_outstanding,
+                  "final_state_status": (
+                      final_allowance_state.get("status")
+                      if isinstance(final_allowance_state, dict)
+                      else None
+                  ),
+              },
               "cost": {
                   "configured_ceiling_cents": configured,
                   "owner_limits": owner_limits,

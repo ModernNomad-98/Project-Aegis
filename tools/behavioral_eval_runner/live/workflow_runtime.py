@@ -29,8 +29,10 @@ from .cumulative import (
     add_smoke_spend,
     merge_smoke_gate_spend,
     normalize_smoke_run_id,
+    smoke_identity_parts,
     smoke_spend_total,
     strict_cents,
+    strict_positive_int,
     validate_smoke_spend,
 )
 
@@ -54,6 +56,49 @@ JOB1_STATE_ARTIFACT_NAME = "ber-shared-allowance-state-job-1"
 STATE_ARTIFACT_NAMES = (STATE_ARTIFACT_NAME, JOB1_STATE_ARTIFACT_NAME)
 PRESERVED_HISTORICAL_LEDGER_CENTS = 222
 PRESERVED_HISTORICAL_SMOKE_CENTS = 18
+#: Producer-shaped evidence for a no-spend failure: GitHub Actions retains the
+#: workflow-run job/step inventory even when the runner is lost before artifact
+#: upload. A run whose spend-bearing step never executed (or was skipped) is a
+#: proven pre-provider/no-spend failure; a run whose step executed but lost its
+#: proof/manifest/state remains unknown and must fail closed or be conservatively
+#: retained as unknown exposure. These are the producer workflow step names.
+SMOKE_SPEND_STEP_PREFIXES = ("Run the single-case live smoke",)
+TRIAL_SPEND_STEP_PREFIXES = ("Run the remaining cases",)
+#: Evidence-reviewed no-spend failures may be skipped explicitly. Empty by
+#: default: no run is pre-provider-proven merely because an artifact is absent.
+PROVEN_PRE_PROVIDER_RUN_IDS = frozenset()
+#: Explicit migration allowlist for pre-change artifacts whose absent proof is
+#: an expected historical fact, not an UNKNOWN spend. The known prior halted
+#: eval-run (41213647310) is skipped here; its preserved 222c/18c floor is
+#: applied by collect_allowance_history/collect_latest_trial_spend instead.
+LEGACY_MIGRATION_RUN_IDS = frozenset({"41213647310"})
+#: Accepted resume-manifest schemas: 1.2.0 is current; 1.1.0 is the documented
+#: pre-change migration schema. Older/other schemas remain refused.
+TRIAL_MANIFEST_SCHEMAS = (
+    "ber-resume-manifest/1.2.0",
+    "ber-resume-manifest/1.1.0",
+)
+#: Accepted trial output caps: migrated manifests may carry 4096 (pre-change
+#: live floor) or 16384 (current owner decision); anything else is refused.
+TRIAL_OUTPUT_CAP_VALUES = (4096, 16384)
+#: Case statuses that a resumed dispatch may retry. IN_FLIGHT is handled
+#: separately by reconciling the latest attempt/ledger before retry; ambiguous
+#: IN_FLIGHT is refused.
+RETRYABLE_CASE_STATUSES = frozenset({
+    "PENDING",
+    "UNRUN",
+    "ERROR",
+    "ATTEMPT_TIMEOUT",
+    "PREFLIGHT_FAILED",
+    "PREFLIGHT_REFUSED",
+    "PREFLIGHT_TIMEOUT",
+    "RESULT_INVALID",
+    "LEDGER_INVALID",
+    "EVIDENCE_UNVERIFIED",
+    "RESULT_COUNT_INVALID",
+    "CHUNK_INVALID",
+    "NOT_RUN_BUDGET",
+})
 
 
 def _completed(gh: Callable[..., Any], args: list[str], label: str) -> Any:
@@ -235,8 +280,9 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
 
 def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any]) -> dict[str, Any]:
     provenance = _validate_run_provenance(run)
-    if payload.get("schema") != RESUME_MANIFEST_SCHEMA:
-        raise ValueError("unsupported trial manifest schema: " + repr(payload.get("schema")))
+    schema = payload.get("schema")
+    if schema not in TRIAL_MANIFEST_SCHEMAS:
+        raise ValueError("unsupported trial manifest schema: " + repr(schema))
     plan = payload.get("plan")
     if not isinstance(plan, Mapping):
         raise ValueError("trial manifest has no plan provenance")
@@ -245,11 +291,25 @@ def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any])
     _require_hex(plan, "config_sha256", HEX64, "trial plan")
     _require_hex(plan, "dataset_sha256", HEX64, "trial plan")
     _require_text(plan, "gate_id", "trial plan")
-    if plan.get("subject_vendors") != [proof_provenance_pins()["subject_vendor"]]:
-        raise ValueError("trial plan subject vendor is not the pinned single vendor")
-    if plan.get("max_output_tokens") != 16_384:
-        raise ValueError("trial plan output cap is not the pinned 16384")
-    return provenance
+    vendors = plan.get("subject_vendors")
+    pins = proof_provenance_pins()
+    pinned_subject = pins["subject_vendor"]
+    cross_vendor = pins.get("judge_vendor")
+    allowed_vendors = ([pinned_subject],)
+    if isinstance(cross_vendor, str) and cross_vendor and cross_vendor != pinned_subject:
+        allowed_vendors = (allowed_vendors[0], [pinned_subject, cross_vendor])
+    if vendors != [pinned_subject] and vendors not in allowed_vendors:
+        raise ValueError("trial plan subject vendors are not the pinned/migrated shape")
+    if plan.get("max_output_tokens") not in TRIAL_OUTPUT_CAP_VALUES:
+        raise ValueError(
+            "trial plan output cap is not a supported/migrated value: "
+            + repr(plan.get("max_output_tokens"))
+        )
+    return {
+        **provenance,
+        "manifest_schema": schema,
+        "migrated": schema != RESUME_MANIFEST_SCHEMA,
+    }
 
 
 def _available_artifact_name(
@@ -272,6 +332,68 @@ def _fail_unknown(label: str) -> None:
     raise ValueError(label + ": UNKNOWN, not zero")
 
 
+def list_run_jobs(
+    gh: Callable[..., Any], repository: str, run_id: Any,
+) -> list[dict[str, Any]]:
+    """List every job (including steps) of one workflow run, refusing an
+    incomplete listing. This is producer-shaped GitHub Actions evidence, not
+    an inference from a run conclusion."""
+    pages = _json_pages(
+        gh,
+        ["api", "--paginate", "--slurp",
+         "repos/" + repository + "/actions/runs/" + str(run_id)
+         + "/jobs?per_page=100"],
+        "run job listing",
+    )
+    declared_total = None
+    jobs: list[dict[str, Any]] = []
+    for page in pages:
+        if declared_total is None:
+            declared_total = page.get("total_count")
+        page_jobs = page.get("jobs")
+        if not isinstance(page_jobs, list):
+            raise ValueError("a workflow job listing page has no jobs list")
+        jobs.extend(page_jobs)
+    if type(declared_total) is not int or declared_total < 0:
+        raise ValueError("the workflow job listing did not report an integer total_count")
+    if len(jobs) != declared_total:
+        raise ValueError("the workflow job listing is incomplete")
+    return jobs
+
+
+def run_spend_step_executed(
+    *, gh: Callable[..., Any], repository: str, run_id: Any,
+    step_prefixes: tuple[str, ...],
+) -> bool:
+    """Whether any spend-bearing step actually executed for this run.
+
+    Producer-shaped proof of no spend: the spend step is absent or explicitly
+    skipped. Unknown/ambiguous listings raise (fail closed); a missing jobs
+    response is never treated as no-spend.
+    """
+    executed = False
+    for job in list_run_jobs(gh, repository, run_id):
+        if not isinstance(job, Mapping):
+            raise ValueError("a workflow job entry was not an object")
+        for step in job.get("steps") or []:
+            if not isinstance(step, Mapping):
+                raise ValueError("a workflow job step was not an object")
+            name = step.get("name")
+            if not isinstance(name, str):
+                raise ValueError("a workflow job step has no readable name")
+            if name.startswith(step_prefixes) and step.get("conclusion") != "skipped":
+                executed = True
+    return executed
+
+
+def _spend_prefixes_for_workflow(workflow_file: str) -> tuple[str, ...]:
+    return (
+        SMOKE_SPEND_STEP_PREFIXES
+        if workflow_file == "eval-smoke.yml"
+        else TRIAL_SPEND_STEP_PREFIXES
+    )
+
+
 def collect_smoke_proof_spends(
     *, gh: Callable[..., Any], repository: str, work_dir: Path,
     current_run_id: Any = None, smoke_workflow_file: str = "eval-smoke.yml",
@@ -285,15 +407,32 @@ def collect_smoke_proof_spends(
         run_id = run.get("id")
         if run_id is None:
             raise ValueError("a smoke workflow run entry has no id")
+        if str(run_id) in LEGACY_MIGRATION_RUN_IDS:
+            continue
         if current_run_id is not None and str(run_id) == str(current_run_id):
             continue
         if not _run_has_ended(run):
             continue
         _validate_run_provenance(run)
+        success = run.get("conclusion") == "success"
         artifacts = list_run_artifacts(gh, repository, run_id)
         names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
         if SMOKE_ARTIFACT_NAME not in names:
-            _fail_unknown("ended smoke run " + str(run_id) + " has no proof artifact")
+            if success:
+                _fail_unknown("successful smoke run " + str(run_id) + " has no proof artifact")
+            if str(run_id) in PROVEN_PRE_PROVIDER_RUN_IDS:
+                continue
+            if run_spend_step_executed(
+                gh=gh, repository=repository, run_id=run_id,
+                step_prefixes=SMOKE_SPEND_STEP_PREFIXES,
+            ):
+                raise ValueError(
+                    "failed smoke run " + str(run_id)
+                    + " executed the single-case live smoke step but published no "
+                    "proof artifact; its spend cannot be proven (unknown exposure "
+                    "fails closed)"
+                )
+            continue
         payload = download_artifact_json(
             gh, repository, run_id, SMOKE_ARTIFACT_NAME,
             SMOKE_ARTIFACT_MEMBER, work_dir,
@@ -315,52 +454,103 @@ def collect_latest_trial_spend(
 ) -> dict[str, Any]:
     """Use the newest successful eval-run resume manifest as the authoritative
     cumulative trial total; a successful run without a manifest is UNKNOWN."""
-    chosen: tuple[int, dict[str, Any], int] | None = None
-    seen_totals: set[int] = set()
-    for run in list_workflow_runs(gh, repository, trial_workflow_file):
+    entries: list[dict[str, Any]] = []
+    for order, run in enumerate(list_workflow_runs(gh, repository, trial_workflow_file)):
         if not isinstance(run, Mapping):
             raise ValueError("a trial workflow-run entry was not an object")
         run_id = run.get("id")
         if run_id is None:
             raise ValueError("a trial workflow-run entry has no id")
+        if str(run_id) in LEGACY_MIGRATION_RUN_IDS:
+            continue
         if current_run_id is not None and str(run_id) == str(current_run_id):
             continue
         if not _run_has_ended(run):
             continue
         _validate_run_provenance(run)
+        success = run.get("conclusion") == "success"
         artifacts = list_run_artifacts(gh, repository, run_id)
         names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
         artifact_name = _available_artifact_name(names, TRIAL_ARTIFACT_NAMES)
         if artifact_name is None:
-            _fail_unknown("ended trial run " + str(run_id) + " has no resume manifest")
+            if success:
+                _fail_unknown("successful trial run " + str(run_id) + " has no resume manifest")
+            if str(run_id) in PROVEN_PRE_PROVIDER_RUN_IDS:
+                continue
+            if run_spend_step_executed(
+                gh=gh, repository=repository, run_id=run_id,
+                step_prefixes=TRIAL_SPEND_STEP_PREFIXES,
+            ):
+                raise ValueError(
+                    "failed trial run " + str(run_id)
+                    + " executed the case step but published no resume manifest; "
+                    "its spend cannot be proven (unknown exposure fails closed)"
+                )
+            continue
         payload = download_artifact_json(
             gh, repository, run_id, artifact_name,
             TRIAL_ARTIFACT_MEMBER, work_dir,
         )
-        _validate_trial_manifest(payload, run)
+        provenance = _validate_trial_manifest(payload, run)
         totals = payload.get("totals")
         if not isinstance(totals, Mapping):
             _fail_unknown("trial manifest " + str(run_id) + " has no totals")
         spent = strict_cents(totals.get("spent_cents"), "trial total spent_cents")
-        seen_totals.add(spent)
         smoke_records = validate_smoke_spend(payload.get("smoke_spend", {}))
         smoke = smoke_spend_total(smoke_records)
         if spent < smoke:
             raise ValueError("trial manifest total is below its smoke spend")
-        numeric_id = int(run_id) if isinstance(run_id, int) else 0
-        if chosen is None or spent > chosen[0]:
-            chosen = (spent, payload, spent - smoke)
-    if len(seen_totals) > 1:
-        raise ValueError("multiple independent trial manifests have different totals; aggregation is ambiguous, fail closed")
-    if chosen is None:
-        return {"schema": RESUME_MANIFEST_SCHEMA, "ledger_spend_cents": PRESERVED_HISTORICAL_LEDGER_CENTS, "smoke_spend": {}, "preserved_historical": True}
-    payload, ledger_spend = chosen[1], chosen[2]
-    smoke_records = validate_smoke_spend(payload.get("smoke_spend", {}))
+        numeric_id = int(str(run_id)) if str(run_id).isdigit() else None
+        entries.append({
+            "order": order,
+            "run_id": run_id,
+            "run_attempt": int(run.get("run_attempt", 1)),
+            "numeric_id": numeric_id,
+            "total_spent_cents": spent,
+            "ledger_spend_cents": spent - smoke,
+            "smoke_spend": smoke_records,
+            "manifest_schema": provenance["manifest_schema"],
+            "migrated": provenance["migrated"],
+        })
+    if not entries:
+        return {
+            "schema": RESUME_MANIFEST_SCHEMA,
+            "ledger_spend_cents": PRESERVED_HISTORICAL_LEDGER_CENTS,
+            "smoke_spend": {},
+            "preserved_historical": True,
+            "source_run_id": None,
+        }
+    numeric_entries = [entry for entry in entries if entry["numeric_id"] is not None]
+    if len(numeric_entries) == len(entries):
+        chain = sorted(entries, key=lambda entry: (entry["numeric_id"], entry["run_attempt"]))
+        for previous, current in zip(chain, chain[1:]):
+            if current["total_spent_cents"] < previous["total_spent_cents"]:
+                raise ValueError(
+                    "trial cumulative totals decrease along run order "
+                    + str(previous["run_id"]) + " -> " + str(current["run_id"])
+                    + "; aggregation is ambiguous, fail closed"
+                )
+        chosen = chain[-1]
+    else:
+        chosen = entries[0]
+        totals = {entry["total_spent_cents"] for entry in entries}
+        if len(totals) > 1:
+            raise ValueError(
+                "non-numeric trial run ids have different totals; aggregation is "
+                "ambiguous, fail closed"
+            )
     return {
-        "schema": RESUME_MANIFEST_SCHEMA,
-        "ledger_spend_cents": max(ledger_spend, PRESERVED_HISTORICAL_LEDGER_CENTS),
-        "smoke_spend": smoke_records,
+        "schema": chosen["manifest_schema"],
+        "ledger_spend_cents": max(
+            chosen["ledger_spend_cents"], PRESERVED_HISTORICAL_LEDGER_CENTS
+        ),
+        "smoke_spend": chosen["smoke_spend"],
         "preserved_historical": True,
+        "source_run_id": normalize_smoke_run_id(chosen["run_id"]),
+        "source_run_attempt": chosen["run_attempt"],
+        "source_total_spent_cents": chosen["total_spent_cents"],
+        "manifest_schema": chosen["manifest_schema"],
+        "migrated": chosen["migrated"],
     }
 
 
@@ -378,14 +568,14 @@ def collect_allowance_history(
         current_run_id=current_run_id,
     )
     for identity, spent in validate_smoke_spend(trial["smoke_spend"]).items():
-        parts = identity.split("|")
-        if len(parts) == 4:
-            run_id, attempt = parts[1], int(parts[2]) if parts[2].isdigit() else 1
-        else:
-            run_id, _, attempt_text = identity.partition("#")
-            attempt = int(attempt_text) if attempt_text.isdigit() else 1
+        parts = smoke_identity_parts(identity)
         smoke_records = add_smoke_spend(
-            smoke_records, run_id, spent, run_attempt=attempt
+            smoke_records,
+            parts["workflow_run_id"],
+            spent,
+            run_attempt=parts["run_attempt"],
+            allowance_id=parts["allowance_id"],
+            phase=parts["phase"],
         )
     recorded_smoke = smoke_spend_total(smoke_records)
     if recorded_smoke == 0:
@@ -393,9 +583,10 @@ def collect_allowance_history(
             smoke_records, "preserved-historical-20261031", PRESERVED_HISTORICAL_SMOKE_CENTS
         )
     elif recorded_smoke < PRESERVED_HISTORICAL_SMOKE_CENTS:
-        raise ValueError(
-            "observed smoke history is below the preserved historical floor and "
-            "cannot be deduplicated without double counting; fail closed"
+        smoke_records = add_smoke_spend(
+            smoke_records,
+            "preserved-historical-topup-20261031",
+            PRESERVED_HISTORICAL_SMOKE_CENTS - recorded_smoke,
         )
     return {
         "schema": ALLOWANCE_HISTORY_SCHEMA,
@@ -435,15 +626,36 @@ def collect_latest_allowance_state(
             names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
             artifact_name = _available_artifact_name(names, STATE_ARTIFACT_NAMES)
             if artifact_name is None:
+                if str(run_id) in LEGACY_MIGRATION_RUN_IDS:
+                    continue
+                if str(run_id) in PROVEN_PRE_PROVIDER_RUN_IDS:
+                    continue
+                # This applies to SUCCESSFUL runs too (delta-review F2): a
+                # run that executed the spend-bearing step but lost its
+                # reservation-state artifact has unknown outstanding exposure.
+                # The run conclusion is not proof that its state is settled.
+                if run_spend_step_executed(
+                    gh=gh, repository=repository, run_id=run_id,
+                    step_prefixes=_spend_prefixes_for_workflow(workflow_file),
+                ):
+                    raise ValueError(
+                        "run " + str(run_id)
+                        + " has no reservation-state artifact; outstanding "
+                        "exposure cannot be excluded (unknown exposure fails closed)"
+                    )
+                # Producer-shaped proof that the spend step never executed:
+                # no spend-bearing reservation could exist.
                 continue
             payload = download_artifact_json(
                 gh, repository, run_id, artifact_name,
                 STATE_ARTIFACT_MEMBER, Path(work_dir) / "state",
             )
             validated = validate_state(payload)
-            numeric_id = int(run_id) if isinstance(run_id, int) else 0
-            if chosen is None or numeric_id > chosen[0]:
-                chosen = (numeric_id, validated)
+            numeric_id = int(str(run_id)) if str(run_id).isdigit() else 0
+            attempt = int(run.get("run_attempt", 1) or 1)
+            key = (numeric_id, attempt)
+            if chosen is None or key > chosen[0]:
+                chosen = (key, validated)
     return None if chosen is None else chosen[1]
 
 
@@ -500,7 +712,7 @@ def validate_state(payload: Any) -> dict[str, Any]:
     outstanding = strict_cents(payload.get("outstanding_reservations_cents"), "outstanding_reservations_cents")
     ledger = strict_cents(payload.get("ledger_spend_cents"), "ledger_spend_cents")
     smoke = strict_cents(payload.get("smoke_spend_cents"), "smoke_spend_cents")
-    ceiling = strict_cents(payload.get("ceiling_cents"), "ceiling_cents")
+    ceiling = strict_positive_int(payload.get("ceiling_cents"), "ceiling_cents")
     if status == STATUS_TRUE_UP and outstanding != 0:
         raise ValueError("a true-up state must have zero outstanding reservations")
     return {
@@ -561,6 +773,27 @@ def cancel(path: Any) -> dict[str, Any]:
     state["status"] = STATUS_CANCELLED
     atomic_write_json(path, state)
     return validate_state(state)
+
+
+def job2_effective_ceiling(
+    *, plan_ceiling_cents: Any, job1_effective_ceiling_cents: Any,
+) -> dict[str, int]:
+    """Carry job 1's effective ceiling into job 2 without widening it.
+
+    Job 2 must spend against exactly the ceiling job 1 used, which may be lower
+    than the plan ceiling when prior outstanding exposure reduced it. The
+    returned incoming-outstanding value is what the run step's existing
+    CEILING = plan - incoming_outstanding formula must use.
+    """
+    plan = strict_positive_int(plan_ceiling_cents, "plan_ceiling_cents")
+    job1 = strict_positive_int(job1_effective_ceiling_cents, "job1_effective_ceiling_cents")
+    if job1 > plan:
+        raise ValueError("job 1 effective ceiling is above the plan ceiling")
+    return {
+        "plan_ceiling_cents": plan,
+        "job1_effective_ceiling_cents": job1,
+        "incoming_outstanding_reservations_cents": plan - job1,
+    }
 
 
 def dispatch_if_admitted(admission: Any, dispatch: Any, *args: Any, **kwargs: Any) -> Any:
