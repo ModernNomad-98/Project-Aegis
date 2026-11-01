@@ -707,22 +707,6 @@ jobs:
           print(json.dumps(structure, indent=2, sort_keys=True))
           PY
 
-      - name: Publish the dispatch context for the second job (no secrets)
-        # The second job trusts only these immutable outputs of job 1's config
-        # step: the plan, the built config and the staged gate. They carry no
-        # credential value. Publishing them immediately means job 2 verifies the
-        # same dispatch context instead of rebuilding a second, possibly
-        # different one; a missing or mismatched context fails job 2 closed.
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
-        with:
-          name: ber-dispatch-context-job-1
-          path: |
-            ${{ runner.temp }}/ber-plan.json
-            ${{ runner.temp }}/live-config.json
-            ${{ runner.temp }}/live-gate.json
-          retention-days: 14
-          if-no-files-found: error
-
       - name: Live preflight (staged gate; checkout must equal the gate revision)
         env:
           # The dispatch value is mapped through the environment, never
@@ -1025,6 +1009,23 @@ jobs:
           print(json.dumps(plan["smoke_gate"], indent=2, sort_keys=True))
           print("single-case live smoke gate SATISFIED at " + dispatch_sha)
           PY
+
+      - name: Publish the dispatch context for the second job (no secrets)
+        # The second job trusts only these immutable outputs of job 1: the
+        # plan, the built config and the staged gate. They carry no credential
+        # value. The step runs AFTER the same-head smoke gate so the published
+        # plan is the final dispatch plan (including its smoke-gate record),
+        # and job 2 verifies the same context instead of rebuilding a second,
+        # possibly different one; a missing or mismatched context fails closed.
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-dispatch-context-job-1
+          path: |
+            ${{ runner.temp }}/ber-plan.json
+            ${{ runner.temp }}/live-config.json
+            ${{ runner.temp }}/live-gate.json
+          retention-days: 14
+          if-no-files-found: error
 
       - name: Restore every prior dispatch's resume state for this dataset
         id: restore
