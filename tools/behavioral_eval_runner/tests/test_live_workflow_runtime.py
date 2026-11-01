@@ -1137,6 +1137,59 @@ class PostMergeAdvisoryFixTests(unittest.TestCase):
         self.assertIn("NOT dispatchable", readme)
         self.assertIn("only accepted eval-run template", readme)
 
+    def test_real_shaped_smoke_proof_is_collected(self):
+        # Advisory item 22: exercise the exact producer shape (no FakeGH
+        # auto-fill) with a real recomputed proof hash.
+        from tools.behavioral_eval_runner.live.providers import proof_provenance_pins
+        import hashlib
+        pins = proof_provenance_pins()
+        payload = {
+            "__no_defaults__": True,
+            "schema": "ber-live-smoke-proof/1.0.0",
+            "status": "PASS",
+            "workflow": "eval-smoke",
+            "citability": "REAL_HOST",
+            "head_sha": HEAD_SHA,
+            "dataset_sha256": "b" * 64,
+            "built_config_sha256": "c" * 64,
+            "config_template_sha256": "d" * 64,
+            "gate_id": "gate-1",
+            "subject_vendor": pins["subject_vendor"],
+            "judge_vendor": pins["judge_vendor"],
+            "judge_model": pins["judge_model"],
+            "max_output_tokens": 16384,
+            "planned_calls": 2,
+            "dispatched_calls": 2,
+            "spent_cents": 32,
+        }
+        payload["proof_sha256"] = hashlib.sha256(json.dumps(
+            {k: v for k, v in payload.items() if k not in ("proof_sha256", "__no_defaults__")},
+            sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8")).hexdigest()
+        fake = FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([])]},
+            {"42": [artifact("ber-live-smoke-proof")]},
+            {("42", "ber-live-smoke-proof"): ("smoke-proof.json", payload)},
+        )
+        records = collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertEqual(smoke_spend_total(records), 32)
+
+    def test_plan_producer_and_consumer_keys_are_static(self):
+        # Advisory item 23: pin the plan field names the config step writes and
+        # the verify step consumes, so a producer/consumer rename is caught here.
+        root = Path(__file__).resolve().parents[3]
+        text = (root / ".github/workflows/eval-run.yml").read_text()
+        for key in (
+            "template_gate_path",
+            "template_gate_sha256",
+            "staged_gate_sha256",
+            "config_sha256",
+            "dataset_sha256",
+            "spend_ceiling_cents",
+        ):
+            self.assertIn('"' + key + '":', text)
+            self.assertIn('plan.get("' + key + '")', text)
+
     def setUp(self):
         import tempfile
         self._tmp = tempfile.TemporaryDirectory()
