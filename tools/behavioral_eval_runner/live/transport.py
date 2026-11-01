@@ -100,33 +100,57 @@ class ProviderResponse:
     usage: ProviderUsage
     stop_reason: str = "UNKNOWN"
 
+    def _evidence(self) -> dict[str, Any]:
+        """Provider evidence to carry into a validation failure (no raw text).
+
+        A response envelope can be unusable (for example truncated at the output
+        budget) while still carrying the provider's usage telemetry. Every
+        validation failure carries that evidence so the caller can account the
+        dispatched call at its actual usage instead of losing it; the response
+        itself is still never graded or judged.
+        """
+        evidence: dict[str, Any] = {
+            "response_id": self.response_id,
+            "served_model": self.served_model,
+            "stop_reason": self.stop_reason,
+            "response_chars": len(self.text) if isinstance(self.text, str) else None,
+        }
+        if isinstance(self.usage, ProviderUsage):
+            evidence["usage"] = self.usage.to_dict()
+        return evidence
+
     def validate(self, *, require_model: bool = True) -> None:
         if not isinstance(self.response_id, str):
-            raise ProviderTransportError("response_id must be a string")
+            raise ProviderTransportError(
+                "response_id must be a string", context=self._evidence()
+            )
         if not isinstance(self.served_model, str):
             raise ProviderTransportError(
-                "the served model field must be a string", context={"response_id": self.response_id}
+                "the served model field must be a string",
+                context=self._evidence(),
             )
         if require_model and not self.served_model:
             raise ProviderTransportError(
                 "the provider returned no served model string; a response without "
                 "a model identifier cannot be pin-verified",
-                context={"response_id": self.response_id},
+                context={**self._evidence(), "require_model": True},
             )
         if not isinstance(self.text, str) or not self.text.strip():
             raise ProviderTransportError(
                 "the provider returned empty or non-string response text",
-                context={"response_id": self.response_id},
+                context={**self._evidence(), "empty_response_text": True},
             )
         if not isinstance(self.stop_reason, str) or self.stop_reason.lower() not in COMPLETE_STOP_REASONS:
             raise ProviderTransportError(
                 f"the provider response is not clearly complete (status "
                 f"{self.stop_reason!r}); a partial, failed or unknown response "
                 "is not graded or judged",
-                context={"response_id": self.response_id, "stop_reason": self.stop_reason},
+                context={**self._evidence(), "response_incomplete": True},
             )
         if not isinstance(self.usage, ProviderUsage):
-            raise ProviderTransportError("response usage must be ProviderUsage")
+            raise ProviderTransportError(
+                "response usage must be ProviderUsage", context=self._evidence()
+            )
         self.usage.validate()
 
 

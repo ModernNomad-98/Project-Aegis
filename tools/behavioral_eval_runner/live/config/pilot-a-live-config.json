@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0-ber-live",
   "spend_ceiling_cents": 12000,
-  "max_output_tokens": 4096,
+  "max_output_tokens": 16384,
   "runs_per_case": 3,
   "request_timeout_seconds": 300,
   "subject_vendors": [

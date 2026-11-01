@@ -11,8 +11,9 @@ provider cap in integer cents before every call.
 | File | Used by | Spend class | `max_output_tokens` | Ceiling | Shape |
 | --- | --- | --- | --- | --- | --- |
 | `dry-run-config.json` | `live-dry-run` (synthetic gate, mock transport) | build-only / no-spend | 512 | 15000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
-| `pilot-a-live-config.json` | `eval-run` full Pilot A dispatch | live | 4096 | 12000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
-| `pilot-a-smoke-config.json` | `eval-smoke` single-case gate | live | 4096 | 50 cents ($0.50 hard cap) | one case, one arm, one run, one vendor |
+| `pilot-a-live-config.json` | `eval-run` full Pilot A dispatch | live | 16384 | 12000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
+| `pilot-a-smoke-config.json` | `eval-smoke` single-case gate | live | 16384 | 200 cents ($2.00 hard cap) | one case, one arm, one run, one vendor |
+| `pilot-a-trial-config.json` | bounded trial template (owner-approved) | live | 16384 | 12000 cents | 20 cases x 2 arms x 1 run x 2 vendors (workflow narrows) |
 
 ## Build-only and live settings are different classes
 
@@ -54,13 +55,16 @@ The spend-affecting values are:
 (the number of billed subject routes), `max_input_bytes`,
 `request_timeout_seconds`, the `judge_allowlist` entries (which vendor/model is
 allowed to be billed as a judge), and the pinned model/price table the config
-round-trips against (`price_table`, `owner_limits`).
+round-trips against (`price_table`, `owner_limits`) — the owner-approved 2026-10-31
+pricing repair pins the documented standard rates (anthropic 200/1000, openai
+1000/5000 cents per MTok) as the conservative reservation basis.
 
 ## Required gate before a full Pilot A dispatch
 
 `eval-smoke` (`.github/workflows/eval-smoke.yml`, `workflow_dispatch` only) runs
 exactly one subject call and one judge call on one committed case, hard-capped
-at 50 integer cents ($0.50), and publishes a proof artifact only when the judge finishes
+at 200 integer cents ($2.00) inside the unchanged 12,000-cent aggregate, and
+publishes a proof artifact only when the judge finishes
 (judge terminal finish reason recorded in the run evidence). A full Pilot A
 `eval-run` dispatch is required to run only after `eval-smoke` passed on the
 same exact head; the full dispatch refuses when no passing proof at that head

@@ -42,6 +42,7 @@ from .config import (
     DRY_RUN_CONFIG_TEMPLATE_RELPATH,
     JUDGE_PINS,
     MIN_LIVE_MAX_OUTPUT_TOKENS,
+    MAX_JUDGE_REQUEST_BYTES,
     SMOKE_CEILING_CENTS,
     SUBJECT_PINS,
     LiveConfig,
@@ -130,11 +131,11 @@ def _require_smoke_config(config: LiveConfig) -> None:
             f"{list(config.subject_vendors)}"
         )
     if config.spend_ceiling_cents > SMOKE_CEILING_CENTS:
-        # The $0.50 cap is a ceiling, not a clamp target: a config above it is
+        # The $2.00 cap is a ceiling, not a clamp target: a config above it is
         # refused, so the committed template cannot drift above the cap.
         problems.append(
             "spend_ceiling_cents must be <= "
-            f"{SMOKE_CEILING_CENTS} (the 50-cent smoke cap), got "
+            f"{SMOKE_CEILING_CENTS} (the 200-cent smoke cap), got "
             f"{config.spend_ceiling_cents}"
         )
     if problems:
@@ -721,8 +722,9 @@ def _execute(
     state = _RunState()
     planned = _planned_calls(config, cases, smoke=smoke)
     # The smoke ceiling is the SMALLER of the binding gate/config/provider-cap
-    # minimum and the $0.50 smoke cap (50 integer cents), so a smoke cannot
-    # spend more than 50 cents even when handed the full pilot gate and config.
+    # minimum and the $2.00 smoke cap (200 integer cents), so a smoke cannot
+    # spend more than 200 cents even when handed the full pilot gate and config;
+    # its spend also counts against the shared 12,000c aggregate allowance.
     ceiling_cents = gate.effective_ceiling_cents(config)
     if smoke:
         ceiling_cents = min(ceiling_cents, SMOKE_CEILING_CENTS)
@@ -840,6 +842,52 @@ def _enforce_input_bound(request, config: LiveConfig) -> None:
         )
 
 
+def _is_token_count(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value >= 0
+
+
+def _settle_failed_dispatch(
+    meter: CostMeter,
+    handle,
+    exc: LiveError,
+) -> dict[str, Any]:
+    """Settle a dispatched call that failed after reaching the transport.
+
+    A provider response envelope can carry usable usage telemetry while its
+    content is not usable evidence (for example a response truncated at the
+    output budget). The response is never graded. When the error carries the
+    provider usage and served model, the call is reconciled at its actual cost
+    and explicitly marked ungraded; without usable usage telemetry the
+    conservative reservation charge is recorded unreconciled, exactly as before.
+    """
+    context = exc.context if isinstance(getattr(exc, "context", None), Mapping) else {}
+    usage = context.get("usage")
+    served_model = context.get("served_model")
+    stop_reason = context.get("stop_reason")
+    response_id = context.get("response_id")
+    response_chars = context.get("response_chars")
+    if (
+        isinstance(usage, Mapping)
+        and _is_token_count(usage.get("input_tokens"))
+        and _is_token_count(usage.get("output_tokens"))
+        and isinstance(served_model, str)
+    ):
+        return meter.reconcile_ungraded_response(
+            handle,
+            input_tokens=usage["input_tokens"],
+            output_tokens=usage["output_tokens"],
+            served_model=served_model,
+            reason_code=exc.reason_code,
+            detail=str(exc),
+            stop_reason=stop_reason if isinstance(stop_reason, str) else None,
+            response_id=response_id if isinstance(response_id, str) else None,
+            response_chars=response_chars if _is_token_count(response_chars) else None,
+        )
+    return meter.release_unreconciled(
+        handle, reason_code=exc.reason_code, detail=str(exc)
+    )
+
+
 def _execute_one(
     *,
     case: LiveCase,
@@ -877,13 +925,12 @@ def _execute_one(
         pin=subject_pin,
         system_bytes=len(request.system.encode("utf-8")),
         user_bytes=len(request.user_content.encode("utf-8")),
+        max_output_tokens=request.max_output_tokens,
     )
     try:
         subject_result, subject_text = adapter.dispatch(request)
     except LiveError as exc:
-        meter.release_unreconciled(
-            handle, reason_code=exc.reason_code, detail=str(exc)
-        )
+        _settle_failed_dispatch(meter, handle, exc)
         raise
     except Exception as exc:  # noqa: BLE001 - a foreign transport must not bypass the halt path
         from .errors import ProviderTransportError
@@ -892,9 +939,7 @@ def _execute_one(
             f"subject transport raised {type(exc).__name__}",
             context={"request_id": request.request_id},
         )
-        meter.release_unreconciled(
-            handle, reason_code=error.reason_code, detail=str(error)
-        )
+        _settle_failed_dispatch(meter, handle, error)
         raise error from exc
     meter.reconcile(
         handle,
@@ -919,21 +964,36 @@ def _execute_one(
         subject_result=subject_result,
         subject_text=subject_text,
     )
+    judge_request_bytes = len(judge_request.system.encode("utf-8")) + len(
+        judge_request.user_content.encode("utf-8")
+    )
+    if judge_request_bytes > MAX_JUDGE_REQUEST_BYTES:
+        # The judge adapter JSON-embeds the subject text (ensure_ascii=True), so
+        # the raw subject-response byte cap is not a safe bound. Fail closed on
+        # the ENCODED judge request before any judge reservation or dispatch;
+        # the subject charge remains and the run halts.
+        raise LiveError(
+            "the encoded judge request exceeds the safe encoded-byte bound",
+            context={
+                "judge_request_bytes": judge_request_bytes,
+                "max_judge_request_bytes": MAX_JUDGE_REQUEST_BYTES,
+            },
+            reason_code="JUDGE_REQUEST_BYTES_EXCEEDED",
+        )
     _enforce_input_bound(judge_request, config)
     judge_handle = meter.reserve(
         call_ref=judge_request_id,
         pin=judge_pin,
         system_bytes=len(judge_request.system.encode("utf-8")),
         user_bytes=len(judge_request.user_content.encode("utf-8")),
+        max_output_tokens=judge_request.max_output_tokens,
     )
     try:
         judge_result = judge_adapter.dispatch(
             judge_request, case=case, subject_text=subject_text
         )
     except LiveError as exc:
-        meter.release_unreconciled(
-            judge_handle, reason_code=exc.reason_code, detail=str(exc)
-        )
+        _settle_failed_dispatch(meter, judge_handle, exc)
         raise
     except Exception as exc:  # noqa: BLE001 - a foreign transport must not bypass the halt path
         from .errors import ProviderTransportError
@@ -942,9 +1002,7 @@ def _execute_one(
             f"judge transport raised {type(exc).__name__}",
             context={"request_id": judge_request.request_id},
         )
-        meter.release_unreconciled(
-            judge_handle, reason_code=error.reason_code, detail=str(error)
-        )
+        _settle_failed_dispatch(meter, judge_handle, error)
         raise error from exc
     meter.reconcile(
         judge_handle,
@@ -1219,7 +1277,7 @@ def live_run(
     citable real-host evidence.
 
     ``smoke=True`` runs the single-case live smoke: exactly one subject call and
-    one judge call, hard-capped at SMOKE_CEILING_CENTS (50 integer cents = $0.50)
+    one judge call, hard-capped at SMOKE_CEILING_CENTS (200 integer cents = $2.00)
     in addition to the gate/config/provider-cap minimum. The live-setting guards
     refuse a
     build-only dry-run config source and any output budget below the live

@@ -21,14 +21,14 @@
 # this workflow exists at the SAME exact head SHA.
 #
 # Cost containment (layered, fail-closed):
-#   1. the committed smoke config template sets spend_ceiling_cents 50; this
+#   1. the committed smoke config template sets spend_ceiling_cents 200; this
 #      workflow rebuilds it with min(template, gate ceiling, provider cap,
-#      50-cent ($0.50 = 50 integer cents) smoke cap, and REFUSES a template
-#      above 50 cents rather than clamping it) and validates it with the package
+#      200-cent ($2.00 = 200 integer cents) smoke cap, and REFUSES a template
+#      above 200 cents rather than clamping it) and validates it with the package
 #      validator;
-#   2. the package meter clamps the smoke ceiling to min(effective, 50) and
+#   2. the package meter clamps the smoke ceiling to min(effective, 200) and
 #      refuses the next reservation that would cross the ceiling;
-#   3. the verify step fails closed unless spent_cents <= ceiling_cents <= 50
+#   3. the verify step fails closed unless spent_cents <= ceiling_cents <= 200
 #      and the ledger shows exactly two reconciled calls.
 #
 # Fail-closed surface: no artifact is published unless the smoke COMPLETED with
@@ -53,6 +53,11 @@ on:
 
 permissions:
   contents: read
+  actions: read
+
+concurrency:
+  group: pilot-a-shared-allowance
+  cancel-in-progress: false
 
 jobs:
   eval-smoke:
@@ -97,6 +102,106 @@ jobs:
       - name: Install hash-locked dependencies
         run: 'python -P -m pip install --quiet --require-hashes --only-binary :all: --no-deps -r requirements-ci.txt'
 
+      - name: Shared allowance admission preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -P - <<'PY'
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          WORKSPACE = Path(os.environ["GITHUB_WORKSPACE"]).resolve()
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          sys.path.insert(0, str(WORKSPACE))
+
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
+              collect_allowance_history,
+              collect_latest_allowance_state,
+          )
+          from tools.behavioral_eval_runner.live.config import (  # noqa: E402
+              OWNER_PROVIDER_CAP_CENTS,
+              SMOKE_CEILING_CENTS,
+          )
+          from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
+              admit_paid_call,
+          )
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
+              cancel,
+              reserve,
+          )
+
+          def gh(args):
+              return subprocess.run(["gh", *args], capture_output=True, text=True)
+
+          try:
+              history = collect_allowance_history(
+                  gh=gh,
+                  repository=os.environ["GITHUB_REPOSITORY"],
+                  work_dir=RUNNER_TEMP / "ber-shared-allowance-history",
+                  current_run_id=os.environ.get("GITHUB_RUN_ID"),
+              )
+              incoming_state = collect_latest_allowance_state(
+                  gh=gh,
+                  repository=os.environ["GITHUB_REPOSITORY"],
+                  work_dir=RUNNER_TEMP / "ber-allowance-state",
+                  current_run_id=os.environ.get("GITHUB_RUN_ID"),
+              )
+              incoming_outstanding = 0 if incoming_state is None else incoming_state["outstanding_reservations_cents"]
+              admission = admit_paid_call(
+                  ceiling_cents=OWNER_PROVIDER_CAP_CENTS,
+                  prior_ledger_spend_cents=history["ledger_spend_cents"],
+                  prior_smoke_spend_records=history["smoke_spend"],
+                  reservation_cents=SMOKE_CEILING_CENTS,
+                  outstanding_reservations_cents=incoming_outstanding,
+              )
+          except Exception as exc:  # noqa: BLE001 - fail closed before keys
+              print(
+                  "REFUSED: shared allowance history is unavailable: "
+                  + type(exc).__name__ + ": " + str(exc),
+                  flush=True,
+              )
+              raise SystemExit(1)
+
+          snapshot = {
+              "schema": history["schema"],
+              "ledger_spend_cents": history["ledger_spend_cents"],
+              "smoke_spend": history["smoke_spend"],
+              "smoke_spend_cents": history["smoke_spend_cents"],
+              "admission": admission,
+              "reservation_cents": SMOKE_CEILING_CENTS,
+              "ceiling_cents": OWNER_PROVIDER_CAP_CENTS,
+              "incoming_outstanding_reservations_cents": incoming_outstanding,
+              "evidence_only": True,
+          }
+          (RUNNER_TEMP / "ber-shared-allowance.json").write_text(
+              json.dumps(snapshot, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          print(json.dumps(snapshot, indent=2, sort_keys=True))
+          if admission["admitted"]:
+              reserve(
+                  RUNNER_TEMP / "ber-shared-allowance-state" / "allowance-state.json",
+                  allowance_id="pilot-a-recovery-20261031",
+                  workflow_run_id=os.environ.get("GITHUB_RUN_ID"),
+                  identity="eval-smoke-admission",
+                  amount_cents=SMOKE_CEILING_CENTS,
+                  ledger_spend_cents=history["ledger_spend_cents"],
+                  smoke_spend_cents=history["smoke_spend_cents"],
+                  ceiling_cents=OWNER_PROVIDER_CAP_CENTS,
+              )
+          else:
+              print(
+                  "REFUSED: the smoke reservation would exceed the shared "
+                  + str(OWNER_PROVIDER_CAP_CENTS) + "-cent allowance",
+                  flush=True,
+              )
+              raise SystemExit(1)
+          PY
+
       - name: Stage and verify the single-case smoke settings
         env:
           PYTHONPATH: ${{ github.workspace }}
@@ -117,7 +222,7 @@ jobs:
           from tools.behavioral_eval_runner.live.config import (  # noqa: E402
               JUDGE_PINS,
               MIN_LIVE_MAX_OUTPUT_TOKENS,
-              OWNER_PILOT_CEILING_CENTS,
+              OWNER_PROVIDER_CAP_CENTS,
               SMOKE_CEILING_CENTS,
               SUBJECT_PINS,
               LiveConfig,
@@ -212,17 +317,17 @@ jobs:
           if type(template_ceiling) is not int or template_ceiling <= 0:
               fail("the smoke config has no positive integer spend ceiling")
           if template_ceiling > SMOKE_CEILING_CENTS:
-              # The cap is 50 integer cents ($0.50), not a clamp target: a
-              # 51-cent template is refused before any plan or call exists.
+              # The cap is 200 integer cents ($2.00), not a clamp target: a
+              # 201-cent template is refused before any plan or call exists.
               fail(
-                  "the smoke config spend ceiling is above the 50-cent ($0.50) "
+                  "the smoke config spend ceiling is above the 200-cent ($2.00) "
                   f"hard cap: {template_ceiling} cents"
               )
           effective_ceiling = min(
               template_ceiling,
               staged_gate.spend_ceiling_cents,
               staged_gate.provider_cap_cents,
-              OWNER_PILOT_CEILING_CENTS,
+              OWNER_PROVIDER_CAP_CENTS,
               SMOKE_CEILING_CENTS,
           )
           config_payload["spend_ceiling_cents"] = effective_ceiling
@@ -234,7 +339,7 @@ jobs:
           if config.spend_ceiling_cents != effective_ceiling:
               fail("the built smoke ceiling is not the effective smoke ceiling")
           if config.spend_ceiling_cents > SMOKE_CEILING_CENTS:
-              fail("the built smoke ceiling exceeds the 50-cent ($0.50) smoke cap")
+              fail("the built smoke ceiling exceeds the 200-cent ($2.00) smoke cap")
           if config.max_output_tokens < MIN_LIVE_MAX_OUTPUT_TOKENS:
               fail("the built smoke output budget is below the live floor")
           if config.runs_per_case != 1:
@@ -502,7 +607,7 @@ jobs:
           require(type(spent) is int and spent >= 0, "spent_cents is not a non-negative int")
           require(
               type(ceiling) is int and 0 < ceiling <= SMOKE_CEILING_CENTS,
-              "ceiling_cents is outside the 50-cent ($0.50) smoke cap",
+              "ceiling_cents is outside the 200-cent ($2.00) smoke cap",
           )
           require(type(spent) is int and type(ceiling) is int and spent <= ceiling, "spent exceeds the smoke ceiling")
           require(ceiling == plan["spend_ceiling_cents"], "the smoke ceiling is not the built smoke ceiling")
@@ -592,11 +697,36 @@ jobs:
           (out_dir / "smoke-proof.json").write_text(
               json.dumps(proof, indent=2, sort_keys=True) + "\n", encoding="utf-8"
           )
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
+              true_up,
+          )
+          true_up(
+              RUNNER_TEMP / "ber-shared-allowance-state" / "allowance-state.json",
+              spent_cents=spent,
+          )
           print(json.dumps(proof, indent=2, sort_keys=True))
           if failures:
               print("SMOKE PROOF REFUSED: " + "; ".join(failures), flush=True)
               raise SystemExit(1)
           PY
+
+      - name: Upload shared-allowance reservation state
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-shared-allowance-state
+          path: ${{ runner.temp }}/ber-shared-allowance-state/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload shared-allowance admission snapshot
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-shared-allowance-admission
+          path: ${{ runner.temp }}/ber-shared-allowance.json
+          retention-days: 14
+          if-no-files-found: warn
 
       - name: Upload the single-case live smoke proof
         if: success()

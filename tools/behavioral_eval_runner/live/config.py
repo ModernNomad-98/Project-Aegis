@@ -43,19 +43,29 @@ DEFAULT_MAX_INPUT_BYTES = 200_000
 #: (max_output_tokens 512) had never been raised for live: the subject response
 #: was truncated at the provider stop reason. A live verb refuses any config
 #: below this floor BEFORE it resolves a credential or reserves a call. 4096 is
-#: the owner-directed live value: twice the build-only package default (2048),
-#: with headroom for the longest committed case prompt and long-form answer,
-#: and a worst-case reservation bound that stays under the unchanged $120 cap
-#: (see live/config/pilot-a-live-config.json and the fix PR cost table).
+#: the minimum live value (twice the build-only package default, 2048); the
+#: committed Pilot A live/smoke configs use 16,384 output tokens per the owner's
+#: 2026-10-31 decision (the trial template uses the same value).
 MIN_LIVE_MAX_OUTPUT_TOKENS = 4096
 
-#: The single-case live smoke HARD ceiling, in INTEGER CENTS: 50 cents = $0.50.
-#: The committed smoke config template must not exceed it (a 51-cent template is
+#: The single-case live smoke HARD ceiling, in INTEGER CENTS: 200 cents = $2.00
+#: (owner decision 2026-10-31: the smoke cap is raised from 50c to 200c; it
+#: remains a hard ceiling inside the unchanged 12,000c aggregate cap). The
+#: committed smoke config template must not exceed it (a 201-cent template is
 #: refused, not clamped), the runner clamps the meter to min(this, config
 #: ceiling, gate ceiling, provider cap), and the smoke workflow re-verifies the
-#: cap. A smoke therefore cannot spend more than 50 cents even when handed the
-#: full pilot gate/config.
-SMOKE_CEILING_CENTS = 50
+#: cap. A smoke therefore cannot spend more than $2.00 even when handed the full
+#: pilot gate/config, and its spend counts against the shared 12,000c aggregate.
+SMOKE_CEILING_CENTS = 200
+
+#: Safe bound on the ENCODED judge request payload bytes (system + user
+#: content as the adapter builds them: canonical JSON escapes non-ASCII and
+#: control characters, so encoded bytes can exceed raw UTF-8 bytes). The judge
+#: request is refused fail-closed BEFORE reservation/dispatch when its encoded
+#: bytes exceed this bound; the subject charge remains and no judge is called.
+#: 90,000 encoded judge bytes + the fixed smoke subject 21c gives 172c + 21c =
+#: 193c <= 200c; trial 40 x (24c + 172c) = 7,840c, +222c prior = 8,062c <= 12,000c.
+MAX_JUDGE_REQUEST_BYTES = 90_000
 
 #: The committed build-only/no-spend dry-run config template, relative to the
 #: repository root. A live verb refuses this source: its spend-affecting values
@@ -239,3 +249,20 @@ class LiveConfig:
         )
         config.validate()
         return config
+
+
+def aggregate_pilot_a_bound_cents(
+    *, prior_spent_cents: int, smoke_bound_cents: int, trial_bound_cents: int
+) -> int:
+    """Return the shared Pilot A cumulative bound, in integer cents.
+
+    Owner decision 2026-10-31: the smoke and trial spend one cumulative
+    $120 (12,000c) allowance that also includes the preserved prior spend;
+    separate workflow ledgers must not create separate allowances. This
+    helper is the single accounting path used by the offline aggregate
+    regression tests and the final-checkpoint bound arithmetic.
+    """
+    components = (prior_spent_cents, smoke_bound_cents, trial_bound_cents)
+    if any(isinstance(v, bool) or not isinstance(v, int) or v < 0 for v in components):
+        raise LiveError("aggregate budget components must be non-negative int cents")
+    return sum(components)

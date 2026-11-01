@@ -122,18 +122,34 @@ class CostMeter:
         pin: ModelPin,
         system_bytes: int,
         user_bytes: int,
+        max_output_tokens: int | None = None,
     ) -> ReservationHandle:
-        """Reserve a conservative upper bound BEFORE the call; denial halts."""
+        """Reserve a conservative upper bound BEFORE the call; denial halts.
+
+        The output bound is the one the request will actually ask the provider
+        for. It defaults to the meter configured bound, so existing callers keep
+        their behaviour; passing the request's own bound keeps the reservation
+        exact when a role uses a different output cap.
+        """
         if self.halted:
             raise CostCeilingHaltError(
                 "the cost meter is halted; no further call may be reserved",
                 context=dict(self._halt or {}),
             )
+        output_bound = (
+            self.max_output_tokens if max_output_tokens is None else max_output_tokens
+        )
+        if (
+            not isinstance(output_bound, int)
+            or isinstance(output_bound, bool)
+            or output_bound < 1
+        ):
+            raise ValueError("max_output_tokens must be an int >= 1")
         input_upper = max(1, max(0, int(system_bytes)) + max(0, int(user_bytes)))
         reserved = ceil_cents(
             input_upper,
             pin.input_cents_per_mtok,
-            self.max_output_tokens,
+            output_bound,
             pin.output_cents_per_mtok,
         )
         try:
@@ -162,7 +178,7 @@ class CostMeter:
             vendor=pin.vendor,
             model=pin.model,
             reserved_input_tokens=input_upper,
-            reserved_output_tokens=self.max_output_tokens,
+            reserved_output_tokens=output_bound,
             reserved_cents=reserved,
             input_cents_per_mtok=pin.input_cents_per_mtok,
             output_cents_per_mtok=pin.output_cents_per_mtok,
@@ -242,6 +258,110 @@ class CostMeter:
             "ceiling_cents": self.ceiling_cents,
             "reconciled": True,
             "reason_code": None,
+        }
+        self._entries.append(entry)
+        self._snapshot()
+        return dict(entry)
+
+    def reconcile_ungraded_response(
+        self,
+        handle: ReservationHandle,
+        *,
+        input_tokens: int,
+        output_tokens: int,
+        served_model: str,
+        reason_code: str,
+        detail: str,
+        stop_reason: str | None = None,
+        response_id: str | None = None,
+        response_chars: int | None = None,
+    ) -> dict[str, Any]:
+        """Reconcile a dispatched call whose response is not usable evidence.
+
+        The provider answered and its usage telemetry exists, but the response
+        must never be graded (for example it was truncated at the output
+        budget). The actual provider usage is recorded and the unused
+        reservation is released, exactly like a normal reconcile, so the ledger
+        is accounted without an owner attestation. The entry is explicitly
+        marked as an ungraded incomplete response: no PASS or FAIL is derived
+        from it, and the caller still halts fail-closed on the transport error.
+
+        Accounting stays exact only while the provider-reported usage fits the
+        reservation. If usage exceeds the reservation (unexpected for honest
+        usage, where the byte-derived input bound is at least the token count and
+        the output is capped), the same conservative drift branch as reconcile()
+        records the call unreconciled with reason BUDGET_CAP and halts the run:
+        usage present implies reconciled only when usage <= reservation.
+        """
+        actual = ceil_cents(
+            input_tokens,
+            handle.input_cents_per_mtok,
+            output_tokens,
+            handle.output_cents_per_mtok,
+        )
+        try:
+            self._ledger.reconcile(
+                Reservation(
+                    handle.reservation_id,
+                    {"calls": 1, "monetary_cents": handle.reserved_cents},
+                ),
+                {"calls": 1, "monetary_cents": actual},
+            )
+        except BudgetError as exc:
+            entry = {
+                "call_index": handle.call_index,
+                "call_ref": handle.call_ref,
+                "vendor": handle.vendor,
+                "model": handle.model,
+                "served_model": served_model,
+                "pinned_match": served_model == handle.model,
+                "input_tokens": int(input_tokens),
+                "output_tokens": int(output_tokens),
+                "reserved_cents": handle.reserved_cents,
+                "actual_cents": actual,
+                "cost_cents": max(actual, handle.reserved_cents),
+                "cumulative_cents": self.spent_cents()
+                + max(actual, handle.reserved_cents),
+                "ceiling_cents": self.ceiling_cents,
+                "reconciled": False,
+                "reason_code": "BUDGET_CAP",
+                "detail": "reservation drift: actual usage exceeded the reservation",
+            }
+            self._entries.append(entry)
+            self._snapshot()
+            self._record_halt(
+                reason_code="BUDGET_CAP",
+                detail=f"reservation drift: {exc}",
+                call_ref=handle.call_ref,
+                requested_cents=actual,
+                vendor=handle.vendor,
+                model=handle.model,
+            )
+            raise CostCeilingHaltError(
+                f"actual usage exceeded the reservation for {handle.call_ref!r}: {exc}",
+                context=dict(self._halt or {}),
+            ) from exc
+        entry = {
+            "call_index": handle.call_index,
+            "call_ref": handle.call_ref,
+            "vendor": handle.vendor,
+            "model": handle.model,
+            "served_model": served_model,
+            "pinned_match": served_model == handle.model,
+            "input_tokens": int(input_tokens),
+            "output_tokens": int(output_tokens),
+            "reserved_cents": handle.reserved_cents,
+            "actual_cents": actual,
+            "cost_cents": actual,
+            "cumulative_cents": self.spent_cents() + actual,
+            "ceiling_cents": self.ceiling_cents,
+            "reconciled": True,
+            "reason_code": reason_code,
+            "response_state": "UNGRADED_INCOMPLETE",
+            "stop_reason": stop_reason,
+            "response_id": response_id,
+            "response_chars": response_chars,
+            "detail": detail,
         }
         self._entries.append(entry)
         self._snapshot()
