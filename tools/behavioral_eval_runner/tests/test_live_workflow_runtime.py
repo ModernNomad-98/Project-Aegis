@@ -1136,6 +1136,14 @@ class PostMergeAdvisoryFixTests(unittest.TestCase):
         readme = (root / "tools/behavioral_eval_runner/live/config/README.md").read_text()
         self.assertIn("NOT dispatchable", readme)
         self.assertIn("only accepted eval-run template", readme)
+        self.assertIn("Re-derive the committed gate template", run_text)
+        self.assertIn("settled_on_timeout", run_text)
+        self.assertIn("final_outstanding_reservations_cents", run_text)
+        runtime = (
+            root / "tools/behavioral_eval_runner/live/workflow_runtime.py"
+        ).read_text()
+        self.assertIn("smoke_identity_parts", runtime)
+        self.assertIn('if str(run_id).isdigit()', runtime)
 
     def test_real_shaped_smoke_proof_is_collected(self):
         # Advisory item 22: exercise the exact producer shape (no FakeGH
