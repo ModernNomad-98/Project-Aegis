@@ -1647,6 +1647,7 @@ jobs:
           )
           from tools.behavioral_eval_runner.live.reservations import (  # noqa: E402
               cancel as cancel_reservation,
+              dispatch_if_admitted,
               reserve as reserve_spend,
               true_up as true_up_spend,
           )
@@ -2130,8 +2131,11 @@ jobs:
                   smoke_spend_cents=smoke_spent(),
                   ceiling_cents=CEILING,
               )
+              admission = {"admitted": reserve_amount > 0}
               try:
-                  completed = run_cli(
+                  completed = dispatch_if_admitted(
+                      admission,
+                      run_cli,
                       [
                           "live-run",
                           "--config", str(config_path),
@@ -2144,6 +2148,12 @@ jobs:
                       ],
                       timeout=PER_CASE_TIMEOUT_SECONDS,
                   )
+                  if completed is None:
+                      record["status"] = "ADMISSION_DENIED"
+                      entry["status"] = "ADMISSION_DENIED"
+                      failures.append(f"{case_id}: admission denied before live-run")
+                      write_state()
+                      break
               except subprocess.TimeoutExpired:
                   try:
                       cancel_reservation(reservation_state_path)
