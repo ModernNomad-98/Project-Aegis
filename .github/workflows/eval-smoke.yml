@@ -118,7 +118,7 @@ jobs:
           RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
           sys.path.insert(0, str(WORKSPACE))
 
-          from tools.behavioral_eval_runner.live.allowance_history import (  # noqa: E402
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
               collect_allowance_history,
               collect_latest_allowance_state,
           )
@@ -129,7 +129,7 @@ jobs:
           from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
               admit_paid_call,
           )
-          from tools.behavioral_eval_runner.live.reservations import (  # noqa: E402
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
               cancel,
               reserve,
           )
@@ -697,7 +697,7 @@ jobs:
           (out_dir / "smoke-proof.json").write_text(
               json.dumps(proof, indent=2, sort_keys=True) + "\n", encoding="utf-8"
           )
-          from tools.behavioral_eval_runner.live.reservations import (  # noqa: E402
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
               true_up,
           )
           true_up(

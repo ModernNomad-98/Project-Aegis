@@ -964,7 +964,7 @@ jobs:
           for directory in (MANIFEST_DIR, CASES_DIR, LEDGER_DIR, RESTORE_DIR):
               directory.mkdir(parents=True, exist_ok=True)
           sys.path.insert(0, str(WORKSPACE))
-          from tools.behavioral_eval_runner.live.allowance_history import (  # noqa: E402
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
               collect_latest_allowance_state,
               collect_smoke_proof_spends,
           )
@@ -1645,7 +1645,7 @@ jobs:
           from tools.behavioral_eval_runner.live.cumulative import (  # noqa: E402
               smoke_spend_total,
           )
-          from tools.behavioral_eval_runner.live.reservations import (  # noqa: E402
+          from tools.behavioral_eval_runner.live.workflow_runtime import (  # noqa: E402
               cancel as cancel_reservation,
               dispatch_if_admitted,
               reserve as reserve_spend,
