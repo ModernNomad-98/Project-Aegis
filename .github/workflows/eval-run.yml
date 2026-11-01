@@ -1975,6 +1975,18 @@ jobs:
               # prior dispatch already charged, not just this manifest's.
               enforce_ceiling()
               remaining = CEILING - total_spent()
+              # S4c2b: run the production admission gate BEFORE the existing
+              # pre-check so a denied admission is a genuine, observable path
+              # (and cannot be masked by the ceiling pre-check).
+              gate_admission = {"admitted": remaining > 0}
+              if dispatch_if_admitted(gate_admission, lambda: "ADMITTED") is None:
+                  entry["status"] = "ADMISSION_DENIED"
+                  failures.append(
+                      f"{case_id}: admission denied before dispatch "
+                      f"(remaining={remaining}c)"
+                  )
+                  write_state()
+                  break
               if remaining <= 0:
                   entry["status"] = "NOT_RUN_BUDGET"
                   failures.append(
