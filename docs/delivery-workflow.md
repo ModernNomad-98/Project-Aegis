@@ -107,6 +107,8 @@ the stage as **procedurally enforced** — consistent with
 
 Stage A's plan-of-record artifact is a package under _A/evidence/<item>/ containing the plan, the specification annex, the acceptance-row matrix, the impact note and a binding record. The author answers the five questions owed at Stage A; the package records the exact content hashes of the plan revision that was audited (captured-revision content-hash binding), so the Stage B auditor audits a captured revision and the implementation can only later claim to follow that same captured revision. The handoff is author to independent auditor: the author never audits its own plan and the auditor never approves the implementation.
 
+A plan for a change that implements the [universal agent directive](universal-directive-integration.md) also carries the directive's Pages, security, mock-retirement, retroactive-audit and coordinator-report requirements by reference to that page; the final independent PR review (Stage F) checks that the reference and the delivered requirements are present, rather than this rule restating them here.
+
 ### Audit findings are backlog input only
 
 Audit findings (Stage B or Stage D) are backlog input only: dedupe them against the existing backlog first, and record them only in the owner-ordered queue. They must never create a second queue or a second execution plan (backlog-input-only, never a second queue); a finding is not an instruction to widen scope.
