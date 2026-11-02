@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "9747f78a8be0ca15a41925721ec1be18a2d3c537",
+  "source_revision": "97ce18b8b25d82bad6cc9982fa8ead628c9a7f4a",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -307,6 +307,11 @@
       "name": "command-gateway-architect",
       "path": ".claude/skills/command-gateway-architect/SKILL.md",
       "sha256": "4b32c53f1abb738b004c04e93c3b60810f795535277f7f87cc735783f7a82933"
+    },
+    {
+      "name": "complete-project-checkpoint",
+      "path": ".claude/skills/complete-project-checkpoint/SKILL.md",
+      "sha256": "20c6f1e0f807765f56e88aeb1f96c5af7fa6862f52a870a4e849068071589ec5"
     },
     {
       "name": "compliance-control-foundation",
