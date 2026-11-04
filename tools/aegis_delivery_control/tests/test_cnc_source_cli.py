@@ -152,6 +152,8 @@ class SourceCliTests(unittest.TestCase):
              "--input","capture.json"],
             ["--repository-id","example","--bogus","DO_NOT_LEAK","cnc-report",
              "--input","capture.json"],
+            ["--repository-id","example","--bogus","status","cnc-report",
+             "--input","capture.json"],
             ["--bogus","cnc-report","--input","capture.json"],
             ["--bogus=DO_NOT_LEAK","--","cnc-report","--input","capture.json"])
         for argv in vectors:
@@ -168,6 +170,40 @@ class SourceCliTests(unittest.TestCase):
         for argv in vectors:
             with self.subTest(argv=argv):
                 self.assertFalse(cli._report_mode(argv))
+
+    def test_top_level_option_prefix_must_be_unambiguous(self):
+        # With two top-level options sharing a prefix, a shortening must not
+        # resolve to the first one; only an exact or unique prefix matches.
+        options=({"name":"--ledger","required":True,"takes_value":True},
+                 {"name":"--ledger-file","required":False,"takes_value":True})
+        with patch.object(cli,"_TOP_LEVEL_OPTIONS",options):
+            self.assertIsNone(cli._top_level_option("--l"))
+            self.assertIsNone(cli._top_level_option("--led"))
+            self.assertEqual(cli._top_level_option("--ledger")["name"],
+                             "--ledger")
+            self.assertEqual(cli._top_level_option("--ledger-f")["name"],
+                             "--ledger-file")
+            self.assertIsNone(cli._top_level_option("--repository"))
+
+    def test_unknown_option_separated_value_equal_to_subcommand(self):
+        base=[sys.executable,"-B","-m","tools.aegis_delivery_control",
+              "--repository-id","ModernNomad-98/Project-Aegis"]
+        # The unknown option is assumed to take "status" as its value, so the
+        # later cnc-report token still selects the fixed JSON error path.
+        run=subprocess.run([*base,"--bogus","status","cnc-report","--input",
+                            str(self.path)],capture_output=True)
+        self.assertEqual(run.returncode,2)
+        self.assertEqual(run.stdout,b"")
+        self.assertEqual(json.loads(run.stderr),
+                         {"error_code":"CLI_INVALID",
+                          "message":cnc_reporting.ERRORS["CLI_INVALID"][1]})
+        self.assertEqual(run.stderr.count(b"\n"),1)
+        self.assertNotIn(b"\r",run.stderr)
+        self.assertNotIn(b"usage:",run.stderr)
+        self.assertTrue(cli._report_mode(["--repository-id","example","--bogus",
+                                          "status","cnc-report","--input","x"]))
+        self.assertFalse(cli._report_mode(["--repository-id","example","--bogus",
+                                           "status"]))
 
     def test_declared_subcommands_match_build_parser_choices(self):
         parser=cli.build_parser()

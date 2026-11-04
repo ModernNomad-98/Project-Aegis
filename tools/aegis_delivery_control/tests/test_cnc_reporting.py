@@ -6,7 +6,9 @@ The fixture's replay is sanitized supplied record evidence, not verified authori
 import copy
 import hashlib
 import importlib.util
+import io
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -249,7 +251,23 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual(route()["state"], "none")
         self.assertEqual(route()["route"], "NO_FINDING")
         self.assertIsNone(route()["evidenceGap"])
+        # A "none" record that carries evidence or a primary detail is
+        # contradictory: it must never render as NO_FINDING.
+        for detail_key in ("evidence", "primary"):
+            value = item["finding"]["value"]
+            value["evidence"] = {"value": None, "unknown_reason": "not applicable"}
+            value["primary"] = {"value": None, "unknown_reason": "not applicable"}
+            value[detail_key] = {"value": "record:contradiction", "unknown_reason": None}
+            with self.subTest(detail=detail_key):
+                self.assertEqual(route()["state"], "unresolved_none")
+                self.assertEqual(route()["route"], "UNRESOLVED_NATIVE_DISPOSITION")
+                self.assertIn("declares none", route()["evidenceGap"])
+                self.assertTrue(any("Finding for event" in gap
+                                    for gap in self.report()["evidence_gaps"]))
         # A no-finding record contradicted by the flag stays unresolved.
+        value = item["finding"]["value"]
+        value.update(evidence={"value": None, "unknown_reason": "not applicable"},
+                     primary={"value": None, "unknown_reason": "not applicable"})
         item["change"]["material_finding"] = True
         self.assertEqual(route()["state"], "unresolved_material")
         self.assertEqual(route()["route"], "UNRESOLVED_NATIVE_DISPOSITION")
@@ -521,6 +539,77 @@ class ReportingTests(unittest.TestCase):
         self.profile.write_text(json.dumps(profile), encoding="utf-8")
         with self.subTest(identifier="aegis-stage-labels"):
             self.refused(json.dumps(self.data).encode(), "PROFILE_INVALID")
+
+    def test_candidate_profile_requires_an_unknown_adoption_receipt(self):
+        profile = copy.deepcopy(CASES["profile"])
+        self.assertEqual(profile["activation"], "candidate")
+        profile["adoption_receipt"] = {"value": "record:adoption",
+                                       "unknown_reason": None}
+        self.profile.write_text(json.dumps(profile), encoding="utf-8")
+        self.refused(json.dumps(self.data).encode(), "PROFILE_INVALID")
+        # The opposite pairing is required too: an adopted profile needs a
+        # receipt, so the two fields cannot disagree in either direction.
+        profile["activation"] = "adopted_with_receipt"
+        profile["adoption_receipt"] = {"value": None,
+                                       "unknown_reason": "not supplied"}
+        self.profile.write_text(json.dumps(profile), encoding="utf-8")
+        self.refused(json.dumps(self.data).encode(), "PROFILE_INVALID")
+        profile["adoption_receipt"] = {"value": "record:adoption",
+                                       "unknown_reason": None}
+        self.profile.write_text(json.dumps(profile), encoding="utf-8")
+        self.assertEqual(self.report()["report_status"],
+                         "RENDERED_NON_AUTHORIZING")
+
+    def test_path_rejection_exempts_windows_drive_letters(self):
+        for refused in ("-", "https://example.invalid/x", "ssh://host/x",
+                        "//host/file", r"\\host\file"):
+            with self.subTest(refused=refused):
+                self.assertTrue(cnc._path_is_refused(refused))
+        for allowed in (r"C:\tmp\capture.json", "C://tmp/capture.json",
+                        "c:/tmp/capture.json"):
+            with self.subTest(allowed=allowed):
+                self.assertFalse(cnc._path_is_refused(allowed))
+        # A single-letter URI scheme is indistinguishable from a drive path
+        # and shares the documented exemption.
+        self.assertFalse(cnc._path_is_refused("x://host/file"))
+        if sys.platform == "win32":
+            self.input.write_text(json.dumps(self.data), encoding="utf-8")
+            drive = self.input.as_posix()
+            drive = drive[:2] + "//" + drive[3:]
+            self.assertEqual(
+                cnc.report_from_paths(self.data["repository_id"], drive,
+                                      self.profile, self.contract)["report_status"],
+                "RENDERED_NON_AUTHORIZING")
+
+    def test_read_closes_the_descriptor_when_fdopen_fails(self):
+        self.input.write_text(json.dumps(self.data), encoding="utf-8")
+        closed = []
+        real_close = os.close
+        def close(descriptor):
+            closed.append(descriptor)
+            real_close(descriptor)
+        with patch.object(cnc.os, "fdopen", side_effect=OSError("fdopen")), \
+             patch.object(cnc.os, "close", side_effect=close):
+            with self.assertRaises(cnc.ReportError) as caught:
+                cnc._read(self.input, 1048576, "INPUT_INVALID",
+                          "INPUT_UNAVAILABLE")
+        self.assertEqual(caught.exception.code, "INPUT_UNAVAILABLE")
+        self.assertEqual(len(closed), 1)
+
+    def test_json_line_writer_supports_binary_and_text_streams(self):
+        class Binary:
+            def __init__(self):
+                self.buffer = io.BytesIO()
+        binary = Binary()
+        cnc._write_json_line({"b": 1, "a": "café"}, binary)
+        self.assertEqual(
+            binary.buffer.getvalue(),
+            json.dumps({"b": 1, "a": "café"}, ensure_ascii=True,
+                       sort_keys=True).encode("ascii") + b"\n")
+        text = io.StringIO()
+        cnc._write_json_line({"b": 1}, text)
+        self.assertEqual(text.getvalue(), '{"b": 1}\n')
+        self.assertNotIn("\r", text.getvalue())
 
     def test_shipped_contract_bytes_stay_lf_and_match(self):
         # This test is the line-ending enforcement for the shipped contract:

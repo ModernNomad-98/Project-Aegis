@@ -52,8 +52,33 @@ an abbreviation; long-option abbreviations themselves are refused for every
 command. The top-level option surface is declared once and shared by the parser
 and this detection, so a new top-level option cannot silently disable the fixed
 JSON report error path. A path or value that happens to spell `cnc-report` for
-another command changes nothing. Source
-reporting is for Role A;
+another command changes nothing.
+
+Report-mode detection treats an unknown long option written without `=` as
+taking the following non-option token as its value, so
+`--repository-id REPO --bogus status cnc-report --input ...` still reaches the
+fixed JSON path instead of ending the scan at `status`. The token
+`cnc-report` itself is never assumed to be an unknown option's value, so it
+always selects report mode. Residual ambiguity: the real arity of an unknown
+option cannot be known, so an unknown flag directly followed by a non-report
+subcommand is read as if it took that subcommand as a value; a later
+`cnc-report` can therefore select report mode even when argparse would have
+selected the non-report command. That invocation is invalid either way, and
+report mode returns fixed JSON rather than usage. No valid invocation depends
+on either reading.
+
+**Compatibility note (intentional breaking change).** `allow_abbrev=False` is
+set for **every** command, not only `cnc-report`. An existing script that
+abbreviates any long option - for example `--repo` for `--repository-id` -
+now exits 2: report invocations return the fixed `CLI_INVALID` JSON object,
+and the ordinary commands return argparse usage. Spell every long option in
+full. This scope is deliberate rather than scoped to report mode: the command
+surface then has one option grammar, and an abbreviation cannot be accepted by
+one parser path and refused by another; the fixed JSON/no-echo report path
+stays reachable when an abbreviation still names `cnc-report`. Full-name
+invocations are unchanged.
+
+Source reporting is for Role A;
 copying the startup instructions into Role B does not require this package or
 import source stages, grants or authority. Source stages remain exactly A–G.
 Startup/handoff pointer placement in shared governance files belongs to their
@@ -115,7 +140,9 @@ fields and assert the refusal. The portable interface deliberately does not
 pin a consumer profile because the consumer selects its own. The profile
 preserves the prior Aegis mapping's native references, A–G stage labels and
 role boundary, adding precise integration locators. Prior mapping did not
-establish adoption.
+establish adoption. Activation and receipt must agree: `adopted_with_receipt`
+requires a non-null `adoption_receipt.value`, while `candidate` requires a
+null (unknown) receipt and refuses a non-null one as `PROFILE_INVALID`.
 
 A reported grant is routed in order and every route carries the profile's
 `authority_policy_locator` as `policy`. A foreign repository is rejected before
@@ -123,7 +150,10 @@ anything else, so a foreign grant is never described as an authority to locate
 or reuse. Expired, revoked and consumed grants are terminal and are decided
 before a missing original or locator: they route to new authority rather than
 reuse or locating. A missing original or locator is otherwise a reconciliation
-gap. An unknown lifecycle or a scope/conditions mismatch routes exact
+gap, and that gap is decided **before** the lifecycle and scope comparison: an
+unknown lifecycle routes exact reconciliation only when the original is
+verified and the locator is present; with either missing it routes
+`LOCATE_ORIGINAL_AUTHORITY`. A scope/conditions mismatch routes exact
 reconciliation. Only a verified, active, applicable same-repository grant
 routes reuse. No route grants new execution authority, and `ownerWithheld`
 stays unknown because no supplied input establishes that the owner withheld
@@ -134,13 +164,17 @@ entry naming the event and route (`FOREIGN_GRANT_REJECTED`,
 `REUSE_VERIFIED_APPLICABLE_GRANT` adds none.
 
 Finding states are explicit. A supplied finding record routes native
-disposition (`reported`). A null finding value is `unknown` because the schema
-uses null only for unknown-with-a-reason, so it routes
-`UNKNOWN_FINDING_NATIVE_DISPOSITION` with an `evidenceGap`. A record whose
-`status` is `none` is the only positive no-finding report and hence the only
-route to `NO_FINDING`. A material finding without matching details - a null
-finding, a contradictory `none` record, or a non-`none` record with neither an
-evidence nor a primary detail - routes `UNRESOLVED_NATIVE_DISPOSITION` with an
+disposition (`reported`) unless it contradicts the change flags or itself. A
+null finding value is `unknown` because the schema uses null only for
+unknown-with-a-reason, so it routes `UNKNOWN_FINDING_NATIVE_DISPOSITION` with
+an `evidenceGap`. A record whose `status` is `none` is the only positive
+no-finding report and hence the only route to `NO_FINDING`, and only when it
+carries neither an `evidence` nor a `primary` detail: a `none` record carrying
+either detail contradicts itself, renders as `unresolved_none`, and routes
+`UNRESOLVED_NATIVE_DISPOSITION` with an `evidenceGap`. A material finding
+without matching details - a null finding, a `none` record without details, or
+a non-`none` record with neither an evidence nor a primary detail - renders as
+`unresolved_material` and routes `UNRESOLVED_NATIVE_DISPOSITION` with an
 `evidenceGap`. Every finding route stays `closed:false`, and each unknown or
 unresolved item also adds an entry to `evidence_gaps`; non-reuse authority
 routes add their consolidated entries as described above.
@@ -165,8 +199,10 @@ hex characters, plan hashes 64. Items carry immutable `event_id`, task,
 description, evidence label, progress, scope, actor, source locator/hash,
 timestamps, authority, holds, notification evidence, coordinator answer,
 execution evidence, accepted scope, next action/check reason, typed change
-flags and optional finding. Duplicate event IDs are rejected; repeated tasks
-with distinct events are allowed. Accepted completion requires source hash,
+flags and a mandatory `finding` key whose nullable `value` is the only part
+that may be null; omitting the key is `INPUT_INVALID`. Duplicate event IDs are
+rejected; repeated tasks with distinct events are allowed. Accepted completion
+requires source hash,
 execution evidence and acceptance scope, all still caller-supplied claims.
 The four progress kinds are acknowledgment, substantive answer, execution
 milestone and accepted completion; they are not interchangeable delivery units.
@@ -209,8 +245,15 @@ Markdown/HTML renderer.
 
 Only explicit local regular files are read, using bounded descriptor reads.
 Final symlinks, nonregular files, stdin `-`, UNC/device paths and URI paths are
-refused. This does not protect against hostile parent-directory races or
-detect all network/cloud filesystem mounts; the caller selects local captures.
+refused. A path whose first component is a single ASCII drive letter followed
+by `:` and a separator is a Windows drive path, not a URI, so
+`C://tmp/capture.json` is read as a local path. POSIX paths beginning `//` and
+paths beginning with two backslashes remain refused as UNC/device forms, and
+every other `scheme://` prefix is refused as a URI. A single-letter URI scheme
+such as `x://host` is indistinguishable from a drive path and is exempted too;
+that is a documented residual, not a claim that such a string is a local file.
+This does not protect against hostile parent-directory races or detect all
+network/cloud filesystem mounts; the caller selects local captures.
 An availability failure names the document being read: `INPUT_UNAVAILABLE`,
 `PROFILE_UNAVAILABLE` or `CONTRACT_UNAVAILABLE`, all exit 3, so a broken
 profile or contract installation is distinguishable from a bad capture. No

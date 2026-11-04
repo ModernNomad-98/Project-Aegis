@@ -7,10 +7,12 @@ Intentional corrections: a foreign grant is rejected before a missing locator;
 expired, revoked and consumed grants route to new authority even when the
 original or locator is missing; every authority route carries the profile's
 policy locator; a null finding is unknown, never "no finding"; a material
-finding without matching evidence or primary detail stays unresolved; all
-finding adjudication remains native. Inputs are caller claims, never
-authenticated here. CLI output is one LF-terminated JSON object written as
-bytes.
+finding without matching evidence or primary detail stays unresolved; a
+"none" finding record carrying evidence or primary detail contradicts itself
+and stays unresolved; a candidate profile cannot carry an adoption receipt; a
+Windows drive-letter path is local rather than a URI; all finding adjudication
+remains native. Inputs are caller claims, never authenticated here. CLI output
+is one LF-terminated JSON object written as bytes.
 """
 from __future__ import annotations
 
@@ -168,6 +170,39 @@ def _walk(value, depth=0):
         _require(value is None or type(value) is bool)
 
 
+_URI_PATH = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*://")
+_DRIVE_PATH = re.compile(r"^[A-Za-z]:[\\/]")
+
+
+def _path_is_refused(path_text):
+    """True for a path shape refused before any filesystem access.
+
+    A single ASCII drive letter followed by ":" and a separator is a Windows
+    drive path, not a URI scheme, so "C://tmp/capture.json" stays readable.
+    POSIX paths beginning "//" and Windows paths beginning with two backslashes
+    are refused as UNC/device forms before the URI check; every other
+    "scheme://" prefix is a URI. The drive exemption also covers a
+    hypothetical single-letter URI scheme, documented as a residual ambiguity.
+    """
+    return (type(path_text) is not str or path_text == "-" or
+            path_text.startswith(("\\\\", "//")) or
+            (_URI_PATH.match(path_text) is not None and
+             _DRIVE_PATH.match(path_text) is None))
+
+
+def _open_binary(path_text, flags):
+    """Open one binary stream, closing the raw descriptor if wrapping fails."""
+    descriptor = os.open(path_text, flags)
+    try:
+        return os.fdopen(descriptor, "rb")
+    except BaseException:
+        try:
+            os.close(descriptor)
+        except OSError:
+            pass
+        raise
+
+
 def _read(path, maximum, invalid_code, unavailable_code):
     """One explicit regular descriptor, bounded read, no final symlink following.
 
@@ -176,20 +211,19 @@ def _read(path, maximum, invalid_code, unavailable_code):
 
     This is not protection against a hostile actor racing parent directories.
     Cloud/network-backed mounts cannot be identified portably by this helper.
+    The selected path may be a Windows drive-letter path; "C://tmp/x" is a
+    local path, not a URI.
     """
     try:
         path_text = os.fspath(path)
-        if (type(path_text) is not str or path_text == "-" or
-                path_text.startswith(("\\\\", "//")) or
-                re.match(r"^[A-Za-z][A-Za-z0-9+.-]*://", path_text)):
+        if _path_is_refused(path_text):
             raise ReportError(unavailable_code)
         before = os.lstat(path_text)
         if not stat.S_ISREG(before.st_mode) or stat.S_ISLNK(before.st_mode):
             raise ReportError(unavailable_code)
         flags = (os.O_RDONLY | getattr(os, "O_BINARY", 0) |
                  getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
-        descriptor = os.open(path_text, flags)
-        with os.fdopen(descriptor, "rb") as stream:
+        with _open_binary(path_text, flags) as stream:
             actual = os.fstat(stream.fileno())
             if (not stat.S_ISREG(actual.st_mode) or
                     (before.st_dev, before.st_ino) != (actual.st_dev, actual.st_ino)):
@@ -319,8 +353,12 @@ def _profile(value):
         _require(ids == list("ABCDEFG"))
     _enum(value["activation"], "candidate adopted_with_receipt")
     _maybe(value["adoption_receipt"], _text)
+    # Activation and receipt must agree: a candidate has not been adopted, so
+    # it cannot carry a receipt, and an adopted profile must carry one.
     if value["activation"] == "adopted_with_receipt":
         _require(value["adoption_receipt"]["value"] is not None)
+    else:
+        _require(value["adoption_receipt"]["value"] is None)
 
 
 def _authority_route(item, profile):
@@ -377,21 +415,27 @@ def _finding_route(item, profile):
     null finding is unknown, never proof that no finding exists. The three
     states are explicit: a supplied record is "reported"; a caller that has
     positively assessed the change as having no finding supplies a record whose
-    status is "none"; a null value is "unknown". A material finding reported
-    without matching details is unresolved and routes to native disposition
-    instead of "NO_FINDING". For a material finding, a non-"none" record also
-    needs at least one evidence or primary detail; a status alone is not matching
-    detail. Non-material supplied records remain reported assessments for native
-    disposition.
+    status is "none"; a null value is "unknown". A "none" record that carries
+    any evidence or primary detail contradicts itself: no-finding and a finding
+    detail cannot both be true, so it stays unresolved instead of routing
+    "NO_FINDING". A material finding reported without matching details is
+    unresolved and routes to native disposition. For a material finding, a
+    non-"none" record also needs at least one evidence or primary detail; a
+    status alone is not matching detail. Non-material supplied records remain
+    reported assessments for native disposition.
     """
     value = item["finding"]["value"]
     policy = profile["finding_policy_locator"]
     absent = value is None
     declared_none = not absent and value["status"].strip().casefold() == "none"
-    has_detail = (not absent and not declared_none and
-                  (value["evidence"]["value"] is not None or
-                   value["primary"]["value"] is not None))
-    if item["change"]["material_finding"] and (absent or declared_none or not has_detail):
+    detail = (not absent and
+              (value["evidence"]["value"] is not None or
+               value["primary"]["value"] is not None))
+    if declared_none and detail:
+        state, route = "unresolved_none", "UNRESOLVED_NATIVE_DISPOSITION"
+        gap = ("A finding record declares none while carrying an evidence or "
+               "primary detail; native disposition is unresolved.")
+    elif item["change"]["material_finding"] and (absent or declared_none or not detail):
         state, route = "unresolved_material", "UNRESOLVED_NATIVE_DISPOSITION"
         if absent:
             gap = "A material finding is reported without finding details; native disposition is unresolved."
@@ -556,11 +600,21 @@ class ReportParser(argparse.ArgumentParser):
 
 
 def _write_json_line(value, stream):
-    """Write one LF-terminated JSON object as bytes; never translate newlines."""
-    data = (json.dumps(value, ensure_ascii=True, allow_nan=False,
-                       sort_keys=True) + "\n").encode("ascii")
-    stream.buffer.write(data)
-    stream.buffer.flush()
+    """Write one LF-terminated JSON object as bytes; never translate newlines.
+
+    A binary stream's "buffer" keeps the bytes-only contract for stdout and
+    stderr. A text-only stream (a test or an embedder) receives the same ASCII
+    text through "write" instead, so callers do not need a ".buffer".
+    """
+    text = json.dumps(value, ensure_ascii=True, allow_nan=False,
+                      sort_keys=True) + "\n"
+    buffer = getattr(stream, "buffer", None)
+    if buffer is None:
+        stream.write(text)
+        stream.flush()
+    else:
+        buffer.write(text.encode("ascii"))
+        buffer.flush()
 
 
 def emit_error(error):

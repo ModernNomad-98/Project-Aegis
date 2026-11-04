@@ -146,7 +146,14 @@ def _fast_save_refusal(error: fast_save.FastSaveRefused) -> dict[str, object]:
 
 
 class _StrictParser(argparse.ArgumentParser):
-    """Reject long-option abbreviations for the standard command surface."""
+    """Reject long-option abbreviations for the standard command surface.
+
+    This is a deliberate breaking change from argparse's default: an
+    abbreviation such as --repo is refused for every command, so the ordinary
+    and report surfaces share one option grammar and a report invocation cannot
+    be parsed through an abbreviation. The package README records the
+    compatibility impact.
+    """
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("allow_abbrev", False)
@@ -221,15 +228,19 @@ def _top_level_option(option):
 
     argparse accepts any unambiguous prefix by default; the strict parsers
     refuse one, but report-mode detection still recognizes it so the fixed JSON
-    error path, rather than an abbreviated parse, handles the invocation.
+    error path, rather than an abbreviated parse, handles the invocation. A
+    prefix that matches more than one declared option is ambiguous and returns
+    None, so adding a second top-level option cannot silently change which
+    arity detection assumes.
     """
     for spec in _TOP_LEVEL_OPTIONS:
-        name = spec["name"]
-        if option == name or (
-                option.startswith("--") and len(option) > 2 and
-                name.startswith(option)):
+        if option == spec["name"]:
             return spec
-    return None
+    if not (option.startswith("--") and len(option) > 2):
+        return None
+    matches = [spec for spec in _TOP_LEVEL_OPTIONS
+               if spec["name"].startswith(option)]
+    return matches[0] if len(matches) == 1 else None
 
 
 def _report_mode(argv: Sequence[str]) -> bool:
@@ -242,12 +253,26 @@ def _report_mode(argv: Sequence[str]) -> bool:
     build_parser registers, including whether each takes a value. An abbreviated
     top-level option is recognized here only for detection; the parser still
     refuses the abbreviation, so report-mode errors stay fixed JSON and cannot
-    be bypassed by an accepted abbreviation. A token that is neither a known
-    top-level option nor a known subcommand is skipped instead of ending the
-    scan: a malformed invocation that still selects cnc-report reaches the fixed
-    JSON error path, so its offending argument is never echoed by argparse. The
-    first known subcommand stops the scan, so a value that happens to spell
-    "cnc-report" cannot switch the parser class for an ordinary command.
+    be bypassed by an accepted abbreviation.
+
+    A token that is neither a known top-level option nor a known subcommand is
+    skipped instead of ending the scan: a malformed invocation that still
+    selects cnc-report reaches the fixed JSON error path, so its offending
+    argument is never echoed by argparse. The first known subcommand normally
+    stops the scan, so a value that happens to spell "cnc-report" cannot switch
+    the parser class for an ordinary command.
+
+    An unknown long option's real arity is unknowable here, so an unknown long
+    option written without "=" is assumed to take the following non-option
+    token as its value. That keeps a value equal to a known subcommand from
+    ending the scan: "--repository-id REPO --bogus status cnc-report ..." is
+    still report mode. The token "cnc-report" itself is never assumed to be an
+    unknown option's value, so it always selects report mode. Residual
+    ambiguity: an unknown flag directly followed by a non-report subcommand is
+    read as if it took that subcommand as a value, so a later "cnc-report" can
+    select report mode even when argparse would have selected the non-report
+    command. That invocation is invalid either way; no valid invocation
+    depends on the assumption.
     """
     index = 0
     while index < len(argv):
@@ -262,7 +287,14 @@ def _report_mode(argv: Sequence[str]) -> bool:
             continue
         if token in _SUBCOMMANDS:
             return token == "cnc-report"
-        index += 1
+        next_token = argv[index + 1] if index + 1 < len(argv) else None
+        if (separator == "" and option.startswith("--") and len(option) > 2
+                and next_token is not None
+                and next_token != "cnc-report"
+                and not next_token.startswith("-")):
+            index += 2
+        else:
+            index += 1
     return index < len(argv) and argv[index] == "cnc-report"
 
 
