@@ -143,6 +143,74 @@ class SourceCliTests(unittest.TestCase):
         self.assertIn(b"usage:",run.stderr)
         self.assertNotIn(b"error_code",run.stderr)
 
+    def test_report_mode_scans_past_unknown_tokens(self):
+        # Unknown options and values before the subcommand do not end the scan:
+        # the first KNOWN subcommand still decides, so a malformed cnc-report
+        # invocation reaches the fixed JSON path instead of ordinary argparse.
+        vectors=(
+            ["--repository-id","example","--bogus=DO_NOT_LEAK","cnc-report",
+             "--input","capture.json"],
+            ["--repository-id","example","--bogus","DO_NOT_LEAK","cnc-report",
+             "--input","capture.json"],
+            ["--bogus","cnc-report","--input","capture.json"],
+            ["--bogus=DO_NOT_LEAK","--","cnc-report","--input","capture.json"])
+        for argv in vectors:
+            with self.subTest(argv=argv):
+                self.assertTrue(cli._report_mode(argv))
+        # A known non-report subcommand stops the scan first, so a value that
+        # happens to spell cnc-report cannot switch the parser class.
+        vectors=(
+            ["--repository-id","example","--bogus","status"],
+            ["--repository-id","example","status","--bogus"],
+            ["--repository-id","example","fast-save","--state","cnc-report",
+             "--checkpoint","out.json","--bogus"],
+            ["--repository-id","example","--bogus"])
+        for argv in vectors:
+            with self.subTest(argv=argv):
+                self.assertFalse(cli._report_mode(argv))
+
+    def test_declared_subcommands_match_build_parser_choices(self):
+        parser=cli.build_parser()
+        actions=[action for action in parser._subparsers._group_actions]
+        self.assertEqual(len(actions),1)
+        self.assertEqual(set(actions[0].choices),set(cli._SUBCOMMANDS))
+        self.assertEqual(len(cli._SUBCOMMANDS),len(set(cli._SUBCOMMANDS)))
+        self.assertIn("cnc-report",cli._SUBCOMMANDS)
+
+    def test_unknown_option_before_report_subcommand_stays_fixed_json(self):
+        base=[sys.executable,"-B","-m","tools.aegis_delivery_control",
+              "--repository-id","ModernNomad-98/Project-Aegis"]
+        # (a) An unknown option before cnc-report is not echoed by argparse; it
+        # reaches the report parser's fixed JSON CLI_INVALID error path.
+        for extra in (("--bogus=DO_NOT_LEAK",),("--bogus","DO_NOT_LEAK")):
+            run=subprocess.run([*base,*extra,"cnc-report","--input",
+                                str(self.path)],capture_output=True)
+            with self.subTest(extra=extra):
+                self.assertEqual(run.returncode,2)
+                self.assertEqual(run.stdout,b"")
+                self.assertEqual(json.loads(run.stderr)["error_code"],
+                                 "CLI_INVALID")
+                self.assertNotIn(b"DO_NOT_LEAK",run.stdout)
+                self.assertNotIn(b"DO_NOT_LEAK",run.stderr)
+                self.assertNotIn(b"usage:",run.stderr)
+        # (b) The abbreviated top-level option keeps the same fixed JSON path.
+        run=subprocess.run([sys.executable,"-B","-m",
+            "tools.aegis_delivery_control","--repo","ModernNomad-98/Project-Aegis",
+            "cnc-report","--input",str(self.path)],capture_output=True)
+        self.assertEqual(run.returncode,2)
+        self.assertEqual(run.stdout,b"")
+        self.assertEqual(json.loads(run.stderr)["error_code"],"CLI_INVALID")
+        self.assertNotIn(b"usage:",run.stderr)
+        # (c) An unknown option on a non-report command stays an ordinary usage
+        # error; the fixed JSON error object is never emitted.
+        for extra in (("status","--bogus"),("--bogus","status")):
+            run=subprocess.run([*base,*extra],capture_output=True)
+            with self.subTest(extra=extra):
+                self.assertEqual(run.returncode,2)
+                self.assertEqual(run.stdout,b"")
+                self.assertIn(b"usage:",run.stderr)
+                self.assertNotIn(b"error_code",run.stderr)
+
     def test_report_branches_before_database_and_preserves_capabilities(self):
         stdout,stderr=_BinaryCapture(),_BinaryCapture()
         with patch.object(cli,"_database_path",side_effect=AssertionError("database path")), \

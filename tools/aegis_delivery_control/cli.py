@@ -161,6 +161,20 @@ _TOP_LEVEL_OPTIONS = (
     {"name": "--repository-id", "required": True, "takes_value": True},
 )
 
+# One declaration of the subcommand surface, in registration order. _report_mode
+# uses it to recognise the subcommand position, so an unknown option or value
+# before the subcommand cannot force the ordinary parser (which echoes the
+# offending argument) when cnc-report is the selected command. A test pins this
+# declaration to build_parser's subparser choices.
+_SUBCOMMANDS = (
+    "capabilities",
+    "status",
+    "verify",
+    "ci-durations",
+    "cnc-report",
+    "fast-save",
+)
+
 
 def _add_top_level_options(parser):
     for spec in _TOP_LEVEL_OPTIONS:
@@ -228,7 +242,12 @@ def _report_mode(argv: Sequence[str]) -> bool:
     build_parser registers, including whether each takes a value. An abbreviated
     top-level option is recognized here only for detection; the parser still
     refuses the abbreviation, so report-mode errors stay fixed JSON and cannot
-    be bypassed by an accepted abbreviation.
+    be bypassed by an accepted abbreviation. A token that is neither a known
+    top-level option nor a known subcommand is skipped instead of ending the
+    scan: a malformed invocation that still selects cnc-report reaches the fixed
+    JSON error path, so its offending argument is never echoed by argparse. The
+    first known subcommand stops the scan, so a value that happens to spell
+    "cnc-report" cannot switch the parser class for an ordinary command.
     """
     index = 0
     while index < len(argv):
@@ -241,9 +260,9 @@ def _report_mode(argv: Sequence[str]) -> bool:
         if spec is not None:
             index += 1 if separator or not spec["takes_value"] else 2
             continue
-        if token.startswith("-"):
-            return False
-        return token == "cnc-report"
+        if token in _SUBCOMMANDS:
+            return token == "cnc-report"
+        index += 1
     return index < len(argv) and argv[index] == "cnc-report"
 
 
