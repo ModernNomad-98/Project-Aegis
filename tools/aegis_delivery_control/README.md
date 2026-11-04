@@ -44,8 +44,11 @@ python -B -m tools.aegis_delivery_control --repository-id ModernNomad-98/Project
 The source wrapper fixes `cnc/adapter-aegis.json` and
 `cnc/cnc-evidence-contract-v2.json` internally. Foreign repository IDs and
 profile/contract overrides are refused. `cnc-report` is recognized only in the
-subcommand position, so a path or value that happens to spell it for another
-command changes nothing. Source reporting is for Role A;
+subcommand position, including after an abbreviated top-level option, so report
+parsing and fixed JSON errors cannot be bypassed by an abbreviation; long-option
+abbreviations themselves are refused for every command. A path or value that
+happens to spell `cnc-report` for another command changes nothing. Source
+reporting is for Role A;
 copying the startup instructions into Role B does not require this package or
 import source stages, grants or authority. Source stages remain exactly A–G.
 Startup/handoff pointer placement in shared governance files belongs to their
@@ -102,11 +105,13 @@ file. The profile preserves the prior Aegis mapping's
 native references, A–G stage labels and role boundary, adding precise
 integration locators. Prior mapping did not establish adoption.
 
-A reported grant is routed in order. A foreign repository is rejected before
+A reported grant is routed in order and every route carries the profile's
+`authority_policy_locator` as `policy`. A foreign repository is rejected before
 anything else, so a foreign grant is never described as an authority to locate
-or reuse. A missing original or locator is a reconciliation gap. Expired,
-revoked and consumed grants are terminal and route to new authority rather than
-reuse. An unknown lifecycle or a scope/conditions mismatch routes exact
+or reuse. Expired, revoked and consumed grants are terminal and are decided
+before a missing original or locator: they route to new authority rather than
+reuse or locating. A missing original or locator is otherwise a reconciliation
+gap. An unknown lifecycle or a scope/conditions mismatch routes exact
 reconciliation. Only a verified, active, applicable same-repository grant
 routes reuse. No route grants new execution authority, and `ownerWithheld`
 stays unknown because no supplied input establishes that the owner withheld
@@ -117,10 +122,11 @@ disposition (`reported`). A null finding value is `unknown` because the schema
 uses null only for unknown-with-a-reason, so it routes
 `UNKNOWN_FINDING_NATIVE_DISPOSITION` with an `evidenceGap`. A record whose
 `status` is `none` is the only positive no-finding report and hence the only
-route to `NO_FINDING`. `change.material_finding:true` without matching
-details, or contradicted by a `none` record, routes
-`UNRESOLVED_NATIVE_DISPOSITION`. Every finding route stays `closed:false`, and
-each unknown or unresolved item also adds an entry to `evidence_gaps`.
+route to `NO_FINDING`. A material finding without matching details - a null
+finding, a contradictory `none` record, or a non-`none` record with neither an
+evidence nor a primary detail - routes `UNRESOLVED_NATIVE_DISPOSITION` with an
+`evidenceGap`. Every finding route stays `closed:false`, and each unknown or
+unresolved item also adds an entry to `evidence_gaps`.
 Explicit changed-head/scope/material/check-consumption flags route native
 assessment; receipt-only changes cannot clear native gates.
 
@@ -189,11 +195,14 @@ An availability failure names the document being read: `INPUT_UNAVAILABLE`,
 profile or contract installation is distinguishable from a bad capture. No
 source locator inside a document is followed. Input, profile, contract and
 identity are validated in that order before projection, with no partial report.
+The source wrapper passes its fixed repository into the identity phase, so a
+corrupted adapter is rejected before projection.
 
-Success stdout is exactly one sorted, ASCII-escaped JSON object plus newline,
+Success stdout is exactly one sorted, ASCII-escaped JSON object plus a single
+LF newline, written as bytes so Windows cannot translate it to CRLF;
 `report_status:RENDERED_NON_AUTHORIZING`. Expected failure has empty stdout
-and one fixed JSON object on stderr with `error_code` and `message`, with no
-offending path, argument or content echoed:
+and one fixed LF-terminated JSON object on stderr with `error_code` and
+`message`, with no offending path, argument or content echoed:
 
 | Error | Exit | Meaning |
 | --- | --- | --- |

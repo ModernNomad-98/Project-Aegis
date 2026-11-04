@@ -137,8 +137,16 @@ def _fast_save_refusal(error: fast_save.FastSaveRefused) -> dict[str, object]:
     }
 
 
+class _StrictParser(argparse.ArgumentParser):
+    """Reject long-option abbreviations for the standard command surface."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("allow_abbrev", False)
+        super().__init__(*args, **kwargs)
+
+
 def build_parser(*, report_mode: bool = False) -> argparse.ArgumentParser:
-    parser_type = cnc_reporting.ReportParser if report_mode else argparse.ArgumentParser
+    parser_type = cnc_reporting.ReportParser if report_mode else _StrictParser
     parser = parser_type(
         prog="python -m tools.aegis_delivery_control",
         description=(
@@ -172,13 +180,29 @@ def build_parser(*, report_mode: bool = False) -> argparse.ArgumentParser:
 _VALUE_OPTIONS = ("--repository-id",)
 
 
+def _is_value_option(option):
+    """Match an exact top-level option or an unambiguous long abbreviation.
+
+    argparse accepts any unambiguous prefix by default; the strict parsers
+    refuse one, but report-mode detection still recognizes it so the fixed JSON
+    error path, rather than an abbreviated parse, handles the invocation.
+    """
+    return any(
+        option == name or
+        (option.startswith("--") and len(option) > 2 and name.startswith(option))
+        for name in _VALUE_OPTIONS
+    )
+
+
 def _report_mode(argv: Sequence[str]) -> bool:
     """Return True only when the selected subcommand is "cnc-report".
 
     Only the subcommand position is read, after the top-level options and their
     values, so a path or value that happens to spell "cnc-report" cannot switch
     the parser class, strict abbreviation or JSON error handling for an
-    unrelated command.
+    unrelated command. An abbreviated top-level option is recognized here only
+    for detection; the parser still refuses the abbreviation, so report-mode
+    errors stay fixed JSON and cannot be bypassed by an accepted abbreviation.
     """
     index = 0
     while index < len(argv):
@@ -186,11 +210,9 @@ def _report_mode(argv: Sequence[str]) -> bool:
         if token == "--":
             index += 1
             break
-        if token.startswith("--repository-id="):
-            index += 1
-            continue
-        if token in _VALUE_OPTIONS:
-            index += 2
+        option, separator, _value = token.partition("=")
+        if _is_value_option(option):
+            index += 1 if separator else 2
             continue
         if token.startswith("-"):
             return False
@@ -272,12 +294,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         # Fixed source selection, BEFORE any state path/database access.
         support = Path(__file__).parent / "cnc"
         try:
+            # The fixed source repository enters the validation phase, so a
+            # corrupted adapter is rejected before any report is projected.
             report = cnc_reporting.report_from_paths(
                 arguments.repository_id, arguments.input,
                 support / "adapter-aegis.json", support / "cnc-evidence-contract-v2.json",
+                expected_repository_id="ModernNomad-98/Project-Aegis",
             )
-            if arguments.repository_id != "ModernNomad-98/Project-Aegis":
-                raise cnc_reporting.ReportError("IDENTITY_MISMATCH")
             return cnc_reporting.emit_report(report)
         except cnc_reporting.ReportError as error:
             return cnc_reporting.emit_error(error)

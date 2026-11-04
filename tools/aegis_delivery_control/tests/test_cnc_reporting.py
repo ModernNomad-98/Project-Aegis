@@ -53,6 +53,8 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual(run.stdout, b"")
         self.assertEqual(json.loads(run.stderr), {"error_code": code,
                          "message": cnc.ERRORS[code][1]})
+        self.assertNotIn(b"\r", run.stderr)
+        self.assertEqual(run.stderr.count(b"\n"), 1)
         self.assertNotIn(b"DO_NOT_LEAK", run.stderr)
 
     def test_sanitized_record_and_literal_oracles(self):
@@ -72,20 +74,35 @@ class ReportingTests(unittest.TestCase):
 
     def test_authority_literal_routes(self):
         item = self.data["items"][0]
-        self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
-                         "LOCATE_ORIGINAL_AUTHORITY")
+        rendered = self.report()["items"][0]["native_routes"]["authority"]
+        self.assertEqual(rendered["route"], "LOCATE_ORIGINAL_AUTHORITY")
+        self.assertEqual(rendered["policy"],
+                         CASES["profile"]["authority_policy_locator"])
         a = item["authority"]
         a.update(original_verified_reported=True, lifecycle="active",
                  conditions_satisfied_reported=True,
                  source_locator={"value":"record:original-owner", "unknown_reason":None})
         self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
                          "REUSE_VERIFIED_APPLICABLE_GRANT")
-        # Expired, revoked and consumed grants are terminal: no reconciliation
-        # restores reuse, so only a new authority decision can help.
+        # A missing original is a locating gap while the lifecycle is usable.
+        a.update(original_verified_reported=False,
+                 source_locator={"value": None, "unknown_reason": "not supplied"})
+        self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
+                         "LOCATE_ORIGINAL_AUTHORITY")
+        # Expired, revoked and consumed are terminal before the missing check:
+        # no reconciliation restores reuse, so only new authority can help.
         for lifecycle in ("consumed", "revoked", "expired"):
             a["lifecycle"] = lifecycle
             self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
                              "NON_REUSABLE_GRANT_NEW_AUTHORITY_REQUIRED")
+        # An unknown lifecycle falls back to the locating gap.
+        a["lifecycle"] = "unknown"
+        self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
+                         "LOCATE_ORIGINAL_AUTHORITY")
+        # Restore a locatable grant for the remaining routes.
+        a.update(original_verified_reported=True, lifecycle="active",
+                 source_locator={"value": "record:original-owner",
+                                 "unknown_reason": None})
         a["lifecycle"] = "unknown"
         self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
                          "RECONCILE_EXACT_SCOPE_OR_CONDITIONS")
@@ -100,8 +117,11 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
                          "FOREIGN_GRANT_REJECTED")
         for rendered in self.report()["items"]:
-            self.assertFalse(rendered["native_routes"]["authority"]["grantsNewExecutionAuthority"])
-            self.assertIsNone(rendered["native_routes"]["authority"]["ownerWithheld"])
+            authority = rendered["native_routes"]["authority"]
+            self.assertEqual(authority["policy"],
+                             CASES["profile"]["authority_policy_locator"])
+            self.assertFalse(authority["grantsNewExecutionAuthority"])
+            self.assertIsNone(authority["ownerWithheld"])
 
     def test_retained_replay_does_not_invent_pending_progress(self):
         self.data = copy.deepcopy(CASES["retained_replay"])
@@ -171,6 +191,17 @@ class ReportingTests(unittest.TestCase):
         self.assertEqual(route()["state"], "reported")
         self.assertEqual(route()["route"], "NATIVE_DISPOSITION_POLICY")
         self.assertIsNone(route()["evidenceGap"])
+        # A material finding needs a matching evidence or primary detail; a
+        # "accepted" status alone is not detail.
+        item["finding"] = {"value": {"status": "accepted",
+            "evidence": {"value": None, "unknown_reason": "not supplied"},
+            "primary": {"value": None, "unknown_reason": "not supplied"},
+            "applicable_acceptance_verified_reported": True}, "unknown_reason": None}
+        self.assertEqual(route()["state"], "unresolved_material")
+        self.assertEqual(route()["route"], "UNRESOLVED_NATIVE_DISPOSITION")
+        self.assertIn("evidence or primary detail", route()["evidenceGap"])
+        self.assertTrue(any("Finding for event" in gap
+                            for gap in self.report()["evidence_gaps"]))
         # Only a positive no-finding report routes NO_FINDING.
         item["change"]["material_finding"] = False
         item["finding"] = {"value": {"status": "none",
@@ -310,6 +341,35 @@ class ReportingTests(unittest.TestCase):
         self.refused(b"{}","INPUT_INVALID")
         self.contract.write_bytes(b"{}")
         self.refused(json.dumps(self.data).encode(),"PROFILE_INVALID")
+
+    def test_expected_repository_is_checked_before_projection(self):
+        self.data["repository_id"] = "evil/repository"
+        profile = copy.deepcopy(CASES["profile"])
+        profile["repository"] = "evil/repository"
+        self.profile.write_text(json.dumps(profile), encoding="utf-8")
+        self.input.write_text(json.dumps(self.data), encoding="utf-8")
+        with patch.object(cnc, "_routes",
+                          side_effect=AssertionError("projection reached")):
+            with self.assertRaises(cnc.ReportError) as caught:
+                cnc.report_from_paths(
+                    "evil/repository", self.input, self.profile, self.contract,
+                    expected_repository_id="ModernNomad-98/Project-Aegis")
+        self.assertEqual(caught.exception.code, "IDENTITY_MISMATCH")
+
+    def test_cli_writes_lf_only_json(self):
+        run = self.cli()
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(run.stderr, b"")
+        self.assertNotIn(b"\r", run.stdout)
+        self.assertEqual(run.stdout.count(b"\n"), 1)
+        self.assertEqual(json.loads(run.stdout)["report_status"],
+                         "RENDERED_NON_AUTHORIZING")
+        error = self.cli(extra=("--unknown", "DO_NOT_LEAK"))
+        self.assertEqual(error.returncode, 2)
+        self.assertEqual(error.stdout, b"")
+        self.assertNotIn(b"\r", error.stderr)
+        self.assertEqual(error.stderr.count(b"\n"), 1)
+        self.assertEqual(json.loads(error.stderr)["error_code"], "CLI_INVALID")
 
     def test_cli_errors_and_identity(self):
         run = self.cli(extra=("--unknown", "DO_NOT_LEAK"))

@@ -4,9 +4,13 @@ Narrow Python adaptation of cnc-adapter.mjs, SHA256
 ad02d1955526041d3b6e703265bc22ad707ed8f1a4979e3f977de59606f91478.
 Source: retained reconciliation-v2 portable helper (2026-11-03 capture).
 Intentional corrections: a foreign grant is rejected before a missing locator;
-expired, revoked and consumed grants route to new authority; a null finding is
-unknown, never "no finding"; all finding adjudication remains native. Inputs are
-caller claims, never authenticated here.
+expired, revoked and consumed grants route to new authority even when the
+original or locator is missing; every authority route carries the profile's
+policy locator; a null finding is unknown, never "no finding"; a material
+finding without matching evidence or primary detail stays unresolved; all
+finding adjudication remains native. Inputs are caller claims, never
+authenticated here. CLI output is one LF-terminated JSON object written as
+bytes.
 """
 from __future__ import annotations
 
@@ -324,25 +328,28 @@ def _authority_route(item, profile):
 
     The repository is compared first, so a grant issued elsewhere is never
     described as an authority this project may locate and reuse. Expired,
-    revoked and consumed grants are terminal: they cannot be reconciled back
-    into reuse, so only a new authority decision can help. An unknown lifecycle
-    stays a reconciliation route because neither state is established. No
-    supplied input establishes that the owner withheld permission, so
-    "ownerWithheld" remains unknown rather than an affirmative claim.
+    revoked and consumed grants are terminal and are decided before a missing
+    original or locator: locating cannot restore a non-reusable lifecycle, so
+    only a new authority decision can help. A missing original or locator is
+    otherwise a reconciliation gap. An unknown lifecycle stays a reconciliation
+    route because neither state is established. Every route carries the
+    profile's authority policy locator. No supplied input establishes that the
+    owner withheld permission, so "ownerWithheld" remains unknown rather than an
+    affirmative claim.
     """
     a = item["authority"]
     if a["repository"] != profile["repository"]:
         route = "FOREIGN_GRANT_REJECTED"
-    elif not a["original_verified_reported"] or a["source_locator"]["value"] is None:
-        route = "LOCATE_ORIGINAL_AUTHORITY"
     elif a["lifecycle"] in ("expired", "revoked", "consumed"):
         route = "NON_REUSABLE_GRANT_NEW_AUTHORITY_REQUIRED"
+    elif not a["original_verified_reported"] or a["source_locator"]["value"] is None:
+        route = "LOCATE_ORIGINAL_AUTHORITY"
     elif a["lifecycle"] != "active" or not a["conditions_satisfied_reported"] or a["scope"] != item["scope"]:
         route = "RECONCILE_EXACT_SCOPE_OR_CONDITIONS"
     else:
         route = "REUSE_VERIFIED_APPLICABLE_GRANT"
-    return {"route": route, "grantsNewExecutionAuthority": False,
-            "ownerWithheld": None}
+    return {"route": route, "policy": profile["authority_policy_locator"],
+            "grantsNewExecutionAuthority": False, "ownerWithheld": None}
 
 
 def _finding_route(item, profile):
@@ -354,17 +361,26 @@ def _finding_route(item, profile):
     positively assessed the change as having no finding supplies a record whose
     status is "none"; a null value is "unknown". A material finding reported
     without matching details is unresolved and routes to native disposition
-    instead of "NO_FINDING".
+    instead of "NO_FINDING". For a material finding, a non-"none" record also
+    needs at least one evidence or primary detail; a status alone is not matching
+    detail. Non-material supplied records remain reported assessments for native
+    disposition.
     """
     value = item["finding"]["value"]
     policy = profile["finding_policy_locator"]
     absent = value is None
     declared_none = not absent and value["status"].strip().casefold() == "none"
-    if item["change"]["material_finding"] and (absent or declared_none):
+    has_detail = (not absent and not declared_none and
+                  (value["evidence"]["value"] is not None or
+                   value["primary"]["value"] is not None))
+    if item["change"]["material_finding"] and (absent or declared_none or not has_detail):
         state, route = "unresolved_material", "UNRESOLVED_NATIVE_DISPOSITION"
-        gap = ("A material finding is reported without finding details; native disposition is unresolved."
-               if absent else
-               "A material finding is reported while the supplied finding record declares none; native disposition is unresolved.")
+        if absent:
+            gap = "A material finding is reported without finding details; native disposition is unresolved."
+        elif declared_none:
+            gap = "A material finding is reported while the supplied finding record declares none; native disposition is unresolved."
+        else:
+            gap = "A material finding is reported without an evidence or primary detail; native disposition is unresolved."
     elif absent:
         state, route = "unknown", "UNKNOWN_FINDING_NATIVE_DISPOSITION"
         gap = "The finding value is unknown; absence is not proof that no finding exists."
@@ -448,11 +464,15 @@ def _metrics(metrics):
             "cost_provenance":provenance}
 
 
-def report_from_paths(repository_id, input_path, profile_path, contract_path):
+def report_from_paths(repository_id, input_path, profile_path, contract_path,
+                      expected_repository_id=None):
     """Validate selected local documents in deterministic order, then project.
 
     All authority, completion and monetary claims remain caller-reported.
     No sibling discovery, environment input, fetch, database or output write.
+    The optional expected_repository_id is the source wrapper's fixed identity;
+    it is checked in the identity step, after input, profile and contract
+    validation and before any projection work.
     """
     data, input_hash = _read(input_path, 1048576, "INPUT_INVALID", "INPUT_UNAVAILABLE")
     try:
@@ -468,6 +488,8 @@ def report_from_paths(repository_id, input_path, profile_path, contract_path):
     if contract_hash != CONTRACT_SHA256 or contract.get("id") != CONTRACT_ID or contract.get("schemaVersion") != 2:
         raise ReportError("CONTRACT_INVALID")
     if not (type(repository_id) is str and repository_id == data["repository_id"] == profile["repository"]):
+        raise ReportError("IDENTITY_MISMATCH")
+    if expected_repository_id is not None and repository_id != expected_repository_id:
         raise ReportError("IDENTITY_MISMATCH")
     collection = {**data["collection"], "infer_deletions":False, "overwrite_baseline":False}
     gaps = []
@@ -503,14 +525,22 @@ class ReportParser(argparse.ArgumentParser):
         raise ReportError("CLI_INVALID")
 
 
+def _write_json_line(value, stream):
+    """Write one LF-terminated JSON object as bytes; never translate newlines."""
+    data = (json.dumps(value, ensure_ascii=True, allow_nan=False,
+                       sort_keys=True) + "\n").encode("ascii")
+    stream.buffer.write(data)
+    stream.buffer.flush()
+
+
 def emit_error(error):
-    print(json.dumps({"error_code":error.code, "message":ERRORS[error.code][1]},
-                     ensure_ascii=True, allow_nan=False, sort_keys=True), file=sys.stderr)
+    _write_json_line({"error_code":error.code, "message":ERRORS[error.code][1]},
+                     sys.stderr)
     return ERRORS[error.code][0]
 
 
 def emit_report(report):
-    print(json.dumps(report, ensure_ascii=True, allow_nan=False, sort_keys=True))
+    _write_json_line(report, sys.stdout)
     return 0
 
 
