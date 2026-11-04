@@ -5,6 +5,13 @@
 # hashes and a "dirty" working tree on Windows.
 * text=auto eol=lf
 
+# The CNC evidence contract is verified by SHA-256 over its exact bytes
+# (CONTRACT_SHA256 in tools/aegis_delivery_control/cnc_reporting.py). Pin that
+# file explicitly rather than relying on text=auto detection, so no checkout,
+# copy or editor conversion can change those bytes; a CRLF copy is refused with
+# CONTRACT_INVALID.
+tools/aegis_delivery_control/cnc/cnc-evidence-contract-v2.json text eol=lf
+
 # PowerShell scripts stay LF: Windows PowerShell 5.1 and pwsh both accept LF.
 *.ps1 text eol=lf
 

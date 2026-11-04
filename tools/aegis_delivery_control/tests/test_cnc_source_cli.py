@@ -61,6 +61,24 @@ class SourceCliTests(unittest.TestCase):
         self.assertEqual(json.loads(run.stderr)["error_code"],"IDENTITY_MISMATCH")
         self.assertEqual(run.stdout,b"")
 
+    def test_report_mode_uses_the_selected_subcommand(self):
+        self.assertFalse(cli._report_mode(["--repository-id","example","status"]))
+        self.assertFalse(cli._report_mode(["--repository-id","example","fast-save",
+            "--state","cnc-report","--checkpoint","out.json"]))
+        self.assertTrue(cli._report_mode(["--repository-id","example","cnc-report",
+            "--input","capture.json"]))
+        self.assertTrue(cli._report_mode(["--repository-id=example","cnc-report",
+            "--input","capture.json"]))
+        # A value that spells cnc-report must not switch the parser class: an
+        # ordinary unknown option stays an ordinary argparse error.
+        run=subprocess.run([sys.executable,"-B","-m","tools.aegis_delivery_control",
+            "--repository-id","example","fast-save","--state","cnc-report",
+            "--checkpoint",str(self.path),"--bogus"],capture_output=True)
+        self.assertEqual(run.returncode,2)
+        self.assertEqual(run.stdout,b"")
+        self.assertIn(b"usage:",run.stderr)
+        self.assertNotIn(b"error_code",run.stderr)
+
     def test_report_branches_before_database_and_preserves_capabilities(self):
         stdout,stderr=io.StringIO(),io.StringIO()
         with patch.object(cli,"_database_path",side_effect=AssertionError("database path")), \

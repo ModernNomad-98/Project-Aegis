@@ -3,8 +3,10 @@
 Narrow Python adaptation of cnc-adapter.mjs, SHA256
 ad02d1955526041d3b6e703265bc22ad707ed8f1a4979e3f977de59606f91478.
 Source: retained reconciliation-v2 portable helper (2026-11-03 capture).
-Intentional corrections: consumed/unknown grants cannot route reuse; all finding
-adjudication remains native. Inputs are caller claims, never authenticated here.
+Intentional corrections: a foreign grant is rejected before a missing locator;
+expired, revoked and consumed grants route to new authority; a null finding is
+unknown, never "no finding"; all finding adjudication remains native. Inputs are
+caller claims, never authenticated here.
 """
 from __future__ import annotations
 
@@ -14,7 +16,6 @@ import hashlib
 import json
 import math
 import os
-from pathlib import Path
 import re
 import stat
 import sys
@@ -28,6 +29,8 @@ ERRORS = {
     "CONTRACT_INVALID": (2, "Contract is not supported."),
     "IDENTITY_MISMATCH": (2, "Repository identities do not match."),
     "INPUT_UNAVAILABLE": (3, "An explicitly selected input is unavailable."),
+    "PROFILE_UNAVAILABLE": (3, "The explicitly selected profile is unavailable."),
+    "CONTRACT_UNAVAILABLE": (3, "The explicitly selected contract is unavailable."),
     "REPORT_FAILED": (3, "Report could not be produced."),
 }
 _BAD_CHARS = re.compile(r"[\x00-\x1f\x7f-\x9f\u061c\u200e-\u200f\u2028-\u202e\u2066-\u2069\ud800-\udfff]")
@@ -81,8 +84,12 @@ def _enum(value, options):
     _require(type(value) is str and value in options.split())
 
 
+_TIMESTAMP = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{1,6})?Z")
+
+
 def _time(value):
-    _require(type(value) is str and re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z", value))
+    # ASCII digits only: Unicode decimal digits must not satisfy the contract.
+    _require(type(value) is str and _TIMESTAMP.fullmatch(value))
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
@@ -157,8 +164,11 @@ def _walk(value, depth=0):
         _require(value is None or type(value) is bool)
 
 
-def _read(path, maximum, invalid_code):
+def _read(path, maximum, invalid_code, unavailable_code):
     """One explicit regular descriptor, bounded read, no final symlink following.
+
+    Availability failures carry the code of the document being read, so a broken
+    profile or contract installation is not reported as an unavailable capture.
 
     This is not protection against a hostile actor racing parent directories.
     Cloud/network-backed mounts cannot be identified portably by this helper.
@@ -168,10 +178,10 @@ def _read(path, maximum, invalid_code):
         if (type(path_text) is not str or path_text == "-" or
                 path_text.startswith(("\\\\", "//")) or
                 re.match(r"^[A-Za-z][A-Za-z0-9+.-]*://", path_text)):
-            raise ReportError("INPUT_UNAVAILABLE")
+            raise ReportError(unavailable_code)
         before = os.lstat(path_text)
         if not stat.S_ISREG(before.st_mode) or stat.S_ISLNK(before.st_mode):
-            raise ReportError("INPUT_UNAVAILABLE")
+            raise ReportError(unavailable_code)
         flags = (os.O_RDONLY | getattr(os, "O_BINARY", 0) |
                  getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_NONBLOCK", 0))
         descriptor = os.open(path_text, flags)
@@ -179,12 +189,12 @@ def _read(path, maximum, invalid_code):
             actual = os.fstat(stream.fileno())
             if (not stat.S_ISREG(actual.st_mode) or
                     (before.st_dev, before.st_ino) != (actual.st_dev, actual.st_ino)):
-                raise ReportError("INPUT_UNAVAILABLE")
+                raise ReportError(unavailable_code)
             raw = stream.read(maximum + 1)
     except ReportError:
         raise
     except (OSError, TypeError, ValueError):
-        raise ReportError("INPUT_UNAVAILABLE") from None
+        raise ReportError(unavailable_code) from None
     try:
         _require(len(raw) <= maximum)
         text = raw.decode("utf-8", errors="strict")
@@ -278,10 +288,15 @@ def _input(value):
     _maybe(metrics["cost_provenance"], _text)
 
 
+_PROFILE_ID = re.compile(r"[a-z][a-z0-9_-]{0,63}")
+
+
 def _profile(value):
     _obj(value, "schema_version id repository contract_id native_record_locator native_policy_revision native_references stage_labels authority_policy_locator head_policy_locator receipt_policy_locator finding_policy_locator role_boundary activation adoption_receipt")
     _require(type(value["schema_version"]) is int and value["schema_version"] == 1)
-    _enum(value["id"], "aegis waypoint opsflow")
+    # Consumer profiles are portable: any lowercase slug identifies one, and
+    # only the Aegis profile pins the source stage labels A-G below.
+    _require(type(value["id"]) is str and _PROFILE_ID.fullmatch(value["id"]))
     _identifier(value["repository"])
     _require(value["contract_id"] == CONTRACT_ID)
     for key in ("native_record_locator", "native_policy_revision", "authority_policy_locator", "head_policy_locator", "receipt_policy_locator", "finding_policy_locator", "role_boundary"):
@@ -304,17 +319,64 @@ def _profile(value):
         _require(value["adoption_receipt"]["value"] is not None)
 
 
-def _routes(item, profile):
+def _authority_route(item, profile):
+    """Route one reported grant; a missing original stays a gap, not proof.
+
+    The repository is compared first, so a grant issued elsewhere is never
+    described as an authority this project may locate and reuse. Expired,
+    revoked and consumed grants are terminal: they cannot be reconciled back
+    into reuse, so only a new authority decision can help. An unknown lifecycle
+    stays a reconciliation route because neither state is established. No
+    supplied input establishes that the owner withheld permission, so
+    "ownerWithheld" remains unknown rather than an affirmative claim.
+    """
     a = item["authority"]
-    missing = not a["original_verified_reported"] or a["source_locator"]["value"] is None
-    if missing:
-        route = "LOCATE_ORIGINAL_AUTHORITY"
-    elif a["repository"] != profile["repository"]:
+    if a["repository"] != profile["repository"]:
         route = "FOREIGN_GRANT_REJECTED"
+    elif not a["original_verified_reported"] or a["source_locator"]["value"] is None:
+        route = "LOCATE_ORIGINAL_AUTHORITY"
+    elif a["lifecycle"] in ("expired", "revoked", "consumed"):
+        route = "NON_REUSABLE_GRANT_NEW_AUTHORITY_REQUIRED"
     elif a["lifecycle"] != "active" or not a["conditions_satisfied_reported"] or a["scope"] != item["scope"]:
         route = "RECONCILE_EXACT_SCOPE_OR_CONDITIONS"
     else:
         route = "REUSE_VERIFIED_APPLICABLE_GRANT"
+    return {"route": route, "grantsNewExecutionAuthority": False,
+            "ownerWithheld": None}
+
+
+def _finding_route(item, profile):
+    """Route one finding assessment without inferring absence from a null.
+
+    The schema uses null only for an unknown value with a nonempty reason, so a
+    null finding is unknown, never proof that no finding exists. The three
+    states are explicit: a supplied record is "reported"; a caller that has
+    positively assessed the change as having no finding supplies a record whose
+    status is "none"; a null value is "unknown". A material finding reported
+    without matching details is unresolved and routes to native disposition
+    instead of "NO_FINDING".
+    """
+    value = item["finding"]["value"]
+    policy = profile["finding_policy_locator"]
+    absent = value is None
+    declared_none = not absent and value["status"].strip().casefold() == "none"
+    if item["change"]["material_finding"] and (absent or declared_none):
+        state, route = "unresolved_material", "UNRESOLVED_NATIVE_DISPOSITION"
+        gap = ("A material finding is reported without finding details; native disposition is unresolved."
+               if absent else
+               "A material finding is reported while the supplied finding record declares none; native disposition is unresolved.")
+    elif absent:
+        state, route = "unknown", "UNKNOWN_FINDING_NATIVE_DISPOSITION"
+        gap = "The finding value is unknown; absence is not proof that no finding exists."
+    elif declared_none:
+        state, route, gap = "none", "NO_FINDING", None
+    else:
+        state, route, gap = "reported", "NATIVE_DISPOSITION_POLICY", None
+    return {"state": state, "route": route, "policy": policy,
+            "closed": False, "evidenceGap": gap}
+
+
+def _routes(item, profile):
     change = item["change"]
     if any(change[key] for key in ("changes_head", "changes_scope", "material_finding", "consumed_by_check")):
         change_route, policy = "NATIVE_POLICY_ASSESSMENT", profile["head_policy_locator"]
@@ -323,12 +385,10 @@ def _routes(item, profile):
     else:
         change_route, policy = "IDENTIFY_CHANGED_INPUTS", profile["head_policy_locator"]
     return {
-        "authority": {"route": route, "grantsNewExecutionAuthority": False,
-                      "ownerWithheld": False if missing else None},
+        "authority": _authority_route(item, profile),
         "change": {"route": change_route, "policy": policy,
                    "automaticFullRerun": False, "clearsNativeGates": False},
-        "finding": {"route": "NO_FINDING" if item["finding"]["value"] is None else "NATIVE_DISPOSITION_POLICY",
-                    "policy": profile["finding_policy_locator"], "closed": False},
+        "finding": _finding_route(item, profile),
     }
 
 
@@ -336,6 +396,7 @@ def _metrics(metrics):
     def value(key):
         return metrics[key]["value"]
     reasons = []
+    provenance = value("cost_provenance")
     explicit = value("explicit_start") is not None and value("explicit_finish") is not None
     first, last = (value("explicit_start"), value("explicit_finish")) if explicit else (value("first_observation"), value("last_observation"))
     wall = None
@@ -357,7 +418,7 @@ def _metrics(metrics):
             speed = (baseline-current)/baseline
         else:
             reasons.append("Missing or zero baseline elapsed comparison; speed unknown.")
-        if value("cost_provenance") is None:
+        if provenance is None:
             reasons.append("Missing cost provenance; savings and ROI unknown.")
         else:
             baseline_cost, current_cost = value("baseline_attributed_cost"), value("current_attributed_cost")
@@ -376,13 +437,15 @@ def _metrics(metrics):
         if number is not None and not math.isfinite(number):
             computed[i] = None
             reasons.append("Nonfinite comparison result; value unknown.")
+    if provenance is None:
+        reasons.append("Cost provenance unknown: " + metrics["cost_provenance"]["unknown_reason"])
     if value("active_effort_seconds") is None:
         reasons.append("Active effort not measured: " + metrics["active_effort_seconds"]["unknown_reason"])
     return {"unit":metrics["unit"], "wall_seconds":wall, "wall_basis":basis,
             "active_effort_seconds":value("active_effort_seconds"),
             "speed_improvement":computed[0], "cost_savings":computed[1], "roi":computed[2],
             "reasons":reasons, "comparison_basis":"reported_inputs" if any(x is not None for x in computed) else "unknown",
-            "cost_provenance":metrics["cost_provenance"]}
+            "cost_provenance":provenance}
 
 
 def report_from_paths(repository_id, input_path, profile_path, contract_path):
@@ -391,17 +454,17 @@ def report_from_paths(repository_id, input_path, profile_path, contract_path):
     All authority, completion and monetary claims remain caller-reported.
     No sibling discovery, environment input, fetch, database or output write.
     """
-    data, input_hash = _read(input_path, 1048576, "INPUT_INVALID")
+    data, input_hash = _read(input_path, 1048576, "INPUT_INVALID", "INPUT_UNAVAILABLE")
     try:
         _input(data)
     except (ValueError, TypeError, KeyError, RecursionError, OverflowError):
         raise ReportError("INPUT_INVALID") from None
-    profile, profile_hash = _read(profile_path, 65536, "PROFILE_INVALID")
+    profile, profile_hash = _read(profile_path, 65536, "PROFILE_INVALID", "PROFILE_UNAVAILABLE")
     try:
         _profile(profile)
     except (ValueError, TypeError, KeyError, RecursionError, OverflowError):
         raise ReportError("PROFILE_INVALID") from None
-    contract, contract_hash = _read(contract_path, 65536, "CONTRACT_INVALID")
+    contract, contract_hash = _read(contract_path, 65536, "CONTRACT_INVALID", "CONTRACT_UNAVAILABLE")
     if contract_hash != CONTRACT_SHA256 or contract.get("id") != CONTRACT_ID or contract.get("schemaVersion") != 2:
         raise ReportError("CONTRACT_INVALID")
     if not (type(repository_id) is str and repository_id == data["repository_id"] == profile["repository"]):
@@ -412,13 +475,19 @@ def report_from_paths(repository_id, input_path, profile_path, contract_path):
         gaps.append("Inbox total unknown; empty scoped window cannot infer deletion.")
     if profile["activation"] == "candidate":
         gaps.append("Profile is a candidate; native adoption and Lead uptake are not established.")
+    items = []
+    for item in data["items"]:
+        routes = _routes(item, profile)
+        if routes["finding"]["evidenceGap"] is not None:
+            gaps.append("Finding for event " + item["event_id"] + ": " + routes["finding"]["evidenceGap"])
+        items.append({**item, "native_routes":routes,
+                      "authority_assessment_basis":"reported_input_not_verified"})
     return {"report_version":1, "report_status":"RENDERED_NON_AUTHORIZING",
             "repository_id":repository_id, "input_sha256":input_hash,
             "profile_sha256":profile_hash, "contract_sha256":contract_hash,
             "native_record":data["native_record"], "candidate":data["candidate"],
             "collection":collection,
-            "items":[{**item, "native_routes":_routes(item, profile),
-                      "authority_assessment_basis":"reported_input_not_verified"} for item in data["items"]],
+            "items":items,
             "evidence_gaps":gaps, "metrics":_metrics(data["metrics"]),
             "limits":["All observations, authority and acceptance claims are supplied inputs, not independently verified.",
                       "No execution authority, finding closure, gate clearance or readiness is generated.",

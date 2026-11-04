@@ -43,7 +43,9 @@ python -B -m tools.aegis_delivery_control --repository-id ModernNomad-98/Project
 
 The source wrapper fixes `cnc/adapter-aegis.json` and
 `cnc/cnc-evidence-contract-v2.json` internally. Foreign repository IDs and
-profile/contract overrides are refused. Source reporting is for Role A;
+profile/contract overrides are refused. `cnc-report` is recognized only in the
+subcommand position, so a path or value that happens to spell it for another
+command changes nothing. Source reporting is for Role A;
 copying the startup instructions into Role B does not require this package or
 import source stages, grants or authority. Source stages remain exactly A–G.
 Startup/handoff pointer placement in shared governance files belongs to their
@@ -65,7 +67,9 @@ The portable interface is separate and requires all selections explicitly:
 python -B scripts/aegis-cnc/cnc_reporting.py --repository-id REPOSITORY --profile scripts/aegis-cnc/profile.json --contract scripts/aegis-cnc/cnc-evidence-contract-v2.json --input SANITIZED-CAPTURE.json
 ```
 
-For a portable installation copy these files **without changing bytes**:
+For a portable installation copy these files **without changing bytes**, with
+a byte-preserving copy such as `Copy-Item` or `cp`; do not let an editor or a
+line-ending conversion rewrite them:
 
 | Source | Consumer destination |
 | --- | --- |
@@ -80,18 +84,43 @@ integration documentation and native startup/handoff placement. Source-only
 dependency installation or implicit support-file discovery are needed by the
 portable module or tests. Record exact source commit/tree, every copied path
 and SHA256, profile identity/hash and actual checks. Partial consumer snapshots
-cannot establish complete app-map/context or native delivery readiness.
+cannot establish complete app-map/context or native delivery readiness. A
+profile `id` is any lowercase slug matching `[a-z][a-z0-9_-]{0,63}`: the
+reporter validates that shape rather than a fixed list of consumers. Only
+`id: aegis` additionally pins the source stage labels to exactly A–G; another
+consumer keeps its own stage labels.
 
 The small pure helper adaptation records its original SHA256 in
 `cnc_reporting.py`; the unchanged common contract is pinned to SHA256
 `1b2469b3f663d9b04712c4dbbdb997fdfdc0c6a28727c5647c954854850a3268`.
-The profile preserves the prior Aegis mapping's native references, A–G stage
-labels and role boundary, adding precise integration locators. Prior mapping
-did not establish adoption. Expired, revoked, consumed or unknown grants cannot
-route reuse. Every authority assessment remains reported input; no route grants
-new execution authority. Finding dispositions always require native policy and
-remain `closed:false`. Explicit changed-head/scope/material/check-consumption
-flags route native assessment; receipt-only changes cannot clear native gates.
+That hash covers the contract's exact bytes, so `.gitattributes` pins the file
+to LF and the reporter refuses any other bytes with `CONTRACT_INVALID`; the
+portable tests re-hash the shipped file, a byte copy of it and a
+line-ending-converted copy. The profile preserves the prior Aegis mapping's
+native references, A–G stage labels and role boundary, adding precise
+integration locators. Prior mapping did not establish adoption.
+
+A reported grant is routed in order. A foreign repository is rejected before
+anything else, so a foreign grant is never described as an authority to locate
+or reuse. A missing original or locator is a reconciliation gap. Expired,
+revoked and consumed grants are terminal and route to new authority rather than
+reuse. An unknown lifecycle or a scope/conditions mismatch routes exact
+reconciliation. Only a verified, active, applicable same-repository grant
+routes reuse. No route grants new execution authority, and `ownerWithheld`
+stays unknown because no supplied input establishes that the owner withheld
+anything.
+
+Finding states are explicit. A supplied finding record routes native
+disposition (`reported`). A null finding value is `unknown` because the schema
+uses null only for unknown-with-a-reason, so it routes
+`UNKNOWN_FINDING_NATIVE_DISPOSITION` with an `evidenceGap`. A record whose
+`status` is `none` is the only positive no-finding report and hence the only
+route to `NO_FINDING`. `change.material_finding:true` without matching
+details, or contradicted by a `none` record, routes
+`UNRESOLVED_NATIVE_DISPOSITION`. Every finding route stays `closed:false`, and
+each unknown or unresolved item also adds an entry to `evidence_gaps`.
+Explicit changed-head/scope/material/check-consumption flags route native
+assessment; receipt-only changes cannot clear native gates.
 
 `tests/fixtures/cnc-report-cases.json` is a complete schema example: `input`
 contains synthetic literal examples; `retained_replay` minimizes a supplied
@@ -130,7 +159,9 @@ or missing intervals return null with a reason. Speed improvement is
 `(baseline_elapsed-current_elapsed)/baseline_elapsed`; cost savings is
 `baseline_attributed_cost-current_attributed_cost`; ROI is
 `(attributable_benefit-incremental_cost)/incremental_cost`. Comparisons require
-reported comparability; money calculations also require cost provenance.
+reported comparability; money calculations also require cost provenance. Cost
+provenance is reported as a scalar value like every other metric fact, and its
+unknown reason is collected in `reasons`.
 Missing inputs and zero/nonpositive denominators stay null with reasons.
 Computed comparisons are labeled `reported_inputs`, never verified savings.
 
@@ -139,7 +170,8 @@ Infinity, overflowed floats, unknown keys, coerced booleans or depth above 16.
 Input is at most 1 MiB; profile and contract at most 64 KiB each. Text is at
 most 4096 code points, identifiers 128, arrays 1000 (locator arrays 100,
 collection positions 6). Numeric inputs are finite, nonnegative and at most
-10^12. Times must be actual UTC `YYYY-MM-DDTHH:MM:SS[.ffffff]Z` dates.
+10^12. Times must be actual UTC `YYYY-MM-DDTHH:MM:SS[.ffffff]Z` dates with
+ASCII digits only.
 Decoded controls, bidi overrides/isolates, line separators and surrogates are
 rejected. Explicit conservative token/private-key/Bearer/URL-credential guards
 reject known patterns; they cannot detect every secret. Sanitization and data
@@ -150,7 +182,10 @@ Only explicit local regular files are read, using bounded descriptor reads.
 Final symlinks, nonregular files, stdin `-`, UNC/device paths and URI paths are
 refused. This does not protect against hostile parent-directory races or
 detect all network/cloud filesystem mounts; the caller selects local captures.
-No source locator inside a document is followed. Input, profile, contract and
+An availability failure names the document being read: `INPUT_UNAVAILABLE`,
+`PROFILE_UNAVAILABLE` or `CONTRACT_UNAVAILABLE`, all exit 3, so a broken
+profile or contract installation is distinguishable from a bad capture. No
+source locator inside a document is followed. Input, profile, contract and
 identity are validated in that order before projection, with no partial report.
 
 Success stdout is exactly one sorted, ASCII-escaped JSON object plus newline,
@@ -165,7 +200,9 @@ offending path, argument or content echoed:
 | `PROFILE_INVALID` | 2 | Profile is not valid for this report contract. |
 | `CONTRACT_INVALID` | 2 | Contract is not supported. |
 | `IDENTITY_MISMATCH` | 2 | Repository identities do not match. |
-| `INPUT_UNAVAILABLE` | 3 | An explicitly selected input is unavailable. |
+| `INPUT_UNAVAILABLE` | 3 | The explicitly selected input is unavailable. |
+| `PROFILE_UNAVAILABLE` | 3 | The explicitly selected profile is unavailable. |
+| `CONTRACT_UNAVAILABLE` | 3 | The explicitly selected contract is unavailable. |
 | `REPORT_FAILED` | 3 | Report could not be produced. |
 
 `--help` is static usage, not a report. Existing usage consent, cohort admission,

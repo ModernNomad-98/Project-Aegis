@@ -169,6 +169,35 @@ def build_parser(*, report_mode: bool = False) -> argparse.ArgumentParser:
     return parser
 
 
+_VALUE_OPTIONS = ("--repository-id",)
+
+
+def _report_mode(argv: Sequence[str]) -> bool:
+    """Return True only when the selected subcommand is "cnc-report".
+
+    Only the subcommand position is read, after the top-level options and their
+    values, so a path or value that happens to spell "cnc-report" cannot switch
+    the parser class, strict abbreviation or JSON error handling for an
+    unrelated command.
+    """
+    index = 0
+    while index < len(argv):
+        token = argv[index]
+        if token == "--":
+            index += 1
+            break
+        if token.startswith("--repository-id="):
+            index += 1
+            continue
+        if token in _VALUE_OPTIONS:
+            index += 2
+            continue
+        if token.startswith("-"):
+            return False
+        return token == "cnc-report"
+    return index < len(argv) and argv[index] == "cnc-report"
+
+
 def _database_path(arguments: argparse.Namespace) -> Path:
     return default_state_root(arguments.repository_id) / "state.sqlite3"
 
@@ -234,7 +263,7 @@ def _status(
 
 def main(argv: Sequence[str] | None = None) -> int:
     selected_argv = list(sys.argv[1:] if argv is None else argv)
-    report_mode = "cnc-report" in selected_argv
+    report_mode = _report_mode(selected_argv)
     try:
         arguments = build_parser(report_mode=report_mode).parse_args(selected_argv)
     except cnc_reporting.ReportError as error:

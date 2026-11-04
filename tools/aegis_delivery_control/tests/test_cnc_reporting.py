@@ -8,6 +8,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -79,16 +80,28 @@ class ReportingTests(unittest.TestCase):
                  source_locator={"value":"record:original-owner", "unknown_reason":None})
         self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
                          "REUSE_VERIFIED_APPLICABLE_GRANT")
-        for lifecycle in ("consumed", "revoked", "expired", "unknown"):
+        # Expired, revoked and consumed grants are terminal: no reconciliation
+        # restores reuse, so only a new authority decision can help.
+        for lifecycle in ("consumed", "revoked", "expired"):
             a["lifecycle"] = lifecycle
             self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
-                             "RECONCILE_EXACT_SCOPE_OR_CONDITIONS")
+                             "NON_REUSABLE_GRANT_NEW_AUTHORITY_REQUIRED")
+        a["lifecycle"] = "unknown"
+        self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
+                         "RECONCILE_EXACT_SCOPE_OR_CONDITIONS")
         a["lifecycle"] = "active"
         a["repository"] = "foreign/repository"
         self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
                          "FOREIGN_GRANT_REJECTED")
+        # Foreign is decided before missing: a foreign grant without a verified
+        # original or locator is still foreign, not an authority to locate.
+        a["original_verified_reported"] = False
+        a["source_locator"] = {"value": None, "unknown_reason": "not supplied"}
+        self.assertEqual(self.report()["items"][0]["native_routes"]["authority"]["route"],
+                         "FOREIGN_GRANT_REJECTED")
         for rendered in self.report()["items"]:
             self.assertFalse(rendered["native_routes"]["authority"]["grantsNewExecutionAuthority"])
+            self.assertIsNone(rendered["native_routes"]["authority"]["ownerWithheld"])
 
     def test_retained_replay_does_not_invent_pending_progress(self):
         self.data = copy.deepcopy(CASES["retained_replay"])
@@ -129,8 +142,48 @@ class ReportingTests(unittest.TestCase):
             "primary":{"value":None,"unknown_reason":"not supplied"},
             "applicable_acceptance_verified_reported":True}, "unknown_reason":None}
         route = self.report()["items"][0]["native_routes"]["finding"]
+        self.assertEqual(route["state"], "reported")
         self.assertEqual(route["route"], "NATIVE_DISPOSITION_POLICY")
+        self.assertIsNone(route["evidenceGap"])
         self.assertFalse(route["closed"])
+
+    def test_finding_states_are_explicit(self):
+        item = self.data["items"][0]
+        def route():
+            return self.report()["items"][0]["native_routes"]["finding"]
+        # A null finding is unknown, not proof that no finding exists.
+        self.assertEqual(route()["state"], "unknown")
+        self.assertEqual(route()["route"], "UNKNOWN_FINDING_NATIVE_DISPOSITION")
+        self.assertTrue(route()["evidenceGap"])
+        self.assertFalse(route()["closed"])
+        self.assertTrue(any("Finding for event" in gap
+                            for gap in self.report()["evidence_gaps"]))
+        # A material finding flag without details is unresolved, never NO_FINDING.
+        item["change"]["material_finding"] = True
+        self.assertEqual(route()["state"], "unresolved_material")
+        self.assertEqual(route()["route"], "UNRESOLVED_NATIVE_DISPOSITION")
+        self.assertIn("material finding", route()["evidenceGap"])
+        # Supplied details are a reported finding for native disposition.
+        item["finding"] = {"value": {"status": "accepted",
+            "evidence": {"value": "record:review", "unknown_reason": None},
+            "primary": {"value": None, "unknown_reason": "not supplied"},
+            "applicable_acceptance_verified_reported": True}, "unknown_reason": None}
+        self.assertEqual(route()["state"], "reported")
+        self.assertEqual(route()["route"], "NATIVE_DISPOSITION_POLICY")
+        self.assertIsNone(route()["evidenceGap"])
+        # Only a positive no-finding report routes NO_FINDING.
+        item["change"]["material_finding"] = False
+        item["finding"] = {"value": {"status": "none",
+            "evidence": {"value": None, "unknown_reason": "not applicable"},
+            "primary": {"value": None, "unknown_reason": "not applicable"},
+            "applicable_acceptance_verified_reported": False}, "unknown_reason": None}
+        self.assertEqual(route()["state"], "none")
+        self.assertEqual(route()["route"], "NO_FINDING")
+        self.assertIsNone(route()["evidenceGap"])
+        # A no-finding record contradicted by the flag stays unresolved.
+        item["change"]["material_finding"] = True
+        self.assertEqual(route()["state"], "unresolved_material")
+        self.assertEqual(route()["route"], "UNRESOLVED_NATIVE_DISPOSITION")
 
     def test_metrics_literal_formula_and_unknowns(self):
         m = self.data["metrics"]
@@ -143,6 +196,7 @@ class ReportingTests(unittest.TestCase):
         result = self.report()["metrics"]
         self.assertEqual([result[x] for x in ("speed_improvement","cost_savings","roi")], [.5,2,2])
         self.assertEqual(result["comparison_basis"], "reported_inputs")
+        self.assertEqual(result["cost_provenance"], "record:synthetic-cost")
         m["baseline_elapsed_seconds"]["value"] = 0
         m["incremental_cost"]["value"] = 0
         m["explicit_finish"]["value"] = "2026-11-02T00:00:00Z"
@@ -151,6 +205,18 @@ class ReportingTests(unittest.TestCase):
         self.assertIsNone(result["speed_improvement"])
         self.assertIsNone(result["roi"])
         self.assertTrue(result["reasons"])
+
+    def test_cost_provenance_is_a_scalar_fact(self):
+        metrics = self.report()["metrics"]
+        self.assertIsNone(metrics["cost_provenance"])
+        self.assertTrue(any(reason.startswith("Cost provenance unknown: ")
+                            for reason in metrics["reasons"]))
+        self.data["metrics"]["cost_provenance"] = {"value": "record:synthetic-cost",
+                                                   "unknown_reason": None}
+        metrics = self.report()["metrics"]
+        self.assertEqual(metrics["cost_provenance"], "record:synthetic-cost")
+        self.assertFalse(any("Cost provenance unknown" in reason
+                             for reason in metrics["reasons"]))
 
     def test_no_side_effects(self):
         self.input.write_text(json.dumps(self.data), encoding="utf-8")
@@ -255,6 +321,114 @@ class ReportingTests(unittest.TestCase):
         self.profile.write_text(json.dumps(CASES["profile"]),encoding="utf-8")
         self.contract.write_bytes(self.contract.read_bytes()+b" ")
         self.refused(json.dumps(self.data).encode(),"CONTRACT_INVALID")
+
+    def test_availability_errors_name_the_document(self):
+        self.input.write_text(json.dumps(self.data), encoding="utf-8")
+        cases = ((self.root/"missing-input.json", self.profile, self.contract,
+                  "INPUT_UNAVAILABLE"),
+                 (self.input, self.root/"missing-profile.json", self.contract,
+                  "PROFILE_UNAVAILABLE"),
+                 (self.input, self.profile, self.root/"missing-contract.json",
+                  "CONTRACT_UNAVAILABLE"))
+        for input_path, profile_path, contract_path, code in cases:
+            with self.subTest(code=code):
+                with self.assertRaises(cnc.ReportError) as caught:
+                    cnc.report_from_paths(self.data["repository_id"], input_path,
+                                          profile_path, contract_path)
+                self.assertEqual(caught.exception.code, code)
+                self.assertEqual(cnc.ERRORS[code][0], 3)
+        for profile_path, contract_path, code in (
+                (self.root, self.contract, "PROFILE_UNAVAILABLE"),
+                (self.profile, "-", "CONTRACT_UNAVAILABLE"),
+                (self.profile, "https://example.invalid/contract.json",
+                 "CONTRACT_UNAVAILABLE")):
+            with self.subTest(code=code, path=str(profile_path)):
+                with self.assertRaises(cnc.ReportError) as caught:
+                    cnc.report_from_paths(self.data["repository_id"], self.input,
+                                          profile_path, contract_path)
+                self.assertEqual(caught.exception.code, code)
+
+    def test_cli_availability_exit_codes(self):
+        self.input.write_text(json.dumps(self.data), encoding="utf-8")
+        base = [sys.executable, "-B", str(MODULE), "--repository-id",
+                self.data["repository_id"], "--input", str(self.input)]
+        for profile_path, contract_path, code in (
+                (str(self.root/"missing-profile.json"), str(self.contract),
+                 "PROFILE_UNAVAILABLE"),
+                (str(self.profile), str(self.root/"missing-contract.json"),
+                 "CONTRACT_UNAVAILABLE")):
+            with self.subTest(code=code):
+                run = subprocess.run(base + ["--profile", profile_path,
+                                             "--contract", contract_path],
+                                     capture_output=True)
+                self.assertEqual(run.returncode, 3, run.stderr)
+                self.assertEqual(run.stdout, b"")
+                self.assertEqual(json.loads(run.stderr),
+                                 {"error_code": code, "message": cnc.ERRORS[code][1]})
+
+    def test_profile_identifiers_are_structural(self):
+        for identifier in ("aegis", "waypoint", "opsflow", "consumer-product",
+                           "consumer_product", "a"*64):
+            profile = copy.deepcopy(CASES["profile"])
+            profile["id"] = identifier
+            if identifier != "aegis":
+                profile["stage_labels"] = [{"id": "1", "label": "consumer stage"}]
+            self.profile.write_text(json.dumps(profile), encoding="utf-8")
+            with self.subTest(identifier=identifier):
+                self.assertEqual(self.report()["report_status"],
+                                 "RENDERED_NON_AUTHORIZING")
+        for bad in ("Aegis", "with space", "", "1st", "a"*65, "aegis!", "caf\u00e9"):
+            profile = copy.deepcopy(CASES["profile"])
+            profile["id"] = bad
+            self.profile.write_text(json.dumps(profile), encoding="utf-8")
+            with self.subTest(identifier=bad):
+                self.refused(json.dumps(self.data).encode(), "PROFILE_INVALID")
+        # Only the aegis profile keeps the source stage labels A-G.
+        profile = copy.deepcopy(CASES["profile"])
+        profile["stage_labels"] = [{"id": "A", "label": "plan"}]
+        self.profile.write_text(json.dumps(profile), encoding="utf-8")
+        with self.subTest(identifier="aegis-stage-labels"):
+            self.refused(json.dumps(self.data).encode(), "PROFILE_INVALID")
+
+    def test_shipped_contract_bytes_stay_lf_and_match(self):
+        candidates = (MODULE.parent/"cnc"/"cnc-evidence-contract-v2.json",
+                      MODULE.parent/"cnc-evidence-contract-v2.json")
+        shipped = next((path for path in candidates if path.is_file()), None)
+        if shipped is None:
+            self.skipTest("shipped contract is not beside the portable module")
+        raw = shipped.read_bytes()
+        self.assertNotIn(b"\r", raw)
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), cnc.CONTRACT_SHA256)
+        self.assertEqual(raw, CASES["contract_utf8"].encode("utf-8"))
+        copied = self.root/"copied-contract.json"
+        shutil.copyfile(shipped, copied)
+        self.assertEqual(hashlib.sha256(copied.read_bytes()).hexdigest(),
+                         cnc.CONTRACT_SHA256)
+        self.input.write_text(json.dumps(self.data), encoding="utf-8")
+        report = cnc.report_from_paths(self.data["repository_id"], self.input,
+                                       self.profile, copied)
+        self.assertEqual(report["contract_sha256"], cnc.CONTRACT_SHA256)
+        # A line-ending conversion is caught by the pinned byte hash.
+        mangled = self.root/"crlf-contract.json"
+        mangled.write_bytes(raw.replace(b"\n", b"\r\n"))
+        with self.assertRaises(cnc.ReportError) as caught:
+            cnc.report_from_paths(self.data["repository_id"], self.input,
+                                  self.profile, mangled)
+        self.assertEqual(caught.exception.code, "CONTRACT_INVALID")
+
+    def test_utc_timestamps_require_ascii_digits(self):
+        self.assertNotIn("\\d", cnc._TIMESTAMP.pattern)
+        for text in ("\u0662\u0660\u0662\u0666-11-03T00:00:00Z",
+                     "2026-\u0661\u0661-03T00:00:00Z",
+                     "2026-11-0\u0663T00:00:00Z"):
+            with self.subTest(text=text):
+                self.assertIsNone(cnc._TIMESTAMP.fullmatch(text))
+                with self.assertRaises(ValueError):
+                    cnc._time(text)
+        self.assertIsNotNone(
+            cnc._TIMESTAMP.fullmatch("2026-11-03T00:00:00.123456Z"))
+        self.data["items"][0]["retrieved_at"] = "\u0662\u0660\u0662\u0666-11-03T00:00:00Z"
+        self.refused(json.dumps(self.data).encode())
 
     def test_boundaries_files_and_limits(self):
         for raw in (b" "*1048577,): self.refused(raw)
