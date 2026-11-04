@@ -42,8 +42,8 @@ _SECRETS = [
     re.compile(r"(?:ghp_|gho_|ghu_|ghs_|ghr_|github_pat_|sk-proj-|sk-ant-|AKIA|ASIA)"),
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----", re.I),
     re.compile(r"\bBearer\s+\S+", re.I),
-    re.compile(r"https?://[^/@\s]+:[^/@\s]+@", re.I),
-    re.compile(r"[?&](?:token|secret|password|api_key|access_key|signature)=[^&#\s]+", re.I),
+    re.compile(r"[A-Za-z][A-Za-z0-9+.-]*://[^/@\s]+:[^/@\s]+@", re.I),
+    re.compile(r"[?&](?:token|id[_-]?token|access[_-]?token|refresh[_-]?token|auth[_-]?token|secret|client[_-]?secret|private[_-]?key|secret[_-]?key|password|passwd|pwd|api[_-]?key|access[_-]?key|credential|authorization|signature|sig|session(?:[_-]?id)?)=[^&#\s]+", re.I),
 ]
 
 
@@ -352,6 +352,24 @@ def _authority_route(item, profile):
             "grantsNewExecutionAuthority": False, "ownerWithheld": None}
 
 
+_AUTHORITY_GAP_REASONS = {
+    "FOREIGN_GRANT_REJECTED":
+        "the reported grant is from another repository and cannot be reused",
+    "NON_REUSABLE_GRANT_NEW_AUTHORITY_REQUIRED":
+        "the reported grant is expired, revoked or consumed",
+    "LOCATE_ORIGINAL_AUTHORITY":
+        "the original grant or locator is not verified",
+    "RECONCILE_EXACT_SCOPE_OR_CONDITIONS":
+        "the grant scope or conditions do not match, or its lifecycle is unknown",
+}
+
+
+def _authority_gap(event_id, route):
+    """One consolidated authority-reconciliation gap for a non-reuse route."""
+    return ("Authority for event " + event_id + ": " + route + "; " +
+            _AUTHORITY_GAP_REASONS[route] + ".")
+
+
 def _finding_route(item, profile):
     """Route one finding assessment without inferring absence from a null.
 
@@ -434,9 +452,7 @@ def _metrics(metrics):
             speed = (baseline-current)/baseline
         else:
             reasons.append("Missing or zero baseline elapsed comparison; speed unknown.")
-        if provenance is None:
-            reasons.append("Missing cost provenance; savings and ROI unknown.")
-        else:
+        if provenance is not None:
             baseline_cost, current_cost = value("baseline_attributed_cost"), value("current_attributed_cost")
             if baseline_cost is not None and current_cost is not None:
                 savings = baseline_cost-current_cost
@@ -454,7 +470,13 @@ def _metrics(metrics):
             computed[i] = None
             reasons.append("Nonfinite comparison result; value unknown.")
     if provenance is None:
-        reasons.append("Cost provenance unknown: " + metrics["cost_provenance"]["unknown_reason"])
+        # One reason only: the specific unknown reason, with the affected
+        # comparison named when a reported matched comparison exists.
+        reason = ("Cost provenance unknown: " +
+                  metrics["cost_provenance"]["unknown_reason"])
+        if metrics["comparable_reported"]:
+            reason += " Savings and ROI unknown."
+        reasons.append(reason)
     if value("active_effort_seconds") is None:
         reasons.append("Active effort not measured: " + metrics["active_effort_seconds"]["unknown_reason"])
     return {"unit":metrics["unit"], "wall_seconds":wall, "wall_basis":basis,
@@ -465,14 +487,17 @@ def _metrics(metrics):
 
 
 def report_from_paths(repository_id, input_path, profile_path, contract_path,
-                      expected_repository_id=None):
+                      expected_repository_id=None,
+                      expected_profile_sha256=None):
     """Validate selected local documents in deterministic order, then project.
 
     All authority, completion and monetary claims remain caller-reported.
     No sibling discovery, environment input, fetch, database or output write.
     The optional expected_repository_id is the source wrapper's fixed identity;
     it is checked in the identity step, after input, profile and contract
-    validation and before any projection work.
+    validation and before any projection work. The optional
+    expected_profile_sha256 is the source wrapper's byte pin for its fixed
+    adapter; a mismatch is PROFILE_INVALID during profile validation.
     """
     data, input_hash = _read(input_path, 1048576, "INPUT_INVALID", "INPUT_UNAVAILABLE")
     try:
@@ -484,6 +509,8 @@ def report_from_paths(repository_id, input_path, profile_path, contract_path,
         _profile(profile)
     except (ValueError, TypeError, KeyError, RecursionError, OverflowError):
         raise ReportError("PROFILE_INVALID") from None
+    if expected_profile_sha256 is not None and profile_hash != expected_profile_sha256:
+        raise ReportError("PROFILE_INVALID")
     contract, contract_hash = _read(contract_path, 65536, "CONTRACT_INVALID", "CONTRACT_UNAVAILABLE")
     if contract_hash != CONTRACT_SHA256 or contract.get("id") != CONTRACT_ID or contract.get("schemaVersion") != 2:
         raise ReportError("CONTRACT_INVALID")
@@ -500,6 +527,9 @@ def report_from_paths(repository_id, input_path, profile_path, contract_path,
     items = []
     for item in data["items"]:
         routes = _routes(item, profile)
+        authority_route = routes["authority"]["route"]
+        if authority_route in _AUTHORITY_GAP_REASONS:
+            gaps.append(_authority_gap(item["event_id"], authority_route))
         if routes["finding"]["evidenceGap"] is not None:
             gaps.append("Finding for event " + item["event_id"] + ": " + routes["finding"]["evidenceGap"])
         items.append({**item, "native_routes":routes,

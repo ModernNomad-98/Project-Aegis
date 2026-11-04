@@ -23,6 +23,16 @@ cnc = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cnc)
 
 
+def _shipped_contract(candidates):
+    """Return the required contract, or fail; a missing file must not skip."""
+    for path in candidates:
+        if path.is_file():
+            return path
+    raise AssertionError(
+        "required shipped contract is missing; a portable installation must "
+        "include cnc-evidence-contract-v2.json beside the module")
+
+
 class ReportingTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="cnc-portable-")
@@ -122,6 +132,34 @@ class ReportingTests(unittest.TestCase):
                              CASES["profile"]["authority_policy_locator"])
             self.assertFalse(authority["grantsNewExecutionAuthority"])
             self.assertIsNone(authority["ownerWithheld"])
+
+    def test_non_reuse_authority_routes_are_consolidated_gaps(self):
+        item = self.data["items"][0]
+        event = item["event_id"]
+        prefix = "Authority for event " + event + ": "
+
+        def gaps():
+            return [gap for gap in self.report()["evidence_gaps"]
+                    if gap.startswith(prefix)]
+
+        self.assertEqual(len(gaps()), 1)
+        self.assertIn("LOCATE_ORIGINAL_AUTHORITY", gaps()[0])
+        # A verified, active, applicable same-repository grant is the only
+        # route that creates no consolidated authority gap.
+        item["authority"].update(
+            original_verified_reported=True, lifecycle="active",
+            conditions_satisfied_reported=True,
+            source_locator={"value": "record:original-owner",
+                            "unknown_reason": None})
+        self.assertEqual(gaps(), [])
+        item["authority"]["lifecycle"] = "revoked"
+        self.assertIn("NON_REUSABLE_GRANT_NEW_AUTHORITY_REQUIRED", gaps()[0])
+        item["authority"]["lifecycle"] = "active"
+        item["authority"]["conditions_satisfied_reported"] = False
+        self.assertIn("RECONCILE_EXACT_SCOPE_OR_CONDITIONS", gaps()[0])
+        item["authority"]["conditions_satisfied_reported"] = True
+        item["authority"]["repository"] = "foreign/repository"
+        self.assertIn("FOREIGN_GRANT_REJECTED", gaps()[0])
 
     def test_retained_replay_does_not_invent_pending_progress(self):
         self.data = copy.deepcopy(CASES["retained_replay"])
@@ -240,8 +278,19 @@ class ReportingTests(unittest.TestCase):
     def test_cost_provenance_is_a_scalar_fact(self):
         metrics = self.report()["metrics"]
         self.assertIsNone(metrics["cost_provenance"])
-        self.assertTrue(any(reason.startswith("Cost provenance unknown: ")
-                            for reason in metrics["reasons"]))
+        unknown = [reason for reason in metrics["reasons"]
+                   if reason.startswith("Cost provenance unknown: ")]
+        self.assertEqual(len(unknown), 1)
+        self.assertFalse(any("Missing cost provenance" in reason
+                             for reason in metrics["reasons"]))
+        # A reported comparison names the affected measures in the same single
+        # reason; the former generic duplicate is not emitted.
+        self.data["metrics"]["comparable_reported"] = True
+        metrics = self.report()["metrics"]
+        unknown = [reason for reason in metrics["reasons"]
+                   if reason.startswith("Cost provenance unknown: ")]
+        self.assertEqual(len(unknown), 1)
+        self.assertTrue(unknown[0].endswith("Savings and ROI unknown."))
         self.data["metrics"]["cost_provenance"] = {"value": "record:synthetic-cost",
                                                    "unknown_reason": None}
         metrics = self.report()["metrics"]
@@ -315,7 +364,15 @@ class ReportingTests(unittest.TestCase):
                        "github_pat_DO_NOT_LEAK", "sk-proj-DO_NOT_LEAK", "sk-ant-DO_NOT_LEAK",
                        "AKIADO_NOT_LEAK", "ASIADO_NOT_LEAK", "Bearer DO_NOT_LEAK",
                        "-----BEGIN RSA PRIVATE KEY-----", "https://e.invalid/?token=DO_NOT_LEAK",
-                       "https://e.invalid/?password=DO_NOT_LEAK", "https://e.invalid/?api_key=DO_NOT_LEAK"):
+                       "https://e.invalid/?password=DO_NOT_LEAK", "https://e.invalid/?api_key=DO_NOT_LEAK",
+                       "postgres://user:DO_NOT_LEAK@db.invalid/app",
+                       "ssh://user:DO_NOT_LEAK@host.invalid",
+                       "git+ssh://user:DO_NOT_LEAK@host.invalid/repository",
+                       "https://e.invalid/?access_token=DO_NOT_LEAK",
+                       "https://e.invalid/?refresh_token=DO_NOT_LEAK",
+                       "https://e.invalid/?client_secret=DO_NOT_LEAK",
+                       "https://e.invalid/?private_key=DO_NOT_LEAK",
+                       "https://e.invalid/?session_id=DO_NOT_LEAK"):
             d=copy.deepcopy(self.data); d["items"][0]["description"]=secret
             self.refused(json.dumps(d).encode())
         for mutation in (lambda p:p.update(extra=True),
@@ -341,6 +398,21 @@ class ReportingTests(unittest.TestCase):
         self.refused(b"{}","INPUT_INVALID")
         self.contract.write_bytes(b"{}")
         self.refused(json.dumps(self.data).encode(),"PROFILE_INVALID")
+
+    def test_expected_profile_hash_is_checked_before_projection(self):
+        self.input.write_text(json.dumps(self.data), encoding="utf-8")
+        with patch.object(cnc, "_routes",
+                          side_effect=AssertionError("projection reached")):
+            with self.assertRaises(cnc.ReportError) as caught:
+                cnc.report_from_paths(
+                    self.data["repository_id"], self.input, self.profile,
+                    self.contract, expected_profile_sha256="0" * 64)
+        self.assertEqual(caught.exception.code, "PROFILE_INVALID")
+        expected = hashlib.sha256(self.profile.read_bytes()).hexdigest()
+        report = cnc.report_from_paths(
+            self.data["repository_id"], self.input, self.profile, self.contract,
+            expected_profile_sha256=expected)
+        self.assertEqual(report["profile_sha256"], expected)
 
     def test_expected_repository_is_checked_before_projection(self):
         self.data["repository_id"] = "evil/repository"
@@ -456,9 +528,7 @@ class ReportingTests(unittest.TestCase):
         # byte pin lives in the suite rather than in a per-file attribute.
         candidates = (MODULE.parent/"cnc"/"cnc-evidence-contract-v2.json",
                       MODULE.parent/"cnc-evidence-contract-v2.json")
-        shipped = next((path for path in candidates if path.is_file()), None)
-        if shipped is None:
-            self.skipTest("shipped contract is not beside the portable module")
+        shipped = _shipped_contract(candidates)
         raw = shipped.read_bytes()
         self.assertNotIn(b"\r", raw)
         self.assertEqual(hashlib.sha256(raw).hexdigest(), cnc.CONTRACT_SHA256)
@@ -478,6 +548,11 @@ class ReportingTests(unittest.TestCase):
             cnc.report_from_paths(self.data["repository_id"], self.input,
                                   self.profile, mangled)
         self.assertEqual(caught.exception.code, "CONTRACT_INVALID")
+
+    def test_missing_shipped_contract_is_a_failure_not_a_skip(self):
+        with self.assertRaises(AssertionError) as caught:
+            _shipped_contract((self.root/"missing-contract.json",))
+        self.assertIn("contract", str(caught.exception).lower())
 
     def test_utc_timestamps_require_ascii_digits(self):
         self.assertNotIn("\\d", cnc._TIMESTAMP.pattern)

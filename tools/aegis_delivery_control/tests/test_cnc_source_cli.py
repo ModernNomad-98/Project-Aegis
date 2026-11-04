@@ -1,5 +1,6 @@
 """Source wrapper checks; these tests are not copied to consumers."""
 from contextlib import redirect_stderr, redirect_stdout
+import hashlib
 import io
 import json
 from pathlib import Path
@@ -70,6 +71,31 @@ class SourceCliTests(unittest.TestCase):
         self.assertEqual(json.loads(run.stderr)["error_code"],"IDENTITY_MISMATCH")
         self.assertEqual(run.stdout,b"")
 
+    def test_report_mode_tracks_shared_top_level_option_metadata(self):
+        # The detector and build_parser must agree on the top-level surface.
+        expected = {spec["name"] for spec in cli._TOP_LEVEL_OPTIONS}
+        parser = cli.build_parser(report_mode=True)
+        self.assertEqual(
+            set(parser._option_string_actions) - {"-h", "--help"}, expected)
+        extra = {"name": "--ledger", "required": True, "takes_value": True}
+        flag = {"name": "--verbose", "required": False, "takes_value": False}
+        with patch.object(cli, "_TOP_LEVEL_OPTIONS",
+                          cli._TOP_LEVEL_OPTIONS + (extra, flag)):
+            parser = cli.build_parser(report_mode=True)
+            self.assertIn("--ledger", parser._option_string_actions)
+            self.assertIn("--verbose", parser._option_string_actions)
+            self.assertTrue(cli._report_mode([
+                "--repository-id", "example", "--ledger", "book",
+                "cnc-report", "--input", "capture.json"]))
+            self.assertTrue(cli._report_mode([
+                "--repository-id=example", "--ledger=book", "cnc-report",
+                "--input", "capture.json"]))
+            self.assertTrue(cli._report_mode([
+                "--verbose", "--repository-id", "example", "cnc-report",
+                "--input", "capture.json"]))
+            self.assertFalse(cli._report_mode([
+                "--repository-id", "example", "--ledger", "book", "status"]))
+
     def test_report_mode_uses_the_selected_subcommand(self):
         self.assertFalse(cli._report_mode(["--repository-id","example","status"]))
         self.assertFalse(cli._report_mode(["--repository-id","example","fast-save",
@@ -133,31 +159,53 @@ class SourceCliTests(unittest.TestCase):
         self.assertEqual(run.returncode,0)
         self.assertFalse(json.loads(run.stdout)["real_adapters"])
 
-    def test_corrupted_source_adapter_rejected_before_projection(self):
+    def test_fixed_source_adapter_hash_matches_shipped_bytes(self):
+        source=Path(cli.__file__).resolve().parent/"cnc"/"adapter-aegis.json"
+        self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(),
+                         cli.ADAPTER_SHA256)
+
+    def test_source_adapter_mutations_rejected_before_projection(self):
         cases=json.loads((Path(__file__).parent / "fixtures" /
             "cnc-report-cases.json").read_text("utf-8"))
-        profile=cases["profile"]
-        profile["repository"]="evil/repository"
         support=Path(self.tmp.name)/"support"
         (support/"cnc").mkdir(parents=True)
-        (support/"cnc"/"adapter-aegis.json").write_text(
-            json.dumps(profile),encoding="utf-8")
         source=Path(cli.__file__).resolve().parent/"cnc"
         (support/"cnc"/"cnc-evidence-contract-v2.json").write_bytes(
             (source/"cnc-evidence-contract-v2.json").read_bytes())
-        self.data["repository_id"]="evil/repository"
-        self.path.write_text(json.dumps(self.data),encoding="utf-8")
-        stdout,stderr=_BinaryCapture(),_BinaryCapture()
-        with patch.object(cli,"__file__",str(support/"cli.py")), \
-             patch.object(cnc_reporting,"_routes",
-                          side_effect=AssertionError("projection reached")), \
-             redirect_stdout(stdout),redirect_stderr(stderr):
-            status=cli.main(["--repository-id","evil/repository","cnc-report",
-                             "--input",str(self.path)])
-        self.assertEqual(status,2,stderr.buffer.getvalue())
-        self.assertEqual(stdout.buffer.getvalue(),b"")
-        self.assertEqual(json.loads(stderr.buffer.getvalue())["error_code"],
-                         "IDENTITY_MISMATCH")
+        mutations={
+            "repository": lambda p:p.update(repository="evil/repository"),
+            "id": lambda p:p.update(id="aegis-other"),
+            "stage_label": lambda p:p["stage_labels"][0].update(label="planning"),
+            "activation": lambda p:p.update(activation="adopted_with_receipt",
+                adoption_receipt={"value":"record:adoption","unknown_reason":None}),
+            "fabricated_receipt": lambda p:p.update(
+                activation="adopted_with_receipt",
+                adoption_receipt={"value":"fabricated receipt","unknown_reason":None}),
+            "policy_locator": lambda p:p.update(
+                authority_policy_locator="docs/other-policy.md"),
+        }
+        for name,mutate in mutations.items():
+            profile=json.loads(json.dumps(cases["profile"]))
+            mutate(profile)
+            (support/"cnc"/"adapter-aegis.json").write_text(
+                json.dumps(profile),encoding="utf-8")
+            repository=("evil/repository" if name=="repository"
+                        else "ModernNomad-98/Project-Aegis")
+            data=json.loads(json.dumps(cases["input"]))
+            data["repository_id"]=repository
+            self.path.write_text(json.dumps(data),encoding="utf-8")
+            stdout,stderr=_BinaryCapture(),_BinaryCapture()
+            with patch.object(cli,"__file__",str(support/"cli.py")), \
+                 patch.object(cnc_reporting,"_routes",
+                              side_effect=AssertionError("projection reached")), \
+                 redirect_stdout(stdout),redirect_stderr(stderr):
+                status=cli.main(["--repository-id",repository,"cnc-report",
+                                 "--input",str(self.path)])
+            with self.subTest(mutation=name):
+                self.assertEqual(status,2,stderr.buffer.getvalue())
+                self.assertEqual(stdout.buffer.getvalue(),b"")
+                self.assertEqual(json.loads(stderr.buffer.getvalue())["error_code"],
+                                 "PROFILE_INVALID")
 
 
 if __name__ == "__main__":

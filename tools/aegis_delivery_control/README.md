@@ -42,12 +42,17 @@ python -B -m tools.aegis_delivery_control --repository-id ModernNomad-98/Project
 ```
 
 The source wrapper fixes `cnc/adapter-aegis.json` and
-`cnc/cnc-evidence-contract-v2.json` internally. Foreign repository IDs and
-profile/contract overrides are refused. `cnc-report` is recognized only in the
-subcommand position, including after an abbreviated top-level option, so report
-parsing and fixed JSON errors cannot be bypassed by an abbreviation; long-option
-abbreviations themselves are refused for every command. A path or value that
-happens to spell `cnc-report` for another command changes nothing. Source
+`cnc/cnc-evidence-contract-v2.json` internally, and byte-pins both: the
+contract to the SHA256 below and the adapter to
+`e45020f79f9e3caf328c598645e93e6c1fdc3e46da0819cf16eb1c9c289d4b95`. Foreign
+repository IDs and profile/contract overrides are refused. `cnc-report` is
+recognized only in the subcommand position, including after an abbreviated
+top-level option, so report parsing and fixed JSON errors cannot be bypassed by
+an abbreviation; long-option abbreviations themselves are refused for every
+command. The top-level option surface is declared once and shared by the parser
+and this detection, so a new top-level option cannot silently disable the fixed
+JSON report error path. A path or value that happens to spell `cnc-report` for
+another command changes nothing. Source
 reporting is for Role A;
 copying the startup instructions into Role B does not require this package or
 import source stages, grants or authority. Source stages remain exactly A–G.
@@ -101,9 +106,16 @@ bytes with `CONTRACT_INVALID`, and the portable tests re-hash the shipped file,
 a byte copy of it and a line-ending-converted copy, so a CRLF checkout fails
 the suite. The repository-wide `* text=auto eol=lf` policy still normalises
 text checkouts to LF; no per-file `.gitattributes` entry is added for this
-file. The profile preserves the prior Aegis mapping's
-native references, A–G stage labels and role boundary, adding precise
-integration locators. Prior mapping did not establish adoption.
+file. The source-only fixed adapter is pinned the same way to SHA256
+`e45020f79f9e3caf328c598645e93e6c1fdc3e46da0819cf16eb1c9c289d4b95`, so any
+byte change - including a schema-valid edit to its `id`, `activation`,
+adoption receipt, stage labels or policy locators - is refused as
+`PROFILE_INVALID` before projection. The source tests mutate each of those
+fields and assert the refusal. The portable interface deliberately does not
+pin a consumer profile because the consumer selects its own. The profile
+preserves the prior Aegis mapping's native references, A–G stage labels and
+role boundary, adding precise integration locators. Prior mapping did not
+establish adoption.
 
 A reported grant is routed in order and every route carries the profile's
 `authority_policy_locator` as `policy`. A foreign repository is rejected before
@@ -115,7 +127,11 @@ gap. An unknown lifecycle or a scope/conditions mismatch routes exact
 reconciliation. Only a verified, active, applicable same-repository grant
 routes reuse. No route grants new execution authority, and `ownerWithheld`
 stays unknown because no supplied input establishes that the owner withheld
-anything.
+anything. Every non-reuse route also adds one consolidated `evidence_gaps`
+entry naming the event and route (`FOREIGN_GRANT_REJECTED`,
+`NON_REUSABLE_GRANT_NEW_AUTHORITY_REQUIRED`, `LOCATE_ORIGINAL_AUTHORITY` or
+`RECONCILE_EXACT_SCOPE_OR_CONDITIONS`); only
+`REUSE_VERIFIED_APPLICABLE_GRANT` adds none.
 
 Finding states are explicit. A supplied finding record routes native
 disposition (`reported`). A null finding value is `unknown` because the schema
@@ -126,7 +142,8 @@ route to `NO_FINDING`. A material finding without matching details - a null
 finding, a contradictory `none` record, or a non-`none` record with neither an
 evidence nor a primary detail - routes `UNRESOLVED_NATIVE_DISPOSITION` with an
 `evidenceGap`. Every finding route stays `closed:false`, and each unknown or
-unresolved item also adds an entry to `evidence_gaps`.
+unresolved item also adds an entry to `evidence_gaps`; non-reuse authority
+routes add their consolidated entries as described above.
 Explicit changed-head/scope/material/check-consumption flags route native
 assessment; receipt-only changes cannot clear native gates.
 
@@ -169,7 +186,9 @@ or missing intervals return null with a reason. Speed improvement is
 `(attributable_benefit-incremental_cost)/incremental_cost`. Comparisons require
 reported comparability; money calculations also require cost provenance. Cost
 provenance is reported as a scalar value like every other metric fact, and its
-unknown reason is collected in `reasons`.
+unknown reason is collected once in `reasons`; a reported matched comparison
+names the affected savings/ROI measures in that same reason rather than
+emitting a second generic reason.
 Missing inputs and zero/nonpositive denominators stay null with reasons.
 Computed comparisons are labeled `reported_inputs`, never verified savings.
 
@@ -181,10 +200,12 @@ collection positions 6). Numeric inputs are finite, nonnegative and at most
 10^12. Times must be actual UTC `YYYY-MM-DDTHH:MM:SS[.ffffff]Z` dates with
 ASCII digits only.
 Decoded controls, bidi overrides/isolates, line separators and surrogates are
-rejected. Explicit conservative token/private-key/Bearer/URL-credential guards
-reject known patterns; they cannot detect every secret. Sanitization and data
-minimization remain the caller's obligation. Literal backticks/HTML remain
-inert JSON text; there is no Markdown/HTML renderer.
+rejected. Explicit conservative token/private-key/Bearer guards, userinfo
+credentials in any URI scheme (for example `postgres://` or `ssh://`), and
+common credential query/token names reject known patterns; they cannot detect
+every secret. Sanitization and data minimization remain the caller's
+obligation. Literal backticks/HTML remain inert JSON text; there is no
+Markdown/HTML renderer.
 
 Only explicit local regular files are read, using bounded descriptor reads.
 Final symlinks, nonregular files, stdin `-`, UNC/device paths and URI paths are
@@ -195,8 +216,9 @@ An availability failure names the document being read: `INPUT_UNAVAILABLE`,
 profile or contract installation is distinguishable from a bad capture. No
 source locator inside a document is followed. Input, profile, contract and
 identity are validated in that order before projection, with no partial report.
-The source wrapper passes its fixed repository into the identity phase, so a
-corrupted adapter is rejected before projection.
+The source wrapper also passes its fixed adapter SHA256 into profile validation
+and its fixed repository into the identity phase, so a mutated adapter or a
+foreign repository is rejected before projection.
 
 Success stdout is exactly one sorted, ASCII-escaped JSON object plus a single
 LF newline, written as bytes so Windows cannot translate it to CRLF;

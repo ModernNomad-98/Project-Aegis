@@ -29,6 +29,14 @@ from .owned_paths import (
 )
 
 
+# The fixed source adapter is pinned by exact bytes, like the contract. A
+# schema-valid edit that keeps the same repository can otherwise change the
+# profile id, activation/adoption receipt, stage labels or policy locators and
+# therefore source-stage or route behavior. Any byte change is refused as
+# PROFILE_INVALID before projection.
+ADAPTER_SHA256 = "e45020f79f9e3caf328c598645e93e6c1fdc3e46da0819cf16eb1c9c289d4b95"
+
+
 class ExpectedFreshnessOracle:
     """Synthetic CLI oracle requiring an independent complete head vector."""
 
@@ -145,6 +153,23 @@ class _StrictParser(argparse.ArgumentParser):
         super().__init__(*args, **kwargs)
 
 
+# One declaration of the top-level option surface. build_parser registers
+# these options and _report_mode uses the same metadata to find the subcommand
+# position, so a new top-level option cannot silently make report mode fall
+# back to ordinary argparse output.
+_TOP_LEVEL_OPTIONS = (
+    {"name": "--repository-id", "required": True, "takes_value": True},
+)
+
+
+def _add_top_level_options(parser):
+    for spec in _TOP_LEVEL_OPTIONS:
+        kwargs = {"required": spec["required"]}
+        if not spec["takes_value"]:
+            kwargs["action"] = "store_true"
+        parser.add_argument(spec["name"], **kwargs)
+
+
 def build_parser(*, report_mode: bool = False) -> argparse.ArgumentParser:
     parser_type = cnc_reporting.ReportParser if report_mode else _StrictParser
     parser = parser_type(
@@ -155,7 +180,7 @@ def build_parser(*, report_mode: bool = False) -> argparse.ArgumentParser:
             "operator names."
         ),
     )
-    parser.add_argument("--repository-id", required=True)
+    _add_top_level_options(parser)
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("capabilities")
     subparsers.add_parser("status")
@@ -177,21 +202,20 @@ def build_parser(*, report_mode: bool = False) -> argparse.ArgumentParser:
     return parser
 
 
-_VALUE_OPTIONS = ("--repository-id",)
-
-
-def _is_value_option(option):
+def _top_level_option(option):
     """Match an exact top-level option or an unambiguous long abbreviation.
 
     argparse accepts any unambiguous prefix by default; the strict parsers
     refuse one, but report-mode detection still recognizes it so the fixed JSON
     error path, rather than an abbreviated parse, handles the invocation.
     """
-    return any(
-        option == name or
-        (option.startswith("--") and len(option) > 2 and name.startswith(option))
-        for name in _VALUE_OPTIONS
-    )
+    for spec in _TOP_LEVEL_OPTIONS:
+        name = spec["name"]
+        if option == name or (
+                option.startswith("--") and len(option) > 2 and
+                name.startswith(option)):
+            return spec
+    return None
 
 
 def _report_mode(argv: Sequence[str]) -> bool:
@@ -200,9 +224,11 @@ def _report_mode(argv: Sequence[str]) -> bool:
     Only the subcommand position is read, after the top-level options and their
     values, so a path or value that happens to spell "cnc-report" cannot switch
     the parser class, strict abbreviation or JSON error handling for an
-    unrelated command. An abbreviated top-level option is recognized here only
-    for detection; the parser still refuses the abbreviation, so report-mode
-    errors stay fixed JSON and cannot be bypassed by an accepted abbreviation.
+    unrelated command. Top-level options come from the same declaration that
+    build_parser registers, including whether each takes a value. An abbreviated
+    top-level option is recognized here only for detection; the parser still
+    refuses the abbreviation, so report-mode errors stay fixed JSON and cannot
+    be bypassed by an accepted abbreviation.
     """
     index = 0
     while index < len(argv):
@@ -211,8 +237,9 @@ def _report_mode(argv: Sequence[str]) -> bool:
             index += 1
             break
         option, separator, _value = token.partition("=")
-        if _is_value_option(option):
-            index += 1 if separator else 2
+        spec = _top_level_option(option)
+        if spec is not None:
+            index += 1 if separator or not spec["takes_value"] else 2
             continue
         if token.startswith("-"):
             return False
@@ -300,6 +327,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 arguments.repository_id, arguments.input,
                 support / "adapter-aegis.json", support / "cnc-evidence-contract-v2.json",
                 expected_repository_id="ModernNomad-98/Project-Aegis",
+                expected_profile_sha256=ADAPTER_SHA256,
             )
             return cnc_reporting.emit_report(report)
         except cnc_reporting.ReportError as error:
