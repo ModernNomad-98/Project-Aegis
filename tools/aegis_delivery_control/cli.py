@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Mapping, Sequence
 
 from . import ci_durations
+from . import cnc_reporting
 from . import fast_save
 from .authority import SyntheticAuthority
 from .contracts import DispatchDenied, StorageIntegrityError
@@ -26,6 +27,14 @@ from .owned_paths import (
     nearest_existing_trusted_root,
     prepare_owned_file,
 )
+
+
+# The fixed source adapter is pinned by exact bytes, like the contract. A
+# schema-valid edit that keeps the same repository can otherwise change the
+# profile id, activation/adoption receipt, stage labels or policy locators and
+# therefore source-stage or route behavior. Any byte change is refused as
+# PROFILE_INVALID before projection.
+ADAPTER_SHA256 = "e45020f79f9e3caf328c598645e93e6c1fdc3e46da0819cf16eb1c9c289d4b95"
 
 
 class ExpectedFreshnessOracle:
@@ -136,8 +145,55 @@ def _fast_save_refusal(error: fast_save.FastSaveRefused) -> dict[str, object]:
     }
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
+class _StrictParser(argparse.ArgumentParser):
+    """Reject long-option abbreviations for the standard command surface.
+
+    This is a deliberate breaking change from argparse's default: an
+    abbreviation such as --repo is refused for every command, so the ordinary
+    and report surfaces share one option grammar and a report invocation cannot
+    be parsed through an abbreviation. The package README records the
+    compatibility impact.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("allow_abbrev", False)
+        super().__init__(*args, **kwargs)
+
+
+# One declaration of the top-level option surface. build_parser registers
+# these options and _report_mode uses the same metadata to find the subcommand
+# position, so a new top-level option cannot silently make report mode fall
+# back to ordinary argparse output.
+_TOP_LEVEL_OPTIONS = (
+    {"name": "--repository-id", "required": True, "takes_value": True},
+)
+
+# One declaration of the subcommand surface, in registration order. _report_mode
+# uses it to recognise the subcommand position, so an unknown option or value
+# before the subcommand cannot force the ordinary parser (which echoes the
+# offending argument) when cnc-report is the selected command. A test pins this
+# declaration to build_parser's subparser choices.
+_SUBCOMMANDS = (
+    "capabilities",
+    "status",
+    "verify",
+    "ci-durations",
+    "cnc-report",
+    "fast-save",
+)
+
+
+def _add_top_level_options(parser):
+    for spec in _TOP_LEVEL_OPTIONS:
+        kwargs = {"required": spec["required"]}
+        if not spec["takes_value"]:
+            kwargs["action"] = "store_true"
+        parser.add_argument(spec["name"], **kwargs)
+
+
+def build_parser(*, report_mode: bool = False) -> argparse.ArgumentParser:
+    parser_type = cnc_reporting.ReportParser if report_mode else _StrictParser
+    parser = parser_type(
         prog="python -m tools.aegis_delivery_control",
         description=(
             "Read-only for capabilities, status and verify; fast-save is the "
@@ -145,7 +201,7 @@ def build_parser() -> argparse.ArgumentParser:
             "operator names."
         ),
     )
-    parser.add_argument("--repository-id", required=True)
+    _add_top_level_options(parser)
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("capabilities")
     subparsers.add_parser("status")
@@ -153,11 +209,93 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--expected-vector", required=True, type=Path)
     verify.add_argument("--authority-key-file", required=True, type=Path)
     ci_durations.build_parser(subparsers)
+    cnc_report = subparsers.add_parser(
+        "cnc-report", description=(
+            "Local JSON-only evidence report from an explicitly selected sanitized "
+            "input; non-authorizing and no database or external effects."
+        ),
+    )
+    cnc_report.add_argument("--input", required=True)
     fast_save_parser = subparsers.add_parser("fast-save")
     fast_save_parser.add_argument("--state", required=True, type=Path)
     fast_save_parser.add_argument("--checkpoint", required=True, type=Path)
     fast_save_parser.add_argument("--invocation-phrase", default="fast save")
     return parser
+
+
+def _top_level_option(option):
+    """Match an exact top-level option or an unambiguous long abbreviation.
+
+    argparse accepts any unambiguous prefix by default; the strict parsers
+    refuse one, but report-mode detection still recognizes it so the fixed JSON
+    error path, rather than an abbreviated parse, handles the invocation. A
+    prefix that matches more than one declared option is ambiguous and returns
+    None, so adding a second top-level option cannot silently change which
+    arity detection assumes.
+    """
+    for spec in _TOP_LEVEL_OPTIONS:
+        if option == spec["name"]:
+            return spec
+    if not (option.startswith("--") and len(option) > 2):
+        return None
+    matches = [spec for spec in _TOP_LEVEL_OPTIONS
+               if spec["name"].startswith(option)]
+    return matches[0] if len(matches) == 1 else None
+
+
+def _report_mode(argv: Sequence[str]) -> bool:
+    """Return True only when the selected subcommand is "cnc-report".
+
+    Only the subcommand position is read, after the top-level options and their
+    values, so a path or value that happens to spell "cnc-report" cannot switch
+    the parser class, strict abbreviation or JSON error handling for an
+    unrelated command. Top-level options come from the same declaration that
+    build_parser registers, including whether each takes a value. An abbreviated
+    top-level option is recognized here only for detection; the parser still
+    refuses the abbreviation, so report-mode errors stay fixed JSON and cannot
+    be bypassed by an accepted abbreviation.
+
+    A token that is neither a known top-level option nor a known subcommand is
+    skipped instead of ending the scan: a malformed invocation that still
+    selects cnc-report reaches the fixed JSON error path, so its offending
+    argument is never echoed by argparse. The first known subcommand normally
+    stops the scan, so a value that happens to spell "cnc-report" cannot switch
+    the parser class for an ordinary command.
+
+    An unknown long option's real arity is unknowable here, so an unknown long
+    option written without "=" is assumed to take the following non-option
+    token as its value. That keeps a value equal to a known subcommand from
+    ending the scan: "--repository-id REPO --bogus status cnc-report ..." is
+    still report mode. The token "cnc-report" itself is never assumed to be an
+    unknown option's value, so it always selects report mode. Residual
+    ambiguity: an unknown flag directly followed by a non-report subcommand is
+    read as if it took that subcommand as a value, so a later "cnc-report" can
+    select report mode even when argparse would have selected the non-report
+    command. That invocation is invalid either way; no valid invocation
+    depends on the assumption.
+    """
+    index = 0
+    while index < len(argv):
+        token = argv[index]
+        if token == "--":
+            index += 1
+            break
+        option, separator, _value = token.partition("=")
+        spec = _top_level_option(option)
+        if spec is not None:
+            index += 1 if separator or not spec["takes_value"] else 2
+            continue
+        if token in _SUBCOMMANDS:
+            return token == "cnc-report"
+        next_token = argv[index + 1] if index + 1 < len(argv) else None
+        if (separator == "" and option.startswith("--") and len(option) > 2
+                and next_token is not None
+                and next_token != "cnc-report"
+                and not next_token.startswith("-")):
+            index += 2
+        else:
+            index += 1
+    return index < len(argv) and argv[index] == "cnc-report"
 
 
 def _database_path(arguments: argparse.Namespace) -> Path:
@@ -224,7 +362,29 @@ def _status(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    arguments = build_parser().parse_args(argv)
+    selected_argv = list(sys.argv[1:] if argv is None else argv)
+    report_mode = _report_mode(selected_argv)
+    try:
+        arguments = build_parser(report_mode=report_mode).parse_args(selected_argv)
+    except cnc_reporting.ReportError as error:
+        return cnc_reporting.emit_error(error)
+    if arguments.command == "cnc-report":
+        # Fixed source selection, BEFORE any state path/database access.
+        support = Path(__file__).parent / "cnc"
+        try:
+            # The fixed source repository enters the validation phase, so a
+            # corrupted adapter is rejected before any report is projected.
+            report = cnc_reporting.report_from_paths(
+                arguments.repository_id, arguments.input,
+                support / "adapter-aegis.json", support / "cnc-evidence-contract-v2.json",
+                expected_repository_id="ModernNomad-98/Project-Aegis",
+                expected_profile_sha256=ADAPTER_SHA256,
+            )
+            return cnc_reporting.emit_report(report)
+        except cnc_reporting.ReportError as error:
+            return cnc_reporting.emit_error(error)
+        except Exception:
+            return cnc_reporting.emit_error(cnc_reporting.ReportError("REPORT_FAILED"))
     if arguments.command == "fast-save":
         # Taken BEFORE the state document is loaded, so idle_measurement really
         # covers the state load and validation that measured_what names.

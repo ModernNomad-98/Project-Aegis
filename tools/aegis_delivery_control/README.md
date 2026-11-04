@@ -26,6 +26,275 @@ does not authorize a real route; `require_real_dispatch` always denies it. A
 selected source and host, independent freshness proof, actual evidence and
 billing policy remain open work-package 003 gates.
 
+## Local C&C reporting
+
+The `cnc-report` command packages an explicitly selected, sanitized local
+capture of the existing Lead record into one JSON evidence report. It opens
+no state database and performs no network request, subprocess, Git command,
+output-file write, dispatch, metrics enrollment or telemetry export. The
+existing synthetic kernel and its real-dispatch denial remain unchanged.
+Exit zero means **rendered**, not verified, accepted, authorized or ready.
+
+From the source repository root:
+
+```powershell
+python -B -m tools.aegis_delivery_control --repository-id ModernNomad-98/Project-Aegis cnc-report --input SANITIZED-CAPTURE.json
+```
+
+The source wrapper fixes `cnc/adapter-aegis.json` and
+`cnc/cnc-evidence-contract-v2.json` internally, and byte-pins both: the
+contract to the SHA256 below and the adapter to
+`e45020f79f9e3caf328c598645e93e6c1fdc3e46da0819cf16eb1c9c289d4b95`. Foreign
+repository IDs and profile/contract overrides are refused. `cnc-report` is
+recognized only in the subcommand position, including after an abbreviated
+top-level option, so report parsing and fixed JSON errors cannot be bypassed by
+an abbreviation; long-option abbreviations themselves are refused for every
+command. The top-level option surface is declared once and shared by the parser
+and this detection, so a new top-level option cannot silently disable the fixed
+JSON report error path. A path or value that happens to spell `cnc-report` for
+another command changes nothing.
+
+Report-mode detection treats an unknown long option written without `=` as
+taking the following non-option token as its value, so
+`--repository-id REPO --bogus status cnc-report --input ...` still reaches the
+fixed JSON path instead of ending the scan at `status`. The token
+`cnc-report` itself is never assumed to be an unknown option's value, so it
+always selects report mode. Residual ambiguity: the real arity of an unknown
+option cannot be known, so an unknown flag directly followed by a non-report
+subcommand is read as if it took that subcommand as a value; a later
+`cnc-report` can therefore select report mode even when argparse would have
+selected the non-report command. That invocation is invalid either way, and
+report mode returns fixed JSON rather than usage. No valid invocation depends
+on either reading.
+
+**Compatibility note (intentional breaking change).** `allow_abbrev=False` is
+set for **every** command, not only `cnc-report`. An existing script that
+abbreviates any long option - for example `--repo` for `--repository-id` -
+now exits 2: report invocations return the fixed `CLI_INVALID` JSON object,
+and the ordinary commands return argparse usage. Spell every long option in
+full. This scope is deliberate rather than scoped to report mode: the command
+surface then has one option grammar, and an abbreviation cannot be accepted by
+one parser path and refused by another; the fixed JSON/no-echo report path
+stays reachable when an abbreviation still names `cnc-report`. Full-name
+invocations are unchanged.
+
+Source reporting is for Role A;
+copying the startup instructions into Role B does not require this package or
+import source stages, grants or authority. Source stages remain exactly A–G.
+Startup/handoff pointer placement in shared governance files belongs to their
+existing holder and is not established by this command or a passing fixture.
+
+The existing coordinator may invoke this command at startup/resume or material
+handoff using an authorized capture of its **existing** record. The capture's
+`native_record.locator` must identify that actual record; `revision` identifies
+the captured revision. Do not invent a board or replace the designated writer.
+Retain the original capture, its source hashes, unknowns, holds and scope.
+Attach or link output only through that record's existing owner and access,
+retention and publication rules. Rendering does not itself attach anything.
+An actual Lead use receipt and native delivery evidence are needed before
+claiming adoption; the shipped profile remains `candidate`.
+
+The portable interface is separate and requires all selections explicitly:
+
+```powershell
+python -B scripts/aegis-cnc/cnc_reporting.py --repository-id REPOSITORY --profile scripts/aegis-cnc/profile.json --contract scripts/aegis-cnc/cnc-evidence-contract-v2.json --input SANITIZED-CAPTURE.json
+```
+
+For a portable installation copy these files **without changing bytes**, with
+a byte-preserving copy such as `Copy-Item` or `cp`; do not let an editor or a
+line-ending conversion rewrite them:
+
+| Source | Consumer destination |
+| --- | --- |
+| `cnc_reporting.py` | `scripts/aegis-cnc/cnc_reporting.py` |
+| `cnc/cnc-evidence-contract-v2.json` | `scripts/aegis-cnc/cnc-evidence-contract-v2.json` |
+| `tests/test_cnc_reporting.py` | `scripts/aegis-cnc/tests/test_cnc_reporting.py` |
+| `tests/fixtures/cnc-report-cases.json` | `scripts/aegis-cnc/tests/fixtures/cnc-report-cases.json` |
+
+The consumer Lead supplies its own closed `profile.json`, copy manifest,
+integration documentation and native startup/handoff placement. Source-only
+`tests/test_cnc_source_cli.py` is not copied. No source imports, Node runtime,
+dependency installation or implicit support-file discovery are needed by the
+portable module or tests. Record exact source commit/tree, every copied path
+and SHA256, profile identity/hash and actual checks. Partial consumer snapshots
+cannot establish complete app-map/context or native delivery readiness. A
+profile `id` is any lowercase slug matching `[a-z][a-z0-9_-]{0,63}`: the
+reporter validates that shape rather than a fixed list of consumers. Only
+`id: aegis` additionally pins the source stage labels to exactly A–G; another
+consumer keeps its own stage labels.
+
+The small pure helper adaptation records its original SHA256 in
+`cnc_reporting.py`; the unchanged common contract is pinned to SHA256
+`1b2469b3f663d9b04712c4dbbdb997fdfdc0c6a28727c5647c954854850a3268`.
+That hash covers the contract's exact bytes: the reporter refuses any other
+bytes with `CONTRACT_INVALID`, and the portable tests re-hash the shipped file,
+a byte copy of it and a line-ending-converted copy, so a CRLF checkout fails
+the suite. The repository-wide `* text=auto eol=lf` policy still normalises
+text checkouts to LF; no per-file `.gitattributes` entry is added for this
+file. The source-only fixed adapter is pinned the same way to SHA256
+`e45020f79f9e3caf328c598645e93e6c1fdc3e46da0819cf16eb1c9c289d4b95`, so any
+byte change - including a schema-valid edit to its `id`, `activation`,
+adoption receipt, stage labels or policy locators - is refused as
+`PROFILE_INVALID` before projection. The source tests mutate each of those
+fields and assert the refusal. The portable interface deliberately does not
+pin a consumer profile because the consumer selects its own. The profile
+preserves the prior Aegis mapping's native references, A–G stage labels and
+role boundary, adding precise integration locators. Prior mapping did not
+establish adoption. Activation and receipt must agree: `adopted_with_receipt`
+requires a non-null `adoption_receipt.value`, while `candidate` requires a
+null (unknown) receipt and refuses a non-null one as `PROFILE_INVALID`.
+
+A reported grant is routed in order and every route carries the profile's
+`authority_policy_locator` as `policy`. A foreign repository is rejected before
+anything else, so a foreign grant is never described as an authority to locate
+or reuse. Expired, revoked and consumed grants are terminal and are decided
+before a missing original or locator: they route to new authority rather than
+reuse or locating. A missing original or locator is otherwise a reconciliation
+gap, and that gap is decided **before** the lifecycle and scope comparison: an
+unknown lifecycle routes exact reconciliation only when the original is
+verified and the locator is present; with either missing it routes
+`LOCATE_ORIGINAL_AUTHORITY`. A scope/conditions mismatch routes exact
+reconciliation. Only a verified, active, applicable same-repository grant
+routes reuse. No route grants new execution authority, and `ownerWithheld`
+stays unknown because no supplied input establishes that the owner withheld
+anything. Every non-reuse route also adds one consolidated `evidence_gaps`
+entry naming the event and route (`FOREIGN_GRANT_REJECTED`,
+`NON_REUSABLE_GRANT_NEW_AUTHORITY_REQUIRED`, `LOCATE_ORIGINAL_AUTHORITY` or
+`RECONCILE_EXACT_SCOPE_OR_CONDITIONS`); only
+`REUSE_VERIFIED_APPLICABLE_GRANT` adds none.
+
+Finding states are explicit. A supplied finding record routes native
+disposition (`reported`) unless it contradicts the change flags or itself. A
+null finding value is `unknown` because the schema uses null only for
+unknown-with-a-reason, so it routes `UNKNOWN_FINDING_NATIVE_DISPOSITION` with
+an `evidenceGap`. A record whose `status` is `none` is the only positive
+no-finding report and hence the only route to `NO_FINDING`, and only when it
+carries neither an `evidence` nor a `primary` detail: a `none` record carrying
+either detail contradicts itself, renders as `unresolved_none`, and routes
+`UNRESOLVED_NATIVE_DISPOSITION` with an `evidenceGap`. A material finding
+without matching details - a null finding, a `none` record without details, or
+a non-`none` record with neither an evidence nor a primary detail - renders as
+`unresolved_material` and routes `UNRESOLVED_NATIVE_DISPOSITION` with an
+`evidenceGap`. Every finding route stays `closed:false`, and each unknown or
+unresolved item also adds an entry to `evidence_gaps`; non-reuse authority
+routes add their consolidated entries as described above.
+Explicit changed-head/scope/material/check-consumption flags route native
+assessment; receipt-only changes cannot clear native gates.
+
+`tests/fixtures/cnc-report-cases.json` is a complete schema example: `input`
+contains synthetic literal examples; `retained_replay` minimizes a supplied
+historical existing-record capture with its original locator/body digest.
+Its runnable events include only progress supported by the supplied capture.
+The zero-progress held source item remains pending provenance outside runnable
+input; no acknowledgment or answer is invented for it. Unknown replies remain
+null, and reported historical operational proof acceptance is scoped separately
+from this rollout.
+Synthetic examples do not prove actual accepted product delivery.
+
+The input has exactly `schema_version`, `repository_id`, `native_record`,
+`candidate`, `collection`, `items` and `metrics`. Nullable facts are objects
+with exactly `value` and `unknown_reason`; null requires a nonempty reason,
+while nonnull requires a null reason. Candidate head/base/tree are 40 lowercase
+hex characters, plan hashes 64. Items carry immutable `event_id`, task,
+description, evidence label, progress, scope, actor, source locator/hash,
+timestamps, authority, holds, notification evidence, coordinator answer,
+execution evidence, accepted scope, next action/check reason, typed change
+flags and a mandatory `finding` key whose nullable `value` is the only part
+that may be null; omitting the key is `INPUT_INVALID`. Duplicate event IDs are
+rejected; repeated tasks with distinct events are allowed. Accepted completion
+requires source hash,
+execution evidence and acceptance scope, all still caller-supplied claims.
+The four progress kinds are acknowledgment, substantive answer, execution
+milestone and accepted completion; they are not interchangeable delivery units.
+
+Collection always has `complete:false`. Known inbox totals require exactly
+the newest `min(6,total)` positions; unknown totals require empty positions and
+an explicit reason. The output forbids deletion inference and baseline
+overwrite. Paused/manual/heartbeat provenance is retained as supplied data;
+the reporter performs no collection or scheduling.
+
+Metrics distinguish artifact review from accepted product delivery. Explicit
+UTC start/finish gives a review wall window; otherwise two observations give
+only an observation-span lower bound. Neither infers active effort. Reversed
+or missing intervals return null with a reason. Speed improvement is
+`(baseline_elapsed-current_elapsed)/baseline_elapsed`; cost savings is
+`baseline_attributed_cost-current_attributed_cost`; ROI is
+`(attributable_benefit-incremental_cost)/incremental_cost`. Comparisons require
+reported comparability; money calculations also require cost provenance. Cost
+provenance is reported as a scalar value like every other metric fact, and its
+unknown reason is collected once in `reasons`; a reported matched comparison
+names the affected savings/ROI measures in that same reason rather than
+emitting a second generic reason.
+Missing inputs and zero/nonpositive denominators stay null with reasons.
+Computed comparisons are labeled `reported_inputs`, never verified savings.
+
+Parsing is strict UTF-8 without BOM, duplicate keys, trailing data, NaN,
+Infinity, overflowed floats, unknown keys, coerced booleans or depth above 16.
+Input is at most 1 MiB; profile and contract at most 64 KiB each. Text is at
+most 4096 code points, identifiers 128, arrays 1000 (locator arrays 100,
+collection positions 6). Numeric inputs are finite, nonnegative and at most
+10^12. Times must be actual UTC `YYYY-MM-DDTHH:MM:SS[.ffffff]Z` dates with
+ASCII digits only.
+Decoded controls, bidi overrides/isolates, line separators and surrogates are
+rejected. Explicit conservative token/private-key/Bearer guards, userinfo
+credentials in any URI scheme (for example `postgres://` or `ssh://`), and
+common credential query/token names reject known patterns; they cannot detect
+every secret. Sanitization and data minimization remain the caller's
+obligation. Literal backticks/HTML remain inert JSON text; there is no
+Markdown/HTML renderer.
+
+Only explicit local regular files are read, using bounded descriptor reads.
+Final symlinks, nonregular files, stdin `-`, UNC/device paths and URI paths are
+refused. A path whose first component is a single ASCII drive letter followed
+by `:` and a separator is a Windows drive path, not a URI, so
+`C://tmp/capture.json` is read as a local path. POSIX paths beginning `//` and
+paths beginning with two backslashes remain refused as UNC/device forms, and
+every other `scheme://` prefix is refused as a URI. A single-letter URI scheme
+such as `x://host` is indistinguishable from a drive path and is exempted too;
+that is a documented residual, not a claim that such a string is a local file.
+This does not protect against hostile parent-directory races or detect all
+network/cloud filesystem mounts; the caller selects local captures.
+An availability failure names the document being read: `INPUT_UNAVAILABLE`,
+`PROFILE_UNAVAILABLE` or `CONTRACT_UNAVAILABLE`, all exit 3, so a broken
+profile or contract installation is distinguishable from a bad capture. No
+source locator inside a document is followed. Input, profile, contract and
+identity are validated in that order before projection, with no partial report.
+The source wrapper also passes its fixed adapter SHA256 into profile validation
+and its fixed repository into the identity phase, so a mutated adapter or a
+foreign repository is rejected before projection.
+
+Success stdout is exactly one sorted, ASCII-escaped JSON object plus a single
+LF newline, written as bytes so Windows cannot translate it to CRLF;
+`report_status:RENDERED_NON_AUTHORIZING`. Expected failure has empty stdout
+and one fixed LF-terminated JSON object on stderr with `error_code` and
+`message`, with no offending path, argument or content echoed:
+
+| Error | Exit | Meaning |
+| --- | --- | --- |
+| `CLI_INVALID` | 2 | Invalid command arguments. |
+| `INPUT_INVALID` | 2 | Input is not valid for this report contract. |
+| `PROFILE_INVALID` | 2 | Profile is not valid for this report contract. |
+| `CONTRACT_INVALID` | 2 | Contract is not supported. |
+| `IDENTITY_MISMATCH` | 2 | Repository identities do not match. |
+| `INPUT_UNAVAILABLE` | 3 | The explicitly selected input is unavailable. |
+| `PROFILE_UNAVAILABLE` | 3 | The explicitly selected profile is unavailable. |
+| `CONTRACT_UNAVAILABLE` | 3 | The explicitly selected contract is unavailable. |
+| `REPORT_FAILED` | 3 | Report could not be produced. |
+
+`--help` is static usage, not a report. Existing usage consent, cohort admission,
+60/90-day retention and public-export controls are unchanged. Attaching a report
+is not a telemetry export route and inherits no automatic deletion or consent.
+
+Run the focused source checks with:
+
+```powershell
+python -B -m unittest tools.aegis_delivery_control.tests.test_cnc_reporting tools.aegis_delivery_control.tests.test_cnc_source_cli -v
+```
+
+Portable copies run `python -B -m unittest discover -s scripts/aegis-cnc/tests -v`.
+These author checks do not replace independent audit, native validation or
+exact-head final review. Required unavailable platform checks remain UNRUN.
+
 ## Boundary
 
 The [control-plane design](../../docs/design/resumable-control-plane-v1.md)

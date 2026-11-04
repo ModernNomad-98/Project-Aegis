@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 2,
+  "id": "cnc-evidence-contract-v2",
+  "status": "Local evidence/coordination contract; not repository policy",
+  "scope": "Common vocabulary and evidence bookkeeping only. Each project owns all workflow, approval, model, concurrency, review, merge and production rules.",
+  "precedence": "Follow applicable direct owner authority and the project's own precedence rules. Locate and reconcile the exact conflicting scope; never transfer another project's grant or apply a universal strictest-text rule.",
+  "progress": [
+    "acknowledgment",
+    "substantive_answer",
+    "execution_milestone",
+    "accepted_completion"
+  ],
+  "evidenceLabels": [
+    "Observed",
+    "Reported",
+    "Inferred",
+    "Planned",
+    "UNRUN",
+    "Unknown",
+    "Historical"
+  ],
+  "recordFields": [
+    "project",
+    "task",
+    "source",
+    "sourceSHA256",
+    "retrievedAt",
+    "firstObservedAt_or_unknown",
+    "responsibleActor",
+    "scope",
+    "authority_original_locator",
+    "authority_confidence",
+    "candidate_identity",
+    "dependencies_and_holds",
+    "owner_notification_delivery_evidence",
+    "coordinator_answer",
+    "execution_evidence",
+    "accepted_completion_scope",
+    "next_action",
+    "next_check_or_due_reason"
+  ],
+  "failureKinds": [
+    "permission",
+    "access",
+    "evidence",
+    "technical_failure"
+  ],
+  "inheritFromProject": [
+    "canonical_board_and_designated_writer",
+    "applicable_authority_and_exceptions",
+    "stages_and_role_independence",
+    "model_routing_and_agent_cap",
+    "one_PR_submission_and_CI_serialization",
+    "review_and_provider_dispositions",
+    "exact_head_and_freshness_rules",
+    "skills_receipt_format",
+    "merge_backend_effects_and_postmerge_verification"
+  ],
+  "findingRule": "Use native dispositions. Late relevant findings must be assessed; workflow success is not a disposition. Duplicate/superseded findings point to their primary evidence. No C&C blocker whitelist, risk waiver, review cutoff or extra merge hold is created.",
+  "changeRule": "Identify changed inputs and the checks that consume them. A receipt-only change needs accurate readback and any native receipt checks, not an automatic full audit. Candidate head/scope/material findings route to native policy; mandatory exact-head, independence and freshness conditions remain.",
+  "authorityRule": "Verified applicable grants are reused without reapproval. A missing original is an authority-reconciliation gap, not proof the owner withheld permission. Preparation, risk acceptance, merge, hosted execution and publication remain separate.",
+  "partialEvidenceRule": "An inbox window is scoped complete:false; no deletion inference outside it or full-baseline overwrite. Keep manual versus heartbeat provenance truthful.",
+  "metrics": {
+    "unit": "Identify artifact review versus accepted product delivery; do not mix denominators",
+    "eventFields": [
+      "event_id",
+      "project",
+      "event_type",
+      "artifact_or_delivery_identity",
+      "source_and_hash",
+      "authorized_start_or_unknown",
+      "first_observed",
+      "last_observed",
+      "acceptance_and_scope",
+      "wall_window_basis",
+      "active_effort_or_unknown",
+      "quality_or_rework",
+      "cost_provenance"
+    ],
+    "comparison": "Speed comparison requires matched work definitions, boundaries and quality/coverage. Cost savings requires comparable attributed costs including coordination/rework. ROI requires attributable benefit and full incremental cost, with uncertainty disclosed.",
+    "missing": "Unknown is null with a reason, never inferred zero. Quotes, reservations, reported usage, estimated price and invoices remain separate.",
+    "speedFormula": "(matched_baseline_elapsed - current_elapsed) / matched_baseline_elapsed; undefined without comparable baseline",
+    "savingsFormula": "matched_baseline_attributed_cost - current_attributed_cost; undefined without comparable cost",
+    "roiFormula": "(attributable_benefit - incremental_cost) / incremental_cost; undefined when inputs are missing or denominator is nonpositive",
+    "sampling": "Capture existing delivery/review receipts once; no extra provider run, schedule, duplicate board or metrics-only PR.",
+    "reportTrigger": "Retain the local 30-day or 10 accepted-product-delivery review target. While timer is paused, no scheduled collection occurs. Manual authorized outcomes can append evidence."
+  },
+  "notAuthority": [
+    "No executing agent, reviewer or merger is dispatched by this contract",
+    "No product readiness can be inferred from passing helper checks",
+    "No source/consumer adoption or money saving is inferred from these files"
+  ]
+}

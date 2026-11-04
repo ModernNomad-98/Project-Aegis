@@ -1,0 +1,581 @@
+{
+  "provenance": {
+    "replay": "Minimized supplied existing-inbox summary vocabulary from PREFLIGHT-SOURCES.json; synthetic event IDs and acceptance examples. Not a full or freshly verified inbox capture. Original holder/dispatch holds remain.",
+    "helper_sha256": "ad02d1955526041d3b6e703265bc22ad707ed8f1a4979e3f977de59606f91478"
+  },
+  "contract_utf8": "{\n  \"schemaVersion\": 2,\n  \"id\": \"cnc-evidence-contract-v2\",\n  \"status\": \"Local evidence/coordination contract; not repository policy\",\n  \"scope\": \"Common vocabulary and evidence bookkeeping only. Each project owns all workflow, approval, model, concurrency, review, merge and production rules.\",\n  \"precedence\": \"Follow applicable direct owner authority and the project's own precedence rules. Locate and reconcile the exact conflicting scope; never transfer another project's grant or apply a universal strictest-text rule.\",\n  \"progress\": [\n    \"acknowledgment\",\n    \"substantive_answer\",\n    \"execution_milestone\",\n    \"accepted_completion\"\n  ],\n  \"evidenceLabels\": [\n    \"Observed\",\n    \"Reported\",\n    \"Inferred\",\n    \"Planned\",\n    \"UNRUN\",\n    \"Unknown\",\n    \"Historical\"\n  ],\n  \"recordFields\": [\n    \"project\",\n    \"task\",\n    \"source\",\n    \"sourceSHA256\",\n    \"retrievedAt\",\n    \"firstObservedAt_or_unknown\",\n    \"responsibleActor\",\n    \"scope\",\n    \"authority_original_locator\",\n    \"authority_confidence\",\n    \"candidate_identity\",\n    \"dependencies_and_holds\",\n    \"owner_notification_delivery_evidence\",\n    \"coordinator_answer\",\n    \"execution_evidence\",\n    \"accepted_completion_scope\",\n    \"next_action\",\n    \"next_check_or_due_reason\"\n  ],\n  \"failureKinds\": [\n    \"permission\",\n    \"access\",\n    \"evidence\",\n    \"technical_failure\"\n  ],\n  \"inheritFromProject\": [\n    \"canonical_board_and_designated_writer\",\n    \"applicable_authority_and_exceptions\",\n    \"stages_and_role_independence\",\n    \"model_routing_and_agent_cap\",\n    \"one_PR_submission_and_CI_serialization\",\n    \"review_and_provider_dispositions\",\n    \"exact_head_and_freshness_rules\",\n    \"skills_receipt_format\",\n    \"merge_backend_effects_and_postmerge_verification\"\n  ],\n  \"findingRule\": \"Use native dispositions. Late relevant findings must be assessed; workflow success is not a disposition. Duplicate/superseded findings point to their primary evidence. No C&C blocker whitelist, risk waiver, review cutoff or extra merge hold is created.\",\n  \"changeRule\": \"Identify changed inputs and the checks that consume them. A receipt-only change needs accurate readback and any native receipt checks, not an automatic full audit. Candidate head/scope/material findings route to native policy; mandatory exact-head, independence and freshness conditions remain.\",\n  \"authorityRule\": \"Verified applicable grants are reused without reapproval. A missing original is an authority-reconciliation gap, not proof the owner withheld permission. Preparation, risk acceptance, merge, hosted execution and publication remain separate.\",\n  \"partialEvidenceRule\": \"An inbox window is scoped complete:false; no deletion inference outside it or full-baseline overwrite. Keep manual versus heartbeat provenance truthful.\",\n  \"metrics\": {\n    \"unit\": \"Identify artifact review versus accepted product delivery; do not mix denominators\",\n    \"eventFields\": [\n      \"event_id\",\n      \"project\",\n      \"event_type\",\n      \"artifact_or_delivery_identity\",\n      \"source_and_hash\",\n      \"authorized_start_or_unknown\",\n      \"first_observed\",\n      \"last_observed\",\n      \"acceptance_and_scope\",\n      \"wall_window_basis\",\n      \"active_effort_or_unknown\",\n      \"quality_or_rework\",\n      \"cost_provenance\"\n    ],\n    \"comparison\": \"Speed comparison requires matched work definitions, boundaries and quality/coverage. Cost savings requires comparable attributed costs including coordination/rework. ROI requires attributable benefit and full incremental cost, with uncertainty disclosed.\",\n    \"missing\": \"Unknown is null with a reason, never inferred zero. Quotes, reservations, reported usage, estimated price and invoices remain separate.\",\n    \"speedFormula\": \"(matched_baseline_elapsed - current_elapsed) / matched_baseline_elapsed; undefined without comparable baseline\",\n    \"savingsFormula\": \"matched_baseline_attributed_cost - current_attributed_cost; undefined without comparable cost\",\n    \"roiFormula\": \"(attributable_benefit - incremental_cost) / incremental_cost; undefined when inputs are missing or denominator is nonpositive\",\n    \"sampling\": \"Capture existing delivery/review receipts once; no extra provider run, schedule, duplicate board or metrics-only PR.\",\n    \"reportTrigger\": \"Retain the local 30-day or 10 accepted-product-delivery review target. While timer is paused, no scheduled collection occurs. Manual authorized outcomes can append evidence.\"\n  },\n  \"notAuthority\": [\n    \"No executing agent, reviewer or merger is dispatched by this contract\",\n    \"No product readiness can be inferred from passing helper checks\",\n    \"No source/consumer adoption or money saving is inferred from these files\"\n  ]\n}\n",
+  "profile": {
+    "schema_version": 1,
+    "id": "aegis",
+    "repository": "ModernNomad-98/Project-Aegis",
+    "contract_id": "cnc-evidence-contract-v2",
+    "native_record_locator": "caller-supplied input.native_record.locator; existing Lead record",
+    "native_policy_revision": "f69c6e9219335d1979b8ec9658cc86e0a7a5583a",
+    "native_references": [
+      "AGENTS.md",
+      "docs/delivery-workflow.md",
+      "tools/aegis_delivery_control/README.md#local-cc-reporting"
+    ],
+    "stage_labels": [
+      {
+        "id": "A",
+        "label": "plan"
+      },
+      {
+        "id": "B",
+        "label": "independent plan audit"
+      },
+      {
+        "id": "C",
+        "label": "implement"
+      },
+      {
+        "id": "D",
+        "label": "independent implementation audit"
+      },
+      {
+        "id": "E",
+        "label": "validate"
+      },
+      {
+        "id": "F",
+        "label": "independent final review"
+      },
+      {
+        "id": "G",
+        "label": "authorized merge"
+      }
+    ],
+    "authority_policy_locator": "docs/approvals/APPROVAL_REGISTER.md",
+    "head_policy_locator": "docs/delivery-workflow.md#exact-head-invalidation",
+    "receipt_policy_locator": "docs/delivery-workflow.md#the-bound-fields",
+    "finding_policy_locator": "docs/delivery-workflow.md#stage-dispositions",
+    "role_boundary": "Role A source only. Consumers retain their own workflow and grants.",
+    "activation": "candidate",
+    "adoption_receipt": {
+      "value": null,
+      "unknown_reason": "not supplied in sanitized capture"
+    }
+  },
+  "input": {
+    "schema_version": 1,
+    "repository_id": "ModernNomad-98/Project-Aegis",
+    "native_record": {
+      "locator": "PREFLIGHT-SOURCES.json#retained-existing-Lead-record",
+      "revision": "sanitized supplied replay; not live or independently authenticated"
+    },
+    "candidate": {
+      "head": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "base": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "tree": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "plan_sha256": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      }
+    },
+    "collection": {
+      "kind": "manual",
+      "paused": true,
+      "manual_task_authorized_reported": true,
+      "inbox_total": {
+        "value": 670,
+        "unknown_reason": null
+      },
+      "positions": [
+        665,
+        666,
+        667,
+        668,
+        669,
+        670
+      ],
+      "complete": false
+    },
+    "items": [
+      {
+        "event_id": "sanitized-event-0",
+        "task": "retained-record-0",
+        "description": "Sanitized retained Lead record summary; supplied evidence only",
+        "evidence_label": "Reported",
+        "progress": "acknowledgment",
+        "scope": "local report preparation",
+        "responsible_actor": "Existing Lead",
+        "source_locator": "PREFLIGHT-SOURCES.json#retained-inbox-summary",
+        "source_sha256": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "retrieved_at": "2026-11-03T00:00:10Z",
+        "first_observed_at": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "authority": {
+          "repository": "ModernNomad-98/Project-Aegis",
+          "scope": "local report preparation",
+          "original_verified_reported": false,
+          "lifecycle": "unknown",
+          "conditions_satisfied_reported": false,
+          "source_locator": {
+            "value": null,
+            "unknown_reason": "not supplied in sanitized capture"
+          }
+        },
+        "dependencies_and_holds": [
+          "Real dispatch remains held"
+        ],
+        "owner_notification_delivery_evidence": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "coordinator_answer": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "execution_evidence": [],
+        "accepted_completion_scope": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "next_action": "Existing Lead reconciles retained record",
+        "next_check_or_due_reason": "Material handoff with exact record revision",
+        "change": {
+          "kind": "receipt_only",
+          "changes_head": false,
+          "changes_scope": false,
+          "material_finding": false,
+          "consumed_by_check": false
+        },
+        "finding": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        }
+      },
+      {
+        "event_id": "sanitized-event-1",
+        "task": "retained-record-1",
+        "description": "Sanitized retained Lead record summary; supplied evidence only",
+        "evidence_label": "Reported",
+        "progress": "substantive_answer",
+        "scope": "local report preparation",
+        "responsible_actor": "Existing Lead",
+        "source_locator": "PREFLIGHT-SOURCES.json#retained-inbox-summary",
+        "source_sha256": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "retrieved_at": "2026-11-03T00:00:10Z",
+        "first_observed_at": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "authority": {
+          "repository": "ModernNomad-98/Project-Aegis",
+          "scope": "local report preparation",
+          "original_verified_reported": false,
+          "lifecycle": "unknown",
+          "conditions_satisfied_reported": false,
+          "source_locator": {
+            "value": null,
+            "unknown_reason": "not supplied in sanitized capture"
+          }
+        },
+        "dependencies_and_holds": [
+          "Real dispatch remains held"
+        ],
+        "owner_notification_delivery_evidence": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "coordinator_answer": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "execution_evidence": [],
+        "accepted_completion_scope": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "next_action": "Existing Lead reconciles retained record",
+        "next_check_or_due_reason": "Material handoff with exact record revision",
+        "change": {
+          "kind": "receipt_only",
+          "changes_head": false,
+          "changes_scope": false,
+          "material_finding": false,
+          "consumed_by_check": false
+        },
+        "finding": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        }
+      },
+      {
+        "event_id": "sanitized-event-2",
+        "task": "retained-record-2",
+        "description": "Sanitized retained Lead record summary; supplied evidence only",
+        "evidence_label": "Reported",
+        "progress": "execution_milestone",
+        "scope": "local report preparation",
+        "responsible_actor": "Existing Lead",
+        "source_locator": "PREFLIGHT-SOURCES.json#retained-inbox-summary",
+        "source_sha256": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "retrieved_at": "2026-11-03T00:00:10Z",
+        "first_observed_at": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "authority": {
+          "repository": "ModernNomad-98/Project-Aegis",
+          "scope": "local report preparation",
+          "original_verified_reported": false,
+          "lifecycle": "unknown",
+          "conditions_satisfied_reported": false,
+          "source_locator": {
+            "value": null,
+            "unknown_reason": "not supplied in sanitized capture"
+          }
+        },
+        "dependencies_and_holds": [
+          "Real dispatch remains held"
+        ],
+        "owner_notification_delivery_evidence": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "coordinator_answer": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "execution_evidence": [],
+        "accepted_completion_scope": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "next_action": "Existing Lead reconciles retained record",
+        "next_check_or_due_reason": "Material handoff with exact record revision",
+        "change": {
+          "kind": "receipt_only",
+          "changes_head": false,
+          "changes_scope": false,
+          "material_finding": false,
+          "consumed_by_check": false
+        },
+        "finding": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        }
+      },
+      {
+        "event_id": "sanitized-event-3",
+        "task": "retained-record-3",
+        "description": "Sanitized retained Lead record summary; supplied evidence only",
+        "evidence_label": "Reported",
+        "progress": "accepted_completion",
+        "scope": "local report preparation",
+        "responsible_actor": "Existing Lead",
+        "source_locator": "PREFLIGHT-SOURCES.json#retained-inbox-summary",
+        "source_sha256": {
+          "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "unknown_reason": null
+        },
+        "retrieved_at": "2026-11-03T00:00:10Z",
+        "first_observed_at": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "authority": {
+          "repository": "ModernNomad-98/Project-Aegis",
+          "scope": "local report preparation",
+          "original_verified_reported": false,
+          "lifecycle": "unknown",
+          "conditions_satisfied_reported": false,
+          "source_locator": {
+            "value": null,
+            "unknown_reason": "not supplied in sanitized capture"
+          }
+        },
+        "dependencies_and_holds": [
+          "Real dispatch remains held"
+        ],
+        "owner_notification_delivery_evidence": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "coordinator_answer": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "execution_evidence": [
+          "record:local-artifact-only"
+        ],
+        "accepted_completion_scope": {
+          "value": "Sanitized historical artifact only; no product acceptance",
+          "unknown_reason": null
+        },
+        "next_action": "Existing Lead reconciles retained record",
+        "next_check_or_due_reason": "Material handoff with exact record revision",
+        "change": {
+          "kind": "receipt_only",
+          "changes_head": false,
+          "changes_scope": false,
+          "material_finding": false,
+          "consumed_by_check": false
+        },
+        "finding": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        }
+      }
+    ],
+    "metrics": {
+      "explicit_start": {
+        "value": "2026-11-03T00:00:00Z",
+        "unknown_reason": null
+      },
+      "explicit_finish": {
+        "value": "2026-11-03T00:00:10Z",
+        "unknown_reason": null
+      },
+      "first_observation": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "last_observation": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "active_effort_seconds": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "baseline_elapsed_seconds": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "current_elapsed_seconds": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "baseline_attributed_cost": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "current_attributed_cost": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "attributable_benefit": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "incremental_cost": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "cost_provenance": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "unit": "artifact_review",
+      "comparable_reported": false
+    }
+  },
+  "expected_progress": [
+    "acknowledgment",
+    "substantive_answer",
+    "execution_milestone",
+    "accepted_completion"
+  ],
+  "retained_replay": {
+    "schema_version": 1,
+    "repository_id": "ModernNomad-98/Project-Aegis",
+    "native_record": {
+      "locator": "https://github.com/ModernNomad-98/Project-Aegis/issues/910#issuecomment-6614470166",
+      "revision": "body-sha256:0a4bd5a72669bd54a63180923826a61c7b2150719a29c83dab984ba998887227"
+    },
+    "candidate": {
+      "head": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "base": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "tree": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "plan_sha256": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      }
+    },
+    "collection": {
+      "kind": "manual",
+      "paused": true,
+      "manual_task_authorized_reported": true,
+      "inbox_total": {
+        "value": 670,
+        "unknown_reason": null
+      },
+      "positions": [
+        665,
+        666,
+        667,
+        668,
+        669,
+        670
+      ],
+      "complete": false
+    },
+    "items": [
+      {
+        "event_id": "6614470166:proof2-retained",
+        "task": "proof2-retained",
+        "description": "Reported operational proof complete; dedicated resources retained seven days",
+        "evidence_label": "Reported",
+        "progress": "accepted_completion",
+        "scope": "local report preparation",
+        "responsible_actor": "Existing Lead",
+        "source_locator": "https://github.com/ModernNomad-98/Project-Aegis/issues/910#issuecomment-6614470166",
+        "source_sha256": {
+          "value": "0a4bd5a72669bd54a63180923826a61c7b2150719a29c83dab984ba998887227",
+          "unknown_reason": null
+        },
+        "retrieved_at": "2026-11-03T20:24:31.073Z",
+        "first_observed_at": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "authority": {
+          "repository": "ModernNomad-98/Project-Aegis",
+          "scope": "local report preparation",
+          "original_verified_reported": false,
+          "lifecycle": "unknown",
+          "conditions_satisfied_reported": false,
+          "source_locator": {
+            "value": null,
+            "unknown_reason": "not supplied in sanitized capture"
+          }
+        },
+        "dependencies_and_holds": [
+          "Reported owner retention choice; source merge authority separate"
+        ],
+        "owner_notification_delivery_evidence": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "coordinator_answer": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        },
+        "execution_evidence": [
+          "https://github.com/ModernNomad-98/Project-Aegis/issues/910#issuecomment-6614470166"
+        ],
+        "accepted_completion_scope": {
+          "value": "Reported operational consumer proof only; no source C&C rollout acceptance",
+          "unknown_reason": null
+        },
+        "next_action": "Use existing retention/deletion reminder; no new run or cleanup",
+        "next_check_or_due_reason": "Material handoff with exact record revision",
+        "change": {
+          "kind": "receipt_only",
+          "changes_head": false,
+          "changes_scope": false,
+          "material_finding": false,
+          "consumed_by_check": false
+        },
+        "finding": {
+          "value": null,
+          "unknown_reason": "not supplied in sanitized capture"
+        }
+      }
+    ],
+    "metrics": {
+      "explicit_start": {
+        "value": null,
+        "unknown_reason": "No explicit retained-record review window supplied"
+      },
+      "explicit_finish": {
+        "value": null,
+        "unknown_reason": "No explicit retained-record review window supplied"
+      },
+      "first_observation": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "last_observation": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "active_effort_seconds": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "baseline_elapsed_seconds": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "current_elapsed_seconds": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "baseline_attributed_cost": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "current_attributed_cost": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "attributable_benefit": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "incremental_cost": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "cost_provenance": {
+        "value": null,
+        "unknown_reason": "not supplied in sanitized capture"
+      },
+      "unit": "artifact_review",
+      "comparable_reported": false
+    }
+  },
+  "replay_provenance": {
+    "source": "SANITIZED-REPLAY-SOURCES.json / cases[0] plus INBOX-BODY-HASHES.json entry6614470166",
+    "source_body_sha256": "0a4bd5a72669bd54a63180923826a61c7b2150719a29c83dab984ba998887227",
+    "limits": "Minimized supplied historical record. Zero-progress held source-995-record is retained only as pending provenance outside runnable input, never as an acknowledgment or answer. Runnable proof2 completion remains Reported operational consumer proof only, not source rollout acceptance. Synthetic four-progress input remains separate.",
+    "pending_facts_excluded_from_input": [
+      {
+        "id": "source-995-record",
+        "description": "Existing holder corrects final-review bound-fields publication",
+        "reportedState": "HELD_FOR_NATIVE_RECORDS",
+        "progress": {
+          "acknowledgment": false,
+          "substantive_answer": false,
+          "execution_milestone": false,
+          "accepted_completion": false
+        },
+        "next": "Existing holder supplies actual corrected publication and formal-stage disposition",
+        "hold": "Native exact-head and bound-field conditions"
+      }
+    ]
+  }
+}
