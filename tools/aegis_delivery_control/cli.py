@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Mapping, Sequence
 
 from . import ci_durations
+from . import cnc_reporting
 from . import fast_save
 from .authority import SyntheticAuthority
 from .contracts import DispatchDenied, StorageIntegrityError
@@ -136,8 +137,9 @@ def _fast_save_refusal(error: fast_save.FastSaveRefused) -> dict[str, object]:
     }
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
+def build_parser(*, report_mode: bool = False) -> argparse.ArgumentParser:
+    parser_type = cnc_reporting.ReportParser if report_mode else argparse.ArgumentParser
+    parser = parser_type(
         prog="python -m tools.aegis_delivery_control",
         description=(
             "Read-only for capabilities, status and verify; fast-save is the "
@@ -153,6 +155,13 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--expected-vector", required=True, type=Path)
     verify.add_argument("--authority-key-file", required=True, type=Path)
     ci_durations.build_parser(subparsers)
+    cnc_report = subparsers.add_parser(
+        "cnc-report", description=(
+            "Local JSON-only evidence report from an explicitly selected sanitized "
+            "input; non-authorizing and no database or external effects."
+        ),
+    )
+    cnc_report.add_argument("--input", required=True)
     fast_save_parser = subparsers.add_parser("fast-save")
     fast_save_parser.add_argument("--state", required=True, type=Path)
     fast_save_parser.add_argument("--checkpoint", required=True, type=Path)
@@ -224,7 +233,27 @@ def _status(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    arguments = build_parser().parse_args(argv)
+    selected_argv = list(sys.argv[1:] if argv is None else argv)
+    report_mode = "cnc-report" in selected_argv
+    try:
+        arguments = build_parser(report_mode=report_mode).parse_args(selected_argv)
+    except cnc_reporting.ReportError as error:
+        return cnc_reporting.emit_error(error)
+    if arguments.command == "cnc-report":
+        # Fixed source selection, BEFORE any state path/database access.
+        support = Path(__file__).parent / "cnc"
+        try:
+            report = cnc_reporting.report_from_paths(
+                arguments.repository_id, arguments.input,
+                support / "adapter-aegis.json", support / "cnc-evidence-contract-v2.json",
+            )
+            if arguments.repository_id != "ModernNomad-98/Project-Aegis":
+                raise cnc_reporting.ReportError("IDENTITY_MISMATCH")
+            return cnc_reporting.emit_report(report)
+        except cnc_reporting.ReportError as error:
+            return cnc_reporting.emit_error(error)
+        except Exception:
+            return cnc_reporting.emit_error(cnc_reporting.ReportError("REPORT_FAILED"))
     if arguments.command == "fast-save":
         # Taken BEFORE the state document is loaded, so idle_measurement really
         # covers the state load and validation that measured_what names.

@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "aegis",
+  "repository": "ModernNomad-98/Project-Aegis",
+  "contract_id": "cnc-evidence-contract-v2",
+  "native_record_locator": "caller-supplied input.native_record.locator; existing Lead record",
+  "native_policy_revision": "f69c6e9219335d1979b8ec9658cc86e0a7a5583a",
+  "native_references": [
+    "AGENTS.md",
+    "docs/delivery-workflow.md",
+    "tools/aegis_delivery_control/README.md#local-cc-reporting"
+  ],
+  "stage_labels": [
+    {
+      "id": "A",
+      "label": "plan"
+    },
+    {
+      "id": "B",
+      "label": "independent plan audit"
+    },
+    {
+      "id": "C",
+      "label": "implement"
+    },
+    {
+      "id": "D",
+      "label": "independent implementation audit"
+    },
+    {
+      "id": "E",
+      "label": "validate"
+    },
+    {
+      "id": "F",
+      "label": "independent final review"
+    },
+    {
+      "id": "G",
+      "label": "authorized merge"
+    }
+  ],
+  "authority_policy_locator": "docs/approvals/APPROVAL_REGISTER.md",
+  "head_policy_locator": "docs/delivery-workflow.md#exact-head-invalidation",
+  "receipt_policy_locator": "docs/delivery-workflow.md#the-bound-fields",
+  "finding_policy_locator": "docs/delivery-workflow.md#stage-dispositions",
+  "role_boundary": "Role A source only. Consumers retain their own workflow and grants.",
+  "activation": "candidate",
+  "adoption_receipt": {
+    "value": null,
+    "unknown_reason": "not supplied in sanitized capture"
+  }
+}
