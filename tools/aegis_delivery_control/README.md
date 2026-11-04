@@ -93,10 +93,12 @@ consumer keeps its own stage labels.
 The small pure helper adaptation records its original SHA256 in
 `cnc_reporting.py`; the unchanged common contract is pinned to SHA256
 `1b2469b3f663d9b04712c4dbbdb997fdfdc0c6a28727c5647c954854850a3268`.
-That hash covers the contract's exact bytes, so `.gitattributes` pins the file
-to LF and the reporter refuses any other bytes with `CONTRACT_INVALID`; the
-portable tests re-hash the shipped file, a byte copy of it and a
-line-ending-converted copy. The profile preserves the prior Aegis mapping's
+That hash covers the contract's exact bytes: the reporter refuses any other
+bytes with `CONTRACT_INVALID`, and the portable tests re-hash the shipped file,
+a byte copy of it and a line-ending-converted copy, so a CRLF checkout fails
+the suite. The repository-wide `* text=auto eol=lf` policy still normalises
+text checkouts to LF; no per-file `.gitattributes` entry is added for this
+file. The profile preserves the prior Aegis mapping's
 native references, A–G stage labels and role boundary, adding precise
 integration locators. Prior mapping did not establish adoption.
 

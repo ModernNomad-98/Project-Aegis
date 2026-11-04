@@ -391,6 +391,9 @@ class ReportingTests(unittest.TestCase):
             self.refused(json.dumps(self.data).encode(), "PROFILE_INVALID")
 
     def test_shipped_contract_bytes_stay_lf_and_match(self):
+        # This test is the line-ending enforcement for the shipped contract:
+        # every .gitattributes path is a gate-guard-protected surface, so the
+        # byte pin lives in the suite rather than in a per-file attribute.
         candidates = (MODULE.parent/"cnc"/"cnc-evidence-contract-v2.json",
                       MODULE.parent/"cnc-evidence-contract-v2.json")
         shipped = next((path for path in candidates if path.is_file()), None)
