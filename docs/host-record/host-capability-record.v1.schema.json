@@ -1,0 +1,223 @@
+{
+  "$id": "aegis.host-capability-record/1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Strict synthetic/offline host capability record contract. No aggregate verdict, no authority field, no secret values. Program-internal; not a host or consumer qualification.",
+  "properties": {
+    "capabilities": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "capability": {
+            "enum": [
+              "discovery",
+              "explicit-invocation",
+              "automatic-invocation-restriction",
+              "reference-loading",
+              "tool-permission",
+              "interruption-resume",
+              "evidence-collection"
+            ]
+          },
+          "disposition": {
+            "enum": [
+              "VERIFIED",
+              "UNSUPPORTED",
+              "UNKNOWN",
+              "NOT_RUN"
+            ]
+          },
+          "evidence_refs": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "reason": {
+            "minLength": 3,
+            "type": "string"
+          },
+          "remaining_action": {
+            "minLength": 3,
+            "type": "string"
+          }
+        },
+        "required": [
+          "capability",
+          "disposition",
+          "reason",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "maxItems": 50,
+      "minItems": 7,
+      "type": "array"
+    },
+    "config_digest": {
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "digest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "input_names": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "input_values": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "algorithm",
+        "input_names",
+        "input_values",
+        "digest"
+      ],
+      "type": "object"
+    },
+    "host": {
+      "additionalProperties": false,
+      "properties": {
+        "invocation_mode": {
+          "enum": [
+            "discovery",
+            "explicit-invocation",
+            "manual-invocation",
+            "automatic-invocation"
+          ]
+        },
+        "os_name": {
+          "minLength": 3,
+          "type": "string"
+        },
+        "os_version": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "product": {
+          "minLength": 3,
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "product",
+        "version",
+        "os_name",
+        "os_version",
+        "invocation_mode"
+      ],
+      "type": "object"
+    },
+    "limits": {
+      "items": {
+        "minLength": 3,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "non_claims": {
+      "items": {
+        "minLength": 3,
+        "type": "string"
+      },
+      "minItems": 3,
+      "type": "array"
+    },
+    "package_binding": {
+      "additionalProperties": false,
+      "properties": {
+        "package_manifest_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        "profile_id": {
+          "minLength": 3,
+          "type": "string"
+        }
+      },
+      "required": [
+        "package_manifest_sha256",
+        "profile_id"
+      ],
+      "type": "object"
+    },
+    "preparation_only": {
+      "const": true
+    },
+    "record_id": {
+      "pattern": "^HCR-[A-Z0-9-]{1,40}$",
+      "type": "string"
+    },
+    "schema": {
+      "const": "aegis.host-capability-record/1"
+    },
+    "source_evidence": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "note": {
+            "minLength": 3,
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "bytes",
+          "sha256",
+          "note"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "synthetic": {
+      "const": true
+    }
+  },
+  "required": [
+    "schema",
+    "record_id",
+    "synthetic",
+    "preparation_only",
+    "source_evidence",
+    "host",
+    "config_digest",
+    "package_binding",
+    "capabilities",
+    "limits",
+    "non_claims"
+  ],
+  "title": "Aegis host capability record v1",
+  "type": "object"
+}

@@ -1,0 +1,55 @@
+{
+  "entries": [
+    {
+      "bytes": 2107,
+      "expected_exit": 0,
+      "kind": "expectations",
+      "path": "docs/host-record/fixtures/expected-findings.v1.json",
+      "sha256": "411e12b6c1600f361e718927da8f709f1ff4e19a7a784d5de0e3736d65ff7852"
+    },
+    {
+      "bytes": 3150,
+      "expected_exit": 1,
+      "kind": "record",
+      "path": "docs/host-record/fixtures/invalid/host-record.aggregate-boolean.json",
+      "sha256": "cbf882691b9430c7273b0592c849ffc9acf2d58f6e08ee4c2d5e31bea2b31b92"
+    },
+    {
+      "bytes": 3100,
+      "expected_exit": 1,
+      "kind": "record",
+      "path": "docs/host-record/fixtures/invalid/host-record.missing-disposition.json",
+      "sha256": "f07a1c72e7c192cc696e504d07239b0892b9cbc1565af6c576fe3757d51ca7f3"
+    },
+    {
+      "bytes": 2988,
+      "expected_exit": 1,
+      "kind": "record",
+      "path": "docs/host-record/fixtures/invalid/host-record.unknown-field.json",
+      "sha256": "ff9ca9cb66bdefe0ad914f8817ead24d9e96ac8380cc8067c42c4c4048e38196"
+    },
+    {
+      "bytes": 3215,
+      "expected_exit": 1,
+      "kind": "record",
+      "path": "docs/host-record/fixtures/invalid/host-record.unsafe-secret-field.json",
+      "sha256": "137eba48a351467b4c72d246789c4c21a6fec176bc0b97f051210a3174187481"
+    },
+    {
+      "bytes": 3222,
+      "expected_exit": 0,
+      "kind": "record",
+      "path": "docs/host-record/fixtures/valid/host-record.synthetic-unknown-gap.json",
+      "sha256": "c32aea247b9b092d0cc96ba79879002681bacf0c5544e2319b5f520400a3ff83"
+    },
+    {
+      "bytes": 3134,
+      "expected_exit": 0,
+      "kind": "record",
+      "path": "docs/host-record/fixtures/valid/host-record.synthetic-windows-11-python-314.json",
+      "sha256": "2cd5f4f6c0bf8d44d0c9096464bfe5c605e0f3fe29c21d758ee0bc0b4672d0a7"
+    }
+  ],
+  "fixture_version": "v1",
+  "schema": "aegis.host-record-fixture-manifest/1"
+}
