@@ -64,6 +64,7 @@ status; the dated proposals and evidence pages further down are history.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
   the plan to explain each component in plain language, define project shorthand,
   and review all repository documentation for human and agent readers.
+- [Aegis Maturity Package program record](roadmaps/aegis-maturity-package.md): the program name and readable-item naming rule, the 11 readable items with plain-English descriptions, phases, authority/preservation boundaries and current status.
 
 **Run and read the current workflows.**
 
