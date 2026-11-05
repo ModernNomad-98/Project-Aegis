@@ -1,0 +1,6 @@
+{
+  "repository": "example/aegis-payload-fixture",
+  "commit": "0123456789abcdef0123456789abcdef01234567",
+  "tree": "89abcdef0123456789abcdef0123456789abcdef",
+  "note": "synthetic fixture source identity for unit tests; not a real repository state"
+}

@@ -1,0 +1,436 @@
+{
+  "$id": "aegis.conformance-catalog/1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Strict schema for docs/conformance/requirements.v1.json. The catalog separates requirement, enforcing mechanism, verification and evidence requirement; it stores no observations and grants no authority. Raw source bytes are pinned by sha256; no field may carry an observation, authority, approval or self-digest.",
+  "properties": {
+    "catalog_version": {
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "type": "string"
+    },
+    "profiles": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "maxLength": 1000,
+            "minLength": 10,
+            "type": "string"
+          },
+          "maintains_full_catalog": {
+            "const": true
+          },
+          "mandatory_requirement_ids": {
+            "items": {
+              "pattern": "^(?:SD-[A-G]|MG[1-5]|AEGIS-REQ-[A-Z0-9]{2,8}-[0-9]{2})$",
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "type": "array"
+          },
+          "owner": {
+            "additionalProperties": false,
+            "properties": {
+              "maintainer": {
+                "maxLength": 200,
+                "minLength": 3,
+                "type": "string"
+              },
+              "role": {
+                "maxLength": 120,
+                "minLength": 3,
+                "type": "string"
+              }
+            },
+            "required": [
+              "role",
+              "maintainer"
+            ],
+            "type": "object"
+          },
+          "profile_id": {
+            "pattern": "^[a-z0-9][a-z0-9-]{1,40}$",
+            "type": "string"
+          },
+          "readable_name": {
+            "maxLength": 120,
+            "minLength": 3,
+            "type": "string"
+          },
+          "scope_statement": {
+            "maxLength": 1000,
+            "minLength": 10,
+            "type": "string"
+          }
+        },
+        "required": [
+          "profile_id",
+          "readable_name",
+          "description",
+          "scope_statement",
+          "mandatory_requirement_ids",
+          "maintains_full_catalog",
+          "owner"
+        ],
+        "type": "object"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "type": "array"
+    },
+    "requirements": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "additionalProperties": false,
+            "properties": {
+              "inapplicability": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "justification": {
+                      "maxLength": 600,
+                      "minLength": 20,
+                      "type": "string"
+                    },
+                    "profile_id": {
+                      "pattern": "^[a-z0-9][a-z0-9-]{1,40}$",
+                      "type": "string"
+                    },
+                    "reason_code": {
+                      "enum": [
+                        "production-only",
+                        "outside-first-profile-scope",
+                        "not-yet-enforced",
+                        "host-specific"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "profile_id",
+                    "reason_code",
+                    "justification"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              "profiles": {
+                "items": {
+                  "pattern": "^[a-z0-9][a-z0-9-]{1,40}$",
+                  "type": "string"
+                },
+                "maxItems": 50,
+                "type": "array"
+              }
+            },
+            "required": [
+              "profiles",
+              "inapplicability"
+            ],
+            "type": "object"
+          },
+          "evidence_requirement": {
+            "additionalProperties": false,
+            "properties": {
+              "description": {
+                "maxLength": 600,
+                "minLength": 4,
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "console-log",
+                  "json-record",
+                  "review-verdict",
+                  "artifact-digest",
+                  "host-observation",
+                  "none"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "description"
+            ],
+            "type": "object"
+          },
+          "id_kind": {
+            "enum": [
+              "existing-authoritative",
+              "catalog-minted"
+            ]
+          },
+          "mechanism": {
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "enum": [
+                  "machine-check",
+                  "independent-review",
+                  "manual-attestation",
+                  "procedural-none"
+                ]
+              },
+              "limits": {
+                "maxLength": 1000,
+                "minLength": 20,
+                "type": "string"
+              },
+              "refs": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "path": {
+                      "maxLength": 400,
+                      "minLength": 1,
+                      "pattern": "^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$",
+                      "type": "string"
+                    },
+                    "symbol_or_line": {
+                      "maxLength": 300,
+                      "minLength": 1,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path"
+                  ],
+                  "type": "object"
+                },
+                "maxItems": 20,
+                "type": "array"
+              }
+            },
+            "required": [
+              "kind",
+              "refs",
+              "limits"
+            ],
+            "type": "object"
+          },
+          "negative_case_ids": {
+            "items": {
+              "pattern": "^AC-[0-9]{2}$",
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "notes": {
+            "maxLength": 1000,
+            "type": "string"
+          },
+          "owner": {
+            "additionalProperties": false,
+            "properties": {
+              "maintainer": {
+                "maxLength": 200,
+                "minLength": 3,
+                "type": "string"
+              },
+              "role": {
+                "maxLength": 120,
+                "minLength": 3,
+                "type": "string"
+              }
+            },
+            "required": [
+              "role",
+              "maintainer"
+            ],
+            "type": "object"
+          },
+          "readable_name": {
+            "maxLength": 160,
+            "minLength": 3,
+            "type": "string"
+          },
+          "related": {
+            "items": {
+              "pattern": "^(?:SD-[A-G]|MG[1-5]|AEGIS-REQ-[A-Z0-9]{2,8}-[0-9]{2})$",
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "requirement_id": {
+            "pattern": "^(?:SD-[A-G]|MG[1-5]|AEGIS-REQ-[A-Z0-9]{2,8}-[0-9]{2})$",
+            "type": "string"
+          },
+          "source_ref": {
+            "additionalProperties": false,
+            "properties": {
+              "anchor": {
+                "maxLength": 300,
+                "minLength": 1,
+                "type": "string"
+              },
+              "anchor_kind": {
+                "enum": [
+                  "heading",
+                  "line-span",
+                  "symbol"
+                ]
+              },
+              "path": {
+                "maxLength": 400,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$",
+                "type": "string"
+              },
+              "quoted_phrase": {
+                "maxLength": 200,
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "anchor_kind",
+              "anchor"
+            ],
+            "type": "object"
+          },
+          "superseded_by": {
+            "items": {
+              "pattern": "^(?:SD-[A-G]|MG[1-5]|AEGIS-REQ-[A-Z0-9]{2,8}-[0-9]{2})$",
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "supersedes": {
+            "items": {
+              "pattern": "^(?:SD-[A-G]|MG[1-5]|AEGIS-REQ-[A-Z0-9]{2,8}-[0-9]{2})$",
+              "type": "string"
+            },
+            "maxItems": 50,
+            "type": "array"
+          },
+          "verification": {
+            "additionalProperties": false,
+            "properties": {
+              "check": {
+                "maxLength": 600,
+                "minLength": 3,
+                "type": "string"
+              },
+              "expected_result": {
+                "maxLength": 600,
+                "minLength": 4,
+                "type": "string"
+              },
+              "limits": {
+                "maxLength": 600,
+                "minLength": 20,
+                "type": "string"
+              },
+              "method": {
+                "enum": [
+                  "deterministic-check",
+                  "independent-review",
+                  "execution-evidence",
+                  "manual-attestation",
+                  "none"
+                ]
+              }
+            },
+            "required": [
+              "method",
+              "check",
+              "expected_result"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "requirement_id",
+          "id_kind",
+          "readable_name",
+          "source_ref",
+          "applicability",
+          "mechanism",
+          "verification",
+          "evidence_requirement",
+          "owner"
+        ],
+        "type": "object"
+      },
+      "maxItems": 500,
+      "minItems": 23,
+      "type": "array"
+    },
+    "schema": {
+      "const": "aegis.conformance-catalog/1"
+    },
+    "source_baseline": {
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "maxLength": 200,
+          "minLength": 3,
+          "type": "string"
+        },
+        "revision": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        },
+        "tree": {
+          "pattern": "^[0-9a-f]{40}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository",
+        "revision",
+        "tree"
+      ],
+      "type": "object"
+    },
+    "sources": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "bytes": {
+            "maximum": 10485760,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "path": {
+            "maxLength": 400,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "bytes"
+        ],
+        "type": "object"
+      },
+      "maxItems": 500,
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema",
+    "catalog_version",
+    "source_baseline",
+    "profiles",
+    "sources",
+    "requirements"
+  ],
+  "title": "Aegis requirements-to-evidence conformance catalog v1 (strict, draft)",
+  "type": "object"
+}

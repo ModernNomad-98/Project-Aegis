@@ -1,0 +1,542 @@
+{
+  "environment": {
+    "host_os": "Windows 11",
+    "network_used_for_static": false,
+    "python_note": "measurement used the bundled standard-library Python available to this session; Stage A recorded Python 3.14.7. Both are CPython 3.x, and the ast/splitlines/getsize semantics used here are unchanged for the measured constructs; the difference is recorded, not hidden.",
+    "python_version": "3.12.14",
+    "third_party_packages": "none"
+  },
+  "errors": [],
+  "limitations": [
+    "size and span measurements are investigation signals, not proof of defect or benefit (blueprint section 14)",
+    "change concentration is a point-in-time remote observation recorded in Stage A, not re-read here",
+    "static import analysis cannot see dynamic imports or runtime callbacks",
+    "test-method counts are source constructs, not executed-test counts or coverage",
+    "the record contains public source metrics and repository-relative paths only; no personal data",
+    "the generator is described in README.md and not shipped, so the Stage C static digest (72544742...) is an untracked evidence detail, not independently re-derivable from the tracked record; the values are reproducible from the definitions (Stage D D-1)",
+    "fail-closed malformed-input behaviour is declared by contract; without a shipped generator it is not demonstrated by execution in this record (Stage D B-2)"
+  ],
+  "method": {
+    "ast": "ast.parse of the decoded text; functions = FunctionDef/AsyncFunctionDef; classes = ClassDef",
+    "bytes": "os.path.getsize of the file's raw on-disk bytes (line endings included)",
+    "determinism": "static section contains no timestamps or environment-dependent values; canonical JSON is sort_keys=True, indent=2, ASCII-escaped, one trailing LF, and is byte-identical between two runs on the same revision",
+    "import_edges": "ast.ImportFrom with level == 1, first dotted segment of node.module",
+    "lines": "physical lines via len(text.splitlines()) after utf-8 decode with errors=replace; line-ending agnostic",
+    "malformed_input_contract": {
+      "adversarial_cases": [
+        "non-UTF-8 bytes in a target file: recorded as an explicit error entry {path, reason}; never coerced to zero definitions",
+        "CRLF vs LF line endings: lines are physical splitlines() and are line-ending agnostic; raw bytes remain the authoritative identity",
+        "very long line: causes an explicit error entry (bounded-line rule); never truncation and never a silent zero count",
+        "path containing spaces: accepted as an opaque repository-relative POSIX path; path is emitted verbatim in the record",
+        "unreadable or missing path: explicit error entry; the module row is absent, never filled with zeros"
+      ],
+      "declaration": "Fail-closed measurement contract: a target file that is unreadable, not representable as UTF-8, unparseable by ast.parse, or whose physical line exceeds the documented bound is recorded as an explicit error entry {path, reason, stage} in the top-level errors array. The affected module row is ABSENT and the record status is INCOMPLETE_EVIDENCE; the measurement is never silently coerced to a zero-count or empty record, and no file is skipped silently.",
+      "decode_rule": "bytes are measured exactly from raw on-disk bytes; for line counting only, UTF-8 decode uses errors=\"replace\" as declared; if replacement characters occur the file gets an error entry rather than a silent line count",
+      "error_entry_shape": "{path: repository-relative POSIX path, reason: short deterministic token such as unreadable|not_utf8|ast_parse_failed|line_too_long, stage: bytes|lines|ast}",
+      "generator_note": "The generator is described in README.md, not shipped as a repository script. The error-entry behaviour is therefore declared by contract here and is NOT demonstrated by a shipped executable in this record; the later generator-producing slice must ship it and exercise the adversarial cases above (Stage D B-2 correction).",
+      "status_when_errors_present": "INCOMPLETE_EVIDENCE"
+    },
+    "package_totals": "walk tools/aegis_delivery_control recursively; test bytes = files under the tests/ subtree; source .py = .py files outside tests/",
+    "span": "inclusive end_lineno - lineno + 1",
+    "static_digest_note": "The Stage C evidence recorded a static payload digest (72544742...) from the then-unshipped generator. The digest and the 'byte-identical second run' claim are untracked evidence details and are NOT independently re-derivable from this tracked record; the measured VALUES are reproducible from the definitions above (Stage D D-1 disclosure).",
+    "test_methods": "FunctionDef/AsyncFunctionDef nodes whose name starts with 'test' (method count, not executed tests)"
+  },
+  "observed": {
+    "change_concentration": {
+      "limits": "a path-touch count is not defect history, review effort or per-function churn; re-read before reuse (source-currency rule)",
+      "observed_at": "2026-11-04T14:04:00-08:00",
+      "oldest_observed_directory_touch": "2026-09-18",
+      "paths": [
+        {
+          "commits_touching": 69,
+          "latest_observed_touch": "2026-10-12",
+          "path": "tools/aegis_delivery_control"
+        },
+        {
+          "commits_touching": 39,
+          "latest_observed_touch": "2026-09-29",
+          "path": "tools/aegis_delivery_control/storage.py"
+        },
+        {
+          "commits_touching": 41,
+          "latest_observed_touch": "2026-09-29",
+          "path": "tools/aegis_delivery_control/tests/test_storage.py"
+        },
+        {
+          "commits_touching": 25,
+          "latest_observed_touch": "2026-10-05",
+          "path": "tools/aegis_delivery_control/authority.py"
+        },
+        {
+          "commits_touching": 29,
+          "latest_observed_touch": "2026-10-05",
+          "path": "tools/aegis_delivery_control/contracts.py"
+        },
+        {
+          "commits_touching": 5,
+          "latest_observed_touch": "2026-09-30",
+          "path": "tools/aegis_delivery_control/engine.py"
+        },
+        {
+          "commits_touching": 1,
+          "latest_observed_touch": "2026-10-20",
+          "path": "tools/record_verifier"
+        },
+        {
+          "commits_touching": 6,
+          "latest_observed_touch": "2026-10-28",
+          "path": "tools/aegis_usage"
+        },
+        {
+          "commits_touching": 3,
+          "latest_observed_touch": "2026-10-19",
+          "path": "tools/plan_preservation"
+        },
+        {
+          "commits_touching": 69,
+          "latest_observed_touch": "2026-11-01",
+          "path": "tools/behavioral_eval_runner"
+        }
+      ],
+      "repository_total_commits": 2829,
+      "source": "github-rest-read-only"
+    },
+    "note": "Recorded-once observation copied from the accepted Stage A packet (SPECS-ANNEX section 2.4). NOT re-read by the Stage C implementation: re-reading needs read-only network access and is UNRUN here. Treat as a point-in-time observation, not as reproducible offline.",
+    "unrun": [
+      {
+        "item": "current package-suite wall time and pass/fail/skip totals",
+        "planned_command": "python -P -B -m unittest discover -s tools/aegis_delivery_control/tests -p \"test_*.py\" -v",
+        "resolution_route": "Stage E authorization, then run the planned command from the repository root and record wall time, pass/fail/skip, and exit code; no result is claimed before that run.",
+        "status": "UNRUN",
+        "why": "test execution requires Stage E authorization; no duration or result is claimed here"
+      },
+      {
+        "item": "defect history mapped to the measured files",
+        "locator": "Repository search this session found no defect register mapping tools/aegis_delivery_control files: git grep -n \"defect\" docs/ returned no mapping; local baseline has one synthetic commit (2e606c58...) so local history cannot establish it.",
+        "resolution_route": "Optional bounded investigation: map any future defect/incident register entry to these paths; not scheduled and not estimated. Until then this stays UNKNOWN, never zero.",
+        "status": "UNKNOWN",
+        "why": "the local materialized baseline has one synthetic commit and no defect register maps findings to these files; not estimated"
+      },
+      {
+        "equivalence_command": "Defined by the later extraction slice's accepted A-ROWS; not yet defined and not executable from this record.",
+        "item": "measurable benefit of any future extraction",
+        "resolution_route": "Later WP-07C extraction slice only: (a) capture pre-extraction behaviour with the planned_command; (b) run that slice's accepted equivalence harness over captured durable-state fixtures (command contract defined in that slice's accepted A-ROWS, not in this record); (c) record measured review/change-cost deltas. Size alone does not establish benefit and no extraction exists in this record.",
+        "status": "UNRUN",
+        "why": "requires the later WP-07C slice with equivalence evidence; size alone cannot establish benefit"
+      },
+      {
+        "item": "re-read of remote change-concentration counts",
+        "resolving_command": "gh api \"repos/ModernNomad-98/Project-Aegis/commits?path=<path>&per_page=1\" -i  (parse the Link: rel=\"last\" page number = commits touching the path); repeat for each of the 10 recorded paths; compare with the recorded values and update the observation timestamp. Read-only, requires authenticated GitHub access; not performed in this record.",
+        "resolving_paths": [
+          "tools/aegis_delivery_control",
+          "tools/aegis_delivery_control/storage.py",
+          "tools/aegis_delivery_control/tests/test_storage.py",
+          "tools/aegis_delivery_control/authority.py",
+          "tools/aegis_delivery_control/contracts.py",
+          "tools/aegis_delivery_control/engine.py",
+          "tools/record_verifier",
+          "tools/aegis_usage",
+          "tools/plan_preservation",
+          "tools/behavioral_eval_runner"
+        ],
+        "status": "UNRUN",
+        "why": "needs read-only network access; not performed by this Stage C implementation"
+      }
+    ],
+    "unrun_note": "Each UNRUN/UNKNOWN entry names its exact resolving command or procedure; the defect-history item remains UNKNOWN with its locator (Stage D B-1 correction)."
+  },
+  "schema": {
+    "id": "aegis.maintainability-baseline",
+    "note": "Draft data format for a Stage C evidence record. The canonical acceptance-row/A-ROWS schema is unresolved at Stage A; this file is self-describing and is not a canonical Aegis schema.",
+    "version": "0-draft"
+  },
+  "static": {
+    "import_edges": {
+      "definition": "intra-package absolute imports written as ImportFrom with level == 1, first dotted segment only",
+      "edges": {
+        "__init__.py": [
+          "contracts",
+          "dispatch"
+        ],
+        "__main__.py": [
+          "cli"
+        ],
+        "adapters.py": [
+          "authority",
+          "contracts",
+          "owned_paths",
+          "storage"
+        ],
+        "authority.py": [
+          "contracts",
+          "owned_paths"
+        ],
+        "capabilities.py": [
+          "adapters",
+          "authority",
+          "contracts"
+        ],
+        "cli.py": [
+          "authority",
+          "contracts",
+          "owned_paths",
+          "storage"
+        ],
+        "dispatch.py": [
+          "adapters",
+          "authority",
+          "capabilities",
+          "contracts",
+          "engine",
+          "storage"
+        ],
+        "engine.py": [
+          "contracts"
+        ],
+        "evidence.py": [
+          "contracts"
+        ],
+        "owned_paths.py": [
+          "contracts"
+        ],
+        "storage.py": [
+          "authority",
+          "contracts",
+          "engine",
+          "owned_paths"
+        ]
+      },
+      "graph_note": "static import graph only; no directed cycle observed among these edges; dynamic imports/runtime callbacks are not excluded"
+    },
+    "modules": [
+      {
+        "bytes": 2180782,
+        "classes": 3,
+        "functions": 229,
+        "lines": 44972,
+        "longest_class": {
+          "name": "SQLiteStateStore",
+          "span": 43753,
+          "start": 930
+        },
+        "longest_function": {
+          "name": "_verify_projections",
+          "span": 8719,
+          "start": 35902
+        },
+        "path": "tools/aegis_delivery_control/storage.py"
+      },
+      {
+        "bytes": 148406,
+        "classes": 35,
+        "functions": 107,
+        "lines": 3807,
+        "longest_class": {
+          "name": "SyntheticAuthority",
+          "span": 3185,
+          "start": 538
+        },
+        "longest_function": {
+          "name": "_initialize_validator_claim_store",
+          "span": 132,
+          "start": 595
+        },
+        "path": "tools/aegis_delivery_control/authority.py"
+      },
+      {
+        "bytes": 116673,
+        "classes": 92,
+        "functions": 61,
+        "lines": 3399,
+        "longest_class": {
+          "name": "PlanAcceptanceRequest",
+          "span": 248,
+          "start": 394
+        },
+        "longest_function": {
+          "name": "validate",
+          "span": 172,
+          "start": 470
+        },
+        "path": "tools/aegis_delivery_control/contracts.py"
+      },
+      {
+        "bytes": 10587,
+        "classes": 2,
+        "functions": 2,
+        "lines": 147,
+        "longest_class": {
+          "name": "TransitionEngine",
+          "span": 52,
+          "start": 96
+        },
+        "longest_function": {
+          "name": "authorize",
+          "span": 44,
+          "start": 104
+        },
+        "path": "tools/aegis_delivery_control/engine.py"
+      },
+      {
+        "bytes": 46166,
+        "classes": 6,
+        "functions": 31,
+        "lines": 1140,
+        "longest_class": {
+          "name": "SyntheticValidatorAdapter",
+          "span": 524,
+          "start": 617
+        },
+        "longest_function": {
+          "name": "_execute_committed",
+          "span": 125,
+          "start": 988
+        },
+        "path": "tools/aegis_delivery_control/adapters.py"
+      },
+      {
+        "bytes": 38376,
+        "classes": 6,
+        "functions": 59,
+        "lines": 1132,
+        "longest_class": {
+          "name": "SyntheticDispatchCoordinator",
+          "span": 741,
+          "start": 135
+        },
+        "longest_function": {
+          "name": "intake_effect_receipt",
+          "span": 112,
+          "start": 729
+        },
+        "path": "tools/aegis_delivery_control/dispatch.py"
+      },
+      {
+        "bytes": 59932,
+        "classes": 6,
+        "functions": 51,
+        "lines": 1291,
+        "longest_class": {
+          "name": "HttpTransport",
+          "span": 63,
+          "start": 889
+        },
+        "longest_function": {
+          "name": "derive_status",
+          "span": 80,
+          "start": 613
+        },
+        "path": "tools/aegis_delivery_control/ci_durations.py"
+      },
+      {
+        "bytes": 48733,
+        "classes": 4,
+        "functions": 23,
+        "lines": 1102,
+        "longest_class": {
+          "name": "SaveRequest",
+          "span": 23,
+          "start": 188
+        },
+        "longest_function": {
+          "name": "build_checkpoint",
+          "span": 169,
+          "start": 551
+        },
+        "path": "tools/aegis_delivery_control/fast_save.py"
+      },
+      {
+        "bytes": 41167,
+        "classes": 8,
+        "functions": 37,
+        "lines": 1055,
+        "longest_class": {
+          "name": "CheckedPathCapability",
+          "span": 296,
+          "start": 583
+        },
+        "longest_function": {
+          "name": "_prepare_parent",
+          "span": 130,
+          "start": 618
+        },
+        "path": "tools/aegis_delivery_control/owned_paths.py"
+      },
+      {
+        "bytes": 11531,
+        "classes": 1,
+        "functions": 10,
+        "lines": 324,
+        "longest_class": {
+          "name": "ExpectedFreshnessOracle",
+          "span": 25,
+          "start": 31
+        },
+        "longest_function": {
+          "name": "main",
+          "span": 99,
+          "start": 226
+        },
+        "path": "tools/aegis_delivery_control/cli.py"
+      },
+      {
+        "bytes": 8846,
+        "classes": 8,
+        "functions": 17,
+        "lines": 227,
+        "longest_class": {
+          "name": "SyntheticLiabilityBook",
+          "span": 53,
+          "start": 175
+        },
+        "longest_function": {
+          "name": "verify_freshness",
+          "span": 21,
+          "start": 120
+        },
+        "path": "tools/aegis_delivery_control/capabilities.py"
+      },
+      {
+        "bytes": 7249,
+        "classes": 0,
+        "functions": 5,
+        "lines": 185,
+        "longest_class": null,
+        "longest_function": {
+          "name": "verify_versioned_evidence_envelope",
+          "span": 52,
+          "start": 134
+        },
+        "path": "tools/aegis_delivery_control/evidence.py"
+      },
+      {
+        "bytes": 15639,
+        "classes": 2,
+        "functions": 15,
+        "lines": 439,
+        "longest_class": {
+          "name": "UsageError",
+          "span": 2,
+          "start": 101
+        },
+        "longest_function": {
+          "name": "main",
+          "span": 52,
+          "start": 384
+        },
+        "path": "tools/record_verifier/run.py"
+      },
+      {
+        "bytes": 53549,
+        "classes": 1,
+        "functions": 43,
+        "lines": 1238,
+        "longest_class": {
+          "name": "ContractError",
+          "span": 14,
+          "start": 168
+        },
+        "longest_function": {
+          "name": "validate_envelope",
+          "span": 141,
+          "start": 520
+        },
+        "path": "tools/aegis_usage/local_report.py"
+      },
+      {
+        "bytes": 43360,
+        "classes": 0,
+        "functions": 26,
+        "lines": 921,
+        "longest_class": null,
+        "longest_function": {
+          "name": "compute_report",
+          "span": 142,
+          "start": 553
+        },
+        "path": "tools/aegis_usage/aggregate.py"
+      }
+    ],
+    "package": {
+      "directory_bytes": 4653062,
+      "modules_measured": 15,
+      "note": "tools/aegis_delivery_control directory, recursive regular-file bytes only; test_files lists the 10 test modules that contain test methods - the tests/ directory also contains helper modules, so the directory .py count is higher (14). The README's 10/742 figure uses this array definition (Stage D D-4 note)",
+      "readme_bytes": 29893,
+      "source_py_bytes": 2718847,
+      "source_py_definition": "all .py regular files under the package excluding the tests/ subtree",
+      "test_bytes": 1904322,
+      "test_files": [
+        {
+          "bytes": 12276,
+          "lines": 245,
+          "path": "tools/aegis_delivery_control/tests/test_capabilities.py",
+          "test_methods": 10
+        },
+        {
+          "bytes": 79642,
+          "lines": 1672,
+          "path": "tools/aegis_delivery_control/tests/test_ci_durations.py",
+          "test_methods": 102
+        },
+        {
+          "bytes": 370240,
+          "lines": 8103,
+          "path": "tools/aegis_delivery_control/tests/test_dispatch.py",
+          "test_methods": 92
+        },
+        {
+          "bytes": 5948,
+          "lines": 146,
+          "path": "tools/aegis_delivery_control/tests/test_engine.py",
+          "test_methods": 8
+        },
+        {
+          "bytes": 54003,
+          "lines": 1090,
+          "path": "tools/aegis_delivery_control/tests/test_fast_save.py",
+          "test_methods": 20
+        },
+        {
+          "bytes": 41063,
+          "lines": 681,
+          "path": "tools/aegis_delivery_control/tests/test_guard_traceability.py",
+          "test_methods": 19
+        },
+        {
+          "bytes": 51876,
+          "lines": 1175,
+          "path": "tools/aegis_delivery_control/tests/test_platform.py",
+          "test_methods": 46
+        },
+        {
+          "bytes": 10100,
+          "lines": 267,
+          "path": "tools/aegis_delivery_control/tests/test_recovery.py",
+          "test_methods": 8
+        },
+        {
+          "bytes": 11647,
+          "lines": 233,
+          "path": "tools/aegis_delivery_control/tests/test_shared_authority_claims.py",
+          "test_methods": 12
+        },
+        {
+          "bytes": 1239560,
+          "lines": 27954,
+          "path": "tools/aegis_delivery_control/tests/test_storage.py",
+          "test_methods": 425
+        }
+      ],
+      "test_methods": 742,
+      "test_source_ratio": 0.7
+    }
+  },
+  "subject": {
+    "captured_on": "2026-11-04",
+    "captured_timezone": "America/Los_Angeles",
+    "local_base_identity": "materialized exact tree via synthetic commit 2e606c588f82211f591cf2daa1cb660dcb39852c",
+    "repository": "ModernNomad-98/Project-Aegis",
+    "revision": "f69c6e9219335d1979b8ec9658cc86e0a7a5583a",
+    "tree": "4e584f59287f8b8fc3d10d3567158f52bff99a18"
+  }
+}
