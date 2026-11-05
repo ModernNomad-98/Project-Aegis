@@ -19,6 +19,7 @@ unavailable.
 
 from __future__ import annotations
 
+import re
 from typing import Any, Mapping
 
 from .cost_meter import ceil_cents
@@ -30,17 +31,32 @@ def _non_negative_int(value: Any, label: str) -> int:
     return value
 
 
+_SAFE_SMOKE_RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+
+
 def normalize_smoke_run_id(value: Any) -> str:
-    """Smoke run ids may arrive as GitHub numeric ids or strings; normalize to
-    a non-empty string so the same run dedups across manifests/API shapes."""
+    """Normalize a smoke run id to the strict shared identity form.
+
+    Accepted forms are a positive integer/numeric string (canonicalized to its
+    decimal string, so 007 and 7 dedup) or a bounded safe token for preserved
+    historical identities (letters, digits, dot, underscore, dash, starting
+    alphanumeric). Negative numbers, signs, leading dashes and unsafe characters
+    are refused rather than silently accepted as opaque strings.
+    """
     if isinstance(value, bool) or not isinstance(value, (int, str)):
-        raise ValueError("smoke run id must be a non-empty string or integer")
+        raise ValueError("smoke run id must be a positive integer or safe token")
     text = str(value).strip()
     if not text:
         raise ValueError("smoke run id must be non-empty")
-    numeric = text[1:] if text.startswith("-") else text
-    if numeric.isdigit() and int(text) <= 0:
-        raise ValueError("numeric smoke run ids must be positive")
+    if text.isdigit():
+        number = int(text)
+        if number <= 0:
+            raise ValueError("numeric smoke run ids must be positive")
+        return str(number)
+    if not _SAFE_SMOKE_RUN_ID.match(text):
+        raise ValueError(
+            "smoke run id must be a positive integer or a bounded safe token"
+        )
     return text
 
 
@@ -101,6 +117,11 @@ def identity_key(identity: Mapping[str, Any]) -> str:
         str(identity["run_attempt"]),
         str(identity["phase"]),
     ])
+
+
+def smoke_identity_parts(raw_key: str) -> dict[str, Any]:
+    """Public parser for one stored smoke identity (four-field or legacy)."""
+    return dict(_legacy_identity(raw_key))
 
 
 def _legacy_identity(raw_key: str) -> dict[str, Any]:

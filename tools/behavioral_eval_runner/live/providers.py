@@ -49,12 +49,15 @@ class ModelPin:
 
 
 #: The two subject pins. These strings are the ONLY accepted identifiers; a
-#: served model string that differs halts the run. The price table is the
-#: documented standard list for the exact models (owner-approved 2026-10-31
-#: pricing repair): a conservative reservation basis, not an observed bill.
+#: served model string that differs halts the run. The price table is a
+#: conservative reservation basis, not an observed bill. It uses the MAXIMUM of
+#: the pre-repair conservative values and the documented standard list for each
+#: exact model (over-reserving is safe; under-reserving is not): anthropic
+#: max((300,1500),(200,1000)) = 300/1500; openai max((250,1000),(1000,5000)) =
+#: 1000/5000 cents per million tokens.
 SUBJECT_PINS: Mapping[str, ModelPin] = {
     "anthropic": ModelPin(
-        "anthropic", "claude-sonnet-5-5", "ANTHROPIC_API_KEY", 200, 1000
+        "anthropic", "claude-sonnet-5-5", "ANTHROPIC_API_KEY", 300, 1500
     ),
     "openai": ModelPin("openai", "gpt-6-astra", "OPENAI_API_KEY", 1000, 5000),
 }
@@ -66,7 +69,7 @@ JUDGE_PINS: Mapping[tuple[str, str], ModelPin] = {
         "openai", "gpt-6-astra", "OPENAI_API_KEY", 1000, 5000
     ),
     ("openai", "gpt-6-astra"): ModelPin(
-        "anthropic", "claude-sonnet-5-5", "ANTHROPIC_API_KEY", 200, 1000
+        "anthropic", "claude-sonnet-5-5", "ANTHROPIC_API_KEY", 300, 1500
     ),
 }
 

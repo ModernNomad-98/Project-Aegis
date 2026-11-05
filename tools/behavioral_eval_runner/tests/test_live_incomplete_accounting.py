@@ -409,7 +409,7 @@ class PerCallOutputBoundTests(unittest.TestCase):
         meter = CostMeter(1000, max_calls=10, max_output_tokens=4096)
         wide = meter.reserve(call_ref="wide", pin=pin, system_bytes=1000, user_bytes=1000)
         self.assertEqual(wide.reserved_output_tokens, 4096)
-        self.assertEqual(wide.reserved_cents, 5)
+        self.assertEqual(wide.reserved_cents, 7)
         # The meter holds one reservation at a time (concurrency cap 1): reconcile
         # the first before opening the second.
         meter.reconcile(wide, input_tokens=500, output_tokens=100, served_model=pin.model)
@@ -642,6 +642,6 @@ class DriftBranchTests(unittest.TestCase):
         entry = ledger["calls"][0]
         self.assertFalse(entry["reconciled"])
         self.assertEqual(entry["reason_code"], "BUDGET_CAP")
-        # 10,000,000 input tokens * 200 cents/Mtok = 2,000 cents (literal).
-        self.assertEqual(entry["actual_cents"], 2000)
-        self.assertEqual(entry["cost_cents"], max(2000, entry["reserved_cents"]))
+        # 10,000,000 input tokens * 300 cents/Mtok = 3,000 cents (literal).
+        self.assertEqual(entry["actual_cents"], 3000)
+        self.assertEqual(entry["cost_cents"], max(3000, entry["reserved_cents"]))

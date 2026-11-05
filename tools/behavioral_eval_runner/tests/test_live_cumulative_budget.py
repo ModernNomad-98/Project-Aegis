@@ -197,9 +197,9 @@ class SafeReservationBasisTests(unittest.TestCase):
             judge_output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
         )
         self.assertEqual(DEFAULT_MAX_INPUT_BYTES, 200_000)
-        self.assertEqual(bounds["subject_max_cents"], 57)
+        self.assertEqual(bounds["subject_max_cents"], 85)
         self.assertEqual(bounds["judge_max_cents"], 282)
-        self.assertEqual(bounds["attempt_max_cents"], 339)
+        self.assertEqual(bounds["attempt_max_cents"], 367)
         # A 4-bytes-per-output-token judge-input term would be 65,536 bytes;
         # the safe enforced limit is 200,000 bytes, so the safe reserve is larger.
         self.assertGreater(69_586, 65_536)
@@ -214,9 +214,9 @@ class SafeReservationBasisTests(unittest.TestCase):
             judge_input_cents_per_mtok=JUDGE_PIN.input_cents_per_mtok,
             judge_output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
         )
-        self.assertEqual(smoke["subject_max_cents"], 21)
+        self.assertEqual(smoke["subject_max_cents"], 32)
         self.assertEqual(smoke["judge_max_cents"], 282)
-        self.assertEqual(smoke["smoke_max_cents"], 303)
+        self.assertEqual(smoke["smoke_max_cents"], 314)
         self.assertGreater(smoke["smoke_max_cents"], SMOKE_CEILING_CENTS)
         self.assertEqual(SMOKE_CEILING_CENTS, 200)
 
@@ -231,8 +231,8 @@ class SafeReservationBasisTests(unittest.TestCase):
         )
         trial_safe = 40 * bounds["attempt_max_cents"]
         full_safe = 120 * bounds["attempt_max_cents"]
-        self.assertEqual(trial_safe, 13_560)
-        self.assertEqual(full_safe, 40_680)
+        self.assertEqual(trial_safe, 14_680)
+        self.assertEqual(full_safe, 44_040)
         self.assertGreater(trial_safe, CEILING)
         self.assertGreater(full_safe, CEILING)
         self.assertGreater(trial_safe + 222, CEILING)
@@ -248,7 +248,7 @@ class SafeReservationBasisTests(unittest.TestCase):
             system_bytes=SMOKE_SUBJECT_REQUEST_BYTES,
             user_bytes=0,
         )
-        self.assertEqual(subject.reserved_cents, 21)
+        self.assertEqual(subject.reserved_cents, 32)
         meter.reconcile(subject, input_tokens=1, output_tokens=1, served_model=SUBJECT_PIN.model)
         with self.assertRaises(CostCeilingHaltError):
             meter.reserve(
@@ -505,10 +505,49 @@ class ActualByteBasisTests(unittest.TestCase):
         )
         self.assertEqual(smoke[0], SMOKE_SUBJECT_REQUEST_BYTES)
         self.assertEqual(smoke[1], 4_050)
-        self.assertEqual(bound["subject_cents"], 21)
+        self.assertEqual(bound["subject_cents"], 32)
         self.assertEqual(bound["judge_cents"], 172)
-        self.assertEqual(bound["smoke_cents"], 193)
-        self.assertLessEqual(bound["smoke_cents"], SMOKE_CEILING_CENTS)
+        self.assertEqual(bound["smoke_cents"], 204)
+        # With the max-rate conservative basis the worst-case (200,000-byte
+        # judge request) planning bound exceeds $2; the actual request path is
+        # narrower (subject 32 + judge ~86 = ~118c), so this is a conservative
+        # planning bound, not the payable smoke cost.
+        self.assertGreater(bound["smoke_cents"], SMOKE_CEILING_CENTS)
+
+    def test_no_safe_smoke_completion_under_the_200c_cap(self) -> None:
+        # A refusing meter proves the $2 spend STOP, not that the two-call smoke
+        # can COMPLETE. The minimum worst-case-safe reservation under the
+        # enforced judge-request limit is 204c > 200c, so no safe plan can be
+        # proven to complete at the current cap/limits.
+        smoke = self.rows[0]
+        bound = actual_byte_smoke_bounds(
+            subject_request_bytes=smoke[0],
+            max_judge_request_bytes=MAX_JUDGE_REQUEST_BYTES,
+            max_output_tokens=OUTPUT_TOKENS,
+            subject_input_cents_per_mtok=SUBJECT_PIN.input_cents_per_mtok,
+            subject_output_cents_per_mtok=SUBJECT_PIN.output_cents_per_mtok,
+            judge_input_cents_per_mtok=JUDGE_PIN.input_cents_per_mtok,
+            judge_output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
+        )
+        self.assertEqual(bound["subject_cents"], 32)
+        self.assertEqual(bound["judge_cents"], 172)
+        self.assertEqual(bound["smoke_cents"], 204)
+        self.assertGreater(bound["smoke_cents"], SMOKE_CEILING_CENTS)
+        # To fit 200c the judge input budget is 200 - 32 - ceil(output) = 86c,
+        # i.e. at most 86,080 input bytes; the enforced cap is 90,000 bytes.
+        self.assertEqual(MAX_JUDGE_REQUEST_BYTES, 90_000)
+        self.assertGreater(MAX_JUDGE_REQUEST_BYTES, 86_080)
+        # An actual short judge request can fit (~118c total), but that is an
+        # observed-path convenience, not a worst-case-safe completion proof.
+        actual_judge = actual_byte_reservation_cents(
+            input_bytes=4_050,
+            input_cents_per_mtok=JUDGE_PIN.input_cents_per_mtok,
+            output_tokens=OUTPUT_TOKENS,
+            output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
+        )
+        self.assertEqual(actual_judge, 86)
+        self.assertEqual(bound["subject_cents"] + actual_judge, 118)
+        self.assertLessEqual(bound["subject_cents"] + actual_judge, SMOKE_CEILING_CENTS)
 
     def test_actual_byte_trial_bound_fits_shared_ceiling_with_prior(self) -> None:
         subject_max = max(row[0] for row in self.rows)
@@ -525,15 +564,15 @@ class ActualByteBasisTests(unittest.TestCase):
             output_tokens=OUTPUT_TOKENS,
             output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
         )
-        self.assertEqual(subject_cents, 24)
+        self.assertEqual(subject_cents, 36)
         self.assertEqual(judge_scaffold_max, 5_304)
         self.assertEqual(judge_cents, 172)
         trial = 40 * (subject_cents + judge_cents)
-        self.assertEqual(trial, 7_840)
-        self.assertEqual(PRIOR_SPENT_CENTS + trial, 8_062)
+        self.assertEqual(trial, 8_320)
+        self.assertEqual(PRIOR_SPENT_CENTS + trial, 8_542)
         self.assertLessEqual(PRIOR_SPENT_CENTS + trial, CEILING)
         full = 120 * (subject_cents + judge_cents)
-        self.assertEqual(full, 23_520)
+        self.assertEqual(full, 24_960)
         self.assertGreater(PRIOR_SPENT_CENTS + full, CEILING)
 
     def test_json_escaping_newline_emoji_c0_cjk(self) -> None:
