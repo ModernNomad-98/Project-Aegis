@@ -51,3 +51,30 @@ is unchanged and is not part of the compatibility registry.
 
 These fixtures must not be cited as evidence of anything beyond the recorded
 historical artifacts listed above.
+
+## Expiry-only recorded-hash registry
+
+`eval-smoke.yml` publishes `ber-live-smoke-proof` with `retention-days: 14`, so
+GitHub is expected to delete the two artifacts above on/about **2026-11-14**
+(exact time unknown; no deletion or retention change was performed by this
+repository). After deletion the two runs become artifactless history and the
+collector's artifact-proof path can no longer read them.
+
+`SMOKE_RUNS_WITH_EXPIRED_PROOF` in
+tools/behavioral_eval_runner/live/workflow_runtime.py therefore records exactly
+these two run ids with the recorded conclusion, full head SHA, run attempt,
+2,253-byte proof length and whole-file SHA-256 above. Only when the proof artifact
+is **absent** does the collector book the recorded 6c each (the same amount the
+artifact path booked before expiry), keeping the unchanged preserved floors
+(smoke 18c, ledger 222c) and the same records the artifact-present path produced.
+It is not a wildcard and does not bypass present-artifact validation: an
+unregistered artifactless run stays UNKNOWN, a registered run with mismatched
+recorded metadata refuses, and a present-but-tampered artifact still refuses
+through the existing provenance/tamper checks.
+
+This is a bounded, documented exception to live artifact verification: it
+accepts recorded-hash history without the artifact, which is weaker than
+verifying the artifact, and it requires explicit change-owner risk acceptance
+and independent review. The recorded identities are pinned to these fixture
+bytes; a changed fixture or a wrong/cross-bound recorded hash fails
+`SmokeProofExpiryRegistryTests`.
