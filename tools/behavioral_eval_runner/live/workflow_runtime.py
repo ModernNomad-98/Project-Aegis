@@ -55,6 +55,67 @@ STATE_ARTIFACT_NAMES = (STATE_ARTIFACT_NAME, JOB1_STATE_ARTIFACT_NAME)
 PRESERVED_HISTORICAL_LEDGER_CENTS = 222
 PRESERVED_HISTORICAL_SMOKE_CENTS = 18
 
+#: Version-aware smoke-proof config pin registry: accepted historical smoke
+#: config TEMPLATE identities (the exact sha256 the producer records as the
+#: proof's config_template_sha256 field) mapped to the max_output_tokens they
+#: pinned. A proof whose recorded identity is absent is refused (fail closed), so
+#: a future committed-config change must update this registry in the same
+#: reviewed change; the drift-guard test pins the current entry.
+#:
+#: Current committed template
+#: (tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json):
+#: 332 B / c484d8d9... -> 16,384.
+#:
+#: Legacy 2026-10-31 template identity recorded by both retained historical
+#: proofs (eval-smoke runs 41213566873 / 41179846875, artifacts 13046737982 /
+#: 13034581056, 2,253 B each) -> 4,096. The legacy identity is a TEXTUAL
+#: two-value substitution of the exact current committed template bytes
+#: (max_output_tokens 16384 -> 4096 and spend_ceiling_cents 200 -> 50), yielding
+#: 330 B / a90ae2ce...; it is not a JSON re-serialization (a sorted-key
+#: re-serialization is also 330 B but hashes to a227082d..., which is not an
+#: accepted identity), and no regenerated template file is claimed.
+SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
+    "c484d8d9eff3f53cfdeaf05f86701351c498bb3a0dae442d5ddae66f7b76877e": 16_384,
+    "a90ae2ce140e8dfb4beb60a4caef4782e4fbf07702dc60ab73fa4527d3c4e1d0": 4_096,
+}
+
+#: Explicit, fail-closed registry of identified historical ended eval-smoke runs
+#: that have NO proof artifact. Only the exact run ids below are eligible, and
+#: only when the proof artifact is absent and the run entry's recorded conclusion
+#: and head (or retained head prefix) match. An unregistered artifactless run
+#: stays UNKNOWN-not-zero; a present artifact always goes through the
+#: download/validation path first (the registry never bypasses proof validation).
+#:
+#: 41167546138: the 2026-10-30 pre-artifact judge-output-contract failure run
+#:   (zero artifacts). Its spend is the committed preserved-floor residual:
+#:   PRESERVED_HISTORICAL_SMOKE_CENTS (18) minus the two retained 6c proofs
+#:   leaves 6c; booking it keeps the identified history exactly at the unchanged
+#:   preserved floor (derived, not a measured bill). The full head SHA was never
+#:   retained locally; only the identification-record prefix is registered.
+#: 42134872074: the 2026-11-06 admission-refused dispatch (failed before any
+#:   credential mapping or provider call; documented $0; zero artifacts).
+SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
+    "41167546138": {
+        "spent_cents": 6,
+        "expected_conclusion": "failure",
+        "head_sha_prefix": "88fdec73",
+        "basis": (
+            "preserved-floor residual: 18c floor - 6c - 6c; 2026-10-30 "
+            "judge-output-contract failure; zero artifacts (identification record; "
+            "docs/behavioral-eval-runner-schema-compatibility.md:43)"
+        ),
+    },
+    "42134872074": {
+        "spent_cents": 0,
+        "expected_conclusion": "failure",
+        "head_sha": "2cad63e57d3d215f62a9d5f22b1f2b23cbaf8abf",
+        "basis": (
+            "admission-refused before credential mapping/provider call; documented "
+            "$0 spend; zero artifacts (SMOKE-RUN-RESULT-2026-11-06 + dispatch receipt)"
+        ),
+    },
+}
+
 
 def _completed(gh: Callable[..., Any], args: list[str], label: str) -> Any:
     completed = gh(args)
@@ -210,7 +271,7 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
         raise ValueError("smoke proof head does not match the workflow run head")
     _require_hex(payload, "dataset_sha256", HEX64, "smoke proof")
     _require_hex(payload, "built_config_sha256", HEX64, "smoke proof")
-    _require_hex(payload, "config_template_sha256", HEX64, "smoke proof")
+    config_identity = _require_hex(payload, "config_template_sha256", HEX64, "smoke proof")
     _require_text(payload, "gate_id", "smoke proof")
     if _require_text(payload, "subject_vendor", "smoke proof") != pins["subject_vendor"]:
         raise ValueError("smoke proof subject vendor is not pinned")
@@ -218,8 +279,13 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
         raise ValueError("smoke proof judge vendor is not pinned")
     if _require_text(payload, "judge_model", "smoke proof") != pins["judge_model"]:
         raise ValueError("smoke proof judge model is not pinned")
-    if payload.get("max_output_tokens") != 16_384:
-        raise ValueError("smoke proof max_output_tokens is not the pinned 16384")
+    expected_cap = SMOKE_PROOF_CONFIG_PINS.get(config_identity)
+    if expected_cap is None:
+        raise ValueError("smoke proof config identity is not a recognized smoke config pin")
+    if payload.get("max_output_tokens") != expected_cap:
+        raise ValueError(
+            "smoke proof max_output_tokens is not the pinned value for its config identity"
+        )
     if payload.get("planned_calls") != 2 or payload.get("dispatched_calls") != 2:
         raise ValueError("smoke proof call shape is not exactly two calls")
     supplied = _require_hex(payload, "proof_sha256", HEX64, "smoke proof")
@@ -272,12 +338,51 @@ def _fail_unknown(label: str) -> None:
     raise ValueError(label + ": UNKNOWN, not zero")
 
 
+def _registered_legacy_run_spend(run: Mapping[str, Any]) -> int | None:
+    """Registered spend for an identified artifactless ended run, else None.
+
+    Only the exact run ids committed in SMOKE_RUNS_WITHOUT_PROOF are eligible,
+    and only when the run entry's recorded conclusion and head (or retained head
+    prefix) match the committed record; a mismatch fails closed rather than
+    booking the residual. Callers reach this only when the proof artifact is
+    absent: a present artifact is always handled by download/validation first.
+    """
+    run_id = str(run.get("id"))
+    registered = SMOKE_RUNS_WITHOUT_PROOF.get(run_id)
+    if registered is None:
+        return None
+    label = "registered legacy smoke run " + run_id
+    if run.get("conclusion") != registered.get("expected_conclusion"):
+        raise ValueError(label + " does not match its recorded conclusion")
+    head = _require_hex(run, "head_sha", HEX40, "run entry")
+    expected_head = registered.get("head_sha")
+    if expected_head is not None:
+        if head != expected_head:
+            raise ValueError(label + " does not match its recorded head")
+    else:
+        expected_prefix = registered.get("head_sha_prefix")
+        if (
+            not isinstance(expected_prefix, str)
+            or not expected_prefix
+            or not head.startswith(expected_prefix)
+        ):
+            raise ValueError(label + " does not match its recorded head prefix")
+    return strict_cents(registered.get("spent_cents"), "registered legacy smoke spend")
+
+
 def collect_smoke_proof_spends(
     *, gh: Callable[..., Any], repository: str, work_dir: Path,
     current_run_id: Any = None, smoke_workflow_file: str = "eval-smoke.yml",
 ) -> dict[str, int]:
-    """Collect every successful smoke proof. A successful run without a readable
-    proof is UNKNOWN and refuses; it is never counted as zero."""
+    """Collect every successful smoke proof and the identified legacy runs.
+
+    A successful run without a readable proof is UNKNOWN and refuses; it is never
+    counted as zero. The single documented exception is an ended run whose proof
+    artifact is absent AND whose exact run id is committed in
+    SMOKE_RUNS_WITHOUT_PROOF together with matching recorded run metadata; only
+    that run's recorded spend is booked. A present-but-unreadable, malformed or
+    tampered artifact never enters the registry path and remains a hard refusal.
+    """
     records: dict[str, int] = {}
     for run in list_workflow_runs(gh, repository, smoke_workflow_file):
         if not isinstance(run, Mapping):
@@ -293,7 +398,16 @@ def collect_smoke_proof_spends(
         artifacts = list_run_artifacts(gh, repository, run_id)
         names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
         if SMOKE_ARTIFACT_NAME not in names:
-            _fail_unknown("ended smoke run " + str(run_id) + " has no proof artifact")
+            registered_spent = _registered_legacy_run_spend(run)
+            if registered_spent is None:
+                _fail_unknown("ended smoke run " + str(run_id) + " has no proof artifact")
+            attempt = run.get("run_attempt", 1)
+            records = merge_smoke_gate_spend(
+                records,
+                {"smoke_run_id": normalize_smoke_run_id(run_id),
+                 "smoke_run_attempt": attempt, "spent_cents": registered_spent},
+            )
+            continue
         payload = download_artifact_json(
             gh, repository, run_id, SMOKE_ARTIFACT_NAME,
             SMOKE_ARTIFACT_MEMBER, work_dir,

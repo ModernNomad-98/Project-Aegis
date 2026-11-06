@@ -7,6 +7,7 @@ budget-proof coverage; no assertions weakened.
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import tempfile
 import unittest
@@ -32,6 +33,10 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 from tools.behavioral_eval_runner.live.workflow_runtime import (
     ALLOWANCE_HISTORY_SCHEMA,
+    PRESERVED_HISTORICAL_LEDGER_CENTS,
+    PRESERVED_HISTORICAL_SMOKE_CENTS,
+    SMOKE_PROOF_CONFIG_PINS,
+    SMOKE_RUNS_WITHOUT_PROOF,
     collect_allowance_history,
     collect_latest_allowance_state,
     collect_latest_trial_spend,
@@ -78,7 +83,7 @@ class FakeGH:
                     payload.setdefault("head_sha", HEAD_SHA)
                     payload.setdefault("dataset_sha256", "b" * 64)
                     payload.setdefault("built_config_sha256", "c" * 64)
-                    payload.setdefault("config_template_sha256", "d" * 64)
+                    payload.setdefault("config_template_sha256", CURRENT_SMOKE_CONFIG_SHA256)
                     payload.setdefault("gate_id", "gate-1")
                     payload.setdefault("subject_vendor", "anthropic")
                     payload.setdefault("judge_vendor", "openai")
@@ -108,6 +113,30 @@ class FakeGH:
 
 HEAD_SHA = "a" * 40
 
+#: Config-template identity recorded by the producer for the current committed
+#: smoke config (tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json).
+CURRENT_SMOKE_CONFIG_SHA256 = "c484d8d9eff3f53cfdeaf05f86701351c498bb3a0dae442d5ddae66f7b76877e"
+
+#: Config-template identity recorded in the two identified 2026-10-31 historical
+#: proofs (legacy cap 4,096; see tests/fixtures/live/smoke-proof/README.md).
+LEGACY_SMOKE_CONFIG_SHA256 = "a90ae2ce140e8dfb4beb60a4caef4782e4fbf07702dc60ab73fa4527d3c4e1d0"
+
+#: Verbatim historical proof fixtures (eval-smoke runs 41213566873 / 41179846875).
+SMOKE_PROOF_FIXTURE_DIR = (
+    REPO_ROOT / "tools/behavioral_eval_runner/tests/fixtures/live/smoke-proof"
+)
+LEGACY_PROOF_HEADS = {
+    "41213566873": "1bfdf4a96966a97059270e383b6d0b90e1d88fa0",
+    "41179846875": "cef6e91cbae4af1114f182dce0f0d98ebc146b65",
+}
+#: Identified artifactless historical run (2026-10-30 judge-output-contract
+#: failure; zero artifacts); only the retained head prefix is registered.
+FAILED_NO_PROOF_RUN_ID = "41167546138"
+FAILED_NO_PROOF_HEAD = "88fdec73" + "0" * 32
+#: Incident admission-refused run (zero spend; no artifacts).
+INCIDENT_RUN_ID = "42134872074"
+INCIDENT_RUN_HEAD = "2cad63e57d3d215f62a9d5f22b1f2b23cbaf8abf"
+
 
 def run(run_id, attempt=1, conclusion="success"):
     return {"id": run_id, "run_attempt": attempt, "status": "completed", "conclusion": conclusion, "head_sha": HEAD_SHA}
@@ -119,6 +148,40 @@ def page(items, total=None):
 
 def artifact(name):
     return {"name": name}
+
+
+def smoke_proof(**overrides):
+    """A complete current-config-shaped smoke proof payload with a valid self-hash.
+
+    Used by the compatibility tests for synthetic current / mismatched-identity
+    proofs; the historical proofs are loaded verbatim from the committed fixtures.
+    """
+    payload = {
+        "schema": "ber-live-smoke-proof/1.0.0",
+        "status": "PASS",
+        "workflow": "eval-smoke",
+        "citability": "REAL_HOST",
+        "head_sha": HEAD_SHA,
+        "dataset_sha256": "b" * 64,
+        "built_config_sha256": "c" * 64,
+        "config_template_sha256": CURRENT_SMOKE_CONFIG_SHA256,
+        "gate_id": "gate-1",
+        "subject_vendor": "anthropic",
+        "judge_vendor": "openai",
+        "judge_model": "gpt-6-astra",
+        "max_output_tokens": 16384,
+        "planned_calls": 2,
+        "dispatched_calls": 2,
+        "spent_cents": 150,
+    }
+    payload.update(overrides)
+    import hashlib
+    if "proof_sha256" not in overrides:
+        payload["proof_sha256"] = hashlib.sha256(json.dumps(
+            {k: v for k, v in payload.items() if k != "proof_sha256"},
+            sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8")).hexdigest()
+    return payload
 
 
 class AllowanceHistoryTests(unittest.TestCase):
@@ -382,6 +445,11 @@ class AllowanceHistoryTests(unittest.TestCase):
             collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
 
     def _proof_with(self, **overrides):
+        # F-B1: both identity sites use the real current committed config
+        # identity, and the self-hash is computed over the payload as the fake
+        # download writes it (the test-only __no_defaults__ marker is excluded).
+        # This keeps every existing negative test failing for the check it names
+        # rather than for an incidental hash mismatch.
         payload = {
             "__no_defaults__": True,
             "schema": "ber-live-smoke-proof/1.0.0",
@@ -391,7 +459,7 @@ class AllowanceHistoryTests(unittest.TestCase):
             "head_sha": HEAD_SHA,
             "dataset_sha256": "b" * 64,
             "built_config_sha256": "c" * 64,
-            "config_template_sha256": "d" * 64,
+            "config_template_sha256": CURRENT_SMOKE_CONFIG_SHA256,
             "gate_id": "gate-1",
             "subject_vendor": "anthropic",
             "judge_vendor": "openai",
@@ -403,10 +471,11 @@ class AllowanceHistoryTests(unittest.TestCase):
         }
         payload.update(overrides)
         import hashlib
-        payload["proof_sha256"] = hashlib.sha256(json.dumps(
-            {k: v for k, v in payload.items() if k != "proof_sha256"},
-            sort_keys=True, separators=(",", ":"),
-        ).encode("utf-8")).hexdigest()
+        body = {k: v for k, v in payload.items() if k not in ("proof_sha256", "__no_defaults__")}
+        if "proof_sha256" not in overrides:
+            payload["proof_sha256"] = hashlib.sha256(json.dumps(
+                body, sort_keys=True, separators=(",", ":"),
+            ).encode("utf-8")).hexdigest()
         return payload
 
     def _history_with_proof(self, payload):
@@ -448,6 +517,336 @@ class AllowanceHistoryTests(unittest.TestCase):
                     collect_smoke_proof_spends(
                         gh=self._history_with_proof(payload), repository="o/r", work_dir=self.tmp
                     )
+
+class SmokeProofCompatibilityTests(unittest.TestCase):
+    """Legacy smoke-proof compatibility, artifactless-run registry and preserved floor.
+
+    Covers plan AC-01..AC-04, AC-10..AC-12 and NC-01..NC-14 for the shared
+    allowance-history collector. Every test is offline: gh is FakeGH and the
+    historical proofs are the committed verbatim fixture copies.
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def _legacy_proof(self, run_id):
+        path = SMOKE_PROOF_FIXTURE_DIR / ("smoke-proof-run-" + str(run_id) + ".json")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def _run_with_head(self, run_id, head_sha, conclusion="success"):
+        entry = run(run_id, conclusion=conclusion)
+        entry["head_sha"] = head_sha
+        return entry
+
+    def _legacy_history_parts(self):
+        runs = [
+            self._run_with_head(41213566873, LEGACY_PROOF_HEADS["41213566873"]),
+            self._run_with_head(41179846875, LEGACY_PROOF_HEADS["41179846875"]),
+        ]
+        artifacts = {
+            "41213566873": [artifact("ber-live-smoke-proof")],
+            "41179846875": [artifact("ber-live-smoke-proof")],
+        }
+        payloads = {
+            ("41213566873", "ber-live-smoke-proof"): (
+                "smoke-proof.json", self._legacy_proof("41213566873"),
+            ),
+            ("41179846875", "ber-live-smoke-proof"): (
+                "smoke-proof.json", self._legacy_proof("41179846875"),
+            ),
+        }
+        return runs, artifacts, payloads
+
+    def _history(self, runs, artifacts, payloads, current_run_id="9999999999"):
+        fake = FakeGH({"smoke": [page(runs)], "trial": [page([])]}, artifacts, payloads)
+        return collect_allowance_history(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+            current_run_id=current_run_id,
+        )
+
+    def _identified_history(self, current_run_id):
+        runs, artifacts, payloads = self._legacy_history_parts()
+        runs.append(self._run_with_head(
+            FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, conclusion="failure",
+        ))
+        runs.append(self._run_with_head(
+            INCIDENT_RUN_ID, INCIDENT_RUN_HEAD, conclusion="failure",
+        ))
+        artifacts[FAILED_NO_PROOF_RUN_ID] = []
+        artifacts[INCIDENT_RUN_ID] = []
+        return self._history(runs, artifacts, payloads, current_run_id=current_run_id)
+
+    def _admission(self, smoke_records, reservation_cents=200):
+        return admit_paid_call(
+            ceiling_cents=12_000,
+            prior_ledger_spend_cents=222,
+            prior_smoke_spend_records=smoke_records,
+            reservation_cents=reservation_cents,
+        )
+
+    def _proof_fake(self, payload):
+        return FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([])]},
+            {"42": [artifact("ber-live-smoke-proof")]},
+            {("42", "ber-live-smoke-proof"): ("smoke-proof.json", payload)},
+        )
+
+    def test_legacy_smoke_proofs_are_accepted_by_recorded_config_identity(self):
+        # AC-04: both identified legacy proofs are accepted through the recorded
+        # config-identity registry and their recorded 6c each is counted. This uses
+        # the per-run collector directly; the preserved-floor reconciliation is
+        # covered by the full identified-history replay test below.
+        runs, artifacts, payloads = self._legacy_history_parts()
+        records = collect_smoke_proof_spends(
+            gh=FakeGH({"smoke": [page(runs)], "trial": [page([])]}, artifacts, payloads),
+            repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(len(records), 2)
+        self.assertEqual(smoke_spend_total(records), 12)
+
+    def test_current_smoke_proof_still_accepted(self):
+        records = collect_smoke_proof_spends(
+            gh=self._proof_fake(smoke_proof()), repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(smoke_spend_total(records), 150)
+
+    def test_identified_history_replays_to_preserved_totals_and_admission(self):
+        # F-B2 incident-current view: the incident run is the in-flight run and is
+        # excluded, so the preserved total comes from 3 records (two proofs + the
+        # registered 6c artifactless run).
+        history = self._identified_history(INCIDENT_RUN_ID)
+        self.assertEqual(history["schema"], ALLOWANCE_HISTORY_SCHEMA)
+        self.assertEqual(history["ledger_spend_cents"], 222)
+        self.assertEqual(len(history["smoke_spend"]), 3)
+        self.assertEqual(smoke_spend_total(history["smoke_spend"]), 18)
+        admission = self._admission(history["smoke_spend"])
+        self.assertTrue(admission["admitted"])
+        self.assertEqual(admission["snapshot"]["combined_exposure_cents"], 440)
+        self.assertEqual(admission["snapshot"]["remaining_cents"], 11_560)
+        denied = self._admission(history["smoke_spend"], reservation_cents=11_761)
+        self.assertFalse(denied["admitted"])
+
+    def test_future_dispatch_view_counts_registered_zero_cent_run(self):
+        # F-B2 future-dispatch view: when a later run is current, the incident
+        # run is ended history and its registered 0c record is counted; totals and
+        # admission stay invariant (4 records, smoke 18c, ledger 222c).
+        history = self._identified_history("11111111111")
+        self.assertEqual(history["ledger_spend_cents"], 222)
+        self.assertEqual(len(history["smoke_spend"]), 4)
+        self.assertEqual(smoke_spend_total(history["smoke_spend"]), 18)
+        admission = self._admission(history["smoke_spend"])
+        self.assertTrue(admission["admitted"])
+        self.assertEqual(admission["snapshot"]["combined_exposure_cents"], 440)
+        self.assertEqual(admission["snapshot"]["remaining_cents"], 11_560)
+
+    def test_registered_artifactless_run_is_booked_and_unknown_run_still_refuses(self):
+        failed = self._run_with_head(
+            FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, conclusion="failure",
+        )
+        fake = FakeGH(
+            {"smoke": [page([failed])], "trial": [page([])]},
+            {FAILED_NO_PROOF_RUN_ID: []}, {},
+        )
+        records = collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(smoke_spend_total(records), 6)
+
+        incident = self._run_with_head(
+            INCIDENT_RUN_ID, INCIDENT_RUN_HEAD, conclusion="failure",
+        )
+        zero = FakeGH(
+            {"smoke": [page([incident])], "trial": [page([])]},
+            {INCIDENT_RUN_ID: []}, {},
+        )
+        zero_records = collect_smoke_proof_spends(
+            gh=zero, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(len(zero_records), 1)
+        self.assertEqual(smoke_spend_total(zero_records), 0)
+
+        unknown = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": []}, {},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=unknown, repository="o/r", work_dir=self.tmp)
+        self.assertIn("UNKNOWN", str(caught.exception))
+
+    def test_registered_artifactless_run_metadata_mismatch_refuses(self):
+        cases = [
+            self._run_with_head(FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, conclusion="success"),
+            self._run_with_head(FAILED_NO_PROOF_RUN_ID, "a" * 40, conclusion="failure"),
+            self._run_with_head(INCIDENT_RUN_ID, "b" * 40, conclusion="failure"),
+        ]
+        for entry in cases:
+            fake = FakeGH(
+                {"smoke": [page([entry])], "trial": [page([])]},
+                {str(entry["id"]): []}, {},
+            )
+            with self.subTest(run_id=entry["id"]):
+                with self.assertRaises(ValueError):
+                    collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+
+    def test_registered_run_with_present_corrupt_artifact_refuses_without_booking(self):
+        # F-B3/NC-12: artifact PRESENCE is checked before the registry, so a
+        # present-but-corrupt proof for a registered run id hard-refuses and the
+        # registered residual is never booked.
+        failed = self._run_with_head(
+            FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, conclusion="failure",
+        )
+        fake = FakeGH(
+            {"smoke": [page([failed])], "trial": [page([])]},
+            {FAILED_NO_PROOF_RUN_ID: [artifact("ber-live-smoke-proof")]},
+            {(FAILED_NO_PROOF_RUN_ID, "ber-live-smoke-proof"): (
+                "smoke-proof.json", {"not": "a smoke proof"},
+            )},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("unsupported smoke proof schema", str(caught.exception))
+
+    def test_unknown_and_mismatched_smoke_config_identity_refuses(self):
+        cases = [
+            (smoke_proof(config_template_sha256="e" * 64), "config identity"),
+            (
+                smoke_proof(
+                    config_template_sha256=CURRENT_SMOKE_CONFIG_SHA256,
+                    max_output_tokens=4_096,
+                ),
+                "pinned value",
+            ),
+            (
+                smoke_proof(
+                    config_template_sha256=LEGACY_SMOKE_CONFIG_SHA256,
+                    max_output_tokens=16_384,
+                ),
+                "pinned value",
+            ),
+        ]
+        for payload, expected in cases:
+            with self.subTest(
+                config=payload["config_template_sha256"][:8],
+                cap=payload["max_output_tokens"],
+            ):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=self._proof_fake(payload), repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn(expected, str(caught.exception))
+
+    def test_legacy_proof_tamper_still_refused(self):
+        payload = self._legacy_proof("41213566873")
+        payload["spent_cents"] = payload["spent_cents"] + 1
+        fake = FakeGH(
+            {"smoke": [page([self._run_with_head(
+                41213566873, LEGACY_PROOF_HEADS["41213566873"],
+            )])], "trial": [page([])]},
+            {"41213566873": [artifact("ber-live-smoke-proof")]},
+            {("41213566873", "ber-live-smoke-proof"): (
+                "smoke-proof.json", payload,
+            )},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("hash does not verify", str(caught.exception))
+
+    def test_current_provenance_refusals_fire_for_their_named_reason(self):
+        # F-B1: with the real current config identity in place, each existing
+        # provenance refusal must still fire for the check it names.
+        cases = [
+            ({"head_sha": "f" * 40}, "head does not match"),
+            ({"workflow": "other-workflow"}, "workflow is not eval-smoke"),
+            ({"citability": "SYNTHETIC"}, "citability is not REAL_HOST"),
+            ({"status": "UNKNOWN"}, "status is missing or untrusted"),
+            ({"judge_model": ""}, "judge_model"),
+            ({"judge_model": "evil-model"}, "judge model is not pinned"),
+            ({"subject_vendor": "evil"}, "subject vendor is not pinned"),
+            ({"judge_vendor": "evil"}, "judge vendor is not pinned"),
+            ({"proof_sha256": "0" * 64}, "hash does not verify"),
+        ]
+        for overrides, expected in cases:
+            payload = smoke_proof(**overrides)
+            with self.subTest(expected=expected):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=self._proof_fake(payload), repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn(expected, str(caught.exception))
+
+    def test_compatibility_registries_are_exact_match_constants(self):
+        # AC-05: the two registries are exact-match committed constants; repeated
+        # collection must not mutate them, and there is no runtime/env override.
+        self.assertEqual(
+            dict(SMOKE_PROOF_CONFIG_PINS),
+            {
+                CURRENT_SMOKE_CONFIG_SHA256: 16_384,
+                LEGACY_SMOKE_CONFIG_SHA256: 4_096,
+            },
+        )
+        self.assertEqual(
+            set(SMOKE_RUNS_WITHOUT_PROOF), {FAILED_NO_PROOF_RUN_ID, INCIDENT_RUN_ID},
+        )
+        failed = SMOKE_RUNS_WITHOUT_PROOF[FAILED_NO_PROOF_RUN_ID]
+        self.assertEqual(failed["spent_cents"], 6)
+        self.assertEqual(failed["expected_conclusion"], "failure")
+        self.assertEqual(failed["head_sha_prefix"], "88fdec73")
+        incident = SMOKE_RUNS_WITHOUT_PROOF[INCIDENT_RUN_ID]
+        self.assertEqual(incident["spent_cents"], 0)
+        self.assertEqual(incident["expected_conclusion"], "failure")
+        self.assertEqual(incident["head_sha"], INCIDENT_RUN_HEAD)
+        # AC-12/R3: the preserved floors are unchanged and not lowered.
+        self.assertEqual(PRESERVED_HISTORICAL_SMOKE_CENTS, 18)
+        self.assertEqual(PRESERVED_HISTORICAL_LEDGER_CENTS, 222)
+        before = (
+            dict(SMOKE_PROOF_CONFIG_PINS),
+            {key: dict(value) for key, value in SMOKE_RUNS_WITHOUT_PROOF.items()},
+        )
+        self._identified_history(INCIDENT_RUN_ID)
+        after = (
+            dict(SMOKE_PROOF_CONFIG_PINS),
+            {key: dict(value) for key, value in SMOKE_RUNS_WITHOUT_PROOF.items()},
+        )
+        self.assertEqual(before, after)
+
+    def test_current_config_identity_matches_committed_template(self):
+        # AC-07 drift guard: the registry current identity is the sha256 of the
+        # committed smoke template and the mapped cap is its actual value; the
+        # retained legacy proofs record exactly the registered legacy identity and
+        # the unchanged committed gate identity; fixture bytes are pinned.
+        config_bytes = (
+            REPO_ROOT / "tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json"
+        ).read_bytes()
+        self.assertEqual(
+            hashlib.sha256(config_bytes).hexdigest(), CURRENT_SMOKE_CONFIG_SHA256,
+        )
+        config = json.loads(config_bytes)
+        self.assertEqual(
+            config["max_output_tokens"],
+            SMOKE_PROOF_CONFIG_PINS[CURRENT_SMOKE_CONFIG_SHA256],
+        )
+        gate_sha = hashlib.sha256((
+            REPO_ROOT / "tools/behavioral_eval_runner/live/gates/pilot-a-apr161.json"
+        ).read_bytes()).hexdigest()
+        fixture_hashes = {
+            "41213566873": "d1b18fe21bf8d56920b0551f9179c48a7b964f3572120b5dcee350e8935f8ade",
+            "41179846875": "a202b4ac43a6ac20b4da518a1c0006ef5657efd6e6258a3a7809e223cac416f4",
+        }
+        for run_id, expected_hash in fixture_hashes.items():
+            path = SMOKE_PROOF_FIXTURE_DIR / ("smoke-proof-run-" + run_id + ".json")
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), expected_hash)
+            proof = self._legacy_proof(run_id)
+            self.assertEqual(proof["config_template_sha256"], LEGACY_SMOKE_CONFIG_SHA256)
+            self.assertEqual(
+                SMOKE_PROOF_CONFIG_PINS[proof["config_template_sha256"]], 4_096,
+            )
+            self.assertEqual(proof["max_output_tokens"], 4_096)
+            self.assertEqual(proof["gate_template_sha256"], gate_sha)
+
 
 class WorkflowWiringTests(unittest.TestCase):
     def test_eval_smoke_admission_precedes_config_and_keys(self):
