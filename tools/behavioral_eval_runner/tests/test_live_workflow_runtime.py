@@ -37,6 +37,7 @@ from tools.behavioral_eval_runner.live.workflow_runtime import (
     PRESERVED_HISTORICAL_SMOKE_CENTS,
     SMOKE_PROOF_CONFIG_PINS,
     SMOKE_RUNS_WITHOUT_PROOF,
+    SMOKE_RUNS_WITH_EXPIRED_PROOF,
     collect_allowance_history,
     collect_latest_allowance_state,
     collect_latest_trial_spend,
@@ -847,6 +848,474 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
             self.assertEqual(proof["max_output_tokens"], 4_096)
             self.assertEqual(proof["gate_template_sha256"], gate_sha)
 
+
+class _ArtifactListingFailureGH(FakeGH):
+    """Fake gh whose per-run artifact listing command fails (unreadable)."""
+
+    def __init__(self, runs):
+        super().__init__({"smoke": [page(runs)], "trial": [page([])]}, {}, {})
+
+    def __call__(self, args):
+        if "/artifacts" in " ".join(args):
+            return SimpleNamespace(returncode=1, stdout="", stderr="boom")
+        return super().__call__(args)
+
+
+class _IncompleteArtifactListingGH(FakeGH):
+    """Fake gh whose artifact listing under-reports its immutable total."""
+
+    def __init__(self, runs):
+        super().__init__({"smoke": [page(runs)], "trial": [page([])]}, {}, {})
+
+    def __call__(self, args):
+        if "/artifacts" in " ".join(args):
+            return SimpleNamespace(
+                returncode=0,
+                stdout=json.dumps([{"total_count": 2, "artifacts": []}]),
+                stderr="",
+            )
+        return super().__call__(args)
+
+
+class SmokeProofExpiryRegistryTests(unittest.TestCase):
+    """Expiry-only recorded-hash classification for the two 2026-10-31 proofs.
+
+    Adversarial matrix for the bounded exception that keeps shared-allowance
+    history identical after GitHub retention deletes artifacts 13046737982 /
+    13034581056 (eval-smoke.yml retention-days: 14; expected on/about
+    2026-11-14). The exception is exact-match only: two committed run ids,
+    recorded conclusion + full head SHA + run attempt, and the verbatim captured
+    proof identities (2,253 B / a202b4ac... and 2,253 B / d1b18fe2...) committed
+    as fixtures. Every test is offline: gh is FakeGH and no artifact is deleted.
+
+    Positive: both runs booked at their recorded 6c when the artifact is absent,
+    and history math/records equal the artifact-present behavior (incident view
+    3 records / future view 4 records / smoke 18c / ledger 222c).
+
+    Negative: unregistered artifactless runs stay UNKNOWN-not-zero; a registered
+    run with mismatched conclusion/head/attempt (or no head) refuses; a present
+    but malformed/tampered artifact refuses through the existing checks and never
+    falls back to the registry; a readable artifact is validated before the
+    registry and books the artifact's own spend; unreadable/incomplete artifact
+    listings refuse; a wrong or cross-bound recorded hash fails the drift guard;
+    below-floor history still refuses.
+    """
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    # -- helpers ---------------------------------------------------------
+
+    def _legacy_proof(self, run_id):
+        path = SMOKE_PROOF_FIXTURE_DIR / ("smoke-proof-run-" + str(run_id) + ".json")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def _run_entry(self, run_id, head_sha, conclusion="success", attempt=1):
+        entry = run(run_id, attempt=attempt, conclusion=conclusion)
+        entry["head_sha"] = head_sha
+        return entry
+
+    def _expiry_runs(self):
+        return [
+            self._run_entry(41213566873, LEGACY_PROOF_HEADS["41213566873"]),
+            self._run_entry(41179846875, LEGACY_PROOF_HEADS["41179846875"]),
+        ]
+
+    def _expired_history_parts(self):
+        # Expiry scenario: GitHub retention deleted BOTH proof artifacts, so the
+        # artifact listing is empty and no downloadable proof payload exists.
+        artifacts = {"41213566873": [], "41179846875": []}
+        return self._expiry_runs(), artifacts, {}
+
+    def _present_history_parts(self):
+        return (
+            self._expiry_runs(),
+            {
+                "41213566873": [artifact("ber-live-smoke-proof")],
+                "41179846875": [artifact("ber-live-smoke-proof")],
+            },
+            {
+                ("41213566873", "ber-live-smoke-proof"): (
+                    "smoke-proof.json", self._legacy_proof("41213566873"),
+                ),
+                ("41179846875", "ber-live-smoke-proof"): (
+                    "smoke-proof.json", self._legacy_proof("41179846875"),
+                ),
+            },
+        )
+
+    def _identified_parts(self, expired):
+        if expired:
+            runs, artifacts, payloads = self._expired_history_parts()
+        else:
+            runs, artifacts, payloads = self._present_history_parts()
+        runs.append(self._run_entry(
+            FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, conclusion="failure",
+        ))
+        runs.append(self._run_entry(
+            INCIDENT_RUN_ID, INCIDENT_RUN_HEAD, conclusion="failure",
+        ))
+        artifacts[FAILED_NO_PROOF_RUN_ID] = []
+        artifacts[INCIDENT_RUN_ID] = []
+        return runs, artifacts, payloads
+
+    def _history(self, runs, artifacts, payloads, current_run_id="9999999999"):
+        fake = FakeGH({"smoke": [page(runs)], "trial": [page([])]}, artifacts, payloads)
+        return collect_allowance_history(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+            current_run_id=current_run_id,
+        )
+
+    def _identified_history(self, current_run_id, expired):
+        return self._history(
+            *self._identified_parts(expired), current_run_id=current_run_id,
+        )
+
+    def _smoke_records(self, runs, artifacts, payloads):
+        fake = FakeGH({"smoke": [page(runs)], "trial": [page([])]}, artifacts, payloads)
+        return collect_smoke_proof_spends(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+
+    def _admit(self, history, reservation_cents=200):
+        return admit_paid_call(
+            ceiling_cents=12_000,
+            prior_ledger_spend_cents=history["ledger_spend_cents"],
+            prior_smoke_spend_records=history["smoke_spend"],
+            reservation_cents=reservation_cents,
+        )
+
+    # -- positive --------------------------------------------------------
+
+    def test_both_expired_proofs_book_recorded_spend_exactly_as_artifact_path(self):
+        expired_runs, expired_artifacts, no_payloads = self._expired_history_parts()
+        expired_records = self._smoke_records(
+            expired_runs, expired_artifacts, no_payloads,
+        )
+        self.assertEqual(len(expired_records), 2)
+        self.assertEqual(smoke_spend_total(expired_records), 12)
+        for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items():
+            matching = [
+                key for key in expired_records
+                if "|" + run_id + "|" in key
+            ]
+            self.assertEqual(len(matching), 1)
+            self.assertEqual(expired_records[matching[0]], registered["spent_cents"])
+            self.assertIn("|" + str(registered["run_attempt"]) + "|", matching[0])
+        present_records = self._smoke_records(*self._present_history_parts())
+        self.assertEqual(expired_records, present_records)
+
+    def test_expired_history_equals_artifact_present_history(self):
+        for current_run_id in (INCIDENT_RUN_ID, "11111111111"):
+            with self.subTest(current_run_id=current_run_id):
+                expired = self._identified_history(current_run_id, expired=True)
+                present = self._identified_history(current_run_id, expired=False)
+                self.assertEqual(expired["schema"], present["schema"])
+                self.assertEqual(expired["smoke_spend"], present["smoke_spend"])
+                self.assertEqual(expired["smoke_spend_cents"], present["smoke_spend_cents"])
+                self.assertEqual(expired["ledger_spend_cents"], present["ledger_spend_cents"])
+                self.assertEqual(
+                    expired["preserved_historical_ledger_cents"],
+                    present["preserved_historical_ledger_cents"],
+                )
+                self.assertEqual(
+                    expired["preserved_historical_smoke_cents"],
+                    present["preserved_historical_smoke_cents"],
+                )
+                self.assertEqual(expired["source_schema"], present["source_schema"])
+                self.assertEqual(self._admit(expired), self._admit(present))
+
+    def test_expired_incident_and_future_views_keep_preserved_totals(self):
+        incident = self._identified_history(INCIDENT_RUN_ID, expired=True)
+        self.assertEqual(incident["ledger_spend_cents"], 222)
+        self.assertEqual(len(incident["smoke_spend"]), 3)
+        self.assertEqual(incident["smoke_spend_cents"], 18)
+        incident_admission = self._admit(incident)
+        self.assertTrue(incident_admission["admitted"])
+        self.assertEqual(incident_admission["snapshot"]["combined_exposure_cents"], 440)
+        self.assertEqual(incident_admission["snapshot"]["remaining_cents"], 11_560)
+        denied = self._admit(incident, reservation_cents=11_761)
+        self.assertFalse(denied["admitted"])
+
+        future = self._identified_history("11111111111", expired=True)
+        self.assertEqual(future["ledger_spend_cents"], 222)
+        self.assertEqual(len(future["smoke_spend"]), 4)
+        self.assertEqual(future["smoke_spend_cents"], 18)
+        future_admission = self._admit(future)
+        self.assertTrue(future_admission["admitted"])
+        self.assertEqual(future_admission["snapshot"]["combined_exposure_cents"], 440)
+        self.assertEqual(future_admission["snapshot"]["remaining_cents"], 11_560)
+
+    def test_present_valid_artifact_is_validated_before_the_expiry_registry(self):
+        # A readable artifact always wins: the registry must not substitute its
+        # recorded 6c for the artifact's own recorded spend.
+        run_id = "41213566873"
+        fake = FakeGH(
+            {"smoke": [page([self._run_entry(run_id, HEAD_SHA)])], "trial": [page([])]},
+            {run_id: [artifact("ber-live-smoke-proof")]},
+            {(run_id, "ber-live-smoke-proof"): ("smoke-proof.json", smoke_proof())},
+        )
+        records = collect_smoke_proof_spends(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(smoke_spend_total(records), 150)
+        self.assertNotEqual(smoke_spend_total(records), 6)
+
+    # -- negative matrix -------------------------------------------------
+
+    def test_unregistered_artifactless_run_stays_unknown_not_zero(self):
+        # No wildcard/catch-all and no substring/superstring matching: only the
+        # two exact committed run ids are eligible.
+        for run_id in (42, "4121356687", 412135668730, 141213566873):
+            fake = FakeGH(
+                {"smoke": [page([run(run_id, conclusion="failure")])], "trial": [page([])]},
+                {str(run_id): []}, {},
+            )
+            with self.subTest(run_id=run_id):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=fake, repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn("UNKNOWN", str(caught.exception))
+        # A non-proof artifact does not count as the proof artifact either.
+        fake = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": [artifact("ber-shared-allowance-state")]}, {},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("UNKNOWN", str(caught.exception))
+
+    def test_registered_expired_run_metadata_mismatch_refuses(self):
+        for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items():
+            cases = [
+                (
+                    self._run_entry(run_id, registered["head_sha"], conclusion="failure"),
+                    "recorded conclusion",
+                ),
+                (
+                    self._run_entry(run_id, "a" * 40),
+                    "recorded head",
+                ),
+                (
+                    self._run_entry(run_id, registered["head_sha"], attempt=2),
+                    "recorded run attempt",
+                ),
+                (
+                    {
+                        key: value for key, value in
+                        self._run_entry(run_id, registered["head_sha"]).items()
+                        if key != "head_sha"
+                    },
+                    "run entry",
+                ),
+            ]
+            for entry, expected in cases:
+                fake = FakeGH(
+                    {"smoke": [page([entry])], "trial": [page([])]},
+                    {str(entry["id"]): []}, {},
+                )
+                with self.subTest(run_id=run_id, expected=expected):
+                    with self.assertRaises(ValueError) as caught:
+                        collect_smoke_proof_spends(
+                            gh=fake, repository="o/r", work_dir=self.tmp,
+                        )
+                    self.assertIn(expected, str(caught.exception))
+
+    def test_present_but_tampered_artifact_refuses_without_registry_fallback(self):
+        for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items():
+            run_entry = self._run_entry(run_id, registered["head_sha"])
+            corrupt = FakeGH(
+                {"smoke": [page([run_entry])], "trial": [page([])]},
+                {run_id: [artifact("ber-live-smoke-proof")]},
+                {(run_id, "ber-live-smoke-proof"): (
+                    "smoke-proof.json", {"not": "a smoke proof"},
+                )},
+            )
+            with self.subTest(run_id=run_id, mode="corrupt"):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=corrupt, repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn("unsupported smoke proof schema", str(caught.exception))
+
+            tampered = self._legacy_proof(run_id)
+            tampered["spent_cents"] = tampered["spent_cents"] + 1
+            tampered_fake = FakeGH(
+                {"smoke": [page([run_entry])], "trial": [page([])]},
+                {run_id: [artifact("ber-live-smoke-proof")]},
+                {(run_id, "ber-live-smoke-proof"): ("smoke-proof.json", tampered)},
+            )
+            with self.subTest(run_id=run_id, mode="tampered"):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=tampered_fake, repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn("hash does not verify", str(caught.exception))
+
+    def test_unreadable_or_incomplete_artifact_listing_refuses(self):
+        # A GitHub read failure or a lossy listing must refuse; the registry can
+        # never be used as a fallback for an unreadable artifact inventory.
+        run_entry = self._run_entry("41213566873", LEGACY_PROOF_HEADS["41213566873"])
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(
+                gh=_ArtifactListingFailureGH([run_entry]),
+                repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("artifact listing failed", str(caught.exception))
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(
+                gh=_IncompleteArtifactListingGH([run_entry]),
+                repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("artifact listing is incomplete", str(caught.exception))
+
+    def test_single_expired_proof_below_preserved_floor_fails_closed(self):
+        # Only one of the two expired proofs is in history: the unchanged
+        # preserved-floor invariant still refuses rather than booking a short
+        # (or fabricated) history. Artifact-present behavior is identical.
+        run_entry = self._run_entry("41213566873", LEGACY_PROOF_HEADS["41213566873"])
+        expired_fake = FakeGH(
+            {"smoke": [page([run_entry])], "trial": [page([])]},
+            {"41213566873": []}, {},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_allowance_history(
+                gh=expired_fake, repository="o/r", work_dir=self.tmp,
+                current_run_id="9999999999",
+            )
+        self.assertIn("below the preserved historical floor", str(caught.exception))
+
+        present_fake = FakeGH(
+            {"smoke": [page([run_entry])], "trial": [page([])]},
+            {"41213566873": [artifact("ber-live-smoke-proof")]},
+            {("41213566873", "ber-live-smoke-proof"): (
+                "smoke-proof.json", self._legacy_proof("41213566873"),
+            )},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_allowance_history(
+                gh=present_fake, repository="o/r", work_dir=self.tmp,
+                current_run_id="9999999999",
+            )
+        self.assertIn("below the preserved historical floor", str(caught.exception))
+
+    def test_current_run_exclusion_precedes_the_expiry_registry(self):
+        # The in-flight run is skipped before any artifact/bookkeeping logic, so a
+        # current-run id never books its committed historical spend.
+        run_entry = self._run_entry("41179846875", LEGACY_PROOF_HEADS["41179846875"])
+        fake = FakeGH(
+            {"smoke": [page([run_entry])], "trial": [page([])]},
+            {"41179846875": []}, {},
+        )
+        records = collect_smoke_proof_spends(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+            current_run_id="41179846875",
+        )
+        self.assertEqual(records, {})
+
+    # -- recorded identities / registry invariants -----------------------
+
+    def test_expired_registry_is_exact_match_committed_constant(self):
+        self.assertEqual(
+            set(SMOKE_RUNS_WITH_EXPIRED_PROOF),
+            {"41213566873", "41179846875"},
+        )
+        self.assertTrue(
+            set(SMOKE_RUNS_WITH_EXPIRED_PROOF).isdisjoint(SMOKE_RUNS_WITHOUT_PROOF)
+        )
+        expected_keys = {
+            "spent_cents", "expected_conclusion", "head_sha", "run_attempt",
+            "proof_bytes", "proof_sha256", "basis",
+        }
+        for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items():
+            with self.subTest(run_id=run_id):
+                self.assertEqual(set(registered), expected_keys)
+                self.assertEqual(registered["spent_cents"], 6)
+                self.assertEqual(registered["expected_conclusion"], "success")
+                self.assertEqual(registered["run_attempt"], 1)
+                self.assertEqual(registered["proof_bytes"], 2_253)
+                self.assertEqual(
+                    registered["head_sha"], LEGACY_PROOF_HEADS[str(run_id)],
+                )
+                self.assertRegex(registered["head_sha"], "[0-9a-f]{40}")
+                self.assertRegex(registered["proof_sha256"], "[0-9a-f]{64}")
+                self.assertTrue(str(registered["basis"]).strip())
+                self.assertIn("expires 2026-11-14", str(registered["basis"]))
+                self.assertEqual(PRESERVED_HISTORICAL_SMOKE_CENTS, 18)
+                self.assertEqual(PRESERVED_HISTORICAL_LEDGER_CENTS, 222)
+
+    def test_recorded_proof_identities_match_captured_verbatim_fixtures(self):
+        # The recorded proof identity is the whole-file SHA-256 of the verbatim
+        # captured artifact member, committed byte-identically as the fixture; a
+        # wrong recorded hash (or a changed fixture) fails here. The proof's own
+        # recorded run/head/attempt/spend are the same identities the registry
+        # binds at runtime, and its self-hash still verifies.
+        for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items():
+            with self.subTest(run_id=run_id):
+                raw = (
+                    SMOKE_PROOF_FIXTURE_DIR / ("smoke-proof-run-" + run_id + ".json")
+                ).read_bytes()
+                self.assertEqual(len(raw), registered["proof_bytes"])
+                self.assertEqual(
+                    hashlib.sha256(raw).hexdigest(), registered["proof_sha256"],
+                )
+                proof = json.loads(raw)
+                self.assertEqual(proof["workflow_run_id"], run_id)
+                self.assertEqual(
+                    proof["workflow_run_attempt"], str(registered["run_attempt"]),
+                )
+                self.assertEqual(proof["head_sha"], registered["head_sha"])
+                self.assertEqual(proof["spent_cents"], registered["spent_cents"])
+                self.assertEqual(proof["status"], "PASS")
+                self.assertEqual(proof["workflow"], "eval-smoke")
+                recomputed = hashlib.sha256(json.dumps(
+                    {k: v for k, v in proof.items() if k != "proof_sha256"},
+                    sort_keys=True, separators=(",", ":"),
+                ).encode("utf-8")).hexdigest()
+                self.assertEqual(recomputed, proof["proof_sha256"])
+
+    def test_recorded_proof_hash_is_bound_to_its_own_run_only(self):
+        # Cross-binding or mutation must not match: each recorded hash equals its
+        # own captured bytes, differs from the other run's bytes, and differs from
+        # a tampered body (spent_cents 6 -> 7) of its own bytes.
+        hashes = {}
+        for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items():
+            raw = (
+                SMOKE_PROOF_FIXTURE_DIR / ("smoke-proof-run-" + run_id + ".json")
+            ).read_bytes()
+            hashes[run_id] = hashlib.sha256(raw).hexdigest()
+            self.assertEqual(hashes[run_id], registered["proof_sha256"])
+            tampered = raw.replace(b'"spent_cents": 6', b'"spent_cents": 7')
+            self.assertNotEqual(tampered, raw)
+            self.assertNotEqual(
+                hashlib.sha256(tampered).hexdigest(), registered["proof_sha256"],
+            )
+        for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items():
+            for other_id, other_hash in hashes.items():
+                if other_id == run_id:
+                    continue
+                self.assertNotEqual(registered["proof_sha256"], other_hash)
+
+    def test_repeated_expiry_collection_is_idempotent_and_immutable(self):
+        before = {
+            run_id: dict(registered)
+            for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items()
+        }
+        runs, artifacts, payloads = self._expired_history_parts()
+        first = self._smoke_records(runs, artifacts, payloads)
+        second = self._smoke_records(runs, artifacts, payloads)
+        self.assertEqual(first, second)
+        self.assertEqual(smoke_spend_total(first), 12)
+        after = {
+            run_id: dict(registered)
+            for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items()
+        }
+        self.assertEqual(before, after)
 
 class WorkflowWiringTests(unittest.TestCase):
     def test_eval_smoke_admission_precedes_config_and_keys(self):
