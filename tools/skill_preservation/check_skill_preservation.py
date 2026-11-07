@@ -210,9 +210,10 @@ def parse_skill_frontmatter(text: str) -> dict:
         if isinstance(description, str):
             description = _strip_scalar_quotes(description.strip())
         record["description_present"] = bool(isinstance(description, str) and description.strip())
+        sentinel_phrase = MANUAL_ONLY_SENTINEL.rstrip()
         record["sentinel"] = bool(
-            (isinstance(description, str) and description.startswith(MANUAL_ONLY_SENTINEL))
-            or MANUAL_ONLY_SENTINEL in fm_text)
+            (isinstance(description, str) and description.startswith(sentinel_phrase))
+            or sentinel_phrase in fm_text)
         dmi = seen.get("disable-model-invocation")
         raw_dmi = re.search(
             r"^[\s-]*[\"']?disable-model-invocation[\"']?\s*:\s*([^#\r\n]+)",

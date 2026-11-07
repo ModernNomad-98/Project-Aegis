@@ -235,6 +235,27 @@ class GuardSelfTests(unittest.TestCase):
             self.assertEqual(code, 1, label + ": " + out)
             self.assertIn("SILENT_DISABLE", self.rules(payload), label)
 
+    def test_c02k_exact_sentinel_without_trailing_space_blocks(self):
+        for label, extra in (("quoted", ""), ("block", ""), ("missing-name", "")):
+            tree = self.new_candidate("exact-sentinel-" + label)
+            skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+            text = skill_md.read_text(encoding="utf-8")
+            if label == "block":
+                text = text.replace(
+                    "description: 'A synthetic test skill named alpha for guard self-tests.'",
+                    "description: >\n  MANUAL-ONLY; never auto-invoke.", 1)
+            else:
+                text = text.replace("name: alpha", "name: alpha", 1)
+                text = text.replace(
+                    "description: 'A synthetic test skill named alpha for guard self-tests.'",
+                    "description: 'MANUAL-ONLY; never auto-invoke.'", 1)
+            if label == "missing-name":
+                text = text.replace("name: alpha\n", "", 1)
+            write(skill_md, text)
+            code, payload, out, err = self.run_check(tree)
+            self.assertEqual(code, 1, label + ": " + out)
+            self.assertIn("SILENT_DISABLE", self.rules(payload), label)
+
     def test_c02j_unparseable_frontmatter_still_blocks_silent_disable(self):
         tree = self.new_candidate("unparseable-silent-disable")
         skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
