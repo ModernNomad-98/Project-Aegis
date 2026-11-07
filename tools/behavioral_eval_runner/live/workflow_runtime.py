@@ -124,6 +124,77 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
     },
 }
 
+#: Explicit, exact-match EXPIRY-ONLY registry for the two identified historical
+#: eval-smoke proofs whose GitHub artifacts are subject to 14-day retention
+#: (eval-smoke.yml retention-days: 14; uploaded 2026-10-31; GitHub auto-deletion
+#: observed pending, expected on/about 2026-11-14, exact deletion time UNKNOWN).
+#: Once GitHub deletes them the runs become artifactless and, absent this record,
+#: the collector would refuse their history as UNKNOWN and block admission.
+#:
+#: This is a bounded, documented exception to live artifact verification, NOT a
+#: general compatibility rule and NOT a wildcard: only the exact run ids below are
+#: eligible, only when the proof artifact is ABSENT, and only when the run entry's
+#: recorded conclusion, full head SHA and run_attempt all match the committed
+#: record. Any mismatch refuses. The paid-attempt identity includes run_attempt (a
+#: GitHub re-run keeps the run id/head and increments the attempt), so a missing
+#: recorded attempt or a missing/invalid run attempt fails closed and is never
+#: guessed or defaulted. A present artifact always goes through the existing
+#: download/provenance/tamper validation path first and never uses this registry;
+#: an unregistered artifactless run stays UNKNOWN-not-zero. Each entry records the
+#: run attempt as a metadata fact, not as spend proof.
+#:
+#: Recorded proof identities are the verbatim captured artifact member bytes
+#: (read-only capture R-RETENTION-CAPTURE-RECEIPT-2026-11-06, receipt
+#: 1,605 B / 9cefc0f9...; copies committed byte-identically as
+#: tests/fixtures/live/smoke-proof/smoke-proof-run-<id>.json). The recorded
+#: spend is the amount the artifact-proof path booked before expiry (6c each), so
+#: the identified history keeps the unchanged preserved floors: smoke 18c,
+#: ledger 222c, and the same records/totals as when the artifacts were readable.
+#:
+#: Security implication (requires explicit change-owner acceptance and independent
+#: review; this module cannot grant either): accepting recorded-hash history
+#: without the artifact is weaker than verifying the artifact. The exact ids,
+#: heads, attempts and committed-byte hashes bound the exception, and the
+#: fixture-hash drift guard fails if the recorded identity drifts, but this path
+#: cannot prove the artifact was not tampered with while it existed, and an
+#: operator with code-change access could alter this registry. It must not be
+#: extended to other runs and does not restore live artifact verification.
+#:
+#: 41213566873: created 2026-10-31T15:10:21Z, head 1bfdf4a9..., conclusion
+#:   success, attempt 1; artifact 13046737982, 1,266 B; proof file 2,253 B /
+#:   d1b18fe2..., spent 6c.
+#: 41179846875: created 2026-10-31T07:15:02Z, head cef6e91c..., conclusion
+#:   success, attempt 1; artifact 13034581056, 1,264 B; proof file 2,253 B /
+#:   a202b4ac..., spent 6c.
+SMOKE_RUNS_WITH_EXPIRED_PROOF: Mapping[str, Mapping[str, Any]] = {
+    "41213566873": {
+        "spent_cents": 6,
+        "expected_conclusion": "success",
+        "head_sha": "1bfdf4a96966a97059270e383b6d0b90e1d88fa0",
+        "expected_attempt": 1,
+        "proof_bytes": 2_253,
+        "proof_sha256": "d1b18fe21bf8d56920b0551f9179c48a7b964f3572120b5dcee350e8935f8ade",
+        "basis": (
+            "2026-10-31T15:10:21Z eval-smoke run; artifact 13046737982 (1,266 B) "
+            "uploaded 2026-10-31, expires 2026-11-14; captured proof 2,253 B / "
+            "d1b18fe2...; recorded spend 6c"
+        ),
+    },
+    "41179846875": {
+        "spent_cents": 6,
+        "expected_conclusion": "success",
+        "head_sha": "cef6e91cbae4af1114f182dce0f0d98ebc146b65",
+        "expected_attempt": 1,
+        "proof_bytes": 2_253,
+        "proof_sha256": "a202b4ac43a6ac20b4da518a1c0006ef5657efd6e6258a3a7809e223cac416f4",
+        "basis": (
+            "2026-10-31T07:15:02Z eval-smoke run; artifact 13034581056 (1,264 B) "
+            "uploaded 2026-10-31, expires 2026-11-14; captured proof 2,253 B / "
+            "a202b4ac...; recorded spend 6c"
+        ),
+    },
+}
+
 
 def _completed(gh: Callable[..., Any], args: list[str], label: str) -> Any:
     completed = gh(args)
@@ -411,6 +482,44 @@ def _registered_legacy_run_spend(run: Mapping[str, Any]) -> int | None:
     return strict_cents(registered.get("spent_cents"), "registered legacy smoke spend")
 
 
+def _registered_expired_proof_run_spend(run: Mapping[str, Any]) -> int | None:
+    """Registered spend for an identified ended run whose proof artifact expired.
+
+    Only the exact run ids committed in SMOKE_RUNS_WITH_EXPIRED_PROOF are eligible,
+    and only when the run entry's recorded conclusion, full head SHA and run_attempt
+    all match the committed record; a mismatch fails closed rather than booking the
+    recorded spend. The paid-attempt identity includes run_attempt (a GitHub re-run
+    keeps the run id/head and increments the attempt), so a missing recorded attempt
+    or a missing/invalid run attempt also fails closed and is never guessed or
+    defaulted. Callers reach this only when the proof artifact is ABSENT: a present
+    artifact is always handled by download/validation first, so an expired record
+    can never mask a present-but-tampered artifact.
+    """
+    run_id = str(run.get("id"))
+    registered = SMOKE_RUNS_WITH_EXPIRED_PROOF.get(run_id)
+    if registered is None:
+        return None
+    label = "registered expired-proof smoke run " + run_id
+    if run.get("conclusion") != registered.get("expected_conclusion"):
+        raise ValueError(label + " does not match its recorded conclusion")
+    expected_attempt = registered.get("expected_attempt")
+    if (
+        isinstance(expected_attempt, bool)
+        or not isinstance(expected_attempt, int)
+        or expected_attempt <= 0
+    ):
+        raise ValueError(label + " has no recorded attempt evidence")
+    attempt = run.get("run_attempt")
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt <= 0:
+        raise ValueError(label + " has no readable attempt evidence")
+    if attempt != expected_attempt:
+        raise ValueError(label + " does not match its recorded attempt")
+    head = _require_hex(run, "head_sha", HEX40, "run entry")
+    if head != registered.get("head_sha"):
+        raise ValueError(label + " does not match its recorded head")
+    return strict_cents(registered.get("spent_cents"), "registered expired smoke spend")
+
+
 def collect_smoke_proof_spends(
     *, gh: Callable[..., Any], repository: str, work_dir: Path,
     current_run_id: Any = None, smoke_workflow_file: str = "eval-smoke.yml",
@@ -418,15 +527,17 @@ def collect_smoke_proof_spends(
     """Collect every successful smoke proof and the identified legacy runs.
 
     A successful run without a readable proof is UNKNOWN and refuses; it is never
-    counted as zero. The single documented exception is an ended run whose proof
-    artifact is absent AND whose exact run id is committed in
-    SMOKE_RUNS_WITHOUT_PROOF together with matching recorded run metadata
-    (conclusion, head/prefix and run_attempt); only that run's recorded spend is
-    booked. A present-but-unreadable, malformed or tampered artifact never enters
-    the registry path and remains a hard refusal. For a present artifact the
-    proof's own workflow_run_id and workflow_run_attempt must match the API run
-    entry, and more than one same-name proof artifact on the run fails closed
-    rather than letting a name-only download choose an ambiguous attempt.
+    counted as zero. Two documented exceptions exist, both keyed by exact run id and
+    both reached only when the proof artifact is absent: an ended run committed in
+    SMOKE_RUNS_WITHOUT_PROOF, and an identified historical run committed in
+    SMOKE_RUNS_WITH_EXPIRED_PROOF whose proof artifact expired under the 14-day
+    workflow retention. Each books only its committed recorded spend, and only when
+    the recorded run metadata (conclusion, head/prefix and run_attempt) matches; a
+    mismatch refuses. A present-but-unreadable, malformed or tampered artifact never
+    enters either registry path and remains a hard refusal. For a present artifact
+    the proof's own workflow_run_id and workflow_run_attempt must match the API run
+    entry, and more than one same-name proof artifact on the run fails closed rather
+    than letting a name-only download choose an ambiguous attempt.
     """
     records: dict[str, int] = {}
     for run in list_workflow_runs(gh, repository, smoke_workflow_file):
@@ -452,6 +563,8 @@ def collect_smoke_proof_spends(
             )
         if not proof_artifacts:
             registered_spent = _registered_legacy_run_spend(run)
+            if registered_spent is None:
+                registered_spent = _registered_expired_proof_run_spend(run)
             if registered_spent is None:
                 _fail_unknown("ended smoke run " + str(run_id) + " has no proof artifact")
             attempt = run.get("run_attempt")  # validated positive int by the registry
