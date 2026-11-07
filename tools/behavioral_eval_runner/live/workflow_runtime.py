@@ -277,6 +277,24 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
         raise ValueError("smoke proof citability is not REAL_HOST")
     if _require_hex(payload, "head_sha", HEX40, "smoke proof") != provenance["head_sha"]:
         raise ValueError("smoke proof head does not match the workflow run head")
+    # A re-run keeps the workflow run id and head but increments run_attempt, and
+    # gh run download --name may otherwise select an earlier attempt's artifact for
+    # the later API run entry. Bind the retained proof's own workflow provenance to
+    # the API run metadata: both the recorded run id and the recorded attempt must
+    # match, and missing/malformed evidence on either side fails closed.
+    run_attempt = run.get("run_attempt")
+    if isinstance(run_attempt, bool) or not isinstance(run_attempt, int) or run_attempt <= 0:
+        raise ValueError("smoke proof workflow run has no readable attempt evidence")
+    proof_run_id = _require_text(payload, "workflow_run_id", "smoke proof")
+    proof_attempt_text = _require_text(payload, "workflow_run_attempt", "smoke proof")
+    if not proof_attempt_text.isdigit() or int(proof_attempt_text) <= 0:
+        raise ValueError("smoke proof workflow run attempt is not a positive integer")
+    if normalize_smoke_run_id(proof_run_id) != normalize_smoke_run_id(provenance["run_id"]):
+        raise ValueError("smoke proof workflow run id does not match the workflow run id")
+    if int(proof_attempt_text) != run_attempt:
+        raise ValueError(
+            "smoke proof workflow run attempt does not match the workflow run attempt"
+        )
     _require_hex(payload, "dataset_sha256", HEX64, "smoke proof")
     _require_hex(payload, "built_config_sha256", HEX64, "smoke proof")
     config_identity = _require_hex(payload, "config_template_sha256", HEX64, "smoke proof")
@@ -404,8 +422,11 @@ def collect_smoke_proof_spends(
     artifact is absent AND whose exact run id is committed in
     SMOKE_RUNS_WITHOUT_PROOF together with matching recorded run metadata
     (conclusion, head/prefix and run_attempt); only that run's recorded spend is
-    booked. A present-but-unreadable, malformed or
-    tampered artifact never enters the registry path and remains a hard refusal.
+    booked. A present-but-unreadable, malformed or tampered artifact never enters
+    the registry path and remains a hard refusal. For a present artifact the
+    proof's own workflow_run_id and workflow_run_attempt must match the API run
+    entry, and more than one same-name proof artifact on the run fails closed
+    rather than letting a name-only download choose an ambiguous attempt.
     """
     records: dict[str, int] = {}
     for run in list_workflow_runs(gh, repository, smoke_workflow_file):
@@ -420,8 +441,16 @@ def collect_smoke_proof_spends(
             continue
         _validate_run_provenance(run)
         artifacts = list_run_artifacts(gh, repository, run_id)
-        names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
-        if SMOKE_ARTIFACT_NAME not in names:
+        proof_artifacts = [
+            item for item in artifacts
+            if isinstance(item, Mapping) and item.get("name") == SMOKE_ARTIFACT_NAME
+        ]
+        if len(proof_artifacts) > 1:
+            raise ValueError(
+                "ended smoke run " + str(run_id) + " has multiple duplicate "
+                + SMOKE_ARTIFACT_NAME + " artifacts; refusing an ambiguous selection"
+            )
+        if not proof_artifacts:
             registered_spent = _registered_legacy_run_spend(run)
             if registered_spent is None:
                 _fail_unknown("ended smoke run " + str(run_id) + " has no proof artifact")
@@ -436,13 +465,12 @@ def collect_smoke_proof_spends(
             gh, repository, run_id, SMOKE_ARTIFACT_NAME,
             SMOKE_ARTIFACT_MEMBER, work_dir,
         )
-        _validate_smoke_proof(payload, run)
+        validated = _validate_smoke_proof(payload, run)
         spent = strict_cents(payload.get("spent_cents"), "smoke proof spent_cents")
-        attempt = run.get("run_attempt", 1)
         records = merge_smoke_gate_spend(
             records,
             {"smoke_run_id": normalize_smoke_run_id(run_id),
-             "smoke_run_attempt": attempt, "spent_cents": spent},
+             "smoke_run_attempt": validated["attempt"], "spent_cents": spent},
         )
     return records
 

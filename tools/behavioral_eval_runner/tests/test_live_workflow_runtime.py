@@ -56,6 +56,14 @@ class FakeGH:
         self.payloads = payloads
         self.calls = []
 
+    def _run_attempt(self, run_id):
+        for pages in self.run_pages.values():
+            for page_entry in pages:
+                for entry in page_entry.get("workflow_runs", []):
+                    if str(entry.get("id")) == str(run_id):
+                        return entry.get("run_attempt", 1)
+        return 1
+
     def __call__(self, args):
         self.calls.append(list(args))
         joined = " ".join(args)
@@ -93,6 +101,8 @@ class FakeGH:
                     payload.setdefault("max_output_tokens", 16384)
                     payload.setdefault("planned_calls", 2)
                     payload.setdefault("dispatched_calls", 2)
+                    payload.setdefault("workflow_run_id", str(run_id))
+                    payload.setdefault("workflow_run_attempt", str(self._run_attempt(run_id)))
                     if "proof_sha256" not in payload:
                         import hashlib
                         payload["proof_sha256"] = hashlib.sha256(json.dumps(
@@ -174,6 +184,8 @@ def smoke_proof(**overrides):
         "max_output_tokens": 16384,
         "planned_calls": 2,
         "dispatched_calls": 2,
+        "workflow_run_id": "42",
+        "workflow_run_attempt": "1",
         "spent_cents": 150,
     }
     payload.update(overrides)
@@ -469,6 +481,8 @@ class AllowanceHistoryTests(unittest.TestCase):
             "max_output_tokens": 16384,
             "planned_calls": 2,
             "dispatched_calls": 2,
+            "workflow_run_id": "42",
+            "workflow_run_attempt": "1",
             "spent_cents": 150,
         }
         payload.update(overrides)
@@ -490,7 +504,8 @@ class AllowanceHistoryTests(unittest.TestCase):
     def test_provenance_required_fields_missing_reject(self):
         required = ["head_sha", "workflow", "dataset_sha256", "built_config_sha256",
                     "config_template_sha256", "gate_id", "subject_vendor", "judge_vendor",
-                    "judge_model", "status", "citability"]
+                    "judge_model", "status", "citability",
+                    "workflow_run_id", "workflow_run_attempt"]
         for key in required:
             payload = self._proof_with()
             del payload[key]
@@ -780,6 +795,99 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         with self.assertRaises(ValueError) as caught:
             collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
         self.assertIn("unsupported smoke proof schema", str(caught.exception))
+
+    def _present_artifact_fake(self, entry, payload, artifact_names=None):
+        names = artifact_names if artifact_names is not None else [
+            artifact("ber-live-smoke-proof"),
+        ]
+        return FakeGH(
+            {"smoke": [page([entry])], "trial": [page([])]},
+            {str(entry["id"]): names},
+            {(str(entry["id"]), "ber-live-smoke-proof"): (
+                "smoke-proof.json", payload,
+            )},
+        )
+
+    def test_present_artifact_attempt_mismatch_refuses(self):
+        # P2 4501594132: a re-run API entry (attempt 2) must not accept the
+        # retained attempt-1 artifact and record its 6c as attempt 2.
+        cases = [
+            (41213566873, LEGACY_PROOF_HEADS["41213566873"]),
+            (41179846875, LEGACY_PROOF_HEADS["41179846875"]),
+        ]
+        for run_id, head_sha in cases:
+            entry = self._run_with_head(run_id, head_sha)
+            entry["run_attempt"] = 2
+            fake = self._present_artifact_fake(entry, self._legacy_proof(str(run_id)))
+            with self.subTest(run_id=run_id):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+                self.assertIn("workflow run attempt does not match", str(caught.exception))
+
+    def test_present_artifact_run_id_mismatch_refuses(self):
+        fake = self._present_artifact_fake(run(42), smoke_proof(workflow_run_id="43"))
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("workflow run id does not match", str(caught.exception))
+
+    def test_present_artifact_missing_attempt_provenance_refuses(self):
+        for key in ("workflow_run_id", "workflow_run_attempt"):
+            payload = smoke_proof()
+            del payload[key]
+            payload["__no_defaults__"] = True
+            with self.subTest(key=key):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=self._present_artifact_fake(run(42), payload),
+                        repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn(key, str(caught.exception))
+
+    def test_present_artifact_missing_api_attempt_refuses(self):
+        entry = run(42)
+        del entry["run_attempt"]
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(
+                gh=self._present_artifact_fake(entry, smoke_proof()),
+                repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("no readable attempt evidence", str(caught.exception))
+
+    def test_duplicate_same_name_artifact_refuses(self):
+        duplicate = [
+            artifact("ber-live-smoke-proof"),
+            artifact("ber-live-smoke-proof"),
+        ]
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(
+                gh=self._present_artifact_fake(run(42), smoke_proof(), duplicate),
+                repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("duplicate", str(caught.exception))
+        self.assertIn("ambiguous selection", str(caught.exception))
+
+    def test_present_artifact_matching_attempt_two_is_accepted(self):
+        # The binding is not a blanket retry refusal: a re-run's own attempt-2
+        # proof that matches the API attempt is accepted under the attempt-2 identity.
+        entry = run(42, attempt=2)
+        payload = smoke_proof(workflow_run_attempt="2")
+        records = collect_smoke_proof_spends(
+            gh=self._present_artifact_fake(entry, payload),
+            repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(smoke_spend_total(records), 150)
+        self.assertIn("|42|2|smoke-proof", next(iter(records)))
+
+    def test_present_artifact_attempt_one_binding_accepts(self):
+        entry = self._run_with_head(41213566873, LEGACY_PROOF_HEADS["41213566873"])
+        records = collect_smoke_proof_spends(
+            gh=self._present_artifact_fake(entry, self._legacy_proof("41213566873")),
+            repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(smoke_spend_total(records), 6)
+        self.assertIn("|41213566873|1|smoke-proof", next(iter(records)))
 
     def test_unknown_and_mismatched_smoke_config_identity_refuses(self):
         cases = [
