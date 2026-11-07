@@ -37,7 +37,7 @@ This table is the single maintained copy of the program's readable item names. I
 
 | # | Readable item name | What it is (one line) | Blueprint label (reference only) | Phase |
 |---|---|---|---|---|
-| 1 | **Program Baseline and Registration** | Verified starting point, exact-tree baseline, preservation baseline, queue/ownership map and this registration | WP-01 + program record | Phase 0 — COMPLETE |
+| 1 | **Program Baseline and Registration** | Verified starting point, exact-tree baseline, preservation baseline, queue/ownership map and this registration | WP-01 + program record | Phase 0 baseline registered; Stage C local implementation complete; Stage D–F and merge pending |
 | 2 | **Requirements-to-Evidence Conformance Catalog** | Versioned catalog that ties each requirement to its authoritative source, enforcing mechanism and observed evidence, with deterministic checks | FND-01 | Phase 1 |
 | 3 | **Consumer Packaging Manifest and Read-Only Verification** | Complete distributed-payload manifest, dependency closure and a verify path that never repairs or mutates a target | WP-02 | Phase 1 |
 | 4 | **Host Compatibility Qualification** | Named host/product/OS configurations with explicit supported vs unsupported capability evidence | WP-03 | Phase 1/2 |
@@ -77,7 +77,7 @@ Not authorized: pushing; creating or updating remote pull requests, issues, comm
 
 ## S6. Status and next action (as of this record's drafting)
 
-M0 (program baseline and registration) is complete. Four Stage A packets were delivered for the first item slices (requirements-to-evidence conformance; consumer packaging manifest and read-only verification; verification/evaluation; maintainability/AI-product profile/release evidence). The registration packet for this page was independently audited at Stage B and **ACCEPTed**, so the registration slice is at **Stage C** — local implementation in an isolated local worktree. On completion: the registration commit is locally frozen; Stage D independent implementation audit, Stage E validation and Stage F final review follow under the [delivery workflow](../delivery-workflow.md); no push, PR, review posting, merge or publication has occurred or is authorized.
+M0 (program baseline and registration) is **registered, not merged**: the baseline record exists, but Stage D implementation audit, Stage E validation, Stage F final review and merge are pending, so this item is not “complete”. Four Stage A packets were delivered for the first item slices (requirements-to-evidence conformance; consumer packaging manifest and read-only verification; verification/evaluation; maintainability/AI-product profile/release evidence). The registration packet was independently audited at Stage B and **ACCEPTed**, so the registration slice is at **Stage C — local implementation complete; Stage D–F and merge pending**. The commit remains local until a separately authorized merge; no push, PR, review posting, merge or publication is authorized by this page.
 
 **Next action.** Complete the Stage C commit for exactly the three registration paths (`AGENTS.md` append, this page, one `docs/README.md` pointer), re-run the validator and Markdown link checker at the exact candidate, then hand the candidate to independent Stage D review. Remote/owner-gated actions remain untouched.
 

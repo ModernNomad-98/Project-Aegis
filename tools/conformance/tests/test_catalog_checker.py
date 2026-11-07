@@ -167,6 +167,27 @@ class ConformanceCheckerTests(unittest.TestCase):
         self.assertIn("not found", err)
 
     # ---------------------------------------------------------------- structural negatives
+    def test_missing_first_profile_is_finding_not_crash(self):
+        fixture = self.fresh_fixture("no-first-profile")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        catalog["profiles"][0]["profile_id"] = "other-profile"
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker("--json", root=fixture)
+        self.assertEqual(code, 1, out)
+        report = json.loads(out)
+        self.assertTrue(any(item["code"] == "COMPLETENESS-GAP" for item in report["findings"]))
+
+    def test_malformed_containers_are_findings_not_crash(self):
+        for field in ("mechanism", "verification", "evidence_requirement"):
+            fixture = self.fresh_fixture("bad-" + field)
+            catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+            catalog["requirements"][0][field] = ["malformed"]
+            self.write_catalog(catalog, fixture)
+            code, out, _ = self.run_checker("--json", root=fixture)
+            self.assertEqual(code, 1, field + ": " + out)
+            report = json.loads(out)
+            self.assertTrue(report["findings"], field)
+
     def test_duplicate_requirement_id(self):
         fixture = self.fresh_fixture("dup-id")
         catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))

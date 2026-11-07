@@ -128,6 +128,10 @@ def verify_target(manifest_path: Path, target_root: Path,
     if not target.is_dir():
         raise ManifestError("target_not_directory", "target root is not a directory")
     limitations = _containment_preflight(target)
+    if any("mode" in entry for entry in manifest.get("entries", []) if isinstance(entry, dict)):
+        limitations.append(
+            "declared file mode is accepted in the manifest but mode comparison is not "
+            "implemented on this host; mode verification is UNRUN (never checked)")
     planned_report = None
     if report_out is not None:
         planned_report = _plan_report_path(report_out, target, manifest)

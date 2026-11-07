@@ -163,6 +163,28 @@ class GuardSelfTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("TEMPLATE_DISAPPEARED", self.rules(payload))
 
+    def test_c02c_inline_comment_boolean_is_parsed(self):
+        tree = self.new_candidate("inline-comment-boolean")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        text = skill_md.read_text(encoding="utf-8").replace(
+            "name: alpha", "name: alpha\ndisable-model-invocation: true # inline comment", 1)
+        write(skill_md, text)
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1)
+        self.assertIn("SILENT_DISABLE", self.rules(payload))
+
+    def test_c02d_malformed_baseline_section_fails_closed(self):
+        tail = self.new_candidate("malformed-baseline")
+        bad = dict(self.baseline)
+        bad["discovery"] = None
+        bad["baseline_id"] = guard.compute_baseline_id(bad)
+        bad_path = Path(self.tmp.name) / "malformed-baseline.json"
+        guard.atomic_write_bytes(str(bad_path), guard.dump_json(bad).encode("utf-8"))
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = guard.main(["check", "--tree", str(tail), "--baseline", str(bad_path), "--json"])
+        self.assertEqual(code, 2)
+
     def test_c03_renamed_skill_blocks(self):
         tree = self.new_candidate("renamed")
         os.rename(str(tree / ".claude" / "skills" / "alpha"),

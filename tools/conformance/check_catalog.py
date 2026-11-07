@@ -648,6 +648,8 @@ def check_completeness(catalog, findings):
     def gap(message, record=None):
         add(findings, "COMPLETENESS-GAP", "$.requirements", record, message)
 
+    mandatory = []
+    mandatory_set = set()
     if not profiles:
         gap("first profile %r is missing" % FIRST_PROFILE)
     else:
@@ -863,9 +865,12 @@ def build_report(catalog, catalog_identity, repo_root, evidence_path, profile_ar
         record = by_id[rid]
         if selected is not None and mandatory and rid not in mandatory:
             continue
-        mechanism = record.get("mechanism") or {}
-        verification = record.get("verification") or {}
-        evidence_requirement = record.get("evidence_requirement") or {}
+        raw_mechanism = record.get("mechanism")
+        mechanism = raw_mechanism if isinstance(raw_mechanism, dict) else {}
+        raw_verification = record.get("verification")
+        verification = raw_verification if isinstance(raw_verification, dict) else {}
+        raw_evidence = record.get("evidence_requirement")
+        evidence_requirement = raw_evidence if isinstance(raw_evidence, dict) else {}
         if rid in evidence_present:
             status = EVIDENCE_PRESENT
         elif rid in unrun:

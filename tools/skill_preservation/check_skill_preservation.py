@@ -144,6 +144,20 @@ def split_frontmatter(text: str):
     return None, text
 
 
+def _strip_scalar_comment(value: str) -> str:
+    """Strip a YAML inline comment outside quoted scalars."""
+    quote = None
+    for index, char in enumerate(value):
+        if quote:
+            if char == quote:
+                quote = None
+        elif char in ("'", '\"'):
+            quote = char
+        elif char == "#" and (index == 0 or value[index - 1].isspace()):
+            return value[:index].rstrip()
+    return value.rstrip()
+
+
 def _strip_scalar_quotes(value: str) -> str:
     """Remove one layer of surrounding quotes from a simple YAML scalar."""
     if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
@@ -185,7 +199,7 @@ def parse_skill_frontmatter(text: str) -> dict:
                         index += 1
                     seen[key] = "\n".join(block).strip()
                     continue
-                seen[key] = value.strip()
+                seen[key] = _strip_scalar_comment(value.strip())
             index += 1
         name_value = seen.get("name")
         if isinstance(name_value, str) and name_value:
@@ -201,7 +215,13 @@ def parse_skill_frontmatter(text: str) -> dict:
         if dmi is None:
             record["disable_model_invocation"] = None
         else:
-            record["disable_model_invocation"] = str(dmi).strip().strip("'\"").lower() == "true"
+            dmi_token = _strip_scalar_quotes(str(dmi).strip()).strip().lower()
+            if dmi_token in ("true", "false"):
+                record["disable_model_invocation"] = dmi_token == "true"
+            else:
+                record["disable_model_invocation"] = None
+                record["parse_ok"] = False
+                record["unreadable_reason"] = "unrecognized disable-model-invocation value"
         if not record["parse_ok"]:
             record["unreadable_reason"] = "name key missing or unquoted frontmatter unclear"
         return record
@@ -480,6 +500,23 @@ def validate_baseline(baseline: dict) -> None:
     for key in ("contract", "counts", "skills", "discovery", "starter", "file_inventory"):
         if key not in baseline:
             raise InputError("baseline missing required section: %s" % key)
+    if not isinstance(baseline["contract"], dict):
+        raise InputError("baseline contract section is not an object")
+    if not isinstance(baseline["counts"], dict):
+        raise InputError("baseline counts section is not an object")
+    if not isinstance(baseline["discovery"], dict):
+        raise InputError("baseline discovery section is not an object")
+    if not isinstance(baseline["starter"], dict):
+        raise InputError("baseline starter section is not an object")
+    for key in ("declared_paths", "declared_skills"):
+        value = baseline["starter"].get(key)
+        if value is not None and not isinstance(value, list):
+            raise InputError("baseline starter.%s is not a list" % key)
+    if not isinstance(baseline["file_inventory"], list):
+        raise InputError("baseline file_inventory section is not a list")
+    for index, rel in enumerate(baseline["file_inventory"]):
+        if not isinstance(rel, str):
+            raise InputError("baseline file_inventory entry %d is not a string" % index)
     if not isinstance(baseline["skills"], dict) or not baseline["skills"]:
         raise InputError("baseline skills section empty")
     seen = {}
@@ -489,9 +526,14 @@ def validate_baseline(baseline: dict) -> None:
             raise InputError("baseline duplicate/case-colliding skill id: %r and %r" %
                              (seen[key], name))
         seen[key] = name
+        if not isinstance(record, dict):
+            raise InputError("baseline skill %r is not an object" % name)
         files = record.get("files")
         if not isinstance(files, list):
             raise InputError("baseline skill %r has no file inventory" % name)
+        for file_index, item in enumerate(files):
+            if not isinstance(item, dict) or not isinstance(item.get("path"), str):
+                raise InputError("baseline skill %r file entry %d is malformed" % (name, file_index))
     last_casefold = None
     for rel in baseline["file_inventory"]:
         key = str(rel).casefold()
