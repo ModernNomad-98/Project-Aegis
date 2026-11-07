@@ -462,11 +462,18 @@ def create_binding(manifest_path: Path, source: dict, verify_command: str,
     identity = manifest_identity(manifest_path)
     manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
     validate_manifest(manifest)
+    manifest_source = manifest.get("source")
+    if not isinstance(manifest_source, dict):
+        raise ManifestError("binding_source_mismatch",
+                            "manifest source is missing or not an object")
+    if dict(source) != manifest_source:
+        raise ManifestError("binding_source_mismatch",
+                            "binding source must equal the manifest source")
     return {
         "schema": BINDING_SCHEMA,
         "manifest": {"path": Path(manifest_path).name, "bytes": identity["bytes"],
                      "sha256": identity["sha256"]},
-        "source": dict(source),
+        "source": dict(manifest_source),
         "generator": {"tool": TOOL_NAME, "version": TOOL_VERSION},
         "verify": {"command": verify_command, "exit_code": int(verify_exit_code)},
         "evidence_utc": evidence_utc,

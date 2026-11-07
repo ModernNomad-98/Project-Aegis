@@ -398,8 +398,13 @@ def build_baseline(tree: str, source_revision: str = None, source_tree: str = No
     if not dirs:
         raise InputError("candidate tree has an empty %s directory" % SKILLS_REL)
     for full in dirs:
-        if os.path.islink(full):
-            raise InputError("symlinked skill directory refused: " + safe_relpath(full, tree))
+        if os.path.islink(full) or (
+                callable(getattr(os.path, "isjunction", None)) and os.path.isjunction(full)):
+            raise InputError("symlinked/junction skill directory refused: "
+                             + safe_relpath(full, tree))
+    for rel in iter_symlinks_under(tree, SKILLS_REL):
+        raise InputError("symlink/reparse point under the skill surface refused during "
+                         "baseline generation: " + rel)
     skills = {}
     seen_casefold = {}
     for full in dirs:
