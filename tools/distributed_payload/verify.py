@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+import tempfile
 from pathlib import Path
 
 from .manifest import (
@@ -114,8 +115,18 @@ def _plan_report_path(report_out: Path, target: Path, manifest: dict) -> Path:
 
 def _write_report(report_out: Path, report: dict) -> None:
     data = (json.dumps(report, indent=2, sort_keys=True) + "\n").encode("utf-8")
-    with open(report_out, "wb") as handle:
-        handle.write(data)
+    handle = tempfile.NamedTemporaryFile(
+        prefix=".verify-report-", dir=str(report_out.parent), delete=False)
+    temp_path = Path(handle.name)
+    try:
+        with handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temp_path.replace(report_out)
+    finally:
+        if temp_path.exists():
+            temp_path.unlink()
 
 
 def verify_target(manifest_path: Path, target_root: Path,
@@ -155,6 +166,10 @@ def verify_target(manifest_path: Path, target_root: Path,
     for entry in manifest["entries"]:
         relative = entry["path"]
         candidate = target / Path(relative)
+        if _detect_reparse(candidate):
+            findings.append({"class": "CHANGED_TYPE", "path": relative,
+                             "detail": "target entry is a symlink/reparse point (not followed)"})
+            continue
         try:
             candidate.resolve().relative_to(target_root_resolved)
         except ValueError as exc:
@@ -162,10 +177,6 @@ def verify_target(manifest_path: Path, target_root: Path,
                                 "entry path resolves outside the target root", relative) from exc
         if not candidate.exists():
             findings.append({"class": "ABSENT", "path": relative})
-            continue
-        if _detect_reparse(candidate):
-            findings.append({"class": "CHANGED_TYPE", "path": relative,
-                             "detail": "target entry is a symlink/reparse point"})
             continue
         if not candidate.is_file():
             findings.append({"class": "CHANGED_TYPE", "path": relative,

@@ -1,11 +1,11 @@
 # Conformance catalog checker
 
 Deterministic, read-only checker for the Aegis requirements-to-evidence conformance catalog
-(`docs/conformance/requirements.v1.json`). It performs **standard-library structural validation that matches the normative schema** (no
-JSON-Schema engine is loaded; the schema file is normative documentation, and a drift test checks
-selected constants agree), resolves every requirement, mechanism and evidence anchor against the
-pinned raw source bytes, enforces and reports the first-profile completeness rule, and optionally
-checks an evidence binding.
+(`docs/conformance/requirements.v1.json`). It performs **selected standard-library structural validation aligned with the normative schema**
+(no JSON-Schema engine is loaded; the schema file is normative documentation, and a drift test checks
+selected constants agree). It resolves mechanism ref paths and requirement anchors against the pinned
+raw source bytes; mechanism `symbol_or_line` anchors are recorded as UNRUN/unverified unless separately
+resolved. It enforces and reports the first-profile completeness rule and optionally checks an evidence binding.
 
 **It reports only.** It never repairs, writes inside the repository, executes catalog or evidence
 text, contacts a network or acts as an approval. It is **not wired into CI** (owner-gated decision
@@ -53,8 +53,9 @@ findings, a summary, an UNRUN list, a deterministic `completeness` block for AC-
 (`declared_min` 23, `declared_max` 27, `observed_requirements`, `expected_families`,
 `expected_requirements`, per-family expected/present counts, `in_declared_range`, `missing_seed_ids`;
 the human summary prints the same values), the catalog identity (path, bytes, SHA-256), the checker's own
-SHA-256, and a fixed `limits` array. There is **no status, result, pass, approval or authority
-field** anywhere in the report; the checker rejects those field names in its inputs and reports them
+SHA-256, and a fixed `limits` array. There is **no approval, authority or verdict field**; the
+report's `evidence_status` and `exit_code` are report-only coverage/diagnostic labels, never
+catalog facts or approval. The checker rejects observation field names in its inputs and reports them
 as `OBSERVATION-FIELD`.
 
 ## Determinism and safety
@@ -63,7 +64,8 @@ as `OBSERVATION-FIELD`.
   timestamps, hostnames, usernames or absolute home paths. Two runs on identical inputs are
   byte-identical.
 - Input caps: catalog 512 KiB, evidence binding 1 MiB, 500 requirement records, 1,000 evidence
-  records, 2,000 characters per string. Over-cap input is exit 2.
+  records. Over-cap file/record input is exit 2; a string over 2,000 characters is reported as a
+  `SUSPICIOUS-DATA` finding (exit 1), not a usage error.
 - Catalog and evidence strings are data only: the checker never evaluates, executes, imports or
   shells them, and control characters, bidirectional overrides and payload-like tokens are reported
   as `SUSPICIOUS-DATA` after a deterministic escape. No canary or side effect is possible from

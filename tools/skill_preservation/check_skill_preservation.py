@@ -188,7 +188,7 @@ def parse_skill_frontmatter(text: str) -> dict:
         index = 0
         while index < len(lines):
             line = lines[index]
-            match = re.match(r"^([A-Za-z0-9_-]+)\s*:\s*(.*)$", line)
+            match = re.match(r"^[\"']?([A-Za-z0-9_-]+)[\"']?\s*:\s*(.*)$", line)
             if match:
                 key, value = match.group(1), match.group(2)
                 if key == "description" and value[:1] in (">", "|"):
@@ -215,7 +215,12 @@ def parse_skill_frontmatter(text: str) -> dict:
             or MANUAL_ONLY_SENTINEL in fm_text)
         dmi = seen.get("disable-model-invocation")
         raw_dmi = re.search(
-            r"disable-model-invocation\s*:\s*([^\s,}\]]+)", fm_text, re.IGNORECASE)
+            r"^[\s-]*[\"']?disable-model-invocation[\"']?\s*:\s*([^#\r\n]+)",
+            fm_text, re.MULTILINE | re.IGNORECASE)
+        if raw_dmi is None:
+            raw_dmi = re.search(
+                r"[{,]\s*[\"']?disable-model-invocation[\"']?\s*:\s*([^\s,}\]]+)",
+                fm_text, re.IGNORECASE)
         if raw_dmi is not None:
             dmi_token = _strip_scalar_quotes(raw_dmi.group(1).strip()).strip().lower()
             if dmi_token in ("true", "false"):
@@ -266,6 +271,9 @@ def skill_record(tree: str, skill_dir: str) -> dict:
             full = os.path.join(dirpath, name)
             if os.path.islink(full):
                 continue
+            if not os.path.isfile(full):
+                raise InputError("non-regular file inside a skill directory: "
+                                 + safe_relpath(full, tree))
             files.append({
                 "path": safe_relpath(full, tree),
                 "bytes": os.path.getsize(full),

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -21,8 +22,13 @@ from . import verify as verify_module
 
 
 def _build(args: argparse.Namespace) -> int:
+    raw_root = Path(args.root)
+    if raw_root.is_symlink() or (callable(getattr(os.path, "isjunction", None))
+                                and os.path.isjunction(raw_root)):
+        raise manifest_module.ManifestError(
+            "reparse_point", "symlinked/junction payload root is not supported")
     out_path = Path(args.out).resolve()
-    payload_root = Path(args.root).resolve()
+    payload_root = raw_root.resolve()
     try:
         out_path.relative_to(payload_root)
     except ValueError:

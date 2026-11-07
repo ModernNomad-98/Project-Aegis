@@ -4,7 +4,7 @@
 
 ## 1. Problem statement
 
-The repository's existing `tools/skills-manifest.json` covers the 254 entrypoint `SKILL.md` files only; the shipped skill tree has 996 files, so 742 shipped files have no committed per-file digest. Two hashing contracts already coexist: the entrypoint manifest hashes CRLF-to-LF normalized `SKILL.md` bytes, while the audit corpus hashes raw on-disk bytes. No artifact records both identities for one payload. This design adds one versioned contract that records both, plus a read-only verifier that reports drift and never repairs it.
+The repository's existing `tools/skills-manifest.json` covers the 254 entrypoint `SKILL.md` files only; the shipped skill tree has 996 files, and the skill-preservation baseline records a raw SHA-256 for them but not the full payload closure — 742 shipped files therefore have no committed manifest recording both raw and normalized identities. Two hashing contracts already coexist: the entrypoint manifest hashes CRLF-to-LF normalized `SKILL.md` bytes, while the audit corpus hashes raw on-disk bytes. No artifact records both identities for one payload. This design adds one versioned contract that records both, plus a read-only verifier that reports drift and never repairs it.
 
 ## 2. Schema `aegis.distributed-payload-manifest/1`
 

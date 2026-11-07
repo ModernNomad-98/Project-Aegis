@@ -212,6 +212,21 @@ class GuardSelfTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("SILENT_DISABLE", self.rules(payload))
 
+    def test_c02i_quoted_disable_keys_block(self):
+        for label, line in (
+            ("double", '"disable-model-invocation": true'),
+            ("single", "'disable-model-invocation': true"),
+            ("flow", 'meta: {description: x, "disable-model-invocation": true}'),
+        ):
+            tree = self.new_candidate("quoted-key-" + label)
+            skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+            text = skill_md.read_text(encoding="utf-8").replace(
+                "name: alpha", "name: alpha\n" + line, 1)
+            write(skill_md, text)
+            code, payload, out, err = self.run_check(tree)
+            self.assertEqual(code, 1, label + ": " + out)
+            self.assertIn("SILENT_DISABLE", self.rules(payload), label)
+
     def test_c02h_skill_mention_is_token_bounded(self):
         self.assertFalse(guard.mentions_skill("ai-threat-modeler", "threat-modeler"))
         self.assertTrue(guard.mentions_skill("- threat-modeler", "threat-modeler"))
