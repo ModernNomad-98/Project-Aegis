@@ -409,6 +409,19 @@ class ConformanceCheckerTests(unittest.TestCase):
             self.assertNotIn(token, source, "forbidden token in checker source: %r" % token)
 
 
+    def test_completeness_rejects_record_omitted_from_mandatory(self):
+        spec = importlib.util.spec_from_file_location("check_catalog_under_test", TOOL)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        catalog = json.loads((REAL_REPO / CATALOG_REL).read_text(encoding="utf-8"))
+        extra = json.loads(json.dumps(catalog["requirements"][0]))
+        extra["requirement_id"] = "AEGIS-EXTRA-99"
+        catalog["requirements"].append(extra)
+        findings = []
+        module.check_completeness(catalog, findings)
+        self.assertTrue(any(item["code"] == "COMPLETENESS-GAP"
+                            and "omitted" in item["evidence"] for item in findings))
+
     def test_schema_constants_match_checker_structural_validation(self):
         """A-1 drift test: no JSON-Schema engine runs; selected schema constants must match the
         standard-library structural-validation constants in the checker."""

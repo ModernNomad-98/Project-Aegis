@@ -104,6 +104,20 @@ def iter_repo_files(tree: str):
     return collected
 
 
+def iter_symlinks_under(tree: str, rel_root: str):
+    """Return symlink paths under rel_root without following them."""
+    root = os.path.join(tree, *rel_root.split("/"))
+    found = []
+    if not os.path.isdir(root):
+        return found
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        for name in sorted(list(dirnames) + list(filenames)):
+            full = os.path.join(dirpath, name)
+            if os.path.islink(full):
+                found.append(safe_relpath(full, tree))
+    return sorted(set(found))
+
+
 def read_text(path: str) -> str:
     with open(path, "r", encoding="utf-8", errors="replace") as handle:
         return handle.read()
@@ -519,6 +533,21 @@ def compare(baseline: dict, tree: str) -> dict:
         seen_messages.add(key)
         findings.append(finding(rule, severity, message, subject))
 
+    for rel in iter_symlinks_under(tree, SKILLS_REL):
+        add("SYMLINK_IN_SKILL_SURFACE", "BLOCK",
+            "candidate contains a symlink under the protected skill surface: %r" % rel, rel)
+    for rel in iter_symlinks_under(tree, "tools/skill_preservation"):
+        if REMOVAL_VERB_RE.search(rel):
+            add("CLEANUP_PATH_ADDITION", "BLOCK",
+                "candidate contains a removal-looking symlink inside the guard package: %r" % rel, rel)
+    if "_template" in base_skills and "_template" not in candidates:
+        add("TEMPLATE_DISAPPEARED", "BLOCK",
+            "baseline template skill _template is absent from the candidate tree", "_template")
+    base_counts = baseline.get("counts") or {}
+    if isinstance(base_counts.get("skill_directories"), int) and len(dirs) < base_counts["skill_directories"]:
+        add("SKILL_DIRECTORY_COUNT_REDUCED", "BLOCK",
+            "candidate has %d skill directories; baseline has %d" % (len(dirs), base_counts["skill_directories"]))
+
     if case_collisions:
         for first, second in case_collisions:
             add("CASE_COLLIDING_SKILL_DIRS", "BLOCK",
@@ -828,6 +857,8 @@ def run_check(args) -> int:
             raise InputError("--report must resolve outside the scanned tree")
         if os.path.islink(args.report):
             raise InputError("symlinked --report path refused")
+        if os.path.normcase(report_path) == os.path.normcase(baseline_path):
+            raise InputError("--report must not overwrite the baseline input")
     report = compare(baseline, tree)
     payload = dump_json(report).encode("utf-8")
     if report_path is not None:
@@ -858,7 +889,7 @@ def run_check(args) -> int:
         print("SUMMARY: BLOCK=%d WARN=%d INFO=%d UNRUN=%d RESULT=%s" % (
             summary["BLOCK"], summary["WARN"], summary["INFO"], summary["UNRUN"],
             summary["result"]))
-    if args.quiet:
+    if args.quiet and not args.json:
         summary = report["summary"]
         print("RESULT: %s BLOCK=%d WARN=%d INFO=%d UNRUN=%d" % (
             summary["result"], summary["BLOCK"], summary["WARN"], summary["INFO"],

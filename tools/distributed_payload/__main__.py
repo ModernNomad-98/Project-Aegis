@@ -33,7 +33,7 @@ def _build(args: argparse.Namespace) -> int:
     source = manifest_module.load_source_identity(Path(args.source))
     document = manifest_module.build_manifest(
         Path(args.root), args.package_id, args.package_version, source, label=args.label)
-    manifest_module.write_manifest_atomic(document, Path(args.out))
+    manifest_module.write_manifest_atomic(document, out_path)
     print(json.dumps({"schema": document["schema"], "out": str(args.out),
                       "entries": len(document["entries"])}, sort_keys=True))
     return 0

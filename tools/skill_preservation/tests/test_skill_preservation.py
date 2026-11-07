@@ -156,6 +156,13 @@ class GuardSelfTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("DISAPPEARED_SKILL", self.rules(payload))
 
+    def test_c02b_template_removal_blocks(self):
+        tree = self.new_candidate("template-removed")
+        shutil.rmtree(str(tree / ".claude" / "skills" / "_template"))
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1)
+        self.assertIn("TEMPLATE_DISAPPEARED", self.rules(payload))
+
     def test_c03_renamed_skill_blocks(self):
         tree = self.new_candidate("renamed")
         os.rename(str(tree / ".claude" / "skills" / "alpha"),
@@ -311,6 +318,24 @@ class GuardSelfTests(unittest.TestCase):
         rules = self.rules(report)
         self.assertIn("ADDED_SKILL", rules)
         self.assertNotIn("ADDED_PATH_IN_SKILL_SURFACE", rules)
+
+    def test_c16c_json_quiet_output_is_pure_json(self):
+        tree = self.new_candidate("json-quiet")
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = guard.main(["check", "--tree", str(tree),
+                               "--baseline", str(self.baseline_path), "--json", "--quiet"])
+        self.assertEqual(code, 0)
+        json.loads(out.getvalue())
+
+    def test_c16d_report_cannot_overwrite_baseline(self):
+        tree = self.new_candidate("report-overwrite")
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = guard.main(["check", "--tree", str(tree),
+                               "--baseline", str(self.baseline_path),
+                               "--report", str(self.baseline_path), "--json"])
+        self.assertEqual(code, 2)
 
     def test_c17_missing_baseline_fails_closed(self):
         out, err = io.StringIO(), io.StringIO()

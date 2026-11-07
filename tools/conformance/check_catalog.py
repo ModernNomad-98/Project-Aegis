@@ -678,6 +678,13 @@ def check_completeness(catalog, findings):
     if observed < DECLARED_COUNT_MIN or observed > DECLARED_COUNT_MAX:
         gap("declared first-profile record range is %d-%d but the catalog has %d records"
             % (DECLARED_COUNT_MIN, DECLARED_COUNT_MAX, observed))
+    unknown_mandatory = sorted(mandatory_set - set(by_id))
+    for rid in unknown_mandatory:
+        gap("mandatory_requirement_ids names a record that does not exist", rid)
+    uncovered = sorted(set(by_id) - mandatory_set)
+    if uncovered:
+        gap("catalog records omitted from first-profile mandatory_requirement_ids: %s"
+            % ", ".join(uncovered))
 
 
 def build_completeness(catalog):
@@ -997,7 +1004,7 @@ def main(argv=None):
             raise InputError("catalog must be a JSON object")
         findings = []
         structure = check_structure(catalog, findings)
-        if structure is not None:
+        if structure is not None and not any(f.get("code") == "SCHEMA" for f in findings):
             source_paths = check_sources(catalog, repo_root, findings)
             check_requirements(catalog, repo_root, source_paths, findings)
             check_observation_fields(catalog, findings)

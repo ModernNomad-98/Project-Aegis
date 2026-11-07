@@ -128,8 +128,12 @@ def verify_target(manifest_path: Path, target_root: Path,
     if not target.is_dir():
         raise ManifestError("target_not_directory", "target root is not a directory")
     limitations = _containment_preflight(target)
+    planned_report = None
     if report_out is not None:
-        _plan_report_path(report_out, target, manifest)
+        planned_report = _plan_report_path(report_out, target, manifest)
+        if planned_report == Path(manifest_path).resolve():
+            raise ManifestError("unsafe_report_path",
+                                "report path must not overwrite the manifest input")
     resolved_manifest = Path(manifest_path).resolve()
     target_root_resolved = target.resolve()
     entry_paths = [entry["path"] for entry in manifest["entries"]]
@@ -249,8 +253,8 @@ def verify_target(manifest_path: Path, target_root: Path,
         "host_limitations": limitations,
         "repair_available": False,
     }
-    if report_out is not None:
-        _write_report(Path(report_out), report)
+    if planned_report is not None:
+        _write_report(planned_report, report)
     return report, (EXIT_FINDINGS if findings else EXIT_CLEAN)
 
 
