@@ -21,27 +21,31 @@ and were not modified. No remote artifact was deleted or expired.
 raw_transcripts_included=false. They contain spend and provenance metadata only
 (no credentials, no prompts, no provider transcripts, no secrets).
 
-## Legacy config-template identity (state as textual substitution, not regeneration)
+## Legacy config-template identity (verified directly from historical ancestor blobs)
 
 Both proofs record config_template_sha256 =
 a90ae2ce140e8dfb4beb60a4caef4782e4fbf07702dc60ab73fa4527d3c4e1d0.
 
-That identity is a **reconstruction**; the historical template file itself is
-not retained in local git history. It is a TEXTUAL two-value substitution of the
-exact current committed template bytes
-(tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json,
-332 B / c484d8d9eff3f53cfdeaf05f86701351c498bb3a0dae442d5ddae66f7b76877e):
+The historical template is **directly available in this repository** at the two
+proof-head ancestor commits; it was verified read-only with git show on
+2026-11-07 (no reconstruction is required):
 
-- max_output_tokens: 16384 -> 4096
-- spend_ceiling_cents: 200 -> 50
+- cef6e91cbae4af1114f182dce0f0d98ebc146b65:tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json
+- 1bfdf4a96966a97059270e383b6d0b90e1d88fa0:tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json
 
-applied to those exact bytes yields 330 B /
-a90ae2ce140e8dfb4beb60a4caef4782e4fbf07702dc60ab73fa4527d3c4e1d0.
+Both ancestor blobs return the identical **330-byte** file whose SHA-256 is
+**a90ae2ce140e8dfb4beb60a4caef4782e4fbf07702dc60ab73fa4527d3c4e1d0** - exactly
+the identity recorded in both fixtures. The current committed template is
+332 B / c484d8d9eff3f53cfdeaf05f86701351c498bb3a0dae442d5ddae66f7b76877e; the
+historical 330-byte template records max_output_tokens 4096 and
+spend_ceiling_cents 50, versus 16384 and 200 in the current committed template,
+so the identity difference is the historical budget, not a provenance gap.
 
-This is **not** a regenerated or re-serialized template file: a sorted-key JSON
-re-serialization of the same values is also 330 B but hashes to
+For completeness, a sorted-key JSON re-serialization of the same values is also
+330 B but hashes to
 a227082dbfaf05f183ec3984b9e3d6e1ca55c74a650199af7c5e8ee71cc0b49f, which is
-**not** the recorded identity. No regenerated template is committed or claimed.
+**not** the recorded identity. No regenerated template file is committed, used
+or claimed: the provenance evidence is the historical ancestor blob itself.
 
 The recorded gate_template_sha256 in both fixtures
 (3975add5b2e1f8f9bb2a8774f5c1b756e27f981d5c69afafd2ac65726ea8fb16) equals the

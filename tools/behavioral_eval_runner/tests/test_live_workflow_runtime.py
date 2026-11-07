@@ -13,6 +13,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest import mock
 
 import yaml
 
@@ -44,6 +45,7 @@ from tools.behavioral_eval_runner.live.workflow_runtime import (
     list_run_artifacts,
     list_workflow_runs,
 )
+from tools.behavioral_eval_runner.live import workflow_runtime
 from tools.behavioral_eval_runner.live.cumulative import admit_paid_call, smoke_spend_total
 
 
@@ -692,6 +694,75 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
 
+    def _registered_fake(self, entry):
+        return FakeGH(
+            {"smoke": [page([entry])], "trial": [page([])]},
+            {str(entry["id"]): []}, {},
+        )
+
+    def test_registered_artifactless_run_attempt_mismatch_refuses(self):
+        # P2 (Codex 4501462748): the paid-attempt identity includes run_attempt.
+        # A re-run keeps the run id/head and increments run_attempt, so a
+        # non-original attempt must never receive the historical 6c/0c spend.
+        cases = [
+            (FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, "6c"),
+            (INCIDENT_RUN_ID, INCIDENT_RUN_HEAD, "0c"),
+        ]
+        for run_id, head_sha, label in cases:
+            entry = self._run_with_head(run_id, head_sha, conclusion="failure")
+            entry["run_attempt"] = 2
+            with self.subTest(label=label):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=self._registered_fake(entry), repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn("recorded attempt", str(caught.exception))
+
+    def test_registered_artifactless_attempt_evidence_missing_fails_closed(self):
+        # P2: missing attempt evidence is never guessed or defaulted. A missing
+        # run attempt and a registry entry without a recorded attempt both refuse.
+        entry = self._run_with_head(
+            FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, conclusion="failure",
+        )
+        del entry["run_attempt"]
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(
+                gh=self._registered_fake(entry), repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("readable attempt evidence", str(caught.exception))
+
+        missing_recorded = {
+            "spent_cents": 6,
+            "expected_conclusion": "failure",
+            "head_sha_prefix": "88fdec73",
+        }
+        entry = self._run_with_head(
+            FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, conclusion="failure",
+        )
+        with mock.patch.dict(
+            workflow_runtime.SMOKE_RUNS_WITHOUT_PROOF,
+            {FAILED_NO_PROOF_RUN_ID: missing_recorded},
+            clear=False,
+        ):
+            with self.assertRaises(ValueError) as caught:
+                collect_smoke_proof_spends(
+                    gh=self._registered_fake(entry), repository="o/r", work_dir=self.tmp,
+                )
+            self.assertIn("no recorded attempt evidence", str(caught.exception))
+
+        invalid_recorded = dict(missing_recorded)
+        invalid_recorded["expected_attempt"] = "1"
+        with mock.patch.dict(
+            workflow_runtime.SMOKE_RUNS_WITHOUT_PROOF,
+            {FAILED_NO_PROOF_RUN_ID: invalid_recorded},
+            clear=False,
+        ):
+            with self.assertRaises(ValueError) as caught:
+                collect_smoke_proof_spends(
+                    gh=self._registered_fake(entry), repository="o/r", work_dir=self.tmp,
+                )
+            self.assertIn("no recorded attempt evidence", str(caught.exception))
+
     def test_registered_run_with_present_corrupt_artifact_refuses_without_booking(self):
         # F-B3/NC-12: artifact PRESENCE is checked before the registry, so a
         # present-but-corrupt proof for a registered run id hard-refuses and the
@@ -794,10 +865,12 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         failed = SMOKE_RUNS_WITHOUT_PROOF[FAILED_NO_PROOF_RUN_ID]
         self.assertEqual(failed["spent_cents"], 6)
         self.assertEqual(failed["expected_conclusion"], "failure")
+        self.assertEqual(failed["expected_attempt"], 1)
         self.assertEqual(failed["head_sha_prefix"], "88fdec73")
         incident = SMOKE_RUNS_WITHOUT_PROOF[INCIDENT_RUN_ID]
         self.assertEqual(incident["spent_cents"], 0)
         self.assertEqual(incident["expected_conclusion"], "failure")
+        self.assertEqual(incident["expected_attempt"], 1)
         self.assertEqual(incident["head_sha"], INCIDENT_RUN_HEAD)
         # AC-12/R3: the preserved floors are unchanged and not lowered.
         self.assertEqual(PRESERVED_HISTORICAL_SMOKE_CENTS, 18)

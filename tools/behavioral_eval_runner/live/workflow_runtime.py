@@ -81,10 +81,14 @@ SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
 
 #: Explicit, fail-closed registry of identified historical ended eval-smoke runs
 #: that have NO proof artifact. Only the exact run ids below are eligible, and
-#: only when the proof artifact is absent and the run entry's recorded conclusion
-#: and head (or retained head prefix) match. An unregistered artifactless run
-#: stays UNKNOWN-not-zero; a present artifact always goes through the
-#: download/validation path first (the registry never bypasses proof validation).
+#: only when the proof artifact is absent and the run entry's recorded conclusion,
+#: head (or retained head prefix) and run_attempt all match. An unregistered
+#: artifactless run stays UNKNOWN-not-zero; a present artifact always goes through
+#: the download/validation path first (the registry never bypasses proof
+#: validation). A GitHub re-run keeps the run id and head while incrementing
+#: run_attempt, so run_attempt is part of the paid-attempt identity: a missing
+#: recorded attempt, or a missing/invalid run attempt, fails closed and is never
+#: guessed or defaulted.
 #:
 #: 41167546138: the 2026-10-30 pre-artifact judge-output-contract failure run
 #:   (zero artifacts). Its spend is the committed preserved-floor residual:
@@ -92,12 +96,15 @@ SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
 #:   leaves 6c; booking it keeps the identified history exactly at the unchanged
 #:   preserved floor (derived, not a measured bill). The full head SHA was never
 #:   retained locally; only the identification-record prefix is registered.
+#:   Recorded attempt 1 (metadata fact, not spend proof).
 #: 42134872074: the 2026-11-06 admission-refused dispatch (failed before any
 #:   credential mapping or provider call; documented $0; zero artifacts).
+#:   Recorded attempt 1 (metadata fact, not spend proof).
 SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
     "41167546138": {
         "spent_cents": 6,
         "expected_conclusion": "failure",
+        "expected_attempt": 1,
         "head_sha_prefix": "88fdec73",
         "basis": (
             "preserved-floor residual: 18c floor - 6c - 6c; 2026-10-30 "
@@ -108,6 +115,7 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
     "42134872074": {
         "spent_cents": 0,
         "expected_conclusion": "failure",
+        "expected_attempt": 1,
         "head_sha": "2cad63e57d3d215f62a9d5f22b1f2b23cbaf8abf",
         "basis": (
             "admission-refused before credential mapping/provider call; documented "
@@ -342,10 +350,13 @@ def _registered_legacy_run_spend(run: Mapping[str, Any]) -> int | None:
     """Registered spend for an identified artifactless ended run, else None.
 
     Only the exact run ids committed in SMOKE_RUNS_WITHOUT_PROOF are eligible,
-    and only when the run entry's recorded conclusion and head (or retained head
-    prefix) match the committed record; a mismatch fails closed rather than
-    booking the residual. Callers reach this only when the proof artifact is
-    absent: a present artifact is always handled by download/validation first.
+    and only when the run entry's recorded conclusion, head (or retained head
+    prefix) and run_attempt all match the committed record; a mismatch fails
+    closed rather than booking the residual. The paid-attempt identity includes
+    run_attempt (a GitHub re-run keeps run id/head and increments the attempt),
+    so a missing recorded attempt or a missing/invalid run attempt also fails
+    closed and is never defaulted. Callers reach this only when the proof artifact
+    is absent: a present artifact is always handled by download/validation first.
     """
     run_id = str(run.get("id"))
     registered = SMOKE_RUNS_WITHOUT_PROOF.get(run_id)
@@ -354,6 +365,18 @@ def _registered_legacy_run_spend(run: Mapping[str, Any]) -> int | None:
     label = "registered legacy smoke run " + run_id
     if run.get("conclusion") != registered.get("expected_conclusion"):
         raise ValueError(label + " does not match its recorded conclusion")
+    expected_attempt = registered.get("expected_attempt")
+    if (
+        isinstance(expected_attempt, bool)
+        or not isinstance(expected_attempt, int)
+        or expected_attempt <= 0
+    ):
+        raise ValueError(label + " has no recorded attempt evidence")
+    attempt = run.get("run_attempt")
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt <= 0:
+        raise ValueError(label + " has no readable attempt evidence")
+    if attempt != expected_attempt:
+        raise ValueError(label + " does not match its recorded attempt")
     head = _require_hex(run, "head_sha", HEX40, "run entry")
     expected_head = registered.get("head_sha")
     if expected_head is not None:
@@ -379,8 +402,9 @@ def collect_smoke_proof_spends(
     A successful run without a readable proof is UNKNOWN and refuses; it is never
     counted as zero. The single documented exception is an ended run whose proof
     artifact is absent AND whose exact run id is committed in
-    SMOKE_RUNS_WITHOUT_PROOF together with matching recorded run metadata; only
-    that run's recorded spend is booked. A present-but-unreadable, malformed or
+    SMOKE_RUNS_WITHOUT_PROOF together with matching recorded run metadata
+    (conclusion, head/prefix and run_attempt); only that run's recorded spend is
+    booked. A present-but-unreadable, malformed or
     tampered artifact never enters the registry path and remains a hard refusal.
     """
     records: dict[str, int] = {}
@@ -401,7 +425,7 @@ def collect_smoke_proof_spends(
             registered_spent = _registered_legacy_run_spend(run)
             if registered_spent is None:
                 _fail_unknown("ended smoke run " + str(run_id) + " has no proof artifact")
-            attempt = run.get("run_attempt", 1)
+            attempt = run.get("run_attempt")  # validated positive int by the registry
             records = merge_smoke_gate_spend(
                 records,
                 {"smoke_run_id": normalize_smoke_run_id(run_id),
