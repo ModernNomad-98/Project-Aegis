@@ -55,6 +55,75 @@ STATE_ARTIFACT_NAMES = (STATE_ARTIFACT_NAME, JOB1_STATE_ARTIFACT_NAME)
 PRESERVED_HISTORICAL_LEDGER_CENTS = 222
 PRESERVED_HISTORICAL_SMOKE_CENTS = 18
 
+#: Version-aware smoke-proof config pin registry: accepted historical smoke
+#: config TEMPLATE identities (the exact sha256 the producer records as the
+#: proof's config_template_sha256 field) mapped to the max_output_tokens they
+#: pinned. A proof whose recorded identity is absent is refused (fail closed), so
+#: a future committed-config change must update this registry in the same
+#: reviewed change; the drift-guard test pins the current entry.
+#:
+#: Current committed template
+#: (tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json):
+#: 332 B / c484d8d9... -> 16,384.
+#:
+#: Legacy 2026-10-31 template identity recorded by both retained historical
+#: proofs (eval-smoke runs 41213566873 / 41179846875, artifacts 13046737982 /
+#: 13034581056, 2,253 B each) -> 4,096. The legacy identity is a TEXTUAL
+#: two-value substitution of the exact current committed template bytes
+#: (max_output_tokens 16384 -> 4096 and spend_ceiling_cents 200 -> 50), yielding
+#: 330 B / a90ae2ce...; it is not a JSON re-serialization (a sorted-key
+#: re-serialization is also 330 B but hashes to a227082d..., which is not an
+#: accepted identity), and no regenerated template file is claimed.
+SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
+    "c484d8d9eff3f53cfdeaf05f86701351c498bb3a0dae442d5ddae66f7b76877e": 16_384,
+    "a90ae2ce140e8dfb4beb60a4caef4782e4fbf07702dc60ab73fa4527d3c4e1d0": 4_096,
+}
+
+#: Explicit, fail-closed registry of identified historical ended eval-smoke runs
+#: that have NO proof artifact. Only the exact run ids below are eligible, and
+#: only when the proof artifact is absent and the run entry's recorded conclusion,
+#: head (or retained head prefix) and run_attempt all match. An unregistered
+#: artifactless run stays UNKNOWN-not-zero; a present artifact always goes through
+#: the download/validation path first (the registry never bypasses proof
+#: validation). A GitHub re-run keeps the run id and head while incrementing
+#: run_attempt, so run_attempt is part of the paid-attempt identity: a missing
+#: recorded attempt, or a missing/invalid run attempt, fails closed and is never
+#: guessed or defaulted.
+#:
+#: 41167546138: the 2026-10-30 pre-artifact judge-output-contract failure run
+#:   (zero artifacts). Its spend is the committed preserved-floor residual:
+#:   PRESERVED_HISTORICAL_SMOKE_CENTS (18) minus the two retained 6c proofs
+#:   leaves 6c; booking it keeps the identified history exactly at the unchanged
+#:   preserved floor (derived, not a measured bill). The full head SHA was never
+#:   retained locally; only the identification-record prefix is registered.
+#:   Recorded attempt 1 (metadata fact, not spend proof).
+#: 42134872074: the 2026-11-06 admission-refused dispatch (failed before any
+#:   credential mapping or provider call; documented $0; zero artifacts).
+#:   Recorded attempt 1 (metadata fact, not spend proof).
+SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
+    "41167546138": {
+        "spent_cents": 6,
+        "expected_conclusion": "failure",
+        "expected_attempt": 1,
+        "head_sha_prefix": "88fdec73",
+        "basis": (
+            "preserved-floor residual: 18c floor - 6c - 6c; 2026-10-30 "
+            "judge-output-contract failure; zero artifacts (identification record; "
+            "docs/behavioral-eval-runner-schema-compatibility.md:43)"
+        ),
+    },
+    "42134872074": {
+        "spent_cents": 0,
+        "expected_conclusion": "failure",
+        "expected_attempt": 1,
+        "head_sha": "2cad63e57d3d215f62a9d5f22b1f2b23cbaf8abf",
+        "basis": (
+            "admission-refused before credential mapping/provider call; documented "
+            "$0 spend; zero artifacts (SMOKE-RUN-RESULT-2026-11-06 + dispatch receipt)"
+        ),
+    },
+}
+
 
 def _completed(gh: Callable[..., Any], args: list[str], label: str) -> Any:
     completed = gh(args)
@@ -208,9 +277,27 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
         raise ValueError("smoke proof citability is not REAL_HOST")
     if _require_hex(payload, "head_sha", HEX40, "smoke proof") != provenance["head_sha"]:
         raise ValueError("smoke proof head does not match the workflow run head")
+    # A re-run keeps the workflow run id and head but increments run_attempt, and
+    # gh run download --name may otherwise select an earlier attempt's artifact for
+    # the later API run entry. Bind the retained proof's own workflow provenance to
+    # the API run metadata: both the recorded run id and the recorded attempt must
+    # match, and missing/malformed evidence on either side fails closed.
+    run_attempt = run.get("run_attempt")
+    if isinstance(run_attempt, bool) or not isinstance(run_attempt, int) or run_attempt <= 0:
+        raise ValueError("smoke proof workflow run has no readable attempt evidence")
+    proof_run_id = _require_text(payload, "workflow_run_id", "smoke proof")
+    proof_attempt_text = _require_text(payload, "workflow_run_attempt", "smoke proof")
+    if not proof_attempt_text.isdigit() or int(proof_attempt_text) <= 0:
+        raise ValueError("smoke proof workflow run attempt is not a positive integer")
+    if normalize_smoke_run_id(proof_run_id) != normalize_smoke_run_id(provenance["run_id"]):
+        raise ValueError("smoke proof workflow run id does not match the workflow run id")
+    if int(proof_attempt_text) != run_attempt:
+        raise ValueError(
+            "smoke proof workflow run attempt does not match the workflow run attempt"
+        )
     _require_hex(payload, "dataset_sha256", HEX64, "smoke proof")
     _require_hex(payload, "built_config_sha256", HEX64, "smoke proof")
-    _require_hex(payload, "config_template_sha256", HEX64, "smoke proof")
+    config_identity = _require_hex(payload, "config_template_sha256", HEX64, "smoke proof")
     _require_text(payload, "gate_id", "smoke proof")
     if _require_text(payload, "subject_vendor", "smoke proof") != pins["subject_vendor"]:
         raise ValueError("smoke proof subject vendor is not pinned")
@@ -218,8 +305,13 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
         raise ValueError("smoke proof judge vendor is not pinned")
     if _require_text(payload, "judge_model", "smoke proof") != pins["judge_model"]:
         raise ValueError("smoke proof judge model is not pinned")
-    if payload.get("max_output_tokens") != 16_384:
-        raise ValueError("smoke proof max_output_tokens is not the pinned 16384")
+    expected_cap = SMOKE_PROOF_CONFIG_PINS.get(config_identity)
+    if expected_cap is None:
+        raise ValueError("smoke proof config identity is not a recognized smoke config pin")
+    if payload.get("max_output_tokens") != expected_cap:
+        raise ValueError(
+            "smoke proof max_output_tokens is not the pinned value for its config identity"
+        )
     if payload.get("planned_calls") != 2 or payload.get("dispatched_calls") != 2:
         raise ValueError("smoke proof call shape is not exactly two calls")
     supplied = _require_hex(payload, "proof_sha256", HEX64, "smoke proof")
@@ -272,12 +364,70 @@ def _fail_unknown(label: str) -> None:
     raise ValueError(label + ": UNKNOWN, not zero")
 
 
+def _registered_legacy_run_spend(run: Mapping[str, Any]) -> int | None:
+    """Registered spend for an identified artifactless ended run, else None.
+
+    Only the exact run ids committed in SMOKE_RUNS_WITHOUT_PROOF are eligible,
+    and only when the run entry's recorded conclusion, head (or retained head
+    prefix) and run_attempt all match the committed record; a mismatch fails
+    closed rather than booking the residual. The paid-attempt identity includes
+    run_attempt (a GitHub re-run keeps run id/head and increments the attempt),
+    so a missing recorded attempt or a missing/invalid run attempt also fails
+    closed and is never defaulted. Callers reach this only when the proof artifact
+    is absent: a present artifact is always handled by download/validation first.
+    """
+    run_id = str(run.get("id"))
+    registered = SMOKE_RUNS_WITHOUT_PROOF.get(run_id)
+    if registered is None:
+        return None
+    label = "registered legacy smoke run " + run_id
+    if run.get("conclusion") != registered.get("expected_conclusion"):
+        raise ValueError(label + " does not match its recorded conclusion")
+    expected_attempt = registered.get("expected_attempt")
+    if (
+        isinstance(expected_attempt, bool)
+        or not isinstance(expected_attempt, int)
+        or expected_attempt <= 0
+    ):
+        raise ValueError(label + " has no recorded attempt evidence")
+    attempt = run.get("run_attempt")
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt <= 0:
+        raise ValueError(label + " has no readable attempt evidence")
+    if attempt != expected_attempt:
+        raise ValueError(label + " does not match its recorded attempt")
+    head = _require_hex(run, "head_sha", HEX40, "run entry")
+    expected_head = registered.get("head_sha")
+    if expected_head is not None:
+        if head != expected_head:
+            raise ValueError(label + " does not match its recorded head")
+    else:
+        expected_prefix = registered.get("head_sha_prefix")
+        if (
+            not isinstance(expected_prefix, str)
+            or not expected_prefix
+            or not head.startswith(expected_prefix)
+        ):
+            raise ValueError(label + " does not match its recorded head prefix")
+    return strict_cents(registered.get("spent_cents"), "registered legacy smoke spend")
+
+
 def collect_smoke_proof_spends(
     *, gh: Callable[..., Any], repository: str, work_dir: Path,
     current_run_id: Any = None, smoke_workflow_file: str = "eval-smoke.yml",
 ) -> dict[str, int]:
-    """Collect every successful smoke proof. A successful run without a readable
-    proof is UNKNOWN and refuses; it is never counted as zero."""
+    """Collect every successful smoke proof and the identified legacy runs.
+
+    A successful run without a readable proof is UNKNOWN and refuses; it is never
+    counted as zero. The single documented exception is an ended run whose proof
+    artifact is absent AND whose exact run id is committed in
+    SMOKE_RUNS_WITHOUT_PROOF together with matching recorded run metadata
+    (conclusion, head/prefix and run_attempt); only that run's recorded spend is
+    booked. A present-but-unreadable, malformed or tampered artifact never enters
+    the registry path and remains a hard refusal. For a present artifact the
+    proof's own workflow_run_id and workflow_run_attempt must match the API run
+    entry, and more than one same-name proof artifact on the run fails closed
+    rather than letting a name-only download choose an ambiguous attempt.
+    """
     records: dict[str, int] = {}
     for run in list_workflow_runs(gh, repository, smoke_workflow_file):
         if not isinstance(run, Mapping):
@@ -291,20 +441,36 @@ def collect_smoke_proof_spends(
             continue
         _validate_run_provenance(run)
         artifacts = list_run_artifacts(gh, repository, run_id)
-        names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
-        if SMOKE_ARTIFACT_NAME not in names:
-            _fail_unknown("ended smoke run " + str(run_id) + " has no proof artifact")
+        proof_artifacts = [
+            item for item in artifacts
+            if isinstance(item, Mapping) and item.get("name") == SMOKE_ARTIFACT_NAME
+        ]
+        if len(proof_artifacts) > 1:
+            raise ValueError(
+                "ended smoke run " + str(run_id) + " has multiple duplicate "
+                + SMOKE_ARTIFACT_NAME + " artifacts; refusing an ambiguous selection"
+            )
+        if not proof_artifacts:
+            registered_spent = _registered_legacy_run_spend(run)
+            if registered_spent is None:
+                _fail_unknown("ended smoke run " + str(run_id) + " has no proof artifact")
+            attempt = run.get("run_attempt")  # validated positive int by the registry
+            records = merge_smoke_gate_spend(
+                records,
+                {"smoke_run_id": normalize_smoke_run_id(run_id),
+                 "smoke_run_attempt": attempt, "spent_cents": registered_spent},
+            )
+            continue
         payload = download_artifact_json(
             gh, repository, run_id, SMOKE_ARTIFACT_NAME,
             SMOKE_ARTIFACT_MEMBER, work_dir,
         )
-        _validate_smoke_proof(payload, run)
+        validated = _validate_smoke_proof(payload, run)
         spent = strict_cents(payload.get("spent_cents"), "smoke proof spent_cents")
-        attempt = run.get("run_attempt", 1)
         records = merge_smoke_gate_spend(
             records,
             {"smoke_run_id": normalize_smoke_run_id(run_id),
-             "smoke_run_attempt": attempt, "spent_cents": spent},
+             "smoke_run_attempt": validated["attempt"], "spent_cents": spent},
         )
     return records
 
