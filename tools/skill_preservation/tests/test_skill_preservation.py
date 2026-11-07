@@ -428,6 +428,32 @@ class GuardSelfTests(unittest.TestCase):
                       if item["rule"] == "CLEANUP_PATH_ADDITION"]
         self.assertEqual(severities, ["BLOCK"])
 
+    def test_c16b2_new_skill_with_removal_verb_is_allowed(self):
+        tree = self.new_candidate("cleanup-helper")
+        write(tree / ".claude" / "skills" / "cleanup-helper" / "SKILL.md",
+              SKILL_MD_TEMPLATE.format(name="cleanup-helper"))
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("CLEANUP_PATH_ADDITION", self.rules(payload))
+
+    def test_c16b3_candidate_starter_unparsable_blocks(self):
+        tree = self.new_candidate("starter-unparsable")
+        write(tree / "docs" / "consumer-starter-package.md", "# no table here" + chr(10))
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1, out)
+        self.assertIn("INSTALLED_SET_UNVERIFIABLE", self.rules(payload))
+
+    def test_c16b4_yaml_boolean_synonyms_block(self):
+        for token in ("yes", "on", "1"):
+            tree = self.new_candidate("dmi-" + token)
+            skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+            text = skill_md.read_text(encoding="utf-8").replace(
+                "name: alpha", "name: alpha\ndisable-model-invocation: " + token, 1)
+            write(skill_md, text)
+            code, payload, out, err = self.run_check(tree)
+            self.assertEqual(code, 1, token + ": " + out)
+            self.assertIn("SILENT_DISABLE", self.rules(payload), token)
+
     def test_c16b_new_skill_addition_is_not_blocked(self):
         tree = self.new_candidate("new-skill")
         write(tree / ".claude" / "skills" / "gamma" / "SKILL.md",

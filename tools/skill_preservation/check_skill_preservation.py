@@ -244,20 +244,24 @@ def parse_skill_frontmatter(text: str) -> dict:
                 fm_text, re.IGNORECASE)
         if raw_dmi is not None:
             dmi_token = _strip_scalar_quotes(raw_dmi.group(1).strip()).strip().lower()
-            if dmi_token in ("true", "false"):
-                record["disable_model_invocation"] = dmi_token == "true"
+            if dmi_token in ("true", "yes", "on", "1"):
+                record["disable_model_invocation"] = True
+            elif dmi_token in ("false", "no", "off", "0"):
+                record["disable_model_invocation"] = False
             else:
-                record["disable_model_invocation"] = None
+                record["disable_model_invocation"] = True
                 record["parse_ok"] = False
                 record["unreadable_reason"] = "unrecognized disable-model-invocation value"
         elif dmi is None:
             record["disable_model_invocation"] = None
         else:
             dmi_token = _strip_scalar_quotes(str(dmi).strip()).strip().lower()
-            if dmi_token in ("true", "false"):
-                record["disable_model_invocation"] = dmi_token == "true"
+            if dmi_token in ("true", "yes", "on", "1"):
+                record["disable_model_invocation"] = True
+            elif dmi_token in ("false", "no", "off", "0"):
+                record["disable_model_invocation"] = False
             else:
-                record["disable_model_invocation"] = None
+                record["disable_model_invocation"] = True
                 record["parse_ok"] = False
                 record["unreadable_reason"] = "unrecognized disable-model-invocation value"
         if not record["parse_ok"] and record["unreadable_reason"] is None:
@@ -332,6 +336,8 @@ def skill_record(tree: str, skill_dir: str) -> dict:
 
 def build_manifest_surface(tree: str) -> dict:
     path = os.path.join(tree, *MANIFEST_REL.split("/"))
+    if is_reparse_point(path):
+        raise InputError("reparse point at skills manifest path")
     surface = {"present": False, "schema": None, "hash_input": None,
                "source_revision": None, "entries": {}, "error": None}
     if not os.path.isfile(path):
@@ -371,6 +377,8 @@ def mentions_skill(text: str, name: str) -> bool:
 def build_discovery_surface(tree: str, skill_ids: list) -> dict:
     catalog_path = os.path.join(tree, *CATALOG_REL.split("/"))
     readme_path = os.path.join(tree, *README_REL.split("/"))
+    if is_reparse_point(catalog_path) or is_reparse_point(readme_path):
+        raise InputError("reparse point at skill discovery path")
     catalog_text = read_text(catalog_path) if os.path.isfile(catalog_path) else ""
     readme_text = read_text(readme_path) if os.path.isfile(readme_path) else ""
     return {
@@ -383,6 +391,8 @@ def build_discovery_surface(tree: str, skill_ids: list) -> dict:
 
 def build_starter_surface(tree: str) -> dict:
     path = os.path.join(tree, *STARTER_REL.split("/"))
+    if is_reparse_point(path):
+        raise InputError("reparse point at consumer starter-package path")
     surface = {"present": False, "parsed": False, "sha256": None,
                "declared_paths": [], "declared_skills": [], "error": None}
     if not os.path.isfile(path):
@@ -673,8 +683,9 @@ def compare(baseline: dict, tree: str) -> dict:
     if dirs is None or not dirs:
         raise InputError("candidate tree has no non-empty %s directory" % SKILLS_REL)
     for full in dirs:
-        if os.path.islink(full):
-            raise InputError("symlinked skill directory refused: " + safe_relpath(full, tree))
+        if is_reparse_point(full):
+            raise InputError("symlinked/junction skill directory refused: "
+                             + safe_relpath(full, tree))
     candidates = {}
     casefold_seen = {}
     case_collisions = []
@@ -793,13 +804,14 @@ def compare(baseline: dict, tree: str) -> dict:
                 "previously active skill %r is now manual-only (disable-model-invocation "
                 "and/or MANUAL-ONLY sentinel); this silently removes automatic availability"
                 % candidate_id, candidate_id)
-        if not cand_fm.get("description_present"):
-            add("EMPTY_DESCRIPTION", "BLOCK",
-                "skill %r has an empty or missing description" % candidate_id, candidate_id)
-        if cand_fm.get("name") != candidate_id:
-            add("NAME_DIRECTORY_MISMATCH", "BLOCK",
-                "skill %r frontmatter name %r does not equal its directory name"
-                % (candidate_id, cand_fm.get("name")), candidate_id)
+        if cand_fm.get("parse_ok"):
+            if not cand_fm.get("description_present"):
+                add("EMPTY_DESCRIPTION", "BLOCK",
+                    "skill %r has an empty or missing description" % candidate_id, candidate_id)
+            if cand_fm.get("name") != candidate_id:
+                add("NAME_DIRECTORY_MISMATCH", "BLOCK",
+                    "skill %r frontmatter name %r does not equal its directory name"
+                    % (candidate_id, cand_fm.get("name")), candidate_id)
     # discovery surfaces
     discovery = baseline["discovery"]
     named_all = sorted(set(base_named) | set(cand_named))
@@ -854,6 +866,10 @@ def compare(baseline: dict, tree: str) -> dict:
             "docs/consumer-starter-package.md is missing from the candidate; the declared "
             "installed set cannot be verified")
     elif base_starter.get("present") and cand_starter["present"]:
+        if not cand_starter.get("parsed"):
+            add("INSTALLED_SET_UNVERIFIABLE", "BLOCK",
+                "docs/consumer-starter-package.md is present but declares no parseable "
+                "installed set; the installed-set claim cannot be verified")
         if base_starter.get("sha256") != cand_starter["sha256"]:
             add("STARTER_DEFINITION_CHANGED", "WARN",
                 "the consumer starter-package definition changed since baseline; a reviewed "
@@ -880,11 +896,6 @@ def compare(baseline: dict, tree: str) -> dict:
         if rel.startswith(SKILLS_REL + "/"):
             parts = rel.split("/")
             added_skill_id = parts[2] if len(parts) >= 3 else ""
-            if REMOVAL_VERB_RE.search(rel):
-                add("CLEANUP_PATH_ADDITION", "BLOCK",
-                    "candidate adds a removal-looking path inside the protected skill surface: "
-                    "%r" % rel, rel)
-                continue
             if added_skill_id in base_skills:
                 add("ADDED_PATH_IN_SKILL_SURFACE", "BLOCK",
                     "candidate adds a file inside an existing baseline skill directory: %r" % rel, rel)
