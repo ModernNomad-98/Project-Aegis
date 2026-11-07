@@ -604,20 +604,34 @@ def check_requirements(catalog, repo_root, source_paths, findings):
             elif not (os.path.isfile(full) or os.path.isdir(full)):
                 add(findings, "MISSING-SOURCE", where + ".mechanism.refs", rid,
                     "mechanism ref does not exist: %r" % path)
-    edges = {}
+    edges = {rid: set() for rid in by_id}
+
+    def relation_values(record, key):
+        value = record.get(key)
+        return value if isinstance(value, list) else []
+
     for rid, (index, record) in by_id.items():
-        related = []
+        where = "$.requirements[%d]" % index
         for key in ("supersedes", "superseded_by", "related"):
-            for other in record.get(key) or []:
-                if other not in by_id:
-                    add(findings, "UNKNOWN-REF", "$.requirements[%d]" % index, rid,
+            for other in relation_values(record, key):
+                if not isinstance(other, str) or other not in by_id:
+                    add(findings, "UNKNOWN-REF", where, rid,
                         "%s names unknown requirement %r" % (key, other))
-                else:
-                    related.append(other)
+                    continue
                 if other == rid:
-                    add(findings, "CIRCULAR-BINDING", "$.requirements[%d]" % index, rid,
+                    add(findings, "CIRCULAR-BINDING", where, rid,
                         "%s contains the record itself" % key)
-        edges[rid] = [r for r in related if r in by_id]
+                    continue
+                # Normalize supersession direction: supersedes is rid -> other;
+                # superseded_by is other -> rid. Reciprocal expressions therefore
+                # collapse to one edge instead of forming a false 2-cycle.
+                if key == "supersedes":
+                    edges[rid].add(other)
+                elif key == "superseded_by":
+                    edges[other].add(rid)
+                # related is a reciprocal relation, not a supersession ordering;
+                # it is excluded from cycle detection (undirected relations cannot
+                # express a directed cycle and reciprocals must stay valid).
     visiting, done = set(), set()
 
     def visit(node):
@@ -626,7 +640,7 @@ def check_requirements(catalog, repo_root, source_paths, findings):
         if node in visiting:
             return True
         visiting.add(node)
-        for target in edges.get(node, []):
+        for target in sorted(edges.get(node, ())):
             if visit(target):
                 return True
         visiting.discard(node)
@@ -878,6 +892,34 @@ def evaluate_evidence(by_id, evidence, findings):
     return evidence_present, unrun
 
 
+def sanitize_catalog_containers(catalog):
+    """Return a report-safe catalog copy for malformed-container cases.
+
+    check_structure() records SCHEMA findings for malformed profiles/requirements/
+    mandatory_requirement_ids. Report construction must not then iterate the
+    malformed original (which would raise TypeError and become exit 3); normalize
+    those containers to safe empty/list values while the original findings stand.
+    """
+    safe = dict(catalog)
+    raw_requirements = catalog.get("requirements")
+    safe["requirements"] = ([record for record in raw_requirements if isinstance(record, dict)]
+                            if isinstance(raw_requirements, list) else [])
+    raw_profiles = catalog.get("profiles")
+    profiles = []
+    if isinstance(raw_profiles, list):
+        for profile in raw_profiles:
+            if not isinstance(profile, dict):
+                continue
+            safe_profile = dict(profile)
+            mandatory = safe_profile.get("mandatory_requirement_ids")
+            safe_profile["mandatory_requirement_ids"] = (
+                [rid for rid in mandatory if isinstance(rid, str)]
+                if isinstance(mandatory, list) else [])
+            profiles.append(safe_profile)
+    safe["profiles"] = profiles
+    return safe
+
+
 def build_report(catalog, catalog_identity, repo_root, evidence_path, profile_arg, findings):
     by_id = {}
     for record in catalog.get("requirements") or []:
@@ -1065,8 +1107,8 @@ def main(argv=None):
             check_requirements(catalog, repo_root, source_paths, findings)
             check_observation_fields(catalog, findings)
             check_completeness(catalog, findings)
-        report = build_report(catalog, catalog_identity, repo_root, args.evidence,
-                              args.profile, findings)
+        report = build_report(sanitize_catalog_containers(catalog), catalog_identity,
+                              repo_root, args.evidence, args.profile, findings)
         report["exit_code"] = 1 if report["findings"] else 0
         payload = json.dumps(report, sort_keys=True, indent=2, ensure_ascii=True) + "\n"
         if args.out:

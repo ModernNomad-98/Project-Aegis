@@ -486,6 +486,55 @@ class ConformanceCheckerTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("CIRCULAR-BINDING", out)
 
+    # ---------------------------------------------------------------- malformed containers / relations
+    def test_malformed_containers_return_findings_not_internal_error(self):
+        cases = {
+            "requirements-int": lambda catalog: catalog.__setitem__("requirements", 123),
+            "profiles-int": lambda catalog: catalog.__setitem__("profiles", 123),
+            "requirements-nondict": lambda catalog: catalog.__setitem__("requirements", [123]),
+            "mandatory-int": lambda catalog: catalog["profiles"][0].__setitem__(
+                "mandatory_requirement_ids", 123),
+        }
+        for label, mutate in cases.items():
+            fixture = self.fresh_fixture("malformed-" + label)
+            catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+            mutate(catalog)
+            self.write_catalog(catalog, fixture)
+            code, out, err = self.run_checker(root=fixture, *("--json",))
+            self.assertNotEqual(3, code, label + ": " + err)
+            self.assertEqual(1, code, label)
+            report = json.loads(out)
+            self.assertGreater(report["summary"]["findings"], 0, label)
+
+    def test_valid_reciprocal_relations_are_not_cycles(self):
+        fixture = self.fresh_fixture("reciprocal-relations")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        by_id = {record["requirement_id"]: record for record in catalog["requirements"]}
+        ids = sorted(by_id)
+        first, second = ids[0], ids[1]
+        by_id[first]["supersedes"] = [second]
+        by_id[second]["superseded_by"] = [first]
+        by_id[first]["related"] = [second]
+        by_id[second]["related"] = [first]
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker(root=fixture, *("--json",))
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("CIRCULAR-DEPENDENCY", out)
+
+    def test_genuine_supersession_cycle_still_detected(self):
+        fixture = self.fresh_fixture("real-cycle")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        by_id = {record["requirement_id"]: record for record in catalog["requirements"]}
+        ids = sorted(by_id)
+        first, second, third = ids[0], ids[1], ids[2]
+        by_id[first]["supersedes"] = [second]
+        by_id[second]["supersedes"] = [third]
+        by_id[third]["supersedes"] = [first]
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker(root=fixture, *("--json",))
+        self.assertEqual(code, 1, out)
+        self.assertIn("CIRCULAR-DEPENDENCY", out)
+
     # ---------------------------------------------------------------- static hygiene
     def test_static_hygiene_of_checker(self):
         source = TOOL.read_text(encoding="utf-8")

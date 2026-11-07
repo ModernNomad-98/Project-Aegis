@@ -462,6 +462,10 @@ def build_starter_surface(tree: str) -> dict:
 def build_baseline(tree: str, source_revision: str = None, source_tree: str = None,
                    base_commit: str = None) -> dict:
     tree = os.path.realpath(tree)
+    skills_root = os.path.join(tree, *SKILLS_REL.split("/"))
+    if is_reparse_point(skills_root):
+        raise InputError("symlinked/junction skill root refused during baseline generation: "
+                         + SKILLS_REL)
     dirs = skill_dirs(tree)
     if dirs is None:
         raise InputError("candidate tree has no %s directory" % SKILLS_REL)
@@ -881,6 +885,10 @@ def compare(baseline: dict, tree: str) -> dict:
     named_all = sorted(set(base_named) | set(cand_named))
     cand_catalog_path = os.path.join(tree, *CATALOG_REL.split("/"))
     cand_readme_path = os.path.join(tree, *README_REL.split("/"))
+    for label, surface_path in (("docs/skills-catalog.md", cand_catalog_path),
+                                ("README.md", cand_readme_path)):
+        if is_reparse_point(surface_path):
+            raise InputError("candidate discovery surface is a symlink/reparse point: " + label)
     cand_catalog = read_text(cand_catalog_path) if os.path.isfile(cand_catalog_path) else None
     cand_readme = read_text(cand_readme_path) if os.path.isfile(cand_readme_path) else None
     if discovery.get("catalog_present") and cand_catalog is None:

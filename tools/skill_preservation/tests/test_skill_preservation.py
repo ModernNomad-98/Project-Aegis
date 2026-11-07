@@ -10,6 +10,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+from unittest import mock
 
 TESTS_DIR = Path(__file__).resolve().parent
 TOOL_DIR = TESTS_DIR.parent
@@ -586,6 +587,64 @@ class GuardSelfTests(unittest.TestCase):
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             code = guard.main(["check", "--tree", str(self.base_root), "--baseline", str(bad_path)])
         self.assertEqual(code, 2)
+
+    def test_p2d_candidate_discovery_surface_symlink_refused(self):
+        for label, rel in (("catalog", "docs/skills-catalog.md"), ("readme", "README.md")):
+            tree = self.new_candidate("discovery-symlink-" + label)
+            external = Path(self.tmp.name) / ("external-" + label + ".md")
+            external.write_text("# External\n\n- alpha\n- beta\n", encoding="utf-8")
+            surface = tree / rel
+            surface.unlink()
+            created = False
+            try:
+                os.symlink(str(external), str(surface))
+                created = True
+            except (OSError, NotImplementedError):
+                pass
+            if created:
+                code, payload, out, err = self.run_check(tree)
+            else:
+                # Host-limited reparse creation: exercise the same fail-closed code path
+                # with a path-scoped patch of the reparse detector (documented UNRUN host
+                # limitation for real symlink creation).
+                surface_abs = os.path.normcase(os.path.realpath(str(surface)))
+                original = guard.is_reparse_point
+
+                def fake(path):
+                    return (os.path.normcase(os.path.realpath(str(path))) == surface_abs
+                            or original(path))
+
+                with mock.patch.object(guard, "is_reparse_point", side_effect=fake):
+                    code, payload, out, err = self.run_check(tree)
+            self.assertEqual(code, 2, label)
+
+    def test_p2d_baseline_skills_root_symlink_refused(self):
+        tree = self.new_candidate("skills-root-symlink")
+        external = Path(self.tmp.name) / "external-skills"
+        shutil.copytree(str(tree / ".claude" / "skills"), str(external))
+        skills_dir = tree / ".claude" / "skills"
+        backup = tree / ".claude" / "skills-backup"
+        skills_dir.rename(backup)
+        created = False
+        try:
+            os.symlink(str(external), str(skills_dir), target_is_directory=True)
+            created = True
+        except (OSError, NotImplementedError):
+            backup.rename(skills_dir)
+        if created:
+            code, out = self.run_baseline_cli(tree, "skills-root-symlink.json")
+        else:
+            skills_abs = os.path.normcase(os.path.realpath(str(tree / ".claude" / "skills")))
+            original = guard.is_reparse_point
+
+            def fake(path):
+                return (os.path.normcase(os.path.realpath(str(path))) == skills_abs
+                        or original(path))
+
+            with mock.patch.object(guard, "is_reparse_point", side_effect=fake):
+                code, out = self.run_baseline_cli(tree, "skills-root-symlink.json")
+        self.assertEqual(code, 2)
+        self.assertFalse(out.exists())
 
     def test_c24_symlink_refused(self):
         link = Path(self.tmp.name) / "link-tree"
