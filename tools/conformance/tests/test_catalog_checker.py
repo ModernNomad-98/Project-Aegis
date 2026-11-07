@@ -177,6 +177,31 @@ class ConformanceCheckerTests(unittest.TestCase):
         report = json.loads(out)
         self.assertTrue(any(item["code"] == "COMPLETENESS-GAP" for item in report["findings"]))
 
+    def test_extra_mandatory_record_is_completeness_gap(self):
+        fixture = self.fresh_fixture("extra-mandatory")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        extra = json.loads(json.dumps(catalog["requirements"][0]))
+        extra["requirement_id"] = "AEGIS-REQ-EXTRA-99"
+        extra["id_kind"] = "catalog-minted"
+        catalog["requirements"].append(extra)
+        catalog["profiles"][0]["mandatory_requirement_ids"].append("AEGIS-REQ-EXTRA-99")
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker("--json", root=fixture)
+        self.assertEqual(code, 1, out)
+        report = json.loads(out)
+        self.assertTrue(any(item["code"] == "COMPLETENESS-GAP" for item in report["findings"]))
+
+    def test_extra_profile_is_completeness_gap(self):
+        fixture = self.fresh_fixture("extra-profile")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        second = json.loads(json.dumps(catalog["profiles"][0]))
+        second["profile_id"] = "other-profile"
+        catalog["profiles"].append(second)
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker("--json", root=fixture)
+        self.assertEqual(code, 1, out)
+        self.assertTrue(any(item["code"] == "COMPLETENESS-GAP" for item in json.loads(out)["findings"]))
+
     def test_malformed_containers_are_findings_not_crash(self):
         for field in ("mechanism", "verification", "evidence_requirement"):
             fixture = self.fresh_fixture("bad-" + field)

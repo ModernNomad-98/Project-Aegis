@@ -636,8 +636,8 @@ def check_observation_fields(catalog, findings):
 
 
 def check_completeness(catalog, findings):
-    profiles = [p for p in (catalog.get("profiles") or [])
-                if isinstance(p, dict) and p.get("profile_id") == FIRST_PROFILE]
+    all_profiles = [p for p in (catalog.get("profiles") or []) if isinstance(p, dict)]
+    profiles = [p for p in all_profiles if p.get("profile_id") == FIRST_PROFILE]
     requirements = [r for r in (catalog.get("requirements") or []) if isinstance(r, dict)]
     by_id = {}
     for record in requirements:
@@ -650,6 +650,8 @@ def check_completeness(catalog, findings):
 
     mandatory = []
     mandatory_set = set()
+    if len(all_profiles) != 1:
+        gap("v1 requires exactly one profile; catalog declares %d" % len(all_profiles))
     if not profiles:
         gap("first profile %r is missing" % FIRST_PROFILE)
     else:
@@ -662,8 +664,8 @@ def check_completeness(catalog, findings):
                 missing = [rid for rid in ids if rid not in present]
                 gap("family %s is incomplete; missing mandatory seeds: %s"
                     % (family, ", ".join(missing)))
-        if not set(SEED_IDS) <= mandatory_set:
-            gap("mandatory_requirement_ids does not equal the declared seed inventory")
+        if mandatory_set != set(SEED_IDS) or mandatory_set != set(by_id):
+            gap("mandatory_requirement_ids must equal the declared seed inventory and every catalog record")
         for rid in SEED_IDS:
             record = by_id.get(rid)
             if record is None:
@@ -960,8 +962,13 @@ def human_summary(report):
     return "\n".join(lines)
 
 
-def write_out(path, report, repo_root):
+def write_out(path, report, repo_root, input_paths=()):
     full = Path(path).resolve()
+    if full.exists() and not full.is_file():
+        raise InputError("--out destination must be a regular file")
+    for input_path in input_paths:
+        if full == Path(input_path).resolve():
+            raise InputError("--out must not overwrite an input file")
     try:
         common = os.path.commonpath([str(full), str(repo_root.resolve())])
     except ValueError:
@@ -1021,7 +1028,8 @@ def main(argv=None):
         report["exit_code"] = 1 if report["findings"] else 0
         payload = json.dumps(report, sort_keys=True, indent=2, ensure_ascii=True) + "\n"
         if args.out:
-            write_out(args.out, report, repo_root)
+            write_out(args.out, report, repo_root,
+                      [args.catalog] + ([args.evidence] if args.evidence else []))
         if args.json:
             sys.stdout.write(payload)
         elif not args.quiet:

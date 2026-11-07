@@ -71,7 +71,7 @@ def _containment_preflight(target: Path) -> list[str]:
     limitations = []
     if _detect_reparse(target):
         raise ManifestError("unsafe_target", "target root is a symlink/reparse point; refusing")
-    for parent in list(target.parents)[:6]:
+    for parent in target.parents:
         if _detect_reparse(parent):
             raise ManifestError("unsafe_target",
                                 "target path chain contains a symlink/reparse point; refusing")
@@ -209,8 +209,8 @@ def verify_target(manifest_path: Path, target_root: Path,
 
     # Unrecognized content inside declared package directories only.
     payload_prefixes = payload_directory_prefixes(manifest)
+    # Never claim ownership of the whole target: scan only declared package directories.
     roots = [target / prefix for prefix in payload_prefixes]
-    roots.append(target) if not payload_prefixes else None
     for root in roots:
         if not root.is_dir():
             continue

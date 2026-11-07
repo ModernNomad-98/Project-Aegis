@@ -632,6 +632,10 @@ def validate_baseline(baseline: dict) -> None:
 # --------------------------------------------------------------------------- comparison
 def compare(baseline: dict, tree: str) -> dict:
     tree = os.path.realpath(tree)
+    skills_root = os.path.join(tree, *SKILLS_REL.split("/"))
+    if os.path.islink(skills_root) or (
+            callable(getattr(os.path, "isjunction", None)) and os.path.isjunction(skills_root)):
+        raise InputError("symlinked/junction skill root refused")
     dirs = skill_dirs(tree)
     if dirs is None or not dirs:
         raise InputError("candidate tree has no non-empty %s directory" % SKILLS_REL)
@@ -676,6 +680,18 @@ def compare(baseline: dict, tree: str) -> dict:
     if isinstance(base_counts.get("skill_directories"), int) and len(dirs) < base_counts["skill_directories"]:
         add("SKILL_DIRECTORY_COUNT_REDUCED", "BLOCK",
             "candidate has %d skill directories; baseline has %d" % (len(dirs), base_counts["skill_directories"]))
+
+    if "_template" in base_skills and "_template" in candidates:
+        base_template_files = {item["path"] for item in base_skills["_template"].get("files", [])
+                               if isinstance(item, dict) and isinstance(item.get("path"), str)}
+        cand_template_files = {item["path"] for item in candidates["_template"].get("files", [])
+                               if isinstance(item, dict) and isinstance(item.get("path"), str)}
+        for missing in sorted(base_template_files - cand_template_files):
+            add("MISSING_SUPPORTING_FILE", "BLOCK",
+                "candidate template skill is missing baseline file: %r" % missing, missing)
+        if base_skills["_template"].get("skill_md") and not candidates["_template"].get("skill_md"):
+            add("TEMPLATE_SKILL_MD_MISSING", "BLOCK",
+                "candidate template skill has no SKILL.md", "_template")
 
     if case_collisions:
         for first, second in case_collisions:

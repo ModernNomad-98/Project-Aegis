@@ -163,6 +163,14 @@ class GuardSelfTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("TEMPLATE_DISAPPEARED", self.rules(payload))
 
+    def test_c02b2_template_supporting_file_removal_blocks(self):
+        tree = self.new_candidate("template-file-removed")
+        (tree / ".claude" / "skills" / "_template" / "SKILL.md").unlink()
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1)
+        rules = self.rules(payload)
+        self.assertTrue("MISSING_SUPPORTING_FILE" in rules or "TEMPLATE_SKILL_MD_MISSING" in rules)
+
     def test_c02c_inline_comment_boolean_is_parsed(self):
         tree = self.new_candidate("inline-comment-boolean")
         skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
