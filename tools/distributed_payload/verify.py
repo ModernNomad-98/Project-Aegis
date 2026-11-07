@@ -262,9 +262,11 @@ def verify_target(manifest_path: Path, target_root: Path,
         "manifest": {"sha256": sha256_raw(manifest_bytes), "bytes": len(manifest_bytes)},
         "package": {"profile_id": manifest["package"]["profile_id"],
                     "profile_version": manifest["package"]["profile_version"]},
-        "source": manifest["source"],
-        "source_note": ("source identity is a declared claim recorded from the manifest; "
-                        "verification checks payload bytes only and does not prove authorship or approval"),
+        "source": {key: manifest["source"][key] for key in ("repository", "commit", "tree")},
+        "source_note": ("source identity is a declared claim recorded from the manifest; optional "
+                        "source.note and package.label are untrusted free text and are not emitted "
+                        "in this report; verification checks payload bytes only and does not prove "
+                        "authorship or approval"),
         "target": ".",
         "mode": "read-only",
         "findings": findings,
@@ -286,8 +288,10 @@ def check_manifest(manifest_path: Path) -> dict:
         "manifest_schema": document["schema"],
         "bytes": len(data),
         "sha256": sha256_raw(data),
-        "package": document["package"],
-        "source": document["source"],
-        "note": ("this is a content identity, not an approval or a proof of authorship; "
+        "package": {key: document["package"][key]
+                    for key in ("profile_id", "profile_version")},
+        "source": {key: document["source"][key] for key in ("repository", "commit", "tree")},
+        "note": ("this is a content identity, not an approval or a proof of authorship; optional "
+                 "source.note and package.label free text are untrusted and are not emitted; "
                  "acceptance belongs to a detached binding's consumer"),
     }

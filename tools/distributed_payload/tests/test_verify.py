@@ -333,6 +333,24 @@ class HygieneTests(VerifyTestCase):
         self.assertNotIn(":\\", first.read_text(encoding="utf-8"))
         self.assertNotIn(REPO_ROOT.as_posix(), first.read_text(encoding="utf-8"))
 
+    def test_a12b_optional_untrusted_notes_are_not_emitted(self):
+        source = dict(m.load_source_identity(SOURCE))
+        source["note"] = "C:\\Users\\host-owner\\payload\\notes.txt 2026-11-07T00:00:00Z"
+        document = m.build_manifest(PAYLOAD, "example-fixture", "1.0.0", source,
+                                    label="host label C:\\Users\\host-owner")
+        m.write_manifest_atomic(document, self.manifest)
+        report, exit_code = v.verify_target(self.manifest, self.target)
+        self.assertEqual(v.EXIT_CLEAN, exit_code)
+        serialized = json.dumps(report, sort_keys=True)
+        self.assertNotIn("host-owner", serialized)
+        self.assertNotIn("2026-11-07T00:00:00Z", serialized)
+        self.assertEqual({"repository", "commit", "tree"}, set(report["source"]))
+        identity = v.check_manifest(self.manifest)
+        identity_serialized = json.dumps(identity, sort_keys=True)
+        self.assertNotIn("host-owner", identity_serialized)
+        self.assertEqual({"profile_id", "profile_version"}, set(identity["package"]))
+        self.assertEqual({"repository", "commit", "tree"}, set(identity["source"]))
+
 
 class CliExitCodeTests(VerifyTestCase):
     def test_exit_codes_and_check_manifest(self):

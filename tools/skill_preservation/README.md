@@ -26,13 +26,20 @@ The committed generated baseline for this slice is at
 tools/skill_preservation/baseline.json and was generated from the verified baseline tree
 (tree 4e584f59287f8b8fc3d10d3567158f52bff99a18, revision f69c6e9219335d1979b8ec9658cc86e0a7a5583a).
 
+Baseline generation is fail-closed: the clean baseline tree MUST provide a readable `docs/skills-catalog.md`,
+`README.md`, `tools/skills-manifest.json` (with the expected schema and hash-input contract and at least one
+skill entry) and `docs/consumer-starter-package.md` (with parseable declared-install rows). A degraded
+tree is refused (exit 2) rather than frozen as a baseline with `present: false` or empty mention maps.
+Starter-table declared paths are validated as safe relative paths (no `..`, dot/empty segments,
+absolute/drive/UNC forms or backslashes) and contained under the scanned tree before any filesystem check.
+
 ## Exit codes
 
 | Exit | Meaning |
 |---|---|
 | 0 | no BLOCK findings (a clean result, or warnings/info/unrun only) |
 | 1 | at least one BLOCK finding |
-| 2 | usage or input error; fail closed - missing/malformed/tampered baseline, unknown baseline schema, missing or empty candidate tree, output/report path inside the scanned tree, symlinked tree or baseline, duplicate/case-colliding baseline paths |
+| 2 | usage or input error; fail closed - missing/malformed/tampered baseline, unknown baseline schema, missing or empty candidate tree, output/report path inside the scanned tree, symlinked tree or baseline, duplicate/case-colliding baseline paths, baseline generation from a tree whose required discovery/manifest/starter surfaces are missing, unreadable or malformed, or a starter table declaring an unsafe/traversing path |
 | 3 | internal error |
 
 **WARN**, **INFO** and **UNRUN** entries are reported but do not fail the run. BLOCK entries fail it.
@@ -52,8 +59,9 @@ BLOCK findings (availability loss; fail closed):
 - **Declared Installed-Set Reduction** - a source-side file or skill declared in
   docs/consumer-starter-package.md is missing from the candidate.
 - **Added Path in Existing Skill Surface** - any candidate-added file under an existing baseline
-  skill directory. Added files belonging to a newly added skill are reported by the Added Skill
-  WARN/INFO rules instead (additions are allowed).
+  skill directory (BLOCK only; no duplicate informational note is emitted for the same path). Added
+  files belonging to a newly added skill are reported by the Added Skill WARN/INFO rules instead
+  (additions are allowed).
 - **Cleanup-Path Addition (BLOCK)** - a removal-looking path that names skills inside this tool's own
   package (the guard acquiring a removal path is explicitly forbidden).
 
@@ -74,7 +82,10 @@ UNRUN (reported, never PASS):
   approved availability change occurs, re-freeze the baseline deliberately (a reviewed change with a
   recorded reason); the freeze rule is program decision OD-W04-2 and is not decided by this tool.
 - The frontmatter reader is a minimal line parser for the three invariants the guard needs. It never
-  reasons from a parse failure to a BLOCK; the repository validator is the strict YAML gate.
+  reasons from a parse failure to a BLOCK; unrecognized `disable-model-invocation` values are reported as
+  unreadable-frontmatter WARN and left to the repository validator, and the raw key scan is restricted to
+  top-level frontmatter lines so a multiline description that merely mentions the setting cannot trigger
+  a BLOCK. The repository validator remains the strict YAML gate.
 - The cleanup-path rule is a deterministic name/path rule over candidate-added paths only; it does
   not scan file contents and does not detect a renamed pre-existing cleanup tool.
 - Byte identity is not functional availability. A guard pass does not prove the validator passes, and

@@ -135,7 +135,8 @@ class BuildTests(ManifestTestCase):
     def test_a04_path_rules_reject_unsafe_paths(self):
         unsafe = ["", "../escape.txt", "a/../b.txt", "a/./b.txt", "/absolute.txt",
                   "C:/windows.txt", "//server/share.txt", "back\\slash.txt",
-                  "double//slash.txt", "control\x01.txt", "nul\x00.txt"]
+                  "double//slash.txt", "control\x01.txt", "nul\x00.txt",
+                  "foo.", "foo ", "file:stream", "NUL", "nul.txt", "CON", "a/COM1", "AUX"]
         for path in unsafe:
             with self.subTest(path=path), self.assertRaises(m.ManifestError):
                 m.validate_payload_path(path)
@@ -152,6 +153,19 @@ class BuildTests(ManifestTestCase):
         with self.assertRaises(m.ManifestError) as context:
             m.validate_manifest(folded)
         self.assertEqual("duplicate_path", context.exception.code)
+
+    def test_a04b_build_rejects_symlinked_payload_root(self):
+        payload = self.tmp / "root-target"
+        payload.mkdir()
+        (payload / "file.txt").write_text("payload\n", encoding="utf-8")
+        link = self.tmp / "root-link"
+        try:
+            os.symlink(payload, link, target_is_directory=True)
+        except (OSError, NotImplementedError) as exc:
+            self.skipTest("host limitation: symlink creation unavailable (%s) - UNRUN" % exc)
+        with self.assertRaises(m.ManifestError) as context:
+            self.build_fixture_manifest(link)
+        self.assertIn(context.exception.code, {"symlink_payload", "reparse_point"})
 
     def test_a04_build_rejects_symlinked_payload_file(self):
         payload = self.tmp / "symlink-payload"

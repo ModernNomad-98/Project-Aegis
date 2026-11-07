@@ -181,6 +181,16 @@ def sha256_file(path):
     return digest.hexdigest()
 
 
+def _is_reparse_point(path):
+    try:
+        if os.path.islink(path):
+            return True
+        is_junction = getattr(os.path, "isjunction", None)
+        return bool(callable(is_junction) and is_junction(path))
+    except OSError:
+        return False
+
+
 def read_text(path):
     with open(path, "r", encoding="utf-8", errors="strict") as handle:
         return handle.read()
@@ -798,6 +808,7 @@ def load_evidence_binding(path, catalog_identity, repo_root, findings, catalog_r
             payload_path = record.get("stdout_path")
             unsafe = (not isinstance(payload_path, str) or not payload_path
                       or ".." in payload_path.split("/") or "\\" in payload_path
+                      or ":" in payload_path
                       or re.match(r"^[A-Za-z]:", payload_path) or payload_path.startswith("/"))
             if unsafe:
                 add(findings, "BAD-EVIDENCE-BINDING", where, record.get("evidence_id"),
@@ -805,18 +816,38 @@ def load_evidence_binding(path, catalog_identity, repo_root, findings, catalog_r
                 payload_ok = False
             else:
                 payload_full = os.path.join(binding_dir, payload_path)
-                if not os.path.isfile(payload_full):
+                binding_root = os.path.realpath(binding_dir)
+                try:
+                    payload_resolved = os.path.realpath(payload_full)
+                    common = os.path.commonpath([payload_resolved, binding_root])
+                except (OSError, ValueError):
+                    common = None
+                if common is None or os.path.normcase(common) != os.path.normcase(binding_root):
+                    add(findings, "EVIDENCE-PAYLOAD", where, record.get("evidence_id"),
+                        "declared payload path escapes the evidence binding directory")
+                    payload_ok = False
+                elif _is_reparse_point(payload_full):
+                    add(findings, "EVIDENCE-PAYLOAD", where, record.get("evidence_id"),
+                        "declared payload file is a symlink/reparse point; not followed")
+                    payload_ok = False
+                elif not os.path.isfile(payload_full):
                     add(findings, "EVIDENCE-PAYLOAD", where, record.get("evidence_id"),
                         "declared payload file is absent")
                     payload_ok = False
                 else:
-                    actual_bytes = os.path.getsize(payload_full)
-                    actual_sha = sha256_file(payload_full)
-                    if (record.get("stdout_bytes") != actual_bytes
-                            or record.get("stdout_sha256") != actual_sha):
+                    try:
+                        actual_bytes = os.path.getsize(payload_full)
+                        actual_sha = sha256_file(payload_full)
+                    except (OSError, UnicodeDecodeError) as exc:
                         add(findings, "EVIDENCE-PAYLOAD", where, record.get("evidence_id"),
-                            "payload digest does not match the declared evidence")
+                            "declared payload file is unreadable: " + type(exc).__name__)
                         payload_ok = False
+                    else:
+                        if (record.get("stdout_bytes") != actual_bytes
+                                or record.get("stdout_sha256") != actual_sha):
+                            add(findings, "EVIDENCE-PAYLOAD", where, record.get("evidence_id"),
+                                "payload digest does not match the declared evidence")
+                            payload_ok = False
         parsed.append({"record": record, "classification": classification,
                        "requirement_ids": [r for r in requirement_ids if isinstance(r, str)],
                        "payload_ok": payload_ok})
@@ -935,6 +966,8 @@ def build_report(catalog, catalog_identity, repo_root, evidence_path, profile_ar
             "document, validator, audit or delivery workflow.",
             "No status in this report is an approval, a merge authorization or a claim of live "
             "or production behaviour.",
+            "Mechanism symbol_or_line anchors are not resolved or verified by this checker; only the "
+            "mechanism ref path is resolved, so symbol/line anchors remain unverified here.",
         ],
     }
 

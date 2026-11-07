@@ -38,7 +38,8 @@ Raw on-disk bytes are authoritative; the normalized digest (only normalization i
 - Findings are reported, never repaired; `UNRECOGNIZED` content is preserved.
 - Report paths must be regular-file destinations outside the target root and outside the declared package directories; without `--report-out` nothing is written.
 - The tool is offline: stdlib only, no network, no install, no credentials, no provider calls.
-- Failure modes are fail-closed: unsupported schema, malformed digest, unknown field, unsafe path, symlink/reparse payload, duplicate path, bad dependency class, conditional dependency without a rule, manifest self-reference.
+- Failure modes are fail-closed: unsupported schema, malformed digest, unknown field, unsafe path (including Windows-normalized trailing dot/space names, alternate-data-stream colons and reserved device names), symlinked/junction payload root or entries, duplicate path, bad dependency class, conditional dependency without a rule, manifest self-reference.
+- Optional `source.note` and `package.label` are untrusted free text validated only as strings; they are never emitted in verify reports or check-manifest identities, so a host path/timestamp/hostname in them cannot leak into the deterministic report.
 
 ## Determinism
 

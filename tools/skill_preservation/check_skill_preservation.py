@@ -143,11 +143,42 @@ def read_text(path: str) -> str:
         return handle.read()
 
 
+def read_surface_text(path: str, label: str) -> str:
+    try:
+        return read_text(path)
+    except OSError as exc:
+        raise InputError(label + " is unreadable: " + type(exc).__name__ + ": " + str(exc))
+
+
 def is_within(path: str, root: str) -> bool:
     try:
         return os.path.commonpath([os.path.realpath(path), os.path.realpath(root)]) == os.path.realpath(root)
     except ValueError:
         return False
+
+
+def safe_declared_relpath(rel: str, label: str) -> None:
+    """Reject declared relative paths that are unsafe before any filesystem check."""
+    if not isinstance(rel, str) or not rel:
+        raise InputError(label + " is empty or not a string")
+    if "\\" in rel:
+        raise InputError(label + " contains a backslash separator: %r" % rel)
+    if "\x00" in rel or any(ord(character) < 32 or ord(character) == 127 for character in rel):
+        raise InputError(label + " contains a control character: %r" % rel)
+    if rel.startswith("/") or rel.startswith("//") or re.match(r"^[A-Za-z]:", rel):
+        raise InputError(label + " is absolute, drive-qualified or UNC: %r" % rel)
+    segments = rel.split("/")
+    if any(segment == "" or segment in (".", "..") for segment in segments):
+        raise InputError(label + " has an empty, dot or parent segment: %r" % rel)
+
+
+def declared_tree_path(tree: str, rel: str) -> str:
+    """Safe declared relative path resolved and contained under tree."""
+    safe_declared_relpath(rel, "declared path")
+    full = os.path.join(tree, *rel.split("/"))
+    if not is_within(full, tree):
+        raise InputError("declared path escapes the scanned tree: %r" % rel)
+    return full
 
 
 # --------------------------------------------------------------------------- frontmatter parsing
@@ -235,35 +266,49 @@ def parse_skill_frontmatter(text: str) -> dict:
             (isinstance(description, str) and description.startswith(sentinel_phrase))
             or sentinel_phrase in fm_text)
         dmi = seen.get("disable-model-invocation")
-        raw_dmi = re.search(
-            r"^[\s-]*[\"']?disable-model-invocation[\"']?\s*:\s*([^#\r\n]+)",
-            fm_text, re.MULTILINE | re.IGNORECASE)
-        if raw_dmi is None:
+        # The raw scan is deliberately restricted to top-level frontmatter lines so a
+        # multiline description that merely mentions the setting cannot trigger a BLOCK.
+        raw_dmi = None
+        for raw_line in fm_text.splitlines():
+            if not raw_line or raw_line[0].isspace():
+                continue
             raw_dmi = re.search(
-                r"[{,]\s*[\"']?disable-model-invocation[\"']?\s*:\s*([^\s,}\]]+)",
-                fm_text, re.IGNORECASE)
+                r"^[\"']?disable-model-invocation[\"']?\s*:\s*([^#\r\n]+)",
+                raw_line, re.IGNORECASE)
+            if raw_dmi is None:
+                raw_dmi = re.search(
+                    r"[{,]\s*[\"']?disable-model-invocation[\"']?\s*:\s*([^\s,}\]]+)",
+                    raw_line, re.IGNORECASE)
+            if raw_dmi is not None:
+                break
+        def _dmi_value(token):
+            token = _strip_scalar_quotes(str(token).strip()).strip().lower()
+            if token in ("true", "yes", "on", "1"):
+                return True
+            if token in ("false", "no", "off", "0"):
+                return False
+            return None
         if raw_dmi is not None:
-            dmi_token = _strip_scalar_quotes(raw_dmi.group(1).strip()).strip().lower()
-            if dmi_token in ("true", "yes", "on", "1"):
-                record["disable_model_invocation"] = True
-            elif dmi_token in ("false", "no", "off", "0"):
-                record["disable_model_invocation"] = False
-            else:
-                record["disable_model_invocation"] = True
+            parsed_value = _dmi_value(raw_dmi.group(1))
+            if parsed_value is None:
+                # Unknown value: the guard's parser cannot interpret it. Never reason
+                # from this parse failure to a BLOCK (the validator is authoritative);
+                # record it as an unreadable/WARN-able frontmatter state instead.
+                record["disable_model_invocation"] = None
                 record["parse_ok"] = False
                 record["unreadable_reason"] = "unrecognized disable-model-invocation value"
+            else:
+                record["disable_model_invocation"] = parsed_value
         elif dmi is None:
             record["disable_model_invocation"] = None
         else:
-            dmi_token = _strip_scalar_quotes(str(dmi).strip()).strip().lower()
-            if dmi_token in ("true", "yes", "on", "1"):
-                record["disable_model_invocation"] = True
-            elif dmi_token in ("false", "no", "off", "0"):
-                record["disable_model_invocation"] = False
-            else:
-                record["disable_model_invocation"] = True
+            parsed_value = _dmi_value(dmi)
+            if parsed_value is None:
+                record["disable_model_invocation"] = None
                 record["parse_ok"] = False
                 record["unreadable_reason"] = "unrecognized disable-model-invocation value"
+            else:
+                record["disable_model_invocation"] = parsed_value
         if not record["parse_ok"] and record["unreadable_reason"] is None:
             record["unreadable_reason"] = "name key missing or unquoted frontmatter unclear"
         return record
@@ -379,8 +424,10 @@ def build_discovery_surface(tree: str, skill_ids: list) -> dict:
     readme_path = os.path.join(tree, *README_REL.split("/"))
     if is_reparse_point(catalog_path) or is_reparse_point(readme_path):
         raise InputError("reparse point at skill discovery path")
-    catalog_text = read_text(catalog_path) if os.path.isfile(catalog_path) else ""
-    readme_text = read_text(readme_path) if os.path.isfile(readme_path) else ""
+    catalog_text = (read_surface_text(catalog_path, "docs/skills-catalog.md")
+                    if os.path.isfile(catalog_path) else "")
+    readme_text = (read_surface_text(readme_path, "README.md")
+                   if os.path.isfile(readme_path) else "")
     return {
         "catalog_present": os.path.isfile(catalog_path),
         "readme_present": os.path.isfile(readme_path),
@@ -412,14 +459,20 @@ def build_starter_surface(tree: str) -> dict:
             for match in SKILL_PATH_RE.finditer(line):
                 skill_id, rest = match.group(1), match.group(2)
                 declared_skills.add(skill_id)
-                declared_paths.add(".claude/skills/%s/%s" % (skill_id, rest.rstrip(".,;:")))
+                rel = ".claude/skills/%s/%s" % (skill_id, rest.rstrip(".,;:"))
+                declared_tree_path(tree, rel)
+                declared_paths.add(rel)
             for match in STARTER_STARTUP_RE.finditer(line):
-                declared_paths.add(match.group(1))
+                startup_rel = match.group(1)
+                declared_tree_path(tree, startup_rel)
+                declared_paths.add(startup_rel)
         surface["declared_paths"] = sorted(declared_paths)
         surface["declared_skills"] = sorted(declared_skills)
         surface["parsed"] = bool(declared_skills)
         if not surface["parsed"]:
             surface["error"] = "no declared skill paths found in the starter definition table"
+    except InputError:
+        raise
     except Exception as exc:  # pragma: no cover - defensive
         surface["error"] = "starter definition unreadable: " + type(exc).__name__
     return surface
@@ -462,20 +515,36 @@ def build_baseline(tree: str, source_revision: str = None, source_tree: str = No
     manifest_surface = build_manifest_surface(tree)
     discovery = build_discovery_surface(tree, named)
     starter = build_starter_surface(tree)
-    if starter["present"]:
-        if not starter["parsed"]:
-            raise InputError("starter definition present but no declared file-table rows could be read: "
-                             + str(starter.get("error")))
-        missing_declared = [rel for rel in starter["declared_paths"]
-                            if not os.path.isfile(os.path.join(tree, *rel.split("/")))]
-        if missing_declared:
-            raise InputError("starter definition declares paths that are missing from the baseline tree: "
-                             + ", ".join(missing_declared[:5]))
-        missing_skills = [skill_id for skill_id in starter["declared_skills"]
-                          if not os.path.isdir(os.path.join(tree, SKILLS_REL, skill_id))]
-        if missing_skills:
-            raise InputError("starter definition declares skills that are missing from the baseline tree: "
-                             + ", ".join(missing_skills[:5]))
+    if not discovery["catalog_present"]:
+        raise InputError("baseline tree is missing required discovery surface: " + CATALOG_REL)
+    if not discovery["readme_present"]:
+        raise InputError("baseline tree is missing required discovery surface: " + README_REL)
+    if not manifest_surface["present"] or manifest_surface["error"]:
+        raise InputError("baseline tree has a missing or unreadable required manifest surface ("
+                         + MANIFEST_REL + "): " + str(manifest_surface["error"]))
+    if manifest_surface["schema"] != MANIFEST_SCHEMA:
+        raise InputError("baseline tree manifest surface is malformed: unexpected schema %r"
+                         % (manifest_surface["schema"],))
+    if manifest_surface["hash_input"] != MANIFEST_HASH_INPUT:
+        raise InputError("baseline tree manifest surface is malformed: unexpected hash_input %r"
+                         % (manifest_surface["hash_input"],))
+    if not manifest_surface["entries"]:
+        raise InputError("baseline tree manifest surface declares no skill entries")
+    if not starter["present"]:
+        raise InputError("baseline tree is missing required starter surface: " + STARTER_REL)
+    if not starter["parsed"]:
+        raise InputError("starter definition present but no declared file-table rows could be read: "
+                         + str(starter.get("error")))
+    missing_declared = [rel for rel in starter["declared_paths"]
+                        if not os.path.isfile(declared_tree_path(tree, rel))]
+    if missing_declared:
+        raise InputError("starter definition declares paths that are missing from the baseline tree: "
+                         + ", ".join(missing_declared[:5]))
+    missing_skills = [skill_id for skill_id in starter["declared_skills"]
+                      if not os.path.isdir(os.path.join(tree, SKILLS_REL, skill_id))]
+    if missing_skills:
+        raise InputError("starter definition declares skills that are missing from the baseline tree: "
+                         + ", ".join(missing_skills[:5]))
     counts = {
         "skill_directories": len(dirs),
         "named_skills": len(named),
@@ -778,9 +847,9 @@ def compare(baseline: dict, tree: str) -> dict:
             add("MISSING_SUPPORTING_FILE", "BLOCK",
                 "required skill file missing from candidate: %r%s" %
                 (rel, " (severe: SKILL.md or evals asset)" if severe else ""), candidate_id)
-        for rel in sorted(cand_files - base_files):
-            add("ADDED_SKILL_FILE", "INFO",
-                "candidate adds a file inside skill %r: %r" % (candidate_id, rel), candidate_id)
+        # Added files inside an existing baseline skill are a BLOCK via
+        # ADDED_PATH_IN_SKILL_SURFACE below; no duplicate INFO finding is emitted here.
+        # ADDED_SKILL_FILE INFO is reserved for files of newly added skills.
         base_md = base_record.get("skill_md") or {}
         cand_md = candidate_record.get("skill_md") or {}
         if base_md and not cand_md:

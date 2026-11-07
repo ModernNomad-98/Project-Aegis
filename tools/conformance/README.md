@@ -4,8 +4,9 @@ Deterministic, read-only checker for the Aegis requirements-to-evidence conforma
 (`docs/conformance/requirements.v1.json`). It performs **selected standard-library structural validation aligned with the normative schema**
 (no JSON-Schema engine is loaded; the schema file is normative documentation, and a drift test checks
 selected constants agree). It resolves mechanism ref paths and requirement anchors against the pinned
-raw source bytes; mechanism `symbol_or_line` anchors are recorded as UNRUN/unverified unless separately
-resolved. It enforces and reports the first-profile completeness rule and optionally checks an evidence binding.
+raw source bytes; mechanism `symbol_or_line` anchors are **not resolved or verified by this checker** — only
+their mechanism ref path is resolved (the report's limits state this explicitly). It enforces and reports the
+first-profile completeness rule and optionally checks an evidence binding.
 
 **It reports only.** It never repairs, writes inside the repository, executes catalog or evidence
 text, contacts a network or acts as an approval. It is **not wired into CI** (owner-gated decision

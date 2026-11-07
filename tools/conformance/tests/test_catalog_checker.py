@@ -436,6 +436,37 @@ class ConformanceCheckerTests(unittest.TestCase):
         statuses = {row["requirement_id"]: row["evidence_status"] for row in report["requirements"]}
         self.assertNotEqual(statuses["SD-A"], "EVIDENCE-PRESENT")
 
+    def test_evidence_payload_symlink_outside_binding_refused(self):
+        outside = self.tmp / "outside-payload.txt"
+        outside.write_text("outside payload bytes\n", encoding="utf-8")
+
+        def mutate(binding, directory):
+            link = directory / "payload-link.txt"
+            try:
+                os.symlink(str(outside), str(link))
+            except (OSError, NotImplementedError) as exc:
+                raise unittest.SkipTest(
+                    "host limitation: symlink creation unavailable (%s) - UNRUN" % exc)
+            record = binding["records"][0]
+            record["stdout_path"] = "payload-link.txt"
+            record["stdout_bytes"] = outside.stat().st_size
+            record["stdout_sha256"] = sha256_bytes(outside.read_bytes())
+
+        path = self.make_evidence("payload-symlink", mutate)
+        code, out, _ = self.run_checker("--evidence", str(path), "--json")
+        self.assertEqual(code, 1)
+        self.assertIn("EVIDENCE-PAYLOAD", out)
+
+    def test_symbol_or_line_anchor_limits_are_documented(self):
+        code, out, _ = self.run_checker("--json")
+        self.assertEqual(code, 0, out)
+        report = json.loads(out)
+        limits = " ".join(report["limits"])
+        self.assertIn("symbol_or_line", limits)
+        self.assertIn("not resolved", limits)
+        readme = (TOOL_DIR / "README.md").read_text(encoding="utf-8")
+        self.assertIn("not resolved or verified", readme)
+
     def test_circular_binding_self_field(self):
         def mutate(binding, _dir):
             binding["binding_sha256"] = "0" * 64

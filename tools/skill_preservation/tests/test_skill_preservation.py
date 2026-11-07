@@ -591,6 +591,87 @@ class GuardSelfTests(unittest.TestCase):
         second = guard.compare(self.baseline, str(tree))
         self.assertEqual(guard.dump_json(first), guard.dump_json(second))
 
+    def run_baseline_cli(self, tree, out_name):
+        out = Path(self.tmp.name) / out_name
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            code = guard.main(["baseline", "--tree", str(tree), "--out", str(out)])
+        return code, out
+
+    def test_p2_baseline_required_surfaces_missing_fail_closed(self):
+        for rel in ("tools/skills-manifest.json", "docs/skills-catalog.md",
+                    "README.md", "docs/consumer-starter-package.md"):
+            label = rel.replace("/", "-")
+            tree = self.new_candidate("surface-" + label)
+            (tree / rel).unlink()
+            code, out = self.run_baseline_cli(tree, "surface-" + label + ".json")
+            self.assertEqual(code, 2, rel)
+            self.assertFalse(out.exists(), rel)
+
+    def test_p2_baseline_malformed_manifest_fails_closed(self):
+        tree = self.new_candidate("bad-manifest-baseline")
+        (tree / "tools" / "skills-manifest.json").write_text("{not json", encoding="utf-8")
+        code, out = self.run_baseline_cli(tree, "bad-manifest-baseline.json")
+        self.assertEqual(code, 2)
+        self.assertFalse(out.exists())
+
+    def test_p2_starter_declared_traversal_path_refused(self):
+        tree = self.new_candidate("starter-traversal")
+        write(tree / "docs" / "consumer-starter-package.md",
+              "| file | bytes | lines |" + chr(10) + "|---|---|---|" + chr(10)
+              + "| .claude/skills/alpha/../../escape.txt | 10 | 1 |" + chr(10))
+        code, out = self.run_baseline_cli(tree, "starter-traversal.json")
+        self.assertEqual(code, 2)
+        self.assertFalse(out.exists())
+
+    def test_p2_starter_declared_traversal_path_refused_on_check(self):
+        tree = self.new_candidate("starter-traversal-check")
+        write(tree / "docs" / "consumer-starter-package.md",
+              "| .claude/skills/alpha/../../escape.txt | 10 | 1 |" + chr(10))
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 2)
+        self.assertIsNone(payload)
+
+    def test_p2_unrecognized_disable_value_is_warn_not_block(self):
+        tree = self.new_candidate("dmi-unknown")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        text = skill_md.read_text(encoding="utf-8").replace(
+            "name: alpha", "name: alpha" + chr(10) + "disable-model-invocation: maybe", 1)
+        write(skill_md, text)
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("SILENT_DISABLE", self.rules(payload))
+        warn = [item for item in payload["findings"]
+                if item["rule"] == "FRONTMATTER_UNREADABLE_BY_GUARD"]
+        self.assertEqual(1, len(warn))
+        self.assertEqual("WARN", warn[0]["severity"])
+
+    def test_p2_description_mentioning_setting_not_blocked(self):
+        for label, replacement in (
+            ("block-scalar",
+             "description: >" + chr(10)
+             + "  A synthetic test skill that documents disable-model-invocation: true in prose." + chr(10)
+             + "  It does not set the key."),
+            ("inline",
+             "description: 'Notes about disable-model-invocation: true appear in this prose.'"),
+        ):
+            tree = self.new_candidate("desc-" + label)
+            skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+            text = skill_md.read_text(encoding="utf-8").replace(
+                "description: 'A synthetic test skill named alpha for guard self-tests.'",
+                replacement, 1)
+            write(skill_md, text)
+            code, payload, out, err = self.run_check(tree)
+            self.assertEqual(code, 0, label + ": " + out)
+            self.assertNotIn("SILENT_DISABLE", self.rules(payload), label)
+
+    def test_p2_existing_skill_added_file_blocks_without_info_duplicate(self):
+        tree = self.new_candidate("added-existing-skill")
+        write(tree / ".claude" / "skills" / "alpha" / "extra.md", "extra" + chr(10))
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1, out)
+        self.assertIn("ADDED_PATH_IN_SKILL_SURFACE", self.rules(payload))
+        self.assertNotIn("ADDED_SKILL_FILE", self.rules(payload))
+
     def test_baseline_out_inside_tree_refused(self):
         tree = self.new_candidate("baseline-out")
         target = tree / "baseline.json"

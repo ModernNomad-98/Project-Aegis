@@ -98,6 +98,17 @@ def validate_payload_path(path: str) -> None:
         raise ManifestError("empty_segment", "empty path segment (relative form)", path)
     if any(segment in (".", "..") for segment in segments):
         raise ManifestError("dot_segment", "'.' or '..' segments are not allowed", path)
+    for segment in segments:
+        if ":" in segment:
+            raise ManifestError("alternate_data_stream",
+                                "':' alternate-data-stream segments are not allowed", path)
+        if segment.endswith(".") or segment.endswith(" "):
+            raise ManifestError("trailing_dot_or_space",
+                                "Windows-normalized trailing dot/space segments are not allowed", path)
+        stem = segment.split(".", 1)[0].upper()
+        if stem in WINDOWS_RESERVED_NAMES:
+            raise ManifestError("windows_reserved_name",
+                                "Windows reserved device names are not allowed", path)
 
 
 def payload_directory_prefixes(manifest: dict) -> list[str]:
@@ -108,6 +119,13 @@ def payload_directory_prefixes(manifest: dict) -> list[str]:
         if len(parts) > 1:
             prefixes.add(parts[0])
     return sorted(prefixes)
+
+
+WINDOWS_RESERVED_NAMES = frozenset(
+    ["CON", "PRN", "AUX", "NUL", "CLOCK$", "CONIN$", "CONOUT$"]
+    + ["COM%d" % number for number in range(1, 10)]
+    + ["LPT%d" % number for number in range(1, 10)]
+)
 
 
 def _is_reparse_point(path: Path) -> bool:
@@ -138,6 +156,10 @@ def _reject_symlink(path: Path, relative: str) -> None:
 
 def collect_entries(payload_root: Path) -> list[dict]:
     """Walk payload_root and return sorted, validated entries."""
+    original_root = Path(payload_root)
+    if _is_reparse_point(original_root):
+        kind = "symlink_payload" if original_root.is_symlink() else "reparse_point"
+        raise ManifestError(kind, "payload root symlinks and junction/reparse points are not supported in v1")
     root = payload_root.resolve()
     if not root.is_dir():
         raise ManifestError("payload_root", f"payload root is not a directory: {payload_root}")
