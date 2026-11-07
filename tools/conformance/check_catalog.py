@@ -57,6 +57,11 @@ SEED_FAMILIES = {
     "F6": ["AEGIS-REQ-EVID-01", "AEGIS-REQ-EVID-02"],
 }
 SEED_IDS = [item for family in SEED_FAMILIES.values() for item in family]
+
+
+def enum_value(value, allowed):
+    """Membership helper that treats non-string values as invalid, never crashes."""
+    return isinstance(value, str) and value in allowed
 DECLARED_COUNT_MIN = 23
 DECLARED_COUNT_MAX = 27
 FIRST_PROFILE = "source-library-change"
@@ -332,7 +337,7 @@ def check_structure(catalog, findings):
                     "owner"):
             if key not in record:
                 fail(where, rid, "missing required record field %r" % key)
-        if record.get("id_kind") not in ID_KINDS:
+        if not enum_value(record.get("id_kind"), ID_KINDS):
             fail(where + ".id_kind", rid, "invalid id_kind")
         name = record.get("readable_name")
         if not (isinstance(name, str) and 3 <= len(name) <= 160):
@@ -359,7 +364,7 @@ def check_structure(catalog, findings):
             if not is_safe_relpath(path):
                 add(findings, "UNSAFE-PATH" if isinstance(path, str) else "SCHEMA",
                     where + ".source_ref.path", rid, "unsafe or invalid source path %r" % (path,))
-            if source_ref.get("anchor_kind") not in ANCHOR_KINDS:
+            if not enum_value(source_ref.get("anchor_kind"), ANCHOR_KINDS):
                 fail(where + ".source_ref.anchor_kind", rid, "invalid anchor_kind")
             anchor = source_ref.get("anchor")
             if not (isinstance(anchor, str) and 1 <= len(anchor) <= 300):
@@ -373,7 +378,7 @@ def check_structure(catalog, findings):
                      "inapplicability must be an array")
         mechanism = record.get("mechanism") or {}
         if isinstance(mechanism, dict):
-            if mechanism.get("kind") not in MECH_KINDS:
+            if not enum_value(mechanism.get("kind"), MECH_KINDS):
                 add(findings, "BAD-MECHANISM", where + ".mechanism.kind", rid,
                     "invalid mechanism kind %r" % (mechanism.get("kind"),))
             refs = mechanism.get("refs")
@@ -391,7 +396,7 @@ def check_structure(catalog, findings):
         verification = record.get("verification") or {}
         if isinstance(verification, dict):
             method = verification.get("method")
-            if method not in VERIF_METHODS:
+            if not enum_value(method, VERIF_METHODS):
                 add(findings, "BAD-VERIFICATION", where + ".verification.method", rid,
                     "invalid verification method %r" % (method,))
             for key in ("check", "expected_result"):
@@ -404,7 +409,7 @@ def check_structure(catalog, findings):
                     "method 'none' requires an explicit limits statement")
         evidence_requirement = record.get("evidence_requirement") or {}
         if isinstance(evidence_requirement, dict):
-            if evidence_requirement.get("kind") not in EVID_KINDS:
+            if not enum_value(evidence_requirement.get("kind"), EVID_KINDS):
                 add(findings, "BAD-EVIDENCE-REQUIREMENT",
                     where + ".evidence_requirement.kind", rid,
                     "invalid evidence kind %r" % (evidence_requirement.get("kind"),))
@@ -546,7 +551,7 @@ def check_requirements(catalog, repo_root, source_paths, findings):
                            if isinstance(applicability, dict) else []) or []
         valid_profiles = []
         for pid in profiles if isinstance(profiles, list) else []:
-            if pid not in profile_ids:
+            if not isinstance(pid, str) or pid not in profile_ids:
                 add(findings, "UNKNOWN-REF", where + ".applicability", rid,
                     "applicability names unknown profile %r" % (pid,))
             else:
@@ -557,10 +562,10 @@ def check_requirements(catalog, repo_root, source_paths, findings):
                     "inapplicability entry must be an object")
                 continue
             pid = claim.get("profile_id")
-            if pid not in profile_ids:
+            if not isinstance(pid, str) or pid not in profile_ids:
                 add(findings, "BAD-INAPPLICABILITY", where + ".applicability", rid,
                     "inapplicability names unknown profile %r" % (pid,))
-            if claim.get("reason_code") not in REASON_CODES:
+            if not enum_value(claim.get("reason_code"), REASON_CODES):
                 add(findings, "BAD-INAPPLICABILITY", where + ".applicability", rid,
                     "inapplicability reason_code is not allowlisted: %r"
                     % (claim.get("reason_code"),))
@@ -779,7 +784,7 @@ def load_evidence_binding(path, catalog_identity, repo_root, findings, catalog_r
             add(findings, "BAD-EVIDENCE-BINDING", where, None, "record must be an object")
             continue
         classification = record.get("classification")
-        if classification not in CLASSIFICATIONS:
+        if not enum_value(classification, CLASSIFICATIONS):
             add(findings, "UNKNOWN-OUTCOME", where, record.get("evidence_id"),
                 "classification %r is not one of %s" % (classification, sorted(CLASSIFICATIONS)))
             continue

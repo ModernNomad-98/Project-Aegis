@@ -213,6 +213,17 @@ class ConformanceCheckerTests(unittest.TestCase):
             report = json.loads(out)
             self.assertTrue(report["findings"], field)
 
+    def test_unhashable_enum_values_are_findings_not_crash(self):
+        fixture = self.fresh_fixture("unhashable-enums")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        catalog["requirements"][0]["id_kind"] = []
+        catalog["requirements"][1]["mechanism"]["kind"] = []
+        catalog["requirements"][2]["applicability"]["profiles"] = [{}]
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker("--json", root=fixture)
+        self.assertEqual(code, 1, out)
+        json.loads(out)
+
     def test_duplicate_requirement_id(self):
         fixture = self.fresh_fixture("dup-id")
         catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))

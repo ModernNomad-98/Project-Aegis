@@ -212,6 +212,10 @@ def verify_target(manifest_path: Path, target_root: Path,
     # Never claim ownership of the whole target: scan only declared package directories.
     roots = [target / prefix for prefix in payload_prefixes]
     for root in roots:
+        if _detect_reparse(root):
+            findings.append({"class": "UNRECOGNIZED", "path": root.relative_to(target).as_posix(),
+                             "detail": "declared package directory is a symlink/reparse point; not followed"})
+            continue
         if not root.is_dir():
             continue
         for dirpath, dirnames, filenames in os.walk(root, followlinks=False):

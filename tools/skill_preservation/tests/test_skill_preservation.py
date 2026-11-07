@@ -235,6 +235,16 @@ class GuardSelfTests(unittest.TestCase):
             self.assertEqual(code, 1, label + ": " + out)
             self.assertIn("SILENT_DISABLE", self.rules(payload), label)
 
+    def test_c02j_unparseable_frontmatter_still_blocks_silent_disable(self):
+        tree = self.new_candidate("unparseable-silent-disable")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        text = skill_md.read_text(encoding="utf-8").replace("name: alpha", "", 1)
+        text = text.replace("description:", "disable-model-invocation: true\ndescription:", 1)
+        write(skill_md, text)
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1)
+        self.assertIn("SILENT_DISABLE", self.rules(payload))
+
     def test_c02h_skill_mention_is_token_bounded(self):
         self.assertFalse(guard.mentions_skill("ai-threat-modeler", "threat-modeler"))
         self.assertTrue(guard.mentions_skill("- threat-modeler", "threat-modeler"))

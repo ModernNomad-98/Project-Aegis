@@ -574,6 +574,9 @@ def validate_baseline(baseline: dict) -> None:
             raise InputError("baseline missing required section: %s" % key)
     if not isinstance(baseline["contract"], dict):
         raise InputError("baseline contract section is not an object")
+    generated_from = baseline.get("generated_from")
+    if generated_from is not None and not isinstance(generated_from, dict):
+        raise InputError("baseline generated_from section is not an object")
     if not isinstance(baseline["counts"], dict):
         raise InputError("baseline counts section is not an object")
     if not isinstance(baseline["discovery"], dict):
@@ -749,26 +752,24 @@ def compare(baseline: dict, tree: str) -> dict:
                     "the validator remains the per-tree strictness gate)" % candidate_id, candidate_id)
         base_fm = base_record.get("frontmatter") or {}
         cand_fm = candidate_record.get("frontmatter") or {}
-        if not cand_fm.get("parse_ok"):
-            if candidate_record.get("skill_md"):
-                add("FRONTMATTER_UNREADABLE_BY_GUARD", "WARN",
-                    "guard cannot parse frontmatter for skill %r (%s); validator is authoritative"
-                    % (candidate_id, cand_fm.get("unreadable_reason")), candidate_id)
-        else:
-            was_manual = bool(base_fm.get("disable_model_invocation")) or bool(base_fm.get("sentinel"))
-            is_manual = bool(cand_fm.get("disable_model_invocation")) or bool(cand_fm.get("sentinel"))
-            if not was_manual and is_manual:
-                add("SILENT_DISABLE", "BLOCK",
-                    "previously active skill %r is now manual-only (disable-model-invocation "
-                    "and/or MANUAL-ONLY sentinel); this silently removes automatic availability"
-                    % candidate_id, candidate_id)
-            if not cand_fm.get("description_present"):
-                add("EMPTY_DESCRIPTION", "BLOCK",
-                    "skill %r has an empty or missing description" % candidate_id, candidate_id)
-            if cand_fm.get("name") != candidate_id:
-                add("NAME_DIRECTORY_MISMATCH", "BLOCK",
-                    "skill %r frontmatter name %r does not equal its directory name"
-                    % (candidate_id, cand_fm.get("name")), candidate_id)
+        if not cand_fm.get("parse_ok") and candidate_record.get("skill_md"):
+            add("FRONTMATTER_UNREADABLE_BY_GUARD", "WARN",
+                "guard cannot parse frontmatter for skill %r (%s); validator is authoritative"
+                % (candidate_id, cand_fm.get("unreadable_reason")), candidate_id)
+        was_manual = bool(base_fm.get("disable_model_invocation")) or bool(base_fm.get("sentinel"))
+        is_manual = bool(cand_fm.get("disable_model_invocation")) or bool(cand_fm.get("sentinel"))
+        if not was_manual and is_manual:
+            add("SILENT_DISABLE", "BLOCK",
+                "previously active skill %r is now manual-only (disable-model-invocation "
+                "and/or MANUAL-ONLY sentinel); this silently removes automatic availability"
+                % candidate_id, candidate_id)
+        if not cand_fm.get("description_present"):
+            add("EMPTY_DESCRIPTION", "BLOCK",
+                "skill %r has an empty or missing description" % candidate_id, candidate_id)
+        if cand_fm.get("name") != candidate_id:
+            add("NAME_DIRECTORY_MISMATCH", "BLOCK",
+                "skill %r frontmatter name %r does not equal its directory name"
+                % (candidate_id, cand_fm.get("name")), candidate_id)
     # discovery surfaces
     discovery = baseline["discovery"]
     named_all = sorted(set(base_named) | set(cand_named))
@@ -912,6 +913,8 @@ def compare(baseline: dict, tree: str) -> dict:
 
 # --------------------------------------------------------------------------- CLI
 def atomic_write_bytes(path: str, data: bytes) -> None:
+    if os.path.isdir(path):
+        raise InputError("output path is an existing directory")
     directory = os.path.dirname(os.path.abspath(path))
     if directory and not os.path.isdir(directory):
         raise InputError("output directory does not exist: " + directory)

@@ -401,7 +401,7 @@ def build_manifest(payload_root: Path, package_id: str, package_version: str,
     entries = collect_entries(payload_root)
     package = {"profile_id": package_id, "profile_version": package_version}
     if label is not None:
-        if not label.strip():
+        if not isinstance(label, str) or not label.strip():
             raise ManifestError("package_label", "label must be a non-empty string")
         package["label"] = label
     manifest = {
