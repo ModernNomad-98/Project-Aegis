@@ -506,6 +506,51 @@ def finding(rule: str, severity: str, message: str, subject: str = None) -> dict
     return item
 
 
+def _is_hex64(value) -> bool:
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+
+
+def _validate_baseline_skill(name: str, record) -> None:
+    if not isinstance(record, dict):
+        raise InputError("baseline skill %r is not an object" % name)
+    files = record.get("files")
+    if not isinstance(files, list):
+        raise InputError("baseline skill %r has no file inventory" % name)
+    for file_index, item in enumerate(files):
+        if not isinstance(item, dict):
+            raise InputError("baseline skill %r file entry %d is not an object" % (name, file_index))
+        if not isinstance(item.get("path"), str) or not item["path"]:
+            raise InputError("baseline skill %r file entry %d has no path" % (name, file_index))
+        if isinstance(item.get("bytes"), bool) or not isinstance(item.get("bytes"), int) or item["bytes"] < 0:
+            raise InputError("baseline skill %r file entry %d has invalid bytes" % (name, file_index))
+        if not _is_hex64(item.get("sha256")):
+            raise InputError("baseline skill %r file entry %d has invalid sha256" % (name, file_index))
+    skill_md = record.get("skill_md")
+    if skill_md is not None:
+        if not isinstance(skill_md, dict):
+            raise InputError("baseline skill %r skill_md is not an object" % name)
+        if isinstance(skill_md.get("bytes"), bool) or not isinstance(skill_md.get("bytes"), int) \
+                or skill_md.get("bytes") < 0:
+            raise InputError("baseline skill %r skill_md.bytes is invalid" % name)
+        if not _is_hex64(skill_md.get("raw_sha256")) or not _is_hex64(skill_md.get("normalized_sha256")):
+            raise InputError("baseline skill %r skill_md digests are invalid" % name)
+    frontmatter = record.get("frontmatter")
+    if frontmatter is not None:
+        if not isinstance(frontmatter, dict):
+            raise InputError("baseline skill %r frontmatter is not an object" % name)
+        if not isinstance(frontmatter.get("parse_ok"), bool):
+            raise InputError("baseline skill %r frontmatter.parse_ok is not a boolean" % name)
+        if frontmatter.get("name") is not None and not isinstance(frontmatter.get("name"), str):
+            raise InputError("baseline skill %r frontmatter.name is invalid" % name)
+        if not isinstance(frontmatter.get("description_present"), bool):
+            raise InputError("baseline skill %r frontmatter.description_present is invalid" % name)
+        if not isinstance(frontmatter.get("sentinel"), bool):
+            raise InputError("baseline skill %r frontmatter.sentinel is invalid" % name)
+        if frontmatter.get("disable_model_invocation") is not None \
+                and not isinstance(frontmatter.get("disable_model_invocation"), bool):
+            raise InputError("baseline skill %r frontmatter.disable_model_invocation is invalid" % name)
+
+
 def validate_baseline(baseline: dict) -> None:
     if not isinstance(baseline, dict):
         raise InputError("baseline is not a JSON object")
@@ -527,29 +572,45 @@ def validate_baseline(baseline: dict) -> None:
         raise InputError("baseline discovery section is not an object")
     if not isinstance(baseline["starter"], dict):
         raise InputError("baseline starter section is not an object")
-    for key in ("declared_paths", "declared_skills"):
-        value = baseline["starter"].get(key)
-        if value is None or not isinstance(value, list):
-            raise InputError("baseline starter.%s is not a list" % key)
+    if not isinstance(baseline["file_inventory"], list):
+        raise InputError("baseline file_inventory section is not a list")
+    if not isinstance(baseline["skills"], dict) or not baseline["skills"]:
+        raise InputError("baseline skills section empty")
     count_names = ("skill_directories", "named_skills", "skill_md_files",
                    "skill_files_total", "manifest_entries")
     for key in count_names:
         value = baseline["counts"].get(key)
-        if value is not None and not isinstance(value, int):
-            raise InputError("baseline counts.%s is not an integer" % key)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise InputError("baseline counts.%s is not a non-negative integer" % key)
     for key in ("catalog_mentions", "readme_mentions"):
         value = baseline["discovery"].get(key)
-        if not isinstance(value, dict):
-            raise InputError("baseline discovery.%s is not an object" % key)
-    if not isinstance(baseline["discovery"].get("manifest"), dict):
+        if not isinstance(value, dict) or not all(
+                isinstance(k, str) and isinstance(v, bool) for k, v in value.items()):
+            raise InputError("baseline discovery.%s is not an object of booleans" % key)
+    manifest_surface = baseline["discovery"].get("manifest")
+    if not isinstance(manifest_surface, dict):
         raise InputError("baseline discovery.manifest is not an object")
-    for key in ("skill_md", "frontmatter"):
-        for name, record in baseline["skills"].items():
-            value = record.get(key)
-            if value is not None and not isinstance(value, dict):
-                raise InputError("baseline skill %r %s is not an object" % (name, key))
-    if not isinstance(baseline["file_inventory"], list):
-        raise InputError("baseline file_inventory section is not a list")
+    if not isinstance(manifest_surface.get("present"), bool):
+        raise InputError("baseline discovery.manifest.present is not a boolean")
+    if not isinstance(manifest_surface.get("entries"), dict):
+        raise InputError("baseline discovery.manifest.entries is not an object")
+    for key in ("declared_paths", "declared_skills"):
+        value = baseline["starter"].get(key)
+        if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+            raise InputError("baseline starter.%s is not a list of non-empty strings" % key)
+    for key in ("present", "parsed"):
+        if not isinstance(baseline["starter"].get(key), bool):
+            raise InputError("baseline starter.%s is not a boolean" % key)
+    seen_skills = {}
+    for name, record in baseline["skills"].items():
+        if not isinstance(name, str) or not name:
+            raise InputError("baseline skill id is not a non-empty string")
+        key = name.casefold()
+        if key in seen_skills:
+            raise InputError("baseline duplicate/case-colliding skill id: %r and %r" %
+                             (seen_skills[key], name))
+        seen_skills[key] = name
+        _validate_baseline_skill(name, record)
     inventory_seen = set()
     for index, rel in enumerate(baseline["file_inventory"]):
         if not isinstance(rel, str):
@@ -558,31 +619,6 @@ def validate_baseline(baseline: dict) -> None:
         if folded in inventory_seen:
             raise InputError("baseline duplicate/case-colliding path: %r" % rel)
         inventory_seen.add(folded)
-    if not isinstance(baseline["skills"], dict) or not baseline["skills"]:
-        raise InputError("baseline skills section empty")
-    seen = {}
-    for name, record in baseline["skills"].items():
-        key = str(name).casefold()
-        if key in seen:
-            raise InputError("baseline duplicate/case-colliding skill id: %r and %r" %
-                             (seen[key], name))
-        seen[key] = name
-        if not isinstance(record, dict):
-            raise InputError("baseline skill %r is not an object" % name)
-        files = record.get("files")
-        if not isinstance(files, list):
-            raise InputError("baseline skill %r has no file inventory" % name)
-        for file_index, item in enumerate(files):
-            if not isinstance(item, dict) or not isinstance(item.get("path"), str):
-                raise InputError("baseline skill %r file entry %d is malformed" % (name, file_index))
-            if not isinstance(item.get("bytes"), int) or not isinstance(item.get("sha256"), str):
-                raise InputError("baseline skill %r file entry %d lacks bytes/sha256" % (name, file_index))
-    last_casefold = None
-    for rel in baseline["file_inventory"]:
-        key = str(rel).casefold()
-        if key == last_casefold:
-            raise InputError("baseline duplicate/case-colliding path: %r" % rel)
-        last_casefold = key
 
 
 # --------------------------------------------------------------------------- comparison
