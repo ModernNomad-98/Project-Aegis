@@ -59,6 +59,17 @@ REMOVAL_VERB_RE = re.compile(
 SEVERITY_ORDER = {"BLOCK": 0, "WARN": 1, "INFO": 2, "UNRUN": 3}
 
 
+def is_reparse_point(path: str) -> bool:
+    """True for a symlink or Windows junction/reparse point; never follows it."""
+    try:
+        if os.path.islink(path):
+            return True
+        is_junction = getattr(os.path, "isjunction", None)
+        return bool(callable(is_junction) and is_junction(path))
+    except OSError:
+        return False
+
+
 # --------------------------------------------------------------------------- hashing / paths
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -93,11 +104,15 @@ def iter_repo_files(tree: str):
     collected = []
     for dirpath, dirnames, filenames in os.walk(tree):
         dirnames[:] = sorted(d for d in dirnames if d not in EXCLUDED_DIR_NAMES)
+        for name in list(dirnames):
+            full = os.path.join(dirpath, name)
+            if is_reparse_point(full):
+                dirnames.remove(name)
         for name in sorted(filenames):
             if name.endswith(EXCLUDED_SUFFIXES):
                 continue
             full = os.path.join(dirpath, name)
-            if os.path.islink(full):
+            if is_reparse_point(full):
                 continue
             collected.append(safe_relpath(full, tree))
     collected.sort()
@@ -111,9 +126,14 @@ def iter_symlinks_under(tree: str, rel_root: str):
     if not os.path.isdir(root):
         return found
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
-        for name in sorted(list(dirnames) + list(filenames)):
+        for name in list(dirnames):
             full = os.path.join(dirpath, name)
-            if os.path.islink(full):
+            if is_reparse_point(full):
+                found.append(safe_relpath(full, tree))
+                dirnames.remove(name)
+        for name in sorted(filenames):
+            full = os.path.join(dirpath, name)
+            if is_reparse_point(full):
                 found.append(safe_relpath(full, tree))
     return sorted(set(found))
 
@@ -266,12 +286,18 @@ def skill_record(tree: str, skill_dir: str) -> dict:
     files = []
     for dirpath, dirnames, filenames in os.walk(skill_dir):
         dirnames[:] = sorted(d for d in dirnames if d not in EXCLUDED_DIR_NAMES)
+        for name in list(dirnames):
+            full = os.path.join(dirpath, name)
+            if is_reparse_point(full):
+                raise InputError("reparse point inside a skill directory: "
+                                 + safe_relpath(full, tree))
         for name in sorted(filenames):
             if name.endswith(EXCLUDED_SUFFIXES):
                 continue
             full = os.path.join(dirpath, name)
-            if os.path.islink(full):
-                continue
+            if is_reparse_point(full):
+                raise InputError("reparse point inside a skill directory: "
+                                 + safe_relpath(full, tree))
             if not os.path.isfile(full):
                 raise InputError("non-regular file inside a skill directory: "
                                  + safe_relpath(full, tree))
@@ -398,8 +424,7 @@ def build_baseline(tree: str, source_revision: str = None, source_tree: str = No
     if not dirs:
         raise InputError("candidate tree has an empty %s directory" % SKILLS_REL)
     for full in dirs:
-        if os.path.islink(full) or (
-                callable(getattr(os.path, "isjunction", None)) and os.path.isjunction(full)):
+        if is_reparse_point(full):
             raise InputError("symlinked/junction skill directory refused: "
                              + safe_relpath(full, tree))
     for rel in iter_symlinks_under(tree, SKILLS_REL):
@@ -642,8 +667,7 @@ def validate_baseline(baseline: dict) -> None:
 def compare(baseline: dict, tree: str) -> dict:
     tree = os.path.realpath(tree)
     skills_root = os.path.join(tree, *SKILLS_REL.split("/"))
-    if os.path.islink(skills_root) or (
-            callable(getattr(os.path, "isjunction", None)) and os.path.isjunction(skills_root)):
+    if is_reparse_point(skills_root):
         raise InputError("symlinked/junction skill root refused")
     dirs = skill_dirs(tree)
     if dirs is None or not dirs:
