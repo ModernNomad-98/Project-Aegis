@@ -673,8 +673,20 @@ def compare(baseline: dict, tree: str) -> dict:
     added_paths = sorted(cand_inventory - base_inventory)
     for rel in added_paths:
         if rel.startswith(SKILLS_REL + "/"):
-            add("ADDED_PATH_IN_SKILL_SURFACE", "BLOCK",
-                "candidate adds a file inside the protected skill surface: %r" % rel, rel)
+            parts = rel.split("/")
+            added_skill_id = parts[2] if len(parts) >= 3 else ""
+            if REMOVAL_VERB_RE.search(rel):
+                add("CLEANUP_PATH_ADDITION", "BLOCK",
+                    "candidate adds a removal-looking path inside the protected skill surface: "
+                    "%r" % rel, rel)
+                continue
+            if added_skill_id in base_skills:
+                add("ADDED_PATH_IN_SKILL_SURFACE", "BLOCK",
+                    "candidate adds a file inside an existing baseline skill directory: %r" % rel, rel)
+                continue
+            add("ADDED_SKILL_FILE", "INFO",
+                "candidate adds a file inside a newly added skill %r (additions are allowed; "
+                "the added-skill WARN covers discovery/packaging review)" % added_skill_id, rel)
             continue
         if REMOVAL_VERB_RE.search(rel):
             if rel.startswith("tools/skill_preservation/") and re.search(

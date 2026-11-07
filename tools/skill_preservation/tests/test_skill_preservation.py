@@ -302,6 +302,16 @@ class GuardSelfTests(unittest.TestCase):
                       if item["rule"] == "CLEANUP_PATH_ADDITION"]
         self.assertEqual(severities, ["BLOCK"])
 
+    def test_c16b_new_skill_addition_is_not_blocked(self):
+        tree = self.new_candidate("new-skill")
+        write(tree / ".claude" / "skills" / "gamma" / "SKILL.md",
+              SKILL_MD_TEMPLATE.format(name="gamma"))
+        code, report, out, err = self.run_check(tree)
+        self.assertEqual(code, 0)
+        rules = self.rules(report)
+        self.assertIn("ADDED_SKILL", rules)
+        self.assertNotIn("ADDED_PATH_IN_SKILL_SURFACE", rules)
+
     def test_c17_missing_baseline_fails_closed(self):
         out, err = io.StringIO(), io.StringIO()
         with redirect_stdout(out), redirect_stderr(err):

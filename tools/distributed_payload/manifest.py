@@ -110,12 +110,22 @@ def payload_directory_prefixes(manifest: dict) -> list[str]:
     return sorted(prefixes)
 
 
+def _is_reparse_point(path: Path) -> bool:
+    try:
+        if path.is_symlink():
+            return True
+        is_junction = getattr(os.path, "isjunction", None)
+        if callable(is_junction) and is_junction(path):
+            return True
+    except OSError:
+        return False
+    return False
+
+
 def _reject_symlink(path: Path, relative: str) -> None:
-    if path.is_symlink():
-        raise ManifestError("symlink_payload", "symlinks are not supported in v1", relative)
-    is_junction = getattr(os.path, "isjunction", None)
-    if callable(is_junction) and is_junction(path):
-        raise ManifestError("reparse_point", "junction/reparse points are not supported in v1", relative)
+    if _is_reparse_point(path):
+        kind = "symlink_payload" if path.is_symlink() else "reparse_point"
+        raise ManifestError(kind, "symlinks and junction/reparse points are not supported in v1", relative)
     try:
         stat_result = path.stat()
     except OSError as exc:
@@ -137,9 +147,10 @@ def collect_entries(payload_root: Path) -> list[dict]:
         dirnames.sort()
         for dirname in list(dirnames):
             directory_path = Path(dirpath) / dirname
-            if directory_path.is_symlink():
+            if _is_reparse_point(directory_path):
                 relative_dir = directory_path.relative_to(root).as_posix()
-                raise ManifestError("symlink_payload", "symlinks are not supported in v1", relative_dir)
+                kind = "symlink_payload" if directory_path.is_symlink() else "reparse_point"
+                raise ManifestError(kind, "directory symlinks and junction/reparse points are not supported in v1", relative_dir)
         for filename in sorted(filenames):
             file_path = Path(dirpath) / filename
             relative = file_path.relative_to(root).as_posix()

@@ -51,7 +51,9 @@ BLOCK findings (availability loss; fail closed):
 - **Name/Directory Mismatch** and **Empty Description** - frontmatter no longer matches the tree.
 - **Declared Installed-Set Reduction** - a source-side file or skill declared in
   docs/consumer-starter-package.md is missing from the candidate.
-- **Added Path in Skill Surface** - any candidate-added file under .claude/skills/.
+- **Added Path in Existing Skill Surface** - any candidate-added file under an existing baseline
+  skill directory. Added files belonging to a newly added skill are reported by the Added Skill
+  WARN/INFO rules instead (additions are allowed).
 - **Cleanup-Path Addition (BLOCK)** - a removal-looking path that names skills inside this tool's own
   package (the guard acquiring a removal path is explicitly forbidden).
 

@@ -12,10 +12,10 @@ content. The catalog points at them.
 | File | Purpose |
 |---|---|
 | `requirements.v1.json` | The versioned catalog (profile: source-library change conformance; 23 seeded requirements across six families). |
-| `requirements.v1.schema.json` | The strict JSON Schema for the catalog. Unknown fields are rejected; observation-like fields are explicitly listed in the README and rejected by the checker. |
+| `requirements.v1.schema.json` | The strict JSON Schema for the catalog (normative for full shape; unknown fields are rejected by the schema). The stdlib checker enforces the catalog-level schema/version plus a selected set of observation-like forbidden keys; it does not run a JSON-Schema engine. |
 | `README.md` | This contract page. |
-| `../tools/conformance/check_catalog.py` | The deterministic, read-only checker. |
-| `../tools/conformance/README.md` | Checker usage, finding codes and limits. |
+| `../../tools/conformance/check_catalog.py` | The deterministic, read-only checker. |
+| `../../tools/conformance/README.md` | Checker usage, finding codes and limits. |
 
 ## Honest scope of v1
 
@@ -107,6 +107,10 @@ gate (owner-gated decision CP-D2 / D-P2); it is local read-only evidence only.
 
 ## Limits and non-claims
 
+- **The stdlib checker is not a JSON-Schema engine.** Full unknown-field rejection is a property of
+  the normative schema; the checker enforces the catalog-level schema/version and a selected set of
+  observation-like forbidden keys. A claim that the checker rejects every unknown field would be
+  incorrect (DeepSeek P2 finding, fixed by this wording).
 - A clean checker run is **not** a claim that every requirement is well worded, fully enforced, or
   free of review error; it is a structural and anchor-consistency check.
 - The catalog does not convert any UNRUN item into a pass, and does not record observations.

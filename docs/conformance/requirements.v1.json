@@ -1,5 +1,5 @@
 {
-  "catalog_version": "1.0.0",
+  "catalog_version": "1.0.1",
   "profiles": [
     {
       "description": "Requirements that apply to a bounded change to the Project Aegis source library, as an index over existing normative sources.",
@@ -963,11 +963,6 @@
       "bytes": 43194,
       "path": "docs/skill-generation-standard.md",
       "sha256": "9c69ae1009a3828589d018eb9f997cd5fe188a6126dcc99052caadf4f4083879"
-    },
-    {
-      "bytes": 29137,
-      "path": "AGENTS.md",
-      "sha256": "48a8834b6e96d7117a5b7ea84e77a482456dffec96c6aaadf12e67cab1e3a353"
     },
     {
       "bytes": 192041,

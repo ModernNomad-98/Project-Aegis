@@ -197,13 +197,27 @@ def verify_target(manifest_path: Path, target_root: Path,
             continue
         for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
             dirnames.sort()
+            for dirname in list(dirnames):
+                directory_path = Path(dirpath) / dirname
+                if _detect_reparse(directory_path):
+                    try:
+                        relative_dir = directory_path.relative_to(target).as_posix()
+                    except ValueError:
+                        relative_dir = None
+                    if relative_dir is not None and relative_dir not in entry_set:
+                        findings.append({"class": "UNRECOGNIZED", "path": relative_dir,
+                                         "detail": "undeclared directory symlink/reparse point; not followed"})
+                    dirnames.remove(dirname)
             for filename in sorted(filenames):
                 file_path = Path(dirpath) / filename
-                if _detect_reparse(file_path):
-                    continue
                 try:
                     relative = file_path.relative_to(target).as_posix()
                 except ValueError:
+                    continue
+                if _detect_reparse(file_path):
+                    if relative not in entry_set:
+                        findings.append({"class": "UNRECOGNIZED", "path": relative,
+                                         "detail": "undeclared symlink/reparse point; not followed"})
                     continue
                 if relative in entry_set:
                     continue
