@@ -53,7 +53,7 @@ This table is the single maintained copy of the program's readable item names. I
 
 | Phase | Content |
 | --- | --- |
-| Phase 0 | Program baseline and registration: verified exact-tree baseline, preservation baseline, queue/ownership map and this registration — **COMPLETE** |
+| Phase 0 | Program baseline and registration: verified exact-tree baseline, preservation baseline, queue/ownership map and this registration — registered; Stage C local implementation complete; Stage D–F and merge pending |
 | Phase 1 | Planning and first implementation slices for the Phase 1 items in the table above |
 | Phase 2 | Independent plan audits and the Phase 2/3 items' planning slices |
 | Phase 3 | Implementation slices for the Phase 3 items |
@@ -79,7 +79,7 @@ Not authorized: pushing; creating or updating remote pull requests, issues, comm
 
 M0 (program baseline and registration) is **registered, not merged**: the baseline record exists, but Stage D implementation audit, Stage E validation, Stage F final review and merge are pending, so this item is not “complete”. Four Stage A packets were delivered for the first item slices (requirements-to-evidence conformance; consumer packaging manifest and read-only verification; verification/evaluation; maintainability/AI-product profile/release evidence). The registration packet was independently audited at Stage B and **ACCEPTed**, so the registration slice is at **Stage C — local implementation complete; Stage D–F and merge pending**. The commit remains local until a separately authorized merge; no push, PR, review posting, merge or publication is authorized by this page.
 
-**Next action.** Complete the Stage C commit for exactly the three registration paths (`AGENTS.md` append, this page, one `docs/README.md` pointer), re-run the validator and Markdown link checker at the exact candidate, then hand the candidate to independent Stage D review. Remote/owner-gated actions remain untouched.
+**Next action.** Complete the current-round Stage D implementation audit, Stage E validation and Stage F independent review at the exact candidate; a merge remains separately authorized. Remote/owner-gated actions remain untouched.
 
 ## S7. Owner-held items
 

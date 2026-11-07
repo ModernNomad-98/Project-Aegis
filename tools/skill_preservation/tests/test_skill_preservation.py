@@ -173,6 +173,49 @@ class GuardSelfTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("SILENT_DISABLE", self.rules(payload))
 
+    def test_c02e_nested_baseline_shapes_fail_closed(self):
+        tail = self.new_candidate("malformed-nested-baseline")
+        for label, mutate in (
+            ("starter-null", lambda b: b["starter"].__setitem__("declared_paths", None)),
+            ("mentions-null", lambda b: b["discovery"].__setitem__("catalog_mentions", None)),
+            ("skill-md-string", lambda b: b["skills"]["alpha"].__setitem__("skill_md", "bad")),
+        ):
+            bad = json.loads(json.dumps(self.baseline))
+            mutate(bad)
+            bad["baseline_id"] = guard.compute_baseline_id(bad)
+            bad_path = Path(self.tmp.name) / ("malformed-" + label + ".json")
+            guard.atomic_write_bytes(str(bad_path), guard.dump_json(bad).encode("utf-8"))
+            out, err = io.StringIO(), io.StringIO()
+            with redirect_stdout(out), redirect_stderr(err):
+                code = guard.main(["check", "--tree", str(tail),
+                                   "--baseline", str(bad_path), "--json"])
+            self.assertEqual(code, 2, label)
+
+    def test_c02f_block_scalar_sentinel_blocks(self):
+        tree = self.new_candidate("block-sentinel")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        text = skill_md.read_text(encoding="utf-8").replace(
+            "description: 'A synthetic test skill named alpha for guard self-tests.'",
+            "description: >\n  MANUAL-ONLY; never auto-invoke. synthetic", 1)
+        write(skill_md, text)
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1)
+        self.assertIn("SILENT_DISABLE", self.rules(payload))
+
+    def test_c02g_flow_mapping_disable_is_not_ignored(self):
+        tree = self.new_candidate("flow-mapping")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        text = skill_md.read_text(encoding="utf-8").replace(
+            "name: alpha", "name: alpha\ndisable-model-invocation : true", 1)
+        write(skill_md, text)
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1)
+        self.assertIn("SILENT_DISABLE", self.rules(payload))
+
+    def test_c02h_skill_mention_is_token_bounded(self):
+        self.assertFalse(guard.mentions_skill("ai-threat-modeler", "threat-modeler"))
+        self.assertTrue(guard.mentions_skill("- threat-modeler", "threat-modeler"))
+
     def test_c02d_malformed_baseline_section_fails_closed(self):
         tail = self.new_candidate("malformed-baseline")
         bad = dict(self.baseline)

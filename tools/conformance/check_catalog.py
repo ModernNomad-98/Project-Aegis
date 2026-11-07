@@ -856,7 +856,9 @@ def build_report(catalog, catalog_identity, repo_root, evidence_path, profile_ar
                         if isinstance(m, str))
     evidence = None
     if evidence_path:
-        catalog_revision = (catalog.get("source_baseline") or {}).get("revision")
+        raw_baseline = catalog.get("source_baseline")
+        catalog_revision = (raw_baseline.get("revision")
+                            if isinstance(raw_baseline, dict) else None)
         evidence = load_evidence_binding(evidence_path, catalog_identity, repo_root, findings,
                                          catalog_revision)
     evidence_present, unrun = evaluate_evidence(by_id, evidence, findings)

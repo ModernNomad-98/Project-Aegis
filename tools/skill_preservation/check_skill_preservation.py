@@ -188,7 +188,7 @@ def parse_skill_frontmatter(text: str) -> dict:
         index = 0
         while index < len(lines):
             line = lines[index]
-            match = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", line)
+            match = re.match(r"^([A-Za-z0-9_-]+)\s*:\s*(.*)$", line)
             if match:
                 key, value = match.group(1), match.group(2)
                 if key == "description" and value[:1] in (">", "|"):
@@ -210,9 +210,21 @@ def parse_skill_frontmatter(text: str) -> dict:
         if isinstance(description, str):
             description = _strip_scalar_quotes(description.strip())
         record["description_present"] = bool(isinstance(description, str) and description.strip())
-        record["sentinel"] = bool(isinstance(description, str) and description.startswith(MANUAL_ONLY_SENTINEL))
+        record["sentinel"] = bool(
+            (isinstance(description, str) and description.startswith(MANUAL_ONLY_SENTINEL))
+            or MANUAL_ONLY_SENTINEL in fm_text)
         dmi = seen.get("disable-model-invocation")
-        if dmi is None:
+        raw_dmi = re.search(
+            r"disable-model-invocation\s*:\s*([^\s,}\]]+)", fm_text, re.IGNORECASE)
+        if raw_dmi is not None:
+            dmi_token = _strip_scalar_quotes(raw_dmi.group(1).strip()).strip().lower()
+            if dmi_token in ("true", "false"):
+                record["disable_model_invocation"] = dmi_token == "true"
+            else:
+                record["disable_model_invocation"] = None
+                record["parse_ok"] = False
+                record["unreadable_reason"] = "unrecognized disable-model-invocation value"
+        elif dmi is None:
             record["disable_model_invocation"] = None
         else:
             dmi_token = _strip_scalar_quotes(str(dmi).strip()).strip().lower()
@@ -222,7 +234,7 @@ def parse_skill_frontmatter(text: str) -> dict:
                 record["disable_model_invocation"] = None
                 record["parse_ok"] = False
                 record["unreadable_reason"] = "unrecognized disable-model-invocation value"
-        if not record["parse_ok"]:
+        if not record["parse_ok"] and record["unreadable_reason"] is None:
             record["unreadable_reason"] = "name key missing or unquoted frontmatter unclear"
         return record
     except Exception as exc:  # pragma: no cover - defensive; guard must not crash on a tree
@@ -314,6 +326,13 @@ def build_manifest_surface(tree: str) -> dict:
     return surface
 
 
+def mentions_skill(text: str, name: str) -> bool:
+    """Token-bounded mention so a longer skill id cannot mask a shorter one."""
+    if not isinstance(text, str) or not isinstance(name, str) or not name:
+        return False
+    return re.search(r"(?<![A-Za-z0-9-])" + re.escape(name) + r"(?![A-Za-z0-9-])", text) is not None
+
+
 def build_discovery_surface(tree: str, skill_ids: list) -> dict:
     catalog_path = os.path.join(tree, *CATALOG_REL.split("/"))
     readme_path = os.path.join(tree, *README_REL.split("/"))
@@ -322,8 +341,8 @@ def build_discovery_surface(tree: str, skill_ids: list) -> dict:
     return {
         "catalog_present": os.path.isfile(catalog_path),
         "readme_present": os.path.isfile(readme_path),
-        "catalog_mentions": {name: (name in catalog_text) for name in skill_ids},
-        "readme_mentions": {name: (name in readme_text) for name in skill_ids},
+        "catalog_mentions": {name: mentions_skill(catalog_text, name) for name in skill_ids},
+        "readme_mentions": {name: mentions_skill(readme_text, name) for name in skill_ids},
     }
 
 
@@ -510,13 +529,35 @@ def validate_baseline(baseline: dict) -> None:
         raise InputError("baseline starter section is not an object")
     for key in ("declared_paths", "declared_skills"):
         value = baseline["starter"].get(key)
-        if value is not None and not isinstance(value, list):
+        if value is None or not isinstance(value, list):
             raise InputError("baseline starter.%s is not a list" % key)
+    count_names = ("skill_directories", "named_skills", "skill_md_files",
+                   "skill_files_total", "manifest_entries")
+    for key in count_names:
+        value = baseline["counts"].get(key)
+        if value is not None and not isinstance(value, int):
+            raise InputError("baseline counts.%s is not an integer" % key)
+    for key in ("catalog_mentions", "readme_mentions"):
+        value = baseline["discovery"].get(key)
+        if not isinstance(value, dict):
+            raise InputError("baseline discovery.%s is not an object" % key)
+    if not isinstance(baseline["discovery"].get("manifest"), dict):
+        raise InputError("baseline discovery.manifest is not an object")
+    for key in ("skill_md", "frontmatter"):
+        for name, record in baseline["skills"].items():
+            value = record.get(key)
+            if value is not None and not isinstance(value, dict):
+                raise InputError("baseline skill %r %s is not an object" % (name, key))
     if not isinstance(baseline["file_inventory"], list):
         raise InputError("baseline file_inventory section is not a list")
+    inventory_seen = set()
     for index, rel in enumerate(baseline["file_inventory"]):
         if not isinstance(rel, str):
             raise InputError("baseline file_inventory entry %d is not a string" % index)
+        folded = rel.casefold()
+        if folded in inventory_seen:
+            raise InputError("baseline duplicate/case-colliding path: %r" % rel)
+        inventory_seen.add(folded)
     if not isinstance(baseline["skills"], dict) or not baseline["skills"]:
         raise InputError("baseline skills section empty")
     seen = {}
@@ -534,6 +575,8 @@ def validate_baseline(baseline: dict) -> None:
         for file_index, item in enumerate(files):
             if not isinstance(item, dict) or not isinstance(item.get("path"), str):
                 raise InputError("baseline skill %r file entry %d is malformed" % (name, file_index))
+            if not isinstance(item.get("bytes"), int) or not isinstance(item.get("sha256"), str):
+                raise InputError("baseline skill %r file entry %d lacks bytes/sha256" % (name, file_index))
     last_casefold = None
     for rel in baseline["file_inventory"]:
         key = str(rel).casefold()
@@ -677,7 +720,7 @@ def compare(baseline: dict, tree: str) -> dict:
         add("DISCOVERY_OMISSION_CATALOG", "BLOCK", "docs/skills-catalog.md is missing from the candidate")
     elif cand_catalog is not None:
         for name in base_named:
-            if discovery.get("catalog_mentions", {}).get(name) and name not in cand_catalog:
+            if discovery.get("catalog_mentions", {}).get(name) and not mentions_skill(cand_catalog, name):
                 add("DISCOVERY_OMISSION_CATALOG", "BLOCK",
                     "skill %r was listed in docs/skills-catalog.md at baseline and is no longer listed"
                     % name, name)
@@ -685,7 +728,7 @@ def compare(baseline: dict, tree: str) -> dict:
         add("DISCOVERY_OMISSION_README", "BLOCK", "README.md is missing from the candidate")
     elif cand_readme is not None:
         for name in base_named:
-            if discovery.get("readme_mentions", {}).get(name) and name not in cand_readme:
+            if discovery.get("readme_mentions", {}).get(name) and not mentions_skill(cand_readme, name):
                 add("DISCOVERY_OMISSION_README", "BLOCK",
                     "skill %r was listed in README.md at baseline and is no longer listed" % name, name)
     base_manifest = discovery.get("manifest") or {}
