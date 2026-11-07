@@ -467,6 +467,17 @@ class ConformanceCheckerTests(unittest.TestCase):
         readme = (TOOL_DIR / "README.md").read_text(encoding="utf-8")
         self.assertIn("not resolved or verified", readme)
 
+    def test_empty_mechanism_refs_is_finding(self):
+        fixture = self.fresh_fixture("empty-refs")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        catalog["requirements"][0]["mechanism"]["refs"] = []
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker(root=fixture, *("--json",))
+        self.assertEqual(code, 1)
+        self.assertIn("BAD-MECHANISM", out)
+        report = json.loads(out)
+        self.assertTrue(any("at least one ref" in item["evidence"] for item in report["findings"]))
+
     def test_circular_binding_self_field(self):
         def mutate(binding, _dir):
             binding["binding_sha256"] = "0" * 64
@@ -529,6 +540,8 @@ class ConformanceCheckerTests(unittest.TestCase):
         requirement = schema["properties"]["requirements"]["items"]["properties"]
         self.assertEqual(set(requirement["mechanism"]["properties"]["kind"]["enum"]),
                          module.MECH_KINDS)
+        self.assertEqual(requirement["mechanism"]["properties"]["refs"]["minItems"],
+                         module.MECHANISM_REFS_MIN)
         self.assertEqual(set(requirement["verification"]["properties"]["method"]["enum"]),
                          module.VERIF_METHODS)
         self.assertEqual(set(requirement["evidence_requirement"]["properties"]["kind"]["enum"]),

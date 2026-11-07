@@ -75,6 +75,7 @@ REL_PATH_RE = re.compile(r"^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$")
 AC_RE = re.compile(r"^AC-[0-9]{2}$")
 
 MECH_KINDS = {"machine-check", "independent-review", "manual-attestation", "procedural-none"}
+MECHANISM_REFS_MIN = 1
 VERIF_METHODS = {"deterministic-check", "independent-review", "execution-evidence",
                  "manual-attestation", "none"}
 EVID_KINDS = {"console-log", "json-record", "review-verdict", "artifact-digest",
@@ -394,6 +395,9 @@ def check_structure(catalog, findings):
             refs = mechanism.get("refs")
             if not isinstance(refs, list):
                 fail(where + ".mechanism.refs", rid, "refs must be an array")
+            elif len(refs) < MECHANISM_REFS_MIN:
+                add(findings, "BAD-MECHANISM", where + ".mechanism.refs", rid,
+                    "mechanism.refs must contain at least one ref (non-empty anchors required)")
             else:
                 for rindex, ref in enumerate(refs):
                     if not isinstance(ref, dict) or not is_safe_relpath(ref.get("path")):

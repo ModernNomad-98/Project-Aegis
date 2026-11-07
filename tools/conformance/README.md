@@ -118,6 +118,9 @@ constants. It needs no network, no credentials and no third-party packages.
 - The completeness rule is bounded to the declared first-profile seed inventory in this tool; a
   broader profile or additional families require a reviewed change to that constant and to the
   catalog together.
+- A mechanism `refs` array must contain at least one ref: the schema declares `minItems: 1` and the
+  checker reports `BAD-MECHANISM` when `refs` is empty. No `procedural-none` exception is granted; a
+  requirement cannot claim enforcement with zero resolvable mechanism anchors.
 - The tool is not an approval, a merge gate or a CI check; it is not wired and does not block merges.
 
 ## Related

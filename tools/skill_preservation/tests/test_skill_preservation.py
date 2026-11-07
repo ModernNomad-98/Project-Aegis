@@ -224,7 +224,6 @@ class GuardSelfTests(unittest.TestCase):
         for label, line in (
             ("double", '"disable-model-invocation": true'),
             ("single", "'disable-model-invocation': true"),
-            ("flow", 'meta: {description: x, "disable-model-invocation": true}'),
         ):
             tree = self.new_candidate("quoted-key-" + label)
             skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
@@ -234,6 +233,37 @@ class GuardSelfTests(unittest.TestCase):
             code, payload, out, err = self.run_check(tree)
             self.assertEqual(code, 1, label + ": " + out)
             self.assertIn("SILENT_DISABLE", self.rules(payload), label)
+
+    def test_c02i2_nested_flow_or_quoted_json_is_not_a_top_level_setting(self):
+        for label, line in (
+            ("nested-flow", 'meta: {description: x, "disable-model-invocation": true}'),
+            ("quoted-json",
+             'description: \'Example JSON: {"disable-model-invocation": true}\''),
+        ):
+            tree = self.new_candidate("nested-dmi-" + label)
+            skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+            text = skill_md.read_text(encoding="utf-8")
+            if label == "nested-flow":
+                text = text.replace("name: alpha", "name: alpha\n" + line, 1)
+            else:
+                text = text.replace(
+                    "description: 'A synthetic test skill named alpha for guard self-tests.'",
+                    line, 1)
+            write(skill_md, text)
+            code, payload, out, err = self.run_check(tree)
+            self.assertEqual(code, 0, label + ": " + out)
+            self.assertNotIn("SILENT_DISABLE", self.rules(payload), label)
+
+    def test_c02i3_prose_sentinel_mention_is_not_a_manual_only_declaration(self):
+        tree = self.new_candidate("prose-sentinel")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        text = skill_md.read_text(encoding="utf-8").replace(
+            "description: 'A synthetic test skill named alpha for guard self-tests.'",
+            "description: 'A note: MANUAL-ONLY; never auto-invoke. appears in prose only.'", 1)
+        write(skill_md, text)
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("SILENT_DISABLE", self.rules(payload))
 
     def test_c02k_exact_sentinel_without_trailing_space_blocks(self):
         for label, extra in (("quoted", ""), ("block", ""), ("missing-name", "")):
@@ -671,6 +701,46 @@ class GuardSelfTests(unittest.TestCase):
         self.assertEqual(code, 1, out)
         self.assertIn("ADDED_PATH_IN_SKILL_SURFACE", self.rules(payload))
         self.assertNotIn("ADDED_SKILL_FILE", self.rules(payload))
+
+    def tampered_baseline(self, label, mutate):
+        bad = json.loads(guard.dump_json(self.baseline))
+        mutate(bad)
+        bad["baseline_id"] = guard.compute_baseline_id(bad)
+        path = Path(self.tmp.name) / ("tampered-" + label + ".json")
+        guard.atomic_write_bytes(str(path), guard.dump_json(bad).encode("utf-8"))
+        return path
+
+    def assert_baseline_refused(self, label, mutate):
+        path = self.tampered_baseline(label, mutate)
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            code = guard.main(["check", "--tree", str(self.base_root),
+                               "--baseline", str(path), "--json"])
+        self.assertEqual(code, 2, label)
+
+    def test_p2c_tampered_baseline_required_flags_fail_closed(self):
+        cases = {
+            "catalog-false": lambda bad: bad["discovery"].__setitem__("catalog_present", False),
+            "readme-false": lambda bad: bad["discovery"].__setitem__("readme_present", False),
+            "manifest-false": lambda bad: bad["discovery"]["manifest"].__setitem__("present", False),
+            "manifest-empty": lambda bad: bad["discovery"]["manifest"].__setitem__("entries", {}),
+            "starter-false": lambda bad: bad["starter"].__setitem__("present", False),
+            "starter-unparsed": lambda bad: bad["starter"].__setitem__("parsed", False),
+        }
+        for label, mutate in cases.items():
+            self.assert_baseline_refused(label, mutate)
+
+    def test_p2c_tampered_baseline_starter_paths_fail_closed(self):
+        cases = {
+            "dotdot": lambda bad: bad["starter"].__setitem__("declared_paths", ["../escape.txt"]),
+            "absolute": lambda bad: bad["starter"].__setitem__("declared_paths", ["C:/windows/win.ini"]),
+            "backslash": lambda bad: bad["starter"].__setitem__("declared_paths", ["a\\b.txt"]),
+            "dot-segment": lambda bad: bad["starter"].__setitem__(
+                "declared_paths", [".claude/skills/alpha/./x.md"]),
+            "dotdot-skill": lambda bad: bad["starter"].__setitem__(
+                "declared_paths", [".claude/skills/alpha/../../x.md"]),
+        }
+        for label, mutate in cases.items():
+            self.assert_baseline_refused(label, mutate)
 
     def test_baseline_out_inside_tree_refused(self):
         tree = self.new_candidate("baseline-out")

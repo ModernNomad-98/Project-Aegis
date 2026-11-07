@@ -243,12 +243,12 @@ def parse_skill_frontmatter(text: str) -> dict:
             if match:
                 key, value = match.group(1), match.group(2)
                 if key == "description" and value[:1] in (">", "|"):
-                    block = [value]
+                    block_content = []
                     index += 1
                     while index < len(lines) and (lines[index].startswith(" ") or not lines[index].strip()):
-                        block.append(lines[index])
+                        block_content.append(lines[index].strip())
                         index += 1
-                    seen[key] = "\n".join(block).strip()
+                    seen[key] = " ".join(part for part in block_content if part).strip()
                     continue
                 seen[key] = _strip_scalar_comment(value.strip())
             index += 1
@@ -262,25 +262,14 @@ def parse_skill_frontmatter(text: str) -> dict:
             description = _strip_scalar_quotes(description.strip())
         record["description_present"] = bool(isinstance(description, str) and description.strip())
         sentinel_phrase = MANUAL_ONLY_SENTINEL.rstrip()
-        record["sentinel"] = bool(
-            (isinstance(description, str) and description.startswith(sentinel_phrase))
-            or sentinel_phrase in fm_text)
+        # The sentinel is derived only from the exact description scalar/prefix. A mere
+        # mention elsewhere in the frontmatter is not a manual-only declaration.
+        record["sentinel"] = bool(isinstance(description, str)
+                                 and description.startswith(sentinel_phrase))
+        # disable-model-invocation is read only as an actual top-level key (quoted keys
+        # included); text inside another scalar/nested flow mapping is not a top-level
+        # setting and cannot false-BLOCK a legitimate description.
         dmi = seen.get("disable-model-invocation")
-        # The raw scan is deliberately restricted to top-level frontmatter lines so a
-        # multiline description that merely mentions the setting cannot trigger a BLOCK.
-        raw_dmi = None
-        for raw_line in fm_text.splitlines():
-            if not raw_line or raw_line[0].isspace():
-                continue
-            raw_dmi = re.search(
-                r"^[\"']?disable-model-invocation[\"']?\s*:\s*([^#\r\n]+)",
-                raw_line, re.IGNORECASE)
-            if raw_dmi is None:
-                raw_dmi = re.search(
-                    r"[{,]\s*[\"']?disable-model-invocation[\"']?\s*:\s*([^\s,}\]]+)",
-                    raw_line, re.IGNORECASE)
-            if raw_dmi is not None:
-                break
         def _dmi_value(token):
             token = _strip_scalar_quotes(str(token).strip()).strip().lower()
             if token in ("true", "yes", "on", "1"):
@@ -288,22 +277,14 @@ def parse_skill_frontmatter(text: str) -> dict:
             if token in ("false", "no", "off", "0"):
                 return False
             return None
-        if raw_dmi is not None:
-            parsed_value = _dmi_value(raw_dmi.group(1))
-            if parsed_value is None:
-                # Unknown value: the guard's parser cannot interpret it. Never reason
-                # from this parse failure to a BLOCK (the validator is authoritative);
-                # record it as an unreadable/WARN-able frontmatter state instead.
-                record["disable_model_invocation"] = None
-                record["parse_ok"] = False
-                record["unreadable_reason"] = "unrecognized disable-model-invocation value"
-            else:
-                record["disable_model_invocation"] = parsed_value
-        elif dmi is None:
+        if dmi is None:
             record["disable_model_invocation"] = None
         else:
             parsed_value = _dmi_value(dmi)
             if parsed_value is None:
+                # Unknown value: the guard's parser cannot interpret it. Never reason
+                # from this parse failure to a BLOCK (the validator is authoritative);
+                # record it as an unreadable/WARN-able frontmatter state instead.
                 record["disable_model_invocation"] = None
                 record["parse_ok"] = False
                 record["unreadable_reason"] = "unrecognized disable-model-invocation value"
@@ -708,20 +689,34 @@ def validate_baseline(baseline: dict) -> None:
         if not isinstance(value, dict) or not all(
                 isinstance(k, str) and isinstance(v, bool) for k, v in value.items()):
             raise InputError("baseline discovery.%s is not an object of booleans" % key)
+    for key in ("catalog_present", "readme_present"):
+        if baseline["discovery"].get(key) is not True:
+            raise InputError("baseline discovery.%s must be true: a degraded discovery surface "
+                             "cannot be used as a baseline (fail closed)" % key)
     manifest_surface = baseline["discovery"].get("manifest")
     if not isinstance(manifest_surface, dict):
         raise InputError("baseline discovery.manifest is not an object")
-    if not isinstance(manifest_surface.get("present"), bool):
-        raise InputError("baseline discovery.manifest.present is not a boolean")
+    if manifest_surface.get("present") is not True:
+        raise InputError("baseline discovery.manifest.present must be true: a missing/unreadable "
+                         "manifest surface cannot be used as a baseline (fail closed)")
     if not isinstance(manifest_surface.get("entries"), dict):
         raise InputError("baseline discovery.manifest.entries is not an object")
+    if not manifest_surface["entries"]:
+        raise InputError("baseline discovery.manifest.entries is empty")
     for key in ("declared_paths", "declared_skills"):
         value = baseline["starter"].get(key)
         if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
             raise InputError("baseline starter.%s is not a list of non-empty strings" % key)
     for key in ("present", "parsed"):
-        if not isinstance(baseline["starter"].get(key), bool):
-            raise InputError("baseline starter.%s is not a boolean" % key)
+        if baseline["starter"].get(key) is not True:
+            raise InputError("baseline starter.%s must be true: the declared-install surface "
+                             "cannot be skipped (fail closed)" % key)
+    for rel in baseline["starter"]["declared_paths"]:
+        safe_declared_relpath(rel, "baseline starter path")
+    for skill_id in baseline["starter"]["declared_skills"]:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", skill_id) or "/" in skill_id:
+            raise InputError("baseline starter.declared_skills entry is not a safe skill id: %r"
+                             % (skill_id,))
     seen_skills = {}
     for name, record in baseline["skills"].items():
         if not isinstance(name, str) or not name:
@@ -944,7 +939,7 @@ def compare(baseline: dict, tree: str) -> dict:
                 "the consumer starter-package definition changed since baseline; a reviewed "
                 "re-pin decision is required (OD-W04-2 baseline-freeze governance)")
         for rel in base_starter.get("declared_paths", []):
-            if not os.path.isfile(os.path.join(tree, *rel.split("/"))):
+            if not os.path.isfile(declared_tree_path(tree, rel)):
                 add("INSTALLED_SET_REDUCTION", "BLOCK",
                     "declared starter-package file is missing from the candidate: %r" % rel)
         for skill_id in base_starter.get("declared_skills", []):
