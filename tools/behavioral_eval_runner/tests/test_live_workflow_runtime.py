@@ -163,6 +163,12 @@ def artifact(name):
     return {"name": name}
 
 
+def expired_artifact(name):
+    """An artifact-listing record GitHub can return after retention expiry but
+    before the artifact is physically removed (MG3 P2 5816717444)."""
+    return {"name": name, "expired": True}
+
+
 def smoke_proof(**overrides):
     """A complete current-config-shaped smoke proof payload with a valid self-hash.
 
@@ -1253,6 +1259,50 @@ class SmokeProofExpiryRegistryTests(unittest.TestCase):
         )
         self.assertEqual(smoke_spend_total(records), 150)
         self.assertNotEqual(smoke_spend_total(records), 6)
+
+    def test_expired_listing_marker_is_treated_as_absent_for_the_registry(self):
+        # MG3 P2 triage (DeepSeek review 5816717444): GitHub can list the proof
+        # artifact with expired=true before it is physically removed. That record
+        # is not a present/downloadable proof, so treating it as absent lets the
+        # exact-match expiry registry book the committed spend during the
+        # retention/cleanup window instead of failing the download path.
+        runs, _absent_artifacts, no_payloads = self._expired_history_parts()
+        expired_artifacts = {
+            "41213566873": [expired_artifact("ber-live-smoke-proof")],
+            "41179846875": [expired_artifact("ber-live-smoke-proof")],
+        }
+        expired_records = self._smoke_records(runs, expired_artifacts, no_payloads)
+        absent_records = self._smoke_records(*self._expired_history_parts())
+        self.assertEqual(expired_records, absent_records)
+        self.assertEqual(len(expired_records), 2)
+        self.assertEqual(smoke_spend_total(expired_records), 12)
+
+    def test_unregistered_expired_listing_stays_unknown_not_zero(self):
+        # The expired record is treated as ABSENT, so the untouched rule applies:
+        # an unregistered artifactless run stays UNKNOWN-not-zero and refuses.
+        fake = FakeGH(
+            {"smoke": [page([run(42, conclusion="failure")])], "trial": [page([])]},
+            {"42": [expired_artifact("ber-live-smoke-proof")]}, {},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("UNKNOWN", str(caught.exception))
+
+    def test_live_artifact_listed_with_expired_record_still_validates_live(self):
+        # An expired record never substitutes for a genuinely live artifact: when
+        # both are listed, the live artifact's own payload is validated and its
+        # spend booked (150c), never the recorded expiry-registry spend.
+        fake = FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([])]},
+            {"42": [
+                expired_artifact("ber-live-smoke-proof"),
+                artifact("ber-live-smoke-proof"),
+            ]},
+            {("42", "ber-live-smoke-proof"): ("smoke-proof.json", smoke_proof())},
+        )
+        records = collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(smoke_spend_total(records), 150)
 
     # -- negative matrix -------------------------------------------------
 

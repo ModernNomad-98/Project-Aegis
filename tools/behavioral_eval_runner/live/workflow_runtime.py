@@ -166,6 +166,10 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
 #: 41179846875: created 2026-10-31T07:15:02Z, head cef6e91c..., conclusion
 #:   success, attempt 1; artifact 13034581056, 1,264 B; proof file 2,253 B /
 #:   a202b4ac..., spent 6c.
+#: P3 triage (DeepSeek review 5816717444, deferred): this stays a plain
+#: module-level Mapping because tests patch it under mock.patch; an immutable
+#: wrapper is non-blocking and can be revisited separately. Its entries remain
+#: bounded by the committed exact-match values above.
 SMOKE_RUNS_WITH_EXPIRED_PROOF: Mapping[str, Mapping[str, Any]] = {
     "41213566873": {
         "spent_cents": 6,
@@ -494,6 +498,12 @@ def _registered_expired_proof_run_spend(run: Mapping[str, Any]) -> int | None:
     defaulted. Callers reach this only when the proof artifact is ABSENT: a present
     artifact is always handled by download/validation first, so an expired record
     can never mask a present-but-tampered artifact.
+
+    P3 triage (DeepSeek review 5816717444, deferred with rationale): the recorded
+    proof_bytes / proof_sha256 fields are audit-only identities here. They are not
+    re-validated at runtime because the artifact is absent; the committed-fixture
+    drift guard in required CI enforces them, and the fixed test identity is what
+    bounds the recorded-hash acceptance.
     """
     run_id = str(run.get("id"))
     registered = SMOKE_RUNS_WITH_EXPIRED_PROOF.get(run_id)
@@ -533,7 +543,13 @@ def collect_smoke_proof_spends(
     SMOKE_RUNS_WITH_EXPIRED_PROOF whose proof artifact expired under the 14-day
     workflow retention. Each books only its committed recorded spend, and only when
     the recorded run metadata (conclusion, head/prefix and run_attempt) matches; a
-    mismatch refuses. A present-but-unreadable, malformed or tampered artifact never
+    mismatch refuses. An artifact listed with expired=true (GitHub can report it
+    before physical removal) is treated as ABSENT for the exact-match expiry
+    registry path, never as a present artifact; a live same-name artifact still
+    wins and duplicate LIVE artifacts still fail closed. The artifact-listing
+    completeness check remains on the raw records before that filter, so a page
+    total that includes expired records still has to reconcile. A
+    present-but-unreadable, malformed or tampered artifact never
     enters either registry path and remains a hard refusal. For a present artifact
     the proof's own workflow_run_id and workflow_run_attempt must match the API run
     entry, and more than one same-name proof artifact on the run fails closed rather
@@ -556,12 +572,25 @@ def collect_smoke_proof_spends(
             item for item in artifacts
             if isinstance(item, Mapping) and item.get("name") == SMOKE_ARTIFACT_NAME
         ]
-        if len(proof_artifacts) > 1:
+        # MG3 P2 triage (DeepSeek review 5816717444): GitHub can list an artifact
+        # with expired=true before it is physically removed. Such a record is not
+        # a present/downloadable proof, so treating it as a present artifact would
+        # make the normal download path fail and never reach the exact-match expiry
+        # registry. Filter expired records out of the PRESENT-artifact check (only
+        # exact registered run ids can then book, via the unchanged registry path);
+        # a genuinely live artifact still wins and duplicate live artifacts still
+        # fail closed. The listing's page total_count check already reconciles the
+        # raw records before this filter, including expired ones.
+        live_proof_artifacts = [
+            item for item in proof_artifacts
+            if item.get("expired") is not True
+        ]
+        if len(live_proof_artifacts) > 1:
             raise ValueError(
                 "ended smoke run " + str(run_id) + " has multiple duplicate "
                 + SMOKE_ARTIFACT_NAME + " artifacts; refusing an ambiguous selection"
             )
-        if not proof_artifacts:
+        if not live_proof_artifacts:
             registered_spent = _registered_legacy_run_spend(run)
             if registered_spent is None:
                 registered_spent = _registered_expired_proof_run_spend(run)
