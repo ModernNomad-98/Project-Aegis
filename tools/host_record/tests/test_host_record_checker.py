@@ -1,8 +1,9 @@
 """Stdlib synthetic-fixture self-tests for the host-record checker.
 
-Contract (pinned by Stage C readiness A3, extended by delivery prep R-1 and the
-Stage-F correction pass of 2026-11-08): 38 unittest items = 8
-positive/structural + 30 negative/adversarial/refusal/deterministic-negative.
+Contract (pinned by Stage C readiness A3, extended by delivery prep R-1, the
+Stage-F correction pass of 2026-11-08 and the correction-2 pass of 2026-11-08):
+39 unittest items = 8 positive/structural + 31
+negative/adversarial/refusal/deterministic-negative.
 The harness copies the checker and fixture set into a temporary repository and
 drives the checker as a black-box subprocess; that is harness behaviour only,
 not a capability of the shipped checker (the checker itself spawns no process).
@@ -123,7 +124,7 @@ class HostRecordCheckerTests(unittest.TestCase):
         self.write_fixture(relative, document)
         return document
 
-    # ---------------- positive / structural (7) ----------------
+    # ---------------- positive / structural (8) ----------------
     def test_valid_fixture_one_clean(self):
         process = self.run_checker("--record", VALID_ONE, "--json")
         self.assertEqual(process.returncode, 0)
@@ -198,7 +199,7 @@ class HostRecordCheckerTests(unittest.TestCase):
         pairs = [(finding["code"], finding["path"], finding["evidence"]) for finding in report["findings"]]
         self.assertEqual(pairs, sorted(pairs))
 
-    # ---------------- negatives / adversarial (19) ----------------
+    # ---------------- negatives / adversarial (20) ----------------
     def test_refused_out_inside_repository(self):
         out_path = self.repo / "docs" / "host-record" / "fixtures" / "report.json"
         process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json", "--out", str(out_path))
@@ -401,6 +402,16 @@ class HostRecordCheckerTests(unittest.TestCase):
         process = self.run_checker("--record", relative, "--json")
         self.assertEqual(process.returncode, 1)
         self.assertIn("UNSAFE-PATH", self.codes(process))
+
+    def test_self_citation_case_variant_rejected(self):
+        relative = "docs/host-record/fixtures/valid/mutated-selfcite-case.json"
+        document = self.make_valid_copy(relative)
+        document["source_evidence"][0]["path"] = relative.upper()
+        self.write_fixture(relative, document)
+        process = self.run_checker("--record", relative, "--json")
+        self.assertEqual(process.returncode, 1)
+        pairs = {(finding["code"], finding["path"]) for finding in self.report(process)["findings"]}
+        self.assertIn(("UNSAFE-PATH", "source_evidence[0]/path"), pairs)
 
     def test_source_evidence_entry_rules_rejected(self):
         relative = "docs/host-record/fixtures/valid/mutated-source-evidence.json"

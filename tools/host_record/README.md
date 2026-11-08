@@ -68,8 +68,8 @@ and probes no host.
 ## Tests
 
 The stdlib unittest suite drives the checker as a black-box subprocess against
-synthetic temporary repositories. It covers the 38-item pinned contract: 8
-positive/structural items and 30 negative/adversarial/refusal/deterministic-
+synthetic temporary repositories. It covers the 39-item pinned contract: 8
+positive/structural items and 31 negative/adversarial/refusal/deterministic-
 negative items, including the 8-entry expected-findings table, the four
 container-type refusals, path canonicalisation and containment (with a link
 escape created on the host that permits one), the cap refusals and the pinned
@@ -87,13 +87,15 @@ types, enums, unknown-field rejection for the record and its nested objects
 entry shape (path/bytes/sha256/note presence, non-negative integer bytes, note
 length, digest shape), the disposition rules (including reason length and
 evidence_refs array shape), limits/non_claims element types and lengths,
-config-digest recomputation, package-binding shape, path safety and canonical
-self-citation, manifest path canonicalisation and containment, and the
-forbidden/secret/personal field families. Not enforced here: host string
-minLengths, the config_digest.input_names minimum of 1 and the string type of
-input_values, referential integrity of evidence_refs against real files, and
-source_evidence byte/hash comparison against the cited file - source_evidence is
-metadata-only in this slice (see also docs/host-record/README.md).
+config-digest recomputation, package-binding shape, path safety and
+case-insensitive canonical self-citation, manifest path canonicalisation and
+containment, and the forbidden/secret/personal field families. Not enforced
+here: host field types (host.product, host.version and their peers are not
+type-checked), host string minLengths, the config_digest.input_names minimum
+of 1 and its per-item minLength of 1, the string type of input_values,
+referential integrity of evidence_refs against real files, and source_evidence
+byte/hash comparison against the cited file - source_evidence is metadata-only
+in this slice (see also docs/host-record/README.md).
 
 Local synthetic/offline evidence only. No host or consumer qualification, no
 portability claim, no live or production behaviour, no publication or merge

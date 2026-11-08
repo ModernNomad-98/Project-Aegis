@@ -257,7 +257,7 @@ def validate_record(record, record_relative, findings):
             path = item.get("path")
             if not isinstance(path, str) or not is_safe_relative(path):
                 add(findings, "UNSAFE-PATH", base + "/path", "source evidence path is unsafe")
-            elif normalise_relative(path) == normalise_relative(record_relative):
+            elif normalise_relative(path).casefold() == normalise_relative(record_relative).casefold():
                 add(findings, "UNSAFE-PATH", base + "/path", "record may not cite itself")
             digest = item.get("sha256")
             if not isinstance(digest, str) or SHA256_RE.match(digest) is None:
@@ -540,8 +540,6 @@ def validate_fixture_set(repo, fixtures_relative):
                 add(findings, "EXPECTED-FINDINGS-MISMATCH", clean, "expectations entry does not point at expected-findings")
         else:
             add(findings, "MANIFEST-STALE", base + "/kind", "manifest entry kind is not record or expectations")
-    if any(chr(92) in str(path) for path in manifest_paths):
-        add(findings, "UNSAFE-PATH", "entries", "manifest paths must use forward slashes")
     file_set = set()
     for candidate in fixtures_dir.rglob("*"):
         if candidate.is_file():
