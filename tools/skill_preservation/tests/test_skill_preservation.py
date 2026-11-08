@@ -304,16 +304,33 @@ class GuardSelfTests(unittest.TestCase):
         self.assertFalse(guard.mentions_skill("alpha_beta", "alpha"))
         self.assertTrue(guard.mentions_skill("alpha", "alpha"))
 
-    def test_p2e_missing_name_is_block(self):
-        tree = self.new_candidate("missing-name-block")
+    def test_p2e_unreadable_name_warns_not_blocks(self):
+        tree = self.new_candidate("unreadable-name-warn")
         skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
         text = skill_md.read_text(encoding="utf-8").replace("name: alpha\n", "", 1)
         write(skill_md, text)
         code, payload, out, err = self.run_check(tree)
-        self.assertEqual(code, 1, out)
-        findings = [item for item in payload["findings"] if item["rule"] == "NAME_MISSING"]
-        self.assertEqual(1, len(findings))
-        self.assertEqual("BLOCK", findings[0]["severity"])
+        self.assertEqual(code, 0, out)
+        rules = self.rules(payload)
+        self.assertIn("FRONTMATTER_UNREADABLE_BY_GUARD", rules)
+        for rule in ("EMPTY_DESCRIPTION", "NAME_MISSING", "NAME_DIRECTORY_MISMATCH"):
+            self.assertNotIn(rule, rules)
+
+    def test_f4b1_flow_mapping_frontmatter_is_warn_not_block(self):
+        tree = self.new_candidate("flow-mapping-frontmatter")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        skill_md.write_text(
+            "---\n"
+            "{name: alpha, description: 'A synthetic test skill named alpha for guard self-tests.'}\n"
+            "---\n\n# alpha\n\nSynthetic body for guard tests.\n",
+            encoding="utf-8")
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 0, out)
+        rules = self.rules(payload)
+        self.assertIn("FRONTMATTER_UNREADABLE_BY_GUARD", rules)
+        for rule in ("EMPTY_DESCRIPTION", "NAME_MISSING", "NAME_DIRECTORY_MISMATCH",
+                     "SILENT_DISABLE"):
+            self.assertNotIn(rule, rules)
 
     def test_p2f_mention_masking_and_path_mentions(self):
         cases = {
@@ -362,29 +379,40 @@ class GuardSelfTests(unittest.TestCase):
                  if item["severity"] == "WARN"]
         self.assertIn("BASELINE_MENTION_MATCHER_UNRECORDED", rules)
 
-    def test_p2f_missing_or_empty_name_blocks(self):
+    def test_p2f_parser_failure_name_cases_warn_not_block(self):
         cases = {
             "absent": lambda text: text.replace("name: alpha\n", "", 1),
             "empty": lambda text: text.replace("name: alpha", "name:", 1),
             "quoted-empty": lambda text: text.replace("name: alpha", "name: ''", 1),
         }
         for label, mutate in cases.items():
-            tree = self.new_candidate("name-block-" + label)
+            tree = self.new_candidate("name-warn-" + label)
             skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
             write(skill_md, mutate(skill_md.read_text(encoding="utf-8")))
             code, payload, out, err = self.run_check(tree)
-            self.assertEqual(code, 1, label + ": " + out)
-            self.assertIn("NAME_MISSING", self.rules(payload), label)
-        tree = self.new_candidate("name-and-description-block")
+            self.assertEqual(code, 0, label + ": " + out)
+            rules = self.rules(payload)
+            self.assertIn("FRONTMATTER_UNREADABLE_BY_GUARD", rules, label)
+            for rule in ("EMPTY_DESCRIPTION", "NAME_MISSING", "NAME_DIRECTORY_MISMATCH"):
+                self.assertNotIn(rule, rules, label)
+
+    def test_p2f_parsed_but_incomplete_or_mismatched_name_blocks(self):
+        tree = self.new_candidate("empty-description-block")
         skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
-        text = skill_md.read_text(encoding="utf-8").replace("name: alpha\n", "", 1)
-        text = text.replace("description: 'A synthetic test skill named alpha for guard self-tests.'",
-                            "description: ''", 1)
+        text = skill_md.read_text(encoding="utf-8").replace(
+            "description: 'A synthetic test skill named alpha for guard self-tests.'",
+            "description: ''", 1)
         write(skill_md, text)
         code, payload, out, err = self.run_check(tree)
         self.assertEqual(code, 1, out)
-        self.assertIn("NAME_MISSING", self.rules(payload))
         self.assertIn("EMPTY_DESCRIPTION", self.rules(payload))
+        tree = self.new_candidate("name-mismatch-block")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        write(skill_md, skill_md.read_text(encoding="utf-8").replace(
+            "name: alpha", "name: beta", 1))
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1, out)
+        self.assertIn("NAME_DIRECTORY_MISMATCH", self.rules(payload))
 
     def test_p2e_candidate_discovery_read_error_is_exit2(self):
         tree = self.new_candidate("discovery-read-error")

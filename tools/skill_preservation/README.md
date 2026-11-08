@@ -55,9 +55,13 @@ BLOCK findings (availability loss; fail closed):
   roster; a skills-manifest entry is dropped; or the manifest schema/hash_input semantics changed.
 - **Silent Disable** - a previously active skill gains disable-model-invocation: true and/or the
   exact 32-character MANUAL-ONLY description sentinel (both variants BLOCK).
-- **Missing Name**, **Name/Directory Mismatch** and **Empty Description** - frontmatter no longer
-  matches the tree. A missing frontmatter name is a BLOCK even when the guard's line parser cannot
-  read other constructs (those remain WARN with the validator authoritative).
+- **Name/Directory Mismatch** and **Empty Description** - enforced only when the guard's minimal
+  parser produced a readable name (`parse_ok`). A valid YAML construct the minimal parser cannot
+  read (for example flow-mapping frontmatter `{name: alpha, description: ...}`) produces only
+  `FRONTMATTER_UNREADABLE_BY_GUARD` WARN, never a BLOCK from parser failure; the repository
+  validator remains the strict YAML authority. **SILENT_DISABLE remains fail-closed** whenever an
+  actual parsed/top-level `disable-model-invocation` value or the exact MANUAL-ONLY sentinel prefix
+  is present.
 - **Declared Installed-Set Reduction** - a source-side file or skill declared in
   docs/consumer-starter-package.md is missing from the candidate.
 - **Added Path in Existing Skill Surface** - any candidate-added file under an existing baseline
@@ -87,7 +91,10 @@ UNRUN (reported, never PASS):
   reasons from a parse failure to a BLOCK; unrecognized `disable-model-invocation` values are reported as
   unreadable-frontmatter WARN and left to the repository validator, and the raw key scan is restricted to
   top-level frontmatter lines so a multiline description that merely mentions the setting cannot trigger
-  a BLOCK. The repository validator remains the strict YAML gate.
+  a BLOCK. Policy (F-4-B1): name/description invariants are enforced only when the minimal parser has a
+  readable name; unparseable-but-valid YAML is WARN-only and never a BLOCK from parse failure, while
+  SILENT_DISABLE stays fail-closed for an actual parsed/top-level disable or sentinel. The repository
+  validator remains the strict YAML gate.
 - The cleanup-path rule is a deterministic name/path rule over candidate-added paths only; it does
   not scan file contents and does not detect a renamed pre-existing cleanup tool.
 - Discovery mention matching is token-bounded on `[A-Za-z0-9_.-]` (matcher version

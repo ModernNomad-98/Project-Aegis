@@ -257,8 +257,9 @@ def parse_skill_frontmatter(text: str) -> dict:
         name_value = seen.get("name")
         if isinstance(name_value, str) and name_value:
             name_value = _strip_scalar_quotes(name_value.strip())
-            record["name"] = name_value
-            record["parse_ok"] = True
+            if name_value:
+                record["name"] = name_value
+                record["parse_ok"] = True
         description = seen.get("description")
         if isinstance(description, str):
             description = _strip_scalar_quotes(description.strip())
@@ -880,21 +881,21 @@ def compare(baseline: dict, tree: str) -> dict:
                 "previously active skill %r is now manual-only (disable-model-invocation "
                 "and/or MANUAL-ONLY sentinel); this silently removes automatic availability"
                 % candidate_id, candidate_id)
-        if candidate_record.get("skill_md"):
-            # Name/description invariants are evaluated independently of parser
-            # certainty: a missing name is a fail-closed BLOCK, while a genuinely
-            # unreadable construct stays a WARN above.
+        if cand_fm.get("parse_ok"):
+            # F-4-B1: enforce name/description invariants only when the guard's
+            # minimal parser produced a readable name. A valid YAML construct it
+            # cannot read (for example flow-mapping frontmatter) stays
+            # FRONTMATTER_UNREADABLE_BY_GUARD WARN only; parser failure must never
+            # produce a BLOCK, because the repository validator is authoritative.
+            # SILENT_DISABLE above remains fail-closed for an actual parsed/top-level
+            # disable-model-invocation or exact sentinel.
             if not cand_fm.get("description_present"):
                 add("EMPTY_DESCRIPTION", "BLOCK",
                     "skill %r has an empty or missing description" % candidate_id, candidate_id)
-            candidate_name = cand_fm.get("name")
-            if not isinstance(candidate_name, str) or not candidate_name:
-                add("NAME_MISSING", "BLOCK",
-                    "skill %r has no readable frontmatter name" % candidate_id, candidate_id)
-            elif candidate_name != candidate_id:
+            if cand_fm.get("name") != candidate_id:
                 add("NAME_DIRECTORY_MISMATCH", "BLOCK",
                     "skill %r frontmatter name %r does not equal its directory name"
-                    % (candidate_id, candidate_name), candidate_id)
+                    % (candidate_id, cand_fm.get("name")), candidate_id)
     # discovery surfaces
     discovery = baseline["discovery"]
     named_all = sorted(set(base_named) | set(cand_named))
