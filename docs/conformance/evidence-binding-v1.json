@@ -1,0 +1,46 @@
+{
+  "schema": "aegis.evidence-binding/1",
+  "catalog": {
+    "path": "docs/conformance/requirements.v1.json",
+    "bytes": 32041,
+    "sha256": "ebf225ae55c5853d2cf568bca4a49dc082650dfc84e32b44947fcf6d04327167"
+  },
+  "source_revision": "f69c6e9219335d1979b8ec9658cc86e0a7a5583a",
+  "records": [
+    {
+      "evidence_id": "L4-E-01",
+      "requirement_ids": [
+        "AEGIS-REQ-MECH-01",
+        "AEGIS-REQ-PRES-01",
+        "AEGIS-REQ-SKILL-01",
+        "AEGIS-REQ-SKILL-02",
+        "AEGIS-REQ-SKILL-03",
+        "AEGIS-REQ-SKILL-04",
+        "AEGIS-REQ-SKILL-05",
+        "AEGIS-REQ-SKILL-06"
+      ],
+      "classification": "EXECUTED",
+      "stdout_path": "evidence/validate-skills.stdout.txt",
+      "stdout_bytes": 867,
+      "stdout_sha256": "0cbcf0e40199daee7a1f09478ba699cc6ce3af117c5527480ff0e35d3ce063d0"
+    },
+    {
+      "evidence_id": "L4-E-02",
+      "requirement_ids": [
+        "AEGIS-REQ-MECH-02"
+      ],
+      "classification": "EXECUTED",
+      "stdout_path": "evidence/audit-skill-contracts.stdout.txt",
+      "stdout_bytes": 1145,
+      "stdout_sha256": "9e90eb10981d0647a9e7441b3836d2b15da44c52db6bd01354bf68f79e58becf"
+    },
+    {
+      "evidence_id": "L4-U-01",
+      "requirement_ids": [
+        "MG1",
+        "MG3"
+      ],
+      "classification": "UNRUN"
+    }
+  ]
+}

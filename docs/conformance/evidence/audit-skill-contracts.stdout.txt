@@ -1,0 +1,29 @@
+AEGIS conformance evidence payload E-02 (contract-audit stdout)
+capture_sequence: 2 of 2
+command: python -B scripts/audit-skill-contracts.py
+working_directory: repository root (path not recorded)
+base_revision: e99fa451cbd214a3155e07330436b3c87907e78a
+base_tree: f83e3153b6a107a38cae5f068b8c17690e084745
+capture_state: base revision plus this lane's uncommitted docs/conformance additions
+child_env: PYTHONIOENCODING=utf-8 (forced so captured bytes are UTF-8)
+stdout_newline_normalization: CRLF to LF (repository .gitattributes eol=lf policy)
+captured_utc: 2026-11-08T17:53:57Z
+--- begin captured stdout ---
+audit-skill-contracts v1.14.0 — repo e99fa451cbd2 (), 254 skill(s), 28 rule(s)
+corpus hash 024a0ae92898b9fb…  dirty: true
+findings: 463 (P0 3, P1 96, P2 38, info 326; 366 mechanical / 97 semantic-review candidates)
+  ARTF-001: 10
+  EVAL-002: 1
+  EVAL-003: 3
+  PARITY-001: 37
+  REF-003: 1
+  ROUTE-002: 326
+  SIDE-004: 82
+  STATE-001: 2
+  STATE-002: 1
+--- end captured stdout ---
+stdout_bytes: 354
+stdout_sha256: 6d7261a82f7df0fda340105f17e723ca6322090f87349ccf51cce4c3e99752b5
+child_stdout_bytes_raw: 366
+stderr_bytes: 0
+exit_code: 0
