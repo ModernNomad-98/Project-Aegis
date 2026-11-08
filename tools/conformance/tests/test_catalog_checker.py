@@ -520,6 +520,64 @@ class ConformanceCheckerTests(unittest.TestCase):
         self.assertIn("SCHEMA", codes)
         self.assertIn("OBSERVATION-FIELD", codes)
         self.assertIn("STALE-SOURCE", codes)
+        for check in ("structure", "allowed_keys", "sources", "requirements",
+                      "observation_fields", "completeness"):
+            self.assertIs(True, report["checks_run"][check], check)
+        self.assertEqual([], report["checks_skipped"])
+
+    def test_malformed_container_plus_stale_pin_is_findings_not_crash(self):
+        fixture = self.fresh_fixture("malformed-plus-stale")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        catalog["requirements"] = 3
+        catalog["sources"][0]["sha256"] = "0" * 64
+        self.write_catalog(catalog, fixture)
+        code, out, err = self.run_checker(root=fixture, *("--json",))
+        self.assertEqual(1, code, err)
+        self.assertNotEqual(3, code)
+        report = json.loads(out)
+        codes = {finding["code"] for finding in report["findings"]}
+        self.assertIn("SCHEMA", codes)
+        self.assertIn("STALE-SOURCE", codes)
+
+    def _find_with_relation_items(self, catalog, section_key):
+        for record in catalog["requirements"]:
+            section = record.get(section_key)
+            if isinstance(section, dict):
+                if section_key == "mechanism" and isinstance(section.get("refs"), list) and section["refs"]:
+                    return record
+                if section_key == "applicability" and isinstance(section.get("inapplicability"), list) and section["inapplicability"]:
+                    return record
+        return None
+
+    def test_nested_additional_properties_and_observations(self):
+        fixture = self.fresh_fixture("nested-strictness")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        requirement = catalog["requirements"][0]
+        profile = catalog["profiles"][0]
+        requirement["observations"] = {"SD-A": "pass"}
+        requirement["arbitrary_field"] = "x"
+        requirement["source_ref"]["extra_field"] = "x"
+        requirement["mechanism"]["extra_field"] = "x"
+        requirement["verification"]["extra_field"] = "x"
+        requirement["owner"]["extra_field"] = "x"
+        requirement["applicability"]["extra_field"] = "x"
+        requirement["evidence_requirement"]["extra_field"] = "x"
+        profile["extra_field"] = "x"
+        profile["owner"]["extra_field"] = "x"
+        catalog["source_baseline"]["extra_field"] = "x"
+        catalog["sources"][0]["extra_field"] = "x"
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker(root=fixture, *("--json",))
+        self.assertEqual(1, code)
+        report = json.loads(out)
+        codes = {finding["code"] for finding in report["findings"]}
+        self.assertIn("SCHEMA", codes)
+        self.assertIn("OBSERVATION-FIELD", codes)
+        unknown = [finding for finding in report["findings"]
+                   if finding["code"] == "SCHEMA" and "unknown field" in finding["evidence"]]
+        self.assertGreaterEqual(len(unknown), 10)
+        paths = " ".join(finding["path"] for finding in report["findings"])
+        self.assertIn("observations", paths)
 
     def test_valid_reciprocal_relations_are_not_cycles(self):
         fixture = self.fresh_fixture("reciprocal-relations")
@@ -606,6 +664,34 @@ class ConformanceCheckerTests(unittest.TestCase):
                          module.MECH_KINDS)
         self.assertEqual(requirement["mechanism"]["properties"]["refs"]["minItems"],
                          module.MECHANISM_REFS_MIN)
+        self.assertEqual(module.ALLOWED_KEYS["$"], set(schema["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.profiles[]"],
+                         set(schema["properties"]["profiles"]["items"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.profiles[].owner"],
+                         set(schema["properties"]["profiles"]["items"]["properties"]["owner"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[]"],
+                         set(schema["properties"]["requirements"]["items"]["properties"]))
+        req_props = schema["properties"]["requirements"]["items"]["properties"]
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[].source_ref"],
+                         set(req_props["source_ref"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[].applicability"],
+                         set(req_props["applicability"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[].applicability.inapplicability[]"],
+                         set(req_props["applicability"]["properties"]["inapplicability"]["items"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[].mechanism"],
+                         set(req_props["mechanism"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[].mechanism.refs[]"],
+                         set(req_props["mechanism"]["properties"]["refs"]["items"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[].verification"],
+                         set(req_props["verification"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[].evidence_requirement"],
+                         set(req_props["evidence_requirement"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.requirements[].owner"],
+                         set(req_props["owner"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.source_baseline"],
+                         set(schema["properties"]["source_baseline"]["properties"]))
+        self.assertEqual(module.ALLOWED_KEYS["$.sources[]"],
+                         set(schema["properties"]["sources"]["items"]["properties"]))
         self.assertEqual(set(requirement["verification"]["properties"]["method"]["enum"]),
                          module.VERIF_METHODS)
         self.assertEqual(set(requirement["evidence_requirement"]["properties"]["kind"]["enum"]),

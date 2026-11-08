@@ -76,6 +76,12 @@ as `OBSERVATION-FIELD`.
 - A structural SCHEMA finding does not suppress independent checks: source pins, requirement
   relations/anchors, observation fields and completeness are evaluated against sanitized containers,
   so an unrelated schema defect cannot hide stale pins, missing anchors or observation data.
+- The report carries `checks_run` and `checks_skipped` so a partial/refactored run can never look complete;
+  current runs execute structure, allowed-key enforcement, sources, requirements, observation fields,
+  completeness and (when supplied) the evidence binding and report `checks_skipped: []`.
+- All 14 normative `additionalProperties: false` object sites are enforced structurally from an explicit
+  allowed-key map (drift-tested against the schema); `observation`/`observations` are in the forbidden-key
+  vocabulary and nested `observations` maps are reported as `OBSERVATION-FIELD`.
 - The checker imports only the standard library (`argparse`, `hashlib`, `json`, `os`, `re`,
   `sys`, `tempfile`, `pathlib`) and has no network, credential or process-spawning capability.
 

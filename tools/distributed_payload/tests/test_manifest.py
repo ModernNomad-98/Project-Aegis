@@ -121,29 +121,58 @@ class BuildTests(ManifestTestCase):
     def test_a02b_build_with_dependency_input_emits_closure(self):
         dependencies = [
             {"from": "README.txt", "to": "assets/notes.txt", "class": "required"},
-            {"from": "assets/notes.txt", "to": "skills/example/SKILL.md", "class": "optional"},
+            {"from": "assets/notes.txt", "to": "skills/example/SKILL.md", "class": "conditional",
+             "rule": "only when the example journey is installed"},
+            {"from": "README.txt", "to": "skills/example/SKILL.md", "class": "optional"},
+            {"from": "assets/notes.txt", "to": "maintainer-only:release-tooling",
+             "class": "maintainer-only"},
         ]
+        first = self.tmp / "manifest-deps-1.json"
+        second = self.tmp / "manifest-deps-2.json"
         deps_path = self.tmp / "dependencies.json"
         deps_path.write_text(json.dumps(dependencies) + "\n", encoding="utf-8")
-        out = self.tmp / "manifest-deps.json"
-        completed = self._run_build_with(out, ["--dependencies", str(deps_path)])
+        completed = self._run_build_with(first, ["--dependencies", str(deps_path)])
         self.assertEqual(0, completed.returncode, completed.stderr)
-        document = json.loads(out.read_text(encoding="utf-8"))
-        self.assertEqual(dependencies, document["dependencies"])
+        reordered = self.tmp / "dependencies-reordered.json"
+        reordered.write_text(json.dumps(list(reversed(dependencies))) + "\n", encoding="utf-8")
+        completed = self._run_build_with(second, ["--dependencies", str(reordered)])
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        self.assertEqual(first.read_bytes(), second.read_bytes())
+        document = json.loads(first.read_text(encoding="utf-8"))
+        self.assertEqual(4, len(document["dependencies"]))
+        self.assertEqual(document["dependencies"],
+                         sorted(document["dependencies"],
+                                key=lambda item: (item["from"], item["to"], item["class"],
+                                                  item.get("rule", ""))))
         m.validate_manifest(document)
 
     def test_a02c_invalid_dependency_input_is_exit2(self):
-        invalid_edge = self.tmp / "dependencies-invalid.json"
-        invalid_edge.write_text(json.dumps([
-            {"from": "README.txt", "to": "missing.txt", "class": "required"},
-        ]) + "\n", encoding="utf-8")
+        cases = {
+            "unknown-class": [{"from": "README.txt", "to": "assets/notes.txt", "class": "weird"}],
+            "missing-rule": [{"from": "README.txt", "to": "assets/notes.txt",
+                              "class": "conditional"}],
+            "rule-on-optional": [{"from": "README.txt", "to": "assets/notes.txt",
+                                  "class": "optional", "rule": "x"}],
+            "from-not-entry": [{"from": "missing.txt", "to": "assets/notes.txt",
+                                "class": "required"}],
+            "to-not-entry": [{"from": "README.txt", "to": "missing.txt", "class": "required"}],
+            "self-edge": [{"from": "README.txt", "to": "README.txt", "class": "required"}],
+        }
         out = self.tmp / "manifest-invalid-deps.json"
-        completed = self._run_build_with(out, ["--dependencies", str(invalid_edge)])
-        self.assertEqual(2, completed.returncode)
-        self.assertFalse(out.exists())
+        for label, dependencies in cases.items():
+            deps_path = self.tmp / ("dependencies-invalid-" + label + ".json")
+            deps_path.write_text(json.dumps(dependencies) + "\n", encoding="utf-8")
+            completed = self._run_build_with(out, ["--dependencies", str(deps_path)])
+            self.assertEqual(2, completed.returncode, label)
+            self.assertFalse(out.exists(), label)
         invalid_json = self.tmp / "dependencies-invalid-json.json"
         invalid_json.write_text("{not json", encoding="utf-8")
         completed = self._run_build_with(out, ["--dependencies", str(invalid_json)])
+        self.assertEqual(2, completed.returncode)
+        self.assertFalse(out.exists())
+        invalid_utf8 = self.tmp / "dependencies-invalid-utf8.json"
+        invalid_utf8.write_bytes(b"\xff\xfe[")
+        completed = self._run_build_with(out, ["--dependencies", str(invalid_utf8)])
         self.assertEqual(2, completed.returncode)
         self.assertFalse(out.exists())
 

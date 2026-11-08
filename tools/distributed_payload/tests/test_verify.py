@@ -256,18 +256,32 @@ class ReadOnlyVerifyTests(VerifyTestCase):
                           if item["path"] == "assets/notes.txt"]
         self.assertTrue(entry_findings)
         self.assertEqual("CHANGED_TYPE", entry_findings[0]["class"])
+        self.assertIn("reparse point", entry_findings[0]["detail"])
+        self.assertEqual(report["summary"]["entries"] - 1, report["summary"]["ok"])
 
     def test_a19c_containment_preflight_checks_parent_chain(self):
-        parent_abs = os.path.normcase(os.path.realpath(str(self.target.parent)))
+        parent_abs = os.path.normcase(os.path.abspath(str(self.target.parent)))
         original = v._detect_reparse
 
         def fake(path):
-            return os.path.normcase(os.path.realpath(str(path))) == parent_abs or original(path)
+            return os.path.normcase(os.path.abspath(str(path))) == parent_abs or original(path)
 
         with mock.patch.object(v, "_detect_reparse", side_effect=fake):
             with self.assertRaises(m.ManifestError) as context:
                 v.verify_target(self.manifest, self.target)
         self.assertEqual("unsafe_target", context.exception.code)
+
+    def test_a19d_path_has_reparse_compares_abspath_with_realpath(self):
+        candidate = Path("entry-relative.txt")
+        original = os.path.realpath
+
+        def fake(path):
+            if str(path).endswith("entry-relative.txt"):
+                return os.path.abspath(str(path)) + "-resolved-elsewhere"
+            return original(path)
+
+        with mock.patch.object(os.path, "realpath", side_effect=fake):
+            self.assertTrue(v._path_has_reparse(candidate))
 
     def test_i04_no_mutation_for_clean_and_findings_runs(self):
         clean_before = tree_fingerprint(self.target)

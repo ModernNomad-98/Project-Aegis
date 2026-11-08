@@ -20,7 +20,10 @@ Optional `--dependencies <edges.json>` accepts a JSON array of dependency edges 
 contract shape (`{"from": <entry path>, "to": <entry path>, "class": "required|conditional|optional|maintainer-only", "rule": <required for conditional>}`).
 Each edge is validated against the built entry paths with the same rules as `validate_manifest`; the
 array is merged into the manifest's `dependencies` field so the builder can emit a dependency closure
-instead of always writing an empty array. Invalid JSON/encoding or an invalid edge is exit 2.
+instead of always writing an empty array. Edges are sorted by (from,to,class,rule) before writing so reordered
+input produces byte-identical manifests; self-edges are rejected. Invalid JSON/encoding or an invalid edge is
+exit 2 and writes no output. v1 dependencies are **declared** edges: `verify` does not consume them (closure
+verification is a separate slice).
 
 Verify a target read-only; add `--report-out` to write a deterministic JSON report outside the target and the declared package directories:
 

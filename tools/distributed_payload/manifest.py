@@ -329,6 +329,10 @@ def _validate_dependencies(dependencies, entry_paths: set[str]) -> None:
                 raise ManifestError("dependency_missing_rule",
                                     "conditional dependency requires a named activation rule",
                                     source_path)
+        if source_path == target_path:
+            raise ManifestError("dependency_self_edge",
+                                "dependency 'from' and 'to' must differ (self-edges are forbidden)",
+                                source_path)
         if source_path not in entry_paths:
             raise ManifestError("dependency_from_missing",
                                 "dependency 'from' must be a payload entry path", source_path)
@@ -429,6 +433,16 @@ def build_manifest(payload_root: Path, package_id: str, package_version: str,
         if not isinstance(value, str) or not pattern.match(value):
             raise ManifestError("package_invalid", f"invalid {field}: {value!r}")
     entries = collect_entries(payload_root)
+    if dependencies is None:
+        dependencies = []
+    elif not isinstance(dependencies, list):
+        raise ManifestError("dependencies_invalid", "dependencies must be an array of edges")
+    dependencies = sorted(dependencies, key=lambda item: (
+        str(item.get("from") if isinstance(item, dict) else item),
+        str(item.get("to") if isinstance(item, dict) else ""),
+        str(item.get("class") if isinstance(item, dict) else ""),
+        str(item.get("rule") if isinstance(item, dict) else ""),
+    ))
     package = {"profile_id": package_id, "profile_version": package_version}
     if label is not None:
         if not isinstance(label, str) or not label.strip():
@@ -440,7 +454,7 @@ def build_manifest(payload_root: Path, package_id: str, package_version: str,
         "source": source,
         "hash_contract": dict(HASH_CONTRACT),
         "entries": entries,
-        "dependencies": [] if dependencies is None else dependencies,
+        "dependencies": dependencies,
         "generator": {"tool": TOOL_NAME, "version": TOOL_VERSION},
     }
     return validate_manifest(manifest)

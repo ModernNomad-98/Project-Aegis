@@ -315,6 +315,64 @@ class GuardSelfTests(unittest.TestCase):
         self.assertEqual(1, len(findings))
         self.assertEqual("BLOCK", findings[0]["severity"])
 
+    def test_p2f_mention_masking_and_path_mentions(self):
+        cases = {
+            "underscore": "# Catalog\n\n- beta\n- my_alpha\n",
+            "dot": "# Catalog\n\n- beta\n- alpha.md\n",
+            "suffix": "# Catalog\n\n- beta\n- alpha_old\n",
+        }
+        for label, text in cases.items():
+            tree = self.new_candidate("mention-mask-" + label)
+            (tree / "docs" / "skills-catalog.md").write_text(text, encoding="utf-8")
+            code, payload, out, err = self.run_check(tree)
+            self.assertEqual(code, 1, label)
+            self.assertIn("DISCOVERY_OMISSION_CATALOG", self.rules(payload), label)
+        self.assertFalse(guard.mentions_skill("alpha-v2", "alpha"))
+        self.assertTrue(guard.mentions_skill("skills/alpha/SKILL.md", "alpha"))
+        self.assertFalse(guard.mentions_skill("my_alpha", "alpha"))
+        self.assertFalse(guard.mentions_skill("alpha.md", "alpha"))
+
+    def test_p2f_shipped_baseline_mentions_match_current_matcher(self):
+        repo = TESTS_DIR.parents[2]
+        baseline = json.loads((repo / "tools" / "skill_preservation" / "baseline.json")
+                              .read_text(encoding="utf-8"))
+        catalog_text = (repo / "docs" / "skills-catalog.md").read_text(encoding="utf-8")
+        readme_text = (repo / "README.md").read_text(encoding="utf-8")
+        mismatches = []
+        for skill, recorded in (baseline["discovery"]["catalog_mentions"] or {}).items():
+            if guard.mentions_skill(catalog_text, skill) != recorded:
+                mismatches.append(("catalog", skill))
+        for skill, recorded in (baseline["discovery"]["readme_mentions"] or {}).items():
+            if guard.mentions_skill(readme_text, skill) != recorded:
+                mismatches.append(("readme", skill))
+        self.assertEqual([], mismatches,
+                         "baseline mention booleans differ from the current matcher; "
+                         "a reviewed re-baseline is required")
+
+    def test_p2f_missing_or_empty_name_blocks(self):
+        cases = {
+            "absent": lambda text: text.replace("name: alpha\n", "", 1),
+            "empty": lambda text: text.replace("name: alpha", "name:", 1),
+            "quoted-empty": lambda text: text.replace("name: alpha", "name: ''", 1),
+        }
+        for label, mutate in cases.items():
+            tree = self.new_candidate("name-block-" + label)
+            skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+            write(skill_md, mutate(skill_md.read_text(encoding="utf-8")))
+            code, payload, out, err = self.run_check(tree)
+            self.assertEqual(code, 1, label + ": " + out)
+            self.assertIn("NAME_MISSING", self.rules(payload), label)
+        tree = self.new_candidate("name-and-description-block")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        text = skill_md.read_text(encoding="utf-8").replace("name: alpha\n", "", 1)
+        text = text.replace("description: 'A synthetic test skill named alpha for guard self-tests.'",
+                            "description: ''", 1)
+        write(skill_md, text)
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1, out)
+        self.assertIn("NAME_MISSING", self.rules(payload))
+        self.assertIn("EMPTY_DESCRIPTION", self.rules(payload))
+
     def test_p2e_candidate_discovery_read_error_is_exit2(self):
         tree = self.new_candidate("discovery-read-error")
         original = guard.read_text

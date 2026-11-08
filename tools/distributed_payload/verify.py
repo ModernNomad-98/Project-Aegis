@@ -66,23 +66,36 @@ def _detect_reparse(path: Path) -> bool:
         return False
 
 
+def _path_has_reparse(path: Path) -> bool:
+    """True when a path component is a reparse/link.
+
+    Compare the non-resolved absolute form with the real path: a difference proves a
+    link anywhere in the chain regardless of how the path was typed (the audit's
+    junction-CWD/--target . miss). Also test the typed/absolute path explicitly for
+    symlink/junction. The real path is used only as a comparison witness, never as a
+    replacement for detection.
+    """
+    raw_abs = Path(os.path.abspath(str(path)))
+    for prefix in [raw_abs] + list(raw_abs.parents):
+        if _detect_reparse(prefix):
+            return True
+    # Relative targets whose only ancestor is "." cannot be detected through
+    # Path.parents alone; an abspath-vs-realpath difference proves a link in the
+    # chain regardless of how the path was typed. This comparison is limited to
+    # relative targets because hosts may legitimately expose 8.3/short absolute
+    # spellings whose realpath differs without any link.
+    if not os.path.isabs(str(path)):
+        if os.path.normcase(str(raw_abs)) != os.path.normcase(os.path.realpath(str(path))):
+            return True
+    return False
+
+
 def _containment_preflight(target: Path) -> list[str]:
     """Refuse unsafe targets; return host limitations that remain UNRUN."""
     limitations = []
-    if _detect_reparse(target):
-        raise ManifestError("unsafe_target", "target root is a symlink/reparse point; refusing")
-    # Check every ancestor of the supplied path (absolute form) and every ancestor of
-    # the resolved target, so a relative target reached through a symlinked parent
-    # cannot bypass containment preflight.
-    for parent in Path(os.path.abspath(str(target))).parents:
-        if _detect_reparse(parent):
-            raise ManifestError("unsafe_target",
-                                "target path chain contains a symlink/reparse point; refusing")
-    resolved_target = target.resolve()
-    for parent in resolved_target.parents:
-        if _detect_reparse(parent):
-            raise ManifestError("unsafe_target",
-                                "resolved target path chain contains a symlink/reparse point; refusing")
+    if _path_has_reparse(target):
+        raise ManifestError("unsafe_target",
+                            "target path chain contains a symlink/reparse point; refusing")
     if not callable(getattr(os.path, "isjunction", None)):
         limitations.append(
             "junction/reparse detection is unavailable on this host (os.path.isjunction absent); "
@@ -91,12 +104,16 @@ def _containment_preflight(target: Path) -> list[str]:
 
 
 def _entry_parent_reparse(target_root: Path, relative: str):
-    """Return the first symlinked/reparse parent component of an entry, else None."""
+    """Return the first reparse ancestor component of an entry path, else None.
+
+    Every component of the entry path (ancestors and the leaf) is checked with the
+    abspath-vs-realpath comparison plus explicit reparse detection, so an entry read
+    through a junction/symlink ancestor is never counted ok.
+    """
     current = target_root
-    parts = Path(relative).parts
-    for part in parts[:-1]:
+    for part in Path(relative).parts:
         current = current / part
-        if _detect_reparse(current):
+        if _path_has_reparse(current):
             return current
     return None
 
@@ -185,13 +202,15 @@ def verify_target(manifest_path: Path, target_root: Path,
     for entry in manifest["entries"]:
         relative = entry["path"]
         candidate = target / Path(relative)
-        if _entry_parent_reparse(target, relative) is not None:
+        reparse_component = _entry_parent_reparse(target, relative)
+        if reparse_component is not None:
+            try:
+                component_relative = reparse_component.relative_to(target).as_posix()
+            except ValueError:
+                component_relative = relative
             findings.append({"class": "CHANGED_TYPE", "path": relative,
-                             "detail": "target entry path component is a symlink/reparse point (not followed)"})
-            continue
-        if _detect_reparse(candidate):
-            findings.append({"class": "CHANGED_TYPE", "path": relative,
-                             "detail": "target entry is a symlink/reparse point (not followed)"})
+                             "detail": "target entry path component %r is a symlink/reparse point (not followed)"
+                                       % component_relative})
             continue
         try:
             candidate.resolve().relative_to(target_root_resolved)

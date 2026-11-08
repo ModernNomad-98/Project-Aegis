@@ -85,7 +85,8 @@ REASON_CODES = {"production-only", "outside-first-profile-scope", "not-yet-enfor
 ANCHOR_KINDS = {"heading", "line-span", "symbol"}
 ID_KINDS = {"existing-authoritative", "catalog-minted"}
 CLASSIFICATIONS = {"EXECUTED", "PLANNED-UNRUN", "UNRUN"}
-FORBIDDEN_KEYS = {"status", "observed", "pass", "result", "evidence_status", "authority",
+FORBIDDEN_KEYS = {"status", "observed", "observation", "observations", "pass", "result",
+                 "evidence_status", "authority",
                   "approval", "permission", "granted", "self_sha256", "self_digest",
                   "own_sha256", "binding_sha256", "catalog_sha256"}
 EVIDENCE_PRESENT = "EVIDENCE-PRESENT"
@@ -655,6 +656,91 @@ def check_requirements(catalog, repo_root, source_paths, findings):
     return by_id
 
 
+ALLOWED_KEYS = {
+    "$": {"schema", "catalog_version", "source_baseline", "profiles", "sources", "requirements"},
+    "$.profiles[]": {"profile_id", "readable_name", "description", "scope_statement",
+                     "mandatory_requirement_ids", "maintains_full_catalog", "owner"},
+    "$.profiles[].owner": {"role", "maintainer"},
+    "$.requirements[]": {"requirement_id", "id_kind", "readable_name", "source_ref",
+                         "applicability", "mechanism", "verification", "evidence_requirement",
+                         "owner", "negative_case_ids", "notes", "related", "supersedes",
+                         "superseded_by"},
+    "$.requirements[].applicability": {"profiles", "inapplicability"},
+    "$.requirements[].applicability.inapplicability[]": {"profile_id", "reason_code", "justification"},
+    "$.requirements[].evidence_requirement": {"kind", "description"},
+    "$.requirements[].mechanism": {"kind", "refs", "limits"},
+    "$.requirements[].mechanism.refs[]": {"path", "symbol_or_line"},
+    "$.requirements[].owner": {"role", "maintainer"},
+    "$.requirements[].source_ref": {"path", "anchor_kind", "anchor", "quoted_phrase"},
+    "$.requirements[].verification": {"method", "check", "expected_result", "limits"},
+    "$.source_baseline": {"repository", "revision", "tree"},
+    "$.sources[]": {"path", "bytes", "sha256"},
+}
+
+
+def _reject_unknown(mapping, allowed, path, record_id, findings):
+    for key in sorted(set(mapping) - allowed):
+        add(findings, "SCHEMA", path, record_id,
+            "unknown field %r (additionalProperties false in the normative schema)" % key)
+
+
+def check_allowed_keys(catalog, findings):
+    """Enforce the 14 normative additionalProperties:false object sites."""
+    if not isinstance(catalog, dict):
+        return
+    _reject_unknown(catalog, ALLOWED_KEYS["$"], "$", None, findings)
+    baseline = catalog.get("source_baseline")
+    if isinstance(baseline, dict):
+        _reject_unknown(baseline, ALLOWED_KEYS["$.source_baseline"], "$.source_baseline", None, findings)
+    sources = catalog.get("sources") if isinstance(catalog.get("sources"), list) else []
+    for index, source in enumerate(sources):
+        if isinstance(source, dict):
+            _reject_unknown(source, ALLOWED_KEYS["$.sources[]"], "$.sources[%d]" % index, None, findings)
+    profiles = catalog.get("profiles") if isinstance(catalog.get("profiles"), list) else []
+    for index, profile in enumerate(profiles):
+        if not isinstance(profile, dict):
+            continue
+        where = "$.profiles[%d]" % index
+        _reject_unknown(profile, ALLOWED_KEYS["$.profiles[]"], where, None, findings)
+        owner = profile.get("owner")
+        if isinstance(owner, dict):
+            _reject_unknown(owner, ALLOWED_KEYS["$.profiles[].owner"], where + ".owner", None, findings)
+    requirements = (catalog.get("requirements")
+                    if isinstance(catalog.get("requirements"), list) else [])
+    for index, record in enumerate(requirements):
+        if not isinstance(record, dict):
+            continue
+        where = "$.requirements[%d]" % index
+        rid = record.get("requirement_id")
+        _reject_unknown(record, ALLOWED_KEYS["$.requirements[]"], where, rid, findings)
+        checks = (
+            ("source_ref", "$.requirements[].source_ref"),
+            ("applicability", "$.requirements[].applicability"),
+            ("evidence_requirement", "$.requirements[].evidence_requirement"),
+            ("mechanism", "$.requirements[].mechanism"),
+            ("owner", "$.requirements[].owner"),
+            ("verification", "$.requirements[].verification"),
+        )
+        for key, allowed_path in checks:
+            value = record.get(key)
+            if isinstance(value, dict):
+                _reject_unknown(value, ALLOWED_KEYS[allowed_path], where + "." + key, rid, findings)
+        applicability = record.get("applicability")
+        if isinstance(applicability, dict):
+            for claim_index, claim in enumerate(applicability.get("inapplicability") or []):
+                if isinstance(claim, dict):
+                    _reject_unknown(claim,
+                                    ALLOWED_KEYS["$.requirements[].applicability.inapplicability[]"],
+                                    where + ".applicability.inapplicability[%d]" % claim_index, rid,
+                                    findings)
+        mechanism = record.get("mechanism")
+        if isinstance(mechanism, dict):
+            for ref_index, ref in enumerate(mechanism.get("refs") or []):
+                if isinstance(ref, dict):
+                    _reject_unknown(ref, ALLOWED_KEYS["$.requirements[].mechanism.refs[]"],
+                                    where + ".mechanism.refs[%d]" % ref_index, rid, findings)
+
+
 def check_observation_fields(catalog, findings):
     for path, key in walk_keys(catalog, "$"):
         if key in FORBIDDEN_KEYS:
@@ -1030,6 +1116,11 @@ def build_report(catalog, catalog_identity, repo_root, evidence_path, profile_ar
         "requirements": rows,
         "findings": findings,
         "summary": summary,
+        "checks_run": {"structure": True, "allowed_keys": True, "sources": True,
+                       "requirements": True, "observation_fields": True,
+                       "completeness": True,
+                       "evidence_binding": evidence is not None},
+        "checks_skipped": [],
         "unrun": unrun_entries,
         "limits": [
             LIMITS_SENTENCE,
@@ -1127,6 +1218,7 @@ def main(argv=None):
             raise InputError("catalog must be a JSON object")
         findings = []
         check_structure(catalog, findings)
+        check_allowed_keys(catalog, findings)
         safe_catalog = sanitize_catalog_containers(catalog)
         # Independent checks run even when SCHEMA findings exist. Malformed
         # containers are sanitized for structural traversal, but unrelated stale

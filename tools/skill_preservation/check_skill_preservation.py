@@ -42,6 +42,8 @@ BASELINE_SCHEMA = "aegis.skill-preservation-baseline/1"
 MANIFEST_SCHEMA = "aegis.skills-manifest/1"
 MANIFEST_HASH_INPUT = "SKILL.md bytes, CRLF->LF normalized"
 MANUAL_ONLY_SENTINEL = "MANUAL-ONLY; never auto-invoke. "
+MENTION_MATCHER_VERSION = "token-bounded-identifier-v2"
+MENTION_MATCHER_VERSION = "token-bounded-identifier-v2"
 SKILLS_REL = ".claude/skills"
 SKILL_MD = "SKILL.md"
 CATALOG_REL = "docs/skills-catalog.md"
@@ -397,7 +399,7 @@ def mentions_skill(text: str, name: str) -> bool:
     """Token-bounded mention so a longer skill id cannot mask a shorter one."""
     if not isinstance(text, str) or not isinstance(name, str) or not name:
         return False
-    return re.search(r"(?<![A-Za-z0-9_-])" + re.escape(name) + r"(?![A-Za-z0-9_-])", text) is not None
+    return re.search(r"(?<![A-Za-z0-9_.-])" + re.escape(name) + r"(?![A-Za-z0-9_.-])", text) is not None
 
 
 def build_discovery_surface(tree: str, skill_ids: list) -> dict:
@@ -563,6 +565,7 @@ def build_baseline(tree: str, source_revision: str = None, source_tree: str = No
             "manifest_hash_input": MANIFEST_HASH_INPUT,
             "starter_path": STARTER_REL,
             "manual_only_sentinel": MANUAL_ONLY_SENTINEL,
+            "mention_matcher": MENTION_MATCHER_VERSION,
         },
         "counts": counts,
         "skills": skills,
@@ -669,6 +672,11 @@ def validate_baseline(baseline: dict) -> None:
             raise InputError("baseline missing required section: %s" % key)
     if not isinstance(baseline["contract"], dict):
         raise InputError("baseline contract section is not an object")
+    recorded_matcher = baseline["contract"].get("mention_matcher")
+    if recorded_matcher is not None and recorded_matcher != MENTION_MATCHER_VERSION:
+        raise InputError("baseline records mention matcher %r but this guard implements %r; "
+                         "a reviewed re-baseline is required before changing matcher semantics"
+                         % (recorded_matcher, MENTION_MATCHER_VERSION))
     generated_from = baseline.get("generated_from")
     if generated_from is not None and not isinstance(generated_from, dict):
         raise InputError("baseline generated_from section is not an object")
@@ -915,6 +923,12 @@ def compare(baseline: dict, tree: str) -> dict:
             if discovery.get("readme_mentions", {}).get(name) and not mentions_skill(cand_readme, name):
                 add("DISCOVERY_OMISSION_README", "BLOCK",
                     "skill %r was listed in README.md at baseline and is no longer listed" % name, name)
+    baseline_matcher = (baseline.get("contract") or {}).get("mention_matcher")
+    if baseline_matcher != MENTION_MATCHER_VERSION:
+        add("BASELINE_MENTION_MATCHER_UNRECORDED", "WARN",
+            "baseline does not record the current mention matcher (%r); stored mention booleans "
+            "must match the shipped recomputation test or a reviewed re-baseline is required"
+            % MENTION_MATCHER_VERSION)
     base_manifest = discovery.get("manifest") or {}
     cand_manifest = build_manifest_surface(tree)
     if base_manifest.get("present"):

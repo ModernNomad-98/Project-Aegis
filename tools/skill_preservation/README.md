@@ -90,6 +90,13 @@ UNRUN (reported, never PASS):
   a BLOCK. The repository validator remains the strict YAML gate.
 - The cleanup-path rule is a deterministic name/path rule over candidate-added paths only; it does
   not scan file contents and does not detect a renamed pre-existing cleanup tool.
+- Discovery mention matching is token-bounded on `[A-Za-z0-9_.-]` (matcher version
+  `token-bounded-identifier-v2`), so `my_alpha`, `alpha_old` and `alpha.md` do not mention `alpha`.
+  The matcher version is recorded in new baseline contracts; a legacy/different baseline emits
+  `BASELINE_MENTION_MATCHER_UNRECORDED` WARN and changing matcher semantics requires a reviewed
+  re-baseline. The shipped `baseline.json` is deliberately not regenerated here: its stored mention
+  booleans are verified against the current matcher by the test suite, and any mismatch instructs a
+  reviewed re-baseline rather than silent acceptance.
 - Byte identity is not functional availability. A guard pass does not prove the validator passes, and
   the validator does not prove preservation; run both. Neither one repairs anything.
 - The check is local evidence only. It is not a required check, not a CI result, not a merge gate and
