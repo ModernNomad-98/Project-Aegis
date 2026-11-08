@@ -25,7 +25,6 @@ and no consumer install record is produced.
 from __future__ import annotations
 
 import hashlib
-import json
 import os
 import shutil
 import subprocess
@@ -96,8 +95,11 @@ def directory_fingerprint(root: Path) -> list:
 
 
 def run_cli(arguments, cwd=REPO_ROOT):
+    # -B keeps the child interpreter from writing __pycache__ into the
+    # repository: the module docstring promises that no repository file is
+    # written, and this harness must not create one either.
     return subprocess.run(
-        [sys.executable, "-m", "tools.distributed_payload", *arguments],
+        [sys.executable, "-B", "-m", "tools.distributed_payload", *arguments],
         cwd=str(cwd), capture_output=True, text=True, timeout=180)
 
 
@@ -153,6 +155,17 @@ class DesignContractTests(LifecycleTestCase):
                         "## 11. Explicit non-claims and UNRUN register"):
             with self.subTest(heading=heading):
                 self.assertIn(heading, text)
+
+
+class HarnessSubprocessHygieneTests(LifecycleTestCase):
+    def test_run_cli_passes_dash_b_to_the_cli_subprocess(self):
+        """Regression: the CLI subprocess must never write bytecode under the repository."""
+        completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
+        with mock.patch.object(subprocess, "run", return_value=completed) as patched:
+            run_cli(["verify", "--help"])
+        command = patched.call_args[0][0]
+        self.assertEqual("-B", command[1])
+        self.assertEqual(["verify", "--help"], command[-2:])
 
 
 class AbsentVerbTests(LifecycleTestCase):
