@@ -181,7 +181,7 @@ No enumerated operation contains a delete, prune, move, rename or in-place packa
 
 ## 8. Negative cases (executable)
 
-These cases are implemented in the new module `tools/distributed_payload/tests/test_install_lifecycle.py` with fixtures under `tools/distributed_payload/tests/fixtures/lifecycle/`. Every target is materialised in a unique temporary directory; no repository file is written and no install target is touched.
+These cases are implemented in the new module `tools/distributed_payload/tests/test_install_lifecycle.py` with fixtures under `tools/distributed_payload/tests/fixtures/lifecycle/`. Every target is materialised in a unique temporary directory; no repository file is written and no install target is touched. The last row (H-1) is a harness regression, not a lifecycle case: it keeps the executable suite from writing into the repository.
 
 | ID | Case | Expected | Test |
 | --- | --- | --- | --- |
@@ -195,6 +195,7 @@ These cases are implemented in the new module `tools/distributed_payload/tests/t
 | N-8 | The target root does not exist | `ManifestError` (`target_missing`), nothing created | `test_n08_missing_target_is_refused_without_creating_it` |
 | N-9 | A report destination is a directory, the manifest itself, or under a missing parent | `ManifestError` (`unsafe_report_path`); nothing overwritten | `test_n09_report_destination_edge_cases_are_refused` |
 | N-10 | Every refused lifecycle attempt is run against one skill-bearing target | the skill file set and every skill byte are unchanged after all attempts | `test_n10_refused_attempts_cannot_lose_a_skill` |
+| H-1 | The harness's own CLI subprocess call and its scratch tree are exercised | the child command carries `-B`, so no bytecode is written under the repository; the scratch tree exists, is writable, and is 0o700 off Windows | `test_run_cli_passes_dash_b_to_the_cli_subprocess` |
 
 ## 9. Interruption cases
 
@@ -217,7 +218,7 @@ Run from the candidate root:
 
     python -B -m unittest discover -s tools/distributed_payload/tests -p test_*.py -v
 
-The pre-existing suite is 37 tests (3 host-limited skips); this slice adds twelve cases (N-1..N-10 and I-1/I-2) in one new module, so the expected total is 49 tests with the same 3 skips. The observed result is recorded in the lane receipt, not in this page.
+The pre-existing suite is 37 tests (3 host-limited skips); this slice adds **thirteen** new test methods in one new module - the twelve contract cases (N-1..N-10 and I-1/I-2) plus the harness-hygiene regression (H-1) - so the expected total is **50** tests with the same 3 skips. The observed result is recorded in the lane receipt, not in this page.
 
 **CL-15 re-derivation.** The official closure form is `Test-Path -LiteralPath "$C/docs/design/consumer-install-verify-repair-v1.md"` where `$C` is the frozen main checkout (`captures/closures.ps1`, CL-15). Re-derived at this candidate, the same predicate is:
 

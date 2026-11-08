@@ -36,6 +36,12 @@ MIN_SOURCE_EVIDENCE = 1  # v1 schema minItems: at least one cited payload
 MAX_STRING_CHARS = 2000
 FIXTURE_RECORD_COUNT = 6  # this fixture set is pinned at six record entries
 
+MANIFEST_TOP_FIELDS = ("schema", "fixture_version", "entries")
+MANIFEST_ENTRY_FIELDS = ("path", "bytes", "sha256", "kind", "expected_exit")
+EXPECTED_TOP_FIELDS = ("schema", "fixture_version", "entries")
+EXPECTED_ENTRY_FIELDS = ("fixture", "contract_negative", "expected_findings", "expected_exit", "expected_absent_fields")
+VALID_EXITS = (0, 1)
+
 RECORD_ID_RE = re.compile(r"^HCR-[A-Z0-9-]{1,40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 SECRET_RE = re.compile(r"(password|token|secret|api[_-]?key|credential|private[_-]?key)")
@@ -103,6 +109,21 @@ def sha256_bytes(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
+def is_int_not_bool(value):
+    """A JSON integer only: JSON true/false are bool, an int subclass, so 1 == True."""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def is_string_list(value):
+    """A JSON array whose every element is a string."""
+    return isinstance(value, list) and all(isinstance(item, str) for item in value)
+
+
+def has_control_characters(text):
+    """Reject NUL and every other C0/DEL control character in a path string."""
+    return any(ord(char) < 32 or ord(char) == 127 for char in text)
+
+
 def normalise_relative(text):
     """Collapse empty and '.' segments so path comparisons are canonical."""
     return "/".join(part for part in text.split("/") if part not in ("", "."))
@@ -110,6 +131,8 @@ def normalise_relative(text):
 
 def is_safe_relative(text):
     if not isinstance(text, str) or not text:
+        return False
+    if has_control_characters(text):
         return False
     if text.startswith("/") or text.startswith("\\"):
         return False
@@ -126,9 +149,13 @@ def is_safe_relative(text):
 def resolve_under_repo(repo, relative):
     if not is_safe_relative(relative):
         raise UsageError("UNSAFE-PATH: refusing unsafe input path: " + repr(relative))
-    candidate = (repo / relative).resolve()
     try:
-        candidate.relative_to(repo.resolve())
+        candidate = (repo / relative).resolve()
+        root = repo.resolve()
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise UsageError("UNSAFE-PATH: input path cannot be resolved") from exc
+    try:
+        candidate.relative_to(root)
     except ValueError as exc:
         raise UsageError("UNSAFE-PATH: path escapes the repository") from exc
     return candidate
@@ -165,6 +192,13 @@ def enforce_input_caps(record):
 
 
 def load_json(path, max_bytes):
+    """Read one JSON file, refusing an over-cap file from stat() before reading it."""
+    try:
+        size = path.stat().st_size
+    except OSError as exc:
+        raise UsageError("UNKNOWN-FIXTURE: input file cannot be stat()ed") from exc
+    if size > max_bytes:
+        raise UsageError("INPUT-TOO-LARGE: " + str(path.name) + " exceeds the byte cap")
     raw = path.read_bytes()
     if len(raw) > max_bytes:
         raise UsageError("INPUT-TOO-LARGE: " + str(path.name) + " exceeds the byte cap")
@@ -213,12 +247,25 @@ def walk_keys(value, location, findings):
             walk_keys(child, location + "[" + str(index) + "]", findings)
 
 
+def field_names(value):
+    """Every object field name in the document, lower-cased, at any depth."""
+    names = set()
+    if isinstance(value, dict):
+        for name, child in value.items():
+            names.add(str(name).casefold())
+            names |= field_names(child)
+    elif isinstance(value, list):
+        for child in value:
+            names |= field_names(child)
+    return names
+
+
 def config_digest_of(input_names, input_values):
     payload = canonical_json({"input_names": input_names, "input_values": input_values})
     return sha256_bytes(payload.encode("utf-8"))
 
 
-def validate_record(record, record_relative, findings):
+def validate_record(record, record_relative, findings, record_sha256=None):
     if not isinstance(record, dict):
         add(findings, "SCHEMA", "", "record root is not a JSON object")
         return 0
@@ -319,6 +366,8 @@ def validate_record(record, record_relative, findings):
         profile = binding.get("profile_id")
         if not isinstance(manifest_digest, str) or SHA256_RE.match(manifest_digest) is None:
             add(findings, "BAD-PACKAGE-BINDING", "package_binding/package_manifest_sha256", "package manifest digest is not sha256 hex")
+        elif record_sha256 is not None and manifest_digest == record_sha256:
+            add(findings, "BAD-PACKAGE-BINDING", "package_binding/package_manifest_sha256", "package manifest digest may not be the record's own digest")
         if not isinstance(profile, str) or len(profile.strip()) < 3:
             add(findings, "BAD-PACKAGE-BINDING", "package_binding/profile_id", "profile id is missing or too short")
     capabilities = record.get("capabilities")
@@ -369,8 +418,11 @@ def validate_record(record, record_relative, findings):
                 add(findings, "SCHEMA", base + "/evidence_refs", "evidence refs must be an array")
             if isinstance(refs, list):
                 for ref_index, ref in enumerate(refs):
+                    ref_location = base + "/evidence_refs[" + str(ref_index) + "]"
                     if not isinstance(ref, str) or not is_safe_relative(ref):
-                        add(findings, "UNSAFE-PATH", base + "/evidence_refs[" + str(ref_index) + "]", "evidence reference is unsafe")
+                        add(findings, "UNSAFE-PATH", ref_location, "evidence reference is unsafe")
+                    elif normalise_relative(ref).casefold() == normalise_relative(record_relative).casefold():
+                        add(findings, "UNSAFE-PATH", ref_location, "evidence reference may not cite the record itself")
     else:
         add(findings, "AGGREGATE-CAPABILITY", "capabilities", "capabilities must be a separate-entry array, not an aggregate value")
     for name in ("limits", "non_claims"):
@@ -396,65 +448,111 @@ def validate_record(record, record_relative, findings):
     return capability_count
 
 
+def validate_expectation_entry(entry, location, findings):
+    """Validate one expectation entry's metadata; every defect is a finding, never a raise."""
+    for name in entry:
+        if name not in EXPECTED_ENTRY_FIELDS:
+            add(findings, "EXPECTED-FINDINGS-MISMATCH", location + "/" + str(name), "expectation field is not in the v1 contract")
+    if "expected_findings" not in entry:
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", location, "expectation findings list is missing")
+    elif not is_string_list(entry.get("expected_findings")):
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", location + "/expected_findings", "expected findings must be a list of strings")
+    if "expected_exit" not in entry:
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", location + "/expected_exit", "expectation exit code is missing")
+    elif not is_int_not_bool(entry.get("expected_exit")) or entry.get("expected_exit") not in VALID_EXITS:
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", location + "/expected_exit", "expected exit code must be the integer 0 or 1")
+    if "expected_absent_fields" in entry and not is_string_list(entry.get("expected_absent_fields")):
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", location + "/expected_absent_fields", "expected absent fields must be a list of strings")
+    if "contract_negative" in entry and not isinstance(entry.get("contract_negative"), bool):
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", location + "/contract_negative", "contract_negative must be a boolean")
+
+
 def validate_expected_table(expected, findings):
+    for name in expected:
+        if name not in EXPECTED_TOP_FIELDS:
+            add(findings, "EXPECTED-FINDINGS-MISMATCH", str(name), "expected-findings field is not in the v1 contract")
+    if expected.get("fixture_version") != "v1":
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", "fixture_version", "expected-findings fixture version is not the current v1")
     entries = expected.get("entries")
     if not isinstance(entries, list):
         add(findings, "EXPECTED-FINDINGS-MISMATCH", "entries", "expected-findings table has no entries list")
         return {}, []
     real = {}
     contract = []
+    seen = set()
+    declared_paths = []
     for index, entry in enumerate(entries):
+        location = "entries[" + str(index) + "]"
         if not isinstance(entry, dict):
-            add(findings, "EXPECTED-FINDINGS-MISMATCH", "entries[" + str(index) + "]", "expectation entry is not an object")
+            add(findings, "EXPECTED-FINDINGS-MISMATCH", location, "expectation entry is not an object")
             continue
+        validate_expectation_entry(entry, location, findings)
         fixture = entry.get("fixture")
+        if not isinstance(fixture, str) or not is_safe_relative(fixture):
+            add(findings, "EXPECTED-FINDINGS-MISMATCH", location, "expectation fixture path is missing or unsafe")
+            continue
+        clean = normalise_relative(fixture)
+        declared_paths.append(clean)
+        if clean in seen:
+            add(findings, "EXPECTED-FINDINGS-MISMATCH", clean, "duplicate expectation path; only the first entry counts")
+            continue
+        seen.add(clean)
         if entry.get("contract_negative") is True:
             contract.append(entry)
             continue
-        if not isinstance(fixture, str):
-            add(findings, "EXPECTED-FINDINGS-MISMATCH", "entries[" + str(index) + "]", "expectation fixture path is missing")
-            continue
-        real[normalise_relative(fixture)] = entry
+        real[clean] = entry
     if len(entries) != 8:
         add(findings, "EXPECTED-FINDINGS-MISMATCH", "entries", "expected-findings must have exactly eight entries")
     expected_contract_codes = sorted(["MANIFEST-STALE", "EXPECTED-FINDINGS-MISMATCH"])
     actual_contract_codes = sorted(
         code
         for entry in contract
-        for code in (entry.get("expected_findings") or [])
-        if isinstance(code, str)
+        if is_string_list(entry.get("expected_findings"))
+        for code in entry.get("expected_findings")
     )
     if len(contract) != 2 or actual_contract_codes != expected_contract_codes:
         add(findings, "EXPECTED-FINDINGS-MISMATCH", "entries", "contract-negative expectations must be exactly two with the pinned codes")
+    if declared_paths != sorted(declared_paths):
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", "entries", "expectation fixture paths must be sorted")
     return real, contract
 
 
-def compare_expectation(record_relative, actual_codes, expectation, findings):
+def compare_expectation(record, record_relative, actual_codes, expectation, findings):
     expected_codes = expectation.get("expected_findings")
     expected_exit = expectation.get("expected_exit")
-    if not isinstance(expected_codes, list):
-        add(findings, "EXPECTED-FINDINGS-MISMATCH", record_relative, "expectation findings list is missing")
+    if not is_string_list(expected_codes) or not is_int_not_bool(expected_exit) or expected_exit not in VALID_EXITS:
+        add(findings, "EXPECTED-FINDINGS-MISMATCH", record_relative, "expectation metadata is malformed")
         return
     actual_exit = 0 if len(actual_codes) == 0 else 1
     if actual_exit != expected_exit or sorted(actual_codes) != sorted(expected_codes):
         add(findings, "EXPECTED-FINDINGS-MISMATCH", record_relative, "observed codes/exit differ from the expected-findings table")
+    absent = expectation.get("expected_absent_fields")
+    if is_string_list(absent) and absent:
+        present = sorted(field_names(record) & {item.casefold() for item in absent})
+        if present:
+            add(findings, "EXPECTED-FINDINGS-MISMATCH", record_relative, "record carries a field the expectation requires absent: " + ", ".join(present))
 
 
-def resolve_manifest_entry(repo, relative, findings):
-    """Resolve one manifest entry, refusing any path that escapes the repository.
+def resolve_manifest_entry(repo, relative, findings, root=None):
+    """Resolve one manifest entry, refusing any path that escapes the boundary.
 
-    A safe-looking repository-relative string can still resolve outside the root
-    through a symlink or junction; that is a deterministic finding, not a read.
+    The boundary is the repository root by default and the supplied fixtures
+    directory for a fixture-set check. A safe-looking relative string can still
+    resolve outside the boundary through a symlink or junction; that is a
+    deterministic finding, not a read.
     """
+    boundary = repo if root is None else root
     try:
         candidate = (repo / relative).resolve()
-    except (OSError, RuntimeError):
+        boundary_resolved = boundary.resolve()
+    except (OSError, RuntimeError, ValueError):
         add(findings, "UNSAFE-PATH", relative, "manifest entry path cannot be resolved")
         return None
     try:
-        candidate.relative_to(repo.resolve())
+        candidate.relative_to(boundary_resolved)
     except ValueError:
-        add(findings, "UNSAFE-PATH", relative, "manifest entry resolves outside the repository")
+        message = "manifest entry resolves outside the repository" if root is None else "manifest entry resolves outside the fixtures directory"
+        add(findings, "UNSAFE-PATH", relative, message)
         return None
     return candidate
 
@@ -477,6 +575,9 @@ def validate_fixture_set(repo, fixtures_relative):
     if not isinstance(expected, dict) or expected.get("schema") != EXPECTED_SCHEMA_ID:
         raise UsageError("UNKNOWN-FIXTURE: expected-findings schema is not supported")
     findings = []
+    for name in manifest:
+        if name not in MANIFEST_TOP_FIELDS:
+            add(findings, "MANIFEST-STALE", str(name), "manifest field is not in the v1 contract")
     if manifest.get("fixture_version") != "v1":
         add(findings, "MANIFEST-STALE", manifest_rel, "manifest fixture version is not the current v1")
     entries = manifest.get("entries")
@@ -488,38 +589,69 @@ def validate_fixture_set(repo, fixtures_relative):
     if declared_records > MAX_RECORDS:
         raise UsageError("INPUT-TOO-LARGE: manifest declares " + str(declared_records) + " record entries, above the cap of " + str(MAX_RECORDS))
     expected_real, expected_contract = validate_expected_table(expected, findings)
+    if expected.get("fixture_version") is not None and expected.get("fixture_version") != manifest.get("fixture_version"):
+        add(findings, "MANIFEST-STALE", "fixture_version", "manifest and expected-findings fixture versions differ")
     manifest_paths = []
     records = 0
     capabilities = 0
-    expected_findings_total = sum(len(entry.get("expected_findings") or []) for entry in expected_real.values())
+    seen_paths = set()
+    declared_paths = []
     entry_by_path = {}
     for index, entry in enumerate(entries):
         base = "entries[" + str(index) + "]"
         if not isinstance(entry, dict):
             add(findings, "MANIFEST-STALE", base, "manifest entry is not an object")
             continue
+        for name in entry:
+            if name not in MANIFEST_ENTRY_FIELDS:
+                add(findings, "MANIFEST-STALE", base + "/" + str(name), "manifest entry field is not in the v1 contract")
         path = entry.get("path")
         if not isinstance(path, str) or not is_safe_relative(path):
             add(findings, "UNSAFE-PATH", base + "/path", "manifest entry path is unsafe")
             continue
         clean = normalise_relative(path)
+        declared_paths.append(clean)
         if clean == manifest_rel:
             add(findings, "MANIFEST-STALE", base, "manifest may not include itself")
+            continue
+        if clean in seen_paths:
+            add(findings, "MANIFEST-STALE", clean, "duplicate manifest path; only the first entry counts")
+            continue
+        seen_paths.add(clean)
+        kind = entry.get("kind")
+        if kind not in ("record", "expectations"):
+            add(findings, "MANIFEST-STALE", base + "/kind", "manifest entry kind is not record or expectations")
+        expected_exit = entry.get("expected_exit")
+        if not is_int_not_bool(expected_exit) or expected_exit not in VALID_EXITS:
+            add(findings, "MANIFEST-STALE", base + "/expected_exit", "manifest expected exit code must be the integer 0 or 1")
+        byte_count = entry.get("bytes")
+        if not is_int_not_bool(byte_count) or byte_count < 0:
+            add(findings, "MANIFEST-STALE", base + "/bytes", "manifest byte count must be a non-negative integer")
+        declared_digest = entry.get("sha256")
+        if not isinstance(declared_digest, str) or SHA256_RE.match(declared_digest) is None:
+            add(findings, "MANIFEST-STALE", base + "/sha256", "manifest digest is not sha256 hex")
         manifest_paths.append(clean)
         entry_by_path[clean] = entry
-        resolved = resolve_manifest_entry(repo, clean, findings)
+        resolved = resolve_manifest_entry(repo, clean, findings, fixtures_dir)
         if resolved is None:
             continue
         if not resolved.is_file():
             add(findings, "MANIFEST-MISSING-FIXTURE", clean, "manifest entry file is missing")
             continue
+        try:
+            declared_size = resolved.stat().st_size
+        except OSError as exc:
+            raise UsageError("UNKNOWN-FIXTURE: a fixture file cannot be stat()ed") from exc
+        if kind == "record" and declared_size > MAX_RECORD_BYTES:
+            raise UsageError("INPUT-TOO-LARGE: " + resolved.name + " exceeds the record byte cap")
+        if kind == "expectations" and declared_size > MAX_MANIFEST_BYTES:
+            raise UsageError("INPUT-TOO-LARGE: " + resolved.name + " exceeds the manifest byte cap")
         raw = resolved.read_bytes()
         digest = sha256_bytes(raw)
-        if entry.get("bytes") != len(raw):
+        if not is_int_not_bool(entry.get("bytes")) or entry.get("bytes") != len(raw):
             add(findings, "MANIFEST-BYTE-MISMATCH", clean, "manifest byte count does not match the fixture")
         if entry.get("sha256") != digest:
             add(findings, "MANIFEST-BYTE-MISMATCH", clean, "manifest digest does not match the fixture")
-        kind = entry.get("kind")
         if kind == "record":
             records += 1
             try:
@@ -528,18 +660,20 @@ def validate_fixture_set(repo, fixtures_relative):
                 raise UsageError("UNKNOWN-FIXTURE: fixture record is unreadable: " + str(exc)) from exc
             enforce_input_caps(record)
             record_findings = []
-            capabilities += validate_record(record, clean, record_findings)
+            capabilities += validate_record(record, clean, record_findings, digest)
             actual_codes = sorted({finding["code"] for finding in record_findings})
             expectation = expected_real.get(clean)
             if expectation is None:
                 add(findings, "EXPECTED-FINDINGS-MISMATCH", clean, "no expected-findings entry for this record")
             else:
-                compare_expectation(clean, actual_codes, expectation, findings)
+                if is_int_not_bool(expected_exit) and expected_exit != expectation.get("expected_exit"):
+                    add(findings, "EXPECTED-FINDINGS-MISMATCH", clean, "manifest and expected-findings exit codes differ")
+                compare_expectation(record, clean, actual_codes, expectation, findings)
         elif kind == "expectations":
             if clean != expected_rel:
                 add(findings, "EXPECTED-FINDINGS-MISMATCH", clean, "expectations entry does not point at expected-findings")
-        else:
-            add(findings, "MANIFEST-STALE", base + "/kind", "manifest entry kind is not record or expectations")
+    if declared_paths != sorted(declared_paths):
+        add(findings, "MANIFEST-STALE", "entries", "manifest entries must be sorted by canonical path")
     file_set = set()
     for candidate in fixtures_dir.rglob("*"):
         if candidate.is_file():
@@ -553,10 +687,20 @@ def validate_fixture_set(repo, fixtures_relative):
     for path in sorted(file_set - set(path for path in manifest_paths if isinstance(path, str))):
         add(findings, "MANIFEST-MISSING-FIXTURE", path, "fixture file is not inventoried in the manifest")
     for fixture in sorted(expected_real):
+        if not fixture.startswith(fixtures_rel + "/"):
+            add(findings, "UNSAFE-PATH", fixture, "expectation fixture path is outside the fixtures directory")
+            continue
+        if resolve_manifest_entry(repo, fixture, findings, fixtures_dir) is None:
+            continue
         if fixture not in entry_by_path:
             add(findings, "MANIFEST-MISSING-FIXTURE", fixture, "expected record fixture is not in the manifest")
     if records != FIXTURE_RECORD_COUNT:
         add(findings, "MANIFEST-STALE", "entries", "manifest record count " + str(records) + " does not match the pinned fixture count " + str(FIXTURE_RECORD_COUNT))
+    expected_findings_total = sum(
+        len(entry["expected_findings"])
+        for entry in expected_real.values()
+        if is_string_list(entry.get("expected_findings"))
+    )
     manifest_identity = {"path": manifest_rel, "bytes": len(manifest_raw), "sha256": sha256_bytes(manifest_raw)}
     expectations = {
         "expected_findings": expected_findings_total,
@@ -601,12 +745,14 @@ def build_report(manifest_identity, checked_record, findings, counts, limits, ex
 
 def write_report(repo, report, out_arg):
     path = Path(out_arg)
-    if not path.is_absolute():
-        path = (Path.cwd() / path).resolve()
-    else:
-        path = path.resolve()
     try:
-        path.relative_to(repo.resolve())
+        path = (Path.cwd() / path).resolve() if not path.is_absolute() else path.resolve()
+        repo_root = repo.resolve()
+    except (OSError, RuntimeError, ValueError):
+        print("REFUSED: --out path cannot be resolved", file=sys.stderr)
+        return 2
+    try:
+        path.relative_to(repo_root)
     except ValueError:
         pass
     else:
@@ -625,6 +771,9 @@ def main(argv=None):
     parser.add_argument("--out", metavar="PATH", help="write the report outside the repository")
     parser.add_argument("--quiet", action="store_true", help="print only the summary line")
     args = parser.parse_args(argv)
+    if args.record and args.fixtures:
+        print("usage error: --record and --fixtures are mutually exclusive", file=sys.stderr)
+        return 2
     if not args.record and not args.fixtures:
         print("usage error: --record or --fixtures is required", file=sys.stderr)
         return 2
@@ -659,7 +808,7 @@ def main(argv=None):
             record_relative = record_path.resolve().relative_to(repo.resolve()).as_posix()
             enforce_input_caps(record)
             record_findings = []
-            counts["capabilities"] = validate_record(record, record_relative, record_findings)
+            counts["capabilities"] = validate_record(record, record_relative, record_findings, sha256_bytes(raw))
             counts["records"] = 1
             findings.extend(record_findings)
             checked_record = {"path": record_relative, "bytes": len(raw), "sha256": sha256_bytes(raw)}

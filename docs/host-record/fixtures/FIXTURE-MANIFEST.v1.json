@@ -5,7 +5,7 @@
       "expected_exit": 0,
       "kind": "expectations",
       "path": "docs/host-record/fixtures/expected-findings.v1.json",
-      "sha256": "411e12b6c1600f361e718927da8f709f1ff4e19a7a784d5de0e3736d65ff7852"
+      "sha256": "b1bef974ec1e65730f6a71cee2431106db2341933a2949c49bef0182602552ca"
     },
     {
       "bytes": 3150,

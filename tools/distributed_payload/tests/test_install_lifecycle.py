@@ -49,12 +49,15 @@ LIFECYCLE_VERBS = ("install", "repair", "upgrade", "uninstall", "prune", "cleanu
 
 
 def make_temp_dir(prefix: str) -> str:
-    """Create a unique temporary directory with os.mkdir.
+    """Create a unique, owner-private temporary directory.
 
-    `tempfile.mkdtemp()` requests mode 0o700; this repository's Windows test host
-    runs under a restricted-token sandbox whose ACL handling denies child writes
-    inside such directories. `os.mkdir()` without an explicit mode is portable,
-    equally unique with a UUID suffix, and works on normal and restricted hosts.
+    This helper asks for mode 0o700 explicitly, so a POSIX host keeps every
+    scratch tree private to its owner; Windows ignores the mode bits. The earlier
+    shape used `tempfile.mkdtemp()`, which also requests 0o700 but fails on this
+    repository's restricted-token Windows test host, whose ACL handling denies
+    child writes inside the directory it creates. `Path.mkdir(mode=0o700)` is
+    equally unique with a UUID suffix, portable, and works on normal and
+    restricted hosts.
     """
     import uuid
     base = Path(tempfile.gettempdir())
@@ -62,7 +65,7 @@ def make_temp_dir(prefix: str) -> str:
     for _ in range(20):
         candidate = base / (prefix + uuid.uuid4().hex)
         try:
-            candidate.mkdir()
+            candidate.mkdir(mode=0o700)
             return str(candidate)
         except FileExistsError:
             continue
@@ -159,13 +162,19 @@ class DesignContractTests(LifecycleTestCase):
 
 class HarnessSubprocessHygieneTests(LifecycleTestCase):
     def test_run_cli_passes_dash_b_to_the_cli_subprocess(self):
-        """Regression: the CLI subprocess must never write bytecode under the repository."""
+        """Regression: the harness never writes into the repository and keeps its scratch tree private."""
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
         with mock.patch.object(subprocess, "run", return_value=completed) as patched:
             run_cli(["verify", "--help"])
         command = patched.call_args[0][0]
         self.assertEqual("-B", command[1])
         self.assertEqual(["verify", "--help"], command[-2:])
+        # Harness hygiene: the scratch tree exists and is writable, and a POSIX
+        # host keeps it private to its owner (0o700); Windows ignores mode bits.
+        self.assertTrue(self.tmp.is_dir())
+        self.assertTrue(os.access(self.tmp, os.W_OK))
+        if os.name != "nt":
+            self.assertEqual(self.tmp.stat().st_mode & 0o777, 0o700)
 
 
 class AbsentVerbTests(LifecycleTestCase):

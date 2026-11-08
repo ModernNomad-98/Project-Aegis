@@ -24,12 +24,14 @@ A record is a JSON object with:
 - synthetic and preparation_only: both must be true for this slice. A record that
   claims a real host is rejected; real-host work would require separate authority.
 - source_evidence: array of path, bytes, sha256 and note entries. Paths are
-  repository-relative, canonicalised and safe; a record may not cite itself.
-  The entries are metadata only in this slice: the checker validates their
-  shape, path safety and self-citation rule, but it does not open the cited file
-  and does not compare the declared byte count or SHA-256 with that file's
-  bytes. Outer Stage C/D/E records bind these files by raw bytes and SHA-256;
-  the record never carries a self-hash.
+  repository-relative, canonicalised, free of NUL/control characters and safe; a
+  record may not cite itself. A capability's evidence_refs entries carry the same
+  lexical path safety and case-insensitive self-citation rule. Both are metadata
+  only in this slice: the checker validates their shape, path safety and
+  self-citation rule, but it does not open the cited file and does not compare
+  the declared byte count or SHA-256 with that file's bytes. Outer Stage C/D/E
+  records bind these files by raw bytes and SHA-256; the record never carries a
+  self-hash.
 - host: product, version, os_name, os_version and one invocation_mode value from
   discovery, explicit-invocation, manual-invocation, automatic-invocation. This
   is a mode label, not a capability verdict; no personal identifiers are allowed.
@@ -67,10 +69,17 @@ The checker enforces these rules and reports deterministic finding codes.
   contract negatives (stale manifest version and expected-findings mismatch)
   that the test harness exercises on temporary copies of the fixture set. The
   two contract/* strings in that table are pinned scenario labels, not files in
-  this repository.
+  this repository. The table is sorted by canonical fixture path, each path
+  appears once, and every entry declares a list of string finding codes, the JSON
+  integer 0 or 1 as its expected exit, and a list of expected-absent field names.
 - fixtures/FIXTURE-MANIFEST.v1.json - inventory of every fixture file by
   repository-relative path, kind, raw bytes, raw SHA-256 and expected exit. The
   manifest never lists itself, never carries a self-digest and is sorted by path.
+  The checker enforces that sortedness and uniqueness, confines every manifest and
+  expectation path to this fixtures directory after resolution, rejects unknown or
+  forbidden entry fields, rejects a boolean byte count, and cross-checks each
+  record's expected exit with the expected-findings table; a duplicate entry never
+  counts as a second record.
 
 ## Checker and determinism
 
@@ -83,11 +92,12 @@ usage and finding codes are in tools/host_record/README.md.
 
 ## Non-circular binding, privacy and rollback
 
-The record has no self-digest; outer Stage C/D/E records bind these files by raw
-bytes and SHA-256. No secrets and no unnecessary personal data appear in the
-fixtures or reports. The change is additive: rollback is deleting the thirteen
-new paths or reverting the single local commit, with no migration or durable
-state.
+The record has no self-digest, and a package_manifest_sha256 equal to the
+record's own digest is a BAD-PACKAGE-BINDING finding; outer Stage C/D/E records
+bind these files by raw bytes and SHA-256. No secrets and no unnecessary
+personal data appear in the fixtures or reports. The change is additive:
+rollback is deleting the thirteen new paths or reverting the single local
+commit, with no migration or durable state.
 
 ## Exact files in this slice
 

@@ -1,26 +1,22 @@
 {
   "entries": [
     {
-      "expected_absent_fields": [
-        "pass",
-        "qualified",
-        "approved",
-        "authority"
+      "contract_negative": true,
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "EXPECTED-FINDINGS-MISMATCH"
       ],
-      "expected_exit": 0,
-      "expected_findings": [],
-      "fixture": "docs/host-record/fixtures/valid/host-record.synthetic-windows-11-python-314.json"
+      "fixture": "contract/expected-findings-mismatch-copy"
     },
     {
-      "expected_absent_fields": [
-        "pass",
-        "qualified",
-        "approved",
-        "authority"
+      "contract_negative": true,
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "MANIFEST-STALE"
       ],
-      "expected_exit": 0,
-      "expected_findings": [],
-      "fixture": "docs/host-record/fixtures/valid/host-record.synthetic-unknown-gap.json"
+      "fixture": "contract/manifest-stale-copy"
     },
     {
       "expected_absent_fields": [],
@@ -29,6 +25,14 @@
         "AGGREGATE-CAPABILITY"
       ],
       "fixture": "docs/host-record/fixtures/invalid/host-record.aggregate-boolean.json"
+    },
+    {
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "MISSING-DISPOSITION"
+      ],
+      "fixture": "docs/host-record/fixtures/invalid/host-record.missing-disposition.json"
     },
     {
       "expected_absent_fields": [],
@@ -43,36 +47,32 @@
       "expected_absent_fields": [],
       "expected_exit": 1,
       "expected_findings": [
-        "MISSING-DISPOSITION"
-      ],
-      "fixture": "docs/host-record/fixtures/invalid/host-record.missing-disposition.json"
-    },
-    {
-      "expected_absent_fields": [],
-      "expected_exit": 1,
-      "expected_findings": [
         "PERSONAL-DATA-FIELD",
         "SECRET-LIKE-FIELD"
       ],
       "fixture": "docs/host-record/fixtures/invalid/host-record.unsafe-secret-field.json"
     },
     {
-      "contract_negative": true,
-      "expected_absent_fields": [],
-      "expected_exit": 1,
-      "expected_findings": [
-        "MANIFEST-STALE"
+      "expected_absent_fields": [
+        "pass",
+        "qualified",
+        "approved",
+        "authority"
       ],
-      "fixture": "contract/manifest-stale-copy"
+      "expected_exit": 0,
+      "expected_findings": [],
+      "fixture": "docs/host-record/fixtures/valid/host-record.synthetic-unknown-gap.json"
     },
     {
-      "contract_negative": true,
-      "expected_absent_fields": [],
-      "expected_exit": 1,
-      "expected_findings": [
-        "EXPECTED-FINDINGS-MISMATCH"
+      "expected_absent_fields": [
+        "pass",
+        "qualified",
+        "approved",
+        "authority"
       ],
-      "fixture": "contract/expected-findings-mismatch-copy"
+      "expected_exit": 0,
+      "expected_findings": [],
+      "fixture": "docs/host-record/fixtures/valid/host-record.synthetic-windows-11-python-314.json"
     }
   ],
   "fixture_version": "v1",

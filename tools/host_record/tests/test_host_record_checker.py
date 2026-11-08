@@ -1,9 +1,11 @@
 """Stdlib synthetic-fixture self-tests for the host-record checker.
 
 Contract (pinned by Stage C readiness A3, extended by delivery prep R-1, the
-Stage-F correction pass of 2026-11-08 and the correction-2 pass of 2026-11-08):
-39 unittest items = 8 positive/structural + 31
-negative/adversarial/refusal/deterministic-negative.
+Stage-F correction pass of 2026-11-08, the correction-2 pass of 2026-11-08 and
+the correction-3 pass of 2026-11-08):
+54 unittest items = 8 positive/structural + 46
+negative/adversarial/refusal/deterministic-negative, of which 15 are
+correction-3 regressions.
 The harness copies the checker and fixture set into a temporary repository and
 drives the checker as a black-box subprocess; that is harness behaviour only,
 not a capability of the shipped checker (the checker itself spawns no process).
@@ -90,10 +92,17 @@ class HostRecordCheckerTests(unittest.TestCase):
     def tearDown(self):
         for path in self.temp_dirs:
             shutil.rmtree(path, ignore_errors=True)
+        root = getattr(self, "temp_root", None)
+        if root is not None:
+            try:
+                root.rmdir()
+            except OSError:
+                pass
 
     def make_repo(self):
         temp_root = Path(__file__).resolve().parents[4] / "_host-record-test-tmp"
         temp_root.mkdir(parents=True, exist_ok=True)
+        self.temp_root = temp_root
         temp = temp_root / ("repo-" + uuid.uuid4().hex[:12])
         temp.mkdir()
         self.temp_dirs.append(temp)
@@ -521,6 +530,192 @@ class HostRecordCheckerTests(unittest.TestCase):
         self.assertEqual(process.returncode, 1, process.stdout + process.stderr)
         self.assertIn("UNSAFE-PATH", self.codes(process))
 
+
+    # ---------------- Correction-3 pass (2026-11-08) ----------------
+    def expectation_for(self, document, fixture):
+        return next(item for item in document["entries"] if item.get("fixture") == fixture)
+
+    def manifest_entry_for(self, document, path):
+        return next(item for item in document["entries"] if item.get("path") == path)
+
+    def test_expected_findings_type_is_a_finding_not_an_internal_error(self):
+        for value in (1, ["SCHEMA", 1], "SCHEMA", None):
+            with self.subTest(value=repr(value)):
+                expected = self.load_fixture(EXPECTED)
+                self.expectation_for(expected, VALID_ONE)["expected_findings"] = value
+                self.write_fixture(EXPECTED, expected)
+                process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+                self.assertEqual(process.returncode, 1, process.stderr)
+                self.assertNotIn("internal error", process.stderr.lower())
+                self.assertEqual(self.report(process)["result"], "FINDINGS")
+                self.assertIn("EXPECTED-FINDINGS-MISMATCH", self.codes(process))
+
+    def test_expected_exit_bool_and_out_of_range_rejected(self):
+        for value in (False, True, 2, "1"):
+            with self.subTest(value=repr(value)):
+                expected = self.load_fixture(EXPECTED)
+                self.expectation_for(expected, VALID_ONE)["expected_exit"] = value
+                self.write_fixture(EXPECTED, expected)
+                process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+                self.assertEqual(process.returncode, 1, process.stderr)
+                self.assertNotIn("internal error", process.stderr.lower())
+                self.assertTrue(any(finding["code"] == "EXPECTED-FINDINGS-MISMATCH" and finding["path"].endswith("/expected_exit")
+                                    for finding in self.report(process)["findings"]))
+
+    def test_expected_absent_fields_enforced(self):
+        expected = self.load_fixture(EXPECTED)
+        self.expectation_for(expected, VALID_ONE)["expected_absent_fields"] = ["synthetic"]
+        self.write_fixture(EXPECTED, expected)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        pairs = {(finding["code"], finding["path"]) for finding in self.report(process)["findings"]}
+        self.assertIn(("EXPECTED-FINDINGS-MISMATCH", VALID_ONE), pairs)
+
+    def test_expected_fixture_version_mismatch_rejected(self):
+        expected = self.load_fixture(EXPECTED)
+        expected["fixture_version"] = "v0"
+        self.write_fixture(EXPECTED, expected)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        codes = self.codes(process)
+        self.assertIn("EXPECTED-FINDINGS-MISMATCH", codes)
+        self.assertIn("MANIFEST-STALE", codes)
+
+    def test_manifest_expected_exit_mismatch_rejected(self):
+        manifest = self.load_fixture(MANIFEST)
+        self.manifest_entry_for(manifest, VALID_ONE)["expected_exit"] = 1
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        pairs = {(finding["code"], finding["path"]) for finding in self.report(process)["findings"]}
+        self.assertIn(("EXPECTED-FINDINGS-MISMATCH", VALID_ONE), pairs)
+
+    def test_manifest_unknown_field_rejected(self):
+        manifest = self.load_fixture(MANIFEST)
+        self.manifest_entry_for(manifest, VALID_ONE)["approved"] = True
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        self.assertTrue(any(path.endswith("/approved") for path in
+                            [finding["path"] for finding in self.report(process)["findings"]]))
+
+    def test_manifest_bytes_bool_loophole_rejected(self):
+        relative = "docs/host-record/fixtures/invalid/host-record.one-byte.json"
+        one_byte = self.repo / relative
+        one_byte.write_bytes(b"1")
+        manifest = self.load_fixture(MANIFEST)
+        manifest["entries"].append({
+            "bytes": True,
+            "expected_exit": 1,
+            "kind": "record",
+            "path": relative,
+            "sha256": hashlib.sha256(b"1").hexdigest(),
+        })
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        codes = self.codes(process)
+        self.assertIn("MANIFEST-BYTE-MISMATCH", codes)
+        self.assertIn("MANIFEST-STALE", codes)
+
+    def test_duplicate_manifest_path_does_not_satisfy_record_count(self):
+        manifest = self.load_fixture(MANIFEST)
+        record_entry = self.manifest_entry_for(manifest, VALID_ONE)
+        expectations_entry = next(item for item in manifest["entries"] if item["kind"] == "expectations")
+        manifest["entries"] = [expectations_entry] + [dict(record_entry) for _ in range(6)]
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        report = self.report(process)
+        self.assertEqual(report["summary"]["records"], 1)
+        self.assertEqual(report["result"], "FINDINGS")
+        self.assertIn("MANIFEST-STALE", self.codes(process))
+        self.assertTrue(any("duplicate manifest path" in finding["evidence"] for finding in report["findings"]))
+
+    def test_manifest_path_outside_fixtures_directory_rejected(self):
+        manifest = self.load_fixture(MANIFEST)
+        outside = self.repo / "docs" / "host-record" / "README.md"
+        outside.parent.mkdir(parents=True, exist_ok=True)
+        outside.write_text("program-internal host-record contract page\n", encoding="utf-8")
+        manifest["entries"].append({
+            "bytes": outside.stat().st_size,
+            "expected_exit": 0,
+            "kind": "record",
+            "path": "docs/host-record/README.md",
+            "sha256": sha256_path(outside),
+        })
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        self.assertIn("UNSAFE-PATH", self.codes(process))
+
+    def test_manifest_unsorted_entries_rejected(self):
+        manifest = self.load_fixture(MANIFEST)
+        manifest["entries"] = list(reversed(manifest["entries"]))
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        self.assertEqual(self.codes(process), ["MANIFEST-STALE"])
+        self.assertTrue(any("sorted" in finding["evidence"] for finding in self.report(process)["findings"]))
+
+    def test_manifest_self_entry_rejected(self):
+        manifest = self.load_fixture(MANIFEST)
+        manifest["entries"].append({
+            "bytes": 1,
+            "expected_exit": 0,
+            "kind": "record",
+            "path": MANIFEST,
+            "sha256": "0" * 64,
+        })
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        self.assertTrue(any("may not include itself" in finding["evidence"]
+                            for finding in self.report(process)["findings"]))
+
+    def test_nul_and_control_paths_are_findings_not_internal_errors(self):
+        manifest = self.load_fixture(MANIFEST)
+        self.manifest_entry_for(manifest, VALID_ONE)["path"] = "docs/host-record/fixtures/valid/bad\u0000name.json"
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertIn(process.returncode, (1, 2))
+        self.assertNotIn("internal error", process.stderr.lower())
+        if process.returncode == 1:
+            self.assertIn("UNSAFE-PATH", self.codes(process))
+        relative = "docs/host-record/fixtures/valid/mutated-control-path.json"
+        document = self.make_valid_copy(relative)
+        document["source_evidence"][0]["path"] = "docs/host-record/README.md\u0001"
+        self.write_fixture(relative, document)
+        record_process = self.run_checker("--record", relative, "--json")
+        self.assertEqual(record_process.returncode, 1, record_process.stderr)
+        self.assertNotIn("internal error", record_process.stderr.lower())
+        self.assertIn("UNSAFE-PATH", self.codes(record_process))
+
+    def test_evidence_refs_self_citation_rejected(self):
+        relative = "docs/host-record/fixtures/valid/mutated-evidence-selfcite.json"
+        document = self.make_valid_copy(relative)
+        document["capabilities"][0]["evidence_refs"] = [relative]
+        self.write_fixture(relative, document)
+        process = self.run_checker("--record", relative, "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        pairs = {(finding["code"], finding["path"]) for finding in self.report(process)["findings"]}
+        self.assertIn(("UNSAFE-PATH", "capabilities[0]/evidence_refs[0]"), pairs)
+
+    def test_record_and_fixtures_are_mutually_exclusive(self):
+        process = self.run_checker("--record", VALID_ONE, "--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 2)
+        self.assertEqual(process.stdout, "")
+        self.assertIn("mutually exclusive", process.stderr)
+
+    def test_self_binding_package_digest_rejected(self):
+        module = load_checker_module(self.checker_source)
+        document = self.load_fixture(VALID_ONE)
+        digest = "a" * 64
+        document["package_binding"]["package_manifest_sha256"] = digest
+        findings = []
+        module.validate_record(document, VALID_ONE, findings, digest)
+        pairs = {(finding["code"], finding["path"]) for finding in findings}
+        self.assertIn(("BAD-PACKAGE-BINDING", "package_binding/package_manifest_sha256"), pairs)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
