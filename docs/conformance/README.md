@@ -103,6 +103,22 @@ adds the binding), and `records` list the evidence per requirement.
 | `L4-E-02` | `EXECUTED` | `AEGIS-REQ-MECH-02` | `evidence/audit-skill-contracts.stdout.txt` (captured `python -B scripts/audit-skill-contracts.py` stdout, exit code 0) |
 | `L4-U-01` | `UNRUN` | `MG1`, `MG3` | none - these are merge-gate conditions that bind to a pull-request head, and a local lane has no such head |
 
+**Field referents - compare against the file, not the footer.** In the binding,
+`stdout_path` names the captured payload **file**, and `stdout_bytes` /
+`stdout_sha256` are that whole file's byte count and raw SHA-256, header, body
+and footer included (for the checked-in records: 867 /
+`0cbcf0e40199daee...` and 1,145 / `9e90eb10981d0647...`). The payload file's
+own footer repeats the captured child-process stdout block's size and digest
+under the same `stdout_bytes` / `stdout_sha256` names (89 /
+`660f560ee944524e...` and 354 / `6d7261a82f7df0fd...`); those footer figures
+are **not** what the binding's fields carry, and the checker never compares
+them. Read the binding fields as payload-file bytes and payload-file SHA-256,
+not as captured-stdout figures. The names are kept because
+`aegis.evidence-binding/1` is the format implemented by the already-merged
+checker, `tools/conformance/check_catalog.py`, and its tests; renaming the
+fields would change that checker contract rather than this binding's
+documentation.
+
 Those two `EXECUTED` records cover nine requirement IDs whose declared verification is an
 executable local command. The one `UNRUN` record covers two further IDs (`MG1`, `MG3`); it is
 listed as unrun and is never counted as present evidence. The remaining twelve requirements carry
