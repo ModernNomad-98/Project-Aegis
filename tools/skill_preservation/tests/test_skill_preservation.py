@@ -336,6 +336,9 @@ class GuardSelfTests(unittest.TestCase):
         repo = TESTS_DIR.parents[2]
         baseline = json.loads((repo / "tools" / "skill_preservation" / "baseline.json")
                               .read_text(encoding="utf-8"))
+        self.assertEqual(guard.MENTION_MATCHER_VERSION,
+                         baseline["contract"].get("mention_matcher"))
+        self.assertEqual(baseline["baseline_id"], guard.compute_baseline_id(baseline))
         catalog_text = (repo / "docs" / "skills-catalog.md").read_text(encoding="utf-8")
         readme_text = (repo / "README.md").read_text(encoding="utf-8")
         mismatches = []
@@ -348,6 +351,16 @@ class GuardSelfTests(unittest.TestCase):
         self.assertEqual([], mismatches,
                          "baseline mention booleans differ from the current matcher; "
                          "a reviewed re-baseline is required")
+
+    def test_p2f_legacy_baseline_without_matcher_warns_but_passes(self):
+        legacy = json.loads(guard.dump_json(self.baseline))
+        legacy["contract"].pop("mention_matcher", None)
+        legacy["baseline_id"] = guard.compute_baseline_id(legacy)
+        guard.validate_baseline(legacy)
+        payload = guard.compare(legacy, str(self.base_root))
+        rules = [item["rule"] for item in payload["findings"]
+                 if item["severity"] == "WARN"]
+        self.assertIn("BASELINE_MENTION_MATCHER_UNRECORDED", rules)
 
     def test_p2f_missing_or_empty_name_blocks(self):
         cases = {

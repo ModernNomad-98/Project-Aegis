@@ -94,8 +94,11 @@ UNRUN (reported, never PASS):
   `token-bounded-identifier-v2`), so `my_alpha`, `alpha_old` and `alpha.md` do not mention `alpha`.
   The matcher version is recorded in new baseline contracts; a legacy/different baseline emits
   `BASELINE_MENTION_MATCHER_UNRECORDED` WARN and changing matcher semantics requires a reviewed
-  re-baseline. The shipped `baseline.json` is deliberately not regenerated here: its stored mention
-  booleans are verified against the current matcher by the test suite, and any mismatch instructs a
+  re-baseline. The shipped `baseline.json` was migrated by an explicit reviewed change (D-F6):
+  its contract now records `mention_matcher: token-bounded-identifier-v2`, `baseline_id` was
+  recomputed, and the 508 stored catalog/README mention booleans were verified equal to the current
+  matcher's recomputation before writing (mentions were never regenerated). Older baselines without
+  the field still warn `BASELINE_MENTION_MATCHER_UNRECORDED`; any future matcher change requires a
   reviewed re-baseline rather than silent acceptance.
 - Byte identity is not functional availability. A guard pass does not prove the validator passes, and
   the validator does not prove preservation; run both. Neither one repairs anything.

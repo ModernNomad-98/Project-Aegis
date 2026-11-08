@@ -1,11 +1,12 @@
 {
-  "baseline_id": "428660c0522220ee63b4edd5f7e27e03887080b65f6086b35da3f0e63e308bae",
+  "baseline_id": "138389ad7d412676e71b20b0e0f8863bce8d6aaadaaa617b529578e2914e8495",
   "contract": {
     "catalog_path": "docs/skills-catalog.md",
     "manifest_hash_input": "SKILL.md bytes, CRLF->LF normalized",
     "manifest_path": "tools/skills-manifest.json",
     "manifest_schema": "aegis.skills-manifest/1",
     "manual_only_sentinel": "MANUAL-ONLY; never auto-invoke. ",
+    "mention_matcher": "token-bounded-identifier-v2",
     "readme_path": "README.md",
     "skill_md": "SKILL.md",
     "skills_root": ".claude/skills",
