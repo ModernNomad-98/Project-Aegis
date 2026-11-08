@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import itertools
 import json
 import tempfile
 import unittest
@@ -56,6 +57,7 @@ class FakeGH:
         self.artifacts = artifacts
         self.payloads = payloads
         self.calls = []
+        self.download_requests = []
 
     def _run_attempt(self, run_id):
         for pages in self.run_pages.values():
@@ -83,6 +85,22 @@ class FakeGH:
             run_id = args[2]
             name = args[args.index("--name") + 1]
             out_dir = Path(args[args.index("--dir") + 1])
+            records = [
+                item for item in self.artifacts.get(run_id, [])
+                if item.get("name") == name
+            ]
+            if len(records) != 1:
+                # Name-only selection is only acceptable for a single record; fail
+                # loudly here if production code ever guesses across duplicates.
+                return SimpleNamespace(
+                    returncode=1, stdout="", stderr="ambiguous artifact selection",
+                )
+            if records[0].get("expired") is True:
+                # An expired record is never downloadable; fail loudly if requested.
+                return SimpleNamespace(
+                    returncode=1, stdout="", stderr="artifact expired (410)",
+                )
+            self.download_requests.append((run_id, name, records[0].get("id")))
             out_dir.mkdir(parents=True, exist_ok=True)
             member, payload = self.payloads[(run_id, name)]
             payload = dict(payload)
@@ -159,14 +177,29 @@ def page(items, total=None):
     return {"total_count": len(items) if total is None else total, "workflow_runs": items}
 
 
-def artifact(name):
-    return {"name": name}
+_ARTIFACT_ID_SEQ = itertools.count(1000)
 
 
-def expired_artifact(name):
+def artifact(name, artifact_id=None):
+    """One artifact-listing record, with the distinct id/URL the API provides."""
+    if artifact_id is None:
+        artifact_id = next(_ARTIFACT_ID_SEQ)
+    return {
+        "id": artifact_id,
+        "name": name,
+        "archive_download_url": (
+            "https://api.github.com/repos/o/r/actions/artifacts/"
+            + str(artifact_id) + "/zip"
+        ),
+    }
+
+
+def expired_artifact(name, artifact_id=None):
     """An artifact-listing record GitHub can return after retention expiry but
-    before the artifact is physically removed (MG3 P2 5816717444)."""
-    return {"name": name, "expired": True}
+    before the artifact is physically removed."""
+    record = artifact(name, artifact_id)
+    record["expired"] = True
+    return record
 
 
 def smoke_proof(**overrides):
@@ -1064,6 +1097,29 @@ class _IncompleteArtifactListingGH(FakeGH):
         return super().__call__(args)
 
 
+class _UnderReportedArtifactListingGH(FakeGH):
+    """Fake gh whose non-empty artifact page declares total_count=0."""
+
+    def __init__(self, runs, artifacts):
+        super().__init__(
+            {"smoke": [page(runs)], "trial": [page([])]}, artifacts, {},
+        )
+
+    def __call__(self, args):
+        joined = " ".join(args)
+        if "/artifacts" in joined:
+            run_id = joined.split("/actions/runs/")[1].split("/artifacts")[0]
+            return SimpleNamespace(
+                returncode=0,
+                stdout=json.dumps([{
+                    "total_count": 0,
+                    "artifacts": self.artifacts.get(run_id, []),
+                }]),
+                stderr="",
+            )
+        return super().__call__(args)
+
+
 class SmokeProofExpiryRegistryTests(unittest.TestCase):
     """Expiry-only recorded-hash classification for the two 2026-10-31 proofs.
 
@@ -1261,17 +1317,25 @@ class SmokeProofExpiryRegistryTests(unittest.TestCase):
         self.assertNotEqual(smoke_spend_total(records), 6)
 
     def test_expired_listing_marker_is_treated_as_absent_for_the_registry(self):
-        # MG3 P2 triage (DeepSeek review 5816717444): GitHub can list the proof
-        # artifact with expired=true before it is physically removed. That record
-        # is not a present/downloadable proof, so treating it as absent lets the
-        # exact-match expiry registry book the committed spend during the
-        # retention/cleanup window instead of failing the download path.
+        # GitHub can list the proof artifact with expired=true before it is
+        # physically removed. That record is not a present/downloadable proof, so
+        # treating it as absent lets the exact-match expiry registry book the
+        # committed spend during the retention/cleanup window instead of failing
+        # the download path.
         runs, _absent_artifacts, no_payloads = self._expired_history_parts()
         expired_artifacts = {
             "41213566873": [expired_artifact("ber-live-smoke-proof")],
             "41179846875": [expired_artifact("ber-live-smoke-proof")],
         }
-        expired_records = self._smoke_records(runs, expired_artifacts, no_payloads)
+        fake = FakeGH(
+            {"smoke": [page(runs)], "trial": [page([])]},
+            expired_artifacts, no_payloads,
+        )
+        expired_records = collect_smoke_proof_spends(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        # An expired record is never requested: the registry path books directly.
+        self.assertEqual(fake.download_requests, [])
         absent_records = self._smoke_records(*self._expired_history_parts())
         self.assertEqual(expired_records, absent_records)
         self.assertEqual(len(expired_records), 2)
@@ -1288,21 +1352,98 @@ class SmokeProofExpiryRegistryTests(unittest.TestCase):
             collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
         self.assertIn("UNKNOWN", str(caught.exception))
 
-    def test_live_artifact_listed_with_expired_record_still_validates_live(self):
-        # An expired record never substitutes for a genuinely live artifact: when
-        # both are listed, the live artifact's own payload is validated and its
-        # spend booked (150c), never the recorded expiry-registry spend.
+    def test_mixed_expired_and_live_same_name_records_fail_closed_with_ids(self):
+        # The available download is name-based and cannot be constrained to one
+        # artifact id, so a run listing both an expired and a live same-name proof
+        # has no single provable selection. Fail closed (never a name-only guess),
+        # naming both records' distinct ids/URLs; the fake also refuses to download
+        # an expired record, so any wrong selection would fail loudly.
+        expired = expired_artifact("ber-live-smoke-proof")
+        live = artifact("ber-live-smoke-proof")
+        self.assertNotEqual(expired["id"], live["id"])
+        self.assertNotEqual(
+            expired["archive_download_url"], live["archive_download_url"],
+        )
         fake = FakeGH(
             {"smoke": [page([run(42)])], "trial": [page([])]},
-            {"42": [
-                expired_artifact("ber-live-smoke-proof"),
-                artifact("ber-live-smoke-proof"),
-            ]},
+            {"42": [expired, live]},
             {("42", "ber-live-smoke-proof"): ("smoke-proof.json", smoke_proof())},
         )
-        records = collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
-        self.assertEqual(len(records), 1)
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        message = str(caught.exception)
+        self.assertIn("ambiguous", message)
+        self.assertIn("name-only", message)
+        self.assertIn(str(expired["id"]), message)
+        self.assertIn(str(live["id"]), message)
+        self.assertEqual(fake.download_requests, [])
+
+    def test_live_single_artifact_selection_is_the_unique_record_id(self):
+        # A single same-name record is unambiguous for the name-based download;
+        # assert the downloaded record is that exact artifact id (not a guess).
+        live = artifact("ber-live-smoke-proof")
+        fake = FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([])]},
+            {"42": [live]},
+            {("42", "ber-live-smoke-proof"): ("smoke-proof.json", smoke_proof())},
+        )
+        records = collect_smoke_proof_spends(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
         self.assertEqual(smoke_spend_total(records), 150)
+        self.assertEqual(len(fake.download_requests), 1)
+        self.assertEqual(fake.download_requests[0][2], live["id"])
+
+    def test_non_boolean_expired_flag_fails_closed(self):
+        # A truthy string is a malformed listing, not an expiry signal: the strict
+        # boolean check refuses instead of treating it as live or expired.
+        record = artifact("ber-live-smoke-proof")
+        record["expired"] = "true"
+        fake = FakeGH(
+            {"smoke": [page([run(42)])], "trial": [page([])]},
+            {"42": [record]}, {},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("non-boolean expired", str(caught.exception))
+
+    def test_under_reported_artifact_total_count_fails_closed(self):
+        # A non-empty page that declares total_count=0 is lossy: the listing must
+        # reconcile against its declared total before any expiry logic is applied.
+        run_entry = self._run_entry(
+            "41213566873", LEGACY_PROOF_HEADS["41213566873"],
+        )
+        fake = _UnderReportedArtifactListingGH(
+            [run_entry],
+            {"41213566873": [artifact("ber-live-smoke-proof")]},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("artifact listing is incomplete", str(caught.exception))
+
+    def test_head_sha_regex_is_anchored_to_exactly_40_lower_hex(self):
+        # The full head must be exactly 40 lowercase hex characters; a prefixed,
+        # suffixed, uppercase or overlong value never matches the registry path.
+        for bad_head in (
+            "a" * 40 + "x",
+            "a" * 40 + " ",
+            "A" * 40,
+            "a" * 41,
+        ):
+            entry = self._run_entry(
+                "41213566873", LEGACY_PROOF_HEADS["41213566873"],
+            )
+            entry["head_sha"] = bad_head
+            fake = FakeGH(
+                {"smoke": [page([entry])], "trial": [page([])]},
+                {"41213566873": []}, {},
+            )
+            with self.subTest(head=bad_head):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=fake, repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn("malformed provenance", str(caught.exception))
 
     # -- negative matrix -------------------------------------------------
 
@@ -1620,7 +1761,11 @@ class SmokeProofExpiryRegistryTests(unittest.TestCase):
                     continue
                 self.assertNotEqual(registered["proof_sha256"], other_hash)
 
-    def test_repeated_expiry_collection_is_idempotent_and_immutable(self):
+    def test_repeated_expiry_collection_does_not_mutate_registry(self):
+        # The name states the actual assertion: repeated collection is
+        # deterministic and leaves the module mapping unchanged. True registry
+        # immutability is P3-2, deferred as non-blocking (tests still patch the
+        # mapping under mock.patch).
         before = {
             run_id: dict(registered)
             for run_id, registered in SMOKE_RUNS_WITH_EXPIRED_PROOF.items()

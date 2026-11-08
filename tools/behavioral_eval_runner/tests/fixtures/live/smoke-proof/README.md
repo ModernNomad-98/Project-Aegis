@@ -58,27 +58,38 @@ historical artifacts listed above.
 
 ## Expiry-only recorded-hash registry
 
-`eval-smoke.yml` publishes `ber-live-smoke-proof` with `retention-days: 14`, so
-GitHub is expected to delete the two artifacts above on/about **2026-11-14**
-(exact time unknown; no deletion or retention change was performed by this
-repository). After deletion the two runs become artifactless history and the
-collector's artifact-proof path can no longer read them.
+`eval-smoke.yml` publishes `ber-live-smoke-proof` with `retention-days: 14`, an
+ongoing workflow property: every successful proof artifact older than 14 days
+eventually becomes artifactless. This registry is **a bounded two-run exception,
+not a retention fix**. It records exactly the two identified 2026-10-31 run ids
+with the recorded conclusion, full head SHA, run attempt, 2,253-byte proof length
+and whole-file SHA-256 above. Any other or future successful run older than the
+retention window becomes artifactless and unregistered, so the collector reports
+`UNKNOWN` and admission stays blocked; making that history durable or lengthening
+retention is a separate operational/settings decision (not made by this change).
 
-`SMOKE_RUNS_WITH_EXPIRED_PROOF` in
-tools/behavioral_eval_runner/live/workflow_runtime.py therefore records exactly
-these two run ids with the recorded conclusion, full head SHA, run attempt,
-2,253-byte proof length and whole-file SHA-256 above. Only when the proof artifact
-is **absent** does the collector book the recorded 6c each (the same amount the
-artifact path booked before expiry), keeping the unchanged preserved floors
-(smoke 18c, ledger 222c) and the same records the artifact-present path produced.
-It is not a wildcard and does not bypass present-artifact validation: an
-unregistered artifactless run stays UNKNOWN, a registered run with mismatched
-recorded metadata refuses, and a present-but-tampered artifact still refuses
-through the existing provenance/tamper checks. Run attempt is part of the
-paid-attempt identity (a GitHub re-run keeps the run id/head and increments the
-attempt); a missing recorded attempt or a missing/invalid run attempt fails
-closed and is never guessed or defaulted, and for a present artifact the
-repaired #997 proof/API run id + attempt binding is applied before the registry.
+Selection and validation semantics:
+
+- A single **live** proof artifact is downloaded and validated through the
+  existing provenance/tamper path; a genuinely live present-but-tampered artifact
+  still refuses.
+- A single listing record with `expired: true` is treated as **absent** for this
+  exact-match path: its recorded 6c is booked only when the run id, conclusion,
+  full head SHA and attempt match the committed record. Such an expired listing
+  record therefore does **not** receive artifact provenance/tamper validation —
+  it is the recorded-hash exception, which is weaker than verifying the artifact.
+- More than one same-name proof record on a run (duplicate live records, an
+  expired/live mix, or several expired records) fails closed: the available
+  download is name-based and cannot be constrained to one artifact id, so no
+  name-only selection is made. A non-boolean `expired` flag also fails closed.
+- An unregistered artifactless/expired run stays `UNKNOWN`; a registered run with
+  mismatched recorded metadata refuses. Run attempt is part of the paid-attempt
+  identity (a GitHub re-run keeps the run id/head and increments the attempt); a
+  missing recorded attempt or a missing/invalid run attempt fails closed and is
+  never guessed or defaulted, and for a live artifact the repaired #997
+  proof/API run id + attempt binding is applied before the registry.
+- Adding a future run to this registry is a reviewed code change with the same
+  exact-match bounds and risk acceptance; it is not a wildcard.
 
 This is a bounded, documented exception to live artifact verification: it
 accepts recorded-hash history without the artifact, which is weaker than

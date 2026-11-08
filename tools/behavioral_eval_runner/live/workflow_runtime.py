@@ -166,10 +166,11 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
 #: 41179846875: created 2026-10-31T07:15:02Z, head cef6e91c..., conclusion
 #:   success, attempt 1; artifact 13034581056, 1,264 B; proof file 2,253 B /
 #:   a202b4ac..., spent 6c.
-#: P3 triage (DeepSeek review 5816717444, deferred): this stays a plain
-#: module-level Mapping because tests patch it under mock.patch; an immutable
-#: wrapper is non-blocking and can be revisited separately. Its entries remain
-#: bounded by the committed exact-match values above.
+#: P3-2 (deferred): this stays a plain module-level Mapping because tests patch
+#: it under mock.patch; an immutable wrapper is non-blocking follow-up work.
+#: Entries remain bounded by the committed exact-match values above. This is a
+#: bounded two-run exception, not a fix for the workflow's recurring 14-day
+#: retention: any other/future run past retention stays UNKNOWN (see README).
 SMOKE_RUNS_WITH_EXPIRED_PROOF: Mapping[str, Mapping[str, Any]] = {
     "41213566873": {
         "spent_cents": 6,
@@ -495,15 +496,17 @@ def _registered_expired_proof_run_spend(run: Mapping[str, Any]) -> int | None:
     recorded spend. The paid-attempt identity includes run_attempt (a GitHub re-run
     keeps the run id/head and increments the attempt), so a missing recorded attempt
     or a missing/invalid run attempt also fails closed and is never guessed or
-    defaulted. Callers reach this only when the proof artifact is ABSENT: a present
-    artifact is always handled by download/validation first, so an expired record
-    can never mask a present-but-tampered artifact.
+    defaulted. Callers reach this only when the proof artifact is absent or is
+    listed with expired=true (treated as absent); such an expired listing record
+    therefore does NOT receive provenance/tamper validation, and only a genuinely
+    live artifact is downloaded and validated. A run listing both an expired and a
+    live same-name record refuses as ambiguous because the name-based download
+    cannot be constrained to one artifact id.
 
-    P3 triage (DeepSeek review 5816717444, deferred with rationale): the recorded
-    proof_bytes / proof_sha256 fields are audit-only identities here. They are not
-    re-validated at runtime because the artifact is absent; the committed-fixture
-    drift guard in required CI enforces them, and the fixed test identity is what
-    bounds the recorded-hash acceptance.
+    P3-1 (deferred): the recorded proof_bytes / proof_sha256 fields are audit-only
+    here. They are not re-validated at runtime because the artifact is absent; the
+    committed-fixture drift guard in required CI enforces them, and that fixture
+    identity is what bounds the recorded-hash acceptance.
     """
     run_id = str(run.get("id"))
     registered = SMOKE_RUNS_WITH_EXPIRED_PROOF.get(run_id)
@@ -538,22 +541,32 @@ def collect_smoke_proof_spends(
 
     A successful run without a readable proof is UNKNOWN and refuses; it is never
     counted as zero. Two documented exceptions exist, both keyed by exact run id and
-    both reached only when the proof artifact is absent: an ended run committed in
-    SMOKE_RUNS_WITHOUT_PROOF, and an identified historical run committed in
-    SMOKE_RUNS_WITH_EXPIRED_PROOF whose proof artifact expired under the 14-day
-    workflow retention. Each books only its committed recorded spend, and only when
-    the recorded run metadata (conclusion, head/prefix and run_attempt) matches; a
-    mismatch refuses. An artifact listed with expired=true (GitHub can report it
-    before physical removal) is treated as ABSENT for the exact-match expiry
-    registry path, never as a present artifact; a live same-name artifact still
-    wins and duplicate LIVE artifacts still fail closed. The artifact-listing
-    completeness check remains on the raw records before that filter, so a page
-    total that includes expired records still has to reconcile. A
-    present-but-unreadable, malformed or tampered artifact never
-    enters either registry path and remains a hard refusal. For a present artifact
-    the proof's own workflow_run_id and workflow_run_attempt must match the API run
-    entry, and more than one same-name proof artifact on the run fails closed rather
-    than letting a name-only download choose an ambiguous attempt.
+    both reached only when the proof artifact is absent or is listed with
+    expired=true (GitHub can report expiry before physical removal; such a record is
+    treated as absent here): an ended run committed in SMOKE_RUNS_WITHOUT_PROOF, and
+    an identified historical run committed in SMOKE_RUNS_WITH_EXPIRED_PROOF whose
+    proof artifact expired under the workflow retention. Each books only its
+    committed recorded spend, and only when the recorded run metadata (conclusion,
+    head/prefix and run_attempt) matches; a mismatch refuses.
+
+    Bounded exception, not a retention fix: only the two committed runs are
+    registered. Any other or future successful run older than the workflow's
+    14-day retention becomes artifactless and unregistered, stays UNKNOWN and keeps
+    admission blocked; increasing retention or otherwise changing the workflow is a
+    settings change outside this module.
+
+    Artifact selection is deliberately fail closed: the available download is
+    name-based and cannot be constrained to one artifact id, so a run listing more
+    than one same-name proof artifact (duplicate live records, an expired/live mix,
+    or multiple expired records) refuses rather than guessing. A single record is
+    unambiguous: expired=true uses the exact-match registry path; a genuinely live
+    artifact is downloaded and validated, and a present-but-unreadable, malformed or
+    tampered artifact never enters either registry path and remains a hard refusal.
+    A non-boolean expired flag is a malformed listing and refuses. The artifact-
+    listing completeness check remains on the raw records (including expired ones)
+    before any expiry handling, so a page total that includes expired records still
+    has to reconcile. For a live artifact the proof's own workflow_run_id and
+    workflow_run_attempt must match the API run entry.
     """
     records: dict[str, int] = {}
     for run in list_workflow_runs(gh, repository, smoke_workflow_file):
@@ -572,25 +585,32 @@ def collect_smoke_proof_spends(
             item for item in artifacts
             if isinstance(item, Mapping) and item.get("name") == SMOKE_ARTIFACT_NAME
         ]
-        # MG3 P2 triage (DeepSeek review 5816717444): GitHub can list an artifact
-        # with expired=true before it is physically removed. Such a record is not
-        # a present/downloadable proof, so treating it as a present artifact would
-        # make the normal download path fail and never reach the exact-match expiry
-        # registry. Filter expired records out of the PRESENT-artifact check (only
-        # exact registered run ids can then book, via the unchanged registry path);
-        # a genuinely live artifact still wins and duplicate live artifacts still
-        # fail closed. The listing's page total_count check already reconciles the
-        # raw records before this filter, including expired ones.
-        live_proof_artifacts = [
-            item for item in proof_artifacts
-            if item.get("expired") is not True
-        ]
-        if len(live_proof_artifacts) > 1:
-            raise ValueError(
-                "ended smoke run " + str(run_id) + " has multiple duplicate "
-                + SMOKE_ARTIFACT_NAME + " artifacts; refusing an ambiguous selection"
+        # Fail closed on ambiguous same-name selections: the available download is
+        # name-based (there is no artifact-id selector here), so more than one
+        # same-name proof record -- duplicate live, an expired/live mix, or several
+        # expired records -- cannot be resolved to one provable artifact and refuses.
+        # A malformed (non-boolean) expired flag also refuses. A single record is
+        # unambiguous: expired=true is treated as absent and takes the exact-match
+        # registry path; otherwise it is the one live artifact to download and validate.
+        for item in proof_artifacts:
+            if not isinstance(item.get("expired", False), bool):
+                raise ValueError(
+                    "ended smoke run " + str(run_id) + " has a non-boolean expired "
+                    "flag on its " + SMOKE_ARTIFACT_NAME + " listing record"
+                )
+        if len(proof_artifacts) > 1:
+            described = ", ".join(
+                "id=" + str(item.get("id")) + " expired=" + str(item.get("expired"))
+                for item in proof_artifacts
             )
-        if not live_proof_artifacts:
+            raise ValueError(
+                "ended smoke run " + str(run_id) + " has "
+                + str(len(proof_artifacts)) + " duplicate " + SMOKE_ARTIFACT_NAME
+                + " artifacts; refusing an ambiguous selection for a name-only "
+                "download (records: " + described + ")"
+            )
+        proof_artifact = proof_artifacts[0] if proof_artifacts else None
+        if proof_artifact is None or proof_artifact.get("expired") is True:
             registered_spent = _registered_legacy_run_spend(run)
             if registered_spent is None:
                 registered_spent = _registered_expired_proof_run_spend(run)
