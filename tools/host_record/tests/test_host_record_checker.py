@@ -1,26 +1,22 @@
 """Stdlib synthetic-fixture self-tests for the host-record checker.
 
-Contract (pinned by Stage C readiness A3, extended by delivery prep R-1):
-27 unittest items = 7 positive/structural + 20
-negative/adversarial/refusal/deterministic-negative.
+Contract (pinned by Stage C readiness A3, extended by delivery prep R-1 and the
+Stage-F correction pass of 2026-11-08): 38 unittest items = 8
+positive/structural + 30 negative/adversarial/refusal/deterministic-negative.
 The harness copies the checker and fixture set into a temporary repository and
 drives the checker as a black-box subprocess; that is harness behaviour only,
 not a capability of the shipped checker (the checker itself spawns no process).
 """
 import ast
 import hashlib
+import importlib.util
 import json
-import os
 import shutil
 import subprocess
 import sys
 import unittest
 import uuid
 from pathlib import Path
-
-POSITIVE_TESTS = 7
-NEGATIVE_TESTS = 20
-TOTAL_TESTS = POSITIVE_TESTS + NEGATIVE_TESTS
 
 VALID_ONE = "docs/host-record/fixtures/valid/host-record.synthetic-windows-11-python-314.json"
 VALID_TWO = "docs/host-record/fixtures/valid/host-record.synthetic-unknown-gap.json"
@@ -53,6 +49,33 @@ def tree_digest(root):
             relative = path.relative_to(root).as_posix()
             items.append(relative + ":" + sha256_path(path))
     return hashlib.sha256("\n".join(items).encode("utf-8")).hexdigest()
+
+
+def load_checker_module(path):
+    spec = importlib.util.spec_from_file_location("check_host_record_under_test", str(path))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def make_directory_link(target, link):
+    """Create a directory link; return False when this host refuses one.
+
+    Symlink creation needs a privilege on Windows, so the test falls back to a
+    directory junction (mklink /J), which needs none; the caller skips with an
+    explicit UNRUN note when both are unavailable.
+    """
+    try:
+        Path(link).symlink_to(target, target_is_directory=True)
+        return True
+    except (OSError, NotImplementedError):
+        pass
+    if sys.platform.startswith("win"):
+        completed = subprocess.run(
+            ["cmd", "/c", "mklink", "/J", str(link), str(target)],
+            capture_output=True, text=True)
+        return completed.returncode == 0 and Path(link).exists()
+    return False
 
 
 class HostRecordCheckerTests(unittest.TestCase):
@@ -157,6 +180,16 @@ class HostRecordCheckerTests(unittest.TestCase):
 
         walk(report)
         self.assertNotIn("status", report)
+
+    def test_manifest_dot_segments_canonicalised_clean(self):
+        manifest = self.load_fixture(MANIFEST)
+        for entry in manifest["entries"]:
+            if entry["path"] == VALID_ONE:
+                entry["path"] = "docs/host-record/fixtures/valid/./host-record.synthetic-windows-11-python-314.json"
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 0, process.stdout)
+        self.assertEqual(self.report(process)["findings"], [])
 
     def test_report_fields_sorted_deterministic_json(self):
         process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
@@ -341,6 +374,141 @@ class HostRecordCheckerTests(unittest.TestCase):
         oversize.write_text(json.dumps({"padding": "x" * 70000}), encoding="utf-8")
         oversize_run = self.run_checker("--record", "docs/host-record/fixtures/valid/oversize.json", "--json")
         self.assertEqual(oversize_run.returncode, 2)
+
+    # ---------------- Stage-F correction pass (2026-11-08) ----------------
+    def test_required_container_types_rejected(self):
+        mutations = {
+            "host": "not-an-object",
+            "config_digest": [],
+            "package_binding": None,
+            "source_evidence": {},
+        }
+        for name, value in mutations.items():
+            relative = "docs/host-record/fixtures/valid/mutated-type-" + name + ".json"
+            document = self.make_valid_copy(relative)
+            document[name] = value
+            self.write_fixture(relative, document)
+            process = self.run_checker("--record", relative, "--json")
+            self.assertEqual(process.returncode, 1, name)
+            pairs = {(finding["code"], finding["path"]) for finding in self.report(process)["findings"]}
+            self.assertIn(("SCHEMA", name), pairs, name)
+
+    def test_self_citation_dot_segments_rejected(self):
+        relative = "docs/host-record/fixtures/valid/mutated-selfcite.json"
+        document = self.make_valid_copy(relative)
+        document["source_evidence"][0]["path"] = "docs/host-record/fixtures/valid/./mutated-selfcite.json"
+        self.write_fixture(relative, document)
+        process = self.run_checker("--record", relative, "--json")
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("UNSAFE-PATH", self.codes(process))
+
+    def test_source_evidence_entry_rules_rejected(self):
+        relative = "docs/host-record/fixtures/valid/mutated-source-evidence.json"
+        document = self.make_valid_copy(relative)
+        document["source_evidence"][0]["extra"] = "unknown-field"
+        document["source_evidence"][0]["bytes"] = "6230"
+        document["source_evidence"][0]["note"] = "x"
+        self.write_fixture(relative, document)
+        process = self.run_checker("--record", relative, "--json")
+        self.assertEqual(process.returncode, 1)
+        codes = self.codes(process)
+        self.assertIn("UNKNOWN-FIELD", codes)
+        self.assertIn("SCHEMA", codes)
+        pairs = {(finding["code"], finding["path"]) for finding in self.report(process)["findings"]}
+        self.assertIn(("SCHEMA", "source_evidence[0]/bytes"), pairs)
+        self.assertIn(("SCHEMA", "source_evidence[0]/note"), pairs)
+
+    def test_capability_and_list_rules_rejected(self):
+        relative = "docs/host-record/fixtures/valid/mutated-list-rules.json"
+        document = self.make_valid_copy(relative)
+        document["capabilities"][0]["reason"] = "x"
+        document["capabilities"][0]["evidence_refs"] = "docs/host-record/README.md"
+        document["limits"][0] = 5
+        document["non_claims"] = ["not host/consumer qualification", "not a portability claim"]
+        self.write_fixture(relative, document)
+        process = self.run_checker("--record", relative, "--json")
+        self.assertEqual(process.returncode, 1)
+        codes = self.codes(process)
+        self.assertIn("SCHEMA", codes)
+        pairs = {(finding["code"], finding["path"]) for finding in self.report(process)["findings"]}
+        self.assertIn(("SCHEMA", "capabilities[0]/reason"), pairs)
+        self.assertIn(("SCHEMA", "capabilities[0]/evidence_refs"), pairs)
+        self.assertIn(("SCHEMA", "limits[0]"), pairs)
+        self.assertIn(("SCHEMA", "non_claims"), pairs)
+
+    def test_fixture_record_count_must_be_exactly_six(self):
+        manifest = self.load_fixture(MANIFEST)
+        entry = next(item for item in manifest["entries"] if item["kind"] == "record")
+        for _ in range(58):
+            manifest["entries"].append(json.loads(json.dumps(entry)))
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1)
+        self.assertIn("MANIFEST-STALE", self.codes(process))
+
+    def test_record_count_cap_refused(self):
+        manifest = self.load_fixture(MANIFEST)
+        entry = next(item for item in manifest["entries"] if item["kind"] == "record")
+        for _ in range(59):
+            manifest["entries"].append(json.loads(json.dumps(entry)))
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 2)
+        self.assertEqual(process.stdout, "")
+
+    def test_string_cap_refused(self):
+        relative = "docs/host-record/fixtures/valid/mutated-long-string.json"
+        document = self.make_valid_copy(relative)
+        document["capabilities"][0]["reason"] = "x" * 2001
+        self.write_fixture(relative, document)
+        process = self.run_checker("--record", relative, "--json")
+        self.assertEqual(process.returncode, 2)
+        self.assertEqual(process.stdout, "")
+
+    def test_capability_cap_refused(self):
+        relative = "docs/host-record/fixtures/valid/mutated-many-capabilities.json"
+        document = self.make_valid_copy(relative)
+        for _ in range(44):
+            document["capabilities"].append(json.loads(json.dumps(document["capabilities"][0])))
+        self.write_fixture(relative, document)
+        process = self.run_checker("--record", relative, "--json")
+        self.assertEqual(process.returncode, 2)
+        self.assertEqual(process.stdout, "")
+
+    def test_containment_helper_refuses_escapes(self):
+        module = load_checker_module(self.checker_source)
+        with self.assertRaises(module.UsageError):
+            module.resolve_under_repo(self.repo, "../escape.json")
+        with self.assertRaises(module.UsageError):
+            module.resolve_under_repo(self.repo, "C:/Windows/win.ini")
+        findings = []
+        self.assertIsNone(module.resolve_manifest_entry(self.repo, "../outside.json", findings))
+        self.assertEqual([finding["code"] for finding in findings], ["UNSAFE-PATH"])
+        inside = module.resolve_manifest_entry(self.repo, "docs/host-record/fixtures/expected-findings.v1.json", [])
+        self.assertIsNotNone(inside)
+        self.assertTrue(str(inside).startswith(str(self.repo.resolve())))
+
+    def test_manifest_entry_escape_link_rejected(self):
+        outside = Path(self.repo).parent / ("outside-" + uuid.uuid4().hex[:10])
+        outside.mkdir()
+        self.temp_dirs.append(outside)
+        outside_record = outside / "outside-record.json"
+        shutil.copyfile(self.repo / VALID_TWO, outside_record)
+        link = self.repo / "docs" / "host-record" / "fixtures" / "escape-link"
+        if not make_directory_link(outside, link):
+            self.skipTest("UNRUN: this host refused both a symlink and a directory junction")
+        manifest = self.load_fixture(MANIFEST)
+        manifest["entries"].append({
+            "bytes": outside_record.stat().st_size,
+            "expected_exit": 1,
+            "kind": "record",
+            "path": "docs/host-record/fixtures/escape-link/outside-record.json",
+            "sha256": sha256_path(outside_record),
+        })
+        self.write_fixture(MANIFEST, manifest)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stdout + process.stderr)
+        self.assertIn("UNSAFE-PATH", self.codes(process))
 
 
 if __name__ == "__main__":

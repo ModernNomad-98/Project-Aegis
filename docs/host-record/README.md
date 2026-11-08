@@ -24,8 +24,12 @@ A record is a JSON object with:
 - synthetic and preparation_only: both must be true for this slice. A record that
   claims a real host is rejected; real-host work would require separate authority.
 - source_evidence: array of path, bytes, sha256 and note entries. Paths are
-  repository-relative and safe; a record may not cite itself. Evidence binds
-  earlier payloads by raw bytes and SHA-256; the record never carries a self-hash.
+  repository-relative, canonicalised and safe; a record may not cite itself.
+  The entries are metadata only in this slice: the checker validates their
+  shape, path safety and self-citation rule, but it does not open the cited file
+  and does not compare the declared byte count or SHA-256 with that file's
+  bytes. Outer Stage C/D/E records bind these files by raw bytes and SHA-256;
+  the record never carries a self-hash.
 - host: product, version, os_name, os_version and one invocation_mode value from
   discovery, explicit-invocation, manual-invocation, automatic-invocation. This
   is a mode label, not a capability verdict; no personal identifiers are allowed.
@@ -60,8 +64,10 @@ The checker enforces these rules and reports deterministic finding codes.
   and personal fields.
 - fixtures/expected-findings.v1.json - exactly eight deterministic expectations:
   two valid records clean; four invalid records at their declared codes; and two
-  contract negatives (stale manifest copy and expected-findings mismatch copy)
-  that the test harness constructs.
+  contract negatives (stale manifest version and expected-findings mismatch)
+  that the test harness exercises on temporary copies of the fixture set. The
+  two contract/* strings in that table are pinned scenario labels, not files in
+  this repository.
 - fixtures/FIXTURE-MANIFEST.v1.json - inventory of every fixture file by
   repository-relative path, kind, raw bytes, raw SHA-256 and expected exit. The
   manifest never lists itself, never carries a self-digest and is sorted by path.
