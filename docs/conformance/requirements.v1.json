@@ -1,0 +1,988 @@
+{
+  "catalog_version": "1.0.1",
+  "profiles": [
+    {
+      "description": "Requirements that apply to a bounded change to the Project Aegis source library, as an index over existing normative sources.",
+      "maintains_full_catalog": true,
+      "mandatory_requirement_ids": [
+        "SD-A",
+        "SD-B",
+        "SD-C",
+        "SD-D",
+        "SD-E",
+        "SD-F",
+        "SD-G",
+        "MG1",
+        "MG2",
+        "MG3",
+        "MG4",
+        "MG5",
+        "AEGIS-REQ-PRES-01",
+        "AEGIS-REQ-SKILL-01",
+        "AEGIS-REQ-SKILL-02",
+        "AEGIS-REQ-SKILL-03",
+        "AEGIS-REQ-SKILL-04",
+        "AEGIS-REQ-SKILL-05",
+        "AEGIS-REQ-SKILL-06",
+        "AEGIS-REQ-MECH-01",
+        "AEGIS-REQ-MECH-02",
+        "AEGIS-REQ-EVID-01",
+        "AEGIS-REQ-EVID-02"
+      ],
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "profile_id": "source-library-change",
+      "readable_name": "Source-library change conformance",
+      "scope_statement": "Source-library (Role A) changes only. Consumer installation, host qualification, live evaluation and release claims are outside this first profile and remain UNRUN here."
+    }
+  ],
+  "requirements": [
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Stage artifact or command output bound to the revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "Stage order and discipline are procedural; no machine check enforces the stage sequence.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Stage A plan is authored and captured",
+      "requirement_id": "SD-A",
+      "source_ref": {
+        "anchor": "The seven stages",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "SD-A"
+      },
+      "verification": {
+        "check": "Recorded stage artifacts and handoff",
+        "expected_result": "Stage artifacts present and bound",
+        "method": "manual-attestation"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Review verdict record bound to the exact revision and stage.",
+        "kind": "review-verdict"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "independent-review",
+        "limits": "Independent holder judgment is procedural; no machine check enforces reviewer identity or verdict quality.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Independent plan audit",
+      "requirement_id": "SD-B",
+      "source_ref": {
+        "anchor": "The seven stages",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "SD-B"
+      },
+      "verification": {
+        "check": "Independent review bound to a captured revision",
+        "expected_result": "Verdict bound to the captured revision",
+        "method": "independent-review"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Stage artifact or command output bound to the revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "Stage order and discipline are procedural; no machine check enforces the stage sequence.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Implementation in an isolated worktree",
+      "requirement_id": "SD-C",
+      "source_ref": {
+        "anchor": "The seven stages",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "SD-C"
+      },
+      "verification": {
+        "check": "Recorded stage artifacts and handoff",
+        "expected_result": "Stage artifacts present and bound",
+        "method": "manual-attestation"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Review verdict record bound to the exact revision and stage.",
+        "kind": "review-verdict"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "independent-review",
+        "limits": "Independent holder judgment is procedural; no machine check enforces reviewer identity or verdict quality.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Independent implementation audit",
+      "requirement_id": "SD-D",
+      "source_ref": {
+        "anchor": "The seven stages",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "SD-D"
+      },
+      "verification": {
+        "check": "Independent review bound to a captured revision",
+        "expected_result": "Verdict bound to the captured revision",
+        "method": "independent-review"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Stage artifact or command output bound to the revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "Stage order and discipline are procedural; no machine check enforces the stage sequence.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Validation with repository checks",
+      "requirement_id": "SD-E",
+      "source_ref": {
+        "anchor": "The seven stages",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "SD-E"
+      },
+      "verification": {
+        "check": "Recorded stage artifacts and handoff",
+        "expected_result": "Stage artifacts present and bound",
+        "method": "manual-attestation"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Review verdict record bound to the exact revision and stage.",
+        "kind": "review-verdict"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "independent-review",
+        "limits": "Independent holder judgment is procedural; no machine check enforces reviewer identity or verdict quality.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Final independent PR code review",
+      "requirement_id": "SD-F",
+      "source_ref": {
+        "anchor": "The seven stages",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "SD-F"
+      },
+      "verification": {
+        "check": "Independent review bound to a captured revision",
+        "expected_result": "Verdict bound to the captured revision",
+        "method": "independent-review"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Stage artifact or command output bound to the revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "Stage order and discipline are procedural; no machine check enforces the stage sequence.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Merge gate conditions",
+      "requirement_id": "SD-G",
+      "source_ref": {
+        "anchor": "The seven stages",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "SD-G"
+      },
+      "verification": {
+        "check": "Recorded stage artifacts and handoff",
+        "expected_result": "Stage artifacts present and bound",
+        "method": "manual-attestation"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Check log or posted review record bound to the exact head.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "No machine check enforces the full merge gate; parts are procedural and are never presented as machine-enforced.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Every applicable check is green at the exact head",
+      "requirement_id": "MG1",
+      "source_ref": {
+        "anchor": "Before merging: Stage G entry conditions",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "MG1"
+      },
+      "verification": {
+        "check": "Deterministic-check result at the exact head",
+        "expected_result": "All applicable check runs conclusive at the exact head",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Check log or posted review record bound to the exact head.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "No machine check enforces the full merge gate; parts are procedural and are never presented as machine-enforced.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Final review is posted and accepted at the exact head",
+      "requirement_id": "MG2",
+      "source_ref": {
+        "anchor": "Before merging: Stage G entry conditions",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "MG2"
+      },
+      "verification": {
+        "check": "Manual verification of the posted verdict comment",
+        "expected_result": "Posted verdict names the exact head and bound-fields hash",
+        "method": "manual-attestation"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Check log or posted review record bound to the exact head.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "No machine check enforces the full merge gate; parts are procedural and are never presented as machine-enforced.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Automated review result is present and findings P2+ are triaged",
+      "requirement_id": "MG3",
+      "source_ref": {
+        "anchor": "Before merging: Stage G entry conditions",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "MG3"
+      },
+      "verification": {
+        "check": "Automated review run/comment bound to the head",
+        "expected_result": "Result present or unavailable-recorded, and P2+ findings triaged",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Check log or posted review record bound to the exact head.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "No machine check enforces the full merge gate; parts are procedural and are never presented as machine-enforced.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "The merge agent confirms its own authority",
+      "requirement_id": "MG4",
+      "source_ref": {
+        "anchor": "Before merging: Stage G entry conditions",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "MG4"
+      },
+      "verification": {
+        "check": "Registry entry or quoted owner instruction",
+        "expected_result": "Authority source confirmed by the merge agent itself",
+        "method": "manual-attestation"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Check log or posted review record bound to the exact head.",
+        "kind": "console-log"
+      },
+      "id_kind": "existing-authoritative",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "No machine check enforces the full merge gate; parts are procedural and are never presented as machine-enforced.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Outside-contribution security review where applicable",
+      "requirement_id": "MG5",
+      "source_ref": {
+        "anchor": "Before merging: Stage G entry conditions",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "MG5"
+      },
+      "verification": {
+        "check": "Posted security review comment (outside contributions only)",
+        "expected_result": "Posted and accepted at the exact head, or not applicable to own PRs",
+        "method": "manual-attestation"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Validator stdout bound to the candidate revision, plus an independent preservation comparison.",
+        "kind": "console-log"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "Structural presence and catalog coverage only; the frozen preservation baseline is a program workspace record outside this repository and is not pinned by this catalog.",
+        "refs": [
+          {
+            "path": "scripts/validate-skills.py",
+            "symbol_or_line": "module docstring rule inventory"
+          },
+          {
+            "path": "docs/skills-catalog.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Shipped skill library and discovery are preserved",
+      "requirement_id": "AEGIS-REQ-PRES-01",
+      "source_ref": {
+        "anchor": "Implemented",
+        "anchor_kind": "heading",
+        "path": "docs/skills-catalog.md",
+        "quoted_phrase": "skills"
+      },
+      "verification": {
+        "check": "python scripts/validate-skills.py",
+        "expected_result": "exit 0 and OK: 254 skill(s) valid, 0 warning(s)",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Validator stdout bound to the candidate revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "Structural validation only; it does not establish behavioural efficacy or consumer availability.",
+        "refs": [
+          {
+            "path": "scripts/validate-skills.py",
+            "symbol_or_line": "validator checks for this family"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Frontmatter rules are machine-checked",
+      "requirement_id": "AEGIS-REQ-SKILL-01",
+      "source_ref": {
+        "anchor": "2. Frontmatter rules",
+        "anchor_kind": "heading",
+        "path": "docs/skill-generation-standard.md",
+        "quoted_phrase": "frontmatter"
+      },
+      "verification": {
+        "check": "python scripts/validate-skills.py",
+        "expected_result": "exit 0 and OK: 254 skill(s) valid, 0 warning(s)",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Validator stdout bound to the candidate revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "Structural validation only; it does not establish behavioural efficacy or consumer availability.",
+        "refs": [
+          {
+            "path": "scripts/validate-skills.py",
+            "symbol_or_line": "validator checks for this family"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Description and portability limits are enforced",
+      "requirement_id": "AEGIS-REQ-SKILL-02",
+      "source_ref": {
+        "anchor": "Portability contract",
+        "anchor_kind": "heading",
+        "path": "docs/skill-generation-standard.md",
+        "quoted_phrase": "description"
+      },
+      "verification": {
+        "check": "python scripts/validate-skills.py",
+        "expected_result": "exit 0 and OK: 254 skill(s) valid, 0 warning(s)",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Validator stdout bound to the candidate revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "Structural validation only; it does not establish behavioural efficacy or consumer availability.",
+        "refs": [
+          {
+            "path": "scripts/validate-skills.py",
+            "symbol_or_line": "validator checks for this family"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Progressive-disclosure line limits are enforced",
+      "requirement_id": "AEGIS-REQ-SKILL-03",
+      "source_ref": {
+        "anchor": "3. Progressive disclosure",
+        "anchor_kind": "heading",
+        "path": "docs/skill-generation-standard.md",
+        "quoted_phrase": "progressive"
+      },
+      "verification": {
+        "check": "python scripts/validate-skills.py",
+        "expected_result": "exit 0 and OK: 254 skill(s) valid, 0 warning(s)",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Validator stdout bound to the candidate revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "Structural validation only; it does not establish behavioural efficacy or consumer availability.",
+        "refs": [
+          {
+            "path": "scripts/validate-skills.py",
+            "symbol_or_line": "validator checks for this family"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Required skill sections are present",
+      "requirement_id": "AEGIS-REQ-SKILL-04",
+      "source_ref": {
+        "anchor": "4. Required sections",
+        "anchor_kind": "heading",
+        "path": "docs/skill-generation-standard.md",
+        "quoted_phrase": "sections"
+      },
+      "verification": {
+        "check": "python scripts/validate-skills.py",
+        "expected_result": "exit 0 and OK: 254 skill(s) valid, 0 warning(s)",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Validator stdout bound to the candidate revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "Structural validation only; it does not establish behavioural efficacy or consumer availability.",
+        "refs": [
+          {
+            "path": "scripts/validate-skills.py",
+            "symbol_or_line": "validator checks for this family"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Least-privilege and manual-only posture is checked",
+      "requirement_id": "AEGIS-REQ-SKILL-05",
+      "source_ref": {
+        "anchor": "5. Least privilege & side effects",
+        "anchor_kind": "heading",
+        "path": "docs/skill-generation-standard.md",
+        "quoted_phrase": "manual-only"
+      },
+      "verification": {
+        "check": "python scripts/validate-skills.py",
+        "expected_result": "exit 0 and OK: 254 skill(s) valid, 0 warning(s)",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Validator stdout bound to the candidate revision.",
+        "kind": "console-log"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "Structural validation only; it does not establish behavioural efficacy or consumer availability.",
+        "refs": [
+          {
+            "path": "scripts/validate-skills.py",
+            "symbol_or_line": "validator checks for this family"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Skill evaluations are present and structured",
+      "requirement_id": "AEGIS-REQ-SKILL-06",
+      "source_ref": {
+        "anchor": "6. Evaluations",
+        "anchor_kind": "heading",
+        "path": "docs/skill-generation-standard.md",
+        "quoted_phrase": "evals"
+      },
+      "verification": {
+        "check": "python scripts/validate-skills.py",
+        "expected_result": "exit 0 and OK: 254 skill(s) valid, 0 warning(s)",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Validator output bound to the head.",
+        "kind": "console-log"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "Machine checks are structural and do not prove semantic correctness or live behaviour.",
+        "refs": [
+          {
+            "path": "scripts/validate-skills.py"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "The required validator performs the machine checks",
+      "requirement_id": "AEGIS-REQ-MECH-01",
+      "source_ref": {
+        "anchor": "What is machine-enforced and what is procedural",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "validate-skills"
+      },
+      "verification": {
+        "check": "python scripts/validate-skills.py",
+        "expected_result": "exit 0 and OK: 254 skill(s) valid, 0 warning(s)",
+        "method": "deterministic-check"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Audit report bytes/digest bound to the head.",
+        "kind": "artifact-digest"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "machine-check",
+        "limits": "The audit is advisory only and is not a merge gate; its output is not an approval.",
+        "refs": [
+          {
+            "path": "scripts/audit-skill-contracts.py"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "The contract audit remains advisory and not a merge gate",
+      "requirement_id": "AEGIS-REQ-MECH-02",
+      "source_ref": {
+        "anchor": "What remains procedural \u2014 no machine enforcement exists",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "contract-audit"
+      },
+      "verification": {
+        "check": "python scripts/audit-skill-contracts.py",
+        "expected_result": "report produced; advisory only, never an approval or gate",
+        "method": "execution-evidence"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Review verdict bound to the head.",
+        "kind": "review-verdict"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "No machine check enforces honest UNRUN labelling; reviewers check it.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "An unavailable check is reported UNRUN and is never a pass",
+      "requirement_id": "AEGIS-REQ-EVID-01",
+      "source_ref": {
+        "anchor": "Honesty: unavailable tests and insufficient authority",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "UNRUN"
+      },
+      "verification": {
+        "check": "Independent review of the evidence record",
+        "expected_result": "UNRUN recorded with its resolving action; never presented as a passing result",
+        "method": "independent-review"
+      }
+    },
+    {
+      "applicability": {
+        "inapplicability": [],
+        "profiles": [
+          "source-library-change"
+        ]
+      },
+      "evidence_requirement": {
+        "description": "Posted verdict comment bound to the exact head.",
+        "kind": "review-verdict"
+      },
+      "id_kind": "catalog-minted",
+      "mechanism": {
+        "kind": "procedural-none",
+        "limits": "No machine check recomputes the bound-fields hash; reviewers and the merge agent re-check it.",
+        "refs": [
+          {
+            "path": "docs/delivery-workflow.md"
+          }
+        ]
+      },
+      "owner": {
+        "maintainer": "Project Aegis maintainers",
+        "role": "source-library maintainer"
+      },
+      "readable_name": "Evidence bindings are non-circular and exact-head bound",
+      "requirement_id": "AEGIS-REQ-EVID-02",
+      "source_ref": {
+        "anchor": "The bound fields",
+        "anchor_kind": "heading",
+        "path": "docs/delivery-workflow.md",
+        "quoted_phrase": "bound-fields"
+      },
+      "verification": {
+        "check": "Independent recomputation by reviewers and the merge agent",
+        "expected_result": "Verdict names the exact head and the bound-fields hash; a change voids it",
+        "method": "independent-review"
+      }
+    }
+  ],
+  "schema": "aegis.conformance-catalog/1",
+  "source_baseline": {
+    "repository": "ModernNomad-98/Project-Aegis",
+    "revision": "f69c6e9219335d1979b8ec9658cc86e0a7a5583a",
+    "tree": "4e584f59287f8b8fc3d10d3567158f52bff99a18"
+  },
+  "sources": [
+    {
+      "bytes": 82455,
+      "path": "docs/delivery-workflow.md",
+      "sha256": "8d873b4ddac4a3ae1be096b9a38194396b7003e453b917fedbb8d29bee050f61"
+    },
+    {
+      "bytes": 43194,
+      "path": "docs/skill-generation-standard.md",
+      "sha256": "9c69ae1009a3828589d018eb9f997cd5fe188a6126dcc99052caadf4f4083879"
+    },
+    {
+      "bytes": 192041,
+      "path": "docs/skills-catalog.md",
+      "sha256": "203ec348f2b05424fe7e48b5f82bf6dba9de92ff4b124020c2d0a0f3ad9f06f1"
+    },
+    {
+      "bytes": 180442,
+      "path": "scripts/validate-skills.py",
+      "sha256": "b6ad443e6a0c4a7bb051239d16d37c8f04c055ada7f80ead8cc87a1f95a3d950"
+    },
+    {
+      "bytes": 121369,
+      "path": "scripts/audit-skill-contracts.py",
+      "sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609"
+    },
+    {
+      "bytes": 52496,
+      "path": "tools/skills-manifest.json",
+      "sha256": "1bd21d2dc4ca9708cd64bfe830a82c72903c09862fe78c1cdbba386fbad32fea"
+    }
+  ]
+}
