@@ -55,7 +55,9 @@ BLOCK findings (availability loss; fail closed):
   roster; a skills-manifest entry is dropped; or the manifest schema/hash_input semantics changed.
 - **Silent Disable** - a previously active skill gains disable-model-invocation: true and/or the
   exact 32-character MANUAL-ONLY description sentinel (both variants BLOCK).
-- **Name/Directory Mismatch** and **Empty Description** - frontmatter no longer matches the tree.
+- **Missing Name**, **Name/Directory Mismatch** and **Empty Description** - frontmatter no longer
+  matches the tree. A missing frontmatter name is a BLOCK even when the guard's line parser cannot
+  read other constructs (those remain WARN with the validator authoritative).
 - **Declared Installed-Set Reduction** - a source-side file or skill declared in
   docs/consumer-starter-package.md is missing from the candidate.
 - **Added Path in Existing Skill Surface** - any candidate-added file under an existing baseline

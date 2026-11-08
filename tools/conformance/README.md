@@ -73,6 +73,9 @@ as `OBSERVATION-FIELD`.
   string content.
 - Repository-relative paths are rejected when absolute, drive-qualified, UNC, backslash-based or
   containing parent traversal; source and mechanism paths must resolve inside the repository root.
+- A structural SCHEMA finding does not suppress independent checks: source pins, requirement
+  relations/anchors, observation fields and completeness are evaluated against sanitized containers,
+  so an unrelated schema defect cannot hide stale pins, missing anchors or observation data.
 - The checker imports only the standard library (`argparse`, `hashlib`, `json`, `os`, `re`,
   `sys`, `tempfile`, `pathlib`) and has no network, credential or process-spawning capability.
 

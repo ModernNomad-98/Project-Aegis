@@ -14,7 +14,13 @@ There is deliberately no install, repair, upgrade, uninstall, prune, cleanup or 
 
 Build a manifest over a payload tree (source identity comes from a JSON file with `repository`, `commit`, `tree` and optional `note`):
 
-    python -m tools.distributed_payload build --root <payload-root> --package-id <id> --package-version <version> --source <source.json> --out <manifest.json> [--label <text>]
+    python -m tools.distributed_payload build --root <payload-root> --package-id <id> --package-version <version> --source <source.json> --out <manifest.json> [--label <text>] [--dependencies <edges.json>]
+
+Optional `--dependencies <edges.json>` accepts a JSON array of dependency edges in the documented
+contract shape (`{"from": <entry path>, "to": <entry path>, "class": "required|conditional|optional|maintainer-only", "rule": <required for conditional>}`).
+Each edge is validated against the built entry paths with the same rules as `validate_manifest`; the
+array is merged into the manifest's `dependencies` field so the builder can emit a dependency closure
+instead of always writing an empty array. Invalid JSON/encoding or an invalid edge is exit 2.
 
 Verify a target read-only; add `--report-out` to write a deterministic JSON report outside the target and the declared package directories:
 

@@ -23,6 +23,8 @@ Top-level fields (exactly these; unknown fields are rejected):
 
 **Forbidden field:** `manifest_identity`. A manifest must never carry its own hash; identity belongs to a detached binding. The builder also refuses an output path inside the payload root, and the verifier rejects a manifest that lies inside the target and is listed as an entry.
 
+**Dependency input:** the builder accepts an optional `--dependencies PATH` JSON array of dependency edges in the same contract shape; the array is validated against the built entry paths (required/conditional/optional targets must resolve inside entries; conditional edges need a rule; `maintainer-only` targets are non-distributed logical names) and merged into the manifest `dependencies` field. Invalid JSON, invalid encoding or an invalid edge is exit 2.
+
 ## 3. Hashing contract (both identities, explicit equality rule)
 
 For every entry the manifest records:

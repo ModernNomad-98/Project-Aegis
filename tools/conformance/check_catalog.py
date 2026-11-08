@@ -902,8 +902,30 @@ def sanitize_catalog_containers(catalog):
     """
     safe = dict(catalog)
     raw_requirements = catalog.get("requirements")
-    safe["requirements"] = ([record for record in raw_requirements if isinstance(record, dict)]
-                            if isinstance(raw_requirements, list) else [])
+    requirements = []
+    if isinstance(raw_requirements, list):
+        for record in raw_requirements:
+            if not isinstance(record, dict):
+                continue
+            safe_record = dict(record)
+            for section in ("source_ref", "applicability", "mechanism", "verification",
+                            "evidence_requirement", "owner"):
+                value = safe_record.get(section)
+                safe_record[section] = dict(value) if isinstance(value, dict) else {}
+            applicability = dict(safe_record["applicability"])
+            for key in ("profiles", "inapplicability"):
+                value = applicability.get(key)
+                applicability[key] = value if isinstance(value, list) else []
+            safe_record["applicability"] = applicability
+            mechanism = dict(safe_record["mechanism"])
+            value = mechanism.get("refs")
+            mechanism["refs"] = value if isinstance(value, list) else []
+            safe_record["mechanism"] = mechanism
+            for key in ("supersedes", "superseded_by", "related"):
+                value = safe_record.get(key)
+                safe_record[key] = value if isinstance(value, list) else []
+            requirements.append(safe_record)
+    safe["requirements"] = requirements
     raw_profiles = catalog.get("profiles")
     profiles = []
     if isinstance(raw_profiles, list):
@@ -917,6 +939,9 @@ def sanitize_catalog_containers(catalog):
                 if isinstance(mandatory, list) else [])
             profiles.append(safe_profile)
     safe["profiles"] = profiles
+    raw_sources = catalog.get("sources")
+    safe["sources"] = ([source for source in raw_sources if isinstance(source, dict)]
+                       if isinstance(raw_sources, list) else [])
     return safe
 
 
@@ -1101,13 +1126,17 @@ def main(argv=None):
         if not isinstance(catalog, dict):
             raise InputError("catalog must be a JSON object")
         findings = []
-        structure = check_structure(catalog, findings)
-        if structure is not None and not any(f.get("code") == "SCHEMA" for f in findings):
-            source_paths = check_sources(catalog, repo_root, findings)
-            check_requirements(catalog, repo_root, source_paths, findings)
-            check_observation_fields(catalog, findings)
-            check_completeness(catalog, findings)
-        report = build_report(sanitize_catalog_containers(catalog), catalog_identity,
+        check_structure(catalog, findings)
+        safe_catalog = sanitize_catalog_containers(catalog)
+        # Independent checks run even when SCHEMA findings exist. Malformed
+        # containers are sanitized for structural traversal, but unrelated stale
+        # source pins, missing anchors, forbidden observation fields and
+        # completeness gaps must still be reported (a schema typo must not hide them).
+        source_paths = check_sources(safe_catalog, repo_root, findings)
+        check_requirements(safe_catalog, repo_root, source_paths, findings)
+        check_observation_fields(catalog, findings)
+        check_completeness(safe_catalog, findings)
+        report = build_report(safe_catalog, catalog_identity,
                               repo_root, args.evidence, args.profile, findings)
         report["exit_code"] = 1 if report["findings"] else 0
         payload = json.dumps(report, sort_keys=True, indent=2, ensure_ascii=True) + "\n"

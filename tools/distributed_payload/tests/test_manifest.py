@@ -113,6 +113,48 @@ class BuildTests(ManifestTestCase):
         leftovers = [path.name for path in self.tmp.iterdir() if path.name.startswith(".manifest-")]
         self.assertEqual([], leftovers)
 
+    def _run_build_with(self, out, extra_args):
+        return run_cli(["build", "--root", str(PAYLOAD), "--package-id", "example-fixture",
+                        "--package-version", "1.0.0", "--source", str(SOURCE),
+                        "--out", str(out), *extra_args])
+
+    def test_a02b_build_with_dependency_input_emits_closure(self):
+        dependencies = [
+            {"from": "README.txt", "to": "assets/notes.txt", "class": "required"},
+            {"from": "assets/notes.txt", "to": "skills/example/SKILL.md", "class": "optional"},
+        ]
+        deps_path = self.tmp / "dependencies.json"
+        deps_path.write_text(json.dumps(dependencies) + "\n", encoding="utf-8")
+        out = self.tmp / "manifest-deps.json"
+        completed = self._run_build_with(out, ["--dependencies", str(deps_path)])
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        document = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(dependencies, document["dependencies"])
+        m.validate_manifest(document)
+
+    def test_a02c_invalid_dependency_input_is_exit2(self):
+        invalid_edge = self.tmp / "dependencies-invalid.json"
+        invalid_edge.write_text(json.dumps([
+            {"from": "README.txt", "to": "missing.txt", "class": "required"},
+        ]) + "\n", encoding="utf-8")
+        out = self.tmp / "manifest-invalid-deps.json"
+        completed = self._run_build_with(out, ["--dependencies", str(invalid_edge)])
+        self.assertEqual(2, completed.returncode)
+        self.assertFalse(out.exists())
+        invalid_json = self.tmp / "dependencies-invalid-json.json"
+        invalid_json.write_text("{not json", encoding="utf-8")
+        completed = self._run_build_with(out, ["--dependencies", str(invalid_json)])
+        self.assertEqual(2, completed.returncode)
+        self.assertFalse(out.exists())
+
+    def test_a02d_invalid_source_utf8_is_exit2(self):
+        source_path = self.tmp / "source-invalid-utf8.json"
+        source_path.write_bytes(b"\xff\xfe{")
+        out = self.tmp / "manifest-invalid-source.json"
+        completed = self._run_build_with(out, ["--source", str(source_path)])
+        self.assertEqual(2, completed.returncode)
+        self.assertFalse(out.exists())
+
     def test_a03_raw_versus_normalized_identity_with_crlf_fixture(self):
         crlf_root = self.tmp / "crlf-payload"
         lf_root = self.tmp / "lf-payload"

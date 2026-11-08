@@ -18,6 +18,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
@@ -227,6 +228,46 @@ class ReadOnlyVerifyTests(VerifyTestCase):
         self.assertIn(finding["class"], {"UNRECOGNIZED", "CHANGED_TYPE"})
         self.assertTrue(target_file.is_symlink())
         self.assertEqual("outside\n", outside.read_text(encoding="utf-8"))
+
+    def test_a19b_symlinked_entry_parent_component_refused(self):
+        assets = self.target / "assets"
+        real_assets = self.target / "real-assets"
+        created = False
+        try:
+            assets.rename(real_assets)
+            os.symlink(real_assets, assets, target_is_directory=True)
+            created = True
+        except (OSError, NotImplementedError):
+            if real_assets.exists() and not assets.exists():
+                real_assets.rename(assets)
+        if created:
+            report, exit_code = v.verify_target(self.manifest, self.target)
+        else:
+            assets_abs = os.path.normcase(os.path.realpath(str(assets)))
+            original = v._detect_reparse
+
+            def fake(path):
+                return os.path.normcase(os.path.realpath(str(path))) == assets_abs or original(path)
+
+            with mock.patch.object(v, "_detect_reparse", side_effect=fake):
+                report, exit_code = v.verify_target(self.manifest, self.target)
+        self.assertEqual(v.EXIT_FINDINGS, exit_code)
+        entry_findings = [item for item in report["findings"]
+                          if item["path"] == "assets/notes.txt"]
+        self.assertTrue(entry_findings)
+        self.assertEqual("CHANGED_TYPE", entry_findings[0]["class"])
+
+    def test_a19c_containment_preflight_checks_parent_chain(self):
+        parent_abs = os.path.normcase(os.path.realpath(str(self.target.parent)))
+        original = v._detect_reparse
+
+        def fake(path):
+            return os.path.normcase(os.path.realpath(str(path))) == parent_abs or original(path)
+
+        with mock.patch.object(v, "_detect_reparse", side_effect=fake):
+            with self.assertRaises(m.ManifestError) as context:
+                v.verify_target(self.manifest, self.target)
+        self.assertEqual("unsafe_target", context.exception.code)
 
     def test_i04_no_mutation_for_clean_and_findings_runs(self):
         clean_before = tree_fingerprint(self.target)

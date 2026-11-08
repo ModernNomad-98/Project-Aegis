@@ -506,6 +506,21 @@ class ConformanceCheckerTests(unittest.TestCase):
             report = json.loads(out)
             self.assertGreater(report["summary"]["findings"], 0, label)
 
+    def test_independent_checks_run_despite_unrelated_schema_finding(self):
+        fixture = self.fresh_fixture("schema-plus-independent")
+        catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))
+        catalog["requirements"][0]["owner"] = "not-an-object"
+        catalog["requirements"][1]["status"] = "observed"
+        catalog["sources"][0]["sha256"] = "0" * 64
+        self.write_catalog(catalog, fixture)
+        code, out, _ = self.run_checker(root=fixture, *("--json",))
+        self.assertEqual(code, 1)
+        report = json.loads(out)
+        codes = {finding["code"] for finding in report["findings"]}
+        self.assertIn("SCHEMA", codes)
+        self.assertIn("OBSERVATION-FIELD", codes)
+        self.assertIn("STALE-SOURCE", codes)
+
     def test_valid_reciprocal_relations_are_not_cycles(self):
         fixture = self.fresh_fixture("reciprocal-relations")
         catalog = json.loads((fixture / CATALOG_REL).read_text(encoding="utf-8"))

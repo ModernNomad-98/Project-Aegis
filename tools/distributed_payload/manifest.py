@@ -206,6 +206,8 @@ def load_source_identity(source_path: Path) -> dict:
         source = json.loads(source_path.read_text(encoding="utf-8"))
     except OSError as exc:
         raise ManifestError("source_unreadable", f"cannot read source JSON: {exc}") from exc
+    except UnicodeDecodeError as exc:
+        raise ManifestError("source_encoding", f"source JSON is not valid UTF-8: {exc}") from exc
     except json.JSONDecodeError as exc:
         raise ManifestError("source_invalid_json", f"source JSON does not parse: {exc}") from exc
     if not isinstance(source, dict):
@@ -412,8 +414,14 @@ def validate_manifest(manifest: dict) -> dict:
 
 
 def build_manifest(payload_root: Path, package_id: str, package_version: str,
-                   source: dict, label: str | None = None) -> dict:
-    """Build a validated manifest document for a payload tree."""
+                   source: dict, label: str | None = None,
+                   dependencies: list | None = None) -> dict:
+    """Build a validated manifest document for a payload tree.
+
+    dependencies is an optional array of dependency edges using the documented
+    schema contract ({from, to, class[, rule]}); it is validated by
+    validate_manifest against the collected entry paths.
+    """
     for value, pattern, field in (
         (package_id, PROFILE_ID_RE, "package id"),
         (package_version, PROFILE_VERSION_RE, "package version"),
@@ -432,7 +440,7 @@ def build_manifest(payload_root: Path, package_id: str, package_version: str,
         "source": source,
         "hash_contract": dict(HASH_CONTRACT),
         "entries": entries,
-        "dependencies": [],
+        "dependencies": [] if dependencies is None else dependencies,
         "generator": {"tool": TOOL_NAME, "version": TOOL_VERSION},
     }
     return validate_manifest(manifest)

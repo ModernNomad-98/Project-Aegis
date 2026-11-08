@@ -397,7 +397,7 @@ def mentions_skill(text: str, name: str) -> bool:
     """Token-bounded mention so a longer skill id cannot mask a shorter one."""
     if not isinstance(text, str) or not isinstance(name, str) or not name:
         return False
-    return re.search(r"(?<![A-Za-z0-9-])" + re.escape(name) + r"(?![A-Za-z0-9-])", text) is not None
+    return re.search(r"(?<![A-Za-z0-9_-])" + re.escape(name) + r"(?![A-Za-z0-9_-])", text) is not None
 
 
 def build_discovery_surface(tree: str, skill_ids: list) -> dict:
@@ -872,14 +872,21 @@ def compare(baseline: dict, tree: str) -> dict:
                 "previously active skill %r is now manual-only (disable-model-invocation "
                 "and/or MANUAL-ONLY sentinel); this silently removes automatic availability"
                 % candidate_id, candidate_id)
-        if cand_fm.get("parse_ok"):
+        if candidate_record.get("skill_md"):
+            # Name/description invariants are evaluated independently of parser
+            # certainty: a missing name is a fail-closed BLOCK, while a genuinely
+            # unreadable construct stays a WARN above.
             if not cand_fm.get("description_present"):
                 add("EMPTY_DESCRIPTION", "BLOCK",
                     "skill %r has an empty or missing description" % candidate_id, candidate_id)
-            if cand_fm.get("name") != candidate_id:
+            candidate_name = cand_fm.get("name")
+            if not isinstance(candidate_name, str) or not candidate_name:
+                add("NAME_MISSING", "BLOCK",
+                    "skill %r has no readable frontmatter name" % candidate_id, candidate_id)
+            elif candidate_name != candidate_id:
                 add("NAME_DIRECTORY_MISMATCH", "BLOCK",
                     "skill %r frontmatter name %r does not equal its directory name"
-                    % (candidate_id, cand_fm.get("name")), candidate_id)
+                    % (candidate_id, candidate_name), candidate_id)
     # discovery surfaces
     discovery = baseline["discovery"]
     named_all = sorted(set(base_named) | set(cand_named))
@@ -889,8 +896,10 @@ def compare(baseline: dict, tree: str) -> dict:
                                 ("README.md", cand_readme_path)):
         if is_reparse_point(surface_path):
             raise InputError("candidate discovery surface is a symlink/reparse point: " + label)
-    cand_catalog = read_text(cand_catalog_path) if os.path.isfile(cand_catalog_path) else None
-    cand_readme = read_text(cand_readme_path) if os.path.isfile(cand_readme_path) else None
+    cand_catalog = (read_surface_text(cand_catalog_path, "candidate docs/skills-catalog.md")
+                    if os.path.isfile(cand_catalog_path) else None)
+    cand_readme = (read_surface_text(cand_readme_path, "candidate README.md")
+                   if os.path.isfile(cand_readme_path) else None)
     if discovery.get("catalog_present") and cand_catalog is None:
         add("DISCOVERY_OMISSION_CATALOG", "BLOCK", "docs/skills-catalog.md is missing from the candidate")
     elif cand_catalog is not None:

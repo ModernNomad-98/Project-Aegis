@@ -37,8 +37,25 @@ def _build(args: argparse.Namespace) -> int:
         raise manifest_module.ManifestError(
             "out_inside_payload", "manifest output must be outside the payload root")
     source = manifest_module.load_source_identity(Path(args.source))
+    dependencies = None
+    if args.dependencies:
+        try:
+            dependencies = json.loads(Path(args.dependencies).read_text(encoding="utf-8"))
+        except UnicodeDecodeError as exc:
+            raise manifest_module.ManifestError(
+                "dependencies_encoding", f"dependencies JSON is not valid UTF-8: {exc}") from exc
+        except json.JSONDecodeError as exc:
+            raise manifest_module.ManifestError(
+                "dependencies_invalid_json", f"dependencies JSON does not parse: {exc}") from exc
+        except OSError as exc:
+            raise manifest_module.ManifestError(
+                "dependencies_unreadable", f"cannot read dependencies JSON: {exc}") from exc
+        if not isinstance(dependencies, list):
+            raise manifest_module.ManifestError(
+                "dependencies_invalid", "dependencies JSON must be an array of dependency edges")
     document = manifest_module.build_manifest(
-        Path(args.root), args.package_id, args.package_version, source, label=args.label)
+        Path(args.root), args.package_id, args.package_version, source, label=args.label,
+        dependencies=dependencies)
     manifest_module.write_manifest_atomic(document, out_path)
     print(json.dumps({"schema": document["schema"], "out": str(args.out),
                       "entries": len(document["entries"])}, sort_keys=True))
@@ -87,6 +104,8 @@ def build_parser() -> argparse.ArgumentParser:
                               help="source identity JSON file (repository, commit, tree[, note])")
     build_parser.add_argument("--out", required=True, help="manifest output path (outside the payload root)")
     build_parser.add_argument("--label", default=None, help="optional human-readable label")
+    build_parser.add_argument("--dependencies", default=None,
+                              help="optional dependency-closure JSON file (array of dependency edges)")
     build_parser.set_defaults(handler=_build)
 
     verify_parser = subparsers.add_parser("verify", help="read-only verification of a target tree")

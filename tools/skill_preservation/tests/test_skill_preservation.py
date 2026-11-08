@@ -300,6 +300,33 @@ class GuardSelfTests(unittest.TestCase):
     def test_c02h_skill_mention_is_token_bounded(self):
         self.assertFalse(guard.mentions_skill("ai-threat-modeler", "threat-modeler"))
         self.assertTrue(guard.mentions_skill("- threat-modeler", "threat-modeler"))
+        self.assertFalse(guard.mentions_skill("my_alpha", "alpha"))
+        self.assertFalse(guard.mentions_skill("alpha_beta", "alpha"))
+        self.assertTrue(guard.mentions_skill("alpha", "alpha"))
+
+    def test_p2e_missing_name_is_block(self):
+        tree = self.new_candidate("missing-name-block")
+        skill_md = tree / ".claude" / "skills" / "alpha" / "SKILL.md"
+        text = skill_md.read_text(encoding="utf-8").replace("name: alpha\n", "", 1)
+        write(skill_md, text)
+        code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 1, out)
+        findings = [item for item in payload["findings"] if item["rule"] == "NAME_MISSING"]
+        self.assertEqual(1, len(findings))
+        self.assertEqual("BLOCK", findings[0]["severity"])
+
+    def test_p2e_candidate_discovery_read_error_is_exit2(self):
+        tree = self.new_candidate("discovery-read-error")
+        original = guard.read_text
+
+        def fake(path):
+            if str(path).replace("\\", "/").endswith("docs/skills-catalog.md"):
+                raise OSError("simulated unreadable discovery surface")
+            return original(path)
+
+        with mock.patch.object(guard, "read_text", side_effect=fake):
+            code, payload, out, err = self.run_check(tree)
+        self.assertEqual(code, 2)
 
     def test_c02d_malformed_baseline_section_fails_closed(self):
         tail = self.new_candidate("malformed-baseline")
@@ -582,6 +609,7 @@ class GuardSelfTests(unittest.TestCase):
     def test_c23_baseline_case_collision_rejected(self):
         tampered = json.loads(guard.dump_json(self.baseline))
         tampered["skills"]["Alpha"] = tampered["skills"]["alpha"]
+        tampered["baseline_id"] = guard.compute_baseline_id(tampered)
         bad_path = Path(self.tmp.name) / "collision.json"
         bad_path.write_text(guard.dump_json(tampered), encoding="utf-8")
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
