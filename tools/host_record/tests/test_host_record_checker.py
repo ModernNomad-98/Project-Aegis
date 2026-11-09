@@ -1,11 +1,12 @@
 """Stdlib synthetic-fixture self-tests for the host-record checker.
 
 Contract (pinned by Stage C readiness A3, extended by delivery prep R-1, the
-Stage-F correction pass of 2026-11-08, the correction-2 pass of 2026-11-08 and
-the correction-3 pass of 2026-11-08):
-54 unittest items = 8 positive/structural + 46
+Stage-F correction pass of 2026-11-08, the correction-2 pass of 2026-11-08, the
+correction-3 pass of 2026-11-08 and the correction-4 audit residuals of
+2026-11-08):
+57 unittest items = 8 positive/structural + 49
 negative/adversarial/refusal/deterministic-negative, of which 15 are
-correction-3 regressions.
+correction-3 regressions and 3 are correction-4 residual-coverage regressions.
 The harness copies the checker and fixture set into a temporary repository and
 drives the checker as a black-box subprocess; that is harness behaviour only,
 not a capability of the shipped checker (the checker itself spawns no process).
@@ -678,10 +679,9 @@ class HostRecordCheckerTests(unittest.TestCase):
         self.manifest_entry_for(manifest, VALID_ONE)["path"] = "docs/host-record/fixtures/valid/bad\u0000name.json"
         self.write_fixture(MANIFEST, manifest)
         process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
-        self.assertIn(process.returncode, (1, 2))
+        self.assertEqual(process.returncode, 1)
         self.assertNotIn("internal error", process.stderr.lower())
-        if process.returncode == 1:
-            self.assertIn("UNSAFE-PATH", self.codes(process))
+        self.assertIn("UNSAFE-PATH", self.codes(process))
         relative = "docs/host-record/fixtures/valid/mutated-control-path.json"
         document = self.make_valid_copy(relative)
         document["source_evidence"][0]["path"] = "docs/host-record/README.md\u0001"
@@ -716,6 +716,90 @@ class HostRecordCheckerTests(unittest.TestCase):
         module.validate_record(document, VALID_ONE, findings, digest)
         pairs = {(finding["code"], finding["path"]) for finding in findings}
         self.assertIn(("BAD-PACKAGE-BINDING", "package_binding/package_manifest_sha256"), pairs)
+
+    # ---------------- Correction-4 audit residuals (2026-11-08) ----------------
+    def test_over_cap_record_is_refused_from_stat_before_any_read(self):
+        module = load_checker_module(self.checker_source)
+        over_cap = self.repo / "docs" / "host-record" / "fixtures" / "valid" / "over-cap.json"
+        over_cap.write_bytes(b"{" + b" " * module.MAX_RECORD_BYTES + b"}")
+        under_cap = self.repo / "docs" / "host-record" / "fixtures" / "valid" / "under-cap.json"
+        under_cap.write_bytes(b'{"synthetic": true}')
+        original = Path.read_bytes
+        reads = []
+
+        def traced_read_bytes(self):
+            reads.append(Path(self).resolve())
+            if Path(self).resolve() == over_cap.resolve():
+                raise AssertionError("load_json read an over-cap file instead of refusing it from stat()")
+            return original(Path(self))
+
+        Path.read_bytes = traced_read_bytes
+        try:
+            with self.assertRaises(module.UsageError) as raised:
+                module.load_json(over_cap, module.MAX_RECORD_BYTES)
+            document, _raw = module.load_json(under_cap, module.MAX_RECORD_BYTES)
+        finally:
+            Path.read_bytes = original
+        self.assertIn("INPUT-TOO-LARGE", str(raised.exception))
+        self.assertNotIn(over_cap.resolve(), reads)
+        self.assertEqual(document, {"synthetic": True})
+        self.assertIn(under_cap.resolve(), reads)
+
+    def test_invalid_kind_entry_is_a_finding_without_reading_the_file(self):
+        module = load_checker_module(self.checker_source)
+        relative = "docs/host-record/fixtures/invalid/host-record.invalid-kind.json"
+        target = self.repo / relative
+        target.write_bytes(b"x" * (module.MAX_RECORD_BYTES + 1024))
+        manifest = self.load_fixture(MANIFEST)
+        manifest["entries"].append({
+            "bytes": target.stat().st_size,
+            "expected_exit": 1,
+            "kind": "evil",
+            "path": relative,
+            "sha256": sha256_path(target),
+        })
+        self.write_fixture(MANIFEST, manifest)
+        location = "entries[" + str(len(manifest["entries"]) - 1) + "]/kind"
+        original = Path.read_bytes
+        reads = []
+
+        def traced_read_bytes(self):
+            reads.append(Path(self).resolve())
+            if Path(self).resolve() == target.resolve():
+                raise AssertionError("an invalid-kind manifest entry was read in full")
+            return original(Path(self))
+
+        Path.read_bytes = traced_read_bytes
+        try:
+            findings, counts, _identity, _expectations = module.validate_fixture_set(self.repo, "docs/host-record/fixtures")
+        finally:
+            Path.read_bytes = original
+        self.assertNotIn(target.resolve(), reads)
+        self.assertEqual(counts["records"], 6)
+        self.assertTrue(any(finding["code"] == "MANIFEST-STALE" and finding["path"] == location
+                            and "kind is not record or expectations" in finding["evidence"]
+                            for finding in findings))
+
+    def test_expectation_table_sortedness_and_duplicates_rejected(self):
+        expected = self.load_fixture(EXPECTED)
+        expected["entries"] = list(reversed(expected["entries"]))
+        self.write_fixture(EXPECTED, expected)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        self.assertTrue(any(finding["code"] == "EXPECTED-FINDINGS-MISMATCH"
+                            and "must be sorted" in finding["evidence"]
+                            for finding in self.report(process)["findings"]))
+
+        self.repo = self.make_repo()
+        expected = self.load_fixture(EXPECTED)
+        index = next(number for number, entry in enumerate(expected["entries"]) if entry.get("fixture") == VALID_ONE)
+        expected["entries"].insert(index + 1, dict(expected["entries"][index]))
+        self.write_fixture(EXPECTED, expected)
+        process = self.run_checker("--fixtures", "docs/host-record/fixtures", "--json")
+        self.assertEqual(process.returncode, 1, process.stderr)
+        self.assertTrue(any(finding["code"] == "EXPECTED-FINDINGS-MISMATCH"
+                            and "duplicate expectation path" in finding["evidence"]
+                            for finding in self.report(process)["findings"]))
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

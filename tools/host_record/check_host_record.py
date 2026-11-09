@@ -638,6 +638,10 @@ def validate_fixture_set(repo, fixtures_relative):
         if not resolved.is_file():
             add(findings, "MANIFEST-MISSING-FIXTURE", clean, "manifest entry file is missing")
             continue
+        if kind not in ("record", "expectations"):
+            # The invalid kind is already a MANIFEST-STALE finding above. Skip the
+            # entry before any read, so an unknown kind cannot bypass the byte cap.
+            continue
         try:
             declared_size = resolved.stat().st_size
         except OSError as exc:

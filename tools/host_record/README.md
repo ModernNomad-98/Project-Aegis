@@ -92,23 +92,29 @@ and probes no host.
 ## Tests
 
 The stdlib unittest suite drives the checker as a black-box subprocess against
-synthetic temporary repositories. It covers the 54-item pinned contract: 8
+synthetic temporary repositories. It covers the 57-item pinned contract: 8
 positive/structural items, 20 negative/adversarial items, 11 Stage-F correction
-items and 15 correction-3 regression items, including the 8-entry
-expected-findings table, the four container-type refusals, path canonicalisation
-and containment (with a link escape created on the host that permits one), the
-cap refusals and the pinned six-record fixture count. The correction-3
-regressions pin: a non-list expected_findings value and a bool or out-of-range
-expected_exit are findings, never exit 3; a duplicate manifest path does not
-satisfy the six-record count; a fixture path outside the fixtures directory and a
-NUL/control-character path are findings; a manifest expected_exit mismatch, an
-expected-findings fixture_version mismatch, a manifest bytes boolean and a
-manifest unknown field are rejected; expected_absent_fields is enforced; an
-evidence_refs self-citation is rejected; a self-binding package digest is
-rejected; and --record combined with --fixtures is refused. The harness's
-subprocess use is test-harness behaviour only; the shipped checker itself spawns
-no process. The harness removes its per-test repositories and its scratch root
-after each test.
+items, 15 correction-3 regression items and 3 correction-4 residual-coverage
+items, including the 8-entry expected-findings table, the four container-type
+refusals, path canonicalisation and containment (with a link escape created on
+the host that permits one), the cap refusals and the pinned six-record fixture
+count.
+
+The correction-3 regressions pin: a non-list expected_findings value and a
+bool or out-of-range expected_exit are findings, never exit 3; a duplicate
+manifest path does not satisfy the six-record count; a fixture path outside the
+fixtures directory and a NUL/control-character path are findings; a manifest
+expected_exit mismatch, an expected-findings fixture_version mismatch, a
+manifest bytes boolean and a manifest unknown field are rejected;
+expected_absent_fields is enforced; an evidence_refs self-citation is rejected;
+a self-binding package digest is rejected; and --record combined with
+--fixtures is refused. The correction-4 residuals pin: a manifest entry with an
+unknown kind is a finding and is never read, so an invalid kind cannot bypass
+the per-entry byte cap; an over-cap record is refused from stat() before any
+read; and an unsorted or duplicated expectation table is a finding. The
+harness's subprocess use is test-harness behaviour only; the shipped checker
+itself spawns no process. The harness removes its per-test repositories and its
+scratch root after each test.
 
 ## Limits
 
