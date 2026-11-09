@@ -1,8 +1,8 @@
 {
   "schema": "aegis-eval-command-record/v1",
-  "run_id": "post-delivery-item-2-20261109",
+  "run_id": "post-delivery-item-2-20261109-r2",
   "item": "Offline Evaluation Qualification Slice (ITEM-2 / L6-OFFLINE-EVAL)",
-  "command": "python -B -m tools.behavioral_eval_runner live-dry-run --config tools/behavioral_eval_runner/live/config/dry-run-config.json --gate docs/evaluation/case-set-gate.synthetic.json --cases docs/evaluation/cases --repo-root . --evidence-root <empty-temp-dir>/evidence --cost-ledger <empty-temp-dir>/cost-ledger.json --run-id post-delivery-item-2-20261109",
+  "command": "python -B -m tools.behavioral_eval_runner live-dry-run --config tools/behavioral_eval_runner/live/config/dry-run-config.json --gate docs/evaluation/case-set-gate.synthetic.json --cases docs/evaluation/cases --repo-root . --evidence-root <empty-temp-dir>/evidence --cost-ledger <empty-temp-dir>/cost-ledger.json --run-id post-delivery-item-2-20261109-r2",
   "argv": [
     "python",
     "-B",
@@ -22,58 +22,81 @@
     "--cost-ledger",
     "<empty-temp-dir>/cost-ledger.json",
     "--run-id",
-    "post-delivery-item-2-20261109"
+    "post-delivery-item-2-20261109-r2"
   ],
-  "cwd": "<repository-root>",
-  "python": "3.14.7",
-  "started_utc": "2026-11-09T20:04:34Z",
-  "finished_utc": "2026-11-09T20:04:37Z",
-  "elapsed_ms": 3146,
+  "cwd": "<clean worktree at head_at_run 2d7c4959>",
+  "python": "environment-reported CPython 3.14.7 (harness runtime; not an upstream release-schedule claim)",
+  "started_utc": "2026-11-09T20:43:31.741Z",
+  "finished_utc": "2026-11-09T20:43:35Z",
+  "elapsed_ms": 3259,
+  "started_utc_note": "derived: finished_utc minus the measured elapsed_ms",
   "exit_code": 0,
   "stdout": {
-    "bytes": 396674,
-    "sha256": "141fd2c8e5d8080b844311025c3a8997e5d12be7ccf939f9daf46810da17662e"
+    "bytes": 396632,
+    "sha256": "7a1473a055360766bab528e81881d67001f474782ca842001e3cfb8d067f1631"
   },
   "stderr": {
     "bytes": 0,
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "head_at_run": "064136f26e82fbb8c385a2aaef68d1dbde3020b9",
+  "head_at_run": "2d7c49595fd4a4e851e8b3f73742aea42666112b",
+  "checkout_state": "clean worktree at head_at_run; git status --porcelain empty before the run",
   "transport_class": "MOCK",
   "network_calls": 0,
   "real_spend_usd": "0.00",
   "synthetic_cost_meter_cents": 285,
+  "effective_ceiling_cents": 12000,
   "evidence_verified": true,
   "evidence_hashes": {
-    "final_report_sha256": "7087ff4f7d62b793f6f86d6ff143af7eff03b7e11c414b0688b3e7428bceffc8",
-    "final_evidence_manifest_sha256": "02fcbb056501995ffef1f5c43a9dcf73cbb1647c3f6578be6cca1cbe7b9f18b9",
-    "input_evidence_manifest_sha256": "49ab8d31ecc47b8dd2c91c309f14ce5ebed6b076792e2dbf300f0d112d965984",
-    "finalization_marker_sha256": "5554167292aef64d58c83fec5a5665daabcec71a74abfdc124e5330bd4d3964d"
+    "final_report_runner_sha256": "4caf1a5a5b14523370c82d92ce1f51618f91a38fb1d4a40633977fb00098963e",
+    "final_report_retained_sha256": "3039a18628fc679a674a51021f021ea937795f92d8e580d85f62df82a8c4b285",
+    "final_evidence_manifest_sha256": "5c7f9653dde2749909ecb64fe30ce4e6cc8198bc4416e27e00ef66563af8bbfa",
+    "input_evidence_manifest_sha256": "bb109252f9d68b42740ab36c2c9a1173988c549d8ad7928e03ef1b1da3a6632c",
+    "finalization_marker_sha256": "d7c76ed34e0466d8d91102f577daecc3af506c6782d125408d043db07c59e98f",
+    "results_sha256": "a83394139357cd305924406a5f56f3fbdea810ffd9c3319094fe8743ea5cadb2"
   },
   "retained_here": [
     "gate.synthetic.json",
     "final_report.json",
+    "results.json",
     "run-log.json",
     "command.json"
   ],
   "not_retained": {
-    "reason": "The runner's raw per-attempt bundle is deterministic for this mock input; only the identities below are retained.",
-    "results.json": {
-      "bytes": 183157,
-      "sha256": "f8bb93f35fb08c684a2d6d93b64f93715f10cf158a04c90feeaa355540a25ae7"
-    },
+    "reason": "The runner's raw per-attempt bundle is deterministic for this mock input; the raw bundle is not retained, but results.json is.",
     "cost_ledger.json": {
       "bytes": 80943,
       "sha256": "cc603b302b88388ee0164e383dc06c621d0309cd1e1012086839af1b72cd4252"
     },
     "input_evidence_manifest.json": {
-      "bytes": 1592,
-      "sha256": "49ab8d31ecc47b8dd2c91c309f14ce5ebed6b076792e2dbf300f0d112d965984"
+      "bytes": 1595,
+      "sha256": "bb109252f9d68b42740ab36c2c9a1173988c549d8ad7928e03ef1b1da3a6632c"
     },
     "final_evidence_manifest.json": {
-      "bytes": 1227,
-      "sha256": "02fcbb056501995ffef1f5c43a9dcf73cbb1647c3f6578be6cca1cbe7b9f18b9"
+      "bytes": 1230,
+      "sha256": "5c7f9653dde2749909ecb64fe30ce4e6cc8198bc4416e27e00ef66563af8bbfa"
+    },
+    "finalization_marker.json": {
+      "bytes": 555,
+      "sha256": "d7c76ed34e0466d8d91102f577daecc3af506c6782d125408d043db07c59e98f"
+    },
+    "inputs/cases.json": {
+      "bytes": 14619,
+      "sha256": "51683cd32e3fa0660e6c079aa6bb35bdf4f4fae7eb9a1af50b47de5c5ca79fd7"
+    },
+    "inputs/config.json": {
+      "bytes": 810,
+      "sha256": "38e96315573c28a0ad977a21e61fd24d0fea4d8a839b8101e5fdbc6d5769b4da"
+    },
+    "inputs/gate.json": {
+      "bytes": 1060,
+      "sha256": "fd930533bb95f8f2dc7e2e5b02634b22c475f301c4b766e4b8f4e2bddef85ede"
+    },
+    "inputs/model_pins.json": {
+      "bytes": 611,
+      "sha256": "70bef54328260ff583262f0ba22caaffa0aaa1b9f0ed900a0dbf8fb24657026b"
     }
   },
-  "note": "The dry-run accepts only the mock transport and a SYNTHETIC gate; zero network and zero provider calls were made. The report's attempts/aggregates arrays are empty by runner design; per-case deterministic outcomes are in run-log.json."
+  "attempts_aggregates_note": "final_report.json has attempts=[] and aggregates=[] because the merged dry-run pipeline writes them empty; no runner change is made. Per-case smoke outcomes are in run-log.json.case_matrix.",
+  "note": "The dry-run accepts only the mock transport and a SYNTHETIC gate; zero network and zero provider calls were made."
 }
