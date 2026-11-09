@@ -306,6 +306,11 @@
       "declares_read_only": false
     },
     {
+      "name": "complete-project-checkpoint",
+      "manual_only": true,
+      "declares_read_only": false
+    },
+    {
       "name": "compliance-control-foundation",
       "manual_only": false,
       "declares_read_only": false
@@ -5339,6 +5344,11 @@
     },
     {
       "from": "project-orchestrator",
+      "to": "azure-saas-architect",
+      "type": "body-route"
+    },
+    {
+      "from": "project-orchestrator",
       "to": "change-classification-gate",
       "type": "body-route"
     },
@@ -7683,6 +7693,7 @@
     "branching-strategy-designer",
     "browser-boundary-reviewer",
     "cell-based-architecture-designer",
+    "complete-project-checkpoint",
     "configuration-architect",
     "context-co-update-ci-gate",
     "cqrs-read-model-designer",

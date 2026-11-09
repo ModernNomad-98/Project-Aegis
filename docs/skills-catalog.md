@@ -316,6 +316,7 @@ convention, decision D3 — present and well-formed, not "passing").
 | `skill-usage-ledger` | D91 | yes | Emits the six-field record of which Aegis skills a task used, each bound to its skills-manifest SHA-256; writes nothing itself (the user pastes). |
 | `agent-failure-recovery` | #275 | **no** (manual-only; mutates git state) | Preserve-first recovery of broken git/tree state; destructive cleanup needs backup + approval. |
 | `agent-instruction-consolidator` | #276 | **no** (manual-only; edits behavior-steering files) | Align agent instruction files to one canonical source with rule-preservation proof. |
+| `complete-project-checkpoint` | owner instruction 6560045180 (beyond roadmap; joins this family) | **no** (manual-only) | Finish existing authorized finite work and save a complete project checkpoint for a fresh chat: finite agent AND process barrier, late-result reconciliation, complete queue/decisions/authority/memory/schedule/evidence preservation with FULL/BOUNDED/NOT-READ coverage, immutable generation + readback, exact-bound resume card. Never an emergency immediate stop. |
 
 Trigger-overlap coverage (`evals/trigger-evals.json`) ships for the two overlap clusters:
 context/truth (`agent-startup-context-gate`, `source-of-truth-reconciler`) and
@@ -1441,7 +1442,6 @@ not duplicative. Design-only, edits no live config and grants no access →
 | `superadmin-observability-console-designer` | reconciliation §5 D47 (superadmin-console discovery) | yes | Design the cross-tenant superadmin observability/monitoring console — the surface operators use to SEE platform health (signups, DB health, security, audits, cost, incidents) across every tenant. Read-security model FIRST (deny-all-RLS platform-admin registry with grant provenance, no self-service grant, three-layer server-side re-check, read-only-by-default with privileged-write-only telemetry, denied-access-as-metric, break-glass CONTENT reveal), then the layered IA with restraint (one health answer first), the server-shaped read model, per-panel `{feed-owner, read-scope, wired?}` typing with a known-gaps page, the DB/query-perf panel spec, and posture-as-verification-results with the DB self-monitoring caveat. ≠ `admin-console-architect` (cross-tenant ACTIONS/impersonation/break-glass ELEVATION — seeing is not acting), `observability-operator` (wires/operates the telemetry backend), `slo-reliability-architect` (what pages), `audit-log-architect` (the audit substrate), `security-logging-alerting-architect` (detection coverage), `synthetic-monitoring-architect` (the probes), `usage-metering-and-cost-attribution-pipeline-designer` (the metering ETL), `authorization-matrix-designer` (the authz policy). |
 
 ---
-
 ## Backlog by phase (reconciled)
 
 The v4 phase structure is canonical. Each phase's first-pass skills are listed; see the

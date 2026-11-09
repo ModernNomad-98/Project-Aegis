@@ -4,26 +4,29 @@
 > skill-contract audit, for maintainers checking which skill texts the audit
 > script flags for review. Everything below this note is script output.
 >
-> **Regenerated 2026-10-26 under AEGIS-APR-145** (the owner grant recorded
-> in the [approval register](../approvals/APPROVAL_REGISTER.md) for the SIDE-005
-> rule and the three engine-generated baselines) with engine v1.14.0,
-> which adds the SIDE-005 rule and bumps the engine from v1.13.4: the
-> engine is changed by this regeneration, not unchanged. The audit runs over
-> the Repo SHA below, a commit that contains every change the regenerating
-> pull request (PR) makes to the files the audit reads (checkout with
-> core.autocrlf=false, so the corpus hash is over LF (line feed, Unix-style
+> **Regenerated 2026-11-01 under AEGIS-APR-167** (the Route A one-time
+> baseline-regeneration grant recorded in the
+> [approval register](../approvals/APPROVAL_REGISTER.md) for the
+> complete-project-checkpoint integration) with engine v1.14.0 **unchanged**:
+> this is a corpus/baseline refresh, not an engine change (engine v1.14.0
+> remains the same engine recorded by the prior baseline). The audit runs over
+> the Repo SHA below, a commit on the content branch that contains every change
+> the combined PR makes to the files the audit reads (checkout with
+> `core.autocrlf=false`, so the corpus hash is over LF (line feed, Unix-style
 > line ending) bytes; the branch field in the generated header below records
 > the checkout branch, empty when the verification checkout is detached).
-> The previous baseline (195 skills, 339 findings, engine v1.13.4 over `cbb084d6f1f2acbd2373510dbd5290dcb18f285a`, PR #679 under AEGIS-APR-119, merged as `c1acc075910ea1e849401e18cdb60df31c09ef30`) is in git history. This page
-> reports the current baseline only; the older PR #503 baseline is historic and
-> is not the current comparison point.
-> Structural findings are not behavioral proof.
+> The previous baseline (254 skills, 462 findings, engine v1.14.0 over
+> `f697aa3848cfb791c61d69321311f91fe4a5d4e0`, regenerated under AEGIS-APR-145)
+> is in git history; this page reports the current baseline only.
+> Structural findings are not behavioral proof. The current PR's finding delta
+> and per-new-finding dispositions are recorded in the PR body/evidence, not
+> waived by this page.
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `f697aa3848cfb791c61d69321311f91fe4a5d4e0` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `7d1f3aee79539f0273df076d9746d2153dcaa57730aff4751891355c7c801212` (985 files, 6662770 bytes)
-- Skills scanned: **254**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
-- Findings: **462** (365 mechanical, 97 semantic-review candidates)
+- Repo SHA: `7a55d783b7375451878d7a5375b65dcfb3bda4ec` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `29daa81eccc5e973ca7e564bfd3b7081154ca795a527207a173b3dcbbfd50171` (993 files, 6864329 bytes)
+- Skills scanned: **255**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
+- Findings: **465** (368 mechanical, 97 semantic-review candidates)
 
 Findings are EXPECTED here: this report records the corpus as it is
 at the Repo SHA above, after whatever remediation that commit already
@@ -60,7 +63,7 @@ mechanically proven defects.
 | APPR-002 | P0 | semantic-candidate | scope grant authorizing BUILD from a requirements-stage approval | 0 |
 | APPR-003 | P1 | mechanical | approval record with allowed scope but no forbidden scope | 0 |
 | STATE-001 | P0 | semantic-candidate | append-only-declared file carries mutable placeholders | 2 |
-| STATE-002 | P0 | mechanical | append-only-declared file instructs overwrite/rewrite/truncate | 0 |
+| STATE-002 | P0 | mechanical | append-only-declared file instructs overwrite/rewrite/truncate | 1 |
 | STATE-003 | P0 | mechanical | middle insertion described inside an append-only contract | 0 |
 | STATE-004 | P0 | semantic-candidate | exact-operation claim with unbound placeholders in command fences | 0 |
 | STATE-005 | P1 | semantic-candidate | narrative approved-state section inside an append-only contract | 0 |
@@ -73,7 +76,7 @@ mechanically proven defects.
 | PARITY-001 | P2 | mechanical | Validation Checklist with no checkable items | 37 |
 | PARITY-002 | P2 | mechanical | Output Format too thin to verify against | 0 |
 | EVAL-001 | P2 | mechanical | no negative discrimination case anywhere in the skill's evals (STRUCTURAL) | 0 |
-| EVAL-002 | P2 | mechanical | eval case unjudgeable as written (per schema) | 1 |
+| EVAL-002 | P2 | mechanical | eval case unjudgeable as written (per schema) | 3 |
 | EVAL-003 | P1 | semantic-candidate | approval/state-related skill with no refusal or boundary case | 3 |
 | EVAL-004 | P1 | mechanical | trigger-eval target does not resolve in the namespace its syntax declares | 0 |
 | REF-001 | P1 | mechanical | markdown link target missing on disk | 0 |
@@ -82,7 +85,7 @@ mechanically proven defects.
 
 ## Coverage (what was and was not reviewed)
 
-- **Mechanically scanned:** all 254 shipped skills' SKILL.md + references + eval JSONs (this report).
+- **Mechanically scanned:** all 255 shipped skills' SKILL.md + references + eval JSONs (this report).
 - **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — their FILENAMES feed name resolution and the manifest; their content is left to `scripts/validate-skills.py`, which checks agent frontmatter and guided-path links.
 - **Auxiliary input (content read, NOT in the corpus hash):** `docs/skills-catalog.md` supplies the manifest `family` field. It, and the agent/guided-path filenames, are recorded separately under provenance `auxiliary_inputs`; the corpus content hash covers the skill corpus only. All input surfaces are containment-checked fail-closed before any read: a link or path that leads outside the repository stops the run.
 - **Semantically reviewed:** none by this tool — semantic candidates are queued for the named reviewer skills, not executed here.
@@ -91,21 +94,22 @@ mechanically proven defects.
 
 | Severity | Count |
 |---|---:|
-| P0 | 2 |
+| P0 | 3 |
 | P1 | 96 |
-| P2 | 38 |
+| P2 | 40 |
 | info | 326 |
 
 | Rule | Count |
 |---|---:|
 | ARTF-001 | 10 |
-| EVAL-002 | 1 |
+| EVAL-002 | 3 |
 | EVAL-003 | 3 |
 | PARITY-001 | 37 |
 | REF-003 | 1 |
 | ROUTE-002 | 326 |
 | SIDE-004 | 82 |
 | STATE-001 | 2 |
+| STATE-002 | 1 |
 
 ## Findings (P0/P1 + all semantic-review candidates)
 
@@ -206,11 +210,12 @@ mechanically proven defects.
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/tenant-provisioning-designer/SKILL.md` (owner: tenant-provisioning-designer; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seed data' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/tenant-provisioning-designer/SKILL.md` (owner: tenant-provisioning-designer; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'provisioning' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/ux-design-iteration/SKILL.md` (owner: ux-design-iteration; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [deploy-provision]: 'deploy' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
+- **STATE-002** [P0/medium/mechanical] `.claude/skills/ux-design-iteration/SKILL.md:199` (owner: ux-design-iteration; maps: AEGIS-002, AEGIS-004) — append-only-declared file instructs 'rewrite' near the declaration itself
 - **SIDE-004** [P1/low/SEMANTIC-REVIEW CANDIDATE] `.claude/skills/visual-regression-test-designer/SKILL.md` (owner: visual-regression-test-designer; maps: AEGIS-020, AEGIS-057) — auto-invocable skill's Workflow instructs a §5 mutation [data-store-write]: 'seeded data' — semantic-review candidate (instruction vs teaching is the reviewer's judgment)
 
 ## P2/info findings (summarized; full detail in the JSON report)
 
-- **EVAL-002** × 1 — e.g. `.claude/skills/skill-selection-advisor/evals/trigger-evals.json`: trigger-evals case 'catalog-navigation-not-selection' names no expected_skill — unjudgeable as written
+- **EVAL-002** × 3 — e.g. `.claude/skills/complete-project-checkpoint/evals/trigger-evals.json`: trigger-evals case 'authoring-skill' names no expected_skill — unjudgeable as written
 - **PARITY-001** × 37 — e.g. `.claude/skills/application-layer-pattern-advisor/SKILL.md`: Validation Checklist contains no checkbox items — nothing verifiable
 - **ROUTE-002** × 326 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
 
@@ -231,8 +236,8 @@ mechanically proven defects.
 - `agent-harness-architect`: complete×1, deployed×1, verified×4
 - `agent-identity-privilege-reviewer`: durable×1, verified×2
 - `agent-instruction-consolidator`: complete×1, verified×1
-- `agent-memory-governance`: complete×5, durable×6, proposed×1, verified×9
-- `agent-startup-context-gate`: committed×4, complete×1, released×1, verified×12
+- `agent-memory-governance`: complete×5, durable×6, proposed×1, verified×10
+- `agent-startup-context-gate`: accepted×3, committed×4, complete×3, ready×2, released×1, verified×17
 - `agentic-loop-designer`: complete×1, estimated×1
 - `ai-closeout-reporter`: accepted×2, complete×7, verified×3
 - `ai-cost-guardrail-designer`: estimated×4, verified×5
@@ -265,13 +270,14 @@ mechanically proven defects.
 - `cell-based-architecture-designer`: complete×1
 - `chat-backlog-reconciliation`: proposed×1, verified×2
 - `ci-pipeline-architect`: accepted×1, committed×1, deployed×1, estimated×1, released×1
-- `clickthrough-test-engineer`: deployed×2, planned×3, proposed×1
+- `clickthrough-test-engineer`: deployed×2, planned×3, proposed×1, verified×4
 - `client-state-boundary-reviewer`: verified×1
 - `cloud-architecture-decider`: accepted×1, committed×4, complete×1, durable×3, estimated×3, verified×14
 - `cloud-security-baseline-reviewer`: accepted×6, committed×1, complete×1
 - `code-reviewer`: accepted×4, committed×2, deployed×1, proposed×1
 - `code-simplifier`: accepted×1, planned×1, verified×1
 - `command-gateway-architect`: accepted×1, committed×1, complete×1, verified×2
+- `complete-project-checkpoint`: accepted×5, complete×39, durable×8, planned×5, ready×1, verified×34
 - `compliance-control-foundation`: proposed×1, ready×1, verified×11
 - `compliance-evidence-collector`: complete×5, verified×1
 - `compliance-gap-auditor`: verified×3
@@ -362,7 +368,7 @@ mechanically proven defects.
 - `product-spec-writer`: verified×1
 - `production-safe-smoke-tester`: deployed×1, proposed×2, verified×3
 - `profiling-methodology-designer`: complete×1, proposed×1, targeted×1
-- `project-orchestrator`: accepted×22, approved scope×4, commit-able×9, committed×2, complete×42, deployed×1, proposed×11, ready×3, verified×3
+- `project-orchestrator`: accepted×22, approved scope×4, commit-able×9, committed×2, complete×42, deployed×1, proposed×11, ready×3, verified×4
 - `promotion-packet-writer`: ready×3
 - `prompt-injection-defender`: accepted×2
 - `pwa-boundary-reviewer`: verified×1
@@ -388,7 +394,7 @@ mechanically proven defects.
 - `sast-orchestration-designer`: accepted×2, complete×1
 - `schema-evolution-planner`: deployed×2, planned×1, proposed×2, verified×2
 - `scoped-approval-register`: committed×3, complete×2, durable×2, proposed×3, verified×3
-- `screenshot-evidence-planner`: ready×2, verified×3
+- `screenshot-evidence-planner`: accepted×1, ready×2, verified×3
 - `search-architecture-designer`: complete×1
 - `secrets-identity-hardener`: accepted×1, committed×9, complete×5, verified×1
 - `secure-migration-reviewer`: accepted×3, deployed×4, verified×1
@@ -401,7 +407,7 @@ mechanically proven defects.
 - `sharded-validation-with-resume`: complete×1, targeted×2
 - `share-link-access-architect`: complete×1, verified×2
 - `skill-deprecation-planner`: planned×3, ready×1, targeted×1, verified×1
-- `skill-selection-advisor`: planned×2
+- `skill-selection-advisor`: planned×2, verified×5
 - `skill-usage-instrumenter`: estimated×4
 - `slo-reliability-architect`: complete×4, planned×5
 - `soc2-trust-criteria-mapper`: committed×2, complete×3, proposed×1, verified×5
@@ -431,6 +437,6 @@ mechanically proven defects.
 - `url-state-architect`: verified×1
 - `usage-metering-and-cost-attribution-pipeline-designer`: complete×1, estimated×3
 - `user-preference-architect`: verified×1
-- `ux-design-iteration`: accepted×20, proposed×9, ready×22, verified×2
+- `ux-design-iteration`: accepted×46, proposed×9, ready×22, verified×2
 - `vite-build-qa-engineer`: deployed×3, ready×1, verified×3
 - `warehouse-lake-architect`: verified×1

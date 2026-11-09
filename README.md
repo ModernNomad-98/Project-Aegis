@@ -828,7 +828,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->254<!-- /SKILL-COUNT --> skills comprise **253 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->255<!-- /SKILL-COUNT --> skills comprise **254 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -840,10 +840,10 @@ plain-language business question, records each dated decision in a `docs/project
 keeps a human as the approval gate on anything irreversible. See
 *[Your first session](#your-first-session)* for the opening prompt.
 
-1. **Operating discipline** *(Phase 1, 9)* — the always-on rules that keep AI-assisted work
+1. **Operating discipline** *(Phase 1, 10)* — the always-on rules that keep AI-assisted work
    honest: classify before acting, verify against evidence, keep diffs small, halt for
    approval, close out honestly. *e.g.* `change-classification-gate`, `human-approval-boundary`,
-   `reviewable-diff-discipline`, `ai-closeout-reporter`.
+   `reviewable-diff-discipline`, `ai-closeout-reporter`, `complete-project-checkpoint`.
 2. **AI-SDLC governance** *(Phase 1.5, 7)* — the human+agent lifecycle contract: named stages
    and gates, standing agent authority, memory governance, task planning, after-the-fact
    process audit.
@@ -1166,6 +1166,7 @@ Phase 1 — AI engineering operating-discipline pack, under `.claude/skills/<nam
 | `skill-usage-ledger` | Emits the six-field record of which Aegis skills a task used, each bound to its skills-manifest SHA-256, for pasting into a PR description or ledger; writes nothing itself. | auto |
 | `agent-failure-recovery` | Preserve-first recovery from broken git/tree state; destructive cleanup only with backup + explicit approval. | **manual only** |
 | `agent-instruction-consolidator` | Aligns CLAUDE.md / AGENTS.md / Cursor / Copilot instruction files to one canonical source with rule-preservation proof. | **manual only** |
+| `complete-project-checkpoint` | Owner instruction 6560045180 (beyond roadmap; joins this family). Finish existing authorized finite work and save a complete project checkpoint for a fresh chat: drain finite agents AND processes to terminal evidence; reconcile late results; preserve the complete known queue, responsibilities, models, workflow, authority, decisions, technical state, schedules, evidence and documented operational knowledge with FULL/BOUNDED/NOT-READ limits; emit an immutable generation plus readback and an exact-bound resume card. Never an emergency stop, skill-authoring request, handoff design or startup restore; grants no authority. | **manual only** |
 
 Phase 1.5 — AI-SDLC governance completion (roadmap #261/#268/#279/#280, plus #266 under
 D69 plus the two plan-stage skills under the external owner decision OD-6 (beyond-roadmap, no repository D-number); completes the category-08 layer Phase 1 started — composes the Phase 1 skills, never

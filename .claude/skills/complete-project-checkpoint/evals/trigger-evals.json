@@ -1,0 +1,76 @@
+{
+  "skill": "complete-project-checkpoint",
+  "description": "Explicit invocation and neighboring-task discrimination. Synthetic definitions, not passing results.",
+  "overlaps_with": [
+    "phased-work-handoff-designer",
+    "ai-closeout-reporter",
+    "agent-startup-context-gate",
+    "agent-memory-governance"
+  ],
+  "cases": [
+    {
+      "id": "explicit-full-save",
+      "prompt": "Explicitly invoke complete-project-checkpoint. Finish existing authorized finite work, preserve the entire known project queue and recovery evidence, then save for a fresh chat.",
+      "expected_skill": "complete-project-checkpoint",
+      "should_not_trigger": [
+        "phased-work-handoff-designer",
+        "ai-closeout-reporter"
+      ],
+      "reason": "An explicitly requested current whole-project finish-and-save operation."
+    },
+    {
+      "id": "design-future-handoff",
+      "prompt": "Design how sequenced stages should hand off decisions, changed and NOT-touched files, and review evidence across sessions.",
+      "expected_skill": "phased-work-handoff-designer",
+      "should_not_trigger": [
+        "complete-project-checkpoint"
+      ],
+      "reason": "Designs a future protocol; does not invoke a present save."
+    },
+    {
+      "id": "one-task-closeout",
+      "prompt": "Report the completed task: changes, validation, intentionally unfinished work and next action.",
+      "expected_skill": "ai-closeout-reporter",
+      "should_not_trigger": [
+        "complete-project-checkpoint"
+      ],
+      "reason": "One-task reporting does not stop and capture the whole project."
+    },
+    {
+      "id": "resume-existing-checkpoint",
+      "prompt": "Resume from this checkpoint, verify its identity and inspect current instructions and state before continuing.",
+      "expected_skill": "agent-startup-context-gate",
+      "should_not_trigger": [
+        "complete-project-checkpoint"
+      ],
+      "reason": "Startup restoration, not creation of a new save."
+    },
+    {
+      "id": "memory-policy-change",
+      "prompt": "Explicitly invoke agent-memory-governance. Propose how durable project memory should distinguish owner instructions from agent suggestions.",
+      "expected_skill": "agent-memory-governance",
+      "should_not_trigger": [
+        "complete-project-checkpoint"
+      ],
+      "reason": "Memory-policy governance is separate from recording existing accessible references."
+    },
+    {
+      "id": "urgent-stop",
+      "prompt": "Stop immediately. Preserve only the permitted minimum recovery state; do not wait through a new drain workflow.",
+      "expected_skill": null,
+      "should_not_trigger": [
+        "complete-project-checkpoint"
+      ],
+      "reason": "Honor direct STOP and applicable emergency procedure without auto-invoking this manual-only workflow."
+    },
+    {
+      "id": "authoring-skill",
+      "prompt": "Make this pasted universal save prompt into a skill. Keep all its sections; do not execute the save.",
+      "expected_skill": null,
+      "should_not_trigger": [
+        "complete-project-checkpoint"
+      ],
+      "reason": "Skill authoring is not invocation; choose an available authoring procedure under current instructions."
+    }
+  ]
+}
