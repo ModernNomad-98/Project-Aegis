@@ -1,0 +1,99 @@
+{
+  "aggregate": true,
+  "capabilities": [
+    {
+      "capability": "discovery",
+      "disposition": "VERIFIED",
+      "evidence_refs": [
+        "docs/host-record/README.md"
+      ],
+      "reason": "Synthetic discovery facts recorded in an offline fixture."
+    },
+    {
+      "capability": "explicit-invocation",
+      "disposition": "VERIFIED",
+      "evidence_refs": [
+        "docs/host-record/README.md"
+      ],
+      "reason": "Synthetic explicit invocation recorded in the fixture."
+    },
+    {
+      "capability": "automatic-invocation-restriction",
+      "disposition": "UNSUPPORTED",
+      "evidence_refs": [],
+      "reason": "No automatic invocation is claimed in this synthetic slice."
+    },
+    {
+      "capability": "reference-loading",
+      "disposition": "UNKNOWN",
+      "evidence_refs": [],
+      "reason": "Reference loading was not exercised in the synthetic slice.",
+      "remaining_action": "Record offline fixture evidence before any claim."
+    },
+    {
+      "capability": "tool-permission",
+      "disposition": "NOT_RUN",
+      "evidence_refs": [],
+      "reason": "Tool permission behaviour was not run; no real host was contacted.",
+      "remaining_action": "Run only in a separately authorized host step."
+    },
+    {
+      "capability": "interruption-resume",
+      "disposition": "UNSUPPORTED",
+      "evidence_refs": [],
+      "reason": "Interruption/resume is out of scope for this offline slice."
+    },
+    {
+      "capability": "evidence-collection",
+      "disposition": "UNKNOWN",
+      "evidence_refs": [],
+      "reason": "Evidence collection shape is defined; no real collection occurred.",
+      "remaining_action": "Collect only with a named, authorized host profile."
+    }
+  ],
+  "config_digest": {
+    "algorithm": "sha256",
+    "digest": "74c38fe597aecc4d09f76bf58cf3345eb9cf44f37f520e9d26768007b1a0a59b",
+    "input_names": [
+      "AEGIS_HOST_MODE",
+      "PYTHON_VERSION"
+    ],
+    "input_values": {
+      "AEGIS_HOST_MODE": "synthetic-offline",
+      "PYTHON_VERSION": "3.14.7"
+    }
+  },
+  "host": {
+    "invocation_mode": "explicit-invocation",
+    "os_name": "Windows",
+    "os_version": "10.0.26200",
+    "product": "Windows 11 synthetic fixture",
+    "version": "10.0.26200"
+  },
+  "limits": [
+    "Synthetic fixture only; no real host was contacted.",
+    "No provider, network or credential action.",
+    "Two thousand character string cap."
+  ],
+  "non_claims": [
+    "not host/consumer qualification",
+    "not a portability claim",
+    "not live/production behaviour"
+  ],
+  "package_binding": {
+    "package_manifest_sha256": "4e409cf96588da83a782323e6aea409bf4392624ea7dc47c8a662fdc82d7412c",
+    "profile_id": "synthetic-offline-profile-v1"
+  },
+  "preparation_only": true,
+  "record_id": "HCR-SYNTH-AGGREGATE-003",
+  "schema": "aegis.host-capability-record/1",
+  "source_evidence": [
+    {
+      "bytes": 0,
+      "note": "synthetic fixture bound to a program record; bytes/hash re-measured by outer evidence",
+      "path": "docs/host-record/README.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "synthetic": true
+}

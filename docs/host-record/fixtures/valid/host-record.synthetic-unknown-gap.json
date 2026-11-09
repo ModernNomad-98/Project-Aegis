@@ -1,0 +1,100 @@
+{
+  "capabilities": [
+    {
+      "capability": "discovery",
+      "disposition": "VERIFIED",
+      "evidence_refs": [
+        "docs/host-record/README.md"
+      ],
+      "reason": "Synthetic discovery facts recorded for the gap fixture."
+    },
+    {
+      "capability": "explicit-invocation",
+      "disposition": "VERIFIED",
+      "evidence_refs": [
+        "docs/host-record/README.md"
+      ],
+      "reason": "Synthetic explicit invocation recorded for the gap fixture."
+    },
+    {
+      "capability": "automatic-invocation-restriction",
+      "disposition": "UNKNOWN",
+      "evidence_refs": [],
+      "reason": "Automatic invocation restriction not exercised in the gap fixture.",
+      "remaining_action": "Authorize a bounded host step before any claim."
+    },
+    {
+      "capability": "reference-loading",
+      "disposition": "UNKNOWN",
+      "evidence_refs": [],
+      "reason": "Reference loading not exercised; gap is named.",
+      "remaining_action": "Run the offline reference-loading fixture case."
+    },
+    {
+      "capability": "tool-permission",
+      "disposition": "NOT_RUN",
+      "evidence_refs": [],
+      "reason": "Tool permission behaviour not run; gap is named.",
+      "remaining_action": "Run only in a separately authorized host step."
+    },
+    {
+      "capability": "interruption-resume",
+      "disposition": "UNKNOWN",
+      "evidence_refs": [],
+      "reason": "Interruption/resume not exercised; gap is named.",
+      "remaining_action": "Define a deterministic offline case."
+    },
+    {
+      "capability": "evidence-collection",
+      "disposition": "NOT_RUN",
+      "evidence_refs": [],
+      "reason": "Evidence collection not run; gap is named.",
+      "remaining_action": "Collect only with a named, authorized host profile."
+    }
+  ],
+  "config_digest": {
+    "algorithm": "sha256",
+    "digest": "74c38fe597aecc4d09f76bf58cf3345eb9cf44f37f520e9d26768007b1a0a59b",
+    "input_names": [
+      "AEGIS_HOST_MODE",
+      "PYTHON_VERSION"
+    ],
+    "input_values": {
+      "AEGIS_HOST_MODE": "synthetic-offline",
+      "PYTHON_VERSION": "3.14.7"
+    }
+  },
+  "host": {
+    "invocation_mode": "manual-invocation",
+    "os_name": "Windows",
+    "os_version": "10.0.26200",
+    "product": "Windows 11 synthetic fixture (gap record)",
+    "version": "10.0.26200"
+  },
+  "limits": [
+    "Synthetic fixture only; no real host was contacted.",
+    "No provider, network or credential action.",
+    "Two thousand character string cap."
+  ],
+  "non_claims": [
+    "not host/consumer qualification",
+    "not a portability claim",
+    "not live/production behaviour"
+  ],
+  "package_binding": {
+    "package_manifest_sha256": "4e409cf96588da83a782323e6aea409bf4392624ea7dc47c8a662fdc82d7412c",
+    "profile_id": "synthetic-offline-profile-v1"
+  },
+  "preparation_only": true,
+  "record_id": "HCR-SYNTH-UNKNOWN-GAP-002",
+  "schema": "aegis.host-capability-record/1",
+  "source_evidence": [
+    {
+      "bytes": 6230,
+      "note": "synthetic fixture bound to a program record; bytes/hash re-measured by outer evidence",
+      "path": "docs/host-record/README.md",
+      "sha256": "3376c8d905d0b38ea591a2ff4db4e65e8f3c2c595431720fadc6d6376473728c"
+    }
+  ],
+  "synthetic": true
+}

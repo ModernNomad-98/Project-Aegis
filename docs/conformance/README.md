@@ -16,6 +16,9 @@ content. The catalog points at them.
 | `README.md` | This contract page. |
 | `../../tools/conformance/check_catalog.py` | The deterministic, read-only checker. |
 | `../../tools/conformance/README.md` | Checker usage, finding codes and limits. |
+| `evidence-binding-v1.json` | Checked-in evidence binding for the machine-executable requirements of the first profile. It names the catalog's bytes/SHA-256 and source revision, then binds captured payload files by byte count and SHA-256. |
+| `evidence/` | The captured payload files named by the binding (validator stdout; advisory contract-audit stdout). Their bytes are fixed; the binding's digest check compares them on every run that supplies the binding. |
+| `mechanism-anchors-v1.md` | Representative mechanism symbol/line anchors recorded from a reading pass. Recorded, not machine-resolved; the checker verifies only the mechanism ref path. |
 
 ## Honest scope of v1
 
@@ -63,8 +66,9 @@ against. A legitimate source edit requires a catalog update (bump `catalog_versi
 ### Non-circular evidence binding
 
 - The catalog carries no self-digest and no field that requires one.
-- An optional **evidence binding** (checked by the tool, never stored here) names the catalog's
-  bytes/SHA-256 and source revision, then lists evidence records per requirement. `EXECUTED` records
+- An optional **evidence binding** (checked by the tool; stored as a separate versioned file beside
+  this catalog, never embedded in it) names the catalog's bytes/SHA-256 and source revision, then
+  lists evidence records per requirement. `EXECUTED` records
   count only when their payload file exists with the declared bytes and SHA-256; `PLANNED-UNRUN` and
   `UNRUN` records are listed as unrun and never counted as evidence.
 - No binding may embed its own hash, and no artifact requires its enclosing commit SHA to identify
@@ -84,6 +88,60 @@ gates; preservation; skill-standard families; enforcing mechanism anchors; evide
 rules). The checker enforces the union of those families and the declared record range; a missing or
 out-of-range family is a finding. Additional families or profiles are a reviewed change to the
 checker constant and the catalog together, not a silent import.
+
+## Evidence binding v1 (checked in)
+
+`evidence-binding-v1.json` is the first checked-in binding for this catalog. It follows the contract
+in the checker README exactly: `schema` is `aegis.evidence-binding/1`, `catalog` carries the
+catalog's path, byte count and SHA-256, `source_revision` is the catalog's own declared
+`source_baseline.revision` (the value the checker compares against, not the head of the change that
+adds the binding), and `records` list the evidence per requirement.
+
+| Record | Classification | Requirement IDs | Bound payload |
+| --- | --- | --- | --- |
+| `L4-E-01` | `EXECUTED` | `AEGIS-REQ-MECH-01`, `AEGIS-REQ-PRES-01`, `AEGIS-REQ-SKILL-01`..`06` | `evidence/validate-skills.stdout.txt` (captured `python -B scripts/validate-skills.py` stdout, exit code 0) |
+| `L4-E-02` | `EXECUTED` | `AEGIS-REQ-MECH-02` | `evidence/audit-skill-contracts.stdout.txt` (captured `python -B scripts/audit-skill-contracts.py` stdout, exit code 0) |
+| `L4-U-01` | `UNRUN` | `MG1`, `MG3` | none - these are merge-gate conditions that bind to a pull-request head, and a local lane has no such head |
+
+**Field referents - compare against the file, not the footer.** In the binding,
+`stdout_path` names the captured payload **file**, and `stdout_bytes` /
+`stdout_sha256` are that whole file's byte count and raw SHA-256, header, body
+and footer included (for the checked-in records: 867 /
+`0cbcf0e40199daee...` and 1,145 / `9e90eb10981d0647...`). The payload file's
+own footer repeats the captured child-process stdout block's size and digest
+under the same `stdout_bytes` / `stdout_sha256` names (89 /
+`660f560ee944524e...` and 354 / `6d7261a82f7df0fd...`); those footer figures
+are **not** what the binding's fields carry, and the checker never compares
+them. Read the binding fields as payload-file bytes and payload-file SHA-256,
+not as captured-stdout figures. The names are kept because
+`aegis.evidence-binding/1` is the format implemented by the already-merged
+checker, `tools/conformance/check_catalog.py`, and its tests; renaming the
+fields would change that checker contract rather than this binding's
+documentation.
+
+Those two `EXECUTED` records cover nine requirement IDs whose declared verification is an
+executable local command. The one `UNRUN` record covers two further IDs (`MG1`, `MG3`); it is
+listed as unrun and is never counted as present evidence. The remaining twelve requirements carry
+no record and report as `NO-EVIDENCE`:
+their declared evidence is a stage artifact, review verdict or merge receipt produced by later
+stages, not by the implementer.
+
+Run it from the repository root:
+
+```text
+python -P -B tools/conformance/check_catalog.py --catalog docs/conformance/requirements.v1.json --evidence docs/conformance/evidence-binding-v1.json --json
+```
+
+Exit 0 with a top-level `checks_run.evidence_binding` of `true` means the binding matched the catalog
+bytes and source revision, and every `EXECUTED` payload existed with the declared byte count and
+SHA-256. It does **not** mean the evidence proves the requirement semantically; the checker verifies
+bytes and identity, not meaning (see the checker README's limits).
+
+Each payload carries a capture header naming its command, base revision and capture state, plus a
+footer repeating the captured stdout's byte count and SHA-256 and recording the exit code. The audit
+capture names the base revision and reports `dirty: true` because it was taken with this change's
+files still uncommitted; its finding counts and corpus hash are stable across the identical skill
+corpus, while its revision/dirty line necessarily differs at a later head.
 
 ## Using the checker
 

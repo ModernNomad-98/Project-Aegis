@@ -1,0 +1,80 @@
+{
+  "entries": [
+    {
+      "contract_negative": true,
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "EXPECTED-FINDINGS-MISMATCH"
+      ],
+      "fixture": "contract/expected-findings-mismatch-copy"
+    },
+    {
+      "contract_negative": true,
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "MANIFEST-STALE"
+      ],
+      "fixture": "contract/manifest-stale-copy"
+    },
+    {
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "AGGREGATE-CAPABILITY"
+      ],
+      "fixture": "docs/host-record/fixtures/invalid/host-record.aggregate-boolean.json"
+    },
+    {
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "MISSING-DISPOSITION"
+      ],
+      "fixture": "docs/host-record/fixtures/invalid/host-record.missing-disposition.json"
+    },
+    {
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "MISSING-FIELD",
+        "UNKNOWN-FIELD"
+      ],
+      "fixture": "docs/host-record/fixtures/invalid/host-record.unknown-field.json"
+    },
+    {
+      "expected_absent_fields": [],
+      "expected_exit": 1,
+      "expected_findings": [
+        "PERSONAL-DATA-FIELD",
+        "SECRET-LIKE-FIELD"
+      ],
+      "fixture": "docs/host-record/fixtures/invalid/host-record.unsafe-secret-field.json"
+    },
+    {
+      "expected_absent_fields": [
+        "pass",
+        "qualified",
+        "approved",
+        "authority"
+      ],
+      "expected_exit": 0,
+      "expected_findings": [],
+      "fixture": "docs/host-record/fixtures/valid/host-record.synthetic-unknown-gap.json"
+    },
+    {
+      "expected_absent_fields": [
+        "pass",
+        "qualified",
+        "approved",
+        "authority"
+      ],
+      "expected_exit": 0,
+      "expected_findings": [],
+      "fixture": "docs/host-record/fixtures/valid/host-record.synthetic-windows-11-python-314.json"
+    }
+  ],
+  "fixture_version": "v1",
+  "schema": "aegis.host-record-expected-findings/1"
+}
