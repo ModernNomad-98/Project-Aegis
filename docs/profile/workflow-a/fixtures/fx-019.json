@@ -1,0 +1,31 @@
+{
+  "fixture_id": "fx-019",
+  "kind": "positive",
+  "question": "What are the support hours, and does the holiday schedule change them?",
+  "corpus_documents": [
+    "support-hours",
+    "holidays"
+  ],
+  "expected": {
+    "status": "answered",
+    "citations": [
+      "support-hours#hours",
+      "holidays#schedule"
+    ],
+    "refusal_reason": null,
+    "must_include": [
+      "hours",
+      "holiday"
+    ],
+    "must_not_include": [
+      "24/7",
+      "always open"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "Two sections combine; the answer states both the normal hours and the holiday exception."
+}

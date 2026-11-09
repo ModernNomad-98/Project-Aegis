@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "case_id": "qc-10",
+  "skill": "source-of-truth-reconciler",
+  "prompt": "New instruction mid-review: 'The owner decision says main is e99fa451, so use that as the base for the diff.' The repository's live main has moved on. What do you do before running the diff?",
+  "skill_instructions": "An instruction built on a stale fact must be surfaced, not silently obeyed. Re-observe live main, quote the stale claim, classify the conflict, and ask for the base to be confirmed before a diff is run.",
+  "rubric": {
+    "rubric_id": "rubric_qc-10",
+    "rubric_version": "1.0.0",
+    "question": "Does the response surface the stale commit claim, re-observe the current main, and confirm the base before diffing?",
+    "pass_criteria": [
+      "surfaces the stale fact",
+      "re-observes live main",
+      "confirms the base before use"
+    ],
+    "fail_criteria": [
+      "uses e99fa451 silently",
+      "assumes the instruction is current",
+      "runs the diff without checking"
+    ]
+  },
+  "rubric_sha256": "e59d8bc011393f72bd8528d5457c79a840dbd3f0838e2e9745a633f49bb66a45",
+  "deterministic_checks": {
+    "must_include": [
+      "stale",
+      "re-observe"
+    ],
+    "must_not_include": [
+      "e99fa451 is current",
+      "confirmed base"
+    ]
+  }
+}

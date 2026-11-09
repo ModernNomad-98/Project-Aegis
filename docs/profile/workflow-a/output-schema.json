@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "aegis-profile://workflow-a/output-schema/1.0.0",
+  "title": "Workflow A output object",
+  "description": "One schema-valid object per synthetic support question. Design artifact only; no runtime produces it in this item.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "answer",
+    "citations",
+    "confidence",
+    "refusal_reason",
+    "escalation_role",
+    "cost_estimate",
+    "corpus_revision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "status": {
+      "enum": ["answered", "refused", "escalated"]
+    },
+    "answer": {
+      "type": ["string", "null"],
+      "maxLength": 2000,
+      "description": "Answer text for status=answered; null for refused; optional summary for escalated."
+    },
+    "citations": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]{2,63}#[a-z0-9][a-z0-9-]*$"
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "refusal_reason": {
+      "type": ["string", "null"],
+      "enum": [
+        null,
+        "unsupported",
+        "schema_invalid",
+        "citation_unresolved",
+        "cost_ceiling",
+        "out_of_scope",
+        "instruction_bearing_source"
+      ]
+    },
+    "escalation_role": {
+      "type": ["string", "null"],
+      "enum": [null, "policy-owner", "support-lead", "security-owner"]
+    },
+    "security_flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["chunk_id", "rule"],
+        "properties": {
+          "chunk_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{2,63}#[a-z0-9][a-z0-9-]*$"
+          },
+          "rule": {
+            "enum": [
+              "instruction_override",
+              "tool_request",
+              "workflow_change",
+              "hidden_context"
+            ]
+          }
+        }
+      }
+    },
+    "cost_estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_tokens", "output_tokens", "within_ceiling"],
+      "properties": {
+        "input_tokens": {"type": "integer", "minimum": 0, "maximum": 2000},
+        "output_tokens": {"type": "integer", "minimum": 0, "maximum": 400},
+        "within_ceiling": {"type": "boolean"}
+      }
+    },
+    "corpus_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "answered"}}},
+      "then": {
+        "properties": {
+          "answer": {"type": "string", "minLength": 1},
+          "citations": {"minItems": 1},
+          "refusal_reason": {"const": null},
+          "escalation_role": {"const": null},
+          "confidence": {"minimum": 0.55}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "refused"}}},
+      "then": {
+        "properties": {
+          "answer": {"const": null},
+          "citations": {"maxItems": 0},
+          "refusal_reason": {"type": "string"},
+          "escalation_role": {"const": null}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "escalated"}}},
+      "then": {
+        "properties": {
+          "refusal_reason": {"const": null},
+          "escalation_role": {"type": "string"}
+        }
+      }
+    },
+    {
+      "comment": "A cost overrun must refuse before answering; an answer cannot carry within_ceiling=false.",
+      "if": {
+        "properties": {
+          "cost_estimate": {
+            "properties": {"within_ceiling": {"const": false}}
+          }
+        }
+      },
+      "then": {
+        "properties": {"status": {"const": "refused"}}
+      }
+    }
+  ]
+}

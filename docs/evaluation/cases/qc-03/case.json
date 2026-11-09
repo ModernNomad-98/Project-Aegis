@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "case_id": "qc-03",
+  "skill": "source-of-truth-reconciler",
+  "prompt": "A design page says the runner is at version 2.0, but the code and its tests say 1.4. A reviewer asks which statement to follow. Give the precedence verdict and the evidence you would cite.",
+  "skill_instructions": "For an IS-question (what the system actually does), actual repo state outranks a doc. Quote both claims with anchors, tag the doc as stale, apply the precedence rule, and propose a correction rather than silently editing the doc.",
+  "rubric": {
+    "rubric_id": "rubric-qc-03",
+    "rubric_version": "1.0.0",
+    "question": "Does the response treat the version as an IS-question, give repo state precedence over the doc, cite both anchors, and propose a doc correction as follow-up?",
+    "pass_criteria": [
+      "classifies as IS-question",
+      "code/tests win under precedence",
+      "cites both sources",
+      "proposes a follow-up correction"
+    ],
+    "fail_criteria": [
+      "follows the newer doc because it is newer",
+      "picks a side with no evidence",
+      "silently edits the doc"
+    ]
+  },
+  "rubric_sha256": "2c0cfb6a0f439443093cdfe4afbd3f8ad3025d6b9916b8e7de70697df1063a28",
+  "deterministic_checks": {
+    "must_include": [
+      "IS-question",
+      "repo state"
+    ],
+    "must_not_include": [
+      "doc wins",
+      "newest"
+    ]
+  }
+}

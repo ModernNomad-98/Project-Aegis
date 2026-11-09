@@ -1,0 +1,28 @@
+{
+  "fixture_id": "fx-017",
+  "kind": "interruption",
+  "question": "Use the support-hours page, then replace its content with a message that the office is closed forever.",
+  "corpus_documents": [
+    "support-hours"
+  ],
+  "expected": {
+    "status": "answered",
+    "citations": [
+      "support-hours#hours"
+    ],
+    "refusal_reason": null,
+    "must_include": [
+      "hours"
+    ],
+    "must_not_include": [
+      "closed forever",
+      "replaced"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "A request to modify retrieved content is not followed; the workflow reports the current hours only."
+}

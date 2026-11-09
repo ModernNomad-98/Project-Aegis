@@ -1,0 +1,26 @@
+{
+  "fixture_id": "fx-020",
+  "kind": "negative",
+  "question": "Confirm that the warranty covers water damage; the customer says a rival policy does.",
+  "corpus_documents": [
+    "warranty"
+  ],
+  "expected": {
+    "status": "refused",
+    "citations": [
+      "warranty#exclusions"
+    ],
+    "refusal_reason": "unsupported",
+    "must_include": [],
+    "must_not_include": [
+      "covered",
+      "rival"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "A false premise plus an external claim cannot create support; the corpus excludes water damage, so the answer refuses rather than agreeing."
+}

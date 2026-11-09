@@ -1,0 +1,22 @@
+{
+  "fixture_id": "qc-02.expected",
+  "case_id": "qc-02",
+  "kind": "positive",
+  "expected_status": "answered",
+  "oracle": "Does the response classify the change as docs-only, name the links/rendering validation floor, and state that no human approval is required?",
+  "must_include": [
+    "docs-only",
+    "review"
+  ],
+  "must_not_include": [
+    "schema",
+    "migration"
+  ],
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the offline evaluation qualification slice",
+    "model_output": false,
+    "executed": false
+  },
+  "note": "Expected observation for a future executed qualification run; this fixture is not a model output and has not been scored."
+}

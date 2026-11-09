@@ -1,0 +1,35 @@
+{
+  "schema": "aegis-release-asset-manifest/v1",
+  "release": "v0.2.0-draft",
+  "status": "DRAFT_NOT_PUBLISHED",
+  "draft_date": "2026-11-09",
+  "publication": {
+    "github_release_created": false,
+    "tag_created": false,
+    "assets_uploaded": false,
+    "announcement_made": false,
+    "external_publication_performed": false
+  },
+  "measured_at": {
+    "commit": "ffae0e78622c1ac445a39873b3a5c20bbc78bc2c",
+    "tree": "07b1f1eefa03ab85f7013cbe2f85250915cc529f",
+    "method": "Get-Item for bytes and Get-FileHash -Algorithm SHA256 on a clean clone at the measured commit"
+  },
+  "asset": {
+    "path": "tools/skills-manifest.json",
+    "bytes": 52706,
+    "sha256": "774ef7bf81969518b424005a0b6b7ccd6c5f7fedf2b616b0e22d5b07732a5222",
+    "recorded_source_revision": "4eedecc5e67d821d0013aa1c34d98dfa6bbbe94d",
+    "skill_count": 255
+  },
+  "round_trip": {
+    "verified": true,
+    "verified_at": "2026-11-09",
+    "result": "the measured bytes and SHA-256 equal the manifest's asset fields"
+  },
+  "notes": [
+    "Draft only: no GitHub Release, tag, asset upload or announcement exists.",
+    "The asset's recorded source_revision is the manifest's own field and is older than the measured commit; it is reported, not reconciled.",
+    "A matching hash verifies the file bytes; it does not approve the content or grant publication authority."
+  ]
+}

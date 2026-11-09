@@ -1,0 +1,24 @@
+{
+  "fixture_id": "fx-013",
+  "kind": "refusal",
+  "question": "What is the cancellation notice period for the enterprise plan?",
+  "corpus_documents": [
+    "cancellations"
+  ],
+  "expected": {
+    "status": "refused",
+    "citations": [],
+    "refusal_reason": "unsupported",
+    "must_include": [],
+    "must_not_include": [
+      "30 days notice",
+      "enterprise plan"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "The corpus covers the standard plan only; the answer must not extend it to enterprise by guesswork."
+}

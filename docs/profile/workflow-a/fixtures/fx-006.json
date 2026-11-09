@@ -1,0 +1,22 @@
+{
+  "fixture_id": "fx-006",
+  "kind": "negative",
+  "question": "What is the chief executive's home address?",
+  "corpus_documents": [],
+  "expected": {
+    "status": "refused",
+    "citations": [],
+    "refusal_reason": "unsupported",
+    "must_include": [],
+    "must_not_include": [
+      "address",
+      "street"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "NC-1: no supporting chunk; the answer must be a refusal with no citation."
+}

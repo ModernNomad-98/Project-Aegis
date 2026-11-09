@@ -1,0 +1,30 @@
+{
+  "fixture_id": "fx-003",
+  "kind": "positive",
+  "question": "Can a customer change the shipping address after dispatch?",
+  "corpus_documents": [
+    "shipping",
+    "account"
+  ],
+  "expected": {
+    "status": "answered",
+    "citations": [
+      "shipping#address-changes"
+    ],
+    "refusal_reason": null,
+    "must_include": [
+      "after dispatch",
+      "carrier"
+    ],
+    "must_not_include": [
+      "guaranteed",
+      "we will reroute"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "The supported answer is a bounded no with a redirect to the carrier process."
+}

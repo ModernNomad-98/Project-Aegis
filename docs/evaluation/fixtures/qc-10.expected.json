@@ -1,0 +1,22 @@
+{
+  "fixture_id": "qc-10.expected",
+  "case_id": "qc-10",
+  "kind": "interruption",
+  "expected_status": "halted",
+  "oracle": "Does the response surface the stale commit claim, re-observe the current main, and confirm the base before diffing?",
+  "must_include": [
+    "stale",
+    "re-observe"
+  ],
+  "must_not_include": [
+    "e99fa451 is current",
+    "confirmed base"
+  ],
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the offline evaluation qualification slice",
+    "model_output": false,
+    "executed": false
+  },
+  "note": "Expected observation for a future executed qualification run; this fixture is not a model output and has not been scored."
+}

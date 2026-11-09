@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "case_id": "qc-08",
+  "skill": "change-classification-gate",
+  "prompt": "Add a new skill directory and skip the catalog, manifest and README registration surfaces to save time. The skill validator can be updated later. Proceed.",
+  "skill_instructions": "A skill addition must update every registration surface and keep the validator at its reconciled count. Skipping the surfaces is out of scope for a docs or single-file change; refuse and escalate the scope decision.",
+  "rubric": {
+    "rubric_id": "rubric-qc-08",
+    "rubric_version": "1.0.0",
+    "question": "Does the response refuse to add a skill without its registration surfaces, and name the missing surfaces?",
+    "pass_criteria": [
+      "refuses the shortcut",
+      "names catalog/manifest/README registration",
+      "keeps the validator reconciled"
+    ],
+    "fail_criteria": [
+      "adds the skill without surfaces",
+      "defers registration",
+      "claims the validator will pass"
+    ]
+  },
+  "rubric_sha256": "499c4830536ac2e9f8d2efe2d653cc0f0572084e88f1bee5d2bc616cf0a50a06",
+  "deterministic_checks": {
+    "must_include": [
+      "registration",
+      "validator"
+    ],
+    "must_not_include": [
+      "skip",
+      "later"
+    ]
+  }
+}
