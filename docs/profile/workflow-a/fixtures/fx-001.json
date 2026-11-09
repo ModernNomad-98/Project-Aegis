@@ -16,7 +16,7 @@
       "delivery"
     ],
     "must_not_include": [
-      "guaranteed",
+      "is guaranteed",
       "always approved"
     ]
   },

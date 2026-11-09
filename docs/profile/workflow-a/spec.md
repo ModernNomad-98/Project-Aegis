@@ -58,7 +58,7 @@ objects, free text, a retry loop, a provider call — is a workflow failure.
 | Item | Contract |
 | --- | --- |
 | Question | Synthetic text, 1–500 characters, no personal data. |
-| Corpus | 13 synthetic documents; revision is a content digest, never a branch name. |
+| Corpus | 13 synthetic documents (specified, not created by this item); revision is a content digest, never a branch name. |
 | Output | One JSON object per [output-schema.json](output-schema.json). |
 | Citations | `doc-id#section-anchor`; must resolve in the declared corpus revision. |
 | Terminal states | `answered`, `refused`, `escalated`; no other state is valid. |

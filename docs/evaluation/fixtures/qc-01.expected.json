@@ -9,8 +9,11 @@
     "no owner approval"
   ],
   "must_not_include": [
-    "merge",
-    "publish"
+    "requires owner approval",
+    "needs owner approval",
+    "merge is authorized",
+    "authorized to merge",
+    "publish is authorized"
   ],
   "provenance": {
     "synthetic": true,

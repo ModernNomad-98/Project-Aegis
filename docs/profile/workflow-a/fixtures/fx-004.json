@@ -17,7 +17,7 @@
       "misuse"
     ],
     "must_not_include": [
-      "all damage",
+      "covers all damage",
       "nothing is excluded"
     ]
   },

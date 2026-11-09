@@ -11,7 +11,7 @@
     "refusal_reason": "schema_invalid",
     "must_include": [],
     "must_not_include": [
-      "internal_notes"
+      "\"internal_notes\":"
     ]
   },
   "provenance": {

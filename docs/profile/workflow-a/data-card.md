@@ -11,10 +11,10 @@ without inventing a data policy.
 | Name | Synthetic support policy corpus A |
 | Version | `corpus-a/0.1.0` (design version; no content digest yet) |
 | Documents | 13 short policy documents, 150–400 words each |
-| Origin | **Synthetic.** Written for this exercise; invented organization, people and amounts. |
+| Origin | **Synthetic.** Specified for this exercise; to be written from a written outline when created. Invented organization, people and amounts. |
 | Language | English (a locale field exists; only `en` is specified) |
 | Personal data | **None.** No real name, email, phone, address, account, tenant or credential. |
-| Source | Hand-authored from a written outline; no scrape, no customer export, no model generation. |
+| Source | To be hand-authored from a written outline; no scrape, no customer export, no model generation. |
 | Retention | Retained with the repository design record until superseded; fixtures retained with the item. |
 | Document ids | `refunds`, `shipping`, `returns`, `warranty`, `promotions`, `billing`, `cancellations`, `account`, `privacy`, `security`, `support-hours`, `holidays`, `accessibility` |
 

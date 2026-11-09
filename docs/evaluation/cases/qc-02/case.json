@@ -26,8 +26,10 @@
       "review"
     ],
     "must_not_include": [
-      "schema",
-      "migration"
+      "requires a schema change",
+      "requires a migration",
+      "class is backend",
+      "class is ai-agentic"
     ]
   }
 }

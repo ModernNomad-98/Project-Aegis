@@ -84,9 +84,10 @@ sections 4–6; the seven fail-closed negative cases are in
 
 ## 4. Data: synthetic only
 
-The corpus is 13 short policy documents written for this exercise. They are
-**synthetic**: invented organizations, invented names, invented amounts, no
-real person, customer, tenant, credential or production record. The data card
+The corpus is specified as 13 short policy documents for this exercise;
+this item does not create the documents. They are **synthetic**: invented
+organizations, invented names, invented amounts, no real person, customer,
+tenant, credential or production record. The data card
 [workflow-a/data-card.md](workflow-a/data-card.md) records origin, allowed use,
 prohibited use, retention and the leakage checks. Twenty fixture transcripts
 under [workflow-a/fixtures/](workflow-a/fixtures/) are hand-written synthetic

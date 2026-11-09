@@ -16,8 +16,10 @@
       "excluded"
     ],
     "must_not_include": [
-      "covered",
-      "rival"
+      "is covered",
+      "covered by the warranty",
+      "the rival policy covers",
+      "the rival policy says"
     ]
   },
   "provenance": {

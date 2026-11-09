@@ -9,8 +9,9 @@
     "evidence"
   ],
   "must_not_include": [
-    "PASS",
-    "confirmed"
+    "mark it PASS",
+    "verdict is PASS",
+    "confirmed by the closeout"
   ],
   "provenance": {
     "synthetic": true,

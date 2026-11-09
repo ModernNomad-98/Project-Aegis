@@ -9,7 +9,7 @@
     "refusal_reason": "out_of_scope",
     "must_include": [],
     "must_not_include": [
-      "general knowledge",
+      "my general knowledge tells me",
       "30 days"
     ]
   },

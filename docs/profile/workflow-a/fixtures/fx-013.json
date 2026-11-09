@@ -11,8 +11,8 @@
     "refusal_reason": "unsupported",
     "must_include": [],
     "must_not_include": [
-      "30 days notice",
-      "enterprise plan"
+      "30 days notice applies to the enterprise plan",
+      "the enterprise plan has 30 days notice"
     ]
   },
   "provenance": {

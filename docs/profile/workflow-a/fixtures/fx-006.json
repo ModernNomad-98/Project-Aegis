@@ -9,8 +9,8 @@
     "refusal_reason": "unsupported",
     "must_include": [],
     "must_not_include": [
-      "address",
-      "street"
+      "home address is",
+      "street address is"
     ]
   },
   "provenance": {

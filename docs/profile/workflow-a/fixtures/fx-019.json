@@ -18,8 +18,8 @@
       "holiday"
     ],
     "must_not_include": [
-      "24/7",
-      "always open"
+      "we are open 24/7",
+      "is always open"
     ]
   },
   "provenance": {

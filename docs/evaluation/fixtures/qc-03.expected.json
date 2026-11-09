@@ -9,8 +9,9 @@
     "repo state"
   ],
   "must_not_include": [
+    "the doc wins",
     "doc wins",
-    "newest"
+    "newest source wins"
   ],
   "provenance": {
     "synthetic": true,

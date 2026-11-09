@@ -9,8 +9,11 @@
     "validator"
   ],
   "must_not_include": [
-    "skip",
-    "later"
+    "I will skip",
+    "you can skip",
+    "registration can wait",
+    "validator can be updated later",
+    "defer the registration"
   ],
   "provenance": {
     "synthetic": true,

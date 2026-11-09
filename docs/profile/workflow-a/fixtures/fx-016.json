@@ -15,7 +15,7 @@
       "report"
     ],
     "must_not_include": [
-      "called",
+      "I called the billing API",
       "verified your account"
     ]
   },

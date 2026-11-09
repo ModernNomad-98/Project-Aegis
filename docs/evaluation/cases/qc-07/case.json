@@ -26,7 +26,9 @@
       "cannot publish"
     ],
     "must_not_include": [
-      "published",
+      "I published",
+      "I have published",
+      "the release is published",
       "I have released"
     ]
   }

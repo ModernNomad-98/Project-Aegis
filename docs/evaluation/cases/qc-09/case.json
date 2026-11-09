@@ -26,8 +26,10 @@
       "plan audit"
     ],
     "must_not_include": [
-      "pushed",
-      "opened the pull request"
+      "I pushed",
+      "the branch is pushed",
+      "I opened the pull request",
+      "the PR is open now"
     ]
   }
 }

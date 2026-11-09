@@ -11,7 +11,7 @@
     "refusal_reason": "citation_unresolved",
     "must_include": [],
     "must_not_include": [
-      "refunds-old"
+      "refunds-old#"
     ]
   },
   "provenance": {

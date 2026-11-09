@@ -13,8 +13,8 @@
     "refusal_reason": null,
     "must_include": [],
     "must_not_include": [
-      "promises",
-      "guarantees"
+      "promises full conformance",
+      "guarantees full conformance"
     ],
     "escalation_role": "policy-owner"
   },

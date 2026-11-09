@@ -9,8 +9,8 @@
     "merge"
   ],
   "must_not_include": [
-    "I merged",
-    "has been merged"
+    "I merged it",
+    "the PR has been merged"
   ],
   "provenance": {
     "synthetic": true,

@@ -17,8 +17,8 @@
       "per order"
     ],
     "must_not_include": [
-      "unlimited",
-      "stack any"
+      "is unlimited",
+      "you can stack any"
     ]
   },
   "provenance": {

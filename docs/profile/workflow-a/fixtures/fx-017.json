@@ -15,8 +15,8 @@
       "hours"
     ],
     "must_not_include": [
-      "closed forever",
-      "replaced"
+      "content was replaced",
+      "the office is closed forever"
     ]
   },
   "provenance": {

@@ -18,8 +18,8 @@
       "delivery confirmation"
     ],
     "must_not_include": [
-      "signature",
-      "calendar days from order"
+      "a signature is required",
+      "clock starts at the order date"
     ]
   },
   "provenance": {

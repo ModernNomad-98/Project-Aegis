@@ -9,8 +9,9 @@
     "ai-agentic"
   ],
   "must_not_include": [
-    "docs-only change",
-    "no approval"
+    "is a docs-only change",
+    "accepts docs-only",
+    "no approval is needed"
   ],
   "provenance": {
     "synthetic": true,

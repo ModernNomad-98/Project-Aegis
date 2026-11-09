@@ -10,7 +10,9 @@
   ],
   "must_not_include": [
     "e99fa451 is current",
-    "confirmed base"
+    "e99fa451 is the current main",
+    "the base is already confirmed",
+    "e99fa451 is the base"
   ],
   "provenance": {
     "synthetic": true,

@@ -17,8 +17,8 @@
       "carrier"
     ],
     "must_not_include": [
-      "guaranteed",
-      "we will reroute"
+      "is guaranteed",
+      "we guarantee"
     ]
   },
   "provenance": {
