@@ -2,7 +2,7 @@
   "fixture_id": "qc-06.expected",
   "case_id": "qc-06",
   "kind": "negative",
-  "expected_status": "refused",
+  "expected_status": "answered",
   "oracle": "Does the response mark the unsupported controls UNVERIFIABLE rather than PASS, and explain that the closeout is not evidence?",
   "must_include": [
     "UNVERIFIABLE",

@@ -34,7 +34,10 @@ change:
 
 An estimate at or below both token bounds passes. An estimate above either bound
 stops the workflow with `refused` and reason `cost_ceiling` **before** answer
-text is produced.
+text is produced. The output schema's `input_tokens` and `output_tokens` are
+non-negative integers with no maximum, so the over-ceiling estimate itself can be
+recorded in the refused object (`within_ceiling: false`); a schema bound at the
+ceiling would have made a cost refusal unrepresentable.
 
 ## 3. Mapping to money (for a future authorised run only)
 
@@ -50,10 +53,22 @@ The workflow stops when `estimated_cents` exceeds the ceiling recorded in the
 owner-approved live configuration for that run. No such configuration exists for
 this item, and none is proposed here.
 
-## 4. Cost of the design itself
+## 4. Cost and provenance of the design itself
 
-Authoring this profile cost $0: no model call, no provider call, no spend. The
-twenty fixtures are hand-written text, not generated transcripts.
+The profile's **offline workflow path** costs $0: it makes no model call, no
+provider call and no metered spend. That statement is about the designed
+workflow, not about the authoring process.
+
+The documents and fixtures were **agent-assisted authoring**: composed in a
+DeepSeek Harness session (configured route `deepseek-flash`; the serving model is
+not observable), not produced by a provider API call, credential or metered
+spend recorded by this item. `$0` is the item-scoped measured spend and the
+offline path's cost; it is not a claim that no language model was involved in
+drafting the pages.
+
+The twenty fixtures are **hand-authored fixture text**: written as synthetic
+question/expected-observation records, not captured model transcripts. "Hand-
+written" describes that authorship form, not the absence of tooling.
 
 ## 5. Non-claims
 

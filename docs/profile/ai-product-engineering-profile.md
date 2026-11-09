@@ -12,7 +12,7 @@ qualification result. The workflow's execution is **UNRUN**.
 
 **Base identity:** live `main` at `ffae0e78622c1ac445a39873b3a5c20bbc78bc2c`
 (tree `07b1f1eefa03ab85f7013cbe2f85250915cc529f`), measured before this branch's
-single commit. Source options: `RECORDS/OUTCOME-9-PROFILE-OPTIONS.md`
+changes. Source options: `RECORDS/OUTCOME-9-PROFILE-OPTIONS.md`
 (17,351 B / `2bd04ff50c046fa0889fc873221204bde71ea0de02ed6909c4ea534f606e8e7f`),
 section 3 (Option A). Prior delivery context: PR #1001 merged 2026-11-09 at merge
 commit `3a420ed7378f6c726bfc6633315143fd6f832298`; the re-bound consumer
@@ -90,8 +90,9 @@ organizations, invented names, invented amounts, no real person, customer,
 tenant, credential or production record. The data card
 [workflow-a/data-card.md](workflow-a/data-card.md) records origin, allowed use,
 prohibited use, retention and the leakage checks. Twenty fixture transcripts
-under [workflow-a/fixtures/](workflow-a/fixtures/) are hand-written synthetic
-records; none is a model output and none contains personal data.
+under [workflow-a/fixtures/](workflow-a/fixtures/) are hand-authored synthetic
+records (composed with agent assistance as fixture text, not captured model
+transcripts); none is a model output and none contains personal data.
 
 ## 5. Approval boundaries
 
@@ -108,12 +109,15 @@ boundary: a live provider call, a real corpus, a consumer install, a publication
 or a spend. This design grants none of those. Within the synthetic boundary, the
 only approval-shaped step is an **escalation**: when confidence is below the
 declared threshold or the question is out of scope, the workflow emits
-`escalated` with the reason and the named human role, and stops.
+`escalated` with `escalation_role` and a non-empty `escalation_reason`
+(`refusal_reason` stays null), and stops.
 
 ## 6. Cost posture
 
 The offline design costs **$0**: no provider is contacted, no credential is read
-and no metered call is made. The cost model
+and no metered call is made. That is the design's offline path, not a claim that
+no language model assisted the drafting; the authoring disclosure is in the cost
+model. The cost model
 [workflow-a/cost-model.md](workflow-a/cost-model.md) states the per-answer
 ceiling a future live run would have to honour, with its token assumptions
 labelled as assumptions rather than measured prices. There is **no provider**
@@ -148,4 +152,6 @@ decision record is claimed.
 | [workflow-a/fixtures/](workflow-a/fixtures/) | Twenty synthetic fixture transcripts. |
 
 **Prepared by:** Aegis Delivery Agent (DeepSeek Harness; configured route
-`deepseek-flash`; serving model not observable). Local design record only.
+`deepseek-flash`; serving model not observable). This is agent-assisted
+authoring: no provider API call, credential or metered spend is recorded by the
+item, and the designed workflow is not executed. Local design record only.

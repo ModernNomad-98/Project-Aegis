@@ -44,11 +44,13 @@ merge, they are not part of any release.
   profile is selected.
 - **AI-product reference profile:** one synthetic workflow composed from five
   existing skills, with a data card, citation contract, output schema, cost model
-  and seven fail-closed negative cases. Design only; execution UNRUN.
+  and seven specified fail-closed negative cases (six exercised by fixtures;
+  NC-6 is design-only). Design only; execution UNRUN.
 - **Offline evaluation qualification slice:** ten synthetic cases over four
-  kinds, ten expected-observation fixtures, and a recorded mock/offline run with
-  zero network calls; the provider-backed judge and every citable verdict remain
-  UNRUN.
+  kinds, ten expected-observation fixtures, a committed witness matrix, and a
+  recorded mock/offline run with zero network calls and retained per-result
+  evidence. The deterministic layer is a smoke test; the provider-backed judge
+  and every citable verdict remain UNRUN.
 - **Release evidence:** this draft, an asset manifest naming
   `tools/skills-manifest.json` (52,706 B /
   `774ef7bf81969518b424005a0b6b7ccd6c5f7fedf2b616b0e22d5b07732a5222`) and a
@@ -77,11 +79,19 @@ merge, they are not part of any release.
 | --- | --- |
 | Asset path exists at the measured commit | yes |
 | Asset bytes / SHA-256 round-trip | 52,706 B / `774ef7bf81969518b424005a0b6b7ccd6c5f7fedf2b616b0e22d5b07732a5222` |
-| `docs/README.md` evidence-index count | corrected from 18 to 19 |
+| `docs/README.md` evidence-index count | corrected from 18 to 19; the index itself already has 19 rows, and this evaluation run log is not one of them |
 | Publication performed | **no** |
 | Tag created | **no** |
 | Asset uploaded | **no** |
 | Privacy checklist completed | [privacy-review-checklist.md](privacy-review-checklist.md) |
 
+**Evidence-index count.** `docs/evidence/README.md` already lists 19 rows; the
+`docs/README.md` pointer's 18 was stale, and correcting it adds no row. This
+pull request does not modify the evidence index and does not add the evaluation
+run log to it: that log is indexed by `docs/evaluation/README.md`, so the
+19-row count is unchanged.
+
 **Prepared by:** Aegis Delivery Agent (DeepSeek Harness; configured route
-`deepseek-flash`; serving model not observable). Draft record only.
+`deepseek-flash`; serving model not observable). Agent-assisted authoring: no
+provider API call, credential or metered spend is recorded by the item. Draft
+record only.

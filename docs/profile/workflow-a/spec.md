@@ -15,7 +15,8 @@ action.
 
 **Start.** A synthetic question and a session record are accepted by the intake
 check. Inputs: `question`, `session_id`, `corpus_revision`, `requested_locale`
-(optional). Reject empty, non-synthetic or malformed input without retrieval.
+(optional). Reject empty, non-synthetic or malformed input without retrieval:
+the workflow emits `refused` with reason `invalid_input` and cites nothing.
 
 **Step 1 — Retrieve.** Chunk the corpus at section boundaries; rank at most 8
 chunks with a deterministic lexical ranker (no model). Record chunk ids, scores
@@ -27,26 +28,38 @@ to change the workflow, call a tool, ignore a rule or reveal hidden context. Suc
 a chunk is **excluded** from drafting and recorded in `security_flags`.
 
 **Step 3 — Draft.** Compose an answer using only screened chunks. Every factual
-sentence must carry at least one citation. If no screened chunk supports the
-question, stop with `refused` and reason `unsupported`.
+sentence must be mapped to a claim entry, and each claim entry must carry one to
+three citations (see [retrieval-citation-contract.md](retrieval-citation-contract.md)).
+If no screened chunk supports the question, stop with `refused` and reason
+`unsupported`.
 
-**Step 4 — Validate.** Validate the candidate object against
+**Step 4 — Validate structure.** Validate the candidate object against
 [output-schema.json](output-schema.json). Unknown fields, missing required
-fields, a citation outside the corpus, or a confidence outside 0–1 fail closed to
-`refused` with reason `schema_invalid`.
+fields, a bad enum, a malformed citation string, a citation index out of range,
+or a confidence outside 0–1 fail closed to `refused` with reason
+`schema_invalid`. Step 4 checks **shape and format only**; it does not decide
+whether a citation resolves. That is Step 5.
 
 **Step 5 — Resolve citations.** Each citation must resolve to a corpus document
-id and an existing section anchor, and the cited passage must contain the claim's
-supporting terms (see [retrieval-citation-contract.md](retrieval-citation-contract.md)).
-A failed resolution produces `refused` with reason `citation_unresolved`.
+id and an existing section anchor, the cited chunk must be in the screened
+retrieval set, and the cited passage must contain the claim's supporting terms
+(see [retrieval-citation-contract.md](retrieval-citation-contract.md)). A failed
+resolution produces `refused` with reason `citation_unresolved`; it does not
+retroactively become `schema_invalid`.
 
 **Step 6 — Check the ceiling.** Estimate cost from the declared token
-assumptions; if the estimate exceeds the per-answer ceiling, stop with
-`refused` and reason `cost_ceiling` **before** emitting answer text.
+assumptions and record the estimate in `cost_estimate`. If the estimate exceeds
+the per-answer ceiling, stop with `refused` and reason `cost_ceiling`
+**before** emitting answer text. The schema's token fields are non-negative
+integers with no upper bound, so an over-ceiling estimate is representable in
+the refused object; `within_ceiling: false` is valid only when
+`status: refused`.
 
 **Step 7 — Decide the terminal status.**
 - `answered` when steps 3–6 pass and confidence is at or above 0.55;
-- `refused` when support, schema, citation or cost checks fail;
+- `refused` when support, schema, citation or cost checks fail, when intake
+  rejects the input (`invalid_input`), or when the turn carries a prompt
+  injection (`prompt_injection`);
 - `escalated` when the question is in scope but confidence is below 0.55, or the
   question needs a human decision (for example a policy exception).
 
@@ -61,16 +74,22 @@ objects, free text, a retry loop, a provider call — is a workflow failure.
 | Corpus | 13 synthetic documents (specified, not created by this item); revision is a content digest, never a branch name. |
 | Output | One JSON object per [output-schema.json](output-schema.json). |
 | Citations | `doc-id#section-anchor`; must resolve in the declared corpus revision. |
+| Claims | `claims[]` maps each factual sentence index to one to three indices in `citations`; this is the checkable form of "every factual sentence carries a citation". Whether the segmentation into sentences is correct remains a judge-only question. |
 | Terminal states | `answered`, `refused`, `escalated`; no other state is valid. |
 
 ## Failure and refusal path
 
 A refusal is a **successful** workflow outcome, not an error: it carries a
 machine-readable `refusal_reason` from the closed set `unsupported`,
-`schema_invalid`, `citation_unresolved`, `cost_ceiling`, `out_of_scope`,
-`instruction_bearing_source`. Refusals never include a guessed answer. An
-escalation carries `escalation_role` (for example `policy-owner`) and the
-reason; it never substitutes for a refusal when the corpus is simply silent.
+`invalid_input`, `schema_invalid`, `citation_unresolved`, `cost_ceiling`,
+`out_of_scope`, `prompt_injection`, `instruction_bearing_source`. Refusals never
+include a guessed answer.
+
+An escalation carries `escalation_role` (for example `policy-owner`) **and**
+`escalation_reason` (a non-empty string); `refusal_reason` is null for an
+escalation. The reason field exists because "escalated" without a reason is not
+auditable. An escalation never substitutes for a refusal when the corpus is
+simply silent.
 
 ## Approval gates
 
@@ -88,11 +107,17 @@ never self-approve an escalation.
 
 ## Acceptance checks for a future build (not run here)
 
-1. All 20 fixtures produce the expected terminal state.
-2. All seven NC cases in [negative-cases.md](negative-cases.md) fail closed.
-3. Every `answered` object has at least one resolving citation.
-4. No output object contains a citation to a non-corpus id.
-5. An over-ceiling estimate returns `refused` before any answer text.
+1. All 20 fixtures produce their expected terminal state.
+2. Every NC row that has a fixture (NC-1 through NC-5 and NC-7) fails closed;
+   NC-6 is design-only and has no fixture, so it is not exercised by the 20
+   fixtures. The seven-NC claim is scoped to the specified rows, not to executed
+   coverage.
+3. Every `answered` object has at least one resolving citation and at least one
+   claim entry; every claim entry's citation indices are in range.
+4. No output object contains a citation to a non-corpus id or a citation count
+   above three for one claim.
+5. An over-ceiling estimate returns `refused` with `within_ceiling: false`
+   before any answer text.
 6. The run log records zero network calls and zero provider calls.
 
 ## Non-goals
