@@ -15,12 +15,13 @@
     "must_not_include": [
       "promises",
       "guarantees"
-    ]
+    ],
+    "escalation_role": "policy-owner"
   },
   "provenance": {
     "synthetic": true,
     "author": "hand-written for the workflow-a design",
     "model_output": false
   },
-  "note": "NC-5: the corpus supports a status but not a dated promise; confidence is below threshold and the case escalates."
+  "note": "NC-5: the corpus supports a status but not a dated promise; confidence is below threshold, so the case escalates to the policy owner with the supporting citation."
 }

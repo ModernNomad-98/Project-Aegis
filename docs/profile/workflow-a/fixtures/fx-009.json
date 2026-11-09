@@ -7,9 +7,7 @@
   ],
   "expected": {
     "status": "refused",
-    "citations": [
-      "returns#window"
-    ],
+    "citations": [],
     "refusal_reason": "schema_invalid",
     "must_include": [],
     "must_not_include": [
@@ -21,5 +19,5 @@
     "author": "hand-written for the workflow-a design",
     "model_output": false
   },
-  "note": "NC-4: the requested shape violates the schema; the workflow refuses rather than emitting an unknown field."
+  "note": "NC-4: the requested shape violates the schema; the workflow refuses rather than emitting an unknown field, and a refusal carries no citation."
 }
