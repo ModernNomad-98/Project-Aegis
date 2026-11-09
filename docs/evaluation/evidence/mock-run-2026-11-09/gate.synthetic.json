@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "gate_kind": "ber-live-owner-gate",
+  "gate_id": "AEGIS-EVAL-QUALIFICATION-SYNTHETIC-DRY-RUN-2026-11-09",
+  "owner_decision_ref": "none: synthetic dry-run fixture; grants no live authority",
+  "fact_origin": "SYNTHETIC",
+  "dataset": {
+    "revision": "064136f26e82fbb8c385a2aaef68d1dbde3020b9",
+    "path": "docs/evaluation/cases",
+    "sha256": "d7f8b556addb403a316f0a550d6940d73bd3780d2ff8b9004379d2b25c81a01b",
+    "case_count": 10
+  },
+  "models": {
+    "subjects": {
+      "anthropic": "claude-sonnet-5-5",
+      "openai": "gpt-6-astra"
+    },
+    "judges": {
+      "anthropic": {
+        "vendor": "openai",
+        "model": "gpt-6-astra"
+      },
+      "openai": {
+        "vendor": "anthropic",
+        "model": "claude-sonnet-5-5"
+      }
+    }
+  },
+  "model_terms": {
+    "acknowledged": true,
+    "terms_ref": "synthetic dry-run: no provider terms apply; acknowledged=true is a loader-required placeholder, not a live acknowledgement or grant",
+    "acknowledged_on": "2026-11-09"
+  },
+  "spend": {
+    "ceiling_cents": 15000,
+    "provider_cap_cents": 12000
+  },
+  "created_at": "2026-11-09T00:00:00Z",
+  "expires_at": "2027-11-09T00:00:00Z"
+}

@@ -1,0 +1,79 @@
+{
+  "schema": "aegis-eval-command-record/v1",
+  "run_id": "post-delivery-item-2-20261109",
+  "item": "Offline Evaluation Qualification Slice (ITEM-2 / L6-OFFLINE-EVAL)",
+  "command": "python -B -m tools.behavioral_eval_runner live-dry-run --config tools/behavioral_eval_runner/live/config/dry-run-config.json --gate docs/evaluation/case-set-gate.synthetic.json --cases docs/evaluation/cases --repo-root . --evidence-root <empty-temp-dir>/evidence --cost-ledger <empty-temp-dir>/cost-ledger.json --run-id post-delivery-item-2-20261109",
+  "argv": [
+    "python",
+    "-B",
+    "-m",
+    "tools.behavioral_eval_runner",
+    "live-dry-run",
+    "--config",
+    "tools/behavioral_eval_runner/live/config/dry-run-config.json",
+    "--gate",
+    "docs/evaluation/case-set-gate.synthetic.json",
+    "--cases",
+    "docs/evaluation/cases",
+    "--repo-root",
+    ".",
+    "--evidence-root",
+    "<empty-temp-dir>/evidence",
+    "--cost-ledger",
+    "<empty-temp-dir>/cost-ledger.json",
+    "--run-id",
+    "post-delivery-item-2-20261109"
+  ],
+  "cwd": "<repository-root>",
+  "python": "3.14.7",
+  "started_utc": "2026-11-09T20:04:34Z",
+  "finished_utc": "2026-11-09T20:04:37Z",
+  "elapsed_ms": 3146,
+  "exit_code": 0,
+  "stdout": {
+    "bytes": 396674,
+    "sha256": "141fd2c8e5d8080b844311025c3a8997e5d12be7ccf939f9daf46810da17662e"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "head_at_run": "064136f26e82fbb8c385a2aaef68d1dbde3020b9",
+  "transport_class": "MOCK",
+  "network_calls": 0,
+  "real_spend_usd": "0.00",
+  "synthetic_cost_meter_cents": 285,
+  "evidence_verified": true,
+  "evidence_hashes": {
+    "final_report_sha256": "7087ff4f7d62b793f6f86d6ff143af7eff03b7e11c414b0688b3e7428bceffc8",
+    "final_evidence_manifest_sha256": "02fcbb056501995ffef1f5c43a9dcf73cbb1647c3f6578be6cca1cbe7b9f18b9",
+    "input_evidence_manifest_sha256": "49ab8d31ecc47b8dd2c91c309f14ce5ebed6b076792e2dbf300f0d112d965984",
+    "finalization_marker_sha256": "5554167292aef64d58c83fec5a5665daabcec71a74abfdc124e5330bd4d3964d"
+  },
+  "retained_here": [
+    "gate.synthetic.json",
+    "final_report.json",
+    "run-log.json",
+    "command.json"
+  ],
+  "not_retained": {
+    "reason": "The runner's raw per-attempt bundle is deterministic for this mock input; only the identities below are retained.",
+    "results.json": {
+      "bytes": 183157,
+      "sha256": "f8bb93f35fb08c684a2d6d93b64f93715f10cf158a04c90feeaa355540a25ae7"
+    },
+    "cost_ledger.json": {
+      "bytes": 80943,
+      "sha256": "cc603b302b88388ee0164e383dc06c621d0309cd1e1012086839af1b72cd4252"
+    },
+    "input_evidence_manifest.json": {
+      "bytes": 1592,
+      "sha256": "49ab8d31ecc47b8dd2c91c309f14ce5ebed6b076792e2dbf300f0d112d965984"
+    },
+    "final_evidence_manifest.json": {
+      "bytes": 1227,
+      "sha256": "02fcbb056501995ffef1f5c43a9dcf73cbb1647c3f6578be6cca1cbe7b9f18b9"
+    }
+  },
+  "note": "The dry-run accepts only the mock transport and a SYNTHETIC gate; zero network and zero provider calls were made. The report's attempts/aggregates arrays are empty by runner design; per-case deterministic outcomes are in run-log.json."
+}
