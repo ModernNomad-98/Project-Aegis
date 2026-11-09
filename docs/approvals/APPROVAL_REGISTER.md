@@ -7716,3 +7716,48 @@ carry this append, as the register's naming rule requires.
 - **Evidence required before content-PR merge:** old/new bytes, LF and sha256 of the four baseline artifacts; the route-graph node/edge/unreferenced changes; the finding delta with individual NEW-finding dispositions; the truth-preserving docs preface; the exact 19-path diff; applicable local validation and review. Prior baselines remain in git history; this grant's PR replaces them without rewriting history.
 - **Expiry / use limit:** one combined content PR, consumed on its merge (only if the content PR is later separately authorized and merges); plus exactly one later register-only published PR appending the CONSUMED event. No standing exception and no further regeneration under this grant.
 - **Recording attribution:** produced by AI agent `judge-path-fix` (author lane), model **DeepSeek V4 Flash** (DeepSeek Harness), from the owner's direct instruction; recording only, not an approval, reviewer or merger; 0 human review.
+
+### AEGIS-APR-168: Consumption of Route A baseline-regeneration grant (AEGIS-APR-167)
+
+- **Event:** CONSUMED; target grant AEGIS-APR-167.
+- **Status at recording:** AEGIS-APR-167 has no remaining use. Its single
+  combined 19-path content PR — [PR #995](https://github.com/ModernNomad-98/Project-Aegis/pull/995)
+  — merged 2026-11-09T15:14:46Z as merge commit
+  `ba1967b7ee9fa0cc262830a11f2c68489223430c` (head
+  `89131f034d400dc8a1f4e84a46a8ae9a70b9d313`), which is the grant's only
+  consumption condition. The one later register-only published PR that the
+  grant's one-time exception permits is this PR: it is limited to this one
+  path, carries no other content, and appends this event. This is a
+  consumption record, not a new grant.
+- **Effective at:** 2026-11-09T15:14:46Z — the GitHub API's `merged_at` for
+  PR #995 (the source named here). The recording happens now, after that
+  merge, as AEGIS-APR-167 requires.
+- **Recorded at / By:** 2026-11-09 / the Aegis Delivery Agent (DeepSeek
+  Harness; configured route `deepseek-flash`; serving model not observable),
+  the agent that authored this register-only append: recording only, not an
+  approval, reviewer or merger.
+- **New authority:** None. The grant is spent: no further baseline
+  regeneration, no second register-only PR and no other content is covered by
+  AEGIS-APR-167 or by this event.
+- **Reason:** AEGIS-APR-167's use limit is "one combined content PR, consumed
+  on its merge ... plus exactly one later register-only published PR
+  appending the CONSUMED event". The content PR merged, and the 19 paths it
+  changed are exactly the 19 paths the grant names (read from PR #995's file
+  list at recording): the 8 `complete-project-checkpoint` skill files,
+  `README.md`, `docs/skills-catalog.md`, `tools/skills-manifest.json`,
+  `docs/skills/coverage-map.json`, `docs/skills/coverage-map.md`,
+  `docs/reconciliation/step-0-reconciliation-v4.md`, the four regenerated
+  baseline artifacts and the grant's own `docs/approvals/APPROVAL_REGISTER.md`
+  append. This entry is that follow-up append, in the sole permitted
+  register-only PR.
+- **Evidence:** [PR #995](https://github.com/ModernNomad-98/Project-Aegis/pull/995)
+  reads `merged: true`, `merged_at` 2026-11-09T15:14:46Z, merge commit
+  `ba1967b7ee9fa0cc262830a11f2c68489223430c`, head
+  `89131f034d400dc8a1f4e84a46a8ae9a70b9d313` and `changed_files: 19` in the
+  GitHub API at recording (point-in-time; re-read before reliance). The base
+  register blob this entry is appended to — `docs/approvals/APPROVAL_REGISTER.md`
+  at `ba1967b7` — is 669,408 B, 7,718 LF / 0 CR, sha256
+  `fbd0b51b958f4b3210cd194aa79d986237bad0ad3528fe06138d82064d26d6f8`, and
+  already carries the AEGIS-APR-167 GRANT heading (base blob line 7707) and
+  its `Expiry / use limit` (base blob line 7717). That base blob is an exact
+  byte prefix of this PR's file, so no existing line is edited.
