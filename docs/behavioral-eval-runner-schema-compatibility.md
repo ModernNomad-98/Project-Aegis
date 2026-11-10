@@ -207,7 +207,8 @@ the judge call, so it produced no proof and only the shared-allowance
 admission/state artifacts were uploaded. It is registered here for the same
 reason as the zero-spend runs — an artifactless ended run would otherwise refuse
 as `UNKNOWN` and block the next dispatch — but its recorded spend is the
-measured 21c, not zero. Registering the run is the accounting fix.
+measured 21c, not zero. The upload of failure-path diagnostics (below) is the
+durable fix for the *evidence* gap; registering the run is the accounting fix.
 
 The exact-match, fail-closed rules are unchanged:
 
@@ -240,6 +241,47 @@ The exact-match, fail-closed rules are unchanged:
   and still produced no proof, so without its registration the next dispatch
   would refuse its history as `UNKNOWN`. This is a recorded operational
   dependency, not a property the code can supply on its own.
+
+### Failure-path evidence upload (2026-11-10)
+
+The 21c halt exposed a second gap: `eval-smoke.yml` uploaded only the
+always-on admission/state artifacts, so the live-run stdout — the structured
+JSON that carried the transport-error detail — was lost with the runner, and the
+live-run stderr was not retained as an artifact. The workflow now has four
+failure-only `actions/upload-artifact` steps
+under distinct names, each with `if-no-files-found: warn` so one missing file
+does not hide the others:
+
+| Artifact | Member captured from `RUNNER_TEMP` | When present |
+| --- | --- | --- |
+| `ber-smoke-failure-run` | `ber-smoke-run.json` (the live-run summary) | the live step started |
+| `ber-smoke-failure-ledger` | `ber-smoke-ledger.json` (the cost ledger) | a call was recorded |
+| `ber-smoke-failure-evidence` | `ber-smoke-evidence/` (the evidence bundle) | the bundle was written |
+| `ber-smoke-failure-stderr` | `ber-smoke-stderr.log` (the redacted live-run stderr) | redaction verified and the raw capture removed |
+
+The live step redirects stderr to `ber-smoke-stderr.raw.log`, replaces both
+mapped provider key values with a `[REDACTED-<NAME>]` marker, and writes the
+result to the distinct upload target `ber-smoke-stderr.log`. Redaction is
+fail-closed, in this order: it reads the raw capture; writes and re-reads the
+redacted file; checks the written size; requires **both** mapped values to be
+absent from the re-read bytes; removes the raw capture and verifies it is gone;
+and only then writes `ber-smoke-stderr-redaction.json` with status
+`REDACTED`. Any failure prints a non-secret refusal, deletes the raw file, the
+redacted file and the marker, and exits the step non-zero. A separate
+marker-verification step (no provider key is mapped into it) re-checks the
+marker status, both values checked, the raw file's absence, and the redacted
+file's size and SHA-256. The stderr upload runs only on
+`failure() && steps.verify_stderr_redaction.outcome == 'success'`; a failed
+redaction therefore publishes no stderr artifact. The failure-path steps map no
+secret and dump no environment.
+
+The run summary, cost ledger and evidence bundle are uploaded as written and
+are **not sanitized**: they may carry partial model output from the run. The
+repository is private and these artifacts retain for 14 days; full
+sanitization of those three files is a recorded residual, deliberately not
+attempted in this bounded fix. None of these artifacts is a smoke proof: a
+failed run still publishes no proof, so the full-dispatch gate cannot be
+satisfied by a partial run.
 
 ## How to use this policy
 
