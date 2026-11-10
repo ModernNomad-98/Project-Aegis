@@ -76,7 +76,17 @@ PRESERVED_HISTORICAL_SMOKE_CENTS = 18
 #:
 #: Current committed template
 #: (tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json):
-#: 332 B / c484d8d9... -> 16,384.
+#: 331 B / 218d3fdf9d82867553892d67b03e199b3f260567631e9480c98e89278150b724
+#: -> 4,096 (owner line 2026-11-10:
+#: "authorize the smoke-config change to max_output_tokens 4096 and one final
+#: bounded attempt"). 16,384 never produced a successful live smoke; both
+#: retained 2026-10-31 proofs used 4,096.
+#:
+#: Retired identity: c484d8d9... (332 B, 16,384) is no longer an accepted proof
+#: identity. It never produced a proof artifact: the two paid 16,384 dispatches
+#: (42769599894, 42815400201) have no proof and are registered as run-level
+#: entries below. Removing an identity only NARROWS acceptance — a proof naming
+#: the retired identity refuses.
 #:
 #: Legacy 2026-10-31 template identity recorded by both retained historical
 #: proofs (eval-smoke runs 41213566873 / 41179846875, artifacts 13046737982 /
@@ -87,7 +97,7 @@ PRESERVED_HISTORICAL_SMOKE_CENTS = 18
 #: re-serialization is also 330 B but hashes to a227082d..., which is not an
 #: accepted identity), and no regenerated template file is claimed.
 SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
-    "c484d8d9eff3f53cfdeaf05f86701351c498bb3a0dae442d5ddae66f7b76877e": 16_384,
+    "218d3fdf9d82867553892d67b03e199b3f260567631e9480c98e89278150b724": 4_096,
     "a90ae2ce140e8dfb4beb60a4caef4782e4fbf07702dc60ab73fa4527d3c4e1d0": 4_096,
 }
 
@@ -159,11 +169,24 @@ SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
 #:   that set means "documented $0, no provider call", and a non-zero value there
 #:   refuses.
 #:
+#: 42815400201: the 2026-11-10T12:23:54Z authorized retry (the one bounded
+#:   retry under the recorded owner line) at head 51c33fdc, dispatched after
+#:   PR #1011 merged. It also reached the live step and spent real money before
+#:   halting: the retained failure evidence records exit 3, status HALTED,
+#:   dispatched_calls 1, spent_cents 21, halt_reason_code TRANSPORT_ERROR,
+#:   transport_class VENDOR_SDK and detail "anthropic transport failure:
+#:   BadRequestError" (HTTP 400); the judge was not reached and no smoke proof
+#:   exists. Unlike 42769599894, the failure-path artifacts (run summary,
+#:   ledger, evidence bundle and redacted stderr) were retained. Its 21c is
+#:   measured live spend, and it is deliberately NOT in
+#:   ZERO_SPEND_SMOKE_RUN_IDS.
+#:
 #: The five documented-$0 runs (42134872074, 42744285101, 42753652159,
 #: 42759036516 and 42765936890) are pinned zero by ZERO_SPEND_SMOKE_RUN_IDS: a
 #: non-zero committed value for one of them is a registry inconsistency and
-#: refuses rather than booking an unmeasured amount. 42769599894 is the only
-#: registered non-zero entry other than the preserved-floor residual, and it is
+#: refuses rather than booking an unmeasured amount. 42769599894 and
+#: 42815400201 are the registered non-zero measured entries (the
+#: preserved-floor residual is the other entry booked above $0), and both are
 #: intentionally absent from that set.
 #:
 #: Known residual (recorded, not hidden): this registry is a bounded, reviewed,
@@ -265,12 +288,30 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
             "proof (run metadata + live-step log)"
         ),
     },
+    "42815400201": {
+        "spent_cents": 21,
+        "expected_conclusion": "failure",
+        "expected_attempt": 1,
+        "head_sha": "51c33fdcfbce357eeff9a8a7a1752f70fac1c522",
+        "basis": (
+            "authorized retry of the live eval-smoke 2026-11-10T12:23:54Z, "
+            "head 51c33fdc..., attempt 1, dispatched after PR #1011 merged; the "
+            "live step ran and the retained failure evidence records exit 3, "
+            "status HALTED, dispatched_calls 1, spent_cents 21, "
+            "halt_reason_code TRANSPORT_ERROR, transport_class VENDOR_SDK and "
+            "detail 'anthropic transport failure: BadRequestError' (HTTP 400), "
+            "so the judge was not reached; no smoke proof (failure-path run / "
+            "ledger / evidence artifacts retained)"
+        ),
+    },
 }
 
 #: Registered artifactless smoke runs whose documented spend is exactly $0 (the
 #: run failed before any provider call and published no artifact). Their
 #: registry entries record 0; a non-zero committed value is a registry
 #: inconsistency and refuses instead of booking an unmeasured amount.
+#: The two measured 21c transport-halt runs (42769599894, 42815400201) are
+#: deliberately outside this set; a non-zero value here refuses.
 ZERO_SPEND_SMOKE_RUN_IDS = frozenset(
     {
         "42134872074",

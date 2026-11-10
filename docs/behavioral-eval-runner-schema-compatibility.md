@@ -143,7 +143,7 @@ provider call with `ValueError: unsupported trial manifest schema:
 The shared allowance-history smoke collector (`collect_smoke_proof_spends` in
 `tools/behavioral_eval_runner/live/workflow_runtime.py`) refuses an ended
 eval-smoke run that has no proof artifact as `UNKNOWN, not zero`: a missing
-artifact is not evidence of zero spend. Seven identified runs are registered in
+artifact is not evidence of zero spend. Eight identified runs are registered in
 the exact-match `SMOKE_RUNS_WITHOUT_PROOF` map, and only when the proof
 artifact is absent:
 
@@ -156,8 +156,9 @@ artifact is absent:
 | `42759036516` | `bb8e4849a7679a80fbe571cff4ef9252e5d8c96c` | 0c (pinned) | 2026-11-10T04:57:08Z offline-preflight refusal: `the owner gate has expired` (renewal pending); live step skipped, no proof |
 | `42765936890` | `035bab42d5dc27c666a93856adbb5382c87c5468` | 0c (pinned) | 2026-11-10T06:03:16Z admission-refused dispatch on the then-unregistered `42759036516` |
 | `42769599894` | `41d3b27a0e77247ed04297cb6be93b6d815a412b` | **21c (measured)** | 2026-11-10T06:36:05Z live dispatch that ran and halted: `TRANSPORT_ERROR`, `dispatched_calls 1`, `spent_cents 21`, judge not reached; only the admission/state artifacts, no proof |
+| `42815400201` | `51c33fdcfbce357eeff9a8a7a1752f70fac1c522` | **21c (measured)** | 2026-11-10T12:23:54Z authorized retry that ran and halted: `TRANSPORT_ERROR` (`VENDOR_SDK`, Anthropic SDK HTTP 400), `dispatched_calls 1`, `spent_cents 21`, judge not reached; failure-path artifacts retained, no proof |
 
-`41167546138` and `42769599894` are the only entries booked above $0.
+`41167546138`, `42769599894` and `42815400201` are the only entries booked above $0.
 `41167546138`'s 6c is the preserved-floor residual (the 18c floor minus the two
 retained 6c proofs), not a measured bill, and only its retained head prefix
 `88fdec73` could be registered because the full SHA was never kept locally.
@@ -166,8 +167,18 @@ paid execution. Its live-run summary records exit 3, status `HALTED`,
 `dispatched_calls 1`, `spent_cents 21` and `halt_reason_code
 TRANSPORT_ERROR`; with only one dispatched call the pinned two-call shape never
 completed, so the judge was not reached and no proof was published. It is the
-only registered non-zero entry that is neither zero nor a preserved-floor
-residual, and it is deliberately **not** in `ZERO_SPEND_SMOKE_RUN_IDS`.
+first of two registered non-zero measured halts, and it is deliberately
+**not** in `ZERO_SPEND_SMOKE_RUN_IDS`.
+
+The second paid execution, `42815400201` (2026-11-10T12:23:54Z, head
+`51c33fdc`, the authorized retry after PR #1011 merged), repeated the shape:
+admission, staging and the offline preflight passed, the live step dispatched
+one subject call and halted on `TRANSPORT_ERROR` (`transport_class`
+`VENDOR_SDK`, detail `anthropic transport failure: BadRequestError`, HTTP 400)
+before the judge, spent 21c and published no proof. Unlike the first halt, the
+failure-path artifacts now retain the run summary, cost ledger, evidence bundle
+and redacted stderr. It is registered here at its measured 21c, deliberately
+outside the zero-spend set.
 
 The four **zero-spend** 2026-11-10 entries are the same artifactless,
 pre-provider failure shape at two different preflight steps: `42744285101`
@@ -220,8 +231,9 @@ The exact-match, fail-closed rules are unchanged:
   `42744285101`, `42753652159`, `42759036516`, `42765936890`) are pinned
   to 0c by `ZERO_SPEND_SMOKE_RUN_IDS`: a non-zero committed value is a
   registry inconsistency and refuses instead of booking an unmeasured amount.
-  The paid halt run `42769599894` is deliberately **outside** that set: its
-  entry must record exactly 21c, and moving it into the zero-spend set refuses.
+  The paid halt runs `42769599894` and `42815400201` are deliberately
+  **outside** that set: each entry must record exactly 21c, and moving either
+  into the zero-spend set refuses.
 - **A present artifact always wins.** A present proof artifact always goes
   through the download, provenance and tamper validation path first; the
   registry is reached only when the artifact is absent (or GitHub lists it as
@@ -229,9 +241,9 @@ The exact-match, fail-closed rules are unchanged:
 - **Unregistered stays UNKNOWN.** An unregistered artifactless run stays
   `UNKNOWN`, not zero, and keeps admission blocked. Adding a run is a reviewed
   code change with new exact-match bounds, not a wildcard. The preserved floors
-  stay 18c smoke and 222c ledger. With all seven registrations and the two
-  retained proofs, the identified smoke history is 39c = 18c identified
-  (6c + 6c proofs + 6c preserved residual) + 21c measured halt.
+  stay 18c smoke and 222c ledger. With all eight registrations and the two
+  retained proofs, the identified smoke history is 60c = 18c identified
+  (6c + 6c proofs + 6c preserved residual) + 21c + 21c measured halts.
 - **The loop-breaking requirement is ongoing.** Registering
   `42765936890` breaks *this* loop instance, not the pattern: every dispatch
   that fails before it produces a proof artifact is itself artifactless and must
@@ -239,8 +251,10 @@ The exact-match, fail-closed rules are unchanged:
   dispatch**; otherwise the next dispatch refuses that history. The paid halt
   `42769599894` was the next such failure: it reached the live step, spent 21c
   and still produced no proof, so without its registration the next dispatch
-  would refuse its history as `UNKNOWN`. This is a recorded operational
-  dependency, not a property the code can supply on its own.
+  would refuse its history as `UNKNOWN`. The authorized retry `42815400201`
+  became the next such failure: it reached the live step, spent 21c and produced
+  no proof, and is registered here for the same reason. This is a recorded
+  operational dependency, not a property the code can supply on its own.
 
 ### Failure-path evidence upload (2026-11-10)
 
@@ -282,6 +296,22 @@ sanitization of those three files is a recorded residual, deliberately not
 attempted in this bounded fix. None of these artifacts is a smoke proof: a
 failed run still publishes no proof, so the full-dispatch gate cannot be
 satisfied by a partial run.
+
+### Smoke output cap and the retained provider error (2026-11-10)
+
+The owner authorized one final bounded attempt with the single-case smoke
+output cap changed from 16,384 to the known-good 4,096 (`max_output_tokens`):
+both paid 16,384 dispatches halted before the judge with `TRANSPORT_ERROR` (the
+retained retry evidence records the Anthropic SDK HTTP 400 `BadRequestError`; the
+first halt detail was lost with the runner), while both retained 2026-10-31
+proofs used 4,096. The live-setting floor
+is 4,096, so the change is within the enforced bounds. It does not alter the
+smoke shape, the spend caps or the proof format; the full-live and trial
+configs remain at 16,384. Bounded retention of the provider's exact SDK error
+message is **not** part of this change: it would persist provider-authored text
+into uploaded artifacts and therefore needs its own owner authorization; until
+then a transport failure records the exception class and reason code the runner
+already captured.
 
 ## How to use this policy
 

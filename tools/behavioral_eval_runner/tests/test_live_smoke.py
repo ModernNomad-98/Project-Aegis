@@ -77,7 +77,9 @@ class CommittedTemplateTests(unittest.TestCase):
     def test_smoke_template_is_single_case_shaped_and_hard_capped(self):
         template = _load_json(helpers.SMOKE_CONFIG)
         config = LiveConfig.from_dict(template)
-        self.assertEqual(config.max_output_tokens, 16384)
+        # Owner line 2026-11-10: the smoke output cap is the known-good 4,096
+        # (16,384 never produced a successful live smoke).
+        self.assertEqual(config.max_output_tokens, 4096)
         self.assertEqual(config.spend_ceiling_cents, 200)
         self.assertLessEqual(config.spend_ceiling_cents, SMOKE_CEILING_CENTS)
         self.assertEqual(config.runs_per_case, 1)
@@ -199,7 +201,7 @@ class LiveSettingGuardTests(unittest.TestCase):
             report = preflight(paths, environ={})
             self.assertNotEqual(report["status"], "REFUSED", report.get("blockers"))
             settings = report["live_settings"]
-            self.assertEqual(settings["max_output_tokens"], 16384)
+            self.assertEqual(settings["max_output_tokens"], 4096)
             self.assertEqual(
                 settings["max_output_tokens_floor"], MIN_LIVE_MAX_OUTPUT_TOKENS
             )
