@@ -498,7 +498,10 @@ class AllowanceHistoryTests(unittest.TestCase):
         trial = collect_latest_trial_spend(
             gh=fake, repository="o/r", work_dir=self.tmp,
         )
-        self.assertEqual(trial["schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+        # The collector's output schema stays current; the legacy manifest is
+        # recorded as source provenance, never as an emitted output schema.
+        self.assertEqual(trial["schema"], RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["source_schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
         self.assertEqual(trial["ledger_spend_cents"], 222)
         self.assertEqual(trial["smoke_spend"], {})
         history = collect_allowance_history(
@@ -543,7 +546,8 @@ class AllowanceHistoryTests(unittest.TestCase):
             gh=self._legacy_two_run_fake(8, 222), repository="o/r", work_dir=self.tmp,
         )
         self.assertEqual(trial["ledger_spend_cents"], 222)
-        self.assertEqual(trial["schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["schema"], RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["source_schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
         # Equal created_at: the higher run id is the newer record.
         tied = collect_latest_trial_spend(
             gh=self._legacy_two_run_fake(8, 222, same_created_at=True),
@@ -719,7 +723,8 @@ class AllowanceHistoryTests(unittest.TestCase):
         trial = collect_latest_trial_spend(
             gh=fake, repository="o/r", work_dir=self.tmp,
         )
-        self.assertEqual(trial["schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["schema"], RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["source_schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
         self.assertEqual(trial["ledger_spend_cents"], 222)
 
     def test_mixed_schema_regression_fails_closed(self):
@@ -785,15 +790,19 @@ class AllowanceHistoryTests(unittest.TestCase):
         self.assertEqual(trial["ledger_spend_cents"], 230)
 
     def test_legacy_manifest_malformed_created_at_fails_closed(self):
-        fake = self._trial_history_fake([
-            {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": "not-a-timestamp",
-             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222},
-        ])
-        with self.assertRaises(ValueError) as caught:
-            collect_latest_trial_spend(
-                gh=fake, repository="o/r", work_dir=self.tmp,
-            )
-        self.assertIn("malformed created_at", str(caught.exception))
+        # A parseable-but-incomplete value (date only, or no timezone) could
+        # silently change "newest" ordering, so it refuses like a bad string.
+        for created_at in ("not-a-timestamp", "2026-11-08", "2026-11-08T00:00:00"):
+            with self.subTest(created_at=created_at):
+                fake = self._trial_history_fake([
+                    {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": created_at,
+                     "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222},
+                ])
+                with self.assertRaises(ValueError) as caught:
+                    collect_latest_trial_spend(
+                        gh=fake, repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn("malformed created_at", str(caught.exception))
 
     def test_mixed_history_modern_without_created_at_fails_closed(self):
         # Recency decides cross-schema authority, so the modern candidate must

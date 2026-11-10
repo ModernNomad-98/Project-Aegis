@@ -698,13 +698,19 @@ def _run_created_at(run: Mapping[str, Any], label: str) -> datetime:
     value = run.get("created_at")
     if not isinstance(value, str) or not value.strip():
         raise ValueError(label + " has no readable created_at")
+    text = value.strip()
+    # A date-only or naive timestamp is parseable but not a complete GitHub
+    # UTC instant; accepting it could silently change "newest" ordering, so it
+    # is refused instead of being assigned an assumed timezone.
+    if "T" not in text:
+        raise ValueError(label + " has malformed created_at")
     try:
-        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
     except ValueError as exc:
         raise ValueError(label + " has malformed created_at") from exc
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed
+        raise ValueError(label + " has malformed created_at")
+    return parsed.astimezone(timezone.utc)
 
 
 def _run_id_ordinal(run_id: Any, label: str) -> int:
@@ -884,9 +890,19 @@ def collect_latest_trial_spend(
                     + str(record["spent"]) + "; fail closed"
                 )
     if chosen is None:
-        return {"schema": RESUME_MANIFEST_SCHEMA, "ledger_spend_cents": PRESERVED_HISTORICAL_LEDGER_CENTS, "smoke_spend": {}, "preserved_historical": True}
+        return {
+            "schema": RESUME_MANIFEST_SCHEMA,
+            "source_schema": RESUME_MANIFEST_SCHEMA,
+            "ledger_spend_cents": PRESERVED_HISTORICAL_LEDGER_CENTS,
+            "smoke_spend": {},
+            "preserved_historical": True,
+        }
     return {
-        "schema": chosen["schema"],
+        # The collector's output schema is unchanged; the manifest actually read
+        # is recorded separately as provenance. A legacy source never makes the
+        # returned spend record advertise a legacy output schema.
+        "schema": RESUME_MANIFEST_SCHEMA,
+        "source_schema": chosen["schema"],
         "ledger_spend_cents": max(chosen["ledger_spend"], PRESERVED_HISTORICAL_LEDGER_CENTS),
         "smoke_spend": validate_smoke_spend(chosen["payload"].get("smoke_spend", {})),
         "preserved_historical": True,
@@ -936,7 +952,7 @@ def collect_allowance_history(
         "preserved_historical_smoke_cents": PRESERVED_HISTORICAL_SMOKE_CENTS,
         "smoke_spend": smoke_records,
         "smoke_spend_cents": smoke_spend_total(smoke_records),
-        "source_schema": {"trial": trial["schema"], "accounting": ACCOUNTING_SCHEMA},
+        "source_schema": {"trial": trial["source_schema"], "accounting": ACCOUNTING_SCHEMA},
     }
 
 

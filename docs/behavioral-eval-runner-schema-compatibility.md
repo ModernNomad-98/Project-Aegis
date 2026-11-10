@@ -88,7 +88,10 @@ provider call with `ValueError: unsupported trial manifest schema:
   emitted as a new manifest.
 - **No field-meaning change.** Every field the collector reads keeps its
   existing meaning. `totals.spent_cents` remains a cumulative trial total, not
-  an independent delta.
+  an independent delta. The collector's returned `schema` stays the current
+  1.2.0 output schema; the manifest actually read is reported separately as
+  `source_schema`, so a legacy source never makes the spend record advertise a
+  legacy output schema.
 - **Older bytes unmodified.** Published 1.1.0 artifacts (for example eval-run
   `41213647310`, totals 222c, and `41145221349`, totals 8c) keep their
   original bytes, paths and recorded schema; the reader consumes them in
