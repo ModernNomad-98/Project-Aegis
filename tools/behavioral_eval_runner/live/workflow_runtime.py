@@ -146,10 +146,25 @@ SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
 #:   metadata + failure log). Recorded attempt 1 (metadata fact, not spend
 #:   proof).
 #:
+#: 42769599894: the 2026-11-10T06:36:05Z live eval-smoke dispatch at head
+#:   41d3b27a. Unlike every entry above, this run reached the live step and spent
+#:   real money before it halted: the live-run summary records exit 3, status
+#:   HALTED, dispatched_calls 1, spent_cents 21 and halt_reason_code
+#:   TRANSPORT_ERROR, so the judge call was not reached. Only the
+#:   ber-shared-allowance-admission and ber-shared-allowance-state artifacts were
+#:   uploaded (the 200c reservation is RESERVED and was never trued up); there is
+#:   no smoke proof. Its 21c is therefore measured live spend, not a documented
+#:   zero and not a preserved-floor residual. Recorded attempt 1 (metadata fact,
+#:   not spend proof). The run is deliberately NOT in ZERO_SPEND_SMOKE_RUN_IDS:
+#:   that set means "documented $0, no provider call", and a non-zero value there
+#:   refuses.
+#:
 #: The five documented-$0 runs (42134872074, 42744285101, 42753652159,
 #: 42759036516 and 42765936890) are pinned zero by ZERO_SPEND_SMOKE_RUN_IDS: a
 #: non-zero committed value for one of them is a registry inconsistency and
-#: refuses rather than booking an unmeasured amount.
+#: refuses rather than booking an unmeasured amount. 42769599894 is the only
+#: registered non-zero entry other than the preserved-floor residual, and it is
+#: intentionally absent from that set.
 #:
 #: Known residual (recorded, not hidden): this registry is a bounded, reviewed,
 #: exact-match list, not a wildcard. Any FUTURE dispatch that fails before it
@@ -233,6 +248,21 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
             "artifact: UNKNOWN, not zero'); step order means no credential "
             "mapping/provider call; zero artifacts; $0 spend (run metadata + "
             "failure log)"
+        ),
+    },
+    "42769599894": {
+        "spent_cents": 21,
+        "expected_conclusion": "failure",
+        "expected_attempt": 1,
+        "head_sha": "41d3b27a0e77247ed04297cb6be93b6d815a412b",
+        "basis": (
+            "live eval-smoke 2026-11-10T06:36:05Z, head 41d3b27a..., attempt 1; "
+            "the live step ran and the live-run summary records exit 3, status "
+            "HALTED, dispatched_calls 1, spent_cents 21, halt_reason_code "
+            "TRANSPORT_ERROR, so the judge was not reached; only the "
+            "ber-shared-allowance-admission and ber-shared-allowance-state "
+            "artifacts were uploaded (reservation 200c RESERVED), no smoke "
+            "proof (run metadata + live-step log)"
         ),
     },
 }
