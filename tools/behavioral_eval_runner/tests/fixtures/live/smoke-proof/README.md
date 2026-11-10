@@ -48,10 +48,16 @@ a227082dbfaf05f183ec3984b9e3d6e1ca55c74a650199af7c5e8ee71cc0b49f, which is
 or claimed: the provenance evidence is the historical ancestor blob itself.
 
 The recorded gate_template_sha256 in both fixtures
-(3975add5b2e1f8f9bb2a8774f5c1b756e27f981d5c69afafd2ac65726ea8fb16) equals the
-sha256 of the current committed gate template
-(tools/behavioral_eval_runner/live/gates/pilot-a-apr161.json), so gate identity
-is unchanged and is not part of the compatibility registry.
+(3975add5b2e1f8f9bb2a8774f5c1b756e27f981d5c69afafd2ac65726ea8fb16) is the
+**frozen pre-renewal** gate identity these retained proofs bind. It is not the
+identity of the current committed gate template
+(tools/behavioral_eval_runner/live/gates/pilot-a-apr161.json): the owner renewed
+that template on 2026-11-10, and the renewed file (1,552 B, sha256
+9ddca51fa71873e40f711d6edc1be574c9217772451ed9e9018bd6df79d83fa8) is pinned in
+tests/test_live_workflow_runtime.py both by its record fields and by its own
+whole-file byte hash. The fixtures' gate identity is therefore frozen history -
+it is not a claim that the current template is unchanged - and it is not part of
+the compatibility registry.
 
 These fixtures must not be cited as evidence of anything beyond the recorded
 historical artifacts listed above.

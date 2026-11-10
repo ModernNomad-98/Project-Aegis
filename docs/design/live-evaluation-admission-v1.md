@@ -104,7 +104,7 @@ Each rule below is a proposed requirement (R-AB), grounded in the code cited. No
 
 **R-AB-3 - An owner grant is required, and it must be the right kind.** `owner_decision_ref` must name a recorded owner line, and `fact_origin` must be `REAL_HOST` for any real live call; a `SYNTHETIC` record may only exercise a dry run. "The plan allows it" is not a grant; only the owner's recorded words are.
 
-**R-AB-4 - The gate must be current at the instant of the call.** Created-at must not be in the future and now must be strictly before `expires_at`, evaluated per call rather than once per run. The committed gate expires 2026-11-06T17:50:00Z, so no live verb is admissible at the base.
+**R-AB-4 - The gate must be current at the instant of the call.** Created-at must not be in the future and now must be strictly before `expires_at`, evaluated per call rather than once per run. At the captured base revision the committed gate recorded `expires_at = 2026-11-06T17:50:00Z`, so no live verb was admissible there; the owner renewed the gate on 2026-11-10 for one single-case `eval-smoke`, effective 2026-11-10T05:10:00Z and expiring 2026-11-11T12:00:00Z (section 4.2), and that renewal window is the one recorded at this revision.
 
 **R-AB-5 - Model pins are exact and a mismatch halts.** Subject and judge models must equal the pinned identifiers; a served-model string that differs halts the run with a structured mismatch error and no silent substitution. The judge route must not share the subject vendor.
 

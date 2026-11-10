@@ -2022,8 +2022,8 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         # retained legacy proofs record exactly the registered legacy identity.
         # The owner renewed the gate template on 2026-11-10 for the authorized
         # single-case smoke, so the legacy proofs' gate identity is their frozen
-        # pre-renewal value and the renewed template is asserted from its
-        # record fields instead.
+        # pre-renewal value and the renewed template is asserted from its record
+        # fields and by its own whole-file byte hash (not by that legacy value).
         config_bytes = (
             REPO_ROOT / "tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json"
         ).read_bytes()
@@ -2038,7 +2038,16 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         gate_path = (
             REPO_ROOT / "tools/behavioral_eval_runner/live/gates/pilot-a-apr161.json"
         )
-        gate_record = json.loads(gate_path.read_text(encoding="utf-8"))
+        gate_bytes = gate_path.read_bytes()
+        # Whole-file drift guard for the renewed template: the renewed gate is
+        # pinned by its own byte hash (and size), so spend, dataset, case-count
+        # or model-pin drift cannot pass unnoticed.
+        self.assertEqual(len(gate_bytes), 1_552)
+        self.assertEqual(
+            hashlib.sha256(gate_bytes).hexdigest(),
+            "9ddca51fa71873e40f711d6edc1be574c9217772451ed9e9018bd6df79d83fa8",
+        )
+        gate_record = json.loads(gate_bytes)
         # Renewed owner gate: effective 2026-11-10T05:10:00Z, expiring
         # 2026-11-11T12:00:00Z, bound to the renewal record.
         self.assertEqual(gate_record["created_at"], "2026-11-10T05:10:00Z")
