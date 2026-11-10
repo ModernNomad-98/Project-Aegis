@@ -31,11 +31,14 @@
 #   3. the verify step fails closed unless spent_cents <= ceiling_cents <= 200
 #      and the ledger shows exactly two reconciled calls.
 #
-# Fail-closed surface: no artifact is published unless the smoke COMPLETED with
-# a PASS/FAIL rule state, the judge returned a complete terminal finish reason,
-# the evidence bundle verified, and the spend stayed inside the cap. A failed
-# smoke uploads nothing, so the full-dispatch gate cannot be satisfied by a
-# partial run.
+# Fail-closed surface: no PROOF artifact is published unless the smoke
+# COMPLETED with a PASS/FAIL rule state, the judge returned a complete terminal
+# finish reason, the evidence bundle verified, and the spend stayed inside the
+# cap. A failed smoke uploads no proof, so the full-dispatch gate cannot be
+# satisfied by a partial run. Failure-path diagnostics only (run summary, cost
+# ledger, any evidence bundle, and redacted live-run stderr) are uploaded under
+# distinct ber-smoke-failure-* names so a halt's cause is retained; none of
+# them is a proof artifact.
 #
 # Secret containment: ANTHROPIC_API_KEY and OPENAI_API_KEY are mapped only in
 # the single env: block of the smoke run step, are never printed, and no
@@ -511,8 +514,27 @@ jobs:
             --evidence-root "$RUNNER_TEMP/ber-smoke-evidence" \
             --cost-ledger "$RUNNER_TEMP/ber-smoke-ledger.json" \
             --run-id "ber-live-smoke-$GITHUB_RUN_ID" \
-            > "$RUNNER_TEMP/ber-smoke-run.json" || code=$?
+            > "$RUNNER_TEMP/ber-smoke-run.json" \
+            2> "$RUNNER_TEMP/ber-smoke-stderr.log" || code=$?
           echo "live-run smoke exit code: $code"
+          # Failure-path evidence: keep the stderr diagnostics, but never publish
+          # the two mapped provider key values. Redaction happens here, in the
+          # only step where the keys are mapped, so the later upload step reads a
+          # file that cannot contain them. Nothing is printed by this block.
+          python -P - <<'PY'
+          import os
+          from pathlib import Path
+          path = Path(os.environ["RUNNER_TEMP"]) / "ber-smoke-stderr.log"
+          try:
+              text = path.read_text(encoding="utf-8", errors="replace")
+          except OSError:
+              raise SystemExit(0)
+          for name in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
+              value = os.environ.get(name)
+              if value:
+                  text = text.replace(value, "[REDACTED-" + name + "]")
+          path.write_text(text, encoding="utf-8")
+          PY
           if [ "$code" -ne 0 ]; then
             python -P - <<'PY'
           import json
@@ -736,4 +758,49 @@ jobs:
           path: ${{ runner.temp }}/ber-smoke-proof/
           retention-days: 14
           if-no-files-found: error
+
+      # Failure-path evidence. The live step can halt after spending (run
+      # 42769599894 halted at TRANSPORT_ERROR with spent_cents 21), and a
+      # successful-only upload loses the cause. These steps run only when the
+      # job has failed, keep each file group under a distinct artifact name and
+      # warn rather than fail when a file was never written, so one missing
+      # group cannot hide the others. They read files only: no secret is mapped
+      # into these steps, no environment is dumped, and the stderr file was
+      # already redacted inside the live step. No proof artifact is uploaded
+      # here, so the full-dispatch gate still cannot be satisfied by a failure.
+      - name: Upload failure-path smoke run summary
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-smoke-failure-run
+          path: ${{ runner.temp }}/ber-smoke-run.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload failure-path cost ledger
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-smoke-failure-ledger
+          path: ${{ runner.temp }}/ber-smoke-ledger.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload failure-path evidence bundle
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-smoke-failure-evidence
+          path: ${{ runner.temp }}/ber-smoke-evidence/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload failure-path live-run stderr
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: ber-smoke-failure-stderr
+          path: ${{ runner.temp }}/ber-smoke-stderr.log
+          retention-days: 14
+          if-no-files-found: warn
 

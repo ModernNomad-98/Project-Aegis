@@ -143,7 +143,7 @@ provider call with `ValueError: unsupported trial manifest schema:
 The shared allowance-history smoke collector (`collect_smoke_proof_spends` in
 `tools/behavioral_eval_runner/live/workflow_runtime.py`) refuses an ended
 eval-smoke run that has no proof artifact as `UNKNOWN, not zero`: a missing
-artifact is not evidence of zero spend. Six identified runs are registered in
+artifact is not evidence of zero spend. Seven identified runs are registered in
 the exact-match `SMOKE_RUNS_WITHOUT_PROOF` map, and only when the proof
 artifact is absent:
 
@@ -155,14 +155,22 @@ artifact is absent:
 | `42753652159` | `75053caf52a4f7a8e5ad8e6172cd29806b7707d1` | 0c (pinned) | **post-fix** 2026-11-10T04:06:01Z admission-refused dispatch |
 | `42759036516` | `bb8e4849a7679a80fbe571cff4ef9252e5d8c96c` | 0c (pinned) | 2026-11-10T04:57:08Z offline-preflight refusal: `the owner gate has expired` (renewal pending); live step skipped, no proof |
 | `42765936890` | `035bab42d5dc27c666a93856adbb5382c87c5468` | 0c (pinned) | 2026-11-10T06:03:16Z admission-refused dispatch on the then-unregistered `42759036516` |
+| `42769599894` | `41d3b27a0e77247ed04297cb6be93b6d815a412b` | **21c (measured)** | 2026-11-10T06:36:05Z live dispatch that ran and halted: `TRANSPORT_ERROR`, `dispatched_calls 1`, `spent_cents 21`, judge not reached; only the admission/state artifacts, no proof |
 
-`41167546138` is the only entry booked above $0: its 6c is the preserved-floor
-residual (the 18c floor minus the two retained 6c proofs), not a measured bill,
-and only its retained head prefix `88fdec73` could be registered because the
-full SHA was never kept locally.
+`41167546138` and `42769599894` are the only entries booked above $0.
+`41167546138`'s 6c is the preserved-floor residual (the 18c floor minus the two
+retained 6c proofs), not a measured bill, and only its retained head prefix
+`88fdec73` could be registered because the full SHA was never kept locally.
+`42769599894`'s 21c is the opposite case: a measured live bill from the first
+paid execution. Its live-run summary records exit 3, status `HALTED`,
+`dispatched_calls 1`, `spent_cents 21` and `halt_reason_code
+TRANSPORT_ERROR`; with only one dispatched call the pinned two-call shape never
+completed, so the judge was not reached and no proof was published. It is the
+only registered non-zero entry that is neither zero nor a preserved-floor
+residual, and it is deliberately **not** in `ZERO_SPEND_SMOKE_RUN_IDS`.
 
-The four 2026-11-10 entries are the same artifactless, pre-provider failure
-shape at two different preflight steps: `42744285101`
+The four **zero-spend** 2026-11-10 entries are the same artifactless,
+pre-provider failure shape at two different preflight steps: `42744285101`
 (pre-fix) failed closed at the "Shared allowance admission preflight" on the
 then-current legacy-manifest reader rejecting `ber-resume-manifest/1.1.0`.
 `42753652159` (post-fix) was dispatched at head `75053caf`, the merge of
@@ -189,7 +197,18 @@ So each registration PR was followed by another artifactless failure: the
 registration for `42744285101` was followed by `42753652159` refusing on it,
 and the registration for `42753652159` was followed by `42759036516` failing
 on the not-yet-renewed gate and then `42765936890` refusing on it. All four
-stopped before any provider call, so all four are $0.
+zero-spend entries stopped before any provider call, so all four are $0.
+
+The dispatch after those, `42769599894` (2026-11-10T06:36:05Z, head
+`41d3b27a`), finally passed admission, staging and the offline preflight, then
+reached the live step, where the two provider keys are mapped. It is the first paid execution: it
+dispatched one subject call, spent 21c, and halted on `TRANSPORT_ERROR` before
+the judge call, so it produced no proof and only the shared-allowance
+admission/state artifacts were uploaded. It is registered here for the same
+reason as the zero-spend runs — an artifactless ended run would otherwise refuse
+as `UNKNOWN` and block the next dispatch — but its recorded spend is the
+measured 21c, not zero. The upload of failure-path diagnostics (below) is the
+durable fix for the *evidence* gap; registering the run is the accounting fix.
 
 The exact-match, fail-closed rules are unchanged:
 
@@ -201,6 +220,8 @@ The exact-match, fail-closed rules are unchanged:
   `42744285101`, `42753652159`, `42759036516`, `42765936890`) are pinned
   to 0c by `ZERO_SPEND_SMOKE_RUN_IDS`: a non-zero committed value is a
   registry inconsistency and refuses instead of booking an unmeasured amount.
+  The paid halt run `42769599894` is deliberately **outside** that set: its
+  entry must record exactly 21c, and moving it into the zero-spend set refuses.
 - **A present artifact always wins.** A present proof artifact always goes
   through the download, provenance and tamper validation path first; the
   registry is reached only when the artifact is absent (or GitHub lists it as
@@ -208,13 +229,41 @@ The exact-match, fail-closed rules are unchanged:
 - **Unregistered stays UNKNOWN.** An unregistered artifactless run stays
   `UNKNOWN`, not zero, and keeps admission blocked. Adding a run is a reviewed
   code change with new exact-match bounds, not a wildcard. The preserved floors
-  stay 18c smoke and 222c ledger.
+  stay 18c smoke and 222c ledger. With all seven registrations and the two
+  retained proofs, the identified smoke history is 39c = 18c identified
+  (6c + 6c proofs + 6c preserved residual) + 21c measured halt.
 - **The loop-breaking requirement is ongoing.** Registering
   `42765936890` breaks *this* loop instance, not the pattern: every dispatch
   that fails before it produces a proof artifact is itself artifactless and must
   be registered, with its own reviewed exact-match bounds, **before the next
-  dispatch**; otherwise the next dispatch refuses that history. This is a
-  recorded operational dependency, not a property the code can supply on its own.
+  dispatch**; otherwise the next dispatch refuses that history. The paid halt
+  `42769599894` was the next such failure: it reached the live step, spent 21c
+  and still produced no proof, so without its registration the next dispatch
+  would refuse its history as `UNKNOWN`. This is a recorded operational
+  dependency, not a property the code can supply on its own.
+
+### Failure-path evidence upload (2026-11-10)
+
+The 21c halt exposed a second gap: `eval-smoke.yml` uploaded only the
+always-on admission/state artifacts, so the live-run stdout — the structured
+JSON that carried the transport-error detail — was lost with the runner, and the
+live-run stderr was not retained as an artifact. The workflow now has four
+failure-only `actions/upload-artifact` steps
+under distinct names, each with `if-no-files-found: warn` so one missing file
+does not hide the others:
+
+| Artifact | Member captured from `RUNNER_TEMP` | When present |
+| --- | --- | --- |
+| `ber-smoke-failure-run` | `ber-smoke-run.json` (the live-run summary) | the live step started |
+| `ber-smoke-failure-ledger` | `ber-smoke-ledger.json` (the cost ledger) | a call was recorded |
+| `ber-smoke-failure-evidence` | `ber-smoke-evidence/` (the evidence bundle) | the bundle was written |
+| `ber-smoke-failure-stderr` | `ber-smoke-stderr.log` (the live-run stderr) | the live step started |
+
+The live step redirects stderr to `ber-smoke-stderr.log` and replaces both
+mapped provider key values with a `[REDACTED-<NAME>]` marker before it exits;
+the failure-path steps map no secret and dump no environment. None of these
+artifacts is a smoke proof: a failed run still publishes no proof, so the
+full-dispatch gate cannot be satisfied by a partial run.
 
 ## How to use this policy
 

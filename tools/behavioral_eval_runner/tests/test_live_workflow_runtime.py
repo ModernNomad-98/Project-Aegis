@@ -198,6 +198,17 @@ GATE_EXPIRED_HEAD = "bb8e4849a7679a80fbe571cff4ef9252e5d8c96c"
 #: call; zero artifacts, documented $0.
 UNREGISTERED_PREDECESSOR_RUN_ID = "42765936890"
 UNREGISTERED_PREDECESSOR_HEAD = "035bab42d5dc27c666a93856adbb5382c87c5468"
+#: Live transport-halt smoke dispatch (2026-11-10T06:36:05Z, head 41d3b27a).
+#: Unlike the five documented-$0 entries, this run reached the live step and
+#: spent real money before it halted: the live-run summary records exit 3,
+#: status HALTED, dispatched_calls 1, spent_cents 21 and halt_reason_code
+#: TRANSPORT_ERROR (the judge call was not reached). Only the
+#: ber-shared-allowance-admission and ber-shared-allowance-state artifacts were
+#: uploaded, no smoke proof. Its 21c is measured live spend, so it must NOT be
+#: in ZERO_SPEND_SMOKE_RUN_IDS.
+TRANSPORT_HALT_RUN_ID = "42769599894"
+TRANSPORT_HALT_HEAD = "41d3b27a0e77247ed04297cb6be93b6d815a412b"
+TRANSPORT_HALT_SPENT_CENTS = 21
 #: Registered preflight-only eval-run: no provider call, zero spend, and no
 #: resume manifest because no case ran (artifact preflight-only.json).
 PREFLIGHT_ONLY_RUN_ID = "41145124808"
@@ -1913,6 +1924,292 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
             {str(entry["id"]): []}, {},
         )
 
+    def _transport_halt_fake(self, entry):
+        return FakeGH(
+            {"smoke": [page([entry])], "trial": [page([])]},
+            {
+                TRANSPORT_HALT_RUN_ID: [
+                    artifact("ber-shared-allowance-admission"),
+                    artifact("ber-shared-allowance-state"),
+                ],
+            },
+            {},
+        )
+
+    def test_registered_transport_halt_run_books_21c_and_does_not_download(self):
+        # The first paid live-smoke execution: the live step ran, dispatched one
+        # subject call ($0.21) and halted on TRANSPORT_ERROR before the judge.
+        # Its exact-match entry books the measured 21c; only the admission/state
+        # artifacts exist, so the collector never downloads anything for it.
+        entry = self._run_with_head(
+            TRANSPORT_HALT_RUN_ID, TRANSPORT_HALT_HEAD, conclusion="failure",
+        )
+        fake = self._transport_halt_fake(entry)
+        records = collect_smoke_proof_spends(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(smoke_spend_total(records), TRANSPORT_HALT_SPENT_CENTS)
+        self.assertEqual(smoke_spend_total(records), 21)
+        (key,) = records
+        self.assertIn("|" + TRANSPORT_HALT_RUN_ID + "|1|smoke-proof", key)
+        self.assertEqual(fake.download_requests, [])
+
+    def test_registered_transport_halt_run_metadata_mismatch_refuses(self):
+        # Conclusion, full head and attempt are the paid-attempt identity: a
+        # mismatch refuses instead of booking the recorded 21c.
+        cases = [
+            ({"conclusion": "success"}, "recorded conclusion"),
+            ({"head_sha": "b" * 40}, "recorded head"),
+            ({"attempt": 2}, "recorded attempt"),
+        ]
+        for overrides, expected in cases:
+            entry = self._run_with_head(
+                TRANSPORT_HALT_RUN_ID, TRANSPORT_HALT_HEAD,
+                conclusion=overrides.get("conclusion", "failure"),
+            )
+            if "head_sha" in overrides:
+                entry["head_sha"] = overrides["head_sha"]
+            if "attempt" in overrides:
+                entry["run_attempt"] = overrides["attempt"]
+            with self.subTest(overrides=overrides):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=self._transport_halt_fake(entry),
+                        repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn(expected, str(caught.exception))
+
+    def test_transport_halt_21c_entry_refuses_if_moved_into_zero_spend_set(self):
+        # ZERO_SPEND_SMOKE_RUN_IDS means "documented $0, no provider call". The
+        # 21c halt run is deliberately outside it; moving it in must fail closed
+        # as a registry inconsistency, never silently book or drop the 21c.
+        self.assertNotIn(
+            TRANSPORT_HALT_RUN_ID, workflow_runtime.ZERO_SPEND_SMOKE_RUN_IDS,
+        )
+        entry = self._run_with_head(
+            TRANSPORT_HALT_RUN_ID, TRANSPORT_HALT_HEAD, conclusion="failure",
+        )
+        with mock.patch.object(
+            workflow_runtime, "ZERO_SPEND_SMOKE_RUN_IDS",
+            frozenset({TRANSPORT_HALT_RUN_ID}),
+        ):
+            with self.assertRaises(ValueError) as caught:
+                collect_smoke_proof_spends(
+                    gh=self._transport_halt_fake(entry),
+                    repository="o/r", work_dir=self.tmp,
+                )
+        self.assertIn("records non-zero spend", str(caught.exception))
+
+    def test_composite_live_history_accounts_ledger_222_smoke_39(self):
+        # Full real-shaped live history after the first paid halt: the two
+        # published 1.1.0 resume manifests (ledger 222c), the preflight-only
+        # eval-run, the three identified 6c smoke records (the two retained
+        # proofs plus the preserved-floor residual), all five documented-$0
+        # artifactless runs, and the 21c transport-halt run. Expected totals:
+        # ledger 222c, smoke 39c = 18c identified + 21c measured. Only the two
+        # resume manifests and the two live proofs are downloaded; no
+        # artifactless run and no preflight-only run is ever downloaded.
+        fixture_dir = (
+            REPO_ROOT
+            / "tools/behavioral_eval_runner/tests/fixtures/live/legacy-resume-manifest"
+        )
+        older = json.loads(
+            (fixture_dir / "ber-resume-manifest-run-41145221349.json").read_text(
+                encoding="utf-8",
+            )
+        )
+        newer = json.loads(
+            (fixture_dir / "ber-resume-manifest-run-41213647310.json").read_text(
+                encoding="utf-8",
+            )
+        )
+        _proof_runs, artifacts, payloads = self._legacy_history_parts()
+        preflight_only = {
+            "id": PREFLIGHT_ONLY_RUN_ID,
+            "run_attempt": 1,
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": PREFLIGHT_ONLY_HEAD,
+            "created_at": "2026-11-05T00:00:00Z",
+        }
+        zero_spend_smoke_run_ids = (
+            INCIDENT_RUN_ID,
+            PRE_FIX_REFUSED_RUN_ID,
+            POST_FIX_REFUSED_RUN_ID,
+            GATE_EXPIRED_RUN_ID,
+            UNREGISTERED_PREDECESSOR_RUN_ID,
+        )
+        # The real smoke history is nine ended runs; GitHub lists newest first.
+        smoke_runs = [
+            self._run_with_head(
+                TRANSPORT_HALT_RUN_ID, TRANSPORT_HALT_HEAD, conclusion="failure",
+            ),
+            {
+                "id": UNREGISTERED_PREDECESSOR_RUN_ID,
+                "run_attempt": 1,
+                "status": "completed",
+                "conclusion": "failure",
+                "head_sha": UNREGISTERED_PREDECESSOR_HEAD,
+                "created_at": "2026-11-10T06:03:16Z",
+            },
+            {
+                "id": GATE_EXPIRED_RUN_ID,
+                "run_attempt": 1,
+                "status": "completed",
+                "conclusion": "failure",
+                "head_sha": GATE_EXPIRED_HEAD,
+                "created_at": "2026-11-10T04:57:08Z",
+            },
+            {
+                "id": POST_FIX_REFUSED_RUN_ID,
+                "run_attempt": 1,
+                "status": "completed",
+                "conclusion": "failure",
+                "head_sha": POST_FIX_REFUSED_HEAD,
+                "created_at": "2026-11-10T04:06:01Z",
+            },
+            {
+                "id": PRE_FIX_REFUSED_RUN_ID,
+                "run_attempt": 1,
+                "status": "completed",
+                "conclusion": "failure",
+                "head_sha": PRE_FIX_REFUSED_HEAD,
+                "created_at": "2026-11-10T02:39:43Z",
+            },
+            {
+                "id": INCIDENT_RUN_ID,
+                "run_attempt": 1,
+                "status": "completed",
+                "conclusion": "failure",
+                "head_sha": INCIDENT_RUN_HEAD,
+            },
+            self._run_with_head(
+                FAILED_NO_PROOF_RUN_ID, FAILED_NO_PROOF_HEAD, conclusion="failure",
+            ),
+            self._run_with_head(
+                41213566873, LEGACY_PROOF_HEADS["41213566873"], conclusion="success",
+            ),
+            self._run_with_head(
+                41179846875, LEGACY_PROOF_HEADS["41179846875"], conclusion="success",
+            ),
+        ]
+        smoke_artifacts = dict(artifacts)
+        smoke_payloads = dict(payloads)
+        for run_id in zero_spend_smoke_run_ids + (
+            FAILED_NO_PROOF_RUN_ID, TRANSPORT_HALT_RUN_ID,
+        ):
+            smoke_artifacts[run_id] = []
+        smoke_artifacts[TRANSPORT_HALT_RUN_ID] = [
+            artifact("ber-shared-allowance-admission"),
+            artifact("ber-shared-allowance-state"),
+        ]
+        smoke_artifacts[GATE_EXPIRED_RUN_ID] = [
+            artifact("ber-shared-allowance-admission"),
+            artifact("ber-shared-allowance-state"),
+        ]
+        fake = FakeGH(
+            {
+                "smoke": [page(smoke_runs)],
+                "trial": [page([
+                    run(41213647310, created_at=newer["created_at"],
+                        head_sha=newer["plan"]["dispatch_sha"]),
+                    run(41145221349, created_at=older["created_at"],
+                        head_sha=older["plan"]["dispatch_sha"]),
+                    preflight_only,
+                ])],
+            },
+            {
+                **smoke_artifacts,
+                "41213647310": [artifact("ber-resume-manifest")],
+                "41145221349": [artifact("ber-resume-manifest")],
+                PREFLIGHT_ONLY_RUN_ID: [],
+            },
+            {
+                **smoke_payloads,
+                ("41213647310", "ber-resume-manifest"): ("manifest.json", newer),
+                ("41145221349", "ber-resume-manifest"): ("manifest.json", older),
+            },
+        )
+        history = collect_allowance_history(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+            current_run_id="9999999999",
+        )
+        self.assertEqual(history["schema"], ALLOWANCE_HISTORY_SCHEMA)
+        self.assertEqual(history["ledger_spend_cents"], 222)
+        self.assertEqual(history["smoke_spend_cents"], 39)
+        self.assertEqual(history["smoke_spend_cents"], 18 + 21)
+        self.assertEqual(smoke_spend_total(history["smoke_spend"]), 39)
+        self.assertEqual(len(history["smoke_spend"]), 9)
+        self.assertEqual(
+            history["smoke_spend"]
+            ["pilot-a-recovery-20261031|" + TRANSPORT_HALT_RUN_ID + "|1|smoke-proof"],
+            21,
+        )
+        for run_id, expected in (
+            (FAILED_NO_PROOF_RUN_ID, 6),
+            ("41213566873", 6),
+            ("41179846875", 6),
+        ):
+            matching = [key for key in history["smoke_spend"] if run_id in key]
+            self.assertEqual(len(matching), 1)
+            self.assertEqual(history["smoke_spend"][matching[0]], expected)
+        for run_id in zero_spend_smoke_run_ids:
+            matching = [key for key in history["smoke_spend"] if run_id in key]
+            self.assertEqual(len(matching), 1)
+            self.assertEqual(history["smoke_spend"][matching[0]], 0)
+        self.assertNotIn(
+            "|preserved-historical-20261031|", " ".join(history["smoke_spend"]),
+        )
+
+        downloaded = [request[0] for request in fake.download_requests]
+        # Only the two real resume manifests and the two live smoke proofs are
+        # downloaded. "Only 2 manifest downloads" is asserted separately.
+        self.assertEqual(len(downloaded), 4)
+        self.assertEqual(
+            {request[0] for request in fake.download_requests
+             if request[1] == "ber-resume-manifest"},
+            {"41213647310", "41145221349"},
+        )
+        self.assertEqual(
+            {request[0] for request in fake.download_requests
+             if request[1] == "ber-live-smoke-proof"},
+            {"41213566873", "41179846875"},
+        )
+        for run_id in zero_spend_smoke_run_ids + (
+            TRANSPORT_HALT_RUN_ID, FAILED_NO_PROOF_RUN_ID, PREFLIGHT_ONLY_RUN_ID,
+        ):
+            self.assertNotIn(run_id, downloaded)
+
+        # The real 42769599894 state artifact left a 200c reservation RESERVED
+        # (never trued up). The next admission therefore counts it as incoming
+        # outstanding exposure on top of its own 200c reservation:
+        # 222 ledger + 39 smoke + 200 incoming + 200 new = 661, remaining 11339.
+        admission = admit_paid_call(
+            ceiling_cents=12_000,
+            prior_ledger_spend_cents=history["ledger_spend_cents"],
+            prior_smoke_spend_records=history["smoke_spend"],
+            reservation_cents=200,
+            outstanding_reservations_cents=200,
+        )
+        self.assertTrue(admission["admitted"])
+        self.assertEqual(admission["snapshot"]["ledger_spend_cents"], 222)
+        self.assertEqual(admission["snapshot"]["smoke_spend_cents"], 39)
+        self.assertEqual(admission["snapshot"]["outstanding_reservations_cents"], 400)
+        self.assertEqual(admission["snapshot"]["combined_exposure_cents"], 661)
+        self.assertEqual(admission["snapshot"]["remaining_cents"], 11_339)
+        without_incoming = admit_paid_call(
+            ceiling_cents=12_000,
+            prior_ledger_spend_cents=history["ledger_spend_cents"],
+            prior_smoke_spend_records=history["smoke_spend"],
+            reservation_cents=200,
+        )
+        self.assertTrue(without_incoming["admitted"])
+        self.assertEqual(
+            without_incoming["snapshot"]["combined_exposure_cents"], 461,
+        )
+        self.assertEqual(without_incoming["snapshot"]["remaining_cents"], 11_539)
+
     def test_registered_artifactless_run_attempt_mismatch_refuses(self):
         # P2 (Codex 4501462748): the paid-attempt identity includes run_attempt.
         # A re-run keeps the run id/head and increments run_attempt, so a
@@ -2174,6 +2471,7 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
                 POST_FIX_REFUSED_RUN_ID,
                 GATE_EXPIRED_RUN_ID,
                 UNREGISTERED_PREDECESSOR_RUN_ID,
+                TRANSPORT_HALT_RUN_ID,
             },
         )
         failed = SMOKE_RUNS_WITHOUT_PROOF[FAILED_NO_PROOF_RUN_ID]
@@ -2219,6 +2517,24 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         self.assertEqual(predecessor["head_sha"], UNREGISTERED_PREDECESSOR_HEAD)
         self.assertRegex(predecessor["head_sha"], "[0-9a-f]{40}")
         self.assertIn("42759036516", str(predecessor["basis"]))
+        # The first paid live execution: the only registered entry with measured
+        # non-zero spend other than the 6c preserved-floor residual. Its exact
+        # run identity and recorded 21c are pinned.
+        transport_halt = SMOKE_RUNS_WITHOUT_PROOF[TRANSPORT_HALT_RUN_ID]
+        self.assertEqual(transport_halt["spent_cents"], 21)
+        self.assertEqual(transport_halt["expected_conclusion"], "failure")
+        self.assertEqual(transport_halt["expected_attempt"], 1)
+        self.assertEqual(transport_halt["head_sha"], TRANSPORT_HALT_HEAD)
+        self.assertRegex(transport_halt["head_sha"], "[0-9a-f]{40}")
+        self.assertIn("TRANSPORT_ERROR", str(transport_halt["basis"]))
+        self.assertIn("spent_cents 21", str(transport_halt["basis"]))
+        self.assertIn("dispatched_calls 1", str(transport_halt["basis"]))
+        self.assertIn("judge", str(transport_halt["basis"]))
+        self.assertEqual(
+            {run_id for run_id, entry in SMOKE_RUNS_WITHOUT_PROOF.items()
+             if entry["spent_cents"] != 0},
+            {FAILED_NO_PROOF_RUN_ID, TRANSPORT_HALT_RUN_ID},
+        )
         self.assertEqual(
             set(workflow_runtime.ZERO_SPEND_SMOKE_RUN_IDS),
             {
@@ -2228,6 +2544,10 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
                 GATE_EXPIRED_RUN_ID,
                 UNREGISTERED_PREDECESSOR_RUN_ID,
             },
+        )
+        # The 21c halt run must never be pinned as a documented-$0 run.
+        self.assertNotIn(
+            TRANSPORT_HALT_RUN_ID, workflow_runtime.ZERO_SPEND_SMOKE_RUN_IDS,
         )
         # AC-12/R3: the preserved floors are unchanged and not lowered.
         self.assertEqual(PRESERVED_HISTORICAL_SMOKE_CENTS, 18)
@@ -3025,6 +3345,66 @@ class WorkflowWiringTests(unittest.TestCase):
         self.assertLess(admission, keys)
         self.assertIn("collect_allowance_history", text)
         self.assertIn("admit_paid_call", text)
+
+    def test_eval_smoke_uploads_failure_path_evidence_without_secrets(self):
+        # The live step can halt after spending (run 42769599894 spent 21c at
+        # TRANSPORT_ERROR and published no failure evidence). Four distinct
+        # failure-path artifacts now keep the run summary, cost ledger, any
+        # evidence bundle and the captured stderr. They must be failure-only,
+        # warn on missing files, and map no provider key.
+        path = REPO_ROOT / ".github/workflows/eval-smoke.yml"
+        workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
+        steps = workflow["jobs"]["eval-smoke"]["steps"]
+        by_name = {step.get("name"): step for step in steps}
+        expected = {
+            "Upload failure-path smoke run summary": (
+                "ber-smoke-failure-run", "ber-smoke-run.json",
+            ),
+            "Upload failure-path cost ledger": (
+                "ber-smoke-failure-ledger", "ber-smoke-ledger.json",
+            ),
+            "Upload failure-path evidence bundle": (
+                "ber-smoke-failure-evidence", "ber-smoke-evidence/",
+            ),
+            "Upload failure-path live-run stderr": (
+                "ber-smoke-failure-stderr", "ber-smoke-stderr.log",
+            ),
+        }
+        artifact_names = []
+        for name, (artifact_name, member) in expected.items():
+            self.assertIn(name, by_name)
+            step = by_name[name]
+            self.assertEqual(step["if"], "failure()")
+            self.assertEqual(step["with"]["name"], artifact_name)
+            self.assertIn(member, step["with"]["path"])
+            self.assertEqual(step["with"]["if-no-files-found"], "warn")
+            env = step.get("env") or {}
+            self.assertNotIn("ANTHROPIC_API_KEY", env)
+            self.assertNotIn("OPENAI_API_KEY", env)
+            artifact_names.append(artifact_name)
+        self.assertEqual(len(artifact_names), len(set(artifact_names)))
+        self.assertNotIn("ber-live-smoke-proof", artifact_names)
+        # The live step captures stderr to a file and redacts both mapped key
+        # values there (the only step where they are mapped) before the
+        # failure-path steps can read it.
+        live = next(
+            step for step in steps
+            if step.get("name")
+            == "Run the single-case live smoke (one subject call + one judge call)"
+        )
+        run_text = live["run"]
+        self.assertIn('2> "$RUNNER_TEMP/ber-smoke-stderr.log"', run_text)
+        self.assertIn('text.replace(value, "[REDACTED-" + name + "]")', run_text)
+        self.assertEqual(
+            set(live["env"]),
+            {"ANTHROPIC_API_KEY", "OPENAI_API_KEY", "PYTHONPATH"},
+        )
+        for step in steps:
+            if step is live:
+                continue
+            env = step.get("env") or {}
+            self.assertNotIn("ANTHROPIC_API_KEY", env)
+            self.assertNotIn("OPENAI_API_KEY", env)
 
     def test_eval_run_merges_standalone_smoke_proofs(self):
         text = (REPO_ROOT / ".github/workflows/eval-run.yml").read_text(encoding="utf-8")
