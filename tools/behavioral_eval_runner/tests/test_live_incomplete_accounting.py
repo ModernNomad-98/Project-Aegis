@@ -668,7 +668,7 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
             os.environ, {"ANTHROPIC_API_KEY": "Error: foo"}, clear=True,
         ):
             detail = _transport_failure_detail("anthropic", RuntimeError("foo"), "key")
-        self.assertEqual(detail, "anthropic transport failure: RuntimeError")
+        self.assertEqual(detail, "provider transport failure")
 
     def test_equal_length_credentials_use_a_stable_order(self):
         with mock.patch.dict(
@@ -680,6 +680,38 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
             second = _transport_error_excerpt(RuntimeError("aa mm zz"), "mm")
         self.assertEqual(first, second)
         self.assertEqual(first, "[REDACTED] [REDACTED] [REDACTED]")
+
+
+    def test_control_characters_are_removed_from_the_excerpt(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            excerpt = _transport_error_excerpt(
+                RuntimeError("\x1b[31mred\x00\x08blue"), "key",
+            )
+        self.assertTrue(all(ch == " " or ch.isprintable() for ch in excerpt))
+        self.assertIn("redblue", excerpt.replace("[31m", ""))
+
+    def test_credential_in_prefix_falls_back_to_minimal_detail(self):
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "RuntimeError"}, clear=True):
+            detail = _transport_failure_detail("anthropic", RuntimeError("boom"), "key")
+        self.assertEqual(detail, "provider transport failure")
+
+    def test_transport_failure_suppresses_the_chained_cause(self):
+        fake = types.ModuleType("anthropic")
+
+        class _FakeMessages:
+            def create(self, **kwargs):
+                raise RuntimeError("raw provider body")
+
+        class _FakeClient:
+            def __init__(self, **kwargs):
+                self.messages = _FakeMessages()
+
+        fake.Anthropic = _FakeClient
+        with mock.patch.dict(sys.modules, {"anthropic": fake}):
+            with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "fake-key"}, clear=True):
+                with self.assertRaises(ProviderTransportError) as caught:
+                    complete_via_sdk(self._anthropic_request(), "fake-key")
+        self.assertIsNone(caught.exception.__cause__)
 
 
 class PerCallOutputBoundTests(unittest.TestCase):

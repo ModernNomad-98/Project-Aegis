@@ -281,7 +281,9 @@ def _transport_credential_values(api_key: str) -> list[str]:
     return sorted(set(secrets), key=lambda value: (-len(value), value))
 
 
-def _transport_error_excerpt(exc: BaseException, api_key: str) -> str:
+def _transport_error_excerpt(
+    exc: BaseException, api_key: str, *, secrets: list[str] | None = None
+) -> str:
     """A bounded, credential-scrubbed excerpt of a provider SDK exception message.
 
     The paid live transport halts 42815400201 and 42855141731 lost the provider
@@ -311,7 +313,12 @@ def _transport_error_excerpt(exc: BaseException, api_key: str) -> str:
             # A boundary cut could split a credential; fail closed.
             return ""
         text = " ".join(raw.split())
-        secrets = _transport_credential_values(api_key)
+        # Provider text is untrusted: keep only printable characters (plus the
+        # single spaces from the collapse) so ANSI/control/bidi sequences cannot
+        # reach the artifacts.
+        text = "".join(ch for ch in text if ch == " " or ch.isprintable())
+        if secrets is None:
+            secrets = _transport_credential_values(api_key)
         # A marker-substring credential can never be scrubbed to a contained
         # state (the marker re-introduces it); drop the excerpt up front rather
         # than run an expensive replacement loop inside the marker itself.
@@ -345,18 +352,23 @@ def _transport_failure_detail(
 ) -> str:
     """The recorded transport-failure detail: vendor, class, bounded excerpt.
 
-    Containment is re-checked on the assembled detail, because the prefix/
-    separator boundary can join a credential that was not present in the excerpt
-    text alone. If that happens, fall back to the class-only prefix (the fixed
-    prefix itself is a documented residual).
+    Containment is checked on the assembled detail and on the fixed prefix; if
+    either contains a credential the detail falls back to the fixed, minimal
+    "provider transport failure" string. Any unexpected failure in this path
+    also falls back to that minimal string, so the helper cannot mask the halt.
     """
-    prefix = f"{vendor} transport failure: {type(exc).__name__}"
-    excerpt = _transport_error_excerpt(exc, api_key)
-    detail = prefix + (": " + excerpt if excerpt else "")
-    if any(value in detail for value in _transport_credential_values(api_key)):
-        return prefix
-    return detail
-
+    try:
+        prefix = f"{vendor} transport failure: {type(exc).__name__}"
+        secrets = _transport_credential_values(api_key)
+        if any(value in prefix for value in secrets):
+            return "provider transport failure"
+        excerpt = _transport_error_excerpt(exc, api_key, secrets=secrets)
+        detail = prefix + (": " + excerpt if excerpt else "")
+        if any(value in detail for value in secrets):
+            return "provider transport failure"
+        return detail
+    except Exception:  # noqa: BLE001 - the detail must never mask the halt
+        return "provider transport failure"
 
 def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderResponse":
     """One lazy-import SDK call. The key is never logged or stored."""
@@ -393,7 +405,7 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
             raise ProviderTransportError(
                 _transport_failure_detail("anthropic", exc, api_key),
                 context={"vendor": request.vendor, "request_id": request.request_id},
-            ) from exc
+            ) from None
         try:
             blocks = getattr(response, "content", []) or []
             text = "".join(
@@ -470,7 +482,7 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
             raise ProviderTransportError(
                 _transport_failure_detail("openai", exc, api_key),
                 context={"vendor": request.vendor, "request_id": request.request_id},
-            ) from exc
+            ) from None
         try:
             text = str(getattr(response, "output_text", ""))
             stop_reason = str(getattr(response, "status", "UNKNOWN"))

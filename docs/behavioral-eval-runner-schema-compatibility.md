@@ -311,15 +311,19 @@ configs remain at 16,384.
 
 Bounded retention of the provider's exact SDK error message **is** added by the
 follow-up retention change (owner line `d1ba3c6e…`): on a transport failure the
-detail now carries up to 600 characters of the whitespace-collapsed SDK message
-plus a `...[truncated]` marker when the scrubbed, collapsed text exceeds the
-bound (614
-characters maximum). The explicit API key in hand and every mapped credential
+detail now carries up to 600 characters of the scrubbed, whitespace-collapsed
+SDK message plus a `...[truncated]` marker when that scrubbed, collapsed text
+exceeds the bound. The 614-character maximum applies to the excerpt itself; the
+full detail also carries the fixed prefix and may be longer. Non-printable
+control characters (ANSI escapes, NUL, backspace, bidi controls) are removed from
+the retained text. The explicit API key in hand and every mapped credential
 environment value are replaced with `[REDACTED]` - a distinct marker from the
 stderr redactor's `[REDACTED-<NAME>]` - using the same bounded-repeat
 replacement and post-scrub containment pattern as the workflow stderr redactor;
-if containment cannot be proven, the excerpt is dropped and only the class name
-(with the fixed vendor prefix) is retained. This persists provider-authored text into the private
+if containment cannot be proven, the excerpt is dropped and the fixed vendor/class
+prefix is retained; if the prefix itself (or the assembled detail) would contain a
+credential, the detail falls back to the fixed minimal string `provider transport
+failure`. This persists provider-authored text into the private
 repository's failure artifacts (retention unchanged); it is not a proof, and
 it cannot prove the absence of unknown sensitive content.
 
@@ -332,10 +336,12 @@ failure artifacts, which store only `str(ProviderTransportError)`
 halt/ledger/run paths store strings; no traceback, `format_exc`, `exc_info` or
 `__cause__` serialization exists under `live/`).
 The scrubber is exact-match (plus whitespace-collapsed variants) only: encoded,
-truncated or transformed credentials, and a credential that coincides with the
-fixed vendor/class prefix, are not scrubbed. Failure artifacts are private and
-the owner accepted this residual; the excerpt is diagnostic aid, not a
-security boundary.
+truncated or transformed credentials, and credentials split by whitespace in the
+provider message, are not scrubbed. The transport failure is raised `from None`,
+so the unsanitized SDK exception is not exposed through the chained cause, and the
+failure artifacts serialize strings only (no traceback, `exc_info` or `__cause__`).
+Failure artifacts are private and the owner accepted this residual; the excerpt is
+a diagnostic aid, not a security boundary.
 
 ## How to use this policy
 
