@@ -1,0 +1,432 @@
+{
+  "cases": {
+    "pilot-a-01-agent-startup-context-gate": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "a13ce50556ea1570944ec65f595f7ada386124709807f87b39451e599caa7166",
+          "chunk_gate_digest": "90f59acb39b0309a68c36c398664139863c33753713e92d8d36380967112122f",
+          "chunk_gate_sha256": "6285f8edfb382ad6d06185f546ec89434d5ed7e852ec200dd636ad09f546519f",
+          "dispatched_calls": 1,
+          "error_present": false,
+          "finished_at": "2026-10-30T23:34:22.662167Z",
+          "halt_reason_code": "TRANSPORT_ERROR",
+          "halt_view": {
+            "calls_dispatched": 1,
+            "ceiling_cents": 12000,
+            "halted": true,
+            "model": null,
+            "reason_code": "TRANSPORT_ERROR",
+            "requested_cents": null,
+            "spent_cents": 8,
+            "vendor": null
+          },
+          "ledger_name": "41145221349-pilot-a-01-agent-startup-context-gate-attempt1.json",
+          "preflight_status": null,
+          "result_sha256": "edacdc1e4fd84588cc4c012d7a0350e9f40712bcbe2bdabfa1f3d8ad4caad12c",
+          "returncode": null,
+          "source_run_id": "41145221349",
+          "spent_cents": 8,
+          "started_at": "2026-10-30T23:34:15.459259Z",
+          "status": "HALTED"
+        },
+        {
+          "attempt": 2,
+          "chunk_dataset_sha256": "a13ce50556ea1570944ec65f595f7ada386124709807f87b39451e599caa7166",
+          "chunk_gate_digest": "e827a016c28ce12f788ff90583f4ccf3c1f0823cb16139fd6db1693ede9cc82f",
+          "chunk_gate_sha256": "fa084a8f7deb8bfc888b1fba98f613b974c7b952d990070b530173c972517e3b",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:13:02.382128Z",
+          "ledger_name": "pilot-a-01-agent-startup-context-gate-attempt2.json",
+          "remaining_ceiling_cents": 11992,
+          "result_sha256": "0136dd575eec28af6966b0a160972753fa9b2fe06f985f0851c7d1c81a8ebfa5",
+          "spent_cents": 26,
+          "started_at": "2026-10-31T15:11:42.319461Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-01-agent-startup-context-gate",
+      "result_sha256": "0136dd575eec28af6966b0a160972753fa9b2fe06f985f0851c7d1c81a8ebfa5",
+      "status": "COMPLETED"
+    },
+    "pilot-a-02-human-approval-boundary": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "737671ac6bb84e0c938fe4ce6d4029452888bd62765b4ca4d6d05d3bdc7cae36",
+          "chunk_gate_digest": "01d50c576f0d060309ecbe23a3f61b27729f066070aec8f40122b7f339ec3c01",
+          "chunk_gate_sha256": "ebce3cd7bce645fd87c8d9408b4ca0232fe45b0e1521dbefa7471d1805716887",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:14:09.362481Z",
+          "ledger_name": "pilot-a-02-human-approval-boundary-attempt1.json",
+          "remaining_ceiling_cents": 11966,
+          "result_sha256": "ef769ddb1f1d12b2c82600136f2f5d7e092b5d98c3fa130758f850e51d4c60c7",
+          "spent_cents": 19,
+          "started_at": "2026-10-31T15:13:02.383187Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-02-human-approval-boundary",
+      "result_sha256": "ef769ddb1f1d12b2c82600136f2f5d7e092b5d98c3fa130758f850e51d4c60c7",
+      "status": "COMPLETED"
+    },
+    "pilot-a-03-agent-failure-recovery": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "b61b0ba5a0ae6dbbb85bb261e4eaf7f621d5dca90ba5dcd8bbe9864041a91347",
+          "chunk_gate_digest": "9c09f614cc76a7f4d47780124d00084d2212bcb96faa3ebc429ecec01880d845",
+          "chunk_gate_sha256": "adabb26a9750cd6a1b6454822a417760ec5d40284d23d618641df82c1e2673ee",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:15:36.003425Z",
+          "ledger_name": "pilot-a-03-agent-failure-recovery-attempt1.json",
+          "remaining_ceiling_cents": 11947,
+          "result_sha256": "4d5e688e336220e190c774b8c085c4fec53317467c4f1ad76ab60e55f4e158b9",
+          "spent_cents": 24,
+          "started_at": "2026-10-31T15:14:09.363797Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-03-agent-failure-recovery",
+      "result_sha256": "4d5e688e336220e190c774b8c085c4fec53317467c4f1ad76ab60e55f4e158b9",
+      "status": "COMPLETED"
+    },
+    "pilot-a-04-skill-usage-ledger": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "64806c27a8dedcb17b66693af1bf22bc5597396cc26dc0277dbd43ed140482a3",
+          "chunk_gate_digest": "623c2a6797ed3816bfcacf05e4167d15e98c657d1c93381ff63fc488e0c131c2",
+          "chunk_gate_sha256": "3dfb2b34ff55aaf105f572c1eaf12bece300fa1634cb2b7dfd2abc28dcf3bbe7",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:16:36.914296Z",
+          "ledger_name": "pilot-a-04-skill-usage-ledger-attempt1.json",
+          "remaining_ceiling_cents": 11923,
+          "result_sha256": "77a4afb4d452036b25977fa9fe9f0955abc50b23bf21ae7fcb645fa4f3624189",
+          "spent_cents": 15,
+          "started_at": "2026-10-31T15:15:36.005042Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-04-skill-usage-ledger",
+      "result_sha256": "77a4afb4d452036b25977fa9fe9f0955abc50b23bf21ae7fcb645fa4f3624189",
+      "status": "COMPLETED"
+    },
+    "pilot-a-05-plan-audit-reviewer": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "b8a902b9a8d2005f08b75f48021e5a103e6fe258b626dcd3c1b75a98a884c4b9",
+          "chunk_gate_digest": "bf8c03e06b6779c36a7dbbf3ed678f9630ddf88e8cd0c7f4b2f2000b6c5e36e9",
+          "chunk_gate_sha256": "4c020069fae065067573dab4aec19be4e9ca0a2179b554a8dc214961a1a93794",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:17:47.095504Z",
+          "ledger_name": "pilot-a-05-plan-audit-reviewer-attempt1.json",
+          "remaining_ceiling_cents": 11908,
+          "result_sha256": "ca495fda6f23948311b4a8dcd3ce98a99069eb3a7d087e052fb037ba57b46ecf",
+          "spent_cents": 18,
+          "started_at": "2026-10-31T15:16:36.916089Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-05-plan-audit-reviewer",
+      "result_sha256": "ca495fda6f23948311b4a8dcd3ce98a99069eb3a7d087e052fb037ba57b46ecf",
+      "status": "COMPLETED"
+    },
+    "pilot-a-06-agent-governance-audit": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "d9557ba41624beeecc6dce6ee7fee7cc529d4489d4d37edbfd9f010a940c3634",
+          "chunk_gate_digest": "50aa2346b62c6907ab6979275bbf2ddfa518e4bf99f871bb511d5916d8a4735c",
+          "chunk_gate_sha256": "822587fe8d898e39d3844a572fd808dde565c61df337174a93bfee73c252061d",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:19:03.155629Z",
+          "ledger_name": "pilot-a-06-agent-governance-audit-attempt1.json",
+          "remaining_ceiling_cents": 11890,
+          "result_sha256": "8ad43e7f4ff306897c3d29c2e343cb0bffc0c9d055341ab3014a4228c2726352",
+          "spent_cents": 22,
+          "started_at": "2026-10-31T15:17:47.097543Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-06-agent-governance-audit",
+      "result_sha256": "8ad43e7f4ff306897c3d29c2e343cb0bffc0c9d055341ab3014a4228c2726352",
+      "status": "COMPLETED"
+    },
+    "pilot-a-07-code-reviewer": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "2c906c1789b59ce0e04a0f5ded2bdd7f45c489bdcadd4f94fa5e1e88671dbadf",
+          "chunk_gate_digest": "7e68f741a64a6d5abf2f8640449304ca2e374358808441a662b80007ce2d9152",
+          "chunk_gate_sha256": "1e5c1b8b9e63ba6cd7620e60259ca12e05e41c878dc01c8b62ca5b805fb29c49",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:20:07.239153Z",
+          "ledger_name": "pilot-a-07-code-reviewer-attempt1.json",
+          "remaining_ceiling_cents": 11868,
+          "result_sha256": "1255466a23903dfffd778f8a9ea4a9cc48f3f95492667501cf2bed618474d345",
+          "spent_cents": 21,
+          "started_at": "2026-10-31T15:19:03.157859Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-07-code-reviewer",
+      "result_sha256": "1255466a23903dfffd778f8a9ea4a9cc48f3f95492667501cf2bed618474d345",
+      "status": "COMPLETED"
+    },
+    "pilot-a-08-tdd-engineer": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "db7c1ae244d86a52313d3c72a4a573b4c13164b66365e5c110ee00605d016ceb",
+          "chunk_gate_digest": "41aebe72236de14d2fd42ca9b8af6e6bc34b8011180df1d35b0d2217a2e1efbf",
+          "chunk_gate_sha256": "9142a0ef9fb28b800a012a67e7672f5568c49821292a145472de39900d870938",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:21:48.604346Z",
+          "ledger_name": "pilot-a-08-tdd-engineer-attempt1.json",
+          "remaining_ceiling_cents": 11847,
+          "result_sha256": "390436595fc527b74494eb0c5b179106af2d2fa987513038a364149be7a93a9e",
+          "spent_cents": 27,
+          "started_at": "2026-10-31T15:20:07.241696Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-08-tdd-engineer",
+      "result_sha256": "390436595fc527b74494eb0c5b179106af2d2fa987513038a364149be7a93a9e",
+      "status": "COMPLETED"
+    },
+    "pilot-a-09-systematic-debugger": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "e6a74814d404b8b4e2bc38c155b32f36636fc05c80774eae503b61739cae92c6",
+          "chunk_gate_digest": "a68b369979b2f2aafe4acc6bf5f6857da5e6f51a817447f65e1eb3b0cc71b0ad",
+          "chunk_gate_sha256": "eb26d8682fe96b3af8107cc39366e617cf4861b9d18f2077e8972652216b6584",
+          "dispatched_calls": 12,
+          "finished_at": "2026-10-31T15:23:24.542217Z",
+          "ledger_name": "pilot-a-09-systematic-debugger-attempt1.json",
+          "remaining_ceiling_cents": 11820,
+          "result_sha256": "9610551cdb5b06d1e0ec8971b478ec5dac34ff22e01aea3886776bb8e2ff4fe9",
+          "spent_cents": 24,
+          "started_at": "2026-10-31T15:21:48.607124Z",
+          "status": "COMPLETED"
+        }
+      ],
+      "case_id": "pilot-a-09-systematic-debugger",
+      "result_sha256": "9610551cdb5b06d1e0ec8971b478ec5dac34ff22e01aea3886776bb8e2ff4fe9",
+      "status": "COMPLETED"
+    },
+    "pilot-a-10-saas-platform-architect": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "0ae349792d38fe4a157927c0c8f59f35e6f102daf7795e94f5b9daf168895f95",
+          "chunk_gate_digest": "c71929b69a6f02b497a9be18d04a165b974d8f89a63c153255807e53cf79dc59",
+          "chunk_gate_sha256": "022e3de3fca10c5a7ba1b2d69d886a4040295aac04144462fd4377fdcf52e2eb",
+          "dispatched_calls": 3,
+          "error_present": false,
+          "finished_at": "2026-10-31T15:24:31.225056Z",
+          "halt_reason_code": "TRANSPORT_ERROR",
+          "halt_view": {
+            "calls_dispatched": 3,
+            "ceiling_cents": 11796,
+            "halted": true,
+            "model": null,
+            "reason_code": "TRANSPORT_ERROR",
+            "requested_cents": null,
+            "spent_cents": 18,
+            "vendor": null
+          },
+          "ledger_name": "pilot-a-10-saas-platform-architect-attempt1.json",
+          "remaining_ceiling_cents": 11796,
+          "result_sha256": "02144b44ee5782094aa60560da0462ddddf80cf35a2c8e2f6e787ec45bd9f12e",
+          "spent_cents": 18,
+          "started_at": "2026-10-31T15:23:24.545303Z",
+          "status": "HALTED"
+        }
+      ],
+      "case_id": "pilot-a-10-saas-platform-architect",
+      "status": "HALTED"
+    },
+    "pilot-a-11-tenant-isolation-reviewer": {
+      "attempts": [],
+      "case_id": "pilot-a-11-tenant-isolation-reviewer",
+      "status": "UNRUN"
+    },
+    "pilot-a-12-feature-flag-architect": {
+      "attempts": [],
+      "case_id": "pilot-a-12-feature-flag-architect",
+      "status": "UNRUN"
+    },
+    "pilot-a-13-rls-policy-auditor": {
+      "attempts": [],
+      "case_id": "pilot-a-13-rls-policy-auditor",
+      "status": "UNRUN"
+    },
+    "pilot-a-14-appsec-implementer": {
+      "attempts": [],
+      "case_id": "pilot-a-14-appsec-implementer",
+      "status": "UNRUN"
+    },
+    "pilot-a-15-secrets-identity-hardener": {
+      "attempts": [],
+      "case_id": "pilot-a-15-secrets-identity-hardener",
+      "status": "UNRUN"
+    },
+    "pilot-a-16-test-coverage-mapper": {
+      "attempts": [],
+      "case_id": "pilot-a-16-test-coverage-mapper",
+      "status": "UNRUN"
+    },
+    "pilot-a-17-playwright-e2e-engineer": {
+      "attempts": [],
+      "case_id": "pilot-a-17-playwright-e2e-engineer",
+      "status": "UNRUN"
+    },
+    "pilot-a-18-release-readiness-reviewer": {
+      "attempts": [],
+      "case_id": "pilot-a-18-release-readiness-reviewer",
+      "status": "UNRUN"
+    },
+    "pilot-a-19-rollback-runbook-author": {
+      "attempts": [],
+      "case_id": "pilot-a-19-rollback-runbook-author",
+      "status": "UNRUN"
+    },
+    "pilot-a-20-prompt-injection-defender": {
+      "attempts": [],
+      "case_id": "pilot-a-20-prompt-injection-defender",
+      "status": "UNRUN"
+    }
+  },
+  "created_at": "2026-10-31T15:11:39.787861Z",
+  "failures": [
+    "pilot-a-10-saas-platform-architect: live-run finished with status 'HALTED'"
+  ],
+  "last_dispatch": {
+    "ran_in_this_dispatch": [
+      "pilot-a-01-agent-startup-context-gate",
+      "pilot-a-02-human-approval-boundary",
+      "pilot-a-03-agent-failure-recovery",
+      "pilot-a-04-skill-usage-ledger",
+      "pilot-a-05-plan-audit-reviewer",
+      "pilot-a-06-agent-governance-audit",
+      "pilot-a-07-code-reviewer",
+      "pilot-a-08-tdd-engineer",
+      "pilot-a-09-systematic-debugger"
+    ],
+    "run_attempt": "1",
+    "run_id": "41213647310",
+    "skipped_as_complete": []
+  },
+  "plan": {
+    "case_count": 20,
+    "case_ids": [
+      "pilot-a-01-agent-startup-context-gate",
+      "pilot-a-02-human-approval-boundary",
+      "pilot-a-03-agent-failure-recovery",
+      "pilot-a-04-skill-usage-ledger",
+      "pilot-a-05-plan-audit-reviewer",
+      "pilot-a-06-agent-governance-audit",
+      "pilot-a-07-code-reviewer",
+      "pilot-a-08-tdd-engineer",
+      "pilot-a-09-systematic-debugger",
+      "pilot-a-10-saas-platform-architect",
+      "pilot-a-11-tenant-isolation-reviewer",
+      "pilot-a-12-feature-flag-architect",
+      "pilot-a-13-rls-policy-auditor",
+      "pilot-a-14-appsec-implementer",
+      "pilot-a-15-secrets-identity-hardener",
+      "pilot-a-16-test-coverage-mapper",
+      "pilot-a-17-playwright-e2e-engineer",
+      "pilot-a-18-release-readiness-reviewer",
+      "pilot-a-19-rollback-runbook-author",
+      "pilot-a-20-prompt-injection-defender"
+    ],
+    "config_sha256": "32763fa5a4b6de32e7008b50fac22289c443a32de9f03bdfa3e36c4415931fd5",
+    "dataset_path": "tools/behavioral_eval_runner/live/pilot-a/cases",
+    "dataset_sha256": "a842403313a087753bdd35d8302a77ddc947e1498bff1ed5f632b4ce0681c596",
+    "dispatch_sha": "1bfdf4a96966a97059270e383b6d0b90e1d88fa0",
+    "fact_origin": "REAL_HOST",
+    "gate_id": "BER-LIVE-PILOT-A-APR161",
+    "gate_spend_ceiling_cents": 12000,
+    "gate_spend_provider_cap_cents": 12000,
+    "live_setting_floor_tokens": 4096,
+    "max_output_tokens": 4096,
+    "planned_calls": 240,
+    "planned_calls_per_case": 12,
+    "run_attempt": "1",
+    "run_id": "41213647310",
+    "runs_per_case": 3,
+    "schema": "ber-pilot-a-plan/1.0.0",
+    "smoke_gate": {
+      "ceiling_cents": 50,
+      "checked_at": "2026-10-31T15:11:39Z",
+      "head_sha": "1bfdf4a96966a97059270e383b6d0b90e1d88fa0",
+      "judge_finish_reason": "completed",
+      "max_output_tokens": 4096,
+      "schema": "ber-live-smoke-gate/1.0.0",
+      "smoke_artifact_name": "ber-live-smoke-proof",
+      "smoke_proof_sha256": "d1b18fe21bf8d56920b0551f9179c48a7b964f3572120b5dcee350e8935f8ade",
+      "smoke_run_attempt": 1,
+      "smoke_run_id": 41213566873,
+      "smoke_workflow": ".github/workflows/eval-smoke.yml",
+      "spent_cents": 6,
+      "subject_stop_reason": "end_turn"
+    },
+    "spend_ceiling_cents": 12000,
+    "staged_gate_digest": "f43b97f4417f7b742ca00e939a61a25b1e11a208c9a5e5a19bab87eaee85129c",
+    "staged_gate_path": "/home/runner/work/_temp/live-gate.json",
+    "staged_gate_revision": "1bfdf4a96966a97059270e383b6d0b90e1d88fa0",
+    "staged_gate_sha256": "7fa499e5b41ec3a241325db47eb2b527f2474491844ab67bdab229e190f7fbda",
+    "subject_vendors": [
+      "anthropic"
+    ],
+    "template_gate_path": "tools/behavioral_eval_runner/live/gates/pilot-a-apr161.json",
+    "template_gate_revision": "0000000000000000000000000000000000000000",
+    "template_gate_sha256": "3975add5b2e1f8f9bb2a8774f5c1b756e27f981d5c69afafd2ac65726ea8fb16"
+  },
+  "restored_from": {
+    "completed_case_sources": [],
+    "completed_cases": [],
+    "prior_attempts": 1,
+    "prior_spend_cents": 8,
+    "reconciled_ledgers": [
+      {
+        "attestation_ref": "Owner attestation 2026-10-30 21:02 PDT, re-issued with source (the owner's 20:57 PDT statement of spend to date). Sources available at the attestation instant: (1) the owner's 20:57 PDT statement; (2) the Pilot A run record for run 41145221349 - eval-run workflow_dispatch, head 877d6a27a36923cbdeff88a324640ec8cd8a7783, attempt 1, conclusion failure, one charged call of 8 cents. The original owner statement was 2026-10-30 20:57 PDT; attested_on records the 21:02 PDT re-issue with source. Corroboration posted after the attestation: the PR #986 post-merge note, merge receipt comment 6538805513 posted 2026-10-31T04:07:48Z at merge commit 88fdec73453ca460a45376a70b9bdbd08ea28d10, which records the same figures. Figures: $0.08 (8 cents) spent on run 41145221349; no other paid dispatch under eval-run.yml (the only other eval-run dispatch, run 41145124808, was a preflight-only $0 stop that mapped no provider key); 11,992 cents remaining of the unchanged 12,000-cent ($120) cap. The owner accepted this as the statement of spend to date. The charge is preserved: no refund, no deletion, no repricing.",
+        "attested_by": "Peter Nguyen (ModernNomad-98)",
+        "calls_preserved": 1,
+        "ceiling_cents_preserved": 12000,
+        "deleted_entries": 0,
+        "ledger_name": "pilot-a-01-agent-startup-context-gate-attempt1.json",
+        "ledger_sha256": "d9390d5a98483e0ac7abb24bb959af9f3e6ad927b1a2a75e5eb1bfe73fb0c989",
+        "reconciled_call_refs": [
+          "pilot-a-01-agent-startup-context-gate:WITH_SKILL:run-1:subject:anthropic"
+        ],
+        "refunded_cents": 0,
+        "remaining_ceiling_cents_preserved": 11992,
+        "spent_cents_preserved": 8,
+        "unreconciled_after": 0,
+        "unreconciled_before": 1
+      }
+    ],
+    "restored_at": "2026-10-31T15:11:42.215239Z",
+    "runs": [
+      "41145221349"
+    ],
+    "runs_without_artifact": [
+      "41145124808"
+    ]
+  },
+  "resume_refusal": null,
+  "schema": "ber-resume-manifest/1.1.0",
+  "totals": {
+    "cases_completed": 9,
+    "cases_missing": 11,
+    "ceiling_cents": 12000,
+    "prior_spend_cents": 8,
+    "spent_cents": 222
+  },
+  "updated_at": "2026-10-31T15:24:31.226189Z"
+}

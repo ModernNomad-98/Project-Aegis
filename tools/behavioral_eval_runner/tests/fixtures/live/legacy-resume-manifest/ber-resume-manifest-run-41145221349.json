@@ -1,0 +1,202 @@
+{
+  "cases": {
+    "pilot-a-01-agent-startup-context-gate": {
+      "attempts": [
+        {
+          "attempt": 1,
+          "chunk_dataset_sha256": "a13ce50556ea1570944ec65f595f7ada386124709807f87b39451e599caa7166",
+          "chunk_gate_digest": "90f59acb39b0309a68c36c398664139863c33753713e92d8d36380967112122f",
+          "chunk_gate_sha256": "6285f8edfb382ad6d06185f546ec89434d5ed7e852ec200dd636ad09f546519f",
+          "dispatched_calls": 1,
+          "error_present": false,
+          "finished_at": "2026-10-30T23:34:22.662167Z",
+          "halt_reason_code": "TRANSPORT_ERROR",
+          "halt_view": {
+            "calls_dispatched": 1,
+            "ceiling_cents": 12000,
+            "halted": true,
+            "model": null,
+            "reason_code": "TRANSPORT_ERROR",
+            "requested_cents": null,
+            "spent_cents": 8,
+            "vendor": null
+          },
+          "ledger_name": "pilot-a-01-agent-startup-context-gate-attempt1.json",
+          "remaining_ceiling_cents": 12000,
+          "result_sha256": "edacdc1e4fd84588cc4c012d7a0350e9f40712bcbe2bdabfa1f3d8ad4caad12c",
+          "spent_cents": 8,
+          "started_at": "2026-10-30T23:34:15.459259Z",
+          "status": "HALTED"
+        }
+      ],
+      "case_id": "pilot-a-01-agent-startup-context-gate",
+      "status": "HALTED"
+    },
+    "pilot-a-02-human-approval-boundary": {
+      "attempts": [],
+      "case_id": "pilot-a-02-human-approval-boundary",
+      "status": "UNRUN"
+    },
+    "pilot-a-03-agent-failure-recovery": {
+      "attempts": [],
+      "case_id": "pilot-a-03-agent-failure-recovery",
+      "status": "UNRUN"
+    },
+    "pilot-a-04-skill-usage-ledger": {
+      "attempts": [],
+      "case_id": "pilot-a-04-skill-usage-ledger",
+      "status": "UNRUN"
+    },
+    "pilot-a-05-plan-audit-reviewer": {
+      "attempts": [],
+      "case_id": "pilot-a-05-plan-audit-reviewer",
+      "status": "UNRUN"
+    },
+    "pilot-a-06-agent-governance-audit": {
+      "attempts": [],
+      "case_id": "pilot-a-06-agent-governance-audit",
+      "status": "UNRUN"
+    },
+    "pilot-a-07-code-reviewer": {
+      "attempts": [],
+      "case_id": "pilot-a-07-code-reviewer",
+      "status": "UNRUN"
+    },
+    "pilot-a-08-tdd-engineer": {
+      "attempts": [],
+      "case_id": "pilot-a-08-tdd-engineer",
+      "status": "UNRUN"
+    },
+    "pilot-a-09-systematic-debugger": {
+      "attempts": [],
+      "case_id": "pilot-a-09-systematic-debugger",
+      "status": "UNRUN"
+    },
+    "pilot-a-10-saas-platform-architect": {
+      "attempts": [],
+      "case_id": "pilot-a-10-saas-platform-architect",
+      "status": "UNRUN"
+    },
+    "pilot-a-11-tenant-isolation-reviewer": {
+      "attempts": [],
+      "case_id": "pilot-a-11-tenant-isolation-reviewer",
+      "status": "UNRUN"
+    },
+    "pilot-a-12-feature-flag-architect": {
+      "attempts": [],
+      "case_id": "pilot-a-12-feature-flag-architect",
+      "status": "UNRUN"
+    },
+    "pilot-a-13-rls-policy-auditor": {
+      "attempts": [],
+      "case_id": "pilot-a-13-rls-policy-auditor",
+      "status": "UNRUN"
+    },
+    "pilot-a-14-appsec-implementer": {
+      "attempts": [],
+      "case_id": "pilot-a-14-appsec-implementer",
+      "status": "UNRUN"
+    },
+    "pilot-a-15-secrets-identity-hardener": {
+      "attempts": [],
+      "case_id": "pilot-a-15-secrets-identity-hardener",
+      "status": "UNRUN"
+    },
+    "pilot-a-16-test-coverage-mapper": {
+      "attempts": [],
+      "case_id": "pilot-a-16-test-coverage-mapper",
+      "status": "UNRUN"
+    },
+    "pilot-a-17-playwright-e2e-engineer": {
+      "attempts": [],
+      "case_id": "pilot-a-17-playwright-e2e-engineer",
+      "status": "UNRUN"
+    },
+    "pilot-a-18-release-readiness-reviewer": {
+      "attempts": [],
+      "case_id": "pilot-a-18-release-readiness-reviewer",
+      "status": "UNRUN"
+    },
+    "pilot-a-19-rollback-runbook-author": {
+      "attempts": [],
+      "case_id": "pilot-a-19-rollback-runbook-author",
+      "status": "UNRUN"
+    },
+    "pilot-a-20-prompt-injection-defender": {
+      "attempts": [],
+      "case_id": "pilot-a-20-prompt-injection-defender",
+      "status": "UNRUN"
+    }
+  },
+  "created_at": "2026-10-30T23:34:14.189505Z",
+  "failures": [
+    "pilot-a-01-agent-startup-context-gate: live-run finished with status 'HALTED'"
+  ],
+  "last_dispatch": {
+    "ran_in_this_dispatch": [],
+    "run_attempt": "1",
+    "run_id": "41145221349",
+    "skipped_as_complete": []
+  },
+  "plan": {
+    "case_count": 20,
+    "case_ids": [
+      "pilot-a-01-agent-startup-context-gate",
+      "pilot-a-02-human-approval-boundary",
+      "pilot-a-03-agent-failure-recovery",
+      "pilot-a-04-skill-usage-ledger",
+      "pilot-a-05-plan-audit-reviewer",
+      "pilot-a-06-agent-governance-audit",
+      "pilot-a-07-code-reviewer",
+      "pilot-a-08-tdd-engineer",
+      "pilot-a-09-systematic-debugger",
+      "pilot-a-10-saas-platform-architect",
+      "pilot-a-11-tenant-isolation-reviewer",
+      "pilot-a-12-feature-flag-architect",
+      "pilot-a-13-rls-policy-auditor",
+      "pilot-a-14-appsec-implementer",
+      "pilot-a-15-secrets-identity-hardener",
+      "pilot-a-16-test-coverage-mapper",
+      "pilot-a-17-playwright-e2e-engineer",
+      "pilot-a-18-release-readiness-reviewer",
+      "pilot-a-19-rollback-runbook-author",
+      "pilot-a-20-prompt-injection-defender"
+    ],
+    "config_sha256": "31e288267c1624b8aeca48d5d4a705ac61ae4c94e9a1d32dd630cfeb14e279e9",
+    "dataset_path": "tools/behavioral_eval_runner/live/pilot-a/cases",
+    "dataset_sha256": "a842403313a087753bdd35d8302a77ddc947e1498bff1ed5f632b4ce0681c596",
+    "dispatch_sha": "877d6a27a36923cbdeff88a324640ec8cd8a7783",
+    "fact_origin": "REAL_HOST",
+    "gate_id": "BER-LIVE-PILOT-A-APR161",
+    "gate_spend_ceiling_cents": 12000,
+    "gate_spend_provider_cap_cents": 12000,
+    "planned_calls": 240,
+    "planned_calls_per_case": 12,
+    "run_attempt": "1",
+    "run_id": "41145221349",
+    "runs_per_case": 3,
+    "schema": "ber-pilot-a-plan/1.0.0",
+    "spend_ceiling_cents": 12000,
+    "staged_gate_digest": "f04e2ee7d8e5843eee2b2f0662932074bc2386963a985d2ee1182c83ef3b0196",
+    "staged_gate_path": "/home/runner/work/_temp/live-gate.json",
+    "staged_gate_revision": "877d6a27a36923cbdeff88a324640ec8cd8a7783",
+    "staged_gate_sha256": "fb972dd4c01f58ae9d7f53e20c8498bb74c385aa5db2198f414a631a7ad8b2cb",
+    "subject_vendors": [
+      "anthropic"
+    ],
+    "template_gate_path": "tools/behavioral_eval_runner/live/gates/pilot-a-apr161.json",
+    "template_gate_revision": "0000000000000000000000000000000000000000",
+    "template_gate_sha256": "3975add5b2e1f8f9bb2a8774f5c1b756e27f981d5c69afafd2ac65726ea8fb16"
+  },
+  "restored_from": null,
+  "resume_refusal": null,
+  "schema": "ber-resume-manifest/1.1.0",
+  "totals": {
+    "cases_completed": 0,
+    "cases_missing": 20,
+    "ceiling_cents": 12000,
+    "prior_spend_cents": null,
+    "spent_cents": 8
+  },
+  "updated_at": "2026-10-30T23:34:22.662728Z"
+}
