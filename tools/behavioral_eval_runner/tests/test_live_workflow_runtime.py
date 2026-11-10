@@ -139,7 +139,11 @@ class FakeGH:
                     plan.setdefault("dataset_sha256", "f" * 64)
                     plan.setdefault("gate_id", "gate-1")
                     plan.setdefault("subject_vendors", ["anthropic"])
-                    plan.setdefault("max_output_tokens", 16384)
+                    # Only the current schema is pinned to 16,384. The legacy
+                    # 1.1.0 artifacts recorded 4,096 or omitted the field, so a
+                    # default here would mask a real-payload refusal.
+                    if payload.get("schema") == RESUME_MANIFEST_SCHEMA:
+                        plan.setdefault("max_output_tokens", 16384)
             payload.pop("__no_defaults__", None)
             (out_dir / member).write_text(json.dumps(payload), encoding="utf-8")
             return SimpleNamespace(returncode=0, stdout="", stderr="")
@@ -180,8 +184,8 @@ LEGACY_TRIAL_RUN_OLD = "41145221349"
 LEGACY_TRIAL_RUN_NEW = "41213647310"
 
 
-def run(run_id, attempt=1, conclusion="success", created_at=None):
-    entry = {"id": run_id, "run_attempt": attempt, "status": "completed", "conclusion": conclusion, "head_sha": HEAD_SHA}
+def run(run_id, attempt=1, conclusion="success", created_at=None, head_sha=HEAD_SHA):
+    entry = {"id": run_id, "run_attempt": attempt, "status": "completed", "conclusion": conclusion, "head_sha": head_sha}
     if created_at is not None:
         entry["created_at"] = created_at
     return entry
@@ -454,11 +458,16 @@ class AllowanceHistoryTests(unittest.TestCase):
             collect_allowance_history(gh=fake, repository="o/r", work_dir=self.tmp)
         self.assertIn("unsupported smoke proof schema", str(caught.exception))
 
-    def _legacy_manifest(self, spent_cents):
-        return {
+    def _legacy_manifest(self, spent_cents, max_output_tokens=4_096, include_cap=True):
+        payload = {
             "schema": LEGACY_RESUME_MANIFEST_SCHEMA,
             "totals": {"spent_cents": spent_cents},
         }
+        if include_cap:
+            # The real 2026-10-31 artifact records 4,096; the older one omits
+            # the field (include_cap=False).
+            payload["plan"] = {"max_output_tokens": max_output_tokens}
+        return payload
 
     def _legacy_two_run_fake(self, older_spent, newer_spent, same_created_at=False):
         older_at = "2026-11-06T00:00:00Z"
@@ -484,8 +493,9 @@ class AllowanceHistoryTests(unittest.TestCase):
 
     def test_legacy_resume_manifest_is_accepted_and_its_totals_used(self):
         # (a) 1.1.0 is a registered reader path: its plan provenance is validated
-        # by the same checks as 1.2.0, its absent smoke_spend normalizes to {},
-        # and its totals.spent_cents is used as the cumulative trial total.
+        # by 1.2.0's checks except the recorded legacy output cap (absent or a
+        # bounded positive int), its absent smoke_spend normalizes to {}, and its
+        # totals.spent_cents is used as the cumulative trial total.
         fake = FakeGH(
             {"smoke": [page([])], "trial": [page([
                 run(LEGACY_TRIAL_RUN_NEW, created_at="2026-11-08T12:00:00Z"),
@@ -510,6 +520,155 @@ class AllowanceHistoryTests(unittest.TestCase):
         self.assertEqual(history["ledger_spend_cents"], 222)
         self.assertEqual(history["source_schema"]["trial"], LEGACY_RESUME_MANIFEST_SCHEMA)
         self.assertEqual(history["smoke_spend_cents"], PRESERVED_HISTORICAL_SMOKE_CENTS)
+
+    def _legacy_cap_fake(self, max_output_tokens=4_096, include_cap=True):
+        payload = self._legacy_manifest(
+            222,
+            max_output_tokens=max_output_tokens,
+            include_cap=include_cap,
+        )
+        return FakeGH(
+            {"smoke": [page([])], "trial": [page([
+                run(LEGACY_TRIAL_RUN_NEW, created_at="2026-11-08T12:00:00Z"),
+            ])]},
+            {LEGACY_TRIAL_RUN_NEW: [artifact("ber-resume-manifest")]},
+            {(LEGACY_TRIAL_RUN_NEW, "ber-resume-manifest"): (
+                "manifest.json", payload,
+            )},
+        )
+
+    def test_real_legacy_manifest_fixtures_are_consumed(self):
+        # The committed fixtures are byte-for-byte copies of the two published
+        # 1.1.0 artifacts: run 41213647310 records cap 4,096 / totals 222 and
+        # run 41145221349 omits the cap / records totals 8. Both must pass the
+        # registered legacy reader, and the newest cumulative total is 222.
+        fixture_dir = (
+            REPO_ROOT
+            / "tools/behavioral_eval_runner/tests/fixtures/live/legacy-resume-manifest"
+        )
+        older = json.loads(
+            (fixture_dir / "ber-resume-manifest-run-41145221349.json").read_text(
+                encoding="utf-8",
+            )
+        )
+        newer = json.loads(
+            (fixture_dir / "ber-resume-manifest-run-41213647310.json").read_text(
+                encoding="utf-8",
+            )
+        )
+        self.assertEqual(older["schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(older["totals"]["spent_cents"], 8)
+        self.assertNotIn("max_output_tokens", older["plan"])
+        self.assertEqual(newer["schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(newer["totals"]["spent_cents"], 222)
+        self.assertEqual(newer["plan"]["max_output_tokens"], 4_096)
+        fake = FakeGH(
+            {"smoke": [page([])], "trial": [page([
+                run(41213647310, created_at=newer["created_at"],
+                    head_sha=newer["plan"]["dispatch_sha"]),
+                run(41145221349, created_at=older["created_at"],
+                    head_sha=older["plan"]["dispatch_sha"]),
+            ])]},
+            {
+                "41213647310": [artifact("ber-resume-manifest")],
+                "41145221349": [artifact("ber-resume-manifest")],
+            },
+            {
+                ("41213647310", "ber-resume-manifest"): ("manifest.json", newer),
+                ("41145221349", "ber-resume-manifest"): ("manifest.json", older),
+            },
+        )
+        trial = collect_latest_trial_spend(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(trial["schema"], RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["source_schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["ledger_spend_cents"], 222)
+        self.assertEqual(trial["smoke_spend"], {})
+
+    def test_legacy_recorded_output_cap_accepts_absent_or_bounded_positive_int(self):
+        # The real legacy cap is absent (41145221349) or 4,096 (41213647310);
+        # any positive int up to the pinned cap is the recorded legacy budget.
+        for cap in (1, 4_096, 16_384):
+            with self.subTest(cap=cap):
+                trial = collect_latest_trial_spend(
+                    gh=self._legacy_cap_fake(cap),
+                    repository="o/r", work_dir=self.tmp,
+                )
+                self.assertEqual(trial["source_schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+                self.assertEqual(trial["ledger_spend_cents"], 222)
+        absent = collect_latest_trial_spend(
+            gh=self._legacy_cap_fake(include_cap=False),
+            repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(absent["source_schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(absent["ledger_spend_cents"], 222)
+
+    def test_legacy_recorded_output_cap_negative_values_refuse(self):
+        # Fail closed on every present value that is not a positive bounded int:
+        # bool, non-int, null, zero, negative and above the pinned cap.
+        for cap in (0, -1, True, 20_000, None, "4096", 4_096.0):
+            with self.subTest(cap=cap):
+                with self.assertRaises(ValueError) as caught:
+                    collect_latest_trial_spend(
+                        gh=self._legacy_cap_fake(cap),
+                        repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn(
+                    "legacy trial plan output cap", str(caught.exception),
+                )
+
+    def test_current_schema_output_cap_must_stay_pinned(self):
+        # 1.2.0 keeps the exact pinned cap: 4,096, zero, an over-cap value, a
+        # bool/float and an absent field all refuse.
+        for cap in (4_096, 0, 20_000, True, 16_384.0):
+            with self.subTest(cap=cap):
+                payload = {
+                    "schema": RESUME_MANIFEST_SCHEMA,
+                    "totals": {"spent_cents": 222},
+                    "plan": {"max_output_tokens": cap},
+                }
+                fake = FakeGH(
+                    {"smoke": [page([])], "trial": [page([
+                        run(900, created_at="2026-11-08T12:00:00Z"),
+                    ])]},
+                    {"900": [artifact("ber-resume-manifest")]},
+                    {("900", "ber-resume-manifest"): ("manifest.json", payload)},
+                )
+                with self.assertRaises(ValueError) as caught:
+                    collect_latest_trial_spend(
+                        gh=fake, repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn(
+                    "trial plan output cap is not the pinned 16384",
+                    str(caught.exception),
+                )
+        absent = {
+            "schema": RESUME_MANIFEST_SCHEMA,
+            "totals": {"spent_cents": 222},
+            "plan": {
+                "dispatch_sha": HEAD_SHA,
+                "config_sha256": "e" * 64,
+                "dataset_sha256": "f" * 64,
+                "gate_id": "gate-1",
+                "subject_vendors": ["anthropic"],
+            },
+            "__no_defaults__": True,
+        }
+        fake = FakeGH(
+            {"smoke": [page([])], "trial": [page([
+                run(900, created_at="2026-11-08T12:00:00Z"),
+            ])]},
+            {"900": [artifact("ber-resume-manifest")]},
+            {("900", "ber-resume-manifest"): ("manifest.json", absent)},
+        )
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_trial_spend(
+                gh=fake, repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn(
+            "trial plan output cap is not the pinned 16384", str(caught.exception),
+        )
 
     def test_legacy_resume_manifest_plan_is_validated_like_current(self):
         # The legacy reader path is not a looser contract: the same plan fields

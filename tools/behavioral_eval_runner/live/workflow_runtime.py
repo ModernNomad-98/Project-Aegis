@@ -41,8 +41,9 @@ LEGACY_RESUME_MANIFEST_SCHEMA = "ber-resume-manifest/1.1.0"
 #: Registered resume-manifest reader paths. The current writer emits 1.2.0; the
 #: legacy 1.1.0 path exists only so the allowance-history collector can read the
 #: spend evidence already published by earlier eval-run dispatches. Both paths
-#: validate the same plan provenance, and an unregistered schema still refuses
-#: before any field is interpreted.
+#: validate the same plan provenance except that the legacy path accepts the
+#: output cap those artifacts actually recorded (see _validate_trial_manifest);
+#: an unregistered schema still refuses before any field is interpreted.
 REGISTERED_RESUME_MANIFEST_SCHEMAS = (
     RESUME_MANIFEST_SCHEMA,
     LEGACY_RESUME_MANIFEST_SCHEMA,
@@ -462,8 +463,30 @@ def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any])
     _require_text(plan, "gate_id", "trial plan")
     if plan.get("subject_vendors") != [proof_provenance_pins()["subject_vendor"]]:
         raise ValueError("trial plan subject vendor is not the pinned single vendor")
-    if plan.get("max_output_tokens") != 16_384:
-        raise ValueError("trial plan output cap is not the pinned 16384")
+    if schema == LEGACY_RESUME_MANIFEST_SCHEMA:
+        # The two published 1.1.0 artifacts record the legacy per-call output
+        # budget: eval-run 41213647310 records 4,096 and eval-run 41145221349
+        # omits the field entirely (the 1.1.0 writer did not always publish it).
+        # Their recorded totals, not this cap, drive allowance accounting, so
+        # the legacy reader accepts absent or a positive int at or below the
+        # pinned cap. A present non-int, boolean, non-positive or over-cap value
+        # fails closed. This is the only legacy field exception; 1.2.0 stays
+        # pinned to exactly 16,384 below.
+        if "max_output_tokens" in plan:
+            legacy_cap = plan["max_output_tokens"]
+            if (
+                isinstance(legacy_cap, bool)
+                or not isinstance(legacy_cap, int)
+                or legacy_cap <= 0
+                or legacy_cap > 16_384
+            ):
+                raise ValueError(
+                    "legacy trial plan output cap is not a positive int at or below 16384"
+                )
+    else:
+        cap = plan.get("max_output_tokens")
+        if isinstance(cap, bool) or not isinstance(cap, int) or cap != 16_384:
+            raise ValueError("trial plan output cap is not the pinned 16384")
     # The legacy 1.1.0 manifest was written before smoke_spend was published;
     # its absence means "no standalone smoke spend recorded here" and is
     # normalized to an empty record set by the caller. No field meaning changes:
@@ -779,10 +802,12 @@ def collect_latest_trial_spend(
     changing any field meaning:
 
     * A legacy `ber-resume-manifest/1.1.0` record is read through its registered
-      path. Its plan fields are validated exactly as 1.2.0 is, and its absent
-      `smoke_spend` normalizes to an empty record set (the legacy writer did not
-      publish one). Because the legacy manifests are sequential cumulative
-      totals rather than independent deltas, the NEWEST legacy manifest (by run
+      path. Its plan fields are validated as 1.2.0's, except that the recorded
+      legacy output cap may be absent or a positive int at or below 16,384 (the
+      two real artifacts record 4,096 or omit it); its absent `smoke_spend`
+      normalizes to an empty record set (the legacy writer did not publish one).
+      Because the legacy manifests are sequential cumulative totals rather than
+      independent deltas, the NEWEST legacy manifest (by run
       `created_at`, tie-break run id) is authoritative and must be greater than
       or equal to every older legacy total; a regression fails closed. Totals
       are never summed.

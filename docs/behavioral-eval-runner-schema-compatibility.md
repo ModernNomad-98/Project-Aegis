@@ -75,12 +75,19 @@ provider call with `ValueError: unsupported trial manifest schema:
 'ber-resume-manifest/1.1.0'`.
 
 - **Reader path.** `_validate_trial_manifest` accepts either registered
-  schema and applies the SAME plan checks to both: `dispatch_sha` (bound to
+  schema and applies the same plan checks to both: `dispatch_sha` (bound to
   the workflow run head), `config_sha256`, `dataset_sha256`, `gate_id`, the
-  pinned single `subject_vendors` vendor, and the pinned
-  `max_output_tokens` of 16,384. A legacy manifest's absent `smoke_spend` is
-  normalized to an empty record set (`{}`), because the 1.1.0 writer did not
-  publish that field; a present `smoke_spend` is validated exactly as 1.2.0's.
+  pinned single `subject_vendors` vendor, and the output cap. The cap is the
+  one recorded difference between the writers, and accepting the legacy value
+  changes no field meaning: 1.2.0 must record exactly 16,384, while the
+  1.1.0 writer recorded the per-call budget it actually used. The legacy path
+  therefore accepts `max_output_tokens` **absent** or a **positive integer at
+  or below 16,384** - the two published artifacts record exactly those shapes
+  (eval-run `41213647310` records 4,096; `41145221349` omits the field). A
+  present non-integer, boolean, non-positive or over-cap legacy value still
+  fails closed. A legacy manifest's absent `smoke_spend` is normalized to an
+  empty record set (`{}`), because the 1.1.0 writer did not publish that
+  field; a present `smoke_spend` is validated exactly as 1.2.0's.
 - **Exact scope: allowance-history spend accounting only.** The registered
   path changes no producer, writer, evaluator, report, gate or admission
   rule, and it is not a general schema-upgrade rule. Only the allowance
@@ -119,10 +126,13 @@ provider call with `ValueError: unsupported trial manifest schema:
   fields are interpreted. An unregistered artifactless ended trial run still
   refuses as `UNKNOWN, not zero`. A registered preflight-only run whose
   conclusion, head or `run_attempt` does not match its record refuses, as does
-  a registry entry that claims non-zero spend. A legacy manifest without a
-  readable `created_at` cannot be ordered and refuses; a mixed legacy/modern
-  history also requires a readable `created_at` on each candidate 1.2.0
-  record, because recency decides which schema's total is authoritative. A
+  a registry entry that claims non-zero spend. A legacy manifest whose recorded
+  output cap is present but not a positive integer at or below 16,384 refuses,
+  and a 1.2.0 manifest whose cap is not exactly 16,384 still refuses. A legacy
+  manifest without a readable `created_at` cannot be ordered and refuses; a
+  mixed legacy/modern history also requires a readable `created_at` on each
+  candidate 1.2.0 record, because recency decides which schema's total is
+  authoritative. A
   non-numeric run id in a mixed or legacy history refuses rather than tying.
   A present resume artifact always goes through the normal
   download/validation path; the registry is reached only when no resume
