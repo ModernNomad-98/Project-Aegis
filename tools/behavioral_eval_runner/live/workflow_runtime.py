@@ -443,6 +443,11 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
 
 
 def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate one resume manifest; the allowance collector is its only caller.
+
+    Module-internal, and reached only from collect_latest_trial_spend, so the
+    registered legacy acceptance cannot widen any other reader's contract.
+    """
     provenance = _validate_run_provenance(run)
     schema = payload.get("schema")
     if schema not in REGISTERED_RESUME_MANIFEST_SCHEMAS:
@@ -702,16 +707,22 @@ def _run_created_at(run: Mapping[str, Any], label: str) -> datetime:
     return parsed
 
 
-def _run_id_ordinal(run_id: Any) -> int:
-    """Numeric sort key for a run id; a non-numeric id sorts below numeric ids."""
+def _run_id_ordinal(run_id: Any, label: str) -> int:
+    """Numeric run-id sort key; a non-numeric id refuses rather than tying.
+
+    "Newest" is the authority rule for legacy reconciliation, so a run id that
+    cannot be ordered cannot silently share the missing-id sort position.
+    """
     if isinstance(run_id, int) and not isinstance(run_id, bool):
         return run_id
     text = str(run_id)
-    return int(text) if text.isdigit() else -1
+    if not text.isdigit():
+        raise ValueError(label + " has a non-numeric run id")
+    return int(text)
 
 
 def _trial_manifest_order_key(run: Mapping[str, Any], label: str) -> tuple[datetime, int]:
-    return (_run_created_at(run, label), _run_id_ordinal(run.get("id")))
+    return (_run_created_at(run, label), _run_id_ordinal(run.get("id"), label))
 
 
 def _registered_manifestless_trial_spend(run: Mapping[str, Any]) -> int | None:
@@ -840,10 +851,21 @@ def collect_latest_trial_spend(
                 )
         chosen = authoritative
     if modern_records:
-        modern_chosen = modern_records[0]
         if chosen is None:
-            chosen = modern_chosen
+            # Modern-only histories keep the established selection: distinct
+            # totals already refused above, so any equal-total record is valid.
+            chosen = modern_records[0]
         else:
+            # A mixed history is ordered by the SAME (created_at, run id) key as
+            # the legacy records. Selecting the newest modern record explicitly
+            # avoids depending on the API listing order.
+            modern_chosen = max(
+                modern_records,
+                key=lambda record: _trial_manifest_order_key(
+                    record["run"],
+                    "trial run " + str(record["run"].get("id")),
+                ),
+            )
             modern_order = _trial_manifest_order_key(
                 modern_chosen["run"],
                 "trial run " + str(modern_chosen["run"].get("id")),

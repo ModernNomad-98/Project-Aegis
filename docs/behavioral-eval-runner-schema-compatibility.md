@@ -117,9 +117,13 @@ provider call with `ValueError: unsupported trial manifest schema:
   refuses as `UNKNOWN, not zero`. A registered preflight-only run whose
   conclusion, head or `run_attempt` does not match its record refuses, as does
   a registry entry that claims non-zero spend. A legacy manifest without a
-  readable `created_at` cannot be ordered and refuses. A present resume
-  artifact always goes through the normal download/validation path; the
-  registry is reached only when no resume artifact is present.
+  readable `created_at` cannot be ordered and refuses; a mixed legacy/modern
+  history also requires a readable `created_at` on each candidate 1.2.0
+  record, because recency decides which schema's total is authoritative. A
+  non-numeric run id in a mixed or legacy history refuses rather than tying.
+  A present resume artifact always goes through the normal
+  download/validation path; the registry is reached only when no resume
+  artifact is present.
 
 ## How to use this policy
 

@@ -670,6 +670,192 @@ class AllowanceHistoryTests(unittest.TestCase):
         self.assertEqual(registered["head_sha"], PREFLIGHT_ONLY_HEAD)
         self.assertEqual(registered["expected_attempt"], 1)
 
+    def _trial_history_fake(self, entries):
+        """Build a fake trial history from explicit manifest records."""
+        runs, artifacts, payloads = [], {}, {}
+        for entry in entries:
+            rid = str(entry["run_id"])
+            runs.append(run(
+                entry["run_id"],
+                conclusion=entry.get("conclusion", "success"),
+                created_at=entry.get("created_at"),
+            ))
+            artifacts[rid] = [artifact("ber-resume-manifest")]
+            payload = {
+                "schema": entry["schema"],
+                "totals": {"spent_cents": entry["spent"]},
+            }
+            if "smoke_spend" in entry:
+                payload["smoke_spend"] = entry["smoke_spend"]
+            if "plan" in entry:
+                payload["plan"] = entry["plan"]
+            if entry.get("no_defaults"):
+                payload["__no_defaults__"] = True
+            payloads[(rid, "ber-resume-manifest")] = ("manifest.json", payload)
+        return FakeGH({"smoke": [page([])], "trial": [page(runs)]}, artifacts, payloads)
+
+    def test_modern_manifest_newer_than_legacy_is_authoritative(self):
+        # Mixed history: a newer 1.2.0 record wins over an older 1.1.0 record.
+        fake = self._trial_history_fake([
+            {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": "2026-11-08T00:00:00Z",
+             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222},
+            {"run_id": 900, "created_at": "2026-11-09T00:00:00Z",
+             "schema": RESUME_MANIFEST_SCHEMA, "spent": 300},
+        ])
+        trial = collect_latest_trial_spend(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(trial["schema"], RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["ledger_spend_cents"], 300)
+
+    def test_legacy_manifest_newer_than_modern_is_authoritative(self):
+        # The legacy record is newest and non-regressive, so it wins.
+        fake = self._trial_history_fake([
+            {"run_id": 900, "created_at": "2026-11-06T00:00:00Z",
+             "schema": RESUME_MANIFEST_SCHEMA, "spent": 200},
+            {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": "2026-11-08T00:00:00Z",
+             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222},
+        ])
+        trial = collect_latest_trial_spend(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(trial["schema"], LEGACY_RESUME_MANIFEST_SCHEMA)
+        self.assertEqual(trial["ledger_spend_cents"], 222)
+
+    def test_mixed_schema_regression_fails_closed(self):
+        # Newest legacy total below an older modern total is a regression in a
+        # cumulative history, whichever schema is newest.
+        fake = self._trial_history_fake([
+            {"run_id": 900, "created_at": "2026-11-06T00:00:00Z",
+             "schema": RESUME_MANIFEST_SCHEMA, "spent": 300},
+            {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": "2026-11-08T00:00:00Z",
+             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222},
+        ])
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_trial_spend(
+                gh=fake, repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("regress", str(caught.exception))
+
+    def test_equal_modern_totals_choose_newest_modern_not_listing_order(self):
+        # Multiple equal-total 1.2.0 manifests are valid (only DISTINCT totals
+        # are ambiguous). The newest modern record must be selected by
+        # (created_at, run id), not by listing order or by the first record.
+        for listed in (
+            ["modern_old", "legacy", "modern_new"],
+            ["modern_new", "modern_old", "legacy"],
+        ):
+            with self.subTest(listing=listed):
+                records = {
+                    "modern_old": {
+                        "run_id": 901, "created_at": "2026-11-07T00:00:00Z",
+                        "schema": RESUME_MANIFEST_SCHEMA, "spent": 300,
+                    },
+                    "legacy": {
+                        "run_id": LEGACY_TRIAL_RUN_NEW,
+                        "created_at": "2026-11-08T00:00:00Z",
+                        "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222,
+                    },
+                    "modern_new": {
+                        "run_id": 902, "created_at": "2026-11-09T00:00:00Z",
+                        "schema": RESUME_MANIFEST_SCHEMA, "spent": 300,
+                        "smoke_spend": {"901": 50},
+                    },
+                }
+                fake = self._trial_history_fake([records[name] for name in listed])
+                trial = collect_latest_trial_spend(
+                    gh=fake, repository="o/r", work_dir=self.tmp,
+                )
+                self.assertEqual(trial["schema"], RESUME_MANIFEST_SCHEMA)
+                # 300 - 50 = 250, above the 222 preserved floor, so the chosen
+                # record's smoke spend is observable.
+                self.assertEqual(trial["ledger_spend_cents"], 250)
+
+    def test_legacy_manifest_with_smoke_spend_is_still_validated(self):
+        # A legacy record that DOES carry smoke_spend keeps the current
+        # validation and ledger subtraction; absence is the only tolerant case.
+        fake = self._trial_history_fake([
+            {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": "2026-11-08T00:00:00Z",
+             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 250,
+             "smoke_spend": {"901": 20}},
+        ])
+        trial = collect_latest_trial_spend(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(trial["ledger_spend_cents"], 230)
+
+    def test_legacy_manifest_malformed_created_at_fails_closed(self):
+        fake = self._trial_history_fake([
+            {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": "not-a-timestamp",
+             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222},
+        ])
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_trial_spend(
+                gh=fake, repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("malformed created_at", str(caught.exception))
+
+    def test_mixed_history_modern_without_created_at_fails_closed(self):
+        # Recency decides cross-schema authority, so the modern candidate must
+        # be orderable too in a mixed history; modern-only collection does not
+        # require created_at.
+        fake = self._trial_history_fake([
+            {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": "2026-11-08T00:00:00Z",
+             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222},
+            {"run_id": 900, "schema": RESUME_MANIFEST_SCHEMA, "spent": 300},
+        ])
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_trial_spend(
+                gh=fake, repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("created_at", str(caught.exception))
+
+    def test_legacy_manifest_missing_config_sha_fails_closed(self):
+        # The legacy path validates every plan field, not only dispatch_sha.
+        plan = {
+            "dispatch_sha": HEAD_SHA,
+            "dataset_sha256": "f" * 64,
+            "gate_id": "gate-1",
+            "subject_vendors": ["anthropic"],
+            "max_output_tokens": 16384,
+        }
+        fake = self._trial_history_fake([
+            {"run_id": LEGACY_TRIAL_RUN_NEW, "created_at": "2026-11-08T00:00:00Z",
+             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222,
+             "plan": plan, "no_defaults": True},
+        ])
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_trial_spend(
+                gh=fake, repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("config_sha256", str(caught.exception))
+
+    def test_registered_preflight_only_nonzero_registry_spend_refuses(self):
+        # A registry entry that claims spend cannot be skipped as $0.
+        registered = dict(TRIAL_RUNS_WITHOUT_MANIFEST[PREFLIGHT_ONLY_RUN_ID])
+        registered["spent_cents"] = 5
+        with mock.patch.dict(
+            workflow_runtime.TRIAL_RUNS_WITHOUT_MANIFEST,
+            {PREFLIGHT_ONLY_RUN_ID: registered},
+        ):
+            with self.assertRaises(ValueError) as caught:
+                collect_latest_trial_spend(
+                    gh=self._preflight_only_fake(),
+                    repository="o/r", work_dir=self.tmp,
+                )
+        self.assertIn("non-zero spend", str(caught.exception))
+
+    def test_non_numeric_run_id_in_legacy_history_fails_closed(self):
+        fake = self._trial_history_fake([
+            {"run_id": "run-abc", "created_at": "2026-11-08T00:00:00Z",
+             "schema": LEGACY_RESUME_MANIFEST_SCHEMA, "spent": 222},
+        ])
+        with self.assertRaises(ValueError) as caught:
+            collect_latest_trial_spend(
+                gh=fake, repository="o/r", work_dir=self.tmp,
+            )
+        self.assertIn("non-numeric run id", str(caught.exception))
+
     def test_multiple_trial_manifests_with_different_totals_fail_closed(self):
         fake = FakeGH(
             {"smoke": [page([])], "trial": [page([run(900), run(901)])]},
