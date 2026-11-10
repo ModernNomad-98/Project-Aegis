@@ -42,7 +42,14 @@
 #
 # Secret containment: ANTHROPIC_API_KEY and OPENAI_API_KEY are mapped only in
 # the single env: block of the smoke run step, are never printed, and no
-# environment dump, shell tracing or key-file read exists anywhere here.
+# environment dump, shell tracing or key-file read exists anywhere here. The
+# stderr redaction is fail-closed: it writes a new file, re-reads it, requires
+# both mapped values to be absent, deletes the raw capture, and leaves a marker
+# only after verification. A failed redaction fails the step and the stderr
+# upload is gated on a separate marker-verification step, so the raw capture is
+# never uploaded. The run summary, cost ledger and evidence bundle are not
+# sanitized: they may carry partial model output (private repository, 14-day
+# retention). That residual is recorded in the PR body, not hidden here.
 #
 # Authority/limits: workflow_dispatch only; no push, pull_request, schedule or
 # workflow_run trigger; no repository write, merge, tag, release, settings or
@@ -515,26 +522,113 @@ jobs:
             --cost-ledger "$RUNNER_TEMP/ber-smoke-ledger.json" \
             --run-id "ber-live-smoke-$GITHUB_RUN_ID" \
             > "$RUNNER_TEMP/ber-smoke-run.json" \
-            2> "$RUNNER_TEMP/ber-smoke-stderr.log" || code=$?
+            2> "$RUNNER_TEMP/ber-smoke-stderr.raw.log" || code=$?
           echo "live-run smoke exit code: $code"
-          # Failure-path evidence: keep the stderr diagnostics, but never publish
-          # the two mapped provider key values. Redaction happens here, in the
-          # only step where the keys are mapped, so the later upload step reads a
-          # file that cannot contain them. Nothing is printed by this block.
-          python -P - <<'PY'
+          # Failure-path evidence, fail-closed. The raw stderr is captured to a
+          # separate file and redacted here, in the only step where the keys are
+          # mapped, into a NEW file: a read-only raw log can therefore never
+          # leave the raw values in the file that is uploaded. Redaction is not
+          # allowed to "succeed" uncertainly. If the raw file cannot be read,
+          # the redacted file cannot be written or re-read, the written size
+          # differs from the rewritten bytes, either mapped value is still found
+          # after rewriting, or the raw file cannot be removed, this block
+          # prints a non-secret refusal, deletes every uploadable artifact, and
+          # exits non-zero. The marker file is written only after every check
+          # passes; the stderr upload step is gated on a separate verification
+          # step that requires it. No secret value is printed here.
+          redaction_rc=0
+          python -P - <<'PY' || redaction_rc=$?
+          import hashlib
+          import json
           import os
           from pathlib import Path
-          path = Path(os.environ["RUNNER_TEMP"]) / "ber-smoke-stderr.log"
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          raw_path = RUNNER_TEMP / "ber-smoke-stderr.raw.log"
+          redacted_path = RUNNER_TEMP / "ber-smoke-stderr.log"
+          marker_path = RUNNER_TEMP / "ber-smoke-stderr-redaction.json"
+          KEY_NAMES = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY")
+
+          def refuse(reason):
+              # Leave nothing uploadable behind: no raw log, no redacted log and
+              # no marker. The upload step requires the marker, so it is skipped.
+              for candidate in (raw_path, redacted_path, marker_path):
+                  try:
+                      candidate.unlink()
+                  except OSError:
+                      pass
+              print(
+                  "REFUSED: live-run stderr redaction did not verify: " + reason,
+                  flush=True,
+              )
+              raise SystemExit(1)
+
           try:
-              text = path.read_text(encoding="utf-8", errors="replace")
-          except OSError:
-              raise SystemExit(0)
-          for name in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
+              raw = raw_path.read_bytes()
+          except OSError as exc:
+              refuse("the captured stderr is unreadable (" + type(exc).__name__ + ")")
+
+          text = raw.decode("utf-8", errors="replace")
+          # Repeat the replacement a bounded number of times so an overlapping
+          # mapped value cannot survive a single pass. The containment check
+          # below is the authority, not this loop.
+          for _ in range(len(KEY_NAMES) + 1):
+              changed = False
+              for name in KEY_NAMES:
+                  value = os.environ.get(name)
+                  if value and value in text:
+                      text = text.replace(value, "[REDACTED-" + name + "]")
+                      changed = True
+              if not changed:
+                  break
+
+          payload = text.encode("utf-8")
+          try:
+              redacted_path.write_bytes(payload)
+              written = redacted_path.read_bytes()
+          except OSError as exc:
+              refuse("the redacted stderr is not writable (" + type(exc).__name__ + ")")
+          if written != payload:
+              refuse("the redacted stderr read-back differs from the rewritten bytes")
+          try:
+              written_size = redacted_path.stat().st_size
+          except OSError as exc:
+              refuse("the written stderr cannot be inspected (" + type(exc).__name__ + ")")
+          if written_size != len(payload):
+              refuse("the written stderr size is not the rewritten size")
+          for name in KEY_NAMES:
               value = os.environ.get(name)
-              if value:
-                  text = text.replace(value, "[REDACTED-" + name + "]")
-          path.write_text(text, encoding="utf-8")
+              if value and value.encode("utf-8") in written:
+                  refuse("the " + name + " value remains in the redacted stderr")
+          try:
+              raw_path.unlink()
+          except OSError:
+              pass
+          if raw_path.exists():
+              refuse("the unredacted stderr could not be removed")
+          marker = {
+              "schema": "ber-live-smoke-stderr-redaction/1.0.0",
+              "status": "REDACTED",
+              "keys_checked": len(KEY_NAMES),
+              "redacted_bytes": len(payload),
+              "redacted_sha256": hashlib.sha256(written).hexdigest(),
+              "raw_removed": True,
+          }
+          try:
+              marker_path.write_text(
+                  json.dumps(marker, indent=2, sort_keys=True) + "\n",
+                  encoding="utf-8",
+              )
+          except OSError as exc:
+              refuse("the redaction marker is not writable (" + type(exc).__name__ + ")")
           PY
+          if [ "$redaction_rc" -ne 0 ]; then
+            rm -f "$RUNNER_TEMP/ber-smoke-stderr.raw.log" \
+                  "$RUNNER_TEMP/ber-smoke-stderr.log" \
+                  "$RUNNER_TEMP/ber-smoke-stderr-redaction.json"
+            echo "SMOKE FAILED fail-closed: the stderr redaction did not verify; no live-run stderr will be uploaded" >&2
+            exit 1
+          fi
           if [ "$code" -ne 0 ]; then
             python -P - <<'PY'
           import json
@@ -765,9 +859,13 @@ jobs:
       # job has failed, keep each file group under a distinct artifact name and
       # warn rather than fail when a file was never written, so one missing
       # group cannot hide the others. They read files only: no secret is mapped
-      # into these steps, no environment is dumped, and the stderr file was
-      # already redacted inside the live step. No proof artifact is uploaded
-      # here, so the full-dispatch gate still cannot be satisfied by a failure.
+      # into these steps and no environment is dumped. The stderr upload is
+      # gated on BOTH failure() and a successful marker verification, so a
+      # redaction that did not verify publishes nothing. The run summary, cost
+      # ledger and evidence bundle are uploaded as written; they are not
+      # sanitized and may carry partial model output (private repository,
+      # 14-day retention). No proof artifact is uploaded here, so the
+      # full-dispatch gate still cannot be satisfied by a failure.
       - name: Upload failure-path smoke run summary
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
@@ -795,8 +893,65 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
-      - name: Upload failure-path live-run stderr
+      # The gate for the stderr upload. It maps no provider key and reads only
+      # the redaction marker and the redacted file, so it cannot re-create the
+      # values it is checking. It fails closed when the marker is absent,
+      # unreadable or not REDACTED, when the raw capture still exists, or when
+      # the redacted file's size or SHA-256 differs from the marker. Its
+      # outcome is the stderr upload's second condition.
+      - name: Verify the redacted live-run stderr before upload
+        id: verify_stderr_redaction
         if: failure()
+        run: |
+          python -P - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          RUNNER_TEMP = Path(os.environ["RUNNER_TEMP"]).resolve()
+          marker_path = RUNNER_TEMP / "ber-smoke-stderr-redaction.json"
+          redacted_path = RUNNER_TEMP / "ber-smoke-stderr.log"
+          raw_path = RUNNER_TEMP / "ber-smoke-stderr.raw.log"
+
+          def refuse(reason):
+              print(
+                  "REFUSED: refusing to upload live-run stderr: " + reason,
+                  flush=True,
+              )
+              raise SystemExit(1)
+
+          if raw_path.exists():
+              refuse("the unredacted stderr is still present")
+          try:
+              marker = json.loads(marker_path.read_text(encoding="utf-8"))
+          except (OSError, ValueError) as exc:
+              refuse(
+                  "the redaction marker is missing or unreadable ("
+                  + type(exc).__name__ + ")"
+              )
+          if not isinstance(marker, dict) or marker.get("status") != "REDACTED":
+              refuse("the marker does not record a verified redaction")
+          if marker.get("keys_checked") != 2 or marker.get("raw_removed") is not True:
+              refuse("the marker does not record both values checked and the raw file removed")
+          try:
+              payload = redacted_path.read_bytes()
+          except OSError as exc:
+              refuse("the redacted stderr is missing or unreadable (" + type(exc).__name__ + ")")
+          if len(payload) != marker.get("redacted_bytes"):
+              refuse("the redacted stderr size differs from the marker")
+          if hashlib.sha256(payload).hexdigest() != marker.get("redacted_sha256"):
+              refuse("the redacted stderr hash differs from the marker")
+          print(json.dumps({
+              "artifact": "ber-smoke-failure-stderr",
+              "bytes": len(payload),
+              "sha256": marker["redacted_sha256"],
+              "status": "REDACTION_VERIFIED",
+          }, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload failure-path live-run stderr
+        if: failure() && steps.verify_stderr_redaction.outcome == 'success'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: ber-smoke-failure-stderr

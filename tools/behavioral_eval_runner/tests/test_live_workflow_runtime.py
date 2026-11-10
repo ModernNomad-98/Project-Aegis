@@ -10,6 +10,10 @@ import ast
 import hashlib
 import itertools
 import json
+import os
+import re
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -32,6 +36,14 @@ from pathlib import Path
 from types import SimpleNamespace
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+EVAL_SMOKE_WORKFLOW = REPO_ROOT / ".github/workflows/eval-smoke.yml"
+
+# The in-step redaction program is the first heredoc of the live step. It is
+# extracted and executed by StderrRedactionScriptTests; the workflow itself is
+# never executed here.
+STDERR_REDACTION_HEREDOC_RE = re.compile(
+    r"python -P - <<'PY' \|\| redaction_rc=\$\?\n(.*?)\nPY\n", re.DOTALL
+)
 
 from tools.behavioral_eval_runner.live.workflow_runtime import (
     ALLOWANCE_HISTORY_SCHEMA,
@@ -3350,31 +3362,32 @@ class WorkflowWiringTests(unittest.TestCase):
         # The live step can halt after spending (run 42769599894 spent 21c at
         # TRANSPORT_ERROR and published no failure evidence). Four distinct
         # failure-path artifacts now keep the run summary, cost ledger, any
-        # evidence bundle and the captured stderr. They must be failure-only,
-        # warn on missing files, and map no provider key.
-        path = REPO_ROOT / ".github/workflows/eval-smoke.yml"
-        workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
+        # evidence bundle and the captured stderr. Three are plain
+        # failure-only uploads; the stderr upload is additionally gated on the
+        # redaction-verification step, so a failed redaction publishes nothing.
+        workflow = yaml.safe_load(EVAL_SMOKE_WORKFLOW.read_text(encoding="utf-8"))
         steps = workflow["jobs"]["eval-smoke"]["steps"]
         by_name = {step.get("name"): step for step in steps}
         expected = {
             "Upload failure-path smoke run summary": (
-                "ber-smoke-failure-run", "ber-smoke-run.json",
+                "ber-smoke-failure-run", "ber-smoke-run.json", "failure()",
             ),
             "Upload failure-path cost ledger": (
-                "ber-smoke-failure-ledger", "ber-smoke-ledger.json",
+                "ber-smoke-failure-ledger", "ber-smoke-ledger.json", "failure()",
             ),
             "Upload failure-path evidence bundle": (
-                "ber-smoke-failure-evidence", "ber-smoke-evidence/",
+                "ber-smoke-failure-evidence", "ber-smoke-evidence/", "failure()",
             ),
             "Upload failure-path live-run stderr": (
                 "ber-smoke-failure-stderr", "ber-smoke-stderr.log",
+                "failure() && steps.verify_stderr_redaction.outcome == 'success'",
             ),
         }
         artifact_names = []
-        for name, (artifact_name, member) in expected.items():
+        for name, (artifact_name, member, condition) in expected.items():
             self.assertIn(name, by_name)
             step = by_name[name]
-            self.assertEqual(step["if"], "failure()")
+            self.assertEqual(step["if"], condition)
             self.assertEqual(step["with"]["name"], artifact_name)
             self.assertIn(member, step["with"]["path"])
             self.assertEqual(step["with"]["if-no-files-found"], "warn")
@@ -3384,16 +3397,24 @@ class WorkflowWiringTests(unittest.TestCase):
             artifact_names.append(artifact_name)
         self.assertEqual(len(artifact_names), len(set(artifact_names)))
         self.assertNotIn("ber-live-smoke-proof", artifact_names)
+        # The gate step maps no provider key, runs on failure, and requires the
+        # redaction marker before the upload can proceed.
+        verify = by_name["Verify the redacted live-run stderr before upload"]
+        self.assertEqual(verify["id"], "verify_stderr_redaction")
+        self.assertEqual(verify["if"], "failure()")
+        self.assertIsNone(verify.get("env"))
+        self.assertIn('marker.get("status") != "REDACTED"', verify["run"])
         # The live step captures stderr to a file and redacts both mapped key
         # values there (the only step where they are mapped) before the
-        # failure-path steps can read it.
+        # failure-path steps can read it. The raw capture is a different file
+        # from the one uploaded.
         live = next(
             step for step in steps
             if step.get("name")
             == "Run the single-case live smoke (one subject call + one judge call)"
         )
         run_text = live["run"]
-        self.assertIn('2> "$RUNNER_TEMP/ber-smoke-stderr.log"', run_text)
+        self.assertIn('2> "$RUNNER_TEMP/ber-smoke-stderr.raw.log"', run_text)
         self.assertIn('text.replace(value, "[REDACTED-" + name + "]")', run_text)
         self.assertEqual(
             set(live["env"]),
@@ -3405,12 +3426,216 @@ class WorkflowWiringTests(unittest.TestCase):
             env = step.get("env") or {}
             self.assertNotIn("ANTHROPIC_API_KEY", env)
             self.assertNotIn("OPENAI_API_KEY", env)
+        # No upload may target the unredacted capture.
+        for step in steps:
+            if str(step.get("uses", "")).startswith("actions/upload-artifact"):
+                self.assertNotIn(".raw.log", step["with"]["path"])
+
+    def test_stderr_redaction_is_fail_closed(self):
+        # Static proof of the redaction invariants the workflow must keep. The
+        # workflow is never executed here; StderrRedactionScriptTests executes
+        # the extracted program for the runtime behavior, and the if: wiring is
+        # verified structurally because GitHub evaluates it, not this suite.
+        run_text, _ = self._stderr_redaction_parts()
+        self.assertIn("set -uo pipefail", run_text)
+        # A distinct raw capture that is never the upload target.
+        self.assertIn('2> "$RUNNER_TEMP/ber-smoke-stderr.raw.log"', run_text)
+        self.assertIn(
+            'raw_path = RUNNER_TEMP / "ber-smoke-stderr.raw.log"', run_text
+        )
+        self.assertIn(
+            'redacted_path = RUNNER_TEMP / "ber-smoke-stderr.log"', run_text
+        )
+        # The old fail-open swallow must not come back.
+        self.assertNotIn("raise SystemExit(0)", run_text)
+        self.assertNotRegex(
+            run_text, r"except OSError:\s*\n\s*raise SystemExit\(0\)"
+        )
+        # Every refusal is non-secret and fails the step.
+        self.assertIn(
+            '"REFUSED: live-run stderr redaction did not verify: " + reason',
+            run_text,
+        )
+        self.assertIn("raise SystemExit(1)", run_text)
+        # The written file is re-read, its size checked, and BOTH mapped values
+        # are required absent before the marker can be written.
+        read_back = run_text.index("written = redacted_path.read_bytes()")
+        size_check = run_text.index("written_size = redacted_path.stat().st_size")
+        containment = run_text.index('value.encode("utf-8") in written')
+        marker = run_text.index("marker_path.write_text(")
+        self.assertLess(read_back, size_check)
+        self.assertLess(size_check, containment)
+        self.assertLess(containment, marker)
+        self.assertIn(" value remains in the redacted stderr", run_text)
+        # The raw capture is removed, and removal verified, before the marker.
+        self.assertLess(run_text.index("raw_path.unlink()"), marker)
+        self.assertLess(run_text.index("if raw_path.exists():"), marker)
+        # The shell guard fails the live step before the smoke-failure summary
+        # when redaction did not verify, and deletes every uploadable artifact.
+        guard = run_text.index('if [ "$redaction_rc" -ne 0 ]; then')
+        summary = run_text.index('if [ "$code" -ne 0 ]; then')
+        self.assertLess(guard, summary)
+        self.assertIn('rm -f "$RUNNER_TEMP/ber-smoke-stderr.raw.log"', run_text)
+        self.assertIn("no live-run stderr will be uploaded", run_text)
+
+    def test_stderr_upload_requires_redaction_success(self):
+        workflow = yaml.safe_load(EVAL_SMOKE_WORKFLOW.read_text(encoding="utf-8"))
+        steps = workflow["jobs"]["eval-smoke"]["steps"]
+        by_name = {step.get("name"): step for step in steps}
+        upload = by_name["Upload failure-path live-run stderr"]
+        self.assertEqual(
+            upload["if"],
+            "failure() && steps.verify_stderr_redaction.outcome == 'success'",
+        )
+        # The named gate step exists, runs only on failure, and maps no secret.
+        gate = by_name["Verify the redacted live-run stderr before upload"]
+        self.assertEqual(gate["id"], "verify_stderr_redaction")
+        self.assertIn("failure()", gate["if"])
+        self.assertNotIn("ANTHROPIC_API_KEY", gate.get("env") or {})
+        self.assertNotIn("OPENAI_API_KEY", gate.get("env") or {})
+        # Gate invariants: marker status, both values checked, raw gone, hash.
+        for needle in (
+            'marker.get("status") != "REDACTED"',
+            'marker.get("keys_checked") != 2',
+            'marker.get("raw_removed") is not True',
+            "if raw_path.exists():",
+            'hashlib.sha256(payload).hexdigest() != marker.get("redacted_sha256")',
+            "raise SystemExit(1)",
+        ):
+            self.assertIn(needle, gate["run"])
+        # A failed gate means no stderr upload; the proof upload stays
+        # success-only, so a failure can never publish a proof.
+        proof = by_name["Upload the single-case live smoke proof"]
+        self.assertEqual(proof["if"], "success()")
+
+    @staticmethod
+    def _stderr_redaction_parts():
+        workflow = yaml.safe_load(EVAL_SMOKE_WORKFLOW.read_text(encoding="utf-8"))
+        live = next(
+            step for step in workflow["jobs"]["eval-smoke"]["steps"]
+            if step.get("name")
+            == "Run the single-case live smoke (one subject call + one judge call)"
+        )
+        match = STDERR_REDACTION_HEREDOC_RE.search(live["run"])
+        if match is None:
+            raise AssertionError("the live step has no stderr redaction heredoc")
+        return live["run"], match.group(1)
 
     def test_eval_run_merges_standalone_smoke_proofs(self):
         text = (REPO_ROOT / ".github/workflows/eval-run.yml").read_text(encoding="utf-8")
         self.assertIn("collect_smoke_proof_spends", text)
         self.assertIn("standalone smoke history is not restorable", text)
         self.assertIn("prior_smoke_manifests.append(standalone_smoke)", text)
+
+
+class StderrRedactionScriptTests(unittest.TestCase):
+    """Execute the in-step redaction program with a fake RUNNER_TEMP.
+
+    The workflow is not executed: GitHub's if: evaluation, the upload action
+    and the artifact gating are pinned structurally in WorkflowWiringTests.
+    This class runs the exact Python program extracted from the live step as a
+    standalone script, which is the only way to prove the fail-closed branches
+    (unreadable raw, unwritable redacted file, residual mapped value) without
+    dispatching the workflow.
+    """
+
+    def _run(self, work_dir, keys):
+        _, script = WorkflowWiringTests._stderr_redaction_parts()
+        env = dict(os.environ)
+        env["RUNNER_TEMP"] = str(work_dir)
+        env.pop("ANTHROPIC_API_KEY", None)
+        env.pop("OPENAI_API_KEY", None)
+        env.update(keys)
+        return subprocess.run(
+            [sys.executable, "-P", "-"],
+            input=script,
+            text=True,
+            capture_output=True,
+            env=env,
+            timeout=60,
+        )
+
+    def test_redacts_both_values_and_writes_the_marker(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            anthropic = "sk-ant-SENTINEL-1234567890"
+            openai = "sk-openai-SENTINEL-abcdef"
+            raw = work / "ber-smoke-stderr.raw.log"
+            raw.write_text(
+                "provider stderr " + anthropic + " and " + openai + " keep me\n",
+                encoding="utf-8",
+            )
+            completed = self._run(
+                work,
+                {"ANTHROPIC_API_KEY": anthropic, "OPENAI_API_KEY": openai},
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            redacted_bytes = (work / "ber-smoke-stderr.log").read_bytes()
+            redacted = redacted_bytes.decode("utf-8")
+            self.assertNotIn(anthropic, redacted)
+            self.assertNotIn(openai, redacted)
+            self.assertIn("[REDACTED-ANTHROPIC_API_KEY]", redacted)
+            self.assertIn("[REDACTED-OPENAI_API_KEY]", redacted)
+            self.assertIn("keep me", redacted)
+            self.assertFalse(raw.exists())
+            marker = json.loads(
+                (work / "ber-smoke-stderr-redaction.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(marker["status"], "REDACTED")
+            self.assertEqual(marker["keys_checked"], 2)
+            self.assertTrue(marker["raw_removed"])
+            self.assertEqual(marker["redacted_bytes"], len(redacted_bytes))
+            self.assertEqual(
+                marker["redacted_sha256"],
+                hashlib.sha256(redacted_bytes).hexdigest(),
+            )
+            self.assertNotIn(anthropic, completed.stdout + completed.stderr)
+            self.assertNotIn(openai, completed.stdout + completed.stderr)
+
+    def test_unreadable_raw_log_fails_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            # A directory at the raw path makes read_bytes() raise OSError.
+            (work / "ber-smoke-stderr.raw.log").mkdir()
+            completed = self._run(work, {"ANTHROPIC_API_KEY": "sk-ant-SENTINEL"})
+            self.assertNotEqual(completed.returncode, 0)
+            self.assertFalse((work / "ber-smoke-stderr-redaction.json").exists())
+            self.assertFalse((work / "ber-smoke-stderr.log").exists())
+            self.assertIn(
+                "REFUSED: live-run stderr redaction did not verify",
+                completed.stdout,
+            )
+            self.assertNotIn("sk-ant-SENTINEL", completed.stdout + completed.stderr)
+
+    def test_unwritable_redacted_log_fails_closed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            raw = work / "ber-smoke-stderr.raw.log"
+            raw.write_text("stderr sk-ant-SENTINEL", encoding="utf-8")
+            # A directory at the redacted path makes write_bytes() raise OSError.
+            (work / "ber-smoke-stderr.log").mkdir()
+            completed = self._run(work, {"ANTHROPIC_API_KEY": "sk-ant-SENTINEL"})
+            self.assertNotEqual(completed.returncode, 0)
+            self.assertFalse((work / "ber-smoke-stderr-redaction.json").exists())
+            self.assertFalse(raw.exists())
+            self.assertIn(
+                "REFUSED: live-run stderr redaction did not verify",
+                completed.stdout,
+            )
+            self.assertNotIn("sk-ant-SENTINEL", completed.stdout + completed.stderr)
+
+    def test_residual_value_after_redaction_fails_closed(self):
+        # A mapped value that is a substring of its own replacement marker
+        # survives every pass; the post-write containment assertion must catch
+        # it and refuse instead of writing a marker.
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            (work / "ber-smoke-stderr.raw.log").write_text("RED", encoding="utf-8")
+            completed = self._run(work, {"OPENAI_API_KEY": "RED"})
+            self.assertNotEqual(completed.returncode, 0)
+            self.assertFalse((work / "ber-smoke-stderr-redaction.json").exists())
+            self.assertFalse((work / "ber-smoke-stderr.log").exists())
+            self.assertIn("value remains in the redacted stderr", completed.stdout)
 
 
 class TwoJobLayoutTests(unittest.TestCase):

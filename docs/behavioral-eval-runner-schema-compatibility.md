@@ -257,13 +257,31 @@ does not hide the others:
 | `ber-smoke-failure-run` | `ber-smoke-run.json` (the live-run summary) | the live step started |
 | `ber-smoke-failure-ledger` | `ber-smoke-ledger.json` (the cost ledger) | a call was recorded |
 | `ber-smoke-failure-evidence` | `ber-smoke-evidence/` (the evidence bundle) | the bundle was written |
-| `ber-smoke-failure-stderr` | `ber-smoke-stderr.log` (the live-run stderr) | the live step started |
+| `ber-smoke-failure-stderr` | `ber-smoke-stderr.log` (the redacted live-run stderr) | redaction verified and the raw capture removed |
 
-The live step redirects stderr to `ber-smoke-stderr.log` and replaces both
-mapped provider key values with a `[REDACTED-<NAME>]` marker before it exits;
-the failure-path steps map no secret and dump no environment. None of these
-artifacts is a smoke proof: a failed run still publishes no proof, so the
-full-dispatch gate cannot be satisfied by a partial run.
+The live step redirects stderr to `ber-smoke-stderr.raw.log`, replaces both
+mapped provider key values with a `[REDACTED-<NAME>]` marker, and writes the
+result to the distinct upload target `ber-smoke-stderr.log`. Redaction is
+fail-closed, in this order: it reads the raw capture; writes and re-reads the
+redacted file; checks the written size; requires **both** mapped values to be
+absent from the re-read bytes; removes the raw capture and verifies it is gone;
+and only then writes `ber-smoke-stderr-redaction.json` with status
+`REDACTED`. Any failure prints a non-secret refusal, deletes the raw file, the
+redacted file and the marker, and exits the step non-zero. A separate
+marker-verification step (no provider key is mapped into it) re-checks the
+marker status, both values checked, the raw file's absence, and the redacted
+file's size and SHA-256. The stderr upload runs only on
+`failure() && steps.verify_stderr_redaction.outcome == 'success'`; a failed
+redaction therefore publishes no stderr artifact. The failure-path steps map no
+secret and dump no environment.
+
+The run summary, cost ledger and evidence bundle are uploaded as written and
+are **not sanitized**: they may carry partial model output from the run. The
+repository is private and these artifacts retain for 14 days; full
+sanitization of those three files is a recorded residual, deliberately not
+attempted in this bounded fix. None of these artifacts is a smoke proof: a
+failed run still publishes no proof, so the full-dispatch gate cannot be
+satisfied by a partial run.
 
 ## How to use this policy
 
