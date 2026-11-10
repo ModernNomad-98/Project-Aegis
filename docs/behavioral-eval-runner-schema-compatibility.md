@@ -339,8 +339,13 @@ API key and the mapped `CREDENTIAL_ENV_VARS` values are covered (proxy or
 SDK-specific auth env vars, and SDK-derived headers, are not). The transport
 failure is raised `from None`, so the unsanitized SDK exception is not chained;
 the failure artifacts serialize strings only (no traceback, `format_exc`,
-`exc_info` or `__cause__`). Failure artifacts are private and the owner accepted
-this residual; the excerpt is a diagnostic aid, not a security boundary.
+`exc_info` or `__cause__`). `from None` clears the chained cause, but the SDK exception remains as Python's
+`__context__` in-process; traceback rendering suppresses it and the failure
+artifacts serialize strings only. The `context` fields (vendor and request id)
+are internal identifiers and are not scrubbed; the vendor and exception class
+names in the fixed prefix are internal identifiers, not provider-authored text.
+Failure artifacts are private and the owner accepted this residual; the excerpt
+is a diagnostic aid, not a security boundary.
 
 ## How to use this policy
 

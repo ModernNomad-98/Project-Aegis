@@ -740,7 +740,7 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
                 self.assertNotIn(value, detail)
                 self.assertNotIn(value, excerpt)
 
-    def test_formatted_traceback_does_not_contain_the_raw_provider_message(self):
+    def test_formatted_traceback_does_not_chain_the_raw_provider_exception(self):
         fake = types.ModuleType("anthropic")
 
         class _FakeMessages:
@@ -794,6 +794,15 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
                 with self.assertRaises(ProviderTransportError) as caught:
                     complete_via_sdk(request, "fake-key")
         self.assertIsNone(caught.exception.__cause__)
+
+
+    def test_detail_returns_empty_when_secret_resolution_fails(self):
+        with mock.patch(
+            "tools.behavioral_eval_runner.live.providers._transport_credential_values",
+            side_effect=RuntimeError("boom"),
+        ):
+            detail = _transport_failure_detail("anthropic", RuntimeError("x"), "key")
+        self.assertEqual(detail, "")
 
 
 class PerCallOutputBoundTests(unittest.TestCase):

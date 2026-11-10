@@ -355,7 +355,9 @@ def _transport_failure_detail(
     Containment is checked on the assembled detail and on the fixed prefix; if
     either contains a credential the detail falls back to the fixed, minimal
     "provider transport failure" string. Any unexpected failure in this path
-    also falls back to that minimal string, so the helper cannot mask the halt.
+    returns an empty detail (the class, reason code and context remain), because
+    the secrets may not be available to certify a fallback; the helper cannot
+    mask the halt.
     """
     try:
         prefix = f"{vendor} transport failure: {type(exc).__name__}"
