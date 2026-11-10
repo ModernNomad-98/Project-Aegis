@@ -2019,8 +2019,11 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
     def test_current_config_identity_matches_committed_template(self):
         # AC-07 drift guard: the registry current identity is the sha256 of the
         # committed smoke template and the mapped cap is its actual value; the
-        # retained legacy proofs record exactly the registered legacy identity and
-        # the unchanged committed gate identity; fixture bytes are pinned.
+        # retained legacy proofs record exactly the registered legacy identity.
+        # The owner renewed the gate template on 2026-11-10 for the authorized
+        # single-case smoke, so the legacy proofs' gate identity is their frozen
+        # pre-renewal value and the renewed template is asserted from its
+        # record fields instead.
         config_bytes = (
             REPO_ROOT / "tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json"
         ).read_bytes()
@@ -2032,9 +2035,21 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
             config["max_output_tokens"],
             SMOKE_PROOF_CONFIG_PINS[CURRENT_SMOKE_CONFIG_SHA256],
         )
-        gate_sha = hashlib.sha256((
+        gate_path = (
             REPO_ROOT / "tools/behavioral_eval_runner/live/gates/pilot-a-apr161.json"
-        ).read_bytes()).hexdigest()
+        )
+        gate_record = json.loads(gate_path.read_text(encoding="utf-8"))
+        # Renewed owner gate: effective 2026-11-10T05:10:00Z, expiring
+        # 2026-11-11T12:00:00Z, bound to the renewal record.
+        self.assertEqual(gate_record["created_at"], "2026-11-10T05:10:00Z")
+        self.assertEqual(gate_record["expires_at"], "2026-11-11T12:00:00Z")
+        self.assertIn(
+            "OWNER-LIVE-SMOKE-GATE-RENEWAL-2026-11-10.md",
+            gate_record["owner_decision_ref"],
+        )
+        legacy_gate_sha = (
+            "3975add5b2e1f8f9bb2a8774f5c1b756e27f981d5c69afafd2ac65726ea8fb16"
+        )
         fixture_hashes = {
             "41213566873": "d1b18fe21bf8d56920b0551f9179c48a7b964f3572120b5dcee350e8935f8ade",
             "41179846875": "a202b4ac43a6ac20b4da518a1c0006ef5657efd6e6258a3a7809e223cac416f4",
@@ -2048,7 +2063,7 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
                 SMOKE_PROOF_CONFIG_PINS[proof["config_template_sha256"]], 4_096,
             )
             self.assertEqual(proof["max_output_tokens"], 4_096)
-            self.assertEqual(proof["gate_template_sha256"], gate_sha)
+            self.assertEqual(proof["gate_template_sha256"], legacy_gate_sha)
 
 
 class _ArtifactListingFailureGH(FakeGH):
