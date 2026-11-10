@@ -130,11 +130,26 @@ SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
 #:   the still-unregistered PRE-FIX run, which is exactly the self-perpetuating
 #:   loop this registry breaks. Recorded attempt 1 (metadata fact, not spend
 #:   proof).
+#: 42759036516: the 2026-11-10T04:57:08Z eval-smoke dispatch at head bb8e4849. It failed at the "Offline preflight of the staged smoke"
+#:   with "REFUSED" and the recorded detail "the owner gate has expired" (the
+#:   Pilot A owner-gate renewal was still pending at the time). The live smoke
+#:   step was skipped, so no credential mapping or provider call occurred; only
+#:   the shared-allowance admission/state artifacts were published, with no
+#:   smoke proof; $0 (run metadata + failure log). Recorded attempt 1 (metadata
+#:   fact, not spend proof).
+#: 42765936890: the 2026-11-10T06:03:16Z eval-smoke dispatch at head 035bab42. It failed at the "Shared allowance admission preflight" on
+#:   the still-unregistered 42759036516; the observed log reads "REFUSED:
+#:   shared allowance history is unavailable: ValueError: ended smoke run
+#:   42759036516 has no proof artifact: UNKNOWN, not zero". The failure is at
+#:   the first preflight step, whose position in the workflow means no
+#:   credential mapping or provider call occurred; zero artifacts; $0 (run
+#:   metadata + failure log). Recorded attempt 1 (metadata fact, not spend
+#:   proof).
 #:
-#: The three documented-$0 runs (42134872074, 42744285101 and 42753652159) are
-#: pinned zero by ZERO_SPEND_SMOKE_RUN_IDS: a non-zero committed value for one
-#: of them is a registry inconsistency and refuses rather than booking an
-#: unmeasured amount.
+#: The five documented-$0 runs (42134872074, 42744285101, 42753652159,
+#: 42759036516 and 42765936890) are pinned zero by ZERO_SPEND_SMOKE_RUN_IDS: a
+#: non-zero committed value for one of them is a registry inconsistency and
+#: refuses rather than booking an unmeasured amount.
 #:
 #: Known residual (recorded, not hidden): this registry is a bounded, reviewed,
 #: exact-match list, not a wildcard. Any FUTURE dispatch that fails before it
@@ -191,6 +206,35 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
             "artifact: UNKNOWN, not zero' (run metadata + failure log)"
         ),
     },
+    "42759036516": {
+        "spent_cents": 0,
+        "expected_conclusion": "failure",
+        "expected_attempt": 1,
+        "head_sha": "bb8e4849a7679a80fbe571cff4ef9252e5d8c96c",
+        "basis": (
+            "post-renewal eval-smoke 2026-11-10T04:57:08Z, head bb8e4849..., "
+            "attempt 1; offline preflight REFUSED with 'the owner gate has "
+            "expired' (owner gate renewal pending at the time); the live smoke "
+            "step was skipped, so no credential mapping/provider call; only the "
+            "admission/state artifacts, no proof; $0 spend (run metadata + "
+            "failure log)"
+        ),
+    },
+    "42765936890": {
+        "spent_cents": 0,
+        "expected_conclusion": "failure",
+        "expected_attempt": 1,
+        "head_sha": "035bab42d5dc27c666a93856adbb5382c87c5468",
+        "basis": (
+            "post-renewal eval-smoke 2026-11-10T06:03:16Z, head 035bab42..., "
+            "attempt 1; admission preflight refused on the still-unregistered "
+            "42759036516 (observed log: 'REFUSED: shared allowance history is "
+            "unavailable: ValueError: ended smoke run 42759036516 has no proof "
+            "artifact: UNKNOWN, not zero'); step order means no credential "
+            "mapping/provider call; zero artifacts; $0 spend (run metadata + "
+            "failure log)"
+        ),
+    },
 }
 
 #: Registered artifactless smoke runs whose documented spend is exactly $0 (the
@@ -198,7 +242,13 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
 #: registry entries record 0; a non-zero committed value is a registry
 #: inconsistency and refuses instead of booking an unmeasured amount.
 ZERO_SPEND_SMOKE_RUN_IDS = frozenset(
-    {"42134872074", "42744285101", "42753652159"}
+    {
+        "42134872074",
+        "42744285101",
+        "42753652159",
+        "42759036516",
+        "42765936890",
+    }
 )
 
 #: Explicit, exact-match EXPIRY-ONLY registry for the two identified historical

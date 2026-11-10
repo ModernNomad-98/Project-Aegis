@@ -143,7 +143,7 @@ provider call with `ValueError: unsupported trial manifest schema:
 The shared allowance-history smoke collector (`collect_smoke_proof_spends` in
 `tools/behavioral_eval_runner/live/workflow_runtime.py`) refuses an ended
 eval-smoke run that has no proof artifact as `UNKNOWN, not zero`: a missing
-artifact is not evidence of zero spend. Four identified runs are registered in
+artifact is not evidence of zero spend. Six identified runs are registered in
 the exact-match `SMOKE_RUNS_WITHOUT_PROOF` map, and only when the proof
 artifact is absent:
 
@@ -153,23 +153,43 @@ artifact is absent:
 | `42134872074` | `2cad63e57d3d215f62a9d5f22b1f2b23cbaf8abf` | 0c (pinned) | 2026-11-06 admission-refused dispatch, failed before any provider call |
 | `42744285101` | `307ba3c625ba97aaeca18ed531001d6d96670499` | 0c (pinned) | **pre-fix** 2026-11-10T02:39:43Z admission-refused dispatch |
 | `42753652159` | `75053caf52a4f7a8e5ad8e6172cd29806b7707d1` | 0c (pinned) | **post-fix** 2026-11-10T04:06:01Z admission-refused dispatch |
+| `42759036516` | `bb8e4849a7679a80fbe571cff4ef9252e5d8c96c` | 0c (pinned) | 2026-11-10T04:57:08Z offline-preflight refusal: `the owner gate has expired` (renewal pending); live step skipped, no proof |
+| `42765936890` | `035bab42d5dc27c666a93856adbb5382c87c5468` | 0c (pinned) | 2026-11-10T06:03:16Z admission-refused dispatch on the then-unregistered `42759036516` |
 
 `41167546138` is the only entry booked above $0: its 6c is the preserved-floor
 residual (the 18c floor minus the two retained 6c proofs), not a measured bill,
 and only its retained head prefix `88fdec73` could be registered because the
 full SHA was never kept locally.
 
-The two 2026-11-10 entries are the same failure shape one dispatch apart.
-`42744285101` (pre-fix) failed closed at the "Shared allowance admission
-preflight" on the then-current legacy-manifest reader rejecting
-`ber-resume-manifest/1.1.0`. `42753652159` (post-fix) was dispatched at head
-`75053caf`, the merge of PR #1007 that registered the first run, and it failed
-closed at the *same* preflight step; its observed failure log reads
-`REFUSED: shared allowance history is unavailable: ValueError: ended smoke run
-42744285101 has no proof artifact: UNKNOWN, not zero`. So the registration PR
-was itself followed by an artifactless failure, and that failure refused on the
-run the previous commit had just registered. Both stopped before any credential
-mapping or provider call and published zero artifacts, so both are $0.
+The four 2026-11-10 entries are the same artifactless, pre-provider failure
+shape at two different preflight steps: `42744285101`
+(pre-fix) failed closed at the "Shared allowance admission preflight" on the
+then-current legacy-manifest reader rejecting `ber-resume-manifest/1.1.0`.
+`42753652159` (post-fix) was dispatched at head `75053caf`, the merge of
+PR #1007 that registered the first run, and it failed closed at the *same*
+preflight step; its observed failure log reads `REFUSED: shared allowance
+history is unavailable: ValueError: ended smoke run 42744285101 has no proof
+artifact: UNKNOWN, not zero`.
+
+The next dispatch, `42759036516` (2026-11-10T04:57:08Z, head `bb8e4849`),
+failed one step later at the "Offline preflight of the staged smoke" with the
+recorded detail `the owner gate has expired`; the Pilot A owner-gate renewal
+was still pending at the time. The live smoke step was skipped, so no credential
+mapping or provider call occurred, and only the shared-allowance admission/state
+artifacts were published — there is no smoke proof. The dispatch after it,
+`42765936890` (2026-11-10T06:03:16Z, head `035bab42`), failed back at the
+"Shared allowance admission preflight" on the still-unregistered
+`42759036516`; its observed failure log reads `REFUSED: shared allowance
+history is unavailable: ValueError: ended smoke run 42759036516 has no proof
+artifact: UNKNOWN, not zero`. It failed at the first preflight step, whose
+position in the workflow is before any credential mapping or provider call, and
+published zero artifacts.
+
+So each registration PR was followed by another artifactless failure: the
+registration for `42744285101` was followed by `42753652159` refusing on it,
+and the registration for `42753652159` was followed by `42759036516` failing
+on the not-yet-renewed gate and then `42765936890` refusing on it. All four
+stopped before any provider call, so all four are $0.
 
 The exact-match, fail-closed rules are unchanged:
 
@@ -177,10 +197,10 @@ The exact-match, fail-closed rules are unchanged:
   SHA, or the registered head prefix for `41167546138`) and `run_attempt`
   must equal the committed record. A missing or invalid `run_attempt` is never
   guessed or defaulted, and a mismatch refuses.
-- **Zero spend is pinned.** The three documented-$0 runs (`42134872074`,
-  `42744285101`, `42753652159`) are pinned to 0c by
-  `ZERO_SPEND_SMOKE_RUN_IDS`: a non-zero committed value is a registry
-  inconsistency and refuses instead of booking an unmeasured amount.
+- **Zero spend is pinned.** The five documented-$0 runs (`42134872074`,
+  `42744285101`, `42753652159`, `42759036516`, `42765936890`) are pinned
+  to 0c by `ZERO_SPEND_SMOKE_RUN_IDS`: a non-zero committed value is a
+  registry inconsistency and refuses instead of booking an unmeasured amount.
 - **A present artifact always wins.** A present proof artifact always goes
   through the download, provenance and tamper validation path first; the
   registry is reached only when the artifact is absent (or GitHub lists it as
@@ -190,11 +210,11 @@ The exact-match, fail-closed rules are unchanged:
   code change with new exact-match bounds, not a wildcard. The preserved floors
   stay 18c smoke and 222c ledger.
 - **The loop-breaking requirement is ongoing.** Registering
-  `42753652159` breaks *this* loop, not the pattern: any future dispatch that
-  fails before it produces a proof artifact is itself artifactless and needs its
-  own reviewed exact-match registration, or the dispatch after it refuses that
-  history. This is a recorded operational dependency, not a property the code
-  can supply on its own.
+  `42765936890` breaks *this* loop instance, not the pattern: every dispatch
+  that fails before it produces a proof artifact is itself artifactless and must
+  be registered, with its own reviewed exact-match bounds, **before the next
+  dispatch**; otherwise the next dispatch refuses that history. This is a
+  recorded operational dependency, not a property the code can supply on its own.
 
 ## How to use this policy
 
