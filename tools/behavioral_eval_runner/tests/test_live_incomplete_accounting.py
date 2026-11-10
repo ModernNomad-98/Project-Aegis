@@ -38,7 +38,11 @@ from tools.behavioral_eval_runner.live.errors import (
 from tools.behavioral_eval_runner.live.ledger_reconciliation import unreconciled_calls
 from tools.behavioral_eval_runner.live.mock_transport import MockTransport
 from tools.behavioral_eval_runner.live.pipeline import dry_run
-from tools.behavioral_eval_runner.live.providers import complete_via_sdk
+from tools.behavioral_eval_runner.live.providers import (
+    _transport_error_excerpt,
+    _transport_failure_detail,
+    complete_via_sdk,
+)
 from tools.behavioral_eval_runner.live.transport import (
     ProviderRequest,
     ProviderResponse,
@@ -557,6 +561,69 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
         self.assertIn("openai transport failure: RuntimeError:", detail)
         self.assertIn("max_output_tokens is not supported", detail)
 
+
+    def test_empty_api_key_is_filtered_and_excerpt_retained(self):
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "env-secret"}, clear=True):
+            excerpt = _transport_error_excerpt(RuntimeError("token env-secret"), "")
+        self.assertEqual(excerpt, "token [REDACTED]")
+
+    def test_overlapping_credentials_replace_longest_first(self):
+        with mock.patch.dict(
+            os.environ, {"ANTHROPIC_API_KEY": "abcd", "OPENAI_API_KEY": "bc"}, clear=True,
+        ):
+            excerpt = _transport_error_excerpt(RuntimeError("abcd"), "bc")
+        self.assertEqual(excerpt, "[REDACTED]")
+
+    def test_whitespace_bearing_credential_collapsed_variant_is_scrubbed(self):
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "ab\ncd"}, clear=True):
+            excerpt = _transport_error_excerpt(RuntimeError("token ab\ncd"), "key")
+        self.assertEqual(excerpt, "token [REDACTED]")
+
+    def test_containment_failure_is_fail_closed_class_only(self):
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "RED"}, clear=True):
+            excerpt = _transport_error_excerpt(RuntimeError("the word RED"), "key")
+            detail = _transport_failure_detail("anthropic", RuntimeError("the word RED"), "key")
+        self.assertEqual(excerpt, "")
+        self.assertEqual(detail, "anthropic transport failure: RuntimeError")
+
+    def test_truncation_boundary_600_kept_and_601_marked(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            exact = _transport_error_excerpt(RuntimeError("x" * 600), "key")
+            over = _transport_error_excerpt(RuntimeError("x" * 601), "key")
+        self.assertEqual(len(exact), 600)
+        self.assertFalse(exact.endswith("...[truncated]"))
+        self.assertEqual(len(over), 600 + len("...[truncated]"))
+        self.assertTrue(over.endswith("...[truncated]"))
+
+    def test_openai_transport_detail_scrubs_the_explicit_key(self):
+        fake = types.ModuleType("openai")
+
+        class _FakeResponses:
+            def create(self, **kwargs):
+                raise RuntimeError("bad key sk-openai-secret")
+
+        class _FakeClient:
+            def __init__(self, **kwargs):
+                self.responses = _FakeResponses()
+
+        fake.OpenAI = _FakeClient
+        request = ProviderRequest(
+            request_id="openai-scrub",
+            vendor="openai",
+            model="gpt-6-astra",
+            system="system",
+            user_content="user",
+            max_output_tokens=4096,
+            timeout_seconds=30,
+        )
+        with mock.patch.dict(sys.modules, {"openai": fake}):
+            with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-openai-secret"}, clear=True):
+                with self.assertRaises(ProviderTransportError) as caught:
+                    complete_via_sdk(request, "sk-openai-secret")
+        detail = str(caught.exception)
+        self.assertIn("openai transport failure: RuntimeError:", detail)
+        self.assertNotIn("sk-openai-secret", detail)
+        self.assertEqual(detail.count("[REDACTED]"), 1)
 
 class PerCallOutputBoundTests(unittest.TestCase):
     def test_reserve_uses_the_request_output_bound_and_reconciles(self):

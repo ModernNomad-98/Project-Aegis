@@ -322,6 +322,14 @@ class is retained. This persists provider-authored text into the private
 repository's failure artifacts (retention unchanged); it is not a proof, and
 it cannot prove the absence of unknown sensitive content.
 
+Known limits are documented rather than hidden: fragment-level guarantees for
+pathological overlapping credentials are not claimed (longest-first replacement
+covers the common case); a credential that is a substring of `[REDACTED]` forces
+the fail-closed drop; and the chained Python `__cause__` is not recorded by the
+failure artifacts, which store only `str(ProviderTransportError)`
+(`live/pipeline.py` failure/halt recording and `live/cost_meter.py` use
+`detail=str(exc)`; no traceback is serialized).
+
 ## How to use this policy
 
 1. When writing a new external record, include its exact `schema_version`.

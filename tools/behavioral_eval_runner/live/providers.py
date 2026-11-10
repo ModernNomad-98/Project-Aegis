@@ -15,6 +15,7 @@ machinery and no SDK; the imports are inside the dispatch function.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Mapping
 
@@ -253,46 +254,58 @@ TRANSPORT_ERROR_TRUNCATION_MARKER = "...[truncated]"
 def _transport_error_excerpt(exc: BaseException, api_key: str) -> str:
     """A bounded, credential-scrubbed excerpt of a provider SDK exception message.
 
-    Three paid live transport halts lost the provider message because only the
-    exception class was retained. The excerpt is whitespace-collapsed, every
-    mapped credential environment value AND the explicit api_key in hand are
-    replaced with a fixed marker, and the result is truncated. The replacement
-    mirrors the workflow stderr redactor: a bounded number of passes followed by
-    a containment check that is the authority. If containment cannot be proven,
-    the excerpt is dropped (class-only detail) rather than risk publishing a
-    credential. The helper never raises: a broken __str__ must not mask the halt.
+    The paid live transport halts 42815400201 and 42855141731 lost the provider
+    message because only the exception class was retained; the earlier halt
+    42769599894 lost its detail entirely with the runner. The excerpt is
+    whitespace-collapsed, every mapped credential environment value AND the
+    explicit api_key in hand are replaced with a fixed marker, and the result is
+    truncated. The replacement mirrors the workflow stderr redactor: a bounded
+    number of passes (longest secret first, so an overlapping value cannot leave
+    a fragment of the longer one) followed by a containment check that is the
+    authority. If containment cannot be proven, the excerpt is dropped
+    (class-only detail) rather than risk publishing a credential. Known limits:
+    fragment-level guarantees for pathological overlaps are not claimed, and a
+    credential that is a substring of the marker itself forces the fail-closed
+    drop. The helper never raises: a broken __str__ must not mask the halt.
     """
-    import os
-
     try:
-        raw = str(exc)
-    except Exception:  # noqa: BLE001 - a broken __str__ must not mask the halt
-        raw = ""
-    text = " ".join(raw.split())
-    secrets: list[str] = [api_key]
-    secrets.extend(
-        value
-        for value in (
+        try:
+            raw = str(exc)
+        except Exception:  # noqa: BLE001 - a broken __str__ must not mask the halt
+            raw = ""
+        text = " ".join(raw.split())
+        env_values = [
             os.environ.get(name) for name in sorted(CREDENTIAL_ENV_VARS.values())
+        ]
+        secrets = [value for value in [api_key, *env_values] if value]
+        # A credential containing whitespace no longer matches after collapse;
+        # scrub the collapsed form too. Sort longest first so an overlapping
+        # shorter value cannot leave a fragment of the longer one.
+        secrets.extend(
+            " ".join(value.split())
+            for value in list(secrets)
+            if " ".join(value.split()) != value
         )
-        if value
-    )
-    # Bounded repeat: an overlapping mapped value cannot survive every pass.
-    for _ in range(len(secrets) + 1):
-        changed = False
-        for value in secrets:
-            if value in text:
-                text = text.replace(value, TRANSPORT_ERROR_REDACTED_MARKER)
-                changed = True
-        if not changed:
-            break
-    # Containment check is the authority, not the loop.
-    if any(value in text for value in secrets):
+        secrets = sorted(set(secrets), key=len, reverse=True)
+        # Bounded repeat: the containment check below remains the authority.
+        for _ in range(len(secrets) + 1):
+            changed = False
+            for value in secrets:
+                if value in text:
+                    text = text.replace(value, TRANSPORT_ERROR_REDACTED_MARKER)
+                    changed = True
+            if not changed:
+                break
+        if any(value in text for value in secrets):
+            return ""
+        if len(text) > TRANSPORT_ERROR_EXCERPT_LIMIT:
+            text = (
+                text[:TRANSPORT_ERROR_EXCERPT_LIMIT]
+                + TRANSPORT_ERROR_TRUNCATION_MARKER
+            )
+        return text
+    except Exception:  # noqa: BLE001 - the helper must never mask the halt
         return ""
-    if len(text) > TRANSPORT_ERROR_EXCERPT_LIMIT:
-        text = text[:TRANSPORT_ERROR_EXCERPT_LIMIT] + TRANSPORT_ERROR_TRUNCATION_MARKER
-    return text
-
 
 def _transport_failure_detail(vendor: str, exc: BaseException, api_key: str) -> str:
     """The recorded transport-failure detail: vendor, class, bounded excerpt."""
@@ -334,7 +347,7 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
             )
         except Exception as exc:  # noqa: BLE001 - vendor exception types are not stable
             raise ProviderTransportError(
-                _transport_failure_detail(request.vendor, exc, api_key),
+                _transport_failure_detail("anthropic", exc, api_key),
                 context={"vendor": request.vendor, "request_id": request.request_id},
             ) from exc
         try:
@@ -411,7 +424,7 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
             )
         except Exception as exc:  # noqa: BLE001 - vendor exception types are not stable
             raise ProviderTransportError(
-                _transport_failure_detail(request.vendor, exc, api_key),
+                _transport_failure_detail("openai", exc, api_key),
                 context={"vendor": request.vendor, "request_id": request.request_id},
             ) from exc
         try:
