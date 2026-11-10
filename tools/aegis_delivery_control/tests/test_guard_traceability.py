@@ -28,7 +28,9 @@ from tools.aegis_delivery_control.contracts import (
     BudgetDisposition,
     DispatchDenied,
     EffectObservationRequest,
+    LifecycleState,
     PauseExternalMutationRequest,
+    StorageIntegrityError,
     ValidationApplicationRequest,
 )
 from tools.aegis_delivery_control.engine import TRANSITIONS
@@ -304,6 +306,96 @@ class GuardGapTests(storage_tests.SQLiteStateStoreTests):
             expected_head=head, writer_epoch=100,
         )
         self.assertEqual(self.store.table_counts()["outstanding_slot"], 1)
+
+
+    def test_t03_slot_guard_is_shadowed_by_integrity_and_readiness(self) -> None:
+        """Pin the guard order around the commit_intent slot denial.
+
+        The later "another operation owns the repository slot" check is not
+        independently reachable through the public API: a slot row with no
+        unresolved operation is rejected first by the storage-integrity
+        reconciliation, and a legitimate occupied slot makes the readiness
+        verification fail (the T03 readiness recheck runs before the slot
+        check). This records the observed order and changes no behaviour.
+        """
+        # 1. Slot row with no unresolved operation -> integrity reconciliation.
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            connection.execute(
+                "INSERT INTO outstanding_slot (singleton, repository_id, "
+                "run_id, logical_effect_id, attempt_id, generation) VALUES "
+                "(1, 'repo-1', 'run-1', 'effect-1', 'attempt-1', 1)"
+            )
+            connection.commit()
+        grant = storage_tests.SyntheticGrant(
+            "grant-shadow", "repo-1", "effect-shadow", "attempt-shadow",
+            "scope-shadow",
+        )
+        self.authority.register(grant)
+        shadow_capability = self.authority.claim(*grant.__dict__.values())
+        shadow_request = storage_tests.IntentRequest(
+            "repo-1", "run-shadow", "item-shadow", "command-shadow",
+            "event-shadow", "effect-shadow", "descriptor-shadow",
+            "attempt-shadow", "permission-shadow", "reservation-shadow",
+            "budget-policy-shadow", 1, 2, 10,
+        )
+        with self.assertRaisesRegex(
+            StorageIntegrityError, "slot exists without an unresolved operation"
+        ):
+            self.store.commit_intent(
+                shadow_request, shadow_capability, self.authority,
+                expected_head="", writer_epoch=1,
+            )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            connection.execute("DELETE FROM outstanding_slot")
+            connection.commit()
+
+        # 2. Build a blocker-free PLANNED run, then let run-1 own the real slot;
+        # the readiness recheck (any slot makes blockers non-empty) denies
+        # before the later slot-guard message.
+        plan = self.store.accept_plan(
+            storage_tests.PlanAcceptanceRequest(
+                "plan-shadow", "plan-command-shadow", "plan-event-shadow",
+                "repo-1", "run-shadow", "item-shadow", "effect-shadow",
+                "revision-shadow", "descriptor-shadow", "scope-shadow",
+                "budget-policy-shadow", ("check-shadow",),
+            ),
+            expected_head="", writer_epoch=1,
+        )
+        self.oracle.allowed_head = plan.event_hash
+        readiness = self.store.evaluate_readiness(
+            storage_tests.ReadinessEvaluationRequest(
+                "readiness-shadow", "readiness-command-shadow",
+                "readiness-event-shadow", "repo-1", "run-shadow",
+                "item-shadow", "plan-shadow", "revision-shadow",
+                plan.event_hash, None, "inputs-evidence-shadow", True,
+            )
+        )
+        self.assertEqual(readiness.resulting_state, LifecycleState.PLANNED)
+        self.oracle.allowed_head = readiness.event_hash
+        occupied = self._commit_planned_intent(
+            self.request(), self.capability, self.authority,
+            expected_head=readiness.event_hash, writer_epoch=3,
+        )
+        with closing(sqlite3.connect(self.database_path)) as connection:
+            self.assertEqual(
+                connection.execute(
+                    "SELECT COUNT(*) FROM outstanding_slot"
+                ).fetchone()[0],
+                1,
+            )
+        self.oracle.allowed_head = occupied.event_hash
+        with self.assertRaisesRegex(
+            DispatchDenied, "T03 requires current verified readiness"
+        ) as caught:
+            self.store.commit_intent(
+                shadow_request, shadow_capability, self.authority,
+                expected_head=occupied.event_hash, writer_epoch=100,
+            )
+        self.assertNotIn(
+            "another operation owns the repository slot",
+            str(caught.exception),
+        )
+
 
     def test_t04_forged_operator_capability_denies_pause(self) -> None:
         plan = self.store.accept_plan(
