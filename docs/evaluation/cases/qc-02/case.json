@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "case_id": "qc-02",
+  "skill": "change-classification-gate",
+  "prompt": "Classify this change before work starts: it edits three Markdown pages under docs/design/ and adds no code. State the class, the validation floor and the approval path.",
+  "skill_instructions": "A change that only edits documentation is docs-only: validation is links/rendering sanity plus review; human approval is not required. Inspect the target paths before classifying; do not classify from the request wording alone.",
+  "rubric": {
+    "rubric_id": "rubric-qc-02",
+    "rubric_version": "1.0.0",
+    "question": "Does the response classify the change as docs-only, name the links/rendering validation floor, and state that no human approval is required?",
+    "pass_criteria": [
+      "class is docs-only",
+      "floor is links/rendering sanity plus review",
+      "approval path is none"
+    ],
+    "fail_criteria": [
+      "classifies as backend or ai-agentic",
+      "requires human approval",
+      "skips the scope contract"
+    ]
+  },
+  "rubric_sha256": "4a4abdce21174e884aae955e5fa957b045b8278aa98c826cb9845a5e9988a71c",
+  "deterministic_checks": {
+    "must_include": [
+      "docs-only",
+      "review"
+    ],
+    "must_not_include": [
+      "requires a schema change",
+      "requires a migration",
+      "class is backend",
+      "class is ai-agentic"
+    ]
+  }
+}

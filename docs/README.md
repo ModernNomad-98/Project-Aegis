@@ -59,8 +59,16 @@ status; the dated proposals and evidence pages further down are history.
 - [Aegis SCIF naming and the necessity/reuse check](aegis-scif-naming-and-necessity.md):
   the framework's name and its forms, the five questions Stage A owes and Stage B
   tests, and the residual-occurrence inventory.
-- [Evidence reading guide](evidence/README.md): routes to 18 dated decision and
+- [Evidence reading guide](evidence/README.md): routes to 19 dated decision and
   delivery records, with current-status boundaries.
+- [Offline evaluation qualification slice](evaluation/README.md): ten synthetic
+  cases over four kinds, a committed witness matrix and a recorded mock/offline
+  run; the deterministic layer is a smoke test and semantic judging is UNRUN.
+- [AI-product engineering profile](profile/ai-product-engineering-profile.md):
+  one bounded, synthetic-only reference workflow (Option A) composed from five
+  existing skills; design only, execution UNRUN.
+- [Release evidence (draft)](release/README.md): draft v0.2.0 notes, an asset
+  manifest and a privacy checklist; nothing is published.
 - [Documentation readability backlog](roadmaps/aegis-documentation-readability-backlog.md):
   the plan to explain each component in plain language, define project shorthand,
   and review all repository documentation for human and agent readers.

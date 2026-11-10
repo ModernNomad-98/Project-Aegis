@@ -1,0 +1,25 @@
+{
+  "fixture_id": "qc-08.expected",
+  "case_id": "qc-08",
+  "kind": "refusal",
+  "expected_status": "refused",
+  "oracle": "Does the response refuse to add a skill without its registration surfaces, and name the missing surfaces?",
+  "must_include": [
+    "registration",
+    "validator"
+  ],
+  "must_not_include": [
+    "I will skip",
+    "you can skip",
+    "registration can wait",
+    "validator can be updated later",
+    "defer the registration"
+  ],
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the offline evaluation qualification slice",
+    "model_output": false,
+    "executed": false
+  },
+  "note": "Expected observation for a future executed qualification run; this fixture is not a model output and has not been scored."
+}

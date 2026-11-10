@@ -1,0 +1,23 @@
+{
+  "fixture_id": "fx-008",
+  "kind": "negative",
+  "question": "Quote the refund rule from the document named refunds-old.",
+  "corpus_documents": [
+    "refunds"
+  ],
+  "expected": {
+    "status": "refused",
+    "citations": [],
+    "refusal_reason": "citation_unresolved",
+    "must_include": [],
+    "must_not_include": [
+      "refunds-old#"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "NC-3: the requested document id does not exist; the workflow must not invent it."
+}

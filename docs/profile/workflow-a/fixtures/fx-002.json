@@ -1,0 +1,31 @@
+{
+  "fixture_id": "fx-002",
+  "kind": "positive",
+  "question": "When does a shipped order count as delivered for the returns clock?",
+  "corpus_documents": [
+    "shipping",
+    "returns"
+  ],
+  "expected": {
+    "status": "answered",
+    "citations": [
+      "shipping#delivery-confirmation",
+      "returns#clock-start"
+    ],
+    "refusal_reason": null,
+    "must_include": [
+      "carrier",
+      "delivery confirmation"
+    ],
+    "must_not_include": [
+      "a signature is required",
+      "clock starts at the order date"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "Two documents must agree; the answer cites both and states the joint rule."
+}

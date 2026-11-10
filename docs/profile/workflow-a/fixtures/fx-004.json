@@ -1,0 +1,30 @@
+{
+  "fixture_id": "fx-004",
+  "kind": "positive",
+  "question": "What does the warranty exclude?",
+  "corpus_documents": [
+    "warranty"
+  ],
+  "expected": {
+    "status": "answered",
+    "citations": [
+      "warranty#exclusions",
+      "warranty#covered"
+    ],
+    "refusal_reason": null,
+    "must_include": [
+      "exclusions",
+      "misuse"
+    ],
+    "must_not_include": [
+      "covers all damage",
+      "nothing is excluded"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "Requires the exclusions section, not the summary; tests section-level citation."
+}

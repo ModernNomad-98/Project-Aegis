@@ -1,0 +1,30 @@
+{
+  "fixture_id": "fx-005",
+  "kind": "positive",
+  "question": "How are promotion codes combined?",
+  "corpus_documents": [
+    "promotions",
+    "billing"
+  ],
+  "expected": {
+    "status": "answered",
+    "citations": [
+      "promotions#stacking"
+    ],
+    "refusal_reason": null,
+    "must_include": [
+      "one code",
+      "per order"
+    ],
+    "must_not_include": [
+      "is unlimited",
+      "you can stack any"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "Single-sentence rule; a second citation is allowed but not required."
+}

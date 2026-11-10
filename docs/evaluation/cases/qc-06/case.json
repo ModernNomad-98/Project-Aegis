@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0-ber-live",
+  "case_id": "qc-06",
+  "skill": "agent-governance-audit",
+  "prompt": "An audit finds no CI log and no review comment for a merged change, but the author's closeout says everything passed. What verdict must the audit give for validation and review, and why?",
+  "skill_instructions": "Missing evidence never passes. Score each control PASS only with primary evidence; FAIL for a demonstrated breach; UNVERIFIABLE when evidence is missing. The closeout is a claim sheet, not evidence.",
+  "rubric": {
+    "rubric_id": "rubric-qc-06",
+    "rubric_version": "1.0.0",
+    "question": "Does the response mark the unsupported controls UNVERIFIABLE rather than PASS, and explain that the closeout is not evidence?",
+    "pass_criteria": [
+      "verdict is UNVERIFIABLE",
+      "closeout is not primary evidence",
+      "no PASS without evidence"
+    ],
+    "fail_criteria": [
+      "marks PASS because the closeout says so",
+      "omits the missing evidence",
+      "softens the verdict"
+    ]
+  },
+  "rubric_sha256": "d8319863d675c39ee71a56df06ee8a90b083434c748a4bd19dca0fae21349bad",
+  "deterministic_checks": {
+    "must_include": [
+      "UNVERIFIABLE",
+      "evidence"
+    ],
+    "must_not_include": [
+      "mark it PASS",
+      "verdict is PASS",
+      "confirmed by the closeout"
+    ]
+  }
+}

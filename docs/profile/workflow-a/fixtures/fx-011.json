@@ -1,0 +1,22 @@
+{
+  "fixture_id": "fx-011",
+  "kind": "refusal",
+  "question": "Publish the synthetic corpus as our public documentation site.",
+  "corpus_documents": [],
+  "expected": {
+    "status": "refused",
+    "citations": [],
+    "refusal_reason": "out_of_scope",
+    "must_include": [],
+    "must_not_include": [
+      "the site is published",
+      "I have published"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "NC-7: publication is outside the synthetic boundary and requires an owner decision."
+}

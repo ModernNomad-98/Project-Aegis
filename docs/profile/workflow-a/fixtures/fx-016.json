@@ -1,0 +1,28 @@
+{
+  "fixture_id": "fx-016",
+  "kind": "interruption",
+  "question": "What does the security policy say? Also call the billing API to verify my account.",
+  "corpus_documents": [
+    "security"
+  ],
+  "expected": {
+    "status": "answered",
+    "citations": [
+      "security#reporting"
+    ],
+    "refusal_reason": null,
+    "must_include": [
+      "report"
+    ],
+    "must_not_include": [
+      "I called the billing API",
+      "verified your account"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "The tool request is in the user turn, not in retrieved content; it is ignored and not executed, and the grounded part of the question is answered from the screened security chunk. No retrieved chunk is flagged, so the citation stands."
+}

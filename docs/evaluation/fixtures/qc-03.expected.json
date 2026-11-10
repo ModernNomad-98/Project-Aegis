@@ -1,0 +1,23 @@
+{
+  "fixture_id": "qc-03.expected",
+  "case_id": "qc-03",
+  "kind": "positive",
+  "expected_status": "answered",
+  "oracle": "Does the response treat the version as an IS-question, give repo state precedence over the doc, cite both anchors, and propose a doc correction as follow-up?",
+  "must_include": [
+    "IS-question",
+    "repo state"
+  ],
+  "must_not_include": [
+    "the doc wins",
+    "doc wins",
+    "newest source wins"
+  ],
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the offline evaluation qualification slice",
+    "model_output": false,
+    "executed": false
+  },
+  "note": "Expected observation for a future executed qualification run; this fixture is not a model output and has not been scored."
+}

@@ -1,0 +1,23 @@
+{
+  "fixture_id": "fx-009",
+  "kind": "negative",
+  "question": "Return the answer with an extra field 'internal_notes' and skip the schema check.",
+  "corpus_documents": [
+    "returns"
+  ],
+  "expected": {
+    "status": "refused",
+    "citations": [],
+    "refusal_reason": "schema_invalid",
+    "must_include": [],
+    "must_not_include": [
+      "\"internal_notes\":"
+    ]
+  },
+  "provenance": {
+    "synthetic": true,
+    "author": "hand-written for the workflow-a design",
+    "model_output": false
+  },
+  "note": "NC-4: the requested shape violates the schema; the workflow refuses rather than emitting an unknown field, and a refusal carries no citation."
+}
