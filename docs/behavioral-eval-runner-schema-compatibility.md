@@ -253,8 +253,8 @@ The exact-match, fail-closed rules are unchanged:
   and still produced no proof, so without its registration the next dispatch
   would refuse its history as `UNKNOWN`. The authorized retry `42815400201`
   became the next such failure: it reached the live step, spent 21c and produced
-  no proof, and is registered here for the same reason. This is a recorded operational dependency, not a property the
-  code can supply on its own.
+  no proof, and is registered here for the same reason. This is a recorded
+  operational dependency, not a property the code can supply on its own.
 
 ### Failure-path evidence upload (2026-11-10)
 
@@ -301,8 +301,10 @@ satisfied by a partial run.
 
 The owner authorized one final bounded attempt with the single-case smoke
 output cap changed from 16,384 to the known-good 4,096 (`max_output_tokens`):
-both paid 16,384 dispatches halted on an Anthropic SDK HTTP 400 before the
-judge, while both retained 2026-10-31 proofs used 4,096. The live-setting floor
+both paid 16,384 dispatches halted before the judge with `TRANSPORT_ERROR` (the
+retained retry evidence records the Anthropic SDK HTTP 400 `BadRequestError`; the
+first halt detail was lost with the runner), while both retained 2026-10-31
+proofs used 4,096. The live-setting floor
 is 4,096, so the change is within the enforced bounds. It does not alter the
 smoke shape, the spend caps or the proof format; the full-live and trial
 configs remain at 16,384. Bounded retention of the provider's exact SDK error

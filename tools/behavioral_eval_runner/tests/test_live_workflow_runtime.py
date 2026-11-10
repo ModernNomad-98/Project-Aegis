@@ -2023,6 +2023,9 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         self.assertIn("records non-zero spend", str(caught.exception))
 
     def _transport_halt_retry_fake(self, entry):
+        # The retained failure artifacts include the redacted stderr; only the
+        # absence of a proof artifact matters to the collector, which must not
+        # download any of them.
         return FakeGH(
             {"smoke": [page([entry])], "trial": [page([])]},
             {
@@ -2030,6 +2033,7 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
                     artifact("ber-smoke-failure-run"),
                     artifact("ber-smoke-failure-ledger"),
                     artifact("ber-smoke-failure-evidence"),
+                    artifact("ber-smoke-failure-stderr"),
                     artifact("ber-shared-allowance-admission"),
                     artifact("ber-shared-allowance-state"),
                 ],
@@ -2098,7 +2102,7 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
                 )
         self.assertIn("records non-zero spend", str(caught.exception))
 
-    def test_composite_live_history_accounts_ledger_222_smoke_39(self):
+    def test_historical_pre_retry_composite_live_history_accounts_ledger_222_smoke_39(self):
         # Historical full real-shaped live history after the FIRST paid halt
         # (the 2026-11-10 authorized retry is registered separately; this
         # snapshot intentionally predates it): the two
