@@ -307,11 +307,45 @@ first halt detail was lost with the runner), while both retained 2026-10-31
 proofs used 4,096. The live-setting floor
 is 4,096, so the change is within the enforced bounds. It does not alter the
 smoke shape, the spend caps or the proof format; the full-live and trial
-configs remain at 16,384. Bounded retention of the provider's exact SDK error
-message is **not** part of this change: it would persist provider-authored text
-into uploaded artifacts and therefore needs its own owner authorization; until
-then a transport failure records the exception class and reason code the runner
-already captured.
+configs remain at 16,384.
+
+Bounded retention of the provider's exact SDK error message **is** added by the
+follow-up retention change (owner line `d1ba3c6e…`): on a transport failure the
+detail now carries up to 600 characters of the scrubbed, whitespace-collapsed
+SDK message plus a `...[truncated]` marker when that scrubbed, collapsed text
+exceeds the bound. The 614-character maximum applies to the excerpt itself; the
+full detail also carries the fixed prefix and may be longer. A raw provider
+message longer than 16,384 characters fails closed before an excerpt is built. ANSI escape control
+bytes (and NUL, backspace and bidi controls) are removed; printable escape
+parameters such as `[31m` may remain. The explicit API key in hand and every mapped credential
+environment value are replaced with `[REDACTED]` - a distinct marker from the
+stderr redactor's `[REDACTED-<NAME>]` - using the same bounded-repeat
+replacement and post-scrub containment pattern as the workflow stderr redactor;
+if containment cannot be proven, the excerpt is dropped and the fixed vendor/class
+prefix is retained; if the prefix itself (or the assembled detail) would contain a
+credential, the detail falls back to the fixed minimal string `provider transport
+failure`, which is itself containment-checked (an empty detail is returned if
+that fallback also collides with a credential). This persists provider-authored text into the private
+repository's failure artifacts (retention unchanged); it is not a proof, and
+it cannot prove the absence of unknown sensitive content.
+
+Known limits are documented rather than hidden: fragment-level guarantees for
+pathological overlapping credentials are not claimed (longest-first replacement
+covers the common case); a credential that is a substring of `[REDACTED]` forces
+the fail-closed drop. The scrubber is exact-match (plus whitespace-collapsed
+variants) only: encoded, truncated or transformed credentials, and credentials
+split by whitespace in the provider message, are not scrubbed; only the explicit
+API key and the mapped `CREDENTIAL_ENV_VARS` values are covered (proxy or
+SDK-specific auth env vars, and SDK-derived headers, are not). The transport
+failure is raised `from None`, so the unsanitized SDK exception is not chained;
+the failure artifacts serialize strings only (no traceback, `format_exc`,
+`exc_info` or `__cause__`). `from None` clears the chained cause, but the SDK exception remains as Python's
+`__context__` in-process; traceback rendering suppresses it and the failure
+artifacts serialize strings only. The `context` fields (vendor and request id)
+are internal identifiers and are not scrubbed; the vendor and exception class
+names in the fixed prefix are internal identifiers, not provider-authored text.
+Failure artifacts are private and the owner accepted this residual; the excerpt
+is a diagnostic aid, not a security boundary.
 
 ## How to use this policy
 

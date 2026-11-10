@@ -15,6 +15,7 @@ machinery and no SDK; the imports are inside the dispatch function.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Mapping
 
@@ -237,8 +238,153 @@ def ensure_complete_response(stop_reason: str, *, vendor: str) -> None:
         )
 
 
+#: Upper bound on the provider SDK error excerpt retained in a transport-failure
+#: detail, in characters AFTER whitespace collapse and BEFORE the truncation
+#: marker; a truncated excerpt is therefore at most 614 characters.
+TRANSPORT_ERROR_EXCERPT_LIMIT = 600
+
+#: Replacement marker for a credential value that appears in a provider message.
+#: Distinct from the workflow stderr redactor marker [REDACTED-<NAME>].
+TRANSPORT_ERROR_REDACTED_MARKER = "[REDACTED]"
+
+#: Appended when the collapsed, scrubbed text exceeds the excerpt bound.
+TRANSPORT_ERROR_TRUNCATION_MARKER = "...[truncated]"
+
+#: Upper bound on the raw provider message processed before collapse/scrub. A
+#: longer message fails closed: a truncated raw string could split a credential
+#: and let its fragment pass the full-value containment check.
+TRANSPORT_ERROR_RAW_LIMIT = 16_384
+
+
+def _transport_credential_values(api_key: str) -> list[str]:
+    """The credential values to scrub, longest first with a stable tie-break.
+
+    Empty and whitespace-only values are dropped (a whitespace-only value would
+    collapse to the empty string and match everywhere). Whitespace-collapsed
+    variants are included so a credential containing whitespace is still
+    scrubbed after the message is collapsed.
+    """
+    env_values = [
+        os.environ.get(name) for name in sorted(CREDENTIAL_ENV_VARS.values())
+    ]
+    secrets = [
+        value for value in [api_key, *env_values] if value and value.strip()
+    ]
+    secrets.extend(
+        normalized
+        for value in list(secrets)
+        if (normalized := " ".join(value.split())) and normalized != value
+    )
+    # Longest first, then stable lexical order for equal lengths: a
+    # non-deterministic tie-break could produce different excerpts for the same
+    # input.
+    return sorted(set(secrets), key=lambda value: (-len(value), value))
+
+
+def _transport_error_excerpt(
+    exc: BaseException, api_key: str, *, secrets: list[str] | None = None
+) -> str:
+    """A bounded, credential-scrubbed excerpt of a provider SDK exception message.
+
+    The paid live transport halts 42815400201 and 42855141731 lost the provider
+    message because only the exception class was retained; the earlier halt
+    42769599894 lost its detail entirely with the runner. The excerpt is
+    whitespace-collapsed, every credential value in hand (the explicit api_key
+    and the mapped credential environment values) is replaced with a fixed
+    marker, and the result is truncated. The replacement mirrors the workflow
+    stderr redactor: a bounded number of passes (longest secret first, with a
+    deterministic tie-break) followed by a containment check on the final string
+    (including the truncation marker) that is the authority. If containment
+    cannot be proven, the excerpt is dropped (class-only detail) rather than risk
+    publishing a credential. Known limits: encrypted, encoded or transformed
+    credentials, a credential split by whitespace in the provider message, and
+    the fixed vendor/class prefix are not scrubbed; a credential that is a
+    substring of the marker itself forces the fail-closed drop; and a raw
+    message longer than TRANSPORT_ERROR_RAW_LIMIT fails closed because a
+    truncation boundary could split a credential. The helper does not raise
+    ordinary exceptions: a broken __str__ must not mask the halt.
+    """
+    try:
+        try:
+            raw = str(exc)
+        except Exception:  # noqa: BLE001 - a broken __str__ must not mask the halt
+            raw = ""
+        if len(raw) > TRANSPORT_ERROR_RAW_LIMIT:
+            # A boundary cut could split a credential; fail closed.
+            return ""
+        text = " ".join(raw.split())
+        # Provider text is untrusted: keep only printable characters (plus the
+        # single spaces from the collapse) so ANSI/control/bidi sequences cannot
+        # reach the artifacts.
+        text = "".join(ch for ch in text if ch == " " or ch.isprintable())
+        if secrets is None:
+            secrets = _transport_credential_values(api_key)
+        # A marker-substring credential can never be scrubbed to a contained
+        # state (the marker re-introduces it); drop the excerpt up front rather
+        # than run an expensive replacement loop inside the marker itself.
+        if any(value in TRANSPORT_ERROR_REDACTED_MARKER for value in secrets):
+            return ""
+        # Bounded repeat: the containment check below remains the authority.
+        for _ in range(len(secrets) + 1):
+            changed = False
+            for value in secrets:
+                if value in text:
+                    text = text.replace(value, TRANSPORT_ERROR_REDACTED_MARKER)
+                    changed = True
+            if not changed:
+                break
+        if len(text) > TRANSPORT_ERROR_EXCERPT_LIMIT:
+            text = (
+                text[:TRANSPORT_ERROR_EXCERPT_LIMIT]
+                + TRANSPORT_ERROR_TRUNCATION_MARKER
+            )
+        # Check the FINAL string: the truncation marker itself can collide with a
+        # credential, so containment must cover what is actually kept.
+        if any(value in text for value in secrets):
+            return ""
+        return text
+    except Exception:  # noqa: BLE001 - the helper must not mask the halt
+        return ""
+
+
+def _transport_failure_detail(
+    vendor: str, exc: BaseException, api_key: str
+) -> str:
+    """The recorded transport-failure detail: vendor, class, bounded excerpt.
+
+    Containment is checked on the fixed fallback and on the assembled detail. A
+    credential in the prefix or the assembled detail returns the fixed minimal
+    string "provider transport failure" when that string is itself safe; if the
+    fallback would itself collide with a credential, or any unexpected failure
+    occurs, the detail is empty (the class, reason code and context remain),
+    because a safe fallback cannot then be certified; the helper cannot mask the
+    halt.
+    """
+    try:
+        prefix = f"{vendor} transport failure: {type(exc).__name__}"
+        secrets = _transport_credential_values(api_key)
+        fallback = "provider transport failure"
+        # The fallback itself must be containment-checked: an arbitrary
+        # credential could equal one of its words. If unsafe, return an empty
+        # detail (the error class/reason code/context remain).
+        if any(value in fallback for value in secrets):
+            return ""
+        if any(value in prefix for value in secrets):
+            return fallback
+        excerpt = _transport_error_excerpt(exc, api_key, secrets=secrets)
+        detail = prefix + (": " + excerpt if excerpt else "")
+        if any(value in detail for value in secrets):
+            return fallback
+        return detail
+    except Exception:  # noqa: BLE001 - the detail must never mask the halt
+        return ""
+
+
 def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderResponse":
-    """One lazy-import SDK call. The key is never logged or stored."""
+    """One lazy-import SDK call. The runner does not log or store the key; a
+    bounded failure excerpt scrubs the explicit key and mapped env values, with
+    the documented residual limits.
+    """
     from .transport import ProviderResponse
 
     require_clean_transport_environment()
@@ -270,9 +416,9 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
             )
         except Exception as exc:  # noqa: BLE001 - vendor exception types are not stable
             raise ProviderTransportError(
-                f"anthropic transport failure: {type(exc).__name__}",
+                _transport_failure_detail("anthropic", exc, api_key),
                 context={"vendor": request.vendor, "request_id": request.request_id},
-            ) from exc
+            ) from None
         try:
             blocks = getattr(response, "content", []) or []
             text = "".join(
@@ -347,9 +493,9 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
             )
         except Exception as exc:  # noqa: BLE001 - vendor exception types are not stable
             raise ProviderTransportError(
-                f"openai transport failure: {type(exc).__name__}",
+                _transport_failure_detail("openai", exc, api_key),
                 context={"vendor": request.vendor, "request_id": request.request_id},
-            ) from exc
+            ) from None
         try:
             text = str(getattr(response, "output_text", ""))
             stop_reason = str(getattr(response, "status", "UNKNOWN"))
