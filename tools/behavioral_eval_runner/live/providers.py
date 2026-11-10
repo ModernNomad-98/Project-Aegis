@@ -250,6 +250,10 @@ TRANSPORT_ERROR_REDACTED_MARKER = "[REDACTED]"
 #: Appended when the collapsed SDK message exceeds the excerpt bound.
 TRANSPORT_ERROR_TRUNCATION_MARKER = "...[truncated]"
 
+#: Upper bound on the raw provider message processed before collapse/scrub; the
+#: retained excerpt is far smaller (600 characters), so this only bounds work.
+TRANSPORT_ERROR_RAW_LIMIT = 16_384
+
 
 def _transport_error_excerpt(exc: BaseException, api_key: str) -> str:
     """A bounded, credential-scrubbed excerpt of a provider SDK exception message.
@@ -261,48 +265,63 @@ def _transport_error_excerpt(exc: BaseException, api_key: str) -> str:
     explicit api_key in hand are replaced with a fixed marker, and the result is
     truncated. The replacement mirrors the workflow stderr redactor: a bounded
     number of passes (longest secret first, so an overlapping value cannot leave
-    a fragment of the longer one) followed by a containment check that is the
-    authority. If containment cannot be proven, the excerpt is dropped
-    (class-only detail) rather than risk publishing a credential. Known limits:
-    fragment-level guarantees for pathological overlaps are not claimed, and a
-    credential that is a substring of the marker itself forces the fail-closed
-    drop. The helper never raises: a broken __str__ must not mask the halt.
+    a fragment of the longer one) followed by a containment check on the final
+    string (including the truncation marker) that is the authority. If
+    containment cannot be proven, the excerpt is dropped (class-only detail)
+    rather than risk publishing a credential. Known limits: encrypted, encoded
+    or transformed credentials and the fixed vendor/class prefix are not
+    scrubbed, fragment-level guarantees for pathological overlaps are not
+    claimed, and a credential that is a substring of the marker itself forces
+    the fail-closed drop. The helper never raises: a broken __str__ must not
+    mask the halt.
     """
     try:
         try:
             raw = str(exc)
         except Exception:  # noqa: BLE001 - a broken __str__ must not mask the halt
             raw = ""
+        raw = raw[:TRANSPORT_ERROR_RAW_LIMIT]
         text = " ".join(raw.split())
         env_values = [
             os.environ.get(name) for name in sorted(CREDENTIAL_ENV_VARS.values())
         ]
-        secrets = [value for value in [api_key, *env_values] if value]
-        # A credential containing whitespace no longer matches after collapse;
-        # scrub the collapsed form too. Sort longest first so an overlapping
-        # shorter value cannot leave a fragment of the longer one.
-        secrets.extend(
-            " ".join(value.split())
-            for value in list(secrets)
-            if " ".join(value.split()) != value
-        )
+        # Drop empty and whitespace-only values: a whitespace-only credential
+        # would otherwise collapse to the empty string and match everywhere.
+        secrets = [
+            value for value in [api_key, *env_values] if value and value.strip()
+        ]
+        collapsed: list[str] = []
+        for value in list(secrets):
+            normalized = " ".join(value.split())
+            if normalized and normalized != value:
+                collapsed.append(normalized)
+        secrets.extend(collapsed)
         secrets = sorted(set(secrets), key=len, reverse=True)
+        # A marker-substring credential can never be scrubbed to a contained
+        # state (the marker re-introduces it); drop the excerpt up front rather
+        # than run an expensive replacement loop inside the marker itself.
+        if any(value in TRANSPORT_ERROR_REDACTED_MARKER for value in secrets):
+            return ""
         # Bounded repeat: the containment check below remains the authority.
         for _ in range(len(secrets) + 1):
             changed = False
             for value in secrets:
+                if not value:  # defensive: filtered above, never match empty
+                    continue
                 if value in text:
                     text = text.replace(value, TRANSPORT_ERROR_REDACTED_MARKER)
                     changed = True
             if not changed:
                 break
-        if any(value in text for value in secrets):
-            return ""
         if len(text) > TRANSPORT_ERROR_EXCERPT_LIMIT:
             text = (
                 text[:TRANSPORT_ERROR_EXCERPT_LIMIT]
                 + TRANSPORT_ERROR_TRUNCATION_MARKER
             )
+        # Check the FINAL string: the truncation marker itself can collide with
+        # a credential value, so containment must cover what is actually kept.
+        if any(value in text for value in secrets):
+            return ""
         return text
     except Exception:  # noqa: BLE001 - the helper must never mask the halt
         return ""

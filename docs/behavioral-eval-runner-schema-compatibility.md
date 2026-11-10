@@ -329,6 +329,11 @@ the fail-closed drop; and the chained Python `__cause__` is not recorded by the
 failure artifacts, which store only `str(ProviderTransportError)`
 (`live/pipeline.py` failure/halt recording and `live/cost_meter.py` use
 `detail=str(exc)`; no traceback is serialized).
+The scrubber is exact-match (plus whitespace-collapsed variants) only: encoded,
+truncated or transformed credentials, and a credential that coincides with the
+fixed vendor/class prefix, are not scrubbed. Failure artifacts are private and
+the owner accepted this residual; the excerpt is diagnostic aid, not a
+security boundary.
 
 ## How to use this policy
 

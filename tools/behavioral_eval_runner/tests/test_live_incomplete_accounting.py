@@ -561,15 +561,18 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
         self.assertIn("openai transport failure: RuntimeError:", detail)
         self.assertIn("max_output_tokens is not supported", detail)
 
-
     def test_empty_api_key_is_filtered_and_excerpt_retained(self):
-        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "env-secret"}, clear=True):
+        with mock.patch.dict(
+            os.environ, {"ANTHROPIC_API_KEY": "env-secret"}, clear=True,
+        ):
             excerpt = _transport_error_excerpt(RuntimeError("token env-secret"), "")
         self.assertEqual(excerpt, "token [REDACTED]")
 
     def test_overlapping_credentials_replace_longest_first(self):
         with mock.patch.dict(
-            os.environ, {"ANTHROPIC_API_KEY": "abcd", "OPENAI_API_KEY": "bc"}, clear=True,
+            os.environ,
+            {"ANTHROPIC_API_KEY": "abcd", "OPENAI_API_KEY": "bc"},
+            clear=True,
         ):
             excerpt = _transport_error_excerpt(RuntimeError("abcd"), "bc")
         self.assertEqual(excerpt, "[REDACTED]")
@@ -582,7 +585,9 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
     def test_containment_failure_is_fail_closed_class_only(self):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "RED"}, clear=True):
             excerpt = _transport_error_excerpt(RuntimeError("the word RED"), "key")
-            detail = _transport_failure_detail("anthropic", RuntimeError("the word RED"), "key")
+            detail = _transport_failure_detail(
+                "anthropic", RuntimeError("the word RED"), "key",
+            )
         self.assertEqual(excerpt, "")
         self.assertEqual(detail, "anthropic transport failure: RuntimeError")
 
@@ -617,13 +622,39 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
             timeout_seconds=30,
         )
         with mock.patch.dict(sys.modules, {"openai": fake}):
-            with mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-openai-secret"}, clear=True):
+            with mock.patch.dict(
+                os.environ, {"OPENAI_API_KEY": "sk-openai-secret"}, clear=True,
+            ):
                 with self.assertRaises(ProviderTransportError) as caught:
                     complete_via_sdk(request, "sk-openai-secret")
         detail = str(caught.exception)
         self.assertIn("openai transport failure: RuntimeError:", detail)
         self.assertNotIn("sk-openai-secret", detail)
         self.assertEqual(detail.count("[REDACTED]"), 1)
+    def test_whitespace_only_credential_is_filtered_without_expansion(self):
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "\n"}, clear=True):
+            excerpt = _transport_error_excerpt(RuntimeError("hello provider"), "key")
+        self.assertEqual(excerpt, "hello provider")
+        self.assertLessEqual(len(excerpt), 614)
+
+    def test_marker_substring_credential_fails_closed_before_replacement(self):
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "D"}, clear=True):
+            excerpt = _transport_error_excerpt(RuntimeError("a D b"), "key")
+        self.assertEqual(excerpt, "")
+
+    def test_truncation_marker_collision_fails_closed(self):
+        with mock.patch.dict(
+            os.environ, {"ANTHROPIC_API_KEY": "truncated"}, clear=True,
+        ):
+            excerpt = _transport_error_excerpt(RuntimeError("x" * 601), "key")
+        self.assertEqual(excerpt, "")
+
+    def test_large_provider_message_is_bounded(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            excerpt = _transport_error_excerpt(RuntimeError("y" * 2_000_000), "key")
+        self.assertLessEqual(len(excerpt), 614)
+        self.assertTrue(excerpt.endswith("...[truncated]"))
+
 
 class PerCallOutputBoundTests(unittest.TestCase):
     def test_reserve_uses_the_request_output_bound_and_reconciles(self):
