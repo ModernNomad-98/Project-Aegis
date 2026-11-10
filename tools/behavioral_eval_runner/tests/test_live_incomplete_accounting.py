@@ -25,6 +25,7 @@ import json
 import os
 import sys
 import tempfile
+import traceback
 import types
 import unittest
 from unittest import mock
@@ -681,17 +682,18 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertEqual(first, "[REDACTED] [REDACTED] [REDACTED]")
 
-
     def test_control_characters_are_removed_from_the_excerpt(self):
         with mock.patch.dict(os.environ, {}, clear=True):
             excerpt = _transport_error_excerpt(
                 RuntimeError("\x1b[31mred\x00\x08blue"), "key",
             )
         self.assertTrue(all(ch == " " or ch.isprintable() for ch in excerpt))
-        self.assertIn("redblue", excerpt.replace("[31m", ""))
+        self.assertEqual(excerpt, "[31mredblue")
 
     def test_credential_in_prefix_falls_back_to_minimal_detail(self):
-        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "RuntimeError"}, clear=True):
+        with mock.patch.dict(
+            os.environ, {"ANTHROPIC_API_KEY": "RuntimeError"}, clear=True,
+        ):
             detail = _transport_failure_detail("anthropic", RuntimeError("boom"), "key")
         self.assertEqual(detail, "provider transport failure")
 
@@ -708,9 +710,89 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
 
         fake.Anthropic = _FakeClient
         with mock.patch.dict(sys.modules, {"anthropic": fake}):
-            with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "fake-key"}, clear=True):
+            with mock.patch.dict(
+                os.environ, {"ANTHROPIC_API_KEY": "fake-key"}, clear=True,
+            ):
                 with self.assertRaises(ProviderTransportError) as caught:
                     complete_via_sdk(self._anthropic_request(), "fake-key")
+        self.assertIsNone(caught.exception.__cause__)
+
+    def test_fallback_string_is_containment_checked(self):
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "failure"}, clear=True):
+            detail = _transport_failure_detail("anthropic", RuntimeError("boom"), "key")
+        self.assertEqual(detail, "")
+
+    def test_detail_never_contains_any_credential_value(self):
+        cases = [
+            ("sk-ant-abc123", "echo sk-ant-abc123", "abc123"),
+            ("provider", "the provider failed", "transport"),
+            ("RuntimeError", "boom", "failure"),
+        ]
+        for api_key, message, env_value in cases:
+            with mock.patch.dict(
+                os.environ, {"ANTHROPIC_API_KEY": env_value}, clear=True,
+            ):
+                excerpt = _transport_error_excerpt(RuntimeError(message), api_key)
+                detail = _transport_failure_detail(
+                    "anthropic", RuntimeError(message), api_key,
+                )
+            for value in (api_key, env_value):
+                self.assertNotIn(value, detail)
+                self.assertNotIn(value, excerpt)
+
+    def test_formatted_traceback_does_not_contain_the_raw_provider_message(self):
+        fake = types.ModuleType("anthropic")
+
+        class _FakeMessages:
+            def create(self, **kwargs):
+                raise RuntimeError("RAW PROVIDER BODY sk-ant-raw")
+
+        class _FakeClient:
+            def __init__(self, **kwargs):
+                self.messages = _FakeMessages()
+
+        fake.Anthropic = _FakeClient
+        with mock.patch.dict(sys.modules, {"anthropic": fake}):
+            with mock.patch.dict(
+                os.environ, {"ANTHROPIC_API_KEY": "fake-key"}, clear=True,
+            ):
+                with self.assertRaises(ProviderTransportError) as caught:
+                    complete_via_sdk(self._anthropic_request(), "fake-key")
+        rendered = "".join(traceback.format_exception(caught.exception))
+        # The scrubbed, bounded excerpt is intentionally part of the message; the
+        # raw exception must not appear as a chained cause/context.
+        self.assertNotIn("The above exception was the direct cause", rendered)
+        self.assertNotIn("During handling of the above exception", rendered)
+        self.assertIsNone(caught.exception.__cause__)
+        self.assertTrue(caught.exception.__suppress_context__)
+
+    def test_openai_transport_failure_suppresses_the_chained_cause(self):
+        fake = types.ModuleType("openai")
+
+        class _FakeResponses:
+            def create(self, **kwargs):
+                raise RuntimeError("raw openai body")
+
+        class _FakeClient:
+            def __init__(self, **kwargs):
+                self.responses = _FakeResponses()
+
+        fake.OpenAI = _FakeClient
+        request = ProviderRequest(
+            request_id="openai-cause",
+            vendor="openai",
+            model="gpt-6-astra",
+            system="system",
+            user_content="user",
+            max_output_tokens=4096,
+            timeout_seconds=30,
+        )
+        with mock.patch.dict(sys.modules, {"openai": fake}):
+            with mock.patch.dict(
+                os.environ, {"OPENAI_API_KEY": "fake-key"}, clear=True,
+            ):
+                with self.assertRaises(ProviderTransportError) as caught:
+                    complete_via_sdk(request, "fake-key")
         self.assertIsNone(caught.exception.__cause__)
 
 

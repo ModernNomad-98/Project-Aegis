@@ -360,18 +360,28 @@ def _transport_failure_detail(
     try:
         prefix = f"{vendor} transport failure: {type(exc).__name__}"
         secrets = _transport_credential_values(api_key)
+        fallback = "provider transport failure"
+        # The fallback itself must be containment-checked: an arbitrary
+        # credential could equal one of its words. If unsafe, return an empty
+        # detail (the error class/reason code/context remain).
+        if any(value in fallback for value in secrets):
+            return ""
         if any(value in prefix for value in secrets):
-            return "provider transport failure"
+            return fallback
         excerpt = _transport_error_excerpt(exc, api_key, secrets=secrets)
         detail = prefix + (": " + excerpt if excerpt else "")
         if any(value in detail for value in secrets):
-            return "provider transport failure"
+            return fallback
         return detail
     except Exception:  # noqa: BLE001 - the detail must never mask the halt
-        return "provider transport failure"
+        return ""
+
 
 def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderResponse":
-    """One lazy-import SDK call. The key is never logged or stored."""
+    """One lazy-import SDK call. The runner does not log or store the key; a
+    bounded failure excerpt scrubs the explicit key and mapped env values, with
+    the documented residual limits.
+    """
     from .transport import ProviderResponse
 
     require_clean_transport_environment()
