@@ -312,13 +312,14 @@ configs remain at 16,384.
 Bounded retention of the provider's exact SDK error message **is** added by the
 follow-up retention change (owner line `d1ba3c6e…`): on a transport failure the
 detail now carries up to 600 characters of the whitespace-collapsed SDK message
-plus a `...[truncated]` marker when the message exceeds the bound (614
+plus a `...[truncated]` marker when the scrubbed, collapsed text exceeds the
+bound (614
 characters maximum). The explicit API key in hand and every mapped credential
 environment value are replaced with `[REDACTED]` - a distinct marker from the
 stderr redactor's `[REDACTED-<NAME>]` - using the same bounded-repeat
 replacement and post-scrub containment pattern as the workflow stderr redactor;
-if containment cannot be proven, the excerpt is dropped and only the exception
-class is retained. This persists provider-authored text into the private
+if containment cannot be proven, the excerpt is dropped and only the class name
+(with the fixed vendor prefix) is retained. This persists provider-authored text into the private
 repository's failure artifacts (retention unchanged); it is not a proof, and
 it cannot prove the absence of unknown sensitive content.
 
@@ -327,8 +328,9 @@ pathological overlapping credentials are not claimed (longest-first replacement
 covers the common case); a credential that is a substring of `[REDACTED]` forces
 the fail-closed drop; and the chained Python `__cause__` is not recorded by the
 failure artifacts, which store only `str(ProviderTransportError)`
-(`live/pipeline.py` failure/halt recording and `live/cost_meter.py` use
-`detail=str(exc)`; no traceback is serialized).
+(the transport detail is derived from `str(...)` in `live/pipeline.py` and the
+halt/ledger/run paths store strings; no traceback, `format_exc`, `exc_info` or
+`__cause__` serialization exists under `live/`).
 The scrubber is exact-match (plus whitespace-collapsed variants) only: encoded,
 truncated or transformed credentials, and a credential that coincides with the
 fixed vendor/class prefix, are not scrubbed. Failure artifacts are private and

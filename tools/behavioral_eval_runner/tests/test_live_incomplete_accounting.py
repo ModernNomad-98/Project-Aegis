@@ -582,7 +582,7 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
             excerpt = _transport_error_excerpt(RuntimeError("token ab\ncd"), "key")
         self.assertEqual(excerpt, "token [REDACTED]")
 
-    def test_containment_failure_is_fail_closed_class_only(self):
+    def test_marker_substring_env_value_fails_closed_class_only(self):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "RED"}, clear=True):
             excerpt = _transport_error_excerpt(RuntimeError("the word RED"), "key")
             detail = _transport_failure_detail(
@@ -631,6 +631,7 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
         self.assertIn("openai transport failure: RuntimeError:", detail)
         self.assertNotIn("sk-openai-secret", detail)
         self.assertEqual(detail.count("[REDACTED]"), 1)
+
     def test_whitespace_only_credential_is_filtered_without_expansion(self):
         with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "\n"}, clear=True):
             excerpt = _transport_error_excerpt(RuntimeError("hello provider"), "key")
@@ -649,11 +650,36 @@ class ProviderTransportErrorDetailTests(unittest.TestCase):
             excerpt = _transport_error_excerpt(RuntimeError("x" * 601), "key")
         self.assertEqual(excerpt, "")
 
-    def test_large_provider_message_is_bounded(self):
+    def test_large_provider_message_fails_closed_bounded(self):
         with mock.patch.dict(os.environ, {}, clear=True):
             excerpt = _transport_error_excerpt(RuntimeError("y" * 2_000_000), "key")
-        self.assertLessEqual(len(excerpt), 614)
-        self.assertTrue(excerpt.endswith("...[truncated]"))
+        self.assertEqual(excerpt, "")
+
+    def test_raw_limit_boundary_safe(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            at_limit = _transport_error_excerpt(RuntimeError("z" * 16_384), "key")
+            over_limit = _transport_error_excerpt(RuntimeError("z" * 16_385), "key")
+        self.assertTrue(at_limit.endswith("...[truncated]"))
+        self.assertEqual(len(at_limit), 614)
+        self.assertEqual(over_limit, "")
+
+    def test_detail_prefix_final_containment_boundary(self):
+        with mock.patch.dict(
+            os.environ, {"ANTHROPIC_API_KEY": "Error: foo"}, clear=True,
+        ):
+            detail = _transport_failure_detail("anthropic", RuntimeError("foo"), "key")
+        self.assertEqual(detail, "anthropic transport failure: RuntimeError")
+
+    def test_equal_length_credentials_use_a_stable_order(self):
+        with mock.patch.dict(
+            os.environ,
+            {"ANTHROPIC_API_KEY": "zz", "OPENAI_API_KEY": "aa"},
+            clear=True,
+        ):
+            first = _transport_error_excerpt(RuntimeError("aa mm zz"), "mm")
+            second = _transport_error_excerpt(RuntimeError("aa mm zz"), "mm")
+        self.assertEqual(first, second)
+        self.assertEqual(first, "[REDACTED] [REDACTED] [REDACTED]")
 
 
 class PerCallOutputBoundTests(unittest.TestCase):
