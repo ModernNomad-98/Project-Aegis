@@ -352,12 +352,13 @@ def _transport_failure_detail(
 ) -> str:
     """The recorded transport-failure detail: vendor, class, bounded excerpt.
 
-    Containment is checked on the assembled detail and on the fixed prefix; if
-    either contains a credential the detail falls back to the fixed, minimal
-    "provider transport failure" string. Any unexpected failure in this path
-    returns an empty detail (the class, reason code and context remain), because
-    the secrets may not be available to certify a fallback; the helper cannot
-    mask the halt.
+    Containment is checked on the fixed fallback and on the assembled detail. A
+    credential in the prefix or the assembled detail returns the fixed minimal
+    string "provider transport failure" when that string is itself safe; if the
+    fallback would itself collide with a credential, or any unexpected failure
+    occurs, the detail is empty (the class, reason code and context remain),
+    because a safe fallback cannot then be certified; the helper cannot mask the
+    halt.
     """
     try:
         prefix = f"{vendor} transport failure: {type(exc).__name__}"
