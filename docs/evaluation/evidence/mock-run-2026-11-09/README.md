@@ -12,7 +12,7 @@ network call was made, and real spend is **$0**.
 | `gate.synthetic.json` | 1,199 | `f79d1386b4582f3f38537cbc5a8ef33b11e38718137a633c113cf9f945c051b3` | Byte-identical copy of the gate committed at `head_at_run` and loaded by the run. |
 | `final_report.json` | 952 | `3039a18628fc679a674a51021f021ea937795f92d8e580d85f62df82a8c4b285` | The runner's verified final report plus one trailing LF. The raw runner artifact is 951 B / `4caf1a5a5b14523370c82d92ce1f51618f91a38fb1d4a40633977fb00098963e`; both hashes are recorded. |
 | `results.json` | 183,157 | `a83394139357cd305924406a5f56f3fbdea810ffd9c3319094fe8743ea5cadb2` | Runner-generated per-result matrix (120 results), retained byte-identical so the case matrix can be recomputed rather than trusted. |
-| `run-log.json` | 16,227 | `1292374cbae3c05ca094794db60e94104851bc17e71a5b834aca09b9770f1cd6` | Head, dataset/gate identities, per-case record hashes, counts, case matrix, artifact identities, reproduction result and UNRUN. |
+| `run-log.json` | 16,607 | `efad4e500e3e21e84f2758b832f77cca9f4c7f26e5047c1d147201b43e5175a7` | Head, dataset/gate identities, per-case record hashes, counts, case matrix, artifact identities, reproduction result and UNRUN. |
 | `command.json` | 4,416 | `5d9191b555fea0f270c245c889c5d48fdd6e6ce1ce81ed3c16b23867e798754c` | Exact argv, cwd class, environment-reported Python, timings, exit 0, stdout/stderr hashes and the identities of the unretained bundle. |
 
 ## Head and dataset pin
@@ -33,7 +33,7 @@ network call was made, and real spend is **$0**.
 - Gate digest:
   `4f4535f28a04bea230e70d1e02927b4726a37972ced3700f8d9535b7cb0a8405`.
 - Fixtures-inclusive fingerprint:
-  `250fcb9e089e1c6bc94caa65898eb18ac4e8afec675dacd7bd4d459c30a121d3` (10 cases,
+  `3c49706991a0ee3189ecd6d18d3be8e56b9708339ba6be7db5ef9ec9105a91fb` (10 cases,
   10 fixtures, the set and the gate; algorithm and path list in `run-log.json`).
 
 ## Digest scope

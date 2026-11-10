@@ -129,8 +129,9 @@
     ]
   },
   "fixtures_inclusive_fingerprint": {
-    "sha256": "250fcb9e089e1c6bc94caa65898eb18ac4e8afec675dacd7bd4d459c30a121d3",
+    "sha256": "3c49706991a0ee3189ecd6d18d3be8e56b9708339ba6be7db5ef9ec9105a91fb",
     "algorithm": "sha256(canonical_json([{path, sha256} ...])) over the 10 case.json, the 10 *.expected.json, qualification-set.v1.json and case-set-gate.synthetic.json, in the path order listed",
+    "recompute": "python -c \"import hashlib,json,pathlib; p=json.load(open('docs/evaluation/evidence/mock-run-2026-11-09/run-log.json'))['fixtures_inclusive_fingerprint']['paths']; h=lambda b: hashlib.sha256(b).hexdigest(); print(h(json.dumps([{'path':x,'sha256':h(pathlib.Path(x).read_bytes())} for x in p],sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()))\"",
     "paths": [
       "docs/evaluation/cases/qc-01/case.json",
       "docs/evaluation/cases/qc-02/case.json",

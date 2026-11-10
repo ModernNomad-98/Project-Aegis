@@ -131,7 +131,7 @@ The runner's dataset digest covers the ten `case.json` files only. It does not
 cover the expected-observation fixtures, the set file, the witness matrix, the
 run log or the gate; the evidence record therefore carries a separate,
 fixtures-inclusive fingerprint
-`250fcb9e089e1c6bc94caa65898eb18ac4e8afec675dacd7bd4d459c30a121d3` over the
+`3c49706991a0ee3189ecd6d18d3be8e56b9708339ba6be7db5ef9ec9105a91fb` over the
 10 cases, 10 fixtures, the set and the gate (algorithm and path list in
 `run-log.json`). The gate digest covers the gate record, which includes the
 dataset digest; the gate's `dataset.revision` is the git tree id of
