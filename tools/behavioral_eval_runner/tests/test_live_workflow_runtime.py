@@ -180,6 +180,12 @@ INCIDENT_RUN_HEAD = "2cad63e57d3d215f62a9d5f22b1f2b23cbaf8abf"
 #: artifacts, documented $0). Registered so later dispatches count it as $0.
 PRE_FIX_REFUSED_RUN_ID = "42744285101"
 PRE_FIX_REFUSED_HEAD = "307ba3c625ba97aaeca18ed531001d6d96670499"
+#: Post-fix admission-refused smoke dispatch (2026-11-10T04:06:01Z, head
+#: 75053caf = the merge of PR #1007). It refused at the Shared allowance admission
+#: preflight on the still-unregistered pre-fix run 42744285101, before any
+#: credential mapping or provider call; zero artifacts, documented $0.
+POST_FIX_REFUSED_RUN_ID = "42753652159"
+POST_FIX_REFUSED_HEAD = "75053caf52a4f7a8e5ad8e6172cd29806b7707d1"
 #: Registered preflight-only eval-run: no provider call, zero spend, and no
 #: resume manifest because no case ran (artifact preflight-only.json).
 PREFLIGHT_ONLY_RUN_ID = "41145124808"
@@ -671,6 +677,116 @@ class AllowanceHistoryTests(unittest.TestCase):
         ))
         downloaded = {request[0] for request in fake.download_requests}
         self.assertEqual(downloaded, {"41213647310", "41145221349"})
+        admission = admit_paid_call(
+            ceiling_cents=12_000,
+            prior_ledger_spend_cents=history["ledger_spend_cents"],
+            prior_smoke_spend_records=history["smoke_spend"],
+            reservation_cents=200,
+        )
+        self.assertTrue(admission["admitted"])
+        self.assertEqual(admission["snapshot"]["combined_exposure_cents"], 440)
+        self.assertEqual(admission["snapshot"]["remaining_cents"], 11_560)
+
+    def test_real_shaped_history_with_both_failed_smoke_runs_admits(self):
+        # The live history at the PR #1008 head carries BOTH artifactless eval-smoke
+        # failures: the pre-fix 42744285101 (2026-11-10T02:39:43Z) and the post-fix
+        # 42753652159 (2026-11-10T04:06:01Z, head 75053caf). Replaying it with a
+        # hypothetical fresh run id, together with the two real 1.1.0 resume
+        # manifests and the preflight-only eval-run, must collect ledger 222c and
+        # the 18c preserved smoke floor without refusing either missing proof, and
+        # must download only the two real manifest artifacts -- never an
+        # artifactless run.
+        fixture_dir = (
+            REPO_ROOT
+            / "tools/behavioral_eval_runner/tests/fixtures/live/legacy-resume-manifest"
+        )
+        older = json.loads(
+            (fixture_dir / "ber-resume-manifest-run-41145221349.json").read_text(
+                encoding="utf-8",
+            )
+        )
+        newer = json.loads(
+            (fixture_dir / "ber-resume-manifest-run-41213647310.json").read_text(
+                encoding="utf-8",
+            )
+        )
+        preflight_only = {
+            "id": PREFLIGHT_ONLY_RUN_ID,
+            "run_attempt": 1,
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": PREFLIGHT_ONLY_HEAD,
+            "created_at": "2026-11-05T00:00:00Z",
+        }
+        pre_fix_refused = {
+            "id": PRE_FIX_REFUSED_RUN_ID,
+            "run_attempt": 1,
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": PRE_FIX_REFUSED_HEAD,
+            "created_at": "2026-11-10T02:39:43Z",
+        }
+        post_fix_refused = {
+            "id": POST_FIX_REFUSED_RUN_ID,
+            "run_attempt": 1,
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": POST_FIX_REFUSED_HEAD,
+            "created_at": "2026-11-10T04:06:01Z",
+        }
+        fake = FakeGH(
+            {
+                # GitHub lists the newest run first.
+                "smoke": [page([post_fix_refused, pre_fix_refused])],
+                "trial": [page([
+                    run(41213647310, created_at=newer["created_at"],
+                        head_sha=newer["plan"]["dispatch_sha"]),
+                    run(41145221349, created_at=older["created_at"],
+                        head_sha=older["plan"]["dispatch_sha"]),
+                    preflight_only,
+                ])],
+            },
+            {
+                "41213647310": [artifact("ber-resume-manifest")],
+                "41145221349": [artifact("ber-resume-manifest")],
+                PREFLIGHT_ONLY_RUN_ID: [],
+                PRE_FIX_REFUSED_RUN_ID: [],
+                POST_FIX_REFUSED_RUN_ID: [],
+            },
+            {
+                ("41213647310", "ber-resume-manifest"): ("manifest.json", newer),
+                ("41145221349", "ber-resume-manifest"): ("manifest.json", older),
+            },
+        )
+        history = collect_allowance_history(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+            current_run_id="9999999999",
+        )
+        self.assertEqual(history["schema"], ALLOWANCE_HISTORY_SCHEMA)
+        self.assertEqual(history["ledger_spend_cents"], 222)
+        self.assertEqual(history["smoke_spend_cents"], PRESERVED_HISTORICAL_SMOKE_CENTS)
+        # The two registered artifactless runs book 0c each and the preserved
+        # floor record carries the unchanged 18c: three records, 18c total.
+        self.assertEqual(len(history["smoke_spend"]), 3)
+        for run_id in (PRE_FIX_REFUSED_RUN_ID, POST_FIX_REFUSED_RUN_ID):
+            matching = [
+                key for key in history["smoke_spend"] if run_id in key
+            ]
+            self.assertEqual(len(matching), 1)
+            self.assertIn("|" + run_id + "|1|smoke-proof", matching[0])
+            self.assertEqual(history["smoke_spend"][matching[0]], 0)
+        self.assertTrue(any(
+            key.endswith("|preserved-historical-20261031|1|smoke-proof")
+            for key in history["smoke_spend"]
+        ))
+        downloaded = {request[0] for request in fake.download_requests}
+        self.assertEqual(downloaded, {"41213647310", "41145221349"})
+        for run_id in (
+            PRE_FIX_REFUSED_RUN_ID,
+            POST_FIX_REFUSED_RUN_ID,
+            PREFLIGHT_ONLY_RUN_ID,
+        ):
+            self.assertNotIn(run_id, downloaded)
         admission = admit_paid_call(
             ceiling_cents=12_000,
             prior_ledger_spend_cents=history["ledger_spend_cents"],
@@ -1504,6 +1620,90 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
             collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
         self.assertIn("unsupported smoke proof schema", str(caught.exception))
 
+    def test_registered_post_fix_admission_refused_run_is_skipped_as_zero(self):
+        # Run 42753652159 (2026-11-10T04:06:01Z, post-fix head 75053caf) failed in
+        # the Shared allowance admission preflight before any credential mapping
+        # or provider call, and published zero artifacts. Its exact-match registry
+        # entry books 0c instead of refusing the missing proof as UNKNOWN -- the
+        # refusal that failed this dispatch, naming the then-unregistered pre-fix
+        # run 42744285101. The recorded created_at is the run metadata fact.
+        entry = {
+            "id": POST_FIX_REFUSED_RUN_ID,
+            "run_attempt": 1,
+            "status": "completed",
+            "conclusion": "failure",
+            "head_sha": POST_FIX_REFUSED_HEAD,
+            "created_at": "2026-11-10T04:06:01Z",
+        }
+        fake = FakeGH(
+            {"smoke": [page([entry])], "trial": [page([])]},
+            {POST_FIX_REFUSED_RUN_ID: []}, {},
+        )
+        records = collect_smoke_proof_spends(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(smoke_spend_total(records), 0)
+        (key,) = records
+        self.assertIn("|" + POST_FIX_REFUSED_RUN_ID + "|1|smoke-proof", key)
+        self.assertEqual(records[key], 0)
+        # An artifactless run is never downloaded.
+        self.assertEqual(fake.download_requests, [])
+
+    def test_registered_post_fix_admission_refused_run_mismatch_refuses(self):
+        # Conclusion, full head and attempt are the paid-attempt identity, and the
+        # documented spend is exactly $0: any metadata mismatch, or a non-zero
+        # committed spend, refuses rather than booking.
+        cases = [
+            ({"conclusion": "success"}, "recorded conclusion"),
+            ({"head_sha": "b" * 40}, "recorded head"),
+            ({"attempt": 2}, "recorded attempt"),
+        ]
+        for overrides, expected in cases:
+            entry = self._run_with_head(
+                POST_FIX_REFUSED_RUN_ID, POST_FIX_REFUSED_HEAD,
+                conclusion=overrides.get("conclusion", "failure"),
+            )
+            if "head_sha" in overrides:
+                entry["head_sha"] = overrides["head_sha"]
+            if "attempt" in overrides:
+                entry["run_attempt"] = overrides["attempt"]
+            with self.subTest(overrides=overrides):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=self._registered_fake(entry),
+                        repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn(expected, str(caught.exception))
+
+        non_zero = dict(SMOKE_RUNS_WITHOUT_PROOF[POST_FIX_REFUSED_RUN_ID])
+        non_zero["spent_cents"] = 1
+        entry = self._run_with_head(
+            POST_FIX_REFUSED_RUN_ID, POST_FIX_REFUSED_HEAD, conclusion="failure",
+        )
+        with mock.patch.dict(
+            workflow_runtime.SMOKE_RUNS_WITHOUT_PROOF,
+            {POST_FIX_REFUSED_RUN_ID: non_zero},
+            clear=False,
+        ):
+            with self.assertRaises(ValueError) as caught:
+                collect_smoke_proof_spends(
+                    gh=self._registered_fake(entry),
+                    repository="o/r", work_dir=self.tmp,
+                )
+        self.assertIn("records non-zero spend", str(caught.exception))
+
+    def test_registered_post_fix_admission_refused_run_present_artifact_validates(self):
+        # Artifact PRESENCE is checked before the registry: a present-but-invalid
+        # proof for this run id hard-refuses and never books the registered $0.
+        entry = self._run_with_head(
+            POST_FIX_REFUSED_RUN_ID, POST_FIX_REFUSED_HEAD, conclusion="failure",
+        )
+        fake = self._present_artifact_fake(entry, {"not": "a smoke proof"})
+        with self.assertRaises(ValueError) as caught:
+            collect_smoke_proof_spends(gh=fake, repository="o/r", work_dir=self.tmp)
+        self.assertIn("unsupported smoke proof schema", str(caught.exception))
+
     def _registered_fake(self, entry):
         return FakeGH(
             {"smoke": [page([entry])], "trial": [page([])]},
@@ -1764,7 +1964,12 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         )
         self.assertEqual(
             set(SMOKE_RUNS_WITHOUT_PROOF),
-            {FAILED_NO_PROOF_RUN_ID, INCIDENT_RUN_ID, PRE_FIX_REFUSED_RUN_ID},
+            {
+                FAILED_NO_PROOF_RUN_ID,
+                INCIDENT_RUN_ID,
+                PRE_FIX_REFUSED_RUN_ID,
+                POST_FIX_REFUSED_RUN_ID,
+            },
         )
         failed = SMOKE_RUNS_WITHOUT_PROOF[FAILED_NO_PROOF_RUN_ID]
         self.assertEqual(failed["spent_cents"], 6)
@@ -1783,9 +1988,19 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         self.assertEqual(refused["head_sha"], PRE_FIX_REFUSED_HEAD)
         self.assertRegex(refused["head_sha"], "[0-9a-f]{40}")
         self.assertTrue(str(refused["basis"]).strip())
+        # The post-fix artifactless run: same exact-match shape, full head, $0.
+        post_fix = SMOKE_RUNS_WITHOUT_PROOF[POST_FIX_REFUSED_RUN_ID]
+        self.assertEqual(post_fix["spent_cents"], 0)
+        self.assertEqual(post_fix["expected_conclusion"], "failure")
+        self.assertEqual(post_fix["expected_attempt"], 1)
+        self.assertEqual(post_fix["head_sha"], POST_FIX_REFUSED_HEAD)
+        self.assertRegex(post_fix["head_sha"], "[0-9a-f]{40}")
+        self.assertIn(
+            "REFUSED: shared allowance history is unavailable", str(post_fix["basis"]),
+        )
         self.assertEqual(
             set(workflow_runtime.ZERO_SPEND_SMOKE_RUN_IDS),
-            {INCIDENT_RUN_ID, PRE_FIX_REFUSED_RUN_ID},
+            {INCIDENT_RUN_ID, PRE_FIX_REFUSED_RUN_ID, POST_FIX_REFUSED_RUN_ID},
         )
         # AC-12/R3: the preserved floors are unchanged and not lowered.
         self.assertEqual(PRESERVED_HISTORICAL_SMOKE_CENTS, 18)

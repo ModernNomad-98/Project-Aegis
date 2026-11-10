@@ -120,10 +120,28 @@ SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
 #:   1 (metadata fact, not spend proof). Registering it lets later smoke
 #:   dispatches count the failed pre-fix run instead of refusing its missing
 #:   proof as UNKNOWN.
+#: 42753652159: the POST-FIX 2026-11-10T04:06:01Z eval-smoke dispatch at head
+#:   75053caf (the merge of PR #1007, which registered 42744285101). It failed
+#:   closed in the same "Shared allowance admission preflight" before any
+#:   credential mapping or provider call; zero artifacts; $0 (no provider call,
+#:   no artifact). Its observed failure log is the recorded basis: "REFUSED:
+#:   shared allowance history is unavailable: ValueError: ended smoke run
+#:   42744285101 has no proof artifact: UNKNOWN, not zero" -- the refusal names
+#:   the still-unregistered PRE-FIX run, which is exactly the self-perpetuating
+#:   loop this registry breaks. Recorded attempt 1 (metadata fact, not spend
+#:   proof).
 #:
-#: The two documented-$0 runs (42134872074 and 42744285101) are pinned zero by
-#: ZERO_SPEND_SMOKE_RUN_IDS: a non-zero committed value for one of them is a
-#: registry inconsistency and refuses rather than booking an unmeasured amount.
+#: The three documented-$0 runs (42134872074, 42744285101 and 42753652159) are
+#: pinned zero by ZERO_SPEND_SMOKE_RUN_IDS: a non-zero committed value for one
+#: of them is a registry inconsistency and refuses rather than booking an
+#: unmeasured amount.
+#:
+#: Known residual (recorded, not hidden): this registry is a bounded, reviewed,
+#: exact-match list, not a wildcard. Any FUTURE dispatch that fails before it
+#: produces a proof artifact is itself artifactless and must be registered here,
+#: or the next dispatch refuses its history and admission stays blocked. The
+#: loop-breaking requirement is therefore ongoing: every artifactless failure
+#: needs its own reviewed registration with the same exact-match bounds.
 SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
     "41167546138": {
         "spent_cents": 6,
@@ -159,13 +177,29 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
             "artifacts; $0 spend (run metadata + refusal log)"
         ),
     },
+    "42753652159": {
+        "spent_cents": 0,
+        "expected_conclusion": "failure",
+        "expected_attempt": 1,
+        "head_sha": "75053caf52a4f7a8e5ad8e6172cd29806b7707d1",
+        "basis": (
+            "post-fix eval-smoke 2026-11-10T04:06:01Z, head 75053caf..., attempt "
+            "1; admission-refused at the Shared allowance admission preflight "
+            "before credential mapping/provider call; zero artifacts; $0 spend. "
+            "Observed failure log: 'REFUSED: shared allowance history is "
+            "unavailable: ValueError: ended smoke run 42744285101 has no proof "
+            "artifact: UNKNOWN, not zero' (run metadata + failure log)"
+        ),
+    },
 }
 
 #: Registered artifactless smoke runs whose documented spend is exactly $0 (the
 #: run failed before any provider call and published no artifact). Their
 #: registry entries record 0; a non-zero committed value is a registry
 #: inconsistency and refuses instead of booking an unmeasured amount.
-ZERO_SPEND_SMOKE_RUN_IDS = frozenset({"42134872074", "42744285101"})
+ZERO_SPEND_SMOKE_RUN_IDS = frozenset(
+    {"42134872074", "42744285101", "42753652159"}
+)
 
 #: Explicit, exact-match EXPIRY-ONLY registry for the two identified historical
 #: eval-smoke proofs whose GitHub artifacts are subject to 14-day retention
