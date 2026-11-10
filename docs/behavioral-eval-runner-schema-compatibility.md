@@ -63,6 +63,64 @@ remain a tracked owner-line follow-up. The family stays pinned by
 `tests/test_live_pipeline.py`, and the new shape and strict-JSON rejection
 rules are covered by `tests/test_live_judge_contract.py`.
 
+### Registered compatibility reader: allowance-history legacy resume manifest (ber-resume-manifest/1.1.0)
+
+The shared allowance-history collector
+(`tools/behavioral_eval_runner/live/workflow_runtime.py`) reads the resume
+manifests that earlier `eval-run` dispatches published. The current writer
+emits `ber-resume-manifest/1.2.0`; the collector registers **both** 1.2.0 and
+the legacy `ber-resume-manifest/1.1.0` in
+`REGISTERED_RESUME_MANIFEST_SCHEMAS`, so admission no longer refuses before any
+provider call with `ValueError: unsupported trial manifest schema:
+'ber-resume-manifest/1.1.0'`.
+
+- **Reader path.** `_validate_trial_manifest` accepts either registered
+  schema and applies the SAME plan checks to both: `dispatch_sha` (bound to
+  the workflow run head), `config_sha256`, `dataset_sha256`, `gate_id`, the
+  pinned single `subject_vendors` vendor, and the pinned
+  `max_output_tokens` of 16,384. A legacy manifest's absent `smoke_spend` is
+  normalized to an empty record set (`{}`), because the 1.1.0 writer did not
+  publish that field; a present `smoke_spend` is validated exactly as 1.2.0's.
+- **Exact scope: allowance-history spend accounting only.** The registered
+  path changes no producer, writer, evaluator, report, gate or admission
+  rule, and it is not a general schema-upgrade rule. Only the allowance
+  collector uses it; a 1.1.0 record is never rewritten, re-signed, upgraded or
+  emitted as a new manifest.
+- **No field-meaning change.** Every field the collector reads keeps its
+  existing meaning. `totals.spent_cents` remains a cumulative trial total, not
+  an independent delta.
+- **Older bytes unmodified.** Published 1.1.0 artifacts (for example eval-run
+  `41213647310`, totals 222c, and `41145221349`, totals 8c) keep their
+  original bytes, paths and recorded schema; the reader consumes them in
+  place and produces no conversion artifact.
+- **Legacy total reconciliation.** Because the legacy manifests are sequential
+  cumulative totals, the newest legacy manifest (by run `created_at`,
+  tie-break run id) is authoritative and must record at least every older
+  legacy total; a newest total below an older one fails closed. Independent
+  totals are never summed. The existing 1.2.0 rule is preserved: more than one
+  distinct 1.2.0 total refuses as ambiguous aggregation. Once a legacy record
+  is in the history, the authoritative total may not fall below any recorded
+  total, whichever schema is newest.
+- **Registered preflight-only run exception.** Eval-run `41145124808` is
+  preflight-only and produced no resume manifest because no case ran. The
+  exact-match `TRIAL_RUNS_WITHOUT_MANIFEST` registry records its run id,
+  expected conclusion `success`, full head
+  `877d6a27a36923cbdeff88a324640ec8cd8a7783`, expected `run_attempt` 1, zero
+  spend, and the evidence basis that its artifact
+  `eval-run-structured-41145124808-1`, member `preflight-only.json`, records
+  `preflight_only=true`, `cost_incurred_cents=0`, `provider_call_made=false`,
+  `sdk_calls=0` and `network_calls=0`. The collector skips it as $0. This is a
+  bounded, identified-run exception, not a wildcard or a general "missing
+  manifest means zero" rule.
+- **Fail-closed boundaries.** An unregistered schema still refuses before its
+  fields are interpreted. An unregistered artifactless ended trial run still
+  refuses as `UNKNOWN, not zero`. A registered preflight-only run whose
+  conclusion, head or `run_attempt` does not match its record refuses, as does
+  a registry entry that claims non-zero spend. A legacy manifest without a
+  readable `created_at` cannot be ordered and refuses. A present resume
+  artifact always goes through the normal download/validation path; the
+  registry is reached only when no resume artifact is present.
+
 ## How to use this policy
 
 1. When writing a new external record, include its exact `schema_version`.

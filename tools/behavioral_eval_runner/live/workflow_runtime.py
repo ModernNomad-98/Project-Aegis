@@ -20,6 +20,7 @@ This module performs no network, provider, credential or paid action itself.
 
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -36,6 +37,16 @@ from .cumulative import (
 
 SMOKE_PROOF_SCHEMA = "ber-live-smoke-proof/1.0.0"
 RESUME_MANIFEST_SCHEMA = "ber-resume-manifest/1.2.0"
+LEGACY_RESUME_MANIFEST_SCHEMA = "ber-resume-manifest/1.1.0"
+#: Registered resume-manifest reader paths. The current writer emits 1.2.0; the
+#: legacy 1.1.0 path exists only so the allowance-history collector can read the
+#: spend evidence already published by earlier eval-run dispatches. Both paths
+#: validate the same plan provenance, and an unregistered schema still refuses
+#: before any field is interpreted.
+REGISTERED_RESUME_MANIFEST_SCHEMAS = (
+    RESUME_MANIFEST_SCHEMA,
+    LEGACY_RESUME_MANIFEST_SCHEMA,
+)
 ALLOWANCE_HISTORY_SCHEMA = "ber-allowance-history/1.0.0"
 SMOKE_ARTIFACT_NAME = "ber-live-smoke-proof"
 SMOKE_ARTIFACT_MEMBER = "smoke-proof.json"
@@ -196,6 +207,36 @@ SMOKE_RUNS_WITH_EXPIRED_PROOF: Mapping[str, Mapping[str, Any]] = {
             "2026-10-31T07:15:02Z eval-smoke run; artifact 13034581056 (1,264 B) "
             "uploaded 2026-10-31, expires 2026-11-14; captured proof 2,253 B / "
             "a202b4ac...; recorded spend 6c"
+        ),
+    },
+}
+
+#: Explicit, fail-closed registry of identified historical ended eval-run runs
+#: that have NO resume manifest because they were PREFLIGHT-ONLY: the run
+#: validated the dispatch without a provider call, so it published no trial
+#: manifest. Only the exact run ids below are eligible, only when no resume
+#: artifact is present, and only when the run entry's recorded conclusion, full
+#: head SHA and run_attempt all match the committed record. A mismatch fails
+#: closed. The registered spend is 0 by definition, so the run contributes
+#: nothing to the cumulative total; an unregistered artifactless trial run stays
+#: UNKNOWN-not-zero and keeps admission blocked.
+#:
+#: 41145124808: 2026-11-05 preflight-only eval-run. Artifact
+#:   eval-run-structured-41145124808-1 member preflight-only.json records
+#:   preflight_only=true, cost_incurred_cents=0, provider_call_made=false,
+#:   sdk_calls=0, network_calls=0, dispatch_sha=877d6a27...; no resume manifest
+#:   was produced because no case ran. Recorded attempt 1 (metadata fact, not
+#:   spend proof).
+TRIAL_RUNS_WITHOUT_MANIFEST: Mapping[str, Mapping[str, Any]] = {
+    "41145124808": {
+        "spent_cents": 0,
+        "expected_conclusion": "success",
+        "head_sha": "877d6a27a36923cbdeff88a324640ec8cd8a7783",
+        "expected_attempt": 1,
+        "basis": (
+            "preflight-only eval-run: artifact preflight-only.json records "
+            "cost_incurred_cents=0 and provider_call_made=false; no resume "
+            "manifest (dispatch_sha 877d6a27...)"
         ),
     },
 }
@@ -403,8 +444,9 @@ def _validate_smoke_proof(payload: Mapping[str, Any], run: Mapping[str, Any]) ->
 
 def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any]) -> dict[str, Any]:
     provenance = _validate_run_provenance(run)
-    if payload.get("schema") != RESUME_MANIFEST_SCHEMA:
-        raise ValueError("unsupported trial manifest schema: " + repr(payload.get("schema")))
+    schema = payload.get("schema")
+    if schema not in REGISTERED_RESUME_MANIFEST_SCHEMAS:
+        raise ValueError("unsupported trial manifest schema: " + repr(schema))
     plan = payload.get("plan")
     if not isinstance(plan, Mapping):
         raise ValueError("trial manifest has no plan provenance")
@@ -417,7 +459,11 @@ def _validate_trial_manifest(payload: Mapping[str, Any], run: Mapping[str, Any])
         raise ValueError("trial plan subject vendor is not the pinned single vendor")
     if plan.get("max_output_tokens") != 16_384:
         raise ValueError("trial plan output cap is not the pinned 16384")
-    return provenance
+    # The legacy 1.1.0 manifest was written before smoke_spend was published;
+    # its absence means "no standalone smoke spend recorded here" and is
+    # normalized to an empty record set by the caller. No field meaning changes:
+    # when smoke_spend is present it is still validated exactly as in 1.2.0.
+    return {**provenance, "schema": schema}
 
 
 def _available_artifact_name(
@@ -637,14 +683,100 @@ def collect_smoke_proof_spends(
     return records
 
 
+def _run_created_at(run: Mapping[str, Any], label: str) -> datetime:
+    """The run's recorded creation time, required for legacy manifest ordering.
+
+    GitHub returns an ISO-8601 UTC timestamp. A missing or malformed value is
+    refused rather than guessed: "newest" is the whole authority rule for the
+    legacy reader, so an unorderable record cannot be reconciled safely.
+    """
+    value = run.get("created_at")
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(label + " has no readable created_at")
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(label + " has malformed created_at") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def _run_id_ordinal(run_id: Any) -> int:
+    """Numeric sort key for a run id; a non-numeric id sorts below numeric ids."""
+    if isinstance(run_id, int) and not isinstance(run_id, bool):
+        return run_id
+    text = str(run_id)
+    return int(text) if text.isdigit() else -1
+
+
+def _trial_manifest_order_key(run: Mapping[str, Any], label: str) -> tuple[datetime, int]:
+    return (_run_created_at(run, label), _run_id_ordinal(run.get("id")))
+
+
+def _registered_manifestless_trial_spend(run: Mapping[str, Any]) -> int | None:
+    """Registered zero spend for an identified preflight-only trial run, else None.
+
+    Only the exact run ids committed in TRIAL_RUNS_WITHOUT_MANIFEST are eligible,
+    and only when no resume artifact is present and the run entry's recorded
+    conclusion, full head SHA and run_attempt all match the committed record; a
+    mismatch fails closed. The registry records 0 spend, so a non-zero committed
+    value is a registry inconsistency and refuses rather than being skipped.
+    """
+    run_id = str(run.get("id"))
+    registered = TRIAL_RUNS_WITHOUT_MANIFEST.get(run_id)
+    if registered is None:
+        return None
+    label = "registered preflight-only trial run " + run_id
+    if run.get("conclusion") != registered.get("expected_conclusion"):
+        raise ValueError(label + " does not match its recorded conclusion")
+    expected_attempt = registered.get("expected_attempt")
+    if (
+        isinstance(expected_attempt, bool)
+        or not isinstance(expected_attempt, int)
+        or expected_attempt <= 0
+    ):
+        raise ValueError(label + " has no recorded attempt evidence")
+    attempt = run.get("run_attempt")
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt <= 0:
+        raise ValueError(label + " has no readable attempt evidence")
+    if attempt != expected_attempt:
+        raise ValueError(label + " does not match its recorded attempt")
+    head = _require_hex(run, "head_sha", HEX40, "run entry")
+    if head != registered.get("head_sha"):
+        raise ValueError(label + " does not match its recorded head")
+    spent = strict_cents(registered.get("spent_cents"), "registered preflight-only trial spend")
+    if spent != 0:
+        raise ValueError(label + " records non-zero spend and cannot be skipped")
+    return 0
+
+
 def collect_latest_trial_spend(
     *, gh: Callable[..., Any], repository: str, work_dir: Path,
     current_run_id: Any = None, trial_workflow_file: str = "eval-run.yml",
 ) -> dict[str, Any]:
     """Use the newest successful eval-run resume manifest as the authoritative
-    cumulative trial total; a successful run without a manifest is UNKNOWN."""
-    chosen: tuple[int, dict[str, Any], int] | None = None
-    seen_totals: set[int] = set()
+    cumulative trial total; a successful run without a manifest is UNKNOWN.
+
+    Registered compatibility paths preserve already-published evidence without
+    changing any field meaning:
+
+    * A legacy `ber-resume-manifest/1.1.0` record is read through its registered
+      path. Its plan fields are validated exactly as 1.2.0 is, and its absent
+      `smoke_spend` normalizes to an empty record set (the legacy writer did not
+      publish one). Because the legacy manifests are sequential cumulative
+      totals rather than independent deltas, the NEWEST legacy manifest (by run
+      `created_at`, tie-break run id) is authoritative and must be greater than
+      or equal to every older legacy total; a regression fails closed. Totals
+      are never summed.
+    * 1.2.0 keeps its existing rule: more than one distinct total refuses as
+      ambiguous aggregation.
+    * An identified preflight-only run with no resume manifest is skipped as $0
+      only through the exact-match TRIAL_RUNS_WITHOUT_MANIFEST registry; an
+      unregistered artifactless run stays UNKNOWN-not-zero.
+    """
+    legacy_records: list[dict[str, Any]] = []
+    modern_records: list[dict[str, Any]] = []
     for run in list_workflow_runs(gh, repository, trial_workflow_file):
         if not isinstance(run, Mapping):
             raise ValueError("a trial workflow-run entry was not an object")
@@ -660,34 +792,81 @@ def collect_latest_trial_spend(
         names = [item.get("name") for item in artifacts if isinstance(item, Mapping)]
         artifact_name = _available_artifact_name(names, TRIAL_ARTIFACT_NAMES)
         if artifact_name is None:
-            _fail_unknown("ended trial run " + str(run_id) + " has no resume manifest")
+            registered_spent = _registered_manifestless_trial_spend(run)
+            if registered_spent is None:
+                _fail_unknown("ended trial run " + str(run_id) + " has no resume manifest")
+            # A registered preflight-only run spent nothing; it contributes no
+            # total and must not create a fabricated manifest record.
+            continue
         payload = download_artifact_json(
             gh, repository, run_id, artifact_name,
             TRIAL_ARTIFACT_MEMBER, work_dir,
         )
-        _validate_trial_manifest(payload, run)
+        validated = _validate_trial_manifest(payload, run)
         totals = payload.get("totals")
         if not isinstance(totals, Mapping):
             _fail_unknown("trial manifest " + str(run_id) + " has no totals")
         spent = strict_cents(totals.get("spent_cents"), "trial total spent_cents")
-        seen_totals.add(spent)
         smoke_records = validate_smoke_spend(payload.get("smoke_spend", {}))
         smoke = smoke_spend_total(smoke_records)
         if spent < smoke:
             raise ValueError("trial manifest total is below its smoke spend")
-        numeric_id = int(run_id) if isinstance(run_id, int) else 0
-        if chosen is None or spent > chosen[0]:
-            chosen = (spent, payload, spent - smoke)
-    if len(seen_totals) > 1:
+        record = {
+            "schema": validated["schema"],
+            "spent": spent,
+            "payload": payload,
+            "ledger_spend": spent - smoke,
+            "run": run,
+        }
+        if validated["schema"] == LEGACY_RESUME_MANIFEST_SCHEMA:
+            record["order"] = _trial_manifest_order_key(
+                run, "legacy trial run " + str(run_id),
+            )
+            legacy_records.append(record)
+        else:
+            modern_records.append(record)
+    if len({record["spent"] for record in modern_records}) > 1:
         raise ValueError("multiple independent trial manifests have different totals; aggregation is ambiguous, fail closed")
+    chosen: dict[str, Any] | None = None
+    if legacy_records:
+        legacy_records.sort(key=lambda record: record["order"])
+        authoritative = legacy_records[-1]
+        for older in legacy_records[:-1]:
+            if authoritative["spent"] < older["spent"]:
+                raise ValueError(
+                    "legacy trial manifest totals regress: newest total "
+                    + str(authoritative["spent"]) + " is below an older total "
+                    + str(older["spent"]) + "; fail closed"
+                )
+        chosen = authoritative
+    if modern_records:
+        modern_chosen = modern_records[0]
+        if chosen is None:
+            chosen = modern_chosen
+        else:
+            modern_order = _trial_manifest_order_key(
+                modern_chosen["run"],
+                "trial run " + str(modern_chosen["run"].get("id")),
+            )
+            if modern_order > chosen["order"]:
+                chosen = modern_chosen
+    if chosen is not None and legacy_records:
+        # Once legacy cumulative totals are in the history, the authoritative
+        # total may never fall below any recorded total, whichever schema is
+        # newest. This is a monotonicity check, not a sum.
+        for record in legacy_records + modern_records:
+            if chosen["spent"] < record["spent"]:
+                raise ValueError(
+                    "trial manifest totals regress: authoritative total "
+                    + str(chosen["spent"]) + " is below a recorded total "
+                    + str(record["spent"]) + "; fail closed"
+                )
     if chosen is None:
         return {"schema": RESUME_MANIFEST_SCHEMA, "ledger_spend_cents": PRESERVED_HISTORICAL_LEDGER_CENTS, "smoke_spend": {}, "preserved_historical": True}
-    payload, ledger_spend = chosen[1], chosen[2]
-    smoke_records = validate_smoke_spend(payload.get("smoke_spend", {}))
     return {
-        "schema": RESUME_MANIFEST_SCHEMA,
-        "ledger_spend_cents": max(ledger_spend, PRESERVED_HISTORICAL_LEDGER_CENTS),
-        "smoke_spend": smoke_records,
+        "schema": chosen["schema"],
+        "ledger_spend_cents": max(chosen["ledger_spend"], PRESERVED_HISTORICAL_LEDGER_CENTS),
+        "smoke_spend": validate_smoke_spend(chosen["payload"].get("smoke_spend", {})),
         "preserved_historical": True,
     }
 
