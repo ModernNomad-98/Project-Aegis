@@ -112,6 +112,18 @@ SMOKE_PROOF_CONFIG_PINS: Mapping[str, int] = {
 #: 42134872074: the 2026-11-06 admission-refused dispatch (failed before any
 #:   credential mapping or provider call; documented $0; zero artifacts).
 #:   Recorded attempt 1 (metadata fact, not spend proof).
+#: 42744285101: the PRE-FIX 2026-11-10T02:39:43Z eval-smoke dispatch. It failed
+#:   closed at the "Shared allowance admission preflight" on the then-current
+#:   legacy-manifest reader (ValueError: unsupported trial manifest schema:
+#:   'ber-resume-manifest/1.1.0'), before any credential mapping or provider
+#:   call; zero artifacts; $0 (no provider call, no artifact). Recorded attempt
+#:   1 (metadata fact, not spend proof). Registering it lets later smoke
+#:   dispatches count the failed pre-fix run instead of refusing its missing
+#:   proof as UNKNOWN.
+#:
+#: The two documented-$0 runs (42134872074 and 42744285101) are pinned zero by
+#: ZERO_SPEND_SMOKE_RUN_IDS: a non-zero committed value for one of them is a
+#: registry inconsistency and refuses rather than booking an unmeasured amount.
 SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
     "41167546138": {
         "spent_cents": 6,
@@ -134,7 +146,26 @@ SMOKE_RUNS_WITHOUT_PROOF: Mapping[str, Mapping[str, Any]] = {
             "$0 spend; zero artifacts (SMOKE-RUN-RESULT-2026-11-06 + dispatch receipt)"
         ),
     },
+    "42744285101": {
+        "spent_cents": 0,
+        "expected_conclusion": "failure",
+        "expected_attempt": 1,
+        "head_sha": "307ba3c625ba97aaeca18ed531001d6d96670499",
+        "basis": (
+            "pre-fix eval-smoke 2026-11-10T02:39:43Z, head 307ba3c6..., attempt "
+            "1; admission-refused at the Shared allowance admission preflight "
+            "before credential mapping/provider call (refusal log: unsupported "
+            "trial manifest schema 'ber-resume-manifest/1.1.0'); zero "
+            "artifacts; $0 spend (run metadata + refusal log)"
+        ),
+    },
 }
+
+#: Registered artifactless smoke runs whose documented spend is exactly $0 (the
+#: run failed before any provider call and published no artifact). Their
+#: registry entries record 0; a non-zero committed value is a registry
+#: inconsistency and refuses instead of booking an unmeasured amount.
+ZERO_SPEND_SMOKE_RUN_IDS = frozenset({"42134872074", "42744285101"})
 
 #: Explicit, exact-match EXPIRY-ONLY registry for the two identified historical
 #: eval-smoke proofs whose GitHub artifacts are subject to 14-day retention
@@ -523,8 +554,11 @@ def _registered_legacy_run_spend(run: Mapping[str, Any]) -> int | None:
     closed rather than booking the residual. The paid-attempt identity includes
     run_attempt (a GitHub re-run keeps run id/head and increments the attempt),
     so a missing recorded attempt or a missing/invalid run attempt also fails
-    closed and is never defaulted. Callers reach this only when the proof artifact
-    is absent: a present artifact is always handled by download/validation first.
+    closed and is never defaulted. A run in ZERO_SPEND_SMOKE_RUN_IDS (documented
+    $0, no provider call) must record exactly 0c; a non-zero committed value is a
+    registry inconsistency and refuses. Callers reach this only when the proof
+    artifact is absent: a present artifact is always handled by download and
+    validation first.
     """
     run_id = str(run.get("id"))
     registered = SMOKE_RUNS_WITHOUT_PROOF.get(run_id)
@@ -558,7 +592,10 @@ def _registered_legacy_run_spend(run: Mapping[str, Any]) -> int | None:
             or not head.startswith(expected_prefix)
         ):
             raise ValueError(label + " does not match its recorded head prefix")
-    return strict_cents(registered.get("spent_cents"), "registered legacy smoke spend")
+    spent = strict_cents(registered.get("spent_cents"), "registered legacy smoke spend")
+    if run_id in ZERO_SPEND_SMOKE_RUN_IDS and spent != 0:
+        raise ValueError(label + " records non-zero spend and cannot be booked")
+    return spent
 
 
 def _registered_expired_proof_run_spend(run: Mapping[str, Any]) -> int | None:

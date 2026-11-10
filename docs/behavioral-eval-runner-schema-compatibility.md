@@ -138,6 +138,48 @@ provider call with `ValueError: unsupported trial manifest schema:
   download/validation path; the registry is reached only when no resume
   artifact is present.
 
+### Registered artifactless smoke-run exception (allowance-history accounting)
+
+The shared allowance-history smoke collector (`collect_smoke_proof_spends` in
+`tools/behavioral_eval_runner/live/workflow_runtime.py`) refuses an ended
+eval-smoke run that has no proof artifact as `UNKNOWN, not zero`: a missing
+artifact is not evidence of zero spend. Three identified runs are registered in
+the exact-match `SMOKE_RUNS_WITHOUT_PROOF` map, and only when the proof
+artifact is absent:
+
+- `41167546138` - the 2026-10-30 pre-artifact judge-output-contract failure
+  run (zero artifacts). Its recorded 6c is the preserved-floor residual (the
+  18c floor minus the two retained 6c proofs), not a measured bill. Only the
+  retained head prefix `88fdec73` is registered.
+- `42134872074` - the 2026-11-06 admission-refused dispatch. It failed before
+  any credential mapping or provider call, published zero artifacts, and is
+  documented as $0.
+- `42744285101` - the **pre-fix** 2026-11-10T02:39:43Z eval-smoke dispatch
+  (head `307ba3c625ba97aaeca18ed531001d6d96670499`, conclusion `failure`,
+  `run_attempt` 1). It failed closed at the "Shared allowance admission
+  preflight" before any credential mapping or provider call, and published zero
+  artifacts. The refusal was the then-current legacy-manifest reader rejecting
+  `ber-resume-manifest/1.1.0`; the failed dispatch's spend is $0 (it made no
+  provider call and published no artifact).
+
+The exact-match, fail-closed rules are unchanged:
+
+- **Exact match or refuse.** The run entry's recorded conclusion, head (full
+  SHA, or the registered head prefix for `41167546138`) and `run_attempt`
+  must equal the committed record. A missing or invalid `run_attempt` is never
+  guessed or defaulted, and a mismatch refuses.
+- **Zero spend is pinned.** The two documented-$0 runs (`42134872074`,
+  `42744285101`) are pinned to 0c: a non-zero committed value is a registry
+  inconsistency and refuses instead of booking an unmeasured amount.
+- **A present artifact always wins.** A present proof artifact always goes
+  through the download, provenance and tamper validation path first; the
+  registry is reached only when the artifact is absent (or GitHub lists it as
+  expired, which is treated as absent).
+- **Unregistered stays UNKNOWN.** An unregistered artifactless run stays
+  `UNKNOWN`, not zero, and keeps admission blocked. Adding a run is a reviewed
+  code change with new exact-match bounds, not a wildcard. The preserved floors
+  stay 18c smoke and 222c ledger.
+
 ## How to use this policy
 
 1. When writing a new external record, include its exact `schema_version`.
