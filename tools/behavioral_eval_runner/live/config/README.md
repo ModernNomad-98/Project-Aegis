@@ -12,8 +12,13 @@ provider cap in integer cents before every call.
 | --- | --- | --- | --- | --- | --- |
 | `dry-run-config.json` | `live-dry-run` (synthetic gate, mock transport) | build-only / no-spend | 512 | 15000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
 | `pilot-a-live-config.json` | `eval-run` full Pilot A dispatch | live | 16384 | 12000 cents | 20 cases x 2 arms x 3 runs x 2 vendors |
-| `pilot-a-smoke-config.json` | `eval-smoke` single-case gate | live | 16384 | 200 cents ($2.00 hard cap) | one case, one arm, one run, one vendor |
+| `pilot-a-smoke-config.json` | `eval-smoke` single-case gate | live | 4096 | 200 cents ($2.00 hard cap) | one case, one arm, one run, one vendor |
 | `pilot-a-trial-config.json` | bounded trial template (owner-approved) | live | 16384 | 12000 cents | 20 cases x 2 arms x 1 run x 2 vendors (workflow narrows) |
+
+The single-case smoke template's output cap is **4096**, the live-setting floor and
+the only value a successful live smoke has used (owner line 2026-11-10:
+"authorize the smoke-config change to max_output_tokens 4096 and one final
+bounded attempt"). The full-live and trial templates keep 16384.
 
 ## Build-only and live settings are different classes
 

@@ -65,6 +65,9 @@ SUBJECT_PIN = SUBJECT_PINS["anthropic"]
 JUDGE_PIN = JUDGE_PINS[("anthropic", "claude-sonnet-5-5")]
 CEILING = OWNER_PROVIDER_CAP_CENTS
 OUTPUT_TOKENS = 16_384
+#: The committed single-case smoke output cap (owner line 2026-11-10); the
+#: trial and full-pilot configs keep 16,384.
+SMOKE_OUTPUT_TOKENS = 4_096
 # The committed smoke case's exact subject request bytes (prompt + skill text).
 SMOKE_SUBJECT_REQUEST_BYTES = 21_708
 PRIOR_LEDGER_SPEND = 11_700
@@ -208,15 +211,15 @@ class SafeReservationBasisTests(unittest.TestCase):
         smoke = smoke_safe_reservation_bounds(
             subject_request_bytes=SMOKE_SUBJECT_REQUEST_BYTES,
             max_input_bytes=DEFAULT_MAX_INPUT_BYTES,
-            max_output_tokens=OUTPUT_TOKENS,
+            max_output_tokens=SMOKE_OUTPUT_TOKENS,
             subject_input_cents_per_mtok=SUBJECT_PIN.input_cents_per_mtok,
             subject_output_cents_per_mtok=SUBJECT_PIN.output_cents_per_mtok,
             judge_input_cents_per_mtok=JUDGE_PIN.input_cents_per_mtok,
             judge_output_cents_per_mtok=JUDGE_PIN.output_cents_per_mtok,
         )
-        self.assertEqual(smoke["subject_max_cents"], 21)
-        self.assertEqual(smoke["judge_max_cents"], 282)
-        self.assertEqual(smoke["smoke_max_cents"], 303)
+        self.assertEqual(smoke["subject_max_cents"], 9)
+        self.assertEqual(smoke["judge_max_cents"], 221)
+        self.assertEqual(smoke["smoke_max_cents"], 230)
         self.assertGreater(smoke["smoke_max_cents"], SMOKE_CEILING_CENTS)
         self.assertEqual(SMOKE_CEILING_CENTS, 200)
 
@@ -239,16 +242,19 @@ class SafeReservationBasisTests(unittest.TestCase):
 
     def test_smoke_cap_still_prevents_overspend_but_not_a_completion_proof(self) -> None:
         # The meter enforces the $2 ceiling: the subject reservation fits, but a
-        # worst-case judge reservation (282c) is refused, so spend cannot exceed
-        # 200c even though a full smoke cannot be proven to complete.
-        meter = CostMeter(SMOKE_CEILING_CENTS, max_calls=4, max_output_tokens=OUTPUT_TOKENS)
+        # worst-case judge reservation at the committed 4,096 cap (221c) is
+        # refused, so spend cannot exceed 200c even though a full smoke cannot be
+        # proven to complete.
+        meter = CostMeter(
+            SMOKE_CEILING_CENTS, max_calls=4, max_output_tokens=SMOKE_OUTPUT_TOKENS,
+        )
         subject = meter.reserve(
             call_ref="smoke-subject",
             pin=SUBJECT_PIN,
             system_bytes=SMOKE_SUBJECT_REQUEST_BYTES,
             user_bytes=0,
         )
-        self.assertEqual(subject.reserved_cents, 21)
+        self.assertEqual(subject.reserved_cents, 9)
         meter.reconcile(subject, input_tokens=1, output_tokens=1, served_model=SUBJECT_PIN.model)
         with self.assertRaises(CostCeilingHaltError):
             meter.reserve(
@@ -497,7 +503,7 @@ class ActualByteBasisTests(unittest.TestCase):
         bound = actual_byte_smoke_bounds(
             subject_request_bytes=smoke[0],
             max_judge_request_bytes=MAX_JUDGE_REQUEST_BYTES,
-            max_output_tokens=OUTPUT_TOKENS,
+            max_output_tokens=SMOKE_OUTPUT_TOKENS,
             subject_input_cents_per_mtok=SUBJECT_PIN.input_cents_per_mtok,
             subject_output_cents_per_mtok=SUBJECT_PIN.output_cents_per_mtok,
             judge_input_cents_per_mtok=JUDGE_PIN.input_cents_per_mtok,
@@ -505,9 +511,9 @@ class ActualByteBasisTests(unittest.TestCase):
         )
         self.assertEqual(smoke[0], SMOKE_SUBJECT_REQUEST_BYTES)
         self.assertEqual(smoke[1], 4_050)
-        self.assertEqual(bound["subject_cents"], 21)
-        self.assertEqual(bound["judge_cents"], 172)
-        self.assertEqual(bound["smoke_cents"], 193)
+        self.assertEqual(bound["subject_cents"], 9)
+        self.assertEqual(bound["judge_cents"], 111)
+        self.assertEqual(bound["smoke_cents"], 120)
         self.assertLessEqual(bound["smoke_cents"], SMOKE_CEILING_CENTS)
 
     def test_actual_byte_trial_bound_fits_shared_ceiling_with_prior(self) -> None:

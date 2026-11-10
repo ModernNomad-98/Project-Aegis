@@ -36,10 +36,12 @@ proof-head ancestor commits; it was verified read-only with git show on
 Both ancestor blobs return the identical **330-byte** file whose SHA-256 is
 **a90ae2ce140e8dfb4beb60a4caef4782e4fbf07702dc60ab73fa4527d3c4e1d0** - exactly
 the identity recorded in both fixtures. The current committed template is
-332 B / c484d8d9eff3f53cfdeaf05f86701351c498bb3a0dae442d5ddae66f7b76877e; the
+331 B / 218d3fdf9d82867553892d67b03e199b3f260567631e9480c98e89278150b724; the
 historical 330-byte template records max_output_tokens 4096 and
-spend_ceiling_cents 50, versus 16384 and 200 in the current committed template,
-so the identity difference is the historical budget, not a provenance gap.
+spend_ceiling_cents 50, versus 4096 and 200 in the current committed template,
+so the identity difference is the historical ceiling (50 versus 200), not a
+provenance gap; the current template's 4,096 output cap was set by the owner
+line of 2026-11-10, and the full-live and trial templates remain 16,384.
 
 For completeness, a sorted-key JSON re-serialization of the same values is also
 330 B but hashes to

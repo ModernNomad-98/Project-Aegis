@@ -133,7 +133,7 @@ class FakeGH:
                     payload.setdefault("subject_vendor", "anthropic")
                     payload.setdefault("judge_vendor", "openai")
                     payload.setdefault("judge_model", "gpt-6-astra")
-                    payload.setdefault("max_output_tokens", 16384)
+                    payload.setdefault("max_output_tokens", 4096)
                     payload.setdefault("planned_calls", 2)
                     payload.setdefault("dispatched_calls", 2)
                     payload.setdefault("workflow_run_id", str(run_id))
@@ -166,7 +166,7 @@ HEAD_SHA = "a" * 40
 
 #: Config-template identity recorded by the producer for the current committed
 #: smoke config (tools/behavioral_eval_runner/live/config/pilot-a-smoke-config.json).
-CURRENT_SMOKE_CONFIG_SHA256 = "c484d8d9eff3f53cfdeaf05f86701351c498bb3a0dae442d5ddae66f7b76877e"
+CURRENT_SMOKE_CONFIG_SHA256 = "218d3fdf9d82867553892d67b03e199b3f260567631e9480c98e89278150b724"
 
 #: Config-template identity recorded in the two identified 2026-10-31 historical
 #: proofs (legacy cap 4,096; see tests/fixtures/live/smoke-proof/README.md).
@@ -221,6 +221,15 @@ UNREGISTERED_PREDECESSOR_HEAD = "035bab42d5dc27c666a93856adbb5382c87c5468"
 TRANSPORT_HALT_RUN_ID = "42769599894"
 TRANSPORT_HALT_HEAD = "41d3b27a0e77247ed04297cb6be93b6d815a412b"
 TRANSPORT_HALT_SPENT_CENTS = 21
+#: Authorized-retry transport-halt smoke dispatch (2026-11-10T12:23:54Z, head
+#: 51c33fdc, attempt 1), dispatched after PR #1011 merged. It also reached the
+#: live step and spent 21c before halting on TRANSPORT_ERROR (Anthropic SDK
+#: HTTP 400 BadRequestError); the judge was not reached and no smoke proof
+#: exists. Its retained failure-path artifacts are not a proof. The 21c is
+#: measured live spend, so it must NOT be in ZERO_SPEND_SMOKE_RUN_IDS.
+TRANSPORT_HALT_RETRY_RUN_ID = "42815400201"
+TRANSPORT_HALT_RETRY_HEAD = "51c33fdcfbce357eeff9a8a7a1752f70fac1c522"
+TRANSPORT_HALT_RETRY_SPENT_CENTS = 21
 #: Registered preflight-only eval-run: no provider call, zero spend, and no
 #: resume manifest because no case ran (artifact preflight-only.json).
 PREFLIGHT_ONLY_RUN_ID = "41145124808"
@@ -285,7 +294,7 @@ def smoke_proof(**overrides):
         "subject_vendor": "anthropic",
         "judge_vendor": "openai",
         "judge_model": "gpt-6-astra",
-        "max_output_tokens": 16384,
+        "max_output_tokens": 4096,
         "planned_calls": 2,
         "dispatched_calls": 2,
         "workflow_run_id": "42",
@@ -1390,7 +1399,7 @@ class AllowanceHistoryTests(unittest.TestCase):
             "subject_vendor": "anthropic",
             "judge_vendor": "openai",
             "judge_model": "gpt-6-astra",
-            "max_output_tokens": 16384,
+            "max_output_tokens": 4096,
             "planned_calls": 2,
             "dispatched_calls": 2,
             "workflow_run_id": "42",
@@ -2013,8 +2022,86 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
                 )
         self.assertIn("records non-zero spend", str(caught.exception))
 
+    def _transport_halt_retry_fake(self, entry):
+        return FakeGH(
+            {"smoke": [page([entry])], "trial": [page([])]},
+            {
+                TRANSPORT_HALT_RETRY_RUN_ID: [
+                    artifact("ber-smoke-failure-run"),
+                    artifact("ber-smoke-failure-ledger"),
+                    artifact("ber-smoke-failure-evidence"),
+                    artifact("ber-shared-allowance-admission"),
+                    artifact("ber-shared-allowance-state"),
+                ],
+            },
+            {},
+        )
+
+    def test_registered_retry_transport_halt_run_books_21c_and_does_not_download(self):
+        # The authorized 2026-11-10 retry ran one subject call (21c) and halted
+        # on TRANSPORT_ERROR before the judge. Its failure artifacts are retained
+        # but are not a proof, so the collector must never download them; the
+        # exact-match entry books the measured 21c.
+        entry = self._run_with_head(
+            TRANSPORT_HALT_RETRY_RUN_ID, TRANSPORT_HALT_RETRY_HEAD, conclusion="failure",
+        )
+        fake = self._transport_halt_retry_fake(entry)
+        records = collect_smoke_proof_spends(
+            gh=fake, repository="o/r", work_dir=self.tmp,
+        )
+        self.assertEqual(len(records), 1)
+        self.assertEqual(
+            smoke_spend_total(records), TRANSPORT_HALT_RETRY_SPENT_CENTS,
+        )
+        (key,) = records
+        self.assertIn("|" + TRANSPORT_HALT_RETRY_RUN_ID + "|1|smoke-proof", key)
+        self.assertEqual(fake.download_requests, [])
+
+    def test_registered_retry_transport_halt_run_metadata_mismatch_refuses(self):
+        cases = [
+            ({"conclusion": "success"}, "recorded conclusion"),
+            ({"head_sha": "b" * 40}, "recorded head"),
+            ({"attempt": 2}, "recorded attempt"),
+        ]
+        for overrides, expected in cases:
+            entry = self._run_with_head(
+                TRANSPORT_HALT_RETRY_RUN_ID, TRANSPORT_HALT_RETRY_HEAD,
+                conclusion=overrides.get("conclusion", "failure"),
+            )
+            if "head_sha" in overrides:
+                entry["head_sha"] = overrides["head_sha"]
+            if "attempt" in overrides:
+                entry["run_attempt"] = overrides["attempt"]
+            with self.subTest(overrides=overrides):
+                with self.assertRaises(ValueError) as caught:
+                    collect_smoke_proof_spends(
+                        gh=self._transport_halt_retry_fake(entry),
+                        repository="o/r", work_dir=self.tmp,
+                    )
+                self.assertIn(expected, str(caught.exception))
+
+    def test_retry_transport_halt_21c_entry_refuses_if_moved_into_zero_spend_set(self):
+        self.assertNotIn(
+            TRANSPORT_HALT_RETRY_RUN_ID, workflow_runtime.ZERO_SPEND_SMOKE_RUN_IDS,
+        )
+        entry = self._run_with_head(
+            TRANSPORT_HALT_RETRY_RUN_ID, TRANSPORT_HALT_RETRY_HEAD, conclusion="failure",
+        )
+        with mock.patch.object(
+            workflow_runtime, "ZERO_SPEND_SMOKE_RUN_IDS",
+            frozenset({TRANSPORT_HALT_RETRY_RUN_ID}),
+        ):
+            with self.assertRaises(ValueError) as caught:
+                collect_smoke_proof_spends(
+                    gh=self._transport_halt_retry_fake(entry),
+                    repository="o/r", work_dir=self.tmp,
+                )
+        self.assertIn("records non-zero spend", str(caught.exception))
+
     def test_composite_live_history_accounts_ledger_222_smoke_39(self):
-        # Full real-shaped live history after the first paid halt: the two
+        # Historical full real-shaped live history after the FIRST paid halt
+        # (the 2026-11-10 authorized retry is registered separately; this
+        # snapshot intentionally predates it): the two
         # published 1.1.0 resume manifests (ledger 222c), the preflight-only
         # eval-run, the three identified 6c smoke records (the two retained
         # proofs plus the preserved-floor residual), all five documented-$0
@@ -2402,7 +2489,7 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
             (
                 smoke_proof(
                     config_template_sha256=CURRENT_SMOKE_CONFIG_SHA256,
-                    max_output_tokens=4_096,
+                    max_output_tokens=16_384,
                 ),
                 "pinned value",
             ),
@@ -2470,7 +2557,7 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         self.assertEqual(
             dict(SMOKE_PROOF_CONFIG_PINS),
             {
-                CURRENT_SMOKE_CONFIG_SHA256: 16_384,
+                CURRENT_SMOKE_CONFIG_SHA256: 4_096,
                 LEGACY_SMOKE_CONFIG_SHA256: 4_096,
             },
         )
@@ -2484,6 +2571,7 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
                 GATE_EXPIRED_RUN_ID,
                 UNREGISTERED_PREDECESSOR_RUN_ID,
                 TRANSPORT_HALT_RUN_ID,
+                TRANSPORT_HALT_RETRY_RUN_ID,
             },
         )
         failed = SMOKE_RUNS_WITHOUT_PROOF[FAILED_NO_PROOF_RUN_ID]
@@ -2542,10 +2630,40 @@ class SmokeProofCompatibilityTests(unittest.TestCase):
         self.assertIn("spent_cents 21", str(transport_halt["basis"]))
         self.assertIn("dispatched_calls 1", str(transport_halt["basis"]))
         self.assertIn("judge", str(transport_halt["basis"]))
+        # The authorized retry: same measured 21c shape, own exact-match entry.
+        transport_halt_retry = SMOKE_RUNS_WITHOUT_PROOF[TRANSPORT_HALT_RETRY_RUN_ID]
+        self.assertEqual(transport_halt_retry["spent_cents"], 21)
+        self.assertEqual(transport_halt_retry["expected_conclusion"], "failure")
+        self.assertEqual(transport_halt_retry["expected_attempt"], 1)
+        self.assertEqual(
+            transport_halt_retry["head_sha"], TRANSPORT_HALT_RETRY_HEAD,
+        )
+        self.assertIn("TRANSPORT_ERROR", str(transport_halt_retry["basis"]))
+        self.assertIn("spent_cents 21", str(transport_halt_retry["basis"]))
+        self.assertIn("dispatched_calls 1", str(transport_halt_retry["basis"]))
         self.assertEqual(
             {run_id for run_id, entry in SMOKE_RUNS_WITHOUT_PROOF.items()
              if entry["spent_cents"] != 0},
-            {FAILED_NO_PROOF_RUN_ID, TRANSPORT_HALT_RUN_ID},
+            {
+                FAILED_NO_PROOF_RUN_ID,
+                TRANSPORT_HALT_RUN_ID,
+                TRANSPORT_HALT_RETRY_RUN_ID,
+            },
+        )
+        # F6: registry-derived totals, so the docs/AC numbers cannot drift from
+        # the registry silently: 18c preserved floor + 42c measured halts = 60c
+        # identified smoke spend; next admission exposure 222 + 60 + 200 + 200 =
+        # 682c, remaining 12,000 - 682 = 11,318c.
+        measured_halt_cents = sum(
+            entry["spent_cents"]
+            for run_id, entry in SMOKE_RUNS_WITHOUT_PROOF.items()
+            if entry["spent_cents"] != 0 and run_id != FAILED_NO_PROOF_RUN_ID
+        )
+        self.assertEqual(measured_halt_cents, 42)
+        self.assertEqual(PRESERVED_HISTORICAL_SMOKE_CENTS + measured_halt_cents, 60)
+        self.assertEqual(PRESERVED_HISTORICAL_LEDGER_CENTS + 60 + 200 + 200, 682)
+        self.assertEqual(
+            12_000 - (PRESERVED_HISTORICAL_LEDGER_CENTS + 60 + 200 + 200), 11_318,
         )
         self.assertEqual(
             set(workflow_runtime.ZERO_SPEND_SMOKE_RUN_IDS),

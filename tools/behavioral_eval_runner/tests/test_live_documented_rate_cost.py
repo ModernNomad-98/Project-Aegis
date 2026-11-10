@@ -5,8 +5,10 @@ These are offline, no-network regression tests over the committed request
 builders and the live config templates. They pin:
   * the pinned price table equals the documented standard rates for the exact
     models (anthropic 200/1000, openai 1000/5000 cents per MTok);
-  * SMOKE_CEILING_CENTS is 200 and the committed smoke/live/trial configs carry
-    16,384 output tokens (smoke: 200c ceiling, trial: runs_per_case=1);
+  * SMOKE_CEILING_CENTS is 200; the committed full-live and trial configs carry
+    16,384 output tokens (trial: runs_per_case=1), while the committed single-case
+    smoke config carries 4,096 per the owner line of 2026-11-10 (the only cap a
+    successful live smoke has used);
   * the documented-rate SCENARIO ESTIMATE (historical 4-bytes-per-output-token
     assumption, NOT a safe bound) is subject 21c + judge 153c = 174c (first case
     173c); trial scenario estimates are measured 6,808c / uniform 7,080c, whose
@@ -16,9 +18,10 @@ builders and the live config templates. They pin:
     all inside the unchanged 12,000c shared ceiling (no separate allowance);
   * full Pilot A scenario estimate is 21,240c > 12,000c: exact
     incompatibility; it is not authorized/dispatched. The SAFE reservation basis
-  (enforced 200,000-byte request limit + 16,384 output cap, no bytes-per-token
-  factor) is tested in test_live_cumulative_budget.py: smoke safe reservation
-  21c + 282c = 303c > 200c and trial safe bound 13,560c > 12,000c -- recorded
+  (enforced 200,000-byte request limit + the configured output cap, no
+  bytes-per-token factor) is tested in test_live_cumulative_budget.py: the
+  smoke safe reservation under its committed 4,096 cap is 9c + 221c = 230c
+  > 200c, and the trial safe bound at 16,384 is 13,560c > 12,000c -- recorded
   there as exact incompatibilities, not a paid-plan claim.
 """
 
@@ -49,6 +52,8 @@ ROOT = Path(__file__).resolve().parents[3]
 CASES_DIR = ROOT / "tools/behavioral_eval_runner/live/pilot-a/cases"
 CONFIG_DIR = ROOT / "tools/behavioral_eval_runner/live/config"
 OUTPUT_TOKENS = 16_384
+#: The committed single-case smoke output cap (owner line 2026-11-10).
+SMOKE_OUTPUT_TOKENS = 4_096
 PRIOR_SPENT_CENTS = 222
 TRIAL_CONSERVATIVE_CENTS = 7_156  # plan §10.3 owner-approved conservative trial bound
 SMOKE_BOUND_CENTS = 174
@@ -142,7 +147,7 @@ class DocumentedRateReservationTests(unittest.TestCase):
         smoke = LiveConfig.from_dict(json.loads((CONFIG_DIR / "pilot-a-smoke-config.json").read_text()))
         trial = LiveConfig.from_dict(json.loads((CONFIG_DIR / "pilot-a-trial-config.json").read_text()))
         self.assertEqual(live.max_output_tokens, OUTPUT_TOKENS)
-        self.assertEqual(smoke.max_output_tokens, OUTPUT_TOKENS)
+        self.assertEqual(smoke.max_output_tokens, SMOKE_OUTPUT_TOKENS)
         self.assertEqual(smoke.spend_ceiling_cents, SMOKE_CEILING_CENTS)
         self.assertEqual(trial.max_output_tokens, OUTPUT_TOKENS)
         self.assertEqual(trial.runs_per_case, 1)

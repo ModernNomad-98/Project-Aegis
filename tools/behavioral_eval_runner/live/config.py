@@ -44,8 +44,12 @@ DEFAULT_MAX_INPUT_BYTES = 200_000
 #: was truncated at the provider stop reason. A live verb refuses any config
 #: below this floor BEFORE it resolves a credential or reserves a call. 4096 is
 #: the minimum live value (twice the build-only package default, 2048); the
-#: committed Pilot A live/smoke configs use 16,384 output tokens per the owner's
-#: 2026-10-31 decision (the trial template uses the same value).
+#: committed Pilot A full-live and trial configs use 16,384 output tokens per
+#: the owner's 2026-10-31 decision. The single-case smoke config uses the
+#: 4,096 floor per the owner's 2026-11-10 line ("authorize the smoke-config
+#: change to max_output_tokens 4096 and one final bounded attempt"): 16,384
+#: was never a successful live smoke setting, while both retained 2026-10-31
+#: proofs used 4,096.
 MIN_LIVE_MAX_OUTPUT_TOKENS = 4096
 
 #: The single-case live smoke HARD ceiling, in INTEGER CENTS: 200 cents = $2.00
