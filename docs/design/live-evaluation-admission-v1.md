@@ -61,6 +61,8 @@ Everything in this section was read from the base tree, not recalled. Module ide
 
 **The committed gate at the base cannot authorize anything.** `live/gates/pilot-a-apr161.json` records `spend.ceiling_cents = 12000`, `spend.provider_cap_cents = 12000`, `created_at = 2026-10-30T17:50:00Z` and `expires_at = 2026-11-06T17:50:00Z` (lines 34-39). The expiry instant is in the past, so `require_live_gate` refuses. This agrees with the recorded owner-decision request ROD-13 ("the earlier live gate expired 2026-11-06T17:50Z and was not renewed"). A second observation: the same record's `dataset.revision` is forty zeros (line 8) - a placeholder that satisfies the 40-hex shape without binding a real dataset commit.
 
+**Renewal (2026-11-10).** The owner renewed this same gate for one single-case `eval-smoke` dispatch, effective `2026-11-10T05:10:00Z` and expiring `2026-11-11T12:00:00Z`, under the local record `OWNER-LIVE-SMOKE-GATE-RENEWAL-2026-11-10.md` (sha256 `9929d7f96e14f1137628f3266f373539999aa51d1b2dd1c55add55c4b9704e97`); the base-tree reading above is the pre-renewal evidence and remains accurate for that revision.
+
 ### 4.3 The effective ceiling is the smallest applicable bound
 
 `OwnerGateRecord.effective_ceiling_cents` returns the minimum of the configured spend ceiling, the gate's ceiling and the gate's provider cap (lines 179-185). The package-level owner bounds are `OWNER_PILOT_CEILING_CENTS = 15000` and `OWNER_PROVIDER_CAP_CENTS = 12000` (`live/config.py`, lines 29-30), and a configuration ceiling above the owner ceiling is refused (lines 140-147). The committed live configuration sets `spend_ceiling_cents = 12000`, `max_output_tokens = 16384` and `runs_per_case = 3` (`live/config/pilot-a-live-config.json`, lines 3-5).
@@ -102,7 +104,7 @@ Each rule below is a proposed requirement (R-AB), grounded in the code cited. No
 
 **R-AB-3 - An owner grant is required, and it must be the right kind.** `owner_decision_ref` must name a recorded owner line, and `fact_origin` must be `REAL_HOST` for any real live call; a `SYNTHETIC` record may only exercise a dry run. "The plan allows it" is not a grant; only the owner's recorded words are.
 
-**R-AB-4 - The gate must be current at the instant of the call.** Created-at must not be in the future and now must be strictly before `expires_at`, evaluated per call rather than once per run. The committed gate expires 2026-11-06T17:50:00Z, so no live verb is admissible at the base.
+**R-AB-4 - The gate must be current at the instant of the call.** Created-at must not be in the future and now must be strictly before `expires_at`, evaluated per call rather than once per run. At the captured base revision the committed gate recorded `expires_at = 2026-11-06T17:50:00Z`, so no live verb was admissible there; the owner renewed the gate on 2026-11-10 for one single-case `eval-smoke`, effective 2026-11-10T05:10:00Z and expiring 2026-11-11T12:00:00Z (section 4.2), and that renewal window is the one recorded at this revision.
 
 **R-AB-5 - Model pins are exact and a mismatch halts.** Subject and judge models must equal the pinned identifiers; a served-model string that differs halts the run with a structured mismatch error and no silent substitution. The judge route must not share the subject vendor.
 
@@ -263,7 +265,7 @@ All values below were measured locally at the base. Records outside the reposito
 | `tools/behavioral_eval_runner/live/__init__.py` | 1,910 | `dd00f73a9c91d2373c6df66d610f14435abf33e60b2b90b5f4ce3148569701bf` |
 | `tools/behavioral_eval_runner/tests/fixtures/live/smoke-proof/README.md` | 6,047 | `8846043701aaeb41227cf6574e304ef8bfcbaabba7606297f84f8e33bc043092` |
 
-The two committed JSON inputs cited in section 4 are read as content, not hashed here: `live/gates/pilot-a-apr161.json` (1,342 B) and `live/config/pilot-a-live-config.json` (433 B).
+The two committed JSON inputs cited in section 4 are read as content, not hashed here: `live/gates/pilot-a-apr161.json` (1,342 B at the base; 1,552 B as renewed on 2026-11-10, section 4.2) and `live/config/pilot-a-live-config.json` (433 B).
 
 ## 12. UNRUN and limitations
 
