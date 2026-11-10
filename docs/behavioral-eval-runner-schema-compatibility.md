@@ -138,6 +138,64 @@ provider call with `ValueError: unsupported trial manifest schema:
   download/validation path; the registry is reached only when no resume
   artifact is present.
 
+### Registered artifactless smoke-run exception (allowance-history accounting)
+
+The shared allowance-history smoke collector (`collect_smoke_proof_spends` in
+`tools/behavioral_eval_runner/live/workflow_runtime.py`) refuses an ended
+eval-smoke run that has no proof artifact as `UNKNOWN, not zero`: a missing
+artifact is not evidence of zero spend. Four identified runs are registered in
+the exact-match `SMOKE_RUNS_WITHOUT_PROOF` map, and only when the proof
+artifact is absent:
+
+| Run id | Head | Recorded spend | Why it has no artifact |
+| --- | --- | --- | --- |
+| `41167546138` | prefix `88fdec73` (full SHA never retained) | 6c (residual) | 2026-10-30 pre-artifact judge-output-contract failure, zero artifacts |
+| `42134872074` | `2cad63e57d3d215f62a9d5f22b1f2b23cbaf8abf` | 0c (pinned) | 2026-11-06 admission-refused dispatch, failed before any provider call |
+| `42744285101` | `307ba3c625ba97aaeca18ed531001d6d96670499` | 0c (pinned) | **pre-fix** 2026-11-10T02:39:43Z admission-refused dispatch |
+| `42753652159` | `75053caf52a4f7a8e5ad8e6172cd29806b7707d1` | 0c (pinned) | **post-fix** 2026-11-10T04:06:01Z admission-refused dispatch |
+
+`41167546138` is the only entry booked above $0: its 6c is the preserved-floor
+residual (the 18c floor minus the two retained 6c proofs), not a measured bill,
+and only its retained head prefix `88fdec73` could be registered because the
+full SHA was never kept locally.
+
+The two 2026-11-10 entries are the same failure shape one dispatch apart.
+`42744285101` (pre-fix) failed closed at the "Shared allowance admission
+preflight" on the then-current legacy-manifest reader rejecting
+`ber-resume-manifest/1.1.0`. `42753652159` (post-fix) was dispatched at head
+`75053caf`, the merge of PR #1007 that registered the first run, and it failed
+closed at the *same* preflight step; its observed failure log reads
+`REFUSED: shared allowance history is unavailable: ValueError: ended smoke run
+42744285101 has no proof artifact: UNKNOWN, not zero`. So the registration PR
+was itself followed by an artifactless failure, and that failure refused on the
+run the previous commit had just registered. Both stopped before any credential
+mapping or provider call and published zero artifacts, so both are $0.
+
+The exact-match, fail-closed rules are unchanged:
+
+- **Exact match or refuse.** The run entry's recorded conclusion, head (full
+  SHA, or the registered head prefix for `41167546138`) and `run_attempt`
+  must equal the committed record. A missing or invalid `run_attempt` is never
+  guessed or defaulted, and a mismatch refuses.
+- **Zero spend is pinned.** The three documented-$0 runs (`42134872074`,
+  `42744285101`, `42753652159`) are pinned to 0c by
+  `ZERO_SPEND_SMOKE_RUN_IDS`: a non-zero committed value is a registry
+  inconsistency and refuses instead of booking an unmeasured amount.
+- **A present artifact always wins.** A present proof artifact always goes
+  through the download, provenance and tamper validation path first; the
+  registry is reached only when the artifact is absent (or GitHub lists it as
+  expired, which is treated as absent).
+- **Unregistered stays UNKNOWN.** An unregistered artifactless run stays
+  `UNKNOWN`, not zero, and keeps admission blocked. Adding a run is a reviewed
+  code change with new exact-match bounds, not a wildcard. The preserved floors
+  stay 18c smoke and 222c ledger.
+- **The loop-breaking requirement is ongoing.** Registering
+  `42753652159` breaks *this* loop, not the pattern: any future dispatch that
+  fails before it produces a proof artifact is itself artifactless and needs its
+  own reviewed exact-match registration, or the dispatch after it refuses that
+  history. This is a recorded operational dependency, not a property the code
+  can supply on its own.
+
 ## How to use this policy
 
 1. When writing a new external record, include its exact `schema_version`.
