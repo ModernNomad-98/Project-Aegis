@@ -237,6 +237,70 @@ def ensure_complete_response(stop_reason: str, *, vendor: str) -> None:
         )
 
 
+#: Upper bound on the provider SDK error excerpt retained in a transport-failure
+#: detail, in characters AFTER whitespace collapse and BEFORE the truncation
+#: marker; a truncated excerpt is therefore at most 614 characters.
+TRANSPORT_ERROR_EXCERPT_LIMIT = 600
+
+#: Replacement marker for a credential value that appears in a provider message.
+#: Distinct from the workflow stderr redactor marker [REDACTED-<NAME>].
+TRANSPORT_ERROR_REDACTED_MARKER = "[REDACTED]"
+
+#: Appended when the collapsed SDK message exceeds the excerpt bound.
+TRANSPORT_ERROR_TRUNCATION_MARKER = "...[truncated]"
+
+
+def _transport_error_excerpt(exc: BaseException, api_key: str) -> str:
+    """A bounded, credential-scrubbed excerpt of a provider SDK exception message.
+
+    Three paid live transport halts lost the provider message because only the
+    exception class was retained. The excerpt is whitespace-collapsed, every
+    mapped credential environment value AND the explicit api_key in hand are
+    replaced with a fixed marker, and the result is truncated. The replacement
+    mirrors the workflow stderr redactor: a bounded number of passes followed by
+    a containment check that is the authority. If containment cannot be proven,
+    the excerpt is dropped (class-only detail) rather than risk publishing a
+    credential. The helper never raises: a broken __str__ must not mask the halt.
+    """
+    import os
+
+    try:
+        raw = str(exc)
+    except Exception:  # noqa: BLE001 - a broken __str__ must not mask the halt
+        raw = ""
+    text = " ".join(raw.split())
+    secrets: list[str] = [api_key]
+    secrets.extend(
+        value
+        for value in (
+            os.environ.get(name) for name in sorted(CREDENTIAL_ENV_VARS.values())
+        )
+        if value
+    )
+    # Bounded repeat: an overlapping mapped value cannot survive every pass.
+    for _ in range(len(secrets) + 1):
+        changed = False
+        for value in secrets:
+            if value in text:
+                text = text.replace(value, TRANSPORT_ERROR_REDACTED_MARKER)
+                changed = True
+        if not changed:
+            break
+    # Containment check is the authority, not the loop.
+    if any(value in text for value in secrets):
+        return ""
+    if len(text) > TRANSPORT_ERROR_EXCERPT_LIMIT:
+        text = text[:TRANSPORT_ERROR_EXCERPT_LIMIT] + TRANSPORT_ERROR_TRUNCATION_MARKER
+    return text
+
+
+def _transport_failure_detail(vendor: str, exc: BaseException, api_key: str) -> str:
+    """The recorded transport-failure detail: vendor, class, bounded excerpt."""
+    prefix = f"{vendor} transport failure: {type(exc).__name__}"
+    excerpt = _transport_error_excerpt(exc, api_key)
+    return prefix + (": " + excerpt if excerpt else "")
+
+
 def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderResponse":
     """One lazy-import SDK call. The key is never logged or stored."""
     from .transport import ProviderResponse
@@ -270,7 +334,7 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
             )
         except Exception as exc:  # noqa: BLE001 - vendor exception types are not stable
             raise ProviderTransportError(
-                f"anthropic transport failure: {type(exc).__name__}",
+                _transport_failure_detail(request.vendor, exc, api_key),
                 context={"vendor": request.vendor, "request_id": request.request_id},
             ) from exc
         try:
@@ -347,7 +411,7 @@ def complete_via_sdk(request: "ProviderRequest", api_key: str) -> "ProviderRespo
             )
         except Exception as exc:  # noqa: BLE001 - vendor exception types are not stable
             raise ProviderTransportError(
-                f"openai transport failure: {type(exc).__name__}",
+                _transport_failure_detail(request.vendor, exc, api_key),
                 context={"vendor": request.vendor, "request_id": request.request_id},
             ) from exc
         try:

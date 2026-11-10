@@ -307,11 +307,20 @@ first halt detail was lost with the runner), while both retained 2026-10-31
 proofs used 4,096. The live-setting floor
 is 4,096, so the change is within the enforced bounds. It does not alter the
 smoke shape, the spend caps or the proof format; the full-live and trial
-configs remain at 16,384. Bounded retention of the provider's exact SDK error
-message is **not** part of this change: it would persist provider-authored text
-into uploaded artifacts and therefore needs its own owner authorization; until
-then a transport failure records the exception class and reason code the runner
-already captured.
+configs remain at 16,384.
+
+Bounded retention of the provider's exact SDK error message **is** added by the
+follow-up retention change (owner line `d1ba3c6e…`): on a transport failure the
+detail now carries up to 600 characters of the whitespace-collapsed SDK message
+plus a `...[truncated]` marker when the message exceeds the bound (614
+characters maximum). The explicit API key in hand and every mapped credential
+environment value are replaced with `[REDACTED]` - a distinct marker from the
+stderr redactor's `[REDACTED-<NAME>]` - using the same bounded-repeat
+replacement and post-scrub containment pattern as the workflow stderr redactor;
+if containment cannot be proven, the excerpt is dropped and only the exception
+class is retained. This persists provider-authored text into the private
+repository's failure artifacts (retention unchanged); it is not a proof, and
+it cannot prove the absence of unknown sensitive content.
 
 ## How to use this policy
 
