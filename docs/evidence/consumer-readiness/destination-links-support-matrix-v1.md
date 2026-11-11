@@ -177,6 +177,7 @@ removed or weakened by this pass - it changes no test.
 - **Other reparse types** (volume mount point, cloud placeholder, AppExecLink,
   WOF): not created; the check refuses any reparse attribute, but only junction
   tags `0xa0000003` were observed natively.
+- **Exit 25 (atomic-write-failure / record-guard branch case)**: the required case set's exit-25 code was **NOT executed** on this host; there is no captured exit-25 observation and no claim about atomic-write-failure semantics. Disposition: **UNRUN**, not PASS. Adding a passing exit-25 case would require an authorised fault-injection/atomic-write test; none was authorised here.
 - **Concurrent replacement (TOCTOU)** of a checked directory between preflight
   and copy is not detected by this record. The guarantee is the inspected,
   quiescent tree, as the page states in its limitation sections; it is not a
