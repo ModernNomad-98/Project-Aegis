@@ -148,3 +148,54 @@ class ClosedSchemaTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MergedLoaderRoundTripTest(unittest.TestCase):
+    """AC1 round-trip: the merged checker's own loaders accept what we produce."""
+
+    def test_merged_checker_loaders_accept_produced_envelopes(self):
+        try:
+            from tools.aegis_verdict_gate import inputs
+        except ImportError:
+            self.skipTest("merged checker is absent at this head: A7 rebind required (UNRUN)")
+
+        temporary = _fixtures.temporary_directory()
+        self.addCleanup(lambda: __import__("shutil").rmtree(str(temporary), ignore_errors=True))
+        bundle = _fixtures.build_bundle(temporary / "bundle")
+        change_id = _fixtures.CHANGE_ID
+
+        freeze = inputs.load_envelope(bundle / "freeze" / (change_id + ".json"))
+        self.assertEqual(freeze.issues, [])
+        immutable = freeze.payload["immutable_inputs"]
+        verdict_mapping = {
+            "head_sha": freeze.payload["head_sha"],
+            "tree_sha": freeze.payload["tree_sha"],
+            "base_sha": freeze.payload["base_sha"],
+            "candidate_id": freeze.payload["candidate_id"],
+            "policy_sha256": immutable["policy_sha256"],
+            "plan": {"sha256": immutable["plan_sha256"]},
+            "evidence_inputs_sha256": immutable["evidence_inputs_sha256"],
+        }
+        derived_freeze = inputs.derive_freeze(freeze, verdict_mapping)
+        self.assertEqual(derived_freeze.issues, [])
+        self.assertTrue(derived_freeze.valid)
+
+        settlement = inputs.load_envelope(bundle / "settlement" / (change_id + ".json"))
+        self.assertEqual(settlement.issues, [])
+        derived_settlement = inputs.derive_settlement(settlement, verdict_mapping, bundle)
+        self.assertEqual(derived_settlement.issues, [])
+        self.assertTrue(derived_settlement.settled)
+
+        history = inputs.load_envelope(bundle / "head-history" / (change_id + ".json"))
+        self.assertEqual(history.issues, [])
+        derived_history = inputs.validate_head_history(history, verdict_mapping)
+        self.assertEqual(derived_history.issues, [])
+
+        declarations = [
+            inputs.load_envelope(path).payload
+            for path in sorted((bundle / "stage-records").glob("*.json"))
+        ]
+        self.assertEqual(len(declarations), 3)
+        stage_result = inputs.validate_stage_records(bundle, declarations, _fixtures.HEAD, True)
+        self.assertEqual(stage_result.issues, [])
+        self.assertEqual(sorted(stage_result.present_by_stage), ["B", "D", "E"])

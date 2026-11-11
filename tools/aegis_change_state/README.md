@@ -140,10 +140,11 @@ self-authorise.
 
     python -m unittest discover -s tools/aegis_change_state/tests -p 'test_*.py' -v
 
-85 tests: schema/envelope/canonicalization (including a cross-check against the
-merged checker's own canonicalization when it is present), records/chain/
-manifest/prefix, snapshot reproducibility, CLI/exit-code/isolation, and the
-C1.3 thirteen-row adversarial matrix. The matrix's host-side row is UNRUN with
+86 tests: schema/envelope/canonicalization (including a cross-check against the
+merged checker's own canonicalization and an acceptance round-trip through its
+own input loaders when they are present), records/chain/manifest/prefix,
+snapshot reproducibility, CLI/exit-code/isolation, and the C1.3 thirteen-row
+adversarial matrix. The matrix's host-side row is UNRUN with
 the missing authority named; nothing here simulates a host.
 
 ## Non-claims
