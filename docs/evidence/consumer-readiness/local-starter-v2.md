@@ -348,3 +348,51 @@ harness, 17,305 B, sha256 78f8a2f9...); raw/fixtures/install-record-run1.md
 (6,816 B, sha256 e21e657e...); raw/fixtures/install-verify.json; the case-*.json
 refusal records; raw/fixtures/authority-before.json and authority-after.json;
 raw/fixtures/authority-prompt.txt and raw/logs/08-authority-reading.log.
+
+
+## 11. Preservation custody and independent retrieval (item-5 link; added 2026-11-11)
+
+Status of this addition: **item-5 preservation/retrieval evidence link, added after the fact.
+It is not a revision of the 2026-10-28 run, not a data change, and not an item-5 closure claim
+by itself.**
+
+The exact 78-file E0 item-5 custody set identified in sections 1 and 10 (77 historical
+manifest members + ARTIFACT-MANIFEST.txt; historical manifest 8,105 B, sha256
+9c2a50895ea14a8c14efe7095498282826a8b7828123d0983357e5fdb7df84d3; 310,293 B total) has
+been preserved byte-for-byte at an owner-authorized durable private destination under the
+item-5 export authority. The destination is private and access-controlled; its exact path,
+custody holder and retention are recorded in the export receipt in the programme records
+area and are not reproduced here (the source repository is public and the exact set is not
+publication-cleared).
+
+- Export: 78 files / 310,293 B; source C1 re-verified before copy (77/77 members exact,
+  manifest 9c2a5089...); per-file SHA-256+bytes export identity
+  256673abe3e9951f7875eded4cce00f76a5d6e7083d25655f3856de9c3dc6030; export receipt
+  21,491 B / c8d3250e8a03da34774490271558d1010738d5a615e2fd7e0cc65d3614b6e02e.
+- Independent retrieval: retrieval receipt 12,503 B /
+  93f432f2de6109e028b700d71d32b2b89b37c7356392478f13c0d2b837428a65 issued 2026-11-11 by
+  a separate reviewer (evidence-lineage-steward), not the exporter and not the 2026-10-28/29
+  builder chain. The reviewer retrieved the export from the stated destination in a fresh
+  session, recomputed all 78 member SHA-256 values and byte lengths (78/78 exact; 0 missing,
+  0 mismatched, 0 unlisted), recomputed the historical manifest identity (9c2a5089...),
+  opened the decisive logs/fixtures, and executed 7/7 negative controls on disposable copies.
+- Scope and privacy: preservation and independent-retrieval evidence only. The exact set
+  remains private and access-controlled; three logs contain owner-local identifier classes
+  and are not published; no identifier value is reproduced in this record. No publication,
+  upload, release, consumer-repository change or source-repository payload change is
+  authorised or claimed by this link.
+- The historical working-material pointers in sections 1 and 10
+  (_A/remediation/handshake/item1-stage-e/) remain unchanged as historical facts; this
+  section names the durable preservation copy and does not promote the earlier working
+  location to custody of record.
+- Claim boundary preserved: one host, one run, one clone, one consumer fixture; not a
+  readiness, completion, production, hosted, live-model, CI-green or second-host claim; the
+  J1 journey remains out of scope; the UNRUN register in section 8 (U-1..U-11) is unchanged;
+  the aggregate remains an identity anchor, not a signature; synthetic histories are
+  non-authorizing.
+- Criterion effect: this link is source-link evidence for 05-G only after this change is
+  independently reviewed and merged. It does not by itself close 05-A..05-G or the item-5
+  entity; acceptance/closure is recorded separately by the applicable authority.
+
+Recorded by the programme lead under the item-5 source-link authority; reviewed by an
+independent reviewer; merged via the source workflow.
