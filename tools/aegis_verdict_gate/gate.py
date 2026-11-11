@@ -1347,6 +1347,16 @@ def evaluate(
             fixture_mode,
         )
     plan_audit_applies = doc.get("plan_audit_applies") is True
+    applicable_stages = ["D", "E"] + (["B"] if plan_audit_applies else [])
+    missing_stages = [stage for stage in applicable_stages if stage not in declarations]
+    if missing_stages:
+        return _empty_result(
+            "REQUIRED_INPUT_UNAVAILABLE",
+            "--stage-records-dir is missing required stage declaration(s): %s"
+            % ", ".join(missing_stages),
+            inputs_sha,
+            fixture_mode,
+        )
     stages = inputs.validate_stage_records(root, doc.get("stage_records"), resolved_head, plan_audit_applies)
     heads = records.derive_review_heads(store.change_events, history.heads, resolved_head)
     ctx = Context(

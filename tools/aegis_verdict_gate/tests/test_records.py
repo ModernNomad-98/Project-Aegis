@@ -503,6 +503,22 @@ class AppendOnlyPrefixTest(unittest.TestCase):
         self.assertEqual(rewritten.prefix_checks["items/fixture-0001.jsonl"], "PREFIX_VIOLATION")
         self.assertTrue(any("append-only prefix" in issue.detail for issue in rewritten.issues))
 
+    def test_whole_file_deletion_is_detected(self):
+        items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
+        build_store(self.root, items)
+        self.git("add", "-A")
+        self.git("commit", "-m", "base store")
+        self.git("update-ref", "refs/remotes/origin/main", "HEAD")
+        self.git("switch", "-c", "feature")
+
+        item_path = self.root / records_store_dir() / "items" / "fixture-0001.jsonl"
+        item_path.unlink()
+        build_store(self.root, {})
+        deleted = records.load_store(self.root, base_ref="origin/main")
+        self.assertIn("items/fixture-0001.jsonl", deleted.prefix_checks)
+        self.assertEqual(deleted.prefix_checks["items/fixture-0001.jsonl"], "BASE_FILE_MISSING")
+        self.assertTrue(any("whole-file deletion" in issue.detail for issue in deleted.issues))
+
 
 def _head(seq, head_sha, kind="INITIAL"):
     return {"seq": seq, "head_sha": head_sha, "kind": kind, "published_at": "2026-11-10T18:00:00Z"}
@@ -674,6 +690,10 @@ class RegisterResolutionTest(unittest.TestCase):
     def test_absent_entry_resolves_to_none(self):
         self.assertIsNone(records.resolve_register_entry(REGISTER_TEXT, "APR-TEST-0404"))
         self.assertIsNone(records.resolve_register_entry(REGISTER_TEXT, ""))
+
+    def test_negated_or_unknown_status_is_not_active(self):
+        for text in ("NOT ACTIVE", "NOT-ACTIVE", "INACTIVE", "unknown", "UNKNOWN STATUS", "NONE"):
+            self.assertEqual(records._status_token(text), "", text)
 
     def test_scope_parser_keeps_only_known_keys(self):
         self.assertEqual(

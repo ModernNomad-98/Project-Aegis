@@ -578,6 +578,17 @@ class StageDeclarationsFailClosedTest(unittest.TestCase):
         finally:
             _fixtures.cleanup(paths["root"])
 
+    def test_missing_declaration_is_required_input(self):
+        _, paths = self.bundle_paths()
+        try:
+            (paths["stage_records_dir"] / "d.json").unlink()
+            result = self.evaluate(paths)
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["REQUIRED_INPUT_UNAVAILABLE"])
+            self.assertIn("missing required stage declaration", result.blockers[0].detail)
+        finally:
+            _fixtures.cleanup(paths["root"])
+
 
 class HeadHistoryBindingTest(unittest.TestCase):
     """B8: the head-history export must be bound to the evaluated change/head."""

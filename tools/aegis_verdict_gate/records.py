@@ -127,6 +127,29 @@ def _base_file_bytes(repo_root: Path, base: str, relative_path: str) -> typing.O
         return None
     return out.encode("utf-8")
 
+def _base_record_files(repo_root: Path, base: str, records_dir: str) -> typing.Optional[typing.List[str]]:
+    """Enumerate the record files that exist at the git base (fail closed).
+
+    Uses only the already-allow-listed read-only log plumbing: every base
+    record file was added or modified by some commit reachable from the base,
+    so the union of history paths is a superset; each candidate is then
+    confirmed to exist at the base with cat-file.  No new git subcommand is
+    allowed."""
+
+    code, out = _git(repo_root, "log", "--pretty=format:", "--name-only", base, "--", records_dir)
+    if code != 0:
+        return None
+    prefix = records_dir.rstrip("/") + "/"
+    candidates: typing.Set[str] = set()
+    for line in out.splitlines():
+        line = line.strip()
+        if not line.startswith(prefix):
+            continue
+        relative = line[len(prefix):]
+        if relative.endswith(".jsonl") and (relative.startswith("items/") or relative.startswith("changes/")):
+            candidates.add(relative)
+    return sorted(path for path in candidates if _base_file_bytes(repo_root, base, prefix + path) is not None)
+
 
 @dataclasses.dataclass
 class RegisterEntry:
@@ -185,10 +208,15 @@ def _words(text: str) -> typing.List[str]:
 
 
 def _status_token(text: str) -> str:
-    for word in _words(text.upper()):
-        if word in REGISTER_STATUSES:
-            return word
-    return ""
+    """Return the exact documented status token, or "" (fail closed)."""
+
+    words = _words(text.upper())
+    if not words:
+        return ""
+    negations = {"NOT", "NO", "NEVER", "INACTIVE", "UNKNOWN", "NONE", "NON"}
+    if any(word in negations for word in words):
+        return ""
+    return words[0] if words[0] in REGISTER_STATUSES else ""
 
 
 def _mentions(text: str, token: str) -> bool:
@@ -964,6 +992,25 @@ def load_store(
         )
     else:
         prefix_checks["__status__"] = "GIT_BASE_RESOLVED"
+        base_files = _base_record_files(root, base, records_dir)
+        if base_files is None:
+            issues.append(
+                Issue(
+                    BLOCKER_REQUIRED_INPUT,
+                    "append-only base record file list could not be read from %s" % base,
+                )
+            )
+            base_files = []
+        listed_paths = set(listed)
+        for base_path in base_files:
+            if base_path not in listed_paths:
+                issues.append(
+                    Issue(
+                        BLOCKER_TAMPER,
+                        "record file %s exists at the git base but is missing now (whole-file deletion)" % base_path,
+                    )
+                )
+                prefix_checks[base_path] = "BASE_FILE_MISSING"
         for relative_path in sorted(listed):
             repository_path = (Path(records_dir) / relative_path).as_posix()
             base_bytes = _base_file_bytes(root, base, repository_path)
