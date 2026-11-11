@@ -7,11 +7,11 @@ import pathlib
 import sys
 import unittest
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+SCRIPTS_DIR = pathlib.Path(__file__).resolve().parents[2]
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
-from tools.aegis_verdict_gate import canonical, catalogue  # noqa: E402
+from aegis_verdict_gate import canonical, catalogue  # noqa: E402
 
 
 class SelfTestVectorTest(unittest.TestCase):

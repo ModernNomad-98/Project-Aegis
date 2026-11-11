@@ -76,11 +76,11 @@ The canonicalization is JCS-RFC8785-v1 and is pinned by a byte-for-byte
 self-test vector: **560 UTF-8 bytes**,
 `098ad54886568bbc7e9103839d5ceda9a573d01f7d234d58a8747913e331bd5d`. Run it with:
 
-    python -m tools.aegis_verdict_gate --self-test
+    python -P scripts/aegis_verdict_gate/run.py --self-test
 
 ## Usage
 
-    python -m tools.aegis_verdict_gate check \
+    python -P scripts/aegis_verdict_gate/run.py check \
         --repo-root . \
         --verdict inputs/verdict.json \
         --freeze inputs/freeze.json \
@@ -282,9 +282,9 @@ Limitations, stated rather than hidden:
 
 ## Tests
 
-    python -m unittest discover -s tools/aegis_verdict_gate/tests -p 'test_*.py' -v
+    python scripts/aegis_verdict_gate/tests/run_tests.py
 
-182 tests: catalogue, canonicalization (including the pinned vector), records,
+186 tests: catalogue, canonicalization (including the pinned vector), records,
 inputs, gate (26 fixture bundles plus the errata D1/D2/D3 vectors and the
 blocking-fix vectors), provenance, determinism and exit codes. The fixtures
 under `tests/fixtures/` are synthetic (each one builds a throw-away git

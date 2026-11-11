@@ -20,6 +20,7 @@ import yaml
 REPO = Path(__file__).resolve().parents[2]
 RECORDER = REPO / "scripts/ci/record-check.py"
 WORKFLOW = REPO / ".github/workflows/validate-skills.yml"
+VERDICT_WORKFLOW = REPO / ".github/workflows/aegis-verdict-gate.yml"
 VALIDATOR = REPO / "scripts/validate-skills.py"
 # The only module runs that need the checkout root on sys.path; gate-guard
 # protects every root-level importable name in their place.
@@ -37,9 +38,9 @@ atexit.register(lambda: os._exit(0))
 """
 
 
-def load_workflow():
+def load_workflow(path=WORKFLOW):
     # BaseLoader preserves GitHub's literal `on` key instead of YAML 1.1 bools.
-    return yaml.load(WORKFLOW.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
+    return yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
 
 
 class RecorderTests(unittest.TestCase):
@@ -376,7 +377,113 @@ class ImportPathIsolationTests(unittest.TestCase):
         self.assertEqual(0, result.returncode, result.stdout + result.stderr)
 
 
-class GateJobIsolationTests(unittest.TestCase):
+class _GateIsolationMixin:
+    """Shared gate-isolation helpers, applied to one workflow at a time.
+
+    The existing validate-skills gate jobs and the C1.1b aegis-verdict-gate job
+    are checked separately, so a new job cannot mask an old violation or relax
+    an existing threshold.
+    """
+
+    GATE_JOBS = ()
+    workflow = None
+    gate_pattern = None
+
+    # Environment variables that make an interpreter, shell or tool load code
+    # or configuration from a chosen location. None belongs in a gate job.
+    LOADER_VARIABLES = {
+        "PATH", "PYTHONPATH", "PYTHONHOME", "PYTHONSTARTUP", "PYTHONUSERBASE",
+        "PYTHONPLATLIBDIR", "PYTHONEXECUTABLE", "NODE_OPTIONS", "NODE_PATH",
+        "PSMODULEPATH", "BASH_ENV", "ENV", "LD_PRELOAD", "LD_LIBRARY_PATH",
+        "GIT_EXEC_PATH", "GIT_DIR", "GIT_WORK_TREE", "GIT_TEMPLATE_DIR",
+    }
+    # Any GIT_CONFIG* variable (COUNT, KEY_n, VALUE_n, GLOBAL, SYSTEM,
+    # NOSYSTEM, PARAMETERS) can inject git configuration such as
+    # core.fsmonitor, which `git status` in the recorder would execute.
+    LOADER_VARIABLE_PREFIXES = ("GIT_CONFIG",)
+    GATE_SHELLS = {"bash", "pwsh", "powershell"}
+
+    def repo_paths(self, job_name, workflow=None):
+        """Yield every repository path or module a job's steps execute or read."""
+        selected = self.workflow if workflow is None else workflow
+        for step in selected["jobs"][job_name]["steps"]:
+            if "working-directory" in step:
+                yield step.get("name", ""), step["working-directory"].rstrip("/") + "/"
+            for line in step.get("run", "").splitlines():
+                words = shlex.split(line, comments=True, posix=True)
+                for index, word in enumerate(words):
+                    if index and words[index - 1] == "-m" and "." in word:
+                        yield step.get("name", ""), word.replace(".", "/") + "/"
+                    elif index and words[index - 1] == "-r":
+                        yield step.get("name", ""), word
+                    elif ("/" in word and "$" not in word and "://" not in word
+                          and not word.startswith(("-", "origin/"))):
+                        yield step.get("name", ""), word
+
+    def gate_violations(self, workflow, job_names=None):
+        """Return every gate-isolation violation in a parsed workflow.
+
+        Covers: action pins, step and job-default shells, job-default working
+        directories, loader or git-config variables, and env or `with` values
+        that climb (`..`) or name an unguarded path.
+        """
+        selected_jobs = tuple(self.GATE_JOBS if job_names is None else job_names)
+        found = []
+
+        def check_value(where, value):
+            if "${{" in value:
+                return
+            if ".." in value:
+                found.append(f"{where}: value climbs with '..': {value!r}")
+            elif ("/" in value or "\\" in value) and not self.gate_pattern.search(
+                    value.replace("\\", "/")):
+                found.append(f"{where}: value names an unguarded path: {value!r}")
+
+        def check_env(where, env):
+            for key, value in (env or {}).items():
+                upper = key.upper()
+                if upper in self.LOADER_VARIABLES or upper.startswith(self.LOADER_VARIABLE_PREFIXES):
+                    found.append(f"{where}: loader variable {key}")
+                check_value(f"{where} {key}", value)
+
+        check_env("workflow env", workflow.get("env"))
+        for job_name in selected_jobs:
+            job = workflow["jobs"][job_name]
+            check_env(f"{job_name} env", job.get("env"))
+            defaults = (job.get("defaults") or {}).get("run") or {}
+            if defaults.get("shell", "bash") not in self.GATE_SHELLS:
+                found.append(f"{job_name}: default shell {defaults['shell']!r}")
+            if "working-directory" in defaults:
+                found.append(
+                    f"{job_name}: default working-directory {defaults['working-directory']!r}")
+            for step in job["steps"]:
+                where = f"{job_name}/{step.get('name', step.get('uses'))}"
+                if "uses" in step and not re.fullmatch(
+                        r"[\w.-]+/[\w.-]+@[0-9a-f]{40}", step["uses"]):
+                    found.append(f"{where}: action is local or not SHA-pinned: {step['uses']!r}")
+                if "shell" in step and step["shell"] not in self.GATE_SHELLS:
+                    found.append(f"{where}: custom shell {step['shell']!r}")
+                if ".." in step.get("working-directory", ""):
+                    found.append(f"{where}: working-directory climbs with '..'")
+                check_env(f"{where} env", step.get("env"))
+                for key, value in (step.get("with") or {}).items():
+                    check_value(f"{where} with {key}", value)
+        return found
+
+    def mutated(self, change, workflow=None):
+        selected = copy.deepcopy(self.workflow if workflow is None else workflow)
+        change(selected)
+        return self.gate_violations(selected)
+
+    def first_step(self, workflow, job_name="validate-skills", name="Run skill validator"):
+        return next(s for s in workflow["jobs"][job_name]["steps"] if s.get("name") == name)
+
+    def assert_mutation_caught(self, change, fragment, workflow=None):
+        violations = self.mutated(change, workflow)
+        self.assertTrue(any(fragment in v for v in violations), violations)
+
+
+class GateJobIsolationTests(_GateIsolationMixin, unittest.TestCase):
     """Gate jobs run only gate-guarded repository code; tools suites run apart.
 
     A step in a gate job can write $GITHUB_ENV or $GITHUB_PATH, or rewrite a
@@ -403,22 +510,6 @@ class GateJobIsolationTests(unittest.TestCase):
                      if "gate_pattern=" in step.get("run", ""))
         cls.gate_pattern = re.compile(re.search(r"gate_pattern='([^']+)'", guard).group(1),
                                       re.IGNORECASE)
-
-    def repo_paths(self, job_name):
-        """Yield every repository path or module a job's steps execute or read."""
-        for step in self.workflow["jobs"][job_name]["steps"]:
-            if "working-directory" in step:
-                yield step.get("name", ""), step["working-directory"].rstrip("/") + "/"
-            for line in step.get("run", "").splitlines():
-                words = shlex.split(line, comments=True, posix=True)
-                for index, word in enumerate(words):
-                    if index and words[index - 1] == "-m" and "." in word:
-                        yield step.get("name", ""), word.replace(".", "/") + "/"
-                    elif index and words[index - 1] == "-r":
-                        yield step.get("name", ""), word
-                    elif ("/" in word and "$" not in word and "://" not in word
-                          and not word.startswith(("-", "origin/"))):
-                        yield step.get("name", ""), word
 
     def test_gate_jobs_run_only_gate_guarded_repository_paths(self):
         for job_name in self.GATE_JOBS:
@@ -482,81 +573,6 @@ class GateJobIsolationTests(unittest.TestCase):
                 for path in ("tools/aegis_setup", "tools/aegis_delivery_control",
                              "scripts/", "record-check.py"):
                     self.assertNotIn(path, text)
-
-    # Environment variables that make an interpreter, shell or tool load code
-    # or configuration from a chosen location. None belongs in a gate job.
-    LOADER_VARIABLES = {
-        "PATH", "PYTHONPATH", "PYTHONHOME", "PYTHONSTARTUP", "PYTHONUSERBASE",
-        "PYTHONPLATLIBDIR", "PYTHONEXECUTABLE", "NODE_OPTIONS", "NODE_PATH",
-        "PSMODULEPATH", "BASH_ENV", "ENV", "LD_PRELOAD", "LD_LIBRARY_PATH",
-        "GIT_EXEC_PATH", "GIT_DIR", "GIT_WORK_TREE", "GIT_TEMPLATE_DIR",
-    }
-    # Any GIT_CONFIG* variable (COUNT, KEY_n, VALUE_n, GLOBAL, SYSTEM,
-    # NOSYSTEM, PARAMETERS) can inject git configuration such as
-    # core.fsmonitor, which `git status` in the recorder would execute.
-    LOADER_VARIABLE_PREFIXES = ("GIT_CONFIG",)
-    GATE_SHELLS = {"bash", "pwsh", "powershell"}
-
-    def gate_violations(self, workflow):
-        """Return every gate-isolation violation in a parsed workflow.
-
-        Covers: action pins, step and job-default shells, job-default working
-        directories, loader or git-config variables, and env or `with` values
-        that climb (`..`) or name an unguarded path.
-        """
-        found = []
-
-        def check_value(where, value):
-            if "${{" in value:
-                return
-            if ".." in value:
-                found.append(f"{where}: value climbs with '..': {value!r}")
-            elif ("/" in value or "\\" in value) and not self.gate_pattern.search(
-                    value.replace("\\", "/")):
-                found.append(f"{where}: value names an unguarded path: {value!r}")
-
-        def check_env(where, env):
-            for key, value in (env or {}).items():
-                upper = key.upper()
-                if upper in self.LOADER_VARIABLES or upper.startswith(self.LOADER_VARIABLE_PREFIXES):
-                    found.append(f"{where}: loader variable {key}")
-                check_value(f"{where} {key}", value)
-
-        check_env("workflow env", workflow.get("env"))
-        for job_name in self.GATE_JOBS:
-            job = workflow["jobs"][job_name]
-            check_env(f"{job_name} env", job.get("env"))
-            defaults = (job.get("defaults") or {}).get("run") or {}
-            if defaults.get("shell", "bash") not in self.GATE_SHELLS:
-                found.append(f"{job_name}: default shell {defaults['shell']!r}")
-            if "working-directory" in defaults:
-                found.append(
-                    f"{job_name}: default working-directory {defaults['working-directory']!r}")
-            for step in job["steps"]:
-                where = f"{job_name}/{step.get('name', step.get('uses'))}"
-                if "uses" in step and not re.fullmatch(
-                        r"[\w.-]+/[\w.-]+@[0-9a-f]{40}", step["uses"]):
-                    found.append(f"{where}: action is local or not SHA-pinned: {step['uses']!r}")
-                if "shell" in step and step["shell"] not in self.GATE_SHELLS:
-                    found.append(f"{where}: custom shell {step['shell']!r}")
-                if ".." in step.get("working-directory", ""):
-                    found.append(f"{where}: working-directory climbs with '..'")
-                check_env(f"{where} env", step.get("env"))
-                for key, value in (step.get("with") or {}).items():
-                    check_value(f"{where} with {key}", value)
-        return found
-
-    def mutated(self, change):
-        workflow = copy.deepcopy(self.workflow)
-        change(workflow)
-        return self.gate_violations(workflow)
-
-    def first_step(self, workflow, job_name="validate-skills", name="Run skill validator"):
-        return next(s for s in workflow["jobs"][job_name]["steps"] if s.get("name") == name)
-
-    def assert_mutation_caught(self, change, fragment):
-        violations = self.mutated(change)
-        self.assertTrue(any(fragment in v for v in violations), violations)
 
     def test_current_workflow_has_no_gate_violations(self):
         self.assertEqual([], self.gate_violations(self.workflow))
@@ -655,6 +671,261 @@ class GateJobIsolationTests(unittest.TestCase):
             # Proves the stand-in is live: without the variable, it runs instead.
             exposed = run_git(search_current_directory=True)
             self.assertFalse(exposed.stdout.startswith("git version"), exposed.stdout)
+
+
+VERDICT_JOB = "aegis-verdict-gate"
+VERDICT_CONTEXT = "aegis-verdict-gate"
+
+VERDICT_TRIGGERS = {
+    "pull_request_target": {"opened", "synchronize", "reopened", "edited"},
+    "issue_comment": {"created", "edited", "deleted"},
+}
+
+VERDICT_PERMISSIONS = {
+    "contents": "read",
+    "pull-requests": "read",
+    "issues": "read",
+    "statuses": "write",
+}
+
+VERDICT_LABELS = ["environment", "resolve", "fetch-inputs", "verdict-gate",
+                  "publish-status", "self-test", "checker-tests"]
+
+
+def verdict_trigger_violations(workflow):
+    """Return every deviation from the default-branch trigger contract."""
+    found = []
+    events = workflow.get("on")
+    if not isinstance(events, dict):
+        return ["the workflow has no event mapping"]
+    if set(events) != set(VERDICT_TRIGGERS):
+        found.append("triggers are not exactly pull_request_target + issue_comment: %r" % sorted(events))
+    for event, expected in VERDICT_TRIGGERS.items():
+        if event not in events:
+            continue
+        declared = events[event] if isinstance(events[event], dict) else {}
+        actual = set(declared.get("types") or [])
+        if actual != expected:
+            found.append("%s types are not exactly %r" % (event, sorted(expected)))
+    for forbidden in ("push", "workflow_dispatch", "workflow_run", "schedule"):
+        if forbidden in events:
+            found.append("forbidden trigger %s" % forbidden)
+    return found
+
+
+def verdict_permission_violations(workflow):
+    """Return every deviation from the exact least-privilege permission set."""
+    found = []
+    permissions = workflow.get("permissions")
+    if not isinstance(permissions, dict):
+        return ["the workflow declares no permissions map"]
+    if dict(permissions) != VERDICT_PERMISSIONS:
+        found.append("permissions are not the exact least-privilege set: %r" % dict(permissions))
+    writes = sorted(key for key, value in permissions.items() if value == "write")
+    if writes != ["statuses"]:
+        found.append("write scopes are not exactly statuses: %r" % writes)
+    if "secrets." in json.dumps(workflow):
+        found.append("the workflow references secrets. instead of the ephemeral github.token")
+    return found
+
+
+def verdict_checkout_violations(workflow):
+    """Return every deviation from the base-only checkout contract."""
+    found = []
+    checkouts = []
+    for job in workflow.get("jobs", {}).values():
+        for step in job.get("steps", []):
+            if step.get("uses", "").startswith("actions/checkout@"):
+                checkouts.append(step)
+            run = step.get("run", "")
+            for marker in ("refs/pull", "github.head_ref", "pull_request.head.sha"):
+                if marker in run:
+                    found.append("%s: run names a pull-request head reference (%s)"
+                                 % (step.get("name"), marker))
+            for key, value in (step.get("with") or {}).items():
+                if key == "ref" and "head" in value.lower():
+                    found.append("%s: checkout ref names a head" % step.get("name"))
+    if not 1 <= len(checkouts) <= 2:
+        found.append("expected one base checkout and at most one resolved-base checkout, found %d"
+                     % len(checkouts))
+    primary, secondary = [], []
+    for step in checkouts:
+        values = step.get("with") or {}
+        ref = values.get("ref", "")
+        if str(values.get("persist-credentials", "")).lower() != "false":
+            found.append("%s: checkout persists credentials" % step.get("name"))
+        if str(values.get("fetch-depth")) != "0":
+            found.append("%s: checkout does not fetch full history" % step.get("name"))
+        if "github.event.pull_request.base.sha" in ref and "github.event.repository.default_branch" in ref:
+            primary.append(step)
+        elif "steps.resolve.outputs.base_sha" in ref:
+            secondary.append(step)
+        else:
+            found.append("checkout ref is not a base-only ref: %r" % ref)
+    if len(primary) != 1:
+        found.append("expected exactly one pull-request-base/default-branch checkout, found %d"
+                     % len(primary))
+    if len(secondary) > 1:
+        found.append("expected at most one resolved-base checkout, found %d" % len(secondary))
+    if secondary:
+        condition = secondary[0].get("if", "")
+        if "github.event_name == 'issue_comment'" not in condition:
+            found.append("the resolved-base checkout is not restricted to issue_comment")
+        for fragment in ("steps.resolve.outputs.decision == 'evaluate'",
+                         "steps.resolve.outputs.base_sha != ''"):
+            if fragment not in condition:
+                found.append("the resolved-base checkout is not gated on %s" % fragment)
+    return found
+
+
+def verdict_node_violations(workflow):
+    """Return every Node or tools-suite use in any job of the workflow."""
+    found = []
+    for job in workflow.get("jobs", {}).values():
+        for step in job.get("steps", []):
+            where = step.get("name", step.get("uses"))
+            if "setup-node" in step.get("uses", ""):
+                found.append("%s: setup-node" % where)
+            words = set(shlex.split(step.get("run", ""), comments=True))
+            if words & {"node", "npm", "npx"}:
+                found.append("%s: node/npm/npx" % where)
+            text = step.get("run", "") + step.get("working-directory", "")
+            for path in ("tools/aegis_setup", "tools/aegis_delivery_control"):
+                if path in text:
+                    found.append("%s: tools path %s" % (where, path))
+    return found
+
+
+class VerdictGateWorkflowTests(_GateIsolationMixin, unittest.TestCase):
+    """The C1.1b workflow is one default-branch job with one head-bound status."""
+
+    GATE_JOBS = (VERDICT_JOB,)
+
+    @classmethod
+    def setUpClass(cls):
+        cls.workflow = load_workflow(VERDICT_WORKFLOW)
+        cls.job = cls.workflow["jobs"][VERDICT_JOB]
+        guard_workflow = load_workflow()
+        guard = next(step["run"] for step in guard_workflow["jobs"]["gate-guard"]["steps"]
+                     if "gate_pattern=" in step.get("run", ""))
+        cls.gate_pattern = re.compile(re.search(r"gate_pattern='([^']+)'", guard).group(1),
+                                      re.IGNORECASE)
+
+    def test_trigger_contract_is_default_branch_executed(self):
+        self.assertEqual([], verdict_trigger_violations(self.workflow))
+        self.assertEqual({"pull_request_target", "issue_comment"}, set(self.workflow["on"]))
+        self.assertNotIn("if", self.job)
+        self.assertNotIn("needs", self.job)
+
+    def test_one_job_and_one_unique_context_name(self):
+        self.assertEqual([VERDICT_JOB], list(self.workflow["jobs"]))
+        self.assertEqual(VERDICT_JOB, self.workflow["name"])
+        self.assertEqual(VERDICT_CONTEXT, VERDICT_JOB)
+        matching = [path.name for path in sorted((REPO / ".github/workflows").glob("*.yml"))
+                    if VERDICT_CONTEXT in path.read_text(encoding="utf-8")]
+        self.assertEqual(["aegis-verdict-gate.yml"], matching)
+        publisher = (REPO / "scripts/ci/aegis_verdict_gate_publish.py").read_text(encoding="utf-8")
+        self.assertIn('STATUS_CONTEXT = "%s"' % VERDICT_CONTEXT, publisher)
+
+    def test_permissions_are_exact_read_plus_statuses_write(self):
+        self.assertEqual([], verdict_permission_violations(self.workflow))
+        self.assertEqual(VERDICT_PERMISSIONS, dict(self.workflow["permissions"]))
+        writes = sorted(key for key, value in self.workflow["permissions"].items() if value == "write")
+        self.assertEqual(["statuses"], writes)
+        publish_steps = [step for step in self.job["steps"]
+                         if "aegis_verdict_gate_publish.py" in step.get("run", "")]
+        self.assertEqual(1, len(publish_steps))
+        self.assertEqual("Publish the head-bound commit status", publish_steps[0].get("name"))
+        for step in self.job["steps"]:
+            if step is publish_steps[0]:
+                continue
+            self.assertNotIn("aegis_verdict_gate_publish.py", step.get("run", ""))
+            self.assertNotIn("/statuses", step.get("run", ""))
+        self.assertNotIn("secrets.", json.dumps(self.workflow))
+
+    def test_executed_workflow_identity_is_compared_to_the_default_branch(self):
+        step = next(s for s in self.job["steps"]
+                    if s.get("name") == "Verify the executed workflow is the default-branch file")
+        self.assertIn("github.workflow_ref", step["env"]["WORKFLOW_REF"])
+        self.assertIn("github.workflow_sha", step["env"]["WORKFLOW_SHA"])
+        self.assertIn("aegis-verdict-gate.yml", step["run"])
+        self.assertIn("github.event.repository.default_branch", step["run"])
+        names = [s.get("name") for s in self.job["steps"]]
+        self.assertLess(names.index("Verify the executed workflow is the default-branch file"),
+                        names.index("Resolve the pull request and base checkout"))
+
+    def test_checkout_is_base_only_and_fetches_no_head_ref(self):
+        self.assertEqual([], verdict_checkout_violations(self.workflow))
+        text = json.dumps(self.workflow)
+        self.assertNotIn("refs/pull", text)
+        self.assertNotIn("pull_request.head.sha", text)
+
+    def test_gate_job_runs_only_gate_guarded_repository_paths(self):
+        paths = list(self.repo_paths(VERDICT_JOB))
+        self.assertGreaterEqual(len(paths), 10)
+        for step_name, path in paths:
+            with self.subTest(step=step_name, path=path):
+                self.assertRegex(path, self.gate_pattern)
+
+    def test_gate_job_runs_no_node_or_tools_suites(self):
+        self.assertEqual([], verdict_node_violations(self.workflow))
+
+    def test_gate_job_has_no_pip_install_or_continue_on_error(self):
+        text = json.dumps(self.job)
+        self.assertNotIn("pip install", text)
+        self.assertNotIn("requirements-ci.txt", text)
+        self.assertNotIn("continue-on-error", text)
+        self.assertNotIn("workflow_dispatch", json.dumps(self.workflow))
+
+    def test_every_python_call_keeps_the_script_directory_off_sys_path(self):
+        calls = 0
+        for step in self.job["steps"]:
+            for line in step.get("run", "").splitlines():
+                words = shlex.split(line, comments=True)
+                for index, word in enumerate(words):
+                    if word == "python":
+                        calls += 1
+                        self.assertEqual("-P", words[index + 1] if index + 1 < len(words) else None,
+                                         step.get("name"))
+        self.assertGreaterEqual(calls, 3)
+
+    def test_evidence_labels_are_distinct_and_lowercase(self):
+        labels = []
+        for step in self.job["steps"]:
+            labels.extend(re.findall(r"record-check\.py ([a-z0-9-]+) --", step.get("run", "")))
+        self.assertEqual(VERDICT_LABELS, labels)
+        self.assertEqual(len(labels), len(set(labels)))
+
+    def test_no_gate_isolation_violations(self):
+        self.assertEqual([], self.gate_violations(self.workflow))
+        self.assertEqual("1", self.workflow["env"]["NoDefaultCurrentDirectoryInExePath"])
+
+    def test_mutations_are_caught_by_the_new_checks(self):
+        def mutated():
+            return copy.deepcopy(self.workflow)
+
+        def caught(change, checker, fragment):
+            workflow = mutated()
+            change(workflow)
+            violations = checker(workflow)
+            self.assertTrue(any(fragment in violation for violation in violations), violations)
+
+        caught(lambda w: w["jobs"][VERDICT_JOB]["steps"].append({"uses": "actions/checkout@v4"}),
+               self.gate_violations, "not SHA-pinned")
+        caught(lambda w: w["env"].__setitem__("HOOK", "tools/aegis_setup/evil.sh"),
+               self.gate_violations, "unguarded path")
+        caught(lambda w: w["env"].__setitem__("PYTHONPATH", "scripts"),
+               self.gate_violations, "loader variable")
+        caught(lambda w: w["permissions"].__setitem__("contents", "write"),
+               verdict_permission_violations, "permissions")
+        caught(lambda w: w["on"].__setitem__("push", None),
+               verdict_trigger_violations, "forbidden trigger")
+        caught(lambda w: w["jobs"][VERDICT_JOB]["steps"][0]["with"].__setitem__(
+                   "ref", "${{ github.event.pull_request.head.sha }}"),
+               verdict_checkout_violations, "head")
+        caught(lambda w: w["jobs"][VERDICT_JOB]["steps"].append(
+                   {"name": "shadow", "run": "node tools/aegis_setup/evil.js"}),
+               verdict_node_violations, "node")
 
 
 LOCK = REPO / "requirements-ci.txt"

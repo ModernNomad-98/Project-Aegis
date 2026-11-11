@@ -59,9 +59,9 @@ EVIDENCE_REQUIRED_FIELDS = (
     "invalidation",
 )
 
-# The only subprocess modules the preflight may invoke.  git plumbing is
+# The only subprocess entrypoints the preflight may invoke.  git plumbing is
 # restricted to read-only subcommands.
-SUBPROCESS_MODULES = ("tools.aegis_verdict_gate", "tools.aegis_evidence_reuse")
+SUBPROCESS_MODULES = ("scripts/aegis_verdict_gate/run.py", "tools.aegis_evidence_reuse")
 GIT_SUBCOMMANDS = ("rev-parse", "cat-file", "log", "merge-base")
 
 NON_CLAIMS = (

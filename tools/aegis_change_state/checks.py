@@ -2,7 +2,7 @@
 
 Every function here derives a value; none of them accepts a declared value on
 trust and none of them returns a readiness verdict.  Readiness remains the
-merged checker's job (tools/aegis_verdict_gate/): this module only proves that
+merged checker's job (scripts/aegis_verdict_gate/): this module only proves that
 the records it produced are internally consistent, bound to one frozen head,
 and fail closed under the adversarial conditions C1.3 exercises.
 

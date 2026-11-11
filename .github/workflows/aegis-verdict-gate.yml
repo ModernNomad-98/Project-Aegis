@@ -1,0 +1,194 @@
+# C1.1b post-F readiness association: one protected, default-branch-executed
+# workflow that evaluates a pull request from base-only content and publishes
+# exactly one head-bound commit status.
+#
+# Why this workflow looks the way it does (C1.1b Stage A plan REV2 sections
+# 5.1-5.3; authority C11B-H1-REBIND-AUTHORITY-REV6-2026-11-11):
+#
+#   * pull_request_target and issue_comment both execute the workflow
+#     definition from the default branch, not from the pull request.  A pull
+#     request therefore cannot alter the workflow that evaluates it, and no
+#     pull-request head ref is checked out or executed.  The workflow also
+#     records github.workflow_ref/workflow_sha and refuses to run unless the
+#     executed file is the default-branch aegis-verdict-gate.yml.
+#   * The checkout is base-only: the pull request's base sha for
+#     pull_request_target, the default branch for issue_comment.  The adapter
+#     resolves the pull request read-only and fails closed (BASE_MISMATCH) if
+#     the resolved base is not the base-only checkout.  No head ref is fetched.
+#   * The association mechanism is a commit status with context
+#     "aegis-verdict-gate", posted by scripts/ci/aegis_verdict_gate_publish.py
+#     on the evaluated head.  GitHub Actions permissions are job-scoped, not
+#     step-scoped, so the single job holds statuses: write and only the
+#     publish-status step invokes the only status writer; every other step is
+#     read-only.  The isolation tests assert both facts.
+#   * There is no push, workflow_dispatch or workflow_run trigger, no skip
+#     variable, no continue-on-error and no retry.  The job runs on every
+#     declared event; a disabled or absent run leaves the required context
+#     missing (blocked), never green.
+#   * Readiness is not merge authority.  This job reports post-F readiness
+#     evidence only.  Stage 3 registration of the context is an owner action
+#     and is not performed here.
+name: aegis-verdict-gate
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
+  issue_comment:
+    types: [created, edited, deleted]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+  statuses: write
+
+concurrency:
+  # One run per pull request; the latest run posts the latest status.
+  group: aegis-verdict-gate-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
+env:
+  NoDefaultCurrentDirectoryInExePath: '1'
+  PYTHONDONTWRITEBYTECODE: '1'
+  PYTHONIOENCODING: utf-8
+  # The base-only checkout this run is allowed to evaluate against.
+  AEGIS_VERDICT_CHECKOUT_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
+
+jobs:
+  aegis-verdict-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          # Base-only: never the pull-request head.  For issue_comment the
+          # default branch is checked out; the adapter then verifies that the
+          # resolved pull-request base equals this checkout and fails closed
+          # when it does not.
+          ref: ${{ github.event.pull_request.base.sha || github.event.repository.default_branch }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          # Pinned to a minor, matching validate-skills: the interpreter the
+          # gate runs on moves only by a reviewed change.
+          python-version: '3.14'
+
+      - name: Verify the executed workflow is the default-branch file
+        env:
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKFLOW_SHA: ${{ github.workflow_sha }}
+        run: |
+          case "$WORKFLOW_REF" in
+            */aegis-verdict-gate.yml"@refs/heads/${{ github.event.repository.default_branch }}") ;;
+            *)
+              echo "REFUSING: the executed workflow is not the default-branch aegis-verdict-gate.yml: $WORKFLOW_REF" >&2
+              exit 1
+              ;;
+          esac
+          printf 'executed workflow: %s @ %s\n' "$WORKFLOW_REF" "$WORKFLOW_SHA"
+
+      - name: Record the runner environment
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+          WORKFLOW_SHA: ${{ github.workflow_sha }}
+        run: >-
+          python -P scripts/ci/record-check.py environment -- python -P -c
+          "import json,os,platform,sys; print(json.dumps({'event': os.environ['EVENT_NAME'], 'workflow_ref': os.environ['WORKFLOW_REF'], 'workflow_sha': os.environ['WORKFLOW_SHA'], 'python': sys.version.split()[0], 'platform': platform.platform()}, sort_keys=True))"
+
+      - name: Resolve the pull request and base checkout
+        id: resolve
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          AEGIS_VERDICT_RUN_DIR: ${{ runner.temp }}/aegis-verdict-gate
+        run: |
+          set +e
+          python -P scripts/ci/record-check.py resolve -- python -P scripts/ci/aegis_verdict_gate_fetch.py --resolve-only
+          code=$?
+          decision=$(python -P -c "import json,os;print(json.load(open(os.path.join(os.environ['AEGIS_VERDICT_RUN_DIR'], 'gate-context.json')))['decision'])" || true)
+          printf 'decision=%s\n' "$decision" >> "$GITHUB_OUTPUT"
+          base_sha=$(python -P -c "import json,os;print(json.load(open(os.path.join(os.environ['AEGIS_VERDICT_RUN_DIR'], 'gate-context.json')))['base_sha'])" || true)
+          printf 'base_sha=%s\n' "$base_sha" >> "$GITHUB_OUTPUT"
+          exit $code
+
+      - name: Check out the resolved base for an issue_comment run
+        # issue_comment starts on the default branch (needed to run the
+        # adapter).  Its pull request base can be older than that tip, so the
+        # resolved base is checked out here; the fetch phase refuses to run
+        # unless HEAD is the resolved base.  pull_request_target already
+        # checked out its base above.
+        if: github.event_name == 'issue_comment' && steps.resolve.outcome == 'success' && steps.resolve.outputs.decision == 'evaluate' && steps.resolve.outputs.base_sha != ''
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ steps.resolve.outputs.base_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fetch the C1.1a input envelopes
+        id: fetch
+        if: steps.resolve.outputs.decision == 'evaluate' && steps.resolve.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          AEGIS_VERDICT_RUN_DIR: ${{ runner.temp }}/aegis-verdict-gate
+        run: python -P scripts/ci/record-check.py fetch-inputs -- python -P scripts/ci/aegis_verdict_gate_fetch.py --fetch
+
+      - name: Evaluate the verdict gate
+        if: always() && steps.resolve.outputs.decision == 'evaluate' && steps.fetch.outcome == 'success'
+        env:
+          AEGIS_VERDICT_RUN_DIR: ${{ runner.temp }}/aegis-verdict-gate
+        run: >-
+          python -P scripts/ci/record-check.py verdict-gate -- python -P scripts/aegis_verdict_gate/run.py check
+          --repo-root .
+          --verdict "$AEGIS_VERDICT_RUN_DIR/verdict.json"
+          --freeze "$AEGIS_VERDICT_RUN_DIR/freeze.json"
+          --settlement "$AEGIS_VERDICT_RUN_DIR/settlement.json"
+          --head-history "$AEGIS_VERDICT_RUN_DIR/head-history.json"
+          --stage-records-dir "$AEGIS_VERDICT_RUN_DIR/stage-records"
+          --json
+
+      - name: Publish the head-bound commit status
+        if: always() && steps.resolve.outputs.decision == 'evaluate'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          AEGIS_VERDICT_RUN_DIR: ${{ runner.temp }}/aegis-verdict-gate
+        run: >-
+          python -P scripts/ci/record-check.py publish-status -- python -P scripts/ci/aegis_verdict_gate_publish.py
+          --run-dir "$AEGIS_VERDICT_RUN_DIR"
+          --checker-record "$RUNNER_TEMP/aegis-ci/verdict-gate.json"
+          --checker-log "$RUNNER_TEMP/aegis-ci/verdict-gate.log"
+
+      - name: Run the checker canonicalization self-test
+        if: always() && steps.resolve.outputs.decision == 'evaluate'
+        run: python -P scripts/ci/record-check.py self-test -- python -P scripts/aegis_verdict_gate/run.py --self-test
+
+      - name: Run the moved checker test suite
+        if: always() && steps.resolve.outputs.decision == 'evaluate'
+        run: python -P scripts/ci/record-check.py checker-tests -- python -P scripts/aegis_verdict_gate/tests/run_tests.py
+
+      - name: Write the job summary
+        if: always()
+        env:
+          AEGIS_VERDICT_RUN_DIR: ${{ runner.temp }}/aegis-verdict-gate
+        run: |
+          summary="$AEGIS_VERDICT_RUN_DIR/summary.md"
+          if [ -f "$summary" ]; then
+            cat "$summary" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf 'aegis-verdict-gate: no summary (no-op, or the event was refused before evaluation)\n' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Retain verdict-gate evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: aegis-verdict-gate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/aegis-ci/
+            ${{ runner.temp }}/aegis-verdict-gate/
+          retention-days: 14
+          if-no-files-found: warn

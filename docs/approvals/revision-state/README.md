@@ -169,7 +169,8 @@ UNVERIFIED and blocks readiness. `UNKNOWN` can never be VERIFIED.
 
 `docs/approvals/` is **not** matched by the live gate-guard pattern applied to
 this change (the pattern protects `scripts/`, root-level executables and
-`tools/behavioral_eval_runner/`; all 47 C1.1a paths are unmatched). The
+`tools/behavioral_eval_runner/`; the store's own paths are unmatched, while the
+moved checker now sits under the protected `scripts/`). The
 store's integrity in v1 is therefore **policy + append-only checker + git
 history**, not CI protection: a repository administrator can still rewrite it.
 That is the known custody gap recorded in the plan, not a claim of protection.
@@ -177,8 +178,8 @@ The approval register itself relies on the same append-only policy plus review.
 
 ## How to run the checker against this store
 
-    python -m tools.aegis_verdict_gate --self-test
-    python -m tools.aegis_verdict_gate check \
+    python -P scripts/aegis_verdict_gate/run.py --self-test
+    python -P scripts/aegis_verdict_gate/run.py check \
         --repo-root . \
         --verdict <verdict.json> --freeze <freeze.json> \
         --settlement <settlement.json> --head-history <head-history.json> \
@@ -187,9 +188,9 @@ The approval register itself relies on the same append-only policy plus review.
 
 The store alone can be inspected with the checker's record reader:
 
-    python -c "from tools.aegis_verdict_gate import records; s = records.load_store('.', base_ref='HEAD'); print([(k, v.revision_count, v.stop_state) for k, v in sorted(s.items.items())]); print(s.binding_status)"
+    python -c "import sys; sys.path.insert(0, 'scripts'); from aegis_verdict_gate import records; s = records.load_store('.', base_ref='HEAD'); print([(k, v.revision_count, v.stop_state) for k, v in sorted(s.items.items())]); print(s.binding_status)"
 
-See [the checker README](../../../tools/aegis_verdict_gate/README.md) for the
+See [the checker README](../../../scripts/aegis_verdict_gate/README.md) for the
 full output contract, blocker classes and limitations. `docs/approvals/APPROVAL_REGISTER.md`
 remains read-only to this change and is never edited by it.
 

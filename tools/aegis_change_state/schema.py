@@ -14,7 +14,7 @@ re-derive it.  A declared hash is never trusted where bytes can be re-hashed.
 The schemas here are closed: an unexpected field is
 CANONICAL_FIELD_MISSING_OR_MISMATCH, a missing required field is
 REQUIRED_INPUT_UNAVAILABLE.  The verdict field list is NOT restated here - the
-merged checker's catalogue (tools/aegis_verdict_gate/catalogue.py) remains the
+merged checker's catalogue (scripts/aegis_verdict_gate/catalogue.py) remains the
 only in-code field list; these are the *input record* schemas the checker
 consumes.
 

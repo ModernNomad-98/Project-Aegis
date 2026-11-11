@@ -171,7 +171,7 @@ def blockers_codes(report: dict) -> list:
 def merged_fixtures():
     """Load the merged checker's fixture builder read-only (or None if absent)."""
 
-    path = REPO_ROOT / "tools" / "aegis_verdict_gate" / "tests" / "_fixtures.py"
+    path = REPO_ROOT / "scripts" / "aegis_verdict_gate" / "tests" / "_fixtures.py"
     if not path.is_file():
         return None
     import importlib.util

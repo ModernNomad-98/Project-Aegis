@@ -3,7 +3,7 @@
 Package marker and version constants bound to aegis.change-state/v1.
 
 This package produces and validates the *supplied inputs* the merged C1.1a
-checker (tools/aegis_verdict_gate/) already consumes: a candidate freeze
+checker (scripts/aegis_verdict_gate/) already consumes: a candidate freeze
 record, a settlement record, B/D/E stage declarations, a per-head snapshot
 manifest, an authoritative head-history export and an append-only change
 ledger.  It never computes readiness, never approves anything and never
