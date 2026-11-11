@@ -131,6 +131,12 @@ silently skip a gate.
   quiescent target.
 - This package installs files; it does not run your project, choose your
   technology, or approve anything. Approvals remain the human's.
+- A successful install proves the enumerated 41-file closure on the measured
+  host; it is not a review verdict, an assurance class, an approval, an
+  enforcement claim or a consumer status display. The status vocabulary, the
+  never-implies rules and the one permitted next action are in
+  [consumer-status-presentation-v1](consumer-status-presentation-v1.md); this
+  page does not render them.
 
 **Not claimed by this package:** consumer readiness, production readiness,
 multi-tenant or SaaS readiness, a second host, a hosted deployment, live-model
@@ -451,6 +457,14 @@ the same way.
 | A product repository (Role B), **git-initialised**, with a human owner | The install target; the owner record is `--local` Git config, and a fresh repository may legitimately have **zero commits** | created per run (`git init` if the product repo has no repository yet) |
 | Python, Node, pip, any package manager | **Not required.** The Python pins belong to the source merge gate, not to a consumer, and no packaged skill's workflow needs Python | n/a — deliberately not used |
 
+On your host each row is **MET**, **UNMET** or **UNKNOWN**; the third column
+reports the measured host, not yours. An UNMET or UNKNOWN prerequisite stops the
+step that needs it; the procedure does not substitute a default, does not write
+before the precondition is met, and names the exact remediation. The status
+display rules consume the same three outcomes (CS-4 and CS-7 in
+[consumer-status-presentation-v1](consumer-status-presentation-v1.md)); this page
+does not display a status.
+
 ## 7. The install procedure
 
 `$TGT` below is your product repository and `$SRC` is the pinned clone from P3.
@@ -470,6 +484,15 @@ Windows paths. The order and the checks are portable in principle, but **macOS a
 Linux are unvalidated** and this package claims nothing there. Run the scripted
 procedure under PowerShell 7: its control flow is its exit codes, and a 5.1
 interactive paste would close the session instead of reporting a code.
+
+**What the run verifies, and what it does not.** P0 records the host, P1
+classifies the target, P2 accepts one explicitly stated install mode, P3-P8
+verify the pinned source, the destination, the 41 files and the closure, and P9
+writes the record. A successful run is evidence of that install on that host; it
+is not a review verdict, an approval, an assurance class or a status display.
+The read-only display rules (CS-0..CS-7, the never-implies sets and the one
+permitted next action) are in
+[consumer-status-presentation-v1](consumer-status-presentation-v1.md).
 
 ### P0 — Record the host
 
@@ -1529,6 +1552,15 @@ Each code stops; none warns and continues.
 | 42 | Commit identity missing or owner-matching on the `agent-commit` route | On **stderr**: the parse failure, or the matched field and value plus the resolved author/committer and one question (section 8.3). A `human-only` install does not exit 42 on an owner match, because it makes no commit; it is not a relaxed agent check. Both modes still need a parsable identity, because P2 reports `owner_match=` in its acceptance line. This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
 | 43 | Install mode or owner authorization not stated, empty or unrecognised | The exact question and the two valid `-Mode` tokens (P2). Nothing written; no package file copied |
 
+**Refusal and recovery.** Every code above stops before the step it guards; none
+warns and continues. A refusal is first-class: the message names the exact path,
+code or check and what is still unchanged, so completed work is preserved. A
+repeated run is distinguishable from the first run because the destination and
+record state differ: an identical partial install resumes, an existing install
+record is refused at 24 unless `-AllowExistingRecord` keeps it unchanged, and a
+record that first appears after the preflight is refused. Recovery never invents
+a record, a commit or an approval.
+
 ### 7.3 Transitioning an installed v1 package to v2
 
 A consumer repository that already holds the published 39-file v1 starter moves to
@@ -2088,6 +2120,16 @@ a pass.
 
 - **The package is complete for J1 only** (section 1.2). Anything else is a stop
   with the owning skill named, never an improvisation.
+- **Status, assurance and cost are not this page's claim.** The consumer status
+  display requirements (CS-0..CS-7), the never-implies rules, the one permitted
+  next action and the assurance/UNRUN/bypass/dual-budget panels are in
+  [consumer-status-presentation-v1](consumer-status-presentation-v1.md). This
+  page supplies install facts only: it does not display a status, grant an
+  approval, claim enforcement or claim consumer readiness. The package requires
+  no vendor, subscription, inbox, subagent or additional provider; the setup
+  burden is the section 6 checklist and the P0-P9 steps, and a dollar cost is
+  **UNKNOWN**, not zero or invented. Agent time and owner attention remain costs
+  even though no price is attached.
 - **No machine enforcement of the semantic minimum.** A source test
   (`scripts/tests/test_validator.py`) now proves that the table and the executable
   array select the same rows, that each selected skill's allow-list closure
