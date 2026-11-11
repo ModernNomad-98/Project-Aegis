@@ -20,7 +20,7 @@ It does not define policy, authority or evidence semantics, and it does not prom
 The following is the state this document was written against. It is a point-in-time record; re-measure before relying on it.
 
 - Merged / delivered on the reviewed lineage: C1.1a (verdict-gate checker and seeded revision-state store), C2 (governance/evidence reuse), C1.2-C1.4 (freeze/snapshot/stage and qualification work), C1.1b (required-context design work, staged), C3 (overhead controls), C4 (qualification/economics work), E1.4 and E1.5 (current-head containment and transition evidence).
-- Open / UNRUN: E1.6 integrated independent verification; historical Stage-B gaps on E1 items 3/4/8 (T12); programme closure of E1 items 3/4 (T13); item-5 05-G source link (05-D/05-G not met); C4 external cells; and the contract design basis T2. The item-8 hosted acceptance row P3-08-01 is **PASS** under bounded acceptance record `281f5b7e…` (not full item-8/E1 closure).
+- Open / UNRUN: E1.6 integrated independent verification; historical Stage-B gaps on E1 items 3/4/8 (T12); programme closure of E1 items 3/4 (T13); C4 external cells; and the contract design basis T2. The item-8 hosted acceptance row P3-08-01 is **PASS** under bounded acceptance record `281f5b7e…` (not full item-8/E1 closure). Item-5 05-D and 05-G are **MET** (source link merged in #1030; acceptance `0e1b0396…`); item-5 is not fully closed.
 - Never inferred from merge status: a merged control has no consumer status view by itself, and a merged PR is not an approval, acceptance or enforcement. T5 mounted coverage is UNKNOWN, T6 authenticated verdicts are UNVERIFIED/BLOCKED, and the relevant owner decisions (T7 exception authority, T8/T8a-c/T21 item-5, T14 item-8, T15-T20 item-2) remain open unless separately recorded.
 
 ## 3. Modes, capabilities, optional components, burden and costs
@@ -53,7 +53,7 @@ Every state has the same four obligations: **show** the state and its cause; **s
 
 - **Assurance classes are shown with their meaning:** VERIFIED (re-derived from a primary source), REPORTED (asserted by a record not re-executed), UNKNOWN (not derivable; a resolver is named), UNRUN (not executed; named remaining action), FAIL (recorded failure). A class is never silently upgraded.
 - **Local, hosted and independently verified are distinct.** A local acceptance pass is not a hosted run and is not an independent verification. One host's evidence is bounded to that host.
-- **No aggregate green.** Named UNRUNs, frozen denominators and counts must be visible where a claim depends on them; the CP-01..CP-22 consumer-proof ledger currently records 18 PASS / 3 FAIL / 1 UNRUN out of 22 and is not accepted, and the item-5 evidence remains not independently retrievable (05-D) and not source-linked (05-G).
+- **No aggregate green.** Named UNRUNs, frozen denominators and counts must be visible where a claim depends on them; the CP-01..CP-22 consumer-proof ledger currently records 18 PASS / 3 FAIL / 1 UNRUN out of 22 and is not accepted, and the item-5 evidence is independently retrievable (05-D MET) and source-linked (05-G MET), while item-5 remains not fully closed; no publication or platform claim.
 - **Bypasses are shown as bypasses.** An administrator bypass or a red required check is never displayed as green or approval; it is recorded with its authority and disposition.
 - **Enforcement is not claimed.** Current enforcement status is AUDITABLE, not ENFORCED: mounted coverage is UNKNOWN and custody preconditions are not met. A display may not imply otherwise.
 
@@ -80,7 +80,7 @@ Every state has the same four obligations: **show** the state and its cause; **s
 ## 9. Non-claims and next steps
 
 - No live governance status value is claimed to exist or to be verified by this document. The merged controls provide records and checks, not a consumer status view.
-- T2 remains open: this is requirements-level presentation, not contract-conformance evidence. T5 mounted coverage is UNKNOWN; T6 authenticated verdicts are UNVERIFIED/BLOCKED; T7 exception/unavailable-review authority is UNKNOWN; item-5 05-G, E1.6/T12/T13 and C4 external cells remain open/UNRUN; item-8 P3-08-01 is **PASS** under bounded acceptance record `281f5b7e…`.
+- T2 remains open: this is requirements-level presentation, not contract-conformance evidence. T5 mounted coverage is UNKNOWN; T6 authenticated verdicts are UNVERIFIED/BLOCKED; T7 exception/unavailable-review authority is UNKNOWN; E1.6/T12/T13 and C4 external cells remain open/UNRUN; item-5 05-D/05-G are **MET** but item-5 is not fully closed; item-8 P3-08-01 is **PASS** under bounded acceptance record `281f5b7e…`.
 - **Next:** independent E2.4 exercise against the implemented documentation surfaces, then Stage D/E/F review under the programme route. A separate reviewer - not the author - must disposition this document and the E2.4 exercise; a REVISE grants nothing.
 
 Proposed by e0-requirements-envoy (DeepSeek Harness; route deepseek-flash; serving model not observable), 2026-11-11. Docs-only proposal; no code, publication, delivery, settings, host or approval action.
