@@ -1,0 +1,17 @@
+{
+  "case_id": "missing-required-field",
+  "notes": "The bundle omits declared.generated_by; PF-01 fails closed rather than defaulting the field true.",
+  "checker_case": "valid-verdict",
+  "mutations": [
+    {
+      "op": "delete",
+      "path": "declared.generated_by"
+    }
+  ],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-01": "FAIL"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "case_id": "checker-output-mismatch",
+  "notes": "The checker input is malformed, so no checker output can be reconciled; PF-07 fails closed (and PF-02 refuses the unreadable envelope).",
+  "checker_case": "valid-verdict",
+  "mutations": [],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-07": "FAIL",
+      "PF-02": "FAIL"
+    }
+  },
+  "malformed_checker_input": "verdict"
+}

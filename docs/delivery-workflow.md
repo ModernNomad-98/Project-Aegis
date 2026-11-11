@@ -402,6 +402,172 @@ author's summary, nor a completed task.** Those are inputs. The verdict is a
 posted, accepted review by an agent that is not the author, naming the exact
 head. Anything else that reads as approval is not one.
 
+## Gate-passing paths, finding triage and authenticated verdicts (C2.1)
+
+**Status and scope.** This is one bounded normative amendment, adopted on merge
+of the change that adds it. It adds no stage, no gate, no receipt row and no
+bound field, and it changes no `SD` or `MG` condition: every condition keeps its
+single normative home and this section restates none of their content. It
+records, for each existing gate surface, the legitimate passing path and the
+rule for recording a failure or an owner-authorised bypass; reconciles the R3
+finding-triage rubric into this page; and names the authenticated verdict
+source that a future gate would consume, without wiring one. **"Gate" here
+means the required contexts (`validate-skills`, `gate-guard`), the
+manual/process gates `MG1`-`MG5`, and DCO.** The other visible jobs (`changes`,
+`windows-offline-checks`, `tools-tests-linux`, `tools-tests-windows` and the
+advisory DeepSeek review) are advisory coverage, labelled as such here; they
+are not missing mandatory gates.
+
+### Gate-passing paths and bypass recording
+
+**Passing is not the same as green display.** A surface passes only by its own
+legitimate path at the exact head being merged. A failure, an unavailable
+check or an owner-authorised departure is recorded as what it is — failed,
+unavailable or a bypass, with the authority that covers it — and is never
+displayed as green, passed or waived. The receipt carries the status token and
+the pointer, never the condition's requirement text.
+
+| Surface | Status | Legitimate passing path | Failure / bypass record |
+| --- | --- | --- | --- |
+| `validate-skills` | required context | the job's own suite runs green at the exact head ([enforcement account](#what-ci-and-branch-protection-actually-enforce-today)) | a red or absent job is failed/absent; only the owner-exception route at [`MG1`](#before-merging-stage-g-entry-conditions) can cover it, and it is recorded as a bypass with its disposition |
+| `gate-guard` | required context, pull requests only | no changed path matches the protected-path pattern; the already-recorded APR-140 scripts-only route remains available only for the routine count/registration edits it names ([enforcement account](#what-ci-and-branch-protection-actually-enforce-today)) | a protected-path hit is never green; it needs the named owner decision or exception, recorded as a bypass, and the path is not treated as unprotected |
+| `MG1` | manual/process gate | the condition at [`MG1`](#before-merging-stage-g-entry-conditions) | any non-passing result is recorded by its own status under [`MG1`](#before-merging-stage-g-entry-conditions) and is never shown green |
+| `MG2` | manual/process gate | the condition at [`MG2`](#before-merging-stage-g-entry-conditions) | any non-passing result is recorded by its own status under [`MG2`](#before-merging-stage-g-entry-conditions) and is never shown green |
+| `MG3` | manual/process gate | the condition at [`MG3`](#before-merging-stage-g-entry-conditions) | any non-passing result is recorded by its own status under [`MG3`](#before-merging-stage-g-entry-conditions) and is never shown green |
+| `MG4` | manual/process gate | the condition at [`MG4`](#before-merging-stage-g-entry-conditions) | any non-passing result is recorded by its own status under [`MG4`](#before-merging-stage-g-entry-conditions) and is never shown green |
+| `MG5` | manual/process gate | the condition at [`MG5`](#before-merging-stage-g-entry-conditions) | any non-passing result is recorded by its own status under [`MG5`](#before-merging-stage-g-entry-conditions) and is never shown green |
+| DCO | required commit check (inside `validate-skills`) | every commit carries a `Signed-off-by` line, produced with `git commit -s`, and the DCO step of `validate-skills` checks it | an unsigned commit is not a pass; no local tool, label or severity claim waives it |
+| `aegis-verdict-gate` | **NOT WIRED** (C1.1b) | none today: C1.1b under owner decision T23 owns any wiring, and registering a required context needs T4 | a checker readiness record is evidence only; it is not a gate and it creates no bypass or green result |
+
+**Why the `MG` cells are links.** For an `MG` row the legitimate passing path is
+the linked condition itself. Stating that condition here would make this table
+a second rendering of the gate block and would fail [the agreement
+check](#the-agreement-check-procedural). The table therefore carries the ID, a
+short label, a status and the record rule; the condition stays where it is.
+
+**No new required context is registered by this section**, and no job listed
+above becomes mandatory by being described here.
+
+### R3 finding-triage rubric
+
+**One triage rule, reconciled here.** This rubric is the policy-of-record home
+for triaging audit and review findings. It carries the R3 classes and the
+non-waivable expansions; it does not create a second queue or a second
+execution plan, and every finding remains backlog input only
+([pointer](#audit-findings-are-backlog-input-only)).
+
+| Class | What belongs there | Effect |
+| --- | --- | --- |
+| **BLOCKING** | credential/secret exposure or a data-integrity defect; evidence dishonesty; a behavioural defect or a weakened/deleted assertion; an approved-scope violation; an unmet applicable acceptance, authorization, security or required-validation condition | must be fixed; a blocking finding is the only class that can justify a new head, and it still counts against the recorded review-head budget |
+| **RESIDUAL** | a real, non-blocking defect whose impact is understood and bounded | may be accepted only with a recorded disposition and a follow-up backlog id |
+| **NIT** | a stylistic, readability or similarly non-behavioural remark | may be accepted, with the remark and its disposition recorded in the final review |
+
+**The four named R3 classes are examples, not an exhaustive safe list.** An
+unmet applicable acceptance, authorization, security or required-validation
+condition is always blocking, however it is labelled. Labels such as
+"theoretical", "conservative", "stylistic", "pre-existing", "low-risk",
+"out-of-scope" or "follow-up" cannot waive a mandatory finding; severity
+vocabulary is not authority.
+
+**Every disposition carries**: the finding id, the candidate head, the evidence
+reference, the classification, the decision-maker, the outcome, and (for a
+follow-up) the backlog id. A row without those fields is not a disposition.
+
+**A CI result, an automated review or a green head is an input, not a triage
+decision.** The triage decision belongs to the named decision-maker and is
+recorded as such.
+
+### Authenticated independent verdict consumption
+
+**The canonical set is consumed by version, never restated.** A verdict and any
+future gate consume `aegis.verdict-bound/v2.1` — the C03-M1 canonical fields
+delta as corrected by the v2.1 errata — by version label. This page defines no
+second field list and no competing policy; the merged checker's
+`catalogue.py` remains the single in-code projection and
+[the evidence-binding catalog](conformance/evidence-binding-v1.json) remains the
+companion catalog convention.
+
+**The merged checker of record.** `tools/aegis_verdict_gate/` is the merged
+C1.1a checker: a standard-library-only, read-only checker whose CLI is
+`python -m tools.aegis_verdict_gate check|validate --repo-root . --verdict
+PATH --freeze PATH --settlement PATH --head-history PATH --stage-records-dir
+PATH [--candidate-head HEX40] [--base-ref origin/main] [--json]`. Its exit codes
+are **0** readiness true (reachable only in fixture mode), **1** not ready or
+blocked, **2** invalid input and **3** internal error; it emits deterministic
+JSON with `assurance.claim = AUDITABLE` and `assurance.mounted_coverage =
+UNKNOWN`. See its [README](../tools/aegis_verdict_gate/README.md).
+
+**The status that must be stated with every consumption:**
+
+- **T6 accepted UNVERIFIED+BLOCKED.** No supported authentication method is
+  selected, so a production run has no path to readiness true; a claimed
+  verified authentication is `VERDICT_STALE_OR_UNVERIFIED`.
+- **T4 declined** for the prior slice: no settings, branch protection,
+  required context, identity or label change is made, and the checker is not a
+  required status context.
+- **T24 unresolved:** the revision-state store is UNVERIFIED; a real run is
+  blocked with `REQUIRED_INPUT_UNAVAILABLE` and no verified count is claimed.
+
+**A consumed result is reported as reported.** The exit code, the reason codes
+and the assurance claim travel with the result. A blocked, UNRUN or UNVERIFIED
+result is never converted to green; an owner exception is recorded as a bypass
+with its authority and is never recorded as readiness. A `PASS` from the C2.2
+preflight means its mechanical checks passed; it is not the checker's readiness
+and it is not approval.
+
+**Evidence reuse is a separate record, not a copied pass.**
+`aegis.evidence-reuse/1` records are validated under the companion
+[schema](conformance/evidence-reuse-v1.schema.json) by the read-only
+[validator](../tools/aegis_evidence_reuse/README.md). A reuse record preserves
+the original evidence identity and binds a target head; it does not replace or
+edit the original evidence, does not copy a `PASS`, does not waive required CI
+and does not create approval. A `VALID` reuse decision is a decision record;
+the review and approval route still applies.
+
+### Self-approval and one active worker (pointer)
+
+**This section creates no exception.** No agent may approve or audit its own
+work at any stage (A/B/D/F); one active authorised worker per stage/candidate
+remains the rule; the implementation audit, validation and final review remain
+independent; and the merge remains a separate act under its own authority. The
+no-self-approval rule and the rule-preservation duty remain exactly as stated
+in [No self-approval and rule preservation](#no-self-approval-and-rule-preservation),
+and the distinct-holder rule remains as stated in [When the separation cannot
+be achieved](#when-the-separation-cannot-be-achieved). This paragraph is a
+pointer and adds no approval path or waiver.
+
+### Rule-preservation inventory for this amendment
+
+**Clause-by-clause.** The inventory lists every clause this amendment touches
+or could be read to affect; the Stage D audit checks the diff against it.
+
+| Clause | Location | Disposition | Evidence |
+| --- | --- | --- | --- |
+| No self-approval and rule preservation | [here](#no-self-approval-and-rule-preservation) | **kept**, pointer added; no rule removed or weakened | text unchanged; new pointer paragraph |
+| Stage dispositions `SD-A`-`SD-G` | [here](#stage-dispositions) | **kept**, untouched | diff has no hunk |
+| Stage dependencies | [here](#stage-dependencies) | **kept**, untouched | diff has no hunk |
+| Merge-gate conditions `MG1`-`MG5` | [here](#before-merging-stage-g-entry-conditions) | **kept**; the new table links to them and carries no condition text | agreement-check greps; table cells are IDs/links/labels/statuses |
+| Receipt and bound fields | [here](#the-receipt-what-stage-g-must-be-able-to-show) | **kept**, untouched | diff has no hunk |
+| CI/enforcement account | [here](#what-is-machine-enforced-and-what-is-procedural) | **kept**; new table adds passing-path/status text only, and the advisory jobs are labelled advisory | diff adds the new section only |
+| Agreement check | [here](#the-agreement-check-procedural) | **kept**; the new block owns no `MG`/`SD` condition content | grep judgement |
+| Numbered collapse sites | [here](#the-numbered-collapse-sites) | **amended**: one numbered site (9) added for the new block; sites 1-8 unchanged | diff; PR witness row count |
+| Exact-head invalidation | [here](#exact-head-invalidation) | **kept**, untouched | diff has no hunk |
+| DCO and required checks | [here](#what-ci-and-branch-protection-actually-enforce-today) | **kept**; the new table records the DCO passing path, not a new check | diff adds the new section only |
+| Adoption and review | [here](#adoption-and-review) | **kept**; this amendment is a proposal until reviewed and merged, then effective | status paragraph above |
+| Related instruments | [here](#related-instruments) | **kept**, untouched | diff has no hunk |
+
+**No existing clause is deleted, relaxed, renamed or duplicated.** The
+amendment's new text is additive; where it mentions an existing condition it
+uses the condition's ID and a link, not its content.
+
+### Effect
+
+This section is a **proposal until the change that adds it is reviewed and
+merged under the owner's rule-change route**; on merge it becomes part of this
+page. It claims no enforcement and registers no required context. Its tooling
+references are auditable, read-only and non-gating; production readiness
+remains unreachable under T6 and the store remains UNVERIFIED under T24.
+
 ## The lighter review path: pure-docs pull requests only
 
 **This section states one class-scoped condition. It adds no stage, no gate, no
@@ -870,8 +1036,12 @@ block with **exactly one row per numbered site below**.
 7. **The PR body** — the only rule-bearing content permitted there is the witness
    block, the skills table and the divergence table.
 8. **The stage table's exit-disposition column** — seven cells, each a bare ID.
+9. **The gate-path, triage and verdict-consumption block** — the bounded
+   subsection `Gate-passing paths and bypass recording`, `R3 finding-triage
+   rubric`, `Authenticated independent verdict consumption` and their supporting
+   subsections; it owns no `MG`/`SD` condition content.
 
-**Sites 1–4 and 8 are on this page; 5 is on this page but counted once; 6 is
+**Sites 1–4, 8 and 9 are on this page; 5 is on this page but counted once; 6 is
 another file; 7 is outside the repository.** The witness records `changed` or
 `unchanged-and-verified` for each, with the command output that establishes it.
 **The witness is content-free** — IDs and statuses only — so it is not itself a

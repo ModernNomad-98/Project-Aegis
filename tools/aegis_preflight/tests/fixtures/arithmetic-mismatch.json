@@ -1,0 +1,18 @@
+{
+  "case_id": "arithmetic-mismatch",
+  "notes": "triage.open_blocking is 1 while the re-derived count is 0; PF-04 refuses the unexplained mismatch.",
+  "checker_case": "valid-verdict",
+  "mutations": [
+    {
+      "op": "set",
+      "path": "inputs.triage.open_blocking",
+      "value": 1
+    }
+  ],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-04": "FAIL"
+    }
+  }
+}

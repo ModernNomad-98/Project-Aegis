@@ -66,6 +66,17 @@ Other dated records are reachable from the owning backlogs and the
 [documentation index](../README.md). Do not infer that an unlisted evidence
 page has been reviewed or that these 19 pages cover the full repository.
 
+## Evidence-reuse decisions
+
+Evidence-reuse decisions are separate records validated under the companion
+schema [docs/conformance/evidence-reuse-v1.schema.json](../conformance/evidence-reuse-v1.schema.json)
+by the read-only [aegis_evidence_reuse validator](../../tools/aegis_evidence_reuse/README.md).
+A reuse record preserves the original evidence identity — its source head,
+scope, method, environment and result — and never replaces or edits it; the
+target-head binding and the independent qualifier are additive. A `VALID`
+decision is a record, not an approval: it waives no required CI, does not copy a
+`PASS`, and does not make evidence reusable without the policy's review.
+
 ## Citation durability
 
 A permanent record here — a governance log entry, a register entry, a dated evidence page or a roadmap
