@@ -480,7 +480,7 @@ recorded as such.
 ### Authenticated independent verdict consumption
 
 **The canonical set is consumed by version, never restated.** A verdict and any
-future gate consume `aegis.verdict-bound/v2.1` — the C03-M1 canonical fields
+future gate consume the merged checker's bound-verdict schema (version 2.1) — the C03-M1 canonical fields
 delta as corrected by the v2.1 errata — by version label. This page defines no
 second field list and no competing policy; the merged checker's
 `catalogue.py` remains the single in-code projection and
