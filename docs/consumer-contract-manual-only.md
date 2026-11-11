@@ -17,3 +17,12 @@ Status: NORMATIVE for consumers that adopt the Aegis manual-only policy (OD-Q903
 7. Audit evidence: keep the minimal record (exact skill name and reason, actor, named trigger, scope, date, exact head/commit where applicable, the pin/version at each sync, and revocation events) in the consumer-local append-only register; do not record secrets or PII. Evidence is available to the consumer's reviewers on request.
 
 8. Escalation and non-substitution: if a task seems to require a manual-only skill and no human or valid trigger-scoped override is available, stop and surface the request; do not substitute an auto-applied skill or a paraphrased procedure. An override never substitutes for any other required approval or authority.
+
+9. **Consumer status presentation is display-only and does not change this contract.** A status view may
+   show governance states and their permitted next actions, but it cannot grant authority, approve,
+   merge, waive or clear anything, and it cannot create durable request records (owner decision
+   2026-11-11: display-only request records, consumer audience, docs-only status/claims). Fail-closed
+   defaults above still apply. The proposed vocabulary and current limits are in
+   [consumer-status-presentation-v1.md](consumer-status-presentation-v1.md): the contract basis (T2) is
+   open, authenticated verdicts display UNVERIFIED/BLOCKED until T6, mounted coverage is UNKNOWN, and no
+   enforcement claim is made.
