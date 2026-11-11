@@ -1,0 +1,33 @@
+{
+  "case_id": "duplicate-ids",
+  "notes": "The evidence set repeats EV-1; PF-02 refuses the duplicate id and PF-04 refuses the denominator mismatch.",
+  "checker_case": "valid-verdict",
+  "mutations": [
+    {
+      "op": "append",
+      "path": "inputs.evidence",
+      "value": {
+        "evidence_id": "EV-1",
+        "kind": "test-run",
+        "bytes": 128,
+        "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+        "scope": "tools/aegis_preflight/",
+        "source_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "method": "python -m unittest",
+        "environment": "python-3.14",
+        "result": "PASS",
+        "retention": "repository",
+        "assurance": "AUDITABLE",
+        "invalidation": "head-move",
+        "evidence_ref": "../evidence/EV-1.stdout.txt"
+      }
+    }
+  ],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-02": "FAIL",
+      "PF-04": "FAIL"
+    }
+  }
+}

@@ -998,6 +998,119 @@ voids the verdict."*** The first was chosen; the second is what this section's
 invalidation sentence implements as a consequence, and the third is what the
 who/when above assigns to the merge agent. **The choice is the owner's.**
 
+## Review efficiency: finding triage, gate paths and authenticated verdicts
+
+**What this addition is, and its status.** It is additive and bounded: a finding
+triage rubric, a legitimate-passing-path account for each gate, and the
+consumption rules for an authenticated independent verdict. It **removes,
+relaxes, duplicates or restates no existing clause**, adds no stage, no gate
+condition, no receipt row and no bound field, and makes no enforcement claim of
+its own. Its clause-by-clause preservation inventory is carried in the change's
+PR body. **Until the change that adds it is reviewed and merged under the
+owner's rule-change route, this section is a proposal and not effective
+policy.**
+
+### Finding triage (the R3 rubric) and non-waivable defects
+
+**Every audit or review finding receives exactly one class, and the class fixes
+which dispositions are permitted.** A label describes a finding; it never
+changes the class.
+
+| Class | What it means | Permitted dispositions |
+| --- | --- | --- |
+| `BLOCKING` | the change cannot be accepted at that head until the defect is fixed | `FIXED` at a head named in the record. A blocking finding is never accepted, deferred, downgraded or relabelled |
+| `RESIDUAL` | a real but non-blocking defect or gap, accepted with a named owner and follow-up | `RESIDUAL_ACCEPTED` with a backlog id |
+| `NIT` | a style, wording or preference point with no correctness, security or evidence effect | `NIT_ACCEPTED`, `REJECTED` or `FIXED` |
+
+**Five subjects are always `BLOCKING`, whatever label is applied:** security,
+authorization, acceptance-criteria compliance, evidence integrity, and required
+validation. Calling such a finding *theoretical*, *conservative*, *stylistic* or
+*out of scope* changes its description and not its class — **a label cannot
+waive a mandatory finding**.
+
+**A disposition is a record, not a recollection.** Per finding it carries the
+**finding id**; the **exact 40-hex head** at which it was raised and disposed;
+the **evidence** relied on; the **class**; the **decision-maker** (role and
+identity reference); the **outcome**; and, for a follow-up, the **backlog id**.
+`UNRUN` is a status, never a disposition, and a finding without those fields is
+not disposed.
+
+**This rubric adds no gate condition.** The floor for triaged findings is
+stated once in [`MG3`](#before-merging-stage-g-entry-conditions) and is
+unchanged here; the always-blocking list above classifies a finding and does not
+create a merge-gate condition.
+
+### Legitimate passing paths for each gate
+
+**Every gate has a legitimate passing path, and only that path satisfies it.**
+This table names the path and how a bypass is recorded. **It states no gate
+condition:** where a condition already has a normative home on this page the row
+points to it and adds nothing to it, and where nothing is wired the row says so.
+
+| Gate | Legitimate passing path | How a bypass is recorded |
+| --- | --- | --- |
+| `validate-skills` (required) | The job runs at the exact head and exits 0; local reproduction of the same steps is documented in [the offline CI guide](offline-ci.md). | An owner grant covering that exact head and scope is cited by its register id, and the failed or skipped job stays failed or skipped — **never green**. |
+| `gate-guard` (required, pull requests) | The change touches no protected path, so the guard has nothing to fail on. A pull request whose **only** protected paths are under `scripts/` may take the already-recorded standing exception `AEGIS-APR-140` in [the approval register](approvals/APPROVAL_REGISTER.md), under that entry's conditions: the guard still **fails**, is recorded as failed with the authorized disposition, and the exact head is named. | Any protected path outside that recorded route needs a one-time owner decision, recorded as a bypass with its grant; the guard's result is never rewritten as a pass. |
+| `DCO` (every commit) | Every commit carries a `Signed-off-by` line, produced with `git commit -s`; the check is the repository's own script and is reproducible locally. | None is recorded here. A missing sign-off is repaired in a DCO-signed history; it is not waived, and an unsigned commit is never described as signed off. |
+| `MG1`–`MG5` (merge-gate conditions) | The conditions are stated once in [the merge-gate conditions](#before-merging-stage-g-entry-conditions); their legitimate path is that those conditions hold at the exact head being merged. This row adds nothing to any of them. | Recorded as a bypass with its grant id; the condition's result is never rewritten as green. Where no bypass is recorded, the merge does not happen. |
+| `aegis-verdict-gate` (future context) | **NOT WIRED.** The merged checker `tools/aegis_verdict_gate/` is auditable tooling, not a required status context; any wiring is C1.1b's under its own authority. When and if it is wired, its documented CLI and exit codes are the path. | Not applicable while it is not a gate. Nothing on this page may be read as claiming that it is one. |
+
+**The remaining visible jobs are not required checks.** `changes` (the path
+filter), `windows-offline-checks`, `tools-tests-linux` and
+`tools-tests-windows` (visible coverage) are not registered required checks,
+and the automated review is advisory. This table therefore does not treat them as
+missing mandatory gates; their results are still reported as they ran, and a
+skipped job is recorded as skipped, never as passed.
+
+### Authenticated independent verdicts: what is consumed, and from where
+
+**The canonical verdict set is consumed by reference, never restated.** The
+set is `aegis.verdict-bound/v2.1` — the C03-M1 delta as corrected by its
+errata, contract-owned. This page names the version and consumes it; it does not
+reproduce its fields. The merged checker's `tools/aegis_verdict_gate/catalogue.py`
+remains the **single in-code projection** of the catalogue, and **no second
+field list, second readiness predicate or competing policy is created here or in
+the C2 tooling** that this section accompanies.
+
+**The interface of record is the merged checker's CLI and deterministic JSON**:
+`check` and `validate`, with exit 0 for ready, 1 for not ready or blocked, 2
+for invalid input and 3 for internal error. A consumer reports the checker's
+result verbatim. A `BLOCKED` or `UNRUN` outcome is reported as such and is
+**never converted to a pass**; a readiness `true` outside the checker's own
+fixture mode is refused.
+
+**The limits of that consumption are part of the rule, not a footnote.**
+
+- **T6 is accepted as UNVERIFIED+BLOCKED.** No authentication method is
+  supported, so **production readiness is unreachable**; no verdict, receipt or
+  summary may claim it, and an `AUDITABLE` assurance claim is not a claim of
+  enforcement.
+- **T4 remains declined.** This page and the C2 tooling make no settings,
+  branch-protection, identity, label or required-context change, and nothing here
+  turns the checker into a required status context.
+- **T24 leaves the revision-state store UNVERIFIED.** A consumer treats that
+  provenance as a required input that is **unavailable** — blocked, never
+  verified — and no verified-count claim is made from it.
+- **Mounted coverage is UNKNOWN**, and no host or containment claim is made.
+
+**So "authenticated independent verdict" means**: a posted verdict by an agent
+that did not author the change, naming the exact 40-hex head and the
+bound-fields hash, whose mechanical input record the checker can reopen and
+re-hash. It does **not** mean that a machine authenticated the agent's identity;
+independence remains procedural, and the checker's result is an input to a
+verdict, never the verdict itself.
+
+### Self-approval and one worker per stage (pointer, not a new rule)
+
+**This section creates no approval path and waives nothing.**
+[Stage separation](#stage-separation) already states that no agent holds two
+stages of the same change, that the implementer does not audit the
+implementation, that the author does not perform the final review, and that no
+reviewer merges what it reviewed; the per-head one-active-verdict discipline is
+unchanged; and G remains a separate holder. A finding disposition, a reuse
+decision, a passing preflight or a checker result is **not an approval**, and
+none of them may be cited as one.
+
 ## Adoption and review
 
 **Adoption is incremental by stage, not by document.** Stages A–G take effect on

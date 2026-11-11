@@ -92,3 +92,17 @@ links a record **already contains** - it goes red when a written link stops reso
 plain text, or omit its evidence entirely, and that step stays green. Supplying the citation this rule
 requires is therefore a **documentation obligation that nothing machine-checks**; the *digest* half is
 checked by nothing either, and a record that relies on it says so.
+
+## Evidence reuse
+
+A reuse decision is a **separate record**, not a replacement for the evidence it
+cites: it preserves the original evidence identity (source head, tree, base,
+evidence ids and record digests) and binds a stated target head, so a moved
+target makes the decision stale rather than silently reusable. Reuse records are
+validated under the closed companion schema
+[evidence-reuse-v1.schema.json](../conformance/evidence-reuse-v1.schema.json) —
+a companion to [evidence-binding-v1.json](../conformance/evidence-binding-v1.json)
+that does not rewrite historical bindings — and they never turn a previous
+`PASS` into a pass at a new head, never waive a required check and never
+substitute for approval. Validation is auditable tooling, not enforcement: it
+registers no required context and changes no settings.

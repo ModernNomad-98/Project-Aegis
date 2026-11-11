@@ -1,0 +1,19 @@
+{
+  "case_id": "unrun-unconverted",
+  "notes": "An evidence record is UNRUN without a named reason; PF-05 refuses the unnamed unrun and PF-09 refuses to let it read as covered.",
+  "checker_case": "valid-verdict",
+  "mutations": [
+    {
+      "op": "set",
+      "path": "inputs.evidence.0.result",
+      "value": "UNRUN"
+    }
+  ],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-05": "FAIL",
+      "PF-09": "FAIL"
+    }
+  }
+}

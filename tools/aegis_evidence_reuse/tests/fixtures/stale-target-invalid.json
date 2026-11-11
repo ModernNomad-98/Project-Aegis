@@ -1,0 +1,103 @@
+{
+  "case_id": "stale-target-invalid",
+  "notes": "The record targets a superseded head; the current authoritative target differs, so the effective decision is STALE (RU-04). Synthetic PR #1014-style 182d5221-class scenario only.",
+  "record": {
+    "schema_version": "aegis.evidence-reuse/1",
+    "reuse_id": "REUSE-FIXTURE-0007",
+    "subject": {
+      "repo": {
+        "owner": "example-org",
+        "name": "example-repo"
+      },
+      "change_id": 42
+    },
+    "source": {
+      "evidence_ids": [
+        "EV-1"
+      ],
+      "source_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source_tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "source_base": "cccccccccccccccccccccccccccccccccccccccc",
+      "source_records_sha256": [
+        "1111111111111111111111111111111111111111111111111111111111111111"
+      ],
+      "requirement_ids": [
+        "MG1"
+      ]
+    },
+    "target": {
+      "target_head": "9999999999999999999999999999999999999999",
+      "target_tree": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "target_base": "ffffffffffffffffffffffffffffffffffffffff"
+    },
+    "delta_class": "DOCS_TEXT_ONLY",
+    "affected_inputs": [
+      "docs/example.md"
+    ],
+    "full_diff": {
+      "name_only_ref": "fixture-diff-0001",
+      "name_only_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "file_count": 1
+    },
+    "comparison": {
+      "method": "name-only-diff",
+      "tool": "git",
+      "tool_version": "2.x",
+      "ast_stripped": false,
+      "ast_equality_sha256": null
+    },
+    "excluded_claims": [
+      "APPROVAL",
+      "BEHAVIORAL_EQUIVALENCE",
+      "CI_WAIVER",
+      "COPIED_PASS"
+    ],
+    "target_delta_checks": [
+      {
+        "check_id": "CI-REQUIRED",
+        "kind": "REQUIRED_CI",
+        "result": "PASS",
+        "evidence_ref": "EV-1"
+      }
+    ],
+    "independence": {
+      "qualifier_identity_ref": "role-e-fixture",
+      "class": "INDEPENDENT",
+      "attestation_ref": "ATT-FIXTURE-0001"
+    },
+    "decision": "VALID",
+    "decision_authority": {
+      "authority_kind": "OWNER_LINE_RECORD",
+      "authority_ref_id": "OWNER-LINE-FIXTURE-0001",
+      "authority_ref_sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    "invalid_after": [
+      "TARGET_HEAD_MOVE",
+      "SOURCE_EVIDENCE_CHANGE"
+    ],
+    "provenance": {
+      "source_ref": "fixture:reuse",
+      "as_of": "2026-11-11T00:00:00Z",
+      "producer_role": "implementer",
+      "producer_identity_ref": null,
+      "declared_payload_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "declared_payload_bytes": 0
+    }
+  },
+  "evidence": [
+    {
+      "evidence_id": "EV-1",
+      "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+      "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "kind": "docs-review"
+    }
+  ],
+  "target_head": "dddddddddddddddddddddddddddddddddddddddd",
+  "expected": {
+    "exit_code": 1,
+    "effective_decision": "STALE",
+    "violation_codes": [
+      "RU-04"
+    ]
+  }
+}

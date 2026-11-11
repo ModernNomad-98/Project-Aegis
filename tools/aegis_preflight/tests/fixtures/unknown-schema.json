@@ -1,0 +1,18 @@
+{
+  "case_id": "unknown-schema",
+  "notes": "The bundle declares aegis.preflight/v0; PF-01 refuses the unknown schema instead of assuming the current one.",
+  "checker_case": "valid-verdict",
+  "mutations": [
+    {
+      "op": "set",
+      "path": "schema_version",
+      "value": "aegis.preflight/v0"
+    }
+  ],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-01": "FAIL"
+    }
+  }
+}

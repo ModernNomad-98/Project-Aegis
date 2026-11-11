@@ -1,0 +1,28 @@
+{
+  "case_id": "unresolved-reference",
+  "notes": "A triage finding cites evidence EV-404 that is not in the supplied set; PF-02 fails closed.",
+  "checker_case": "valid-verdict",
+  "mutations": [
+    {
+      "op": "append",
+      "path": "inputs.triage.findings",
+      "value": {
+        "finding_id": "F-404",
+        "class": "NIT",
+        "disposition": "NIT_ACCEPTED",
+        "candidate_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "evidence_ref": "EV-404",
+        "decided_by": {
+          "role": "F",
+          "identity_ref": "role-f-fixture"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-02": "FAIL"
+    }
+  }
+}
