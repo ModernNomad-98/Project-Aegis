@@ -1,0 +1,344 @@
+{
+  "case_id": "d-revise",
+  "notes": "Synthetic fixture bundle; no real PR, identity, secret or approval. Mechanical hashes are computed by tests/_fixtures.py at build time. Stage D verdict is REVISE: C8 fails with STAGE_VERDICT_NOT_ACCEPTED (errata NV-D1-4).",
+  "verdict": {
+    "repo": {
+      "owner": "example-org",
+      "name": "example-repo"
+    },
+    "change": {
+      "type": "PR",
+      "id": 42
+    },
+    "merge_target": {
+      "ref": "refs/heads/main"
+    },
+    "candidate_id": "cand-c11a-fixture-0001",
+    "contract_schema_version": "aegis.capability-status/v2",
+    "bound_set_id": "aegis.verdict-bound/v2.1",
+    "bound_set_version": "2.1",
+    "canonicalization_version": "JCS-RFC8785-v1",
+    "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "tree_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "base_sha": "cccccccccccccccccccccccccccccccccccccccc",
+    "policy_ref": "policy-fixture-0001",
+    "policy_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "plan": {
+      "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "revision_count": 2
+    },
+    "revision_state_sha256": "",
+    "review_heads": {
+      "used": 0,
+      "exception_id": null
+    },
+    "evidence_inputs_sha256": "",
+    "stage_records": [],
+    "plan_audit_applies": true,
+    "plan_audit_waiver_ref": null,
+    "triage": {
+      "schema_version": "aegis.triage/v1",
+      "sha256": "",
+      "open_blocking": 0,
+      "residual_accepted_count": 1
+    },
+    "reviewer": {
+      "identity_ref": "role-f-independent",
+      "role": "F",
+      "auth_method": "provider-event-author",
+      "auth_verified": true,
+      "independence": {
+        "class": "INDEPENDENT",
+        "distinct_from": [
+          "implementer",
+          "pr-author"
+        ],
+        "attestation_ref": "att-fixture-0001"
+      }
+    },
+    "verdict": {
+      "stage": "F",
+      "value": "PASS",
+      "record_id": "rec-f-0001",
+      "record_sha256": "",
+      "posted_at": "2026-11-10T20:00:00Z",
+      "posted_after_last_commit": true,
+      "edit_state": {
+        "post_post_edits": 0,
+        "deleted": false,
+        "body_hash_match": true
+      },
+      "event_ref": "evt-fixture-0001"
+    },
+    "owner_line": {
+      "id": "APR-FIXTURE-C11A-0001",
+      "register_sha256": ""
+    },
+    "merge_authority_ref": null,
+    "skills": {
+      "rows": [
+        {
+          "name": "state-machine-modeler",
+          "blob_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "purpose": "negative vectors",
+          "result": "recorded"
+        }
+      ],
+      "none_reason": null,
+      "sha256": ""
+    },
+    "security": {
+      "surfaces_touched": [
+        "tools/aegis_verdict_gate/"
+      ],
+      "mitigations": [
+        "fail-closed input derivation"
+      ],
+      "residual": [
+        "fixture repository is synthetic"
+      ],
+      "secret_read_or_logged": false,
+      "sha256": ""
+    },
+    "witness": {
+      "diff_name_only": [
+        "tools/aegis_verdict_gate/README.md"
+      ],
+      "probes": [
+        {
+          "probe_id": "P1",
+          "expected": "blocked",
+          "observed": "blocked"
+        }
+      ],
+      "sha256": ""
+    },
+    "bound_fields_sha256": "",
+    "record": {
+      "body_text": "F verdict for aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\nAll required checks are affirmative at this head.\n",
+      "verdict_records": [
+        {
+          "record_id": "rec-f-0001",
+          "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "value": "PASS",
+          "active": true
+        }
+      ],
+      "triage_rows": [
+        {
+          "finding_id": "F-001",
+          "source": "automated-review",
+          "round": 1,
+          "candidate_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "class": "RESIDUAL",
+          "disposition": "RESIDUAL_ACCEPTED",
+          "decided_by": {
+            "role": "F",
+            "identity_ref": "role-f-independent"
+          },
+          "authority_ref": "APR-FIXTURE-C11A-0001",
+          "evidence_ref": "evt-fixture-0001",
+          "backlog_id": "BL-0001",
+          "decided_at": "2026-11-10T20:01:00Z"
+        }
+      ],
+      "post_f_state": "ACTIVE",
+      "evidence_set": [
+        {
+          "evidence_id": "EV-1",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        }
+      ],
+      "owner_line_resolution": {
+        "entry_id": "APR-FIXTURE-C11A-0001",
+        "register_sha256": "",
+        "effective_status": "ACTIVE",
+        "scope": {
+          "repo": "example-org/example-repo",
+          "change_id": 42,
+          "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "merge_target_ref": "refs/heads/main"
+        },
+        "resolved_by": "records-steward",
+        "resolved_at": "2026-11-10T20:02:00Z"
+      },
+      "identity_attestation": {
+        "repo": {
+          "owner": "example-org",
+          "name": "example-repo"
+        },
+        "change": {
+          "type": "PR",
+          "id": 42
+        }
+      },
+      "owner_decisions": [],
+      "bypasses": []
+    }
+  },
+  "inputs": {
+    "freeze": {
+      "freeze_id": "frz-fixture-0001",
+      "candidate_id": "",
+      "head_sha": "",
+      "tree_sha": "",
+      "base_sha": "",
+      "frozen_at": "2026-11-10T19:30:00Z",
+      "immutable_inputs_sha256": "",
+      "mutation_events": [],
+      "settlement_ref": "set-fixture-0001"
+    },
+    "settlement": {
+      "settlement_id": "set-fixture-0001",
+      "as_of": "2026-11-10T19:45:00Z",
+      "pre_audit_checks": [
+        {
+          "check_id": "PA-1",
+          "state": "pass",
+          "evidence_ref": "EV-1"
+        }
+      ],
+      "review_sources": [
+        {
+          "source_id": "SR-1",
+          "state": "SETTLED",
+          "disposition_authority_ref": null,
+          "disposition_scope": null,
+          "expires": null
+        }
+      ],
+      "settled": true
+    },
+    "head_history": {
+      "change_id": 42,
+      "status": "VERIFIED",
+      "heads": [
+        {
+          "seq": 1,
+          "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "kind": "INITIAL",
+          "published_at": "2026-11-10T18:00:00Z"
+        }
+      ]
+    },
+    "revision_state": {
+      "items": {
+        "aegis.plan.fixture-0001": [
+          {
+            "event_id": "FX-0001",
+            "item_id": "aegis.plan.fixture-0001",
+            "plan_id": "PLAN-FIXTURE-0001",
+            "event_kind": "REVISION_RECORDED",
+            "revision_counted": true,
+            "reopen_counted": false,
+            "stop_state": null,
+            "authority_ref": {
+              "authority_kind": "REGISTER_ENTRY",
+              "authority_ref_id": "APR-FIXTURE-C11A-0001",
+              "authority_ref_sha256": "",
+              "holder_role": "programme-lead",
+              "holder_identity_ref": null
+            },
+            "evidence_refs": [
+              {
+                "ref_id": "checkpoint-fixture",
+                "ref_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+              }
+            ],
+            "recorded_at": "2026-11-10T18:10:00Z",
+            "recorded_by": "records-steward"
+          },
+          {
+            "event_id": "FX-0002",
+            "item_id": "aegis.plan.fixture-0001",
+            "plan_id": "PLAN-FIXTURE-0001",
+            "event_kind": "REVISION_RECORDED",
+            "revision_counted": true,
+            "reopen_counted": false,
+            "stop_state": null,
+            "authority_ref": {
+              "authority_kind": "REGISTER_ENTRY",
+              "authority_ref_id": "APR-FIXTURE-C11A-0001",
+              "authority_ref_sha256": "",
+              "holder_role": "programme-lead",
+              "holder_identity_ref": null
+            },
+            "evidence_refs": [
+              {
+                "ref_id": "checkpoint-fixture",
+                "ref_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+              }
+            ],
+            "recorded_at": "2026-11-10T18:10:00Z",
+            "recorded_by": "records-steward"
+          },
+          {
+            "event_id": "FX-0003",
+            "item_id": "aegis.plan.fixture-0001",
+            "plan_id": "PLAN-FIXTURE-0001",
+            "event_kind": "STOP_STATE_SET",
+            "revision_counted": false,
+            "reopen_counted": false,
+            "stop_state": "OPEN",
+            "authority_ref": {
+              "authority_kind": "REGISTER_ENTRY",
+              "authority_ref_id": "APR-FIXTURE-C11A-0001",
+              "authority_ref_sha256": "",
+              "holder_role": "programme-lead",
+              "holder_identity_ref": null
+            },
+            "evidence_refs": [
+              {
+                "ref_id": "checkpoint-fixture",
+                "ref_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+              }
+            ],
+            "recorded_at": "2026-11-10T18:10:00Z",
+            "recorded_by": "records-steward"
+          }
+        ]
+      },
+      "change_ledger": [],
+      "register_text": "# SYNTHETIC FIXTURE APPROVAL REGISTER - NOT AN APPROVAL\n\nThis file exists only inside a temporary fixture repository built by\ntools/aegis_verdict_gate/tests/_fixtures.py. It is not the repository\napproval register and it grants nothing.\n\n| Entry | Status | Scope |\n| --- | --- | --- |\n| APR-FIXTURE-C11A-0001 | ACTIVE | repo=example-org/example-repo; change_id=42; head_sha=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; merge_target_ref=refs/heads/main |\n| APR-FIXTURE-STORE-0001 | ACTIVE | store=docs/approvals/revision-state |\n| EXC-FIXTURE-0001 | ACTIVE | repo=example-org/example-repo; change_id=42; head_sha=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; merge_target_ref=refs/heads/main |\n"
+    },
+    "stage_records": [
+      {
+        "stage": "B",
+        "record_id": "rec-b-0001",
+        "content": "# STAGE B - FIXTURE PLAN AUDIT\n\nSynthetic fixture record. Verdict: ACCEPT at the frozen head.\n",
+        "verdict": "ACCEPT",
+        "holder_identity_ref": "plan-audit-reviewer",
+        "independence_class": "INDEPENDENT",
+        "snapshot_identity": "snap-b-2026-11-10",
+        "completed_at": "2026-11-10T19:05:00Z"
+      },
+      {
+        "stage": "D",
+        "record_id": "rec-d-0001",
+        "content": "# STAGE D - FIXTURE IMPLEMENTATION AUDIT\n\nSynthetic fixture record. Verdict: ACCEPT at the frozen head.\n",
+        "verdict": "REVISE",
+        "holder_identity_ref": "delta-independent-reviewer",
+        "independence_class": "INDEPENDENT",
+        "snapshot_identity": "snap-d-2026-11-10",
+        "completed_at": "2026-11-10T19:10:00Z"
+      },
+      {
+        "stage": "E",
+        "record_id": "rec-e-0001",
+        "content": "# STAGE E - FIXTURE EVIDENCE RUN\n\nSynthetic fixture record. Verdict: PASS at the frozen head.\n",
+        "verdict": "PASS",
+        "holder_identity_ref": "evidence-lineage-steward",
+        "independence_class": "INDEPENDENT",
+        "snapshot_identity": "snap-e-2026-11-10",
+        "completed_at": "2026-11-10T19:15:00Z"
+      }
+    ]
+  },
+  "expected": {
+    "readiness": false,
+    "blocker_codes": [
+      "STAGE_VERDICT_NOT_ACCEPTED"
+    ]
+  }
+}
