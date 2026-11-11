@@ -402,6 +402,71 @@ author's summary, nor a completed task.** Those are inputs. The verdict is a
 posted, accepted review by an agent that is not the author, naming the exact
 head. Anything else that reads as approval is not one.
 
+### Advisory review triggers and findings policy (C3.3)
+
+**Status and scope.** This subsection records the advisory automated-review
+trigger and finding-handling policy. It adds no stage, no gate, no receipt row
+and no bound field. It is effective only through the repository's rule-change
+route when the change that adds it is reviewed and merged; until then it is a
+proposal. The R3 finding-triage rubric is owned by the C2.1 amendment at
+[R3 finding-triage rubric](#r3-finding-triage-rubric); this subsection
+references that rubric and does not restate or duplicate it.
+
+**Trigger set.** One advisory automated review is triggered by the existing
+[deepseek-code-review.yml](../.github/workflows/deepseek-code-review.yml) workflow
+on `pull_request_target` `opened`, `reopened`, `synchronize` and
+`ready_for_review`, and by the `@deepseek` issue-comment rule for authorised
+associations. No other trigger is authorised here. A body edit (`edited`) is
+not a review trigger: the pull-request body is checked by the separate
+structural bound-field step, and re-running the whole pipeline on a body edit
+is the overhead this policy removes.
+
+**Advisory is not a gate.** The automated review is advisory coverage. It is
+not a required context, not an `MG1`-`MG5` condition, not an approval and
+not a green result. Its absence, failure, usage-limit notice or superseded-head
+result never satisfies a mandatory review condition, and it never waives DCO,
+`validate-skills`, `gate-guard` or any other required validation. A finding
+that is mandatory under the R3 rubric stays blocking however the automated
+review labels it.
+
+**Findings triage.** Every advisory finding is triaged under the R3 rubric at
+[R3 finding-triage rubric](#r3-finding-triage-rubric), by reference. The four
+named R3 classes (BLOCKING, RESIDUAL, NIT and the non-exhaustive expansions)
+are preserved exactly; the list is not exhaustive and a severity label
+("low", "theoretical", "pre-existing", "out-of-scope", "follow-up") cannot
+disposition a mandatory finding as non-blocking. An unmet applicable
+acceptance, authorization, security or required-validation condition remains
+blocking. Every disposition carries the finding id, candidate head, evidence
+reference, classification, decision-maker, outcome and, for a follow-up, a
+backlog id; a row without those fields is not a disposition.
+
+**Carried findings.** A finding carried across heads is recorded in the PR's
+triage table with its original finding id, the head that raised it, the current
+head, the classification and the decision. Carried findings stay visible; a
+carried finding is never silently dropped because the head moved or because a
+later automated run did not repeat it. A blocking finding can justify a new
+head only under the existing R3/R4 rules, and the head still counts against the
+review-head budget.
+
+**No severity-label waiver.** There is no severity-label waiver, no
+"advisory-only" waiver of a mandatory finding, and no second triage queue. The
+decision-maker for a residual/nit disposition is the named reviewer or owner
+already required by the existing workflow; the automated review is an input,
+not the decision.
+
+**Trigger and yield measurement.** The following fields are recordable from
+existing evidence for C4.2 and add no telemetry: review run id, candidate head,
+trigger (`opened`/`reopened`/`synchronize`/`ready_for_review`/comment),
+result or unavailable notice, finding counts by R3 class, triaged count, fixed
+count, accepted-residual/nit count, and carried-finding count. The fields are
+descriptive; no rate is a programme-completion or efficiency claim.
+
+**Boundary.** This subsection registers no new required context and makes no
+settings, branch-protection, permissions or CI change. It does not create a
+second policy file, a second rubric or an enforcement claim. The R3 rubric's
+normative home remains the C2.1 amendment at
+[R3 finding-triage rubric](#r3-finding-triage-rubric).
+
 ## Gate-passing paths, finding triage and authenticated verdicts (C2.1)
 
 **Status and scope.** This is one bounded normative amendment, adopted on merge

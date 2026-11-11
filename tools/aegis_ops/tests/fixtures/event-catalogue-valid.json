@@ -1,0 +1,81 @@
+{
+  "catalogue": [
+    {
+      "action": "opened",
+      "authority_role": "stage-commissioner",
+      "deterministic_check": "stage record bound to the exact head",
+      "duplicate_semantics": "NO_OP",
+      "event_name": "pull_request",
+      "source": "pull_request",
+      "stage_action": "START_STAGE_B",
+      "state_update": "stage=B ACTIVE"
+    },
+    {
+      "action": "synchronize",
+      "authority_role": "stage-commissioner",
+      "deterministic_check": "head-bound freeze/snapshot",
+      "duplicate_semantics": "RESTART_NOT_ALLOWED",
+      "event_name": "pull_request",
+      "source": "pull_request",
+      "stage_action": "INVALIDATE_AND_REBIND",
+      "state_update": "stage=STALE"
+    },
+    {
+      "action": "edited",
+      "authority_role": "none",
+      "deterministic_check": "no body-triggered pipeline re-run",
+      "duplicate_semantics": "NO_OP",
+      "event_name": "pull_request",
+      "source": "pull_request",
+      "stage_action": "NO_STAGE_ACTION",
+      "state_update": "unchanged"
+    },
+    {
+      "action": "reopened",
+      "authority_role": "stage-commissioner",
+      "deterministic_check": "durable resume record",
+      "duplicate_semantics": "NO_OP",
+      "event_name": "pull_request",
+      "source": "pull_request",
+      "stage_action": "RESUME_FROM_RECORD",
+      "state_update": "stage=ACTIVE"
+    },
+    {
+      "action": "",
+      "authority_role": "repository",
+      "deterministic_check": "full suite on the push lane",
+      "duplicate_semantics": "NO_OP",
+      "event_name": "push",
+      "source": "push",
+      "stage_action": "PUSH_LANE_DETECTION",
+      "state_update": "none"
+    },
+    {
+      "action": "created",
+      "authority_role": "reviewer",
+      "deterministic_check": "authorised association check",
+      "duplicate_semantics": "NO_OP",
+      "event_name": "issue_comment",
+      "source": "issue_comment",
+      "stage_action": "ADVISORY_REVIEW_TRIGGER",
+      "state_update": "none"
+    }
+  ],
+  "events": [
+    {
+      "action": "opened",
+      "delivery_id": "d-1",
+      "event_name": "pull_request",
+      "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sequence": 1
+    },
+    {
+      "action": "edited",
+      "delivery_id": "d-2",
+      "event_name": "pull_request",
+      "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sequence": 2
+    }
+  ],
+  "schema_version": "aegis.ops-event-catalogue/v1"
+}
