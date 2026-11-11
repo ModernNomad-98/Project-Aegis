@@ -1,0 +1,52 @@
+{
+  "case_id": "adversarial-unauthorized-exception",
+  "exception_ref": "self-written-4th-head-exception",
+  "expected": [
+    "AUTHORITY_ABSENT"
+  ],
+  "head_history": {
+    "payload": {
+      "candidate_head": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+      "change_id": "c1-2-c14-fixture-0001",
+      "export_ref": "export-fourth-head-0001",
+      "exported_at": "2026-11-11T05:20:00Z",
+      "heads": [
+        {
+          "counted_at": "2026-11-10T18:00:00Z",
+          "exception_ref": null,
+          "head_sha": "2a4c6e8f0b1d3f5a7c9e1b3d5f7a9c2e4b6d8f0a",
+          "kind": "INITIAL",
+          "seq": 1
+        },
+        {
+          "counted_at": "2026-11-10T22:00:00Z",
+          "exception_ref": null,
+          "head_sha": "6f8e4d2c0b9a7f5e3d1c9b8a6f4e2d0c8b6a5f3e",
+          "kind": "BATCHED_BLOCKING_FIX",
+          "seq": 2
+        },
+        {
+          "counted_at": "2026-11-11T02:00:00Z",
+          "exception_ref": "self-written-4th-head-exception",
+          "head_sha": "8e0f2a4c6b8d0e1f3a5c7b9d2e4f6a8c0b1d3e5f",
+          "kind": "FINAL_BLOCKING_FIX",
+          "seq": 3
+        }
+      ],
+      "schema_version": "aegis.change-state/head-history/v1"
+    },
+    "provenance": {
+      "as_of": "2026-11-11T05:22:00Z",
+      "declared_payload_bytes": 704,
+      "declared_payload_sha256": "7aac1129b85d98fd865ecafa32e87e5c5a0c903db266e602710d268abc1dc7dc",
+      "producer_identity_ref": "role-programme-lead",
+      "producer_role": "head-history-export",
+      "source_ref": "head-history/fourth-head",
+      "status": "VERIFIED"
+    }
+  },
+  "notes": "T7 general authority is undefined; used=3 without an ACTIVE scoped exception from the actual authority is blocked, and an exception is never an approval.",
+  "provenance_status": "VERIFIED",
+  "row": 10,
+  "scenario": "a self-written fourth-head exception is cited as if it were an authority"
+}

@@ -1,0 +1,29 @@
+{
+  "payload": {
+    "archive_bytes": 4096,
+    "archive_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "base": "7c1d3e5f9a2b4c6d8e0f1a3b5c7d9e2f4a6b8c0d",
+    "change_id": "c1-2-c14-fixture-0001",
+    "commit": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "created_at": "2026-11-11T05:25:00Z",
+    "created_by": "snapshot-producer",
+    "file_count": 12,
+    "flags": [
+      "--format=tar"
+    ],
+    "format_version": "git-archive-tar/v1",
+    "method": "git-archive",
+    "retention_ref": "_A/strengthening-program-2026-11-04/COMMANDER-DECISION-PACKET-2026-11-06/AEGIS-COMPLETION-2026-11-08/PROGRAMME-EXECUTION-2026-11-10/snapshots/",
+    "schema_version": "aegis.change-state/snapshot/v1",
+    "snapshot_id": "snapshot:9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "tree": "4b8e2f6a9c0d1e3f5a7b9c2d4e6f8a0b1c3d5e7f"
+  },
+  "provenance": {
+    "as_of": "2026-11-11T05:26:00Z",
+    "declared_payload_bytes": 742,
+    "declared_payload_sha256": "dbb20ba633a35ce3cc1433e54a93281eb0477e8fcfba75450ac350e09d40b99d",
+    "producer_identity_ref": "role-snapshot-producer",
+    "producer_role": "snapshot-producer",
+    "source_ref": "snapshots/c12c14-mismatch"
+  }
+}

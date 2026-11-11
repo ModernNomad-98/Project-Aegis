@@ -1,0 +1,38 @@
+{
+  "payload": {
+    "applicability": "REQUIRED",
+    "bytes": 289,
+    "change_id": "c1-2-c14-fixture-0001",
+    "completed_at": "2026-11-11T05:30:00Z",
+    "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "holder_identity_ref": "role-b-plan-auditor",
+    "independence_class": "INDEPENDENT",
+    "record_id": "stage-B-c12c14-0001",
+    "record_path": "records/B.json",
+    "replacement_of": null,
+    "schema_version": "aegis.change-state/stage-declaration/v1",
+    "sha256": "c4817b86b31c1abc73822b3673122d1f795f9d39b4d0fc2a2479aa006000c8ed",
+    "snapshot_identity": "snapshot:9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "stage": "B",
+    "verdict": "ACCEPT",
+    "waiver_ref": null
+  },
+  "provenance": {
+    "as_of": "2026-11-11T05:30:00Z",
+    "declared_payload_bytes": 590,
+    "declared_payload_sha256": "338e26bbc37a9ae4be18d28d1e7b3f0bcd110ad548d2bba1f18cf44836043b42",
+    "producer_identity_ref": "role-b-plan-auditor",
+    "producer_role": "role-b-plan-auditor",
+    "source_ref": "stage-B"
+  },
+  "record": {
+    "change_id": "c1-2-c14-fixture-0001",
+    "completed_at": "2026-11-11T05:30:00Z",
+    "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "notes": "Synthetic plan-audit record; not a real approval.",
+    "record_id": "stage-B-c12c14-0001",
+    "reviewer_role": "records-steward",
+    "stage": "B",
+    "verdict": "ACCEPT"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "payload": {
+    "applicability": "REQUIRED",
+    "bytes": 302,
+    "change_id": "c1-2-c14-fixture-0001",
+    "completed_at": "2026-11-11T05:32:00Z",
+    "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "holder_identity_ref": "role-d-delta-reviewer",
+    "independence_class": "INDEPENDENT",
+    "record_id": "stage-D-c12c14-0001",
+    "record_path": "records/D.json",
+    "replacement_of": null,
+    "schema_version": "aegis.change-state/stage-declaration/v1",
+    "sha256": "5e363a428c28fd08cf886ccca762a229e9b2f8299cf1dfdf902cec40e3d9fb34",
+    "snapshot_identity": "snapshot:9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "stage": "D",
+    "verdict": "ACCEPT",
+    "waiver_ref": null
+  },
+  "provenance": {
+    "as_of": "2026-11-11T05:32:00Z",
+    "declared_payload_bytes": 592,
+    "declared_payload_sha256": "26535437da16408dc4ec8bc1d32852bbf5be4abdad7ad2f1d2932e865308e661",
+    "producer_identity_ref": "role-d-delta-reviewer",
+    "producer_role": "role-d-delta-reviewer",
+    "source_ref": "stage-D"
+  },
+  "record": {
+    "change_id": "c1-2-c14-fixture-0001",
+    "completed_at": "2026-11-11T05:32:00Z",
+    "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "notes": "Synthetic delta-review record; not a real approval.",
+    "record_id": "stage-D-c12c14-0001",
+    "reviewer_role": "delta-independent-reviewer",
+    "stage": "D",
+    "verdict": "ACCEPT"
+  }
+}
