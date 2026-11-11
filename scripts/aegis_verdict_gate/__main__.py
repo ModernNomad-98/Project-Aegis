@@ -2,8 +2,8 @@
 
 Usage (from the repository root):
 
-    python -m tools.aegis_verdict_gate --self-test
-    python -m tools.aegis_verdict_gate check --repo-root . \
+    python -P scripts/aegis_verdict_gate/run.py --self-test
+    python -P scripts/aegis_verdict_gate/run.py check --repo-root . \
         --verdict verdict.json --head-history history.json \
         --freeze freeze.json --settlement settlement.json \
         --stage-records-dir stage-records [--candidate-head HEX40] [--json]
@@ -46,7 +46,7 @@ EXIT_INTERNAL = 3
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="python -m tools.aegis_verdict_gate",
+        prog="python -P scripts/aegis_verdict_gate/run.py",
         description=(
             "Read-only fail-closed checker for aegis.verdict-bound/v2.1 verdicts and "
             "readiness. Auditable tooling, not enforcement."

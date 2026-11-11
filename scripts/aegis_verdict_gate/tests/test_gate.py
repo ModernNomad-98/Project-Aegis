@@ -16,13 +16,13 @@ import sys
 import unittest
 from unittest import mock
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+SCRIPTS_DIR = pathlib.Path(__file__).resolve().parents[2]
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
 import _fixtures  # noqa: E402
-from tools.aegis_verdict_gate import __main__ as cli  # noqa: E402
-from tools.aegis_verdict_gate import gate, records  # noqa: E402
+from aegis_verdict_gate import __main__ as cli  # noqa: E402
+from aegis_verdict_gate import gate, records  # noqa: E402
 
 HEAD = "a" * 40
 

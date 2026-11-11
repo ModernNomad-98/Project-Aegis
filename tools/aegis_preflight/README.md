@@ -17,7 +17,7 @@ cannot see a provider event and does not replace the repository's CI.
 The preflight composes **exactly two** read-only tools and nothing else:
 
 1. the merged C1.1a verdict/readiness checker
-   (`python -m tools.aegis_verdict_gate`, PF-07), invoked with the supplied
+   (`python -P scripts/aegis_verdict_gate/run.py`, PF-07), invoked with the supplied
    inputs and `--json`;
 2. the C2.3 evidence-reuse validator
    (`python -m tools.aegis_evidence_reuse`, PF-08).

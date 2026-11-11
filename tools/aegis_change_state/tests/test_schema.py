@@ -7,8 +7,11 @@ import pathlib
 import sys
 import unittest
 
-if str(pathlib.Path(__file__).resolve().parents[3]) not in sys.path:
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
+SCRIPTS_DIR = REPO_ROOT / "scripts"
+for directory in (REPO_ROOT, SCRIPTS_DIR):
+    if str(directory) not in sys.path:
+        sys.path.insert(0, str(directory))
 
 import _fixtures  # noqa: E402
 from tools.aegis_change_state import schema  # noqa: E402
@@ -31,7 +34,7 @@ class CanonicalizationTest(unittest.TestCase):
         """The local JCS implementation must agree with the merged checker's."""
 
         try:
-            from tools.aegis_verdict_gate import canonical as module
+            from aegis_verdict_gate import canonical as module
         except ImportError:
             self.skipTest("merged checker is absent at this head: A7 rebind required (UNRUN)")
         for value in (
@@ -155,7 +158,7 @@ class MergedLoaderRoundTripTest(unittest.TestCase):
 
     def test_merged_checker_loaders_accept_produced_envelopes(self):
         try:
-            from tools.aegis_verdict_gate import inputs
+            from aegis_verdict_gate import inputs
         except ImportError:
             self.skipTest("merged checker is absent at this head: A7 rebind required (UNRUN)")
 

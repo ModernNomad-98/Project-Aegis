@@ -711,8 +711,8 @@ def _checker_command(ctx: Context, stage_dir: Path) -> typing.List[str]:
     bundle = ctx.bundle
     command = [
         sys.executable,
-        "-m",
-        "tools.aegis_verdict_gate",
+        "-P",
+        "scripts/aegis_verdict_gate/run.py",
         "check",
         "--repo-root",
         str(ctx.repo_root),
@@ -1061,7 +1061,7 @@ def check_pf10(ctx: Context, source_root: typing.Optional[Path] = None) -> typin
     second = models.canonical_bytes(ctx.bundle.document)
     if first != second:
         issues.append("canonical serialization is not byte-identical across two runs")
-    if models.SUBPROCESS_MODULES != ("tools.aegis_verdict_gate", "tools.aegis_evidence_reuse"):
+    if models.SUBPROCESS_MODULES != ("scripts/aegis_verdict_gate/run.py", "tools.aegis_evidence_reuse"):
         issues.append("the subprocess allowlist is not exactly the merged checker and the reuse validator")
     if models.GIT_SUBCOMMANDS != ("rev-parse", "cat-file", "log", "merge-base"):
         issues.append("the git allowlist is not the read-only plumbing set")

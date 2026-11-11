@@ -264,13 +264,13 @@ become `VERIFIED`, and a `VERIFIED` binding over
 ## How to feed the merged checker
 
     python -m tools.aegis_change_state build --out <tmp>
-    python -m tools.aegis_verdict_gate check         --repo-root .         --verdict <verdict.json>         --freeze <tmp>/freeze/<change-id>.json         --settlement <tmp>/settlement/<change-id>.json         --head-history <tmp>/head-history/<change-id>.json         --stage-records-dir <tmp>/stage-records         --records-dir docs/approvals/revision-state --json
+    python -P scripts/aegis_verdict_gate/run.py check         --repo-root .         --verdict <verdict.json>         --freeze <tmp>/freeze/<change-id>.json         --settlement <tmp>/settlement/<change-id>.json         --head-history <tmp>/head-history/<change-id>.json         --stage-records-dir <tmp>/stage-records         --records-dir docs/approvals/revision-state --json
 
 The checker remains the readiness authority. A real run is blocked by design
 while T24 (store UNVERIFIED) and T6 (auth UNVERIFIED) are open; the result must
 be reported verbatim with its blocker codes and `assurance.claim = "AUDITABLE"`,
 never as green. See
-[the checker README](../../../tools/aegis_verdict_gate/README.md) and
+[the checker README](../../../scripts/aegis_verdict_gate/README.md) and
 [the revision-state store](../revision-state/README.md).
 
 ## Retention, privacy and custody

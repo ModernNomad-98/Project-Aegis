@@ -34,7 +34,7 @@ def load_case(name: str) -> dict:
 
 
 def _checker_fixtures():
-    path = REPO_ROOT / "tools" / "aegis_verdict_gate" / "tests" / "_fixtures.py"
+    path = REPO_ROOT / "scripts" / "aegis_verdict_gate" / "tests" / "_fixtures.py"
     spec = importlib.util.spec_from_file_location("aegis_merged_checker_fixtures", path)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None

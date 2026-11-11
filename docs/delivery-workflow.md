@@ -487,15 +487,15 @@ second field list and no competing policy; the merged checker's
 [the evidence-binding catalog](conformance/evidence-binding-v1.json) remains the
 companion catalog convention.
 
-**The merged checker of record.** `tools/aegis_verdict_gate/` is the merged
+**The merged checker of record.** `scripts/aegis_verdict_gate/` is the merged
 C1.1a checker: a standard-library-only, read-only checker whose CLI is
-`python -m tools.aegis_verdict_gate check|validate --repo-root . --verdict
+`python -P scripts/aegis_verdict_gate/run.py check|validate --repo-root . --verdict
 PATH --freeze PATH --settlement PATH --head-history PATH --stage-records-dir
 PATH [--candidate-head HEX40] [--base-ref origin/main] [--json]`. Its exit codes
 are **0** readiness true (reachable only in fixture mode), **1** not ready or
 blocked, **2** invalid input and **3** internal error; it emits deterministic
 JSON with `assurance.claim = AUDITABLE` and `assurance.mounted_coverage =
-UNKNOWN`. See its [README](../tools/aegis_verdict_gate/README.md).
+UNKNOWN`. See its [README](../scripts/aegis_verdict_gate/README.md).
 
 **The status that must be stated with every consumption:**
 

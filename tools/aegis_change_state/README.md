@@ -44,7 +44,7 @@ This README does not restate them.
 
 ## What it does not do
 
-- It does not modify `tools/aegis_verdict_gate/` or
+- It does not modify `scripts/aegis_verdict_gate/` or
   `docs/approvals/revision-state/`; both are consumed read-only by
   reference. The checker's blocker vocabulary, exit codes and field
   catalogue remain the only contract implementation.
