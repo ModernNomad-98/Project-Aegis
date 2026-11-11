@@ -59,6 +59,15 @@ class SelfTestCliTest(unittest.TestCase):
         self.assertEqual(report["readiness"], "NOT_COMPUTED")
 
 
+class SelfTestAliasTest(unittest.TestCase):
+    def test_top_level_self_test_flag_matches_the_subcommand(self):
+        alias = run_module("--self-test")
+        subcommand = run_module("self-test")
+        self.assertEqual(alias.returncode, 0, alias.stderr.decode("utf-8", "replace"))
+        self.assertEqual(alias.stdout, subcommand.stdout)
+        self.assertTrue(json.loads(alias.stdout.decode("utf-8"))["ok"])
+
+
 class BuildAndValidateCliTest(unittest.TestCase):
     def setUp(self):
         self.temporary = _fixtures.temporary_directory()

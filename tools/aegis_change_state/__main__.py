@@ -330,7 +330,13 @@ def build_parser() -> argparse.ArgumentParser:
         prog="python -m tools.aegis_change_state",
         description="Aegis C1.2 change-state producers/validators (auditable tooling, not enforcement)",
     )
-    subparsers = parser.add_subparsers(dest="command", required=True)
+    parser.add_argument(
+        "--self-test",
+        action="store_true",
+        dest="self_test",
+        help="alias for the self-test subcommand (the plan's documented command 1)",
+    )
+    subparsers = parser.add_subparsers(dest="command", required=False)
 
     self_test = subparsers.add_parser("self-test", help="run the built-in canonical/append-only checks")
     self_test.set_defaults(func=cmd_self_test)
@@ -369,6 +375,10 @@ def main(argv: typing.Optional[typing.Sequence[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
+        if getattr(args, "self_test", False):
+            return cmd_self_test(args)
+        if not getattr(args, "command", None):
+            parser.error("a command is required: self-test, validate, build or snapshot-manifest")
         return int(args.func(args))
     except (schema.SchemaError, snapshot.SnapshotError) as error:
         print(_json_text({"ok": False, "error": "invalid input", "detail": str(error)}))
