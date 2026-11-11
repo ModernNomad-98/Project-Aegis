@@ -106,7 +106,7 @@ Where a guide-level statement here differs from the contract of record or the [d
 - **E1 closure evidence:** E1.6 integrated verification and the T12/T13 closure decisions remain UNRUN/open; the E1.4/E1.5 records are PROPOSED/UNVERIFIED evidence, not acceptance.
 - **E3 item-2:** 18 PASS / 3 FAIL / 1 UNRUN; item-2 is not accepted; one failed row is irreparable in this attempt; no 22/22 claim.
 - **Item-8:** the schema annotation is merged and the hosted acceptance row P3-08-01 is **PASS** under bounded acceptance `281f5b7e…`; this is not full item-8/E1 closure or an enforcement/readiness claim.
-- **Item-5:** export to an owner-authorized destination occurred; the retrieval evidence is recorded; the source-documentation link criterion remains NOT MET at this head.
+- **Item-5:** export and independent retrieval occurred; the source-documentation link criterion 05-G is **MET** (#1030 merged `b2763f18`; acceptance `0e1b0396…`). Item-5 is not fully closed (separate criteria/authority remain); no publication or platform claim.
 - **External qualification:** C4.1 external cells and C4.3 independent review are UNRUN; the compatibility matrix therefore contains zero qualified cells.
 - **Pilot evidence:** a bounded pilot shortfall is recorded; no economics or general-overhead claim follows.
 - **Host coverage:** mounted composition is UNKNOWN; no host-containment or enforced-boundary statement is available.

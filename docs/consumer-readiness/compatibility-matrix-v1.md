@@ -117,7 +117,7 @@ Every prerequisite below is open unless stated; the owner is the programme owner
 | 3 | C4.1 qualification evidence | Programme owner | Evidence-only; 0 qualified cells | C4.1 support matrix (programme record, 2,095 B) |
 | 4 | C4.2 bounded pilot shortfall | Programme owner | Bounded record; no economics claim | Pilot baseline/final records (programme) |
 | 5 | C4.3 independent review of this evidence set | Independent reviewer | `UNRUN`; request drafted, reviewer not assigned | E4.3 review request record (programme) |
-| 6 | Item-5 preservation/retrieval | Programme owner | Export executed to owner-authorized destination; `05-D` MET; `05-G` NOT MET | Export/retrieval receipts in programme records |
+| 6 | Item-5 preservation/retrieval | Programme owner | Export executed; independent retrieval `05-D` MET; source link `05-G` MET (#1030 merged `b2763f18`; acceptance `0e1b0396…`); item-5 not fully closed | Export/retrieval/source-link receipts in programme records |
 | 7 | Item-8 hosted schema-only proof (T14/P14) | Programme owner | `P3-08-01` **PASS** (bounded) | Hosted run 43047801794; acceptance REV2 `281f5b7e…`; no full item-8/E1 closure |
 | 8 | Contract design-basis acceptance (T2) | Programme owner | Open; proposed documents marked PROPOSED | Contract records (programme) |
 | 9 | Enforcement/coverage decisions (T5/T6/T7) | Programme owner | Open | Mounted coverage UNKNOWN; authentication UNDEFINED; exception/unavailable authority undefined |
@@ -153,7 +153,7 @@ Only checks affected by this documentation change are listed; all others are reu
 | Store/evidence provenance | UNVERIFIED | Resolve AUTH-STORE/decision; re-derive provenance |
 | E1 closure | UNRUN | T12/T13 decisions and E1.6 verification |
 | E3 item-2 | 18/3/1, not accepted | T15 outcome; bounded proof/no-repair route |
-| Item-5 source link | `05-G` NOT MET | Owner/records decision on authorized source-documentation link |
+| Item-5 source link | `05-G` **MET** | #1030 merged `b2763f18`; acceptance `0e1b0396…`; item-5 not fully closed |
 | Item-8 hosted row | `P3-08-01` **PASS** | Hosted run 43047801794; acceptance REV2 `281f5b7e…`; durable archive manifest `c147a8e2…` |
 | Consumer status presentation | Not delivered | E2 implementation under its own plan/authority |
 
