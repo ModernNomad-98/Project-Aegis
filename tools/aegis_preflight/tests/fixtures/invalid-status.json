@@ -1,0 +1,18 @@
+{
+  "case_id": "invalid-status",
+  "notes": "MG2 is recorded as 'green' instead of a closed status token; a bypass cannot be displayed green (PF-03).",
+  "checker_case": "valid-verdict",
+  "mutations": [
+    {
+      "op": "set",
+      "path": "inputs.gate_status.MG2",
+      "value": "green"
+    }
+  ],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-03": "FAIL"
+    }
+  }
+}

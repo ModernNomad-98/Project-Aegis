@@ -1,0 +1,22 @@
+{
+  "case_id": "clean-bundle",
+  "notes": "A fully synthetic clean preflight bundle composed over the merged checker's valid fixture; run with --fixture-mode. All ten checks pass and exit 0 means mechanical checks passed only.",
+  "checker_case": "valid-verdict",
+  "mutations": [],
+  "expected": {
+    "exit_code": 0,
+    "statuses": {
+      "PF-01": "PASS",
+      "PF-02": "PASS",
+      "PF-03": "PASS",
+      "PF-04": "PASS",
+      "PF-05": "PASS",
+      "PF-06": "PASS",
+      "PF-07": "PASS",
+      "PF-08": "PASS",
+      "PF-09": "PASS",
+      "PF-10": "PASS"
+    }
+  },
+  "include_reuse": true
+}

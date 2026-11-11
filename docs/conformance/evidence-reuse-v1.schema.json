@@ -1,0 +1,532 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aegis:evidence-reuse:1",
+  "title": "aegis.evidence-reuse/1",
+  "description": "Closed companion schema for evidence-reuse decisions. A record preserves the original evidence identity, binds source and target 40-character heads, names an independent qualifier and a decision authority, and explicitly excludes copied PASS, CI waiver, approval and behavioural-equivalence claims. A VALID decision is a record, never an approval or a merge permission.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "reuse_id",
+    "subject",
+    "source",
+    "target",
+    "delta_class",
+    "affected_inputs",
+    "full_diff",
+    "comparison",
+    "excluded_claims",
+    "target_delta_checks",
+    "independence",
+    "decision",
+    "decision_authority",
+    "invalid_after",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aegis.evidence-reuse/1"
+    },
+    "reuse_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "change_id"
+      ],
+      "properties": {
+        "repo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "owner",
+            "name"
+          ],
+          "properties": {
+            "owner": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "change_id": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_ids",
+        "source_head",
+        "source_tree",
+        "source_base",
+        "source_records_sha256",
+        "requirement_ids"
+      ],
+      "properties": {
+        "evidence_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_head": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_base": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "source_records_sha256": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "requirement_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_head",
+        "target_tree",
+        "target_base"
+      ],
+      "properties": {
+        "target_head": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "target_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "target_base": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "delta_class": {
+      "enum": [
+        "DOCS_TEXT_ONLY",
+        "DOCSTRING_COMMENT_TEXT_ONLY_CODE",
+        "TEST_CHANGE",
+        "CONFIG_WORKFLOW_POLICY_GENERATED_DEPENDENCY",
+        "BEHAVIOR_CHANGE",
+        "OTHER"
+      ]
+    },
+    "affected_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "full_diff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name_only_ref",
+        "name_only_sha256",
+        "file_count"
+      ],
+      "properties": {
+        "name_only_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name_only_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "file_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "tool",
+        "tool_version",
+        "ast_stripped",
+        "ast_equality_sha256"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ast_stripped": {
+          "type": "boolean"
+        },
+        "ast_equality_sha256": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "excluded_claims": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "APPROVAL",
+          "BEHAVIORAL_EQUIVALENCE",
+          "CI_WAIVER",
+          "COPIED_PASS"
+        ]
+      }
+    },
+    "target_delta_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "check_id",
+          "kind",
+          "result",
+          "evidence_ref"
+        ],
+        "properties": {
+          "check_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "DIFF_SCOPE",
+              "REQUIRED_CI",
+              "AFFECTED_INPUTS",
+              "REVIEWED_DIFF"
+            ]
+          },
+          "result": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNRUN"
+            ]
+          },
+          "evidence_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "independence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "qualifier_identity_ref",
+        "class",
+        "attestation_ref"
+      ],
+      "properties": {
+        "qualifier_identity_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class": {
+          "const": "INDEPENDENT"
+        },
+        "attestation_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "decision": {
+      "enum": [
+        "PROPOSED",
+        "VALID",
+        "INVALID",
+        "STALE"
+      ]
+    },
+    "decision_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority_kind",
+        "authority_ref_id",
+        "authority_ref_sha256"
+      ],
+      "properties": {
+        "authority_kind": {
+          "enum": [
+            "REGISTER_ENTRY",
+            "OWNER_LINE_RECORD",
+            "UNKNOWN"
+          ]
+        },
+        "authority_ref_id": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "authority_ref_sha256": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "invalid_after": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "TARGET_HEAD_MOVE",
+          "SOURCE_EVIDENCE_CHANGE",
+          "POLICY_CHANGE"
+        ]
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_ref",
+        "as_of",
+        "producer_role",
+        "producer_identity_ref",
+        "declared_payload_sha256",
+        "declared_payload_bytes"
+      ],
+      "properties": {
+        "source_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "as_of": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producer_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "producer_identity_ref": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "declared_payload_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "declared_payload_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "delta_class": {
+            "const": "DOCSTRING_COMMENT_TEXT_ONLY_CODE"
+          }
+        },
+        "required": [
+          "delta_class"
+        ]
+      },
+      "then": {
+        "properties": {
+          "comparison": {
+            "properties": {
+              "ast_stripped": {
+                "const": true
+              },
+              "ast_equality_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "delta_class": {
+            "enum": [
+              "TEST_CHANGE",
+              "CONFIG_WORKFLOW_POLICY_GENERATED_DEPENDENCY",
+              "BEHAVIOR_CHANGE",
+              "OTHER"
+            ]
+          }
+        },
+        "required": [
+          "delta_class"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "not": {
+              "const": "VALID"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "VALID"
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "target_delta_checks": {
+            "minItems": 1
+          },
+          "independence": {
+            "properties": {
+              "class": {
+                "const": "INDEPENDENT"
+              }
+            }
+          },
+          "decision_authority": {
+            "properties": {
+              "authority_kind": {
+                "enum": [
+                  "REGISTER_ENTRY",
+                  "OWNER_LINE_RECORD"
+                ]
+              },
+              "authority_ref_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "authority_ref_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "invalid_after": {
+            "contains": {
+              "const": "TARGET_HEAD_MOVE"
+            }
+          },
+          "excluded_claims": {
+            "allOf": [
+              {
+                "contains": {
+                  "const": "APPROVAL"
+                }
+              },
+              {
+                "contains": {
+                  "const": "BEHAVIORAL_EQUIVALENCE"
+                }
+              },
+              {
+                "contains": {
+                  "const": "CI_WAIVER"
+                }
+              },
+              {
+                "contains": {
+                  "const": "COPIED_PASS"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

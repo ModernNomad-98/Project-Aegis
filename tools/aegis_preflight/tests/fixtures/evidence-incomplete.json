@@ -1,0 +1,17 @@
+{
+  "case_id": "evidence-incomplete",
+  "notes": "An evidence record omits its environment; PF-05 treats incomplete evidence as a defect, not a pass.",
+  "checker_case": "valid-verdict",
+  "mutations": [
+    {
+      "op": "delete",
+      "path": "inputs.evidence.0.environment"
+    }
+  ],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-05": "FAIL"
+    }
+  }
+}

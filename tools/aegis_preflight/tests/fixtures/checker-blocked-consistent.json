@@ -1,0 +1,12 @@
+{
+  "case_id": "checker-blocked-consistent",
+  "notes": "The merged checker's missing-approval fixture is blocked; PF-07 reports BLOCKED verbatim and never turns it green.",
+  "checker_case": "missing-approval",
+  "mutations": [],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-07": "BLOCKED"
+    }
+  }
+}

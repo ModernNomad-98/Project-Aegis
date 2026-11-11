@@ -1,0 +1,14 @@
+{
+  "case_id": "stale-manifest",
+  "notes": "A record file is appended after the manifest was generated; PF-06 detects the stale generated record and the checker blocks on the same tamper.",
+  "checker_case": "valid-verdict",
+  "mutations": [],
+  "expected": {
+    "exit_code": 1,
+    "statuses": {
+      "PF-06": "FAIL",
+      "PF-07": "BLOCKED"
+    }
+  },
+  "mutate_store": true
+}
