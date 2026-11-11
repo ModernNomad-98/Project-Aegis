@@ -32,6 +32,7 @@
       ]
     },
     "reporting_window_days": {
+      "description": "Fixed 30-day reporting horizon measured from start_day; report_due_day is start_day plus 30 days.",
       "const": 30
     },
     "admission_ref": {
