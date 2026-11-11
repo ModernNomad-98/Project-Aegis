@@ -1,0 +1,38 @@
+{
+  "payload": {
+    "applicability": "REQUIRED",
+    "bytes": 302,
+    "change_id": "c1-2-c14-fixture-0001",
+    "completed_at": "2026-11-11T05:34:00Z",
+    "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "holder_identity_ref": "role-e-evidence-steward",
+    "independence_class": "INDEPENDENT",
+    "record_id": "stage-E-c12c14-0001",
+    "record_path": "records/E.json",
+    "replacement_of": null,
+    "schema_version": "aegis.change-state/stage-declaration/v1",
+    "sha256": "115709d122b3e7c7d6a04dfd492062b28a37a019ce623ec660213403b11e2f14",
+    "snapshot_identity": "snapshot:9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "stage": "E",
+    "verdict": "PASS",
+    "waiver_ref": null
+  },
+  "provenance": {
+    "as_of": "2026-11-11T05:34:00Z",
+    "declared_payload_bytes": 592,
+    "declared_payload_sha256": "b2aa9309ff6fc18fdae6682de5742a7ccc71825f7ebcbeccb67d1b784260fce6",
+    "producer_identity_ref": "role-e-evidence-steward",
+    "producer_role": "role-e-evidence-steward",
+    "source_ref": "stage-E"
+  },
+  "record": {
+    "change_id": "c1-2-c14-fixture-0001",
+    "completed_at": "2026-11-11T05:34:00Z",
+    "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "notes": "Synthetic evidence-lineage record; not a real approval.",
+    "record_id": "stage-E-c12c14-0001",
+    "reviewer_role": "evidence-lineage-steward",
+    "stage": "E",
+    "verdict": "PASS"
+  }
+}

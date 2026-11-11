@@ -1,0 +1,64 @@
+{
+  "payload": {
+    "as_of": "2026-11-11T05:15:00Z",
+    "change_id": "c1-2-c14-fixture-0001",
+    "pre_audit_checks": [
+      {
+        "check_id": "freeze-inputs",
+        "evidence_ref": "freeze-c12c14-0001",
+        "state": "pass"
+      },
+      {
+        "check_id": "snapshot-identity",
+        "evidence_ref": "snapshot:9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+        "note": null,
+        "state": "pass"
+      },
+      {
+        "check_id": "stage-records",
+        "evidence_ref": "stage-records",
+        "state": "pass"
+      },
+      {
+        "check_id": "budget-recompute",
+        "evidence_ref": "head-history",
+        "state": "pass"
+      }
+    ],
+    "review_sources": [
+      {
+        "evidence_ref": "stage-records/B.json",
+        "required": true,
+        "role": "records-steward",
+        "source_id": "plan-audit",
+        "state": "SETTLED"
+      },
+      {
+        "evidence_ref": "stage-records/D.json",
+        "required": true,
+        "role": "delta-independent-reviewer",
+        "source_id": "delta-review",
+        "state": "SETTLED"
+      },
+      {
+        "evidence_ref": "stage-records/E.json",
+        "required": true,
+        "role": "evidence-lineage-steward",
+        "source_id": "evidence-lineage",
+        "state": "SETTLED"
+      }
+    ],
+    "schema_version": "aegis.change-state/settlement/v1",
+    "settled": true,
+    "settled_by": "reviewer-coordinator",
+    "settlement_id": "settlement-c12c14-0001"
+  },
+  "provenance": {
+    "as_of": "2026-11-11T05:15:00Z",
+    "declared_payload_bytes": 1011,
+    "declared_payload_sha256": "c010eb55e640d1707b874c0019549df0be8bf48d367386ecf7e8b9272a459134",
+    "producer_identity_ref": "role-reviewer-coordinator",
+    "producer_role": "reviewer-coordinator",
+    "source_ref": "settlement/c12c14"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "payload": {
+    "applicability": "REQUIRED",
+    "bytes": 293,
+    "change_id": "c1-2-c14-fixture-0001",
+    "completed_at": "2026-11-11T05:38:00Z",
+    "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "holder_identity_ref": "role-e-evidence-steward",
+    "independence_class": "INDEPENDENT",
+    "record_id": "stage-E-c12c14-0003",
+    "record_path": "records/E-as-D.json",
+    "replacement_of": null,
+    "schema_version": "aegis.change-state/stage-declaration/v1",
+    "sha256": "ff1747e4ca68f3d8f2be23e30d11e2a3b7bb9320d98cb75bb2cfb6e4fe0c0456",
+    "snapshot_identity": "snapshot:9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "stage": "D",
+    "verdict": "PASS",
+    "waiver_ref": null
+  },
+  "provenance": {
+    "as_of": "2026-11-11T05:38:00Z",
+    "declared_payload_bytes": 597,
+    "declared_payload_sha256": "aa41496b977ed690298a394dcf60c9088f5feec779c4448f02f1ef6441c43d18",
+    "producer_identity_ref": "role-e-evidence-steward",
+    "producer_role": "role-e-evidence-steward",
+    "source_ref": "stage-E-as-D"
+  },
+  "record": {
+    "change_id": "c1-2-c14-fixture-0001",
+    "completed_at": "2026-11-11T05:38:00Z",
+    "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "notes": "Synthetic E record offered as a D declaration.",
+    "record_id": "stage-E-c12c14-0003",
+    "reviewer_role": "evidence-lineage-steward",
+    "stage": "E",
+    "verdict": "PASS"
+  }
+}

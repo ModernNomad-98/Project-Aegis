@@ -1,0 +1,38 @@
+{
+  "bypass": {
+    "bypass_id": "bypass-c12c14-0001",
+    "display": "GREEN",
+    "recorded_as": "enforcement"
+  },
+  "case_id": "adversarial-overclaim-bypass",
+  "expected": [
+    "CANONICAL_FIELD_MISSING_OR_MISMATCH"
+  ],
+  "manifest": {
+    "assurance_claim": "ENFORCED",
+    "change_id": "c1-2-c14-fixture-0001",
+    "derived_counts_at_binding": {
+      "review_heads": {
+        "source": "ledger",
+        "used": 0
+      }
+    },
+    "files": [],
+    "mounted_coverage": "VERIFIED",
+    "provenance_binding": {
+      "authority_kind": "UNKNOWN",
+      "authority_ref_id": null,
+      "authority_ref_sha256": null,
+      "binding_commit_or_pr": null,
+      "binding_status": "UNVERIFIED",
+      "holder_identity_ref": null,
+      "holder_role": "change-state-producer",
+      "unverified_reason": "no owner-authorised change-state authority record yet"
+    },
+    "schema_version": "aegis.change-state/v1",
+    "store_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "notes": "Only NONE/AUDITABLE labels are permitted; mounted coverage stays UNKNOWN and a bypass is never green.",
+  "row": 12,
+  "scenario": "a recorded bypass displayed as green and a mounted-coverage claim without a T5 export"
+}

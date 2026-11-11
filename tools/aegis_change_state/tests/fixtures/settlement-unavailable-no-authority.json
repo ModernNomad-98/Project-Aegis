@@ -1,0 +1,64 @@
+{
+  "payload": {
+    "as_of": "2026-11-11T05:15:00Z",
+    "change_id": "c1-2-c14-fixture-0001",
+    "pre_audit_checks": [
+      {
+        "check_id": "freeze-inputs",
+        "evidence_ref": "freeze-c12c14-0001",
+        "state": "pass"
+      },
+      {
+        "check_id": "snapshot-identity",
+        "evidence_ref": "snapshot:9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+        "note": null,
+        "state": "pass"
+      },
+      {
+        "check_id": "stage-records",
+        "evidence_ref": "stage-records",
+        "state": "pass"
+      },
+      {
+        "check_id": "budget-recompute",
+        "evidence_ref": "head-history",
+        "state": "pass"
+      }
+    ],
+    "review_sources": [
+      {
+        "evidence_ref": "stage-records/B.json",
+        "required": true,
+        "role": "records-steward",
+        "source_id": "plan-audit",
+        "state": "SETTLED"
+      },
+      {
+        "evidence_ref": "stage-records/D.json",
+        "required": true,
+        "role": "delta-independent-reviewer",
+        "source_id": "delta-review",
+        "state": "SETTLED"
+      },
+      {
+        "evidence_ref": "synthetic:unavailable-review",
+        "required": true,
+        "role": "evidence-lineage-steward",
+        "source_id": "evidence-lineage",
+        "state": "UNAVAILABLE_DISPOSITIONED"
+      }
+    ],
+    "schema_version": "aegis.change-state/settlement/v1",
+    "settled": true,
+    "settled_by": "reviewer-coordinator",
+    "settlement_id": "settlement-c12c14-0001"
+  },
+  "provenance": {
+    "as_of": "2026-11-11T05:17:00Z",
+    "declared_payload_bytes": 1037,
+    "declared_payload_sha256": "c6ebf38cadf93d4ca3ca56ae11815a8acde3db5a2eda5602e5747d450764e12e",
+    "producer_identity_ref": "role-reviewer-coordinator",
+    "producer_role": "reviewer-coordinator",
+    "source_ref": "settlement/c12c14-unavailable"
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "case_id": "adversarial-freeze-race",
+  "expected": [
+    "STATE_TAMPER_SUSPECTED",
+    "MISSING_REQUIRED_REVIEW_OR_DISPOSITION"
+  ],
+  "freezes": [
+    {
+      "payload": {
+        "base_ref": "refs/heads/main",
+        "base_sha": "7c1d3e5f9a2b4c6d8e0f1a3b5c7d9e2f4a6b8c0d",
+        "candidate_id": "cand-c12c14-fixture-0001",
+        "change_id": "c1-2-c14-fixture-0001",
+        "freeze_id": "freeze-race-a",
+        "frozen_at": "2026-11-11T05:41:00Z",
+        "frozen_by": "freeze-holder",
+        "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+        "immutable_inputs": {
+          "base_sha": "7c1d3e5f9a2b4c6d8e0f1a3b5c7d9e2f4a6b8c0d",
+          "evidence_inputs_sha256": "f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5",
+          "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+          "plan_sha256": "e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4",
+          "policy_sha256": "d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3",
+          "tree_sha": "4b8e2f6a9c0d1e3f5a7b9c2d4e6f8a0b1c3d5e7f"
+        },
+        "immutable_inputs_sha256": "e98e60295ca8a1fa80daff1f078a56d73008ec0feeb22fdd32232382d827729b",
+        "mutation_events": [],
+        "schema_version": "aegis.change-state/freeze/v1",
+        "settlement_ref": "settlement-c12c14-0001",
+        "tree_sha": "4b8e2f6a9c0d1e3f5a7b9c2d4e6f8a0b1c3d5e7f",
+        "valid": true
+      },
+      "provenance": {
+        "as_of": "2026-11-11T05:41:00Z",
+        "declared_payload_bytes": 1017,
+        "declared_payload_sha256": "e58191e3295e349e4efa93db99ca4f57eb02b6d67b555d1a832c513b4470814d",
+        "producer_identity_ref": "role-freeze-holder-a",
+        "producer_role": "freeze-holder",
+        "source_ref": "freeze/race-a"
+      }
+    },
+    {
+      "payload": {
+        "base_ref": "refs/heads/main",
+        "base_sha": "7c1d3e5f9a2b4c6d8e0f1a3b5c7d9e2f4a6b8c0d",
+        "candidate_id": "cand-c12c14-fixture-0001",
+        "change_id": "c1-2-c14-fixture-0001",
+        "freeze_id": "freeze-race-b",
+        "frozen_at": "2026-11-11T05:42:00Z",
+        "frozen_by": "freeze-holder",
+        "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+        "immutable_inputs": {
+          "base_sha": "7c1d3e5f9a2b4c6d8e0f1a3b5c7d9e2f4a6b8c0d",
+          "evidence_inputs_sha256": "f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5",
+          "head_sha": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+          "plan_sha256": "e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4",
+          "policy_sha256": "d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3",
+          "tree_sha": "4b8e2f6a9c0d1e3f5a7b9c2d4e6f8a0b1c3d5e7f"
+        },
+        "immutable_inputs_sha256": "e98e60295ca8a1fa80daff1f078a56d73008ec0feeb22fdd32232382d827729b",
+        "mutation_events": [],
+        "schema_version": "aegis.change-state/freeze/v1",
+        "settlement_ref": "settlement-c12c14-0001",
+        "tree_sha": "4b8e2f6a9c0d1e3f5a7b9c2d4e6f8a0b1c3d5e7f",
+        "valid": true
+      },
+      "provenance": {
+        "as_of": "2026-11-11T05:42:00Z",
+        "declared_payload_bytes": 1017,
+        "declared_payload_sha256": "6e0da5b3678d779f8599e5739500b147f5d5f20ff6a73a05a0aad3a8d3392616",
+        "producer_identity_ref": "role-freeze-holder-b",
+        "producer_role": "freeze-holder",
+        "source_ref": "freeze/race-b"
+      }
+    }
+  ],
+  "notes": "The later/racing record is INVALID and never silently wins; an UNRUN check cannot settle.",
+  "row": 5,
+  "scenario": "two freezes for one candidate and a settlement recorded before the pre-audit checks finish",
+  "settlement": {
+    "payload": {
+      "as_of": "2026-11-11T05:41:30Z",
+      "change_id": "c1-2-c14-fixture-0001",
+      "pre_audit_checks": [
+        {
+          "check_id": "freeze-inputs",
+          "evidence_ref": "freeze-c12c14-0001",
+          "state": "pass"
+        },
+        {
+          "check_id": "snapshot-identity",
+          "evidence_ref": "snapshot:9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+          "note": null,
+          "state": "pass"
+        },
+        {
+          "check_id": "stage-records",
+          "evidence_ref": "stage-records",
+          "state": "pass"
+        },
+        {
+          "check_id": "budget-recompute",
+          "evidence_ref": "head-history",
+          "state": "unrun"
+        }
+      ],
+      "review_sources": [
+        {
+          "evidence_ref": "stage-records/B.json",
+          "required": true,
+          "role": "records-steward",
+          "source_id": "plan-audit",
+          "state": "SETTLED"
+        },
+        {
+          "evidence_ref": "stage-records/D.json",
+          "required": true,
+          "role": "delta-independent-reviewer",
+          "source_id": "delta-review",
+          "state": "SETTLED"
+        },
+        {
+          "evidence_ref": "stage-records/E.json",
+          "required": true,
+          "role": "evidence-lineage-steward",
+          "source_id": "evidence-lineage",
+          "state": "SETTLED"
+        }
+      ],
+      "schema_version": "aegis.change-state/settlement/v1",
+      "settled": true,
+      "settled_by": "reviewer-coordinator",
+      "settlement_id": "settlement-race"
+    },
+    "provenance": {
+      "as_of": "2026-11-11T05:41:30Z",
+      "declared_payload_bytes": 1005,
+      "declared_payload_sha256": "7066e136cbe199e89acb46017b3798af966328f17cbb8a15715d90f28497448f",
+      "producer_identity_ref": "role-reviewer-coordinator",
+      "producer_role": "reviewer-coordinator",
+      "source_ref": "settlement/race"
+    }
+  }
+}

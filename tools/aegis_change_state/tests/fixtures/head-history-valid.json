@@ -1,0 +1,34 @@
+{
+  "payload": {
+    "candidate_head": "9f2c4d7e1a3b5c6d8e0f1a2b3c4d5e6f7a8b9c0d",
+    "change_id": "c1-2-c14-fixture-0001",
+    "export_ref": "export-c12c14-0001",
+    "exported_at": "2026-11-11T05:20:00Z",
+    "heads": [
+      {
+        "counted_at": "2026-11-10T18:00:00Z",
+        "exception_ref": null,
+        "head_sha": "2a4c6e8f0b1d3f5a7c9e1b3d5f7a9c2e4b6d8f0a",
+        "kind": "INITIAL",
+        "seq": 1
+      },
+      {
+        "counted_at": "2026-11-10T22:00:00Z",
+        "exception_ref": null,
+        "head_sha": "6f8e4d2c0b9a7f5e3d1c9b8a6f4e2d0c8b6a5f3e",
+        "kind": "BATCHED_BLOCKING_FIX",
+        "seq": 2
+      }
+    ],
+    "schema_version": "aegis.change-state/head-history/v1"
+  },
+  "provenance": {
+    "as_of": "2026-11-11T05:20:00Z",
+    "declared_payload_bytes": 521,
+    "declared_payload_sha256": "ee2c398ae7bd16711a8141c17c37bff22a7a33e5e175cd58af263b4262720d29",
+    "producer_identity_ref": "role-programme-lead",
+    "producer_role": "head-history-export",
+    "source_ref": "head-history/c12c14",
+    "status": "VERIFIED"
+  }
+}
