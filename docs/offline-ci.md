@@ -124,6 +124,93 @@ branch-protection decision for the owner. Until then they are visible
 coverage, and a delivery closeout waits for them, as for the Windows job,
 whenever they run.
 
+## The aegis-verdict-gate workflow (C1.1b)
+
+The C1.1b slice adds one dedicated workflow,
+`.github/workflows/aegis-verdict-gate.yml`, with one job,
+`aegis-verdict-gate`. It is **non-required evidence**: it publishes the commit
+status context `aegis-verdict-gate`, but branch protection does not register
+that context. Stage 3 registration is an owner action behind T4/T6/T24/T7 and is
+not performed by this change. Readiness is not merge authority.
+
+### Default-branch execution and base-only checkout
+
+The workflow is triggered by `pull_request_target` (`opened`,
+`synchronize`, `reopened`, `edited`) and `issue_comment` (`created`,
+`edited`, `deleted`). Both events execute the workflow definition from the
+default branch; a pull request cannot change the workflow that evaluates it, and
+no pull-request head ref is checked out or executed. The checkout is base-only:
+the pull request's base SHA for `pull_request_target`; for `issue_comment` the
+default branch first (to run the adapter), then the resolved base SHA. The
+adapter resolves the pull request read-only, and the fetch phase fails closed
+with `BASE_MISMATCH` unless the working tree is the resolved base. The job
+records `github.workflow_ref` and `github.workflow_sha`
+and refuses to run unless the executed file is the default-branch
+`aegis-verdict-gate.yml`.
+
+The workflow has no `push`, `workflow_dispatch` or `workflow_run` trigger,
+no repository-variable skip and no `continue-on-error`. A disabled or absent
+run leaves the context missing (blocked), never green.
+
+### Adapter, checker and publisher
+
+1. `scripts/ci/aegis_verdict_gate_fetch.py` is a read-only provider adapter.
+   It reads `GITHUB_TOKEN` from the environment, the event payload, the pull
+   request, its issue comments and its commits, and writes the C1.1a input
+   envelopes (`verdict.json`, `freeze.json`, `settlement.json`,
+   `head-history.json`, `stage-records/`) plus `gate-context.json`,
+   `provenance-manifest.json` and `adapter-result.json` under
+   `RUNNER_TEMP`. Every envelope is re-read with the moved package's own
+   `inputs.load_envelope` validator. The adapter never decides readiness and
+   never defaults a required field to true: a field without a trustworthy
+   source is omitted and listed in `adapter-result.json` as unavailable, so
+   the checker reports `REQUIRED_INPUT_UNAVAILABLE` or the specific canonical
+   blocker. The head-history export is always `UNVERIFIED` because the
+   read-only provider cannot establish a complete published-head sequence. It
+   does not synthesize owner-assigned identifiers or free-form PR-body fields,
+   so a run can be blocked with `REQUIRED_INPUT_UNAVAILABLE` (or a canonical
+   blocker) until those records are supplied: that is fail-closed evidence, not
+   a readiness claim.
+2. `scripts/aegis_verdict_gate/run.py` runs the merged C1.1a checker from
+   the base-only checkout; it is the only decision-maker.
+3. `scripts/ci/aegis_verdict_gate_publish.py` is the only write path. It
+   validates the repository, pull request and head against the evaluated
+   inputs, re-reads the pull request, refuses a head that has moved or a
+   foreign, closed or non-PR change, and posts **exactly one** commit status
+   (context `aegis-verdict-gate`) on the resolved head: `success` only
+   when the checker exited 0 *and* reported readiness true; `failure` for a
+   blocked or invalid result; `error` otherwise. It never posts `pending`,
+   never retries, and exits nonzero on a refusal or provider failure, leaving
+   no success status. A non-pull-request issue comment is a recorded no-op: no
+   status and exit 0.
+
+The token is read only from `GITHUB_TOKEN`, never passed as an argument,
+never written to an artifact and never printed. The job's permissions are
+`contents: read`, `pull-requests: read`, `issues: read` and
+`statuses: write`. GitHub Actions permissions are job-scoped, not
+step-scoped, so the single job holds `statuses: write`; only the
+`publish-status` step invokes the publisher, and the isolation tests assert
+that no other step names the writer or a status endpoint.
+
+### Evidence and isolation coverage
+
+The job records `environment`, `resolve`, `fetch-inputs`,
+`verdict-gate`, `publish-status`, `self-test` and `checker-tests` with
+`scripts/ci/record-check.py` (distinct lowercase labels), writes a job summary
+naming readiness, blockers, assurance and the published state, and retains
+`$RUNNER_TEMP/aegis-ci/` and the run directory with 14-day retention.
+
+`scripts/tests/test_offline_ci.py` parses the new workflow separately from
+`validate-skills.yml` and asserts: the exact trigger set; one job that always
+runs; the exact permissions map with `statuses` as the only write scope;
+exactly one base-only checkout that never names a head ref; SHA-pinned actions;
+`bash` only; `python -P` for every Python call; distinct lowercase evidence
+labels; no Node, npm, tools suite or pip install; and no gate-isolation
+violation. Mutation tests prove each new check fails on an unpinned action, an
+unguarded path, a loader variable, a widened write permission, a `push`
+trigger, a head-ref checkout and a Node step. The existing `validate-skills`
+gate-job assertions and thresholds are unchanged.
+
 ## Dependencies and environment
 
 Both verification jobs use Python 3.14 and full Git history. Some BER fixtures
