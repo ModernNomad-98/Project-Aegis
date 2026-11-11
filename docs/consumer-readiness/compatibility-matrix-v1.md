@@ -25,7 +25,7 @@ It deliberately reuses qualification evidence rather than re-running qualificati
 | Reference | Pinned identity | Status | Semantics owner |
 | --- | --- | --- | --- |
 | Capability/status contract | `aegis.capability-status/v2` (proposed) | PROPOSED; design-basis decision T2 remains open | C0 contract records (programme) |
-| Verdict bound fields | `aegis.verdict-bound/v2.1` (canonical field set, 62 entries) | Design basis only; not owner-accepted | C0 contract records (programme) |
+| Verdict bound fields | The merged checker's versioned bound-verdict schema (version 2.1; 62-entry canonical field set held by `catalogue.py`) | Design basis only; not owner-accepted | C0 contract records (programme) |
 | Consumer display mapping | candidate `cs-map/1` (E2/E4 presentation design) | Candidate; mapping-version decision open | E2/E4 presentation design record |
 | Status vocabulary | CS-0..CS-7 plus the extension states defined by the contract of record | Proposed; display semantics do not grant authority | C0 contract records (programme) |
 | Review-efficiency policy amendment | `docs/delivery-workflow.md` at the current merged head | Merged; advisory policy insertion only | Repository policy of record |
