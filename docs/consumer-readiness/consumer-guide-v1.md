@@ -51,7 +51,7 @@ The following are available as documentation/evidence artifacts with identities 
 | Change-state tooling | Append-only freeze/settlement/stage/snapshot record format and validators, plus host-boundary disclosures | Mounted coverage, ENFORCED claim, real production records |
 | Operations/overhead docs and tooling | Overhead controls, CI routing, advisory policy, stage holders, inbox-zero, qualification/pilot metrics | External qualification cells (UNRUN), economics claims |
 | E1.4/E1.5 evidence records | Current-head destination-link containment and starter-transition records, with named UNRUNs | Acceptance, independent reviewer disposition, second-host claims |
-| Item-8 schema annotation | A schema annotation merged into the instrumentation schema | Hosted acceptance row (P3-08-01 remains UNRUN) |
+| Item-8 schema annotation | A schema annotation merged into the instrumentation schema | Hosted acceptance row P3-08-01 **PASS** (bounded acceptance `281f5b7e…`; not full item-8/E1 closure) |
 | Consumer status presentation | Design only | A delivered consumer page/renderer |
 
 ---
@@ -105,7 +105,7 @@ Where a guide-level statement here differs from the contract of record or the [d
 
 - **E1 closure evidence:** E1.6 integrated verification and the T12/T13 closure decisions remain UNRUN/open; the E1.4/E1.5 records are PROPOSED/UNVERIFIED evidence, not acceptance.
 - **E3 item-2:** 18 PASS / 3 FAIL / 1 UNRUN; item-2 is not accepted; one failed row is irreparable in this attempt; no 22/22 claim.
-- **Item-8:** the schema annotation is merged, but the hosted acceptance row remains UNRUN; local evidence is supporting only.
+- **Item-8:** the schema annotation is merged and the hosted acceptance row P3-08-01 is **PASS** under bounded acceptance `281f5b7e…`; this is not full item-8/E1 closure or an enforcement/readiness claim.
 - **Item-5:** export to an owner-authorized destination occurred; the retrieval evidence is recorded; the source-documentation link criterion remains NOT MET at this head.
 - **External qualification:** C4.1 external cells and C4.3 independent review are UNRUN; the compatibility matrix therefore contains zero qualified cells.
 - **Pilot evidence:** a bounded pilot shortfall is recorded; no economics or general-overhead claim follows.

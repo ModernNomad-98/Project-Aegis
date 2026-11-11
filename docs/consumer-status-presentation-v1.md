@@ -20,7 +20,7 @@ It does not define policy, authority or evidence semantics, and it does not prom
 The following is the state this document was written against. It is a point-in-time record; re-measure before relying on it.
 
 - Merged / delivered on the reviewed lineage: C1.1a (verdict-gate checker and seeded revision-state store), C2 (governance/evidence reuse), C1.2-C1.4 (freeze/snapshot/stage and qualification work), C1.1b (required-context design work, staged), C3 (overhead controls), C4 (qualification/economics work), E1.4 and E1.5 (current-head containment and transition evidence).
-- Open / UNRUN: E1.6 integrated independent verification; historical Stage-B gaps on E1 items 3/4/8 (T12); programme closure of E1 items 3/4 (T13); item-5 05-G source link (05-D/05-G not met); item-8 acceptance row P3-08-01 hosted proof; C4 external cells; and the contract design basis T2.
+- Open / UNRUN: E1.6 integrated independent verification; historical Stage-B gaps on E1 items 3/4/8 (T12); programme closure of E1 items 3/4 (T13); item-5 05-G source link (05-D/05-G not met); C4 external cells; and the contract design basis T2. The item-8 hosted acceptance row P3-08-01 is **PASS** under bounded acceptance record `281f5b7e…` (not full item-8/E1 closure).
 - Never inferred from merge status: a merged control has no consumer status view by itself, and a merged PR is not an approval, acceptance or enforcement. T5 mounted coverage is UNKNOWN, T6 authenticated verdicts are UNVERIFIED/BLOCKED, and the relevant owner decisions (T7 exception authority, T8/T8a-c/T21 item-5, T14 item-8, T15-T20 item-2) remain open unless separately recorded.
 
 ## 3. Modes, capabilities, optional components, burden and costs
@@ -80,7 +80,7 @@ Every state has the same four obligations: **show** the state and its cause; **s
 ## 9. Non-claims and next steps
 
 - No live governance status value is claimed to exist or to be verified by this document. The merged controls provide records and checks, not a consumer status view.
-- T2 remains open: this is requirements-level presentation, not contract-conformance evidence. T5 mounted coverage is UNKNOWN; T6 authenticated verdicts are UNVERIFIED/BLOCKED; T7 exception/unavailable-review authority is UNKNOWN; item-5 05-G, item-8 P3-08-01, E1.6/T12/T13 and C4 external cells remain open/UNRUN.
+- T2 remains open: this is requirements-level presentation, not contract-conformance evidence. T5 mounted coverage is UNKNOWN; T6 authenticated verdicts are UNVERIFIED/BLOCKED; T7 exception/unavailable-review authority is UNKNOWN; item-5 05-G, E1.6/T12/T13 and C4 external cells remain open/UNRUN; item-8 P3-08-01 is **PASS** under bounded acceptance record `281f5b7e…`.
 - **Next:** independent E2.4 exercise against the implemented documentation surfaces, then Stage D/E/F review under the programme route. A separate reviewer - not the author - must disposition this document and the E2.4 exercise; a REVISE grants nothing.
 
 Proposed by e0-requirements-envoy (DeepSeek Harness; route deepseek-flash; serving model not observable), 2026-11-11. Docs-only proposal; no code, publication, delivery, settings, host or approval action.
