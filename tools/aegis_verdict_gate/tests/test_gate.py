@@ -214,6 +214,19 @@ class AffirmativeVerdictVectorsTest(unittest.TestCase):
         self.assert_blocked(result, "VERDICT_NOT_AFFIRMATIVE")
 
 
+class ReviewerIndependenceVectorsTest(unittest.TestCase):
+    """B13: VB-F06 requires PR author, implementer and declared commit authors."""
+
+    def test_missing_pr_author_distinct_is_not_ready(self):
+        def mutate(bundle):
+            bundle["verdict"]["reviewer"]["identity_ref"] = "pr-author"
+            bundle["verdict"]["reviewer"]["independence"]["distinct_from"] = ["implementer"]
+
+        result, _ = variant(mutate)
+        self.assertFalse(result.readiness)
+        self.assertIn("MISSING_INDEPENDENT_APPROVAL", result.reason_codes)
+        self.assertTrue(any("pr-author" in issue.detail for issue in result.blockers))
+
 class ReviewBudgetVectorsTest(unittest.TestCase):
     """NV-D2-1..8 from the v2.1 errata: exclusive head count."""
 

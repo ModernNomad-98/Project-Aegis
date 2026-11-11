@@ -649,11 +649,33 @@ def check_c4(ctx: Context) -> typing.List[Issue]:
         issues.append(_issue("MISSING_INDEPENDENT_APPROVAL", "reviewer distinct_from is empty"))
     else:
         distinct_values = [str(value) for value in distinct]
-        if "implementer" not in distinct_values:
+        # VB-F06/C4: distinct_from must cover the PR author, the implementing
+        # identity and every declared commit author on the candidate.  The roles
+        # are required tokens; declared commit-author identities must appear too.
+        required_roles = {"implementer", "pr-author"}
+        declared_commit_authors: typing.List[str] = []
+        payload = ctx.record if isinstance(ctx.record, dict) else {}
+        raw_commit_authors = payload.get("commit_authors")
+        if raw_commit_authors is None and isinstance(payload.get("change"), dict):
+            raw_commit_authors = typing.cast(typing.Dict[str, object], payload["change"]).get("commit_authors")
+        if raw_commit_authors is None:
+            reviewer = payload.get("reviewer")
+            if isinstance(reviewer, dict) and isinstance(reviewer.get("independence"), dict):
+                raw_commit_authors = typing.cast(typing.Dict[str, object], reviewer["independence"]).get("commit_authors")
+        if isinstance(raw_commit_authors, list):
+            declared_commit_authors = [str(value) for value in raw_commit_authors]
+            required_roles.update(declared_commit_authors)
+        missing_roles = sorted(required_roles.difference(distinct_values))
+        if missing_roles:
             issues.append(
-                _issue("MISSING_INDEPENDENT_APPROVAL", "reviewer distinct_from does not exclude the implementer")
+                _issue(
+                    "MISSING_INDEPENDENT_APPROVAL",
+                    "reviewer distinct_from does not exclude required role(s)/identity(ies): %s"
+                    % ", ".join(missing_roles),
+                )
             )
-        if ctx.text("reviewer.identity_ref") in distinct_values:
+        identity = ctx.text("reviewer.identity_ref")
+        if identity in distinct_values or identity in required_roles:
             issues.append(
                 _issue("MISSING_INDEPENDENT_APPROVAL", "reviewer identity appears in its own distinct_from list")
             )
