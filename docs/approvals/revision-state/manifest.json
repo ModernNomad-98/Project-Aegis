@@ -1,0 +1,82 @@
+{
+  "schema_version": "aegis.revision-store/v1",
+  "files": [
+    {
+      "path": "items/aegis-plan-maturity-package.jsonl",
+      "kind": "plan_item",
+      "id": "aegis.plan.maturity-package",
+      "bytes": 6910,
+      "sha256": "f0d10d049194fc711cb95e1adbdff00cfd41f1b9b6fd78b366156e79c261a073",
+      "event_count": 6,
+      "first_event_id": "A-0001",
+      "last_event_id": "A-0006"
+    },
+    {
+      "path": "items/aegis-plan-post-delivery-2026-11-09.jsonl",
+      "kind": "plan_item",
+      "id": "aegis.plan.post-delivery-2026-11-09",
+      "bytes": 6182,
+      "sha256": "a51c5df28400c917e0d20803bf8790f23f4ace991d8b454e8d3a013b574eeac0",
+      "event_count": 8,
+      "first_event_id": "B-0001",
+      "last_event_id": "B-0008"
+    },
+    {
+      "path": "items/aegis-plan-integrated-2026-11-10.jsonl",
+      "kind": "plan_item",
+      "id": "aegis.plan.integrated-2026-11-10",
+      "bytes": 4202,
+      "sha256": "5f7ac8adf42293af3755edd53f1346ef6d0e9439dbcb40233cdabf474219ac82",
+      "event_count": 4,
+      "first_event_id": "C-0001",
+      "last_event_id": "C-0004"
+    },
+    {
+      "path": "changes/c1-1-b1-minimal-2026-11-10.jsonl",
+      "kind": "change_ledger",
+      "id": "c1-1-b1-minimal-2026-11-10",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "event_count": 0,
+      "first_event_id": null,
+      "last_event_id": null
+    }
+  ],
+  "derived_counts_at_binding": {
+    "items": [
+      {
+        "item_id": "aegis.plan.integrated-2026-11-10",
+        "revision_count": 2,
+        "reopen_used": false,
+        "stop_state": "OPEN"
+      },
+      {
+        "item_id": "aegis.plan.maturity-package",
+        "revision_count": 5,
+        "reopen_used": false,
+        "stop_state": "WAITING_ON_OWNER"
+      },
+      {
+        "item_id": "aegis.plan.post-delivery-2026-11-09",
+        "revision_count": 7,
+        "reopen_used": false,
+        "stop_state": "CLOSED"
+      }
+    ],
+    "review_heads": {
+      "used": 0,
+      "source": "change ledger (previously published heads only)"
+    }
+  },
+  "store_digest": "9ada1931dd7fbf31330ee5e2a6445ed496acd323a888722be7d0176bed7d1721",
+  "provenance_binding": {
+    "authority_kind": "UNKNOWN",
+    "authority_ref_id": null,
+    "authority_ref_sha256": null,
+    "holder_role": "programme-lead",
+    "holder_identity_ref": null,
+    "binding_commit_or_pr": "impl/c11a-rev2-2026-11-10 from main 7ea22f8c; PR opened after the seed commit",
+    "binding_status": "UNVERIFIED",
+    "unverified_reason": "no owner-authorised authority record yet (AUTH-STORE / owner decision T24 not tabled)"
+  }
+}
