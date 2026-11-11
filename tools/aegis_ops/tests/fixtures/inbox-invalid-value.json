@@ -1,0 +1,29 @@
+{
+  "authority_ref": null,
+  "config": {
+    "inbox.enabled": "false",
+    "inbox.supported": true
+  },
+  "config_identity": "a5fb6a985a0304bf321e894a7a344a518aecf199dd33e6467e3eeeb358e68d55",
+  "dependencies": [],
+  "display_state": "inbox disabled - zero associated activity",
+  "evidence": {
+    "activity": {
+      "background_task": false,
+      "external_reporting": false,
+      "handshake": false,
+      "network": false,
+      "polling": false,
+      "provider_call": false,
+      "queue_activity": false
+    },
+    "disabled_run_ref": "run:disabled-1",
+    "independent_confirmation_ref": "review:independent-1",
+    "kind": "END_TO_END_OBSERVATION",
+    "observed_at": "2026-11-11T00:00:00Z",
+    "source_ref": "fixture:local-observation"
+  },
+  "local_path_evidence": "bounded local operation completed without inbox",
+  "schema_version": "aegis.ops-inbox/v1",
+  "selected_by": "local-setup-operator"
+}

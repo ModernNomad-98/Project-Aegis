@@ -64,6 +64,11 @@ jobs:
     #
     # Flake signature (documented): all jobs cancelled at the same instant at
     # durations matching none of their own timeouts = infra flake -> re-run.
+    #
+    # Next-to-merge preference: the branch is kept next-to-merge; the PR
+    # process revalidates the final base (the three-dot diff below is fetched
+    # against origin/BASE_REF at the current base).  No strict/up-to-date
+    # setting, required-context registration or permissions change is made here.
     runs-on: ubuntu-latest
     timeout-minutes: 5
     defaults:
@@ -72,6 +77,7 @@ jobs:
     outputs:
       tools: ${{ steps.filter.outputs.tools }}
       offline: ${{ steps.filter.outputs.offline }}
+      docs_skills: ${{ steps.filter.outputs.docs_skills }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
@@ -84,7 +90,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" = 'push' ]; then
-            printf 'tools=true\noffline=true\n' >> "$GITHUB_OUTPUT"
+            printf 'tools=true\noffline=true\ndocs_skills=true\n' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git fetch origin "$BASE_REF" --quiet
@@ -101,6 +107,14 @@ jobs:
             echo 'offline=true' >> "$GITHUB_OUTPUT"
           else
             echo 'offline=false' >> "$GITHUB_OUTPUT"
+          fi
+          # Closed docs/skills predicate: true only when every changed path is
+          # under docs/ or .claude/skills/.  "Other non-code paths" is not
+          # guessed; an unmapped path is never silently classified as docs.
+          if [ -s "$RUNNER_TEMP/aegis-changed-paths" ] && ! grep -Ev '^(docs/|\.claude/skills/)' "$RUNNER_TEMP/aegis-changed-paths" >/dev/null; then
+            echo 'docs_skills=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'docs_skills=false' >> "$GITHUB_OUTPUT"
           fi
 
   validate-skills:
@@ -286,7 +300,7 @@ jobs:
     # Additional coverage; not registered in branch protection. Closeout still
     # requires this job to pass. Do not hide failures with continue-on-error.
     needs: [changes]
-    if: github.event_name == 'push' || needs.changes.outputs.offline == 'true'
+    if: github.event_name == 'push' || (needs.changes.outputs.offline == 'true' && needs.changes.outputs.docs_skills != 'true')
     runs-on: windows-latest
     timeout-minutes: 20
     defaults:
@@ -377,7 +391,7 @@ jobs:
   # these jobs become required status checks is a branch-protection decision.
   tools-tests-linux:
     needs: [changes]
-    if: github.event_name == 'push' || needs.changes.outputs.tools == 'true'
+    if: github.event_name == 'push' || (needs.changes.outputs.tools == 'true' && needs.changes.outputs.docs_skills != 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -451,7 +465,7 @@ jobs:
 
   tools-tests-windows:
     needs: [changes]
-    if: github.event_name == 'push' || needs.changes.outputs.tools == 'true'
+    if: github.event_name == 'push' || (needs.changes.outputs.tools == 'true' && needs.changes.outputs.docs_skills != 'true')
     runs-on: windows-latest
     timeout-minutes: 20
     permissions:

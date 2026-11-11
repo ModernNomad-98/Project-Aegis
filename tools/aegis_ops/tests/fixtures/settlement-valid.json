@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-11-11T00:00:00Z",
+  "blockers": [],
+  "bounded_wait": {
+    "deadline": "2026-11-11T01:00:00Z",
+    "max_attempts": 3,
+    "observed_attempts": 1
+  },
+  "candidate_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "change_id": "c3c4-fixture-change",
+  "pre_audit_checks": [
+    {
+      "check_id": "dco",
+      "deadline": "2026-11-11T01:00:00Z",
+      "evidence_ref": "fixture:dco",
+      "state": "pass"
+    },
+    {
+      "check_id": "validate-skills",
+      "deadline": "2026-11-11T01:00:00Z",
+      "evidence_ref": "fixture:validate-skills",
+      "state": "pass"
+    }
+  ],
+  "review_sources": [
+    {
+      "source_id": "stage-B",
+      "state": "SETTLED"
+    },
+    {
+      "source_id": "stage-D",
+      "state": "SETTLED"
+    }
+  ],
+  "schema_version": "aegis.ops-settlement/v1",
+  "settled": true,
+  "source_ref": "fixture:settlement"
+}

@@ -1,0 +1,111 @@
+{
+  "candidate_id": "cand-c34-fixture",
+  "component_owner": {
+    "component": "C3/C4 ops tooling",
+    "governance_path_ref": "plan-section-3",
+    "owner_identity_ref": "component-owner-1"
+  },
+  "context_bundles": [
+    {
+      "active_holder_refs": [
+        "h-new"
+      ],
+      "base_sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "bundle_id": "bundle-2",
+      "candidate_id": "cand-c34-fixture",
+      "context_bundle_sha256": "891dcfcff97fb8d8a939ed558f2dcd9c27f6b90598de89a35e09036e6aaeb53e",
+      "deadline": "2026-11-11T03:00:00Z",
+      "frozen_scope": "C3.4 holder/replacement validation",
+      "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "next_action": "continue only from this bundle, not chat memory",
+      "prior_holder_separation": "new holder is not the implementer, PR author or commit author",
+      "stage": "D",
+      "tree_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "triage_ref": "triage-1",
+      "unrun": [
+        "C4.2 pilot arrivals"
+      ],
+      "verdict_refs": [
+        "verdict-B-1",
+        "verdict-D-1"
+      ]
+    }
+  ],
+  "frozen_head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "head_budget": {
+    "exception_basis": null,
+    "exception_ref": null,
+    "heads_used": 2,
+    "limit": 3
+  },
+  "holders": [
+    {
+      "activated_at": "2026-11-11T00:00:00Z",
+      "activation_event_ref": "activation-h-old",
+      "authority_ref": "T9-COMMISSIONER",
+      "bounded_wait_ref": "wait-h-old",
+      "candidate_id": "cand-c34-fixture",
+      "deadline": "2026-11-11T02:00:00Z",
+      "holder_id": "h-old",
+      "holder_identity_ref": "reviewer-old",
+      "holder_role": "D-reviewer",
+      "independence_class": "INDEPENDENT",
+      "snapshot_identity": "snap-h-old",
+      "stage": "D",
+      "state": "REPLACED"
+    },
+    {
+      "activated_at": "2026-11-11T00:00:00Z",
+      "activation_event_ref": "activation-h-new",
+      "authority_ref": "T9-COMMISSIONER",
+      "bounded_wait_ref": "wait-h-new",
+      "candidate_id": "cand-c34-fixture",
+      "deadline": "2026-11-11T02:00:00Z",
+      "holder_id": "h-new",
+      "holder_identity_ref": "reviewer-new",
+      "holder_role": "D-reviewer",
+      "independence_class": "INDEPENDENT",
+      "snapshot_identity": "snap-h-new",
+      "stage": "D",
+      "state": "ACTIVE"
+    }
+  ],
+  "invalidation": {
+    "base_moved": false,
+    "evidence_moved": false,
+    "head_moved": false,
+    "policy_moved": false,
+    "rebind_ref": null
+  },
+  "replacements": [
+    {
+      "authority_ref": "",
+      "authority_role": "IMPLEMENTER",
+      "candidate_id": "cand-c34-fixture",
+      "context_bundle_sha256": "891dcfcff97fb8d8a939ed558f2dcd9c27f6b90598de89a35e09036e6aaeb53e",
+      "created_at": "2026-11-11T01:00:00Z",
+      "finding_refs": [
+        "finding-D-1"
+      ],
+      "independence_attestation": {
+        "commit_author_identity_refs": [
+          "commit-author-1"
+        ],
+        "implementer_identity_ref": "implementer-1",
+        "new_holder_identity_ref": "reviewer-new",
+        "old_holder_identity_ref": "reviewer-old",
+        "pr_author_identity_ref": "pr-author-1"
+      },
+      "new_holder_ref": "h-new",
+      "old_holder_ref": "h-old",
+      "reason_class": "INCOMPLETE",
+      "replacement_id": "replacement-1",
+      "snapshot_identity": "snap-h-new",
+      "stage": "D",
+      "status": "ACTIVE"
+    }
+  ],
+  "schema_version": "aegis.ops-stage-holders/v1",
+  "stage": "D",
+  "unavailabilities": []
+}

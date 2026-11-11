@@ -1,0 +1,178 @@
+{
+  "as_of": "2026-11-11T00:00:00Z",
+  "cap_tuning": [],
+  "cases": [
+    {
+      "active_vs_wait": {
+        "active": "UNKNOWN",
+        "active_instrumented": false,
+        "wait_wall_minutes": 120
+      },
+      "audit_suite_minutes": {
+        "definition": "recorded check-run wall minutes for this case",
+        "source": "fixture:action-run",
+        "value": 12.5
+      },
+      "candidate_heads": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "case_ordinal": 1,
+      "change_id": "pilot-change-1",
+      "defects": [
+        "defect:fixture-1"
+      ],
+      "dispositions": [
+        "disposition:fixture-1"
+      ],
+      "dollars": 5000,
+      "eligible": true,
+      "exceptions_bypasses": [],
+      "head_exception": null,
+      "owner_touches": {
+        "latency": "UNKNOWN",
+        "latency_instrumented": false,
+        "observable": 2
+      },
+      "reuse_events": [
+        "reuse:fixture-1"
+      ],
+      "review_rounds": {
+        "B": 1,
+        "D": 1,
+        "E": 1,
+        "F": 1,
+        "automated_submissions": 2
+      },
+      "stage_elapsed": {
+        "B": 30,
+        "D": 45,
+        "E": 20,
+        "F": 15
+      },
+      "triage_categories": {
+        "BLOCKING": 1,
+        "NIT": 1,
+        "RESIDUAL": 0
+      },
+      "unrun": []
+    },
+    {
+      "active_vs_wait": {
+        "active": "UNKNOWN",
+        "active_instrumented": false,
+        "wait_wall_minutes": 120
+      },
+      "audit_suite_minutes": {
+        "definition": "recorded check-run wall minutes for this case",
+        "source": "fixture:action-run",
+        "value": 12.5
+      },
+      "candidate_heads": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "case_ordinal": 2,
+      "change_id": "pilot-change-2",
+      "defects": [
+        "defect:fixture-1"
+      ],
+      "dispositions": [
+        "disposition:fixture-1"
+      ],
+      "eligible": true,
+      "exceptions_bypasses": [],
+      "head_exception": null,
+      "owner_touches": {
+        "latency": "UNKNOWN",
+        "latency_instrumented": false,
+        "observable": 2
+      },
+      "reuse_events": [
+        "reuse:fixture-1"
+      ],
+      "review_rounds": {
+        "B": 1,
+        "D": 1,
+        "E": 1,
+        "F": 1,
+        "automated_submissions": 2
+      },
+      "stage_elapsed": {
+        "B": 30,
+        "D": 45,
+        "E": 20,
+        "F": 15
+      },
+      "triage_categories": {
+        "BLOCKING": 1,
+        "NIT": 1,
+        "RESIDUAL": 0
+      },
+      "unrun": []
+    },
+    {
+      "active_vs_wait": {
+        "active": "UNKNOWN",
+        "active_instrumented": false,
+        "wait_wall_minutes": 120
+      },
+      "audit_suite_minutes": {
+        "definition": "recorded check-run wall minutes for this case",
+        "source": "fixture:action-run",
+        "value": 12.5
+      },
+      "candidate_heads": [
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ],
+      "case_ordinal": 3,
+      "change_id": "pilot-change-3",
+      "defects": [
+        "defect:fixture-1"
+      ],
+      "dispositions": [
+        "disposition:fixture-1"
+      ],
+      "eligible": true,
+      "exceptions_bypasses": [],
+      "head_exception": null,
+      "owner_touches": {
+        "latency": "UNKNOWN",
+        "latency_instrumented": false,
+        "observable": 2
+      },
+      "reuse_events": [
+        "reuse:fixture-1"
+      ],
+      "review_rounds": {
+        "B": 1,
+        "D": 1,
+        "E": 1,
+        "F": 1,
+        "automated_submissions": 2
+      },
+      "stage_elapsed": {
+        "B": 30,
+        "D": 45,
+        "E": 20,
+        "F": 15
+      },
+      "triage_categories": {
+        "BLOCKING": 1,
+        "NIT": 1,
+        "RESIDUAL": 0
+      },
+      "unrun": []
+    }
+  ],
+  "measure_sheet": {
+    "definitions": {
+      "head": "a published candidate head for the change",
+      "review_round": "one B/D/E/F stage verdict at a head",
+      "suite_minutes": "check-run wall minutes, declared per case"
+    },
+    "denominators": {
+      "head_rate": "candidate heads / eligible changes",
+      "round_rate": "review rounds / eligible changes"
+    }
+  },
+  "schema_version": "aegis.ops-pilot-metrics/v1"
+}
