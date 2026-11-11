@@ -137,6 +137,18 @@ multi-tenant or SaaS readiness, a second host, a hosted deployment, live-model
 evaluation, CI-green equivalence, or "complete native consumer testing". One
 host's evidence is bounded to that host and that run.
 
+### 1.4 Status and assurance on this page
+
+This page reports what one measured host observed. It is not a live governance status view, and
+nothing on it is an approval: a merged pull request, a green CI run, a claim in this page or a UI state
+is not merge authority, an independent acceptance or enforcement. The consumer governance states
+(frozen, awaiting review, budget exhausted, blocked, residual accepted, evidence reused) and the
+actual permitted next action are defined, docs-only, in
+[consumer-status-presentation-v1.md](consumer-status-presentation-v1.md). That document is a
+**proposal**: the contract basis (T2) is open, authenticated verdicts display UNVERIFIED/BLOCKED until
+T6, mounted coverage (T5) is UNKNOWN, and no enforcement claim is made. Where the authoritative record
+is unavailable, the only truthful display is UNKNOWN or STALE with its resolver - never a pass.
+
 ## 2. The 41 files: 18 skills and 2 startup files
 
 ### 2.1 Selection rule
@@ -450,6 +462,11 @@ the same way.
 | A host coding agent that reads `AGENTS.md`/`CLAUDE.md` | The journey runs in the host agent, and the gate is behaviour that agent executes | **DeepSeek Harness (`deepseek-flash`)** — the agent used for the measured run. **Claude Code 2.1.311** was installed at `C:\Users\PeterNguyen\.local\bin\claude.exe` and was present, but it was **not** the agent used. |
 | A product repository (Role B), **git-initialised**, with a human owner | The install target; the owner record is `--local` Git config, and a fresh repository may legitimately have **zero commits** | created per run (`git init` if the product repo has no repository yet) |
 | Python, Node, pip, any package manager | **Not required.** The Python pins belong to the source merge gate, not to a consumer, and no packaged skill's workflow needs Python | n/a — deliberately not used |
+
+The table is the page's prerequisite view: a dependency that is not observed on your host, is not
+applicable, or is blocked by host policy is stated as UNRUN with the exact remaining action; it is
+never converted to a pass. The same fail-closed vocabulary applies to the governance states in
+[consumer-status-presentation-v1.md](consumer-status-presentation-v1.md).
 
 ## 7. The install procedure
 
@@ -1529,6 +1546,11 @@ Each code stops; none warns and continues.
 | 42 | Commit identity missing or owner-matching on the `agent-commit` route | On **stderr**: the parse failure, or the matched field and value plus the resolved author/committer and one question (section 8.3). A `human-only` install does not exit 42 on an owner match, because it makes no commit; it is not a relaxed agent check. Both modes still need a parsable identity, because P2 reports `owner_match=` in its acceptance line. This is the **prerequisite layer**; the gate's own snippet exits **1** for the same owner match (`SKILL.md:137-138`), so a gate refusal is not an install failure |
 | 43 | Install mode or owner authorization not stated, empty or unrecognised | The exact question and the two valid `-Mode` tokens (P2). Nothing written; no package file copied |
 
+Each code above is a first-class refusal: a run that stops has not installed a partial success, and an
+identical rerun is distinguishable from the initial run. Recover from the reported state using the
+message plus the record rule for that code; the governance-state equivalent and its permitted next
+actions are in [consumer-status-presentation-v1.md](consumer-status-presentation-v1.md).
+
 ### 7.3 Transitioning an installed v1 package to v2
 
 A consumer repository that already holds the published 39-file v1 starter moves to
@@ -2123,6 +2145,12 @@ a pass.
 - **Report UNRUN as UNRUN.** A check that was skipped, blocked by host policy, or
   not applicable is recorded with its exact remaining action; it is never converted
   to a pass.
+
+- **Consumer governance status is docs-only and proposed.** The merged governance controls (checker
+  and revision-state store, freeze/snapshot evidence, review tooling) do not create a consumer status
+  view and do not establish enforcement. T2 is open, T5 mounted coverage is UNKNOWN, T6 authenticated
+  verdicts are UNVERIFIED/BLOCKED, and the plan-revision and review-head counters are displayed, not
+  inferred. See [consumer-status-presentation-v1.md](consumer-status-presentation-v1.md).
 
 If an installation or a later check fails, record the exact command, the exit code,
 the message and the state it left behind. A failed or partial result is evidence; a
