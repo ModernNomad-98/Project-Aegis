@@ -57,6 +57,16 @@ revision dates are not recorded in the cited evidence and are not invented.
   append-only **prefix of its git base version**. Removing a line, editing a
   prior line, decreasing a count, a second reopen, or a rename/restart reset is
   refused as state tamper.
+- The prefix check is a **required input**. If no git base resolves for
+  `--base-ref` (default `origin/main`), the store is blocked with
+  `REQUIRED_INPUT_UNAVAILABLE` and `prefix_checks["__status__"] =
+  "GIT_BASE_UNRESOLVED"`; the check is never skipped and never reported as run.
+- Every manifest binding is compared to the re-derived state: a bound
+  `revision_count` / review-head count may not exceed the derivation (a
+  decrease is tamper, an append is not), a bound `reopen_used` may not be
+  revoked, and a bound `stop_state` must equal the derivation. A stop-state
+  transition therefore needs a refreshed manifest - which the per-file
+  bytes/sha256 binding already requires for any append.
 
 ## Seeded state and its provenance
 
@@ -90,9 +100,12 @@ outside the candidate. Its format is
 
 The candidate head under evaluation is supplied to the checker as input and is
 excluded from the review-head count by definition. The authoritative
-published-head export governs at gate time; this ledger must be a consistent
-mirror of it and never overrides it. Any disagreement or decrease is
-`STATE_TAMPER_SUSPECTED`. Live head history arrives only under C1.1b.
+published-head export governs at gate time; this ledger must be an **exact
+mirror of every previously published head** in that export and never overrides
+it. A truncated (prefix-only) ledger, an empty ledger when heads were
+published, an extra head, or a disagreeing head is `STATE_TAMPER_SUSPECTED`:
+an undercount is not accepted as "model lag". Live head history arrives only
+under C1.1b.
 
 ## Manifest and digests
 
@@ -141,7 +154,13 @@ gate time, never trusted from the manifest:
    `authority_ref_sha256` and the entry id must be present. This change does
    not append it and does not edit `docs/approvals/APPROVAL_REGISTER.md`.
 2. `OWNER_LINE_RECORD` - a recorded owner-line/authority record cited by a
-   repository-relative path and sha256, at that exact sha256.
+   repository-relative path and sha256, at that exact sha256. The cited file
+   must itself be a closed-schema authority record
+   (`aegis.authority-record/v1`: `record_id`, `authority_kind`,
+   `status` = `ACTIVE`, `holder_role`, `scope{repo, change_id, head_sha,
+   merge_target_ref}`). Any other repository file - including a page that
+   happens to hash correctly - is not an authority record and downgrades the
+   binding to UNVERIFIED with `STATE_TAMPER_SUSPECTED`.
 
 A missing, edited or unresolvable cited record downgrades the binding to
 UNVERIFIED and blocks readiness. `UNKNOWN` can never be VERIFIED.
@@ -168,7 +187,7 @@ The approval register itself relies on the same append-only policy plus review.
 
 The store alone can be inspected with the checker's record reader:
 
-    python -c "from tools.aegis_verdict_gate import records; s = records.load_store('.'); print([(k, v.revision_count, v.stop_state) for k, v in sorted(s.items.items())]); print(s.binding_status)"
+    python -c "from tools.aegis_verdict_gate import records; s = records.load_store('.', base_ref='HEAD'); print([(k, v.revision_count, v.stop_state) for k, v in sorted(s.items.items())]); print(s.binding_status)"
 
 See [the checker README](../../../tools/aegis_verdict_gate/README.md) for the
 full output contract, blocker classes and limitations. `docs/approvals/APPROVAL_REGISTER.md`

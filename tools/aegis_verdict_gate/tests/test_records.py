@@ -157,6 +157,7 @@ def build_store(root, items, ledger=(), reverse_manifest_files=False):
     (store / "manifest.json").write_text(
         json.dumps(manifest, sort_keys=True, indent=2) + "\n", encoding="utf-8", newline="\n"
     )
+    commit_git_base(root)
     return manifest
 
 
@@ -164,10 +165,79 @@ def records_store_dir():
     return "docs/approvals/revision-state"
 
 
+def git(root, *args):
+    completed = subprocess.run(
+        ["git", "-C", str(root)] + list(args), capture_output=True, check=False, timeout=60
+    )
+    if completed.returncode != 0:
+        raise AssertionError("git %s failed: %s" % (args, completed.stderr.decode("utf-8", "replace")))
+    return completed.stdout.decode("utf-8", "replace")
+
+
+def commit_git_base(root):
+    """Give the scratch store a real worktree base.
+
+    The append-only prefix invariant is a required input, so a store without a
+    base fails closed.  A caller that has already created the repository (the
+    dedicated prefix test) owns its own commits.
+    """
+
+    if (pathlib.Path(root) / ".git").exists():
+        return
+    git(root, "init", "-q", "-b", "main")
+    git(root, "config", "user.email", "fixture@example.invalid")
+    git(root, "config", "user.name", "Fixture Holder")
+    git(root, "config", "core.autocrlf", "false")
+    git(root, "add", "-A")
+    git(root, "commit", "-q", "-m", "fixture base")
+    git(root, "update-ref", "refs/remotes/origin/main", "HEAD")
+
+
+def write_manifest(root, manifest):
+    path = pathlib.Path(root) / records_store_dir() / "manifest.json"
+    path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def rebind(manifest):
+    """Recompute store_digest so only the tested binding term is inconsistent."""
+
+    digest_files = [
+        {key: entry[key] for key in ("path", "bytes", "sha256", "event_count", "id", "kind")}
+        for entry in sorted(manifest["files"], key=lambda entry: entry["path"])
+    ]
+    manifest["store_digest"] = canonical.digest(
+        {
+            "schema_version": "aegis.revision-store/v1",
+            "files": digest_files,
+            "derived_counts_at_binding": manifest["derived_counts_at_binding"],
+        }
+    )
+    return manifest
+
+
+def ledger_event(head, kind="INITIAL", at="2026-11-10T18:00:00Z"):
+    return {
+        "head_sha": head,
+        "kind": kind,
+        "exception_ref": None,
+        "counted_at": at,
+        "authority_ref": {
+            "authority_kind": "REGISTER_ENTRY",
+            "authority_ref_id": "APR-FIXTURE-C1-0001",
+            "holder_role": "programme-lead",
+            "holder_identity_ref": None,
+        },
+    }
+
+
 class SeedStoreTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.store = records.load_store(REPO_ROOT)
+        # HEAD is always resolvable in a worktree; origin/main is not guaranteed
+        # in every checkout, and an unresolvable base is now a required-input
+        # blocker (B2), so the seed read names its base explicitly.
+        cls.store = records.load_store(REPO_ROOT, base_ref="HEAD")
 
     def test_seed_counts_and_stop_states(self):
         self.assertEqual(self.store.issues, [])
@@ -305,6 +375,70 @@ class TamperTest(unittest.TestCase):
         store = records.load_store(self.root)
         self.assertTrue(any("decreased" in issue.detail for issue in store.issues))
 
+    def test_bound_stop_state_mismatch_is_tamper(self):
+        items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
+        manifest = build_store(self.root, items)
+        manifest["derived_counts_at_binding"]["items"][0]["stop_state"] = "CLOSED"
+        write_manifest(self.root, rebind(manifest))
+        store = records.load_store(self.root)
+        self.assertTrue(any("stop_state" in issue.detail and "disagrees" in issue.detail for issue in store.issues))
+
+    def test_bound_reopen_decrease_is_tamper(self):
+        items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
+        manifest = build_store(self.root, items)
+        manifest["derived_counts_at_binding"]["items"][0]["reopen_used"] = True
+        write_manifest(self.root, rebind(manifest))
+        store = records.load_store(self.root)
+        self.assertTrue(any("reopen_used" in issue.detail and "decreased" in issue.detail for issue in store.issues))
+
+    def test_appended_counted_reopen_is_not_a_decrease(self):
+        items = {
+            ITEM: [
+                _event("FX-0001"),
+                _event("FX-0002", "REOPEN_COUNTED", reopen=True),
+                _event("FX-0003", "STOP_STATE_SET", stop="OPEN"),
+            ]
+        }
+        manifest = build_store(self.root, items)
+        self.assertTrue(manifest["derived_counts_at_binding"]["items"][0]["reopen_used"])
+        # The manifest bound no reopen before the (single) counted reopen was
+        # appended: a legitimate append, never a tamper finding.
+        manifest["derived_counts_at_binding"]["items"][0]["reopen_used"] = False
+        write_manifest(self.root, rebind(manifest))
+        store = records.load_store(self.root)
+        self.assertEqual(store.issues, [])
+        self.assertEqual(store.items[ITEM].reopen_count, 1)
+
+    def test_bound_review_head_count_above_the_ledger_is_tamper(self):
+        items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
+        manifest = build_store(self.root, items, ledger=[ledger_event("1" * 40)])
+        manifest["derived_counts_at_binding"]["review_heads"]["used"] = 3
+        write_manifest(self.root, rebind(manifest))
+        store = records.load_store(self.root)
+        self.assertTrue(
+            any("review-head count decreased" in issue.detail for issue in store.issues)
+        )
+
+    def test_appended_ledger_head_is_not_a_review_head_decrease(self):
+        items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
+        manifest = build_store(
+            self.root, items, ledger=[ledger_event("1" * 40), ledger_event("2" * 40, "RESYNC")]
+        )
+        # Bound before the second head was published: derived 2 >= bound 1 is a
+        # legitimate append, not a decrease.
+        manifest["derived_counts_at_binding"]["review_heads"]["used"] = 1
+        write_manifest(self.root, rebind(manifest))
+        store = records.load_store(self.root)
+        self.assertEqual(store.issues, [])
+
+    def test_derived_item_missing_from_the_binding_is_tamper(self):
+        items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
+        manifest = build_store(self.root, items)
+        manifest["derived_counts_at_binding"]["items"] = []
+        write_manifest(self.root, rebind(manifest))
+        store = records.load_store(self.root)
+        self.assertTrue(any("is not bound in the manifest" in issue.detail for issue in store.issues))
+
     def test_manifest_file_order_does_not_change_the_digest(self):
         items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
         build_store(self.root, items)
@@ -374,6 +508,28 @@ def _head(seq, head_sha, kind="INITIAL"):
     return {"seq": seq, "head_sha": head_sha, "kind": kind, "published_at": "2026-11-10T18:00:00Z"}
 
 
+def _mirror(heads):
+    """The exact change-ledger mirror the export requires (A10)."""
+
+    return [
+        {
+            "seq": head["seq"],
+            "head_sha": head["head_sha"],
+            "kind": head["kind"],
+            "exception_ref": None,
+            "counted_at": head["published_at"],
+            "authority_ref": {
+                "authority_kind": "REGISTER_ENTRY",
+                "authority_ref_id": "APR-FIXTURE-C1-0001",
+                "holder_role": "programme-lead",
+                "holder_identity_ref": None,
+            },
+        }
+        for head in heads
+        if head["head_sha"] != HEAD
+    ]
+
+
 class ReviewHeadBudgetTest(unittest.TestCase):
     def test_boundaries_zero_to_three(self):
         cases = [
@@ -392,7 +548,7 @@ class ReviewHeadBudgetTest(unittest.TestCase):
             ),
         ]
         for heads, used, ordinal in cases:
-            result = records.derive_review_heads([], heads, HEAD)
+            result = records.derive_review_heads(_mirror(heads), heads, HEAD)
             self.assertEqual(result.used, used)
             self.assertEqual(result.ordinal, ordinal)
             self.assertEqual(result.issues, [])
@@ -404,36 +560,164 @@ class ReviewHeadBudgetTest(unittest.TestCase):
             _head(3, EXPORT_HEAD_3, "BATCHED_BLOCKING_FIX"),
             _head(4, HEAD, "FINAL_BLOCKING_FIX"),
         ]
-        self.assertEqual(records.derive_review_heads([], heads, HEAD).used, 3)
+        self.assertEqual(records.derive_review_heads(_mirror(heads), heads, HEAD).used, 3)
 
     def test_duplicate_head_and_bad_ordinal_are_refused(self):
         heads = [_head(1, EXPORT_HEAD_1), _head(2, EXPORT_HEAD_1), _head(3, HEAD)]
-        result = records.derive_review_heads([], heads, HEAD)
+        result = records.derive_review_heads(_mirror(heads), heads, HEAD)
         self.assertTrue(any("duplicate" in issue.detail for issue in result.issues))
         bad_ordinal = [_head(2, EXPORT_HEAD_1), _head(3, HEAD)]
-        result = records.derive_review_heads([], bad_ordinal, HEAD)
+        result = records.derive_review_heads(_mirror(bad_ordinal), bad_ordinal, HEAD)
         self.assertTrue(any("contiguous" in issue.detail for issue in result.issues))
 
     def test_candidate_must_be_last(self):
         heads = [_head(1, HEAD), _head(2, EXPORT_HEAD_1)]
-        result = records.derive_review_heads([], heads, HEAD)
+        result = records.derive_review_heads(_mirror(heads), heads, HEAD)
         self.assertTrue(any("not the last" in issue.detail for issue in result.issues))
 
-    def test_ledger_must_mirror_the_export(self):
+    def test_ledger_must_mirror_every_published_head_exactly(self):
         heads = [_head(1, EXPORT_HEAD_1), _head(2, EXPORT_HEAD_2), _head(3, HEAD)]
-        ledger = [{"seq": 1, "head_sha": EXPORT_HEAD_1, "kind": "INITIAL", "exception_ref": None}]
-        ok = records.derive_review_heads(ledger, heads, HEAD)
+        mirror = _mirror(heads)
+        ok = records.derive_review_heads(mirror, heads, HEAD)
         self.assertEqual(ok.issues, [])
-        self.assertEqual(ok.ledger_count, 1)
-        disagreeing = [{"seq": 1, "head_sha": EXPORT_HEAD_3, "kind": "INITIAL", "exception_ref": None}]
-        bad = records.derive_review_heads(disagreeing, heads, HEAD)
-        self.assertTrue(any("disagrees" in issue.detail for issue in bad.issues))
+        self.assertEqual(ok.ledger_count, 2)
+
+    def test_truncated_ledger_is_tamper_not_a_mirror(self):
+        # The previous behaviour accepted 1-of-2 as a consistent mirror; a
+        # truncated ledger undercounts the published-head budget and is tamper.
+        heads = [_head(1, EXPORT_HEAD_1), _head(2, EXPORT_HEAD_2), _head(3, HEAD)]
+        truncated = _mirror(heads)[:1]
+        result = records.derive_review_heads(truncated, heads, HEAD)
+        self.assertTrue(any("disagrees" in issue.detail for issue in result.issues))
+        self.assertTrue(any("exactly" in issue.detail for issue in result.issues))
+
+    def test_empty_ledger_is_tamper_when_heads_were_published(self):
+        heads = [_head(1, EXPORT_HEAD_1), _head(2, HEAD)]
+        result = records.derive_review_heads([], heads, HEAD)
+        self.assertTrue(any("disagrees" in issue.detail for issue in result.issues))
+
+    def test_disagreeing_ledger_head_is_tamper(self):
+        heads = [_head(1, EXPORT_HEAD_1), _head(2, EXPORT_HEAD_2), _head(3, HEAD)]
+        disagreeing = _mirror(heads)
+        disagreeing[0]["head_sha"] = EXPORT_HEAD_3
+        result = records.derive_review_heads(disagreeing, heads, HEAD)
+        self.assertTrue(any("disagrees" in issue.detail for issue in result.issues))
 
     def test_ledger_cannot_record_the_candidate(self):
         heads = [_head(1, HEAD)]
         ledger = [{"seq": 1, "head_sha": HEAD, "kind": "INITIAL", "exception_ref": None}]
         result = records.derive_review_heads(ledger, heads, HEAD)
         self.assertTrue(any("candidate head" in issue.detail for issue in result.issues))
+
+
+REGISTER_TEXT = (
+    "# Register (fixture text, grants nothing)\n"
+    "\n"
+    "| Entry | Status | Scope |\n"
+    "| --- | --- | --- |\n"
+    "| APR-TEST-0001 | ACTIVE | repo=example-org/example-repo; change_id=42; head_sha="
+    + "a" * 40
+    + "; merge_target_ref=refs/heads/main |\n"
+    "| APR-TEST-0002 | ACTIVE | fixture repo/change/head only |\n"
+    "| APR-TEST-0009 | INACTIVE | repo=example-org/example-repo; change_id=42; head_sha="
+    + "a" * 40
+    + "; merge_target_ref=refs/heads/main |\n"
+    "\n"
+    "### AEGIS-APR-0100: A heading entry\n"
+    "\n"
+    "- **Event:** GRANT\n"
+    "- **Status at recording:** **ACTIVE - recorded, not granted.**\n"
+    "- **Gate scope:** repo=example-org/example-repo; change_id=7; head_sha="
+    + "b" * 40
+    + "; merge_target_ref=refs/heads/main\n"
+    "\n"
+    "### AEGIS-APR-0101: Revocation of AEGIS-APR-0100\n"
+    "\n"
+    "- **Event:** REVOKED - the grant named above is withdrawn.\n"
+)
+
+
+class RegisterResolutionTest(unittest.TestCase):
+    """B5: the G group and exceptions are resolved from the register bytes."""
+
+    def test_table_row_resolves_status_and_scope(self):
+        entry = records.resolve_register_entry(REGISTER_TEXT, "APR-TEST-0001")
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry.status, "ACTIVE")
+        self.assertTrue(entry.scope_present)
+        self.assertTrue(entry.covers("example-org/example-repo", 42, "a" * 40, "refs/heads/main"))
+        self.assertFalse(entry.covers("example-org/example-repo", 42, "f" * 40, "refs/heads/main"))
+        self.assertFalse(entry.covers("example-org/other-repo", 42, "a" * 40, "refs/heads/main"))
+
+    def test_heading_block_resolves_status_and_scope(self):
+        entry = records.resolve_register_entry(REGISTER_TEXT, "AEGIS-APR-0100")
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry.status, "REVOKED")
+        self.assertFalse(entry.scope_present)
+
+    def test_a_later_lifecycle_event_overrides_status_at_recording(self):
+        entry = records.resolve_register_entry(REGISTER_TEXT, "AEGIS-APR-0100")
+        self.assertEqual(entry.status, "REVOKED")
+
+    def test_entry_without_a_machine_checkable_scope(self):
+        entry = records.resolve_register_entry(REGISTER_TEXT, "APR-TEST-0002")
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry.status, "ACTIVE")
+        self.assertFalse(entry.scope_present)
+        self.assertFalse(entry.covers("example-org/example-repo", 42, "a" * 40, "refs/heads/main"))
+
+    def test_status_is_matched_as_a_whole_token(self):
+        entry = records.resolve_register_entry(REGISTER_TEXT, "APR-TEST-0009")
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry.status, "UNKNOWN")
+
+    def test_absent_entry_resolves_to_none(self):
+        self.assertIsNone(records.resolve_register_entry(REGISTER_TEXT, "APR-TEST-0404"))
+        self.assertIsNone(records.resolve_register_entry(REGISTER_TEXT, ""))
+
+    def test_scope_parser_keeps_only_known_keys(self):
+        self.assertEqual(
+            records.parse_gate_scope(
+                "repo=o/r; change_id=1; head_sha=" + "a" * 40 + "; merge_target_ref=refs/heads/main; x=1"
+            ),
+            {
+                "repo": "o/r",
+                "change_id": "1",
+                "head_sha": "a" * 40,
+                "merge_target_ref": "refs/heads/main",
+            },
+        )
+
+
+class GitBaseRequiredTest(unittest.TestCase):
+    """B2: the append-only check is never skipped when no base resolves."""
+
+    def setUp(self):
+        self.root = pathlib.Path(tempfile.mkdtemp(prefix="aegis-nobase-"))
+
+    def tearDown(self):
+        shutil.rmtree(str(self.root), ignore_errors=True)
+
+    def test_unresolvable_base_is_a_required_input_issue(self):
+        items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
+        build_store(self.root, items)
+        # Rename, not delete: Windows refuses to unlink git's read-only objects.
+        (self.root / ".git").rename(self.root / ".git-disabled")
+        store = records.load_store(self.root, base_ref="origin/main")
+        self.assertEqual(store.prefix_checks["__status__"], "GIT_BASE_UNRESOLVED")
+        self.assertTrue(
+            any(
+                issue.code == "REQUIRED_INPUT_UNAVAILABLE" and "no git base" in issue.detail
+                for issue in store.issues
+            )
+        )
+
+    def test_unknown_base_ref_is_a_required_input_issue(self):
+        items = {ITEM: [_event("FX-0001"), _event("FX-0002", "STOP_STATE_SET", stop="OPEN")]}
+        build_store(self.root, items)
+        store = records.load_store(self.root, base_ref="refs/heads/does-not-exist")
+        self.assertEqual(store.prefix_checks["__status__"], "GIT_BASE_UNRESOLVED")
+        self.assertTrue(any(issue.code == "REQUIRED_INPUT_UNAVAILABLE" for issue in store.issues))
 
 
 class DigestDeterminismTest(unittest.TestCase):

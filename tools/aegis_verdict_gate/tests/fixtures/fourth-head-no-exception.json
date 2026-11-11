@@ -317,8 +317,45 @@
           }
         ]
       },
-      "change_ledger": [],
-      "register_text": "# SYNTHETIC FIXTURE APPROVAL REGISTER - NOT AN APPROVAL\n\nThis file exists only inside a temporary fixture repository built by\ntools/aegis_verdict_gate/tests/_fixtures.py. It is not the repository\napproval register and it grants nothing.\n\n| Entry | Status | Scope |\n| --- | --- | --- |\n| APR-FIXTURE-C11A-0001 | ACTIVE | fixture repo/change/head only |\n| APR-FIXTURE-STORE-0001 | ACTIVE | fixture record store provenance only |\n"
+      "change_ledger": [
+        {
+          "head_sha": "1111111111111111111111111111111111111111",
+          "kind": "INITIAL",
+          "exception_ref": null,
+          "counted_at": "2026-11-10T17:00:00Z",
+          "authority_ref": {
+            "authority_kind": "REGISTER_ENTRY",
+            "authority_ref_id": "APR-FIXTURE-C11A-0001",
+            "holder_role": "programme-lead",
+            "holder_identity_ref": null
+          }
+        },
+        {
+          "head_sha": "2222222222222222222222222222222222222222",
+          "kind": "BATCHED_BLOCKING_FIX",
+          "exception_ref": null,
+          "counted_at": "2026-11-10T17:30:00Z",
+          "authority_ref": {
+            "authority_kind": "REGISTER_ENTRY",
+            "authority_ref_id": "APR-FIXTURE-C11A-0001",
+            "holder_role": "programme-lead",
+            "holder_identity_ref": null
+          }
+        },
+        {
+          "head_sha": "3333333333333333333333333333333333333333",
+          "kind": "RESYNC",
+          "exception_ref": null,
+          "counted_at": "2026-11-10T17:45:00Z",
+          "authority_ref": {
+            "authority_kind": "REGISTER_ENTRY",
+            "authority_ref_id": "APR-FIXTURE-C11A-0001",
+            "holder_role": "programme-lead",
+            "holder_identity_ref": null
+          }
+        }
+      ],
+      "register_text": "# SYNTHETIC FIXTURE APPROVAL REGISTER - NOT AN APPROVAL\n\nThis file exists only inside a temporary fixture repository built by\ntools/aegis_verdict_gate/tests/_fixtures.py. It is not the repository\napproval register and it grants nothing.\n\n| Entry | Status | Scope |\n| --- | --- | --- |\n| APR-FIXTURE-C11A-0001 | ACTIVE | repo=example-org/example-repo; change_id=42; head_sha=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; merge_target_ref=refs/heads/main |\n| APR-FIXTURE-STORE-0001 | ACTIVE | store=docs/approvals/revision-state |\n| EXC-FIXTURE-0001 | ACTIVE | repo=example-org/example-repo; change_id=42; head_sha=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; merge_target_ref=refs/heads/main |\n"
     },
     "stage_records": [
       {

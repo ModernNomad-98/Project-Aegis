@@ -48,6 +48,9 @@ def write_envelope(root, name, payload, *, status=None, tamper_hash=False, drop_
 
 def base_verdict():
     return {
+        "repo": {"owner": "example-org", "name": "example-repo"},
+        "change": {"type": "PR", "id": 42},
+        "merge_target": {"ref": "refs/heads/main"},
         "candidate_id": "cand-fixture-0001",
         "head_sha": HEAD,
         "tree_sha": TREE,
@@ -183,9 +186,46 @@ class SettlementDerivationTest(unittest.TestCase):
             "settled": settled,
         }
 
-    def derive(self, payload):
+    def derive(self, payload, verdict=None, repo_root=None):
         path = write_envelope(self.root, "settlement.json", payload)
-        return inputs.derive_settlement(inputs.load_envelope(path))
+        return inputs.derive_settlement(inputs.load_envelope(path), verdict, repo_root)
+
+    def authority_record(self, **overrides):
+        document = {
+            "schema_version": "aegis.disposition-authority/v1",
+            "authority_id": "AUTH-DISP-0001",
+            "status": "ACTIVE",
+            "decision": "UNAVAILABLE_REVIEW",
+            "holder_role": "owner",
+            "holder_identity_ref": "owner",
+            "scope": {
+                "repo": "example-org/example-repo",
+                "change_id": 42,
+                "head_sha": HEAD,
+                "merge_target_ref": "refs/heads/main",
+            },
+            "issued_at": "2026-11-10T19:00:00Z",
+        }
+        document.update(overrides)
+        path = self.root / "authority" / "AUTH-DISP-0001.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8", newline="\n")
+        return document, canonical.sha256_hex(path.read_bytes())
+
+    def disposition_source(self, sha, head=HEAD):
+        return {
+            "source_id": "SR-1",
+            "state": "UNAVAILABLE_DISPOSITIONED",
+            "disposition_authority_ref": "authority/AUTH-DISP-0001.json",
+            "disposition_authority_sha256": sha,
+            "disposition_scope": {
+                "repo": "example-org/example-repo",
+                "change_id": 42,
+                "head_sha": head,
+                "merge_target_ref": "refs/heads/main",
+            },
+            "expires": None,
+        }
 
     def test_settled(self):
         result = self.derive(self.payload([{"source_id": "SR-1", "state": "SETTLED"}], True))
@@ -197,12 +237,17 @@ class SettlementDerivationTest(unittest.TestCase):
         self.assertFalse(result.settled)
         self.assertTrue(any(issue.code == "MISSING_REQUIRED_REVIEW_OR_DISPOSITION" for issue in result.issues))
 
-    def test_unavailable_disposition_requires_authority_and_scope(self):
-        result = self.derive(
-            self.payload([{"source_id": "SR-1", "state": "UNAVAILABLE_DISPOSITIONED"}], False)
+    def test_unavailable_disposition_requires_a_verified_authority(self):
+        verdict = base_verdict()
+        bare = self.derive(
+            self.payload([{"source_id": "SR-1", "state": "UNAVAILABLE_DISPOSITIONED"}], False),
+            verdict,
+            self.root,
         )
-        self.assertFalse(result.settled)
-        disposed = self.derive(
+        self.assertFalse(bare.settled)
+        # Arbitrary strings are not an authority: a truthy ref plus a prose
+        # scope used to be accepted; it is now blocked.
+        arbitrary = self.derive(
             self.payload(
                 [
                     {
@@ -213,9 +258,61 @@ class SettlementDerivationTest(unittest.TestCase):
                     }
                 ],
                 True,
-            )
+            ),
+            verdict,
+            self.root,
         )
-        self.assertTrue(disposed.settled)
+        self.assertFalse(arbitrary.settled)
+        self.assertTrue(any("64-hex sha256" in issue.detail for issue in arbitrary.issues))
+
+    def test_verified_disposition_authority_settles(self):
+        verdict = base_verdict()
+        _, sha = self.authority_record()
+        result = self.derive(self.payload([self.disposition_source(sha)], True), verdict, self.root)
+        self.assertTrue(result.settled)
+        self.assertEqual(result.issues, [])
+
+    def test_revoked_disposition_authority_blocks(self):
+        verdict = base_verdict()
+        _, sha = self.authority_record(status="REVOKED")
+        result = self.derive(self.payload([self.disposition_source(sha)], True), verdict, self.root)
+        self.assertFalse(result.settled)
+        self.assertTrue(any("not ACTIVE" in issue.detail for issue in result.issues))
+
+    def test_disposition_scope_must_cover_this_change(self):
+        verdict = base_verdict()
+        _, sha = self.authority_record()
+        result = self.derive(
+            self.payload([self.disposition_source(sha, head="9" * 40)], True), verdict, self.root
+        )
+        self.assertFalse(result.settled)
+        self.assertTrue(any("scope" in issue.detail for issue in result.issues))
+
+    def test_absent_disposition_authority_record_blocks(self):
+        verdict = base_verdict()
+        _, sha = self.authority_record()
+        (self.root / "authority" / "AUTH-DISP-0001.json").unlink()
+        result = self.derive(self.payload([self.disposition_source(sha)], True), verdict, self.root)
+        self.assertFalse(result.settled)
+        self.assertTrue(any("absent" in issue.detail for issue in result.issues))
+
+    def test_edited_disposition_authority_record_blocks(self):
+        verdict = base_verdict()
+        _, sha = self.authority_record()
+        path = self.root / "authority" / "AUTH-DISP-0001.json"
+        path.write_text(path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        result = self.derive(self.payload([self.disposition_source(sha)], True), verdict, self.root)
+        self.assertFalse(result.settled)
+        self.assertTrue(any("do not match" in issue.detail for issue in result.issues))
+
+    def test_time_bounded_disposition_authority_blocks(self):
+        verdict = base_verdict()
+        _, sha = self.authority_record()
+        source = self.disposition_source(sha)
+        source["expires"] = "2026-12-01T00:00:00Z"
+        result = self.derive(self.payload([source], True), verdict, self.root)
+        self.assertFalse(result.settled)
+        self.assertTrue(any("time-bounded" in issue.detail for issue in result.issues))
 
     def test_declared_disagreement_is_invalid(self):
         result = self.derive(self.payload([{"source_id": "SR-1", "state": "SETTLED"}], False))
@@ -321,10 +418,20 @@ class HeadHistoryTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(str(self.root), ignore_errors=True)
 
-    def history(self, status, heads=None):
-        payload = {"change_id": 42, "heads": heads or [{"seq": 1, "head_sha": HEAD, "kind": "INITIAL"}]}
+    def history(self, status, heads=None, verdict=None, drop=(), **extra):
+        payload = {
+            "change_id": 42,
+            "candidate_head": HEAD,
+            "heads": heads or [{"seq": 1, "head_sha": HEAD, "kind": "INITIAL"}],
+        }
+        payload.update(extra)
+        for key in drop:
+            payload.pop(key, None)
         path = write_envelope(self.root, "history.json", payload, status=status)
-        return inputs.validate_head_history(inputs.load_envelope(path))
+        return inputs.validate_head_history(inputs.load_envelope(path), verdict)
+
+    def verdict(self, change_id=42, head=HEAD):
+        return {"change": {"id": change_id}, "head_sha": head}
 
     def test_verified(self):
         result = self.history("VERIFIED")
@@ -339,6 +446,26 @@ class HeadHistoryTest(unittest.TestCase):
     def test_missing_status_blocks(self):
         result = self.history(None)
         self.assertTrue(any("provenance.status" in issue.detail for issue in result.issues))
+
+    def test_export_bound_to_the_evaluated_change_and_head(self):
+        result = self.history("VERIFIED", verdict=self.verdict())
+        self.assertEqual(result.issues, [])
+
+    def test_foreign_change_export_is_refused(self):
+        result = self.history("VERIFIED", verdict=self.verdict(), change_id=43)
+        self.assertTrue(any("not the evaluated change" in issue.detail for issue in result.issues))
+
+    def test_export_for_an_earlier_head_is_refused(self):
+        result = self.history("VERIFIED", verdict=self.verdict(), candidate_head="9" * 40)
+        self.assertTrue(any("not the evaluated head" in issue.detail for issue in result.issues))
+
+    def test_export_without_change_identity_is_refused(self):
+        result = self.history("VERIFIED", verdict=self.verdict(), drop=("change_id",))
+        self.assertTrue(any("declares no change_id" in issue.detail for issue in result.issues))
+
+    def test_export_without_candidate_head_is_refused(self):
+        result = self.history("VERIFIED", verdict=self.verdict(), drop=("candidate_head",))
+        self.assertTrue(any("declares no candidate_head" in issue.detail for issue in result.issues))
 
 
 class EvidenceSetTest(unittest.TestCase):

@@ -30,6 +30,7 @@ def evaluate(paths):
         head_history_path=paths["head_history"],
         stage_records_dir=paths["stage_records_dir"],
         supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
+        fixture_mode=True,
     )
 
 
@@ -52,7 +53,7 @@ class SeedStoreProvenanceTest(unittest.TestCase):
         self.assertIn("AUTH-STORE", binding["unverified_reason"])
 
     def test_seed_store_displays_as_unverified_not_as_a_verified_count(self):
-        store = records.load_store(REPO_ROOT)
+        store = records.load_store(REPO_ROOT, base_ref="HEAD")
         self.assertEqual(store.binding_status, "UNVERIFIED")
         self.assertEqual(store.issues, [])
         self.assertRegex(store.recomputed_store_digest, "^[0-9a-f]{64}$")
@@ -111,23 +112,63 @@ class BindingRecheckTest(unittest.TestCase):
         self.assertFalse(result.readiness)
         self.assertEqual(result.reason_codes, ["STATE_TAMPER_SUSPECTED"])
 
-    def test_owner_line_record_path_route_verifies(self):
-        register_sha = canonical.sha256_hex(self.register.read_bytes())
-        patch_binding(
-            self.paths,
-            {
-                "authority_kind": "OWNER_LINE_RECORD",
-                "authority_ref_id": records.REGISTER_RELATIVE_PATH,
-                "authority_ref_sha256": register_sha,
-                "holder_role": "programme-lead",
-                "holder_identity_ref": None,
-                "binding_commit_or_pr": "fixture",
-                "binding_status": "VERIFIED",
-                "unverified_reason": None,
+    def write_authority_record(self, record_id="authority/owner-line.json", **overrides):
+        document = {
+            "schema_version": "aegis.authority-record/v1",
+            "record_id": record_id,
+            "authority_kind": "OWNER_LINE_RECORD",
+            "status": "ACTIVE",
+            "holder_role": "owner",
+            "holder_identity_ref": "owner",
+            "scope": {
+                "repo": "example-org/example-repo",
+                "change_id": 42,
+                "head_sha": "a" * 40,
+                "merge_target_ref": "refs/heads/main",
             },
-        )
+            "issued_at": "2026-11-10T19:00:00Z",
+        }
+        document.update(overrides)
+        path = self.paths["root"] / record_id
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+        return record_id, canonical.sha256_hex(path.read_bytes())
+
+    def binding_for(self, record_id, record_sha):
+        return {
+            "authority_kind": "OWNER_LINE_RECORD",
+            "authority_ref_id": record_id,
+            "authority_ref_sha256": record_sha,
+            "holder_role": "programme-lead",
+            "holder_identity_ref": None,
+            "binding_commit_or_pr": "fixture",
+            "binding_status": "VERIFIED",
+            "unverified_reason": None,
+        }
+
+    def test_owner_line_authority_record_verifies(self):
+        record_id, record_sha = self.write_authority_record()
+        patch_binding(self.paths, self.binding_for(record_id, record_sha))
         result = evaluate(self.paths)
         self.assertTrue(result.readiness)
+
+    def test_arbitrary_repository_file_is_not_an_owner_line_authority_record(self):
+        # Any repository file used to satisfy a VERIFIED OWNER_LINE_RECORD
+        # citation: the register prose is a hash-valid, non-authority file.
+        register_sha = canonical.sha256_hex(self.register.read_bytes())
+        patch_binding(self.paths, self.binding_for(records.REGISTER_RELATIVE_PATH, register_sha))
+        result = evaluate(self.paths)
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["STATE_TAMPER_SUSPECTED"])
+        self.assertIn("authority record", result.blockers[0].detail)
+
+    def test_revoked_owner_line_authority_record_is_refused(self):
+        record_id, record_sha = self.write_authority_record(status="REVOKED")
+        patch_binding(self.paths, self.binding_for(record_id, record_sha))
+        result = evaluate(self.paths)
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["STATE_TAMPER_SUSPECTED"])
+        self.assertIn("not ACTIVE", result.blockers[0].detail)
 
     def test_unknown_authority_cannot_claim_verified(self):
         patch_binding(

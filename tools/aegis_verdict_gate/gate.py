@@ -140,6 +140,23 @@ PERMITTED_ACTION: typing.Dict[str, typing.Dict[str, str]] = {
         "actor_role": "reviewer-coordinator",
         "authority_ref": "T7 unavailable-review disposition authority (undefined)",
     },
+    # WAIT codes never block readiness; they still carry a permitted action so
+    # that a displayed blocker is never a KeyError (the class map is total).
+    "ADVISORY_REVIEW_PENDING": {
+        "action": "WAIT_FOR_THE_ADVISORY_REVIEW",
+        "actor_role": "reviewer-coordinator",
+        "authority_ref": "advisory review is not a readiness term",
+    },
+    "SCHEDULED_EXTERNAL_WAIT": {
+        "action": "WAIT_FOR_THE_SCHEDULED_EXTERNAL_EVENT",
+        "actor_role": "record-holder",
+        "authority_ref": "scheduled external wait is not a readiness term",
+    },
+    "OWNER_DECISION_NON_BLOCKING": {
+        "action": "WAIT_FOR_THE_NON_BLOCKING_OWNER_DECISION",
+        "actor_role": "owner",
+        "authority_ref": "non-blocking owner decision",
+    },
 }
 
 READY_ACTION = {
@@ -300,6 +317,7 @@ class Context:
     declarations: typing.Dict[str, typing.Dict[str, object]]
     supported_auth_methods: typing.Tuple[str, ...]
     candidate_head: str
+    fixture_mode: bool
 
     def get(self, path: str) -> typing.Tuple[bool, object]:
         return catalogue.get_path(self.doc, path)
@@ -604,6 +622,16 @@ def check_c4(ctx: Context) -> typing.List[Issue]:
     issues: typing.List[Issue] = []
     if ctx.text("reviewer.role") != "F":
         issues.append(_issue("CANONICAL_FIELD_MISSING_OR_MISMATCH", "VB-F02 reviewer.role is not F"))
+    if ctx.supported_auth_methods and not ctx.fixture_mode:
+        # A supported method is a fixture-only affordance.  If one ever arrives
+        # outside fixture mode this term fails closed rather than lending the
+        # record an authentication it does not have (T6 undecided).
+        issues.append(
+            _issue(
+                "VERDICT_STALE_OR_UNVERIFIED",
+                "supported authentication methods are refused outside fixture mode (T6 undecided)",
+            )
+        )
     method = ctx.text("reviewer.auth_method")
     if method not in ctx.supported_auth_methods:
         issues.append(
@@ -685,6 +713,30 @@ def check_c6(ctx: Context) -> typing.List[Issue]:
 # ---------------------------------------------------------------------------
 
 
+def _register_text(ctx: Context) -> typing.Tuple[str, typing.Optional[Issue]]:
+    """Read the approval register the verdict cites (VB-G02), never a copy.
+
+    Returns (text, issue).  An absent register or a register whose bytes do not
+    match VB-G02 yields an issue and no text: the G group is resolved at gate
+    time from the hashed register, so a missing or edited register can never be
+    read as ACTIVE authority.
+    """
+
+    register_path = ctx.repo_root / records.REGISTER_RELATIVE_PATH
+    if not register_path.is_file():
+        return ("", _issue("REQUIRED_INPUT_UNAVAILABLE", "the approval register is absent"))
+    raw = register_path.read_bytes()
+    if canonical.sha256_hex(raw) != ctx.text("owner_line.register_sha256"):
+        return (
+            "",
+            _issue(
+                "CANONICAL_FIELD_MISSING_OR_MISMATCH",
+                "VB-G02 register hash does not match the register bytes",
+            ),
+        )
+    return (raw.decode("utf-8", "replace"), None)
+
+
 def check_c7(ctx: Context) -> typing.List[Issue]:
     issues: typing.List[Issue] = []
     if not HEX64.match(ctx.text("policy_sha256")):
@@ -699,10 +751,16 @@ def check_c7(ctx: Context) -> typing.List[Issue]:
                 "VB-C06 revision_state_sha256 does not match the derived record",
             )
         )
+    for issue in ctx.history.issues:
+        # The export's own binding findings (wrong change/head, unverified
+        # provenance) are contract blockers, never dropped on the floor.
+        issues.append(_issue(issue.code, issue.detail))
     if ctx.history.status != "VERIFIED":
         issues.append(
             _issue("REQUIRED_INPUT_UNAVAILABLE", "the authoritative head-history export is not VERIFIED")
         )
+        return issues
+    if issues:
         return issues
     for issue in ctx.heads.issues:
         issues.append(_issue("STATE_TAMPER_SUSPECTED", issue.detail))
@@ -721,23 +779,65 @@ def check_c7(ctx: Context) -> typing.List[Issue]:
     exception_id = ctx.get("review_heads.exception_id")[1]
     if ctx.heads.used >= 3:
         exception = ctx.record.get("review_head_exception")
-        valid = False
-        if isinstance(exception, dict) and exception_id:
-            scope = exception.get("scope") if isinstance(exception.get("scope"), dict) else {}
-            valid = (
-                exception.get("exception_id") == exception_id
-                and exception.get("state") == "ACTIVE"
-                and scope.get("change_id") == ctx.get("change.id")[1]
-                and scope.get("head_sha") == ctx.candidate_head
-                and bool(exception.get("authority_ref"))
-            )
-        if not valid:
+        if not isinstance(exception, dict) or not exception_id or exception.get("exception_id") != exception_id:
             issues.append(
                 _issue(
                     "REVIEW_BUDGET_EXHAUSTED",
                     "used=%d with no ACTIVE scoped exception covering this change/head" % ctx.heads.used,
                 )
             )
+            return issues
+        # The exception is validated against the register identity at gate
+        # time, never self-granted by the record that cites it.
+        text, register_issue = _register_text(ctx)
+        if register_issue is not None:
+            issues.append(register_issue)
+            return issues
+        entry_id = typing.cast(str, exception_id)
+        entry = records.resolve_register_entry(text, entry_id)
+        authority = exception.get("authority_ref")
+        granted = (
+            records.resolve_register_entry(text, str(authority))
+            if isinstance(authority, str) and authority
+            else None
+        )
+        repo_ref = "%s/%s" % (ctx.text("repo.owner"), ctx.text("repo.name"))
+        scope = exception.get("scope") if isinstance(exception.get("scope"), dict) else {}
+        valid = (
+            entry is not None
+            and entry.status == "ACTIVE"
+            and entry.scope_present
+            and entry.covers(repo_ref, ctx.get("change.id")[1], ctx.candidate_head, ctx.text("merge_target.ref"))
+            and granted is not None
+            and granted.status == "ACTIVE"
+        )
+        if not valid:
+            issues.append(
+                _issue(
+                    "REVIEW_BUDGET_EXHAUSTED",
+                    "used=%d with no ACTIVE, register-resolved, scope-covering exception for %s"
+                    % (ctx.heads.used, entry_id),
+                )
+            )
+            return issues
+        # The record may not claim a state or scope the register does not hold.
+        if exception.get("state") != entry.status:
+            issues.append(
+                _issue(
+                    "STATE_TAMPER_SUSPECTED",
+                    "the supplied exception claims state %r but the register's effective status is %r"
+                    % (exception.get("state"), entry.status),
+                )
+            )
+        for key in records.GATE_SCOPE_FIELDS:
+            if str(scope.get(key, "")) != str(entry.scope.get(key, "")):
+                issues.append(
+                    _issue(
+                        "STATE_TAMPER_SUSPECTED",
+                        "the supplied exception claims scope %s=%r but the register says %r"
+                        % (key, scope.get(key), entry.scope.get(key)),
+                    )
+                )
     elif exception_id:
         issues.append(
             _issue("STATE_TAMPER_SUSPECTED", "an exception is recorded below the used >= 3 threshold")
@@ -906,49 +1006,80 @@ def check_c11(ctx: Context) -> typing.List[Issue]:
 
 
 def check_c12(ctx: Context) -> typing.List[Issue]:
+    """Owner line: resolved from the register, never from the record's own claim.
+
+    The supplied gate-time resolution is audit/display material.  It must agree
+    with what the hashed register says; a forged ACTIVE status or a forged
+    covering scope is refused even when the resolution record is otherwise
+    well formed.
+    """
+
     issues: typing.List[Issue] = []
     resolution = ctx.record.get("owner_line_resolution")
     if not isinstance(resolution, dict):
         return [_issue("AUTHORITY_ABSENT", "no owner-line resolution record is supplied")]
-    if resolution.get("entry_id") != ctx.text("owner_line.id"):
+    entry_id = ctx.text("owner_line.id")
+    if resolution.get("entry_id") != entry_id:
         issues.append(_issue("CANONICAL_FIELD_MISSING_OR_MISMATCH", "the resolution entry id does not match VB-G01"))
         return issues
-    register_path = ctx.repo_root / records.REGISTER_RELATIVE_PATH
-    if not register_path.is_file():
-        issues.append(_issue("REQUIRED_INPUT_UNAVAILABLE", "the approval register is absent"))
-        return issues
-    raw = register_path.read_bytes()
-    register_sha = canonical.sha256_hex(raw)
-    if register_sha != ctx.text("owner_line.register_sha256"):
-        issues.append(
-            _issue("CANONICAL_FIELD_MISSING_OR_MISMATCH", "VB-G02 register hash does not match the register bytes")
-        )
-        return issues
-    if resolution.get("register_sha256") != register_sha:
+    text, register_issue = _register_text(ctx)
+    if register_issue is not None:
+        return [register_issue]
+    if resolution.get("register_sha256") != ctx.text("owner_line.register_sha256"):
         issues.append(
             _issue("CANONICAL_FIELD_MISSING_OR_MISMATCH", "the resolution register hash does not match the register")
         )
         return issues
-    text = raw.decode("utf-8", "replace")
-    if ctx.text("owner_line.id") not in text:
-        issues.append(_issue("AUTHORITY_ABSENT", "the cited owner-line entry is absent from the register"))
+    entry = records.resolve_register_entry(text, entry_id)
+    if entry is None:
+        issues.append(
+            _issue("AUTHORITY_ABSENT", "the cited owner-line entry %r is absent from the register" % entry_id)
+        )
         return issues
-    if resolution.get("effective_status") != "ACTIVE":
+    if entry.status != "ACTIVE":
         issues.append(
             _issue(
                 "AUTHORITY_ABSENT",
-                "owner-line effective status is %r, not ACTIVE" % (resolution.get("effective_status"),),
+                "the register's effective status for %s is %s, not ACTIVE" % (entry_id, entry.status),
             )
         )
         return issues
+    if not entry.scope_present:
+        issues.append(
+            _issue(
+                "AUTHORITY_ABSENT",
+                "the register entry %s carries no machine-checkable gate scope" % entry_id,
+            )
+        )
+        return issues
+    repo_ref = "%s/%s" % (ctx.text("repo.owner"), ctx.text("repo.name"))
+    if not entry.covers(repo_ref, ctx.get("change.id")[1], ctx.candidate_head, ctx.text("merge_target.ref")):
+        issues.append(
+            _issue(
+                "AUTHORITY_ABSENT",
+                "the register entry %s does not cover this repo/change/head/merge target" % entry_id,
+            )
+        )
+        return issues
+    declared_status = resolution.get("effective_status")
+    if declared_status != entry.status:
+        issues.append(
+            _issue(
+                "STATE_TAMPER_SUSPECTED",
+                "the supplied resolution claims effective_status %r but the register says %r"
+                % (declared_status, entry.status),
+            )
+        )
     scope = resolution.get("scope") if isinstance(resolution.get("scope"), dict) else {}
-    if (
-        scope.get("repo") != "%s/%s" % (ctx.text("repo.owner"), ctx.text("repo.name"))
-        or scope.get("change_id") != ctx.get("change.id")[1]
-        or scope.get("head_sha") != ctx.candidate_head
-        or scope.get("merge_target_ref") != ctx.text("merge_target.ref")
-    ):
-        issues.append(_issue("AUTHORITY_ABSENT", "the owner-line scope does not cover this repo/change/head/merge"))
+    for key in records.GATE_SCOPE_FIELDS:
+        if str(scope.get(key, "")) != str(entry.scope.get(key, "")):
+            issues.append(
+                _issue(
+                    "STATE_TAMPER_SUSPECTED",
+                    "the supplied resolution claims scope %s=%r but the register says %r"
+                    % (key, scope.get(key), entry.scope.get(key)),
+                )
+            )
     return issues
 
 
@@ -1015,22 +1146,84 @@ CHECKS: typing.Tuple[typing.Tuple[str, typing.Callable[[Context], typing.List[Is
 )
 
 
-def _load_stage_declarations(directory: Path) -> typing.Dict[str, typing.Dict[str, object]]:
+def _load_stage_declarations(
+    directory: Path,
+) -> typing.Tuple[typing.Dict[str, typing.Dict[str, object]], typing.List[Issue]]:
+    """Load the required B/D/E declaration envelopes, fail closed.
+
+    --stage-records-dir is a required input: an absent/unreadable directory, an
+    empty directory, an unusable or malformed envelope, a non-B/D/E stage or a
+    duplicate stage is a finding, never a silent omission.  The declarations
+    are cross-checked against VB-D01 in C8 and the records themselves are
+    re-hashed by inputs.validate_stage_records.
+    """
+
     declarations: typing.Dict[str, typing.Dict[str, object]] = {}
+    issues: typing.List[Issue] = []
     if not directory.is_dir():
-        return declarations
-    for path in sorted(directory.glob("*.json")):
+        return (
+            declarations,
+            [
+                _issue(
+                    "REQUIRED_INPUT_UNAVAILABLE",
+                    "required --stage-records-dir is absent or not a directory: %s" % directory,
+                )
+            ],
+        )
+    paths = sorted(directory.glob("*.json"))
+    if not paths:
+        return (
+            declarations,
+            [
+                _issue(
+                    "REQUIRED_INPUT_UNAVAILABLE",
+                    "--stage-records-dir holds no stage declaration envelope: %s" % directory,
+                )
+            ],
+        )
+    for path in paths:
         try:
             envelope = inputs.load_envelope(path)
-        except inputs.InputError:
+        except inputs.InputError as error:
+            issues.append(
+                _issue(error.code, "stage declaration %s is unusable: %s" % (path.name, error.detail))
+            )
+            continue
+        if envelope.issues:
+            issues.append(
+                _issue(
+                    envelope.issues[0].code,
+                    "stage declaration %s is not verifiable: %s" % (path.name, envelope.issues[0].detail),
+                )
+            )
             continue
         stage = envelope.payload.get("stage")
-        if isinstance(stage, str) and stage in STAGE_BY_STAGE and stage not in declarations:
-            declarations[stage] = envelope.payload
-    return declarations
+        if not isinstance(stage, str) or stage not in STAGE_BY_STAGE:
+            issues.append(
+                _issue(
+                    "CANONICAL_FIELD_MISSING_OR_MISMATCH",
+                    "stage declaration %s declares no B/D/E stage" % path.name,
+                )
+            )
+            continue
+        if stage in declarations:
+            issues.append(
+                _issue(
+                    "CANONICAL_FIELD_MISSING_OR_MISMATCH",
+                    "more than one %s stage declaration envelope in --stage-records-dir" % stage,
+                )
+            )
+            continue
+        declarations[stage] = envelope.payload
+    return (declarations, issues)
 
 
-def _empty_result(code: str, detail: str, inputs_sha: typing.Dict[str, object]) -> GateResult:
+def _empty_result(
+    code: str,
+    detail: str,
+    inputs_sha: typing.Dict[str, object],
+    fixture_mode: bool = False,
+) -> GateResult:
     blockers = [Blocker(code, detail)]
     return GateResult(
         readiness=False,
@@ -1041,9 +1234,17 @@ def _empty_result(code: str, detail: str, inputs_sha: typing.Dict[str, object]) 
         store_digest="",
         inputs_sha256=inputs_sha,
         permitted_next_action=PERMITTED_ACTION[code],
-        assurance={"claim": "AUDITABLE", "mounted_coverage": "UNKNOWN"},
+        assurance=_assurance(fixture_mode),
         not_verifiable=list(NOT_VERIFIABLE),
     )
+
+
+def _assurance(fixture_mode: bool) -> typing.Dict[str, str]:
+    return {
+        "claim": "AUDITABLE",
+        "mounted_coverage": "UNKNOWN",
+        "mode": "FIXTURE" if fixture_mode else "PRODUCTION",
+    }
 
 
 def evaluate(
@@ -1058,11 +1259,24 @@ def evaluate(
     candidate_head: typing.Optional[str] = None,
     supported_auth_methods: typing.Sequence[str] = (),
     base_ref: str = "origin/main",
+    fixture_mode: bool = False,
 ) -> GateResult:
-    """Run C1-C13 in order and return a deterministic result.  Read-only."""
+    """Run C1-C13 in order and return a deterministic result.  Read-only.
+
+    supported_auth_methods is a fixture-only affordance: outside fixture_mode a
+    non-empty list is refused before any record is read, so a production run
+    has no path to readiness=true while owner decision T6 is undecided.
+    """
 
     root = Path(repo_root).resolve()
     inputs_sha: typing.Dict[str, object] = {}
+    if supported_auth_methods and not fixture_mode:
+        return _empty_result(
+            "VERDICT_STALE_OR_UNVERIFIED",
+            "supported authentication methods are refused outside fixture mode: T6 is undecided, so "
+            "production has no path to readiness=true",
+            inputs_sha,
+        )
     store = records.load_store(root, records_dir, base_ref)
     inputs_sha["store"] = {
         "manifest_sha256": canonical.sha256_hex((store.records_dir / "manifest.json").read_bytes())
@@ -1075,7 +1289,7 @@ def evaluate(
     if store.issues:
         code = store.issues[0].code
         detail = "; ".join(issue.detail for issue in store.issues)
-        result = _empty_result(code, detail, inputs_sha)
+        result = _empty_result(code, detail, inputs_sha, fixture_mode)
         result.store_digest = store.recomputed_store_digest
         return result
 
@@ -1091,13 +1305,13 @@ def evaluate(
         except inputs.InputError as error:
             if error.fatal:
                 raise
-            return _empty_result(error.code, "%s: %s" % (name, error.detail), inputs_sha)
+            return _empty_result(error.code, "%s: %s" % (name, error.detail), inputs_sha, fixture_mode)
         loaded[name] = envelope
         inputs_sha[name] = envelope.report()
         if envelope.issues:
             code = envelope.issues[0].code
             detail = "; ".join(issue.detail for issue in envelope.issues)
-            return _empty_result(code, "%s: %s" % (name, detail), inputs_sha)
+            return _empty_result(code, "%s: %s" % (name, detail), inputs_sha, fixture_mode)
 
     doc = typing.cast(typing.Dict[str, object], loaded["verdict"].payload)
     record = _record(doc)
@@ -1108,12 +1322,13 @@ def evaluate(
             "HEAD_MOVED_OR_BASE_INVALIDATED",
             "--candidate-head does not equal VB-B01",
             inputs_sha,
+            fixture_mode,
         )
 
     freeze = inputs.derive_freeze(loaded["freeze"], doc)
-    settlement = inputs.derive_settlement(loaded["settlement"])
-    history = inputs.validate_head_history(loaded["head_history"])
-    declarations = _load_stage_declarations(Path(stage_records_dir))
+    settlement = inputs.derive_settlement(loaded["settlement"], doc, root)
+    history = inputs.validate_head_history(loaded["head_history"], doc)
+    declarations, declaration_issues = _load_stage_declarations(Path(stage_records_dir))
     inputs_sha["stage_records"] = {
         stage: {
             "stage": stage,
@@ -1124,6 +1339,13 @@ def evaluate(
         }
         for stage, declaration in sorted(declarations.items())
     }
+    if declaration_issues:
+        return _empty_result(
+            declaration_issues[0].code,
+            "; ".join(issue.detail for issue in declaration_issues),
+            inputs_sha,
+            fixture_mode,
+        )
     plan_audit_applies = doc.get("plan_audit_applies") is True
     stages = inputs.validate_stage_records(root, doc.get("stage_records"), resolved_head, plan_audit_applies)
     heads = records.derive_review_heads(store.change_events, history.heads, resolved_head)
@@ -1140,6 +1362,7 @@ def evaluate(
         declarations=declarations,
         supported_auth_methods=tuple(supported_auth_methods),
         candidate_head=resolved_head,
+        fixture_mode=fixture_mode,
     )
 
     checks: typing.List[typing.Dict[str, typing.List[str]]] = []
@@ -1153,6 +1376,18 @@ def evaluate(
                 blockers.append(Blocker(issue.code, issue.detail))
             break
     readiness = not blockers
+    if readiness and not fixture_mode:
+        # Structural invariant, not a policy override: readiness needs a
+        # supported authentication method and no method exists while T6 is
+        # undecided, so a production run can never be ready.
+        blockers.append(
+            Blocker(
+                "VERDICT_STALE_OR_UNVERIFIED",
+                "production readiness is unreachable while owner decision T6 is undecided "
+                "(a supported method is fixture mode only)",
+            )
+        )
+        readiness = False
     first_code = blockers[0].code if blockers else None
     return GateResult(
         readiness=readiness,
@@ -1168,6 +1403,6 @@ def evaluate(
         store_digest=store.recomputed_store_digest,
         inputs_sha256=inputs_sha,
         permitted_next_action=READY_ACTION if readiness else PERMITTED_ACTION[first_code],
-        assurance={"claim": "AUDITABLE", "mounted_coverage": "UNKNOWN"},
+        assurance=_assurance(fixture_mode),
         not_verifiable=list(NOT_VERIFIABLE),
     )

@@ -40,6 +40,15 @@ STAGE_VERDICT_VOCABULARY = {"B": ("ACCEPT", "REVISE"), "D": ("ACCEPT", "REVISE")
 AFFIRMATIVE_STAGE = {"B": "ACCEPT", "D": "ACCEPT", "E": "PASS"}
 INPUT_STATUSES = ("VERIFIED", "UNVERIFIED", "ABSENT")
 
+# The verified authority record a real unavailable-review disposition needs.
+# The disposition authority (owner decision T7) is undefined, so v1 can only
+# honour a disposition whose authority record is present, closed-schema,
+# ACTIVE, and scoped to this exact change/head/merge target.  Anything else -
+# including arbitrary strings in the settlement payload - is blocked.
+DISPOSITION_AUTHORITY_SCHEMA = "aegis.disposition-authority/v1"
+DISPOSITION_DECISION = "UNAVAILABLE_REVIEW"
+DISPOSITION_SCOPE_FIELDS = ("repo", "change_id", "head_sha", "merge_target_ref")
+
 
 class InputError(ValueError):
     """The input file itself is unusable (missing, unparseable, wrong shape).
@@ -230,7 +239,91 @@ def derive_freeze(freeze: Envelope, verdict: typing.Mapping[str, object]) -> Fre
     )
 
 
-def derive_settlement(settlement: Envelope) -> SettlementResult:
+def _disposition_scope_matches(scope: typing.Any, verdict: typing.Mapping[str, object]) -> bool:
+    if not isinstance(scope, dict):
+        return False
+    change = verdict.get("change") if isinstance(verdict.get("change"), dict) else {}
+    expected = {
+        "repo": "%s/%s" % (verdict.get("repo", {}).get("owner"), verdict.get("repo", {}).get("name"))
+        if isinstance(verdict.get("repo"), dict)
+        else "",
+        "change_id": change.get("id"),
+        "head_sha": verdict.get("head_sha"),
+        "merge_target_ref": verdict.get("merge_target", {}).get("ref")
+        if isinstance(verdict.get("merge_target"), dict)
+        else "",
+    }
+    for key in DISPOSITION_SCOPE_FIELDS:
+        if str(scope.get(key, "")) != str(expected[key]):
+            return False
+    return True
+
+
+def verify_disposition_authority(
+    repo_root: typing.Optional[Path],
+    verdict: typing.Optional[typing.Mapping[str, object]],
+    source: typing.Mapping[str, object],
+) -> typing.Tuple[bool, str]:
+    """Verify a policy-authorised unavailable-review disposition.
+
+    Returns (ok, detail).  ok is true only when the cited authority record is
+    present in the repository at the cited sha256, is a closed-schema
+    disposition authority, is ACTIVE, decides UNAVAILABLE_REVIEW, is not
+    time-bounded (an offline checker cannot evaluate an expiry), and covers
+    this exact repo/change/head/merge target.  A truthy string is never enough.
+    """
+
+    authority = source.get("disposition_authority_ref")
+    if not isinstance(authority, str) or not authority:
+        return (False, "no disposition authority is cited")
+    if verdict is None or repo_root is None:
+        return (False, "the disposition authority cannot be resolved without the evaluated change")
+    declared_sha = source.get("disposition_authority_sha256")
+    if not isinstance(declared_sha, str) or len(declared_sha) != 64 or set(declared_sha) - set("0123456789abcdef"):
+        return (False, "the disposition authority cites no 64-hex sha256")
+    scope = source.get("disposition_scope")
+    if not _disposition_scope_matches(scope, verdict):
+        return (False, "the disposition scope does not cover this repo/change/head/merge target")
+    if source.get("expires") not in (None, ""):
+        return (False, "a time-bounded disposition authority cannot be evaluated offline (status must govern)")
+    path = (Path(repo_root) / authority).resolve()
+    try:
+        path.relative_to(Path(repo_root).resolve())
+    except ValueError:
+        return (False, "the disposition authority path escapes the repository")
+    if not path.is_file():
+        return (False, "the disposition authority record is absent: %s" % authority)
+    raw = path.read_bytes()
+    if canonical.sha256_hex(raw) != declared_sha:
+        return (False, "the disposition authority bytes do not match the cited sha256")
+    try:
+        document = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return (False, "the disposition authority is not UTF-8 JSON")
+    if not isinstance(document, dict):
+        return (False, "the disposition authority is not a JSON object")
+    if document.get("schema_version") != DISPOSITION_AUTHORITY_SCHEMA:
+        return (False, "the disposition authority does not declare schema %s" % DISPOSITION_AUTHORITY_SCHEMA)
+    record_id = document.get("authority_id")
+    if not isinstance(record_id, str) or not record_id:
+        return (False, "the disposition authority declares no authority_id")
+    cited_id = source.get("disposition_authority_id")
+    if isinstance(cited_id, str) and cited_id and cited_id != record_id:
+        return (False, "the disposition authority declares a different authority_id")
+    if document.get("status") != "ACTIVE":
+        return (False, "the disposition authority is not ACTIVE")
+    if document.get("decision") != DISPOSITION_DECISION:
+        return (False, "the disposition authority did not decide UNAVAILABLE_REVIEW")
+    if not _disposition_scope_matches(document.get("scope"), verdict):
+        return (False, "the disposition authority's own scope does not cover this change")
+    return (True, "disposition authority %s resolves ACTIVE at the cited sha256" % authority)
+
+
+def derive_settlement(
+    settlement: Envelope,
+    verdict: typing.Optional[typing.Mapping[str, object]] = None,
+    repo_root: typing.Optional[Path] = None,
+) -> SettlementResult:
     """Re-derive settlement.settled from checks and review sources."""
 
     payload = settlement.payload
@@ -268,14 +361,14 @@ def derive_settlement(settlement: Envelope) -> SettlementResult:
                 Issue(CODE_MISSING_REVIEW, "review source %r is PENDING (not settled)" % source.get("source_id"))
             )
         elif state == "UNAVAILABLE_DISPOSITIONED":
-            authority = source.get("disposition_authority_ref")
-            scope = source.get("disposition_scope")
-            if not authority or not scope:
+            verified, detail = verify_disposition_authority(repo_root, verdict, source)
+            if not verified:
                 derived_settled = False
                 issues.append(
                     Issue(
                         CODE_MISSING_REVIEW,
-                        "review source %r has no policy-authorised unavailable disposition" % source.get("source_id"),
+                        "review source %r has no policy-authorised unavailable disposition: %s"
+                        % (source.get("source_id"), detail),
                     )
                 )
         elif state != "SETTLED":
@@ -365,8 +458,18 @@ def validate_stage_records(
     return StageResult(present_by_stage=by_stage, issues=issues)
 
 
-def validate_head_history(head_history: Envelope) -> HeadHistory:
-    """Validate the authoritative published-head export and its provenance."""
+def validate_head_history(
+    head_history: Envelope,
+    verdict: typing.Optional[typing.Mapping[str, object]] = None,
+) -> HeadHistory:
+    """Validate the authoritative published-head export, its provenance and its binding.
+
+    The export is authoritative only if its provenance status is VERIFIED *for
+    the evaluated change/head*: the payload must declare the change id and the
+    candidate head it was captured for, and both must match the evaluated
+    record.  A VERIFIED string on a foreign or earlier export therefore cannot
+    drive the review-head budget.
+    """
 
     issues: typing.List[Issue] = list(head_history.issues)
     status = head_history.provenance.get("status")
@@ -381,6 +484,42 @@ def validate_head_history(head_history: Envelope) -> HeadHistory:
         issues.append(
             Issue(CODE_REQUIRED_INPUT, "head-history provenance.status is %s, not VERIFIED" % status)
         )
+    declared_change = head_history.payload.get("change_id")
+    declared_head = head_history.payload.get("candidate_head")
+    if verdict is not None:
+        change = verdict.get("change") if isinstance(verdict.get("change"), dict) else {}
+        expected_change = change.get("id")
+        expected_head = verdict.get("head_sha")
+        if declared_change is None:
+            issues.append(
+                Issue(
+                    CODE_REQUIRED_INPUT,
+                    "head-history payload declares no change_id; the export cannot be bound to the evaluated change",
+                )
+            )
+        elif expected_change is not None and str(declared_change) != str(expected_change):
+            issues.append(
+                Issue(
+                    CODE_REQUIRED_INPUT,
+                    "head-history export is for change %r, not the evaluated change %r"
+                    % (declared_change, expected_change),
+                )
+            )
+        if declared_head is None:
+            issues.append(
+                Issue(
+                    CODE_REQUIRED_INPUT,
+                    "head-history payload declares no candidate_head; the export cannot be bound to the evaluated head",
+                )
+            )
+        elif expected_head and str(declared_head) != str(expected_head):
+            issues.append(
+                Issue(
+                    CODE_REQUIRED_INPUT,
+                    "head-history export is captured for head %r, not the evaluated head %r"
+                    % (declared_head, expected_head),
+                )
+            )
     for head in heads:
         if not isinstance(head, dict):
             issues.append(Issue(CODE_CANONICAL, "head-history entry is not an object"))

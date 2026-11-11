@@ -37,6 +37,25 @@ FILE_KINDS = ("plan_item", "change_ledger")
 REGISTER_RELATIVE_PATH = "docs/approvals/APPROVAL_REGISTER.md"
 ALLOWED_GIT_SUBCOMMANDS = ("rev-parse", "cat-file", "log", "merge-base")
 
+# Register resolution vocabulary.  A register entry is ACTIVE/REVOKED/EXPIRED/
+# CONSUMED/SUPERSEDED; a later lifecycle event naming an earlier entry
+# overrides that entry's "status at recording".
+REGISTER_STATUSES = ("ACTIVE", "REVOKED", "EXPIRED", "CONSUMED", "SUPERSEDED")
+REGISTER_LIFECYCLE_EVENTS = {
+    "REVOKED": "REVOKED",
+    "REVOCATION": "REVOKED",
+    "EXPIRED": "EXPIRED",
+    "EXPIRY": "EXPIRED",
+    "CONSUMED": "CONSUMED",
+    "SUPERSEDED": "SUPERSEDED",
+    "SUPERSESSION": "SUPERSEDED",
+}
+# The machine-checkable gate scope an owner-line or exception entry must carry
+# before it can authorise anything: the G group is resolved at gate time, never
+# taken from unhashed record metadata.
+GATE_SCOPE_FIELDS = ("repo", "change_id", "head_sha", "merge_target_ref")
+AUTHORITY_RECORD_SCHEMA = "aegis.authority-record/v1"
+
 BLOCKER_TAMPER = "STATE_TAMPER_SUSPECTED"
 BLOCKER_REQUIRED_INPUT = "REQUIRED_INPUT_UNAVAILABLE"
 
@@ -107,6 +126,222 @@ def _base_file_bytes(repo_root: Path, base: str, relative_path: str) -> typing.O
     if code != 0:
         return None
     return out.encode("utf-8")
+
+
+@dataclasses.dataclass
+class RegisterEntry:
+    """One resolved approval-register entry (G group, gate time).
+
+    The G group is resolved from the register bytes the verdict cites, never
+    from a supplied record's own claim about itself: `status` is the entry's
+    effectively-ACTIVE status after later lifecycle events, and `scope` is the
+    machine-checkable gate scope the entry carries.
+    """
+
+    entry_id: str
+    status: str
+    scope: typing.Dict[str, str]
+    scope_present: bool
+    line: int
+    detail: str
+
+    def covers(
+        self,
+        repo: str,
+        change_id: object,
+        head_sha: str,
+        merge_target_ref: str,
+    ) -> bool:
+        """True only when the entry's gate scope covers this exact target."""
+
+        if not self.scope_present:
+            return False
+        expected = {
+            "repo": repo,
+            "change_id": change_id,
+            "head_sha": head_sha,
+            "merge_target_ref": merge_target_ref,
+        }
+        for key in GATE_SCOPE_FIELDS:
+            if str(self.scope.get(key, "")) != str(expected[key]):
+                return False
+        return True
+
+
+def _words(text: str) -> typing.List[str]:
+    """Split on non-alphanumeric characters (status tokens survive ** and —)."""
+
+    words: typing.List[str] = []
+    current: typing.List[str] = []
+    for character in text:
+        if character.isalnum() or character == "_":
+            current.append(character)
+        elif current:
+            words.append("".join(current))
+            current = []
+    if current:
+        words.append("".join(current))
+    return words
+
+
+def _status_token(text: str) -> str:
+    for word in _words(text.upper()):
+        if word in REGISTER_STATUSES:
+            return word
+    return ""
+
+
+def _mentions(text: str, token: str) -> bool:
+    """Whole-token mention (a register id is not matched inside a longer id)."""
+
+    start = 0
+    while True:
+        index = text.find(token, start)
+        if index < 0:
+            return False
+        before = text[index - 1] if index else " "
+        after = text[index + len(token)] if index + len(token) < len(text) else " "
+        if not (before.isalnum() or before == "-") and not (after.isalnum() or after == "-"):
+            return True
+        start = index + 1
+
+
+def parse_gate_scope(text: str) -> typing.Dict[str, str]:
+    """Parse a machine-checkable gate scope: `key=value; key=value`."""
+
+    scope: typing.Dict[str, str] = {}
+    for part in text.split(";"):
+        if "=" not in part:
+            continue
+        key, value = part.split("=", 1)
+        key = key.strip().lower().replace(" ", "_").replace("*", "")
+        if key in GATE_SCOPE_FIELDS and value.strip():
+            scope[key] = value.strip()
+    return scope
+
+
+def resolve_register_entry(raw_text: str, entry_id: str) -> typing.Optional[RegisterEntry]:
+    """Resolve one register entry from the register bytes.
+
+    Supported shapes (both are documented in the tool README):
+
+    * a heading block `### <ENTRY-ID>: <title>` carrying `- **Status ...:**`
+      and `- **Gate scope:** repo=…; change_id=…; head_sha=…; merge_target_ref=…`
+      bullets;
+    * a table row `| <ENTRY-ID> | <STATUS> | <gate scope> |`.
+
+    The last declaration in document order governs, and a later lifecycle
+    block (`Event:` REVOKED/REVOCATION/EXPIRED/EXPIRY/CONSUMED/SUPERSEDED)
+    that names the entry overrides its status.  No entry, or an unparseable
+    entry, resolves to None/`UNKNOWN` and never to ACTIVE.
+    """
+
+    if not entry_id:
+        return None
+    lines = raw_text.splitlines()
+    blocks: typing.List[typing.Dict[str, object]] = []
+    current: typing.Optional[typing.Dict[str, object]] = None
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("#"):
+            if current is not None:
+                current["end"] = index
+                blocks.append(current)
+            heading = stripped.lstrip("#").strip()
+            current = {
+                "start": index,
+                "end": len(lines),
+                "id": heading.split(":", 1)[0].strip(),
+                "status": "",
+                "scope": {},
+                "scope_present": False,
+                "event": "",
+            }
+            continue
+        if current is None:
+            current = {
+                "start": 0,
+                "end": len(lines),
+                "id": "",
+                "status": "",
+                "scope": {},
+                "scope_present": False,
+                "event": "",
+            }
+        if not stripped.startswith("- **"):
+            continue
+        label, _, value = stripped[2:].partition(":")
+        label = label.strip().lower()
+        if label.startswith("**status") and not current["status"]:
+            current["status"] = _status_token(value)
+        elif label.startswith("**gate scope"):
+            scope = parse_gate_scope(value)
+            if scope:
+                current["scope"] = scope
+                current["scope_present"] = True
+        elif label.startswith("**event") and not current["event"]:
+            for word in _words(value.upper()):
+                if word in REGISTER_LIFECYCLE_EVENTS:
+                    current["event"] = REGISTER_LIFECYCLE_EVENTS[word]
+                    break
+    if current is not None:
+        blocks.append(current)
+
+    declarations: typing.List[typing.Dict[str, object]] = []
+    for block in blocks:
+        if block["id"] != entry_id:
+            continue
+        declarations.append(
+            {
+                "line": block["start"],
+                "status": block["status"],
+                "scope": block["scope"],
+                "scope_present": block["scope_present"],
+                "source": "heading block",
+            }
+        )
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) < 2 or cells[0] != entry_id:
+            continue
+        scope = parse_gate_scope(cells[2]) if len(cells) > 2 else {}
+        declarations.append(
+            {
+                "line": index,
+                "status": _status_token(cells[1]),
+                "scope": scope,
+                "scope_present": bool(scope),
+                "source": "table row",
+            }
+        )
+    if not declarations:
+        return None
+    declarations.sort(key=lambda entry: int(entry["line"]))
+    chosen = declarations[-1]
+    status = str(chosen["status"])
+    scope = typing.cast(typing.Dict[str, str], chosen["scope"])
+    scope_present = bool(chosen["scope_present"])
+    for block in blocks:
+        if int(block["start"]) <= int(chosen["line"]) or not block["event"]:
+            continue
+        text = "\n".join(lines[int(block["start"]) : int(block["end"])])
+        if _mentions(text, entry_id):
+            status = str(block["event"])
+            scope = {}
+            scope_present = False
+    if status not in REGISTER_STATUSES:
+        status = "UNKNOWN"
+    return RegisterEntry(
+        entry_id=entry_id,
+        status=status,
+        scope=scope,
+        scope_present=scope_present,
+        line=int(chosen["line"]),
+        detail="%s at line %d" % (chosen["source"], int(chosen["line"]) + 1),
+    )
 
 
 @dataclasses.dataclass
@@ -365,12 +600,19 @@ def derive_review_heads(
     if candidate_head and candidate_head in ledger_heads:
         issues.append(Issue(BLOCKER_TAMPER, "change ledger records the candidate head as already published"))
     prior_export = [head for head in export_heads if head != candidate_head]
-    if ledger_heads != prior_export[: len(ledger_heads)]:
+    if ledger_heads != prior_export:
+        # Exact mirror, never a prefix: a ledger that records fewer heads than
+        # the export is an undercount of the published-head budget, and a
+        # ledger that records more heads than the export is an overcount.
+        # Both are tamper; neither may be accepted as "model lag".
         issues.append(
-            Issue(BLOCKER_TAMPER, "change ledger disagrees with the authoritative head export")
+            Issue(
+                BLOCKER_TAMPER,
+                "change ledger disagrees with the authoritative head export: the ledger must mirror all "
+                "%d previously published head(s) exactly (it records %d)"
+                % (len(prior_export), len(ledger_heads)),
+            )
         )
-    if len(ledger_heads) > len(prior_export):
-        issues.append(Issue(BLOCKER_TAMPER, "change ledger counts more heads than the export"))
     return ReviewHeads(
         used=used,
         ordinal=used + 1,
@@ -378,6 +620,37 @@ def derive_review_heads(
         heads=export_heads,
         issues=issues,
     )
+
+
+def _authority_record_problem(raw: bytes, entry_id: str) -> typing.Optional[str]:
+    """Why a cited owner-line/authority record cannot be trusted (None = ok).
+
+    The record must be a closed-schema authority record, not any repository
+    file that happens to hash to the cited digest: the citation alone is not a
+    grant, and a markdown page or a fixture cannot stand in for one.
+    """
+
+    try:
+        document = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return "is not UTF-8 JSON"
+    if not isinstance(document, dict):
+        return "is not a JSON object"
+    if document.get("schema_version") != AUTHORITY_RECORD_SCHEMA:
+        return "does not declare schema %s" % AUTHORITY_RECORD_SCHEMA
+    if document.get("record_id") != entry_id:
+        return "declares a different record_id"
+    if document.get("authority_kind") != "OWNER_LINE_RECORD":
+        return "declares a different authority_kind"
+    if document.get("status") != "ACTIVE":
+        return "is not ACTIVE"
+    holder = document.get("holder_role")
+    if not isinstance(holder, str) or not holder:
+        return "names no holder_role"
+    scope = document.get("scope")
+    if not isinstance(scope, dict) or any(key not in scope for key in GATE_SCOPE_FIELDS):
+        return "carries no complete scope"
+    return None
 
 
 def _verify_binding(repo_root: Path, binding: typing.Any) -> typing.Tuple[str, str, typing.List[Issue]]:
@@ -410,7 +683,7 @@ def _verify_binding(repo_root: Path, binding: typing.Any) -> typing.Tuple[str, s
             issues.append(Issue(BLOCKER_TAMPER, "claimed VERIFIED binding cites an edited register"))
             return ("UNVERIFIED", "register bytes do not match authority_ref_sha256", issues)
         entry_id = binding.get("authority_ref_id")
-        if not isinstance(entry_id, str) or entry_id not in raw.decode("utf-8", "replace"):
+        if not isinstance(entry_id, str) or not _mentions(raw.decode("utf-8", "replace"), entry_id):
             issues.append(Issue(BLOCKER_TAMPER, "cited register entry id is absent from the register"))
             return ("UNVERIFIED", "cited register entry id is absent", issues)
         return ("VERIFIED", "register entry %s resolves at the cited sha256" % entry_id, issues)
@@ -426,9 +699,20 @@ def _verify_binding(repo_root: Path, binding: typing.Any) -> typing.Tuple[str, s
     if not record_path.is_file():
         issues.append(Issue(BLOCKER_TAMPER, "claimed VERIFIED binding cites a missing owner-line record"))
         return ("UNVERIFIED", "owner-line record is missing", issues)
-    if sha256_hex(record_path.read_bytes()) != declared_sha:
+    record_bytes = record_path.read_bytes()
+    if sha256_hex(record_bytes) != declared_sha:
         issues.append(Issue(BLOCKER_TAMPER, "claimed VERIFIED binding cites an edited owner-line record"))
         return ("UNVERIFIED", "owner-line record bytes do not match authority_ref_sha256", issues)
+    problem = _authority_record_problem(record_bytes, entry_id)
+    if problem is not None:
+        issues.append(
+            Issue(
+                BLOCKER_TAMPER,
+                "claimed VERIFIED owner-line record %s %s (an arbitrary repository file is not an authority record)"
+                % (entry_id, problem),
+            )
+        )
+        return ("UNVERIFIED", "owner-line record %s %s" % (entry_id, problem), issues)
     return ("VERIFIED", "owner-line record %s resolves at the cited sha256" % entry_id, issues)
 
 
@@ -593,19 +877,57 @@ def load_store(
         if not isinstance(bound, dict):
             issues.append(Issue(BLOCKER_TAMPER, "derived item %s is not bound in the manifest" % item_id))
             continue
-        if state.revision_count < int(bound.get("revision_count", 0)):
+        # Every bound count/state is compared to the re-derived state.  The
+        # integer counters are monotone: a decrease is tamper and an increase
+        # is a legitimate append (a later counted reopen keeps its own
+        # one-only rule).  stop_state is a bound state, so it must equal the
+        # derivation; a transition needs a refreshed manifest, which the
+        # per-file bytes/sha256 binding already requires.
+        bound_revision = bound.get("revision_count")
+        if not isinstance(bound_revision, int) or isinstance(bound_revision, bool):
+            issues.append(Issue(BLOCKER_TAMPER, "manifest binds no integer revision_count for %s" % item_id))
+        elif state.revision_count < bound_revision:
             issues.append(
-                Issue(BLOCKER_TAMPER, "revision_count for %s decreased below the bound value" % item_id)
+                Issue(
+                    BLOCKER_TAMPER,
+                    "revision_count for %s decreased below the bound value (%d < %d)"
+                    % (item_id, state.revision_count, bound_revision),
+                )
             )
-        if state.reopen_count > 0 and bound.get("reopen_used") is False:
-            pass  # a later counted reopen is a legitimate append; the second-reopen rule still applies
+        bound_reopen = bound.get("reopen_used")
+        if not isinstance(bound_reopen, bool):
+            issues.append(Issue(BLOCKER_TAMPER, "manifest binds no boolean reopen_used for %s" % item_id))
+        elif bound_reopen and state.reopen_count == 0:
+            issues.append(
+                Issue(BLOCKER_TAMPER, "reopen_used for %s decreased below the bound value (True -> False)" % item_id)
+            )
+        if "stop_state" not in bound:
+            issues.append(Issue(BLOCKER_TAMPER, "manifest binds no stop_state for %s" % item_id))
+        elif bound.get("stop_state") != state.stop_state:
+            issues.append(
+                Issue(
+                    BLOCKER_TAMPER,
+                    "stop_state for %s (%r) disagrees with the manifest binding (%r)"
+                    % (item_id, state.stop_state, bound.get("stop_state")),
+                )
+            )
     if set(bound_by_id) - set(items):
         issues.append(Issue(BLOCKER_TAMPER, "manifest binds an item with no record file"))
     bound_heads = derived_at_binding.get("review_heads")
-    if isinstance(bound_heads, dict):
+    if not isinstance(bound_heads, dict):
+        issues.append(Issue(BLOCKER_TAMPER, "manifest derived_counts_at_binding.review_heads missing"))
+    else:
         declared_used = bound_heads.get("used")
-        if isinstance(declared_used, int) and declared_used < len(change_events):
-            issues.append(Issue(BLOCKER_TAMPER, "review-head count decreased below the bound value"))
+        if not isinstance(declared_used, int) or isinstance(declared_used, bool):
+            issues.append(Issue(BLOCKER_TAMPER, "manifest review_heads.used is not an integer"))
+        elif declared_used > len(change_events):
+            issues.append(
+                Issue(
+                    BLOCKER_TAMPER,
+                    "review-head count decreased below the bound value (%d < %d)"
+                    % (len(change_events), declared_used),
+                )
+            )
     digest_files = [
         {
             "path": str(entry.get("path")),
@@ -629,8 +951,19 @@ def load_store(
 
     base = resolve_base(root, base_ref)
     if base is None:
-        prefix_checks["__status__"] = "SKIPPED_NO_GIT_BASE"
+        # Fail closed: the append-only prefix invariant is a required input.
+        # Without a resolvable base there is no evidence that a prior line was
+        # not removed, so the check is never silently skipped.
+        prefix_checks["__status__"] = "GIT_BASE_UNRESOLVED"
+        issues.append(
+            Issue(
+                BLOCKER_REQUIRED_INPUT,
+                "append-only prefix invariant cannot be verified: no git base resolved from %r in %s "
+                "(a required input; the check is never skipped)" % (base_ref, root),
+            )
+        )
     else:
+        prefix_checks["__status__"] = "GIT_BASE_RESOLVED"
         for relative_path in sorted(listed):
             repository_path = (Path(records_dir) / relative_path).as_posix()
             base_bytes = _base_file_bytes(root, base, repository_path)
@@ -649,6 +982,7 @@ def load_store(
 
     binding_status, binding_detail, binding_issues = _verify_binding(root, binding)
     if binding_status != "VERIFIED" and binding.get("binding_status") == "VERIFIED":
+        issues.extend(binding_issues)
         issues.append(
             Issue(BLOCKER_TAMPER, "manifest claims a VERIFIED binding that does not re-check")
         )

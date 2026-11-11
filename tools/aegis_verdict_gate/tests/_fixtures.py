@@ -23,6 +23,7 @@ from __future__ import annotations
 import copy
 import json
 import pathlib
+import subprocess
 import sys
 import tempfile
 
@@ -56,6 +57,36 @@ def load_bundles() -> list:
 def _write(path: pathlib.Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8", newline="\n")
+
+
+def _git(root: pathlib.Path, *args: str) -> str:
+    """Run one git command for the synthetic base commit (fixture plumbing)."""
+
+    completed = subprocess.run(
+        ["git", "-C", str(root)] + list(args), capture_output=True, check=False, timeout=60
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "fixture git %s failed: %s" % (args, completed.stderr.decode("utf-8", "replace"))
+        )
+    return completed.stdout.decode("utf-8", "replace")
+
+
+def commit_base(root: pathlib.Path) -> None:
+    """Make the fixture repository a real worktree with a resolvable git base.
+
+    The store's append-only prefix invariant is a required input, so a fixture
+    repository without a base would (correctly) fail closed.  The synthetic
+    base commit and refs/remotes/origin/main are fixture plumbing only.
+    """
+
+    _git(root, "init", "-q", "-b", "main")
+    _git(root, "config", "user.email", "fixture@example.invalid")
+    _git(root, "config", "user.name", "Fixture Builder")
+    _git(root, "config", "core.autocrlf", "false")
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "synthetic fixture base")
+    _git(root, "update-ref", "refs/remotes/origin/main", "HEAD")
 
 
 def _write_envelope(path: pathlib.Path, payload: dict, provenance_extra: dict) -> None:
@@ -381,6 +412,8 @@ def build(bundle: dict, root: pathlib.Path) -> dict:
         )
     head_history = copy.deepcopy(bundle["inputs"]["head_history"])
     status = head_history.pop("status", "VERIFIED")
+    head_history.setdefault("change_id", doc["change"]["id"])
+    head_history.setdefault("candidate_head", doc["head_sha"])
     head_history_path = root / "inputs" / "head-history.json"
     _write_envelope(
         head_history_path,
@@ -392,6 +425,7 @@ def build(bundle: dict, root: pathlib.Path) -> dict:
             "status": status,
         },
     )
+    commit_base(root)
     return {
         "root": root,
         "verdict": verdict_path,
@@ -418,6 +452,7 @@ def run_bundle(bundle: dict, supported_auth_methods=(FIXTURE_AUTH_METHOD,), keep
         stage_records_dir=paths["stage_records_dir"],
         records_dir=RECORDS_DIR,
         supported_auth_methods=supported_auth_methods,
+        fixture_mode=True,
     )
     if keep:
         return result, paths

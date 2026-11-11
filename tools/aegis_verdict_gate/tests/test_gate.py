@@ -62,6 +62,40 @@ def heads_for(previous, candidate=HEAD):
     return heads
 
 
+def ledger_for(heads):
+    """The change-ledger mirror the A10 rule requires for a given export."""
+
+    return [
+        {
+            "head_sha": head["head_sha"],
+            "kind": head["kind"],
+            "exception_ref": None,
+            "counted_at": head.get("published_at", "2026-11-10T18:00:00Z"),
+            "authority_ref": {
+                "authority_kind": "REGISTER_ENTRY",
+                "authority_ref_id": "APR-FIXTURE-C11A-0001",
+                "holder_role": "programme-lead",
+                "holder_identity_ref": None,
+            },
+        }
+        for head in heads
+        if head["head_sha"] != HEAD
+    ]
+
+
+def set_heads(bundle, heads):
+    bundle["inputs"]["head_history"]["heads"] = heads
+    bundle["inputs"]["revision_state"]["change_ledger"] = ledger_for(heads)
+
+
+def rewrite_envelope(path, mutate):
+    """Rewrite one input envelope after mutating its payload (hashes recomputed)."""
+
+    document = json.loads(path.read_text(encoding="utf-8"))
+    mutate(document["payload"])
+    _fixtures._write_envelope(path, document["payload"], document["provenance"])
+
+
 class FixtureBundleTest(unittest.TestCase):
     def test_exactly_26_named_bundles(self):
         names = _fixtures.fixture_names()
@@ -118,7 +152,10 @@ class FixtureBundleTest(unittest.TestCase):
         ):
             self.assertIn(key, payload)
         self.assertEqual(payload["bound_set_id"], "aegis.verdict-bound/v2.1")
-        self.assertEqual(payload["assurance"], {"claim": "AUDITABLE", "mounted_coverage": "UNKNOWN"})
+        self.assertEqual(
+            payload["assurance"],
+            {"claim": "AUDITABLE", "mounted_coverage": "UNKNOWN", "mode": "FIXTURE"},
+        )
         self.assertEqual(payload["schema_version"], "aegis.verdict-gate-output/v1")
         self.assertTrue(payload["readiness"])
         self.assertEqual(payload["permitted_next_action"]["action"], "PROCEED_TO_STAGE_G_MERGE_AUTHORITY")
@@ -192,7 +229,7 @@ class ReviewBudgetVectorsTest(unittest.TestCase):
 
     def test_nv_d2_2_second_head(self):
         def mutate(bundle):
-            bundle["inputs"]["head_history"]["heads"] = heads_for(1)
+            set_heads(bundle, heads_for(1))
             bundle["verdict"]["review_heads"] = {"used": 1, "exception_id": None}
 
         result, _ = variant(mutate)
@@ -201,7 +238,7 @@ class ReviewBudgetVectorsTest(unittest.TestCase):
 
     def test_nv_d2_3_third_head(self):
         def mutate(bundle):
-            bundle["inputs"]["head_history"]["heads"] = heads_for(2)
+            set_heads(bundle, heads_for(2))
             bundle["verdict"]["review_heads"] = {"used": 2, "exception_id": None}
 
         result, _ = variant(mutate)
@@ -221,7 +258,7 @@ class ReviewBudgetVectorsTest(unittest.TestCase):
 
     def test_nv_d2_6_unnecessary_exception_is_invalid(self):
         def mutate(bundle):
-            bundle["inputs"]["head_history"]["heads"] = heads_for(2)
+            set_heads(bundle, heads_for(2))
             bundle["verdict"]["review_heads"] = {"used": 2, "exception_id": "EXC-FIXTURE-0001"}
 
         result, _ = variant(mutate)
@@ -230,7 +267,7 @@ class ReviewBudgetVectorsTest(unittest.TestCase):
 
     def test_nv_d2_7_decreased_reported_count_is_tamper(self):
         def mutate(bundle):
-            bundle["inputs"]["head_history"]["heads"] = heads_for(2)
+            set_heads(bundle, heads_for(2))
             bundle["verdict"]["review_heads"] = {"used": 1, "exception_id": None}
 
         result, _ = variant(mutate)
@@ -241,7 +278,7 @@ class ReviewBudgetVectorsTest(unittest.TestCase):
         def mutate(bundle):
             heads = heads_for(2)
             heads[1]["kind"] = "RESYNC"
-            bundle["inputs"]["head_history"]["heads"] = heads
+            set_heads(bundle, heads)
             bundle["verdict"]["review_heads"] = {"used": 2, "exception_id": None}
 
         result, _ = variant(mutate)
@@ -252,7 +289,7 @@ class ReviewBudgetVectorsTest(unittest.TestCase):
         def mutate(bundle):
             heads = heads_for(3)
             heads[0]["kind"] = "RESYNC"
-            bundle["inputs"]["head_history"]["heads"] = heads
+            set_heads(bundle, heads)
             bundle["verdict"]["review_heads"] = {"used": 0, "exception_id": None}
 
         result, _ = variant(mutate)
@@ -293,10 +330,21 @@ class SecurityFlagVectorsTest(unittest.TestCase):
 class FailClosedTest(unittest.TestCase):
     def test_production_mode_has_no_path_to_readiness(self):
         bundle = _fixtures.load_bundle("valid-verdict")
-        result, _ = _fixtures.run_bundle(bundle, supported_auth_methods=())
-        self.assertFalse(result.readiness)
-        self.assertEqual(result.reason_codes, ["VERDICT_STALE_OR_UNVERIFIED"])
-        self.assertTrue(any("T6" in note for note in result.not_verifiable))
+        _, paths = _fixtures.run_bundle(bundle, keep=True)
+        try:
+            result = gate.evaluate(
+                repo_root=paths["root"],
+                verdict_path=paths["verdict"],
+                freeze_path=paths["freeze"],
+                settlement_path=paths["settlement"],
+                head_history_path=paths["head_history"],
+                stage_records_dir=paths["stage_records_dir"],
+            )
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["VERDICT_STALE_OR_UNVERIFIED"])
+            self.assertTrue(any("T6" in note for note in result.not_verifiable))
+        finally:
+            _fixtures.cleanup(paths["root"])
 
     def test_unexpected_top_level_field_is_invalid(self):
         def mutate(bundle):
@@ -354,10 +402,339 @@ class FailClosedTest(unittest.TestCase):
                 stage_records_dir=paths["stage_records_dir"],
                 supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
                 candidate_head="9" * 40,
+                fixture_mode=True,
             )
             self.assertEqual(moved.reason_codes, ["HEAD_MOVED_OR_BASE_INVALIDATED"])
         finally:
             _fixtures.cleanup(paths["root"])
+
+
+class FixtureModeGuardTest(unittest.TestCase):
+    """B1: production mode has no path to readiness=true while T6 is undecided."""
+
+    def test_gate_refuses_supported_methods_outside_fixture_mode(self):
+        bundle = _fixtures.load_bundle("valid-verdict")
+        self.assertTrue(_fixtures.run_bundle(bundle)[0].readiness)
+        result, paths = _fixtures.run_bundle(bundle, keep=True)
+        try:
+            refused = gate.evaluate(
+                repo_root=paths["root"],
+                verdict_path=paths["verdict"],
+                freeze_path=paths["freeze"],
+                settlement_path=paths["settlement"],
+                head_history_path=paths["head_history"],
+                stage_records_dir=paths["stage_records_dir"],
+                supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
+            )
+            self.assertFalse(refused.readiness)
+            self.assertEqual(refused.reason_codes, ["VERDICT_STALE_OR_UNVERIFIED"])
+            self.assertIn("fixture mode", refused.blockers[0].detail)
+            self.assertEqual(refused.assurance["mode"], "PRODUCTION")
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+    def test_production_run_with_no_method_is_still_blocked(self):
+        bundle = _fixtures.load_bundle("valid-verdict")
+        result, paths = _fixtures.run_bundle(bundle, keep=True)
+        try:
+            blocked = gate.evaluate(
+                repo_root=paths["root"],
+                verdict_path=paths["verdict"],
+                freeze_path=paths["freeze"],
+                settlement_path=paths["settlement"],
+                head_history_path=paths["head_history"],
+                stage_records_dir=paths["stage_records_dir"],
+            )
+            self.assertFalse(blocked.readiness)
+            self.assertEqual(blocked.reason_codes, ["VERDICT_STALE_OR_UNVERIFIED"])
+            self.assertEqual(blocked.assurance["mode"], "PRODUCTION")
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+    def test_cli_refuses_a_supported_method_without_fixture_mode(self):
+        bundle = _fixtures.load_bundle("valid-verdict")
+        _, paths = _fixtures.run_bundle(bundle, keep=True)
+        argv = [
+            "check",
+            "--repo-root",
+            str(paths["root"]),
+            "--verdict",
+            str(paths["verdict"]),
+            "--freeze",
+            str(paths["freeze"]),
+            "--settlement",
+            str(paths["settlement"]),
+            "--head-history",
+            str(paths["head_history"]),
+            "--stage-records-dir",
+            str(paths["stage_records_dir"]),
+            "--supported-auth-method",
+            _fixtures.FIXTURE_AUTH_METHOD,
+        ]
+        stderr = io.StringIO()
+        try:
+            with contextlib.redirect_stderr(stderr):
+                with self.assertRaises(SystemExit) as caught:
+                    cli.main(argv)
+            self.assertEqual(caught.exception.code, 2)
+            self.assertIn("--fixture-mode", stderr.getvalue())
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+
+class AppendOnlyFailClosedTest(unittest.TestCase):
+    """B2: an unresolvable git base is a required-input blocker, not a skip."""
+
+    def test_unresolvable_git_base_blocks_readiness(self):
+        bundle = _fixtures.load_bundle("valid-verdict")
+        result, paths = _fixtures.run_bundle(bundle, keep=True)
+        try:
+            self.assertTrue(result.readiness)
+            # A bad base ref is the documented way to make the base
+            # unresolvable without touching the worktree.
+            blocked = gate.evaluate(
+                repo_root=paths["root"],
+                verdict_path=paths["verdict"],
+                freeze_path=paths["freeze"],
+                settlement_path=paths["settlement"],
+                head_history_path=paths["head_history"],
+                stage_records_dir=paths["stage_records_dir"],
+                supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
+                fixture_mode=True,
+                base_ref="refs/heads/does-not-exist",
+            )
+            self.assertFalse(blocked.readiness)
+            self.assertEqual(blocked.reason_codes, ["REQUIRED_INPUT_UNAVAILABLE"])
+            self.assertIn("no git base", blocked.blockers[0].detail)
+            self.assertEqual(blocked.inputs_sha256["store"]["prefix_checks"]["__status__"], "GIT_BASE_UNRESOLVED")
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+
+class StageDeclarationsFailClosedTest(unittest.TestCase):
+    """B7: --stage-records-dir is required and never silently skipped."""
+
+    def evaluate(self, paths):
+        return gate.evaluate(
+            repo_root=paths["root"],
+            verdict_path=paths["verdict"],
+            freeze_path=paths["freeze"],
+            settlement_path=paths["settlement"],
+            head_history_path=paths["head_history"],
+            stage_records_dir=paths["stage_records_dir"],
+            supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
+            fixture_mode=True,
+        )
+
+    def bundle_paths(self):
+        bundle = _fixtures.load_bundle("valid-verdict")
+        return _fixtures.run_bundle(bundle, keep=True)
+
+    def test_absent_directory_is_required_input(self):
+        import shutil
+
+        _, paths = self.bundle_paths()
+        try:
+            shutil.rmtree(paths["stage_records_dir"])  # noqa: F821 - local import above
+            result = self.evaluate(paths)
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["REQUIRED_INPUT_UNAVAILABLE"])
+            self.assertIn("--stage-records-dir", result.blockers[0].detail)
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+    def test_malformed_envelope_is_a_finding(self):
+        _, paths = self.bundle_paths()
+        try:
+            (paths["stage_records_dir"] / "extra.json").write_text("{not json", encoding="utf-8")
+            result = self.evaluate(paths)
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["CANONICAL_FIELD_MISSING_OR_MISMATCH"])
+            self.assertIn("extra.json", result.blockers[0].detail)
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+    def test_duplicate_stage_envelope_is_a_finding(self):
+        _, paths = self.bundle_paths()
+        try:
+            (paths["stage_records_dir"] / "duplicate-b.json").write_text(
+                (paths["stage_records_dir"] / "b.json").read_text(encoding="utf-8"), encoding="utf-8"
+            )
+            result = self.evaluate(paths)
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["CANONICAL_FIELD_MISSING_OR_MISMATCH"])
+            self.assertIn("more than one B", result.blockers[0].detail)
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+    def test_non_stage_envelope_is_a_finding(self):
+        _, paths = self.bundle_paths()
+        try:
+            rewrite_envelope(paths["stage_records_dir"] / "b.json", lambda payload: payload.__setitem__("stage", "F"))
+            result = self.evaluate(paths)
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["CANONICAL_FIELD_MISSING_OR_MISMATCH"])
+            self.assertIn("no B/D/E stage", result.blockers[0].detail)
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+
+class HeadHistoryBindingTest(unittest.TestCase):
+    """B8: the head-history export must be bound to the evaluated change/head."""
+
+    def evaluate(self, paths):
+        return gate.evaluate(
+            repo_root=paths["root"],
+            verdict_path=paths["verdict"],
+            freeze_path=paths["freeze"],
+            settlement_path=paths["settlement"],
+            head_history_path=paths["head_history"],
+            stage_records_dir=paths["stage_records_dir"],
+            supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
+            fixture_mode=True,
+        )
+
+    def bundle_paths(self):
+        bundle = _fixtures.load_bundle("valid-verdict")
+        return _fixtures.run_bundle(bundle, keep=True)
+
+    def test_foreign_change_export_is_not_authoritative(self):
+        _, paths = self.bundle_paths()
+        try:
+            rewrite_envelope(paths["head_history"], lambda payload: payload.__setitem__("change_id", 43))
+            result = self.evaluate(paths)
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["REQUIRED_INPUT_UNAVAILABLE"])
+            self.assertIn("not the evaluated change", result.blockers[0].detail)
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+    def test_export_for_an_earlier_head_is_not_authoritative(self):
+        _, paths = self.bundle_paths()
+        try:
+            rewrite_envelope(
+                paths["head_history"], lambda payload: payload.__setitem__("candidate_head", "9" * 40)
+            )
+            result = self.evaluate(paths)
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["REQUIRED_INPUT_UNAVAILABLE"])
+            self.assertIn("not the evaluated head", result.blockers[0].detail)
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+    def test_export_without_change_identity_is_not_authoritative(self):
+        _, paths = self.bundle_paths()
+        try:
+            rewrite_envelope(paths["head_history"], lambda payload: payload.pop("change_id", None))
+            result = self.evaluate(paths)
+            self.assertFalse(result.readiness)
+            self.assertEqual(result.reason_codes, ["REQUIRED_INPUT_UNAVAILABLE"])
+            self.assertIn("declares no change_id", result.blockers[0].detail)
+        finally:
+            _fixtures.cleanup(paths["root"])
+
+
+class OwnerLineAndExceptionResolutionTest(unittest.TestCase):
+    """B5: the G group and the budget exception resolve in the register."""
+
+    def test_revoked_owner_line_entry_is_authority_absent(self):
+        def mutate(bundle):
+            text = bundle["inputs"]["revision_state"]["register_text"]
+            bundle["inputs"]["revision_state"]["register_text"] = text.replace(
+                "| APR-FIXTURE-C11A-0001 | ACTIVE |", "| APR-FIXTURE-C11A-0001 | REVOKED |"
+            )
+
+        result, _ = variant(mutate)
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["AUTHORITY_ABSENT"])
+        self.assertIn("not ACTIVE", result.blockers[0].detail)
+
+    def test_absent_owner_line_entry_is_authority_absent(self):
+        def mutate(bundle):
+            text = bundle["inputs"]["revision_state"]["register_text"]
+            bundle["inputs"]["revision_state"]["register_text"] = (
+                "\n".join(line for line in text.splitlines() if "APR-FIXTURE-C11A-0001" not in line) + "\n"
+            )
+
+        result, _ = variant(mutate)
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["AUTHORITY_ABSENT"])
+
+    def test_register_entry_without_a_gate_scope_is_authority_absent(self):
+        def mutate(bundle):
+            text = bundle["inputs"]["revision_state"]["register_text"]
+            bundle["inputs"]["revision_state"]["register_text"] = text.replace(
+                "| APR-FIXTURE-C11A-0001 | ACTIVE | repo=example-org/example-repo; change_id=42; "
+                "head_sha=" + "a" * 40 + "; merge_target_ref=refs/heads/main |",
+                "| APR-FIXTURE-C11A-0001 | ACTIVE | fixture repo/change/head only |",
+            )
+
+        result, _ = variant(mutate)
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["AUTHORITY_ABSENT"])
+        self.assertIn("no machine-checkable gate scope", result.blockers[0].detail)
+
+    def test_forged_covering_scope_is_tamper(self):
+        def mutate(bundle):
+            bundle["verdict"]["record"]["owner_line_resolution"]["scope"]["head_sha"] = "f" * 40
+
+        result, _ = variant(mutate)
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["STATE_TAMPER_SUSPECTED"])
+        self.assertIn("register says", result.blockers[0].detail)
+
+    def test_forged_effective_status_is_tamper(self):
+        def mutate(bundle):
+            bundle["verdict"]["record"]["owner_line_resolution"]["effective_status"] = "REVOKED"
+
+        result, _ = variant(mutate)
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["STATE_TAMPER_SUSPECTED"])
+
+    def test_exception_absent_from_the_register_exhausts_the_budget(self):
+        def mutate(bundle):
+            text = bundle["inputs"]["revision_state"]["register_text"]
+            bundle["inputs"]["revision_state"]["register_text"] = (
+                "\n".join(line for line in text.splitlines() if "EXC-FIXTURE-0001" not in line) + "\n"
+            )
+
+        result, _ = variant(mutate, source="fourth-head-active-exception")
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["REVIEW_BUDGET_EXHAUSTED"])
+        self.assertEqual(result.blockers[0].classification, "LIMIT")
+
+    def test_revoked_exception_entry_exhausts_the_budget(self):
+        def mutate(bundle):
+            text = bundle["inputs"]["revision_state"]["register_text"]
+            bundle["inputs"]["revision_state"]["register_text"] = text.replace(
+                "| EXC-FIXTURE-0001 | ACTIVE |", "| EXC-FIXTURE-0001 | REVOKED |"
+            )
+
+        result, _ = variant(mutate, source="fourth-head-active-exception")
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["REVIEW_BUDGET_EXHAUSTED"])
+
+    def test_forged_exception_scope_is_tamper(self):
+        def mutate(bundle):
+            bundle["verdict"]["record"]["review_head_exception"]["scope"]["head_sha"] = "f" * 40
+
+        result, _ = variant(mutate, source="fourth-head-active-exception")
+        self.assertFalse(result.readiness)
+        self.assertEqual(result.reason_codes, ["STATE_TAMPER_SUSPECTED"])
+
+
+class BlockerClassTotalsTest(unittest.TestCase):
+    """D1: 19 codes = 15 MANDATORY + 1 LIMIT + 3 WAIT (not 16 MANDATORY)."""
+
+    def test_totals(self):
+        counts = {}
+        for klass in gate.BLOCKER_CLASSES.values():
+            counts[klass] = counts.get(klass, 0) + 1
+        self.assertEqual(counts, {"MANDATORY": 15, "LIMIT": 1, "WAIT": 3})
+        self.assertEqual(len(gate.BLOCKER_CLASSES), 19)
+
+    def test_every_code_has_a_permitted_action(self):
+        self.assertEqual(set(gate.PERMITTED_ACTION), set(gate.BLOCKER_CLASSES))
 
 
 class StaticHygieneTest(unittest.TestCase):
@@ -454,6 +831,7 @@ class DeterminismTest(unittest.TestCase):
                     head_history_path=paths["head_history"],
                     stage_records_dir=paths["stage_records_dir"],
                     supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
+                    fixture_mode=True,
                 )
 
             first = json.dumps(evaluate().as_dict(), sort_keys=True)
@@ -476,6 +854,7 @@ class DeterminismTest(unittest.TestCase):
                 head_history_path=paths["head_history"],
                 stage_records_dir=paths["stage_records_dir"],
                 supported_auth_methods=(_fixtures.FIXTURE_AUTH_METHOD,),
+                fixture_mode=True,
             )
             self.assertEqual(first.store_digest, second.store_digest)
             self.assertRegex(first.store_digest, "^[0-9a-f]{64}$")
@@ -509,6 +888,7 @@ class CliExitCodeTest(unittest.TestCase):
             str(paths["head_history"]),
             "--stage-records-dir",
             str(paths["stage_records_dir"]),
+            "--fixture-mode",
         ] + list(extra)
 
     def test_self_test_exit_zero(self):

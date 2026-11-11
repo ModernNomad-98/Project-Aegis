@@ -6,12 +6,18 @@ Usage (from the repository root):
     python -m tools.aegis_verdict_gate check --repo-root . \
         --verdict verdict.json --head-history history.json \
         --freeze freeze.json --settlement settlement.json \
-        --stage-records-dir stage-records [--candidate-head HEX40] \
-        [--supported-auth-method NAME] [--json]
+        --stage-records-dir stage-records [--candidate-head HEX40] [--json]
+        [--fixture-mode [--supported-auth-method NAME]]
+
+A supported authentication method is a fixture-only affordance: it is refused
+unless --fixture-mode is also given, and readiness is reported in
+assurance.mode = "FIXTURE".  A production run (no --fixture-mode) has no
+supported method while owner decision T6 is undecided, so it has no path to
+readiness=true.
 
 Exit codes:
-    0  readiness true (only reachable with a supported authentication method;
-       production runs have none while owner decision T6 is undecided)
+    0  readiness true (reachable only in --fixture-mode; a production run has
+       no supported authentication method while owner decision T6 is undecided)
     1  not ready / blocked, including UNVERIFIED auth and
        REQUIRED_INPUT_UNAVAILABLE
     2  invalid input / usage / parse failure (fail closed)
@@ -57,6 +63,14 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--candidate-head")
     parser.add_argument("--base-ref", default="origin/main")
     parser.add_argument("--supported-auth-method", action="append", default=[])
+    parser.add_argument(
+        "--fixture-mode",
+        action="store_true",
+        help=(
+            "run against synthetic fixtures only: permits --supported-auth-method and marks "
+            "assurance.mode=FIXTURE; never valid for a production readiness claim"
+        ),
+    )
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--json", action="store_true")
     return parser
@@ -76,8 +90,12 @@ def _summary(result: gate.GateResult) -> str:
     lines = [
         "aegis.verdict-bound/v2.1 readiness check",
         "readiness: %s" % ("true" if result.readiness else "false"),
-        "assurance: %s (mounted coverage %s)"
-        % (result.assurance["claim"], result.assurance["mounted_coverage"]),
+        "assurance: %s (mounted coverage %s; mode %s)"
+        % (
+            result.assurance["claim"],
+            result.assurance["mounted_coverage"],
+            result.assurance["mode"],
+        ),
     ]
     if result.blockers:
         lines.append("blockers:")
@@ -113,6 +131,11 @@ def main(argv: typing.Optional[typing.Sequence[str]] = None) -> int:
     ]
     if missing:
         parser.error("check requires %s" % ", ".join(missing))
+    if args.supported_auth_method and not args.fixture_mode:
+        parser.error(
+            "--supported-auth-method requires --fixture-mode: no supported authentication method "
+            "exists while owner decision T6 is undecided, so production has no path to readiness"
+        )
     try:
         result = gate.evaluate(
             repo_root=Path(args.repo_root),
@@ -125,6 +148,7 @@ def main(argv: typing.Optional[typing.Sequence[str]] = None) -> int:
             candidate_head=args.candidate_head,
             supported_auth_methods=tuple(args.supported_auth_method),
             base_ref=args.base_ref,
+            fixture_mode=args.fixture_mode,
         )
     except inputs.InputError as error:
         print("invalid input: %s" % error.detail, file=sys.stderr)
