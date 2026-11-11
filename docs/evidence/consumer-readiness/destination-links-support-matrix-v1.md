@@ -154,11 +154,14 @@ junction), S4-6 (ordinary external record), S4-7 (conflicting `AGENTS.md`),
 S4-8 (identical resume), S4-8b and S4-10/S4-11 (existing record and
 `-AllowExistingRecord`), S4-19/S4-20 (record appearing after the preflight),
 S4-21/S4-23 (junction at `-RecordPath`, including one swapped in after the
-preflight), and S4-12..S4-18/S4-25 (record-temp and record-path contracts) all
-**PASS**. S4-9 and S4-22 (file symbolic link at a leaf and at `-RecordPath`)
-are **UNRUN** with the privilege message and are not counted as passes. Six
+preflight), and S4-12, S4-13, S4-15..S4-18 and S4-25 (record-temp and
+record-path contracts) all **PASS**. S4-9, S4-14, S4-22 and S4-24 - the four
+file-symbolic-link sub-cases (a leaf at the destination, a leaf at
+`<record>.tmp`, the record path itself, and one swapped in after the preflight)
+- are **UNRUN** with the privilege message and are not counted as passes. Six
 unrelated Linux/POSIX cases are reported UNRUN in the same suite
-("Linux POSIX lane unavailable" / "POSIX sh not available on this host").
+("Linux POSIX lane unavailable" / "POSIX sh not available on this host"), so the
+suite reports ten UNRUN skips in total and no failure.
 
 The suite count is executed, not assumed: the item-6 record reported 350 at its
 head and the record-guard record 361; this head reports **375**. No assertion was
