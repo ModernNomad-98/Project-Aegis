@@ -2074,6 +2074,22 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-inbox-zero-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "path": "docs/operations/advisory-trigger-findings-policy.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c3a4a6f827b372072ae7b85c6272fc23a436f982",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md",
+      "date": "2026-11-12"
+    },
+    {
+      "path": "docs/operations/stage-holders-and-replacement.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "425dd7c36886b749e342bb9438da29d9043ff284",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ]
 }

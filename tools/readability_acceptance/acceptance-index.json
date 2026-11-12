@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "4fed4054d678b7cfa5a600d8ee26a5534f7855e4",
-  "table_rows": 259,
+  "built_at_ref": "be9bacb18518cd3e20d63b1aa126089cf346b477",
+  "table_rows": 261,
   "events": [
     {
       "stable_id": "K-001",
@@ -2853,6 +2853,28 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-inbox-zero-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "stable_id": "K-413",
+      "path": "docs/operations/advisory-trigger-findings-policy.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c3a4a6f827b372072ae7b85c6272fc23a436f982",
+      "blob_id": "bd0efd1c88af3daa1a9fb8aedec47f0a1d368689",
+      "quote": "No existing clause is removed, relaxed, renamed or duplicated.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md",
+      "date": "2026-11-12"
+    },
+    {
+      "stable_id": "K-414",
+      "path": "docs/operations/stage-holders-and-replacement.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "425dd7c36886b749e342bb9438da29d9043ff284",
+      "blob_id": "9d50518b89042d199141d0525830142ed3ae1bbc",
+      "quote": "One active holder per stage/candidate. Two simultaneous ACTIVE holders for the same stage are DUPLICATE_ACTIVE_HOLDER.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ],
   "reader_pages": [
@@ -4007,6 +4029,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/operations/advisory-trigger-findings-policy.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "c3a4a6f827b372072ae7b85c6272fc23a436f982",
+      "blob_id": "bd0efd1c88af3daa1a9fb8aedec47f0a1d368689",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md",
+      "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/operations/ci-routing-matrix.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "556fe6dc740e5410f6eade06f702123ef59fd469",
@@ -4033,6 +4065,16 @@
       "blob_id": "f677bf2fba9dad4c16c8a56ff1b62ea16f38ae1a",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
+      "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/operations/stage-holders-and-replacement.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "425dd7c36886b749e342bb9438da29d9043ff284",
+      "blob_id": "9d50518b89042d199141d0525830142ed3ae1bbc",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md",
       "date": "2026-11-12",
       "acceptance_reachable": true
     },
