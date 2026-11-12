@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "56163f63840e6e06e83272210861eb266df5e9fc",
+  "built_at_ref": "17c40a249bdebf0c03e3eb9304ecde19c7bcf5f4",
   "table_rows": 256,
   "events": [
     {
@@ -2816,7 +2816,7 @@
       "event_kind": "full-page-acceptance",
       "revision": "0da362f671ce94c65f837272b5c239091cc2f73c",
       "blob_id": "d090460459fe867398098b499662f4322b0d87b9",
-      "quote": "No aggregate green. The ledger never totals rows into an 'overall supported' state.",
+      "quote": "No aggregate green.",
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-support-claims-2026-11-12.md",
       "date": "2026-11-12"
