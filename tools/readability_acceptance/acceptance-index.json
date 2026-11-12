@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "94ccc5322aff584dac1fa59d8c55203c52e3f1ff",
-  "table_rows": 294,
+  "built_at_ref": "06cd382b17642882609096b1942c242881de386d",
+  "table_rows": 297,
   "events": [
     {
       "stable_id": "K-001",
@@ -3238,6 +3238,39 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows4-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-448",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-05.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f84e71d40b7a6f736f3b27791b7512f3687e18cf",
+      "blob_id": "7c7756b37050df97635e8b4752289a3b1a05042f",
+      "quote": "not comparable to an R1 PASS.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows5-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-449",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-13.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f84e71d40b7a6f736f3b27791b7512f3687e18cf",
+      "blob_id": "4dd7c3fa36ef8b1c5511fbf1920bdf29d9e8a77c",
+      "quote": "The workflow bytes are workflow_dispatch-only, take a release choice input restricted to A/B, pin every referenced action, scope permissions to the deploy job, and verify retained committed bytes (SHA-256, byte and LF counts, aggregate) before upload/publish \u2014 no build output is published. The CP-21 freshness selector merges into the same workflow without changing the gate bytes.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows5-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-450",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-12.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "f84e71d40b7a6f736f3b27791b7512f3687e18cf",
+      "blob_id": "713535daa00eeafdb123186c04af89ad0933afcd",
+      "quote": "**Basis observed.** The guard merged to consumer main as 4f31293 (one path, .github/workflows/pages.yml, +20/\u22120; tree 4d87d37e\u2026), and the merged-main S0\u2013S3 matrix re-ran from main's own bytes: 6/6 required refusals, 2/2 positives, exit codes as specified. CP-12.8, an independent review of that merge, returned PASS (39/39 identity checks, gate extracted independently and byte-identical, matrix reproduced).",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows5-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -4172,6 +4205,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-05.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "f84e71d40b7a6f736f3b27791b7512f3687e18cf",
+      "blob_id": "7c7756b37050df97635e8b4752289a3b1a05042f",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows5-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-06.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
@@ -4218,6 +4261,26 @@
       "blob_id": "b7e8af27c37f2e5e392c6c8d6866fe142700be8c",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-12.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "f84e71d40b7a6f736f3b27791b7512f3687e18cf",
+      "blob_id": "713535daa00eeafdb123186c04af89ad0933afcd",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows5-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-13.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "f84e71d40b7a6f736f3b27791b7512f3687e18cf",
+      "blob_id": "4dd7c3fa36ef8b1c5511fbf1920bdf29d9e8a77c",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows5-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
