@@ -2106,6 +2106,14 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-compatibility-matrix-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/consumer-status-presentation-v1.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "8c67e45d0e4f29eadbdc6cb7159184ae23bb76cd",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-consumer-status-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }
