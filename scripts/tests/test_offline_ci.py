@@ -689,7 +689,7 @@ VERDICT_PERMISSIONS = {
 }
 
 VERDICT_LABELS = ["environment", "resolve", "fetch-inputs", "verdict-gate",
-                  "publish-status", "self-test", "checker-tests"]
+                  "self-test", "checker-tests", "publish-status"]
 
 
 def verdict_trigger_violations(workflow):
