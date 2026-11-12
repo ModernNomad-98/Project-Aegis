@@ -2378,6 +2378,62 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows5-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-11.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-15.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-17.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-19.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-20.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-21.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-22.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }
