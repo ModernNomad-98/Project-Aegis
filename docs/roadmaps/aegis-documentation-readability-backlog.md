@@ -6324,4 +6324,4 @@ carry NO acceptance row and their pages count pending until re-reviewed
 
 ## Index rebuild — 2026-11-12
 
-Rebuilt at `d82384d97016a3773333785c90d0550876ee0f09` after the operational readability batch. Official pending count at that ref: **921** (1,012 reader pages; 90 accepted; 11 provably pending; 889 no recorded acceptance; 11 within-10 not covered; 6 cannot decide; 4 partial pending). The batch accepted the BER backlog and delivery-control README; the backlog forecast remains pending after a rejected automated edit was restored. This note records the rebuild; it accepts no additional page.
+Rebuilt at `d82384d97016a3773333785c90d0550876ee0f09` after the operational readability batch. Official pending count at that ref: **921** (1,012 reader pages; 90 accepted; 11 provably pending; 889 no recorded acceptance; 12 recorded-within-10 (11 not covered); 6 cannot decide; 4 partial pending). The batch accepted the BER backlog and delivery-control README; the backlog forecast remains pending after a rejected automated edit was restored. This note records the rebuild; it accepts no additional page.
