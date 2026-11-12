@@ -99,6 +99,7 @@ timestamps. Without --blocks every existing output byte is unchanged.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -663,7 +664,8 @@ def main():
     ap = argparse.ArgumentParser(description="Decide pending pages from the repaired acceptance index.")
     ap.add_argument("--repo", default=str(REPO_ROOT))
     ap.add_argument("--ref", default="refs/remotes/origin/main")
-    ap.add_argument("--index", default=INDEX_REL)
+    ap.add_argument("--index", default=None,
+                    help="custom index path; omit to load the committed index at --ref")
     ap.add_argument("--partial-dispositions", default=PARTIAL_REL,
                     help="the instrument-level partial-disposition record "
                          "(default: " + PARTIAL_REL + ")")
@@ -705,13 +707,26 @@ def main():
                   file=sys.stderr)
             return 2
         pin_sha = out.strip()
-    index = json.loads((root / args.index).read_text(encoding="utf-8"))
     code, out, err = run(["rev-parse", "--verify", "--quiet", args.ref], root)
     if code != 0:
         print("cannot resolve --ref " + args.ref + ": " + err.strip(),
               file=sys.stderr)
         return 2
     ref_sha = out.strip()
+    if args.index is None:
+        code, out, err = run(["show", ref_sha + ":" + INDEX_REL], root)
+        if code != 0:
+            print("cannot read the acceptance index at " + ref_sha[:12]
+                  + ": " + err.strip(), file=sys.stderr)
+            return 2
+        index_bytes = out.encode("utf-8")
+        index = json.loads(out)
+        index_source = "ref"
+    else:
+        index_bytes = (root / args.index).read_bytes()
+        index = json.loads(index_bytes.decode("utf-8"))
+        index_source = "path"
+    index_sha256 = hashlib.sha256(index_bytes).hexdigest()
     tree = classify_tree(ref_sha, root)
     if tree is None:
         return 2
@@ -835,6 +850,8 @@ def main():
                         + len(within_not_covered))
     summary = {
         "compared_ref": ref_sha,
+        "index_source": index_source,
+        "index_sha256": index_sha256,
         "reader_pages_in_tree": len(reader_pages),
         "accepted_on_recorded_review": len(accepted),
         "provably_pending": len(pending),
