@@ -6325,6 +6325,7 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-409 | docs/consumer-readiness/support-claims-v1.md | full-page-acceptance | 0da362f671ce94c65f837272b5c239091cc2f73c | d090460459fe867398098b499662f4322b0d87b9 | No aggregate green. | records-steward | docs/evidence/documentation/readability-support-claims-2026-11-12.md | 2026-11-12 |
 | K-410 | docs/operations/overhead-controls.md | full-page-acceptance | 556fe6dc740e5410f6eade06f702123ef59fd469 | f677bf2fba9dad4c16c8a56ff1b62ea16f38ae1a | A failed or blocked checker result is reported as blocked, never as approval or green. | c03-contract-owner | docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md | 2026-11-12 |
 | K-411 | docs/operations/ci-routing-matrix.md | full-page-acceptance | 556fe6dc740e5410f6eade06f702123ef59fd469 | 6d1fe5352e9292eb90397a0e997fd37ac85560b3 | A bypass without that record is not a bypass; it is an unresolved red. | evidence-lineage-steward | docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md | 2026-11-12 |
+| K-412 | docs/operations/inbox-zero-activity.md | full-page-acceptance | 0e14f267846d61e61fbcd140cb00bdaeb97ee515 | abc3499a650abc9a49f87a73e5e0537c82c0da63 | All seven activity fields must be present and false. One true field is INBOX_HIDDEN_ACTIVITY and the claim fails. | records-steward | docs/evidence/documentation/readability-inbox-zero-2026-11-12.md | 2026-11-12 |
 
 
 ## Index rebuild — 2026-11-12
