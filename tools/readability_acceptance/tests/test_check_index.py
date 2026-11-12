@@ -554,12 +554,20 @@ class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
             capture_output=True)
         self.assertEqual(blob.returncode, 0,
                          "the base checker must be retrievable from this clone")
+        index_blob = subprocess.run(
+            ["git", "-C", str(ROOT), "show",
+             README_REF + ":tools/readability_acceptance/acceptance-index.json"],
+            capture_output=True)
+        self.assertEqual(index_blob.returncode, 0,
+                         "the pinned ref's index must be retrievable")
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp) / "check_index_base.py"
             base.write_bytes(blob.stdout)
+            fixed_index = Path(tmp) / "pinned-index.json"
+            fixed_index.write_bytes(index_blob.stdout)
             base_proc = subprocess.run(
                 [sys.executable, "-B", str(base), "--repo", str(ROOT),
-                 "--ref", README_REF, "--index", str(INDEX_ABS), "--json"],
+                 "--ref", README_REF, "--index", str(fixed_index), "--json"],
                 capture_output=True, text=True, encoding="utf-8",
                 errors="replace",
                 env=dict(os.environ, PYTHONIOENCODING="utf-8"))
@@ -577,9 +585,9 @@ class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
             "from the mutable index")
         self.assertEqual(
             summary["accepted_on_recorded_review"],
-            base_summary["accepted_on_recorded_review"] - len(postdating),
-            "the pinned ref's acceptance count is the base count less the "
-            "withdrawal rows that postdate this ref")
+            base_summary["accepted_on_recorded_review"],
+            "both checkers read the same ref-committed index, so they must "
+            "agree on the pinned ref's acceptance count")
         self.assertEqual(published_partition(summary),
                          summary["reader_pages_in_tree"],
                          "identity (i): every reader page is in exactly one "
@@ -644,10 +652,18 @@ class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
             + str(pinned_reader_pages) + ") must equal both checkers' count")
     def test_the_sidecar_changes_no_count_at_that_ref(self):
         """Not-applicable declarations are inert, not absorbed."""
+        index_blob = subprocess.run(
+            ["git", "-C", str(ROOT), "show",
+             README_REF + ":tools/readability_acceptance/acceptance-index.json"],
+            capture_output=True)
+        self.assertEqual(index_blob.returncode, 0,
+                         "the pinned ref's index must be retrievable")
         with tempfile.TemporaryDirectory() as tmp:
             empty = write_empty_dispositions(tmp)
+            fixed_index = Path(tmp) / "pinned-index.json"
+            fixed_index.write_bytes(index_blob.stdout)
             empty_summary = payload_of(
-                run_checker(CHECKER, INDEX_ABS, README_REF, empty))["summary"]
+                run_checker(CHECKER, fixed_index, README_REF, empty))["summary"]
         published = run_published_command(README_REF)
         self.assertEqual(published.returncode, 0, published.stderr)
         summary = published_summary(published.stdout)
@@ -1021,3 +1037,41 @@ class NonUtf8SidecarIsADispositionError(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DefaultIndexComesFromRef(unittest.TestCase):
+    """The official count must not depend on the checkout index file."""
+
+    def test_default_reports_ref_identity(self):
+        ref = main_tip()
+        proc = run_published_command(ref)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        summary = published_summary(proc.stdout)
+        self.assertEqual(summary["index_source"], "ref")
+        blob = subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse",
+             ref + ":tools/readability_acceptance/acceptance-index.json"],
+            capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(blob.returncode, 0, blob.stderr)
+        self.assertRegex(summary["index_sha256"], r"^[0-9a-f]{64}$")
+
+    def test_custom_index_reports_path(self):
+        ref = main_tip()
+        proc = run_checker(CHECKER, INDEX_ABS, ref)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        summary = payload_of(proc)["summary"]
+        self.assertEqual(summary["index_source"], "path")
+        self.assertRegex(summary["index_sha256"], r"^[0-9a-f]{64}$")
+
+    def test_ref_without_index_exits_two(self):
+        add = git("log", "--format=%H", "--diff-filter=A", "--",
+                  "tools/readability_acceptance/acceptance-index.json").split()
+        self.assertTrue(add, "the index add commit must be discoverable")
+        parent = git("rev-parse", add[-1] + "^").strip()
+        proc = subprocess.run(
+            [sys.executable, "-B", str(CHECKER), "--repo", str(ROOT),
+             "--ref", parent, "--json"],
+            capture_output=True, text=True, encoding="utf-8",
+            errors="replace", env=dict(os.environ, PYTHONIOENCODING="utf-8"))
+        self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
+        self.assertNotIn('"summary"', proc.stdout)
