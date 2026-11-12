@@ -2130,6 +2130,14 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-supported-controls-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/approvals/revision-state/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "6860062c6c5c1b4468828f8dbd7a171c14c96cc8",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-revision-state-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }
