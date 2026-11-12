@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "468979cae0eabef2460a39450485ab90a018622f",
-  "table_rows": 266,
+  "built_at_ref": "01e93797e8cebbccce047474ead34fca8b5a5997",
+  "table_rows": 267,
   "events": [
     {
       "stable_id": "K-001",
@@ -2930,6 +2930,17 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-supported-controls-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-420",
+      "path": "docs/approvals/revision-state/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "6860062c6c5c1b4468828f8dbd7a171c14c96cc8",
+      "blob_id": "25a6fc39012060188f351377f7be80ebc31a525d",
+      "quote": "This store is data. It does not approve, authorise, merge, reopen, revise or plan anything; it does not make B1 enforcing; it does not satisfy AUTH-STORE; it does not replace the approval register, the plan of record or any stage record.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-revision-state-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3701,6 +3712,16 @@
       "reviewer": "readability-final3-implementer-c",
       "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
       "date": "2026-10-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/approvals/revision-state/README.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "6860062c6c5c1b4468828f8dbd7a171c14c96cc8",
+      "blob_id": "25a6fc39012060188f351377f7be80ebc31a525d",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-revision-state-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
