@@ -2050,6 +2050,22 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-support-claims-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "path": "docs/operations/overhead-controls.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "556fe6dc740e5410f6eade06f702123ef59fd469",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
+      "date": "2026-11-12"
+    },
+    {
+      "path": "docs/operations/ci-routing-matrix.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "556fe6dc740e5410f6eade06f702123ef59fd469",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ]
 }

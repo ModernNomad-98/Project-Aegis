@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "17c40a249bdebf0c03e3eb9304ecde19c7bcf5f4",
-  "table_rows": 256,
+  "built_at_ref": "aa00dc98cf683eedde0f37804f4c7834b460f28c",
+  "table_rows": 258,
   "events": [
     {
       "stable_id": "K-001",
@@ -2820,6 +2820,28 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-support-claims-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "stable_id": "K-410",
+      "path": "docs/operations/overhead-controls.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "556fe6dc740e5410f6eade06f702123ef59fd469",
+      "blob_id": "f677bf2fba9dad4c16c8a56ff1b62ea16f38ae1a",
+      "quote": "A failed or blocked checker result is reported as blocked, never as approval or green.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
+      "date": "2026-11-12"
+    },
+    {
+      "stable_id": "K-411",
+      "path": "docs/operations/ci-routing-matrix.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "556fe6dc740e5410f6eade06f702123ef59fd469",
+      "blob_id": "6d1fe5352e9292eb90397a0e997fd37ac85560b3",
+      "quote": "PASS: ci-routing matrix full-page review; no material defect.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ],
   "reader_pages": [
@@ -3970,6 +3992,26 @@
       "blob_id": "a725c904a9070d667c1d67d1b662aa41583f9314",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md",
+      "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/operations/ci-routing-matrix.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "556fe6dc740e5410f6eade06f702123ef59fd469",
+      "blob_id": "6d1fe5352e9292eb90397a0e997fd37ac85560b3",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
+      "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/operations/overhead-controls.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "556fe6dc740e5410f6eade06f702123ef59fd469",
+      "blob_id": "f677bf2fba9dad4c16c8a56ff1b62ea16f38ae1a",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
       "date": "2026-11-12",
       "acceptance_reachable": true
     },
