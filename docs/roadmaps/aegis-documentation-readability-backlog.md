@@ -6328,6 +6328,7 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-412 | docs/operations/inbox-zero-activity.md | full-page-acceptance | 0e14f267846d61e61fbcd140cb00bdaeb97ee515 | abc3499a650abc9a49f87a73e5e0537c82c0da63 | All seven activity fields must be present and false. One true field is INBOX_HIDDEN_ACTIVITY and the claim fails. | records-steward | docs/evidence/documentation/readability-inbox-zero-2026-11-12.md | 2026-11-12 |
 | K-413 | docs/operations/advisory-trigger-findings-policy.md | full-page-acceptance | c3a4a6f827b372072ae7b85c6272fc23a436f982 | bd0efd1c88af3daa1a9fb8aedec47f0a1d368689 | No existing clause is removed, relaxed, renamed or duplicated. | evidence-lineage-steward | docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md | 2026-11-12 |
 | K-414 | docs/operations/stage-holders-and-replacement.md | full-page-acceptance | 425dd7c36886b749e342bb9438da29d9043ff284 | 9d50518b89042d199141d0525830142ed3ae1bbc | One active holder per stage/candidate. Two simultaneous ACTIVE holders for the same stage are DUPLICATE_ACTIVE_HOLDER. | c03-contract-owner | docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md | 2026-11-12 |
+| K-415 | docs/operations/qualification-and-pilot-metrics.md | full-page-acceptance | 83bcdcb4c91f71a02479973b8d407bb6370f9f02 | e4d9f2f828024f61ed76234b66f8e41d44bfc237 | There is **one** pilot, the existing C4.2 pilot. | records-steward | docs/evidence/documentation/readability-qualification-metrics-2026-11-12.md | 2026-11-12 |
 
 
 ## Index rebuild — 2026-11-12
