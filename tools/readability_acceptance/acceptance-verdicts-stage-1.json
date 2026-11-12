@@ -2146,6 +2146,30 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-change-state-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/documentation/documentation-backlog-current-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/documentation/contributor-merge-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/documentation/user-paths-deep-evidence-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }
