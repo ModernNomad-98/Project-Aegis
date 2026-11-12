@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "aa00dc98cf683eedde0f37804f4c7834b460f28c",
+  "built_at_ref": "56b86d2ad2eb81f621eb39c2f8b29a6eda97d02e",
   "table_rows": 258,
   "events": [
     {
@@ -2838,7 +2838,7 @@
       "event_kind": "full-page-acceptance",
       "revision": "556fe6dc740e5410f6eade06f702123ef59fd469",
       "blob_id": "6d1fe5352e9292eb90397a0e997fd37ac85560b3",
-      "quote": "PASS: ci-routing matrix full-page review; no material defect.",
+      "quote": "A bypass without that record is not a bypass; it is an unresolved red.",
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
       "date": "2026-11-12"
