@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "a5b5cee824edd525c63afb094f186fb6b62c2e63",
-  "table_rows": 285,
+  "built_at_ref": "cbda660e520f5694c9a831edcae54006ea5a3620",
+  "table_rows": 288,
   "events": [
     {
       "stable_id": "K-001",
@@ -3139,6 +3139,39 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-439",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-16.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
+      "blob_id": "61caf2773b60f1e07c319f8456dbfbedbb3f2694",
+      "quote": "One host, one account, one target URL.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-440",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-18.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
+      "blob_id": "b20bcc28f45b4fffcf2cc340000d374fe3fd952b",
+      "quote": "A genuinely new context derived the correct state, decisions, authority and next action from durable records alone, avoided re-asking settled questions, and completed the authorized read-only continuation. The next action itself remains unexecuted (recorded, not performed).",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-441",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-04.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
+      "blob_id": "5ec3d6133b26dae73ab7d5fca7f5107ed6681e8a",
+      "quote": "**Basis observed.** Observed on the same executed control set: N4 (two unrelated files outside the package) exit 0 with 43 files before and after and both files unchanged; N5 (installed AGENTS.md differs from the pinned source) exit 22, a stop; N6 (identical re-run) exit 0 with the tree unchanged at 41 files.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -4033,6 +4066,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-04.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
+      "blob_id": "5ec3d6133b26dae73ab7d5fca7f5107ed6681e8a",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-07.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "84d8352faf05cc976ab40c4b712d009714a4895b",
@@ -4059,6 +4102,26 @@
       "blob_id": "b7e8af27c37f2e5e392c6c8d6866fe142700be8c",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-16.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
+      "blob_id": "61caf2773b60f1e07c319f8456dbfbedbb3f2694",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-18.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
+      "blob_id": "b20bcc28f45b4fffcf2cc340000d374fe3fd952b",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
