@@ -2194,6 +2194,30 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/documentation/ber-runner-command-effects-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/documentation/evidence-followup-current-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/documentation/control-plane-guide-fields-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }

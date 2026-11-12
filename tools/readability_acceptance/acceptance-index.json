@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "ba079fd2cf04ea222939cceffb5a5946250ed1ff",
-  "table_rows": 274,
+  "built_at_ref": "eefdb4596dff2774a40826ce2371c27e6b1bceb4",
+  "table_rows": 277,
   "events": [
     {
       "stable_id": "K-001",
@@ -3018,6 +3018,39 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-428",
+      "path": "docs/evidence/documentation/ber-runner-command-effects-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "blob_id": "7cf6f256447f5935512d9d30d0e6470bb29298b4",
+      "quote": "This changes documentation only; it grants no permission for provider calls, real inputs, or host activation.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-429",
+      "path": "docs/evidence/documentation/evidence-followup-current-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "blob_id": "323bf9fd55fc24502e4af1557514a261f8d2cb00",
+      "quote": "Original findings, test counts, skips, candidate identities and guard result were preserved. This batch changed no grant, runtime, test, fixture, provider, host, credential, private input, or approval state. No old plan was rerun.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-430",
+      "path": "docs/evidence/documentation/control-plane-guide-fields-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "blob_id": "f14ef54e8704f2e87df35bfa365ac92f9cd3abe9",
+      "quote": "The guide still describes a synthetic offline kernel. These explanations do not create real authority, an external adapter, provider access, private input access, a host proof, or a deployment route.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3902,12 +3935,32 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/documentation/ber-runner-command-effects-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "blob_id": "7cf6f256447f5935512d9d30d0e6470bb29298b4",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/documentation/contributor-merge-reading-2026-09-23.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
       "blob_id": "4c3e38679d7cf2f99a486d7d005c879e0a5b6c4a",
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/documentation/control-plane-guide-fields-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "blob_id": "f14ef54e8704f2e87df35bfa365ac92f9cd3abe9",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
@@ -3928,6 +3981,16 @@
       "blob_id": "5fd0ee8d1923c1544b596d47c212dcaf3a126598",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/documentation/evidence-followup-current-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "0e43805aeea0729e7f4631d842d2869aea5faba8",
+      "blob_id": "323bf9fd55fc24502e4af1557514a261f8d2cb00",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings3-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
