@@ -1049,11 +1049,19 @@ class DefaultIndexComesFromRef(unittest.TestCase):
         summary = published_summary(proc.stdout)
         self.assertEqual(summary["index_source"], "ref")
         blob = subprocess.run(
-            ["git", "-C", str(ROOT), "rev-parse",
+            ["git", "-C", str(ROOT), "show",
              ref + ":tools/readability_acceptance/acceptance-index.json"],
-            capture_output=True, text=True, encoding="utf-8")
+            capture_output=True)
         self.assertEqual(blob.returncode, 0, blob.stderr)
-        self.assertRegex(summary["index_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(
+            summary["index_sha256"],
+            hashlib.sha256(blob.stdout).hexdigest(),
+            "the reported identity must be the exact ref-committed index bytes")
+        checkout_sha = hashlib.sha256(INDEX_ABS.read_bytes()).hexdigest()
+        if checkout_sha != hashlib.sha256(blob.stdout).hexdigest():
+            self.assertNotEqual(
+                summary["index_sha256"], checkout_sha,
+                "a drifted checkout index must not override the ref index")
 
     def test_custom_index_reports_path(self):
         ref = main_tip()
@@ -1061,7 +1069,25 @@ class DefaultIndexComesFromRef(unittest.TestCase):
         self.assertEqual(proc.returncode, 0, proc.stderr)
         summary = payload_of(proc)["summary"]
         self.assertEqual(summary["index_source"], "path")
-        self.assertRegex(summary["index_sha256"], r"^[0-9a-f]{64}$")
+        self.assertEqual(
+            summary["index_sha256"],
+            hashlib.sha256(INDEX_ABS.read_bytes()).hexdigest(),
+            "a custom path reports the exact checkout file bytes")
+
+
+
+    def test_deterministic_counts_at_four_refs(self):
+        expected = {
+            "72b45a078e94f5592bca2f8d2e0d0c664d483129": 920,
+            "e257eea5685e9071e163119676340a9d2f9ce4d5": 921,
+            "d82384d97016a3773333785c90d0550876ee0f09": 923,
+            "17c602717571f2db0684f681db5e10654bbfa883": 922,
+        }
+        for ref, count in expected.items():
+            proc = run_published_command(ref)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            summary = published_summary(proc.stdout)
+            self.assertEqual(summary["official_pending_count"], count, ref)
 
     def test_ref_without_index_exits_two(self):
         add = git("log", "--format=%H", "--diff-filter=A", "--",
