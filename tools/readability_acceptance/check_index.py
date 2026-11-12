@@ -714,12 +714,13 @@ def main():
               file=sys.stderr)
         return 2
     ref_sha = out.strip()
+    explicit_index_ref = bool(getattr(args, "index_ref", None))
     index_ref = None
     index_blob = None
     if args.index is not None:
         index = json.loads((root / args.index).read_text(encoding="utf-8"))
-    elif getattr(args, "index_ref", None):
-        index_ref = args.index_ref
+    else:
+        index_ref = getattr(args, "index_ref", None) or ref_sha
         code, out, err = run(["show", index_ref + ":" + INDEX_REL], root)
         if code != 0:
             print("cannot read the acceptance index at " + index_ref
@@ -732,8 +733,6 @@ def main():
                   + ": " + err.strip(), file=sys.stderr)
             return 2
         index_blob = out.strip()
-    else:
-        index = json.loads((root / INDEX_REL).read_text(encoding="utf-8"))
     tree = classify_tree(ref_sha, root)
     if tree is None:
         return 2
@@ -876,7 +875,7 @@ def main():
             "(recorded_acceptance_within_10_lines not covered by a recorded "
             "targeted-review row); computed at the pinned --ref"),
     }
-    if index_ref:
+    if explicit_index_ref and index_ref:
         summary["index_source"] = "ref"
         summary["index_ref"] = index_ref
         summary["index_blob"] = index_blob
