@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "be9bacb18518cd3e20d63b1aa126089cf346b477",
-  "table_rows": 261,
+  "built_at_ref": "cee268603f9593e65321945a224360fece9d0f30",
+  "table_rows": 262,
   "events": [
     {
       "stable_id": "K-001",
@@ -2875,6 +2875,17 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "stable_id": "K-415",
+      "path": "docs/operations/qualification-and-pilot-metrics.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "83bcdcb4c91f71a02479973b8d407bb6370f9f02",
+      "blob_id": "e4d9f2f828024f61ed76234b66f8e41d44bfc237",
+      "quote": "There is **one** pilot, the existing C4.2 pilot.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-qualification-metrics-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ],
   "reader_pages": [
@@ -4065,6 +4076,16 @@
       "blob_id": "f677bf2fba9dad4c16c8a56ff1b62ea16f38ae1a",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
+      "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/operations/qualification-and-pilot-metrics.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "83bcdcb4c91f71a02479973b8d407bb6370f9f02",
+      "blob_id": "e4d9f2f828024f61ed76234b66f8e41d44bfc237",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-qualification-metrics-2026-11-12.md",
       "date": "2026-11-12",
       "acceptance_reachable": true
     },
