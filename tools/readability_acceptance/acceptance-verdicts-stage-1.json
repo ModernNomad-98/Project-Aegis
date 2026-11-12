@@ -2122,6 +2122,14 @@
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-host-qualification-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/design/supported-controls-boundary.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "86146943106fa5649151b09729fb242d315c0891",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-supported-controls-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }
