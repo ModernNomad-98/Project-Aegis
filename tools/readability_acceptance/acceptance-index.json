@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "01e93797e8cebbccce047474ead34fca8b5a5997",
-  "table_rows": 267,
+  "built_at_ref": "905b0aeee3f9097c8739a8a32e716af5b256dfce",
+  "table_rows": 268,
   "events": [
     {
       "stable_id": "K-001",
@@ -2941,6 +2941,17 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-revision-state-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-421",
+      "path": "docs/approvals/change-state/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "db3cf47433f99ebc438f4f9be5914ee240c22644",
+      "blob_id": "6b33f63922724c1dec390bdda0c9b29051e9b6ca",
+      "quote": "This page documents a format. It approves nothing, authorises nothing, merges nothing, satisfies no AUTH-STORE decision, makes no enforcement or readiness claim, and does not replace the approval register, the plan of record or any stage record.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-change-state-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3712,6 +3723,16 @@
       "reviewer": "readability-final3-implementer-c",
       "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
       "date": "2026-10-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/approvals/change-state/README.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "db3cf47433f99ebc438f4f9be5914ee240c22644",
+      "blob_id": "6b33f63922724c1dec390bdda0c9b29051e9b6ca",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-change-state-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
