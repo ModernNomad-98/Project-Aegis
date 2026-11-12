@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "016188cf379a6b124b6fd511e839850bf17747cf",
-  "table_rows": 278,
+  "built_at_ref": "8d1fb136798299c03a0f3f3545ac03bdc2c8a31a",
+  "table_rows": 279,
   "events": [
     {
       "stable_id": "K-001",
@@ -3062,6 +3062,17 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-forecast-routes-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-432",
+      "path": "docs/roadmaps/aegis-maturity-package.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "467f8b9434155f2d9296461c1694315648d3430e",
+      "blob_id": "16f1d8e0786e15101015fc6713ba35b9b1b641db",
+      "quote": "**What this page is not.** It is a record, not an authorization. **It grants nothing by itself.** The approval register remains the documentary grant register; registration is not authorization for any push, review, merge, publication, deployment, spend or credential action.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-maturity-package-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -4473,6 +4484,16 @@
       "reviewer": "ledger-selfcost-stagec-c",
       "evidence_source": "docs/evidence/documentation/readability-ledger-selfcost-2026-10-13.md",
       "date": "2026-10-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/roadmaps/aegis-maturity-package.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "467f8b9434155f2d9296461c1694315648d3430e",
+      "blob_id": "16f1d8e0786e15101015fc6713ba35b9b1b641db",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-maturity-package-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
