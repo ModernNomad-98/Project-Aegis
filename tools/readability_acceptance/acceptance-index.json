@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "44233f4a94fbbbef377881d8f808a3d101ee150f",
-  "table_rows": 271,
+  "built_at_ref": "ba079fd2cf04ea222939cceffb5a5946250ed1ff",
+  "table_rows": 274,
   "events": [
     {
       "stable_id": "K-001",
@@ -2985,6 +2985,39 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-425",
+      "path": "docs/evidence/documentation/roadmap-deep-status-terms-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "244224df2b58818d0e9ddbfba79a2848bc31ba76",
+      "blob_id": "7d689fb2eed5babf152d5b34e8e94fe3fcfdc00a",
+      "quote": "Pull request #139 remains subject to a separate protected-file guard disposition. This clarification does not authorize real-host use or a provider request.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-426",
+      "path": "docs/evidence/documentation/cp-handoff-pinned-citations-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "244224df2b58818d0e9ddbfba79a2848bc31ba76",
+      "blob_id": "71107dab0e09b1f7432a21b2cf97dfbd11ef25df",
+      "quote": "No historical verdict, test result, approval scope, execution behavior or current authority changed. The corrected links should be checked against the exact historical Git objects as well as for existence; a live relative link can resolve while pointing to unrelated later code.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-427",
+      "path": "docs/evidence/documentation/root-status-docs-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "244224df2b58818d0e9ddbfba79a2848bc31ba76",
+      "blob_id": "336934fcd552cb31b4f7a40d547d88b51e9886fa",
+      "quote": "The pending independent review below describes the frozen-draft checkpoint, not current delivery status.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3879,6 +3912,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/documentation/cp-handoff-pinned-citations-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "244224df2b58818d0e9ddbfba79a2848bc31ba76",
+      "blob_id": "71107dab0e09b1f7432a21b2cf97dfbd11ef25df",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/documentation/documentation-backlog-current-reading-2026-09-23.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
@@ -4156,6 +4199,26 @@
       "reviewer": "deepseek-flash-apr117-keeper",
       "evidence_source": "docs/evidence/documentation/readability-lane-d-batch-2-apr117-withdrawal-and-rerecord-2026-10-16.md",
       "date": "2026-10-16",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/documentation/roadmap-deep-status-terms-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "244224df2b58818d0e9ddbfba79a2848bc31ba76",
+      "blob_id": "7d689fb2eed5babf152d5b34e8e94fe3fcfdc00a",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/documentation/root-status-docs-readability-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "244224df2b58818d0e9ddbfba79a2848bc31ba76",
+      "blob_id": "336934fcd552cb31b4f7a40d547d88b51e9886fa",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
