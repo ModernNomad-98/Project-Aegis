@@ -7,13 +7,16 @@ which routes are not governed - and it states the maximum assurance claim this
 slice can make: **AUDITABLE, at most, and NONE for any host control.**
 Mounted coverage is **UNKNOWN** everywhere.
 
+**Audience and reading key.** For Project Aegis maintainers, reviewers and consumers reading the disclosure. **C1.2B/C1.2-C1.4** are the supported-controls/custody, stage/qualification and freeze workstreams; **REV4** is the Stage A plan revision; **C0** is the programme intake findings; **B1-B2** are enforcement-design items; **C1.1a** is the verdict-gate checker store; **AUTH-STORE** is the store-custody decision; **T3/T4/T5/T6/T7/T24** are scope/settings/coverage/authentication/exception/custody decisions; **ACP/MCP** are agent-client and model-context protocol routes; **CODEOWNERS** is the repository ownership file.
+
 **Authority.** C1.2B of the C1.2-C1.4 Stage A plan REV4 (69,918 B /
-`a65fa654...`), captured as
-`C12-C14-STAGE-A-CAPTURE-FINAL-2026-11-11.md` (1,081 B / `56939142...`)
-and accepted plan-only by Stage B (12,193 B / `3318b957...`). The page is
+`a65fa654e59d0852759cab6693780f74b2b08b6bcf4c4c160b3834f39f208e0c`), captured as
+`C12-C14-STAGE-A-CAPTURE-FINAL-2026-11-11.md` (1,081 B / `569391426f889513a415f7fb7c7e9ab495e52050cc185ceb8b7c27ef47ff90a4`)
+and accepted plan-only by Stage B REV4 (12,193 B / `3318b957a3e979813c7e3458092003d7cc5b41f3d3e5f03ca987e312d410b952`). The page is
 docs-only: no host access, no install, no settings/CI/required-context change,
 no T5 export and no T4 identity/settings action. It is grounded in the C0
-intake findings (section 6), the B1-B2 enforcement design REV2 and its errata
+intake findings (`C0-INTAKE-FINDINGS-2026-11-10.md`, 43,074 B /
+`31874a96089ec69bed5547ddf5ed63247ba829a5ba053baa59e835a0b5e65dd9`, section 6), the B1-B2 enforcement design REV2 and its errata
 confirmation, and the merged C1.1a surfaces - it is not a new assessment.
 
 ## What "supported" would require
