@@ -1021,3 +1021,54 @@ class NonUtf8SidecarIsADispositionError(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class IndexRefProvenanceMode(unittest.TestCase):
+    """Optional --index-ref must equal the same ref's committed bytes."""
+
+    def _run(self, ref, extra):
+        command = [sys.executable, "-B", str(CHECKER), "--repo", str(ROOT),
+                   "--ref", ref, *extra, "--json"]
+        return subprocess.run(command, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace",
+                              env=dict(os.environ, PYTHONIOENCODING="utf-8"))
+
+    def test_ref_mode_matches_same_ref_bytes(self):
+        ref = main_tip()
+        blob = subprocess.run(
+            ["git", "-C", str(ROOT), "show",
+             ref + ":tools/readability_acceptance/acceptance-index.json"],
+            capture_output=True)
+        self.assertEqual(blob.returncode, 0, blob.stderr)
+        with tempfile.TemporaryDirectory() as tmp:
+            index = Path(tmp) / "ref-index.json"
+            index.write_bytes(blob.stdout)
+            path_proc = self._run(ref, ["--index", str(index)])
+            ref_proc = self._run(ref, ["--index-ref", ref])
+        self.assertEqual(path_proc.returncode, 0, path_proc.stderr)
+        self.assertEqual(ref_proc.returncode, 0, ref_proc.stderr)
+        path_summary = json.loads(path_proc.stdout)["summary"]
+        ref_summary = json.loads(ref_proc.stdout)["summary"]
+        self.assertEqual(ref_summary["index_source"], "ref")
+        self.assertRegex(ref_summary["index_blob"], r"^[0-9a-f]{40}$")
+        for key in ("official_pending_count", "reader_pages_in_tree",
+                    "accepted_on_recorded_review", "provably_pending",
+                    "no_recorded_acceptance", "cannot_decide"):
+            self.assertEqual(ref_summary[key], path_summary[key], key)
+
+    def test_custom_index_wins_over_index_ref(self):
+        ref = main_tip()
+        proc = self._run(ref, ["--index", str(INDEX_ABS),
+                               "--index-ref", ref])
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        summary = json.loads(proc.stdout)["summary"]
+        self.assertNotIn("index_source", summary)
+
+    def test_missing_index_at_ref_exits_two(self):
+        add = git("log", "--format=%H", "--diff-filter=A", "--",
+                  "tools/readability_acceptance/acceptance-index.json").split()
+        self.assertTrue(add)
+        parent = git("rev-parse", add[-1] + "^").strip()
+        proc = self._run(parent, ["--index-ref", parent])
+        self.assertEqual(proc.returncode, 2, proc.stdout + proc.stderr)
+        self.assertNotIn('"summary"', proc.stdout)
