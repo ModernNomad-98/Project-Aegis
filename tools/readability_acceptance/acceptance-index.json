@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "06cd382b17642882609096b1942c242881de386d",
-  "table_rows": 297,
+  "built_at_ref": "d0aa5a590004c250fd382916c9adcbd52f2ae07c",
+  "table_rows": 304,
   "events": [
     {
       "stable_id": "K-001",
@@ -3271,6 +3271,83 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows5-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-451",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-11.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "1564abc68018d4b5126615669afc69eeb07e2cb6",
+      "quote": "There is therefore no link to click and **no README defect**; step 2 is met vacuously, not by observation of a working link. CP-11 overall = **PASS** (seven steps observed, step 2 vacuously met).",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-452",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-15.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "afa757437d31c089032ecf23b55a6343597fd0b6",
+      "quote": "The provider half alone was never a pass; the row passes on both halves together.",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-453",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-17.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "3f7f944fa13b80a16d069a83715ccb728d8bfea7",
+      "quote": "The row is **UNRUN**, not PASS and not FAIL \u2014 nothing observed falsifies the property, but the required observation was never made.",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-454",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-19.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "796d9741a4609ede27943436c6740a6122dd1314",
+      "quote": "**RUN = FAIL**. Batch `CP19C-22799eb0be91` executed 14 fixtures with 14 fresh `claude-opus-5-5` oracle sessions: **13 PASS / 1 FAIL**.",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-455",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-20.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "fd5d5a0cd222ac1e6c9f511ecedfcc9f0faf116c",
+      "quote": "In the browser the count **returned** and was correct \u2014 reported as `1 of 3 completed` in a `#count p` element with `role=status`; after one reload B persisted and the count stayed visible",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-456",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-21.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "8de0dbeda129c34bbb741f37a9080c4f897ad1fc",
+      "quote": "A reviewed freshness selector was merged to consumer `main` as `f3ec2cff` (`pages.yml` blob `f8c7fba3`; gate bytes unchanged). One live fail-before / pass-after pair then ran against the real runner and Pages site inside an owner-authorized 2 min 06 s settings window",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-457",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-22.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "796f52e7b8e6e88d4ce10bd6c46a1324579b0703",
+      "quote": "**22/22 records ACCEPT, 0 REJECT**, four required rejection controls **and** the optional hash-tamper control rejected (5/5), clean baseline exit 0.",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -4265,6 +4342,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-11.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "1564abc68018d4b5126615669afc69eeb07e2cb6",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-12.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "f84e71d40b7a6f736f3b27791b7512f3687e18cf",
@@ -4295,6 +4382,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-15.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "afa757437d31c089032ecf23b55a6343597fd0b6",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-16.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
@@ -4305,12 +4402,62 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-17.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "3f7f944fa13b80a16d069a83715ccb728d8bfea7",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-18.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
       "blob_id": "b20bcc28f45b4fffcf2cc340000d374fe3fd952b",
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-19.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "796d9741a4609ede27943436c6740a6122dd1314",
+      "reviewer": "delta2-fresh-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-20.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "fd5d5a0cd222ac1e6c9f511ecedfcc9f0faf116c",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-21.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "8de0dbeda129c34bbb741f37a9080c4f897ad1fc",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-22.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "389a4625c706288676cc052dc38245704f67d720",
+      "blob_id": "796f52e7b8e6e88d4ce10bd6c46a1324579b0703",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
