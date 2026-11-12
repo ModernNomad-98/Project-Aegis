@@ -2,6 +2,14 @@
 
 ## Start here — current reading
 
+**Purpose and audience (2026-11-12 reading note).** This page is a rolling active-work estimate for Project Aegis maintainers and coding agents. It is not a calendar promise and not permission to start blocked work. The banners below are dated snapshots; the newest is 2026-10-13, so none of them is the current 2026-11-12 state.
+
+**Navigation.** [Newest dated reading](#start-here--current-reading) · [Cadence reassessments](#cadence-reassessment-through-pr-760-2026-10-13) · [Re-estimation rule](#re-estimation-rule) · [Current selected-work baseline](#current-selected-work-baseline) · [Next trigger](#next-trigger).
+
+**Reading key.** **D73**, **D68** and **D69–D71** are rows in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) log. **V0/V1/V2** are forecast versions. **M**, **M2** and **M3** are frozen assessment cutoffs. **BER** is Behavioral Eval Runner; **CP** is delivery control plane; **TBD** is to be determined.
+
+> **Current-state note — 2026-11-12:** the newest dated reading below is **2026-10-13 (PR #760)**. It is retained as the last frozen forecast snapshot, not as today's state. No later forecast re-estimation is recorded here; the current operational backlog is tracked in the readability and CI baseline records. The multiple "Newest reading" banners below are historical and internally inconsistent; the 2026-10-13 banner is the latest of them.
+
 > **Newest reading — 2026-10-13, assessed through PR #760 (frozen cutoff M3).**
 > This is the current reading; the **#741 banner below is the prior frozen
 > checkpoint**, retained as dated evidence rather than as the present state.
@@ -57,8 +65,10 @@
 > maintainers and coding agents planning Project Aegis work — a rolling active-work
 > estimate, not a calendar promise and not permission to start blocked work, as its
 > own purpose paragraph further down this section states. The dated snapshots below
-> run newest first; the count figures in the block immediately below are themselves
-> superseded, as its own appended note says. This note adds no date, figure or
+> are retained in the order they were appended; the 2026-09-30 reading below is older
+> than the 2026-10-13 banner above, so do not read them as a newest-first list. The
+> count figures in the block immediately below are themselves superseded, as its own
+> appended note says. This note adds no date, figure or
 > estimate, and changes no dated text.
 
 > **Skill-expansion overlap — added 2026-10-08.** At source revision

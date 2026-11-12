@@ -26,10 +26,19 @@ does not authorize a real route; `require_real_dispatch` always denies it. A
 selected source and host, independent freshness proof, actual evidence and
 billing policy remain open work-package 003 gates.
 
+## Reading path
+
+Start with [How a controlled operation works](#how-a-controlled-operation-works)
+and [What the package files do](#what-the-package-files-do) for the kernel model.
+The [read-only commands](#read-only-commands) and [Fast save](#fast-save-the-offline-checkpoint-demonstration)
+sections follow. The local Command and Control (C&C) reporting command is
+covered first because its operational checks are concrete; it is not the
+kernel's core authorization model.
+
 ## Local C&C reporting
 
 The `cnc-report` command packages an explicitly selected, sanitized local
-capture of the existing Lead record into one JSON evidence report. It opens
+capture of the existing Lead record into one JavaScript Object Notation (JSON) evidence report. It opens
 no state database and performs no network request, subprocess, Git command,
 output-file write, dispatch, metrics enrollment or telemetry export. The
 existing synthetic kernel and its real-dispatch denial remain unchanged.
@@ -281,9 +290,10 @@ and one fixed LF-terminated JSON object on stderr with `error_code` and
 | `CONTRACT_UNAVAILABLE` | 3 | The explicitly selected contract is unavailable. |
 | `REPORT_FAILED` | 3 | Report could not be produced. |
 
-`--help` is static usage, not a report. Existing usage consent, cohort admission,
-60/90-day retention and public-export controls are unchanged. Attaching a report
-is not a telemetry export route and inherits no automatic deletion or consent.
+`--help` is static usage, not a report. This command adds no new usage-consent,
+cohort-admission, 60/90-day retention or public-export path; the existing controls
+apply. Attaching a report is not a telemetry export route and inherits no
+automatic deletion or consent.
 
 Run the focused source checks with:
 
@@ -452,8 +462,8 @@ one host, no mutating verb, no artifact download) as JSON and exits 0.
   written, no artifact is downloaded and `gh` is never invoked. `--token-env
   GH_TOKEN` names an environment variable (never the token itself) and is
   applied only to `api.github.com`, to lift the anonymous rate limit.
-- **Never auto-run.** No workflow, schedule, hook or wrapper calls it; a
-  person or an agent runs it deliberately. FAST SAVE never triggers it.
+- **Never auto-run.** The package does not install or register an automatic
+  caller; a person or an agent runs it deliberately. FAST SAVE never triggers it.
 
 ### Exit codes and the status marker
 
@@ -664,7 +674,8 @@ Nothing is written when the command refuses, and a refusal returns exit 4:
 - the target is a symlink (refused by a check that runs first and never follows
   the link), a directory or other non-regular file, a file that does not parse
   as JSON, or a file whose `checkpoint_format` differs (**PATH_GUARD_DENIED**);
-- the parent directory is absent (it is never created);
+- the parent directory is absent (it is never created; the write is refused
+  before any file or directory is created);
 - the serialized checkpoint exceeds 65536 bytes (**CHECKPOINT_TOO_LARGE**); or
 - the temporary file cannot be written, cannot be verified, or cannot be
   atomically replaced (**WRITE_FAILED**, **READBACK_FAILED**, **REPLACE_FAILED**).
