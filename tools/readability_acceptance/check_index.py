@@ -663,7 +663,10 @@ def main():
     ap = argparse.ArgumentParser(description="Decide pending pages from the repaired acceptance index.")
     ap.add_argument("--repo", default=str(REPO_ROOT))
     ap.add_argument("--ref", default="refs/remotes/origin/main")
-    ap.add_argument("--index", default=INDEX_REL)
+    ap.add_argument("--index-ref", default=None,
+                    help="load the tracked acceptance index from this ref")
+    ap.add_argument("--index", default=None,
+                    help="custom index path (default: " + INDEX_REL + ")")
     ap.add_argument("--partial-dispositions", default=PARTIAL_REL,
                     help="the instrument-level partial-disposition record "
                          "(default: " + PARTIAL_REL + ")")
@@ -705,13 +708,32 @@ def main():
                   file=sys.stderr)
             return 2
         pin_sha = out.strip()
-    index = json.loads((root / args.index).read_text(encoding="utf-8"))
     code, out, err = run(["rev-parse", "--verify", "--quiet", args.ref], root)
     if code != 0:
         print("cannot resolve --ref " + args.ref + ": " + err.strip(),
               file=sys.stderr)
         return 2
     ref_sha = out.strip()
+    index_ref = None
+    index_blob = None
+    if args.index is not None:
+        index = json.loads((root / args.index).read_text(encoding="utf-8"))
+    elif getattr(args, "index_ref", None):
+        index_ref = args.index_ref
+        code, out, err = run(["show", index_ref + ":" + INDEX_REL], root)
+        if code != 0:
+            print("cannot read the acceptance index at " + index_ref
+                  + ": " + err.strip(), file=sys.stderr)
+            return 2
+        index = json.loads(out)
+        code, out, err = run(["rev-parse", index_ref + ":" + INDEX_REL], root)
+        if code != 0:
+            print("cannot resolve the acceptance index blob at " + index_ref
+                  + ": " + err.strip(), file=sys.stderr)
+            return 2
+        index_blob = out.strip()
+    else:
+        index = json.loads((root / INDEX_REL).read_text(encoding="utf-8"))
     tree = classify_tree(ref_sha, root)
     if tree is None:
         return 2
@@ -854,6 +876,10 @@ def main():
             "(recorded_acceptance_within_10_lines not covered by a recorded "
             "targeted-review row); computed at the pinned --ref"),
     }
+    if index_ref:
+        summary["index_source"] = "ref"
+        summary["index_ref"] = index_ref
+        summary["index_blob"] = index_blob
 
     blocks = None
     if args.blocks:
