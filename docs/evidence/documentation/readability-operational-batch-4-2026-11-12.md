@@ -13,7 +13,7 @@ Batch ref: `556fe6dc740e5410f6eade06f702123ef59fd469`. Two pages accepted; one d
 ### 2. CI routing matrix
 - Page: `docs/operations/ci-routing-matrix.md`; blob `6d1fe5352e9292eb90397a0e997fd37ac85560b3`; 5,430 B / 117 lines.
 - Full-page review (`READABILITY-CI-ROUTING-REVIEW-2026-11-12.md`, 53f7ebb4): **PASS**; no material readability defect.
-- Keeper quote: "PASS: ci-routing matrix full-page review; no material defect."
+- Keeper quote: "A bypass without that record is not a bypass; it is an unresolved red."
 - Reviewer: evidence-lineage-steward.
 
 ## Deferred page
