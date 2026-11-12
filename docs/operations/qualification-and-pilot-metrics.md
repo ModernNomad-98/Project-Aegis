@@ -6,6 +6,10 @@ reports are programme records outside this repository. This page defines the
 formats and the rules; it adds no product behaviour, telemetry, dashboard,
 ledger, data plane or separate pilot.
 
+**Audience and reading key.** For Project Aegis maintainers and reviewers of C4 qualification. **aegis.ops-support-matrix/v1** is the support-matrix schema; **aegis.ops-pilot-metrics/v1** is the pilot metrics schema; **QUALIFIED** means independently exercised; **UNQUALIFIED** means evidence failed; **T5** is mounted coverage; **T6** authentication; **T7** exception authority; **T15–T19** are E3 item-2 outcome rows; **AUTH-REVIEWERS** is the named reviewer authority; **AC** is acceptance criterion; **E4.1/E4.2/E2.4/E3** are programme evidence items; **bounded_shortfall** is fewer than five eligible cases; **T5-gated** means requiring mounted coverage; **fourth-head** is the register-scoped exception; **B/D/E/F** are workflow stages.
+
+**Status.** Formats and the offline analyser are implemented. C4.1 real-host cells, C4.2 arrivals/reports and C4.3 independent review are **UNRUN**.
+
 ## C4.1 support matrix
 
 `aegis.ops-support-matrix/v1` rows are configurations/claims:
@@ -64,11 +68,20 @@ Rules:
 5. the rubric may be tuned later; the caps may not;
 6. a distinct reviewer can re-derive a sample from the recorded identities.
 
-The analyser is deterministic and offline:
+The analyser is deterministic and offline; run from the repository root:
 
 ```
 python -m tools.aegis_ops pilot-metrics --input tools/aegis_ops/tests/fixtures/pilot-metrics-valid.json
+python -m tools.aegis_ops pilot-metrics --input tools/aegis_ops/tests/fixtures/pilot-metrics-dollar-invented.json
+python -m tools.aegis_ops pilot-metrics --input tools/aegis_ops/tests/fixtures/pilot-metrics-missing-unknown.json
 ```
+
+Expected: valid exits 0 and states bounded_shortfall; the dollar-invented and
+missing-unknown fixtures exit 1. C4.1 matrix production is the programme C4.1 support-matrix record (2,095 B /
+`30cb6bf933afa494d9f067caf4c8f5279aea0a82d833ac7bef306d58e87a056b`); the C4.3
+record is the independent-review request (2,369 B /
+`a3f92a64e87f3cd1dd5c8292a96ac4adfd4b28fe2efaac04473130f920dce07d`).
+Neither is produced by this page.
 
 The output states `bounded_shortfall` and the eligible/required counts. A
 shortfall exits 0 only when the record is otherwise valid; it is a result, not
@@ -81,7 +94,8 @@ inputs and exact identities, method, exclusions, AC-by-AC result, a
 re-derivation sample, accepted changes/compatibility/costs (minutes; dollars
 only if measured), limitations and a remaining backlog with real identities.
 The reviewer must not be the author, implementer or C4.2 analyst; no
-self-approval. T6/T7 status is stated. The review feeds E4.1/E4.2 and claims no
+self-approval. T6 authentication is **UNVERIFIED**; T7 exception authority is
+**UNKNOWN**. Both are stated so the review cannot imply otherwise. The review feeds E4.1/E4.2 and claims no
 merge authority.
 
 In this Stage C slice the C4.3 review is **UNRUN**: no independent reviewer is
@@ -91,11 +105,13 @@ deliverable; the verdict itself waits for the named reviewer.
 
 ## No new telemetry or data plane
 
-Every input is a read-only copy/citation of existing PR, commit, review,
-comment, check-run, action-run, stage-record or merge-receipt metadata. No
-prompt/model output/source content is copied. No network call is made at
-runtime. The docs/instrumentation pilot is not enrolled and
-[`tools/aegis_usage/`](../../tools/aegis_usage/README.md) is not repurposed.
+The analyser reads a read-only copy/citation of existing PR, commit, review,
+comment, check-run, action-run, stage-record or merge-receipt metadata (see the
+fixtures and tests). No prompt/model output/source content is copied. The
+analyser performs no network call; its tests assert this. The docs/instrumentation pilot is not enrolled and
+[`tools/aegis_usage/`](../../tools/aegis_usage/README.md) is not repurposed:
+the analyser fixtures/tests under `tools/aegis_ops/tests/` neither reference
+nor modify that usage directory.
 
 ## UNRUN
 
