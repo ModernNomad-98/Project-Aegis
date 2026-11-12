@@ -25,3 +25,8 @@ Full-page readability acceptances recorded for the operational backlog batch. Ba
 Readability acceptance only. No technical-correctness audit, no ownership acceptance, no merge or delivery approval. New page starts pending under the new-page rule.
 
 Recorded by: Lead. Local record only.
+
+## Keeper-row quotes
+
+- K-405: PASS: BER backlog full-page readability re-review at adb8e5bd; prior F1/F2 closed; whole-page criteria passed.
+- K-406: PASS: control-plane README full-page readability re-review at d09bca04; all prior findings closed.
