@@ -6322,6 +6322,7 @@ carry NO acceptance row and their pages count pending until re-reviewed
 | K-406 | tools/aegis_delivery_control/README.md | full-page-acceptance | d09bca04edb580199d58e59dc15bf52b93716ba4 | 2519910675295a7f3ceaaadc1c85494949ba8246 | PASS: control-plane README full-page readability re-review at d09bca04; all prior findings closed. | records-steward | docs/evidence/documentation/readability-operational-batch-2026-11-12.md | 2026-11-12 |
 | K-407 | docs/operations/README.md | full-page-acceptance | e257eea5685e9071e163119676340a9d2f9ce4d5 | a725c904a9070d667c1d67d1b662aa41583f9314 | PASS: operations README full-page readability review at e257eea5; no material defect. | c03-contract-owner | docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md | 2026-11-12 |
 | K-408 | docs/consumer-readiness/consumer-guide-v1.md | full-page-acceptance | e257eea5685e9071e163119676340a9d2f9ce4d5 | 26b9a2e9b9b7db60e6395498419277facc9d2af7 | PASS: consumer guide full-page readability review at e257eea5; no claim/content change. | evidence-lineage-steward | docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md | 2026-11-12 |
+| K-409 | docs/consumer-readiness/support-claims-v1.md | full-page-acceptance | 0da362f671ce94c65f837272b5c239091cc2f73c | d090460459fe867398098b499662f4322b0d87b9 | No aggregate green. | records-steward | docs/evidence/documentation/readability-support-claims-2026-11-12.md | 2026-11-12 |
 
 
 ## Index rebuild — 2026-11-12

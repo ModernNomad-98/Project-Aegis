@@ -2042,6 +2042,14 @@
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "path": "docs/consumer-readiness/support-claims-v1.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0da362f671ce94c65f837272b5c239091cc2f73c",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-support-claims-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ]
 }
