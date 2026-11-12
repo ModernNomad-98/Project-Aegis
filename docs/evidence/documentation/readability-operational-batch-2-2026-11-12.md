@@ -23,3 +23,8 @@ Batch ref: `e257eea5685e9071e163119676340a9d2f9ce4d5`. Two pages accepted; one d
 Readability acceptance only; no claim/content adjudication, merge or delivery approval.
 
 Recorded by: Lead. Local record only.
+
+## Keeper-row quotes
+
+- K-407: PASS: operations README full-page readability review at e257eea5; no material defect.
+- K-408: PASS: consumer guide full-page readability review at e257eea5; no claim/content change.
