@@ -77,8 +77,11 @@ python -m tools.aegis_ops pilot-metrics --input tools/aegis_ops/tests/fixtures/p
 ```
 
 Expected: valid exits 0 and states bounded_shortfall; the dollar-invented and
-missing-unknown fixtures exit 1. C4.1 matrix and C4.3 record production are
-programme steps outside this page.
+missing-unknown fixtures exit 1. C4.1 matrix production is the programme C4.1 support-matrix record (2,095 B /
+`30cb6bf933afa494d9f067caf4c8f5279aea0a82d833ac7bef306d58e87a056b`); the C4.3
+record is the independent-review request (2,369 B /
+`a3f92a64e87f3cd1dd5c8292a96ac4adfd4b28fe2efaac04473130f920dce07d`).
+Neither is produced by this page.
 
 The output states `bounded_shortfall` and the eligible/required counts. A
 shortfall exits 0 only when the record is otherwise valid; it is a result, not
@@ -106,7 +109,9 @@ The analyser reads a read-only copy/citation of existing PR, commit, review,
 comment, check-run, action-run, stage-record or merge-receipt metadata (see the
 fixtures and tests). No prompt/model output/source content is copied. The
 analyser performs no network call; its tests assert this. The docs/instrumentation pilot is not enrolled and
-[`tools/aegis_usage/`](../../tools/aegis_usage/README.md) is not repurposed.
+[`tools/aegis_usage/`](../../tools/aegis_usage/README.md) is not repurposed:
+the analyser fixtures/tests under `tools/aegis_ops/tests/` neither reference
+nor modify that usage directory.
 
 ## UNRUN
 
