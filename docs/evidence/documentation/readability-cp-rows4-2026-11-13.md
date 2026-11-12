@@ -5,13 +5,13 @@ Acceptance revision: `9011761e389f3f8d15309a2d20a97b1c36fc3cd2`. Three CP rows a
 ### 1. CP-01 — fresh owner-authorized Codex session (PASS)
 - Page blob `9178f5595161ad4f5fd935f88df85cbaaf5035a7`; 1,240 B / 16 lines.
 - Review PASS (`READABILITY-CP01-REVIEW-2026-11-13.md`, 360b8bdd).
-- Quote: "N-6: the 'before investing in the build' ordering is not retroactively showable; the owner defined the run as the closing observation."
+- Quote: "the owner defined the run as the closing observation."
 - Reviewer: c03-contract-owner.
 
 ### 2. CP-03 — installer control (FAIL; preserved)
 - Page blob `1b93f660aff220eab988eebfad6a61315da9936d`; 1,277 B / 16 lines.
 - Readability PASS (`READABILITY-CP03-REVIEW-2026-11-13.md`, c53b5350); **row verdict remains FAIL**.
-- Quote: "The pre-registered N1 installer control (one packaged file removed from the installed set) **exited 0 and healed 40 → 41 installed files** where a stop was required; the case's missing-reference and closure clauses are therefore unsatisfied. An earlier independent semantic review had passed the package (`records/CP03-REVIEW.md`); that PASS is **superseded** by the executed control, and rounds 6 and 7 of the CP-22 review accepted the FAIL typing."
+- Quote: "The pre-registered N1 installer control (one packaged file removed from the installed set) **exited 0 and healed 40 → 41 installed files** where a stop was required."
 - Reviewer: evidence-lineage-steward.
 
 ### 3. CP-09 — public consumer metadata (FAIL; preserved)
