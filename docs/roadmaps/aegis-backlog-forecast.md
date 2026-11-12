@@ -2,98 +2,8 @@
 
 ## Start here — current reading
 
-**Purpose and audience (2026-11-12 reading note).** This page is a rolling active-work estimate for Project Aegis maintainers and coding agents. It is not a calendar promise and not permission to start blocked work. The banners below are dated snapshots; the newest is 2026-10-13, so none of them is the current 2026-11-12 state.
-
-**Navigation.** [Start here](#start-here--current-reading) · [Re-estimation rule](#re-estimation-rule) · [Remaining selected work — baseline estimate](#remaining-selected-work--baseline-estimate) · [Next trigger](#next-trigger) · [Contents](#contents).
-
-## Contents
-
-- [Material owner decision — 2026-10-07, readability count authority](#material-owner-decision-2026-10-07-readability-count-authority)
-- [Five-merge checkpoint — 2026-09-30, after pull request #554 (catch-up for 12 missed windows)](#five-merge-checkpoint-2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows)
-- [Five-merge checkpoint — 2026-09-28, after pull request #491 (catch-up for 3 missed windows)](#five-merge-checkpoint-2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows)
-- [Five-merge checkpoint — 2026-09-28, after pull request #474 (catch-up for 4 missed windows)](#five-merge-checkpoint-2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows)
-- [Five-merge checkpoint — 2026-09-28, after pull request #454 (catch-up for 16 missed windows)](#five-merge-checkpoint-2026-09-28-after-pull-request-454-catch-up-for-16-missed-windows)
-- [Five-merge checkpoint — 2026-09-26, after pull request #370 (catch-up for the windows ending #349, #354, #359, #364, #369)](#five-merge-checkpoint-2026-09-26-after-pull-request-370-catch-up-for-the-windows-ending-349-354-359-364-369)
-- [Material owner decision — 2026-09-26, #331 BER correction and #333 option A](#material-owner-decision-2026-09-26-331-ber-correction-and-333-option-a)
-- [Five-merge checkpoint — 2026-09-26, after pull request #344](#five-merge-checkpoint-2026-09-26-after-pull-request-344)
-- [Five-merge checkpoint — 2026-09-26, after pull request #333](#five-merge-checkpoint-2026-09-26-after-pull-request-333)
-- [Five-merge checkpoint — 2026-09-26, after pull request #328](#five-merge-checkpoint-2026-09-26-after-pull-request-328)
-- [Five-merge checkpoint — 2026-09-26, after pull request #324](#five-merge-checkpoint-2026-09-26-after-pull-request-324)
-- [Five-merge checkpoint — 2026-09-26, after pull request #319](#five-merge-checkpoint-2026-09-26-after-pull-request-319)
-- [Five-merge checkpoint — 2026-09-26, after pull request #314](#five-merge-checkpoint-2026-09-26-after-pull-request-314)
-- [Five-merge checkpoint — 2026-09-25, after pull request #308](#five-merge-checkpoint-2026-09-25-after-pull-request-308)
-- [Catch-up checkpoint — 2026-09-25, after pull request #306](#catch-up-checkpoint-2026-09-25-after-pull-request-306)
-- [Current source-only packets — 2026-09-25](#current-source-only-packets-2026-09-25)
-- [Material owner decision — 2026-09-25, issue #101 host path](#material-owner-decision-2026-09-25-issue-101-host-path)
-- [Five-merge checkpoint — 2026-09-25, after pull request #284](#five-merge-checkpoint-2026-09-25-after-pull-request-284)
-- [Five-merge checkpoint — 2026-09-25, after pull request #278](#five-merge-checkpoint-2026-09-25-after-pull-request-278)
-- [Material owner decision — 2026-09-24, BER-BKL-009](#material-owner-decision-2026-09-24-ber-bkl-009)
-- [Five-merge checkpoint — 2026-09-25, after pull request #270](#five-merge-checkpoint-2026-09-25-after-pull-request-270)
-- [Five-merge checkpoint — 2026-09-25, after pull request #265](#five-merge-checkpoint-2026-09-25-after-pull-request-265)
-- [Five-merge checkpoint — 2026-09-24, after pull request #260](#five-merge-checkpoint-2026-09-24-after-pull-request-260)
-- [Five-merge checkpoint — 2026-09-24, after pull request #255](#five-merge-checkpoint-2026-09-24-after-pull-request-255)
-- [Five-merge checkpoint — 2026-09-24, after pull request #250](#five-merge-checkpoint-2026-09-24-after-pull-request-250)
-- [Five-merge checkpoint — 2026-09-24, after pull request #245](#five-merge-checkpoint-2026-09-24-after-pull-request-245)
-- [Five-merge checkpoint — 2026-09-24, after pull request #238](#five-merge-checkpoint-2026-09-24-after-pull-request-238)
-- [Re-estimation rule](#re-estimation-rule)
-- [Five-merge checkpoint — 2026-09-23, after PR #111](#five-merge-checkpoint-2026-09-23-after-pr-111)
-- [Five-merge checkpoint — 2026-09-23, after PR #104](#five-merge-checkpoint-2026-09-23-after-pr-104)
-- [Five-merge checkpoint — 2026-09-23, after pull request #121](#five-merge-checkpoint-2026-09-23-after-pull-request-121)
-- [Five-merge checkpoint — 2026-09-23, after pull request #126](#five-merge-checkpoint-2026-09-23-after-pull-request-126)
-- [Five-merge checkpoint — 2026-09-23, after pull request #130](#five-merge-checkpoint-2026-09-23-after-pull-request-130)
-- [Five-merge checkpoint — 2026-09-23, after pull request #135](#five-merge-checkpoint-2026-09-23-after-pull-request-135)
-- [Five-merge checkpoint — 2026-09-23, after pull request #141](#five-merge-checkpoint-2026-09-23-after-pull-request-141)
-- [Five-merge checkpoint — 2026-09-23, after pull request #146](#five-merge-checkpoint-2026-09-23-after-pull-request-146)
-- [Five-merge checkpoint — 2026-09-23, after pull request #151](#five-merge-checkpoint-2026-09-23-after-pull-request-151)
-- [Five-merge checkpoint — 2026-09-23, after pull request #156](#five-merge-checkpoint-2026-09-23-after-pull-request-156)
-- [Five-merge checkpoint — 2026-09-23, after pull request #160](#five-merge-checkpoint-2026-09-23-after-pull-request-160)
-- [Five-merge checkpoint — 2026-09-23, after pull request #164](#five-merge-checkpoint-2026-09-23-after-pull-request-164)
-- [Five-merge checkpoint — 2026-09-23, after pull request #169](#five-merge-checkpoint-2026-09-23-after-pull-request-169)
-- [Five-merge checkpoint — 2026-09-23, after pull request #173](#five-merge-checkpoint-2026-09-23-after-pull-request-173)
-- [Five-merge checkpoint — 2026-09-23, after pull request #181](#five-merge-checkpoint-2026-09-23-after-pull-request-181)
-- [Five-merge checkpoint — 2026-09-23, after pull request #186](#five-merge-checkpoint-2026-09-23-after-pull-request-186)
-- [Five-merge checkpoint — 2026-09-23, after pull request #191](#five-merge-checkpoint-2026-09-23-after-pull-request-191)
-- [Five-merge checkpoint — 2026-09-23, after pull request #196](#five-merge-checkpoint-2026-09-23-after-pull-request-196)
-- [Five-merge checkpoint — 2026-09-23, after pull request #202](#five-merge-checkpoint-2026-09-23-after-pull-request-202)
-- [Documentation estimate audit — 2026-09-23, after pull request #205](#documentation-estimate-audit-2026-09-23-after-pull-request-205)
-- [Documentation-batch estimate — 2026-09-24, after pull request #234](#documentation-batch-estimate-2026-09-24-after-pull-request-234)
-- [Documentation-batch estimate — 2026-09-24, after pull request #233](#documentation-batch-estimate-2026-09-24-after-pull-request-233)
-- [Documentation-batch estimate — 2026-09-24, after pull request #231](#documentation-batch-estimate-2026-09-24-after-pull-request-231)
-- [Documentation-batch estimate — 2026-09-24, after pull request #230](#documentation-batch-estimate-2026-09-24-after-pull-request-230)
-- [Documentation-batch estimate — 2026-09-24, after pull request #229](#documentation-batch-estimate-2026-09-24-after-pull-request-229)
-- [Documentation-batch estimate — 2026-09-24, after pull request #228](#documentation-batch-estimate-2026-09-24-after-pull-request-228)
-- [Documentation-batch estimate — 2026-09-24, after pull request #226](#documentation-batch-estimate-2026-09-24-after-pull-request-226)
-- [Documentation-batch estimate — 2026-09-24, after pull request #225](#documentation-batch-estimate-2026-09-24-after-pull-request-225)
-- [Documentation-batch estimate — 2026-09-24, after pull request #224](#documentation-batch-estimate-2026-09-24-after-pull-request-224)
-- [Documentation-batch estimate — 2026-09-24, after pull request #223](#documentation-batch-estimate-2026-09-24-after-pull-request-223)
-- [Five-merge checkpoint — 2026-09-24, after pull request #232](#five-merge-checkpoint-2026-09-24-after-pull-request-232)
-- [Five-merge checkpoint — 2026-09-24, after pull request #227](#five-merge-checkpoint-2026-09-24-after-pull-request-227)
-- [Five-merge checkpoint — 2026-09-24, after pull request #222](#five-merge-checkpoint-2026-09-24-after-pull-request-222)
-- [Documentation-batch estimate — 2026-09-24, after pull request #221](#documentation-batch-estimate-2026-09-24-after-pull-request-221)
-- [Documentation-batch estimate — 2026-09-24, after pull request #220](#documentation-batch-estimate-2026-09-24-after-pull-request-220)
-- [Documentation-batch estimate — 2026-09-24, after pull request #219](#documentation-batch-estimate-2026-09-24-after-pull-request-219)
-- [Documentation-batch estimate — 2026-09-24, after pull request #218](#documentation-batch-estimate-2026-09-24-after-pull-request-218)
-- [Five-merge checkpoint — 2026-09-24, after pull request #217](#five-merge-checkpoint-2026-09-24-after-pull-request-217)
-- [Documentation-batch estimate — 2026-09-24, after pull request #216](#documentation-batch-estimate-2026-09-24-after-pull-request-216)
-- [Documentation-batch estimate — 2026-09-24, after pull request #215](#documentation-batch-estimate-2026-09-24-after-pull-request-215)
-- [Documentation-batch estimate — 2026-09-24, after pull request #214](#documentation-batch-estimate-2026-09-24-after-pull-request-214)
-- [Documentation-batch estimate — 2026-09-24, after pull request #213](#documentation-batch-estimate-2026-09-24-after-pull-request-213)
-- [Five-merge checkpoint — 2026-09-24, after pull request #212](#five-merge-checkpoint-2026-09-24-after-pull-request-212)
-- [Five-merge checkpoint — 2026-09-23, after pull request #207](#five-merge-checkpoint-2026-09-23-after-pull-request-207)
-- [Remaining selected work — baseline estimate](#remaining-selected-work-baseline-estimate)
-- [Conditional and unselected scope](#conditional-and-unselected-scope)
-- [Catch-up reassessment after PR #685 (2026-10-09)](#catch-up-reassessment-after-pr-685-2026-10-09)
-- [Cadence reassessment through PR #688 (2026-10-09)](#cadence-reassessment-through-pr-688-2026-10-09)
-- [Next trigger](#next-trigger)
-- [Cadence reassessment through PR #741 (2026-10-12)](#cadence-reassessment-through-pr-741-2026-10-12)
-- [Cadence reassessment through PR #760 (2026-10-13)](#cadence-reassessment-through-pr-760-2026-10-13)
-
-**Reading key.** **D73**, **D68** and **D69–D71** are rows in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) log. **V0/V1/V2** are forecast versions. **M**, **M2** and **M3** are frozen assessment cutoffs. **BER** is Behavioral Eval Runner; **CP** is delivery control plane; **TBD** is to be determined.
-
-> **Current-state note — 2026-11-12:** the newest dated reading below is **2026-10-13 (PR #760)**. It is retained as the last frozen forecast snapshot, not as today's state. No later forecast re-estimation is recorded here; the current operational backlog is tracked in the readability and CI baseline records. The multiple "Newest reading" banners below are historical and internally inconsistent; the 2026-10-13 banner is the latest of them.
-
-> **Dated snapshot — 2026-10-13, assessed through PR #760 (frozen cutoff M3).**
-> This was the reading at that checkpoint; the **#741 banner below is the prior frozen
+> **Newest reading — 2026-10-13, assessed through PR #760 (frozen cutoff M3).**
+> This is the current reading; the **#741 banner below is the prior frozen
 > checkpoint**, retained as dated evidence rather than as the present state.
 > The assessed cutoff is M3 = `ba522f133d05624c2130f15eb8ef3b6329b0f37a`, the
 > PR #760 integration at 2026-10-13 12:39:16 Coordinated Universal Time (UTC).
@@ -110,8 +20,8 @@
 > integration merge commit, its content having arrived inside #751 — and the
 > [cadence measurement checkpoint](aegis-execution-metrics.md#cadence-measurement-checkpoint-through-pr-760-2026-10-13)
 > for the integration table, window arithmetic and timing limits.
-> **Dated snapshot — 2026-10-12, assessed through PR #741 (frozen cutoff M2).**
-> This was the reading at that checkpoint; the **#688 banner below is the prior frozen
+> **Newest reading — 2026-10-12, assessed through PR #741 (frozen cutoff M2).**
+> This is the current reading; the **#688 banner below is the prior frozen
 > checkpoint**, retained as dated evidence rather than as the present state.
 > The assessed cutoff is M2 = `7fbc2335ee4494ecb8ae6aaea0fe6ecdc297d9f2`, the
 > PR #740 integration at 2026-10-12 07:18:51 Coordinated Universal Time (UTC).
@@ -125,8 +35,8 @@
 > integrations (#690–#741) the window carried, and the
 > [cadence measurement checkpoint](aegis-execution-metrics.md#cadence-measurement-checkpoint-through-pr-741-2026-10-12)
 > for the integration table, window arithmetic and timing limits.
-> **Dated snapshot — 2026-10-09, assessed through PR #688 (frozen cutoff M).**
-> This was the reading at that checkpoint; the **#685 banner below is the prior frozen
+> **Newest reading — 2026-10-09, assessed through PR #688 (frozen cutoff M).**
+> This is the current reading; the **#685 banner below is the prior frozen
 > checkpoint**, retained as dated evidence rather than as the present state.
 > The assessed cutoff is M = `625fc66711eaf7b3ee788cbc2dff98f05f147c1c`, the
 > PR #688 integration at 2026-10-09 16:17:39 Coordinated Universal Time (UTC).
@@ -147,10 +57,8 @@
 > maintainers and coding agents planning Project Aegis work — a rolling active-work
 > estimate, not a calendar promise and not permission to start blocked work, as its
 > own purpose paragraph further down this section states. The dated snapshots below
-> are retained in the order they were appended; the 2026-09-30 reading below is older
-> than the 2026-10-13 banner above, so do not read them as a newest-first list. The
-> count figures in the block immediately below are themselves superseded, as its own
-> appended note says. This note adds no date, figure or
+> run newest first; the count figures in the block immediately below are themselves
+> superseded, as its own appended note says. This note adds no date, figure or
 > estimate, and changes no dated text.
 
 > **Skill-expansion overlap — added 2026-10-08.** At source revision
@@ -167,11 +75,7 @@
 
 **Current reading at the 2026-09-30 catch-up checkpoint after #554:** terms used in this section: **WP-2B-3** to **WP-2B-7** are Behavioral Eval Runner (BER) work packages in the [runner backlog](behavioral-eval-runner-backlog.md); **CP-WP-003** and **CP-WP-004** are control-plane work packages in the [control-plane backlog](resumable-control-plane-backlog.md); **R4/R5** are the runner's selected-host capability and full-profile requirements; **D69**, **D70** and **D71** are rows in the [recorded decisions](../reconciliation/step-0-reconciliation-v4.md#5-recorded-decisions) log; **BER-BKL-009** is a runner backlog item; **TBD** is to be determined.
 
-The [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows) measured the 62 merged PRs strictly after #491 and through #554: twelve complete five-merge windows and residuals #551 and #554. No selected gated row closed, so the subtotal remains **71–146 provisional active hours**; Stage 4B and BER-BKL-009 remain TBD, the virtual machine (VM) is paused, and there is **no finite estimated time to completion (ETA)**. 5 agent-estimated active hours**. D69, D70 and D71 reduce unselected skill expansion from 96–200 to **68–140 agent-estimated active hours**. The next backlog pick remains deferred.
-
-Pull request #556 (`afe703a4bc2c2f5f299b26967b84a6f05ebfb4bb`) reconciled the readability-ledger arithmetic **at that merge** to 653 tracked Markdown files, 586 accepted reader pages, one generated report, 55 classified synthetic fixtures and 11 known pending pages; those are `afe703a4` values, and the ledger's live totals have since moved to 656 / 584 / 1 / 55 / 16. md` shows the rewrite.
-
-That block now dates its latest count to #561 (`410b90aa`) at 653 tracked Markdown files, 584 accepted reader pages, one generated report, 55 classified synthetic fixtures and thirteen known pending pages, and records the skill-eval round as superseding those totals with three newly pending pages, its own arithmetic closing as 584 + 1 + 55 + 16 = 656 tracked files and 16 pending; PR #577 then added one page, so the tip count is 657. )* See the [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows).
+The [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows) measured the 62 merged PRs strictly after #491 and through #554: twelve complete five-merge windows and residuals #551 and #554. No selected gated row closed, so the subtotal remains **71–146 provisional active hours**; Stage 4B and BER-BKL-009 remain TBD, the virtual machine (VM) is paused, and there is **no finite estimated time to completion (ETA)**. The former near-term delivery batches landed; this checkpoint is the only quantified in-progress work at **0.5–1.5 agent-estimated active hours**. D69, D70 and D71 reduce unselected skill expansion from 96–200 to **68–140 agent-estimated active hours**. The next backlog pick remains deferred. Pull request #556 (`afe703a4bc2c2f5f299b26967b84a6f05ebfb4bb`) reconciled the readability-ledger arithmetic **at that merge** to 653 tracked Markdown files, 586 accepted reader pages, one generated report, 55 classified synthetic fixtures and 11 known pending pages; those are `afe703a4` values, and the ledger's live totals have since moved to 656 / 584 / 1 / 55 / 16. *(Superseded-state note appended 2026-09-30: those five figures are themselves out of date, because #567 and #568 rewrote that ledger's own `Start here — current reading` block — `git diff 410b90aa origin/main -- docs/roadmaps/aegis-documentation-readability-backlog.md` shows the rewrite. That block now dates its latest count to #561 (`410b90aa`) at 653 tracked Markdown files, 584 accepted reader pages, one generated report, 55 classified synthetic fixtures and thirteen known pending pages, and records the skill-eval round as superseding those totals with three newly pending pages, its own arithmetic closing as 584 + 1 + 55 + 16 = 656 tracked files and 16 pending; PR #577 then added one page, so the tip count is 657. This is a dated snapshot, so it is annotated, not rewritten.)* See the [catch-up checkpoint after #554](#five-merge-checkpoint--2026-09-30-after-pull-request-554-catch-up-for-12-missed-windows).
 
 > **Readability figures — superseded-state note appended 2026-10-07.** The
 > readability figures in this "Start here" section are dated snapshots, not the
@@ -214,15 +118,9 @@ at the pinned ref; the readability ledger publishes no count of its own and
 cites the index; this forecast carries no readability count either. This note
 changes no dated text.
 
-**Earlier reading at the 2026-09-28 catch-up checkpoint after #491:** sixteen PRs merged after #474, missing three five-merge windows (those ending #475, #481 and #487); this record covers the window ending #491. No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The readability sweep is finished: #475 landed the last pending page, the Behavioral Eval Runner (BER) README, under a one-time exception, and open #490 records **569 accepted reader pages and 0 pending** and the owner's net-difference rule for the 10-line rule. Artificial intelligence (AI) is now spelled out at first use on 64 pages (#486).
+**Earlier reading at the 2026-09-28 catch-up checkpoint after #491:** sixteen PRs merged after #474, missing three five-merge windows (those ending #475, #481 and #487); this record covers the window ending #491. No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The readability sweep is finished: #475 landed the last pending page, the Behavioral Eval Runner (BER) README, under a one-time exception, and open #490 records **569 accepted reader pages and 0 pending** and the owner's net-difference rule for the 10-line rule. Artificial intelligence (AI) is now spelled out at first use on 64 pages (#486). The owner approved a second format-only audit-engine change (v1.13.4), recorded by #491 as AEGIS-APR-079; it is not yet built. The owner also approved building the quality assurance (QA) Tier 1 skill batch proposed in open #492, recorded as decision D68 in open #493, at 9.75–17.25 agent-estimated hours. Near-term work outside the subtotal therefore moves from 1–3.5 to a provisional **11.25–21.75 active hours** of agent estimates, and the unselected skill-expansion candidates fall from 106–220 to 96–200. *(Reading note appended 2026-09-30: both figures belong to this #491-era reading. The arithmetic is 106 − 10 = 96 and 220 − 20 = 200, with QA Tier 1 (10–20) moving to the near-term table; this checkpoint's own optional-scope paragraph still lists the pre-move **106–220** as the base while giving the **96–200** result, and the current reading above records a further reduction to **68–140** after D69, D70 and D71. Dated snapshot: annotated, not rewritten.)* The owner's decisions are in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28) (#460, #487); the next backlog pick is still deferred. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #491](#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows).
 
-4), recorded by #491 as AEGIS-APR-079; it is not yet built. 25 agent-estimated hours. 75 active hours** of agent estimates, and the unselected skill-expansion candidates fall from 106–220 to 96–200. *(Reading note appended 2026-09-30: both figures belong to this #491-era reading. The arithmetic is 106 − 10 = 96 and 220 − 20 = 200, with QA Tier 1 (10–20) moving to the near-term table; this checkpoint's own optional-scope paragraph still lists the pre-move **106–220** as the base while giving the **96–200** result, and the current reading above records a further reduction to **68–140** after D69, D70 and D71. md#decided-on-2026-09-28) (#460, #487); the next backlog pick is still deferred.
-
-Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #491](#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows).
-
-**Earlier reading at the 2026-09-28 catch-up checkpoint after #474:** twenty-one PRs merged after #454, missing four five-merge windows (those ending #455, #458, #465 and #471). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. 5 active hours** of agent estimates. The owner-ordered readability sweep found 103 accepted pages past the 10-line rule; the coordinating session reports 102 of them accepted again after independent full-page re-reads (88 with fixes in #456, #459, #462 and #466 to #474, and 14 unchanged), and the Behavioral Eval Runner (BER) README waits in open #475 for a protected-path exception.
-
-md#decided-on-2026-09-28) (#460); the next backlog pick is still deferred. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #474](#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows).
+**Earlier reading at the 2026-09-28 catch-up checkpoint after #474:** twenty-one PRs merged after #454, missing four five-merge windows (those ending #455, #458, #465 and #471). No merge closed a gated row, so the bounded selected planning subtotal stays **71–146 provisional active hours**. The D15 enrichment deltas (#455; D15 is a recorded decision to improve four shipped skills), the audit-report generator at engine v1.13.3 (#461, with register entries AEGIS-APR-071 to AEGIS-APR-076 from #453 and #465) and the checkpoint after #454 (#457) are delivered, so near-term work outside the subtotal falls from 5.25–14 to a provisional **1–3.5 active hours** of agent estimates. The owner-ordered readability sweep found 103 accepted pages past the 10-line rule; the coordinating session reports 102 of them accepted again after independent full-page re-reads (88 with fixes in #456, #459, #462 and #466 to #474, and 14 unchanged), and the Behavioral Eval Runner (BER) README waits in open #475 for a protected-path exception. The owner's later 2026-09-28 decisions are in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-28) (#460); the next backlog pick is still deferred. Stage 4B and BER-BKL-009 host residuals remain to be determined (TBD) and the virtual machine (VM) paused, so the full selected and all-options totals still have **no finite estimated time to completion (ETA)**. See the [catch-up checkpoint after #474](#five-merge-checkpoint--2026-09-28-after-pull-request-474-catch-up-for-4-missed-windows).
 
 This page is for maintainers and coding agents planning Project Aegis work. It is a rolling **active-work estimate**, not a calendar promise or permission
 to start blocked work. The [owner's issue #101 host-path choice](#material-owner-decision--2026-09-25-issue-101-host-path)
@@ -308,7 +206,7 @@ checkpoint after #554 remains the latest full reassessment.
 
 ## Five-merge checkpoint — 2026-09-30, after pull request #554 (catch-up for 12 missed windows)
 
-This reading's merge window is pinned through #554 (`e0c9a0006d130318492ba5fc620a7af13bf4525e`, merged 2026-09-30 at 02:19:32 UTC); later merges after #554 are outside this reading. mergedAt }` returns the **62** PRs below after #491 through #554. That is twelve complete five-merge windows (60 merges) and residuals #551 and #554, so this is one catch-up reading for the **12** missed cadence points, not twelve invented backdated snapshots. The UTC interval is 1 day, 8 hours, 8 minutes and 20 seconds (`[datetime]'2026-09-30T02:19:32Z' - [datetime]'2026-09-28T18:11:12Z'`); it is not an active-work measurement.
+This reading's merge window is pinned through #554 (`e0c9a0006d130318492ba5fc620a7af13bf4525e`, merged 2026-09-30 at 02:19:32 UTC); later merges after #554 are outside this reading. The command `$checkpoint = (gh pr view 491 --repo ModernNomad-98/Project-Aegis --json mergedAt | ConvertFrom-Json).mergedAt; $through = (gh pr view 554 --repo ModernNomad-98/Project-Aegis --json mergedAt | ConvertFrom-Json).mergedAt; gh pr list --repo ModernNomad-98/Project-Aegis --state merged --limit 100 --json number,mergedAt,mergeCommit | ConvertFrom-Json | ForEach-Object { $_ } | Where-Object { ([datetime]$_.mergedAt) -gt ([datetime]$checkpoint) -and ([datetime]$_.mergedAt) -le ([datetime]$through) } | Sort-Object { [datetime]$_.mergedAt }` returns the **62** PRs below after #491 through #554. That is twelve complete five-merge windows (60 merges) and residuals #551 and #554, so this is one catch-up reading for the **12** missed cadence points, not twelve invented backdated snapshots. The UTC interval is 1 day, 8 hours, 8 minutes and 20 seconds (`[datetime]'2026-09-30T02:19:32Z' - [datetime]'2026-09-28T18:11:12Z'`); it is not an active-work measurement.
 
 **Merge order after #491.** The command above produces this complete window; full merge SHA and UTC timestamp make its boundary repeatable.
 
@@ -377,7 +275,7 @@ This reading's merge window is pinned through #554 (`e0c9a0006d130318492ba5fc620
 | #551 | `ccd5471b81e10307d0de6745979e9f59500c5737` | 2026-09-30T01:04:59Z |
 | #554 | `e0c9a0006d130318492ba5fc620a7af13bf4525e` | 2026-09-30T02:19:32Z |
 
-** The [selected remaining outcomes table](#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows) lists the same ten gated selected outcomes: WP-2B-3 twice, R4/R5, WP-2B-4 through WP-2B-7, CP-WP-003, CP-WP-004 and issue #101 package 7. md) still identifies Stage 4B and BER-BKL-009 as gated residuals. md` shows only #557's punctuation correction to a completed Phase 2B-1 row; no selected row closed. The subtotal therefore stays **71–146 provisional active hours** (`1–4 + 4–10 + 12–24 + 12–24 + 8–16 + 8–16 + 4–8 + 8–16 + 8–16 + 6–12`). Stage 4B and BER-BKL-009 remain TBD, so the selected total has **no finite estimated time to completion (ETA)**.
+**Selected and near-term planning.** The [selected remaining outcomes table](#five-merge-checkpoint--2026-09-28-after-pull-request-491-catch-up-for-3-missed-windows) lists the same ten gated selected outcomes: WP-2B-3 twice, R4/R5, WP-2B-4 through WP-2B-7, CP-WP-003, CP-WP-004 and issue #101 package 7. The [open-decisions index](aegis-open-decisions-2026-09-23.md) still identifies Stage 4B and BER-BKL-009 as gated residuals. `git diff --unified=3 e0c9a0006d130318492ba5fc620a7af13bf4525e 4176459319e95a8d4dd1be7aa3c96e06446572e5 -- docs/roadmaps/behavioral-eval-runner-backlog.md docs/roadmaps/resumable-control-plane-backlog.md docs/roadmaps/aegis-open-decisions-2026-09-23.md` shows only #557's punctuation correction to a completed Phase 2B-1 row; no selected row closed. The subtotal therefore stays **71–146 provisional active hours** (`1–4 + 4–10 + 12–24 + 12–24 + 8–16 + 8–16 + 4–8 + 8–16 + 8–16 + 6–12`). Stage 4B and BER-BKL-009 remain TBD, so the selected total has **no finite estimated time to completion (ETA)**.
 
 The former near-term work landed: #503 delivered audit engine v1.13.4; the post-#491 merges delivered D68 through D71; and #551 recorded the readability round. `gh pr view 551 --repo ModernNomad-98/Project-Aegis --json body,files` shows that its ledger update needs an independent full-page re-read. The only quantified in-progress work here is this checkpoint, **0.5–1.5 agent-estimated active hours** (the prior checkpoint estimate in the near-term table). The needed ledger re-read receives no invented range, so this is the quantified near-term figure, not a delivery promise.
 
@@ -1161,9 +1059,7 @@ With S4 and the S5 step merged, all 23 owner-choice skills are delivered and
 none is in an open PR; active time was not measured, so the provisional
 8.5–16.5-hour range is not scored. #378 added one accepted reader page, so
 main then had 606 tracked Markdown files: 562 accepted reader pages and 44
-classified fixtures, with zero known pending pages. com/ModernNomad-98/Project-Aegis/pull/371) (the `saas-cost-architect` / `ai-cost-guardrail-designer` policy-versus-mechanism seam) merged at 03:25:04 UTC as `da08b0f6`; it changes one skill and its trigger evals and adds no Markdown page. com/ModernNomad-98/Project-Aegis/pull/381), the governance record of APR-046's consumption by #374 (AEGIS-APR-053) and of the #373 grants and exception (AEGIS-APR-054 to AEGIS-APR-056), merged at 03:31:29 UTC as `032e0302`; it changes three existing Markdown pages and adds none, so the count stayed 606.
-
-md`, with no recorded full-page readability review, so main now has 608 tracked Markdown files: 562 accepted reader pages, 44 classified fixtures and two known pending pages. com/ModernNomad-98/Project-Aegis/pull/384), the `project-orchestrator` routes at Stages 3 and 9, merged last, at 04:25:58 UTC as `0f46808d`; it changes one existing skill page and its evals and adds no Markdown page, so main still has 608 tracked Markdown files.
+classified fixtures, with zero known pending pages. [PR #371](https://github.com/ModernNomad-98/Project-Aegis/pull/371) (the `saas-cost-architect` / `ai-cost-guardrail-designer` policy-versus-mechanism seam) merged at 03:25:04 UTC as `da08b0f6`; it changes one skill and its trigger evals and adds no Markdown page. [PR #381](https://github.com/ModernNomad-98/Project-Aegis/pull/381), the governance record of APR-046's consumption by #374 (AEGIS-APR-053) and of the #373 grants and exception (AEGIS-APR-054 to AEGIS-APR-056), merged at 03:31:29 UTC as `032e0302`; it changes three existing Markdown pages and adds none, so the count stayed 606. [PR #383](https://github.com/ModernNomad-98/Project-Aegis/pull/383), the `feature-flag-architect` skill (185 to 186 skills, decision D64), merged at 03:43:01 UTC as `6844ab9f`; it adds two reader pages, the skill's `SKILL.md` and `references/flag-system-sheet.md`, with no recorded full-page readability review, so main now has 608 tracked Markdown files: 562 accepted reader pages, 44 classified fixtures and two known pending pages. [PR #384](https://github.com/ModernNomad-98/Project-Aegis/pull/384), the `project-orchestrator` routes at Stages 3 and 9, merged last, at 04:25:58 UTC as `0f46808d`; it changes one existing skill page and its evals and adds no Markdown page, so main still has 608 tracked Markdown files. Owner decisions made later on 2026-09-26 are
 listed in the [open-decisions index](aegis-open-decisions-2026-09-23.md#decided-on-2026-09-26);
 none changes an estimate above.
 
@@ -5132,8 +5028,6 @@ need. **Later** retains the dependent and optional outcomes above. No precise
 dates, capacity or workload promise is made, and more agents or more documentary
 merges alone do not prove a selected outcome complete; comparative value and
 active capacity remain unknown.
-
-## Next trigger
 
 **Next trigger.** The next reassessment falls due when the boundary after M
 closes — three further integrations after M — and an earlier reassessment is
