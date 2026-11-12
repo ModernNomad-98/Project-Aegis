@@ -502,3 +502,24 @@ lines, at `.github/workflows/validate-skills.yml` L278, L365, L421 and L477, eac
 2026-10-11 measurements on this page — the durations, the skipped-window footnote and every figure in
 S5 — are unchanged and are not re-measured here. No workflow file was edited by this change: the pin
 in `.github/workflows/validate-skills.yml` was already correct.
+
+
+## Observation addendum — 2026-11-12 (measured at e5c04d07)
+
+**Status: observation only. This addendum changes no workflow, no branch protection and no settings; it grants no CI change.**
+
+**Bound facts.** Repository head observed: `e5c04d07ac815d8dfba7069b56ab2c1d211a89b0` (merge of PR #1034, which fixed the post-#1033 validation ordering). Workflow file identities measured at that head: `.github/workflows/validate-skills.yml` (33,366 B / `67c346a58838bdb15d1bad5c384f3ae0a87271acb33096456bd892223d0d4e4e`), `.github/workflows/aegis-verdict-gate.yml` (9,792 B / `b04e8727e5703dbc7a44d86b03b345ea5e9698aed027a1422504cfaf4450c848`), `.github/workflows/deepseek-code-review.yml` (2,257 B / `28a0b7c20311f29b6c17ed8f81ad427d9e4b3da79ef18b617e4d09015b8c5064`), `.github/workflows/eval-run.yml` (268,862 B / `95c7e21f8e2171a7731ced8352b5feaf2e095710057150f8f07a61af8626481e`), `.github/workflows/eval-smoke.yml` (47,029 B / `4c314b027ccd72c2f0dd945c0b444e61360ccdc1bc244c2823c4664b1582df22`).
+
+**Active workflows and jobs.** Five repository workflows are active, plus dynamic Copilot and Dependabot workflows: `validate-skills` (jobs `changes`, `validate-skills`, `windows-offline-checks`, `tools-tests-linux`, `tools-tests-windows`, `gate-guard`; `pull_request` + `push`), `aegis-verdict-gate` (one job; `pull_request_target` + `issue_comment`), `DeepSeek Code Review` (`review`; `pull_request_target` + `issue_comment`), `eval-run` (`eval-run-job-1`, `eval-run-job-2`; `workflow_dispatch`), `eval-smoke` (`eval-smoke`; `workflow_dispatch`).
+
+**Branch protection.** Required contexts: **`gate-guard`, `validate-skills`**; `strict=false`; `enforce_admins=false`; `dismiss_stale_reviews=false`; required approving reviews **1**. `aegis-verdict-gate` is **not required**.
+
+**Recent durations (created→updated, observed 2026-11-12T04:33Z).** `validate-skills`: 4112183c **568 s** success, d33988fe **201 s** success, 555755f5 **480 s** failure, adea5b06 **189 s** failure (pre-fix), e5c04d07 in progress at observation. `aegis-verdict-gate`: 555755f5 **12 s** success, a0cd89a0 **402 s** success, ecbd905a **491 s** success; multiple cancelled/failed PR runs. `gate-guard`: 8–17 s. `DeepSeek Code Review`: 55–100 s when it runs, skipped on some heads.
+
+**Bottleneck observations.**
+1. `validate-skills` dominates wall-clock: 189–568 s observed, and the post-merge main run was still in progress after 8 minutes.
+2. The two `pull_request_target` workflows (`aegis-verdict-gate`, `DeepSeek Code Review`) run on PR events independently of the required `validate-skills` run; `aegis-verdict-gate` was repeatedly cancelled or failed while not being a required context.
+3. `gate-guard` is quick but intentionally fails on protected-path changes (for example the one-line `scripts/tests` fix in #1034), so protected fixes need a manual merge path.
+4. The post-merge `push` lane repeats the full validation; no path-filter optimisation is in this observation.
+
+**Optimisation candidates (not authorized here):** avoid duplicate PR-target runs by consolidating comment-trigger handling; add explicit concurrency groups; consider path filters for post-merge validation; reduce redundant `validate-skills` work. Each would need its own bounded plan, protected-path review and owner authorization.
