@@ -5,6 +5,8 @@ the disabled-state verification and the local no-inbox path. It does not build
 an inbox service, add a queue/provider/vendor, change the E1 installer beyond
 the config surface or run an enabled inbox.
 
+**Audience and reading key.** For Project Aegis maintainers and reviewers of the optional inbox configuration. **aegis.ops-inbox/v1** is the local synthetic config/evidence schema; **selected_by** records the selecting identity; **config_identity** is the canonical hash of the config; **INBOX_HIDDEN_ACTIVITY** is the refusal when a disabled inbox shows activity; **INBOX_CONFIG_INVALID** is the refusal for malformed values; **C4.1** is the qualification support matrix; **E2.4** is the independent consumer exercise; **E1** is the installer/config surface; **QUALIFIED** means independently exercised; **UNRUN** means not executed and never a pass.
+
 ## Configuration
 
 `aegis.ops-inbox/v1` carries two explicit booleans:
@@ -48,8 +50,8 @@ A disabled claim needs an **end-to-end observation**, not just a static config:
 All seven activity fields must be present and `false`. One true field is
 `INBOX_HIDDEN_ACTIVITY` and the claim fails. `independent_confirmation_ref` is
 carried because the end-to-end run is primary; the static config is supporting
-evidence only. No new telemetry is added: the observation uses process/event/
-network/queue evidence available to the programme.
+evidence only. This slice adds no telemetry of its own: the observation uses existing
+process/event/network/queue evidence available to the programme.
 
 ## Display
 
@@ -60,6 +62,10 @@ The disabled display is exactly:
 It is not progress, not approval and not an implication of hidden activity. An
 enabled/disabled state never grants authority and never hides assurance
 limits.
+
+**Claim status.** The disabled zero-activity claim is **NOT ASSERTABLE** in
+this slice: the real disabled run, the independent confirmation and the E2.4
+exercise are UNRUN.
 
 ## Local no-inbox path
 
@@ -72,9 +78,11 @@ required before a QUALIFIED claim.
 
 `dependencies` must be empty. No queue, service, provider or vendor is added;
 the inbox remains optional and the simplest install has no inbox dependency.
-The E1 prerequisites are unchanged.
+This page does not change the E1 prerequisites; it consumes the existing E1 config surface by reference.
 
 ## Commands
+
+Run from the repository root:
 
 ```
 python -m tools.aegis_ops inbox --input tools/aegis_ops/tests/fixtures/inbox-disabled-valid.json
@@ -82,8 +90,10 @@ python -m tools.aegis_ops inbox --input tools/aegis_ops/tests/fixtures/inbox-inv
 python -m tools.aegis_ops inbox --input tools/aegis_ops/tests/fixtures/inbox-zero-activity-evidence.json
 ```
 
-Expected: disabled-valid exits 0; the invalid-value and hidden-activity
-fixtures exit 1 with the named refusal.
+Expected: disabled-valid exits 0; invalid-value exits 1 with
+**INBOX_CONFIG_INVALID**; hidden-activity exits 1 with
+**INBOX_HIDDEN_ACTIVITY**. The complete input shape is the fixture set under
+tools/aegis_ops/tests/fixtures/.
 
 ## UNRUN
 
