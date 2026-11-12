@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "9b2871fe6e442f4c8db6057c8264cd26c8530a2f",
-  "table_rows": 264,
+  "built_at_ref": "c2bce0eaba5e3eb3d648f5da1a1c5b5ad3a3446e",
+  "table_rows": 265,
   "events": [
     {
       "stable_id": "K-001",
@@ -2908,6 +2908,17 @@
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-consumer-status-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-418",
+      "path": "docs/design/host-qualification-disclosure.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "113924ff7c26fbc3c55ebaeda535d49cd6c09496",
+      "blob_id": "077a205929d4bf10d4a9174b4fc3a0036675f06a",
+      "quote": "Until then the honest statement is: **qualification not performed; mounted coverage UNKNOWN; denial and recovery evidence UNRUN; ENFORCED blocked.**",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-host-qualification-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3739,6 +3750,16 @@
       "reviewer": "readability-closeout-implementer-c",
       "evidence_source": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
       "date": "2026-10-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/design/host-qualification-disclosure.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "113924ff7c26fbc3c55ebaeda535d49cd6c09496",
+      "blob_id": "077a205929d4bf10d4a9174b4fc3a0036675f06a",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-host-qualification-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {

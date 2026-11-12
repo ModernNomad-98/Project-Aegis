@@ -2114,6 +2114,14 @@
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-consumer-status-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/design/host-qualification-disclosure.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "113924ff7c26fbc3c55ebaeda535d49cd6c09496",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-host-qualification-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }
