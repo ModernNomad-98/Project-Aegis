@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "905b0aeee3f9097c8739a8a32e716af5b256dfce",
-  "table_rows": 268,
+  "built_at_ref": "44233f4a94fbbbef377881d8f808a3d101ee150f",
+  "table_rows": 271,
   "events": [
     {
       "stable_id": "K-001",
@@ -2952,6 +2952,39 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-change-state-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-422",
+      "path": "docs/evidence/documentation/documentation-backlog-current-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "blob_id": "5fd0ee8d1923c1544b596d47c212dcaf3a126598",
+      "quote": "It labels its original 491-file inventory and ordered starting steps as a planning baseline. The exact #198 tree has 547 tracked Markdown files, and full page acceptance remains in progress. No original plan, acceptance criterion, delivered batch row or authority boundary was changed.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-423",
+      "path": "docs/evidence/documentation/contributor-merge-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "blob_id": "4c3e38679d7cf2f99a486d7d005c879e0a5b6c4a",
+      "quote": "This is a documentation clarification. It grants no new merge, implementation or provider authority. The exact applicable owner approval and PR-head checks must still be verified at a future merge.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-424",
+      "path": "docs/evidence/documentation/user-paths-deep-evidence-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "blob_id": "d0e9c456dca173ea002373d24ed4942b869838d7",
+      "quote": "The pages still provide advisory guidance, not release authorization. No skill contract, automatic selection rule, incident command or provider behavior changed.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3836,6 +3869,26 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/documentation/contributor-merge-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "blob_id": "4c3e38679d7cf2f99a486d7d005c879e0a5b6c4a",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/documentation/documentation-backlog-current-reading-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "blob_id": "5fd0ee8d1923c1544b596d47c212dcaf3a126598",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/documentation/full-page-readability-batch-after-233-2026-09-24.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "e2a3e20b7c20ef8385b219b39c6405237163406f",
@@ -4113,6 +4166,16 @@
       "reviewer": "stage-b-auditor",
       "evidence_source": "docs/evidence/documentation/full-page-readability-batch-after-708-2026-10-10.md",
       "date": "2026-10-10",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/documentation/user-paths-deep-evidence-2026-09-23.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "c4f4ac865618c0409dcd2e9005d38b3e1d59474b",
+      "blob_id": "d0e9c456dca173ea002373d24ed4942b869838d7",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-evidence-readings-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
