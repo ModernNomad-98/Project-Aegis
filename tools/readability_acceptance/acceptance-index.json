@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "8d1fb136798299c03a0f3f3545ac03bdc2c8a31a",
-  "table_rows": 279,
+  "built_at_ref": "ea745d3109ee4386bf5f02887237301dc193c20b",
+  "table_rows": 282,
   "events": [
     {
       "stable_id": "K-001",
@@ -3073,6 +3073,39 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-maturity-package-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-433",
+      "path": "docs/150-claude-skills-roadmap.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "4f684c5a8465ed288ca0ccddb759cbcd184d5eda",
+      "blob_id": "568a8258cb1508b05ef5883dbe743d79d9ff26f5",
+      "quote": "The original 150-skill draft mixed reusable engineering skills with product-specific domain skills. The replacement roadmap removes individual product-feature skills and focuses on repeatable skills for software architecture, software as a service (SaaS) architecture, engineering, security, artificial intelligence (AI) engineering, and quality assurance (QA).",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-index-docs-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-434",
+      "path": "docs/audits/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "4f684c5a8465ed288ca0ccddb759cbcd184d5eda",
+      "blob_id": "6a23c6f250fed61c398cceb5baa4d7f942f21dc7",
+      "quote": "No claim of completeness: the register scope is the 300-row roadmap basis it was produced against, and later batches/decisions are recorded elsewhere (D-records).",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-index-docs-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-435",
+      "path": "docs/release/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "4f684c5a8465ed288ca0ccddb759cbcd184d5eda",
+      "blob_id": "bdd570cf0c9b41aec124374fbc3e75908b814daa",
+      "quote": "**Status:** draft release-evidence preparation. **Nothing in this directory has been published.** No GitHub Release, tag, asset upload, announcement or external publication exists for `v0.2.0`; the only existing tag in the repository is `v0.1.0`.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-index-docs-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3837,6 +3870,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/150-claude-skills-roadmap.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "4f684c5a8465ed288ca0ccddb759cbcd184d5eda",
+      "blob_id": "568a8258cb1508b05ef5883dbe743d79d9ff26f5",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-index-docs-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/approvals/APPROVAL_REGISTER.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "c80c8d2d553671579e878584914eae695028eab4",
@@ -3863,6 +3906,16 @@
       "blob_id": "25a6fc39012060188f351377f7be80ebc31a525d",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-revision-state-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/audits/README.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "4f684c5a8465ed288ca0ccddb759cbcd184d5eda",
+      "blob_id": "6a23c6f250fed61c398cceb5baa4d7f942f21dc7",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-index-docs-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
@@ -4454,6 +4507,16 @@
       "reviewer": "readability-final3-implementer-c",
       "evidence_source": "docs/evidence/documentation/readability-final3-reread-2026-10-12.md",
       "date": "2026-10-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/release/README.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "4f684c5a8465ed288ca0ccddb759cbcd184d5eda",
+      "blob_id": "bdd570cf0c9b41aec124374fbc3e75908b814daa",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-index-docs-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
