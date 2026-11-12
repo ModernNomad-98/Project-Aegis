@@ -66,6 +66,9 @@ python -m tools.aegis_ops holders --input tools/aegis_ops/tests/fixtures/holder-
 python -m tools.aegis_ops holders --input tools/aegis_ops/tests/fixtures/holder-duplicate-active.json
 python -m tools.aegis_ops holders --input tools/aegis_ops/tests/fixtures/replacement-valid.json
 python -m tools.aegis_ops holders --input tools/aegis_ops/tests/fixtures/unavailability-no-t7-blocked.json
+python -m tools.aegis_ops holders --input tools/aegis_ops/tests/fixtures/replacement-missing-authority.json
+python -m tools.aegis_ops holders --input tools/aegis_ops/tests/fixtures/replacement-self-approve.json
+python -m tools.aegis_ops holders --input tools/aegis_ops/tests/fixtures/context-bundle-mismatch.json
 ```
 
 Expected: the duplicate-active, missing-authority, self-approve and
