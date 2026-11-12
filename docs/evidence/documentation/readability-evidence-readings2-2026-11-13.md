@@ -17,7 +17,7 @@ Acceptance revision: `244224df2b58818d0e9ddbfba79a2848bc31ba76`. Three dated 202
 ### 3. Root status docs readability
 - Page blob `336934fcd552cb31b4f7a40d547d88b51e9886fa`; 2,012 B / 37 lines.
 - Review PASS (`READABILITY-ROOT-STATUS-READING-REVIEW-2026-11-13.md`, 0496c820).
-- Quote: "This batch merged in PR #176, recorded locally by merge commit 02ff5f0. The pending independent review below describes the frozen-draft checkpoint, not current delivery status."
+- Quote: "The pending independent review below describes the frozen-draft checkpoint, not current delivery status."
 - Reviewer: records-steward.
 
 ## Limits
