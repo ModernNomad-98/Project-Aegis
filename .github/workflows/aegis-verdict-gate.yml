@@ -151,8 +151,23 @@ jobs:
           --stage-records-dir "$AEGIS_VERDICT_RUN_DIR/stage-records"
           --json
 
-      - name: Publish the head-bound commit status
+      - name: Run the checker canonicalization self-test
+        id: self-test
         if: always() && steps.resolve.outputs.decision == 'evaluate'
+        run: python -P scripts/ci/record-check.py self-test -- python -P scripts/aegis_verdict_gate/run.py --self-test
+
+      - name: Run the moved checker test suite
+        id: checker-tests
+        if: always() && steps.resolve.outputs.decision == 'evaluate'
+        run: python -P scripts/ci/record-check.py checker-tests -- python -P scripts/aegis_verdict_gate/tests/run_tests.py
+
+      # Publish only after the local self-test and protected suite pass. A red
+      # run must not leave a green commit status that branch protection trusts.
+      - name: Publish the head-bound commit status
+        if: >-
+          always() && steps.resolve.outputs.decision == 'evaluate'
+          && steps.self-test.outcome == 'success'
+          && steps.checker-tests.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           AEGIS_VERDICT_RUN_DIR: ${{ runner.temp }}/aegis-verdict-gate
@@ -161,14 +176,6 @@ jobs:
           --run-dir "$AEGIS_VERDICT_RUN_DIR"
           --checker-record "$RUNNER_TEMP/aegis-ci/verdict-gate.json"
           --checker-log "$RUNNER_TEMP/aegis-ci/verdict-gate.log"
-
-      - name: Run the checker canonicalization self-test
-        if: always() && steps.resolve.outputs.decision == 'evaluate'
-        run: python -P scripts/ci/record-check.py self-test -- python -P scripts/aegis_verdict_gate/run.py --self-test
-
-      - name: Run the moved checker test suite
-        if: always() && steps.resolve.outputs.decision == 'evaluate'
-        run: python -P scripts/ci/record-check.py checker-tests -- python -P scripts/aegis_verdict_gate/tests/run_tests.py
 
       - name: Write the job summary
         if: always()
