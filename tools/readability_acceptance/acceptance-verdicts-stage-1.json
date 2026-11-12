@@ -2066,6 +2066,14 @@
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "path": "docs/operations/inbox-zero-activity.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0e14f267846d61e61fbcd140cb00bdaeb97ee515",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-inbox-zero-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ]
 }

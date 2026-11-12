@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "56b86d2ad2eb81f621eb39c2f8b29a6eda97d02e",
-  "table_rows": 258,
+  "built_at_ref": "4fed4054d678b7cfa5a600d8ee26a5534f7855e4",
+  "table_rows": 259,
   "events": [
     {
       "stable_id": "K-001",
@@ -2842,6 +2842,17 @@
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "stable_id": "K-412",
+      "path": "docs/operations/inbox-zero-activity.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "0e14f267846d61e61fbcd140cb00bdaeb97ee515",
+      "blob_id": "abc3499a650abc9a49f87a73e5e0537c82c0da63",
+      "quote": "All seven activity fields must be present and false. One true field is INBOX_HIDDEN_ACTIVITY and the claim fails.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-inbox-zero-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ],
   "reader_pages": [
@@ -4002,6 +4013,16 @@
       "blob_id": "6d1fe5352e9292eb90397a0e997fd37ac85560b3",
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-4-2026-11-12.md",
+      "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/operations/inbox-zero-activity.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "0e14f267846d61e61fbcd140cb00bdaeb97ee515",
+      "blob_id": "abc3499a650abc9a49f87a73e5e0537c82c0da63",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-inbox-zero-2026-11-12.md",
       "date": "2026-11-12",
       "acceptance_reachable": true
     },
