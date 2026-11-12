@@ -2306,6 +2306,30 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-06.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-14.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-02.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }

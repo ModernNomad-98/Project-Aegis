@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "cbda660e520f5694c9a831edcae54006ea5a3620",
-  "table_rows": 288,
+  "built_at_ref": "86db4cfc18e81bbfd0cfcd4f1abd44ccf189f337",
+  "table_rows": 291,
   "events": [
     {
       "stable_id": "K-001",
@@ -3172,6 +3172,39 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-442",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-06.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "blob_id": "3fd32df70063c552d6232d10ec08ba897f94f64a",
+      "quote": "The consumer decision-log append remains a downstream copy task, not a CP-06 condition.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-443",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-14.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "blob_id": "e965d602d6af30739eb5a3a3337f0061897ed6a9",
+      "quote": "The initial empty target is recorded as a real observed state (0 branches, 0 commits, 0 workflows, 0 deployments, URL 404), and retained A bytes plus a concrete restore primitive existed before B. A was later restored from retained bytes, which is the recovery claim observed rather than asserted.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-444",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-02.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "blob_id": "89681888630526917eb7feabb370d72cb5a1df51",
+      "quote": "**Basis observed.** 19/19 planned effects reconciled to the real consumer repository, exposure and budget, with independent RV-1 verification; drifts D-01/D-02/D-03 recorded and the drift correction merged to the consumer as a598f3b. G-01 (E3 allocation) is INFERRED from plan A1 \u00a712, which the owner made authoritative (CP-02=A).",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -4066,12 +4099,32 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-02.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "blob_id": "89681888630526917eb7feabb370d72cb5a1df51",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-04.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "3204b97a538858ce103e9ce978f8c3ee5eb06118",
       "blob_id": "5ec3d6133b26dae73ab7d5fca7f5107ed6681e8a",
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows2-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-06.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "blob_id": "3fd32df70063c552d6232d10ec08ba897f94f64a",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
@@ -4102,6 +4155,16 @@
       "blob_id": "b7e8af27c37f2e5e392c6c8d6866fe142700be8c",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-14.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "bdaf67b88584ff00908f6ded5c56e29eb21496c7",
+      "blob_id": "e965d602d6af30739eb5a3a3337f0061897ed6a9",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows3-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
