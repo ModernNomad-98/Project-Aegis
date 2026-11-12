@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "60ba0fd74c5eae570007d136ad9e9da7dd3f6f15",
+  "built_at_ref": "94ccc5322aff584dac1fa59d8c55203c52e3f1ff",
   "table_rows": 294,
   "events": [
     {
@@ -3212,7 +3212,7 @@
       "event_kind": "full-page-acceptance",
       "revision": "9011761e389f3f8d15309a2d20a97b1c36fc3cd2",
       "blob_id": "9178f5595161ad4f5fd935f88df85cbaaf5035a7",
-      "quote": "N-6: the 'before investing in the build' ordering is not retroactively showable; the owner defined the run as the closing observation.",
+      "quote": "the owner defined the run as the closing observation.",
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows4-2026-11-13.md",
       "date": "2026-11-13"
@@ -3223,7 +3223,7 @@
       "event_kind": "full-page-acceptance",
       "revision": "9011761e389f3f8d15309a2d20a97b1c36fc3cd2",
       "blob_id": "1b93f660aff220eab988eebfad6a61315da9936d",
-      "quote": "The pre-registered N1 installer control (one packaged file removed from the installed set) **exited 0 and healed 40 \u2192 41 installed files** where a stop was required; the case's missing-reference and closure clauses are therefore unsatisfied. An earlier independent semantic review had passed the package (`records/CP03-REVIEW.md`); that PASS is **superseded** by the executed control, and rounds 6 and 7 of the CP-22 review accepted the FAIL typing.",
+      "quote": "The pre-registered N1 installer control (one packaged file removed from the installed set) **exited 0 and healed 40 \u2192 41 installed files** where a stop was required.",
       "reviewer": "evidence-lineage-steward",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows4-2026-11-13.md",
       "date": "2026-11-13"
