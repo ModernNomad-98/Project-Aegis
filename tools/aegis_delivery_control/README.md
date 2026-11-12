@@ -26,10 +26,21 @@ does not authorize a real route; `require_real_dispatch` always denies it. A
 selected source and host, independent freshness proof, actual evidence and
 billing policy remain open work-package 003 gates.
 
+## Reading path
+
+Start with [How a controlled operation works](#how-a-controlled-operation-works)
+and [What the package files do](#what-the-package-files-do) for the kernel model.
+The [read-only commands](#read-only-commands) and [Fast save](#fast-save-the-offline-checkpoint-demonstration)
+sections follow. The local Command and Control (C&C) reporting command is
+covered first because its operational checks are concrete; it is not the
+kernel's core authorization model. **SHA-256** is a 256-bit cryptographic
+hash. **P0-B** and **ZT-P1** are programme/package labels; **FAST SAVE** is
+the offline checkpoint demonstration documented below.
+
 ## Local C&C reporting
 
 The `cnc-report` command packages an explicitly selected, sanitized local
-capture of the existing Lead record into one JSON evidence report. It opens
+capture of the existing Lead record into one JavaScript Object Notation (JSON) evidence report. It opens
 no state database and performs no network request, subprocess, Git command,
 output-file write, dispatch, metrics enrollment or telemetry export. The
 existing synthetic kernel and its real-dispatch denial remain unchanged.
@@ -43,7 +54,7 @@ python -B -m tools.aegis_delivery_control --repository-id ModernNomad-98/Project
 
 The source wrapper fixes `cnc/adapter-aegis.json` and
 `cnc/cnc-evidence-contract-v2.json` internally, and byte-pins both: the
-contract to the SHA256 below and the adapter to
+contract to the SHA-256 below and the adapter to
 `e45020f79f9e3caf328c598645e93e6c1fdc3e46da0819cf16eb1c9c289d4b95`. Foreign
 repository IDs and profile/contract overrides are refused. `cnc-report` is
 recognized only in the subcommand position, including after an abbreviated
@@ -116,22 +127,22 @@ integration documentation and native startup/handoff placement. Source-only
 `tests/test_cnc_source_cli.py` is not copied. No source imports, Node runtime,
 dependency installation or implicit support-file discovery are needed by the
 portable module or tests. Record exact source commit/tree, every copied path
-and SHA256, profile identity/hash and actual checks. Partial consumer snapshots
+and SHA-256, profile identity/hash and actual checks. Partial consumer snapshots
 cannot establish complete app-map/context or native delivery readiness. A
 profile `id` is any lowercase slug matching `[a-z][a-z0-9_-]{0,63}`: the
 reporter validates that shape rather than a fixed list of consumers. Only
 `id: aegis` additionally pins the source stage labels to exactly A–G; another
 consumer keeps its own stage labels.
 
-The small pure helper adaptation records its original SHA256 in
-`cnc_reporting.py`; the unchanged common contract is pinned to SHA256
+The small pure helper adaptation records its original SHA-256 in
+`cnc_reporting.py`; the unchanged common contract is pinned to SHA-256
 `1b2469b3f663d9b04712c4dbbdb997fdfdc0c6a28727c5647c954854850a3268`.
 That hash covers the contract's exact bytes: the reporter refuses any other
 bytes with `CONTRACT_INVALID`, and the portable tests re-hash the shipped file,
 a byte copy of it and a line-ending-converted copy, so a CRLF checkout fails
 the suite. The repository-wide `* text=auto eol=lf` policy still normalises
 text checkouts to LF; no per-file `.gitattributes` entry is added for this
-file. The source-only fixed adapter is pinned the same way to SHA256
+file. The source-only fixed adapter is pinned the same way to SHA-256
 `e45020f79f9e3caf328c598645e93e6c1fdc3e46da0819cf16eb1c9c289d4b95`, so any
 byte change - including a schema-valid edit to its `id`, `activation`,
 adoption receipt, stage labels or policy locators - is refused as
@@ -259,7 +270,7 @@ An availability failure names the document being read: `INPUT_UNAVAILABLE`,
 profile or contract installation is distinguishable from a bad capture. No
 source locator inside a document is followed. Input, profile, contract and
 identity are validated in that order before projection, with no partial report.
-The source wrapper also passes its fixed adapter SHA256 into profile validation
+The source wrapper also passes its fixed adapter SHA-256 into profile validation
 and its fixed repository into the identity phase, so a mutated adapter or a
 foreign repository is rejected before projection.
 
@@ -281,9 +292,10 @@ and one fixed LF-terminated JSON object on stderr with `error_code` and
 | `CONTRACT_UNAVAILABLE` | 3 | The explicitly selected contract is unavailable. |
 | `REPORT_FAILED` | 3 | Report could not be produced. |
 
-`--help` is static usage, not a report. Existing usage consent, cohort admission,
-60/90-day retention and public-export controls are unchanged. Attaching a report
-is not a telemetry export route and inherits no automatic deletion or consent.
+`--help` is static usage, not a report. This command adds no new usage-consent,
+cohort-admission, 60/90-day retention or public-export path; the existing controls
+apply. Attaching a report is not a telemetry export route and inherits no
+automatic deletion or consent.
 
 Run the focused source checks with:
 
@@ -452,8 +464,8 @@ one host, no mutating verb, no artifact download) as JSON and exits 0.
   written, no artifact is downloaded and `gh` is never invoked. `--token-env
   GH_TOKEN` names an environment variable (never the token itself) and is
   applied only to `api.github.com`, to lift the anonymous rate limit.
-- **Never auto-run.** No workflow, schedule, hook or wrapper calls it; a
-  person or an agent runs it deliberately. FAST SAVE never triggers it.
+- **Never auto-run.** The package does not install or register an automatic
+  caller; a person or an agent runs it deliberately. FAST SAVE is not configured to trigger it.
 
 ### Exit codes and the status marker
 
@@ -664,7 +676,8 @@ Nothing is written when the command refuses, and a refusal returns exit 4:
 - the target is a symlink (refused by a check that runs first and never follows
   the link), a directory or other non-regular file, a file that does not parse
   as JSON, or a file whose `checkpoint_format` differs (**PATH_GUARD_DENIED**);
-- the parent directory is absent (it is never created);
+- the parent directory is absent (it is never created; the write is refused
+  before any file or directory is created; **PATH_GUARD_DENIED**);
 - the serialized checkpoint exceeds 65536 bytes (**CHECKPOINT_TOO_LARGE**); or
 - the temporary file cannot be written, cannot be verified, or cannot be
   atomically replaced (**WRITE_FAILED**, **READBACK_FAILED**, **REPLACE_FAILED**).

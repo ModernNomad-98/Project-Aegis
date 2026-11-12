@@ -8,6 +8,11 @@
 > before treating older conditional wording as today's status. This page does
 > not itself authorize a provider call, private-input access or live run.
 
+> **Current reading (2026-11-12):** the first-screen check above is dated
+> 2026-09-29. Later corrections and the 2026-10-29 gated live-adapter package
+> are recorded in section 13 and at the end of this page; those entries are
+> newer than this banner. Do not treat the 2026-09-29 date as the newest state.
+
 ## Start here: status and routes
 
 Behavioral Eval Runner (BER) evaluates recorded skill behavior. A work package
@@ -2668,6 +2673,12 @@ Explicit statements about this map:
 ---
 
 ## 13. Append-only governance log
+
+> **Correction note (2026-11-12):** the log's append-only intent was violated by
+the disclosed in-place edits and replacement recorded later in this section
+(around the 2026-10-13 corrections). Those entries are retained as evidence of
+the violation, not as proof that the log stayed append-only. Read them as a
+disclosed consistency defect.
 
 Rules for this log: entries are **never edited or deleted**; corrections append a
 superseding entry that names the entry it supersedes; mutable backlog status elsewhere in
