@@ -30,9 +30,10 @@ asserted:
 
 Neither is proved today. The guard facility exists and is monotonic (REPORTED
 from C0 section 6, not re-derived here), but the desktop composition cannot be
-dumped, so mounted coverage is UNKNOWN; and the profile patch layer is
-user-writable under the constrained agent's profile, so custody fails for the
-configuration route.
+dumped (REPORTED: C0 intake section 6.2), so mounted coverage is UNKNOWN; and
+the profile patch layer is user-writable under the constrained agent's profile
+(REPORTED: C0 intake section 6.4), so custody fails for the configuration
+route.
 
 ## Control matrix
 
@@ -60,11 +61,14 @@ C0 section 6, reused by the B1-B2 coverage map, not re-derived here):
 5. subagent presets;
 6. restart re-read of configuration.
 
-Repository-side routes are a separate class: gate-guard protects a defined set
-(`scripts/`, `.github/workflows/`, CODEOWNERS, root-level importable
-names, `tools/behavioral_eval_runner/`, requirements locks, agent/MCP config)
-but **not** `docs/approvals/`, settings, branch protection or the required
-contexts list. The change-state store documented in
+Repository-side routes are a separate class: the `gate-guard` job in
+[`.github/workflows/validate-skills.yml`](../../.github/workflows/validate-skills.yml)
+(L543) protects a defined set (`scripts/`, `.github/workflows/`, CODEOWNERS,
+root-level importable names, `tools/behavioral_eval_runner/`, requirements
+locks, agent/MCP config), with ownership recorded in
+[`.github/CODEOWNERS`](../../.github/CODEOWNERS); `scripts/ci/gate_guard.py`
+is not present in this tree. It does **not** protect `docs/approvals/`,
+settings, branch protection or the required contexts list. The change-state store documented in
 [the change-state README](../approvals/change-state/README.md) therefore has
 custody by policy + append-only checker + git history only: a repository
 administrator can still rewrite it. That is a recorded gap, not a claim of
