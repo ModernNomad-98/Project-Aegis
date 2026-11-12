@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "ea745d3109ee4386bf5f02887237301dc193c20b",
-  "table_rows": 282,
+  "built_at_ref": "a5b5cee824edd525c63afb094f186fb6b62c2e63",
+  "table_rows": 285,
   "events": [
     {
       "stable_id": "K-001",
@@ -3106,6 +3106,39 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-index-docs-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-436",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-10.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "84d8352faf05cc976ab40c4b712d009714a4895b",
+      "blob_id": "b7e8af27c37f2e5e392c6c8d6866fe142700be8c",
+      "quote": "N-2 items are open; they bound the row and do not change it.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-437",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-08.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "84d8352faf05cc976ab40c4b712d009714a4895b",
+      "blob_id": "e5b452656962dae92208526d1b1dde575c211900",
+      "quote": "The final captured consumer plan/spec/design was accepted by a non-author reviewer on **exact hashes** before implementation; later changed inputs received affected re-review.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-438",
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-07.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "84d8352faf05cc976ab40c4b712d009714a4895b",
+      "blob_id": "a4c5a6a83d50176c45c3dc9752c14d5ae5966591",
+      "quote": "**Basis observed.** 20/20 required owner/content paths were reachable and hash-equal; routing text was quoted from the delivered artifact; the applicable manual-only triggers were recorded **before** invocation rather than reconstructed afterwards.",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3996,6 +4029,36 @@
       "blob_id": "f285176b37de89429f72695ce6289f1f72c12d61",
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-supported-controls-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-07.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "84d8352faf05cc976ab40c4b712d009714a4895b",
+      "blob_id": "a4c5a6a83d50176c45c3dc9752c14d5ae5966591",
+      "reviewer": "records-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-08.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "84d8352faf05cc976ab40c4b712d009714a4895b",
+      "blob_id": "e5b452656962dae92208526d1b1dde575c211900",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
+      "date": "2026-11-13",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/evidence/aep3-item2-consumer-proof-20261029/rows/CP-10.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "84d8352faf05cc976ab40c4b712d009714a4895b",
+      "blob_id": "b7e8af27c37f2e5e392c6c8d6866fe142700be8c",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-cp-rows-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
