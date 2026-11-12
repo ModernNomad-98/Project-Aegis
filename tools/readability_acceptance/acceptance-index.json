@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "3d70d05351e3c331bf4bf5be40c00329b79bc629",
-  "table_rows": 263,
+  "built_at_ref": "9b2871fe6e442f4c8db6057c8264cd26c8530a2f",
+  "table_rows": 264,
   "events": [
     {
       "stable_id": "K-001",
@@ -2897,6 +2897,17 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-compatibility-matrix-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-417",
+      "path": "docs/consumer-status-presentation-v1.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "8c67e45d0e4f29eadbdc6cb7159184ae23bb76cd",
+      "blob_id": "d4273143a7f33749622fedbb71374f4488b5645d",
+      "quote": "**Permitted next action contract (not a seventh state).** Every state must display the single action the authoritative record authorises now: actor/authority, precondition, one bounded step and the record reference; if none is authorised, display BLOCKED with the reason and responsible authority.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-consumer-status-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -3708,6 +3719,16 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-support-claims-2026-11-12.md",
       "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/consumer-status-presentation-v1.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "8c67e45d0e4f29eadbdc6cb7159184ae23bb76cd",
+      "blob_id": "d4273143a7f33749622fedbb71374f4488b5645d",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-consumer-status-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
