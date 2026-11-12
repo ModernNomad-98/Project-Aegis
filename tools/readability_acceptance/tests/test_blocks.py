@@ -194,9 +194,22 @@ class T1DefaultOutputUnchanged(unittest.TestCase):
     def tearDownClass(cls):
         cls._tmp.cleanup()
 
+    def _ref_index_path(self, ref):
+        """Materialize the committed index at ref for a controlled comparison.
+
+        The default now loads the committed index from --ref, so the base
+        checker must be given that same index to test output-shape equality
+        rather than checkout-local drift.
+        """
+        path = Path(self._tmp.name) / "ref-index.json"
+        path.write_text(_git(ROOT, "show", ref + ":" + check_index.INDEX_REL),
+                        encoding="utf-8")
+        return str(path)
+
     def _assert_identical(self, label, argv):
-        base_code, base_out, base_err = _run_checker(self.base_checker, argv)
-        new_code, new_out, new_err = _run_checker(CHECKER, argv)
+        controlled = list(argv) + ["--index", self._ref_index_path(argv[1])]
+        base_code, base_out, base_err = _run_checker(self.base_checker, controlled)
+        new_code, new_out, new_err = _run_checker(CHECKER, controlled)
         message = ("mode {}: returncode {} != {}\n--- base stderr ---\n{}"
                    "\n--- new stderr ---\n{}".format(
                        label, base_code, new_code,
@@ -214,6 +227,16 @@ class T1DefaultOutputUnchanged(unittest.TestCase):
             "quiet", ["--ref", BASIS_REF, "--quiet", "--path", STABLE_PAGE])
         self._assert_identical(
             "path", ["--ref", BASIS_REF, "--path", STABLE_PAGE])
+
+    def test_t1_default_ref_index_matches_custom_index(self):
+        ref_index = self._ref_index_path(BASIS_REF)
+        code, default_out, err = _run_checker(
+            CHECKER, ["--ref", BASIS_REF, "--json"])
+        self.assertEqual(code, 0, err.decode("utf-8", "replace"))
+        code, custom_out, err = _run_checker(
+            CHECKER, ["--ref", BASIS_REF, "--json", "--index", ref_index])
+        self.assertEqual(code, 0, err.decode("utf-8", "replace"))
+        self.assertEqual(json.loads(default_out), json.loads(custom_out))
 
     def test_t1_base_blob_is_digest_pinned(self):
         blob = _git(ROOT, "cat-file", "blob", BASE_CHECKER_BLOB, binary=True)
@@ -607,6 +630,7 @@ class T6ScopeAndHygiene(unittest.TestCase):
         allowed = {
             "tools/readability_acceptance/check_index.py",
             "tools/readability_acceptance/tests/test_blocks.py",
+            "tools/readability_acceptance/tests/test_check_index.py",
         }
         for line in status.splitlines():
             path = line[3:].strip()

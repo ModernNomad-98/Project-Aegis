@@ -554,22 +554,25 @@ class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
             capture_output=True)
         self.assertEqual(blob.returncode, 0,
                          "the base checker must be retrievable from this clone")
+        pinned_index = subprocess.run(
+            ["git", "-C", str(ROOT), "show",
+             README_REF + ":tools/readability_acceptance/acceptance-index.json"],
+            capture_output=True)
+        self.assertEqual(pinned_index.returncode, 0,
+                         "the pinned ref's index must be retrievable")
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp) / "check_index_base.py"
             base.write_bytes(blob.stdout)
+            fixed = Path(tmp) / "pinned-index.json"
+            fixed.write_bytes(pinned_index.stdout)
             base_proc = subprocess.run(
                 [sys.executable, "-B", str(base), "--repo", str(ROOT),
-                 "--ref", README_REF, "--index", str(INDEX_ABS), "--json"],
+                 "--ref", README_REF, "--index", str(fixed), "--json"],
                 capture_output=True, text=True, encoding="utf-8",
                 errors="replace",
                 env=dict(os.environ, PYTHONIOENCODING="utf-8"))
         self.assertEqual(base_proc.returncode, 0, base_proc.stderr)
         base_summary = json.loads(base_proc.stdout)["summary"]
-        postdating = [row for row in index_reader_rows().values()
-                      if row.get("event_kind") == "withdrawal"
-                      and row.get("last_acceptance_sha")
-                      and not is_ancestor(row["last_acceptance_sha"],
-                                          README_REF)]
         self.assertEqual(
             summary["reader_pages_in_tree"],
             base_summary["reader_pages_in_tree"],
@@ -577,9 +580,8 @@ class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
             "from the mutable index")
         self.assertEqual(
             summary["accepted_on_recorded_review"],
-            base_summary["accepted_on_recorded_review"] - len(postdating),
-            "the pinned ref's acceptance count is the base count less the "
-            "withdrawal rows that postdate this ref")
+            base_summary["accepted_on_recorded_review"],
+            "the default now reads the pinned ref's own committed index")
         self.assertEqual(published_partition(summary),
                          summary["reader_pages_in_tree"],
                          "identity (i): every reader page is in exactly one "
@@ -644,10 +646,17 @@ class ReadmePinnedRefCommandStillRuns(unittest.TestCase):
             + str(pinned_reader_pages) + ") must equal both checkers' count")
     def test_the_sidecar_changes_no_count_at_that_ref(self):
         """Not-applicable declarations are inert, not absorbed."""
+        pinned_index = subprocess.run(
+            ["git", "-C", str(ROOT), "show",
+             README_REF + ":tools/readability_acceptance/acceptance-index.json"],
+            capture_output=True)
+        self.assertEqual(pinned_index.returncode, 0)
         with tempfile.TemporaryDirectory() as tmp:
+            pinned = Path(tmp) / "pinned-index.json"
+            pinned.write_bytes(pinned_index.stdout)
             empty = write_empty_dispositions(tmp)
             empty_summary = payload_of(
-                run_checker(CHECKER, INDEX_ABS, README_REF, empty))["summary"]
+                run_checker(CHECKER, pinned, README_REF, empty))["summary"]
         published = run_published_command(README_REF)
         self.assertEqual(published.returncode, 0, published.stderr)
         summary = published_summary(published.stdout)
