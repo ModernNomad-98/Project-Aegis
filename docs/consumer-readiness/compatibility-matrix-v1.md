@@ -92,10 +92,10 @@ The contract of record owns the state semantics. This table records the identifi
 
 | Label | Meaning for a consumer | Source | Limitation |
 | --- | --- | --- | --- |
-| VERIFIED | Re-derived from a primary source in the issuing pass | Delivery workflow `evidence labels | Point-in-time only; re-check on changed heads |
-| REPORTED | Asserted by a named record, not re-derived | Delivery workflow `evidence labels | Cannot be upgraded by repetition |
-| UNKNOWN | Not derivable; recovery must be named | Delivery workflow `evidence labels | Must be displayed as unknown, never blank |
-| UNRUN | Not executed; never a pass | Delivery workflow `evidence labels | Named in the claim/evidence record; cannot be waived by a label |
+| VERIFIED | Re-derived from a primary source in the issuing pass | Delivery workflow `evidence labels` | Point-in-time only; re-check on changed heads |
+| REPORTED | Asserted by a named record, not re-derived | Delivery workflow `evidence labels` | Cannot be upgraded by repetition |
+| UNKNOWN | Not derivable; recovery must be named | Delivery workflow `evidence labels` | Must be displayed as unknown, never blank |
+| UNRUN | Not executed; never a pass | Delivery workflow `evidence labels` | Named in the claim/evidence record; cannot be waived by a label |
 | FAIL / INVALID | A check failed or a record is invalid | Delivery workflow / contract | Must block the affected claim |
 | Bypass recorded | An authorized route crossed a check; never approval or green | Register/merge receipt convention | Must not be presented as success |
 | Enforcement claim NONE | No enforcement is claimed | Contract assurance vocabulary | Default where custody/coverage are unproved |
@@ -164,7 +164,7 @@ Only checks affected by this documentation change are listed; all others are reu
 - **Change control:** a new version is required for any content change; v1 may not be edited in place once reviewed. Any change re-opens the independent-review requirement.
 - **Independent review:** required before this matrix supports any consumer statement; the reviewer must be independent of the author and must record a verdict and limitations.
 - **Non-claims:** this document is not a supported-product claim, delivery, publication, release, install, certification, conformance, enforcement or readiness statement. It does not accept any design, close any item or authorize any action. It contains no paid-provider, hosted-release or production claim.
-- **Metadata minimisation:** this page contains no pull-request numbers, personal names, staffing labels, promotion material or cross-project monitor references.
+- **Metadata minimisation:** this page contains no pull-request numbers beyond the cited item-5 source-link evidence (#1030), no personal names, staffing labels, promotion material or cross-project monitor references.
 
 ---
 
@@ -195,6 +195,6 @@ All hashes are SHA-256 of the file bytes at the merged head; bytes are the file 
 | `docs/operations/overhead-controls.md` | 5,024 | `62698aa8bfb32929272454b65b1ee0d38edbadfecd401fc99d6202e26a458785` |
 | `docs/operations/ci-routing-matrix.md` | 5,430 | `65ad54da28bf48b6a2780a0b1eb1f7c604666343844b7e4149b6b60b654af03e` |
 | `docs/operations/advisory-trigger-findings-policy.md` | 5,712 | `81410d54cfbcfea3f86f162030ca5778f81c86c2f98f1cfcf56d10f390f38ac5` |
-| `docs/operations/stage-holders-and-replacement.md` | 4,698 | `6da1645d111fa6dab02070a79d80b97336c6084193ed25f28b7af763cd2bd8a8` |
-| `docs/operations/inbox-zero-activity.md` | 3,204 | `c7bf62fa7cb41f6a4430514c2cc70955376bfe66bc35b5f67ad537241b4862e6` |
-| `docs/operations/qualification-and-pilot-metrics.md` | 4,895 | `9e9db216c4c6d8c65155e7019738bbdc1ebab0bb318cd2cebf9856bbb1e71df4` |
+| `docs/operations/stage-holders-and-replacement.md` | 5,011 | `8f84d6777deb98815074b996cda678fc146fc319dc673b6bf6ebf288f8330f89` |
+| `docs/operations/inbox-zero-activity.md` | 4,267 | `5367dc23774cbbb6276324dad23ca6bd29d7daec512e4eae63d4232c1ef7d344` |
+| `docs/operations/qualification-and-pilot-metrics.md` | 6,747 | `b8ef8dad8e2b4aa5f6c1b0a8e1aa3ccd5bc988331d67745d075544a5ab707c0c` |
