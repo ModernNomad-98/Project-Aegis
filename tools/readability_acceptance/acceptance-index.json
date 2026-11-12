@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "d82384d97016a3773333785c90d0550876ee0f09",
-  "table_rows": 253,
+  "built_at_ref": "17c602717571f2db0684f681db5e10654bbfa883",
+  "table_rows": 255,
   "events": [
     {
       "stable_id": "K-001",
@@ -2787,6 +2787,28 @@
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-2026-11-12.md",
       "date": "2026-11-12"
+    },
+    {
+      "stable_id": "K-407",
+      "path": "docs/operations/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e257eea5685e9071e163119676340a9d2f9ce4d5",
+      "blob_id": "a725c904a9070d667c1d67d1b662aa41583f9314",
+      "quote": "PASS: operations README full-page readability review at e257eea5; no material defect.",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md",
+      "date": "2026-11-12"
+    },
+    {
+      "stable_id": "K-408",
+      "path": "docs/consumer-readiness/consumer-guide-v1.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "e257eea5685e9071e163119676340a9d2f9ce4d5",
+      "blob_id": "26b9a2e9b9b7db60e6395498419277facc9d2af7",
+      "quote": "PASS: consumer guide full-page readability review at e257eea5; no claim/content change.",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md",
+      "date": "2026-11-12"
     }
   ],
   "reader_pages": [
@@ -3571,6 +3593,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/consumer-readiness/consumer-guide-v1.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "e257eea5685e9071e163119676340a9d2f9ce4d5",
+      "blob_id": "26b9a2e9b9b7db60e6395498419277facc9d2af7",
+      "reviewer": "evidence-lineage-steward",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md",
+      "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/delivery-workflow.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "79c5c5901cd69101a58a696e0f03f1f7dd2264db",
@@ -3908,6 +3940,16 @@
       "reviewer": "pr-publisher",
       "evidence_source": "docs/evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md",
       "date": "2026-10-10",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/operations/README.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "e257eea5685e9071e163119676340a9d2f9ce4d5",
+      "blob_id": "a725c904a9070d667c1d67d1b662aa41583f9314",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md",
+      "date": "2026-11-12",
       "acceptance_reachable": true
     },
     {

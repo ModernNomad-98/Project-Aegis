@@ -6327,3 +6327,8 @@ carry NO acceptance row and their pages count pending until re-reviewed
 ## Index rebuild — 2026-11-12
 
 Rebuilt at `d82384d97016a3773333785c90d0550876ee0f09` after the operational readability batch. Official pending count at that ref: **921** (1,012 reader pages; 90 accepted; 11 provably pending; 889 no recorded acceptance; 12 recorded-within-10 (11 not covered); 6 cannot decide; 4 partial pending). The batch accepted the BER backlog and delivery-control README; the backlog forecast remains pending after a rejected automated edit was restored. This note records the rebuild; it accepts no additional page.
+
+
+## Index rebuild — batch 2 (2026-11-12)
+
+Rebuilt at `17c602717571f2db0684f681db5e10654bbfa883` with the batch-2 keeper rows in the table. Official pending count: **920** (1,013 reader pages; 92 accepted; 11 provably pending; 888 no recorded acceptance; 12 within-10 (11 not covered); 6 cannot decide; 4 partial pending). Accepted this batch: operations README and consumer guide; support claims remains pending after a FAIL review.
