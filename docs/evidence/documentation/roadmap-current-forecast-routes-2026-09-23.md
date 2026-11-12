@@ -26,8 +26,8 @@ status, estimates, owner decisions or authority boundaries in the three pages.
 Draft freeze: 22:25:35 UTC, 58 seconds observed wall time from edit start;
 active effort was not separately measured. A byte comparison after newline
 normalization confirmed that the three original pages differ only in the four
-forecast link targets. The four changed pages have 121 local relative links
-and 23 heading anchors, all resolved. `python -B scripts/validate-skills.py`
+forecast link targets. The four changed pages (those three plus this record)
+have 121 local relative links and 23 heading anchors, all resolved. `python -B scripts/validate-skills.py`
 reported 185 valid skills and zero warnings; `git diff --check` passed. These
 checks do not grant implementation or live execution authority. Independent
 read-only review is pending at this draft freeze.
