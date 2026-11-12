@@ -2138,6 +2138,14 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-revision-state-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/approvals/change-state/README.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "db3cf47433f99ebc438f4f9be5914ee240c22644",
+      "reviewer": "c03-contract-owner",
+      "evidence_source": "docs/evidence/documentation/readability-change-state-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ]
 }
