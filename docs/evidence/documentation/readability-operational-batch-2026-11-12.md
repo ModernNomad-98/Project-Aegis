@@ -15,7 +15,7 @@ Full-page readability acceptances recorded for the operational backlog batch. Ba
 - Page: `tools/aegis_delivery_control/README.md`; blob at acceptance revision: `2519910675295a7f3ceaaadc1c85494949ba8246`; 47,551 B / 789 lines.
 - First full-page review (`READABILITY-CONTROL-PLANE-README-REVIEW-2026-11-12.md`, 7152cc1e) returned FAIL on structure, term expansion, unsupported absolutes and a refusal mapping. Fixes added a Reading path, expanded C&C/JSON, normalized SHA-256, bounded the automatic-caller wording, and named PATH_GUARD_DENIED.
 - Re-review at `d09bca04` (`READABILITY-CONTROL-PLANE-README-REVIEW-REV3-2026-11-12.md`, a587ac23) returned **PASS**; all prior findings closed.
-- Reviewer quote: "Exit 0 is a green, head-bound claim - not merely the report is complete."
+- Reviewer quote: "**Exit 0 is a green, head-bound claim - not merely \"the report is complete\".**"
 - Reviewer: records-steward (independent of page authors; no self-approval).
 
 ## Deferred page
