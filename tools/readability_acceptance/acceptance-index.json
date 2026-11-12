@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "75c7257d0ac7334e1ebf2c87ca8c866adbef29fd",
+  "built_at_ref": "ba079fd2cf04ea222939cceffb5a5946250ed1ff",
   "table_rows": 274,
   "events": [
     {
@@ -3014,7 +3014,7 @@
       "event_kind": "full-page-acceptance",
       "revision": "244224df2b58818d0e9ddbfba79a2848bc31ba76",
       "blob_id": "336934fcd552cb31b4f7a40d547d88b51e9886fa",
-      "quote": "This batch merged in PR #176, recorded locally by merge commit 02ff5f0. The pending independent review below describes the frozen-draft checkpoint, not current delivery status.",
+      "quote": "The pending independent review below describes the frozen-draft checkpoint, not current delivery status.",
       "reviewer": "records-steward",
       "evidence_source": "docs/evidence/documentation/readability-evidence-readings2-2026-11-13.md",
       "date": "2026-11-13"
