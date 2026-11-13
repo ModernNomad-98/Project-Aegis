@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "617a95d637cd6405e25403599a5fbbcf82f54ed6",
-  "table_rows": 307,
+  "built_at_ref": "222e26158187b038b8255a288d76652a5f0ce205",
+  "table_rows": 309,
   "events": [
     {
       "stable_id": "K-001",
@@ -3381,6 +3381,28 @@
       "reviewer": "batch21-page-reviewer",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-22-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-461",
+      "path": "docs/consumer-readiness/compatibility-matrix-v1.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "1d7dd41766a81f7c8068c9ae100ce655207547ed",
+      "blob_id": "9cdf94bcd28cba8889c040c694299fe304c67230",
+      "quote": "No claim state changes; this matrix remains **DRAFT / EVIDENCE-ONLY / NOT DELIVERED**, with **0 qualified cells** and the **WITHHELD** claims unchanged.",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-compatibility-matrix-p6-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-462",
+      "path": "docs/consumer-readiness/support-claims-v1.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "1d7dd41766a81f7c8068c9ae100ce655207547ed",
+      "blob_id": "ae6056837867156ed02b32fd98e46118d8366fab",
+      "quote": "no claim state/assurance upgraded; history preserved; P5 synthetic verification is not converted into a consumer support/qualification claim.",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-support-claims-p6-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -4207,10 +4229,10 @@
     {
       "path": "docs/consumer-readiness/compatibility-matrix-v1.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "049dfbd3c6ac1f245980bf556e9d8c47a83646a7",
-      "blob_id": "57a69baa1aa3a0e38ba934207d23a46e0d99c401",
-      "reviewer": "c03-contract-owner",
-      "evidence_source": "docs/evidence/documentation/readability-compatibility-matrix-2026-11-13.md",
+      "last_acceptance_sha": "1d7dd41766a81f7c8068c9ae100ce655207547ed",
+      "blob_id": "9cdf94bcd28cba8889c040c694299fe304c67230",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-compatibility-matrix-p6-2026-11-13.md",
       "date": "2026-11-13",
       "acceptance_reachable": true
     },
@@ -4227,11 +4249,11 @@
     {
       "path": "docs/consumer-readiness/support-claims-v1.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "0da362f671ce94c65f837272b5c239091cc2f73c",
-      "blob_id": "d090460459fe867398098b499662f4322b0d87b9",
-      "reviewer": "records-steward",
-      "evidence_source": "docs/evidence/documentation/readability-support-claims-2026-11-12.md",
-      "date": "2026-11-12",
+      "last_acceptance_sha": "1d7dd41766a81f7c8068c9ae100ce655207547ed",
+      "blob_id": "ae6056837867156ed02b32fd98e46118d8366fab",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-support-claims-p6-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
