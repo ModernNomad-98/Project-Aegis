@@ -695,9 +695,14 @@ figures are authorised.
 
 The contract, privacy rules and metric definitions are in
 [`docs/instrumentation/`](docs/instrumentation/README.md); the tool's usage is in
-[`tools/aegis_usage/README.md`](tools/aegis_usage/README.md). This is
-documentation and an offline implementation only: it is not an authorisation to
-collect real data, host a service or run a pilot.
+[`tools/aegis_usage/README.md`](tools/aegis_usage/README.md). A **local-only pilot
+is authorised by the owner's activation** (owner as first participant, Lead as
+local steward-operator). This documentation is **not itself an authorisation**
+for external participant intake, hosting or publication: the private external
+channel is designated and reviewed, but external intake remains closed until the
+owner sends upload-only links and a consent supplement, no external-participant
+data exists, and hosting or publication of aggregates remains a separate owner
+decision.
 
 #### Using Aegis with Codex CLI and other Agent Skills tools
 
