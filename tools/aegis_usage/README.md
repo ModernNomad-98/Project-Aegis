@@ -5,7 +5,7 @@ Two stdlib-only Python 3.14 programs that implement the contract in
 
 | File | Role |
 | --- | --- |
-| [`local_report.py`](local_report.py) | Participant side: per-workflow opt-in, bounded transition history, exact preview, local-only export. |
+| [`local_report.py`](local_report.py) | Participant side: per-workflow opt-in, bounded transition history, exact preview, local export (the tool never uploads). |
 | [`aggregate.py`](aggregate.py) | Steward side: manual admissions, import with revision invariants, 90-day retention, deletion, cohort arithmetic and suppression. |
 | [`tests/`](tests) | 205 behavioral tests, including mutant demonstrations, over synthetic fixtures only. |
 
@@ -13,6 +13,22 @@ Two stdlib-only Python 3.14 programs that implement the contract in
 off until a workflow is explicitly opted in. There is no background upload and
 no reconnect retry: an export happens only after the exact bytes are previewed
 and the preview SHA-256 is confirmed.
+
+**Status (2026-11-13): implemented and synthetic-tested; owner-local pilot active**
+(owner participant, Lead local steward-operator). **Owner-local names the data scope
+only** — owner-only (single-owner) workflow data with no external-participant data —
+and does **not** mean data never leaves this machine. There is **no Aegis-operated
+or hosted service**, and publication is **not authorised**; the **external-participant
+inbox is closed**, and **no external-participant data has been collected (intake
+closed)**. **Channel policy:** the **primary channel is the owner-controlled Google
+Drive folder** (a **third-party provider**), designated, access-reviewed and
+privately rehearsed for the owner's own rehearsal; the **fallback is a local
+non-synced folder**, and the owner may keep data in a local non-synced folder
+instead of using the Drive channel. If the Drive folder is used, the **sync client —
+not the tool — transmits the files, and the provider can access, log, retain and
+back up them** (not only metadata). The tool itself makes no network call, and the
+synthetic tests above are engineering evidence only — not human-usability or
+readiness evidence.
 
 ## Quick start (synthetic data only)
 
