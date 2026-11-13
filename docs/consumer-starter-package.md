@@ -548,30 +548,42 @@ The table below groups actions by `S` label; **it is not the execution order**. 
 
 ### Technical questions and approvals in plain language
 
-When an Aegis-guided step is about to write to your project, the agent should ask you before it proceeds — in plain words, never as a bare technical yes/no. Every approval moment should say, in this order: (a) **what will change**, in your project and in user terms; (b) **what stays untouched**, especially your main project files and anything you did not ask to change; (c) **how to undo it, or say no**, including what happens to anything already prepared; and (d) **the safe default** — the answer that changes nothing, and what being unsure should mean. Ask **one question at a time**; never bundle several technical steps into a single yes/no. This subsection addresses the owner-reported observation **F-CX-UX-01** (a real owner session where one approval question stacked unexplained Git/GitHub terms); the observation is recorded in the programme record and is evidence only, not authority.
+Before asking your permission, explain in plain words (a) **what will change**, (b) **what stays untouched**, (c) **how to undo it or say no**, and (d) **the safe default** (usually **No**). Ask **one question at a time**, and ask a later question only if that step will actually happen. Do not use a Git term without a one-line plain explanation. If you are unsure how to explain a step, say so and ask. This subsection addresses the owner-reported observation **F-CX-UX-01** (a real owner session where one approval question stacked unexplained Git/GitHub terms); the observation is recorded in the programme record and is evidence only, not authority.
 
-**Approval 1 — prepare drafts locally.** Ask only this, then stop:
+**Question 1 — create drafts (asked before anything exists).** Ask only this, then stop:
 
-> I want to prepare your draft files in a separate line of work (a branch) in your project folder. Your main project files stay untouched, and I will not upload anything. If I record the drafts, I will record them in the branch's history (a commit); main is unchanged. If you say no, I delete the drafts and stop. OK to prepare the drafts?
+> I want to create draft files in a separate line of work (a branch) in your project folder. If you say yes, I will create them; if you say no, I will not create anything. Your main project files are untouched. OK?
 
-Answer options in your words: **"Yes, prepare the drafts."** / **"Not yet — explain more."** / **"No, delete them."** Safe default: **No**.
+Options in your words: **"Yes, create the drafts"** / **"Not yet — explain more"** / **"No"**. Safe default: **No**.
 
-**Cleanup rules for this approval.** Uncommitted drafts are **untracked files**; switching branches can carry them with you, so delete them first — or use a separate **worktree** (a second folder attached to the same repository) or a **clone** (an independent copy). Committed branch history stays on that branch and does not move to main by switching branches.
+**Question 2 — optionally record (commit) the drafts.** Ask only if the agent will record them:
 
-**Approval 2 — only if publishing (optional; ask separately, later).** Do not ask this in the same question as Approval 1:
+> I want to record the drafts in the branch's history (a commit) so they are saved in that line of work. If you say no, the drafts remain as uncommitted files. OK?
 
-> I want to upload the branch (push) and open a review page (a pull request) showing exactly what changes. Nothing in main changes until you press Merge. If you say no, nothing in main changes; you can keep the review page open or have me close it and delete the uploaded branch. OK to upload and open the review page?
+Options: **"Yes, record them"** / **"Not yet — explain more"** / **"No"**. Safe default: **No**.
 
-Answer options: **"Yes, publish it and show me the review page."** / **"Not yet — explain more."** / **"No, don't publish."** Safe default: **No**.
+**Question 3 — optionally upload (push) and open the review page (pull request).** Ask separately, and only if the agent will publish:
 
-**How to undo.** Before Merge: say no, delete the drafts, and close the review page (delete the uploaded branch only if you want it gone). After Merge: ask for a new change that reverses it; the review page and project history remain.
+> I want to upload the branch and open a review page showing exactly what changes. If you say no, nothing is uploaded. Nothing in main changes until you press Merge. OK?
+
+Options: **"Yes, publish it and show me the review page"** / **"Not yet — explain more"** / **"No"**. Safe default: **No**.
+
+**How to undo / clean up, by state:**
+
+1. **Drafts not yet created** — nothing to undo.
+2. **Drafts created but not staged** — delete the draft files.
+3. **Drafts staged** — unstage them first, then delete the draft files.
+4. **Drafts recorded on the branch (a commit)** — delete the branch; the recorded history stays on that branch and main is unchanged.
+5. **Uploaded / review page open** — close the review page. Deleting the uploaded branch is a **separate optional action**: the branch cannot be deleted while the review page stays open; if the review page is closed, ask whether to delete the uploaded branch.
+
+To remove a separate worktree (a second working folder attached to the same repository), use `git worktree remove <path>`. A branch is not a worktree: on its own it does not isolate untracked files in your working folder.
 
 **Plain words.** Each term is the technical name and what it means for you:
 
 | Term | What it means for you |
 | --- | --- |
 | Repository | The folder that holds your project together with its saved history. |
-| Branch | A separate line of work in that repository's history; on its own it does not isolate uncommitted or untracked files in your working folder. |
+| Branch | A separate line of work in that repository's history. |
 | Commit | A recorded snapshot of changes on a branch. |
 | Push | Uploading a branch's recorded changes to the remote copy of the repository. |
 | Pull request | The review page that shows the changes and asks for approval before they join main. |
@@ -579,13 +591,12 @@ Answer options: **"Yes, publish it and show me the review page."** / **"Not yet 
 | Main | The default version of your project that other work builds on. |
 | Clone | An independent copy of a repository. |
 | Untracked file | A file in your working folder that Git is not yet recording; switching branches can carry it with you. |
+| Staged file | A changed file that has been marked to be included in the next commit. |
 | Worktree | A second working folder attached to the same repository, so drafts in one folder do not sit beside your main working files. |
 
-**Saying it precisely.** Use **prepare** for creating drafts, **record** (or *commit*) for a saved snapshot, **upload** (or *push*) for sending it to the remote, and **Merge** for accepting it. Avoid an ambiguous "save it": say which of prepare / record / upload / Merge you mean. Do not hardcode how many files are involved — say "your draft files" (or name them).
+**Saying it precisely.** Use **prepare** (or *write*) for creating drafts, **record** (or *commit*) for saving a snapshot, **upload** (or *push*) for sending it to the remote, and **Merge** for accepting it into main. Avoid an ambiguous "save it": say which of prepare / record / upload / Merge you mean. Do not hardcode how many files are involved — say "your draft files" (or name them).
 
-**Agent self-check before asking.** Ask: "Would a non-technical person understand this without docs?" If not, rewrite it in outcomes — what changes, what stays untouched, how to undo or say no, and the safe default — then ask one question again.
-
-Mapping your answer to the technical actions is the **agent's** job, not yours. This subsection is documentation: it changes no package behaviour, adds no capability, and if an agent asks a bare technical yes/no, that is a defect to report rather than a question you must decode.
+**Agent self-check.** Ask: "Would a non-technical person understand this without docs?" If not, rewrite it in outcomes. Never ask a compound question (for example upload + review page together); ask them as separate questions only if each actually happens.
 ### The first useful task — CX-FT1 (described, not executed)
 
 Once installation is verified (CP6), the shared first useful task is a small **Stage 1 requirements brief with fictional inputs**.

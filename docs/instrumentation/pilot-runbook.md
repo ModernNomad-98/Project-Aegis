@@ -5,10 +5,13 @@
 > (`OWNER-DECISIONS/OWNER-USAGE-REPORTING-PILOT-ACTIVATION-2026-11-13.md`), the
 > owner is the first participant and the Lead is the local steward-operator;
 > capture, export, import and cohort arithmetic run for the owner only. Here
-> **owner-local** means **no external-participant intake, no hosted service and no
-> publication**; the reporter tool makes no network call. The owner's own workflow
-> data is exported only to the owner-controlled local/Google Drive folder
-> (provider sync and Google metadata apply); no external-participant data is involved.
+> **owner-local** means **only the owner's own workflow data — no
+> external-participant intake, no hosted service and no publication**; the reporter
+> tool makes no network call. The owner's export may sit in an owner-controlled
+> local folder **or** an owner-controlled provider-synced folder (for example
+> Google Drive); if it is synced, the provider's metadata and backups apply — choose
+> a non-synced local folder if that is not acceptable. No external-participant data
+> is involved.
 > The private **Google Drive** channel is designated, reviewed and rehearsed (the
 > owner's own export; a duplicate import; the file moved to processed) — but
 > **external participant intake remains closed** until the owner shares
@@ -31,22 +34,24 @@
 
 1. Confirm a written collection approval, a private transport channel and a
    named steward. Email, public issues and pull-request comments are not intake.
-   *Local pilot: satisfied in the recorded owner activation + designated Google
-   Drive channel. External intake: pending the owner's per-participant
-   subfolders + consent supplement.*
+   *Local pilot: **owner-only** — the owner activation and the designated Google
+   Drive channel are recorded. External participation: **closed**, pending the
+   owner's channel/consent steps.*
 2. Complete the privacy and security review of the channel's logs, backups,
    access paths and unavoidable metadata. If the channel cannot meet the agreed
-   scope, stay local-only. *Local pilot: satisfied in local-only form — the
-   channel is designated/reviewed/rehearsed for the owner's own rehearsal.
-   External participants: pending the owner's per-participant sharing.*
+   scope, stay local-only. *Local pilot: **owner-only** — the channel is
+   designated/reviewed/rehearsed for the owner's own rehearsal. External
+   participation: **closed**, pending the owner's channel review.*
 3. Prepare the consent text from [privacy-and-consent.md](privacy-and-consent.md):
    purpose, fields, recipient, retention, optional skill plane, withdrawal,
    deletion limits, missing-data limits and no public metrics. *Local pilot:
-   satisfied — the consent text is prepared and the owner is the only
-   participant. External intake: pending the owner's consent supplement.*
+   **owner-only** — the consent text is prepared and the owner is the only
+   participant. External participation: **closed**, pending the owner's consent
+   supplement.*
 4. Set the participant's local store outside project version control with
-   user-only access. *Local pilot: satisfied for the owner's own local store.
-   External participants: pending.* The tool enforces this where the platform allows it:
+   user-only access. *Local pilot: **owner-only** — the owner's own local store
+   sits outside version control with user-only access. External participants:
+   **not admitted**.* The tool enforces this where the platform allows it:
    stores, exports and the directories it creates are `0600`/`0700` on POSIX
    whatever the umask, and a path inside a Git working tree or the tool source
    tree is refused. On Windows the tool cannot set POSIX bits: it clears the

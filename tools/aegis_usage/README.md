@@ -17,10 +17,12 @@ and the preview SHA-256 is confirmed.
 **Status (2026-11-13): implemented and synthetic-tested; owner-local pilot (no external intake) active.**
 Under the owner's recorded activation the owner is the first participant and the
 Lead is the local steward-operator; the private **Google Drive** channel is
-designated, reviewed and rehearsed. **Owner-local** means no external-participant
-intake, no hosted service and no publication; the tool makes no network call, and
-the owner's own workflow data is exported only to the owner-controlled
-local/Google Drive folder (provider sync and Google metadata apply). **External participant intake is closed**
+designated, reviewed and rehearsed. **Owner-local** means **only the owner's own workflow data** — no
+external-participant intake, no hosted service and no publication; the tool makes
+no network call, and the owner's export may sit in an owner-controlled local folder
+**or** an owner-controlled provider-synced folder (for example Google Drive) — if it
+is synced, the provider's metadata and backups apply; choose a non-synced local
+folder if that is not acceptable. **External participant intake is closed**
 until the owner shares per-participant subfolders and a consent supplement; **no
 external-participant data exists**, and publication is **not authorised**. The
 synthetic tests above are engineering evidence only — not human-usability or
