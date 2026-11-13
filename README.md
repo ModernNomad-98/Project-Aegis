@@ -37,10 +37,10 @@ The library does not itself build, deploy or operate an application.
 
 Both doors use the same [starter package](docs/consumer-starter-package.md), the same documented install procedure, the same verification steps and the same authorization rules; they differ only in how much explanation they add before the first command. If you are unsure which door you are, use the second one.
 
-- **Route A — you are comfortable with Git and a terminal, and you are new to Aegis.** Read the starter package's [guided route (Route B)](docs/consumer-starter-package.md#the-guided-route-route-b) once to see the shared steps, then follow the same S1–S9 actions with the page's [install procedure](docs/consumer-starter-package.md#7-the-install-procedure). Expect the exact output and exit codes it lists; there is no second procedure.
-- **Route B — you are new to Git, terminals and Aegis.** Start at the starter package's [guided route (Route B)](docs/consumer-starter-package.md#the-guided-route-route-b), which explains the concepts first, says where each action runs, gives the expected output per step and marks safe stopping points (CP1–CP9) before the same S1–S9 actions. You may stop at a checkpoint and resume there later; do not stop in the middle of a step.
+- **Route A — you are comfortable with Git and a terminal, and you are new to Aegis.** Follow the starter package's [install procedure](docs/consumer-starter-package.md#7-the-install-procedure) — section 7, steps P0 to P9 in that order — and use the [guided walkthrough](docs/consumer-starter-package.md#the-guided-walkthrough) for the shared checkpoints (CP1–CP9) and the first useful task. Expect the exact output and exit codes section 7 lists; there is no second procedure.
+- **Route B — you are new to Git, terminals and Aegis.** Start at the starter package's [guided walkthrough](docs/consumer-starter-package.md#the-guided-walkthrough), which explains the concepts first, says where each action runs, gives the expected output per step and marks safe stopping points (CP1–CP9) before the same actions. You may stop at a checkpoint and resume there later; do not stop in the middle of a step.
 
-The first useful task both doors share is a small, fictional local requirements brief (Stage 1 only). It is described in the guided route, is not executed by this page and does not complete J1 or claim readiness. The [consumer readiness guide](docs/consumer-readiness/consumer-guide-v1.md) is a DRAFT / EVIDENCE-ONLY page that explains the evidence and limits; it is not an installation instruction.
+The first useful task both doors share is a small, fictional local requirements brief (Stage 1 only). It is described in the guided walkthrough, is not executed by this page and does not complete J1 or claim readiness. The [consumer readiness guide](docs/consumer-readiness/consumer-guide-v1.md) is a DRAFT / EVIDENCE-ONLY page that explains the evidence and limits; it is not an installation instruction.
 
 For an optional setup conversation, explicitly say **"Help me set up Aegis"**
 or **"Help me change my Aegis setup"** and invoke the manual-only
@@ -49,7 +49,9 @@ a local helper, an online helper, and help choosing. Only Aegis-only selection
 can currently be completed and remembered, on tested single-user Windows
 PowerShell. Local and online helpers remain unavailable; no provider is
 connected and no token saving is measured. Ordinary project work still starts
-with `project-orchestrator`.
+with `project-orchestrator`. `aegis-setup` is MANUAL-ONLY and is **not** installed by the starter package: it is an optional setup conversation, not an installation route, and a completed starter install does not include it.
+
+**Optional, off by default: local workflow-outcomes reporting.** The opt-in, offline reporter in [the instrumentation directory](docs/instrumentation/README.md) lets a participant record locally whether a workflow reaches delivery, using allowlisted enums and day-precision dates only — no prompts, output, code, file or repository names, URLs or identities, and no network. It is **off by default**; nothing is recorded unless a workflow is explicitly opted in. A **local-only pilot** is currently active with the owner as first participant. **External reporting is not yet available** — it needs the owner-designated private channel plus its privacy and security review — and this pointer makes no adoption, readiness or human-evidence claim.
 
 ## What is included
 

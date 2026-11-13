@@ -5,10 +5,7 @@ reporter** for Project Aegis. It exists so that maintainers can learn whether
 observed, consenting workflows reach delivery, without inspecting anyone's
 project, prompts, output or code.
 
-**Status: offline implementation and synthetic tests only.** No real data has
-been collected, no workflow has been enrolled, no export of real data has been
-made, and no pilot has been authorised. Writing a runbook here is documentation,
-not permission to launch anything.
+**Status: implementation merged; local-only pilot ACTIVE (2026-11-13).** The opt-in, offline reporter is implemented under `tools/aegis_usage/` and its synthetic test suite passes locally (engineering evidence only). A **local-only pilot** is active: the owner is the first participant and the Lead (a DeepSeek Harness agent, configured route deepseek-flash; serving model not observable) acts as the local steward-operator for local capture, export, import and cohort arithmetic only. There is **no external intake, no hosting, no publication, no external transfer and no real external-participant data**: the external channel is not designated, so external reporting is **not yet available** and each further step (external channel, hosting, publication) remains a separate owner decision with its own privacy and security review. The pilot writes only to user-local directories outside any checkout (`%LOCALAPPDATA%\AegisUsagePilot\`); the tool imports no networking module and makes no network call. The sections below describe the default-off, opt-in contract and the authority boundary that still govern any next step.
 
 ## Default off, opt in per workflow
 
@@ -95,13 +92,10 @@ outside this contract and must be disclosed before any real transfer.
 - [metrics.md](metrics.md) — cohort, horizon, denominators, suppression.
 - [workflow-outcomes-v1.schema.json](workflow-outcomes-v1.schema.json) — the
   strict versioned contract.
-- [pilot-runbook.md](pilot-runbook.md) — documentation-only operating procedure.
+- [pilot-runbook.md](pilot-runbook.md) — operating procedure for the local pilot (retention, withdrawal, stop conditions).
 - [tools/aegis_usage/README.md](../../tools/aegis_usage/README.md) — CLI usage
   with synthetic examples.
 
 ## Authority boundary
 
-Implementing or testing this reporter does not authorise real collection,
-enrolment, hosting, a pilot, exports of real data, host hooks, scheduled GitHub
-acquisition, paid services or deployment. Each of those remains a separate owner
-decision with its own privacy and security review.
+The owner's activation authorises only the **local-only pilot** described above: local opt-in capture, export, import and cohort arithmetic for the owner's own workflows, with no network, external transfer, hosting or publication. It does not authorise external participant intake, real data beyond that local pilot, host hooks, scheduled GitHub acquisition, paid services or deployment; each further step — including the owner-designated private external channel, hosting and any publication — remains a separate owner decision with its own privacy and security review.
