@@ -51,7 +51,7 @@ PowerShell. Local and online helpers remain unavailable; no provider is
 connected and no token saving is measured. Ordinary project work still starts
 with `project-orchestrator`. `aegis-setup` is MANUAL-ONLY and is **not** installed by the starter package: it is an optional setup conversation, not an installation route, and a completed starter install does not include it.
 
-**Optional, off by default: local workflow-outcomes reporting.** The opt-in, offline reporter in [the instrumentation directory](docs/instrumentation/README.md) lets a participant record locally whether a workflow reaches delivery, using allowlisted enums and day-precision dates only — no prompts, output, code, file or repository names, URLs or identities, and no network. It is **off by default**; nothing is recorded unless a workflow is explicitly opted in. A **local-only pilot** is currently active with the owner as first participant. **External reporting is not yet available** — the private channel is designated and reviewed, but the owner must share per-participant subfolders and a consent supplement first — and this pointer makes no adoption, readiness or human-evidence claim.
+**Optional, off by default: local workflow-outcomes reporting.** The opt-in, offline reporter in [the instrumentation directory](docs/instrumentation/README.md) lets a participant record locally whether a workflow reaches delivery, using allowlisted enums and day-precision dates only — no prompts, output, code, file or repository names, URLs or identities, and no network. It is **off by default**; nothing is recorded unless a workflow is explicitly opted in. An **owner-local pilot** is active with the owner as first participant: **no external-participant intake, no hosted service and no publication** are authorised, and **external reporting is not yet available**. The private channel is the owner's own **Google Drive** folder, used only for the owner's own rehearsal; if the folder is provider-synced (as Google Drive is), the provider can access, log, retain and back up the files themselves (not only metadata). The reporter tool makes no network call, and this pointer makes no adoption, readiness or human-evidence claim and claims no copyable template or answer options.
 
 ## What is included
 
@@ -695,14 +695,15 @@ figures are authorised.
 
 The contract, privacy rules and metric definitions are in
 [`docs/instrumentation/`](docs/instrumentation/README.md); the tool's usage is in
-[`tools/aegis_usage/README.md`](tools/aegis_usage/README.md). A **local-only pilot
-is authorised by the owner's activation** (owner as first participant, Lead as
-local steward-operator). This documentation is **not itself an authorisation**
-for external participant intake, hosting or publication: the private external
-channel is designated and reviewed, but external intake remains closed until the
-owner shares per-participant subfolders and a consent supplement, no external-participant
-data exists, and hosting or publication of aggregates remains a separate owner
-decision.
+[`tools/aegis_usage/README.md`](tools/aegis_usage/README.md). An **owner-local pilot**
+is active with the owner as first participant and the Lead as local
+steward-operator; its Google Drive channel is designated, access-reviewed and
+privately rehearsed for the owner's own rehearsal. This documentation is **not
+itself an authorisation** for external participant intake, hosting or
+publication: the private external channel is designated and access-reviewed, but
+external participation remains closed pending the owner's per-participant
+sharing + consent steps, no external-participant data exists, and hosting or
+publication of aggregates remains a separate owner decision.
 
 #### Using Aegis with Codex CLI and other Agent Skills tools
 

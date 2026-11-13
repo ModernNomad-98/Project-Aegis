@@ -1,9 +1,17 @@
 # Pilot runbook (documentation only)
 
-> **This is not an authorisation.** No pilot, enrolment of real workflows,
-> export of real data, hosting or deployment is approved by this page. It
-> describes the private procedure that a separately approved pilot would follow.
-> Implementing the tool and passing synthetic tests is not permission to launch.
+> **Current status (2026-11-13): the authorised pilot is owner-local only.**
+> Under the owner's recorded activation the owner is the first participant and the
+> Lead is the local steward-operator; capture, export, import and cohort arithmetic
+> run for the owner only. The private **Google Drive** channel is designated,
+> access-reviewed and privately rehearsed for the owner's own rehearsal;
+> **external participant participation remains closed** pending the owner's
+> per-participant sharing + consent steps, and no external-participant data exists.
+> **This page is not itself an authorisation** for external intake, hosting or
+> publication; each remains a separate owner decision with its own review.
+> **Channel-failure fallback:** stay **local non-synced** (do not use a
+> provider-synced folder) and do not admit external participants. Synthetic tests
+> are engineering evidence, not permission to launch.
 
 ## Roles
 
@@ -20,7 +28,8 @@
    named steward. Email, public issues and pull-request comments are not intake.
 2. Complete the privacy and security review of the channel's logs, backups,
    access paths and unavoidable metadata. If the channel cannot meet the agreed
-   scope, stay local-only.
+   scope, stay local non-synced (do not use a provider-synced folder) and admit
+   no external participants.
 3. Prepare the consent text from [privacy-and-consent.md](privacy-and-consent.md):
    purpose, fields, recipient, retention, optional skill plane, withdrawal,
    deletion limits, missing-data limits and no public metrics.
@@ -132,5 +141,5 @@ A pilot may graduate only on measurement reliability — every synthetic
 contract, privacy, metric and lifecycle test passing, no unexpected
 transmission, every received start reconciled, duplicates and deletion drills
 handled, unknowns reported honestly and steward workload inside the approved
-budget. Low export volume means extend or stay local-only; it never means
-inferring success.
+budget. Low export volume means extend or stay owner-local (no external intake);
+it never means inferring success.

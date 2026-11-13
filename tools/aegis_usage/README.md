@@ -5,7 +5,7 @@ Two stdlib-only Python 3.14 programs that implement the contract in
 
 | File | Role |
 | --- | --- |
-| [`local_report.py`](local_report.py) | Participant side: per-workflow opt-in, bounded transition history, exact preview, local-only export. |
+| [`local_report.py`](local_report.py) | Participant side: per-workflow opt-in, bounded transition history, exact preview, local export (the tool never uploads). |
 | [`aggregate.py`](aggregate.py) | Steward side: manual admissions, import with revision invariants, 90-day retention, deletion, cohort arithmetic and suppression. |
 | [`tests/`](tests) | 205 behavioral tests, including mutant demonstrations, over synthetic fixtures only. |
 
@@ -13,6 +13,17 @@ Two stdlib-only Python 3.14 programs that implement the contract in
 off until a workflow is explicitly opted in. There is no background upload and
 no reconnect retry: an export happens only after the exact bytes are previewed
 and the preview SHA-256 is confirmed.
+
+**Status (2026-11-13): implemented and synthetic-tested; owner-local pilot active**
+(owner participant, Lead local steward-operator). The private **Google Drive**
+channel is designated, access-reviewed and privately rehearsed for the owner's own
+rehearsal; the **external-participant inbox is closed**, **no external-participant
+data exists**, and publication is **not authorised**. There is **no Aegis-hosted
+service**. Storage: the owner chooses an owner-controlled Google Drive folder
+(provider-synced) **or** a local non-synced folder; if the folder is synced, the
+provider can access, log, retain and back up the files themselves (not only
+metadata). The tool makes no network call, and the synthetic tests above are
+engineering evidence only — not human-usability or readiness evidence.
 
 ## Quick start (synthetic data only)
 
