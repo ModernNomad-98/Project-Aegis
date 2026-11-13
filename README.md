@@ -35,7 +35,7 @@ The library does not itself build, deploy or operate an application.
 
 ### Two ways to start — same route, same checks
 
-Both doors use the same [starter package](docs/consumer-starter-package.md), the same installer, the same verification steps and the same authorization rules; they differ only in how much explanation they add before the first command. If you are unsure which door you are, use the second one.
+Both doors use the same [starter package](docs/consumer-starter-package.md), the same documented install procedure, the same verification steps and the same authorization rules; they differ only in how much explanation they add before the first command. If you are unsure which door you are, use the second one.
 
 - **Route A — you are comfortable with Git and a terminal, and you are new to Aegis.** Read the starter package's [guided route (Route B)](docs/consumer-starter-package.md#the-guided-route-route-b) once to see the shared steps, then follow the same S1–S9 actions with the page's [install procedure](docs/consumer-starter-package.md#7-the-install-procedure). Expect the exact output and exit codes it lists; there is no second procedure.
 - **Route B — you are new to Git, terminals and Aegis.** Start at the starter package's [guided route (Route B)](docs/consumer-starter-package.md#the-guided-route-route-b), which explains the concepts first, says where each action runs, gives the expected output per step and marks safe stopping points (CP1–CP9) before the same S1–S9 actions. You may stop at a checkpoint and resume there later; do not stop in the middle of a step.
