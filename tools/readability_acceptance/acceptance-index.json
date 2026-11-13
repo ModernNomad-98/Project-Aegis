@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "be688dbccf359c99acf7561d4846b30f949bb8ba",
-  "table_rows": 306,
+  "built_at_ref": "617a95d637cd6405e25403599a5fbbcf82f54ed6",
+  "table_rows": 307,
   "events": [
     {
       "stable_id": "K-001",
@@ -3370,6 +3370,17 @@
       "reviewer": "batch21-page-reviewer",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-21-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-460",
+      "path": "docs/consumer-readiness/consumer-guide-v1.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "9b5085469b887f76059ddd92b07b88bec65ebbbc",
+      "blob_id": "486e7d149ac28ac3ffe67a316515bbb76c9b020b",
+      "quote": "**Status: DRAFT / EVIDENCE-ONLY / NOT DELIVERED / NO SUPPORTED PROFILE CLAIMED.** This guide is a prepared consumer-readiness artifact for review.",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-22-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -4206,11 +4217,11 @@
     {
       "path": "docs/consumer-readiness/consumer-guide-v1.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "e257eea5685e9071e163119676340a9d2f9ce4d5",
-      "blob_id": "26b9a2e9b9b7db60e6395498419277facc9d2af7",
-      "reviewer": "evidence-lineage-steward",
-      "evidence_source": "docs/evidence/documentation/readability-operational-batch-2-2026-11-12.md",
-      "date": "2026-11-12",
+      "last_acceptance_sha": "9b5085469b887f76059ddd92b07b88bec65ebbbc",
+      "blob_id": "486e7d149ac28ac3ffe67a316515bbb76c9b020b",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-22-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
