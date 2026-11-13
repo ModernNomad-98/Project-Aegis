@@ -139,3 +139,19 @@ None of these limitations is waived by this guide, by a label, or by a successfu
 ## 10. Non-claims
 
 This draft is not a supported-product claim, delivery, publication, release, installation instruction, certification, conformance statement, enforcement claim or readiness statement. It does not accept any design, close any item, approve any action or grant any authority. It does not describe a working consumer setup; it describes the evidence and limitations that a future, reviewed guide must respect.
+
+---
+
+## 11. Starting routes, checkpoints and the first useful task (documentation pointers)
+
+This section is a pointer for a beginner, not a second procedure and not an installation instruction. It does not change this page's status above — DRAFT / EVIDENCE-ONLY / NOT DELIVERED / NO SUPPORTED PROFILE CLAIMED — and the audience/metadata decision remains owner-held.
+
+**Two routes, one implementation.** The [README Start here](../../README.md#start-here) offers two doors for two audiences — Route A for people comfortable with Git and a terminal, Route B for people new to Git, terminals and Aegis — and both converge on the same [consumer starter package](../consumer-starter-package.md) and its [guided route (Route B)](../consumer-starter-package.md#the-guided-route-route-b): the same 41-file package, the same installer, the same verification and the same authorization rules. The routes differ only in explanation depth.
+
+**Plain-language primers.** If you are new to the terms, the guided route explains folder vs repository; source (the Aegis library, Role A) vs product (your repository, Role B); where to open PowerShell 7 and where each action runs; what a pin, an aggregate and an exit code are; and what installation success and failure look like. Read it before the first command.
+
+**Safe stopping points.** The guided route names checkpoints CP1–CP9: after the role probe, after prerequisites and the owner record, after the pinned clone, after the install-mode gate, after install and verification, after success identification, after the first task, after fresh-chat resumption, and after a refusal/recovery. Stopping at a checkpoint is safe and resumable; stopping in the middle of a step is not. The install procedure's exact refusals are in its section 7.2.
+
+**The first useful task.** Both routes share one first useful task: a small Stage 1 requirements brief with fictional inputs ("Maple Street Tool Share"), producing only `docs/requirements.md` and `docs/project-state.md`. It is described in the guided route and is not executed by this page; its execution and the human-usability evidence are UNRUN at this head. It does not complete J1, does not establish consumer readiness and does not convert any UNRUN label.
+
+**Where this guide fits.** The starter package is the how-to; this guide is the evidence-and-limits explanation; the [compatibility matrix](compatibility-matrix-v1.md) is the prerequisites/status reference and the [support claims](support-claims-v1.md) are the claims/evidence index. Where they differ, the contract of record and the [delivery workflow](../delivery-workflow.md) govern (section 6 above).

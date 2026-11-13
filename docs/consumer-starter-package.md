@@ -468,6 +468,70 @@ applicable, or is blocked by host policy is stated as UNRUN with the exact remai
 never converted to a pass. The same fail-closed vocabulary applies to the governance states in
 [consumer-status-presentation-v1.md](consumer-status-presentation-v1.md).
 
+## The guided route (Route B)
+
+**Who this is for.** This section is the guided path for a reader who is new to Git, terminals and Aegis. It changes nothing about the package: it is the same 41-file package, the same [install procedure](#7-the-install-procedure), the same verification and the same authorization rules as the shared steps in [the README's Start here](../README.md#start-here). The only difference is explanation depth — plain-language primers, where each action runs, the expected observable output, and safe stopping points (CP1–CP9). If this section ever tells you to run a different command or check, treat that as a documentation defect, not a second procedure.
+
+### Primers before the first command
+
+**A folder vs a repository.** A folder is a place on your computer. A Git repository is a folder with history: it records snapshots of its files so you can see what changed and go back. Cloning copies a repository to your computer; a commit is one recorded snapshot; a pin is an exact commit.
+
+**The source vs your product.** The *Project Aegis source repository* (Role A) is the maintainers' library. Your *product repository* (Role B) is where your own project lives; installation copies the fixed starter package INTO it. Installing into the source repository is refused (exit 40). Copying skills does not turn your product into the source library.
+
+**Where to open the terminal.** Open Windows Terminal and choose PowerShell 7 (or run `pwsh`). You are in PowerShell 7 when the prompt starts with `PS` and `$PSVersionTable.PSVersion` shows 7.x. Copy one command block at a time. `cd` changes the current folder; the prompt shows where you are. Keep any path containing spaces in single quotes.
+
+**Where each action runs.** Reading this page: your app or browser. The clone and install commands: a PowerShell 7 window on your computer. Product work (the first useful task): a new DeepSeek Harness session opened on your product repository folder.
+
+**Expected output and safe stops.** Every step below names the observable line(s) that mean success. A `CPn` marker is a safe stopping point: you may stop there and resume at that step later. Stopping in the middle of a command is not safe — let it finish, or read the refusal message and follow its next action.
+
+**What success looks like.** Success is the P8/P9 output plus the install record plus the first-task files. It is not "no red text". It is also not a support promise: neither this page nor the evidence behind it establishes consumer readiness or human usability (both are UNRUN at this head).
+
+### Where each shared step runs, what you should see, and where it is safe to stop
+
+| Shared step | Where it runs | Documented action (reference; no new command) | Expected observable output | Safe stop |
+| --- | --- | --- | --- | --- |
+| S0 Canonical start | Your app or browser | Read the [README Start here](../README.md#start-here) and choose Route A or Route B; both doors run the same steps below | You can say which route you are taking and distinguish source from product | none |
+| S1 Workspace and role | PowerShell 7, in your product repository folder | The P1 role probe: confirm the folder is your product repository (0 of 4 Aegis source landmarks) | Role B classification with count 0; nothing written | CP1 |
+| S2 Prerequisites and owner record | PowerShell 7 | Section 6 prerequisites; P0 host record; set `git config --local aegis.ownerName` / `aegis.ownerEmail` (your own values, never committed) | Version lines and `ok` from the shell probe; the two local keys set (values not printed) | CP2 |
+| S3 Clone the pinned source | PowerShell 7 | P3: clone and check out the pinned commit as documented there, then verify HEAD, tree and clean status | HEAD = `ffb040c7a363648856475280646bbd142dfabe4e`; tree = `88a5aee4ad928a49c2fb945032585843ec652da7`; empty status | CP3 |
+| S4 Install-mode gate | PowerShell 7 | P2: save the published P2 block as `install-mode.ps1`; it validates your explicit `-Mode` and `-OwnerAuthorization` and the identity records | Exit 0 with the gate's acceptance line; nothing written | CP4 |
+| S5 Install and verify | PowerShell 7 | P5–P9 / section 7.1: save the published harness as `install-starter.ps1` and run the documented invocation | Five `P8:` lines (`count_check=PASS installed=41 extra=0`, `manifest_pins=PASS 18/18`, `source_pins=PASS 23/23`, `siblings=PASS absent=0`, `forbidden=PASS none`), then the `P9: rows=41 serialized_bytes=5420 aggregate=fcff1124…b699 (matches the published value)` line, exit 0, and the install record written | CP5 |
+| S6 Identify success | PowerShell 7 | Read the exit code, the five P8 lines, the P9 line and the record path; compare the aggregate with the published value | Record at `docs/consumer-install-record.md` with `rows=41`, `serialized_bytes=5420`, aggregate `fcff1124d9d15e7d7230fd317350e0eb3b097b453bb6b911cdc1e2485525b699`; no unexpected files | CP6 |
+| S7 First useful task (CX-FT1) | A new DeepSeek Harness session opened on your product folder | Stage 1 requirements brief only (see below) | `docs/requirements.md` and `docs/project-state.md` with the required sections; no code, commit or push | CP7 |
+| S8 Fresh-chat resumption | A new DeepSeek Harness chat on the same product folder | Start a fresh chat: "Where am I? Read `docs/project-state.md` and continue." | The agent states the latest STATE SNAPSHOT and the next action without restarting; files unchanged | CP8 |
+| S9 Refusal and recovery | PowerShell 7 and/or the product session | Map the exact refusal to section 7.2; use its permitted next action; record what happened; resume at the failed step | A recorded refusal with its exact code and message plus the next action | CP9 |
+
+**Safe stopping points.** CP1–CP9 are the same safe stops as the shared steps above:
+
+| CP | After | Safe to stop? | What is guaranteed | How to resume |
+| --- | --- | --- | --- | --- |
+| CP1 | S1 | Yes | Nothing written; the folder is identified as Role B | Re-open it and continue at S2 |
+| CP2 | S2 | Yes | Nothing written into the product; tools verified | Repeat the version checks and continue at S3 |
+| CP3 | S3 | Yes | A separate read-only pinned source clone exists; product untouched | Use the same clone or clone again at the same pin |
+| CP4 | S4 | Yes | Nothing copied; mode, authorization and identity records validated | Re-run the gate; do not switch mode without re-authorization |
+| CP5 | S5 | Yes | 41 files plus the install record written and verified | Re-run with `-AllowExistingRecord` only for an identical install |
+| CP6 | S6 | Yes | CP5 plus the receipt has been read and the aggregate matches | Continue at S7 |
+| CP7 | S7 | Yes | `docs/requirements.md` and `docs/project-state.md` exist; no out-of-scope output | Continue at S8 |
+| CP8 | S8 | Yes | The latest STATE SNAPSHOT was read and a next action stated | Continue product work or stop for the day |
+| CP9 | S9 | Yes | The refusal is recorded and the product state matches the refusing step's message | Resume at the failed step with its recorded next action |
+
+### Installation, optional `aegis-setup`, and starting product work are three different things
+
+1. **Installation** is this page's P0–P9 procedure. It writes the 41 package files plus the install record, and its success is the observable output above.
+2. **Optional `aegis-setup` preference selection** is different. `aegis-setup` is a **MANUAL-ONLY** skill: this starter package does **not** install it (section 4.1), and a human must name it explicitly to use it. It exists to discuss Aegis setup preferences (the options the README describes under "Help me set up Aegis"); it is not an installer, it does not verify or repair an install, and J1 does not require it. A run that does not use it is complete.
+3. **Starting product work** means opening a new DeepSeek Harness session on your product repository folder and running the first useful task below. It is not a fourth installation step.
+
+### The first useful task — CX-FT1 (described, not executed)
+
+Once installation is verified, the shared first useful task is a small **Stage 1 requirements brief with fictional inputs**, run inside your product repository:
+
+- **Scenario:** "Maple Street Tool Share", a fictional neighbourhood tool-lending group that records loans in a paper notebook; a fictional volunteer coordinator answers. Every answer is a FICTIONAL EXERCISE INPUT, declared as such in the output — not a real person, not a real quote, no personal data.
+- **Task:** run Stage 1 only, one plain-language question per turn, and write **only** `docs/requirements.md` and `docs/project-state.md`. No code, tests, UI, spec, plan, commit, push, network or provider call.
+- **Expected end state:** `docs/requirements.md` carries the fictional-input declaration, the interview record, REQ-* facts, AS-* assumptions, out-of-scope and open questions; `docs/project-state.md` carries a Stage 1 STATE SNAPSHOT with a next action; the install remains intact and no package file is edited.
+- **Exclusions and limits:** no J1 completion, acceptance, consumer readiness, support or delivery claim follows from this task. Execution is **UNRUN** at this head — this page describes it; it is not evidence that anyone ran it, and human usability remains UNRUN.
+
+**Route B limits.** This section adds no command, no installer verb and no capability. It does not make macOS or Linux validated, does not claim the host agent auto-discovers repository skills, and does not replace section 7 as the normative procedure. If the two ever disagree, section 7 governs and the disagreement is a documentation defect.
+
 ## 7. The install procedure
 
 `$TGT` below is your product repository and `$SRC` is the pinned clone from P3.
