@@ -697,9 +697,10 @@ figures are authorised.
 
 The contract, privacy rules and metric definitions are in
 [`docs/instrumentation/`](docs/instrumentation/README.md); the tool's usage is in
-[`tools/aegis_usage/README.md`](tools/aegis_usage/README.md). A **local-only pilot
-is authorised by the owner's activation** (owner as first participant, Lead as
-local steward-operator). This documentation is **not itself an authorisation**
+[`tools/aegis_usage/README.md`](tools/aegis_usage/README.md). An **owner-local pilot (no external intake)**
+is active under the owner's activation (owner as first participant, Lead as
+local steward-operator); its definition and provider-sync caveat are in the
+reporting section above. This documentation is **not itself an authorisation**
 for external participant intake, hosting or publication: the private external
 channel is designated and reviewed, but external intake remains closed until the
 owner shares per-participant subfolders and a consent supplement, no external-participant
