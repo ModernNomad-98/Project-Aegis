@@ -548,52 +548,44 @@ The table below groups actions by `S` label; **it is not the execution order**. 
 
 ### Technical questions and approvals in plain language
 
-When an Aegis-guided step is about to write to your project, the agent should ask you before it proceeds — and it must ask in plain words, never as a bare technical yes/no. This subsection addresses the owner-reported observation **F-CX-UX-01** (a real owner session where the approval question stacked unexplained Git/GitHub terms); the observation is recorded in the programme record and is evidence only, not authority.
+When an Aegis-guided step is about to write to your project, the agent should ask you before it proceeds — in plain words, never as a bare technical yes/no. Every approval moment should say, in this order: (a) **what will change**, in your project and in user terms; (b) **what stays untouched**, especially your main project files and anything you did not ask to change; (c) **how to undo it, or say no**, including what happens to anything already prepared; and (d) **the safe default** — the answer that changes nothing, and what being unsure should mean. Ask **one question at a time**; never bundle several technical steps into a single yes/no. This subsection addresses the owner-reported observation **F-CX-UX-01** (a real owner session where one approval question stacked unexplained Git/GitHub terms); the observation is recorded in the programme record and is evidence only, not authority.
 
-**The rule — explain before asking.** Every approval question must give you four things:
+**Approval 1 — prepare drafts locally.** Ask only this, then stop:
 
-1. **What will change** — in your project, in user terms, and how many files.
-2. **What stays untouched** — especially your main files and anything you did not ask to change.
-3. **How to undo it, or say no** — what "no" means and how to remove what was made.
-4. **The safe default** — what happens if you do nothing, and which answer is reversible.
+> I want to prepare your draft files in a separate line of work (a branch) in your project folder. Your main project files stay untouched, and I will not upload anything. If I record the drafts, I will record them in the branch's history (a commit); main is unchanged. If you say no, I delete the drafts and stop. OK to prepare the drafts?
 
-**Copyable approval template (agent-facing).** Use words a non-technical person can answer:
+Answer options in your words: **"Yes, prepare the drafts."** / **"Not yet — explain more."** / **"No, delete them."** Safe default: **No**.
 
-> I have finished two small files. They are **drafts in a separate line of work** (called a *branch*) on your computer; your **main** files are unchanged. A branch is a separate line of work in the same folder — by itself it does **not** isolate uncommitted or untracked draft files from your main working folder, so when true isolation matters I will use a **separate worktree or clone**, and I will remove the drafts before switching back.
->
-> **Local-only variant (nothing uploaded):** I can keep the work only on this computer — nothing is uploaded and no review page is created. On "no", I will delete the two drafts and the branch, and your main project stays unchanged.
->
-> **Pushed / review-page variant:** I would upload the branch and open a **review page** (a *pull request*) where you can see the drafts. Nothing in your main project changes until you press **Merge**. On "no", I will close the review page, delete the uploaded branch and delete the drafts — or leave the review page open if you prefer, to close it later — and your main project stays unchanged.
->
-> **How to undo:** before Merge, "no" undoes the whole step as described above; after Merge, ask me to prepare a new change that reverses it (the review page and project history remain). OK to continue with the local-only / pushed variant?
+**Cleanup rules for this approval.** Uncommitted drafts are **untracked files**; switching branches can carry them with you, so delete them first — or use a separate **worktree** (a second folder attached to the same repository) or a **clone** (an independent copy). Committed branch history stays on that branch and does not move to main by switching branches.
 
-If the agent cannot state those four things in that shape, it should not ask for approval yet — it should explain first or stop.
+**Approval 2 — only if publishing (optional; ask separately, later).** Do not ask this in the same question as Approval 1:
 
-**Plain words.** Each term below is the technical name and what it means for you:
+> I want to upload the branch (push) and open a review page (a pull request) showing exactly what changes. Nothing in main changes until you press Merge. If you say no, nothing in main changes; you can keep the review page open or have me close it and delete the uploaded branch. OK to upload and open the review page?
+
+Answer options: **"Yes, publish it and show me the review page."** / **"Not yet — explain more."** / **"No, don't publish."** Safe default: **No**.
+
+**How to undo.** Before Merge: say no, delete the drafts, and close the review page (delete the uploaded branch only if you want it gone). After Merge: ask for a new change that reverses it; the review page and project history remain.
+
+**Plain words.** Each term is the technical name and what it means for you:
 
 | Term | What it means for you |
 | --- | --- |
 | Repository | The folder that holds your project together with its saved history. |
-| Branch | A separate line of work in your project's history. It lets changes be developed without changing your main files, but on its own it does **not** isolate uncommitted or untracked files in your working folder. |
-| Commit | One saved snapshot of changes. |
-| Push | Sending your saved snapshots to the remote copy of the repository so they can be reviewed. |
-| Pull request | The review page that shows the changes and asks for approval before they join the main project. |
-| Merge | Accepting the reviewed changes into the main version of the project. |
+| Branch | A separate line of work in that repository's history; on its own it does not isolate uncommitted or untracked files in your working folder. |
+| Commit | A recorded snapshot of changes on a branch. |
+| Push | Uploading a branch's recorded changes to the remote copy of the repository. |
+| Pull request | The review page that shows the changes and asks for approval before they join main. |
+| Merge | Accepting the reviewed changes into main. |
 | Main | The default version of your project that other work builds on. |
-| Clone | Making your own copy of a repository from the remote version. |
-| Untracked file | A file in your working folder that Git is not yet recording. Switching branches can carry untracked files with you; a separate worktree or clone keeps them apart. |
+| Clone | An independent copy of a repository. |
+| Untracked file | A file in your working folder that Git is not yet recording; switching branches can carry it with you. |
 | Worktree | A second working folder attached to the same repository, so drafts in one folder do not sit beside your main working files. |
 
-**Agent self-check before asking.** Ask: "Would a non-technical person understand this question without reading any docs?" If not, rewrite it in outcomes — what changes, what stays untouched, how to undo or say no, and the safe default — and then ask again.
+**Saying it precisely.** Use **prepare** for creating drafts, **record** (or *commit*) for a saved snapshot, **upload** (or *push*) for sending it to the remote, and **Merge** for accepting it. Avoid an ambiguous "save it": say which of prepare / record / upload / Merge you mean. Do not hardcode how many files are involved — say "your draft files" (or name them).
 
-**Answer in user terms.** You can answer in plain words, for example:
+**Agent self-check before asking.** Ask: "Would a non-technical person understand this without docs?" If not, rewrite it in outcomes — what changes, what stays untouched, how to undo or say no, and the safe default — then ask one question again.
 
-- **"Yes, save it and show me the review page."** (The agent maps this to its technical steps: commit the drafts on a branch; in the pushed variant it also pushes the branch and opens the pull request. In the local-only variant it does not upload anything.)
-- **"Not yet — explain more."** (The agent explains what would change and the options, then asks again. The drafts are not added to main; they are left untouched or removed on request.)
-- **"No, discard."** (The agent removes the two draft files and the branch. If a review page was pushed, it also closes the pull request and deletes the uploaded branch — unless you prefer to leave the review page open, in which case the agent leaves it open and records that. Your main project stays unchanged.)
-
-Mapping your answer to the technical actions is the **agent's** job, not yours. This subsection is documentation: it changes no package behaviour, adds no capability, and if an agent asks for a bare technical yes/no, that is a defect to report rather than a question you must decode.
-
+Mapping your answer to the technical actions is the **agent's** job, not yours. This subsection is documentation: it changes no package behaviour, adds no capability, and if an agent asks a bare technical yes/no, that is a defect to report rather than a question you must decode.
 ### The first useful task — CX-FT1 (described, not executed)
 
 Once installation is verified (CP6), the shared first useful task is a small **Stage 1 requirements brief with fictional inputs**.
@@ -621,7 +613,7 @@ do not start Stage 2.
 - **Network/provider boundary.** Running this exercise inside a DeepSeek Harness chat session is allowed. The exercise makes **no additional** provider, network, telemetry or external-tool call beyond the chat session itself: no web search, no API request, no upload, no install/download action. The harness's own model data flow (the provider that serves the chat) is outside this exercise's control and should be treated as provider traffic; do not place participant data in prompts — the exercise inputs are fictional by design.
 - **Minimal templates.** `docs/requirements.md` must contain at least: a `FICTIONAL EXERCISE INPUT` declaration; the interview record of **all question/answer pairs** (one question per turn — not a fixed number of answers); `REQ-1…REQ-n` facts; `AS-1…AS-n` assumptions, explicitly labelled as assumptions; an out-of-scope list; and open questions. `docs/project-state.md` must contain at least: an append-only `STATE SNAPSHOT` row with the current stage (`Stage 1`), where we are and the next recommended action; and a decision log `D-*` for the choices made. An approval entry is allowed only as a consumer-local `A-*` record that a human genuinely authorised — never fabricated.
 - **Expected end state:** `docs/requirements.md` and `docs/project-state.md` exist with the required sections and the fictional-input declaration; the install remains intact and no package file is edited; no other file in the exercise repository is added or changed.
-- **Cleanup — local-only variant (nothing uploaded).** If you used a disposable repository, delete that folder. Otherwise, while you are still on the exercise branch: confirm with `git status` that only the two files you created are untracked; remove only those two files; then switch back to your main branch and delete the exercise branch (or delete the separate worktree/clone). A dedicated branch does **not** isolate untracked files — switching branches would carry them into your main working folder — so a **separate worktree or clone is the recommended isolation**. Do not run a repository-wide clean.
+- **Cleanup — local-only variant (nothing uploaded).** If you used a disposable repository, delete that folder. Otherwise, while you are still on the exercise branch: confirm with `git status` that only the draft files you created are untracked; remove only those draft files; then switch back to your main branch and delete the exercise branch (or delete the separate worktree/clone). A dedicated branch does **not** isolate untracked files — switching branches would carry them into your main working folder — so a **separate worktree or clone is the recommended isolation**. Do not run a repository-wide clean.
 - **Cleanup — pushed / review-page variant.** Tell the agent to close the review page, delete the remote branch it created, and remove the local drafts and branch. If you prefer to keep the review page open for later, say so and the agent leaves it open and records that choice. Confirm the uploaded branch is deleted and your main branch is unchanged. The untracked-file caveat is the same: a branch alone does not isolate drafts, and a separate worktree or clone is recommended.
 - **Exclusions and limits:** no J1 completion, acceptance, consumer readiness, support or delivery claim follows from this task. Execution is **UNRUN** at this head — this page describes it; it is not evidence that anyone ran it, and human usability remains UNRUN.
 
