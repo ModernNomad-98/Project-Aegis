@@ -14,6 +14,15 @@ off until a workflow is explicitly opted in. There is no background upload and
 no reconnect retry: an export happens only after the exact bytes are previewed
 and the preview SHA-256 is confirmed.
 
+**Status (2026-11-13): implemented and synthetic-tested; local-only pilot active.**
+Under the owner's recorded activation the owner is the first participant and the
+Lead is the local steward-operator; the private **Google Drive** channel is
+designated, reviewed and rehearsed. **External participant intake is closed**
+until the owner shares per-participant subfolders and a consent supplement; **no
+external-participant data exists**, and publication is **not authorised**. The
+synthetic tests above are engineering evidence only — not human-usability or
+readiness evidence.
+
 ## Quick start (synthetic data only)
 
 Run from the repository root. Use a store path outside the checkout; the tool

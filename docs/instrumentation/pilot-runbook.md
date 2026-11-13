@@ -1,9 +1,18 @@
 # Pilot runbook (documentation only)
 
-> **This is not an authorisation.** No pilot, enrolment of real workflows,
-> export of real data, hosting or deployment is approved by this page. It
-> describes the private procedure that a separately approved pilot would follow.
-> Implementing the tool and passing synthetic tests is not permission to launch.
+> **Current status (2026-11-13): the pilot that is authorised is local-only.**
+> Under the owner's recorded activation
+> (`OWNER-DECISIONS/OWNER-USAGE-REPORTING-PILOT-ACTIVATION-2026-11-13.md`), the
+> owner is the first participant and the Lead is the local steward-operator;
+> capture, export, import and cohort arithmetic run locally for the owner only.
+> The private **Google Drive** channel is designated, reviewed and rehearsed (the
+> owner's own export; a duplicate import; the file moved to processed) — but
+> **external participant intake remains closed** until the owner shares
+> per-participant subfolders and sends a consent supplement, and **no
+> external-participant data exists**. **This page is not itself an authorisation**
+> for hosting, external intake or publication; each of those remains a separate
+> owner decision with its own review. Synthetic tests are engineering evidence,
+> not permission to launch.
 
 ## Roles
 
@@ -18,14 +27,22 @@
 
 1. Confirm a written collection approval, a private transport channel and a
    named steward. Email, public issues and pull-request comments are not intake.
+   *Local pilot: satisfied in the recorded owner activation + designated Google
+   Drive channel. External intake: pending the owner's per-participant
+   subfolders + consent supplement.*
 2. Complete the privacy and security review of the channel's logs, backups,
    access paths and unavoidable metadata. If the channel cannot meet the agreed
-   scope, stay local-only.
+   scope, stay local-only. *Local pilot: satisfied in local-only form — the
+   channel is designated/reviewed/rehearsed for the owner's own rehearsal.
+   External participants: pending the owner's per-participant sharing.*
 3. Prepare the consent text from [privacy-and-consent.md](privacy-and-consent.md):
    purpose, fields, recipient, retention, optional skill plane, withdrawal,
-   deletion limits, missing-data limits and no public metrics.
+   deletion limits, missing-data limits and no public metrics. *Local pilot:
+   satisfied — the consent text is prepared and the owner is the only
+   participant. External intake: pending the owner's consent supplement.*
 4. Set the participant's local store outside project version control with
-   user-only access. The tool enforces this where the platform allows it:
+   user-only access. *Local pilot: satisfied for the owner's own local store.
+   External participants: pending.* The tool enforces this where the platform allows it:
    stores, exports and the directories it creates are `0600`/`0700` on POSIX
    whatever the umask, and a path inside a Git working tree or the tool source
    tree is refused. On Windows the tool cannot set POSIX bits: it clears the
