@@ -1,10 +1,14 @@
 # Pilot runbook (documentation only)
 
-> **Current status (2026-11-13): the pilot that is authorised is local-only.**
+> **Current status (2026-11-13): the authorised pilot is owner-local (no external intake).**
 > Under the owner's recorded activation
 > (`OWNER-DECISIONS/OWNER-USAGE-REPORTING-PILOT-ACTIVATION-2026-11-13.md`), the
 > owner is the first participant and the Lead is the local steward-operator;
-> capture, export, import and cohort arithmetic run locally for the owner only.
+> capture, export, import and cohort arithmetic run for the owner only. Here
+> **owner-local** means **no external-participant intake, no hosted service and no
+> publication**; the reporter tool makes no network call. The owner's own workflow
+> data is exported only to the owner-controlled local/Google Drive folder
+> (provider sync and Google metadata apply); no external-participant data is involved.
 > The private **Google Drive** channel is designated, reviewed and rehearsed (the
 > owner's own export; a duplicate import; the file moved to processed) — but
 > **external participant intake remains closed** until the owner shares

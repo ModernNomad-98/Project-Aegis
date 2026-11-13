@@ -559,7 +559,13 @@ When an Aegis-guided step is about to write to your project, the agent should as
 
 **Copyable approval template (agent-facing).** Use words a non-technical person can answer:
 
-> I have finished two small files. I would like to save them to a **separate copy** of your project (called a *branch*) so your **main** files stay exactly as they are. I will then upload that copy and open a **review page** (a *pull request*) where you can see the changes; when you are happy, pressing **Merge** brings them into your main project. Nothing in your main project changes until you press Merge; if you say no, nothing is saved and the separate copy can be deleted. OK to save them to the separate copy and show you the review page?
+> I have finished two small files. They are **drafts in a separate line of work** (called a *branch*) on your computer; your **main** files are unchanged. A branch is a separate line of work in the same folder — by itself it does **not** isolate uncommitted or untracked draft files from your main working folder, so when true isolation matters I will use a **separate worktree or clone**, and I will remove the drafts before switching back.
+>
+> **Local-only variant (nothing uploaded):** I can keep the work only on this computer — nothing is uploaded and no review page is created. On "no", I will delete the two drafts and the branch, and your main project stays unchanged.
+>
+> **Pushed / review-page variant:** I would upload the branch and open a **review page** (a *pull request*) where you can see the drafts. Nothing in your main project changes until you press **Merge**. On "no", I will close the review page, delete the uploaded branch and delete the drafts — or leave the review page open if you prefer, to close it later — and your main project stays unchanged.
+>
+> **How to undo:** before Merge, "no" undoes the whole step as described above; after Merge, ask me to prepare a new change that reverses it (the review page and project history remain). OK to continue with the local-only / pushed variant?
 
 If the agent cannot state those four things in that shape, it should not ask for approval yet — it should explain first or stop.
 
@@ -568,21 +574,23 @@ If the agent cannot state those four things in that shape, it should not ask for
 | Term | What it means for you |
 | --- | --- |
 | Repository | The folder that holds your project together with its saved history. |
-| Branch | A separate copy of your project's history where changes can live without touching your main files. |
+| Branch | A separate line of work in your project's history. It lets changes be developed without changing your main files, but on its own it does **not** isolate uncommitted or untracked files in your working folder. |
 | Commit | One saved snapshot of changes. |
 | Push | Sending your saved snapshots to the remote copy of the repository so they can be reviewed. |
 | Pull request | The review page that shows the changes and asks for approval before they join the main project. |
 | Merge | Accepting the reviewed changes into the main version of the project. |
 | Main | The default version of your project that other work builds on. |
 | Clone | Making your own copy of a repository from the remote version. |
+| Untracked file | A file in your working folder that Git is not yet recording. Switching branches can carry untracked files with you; a separate worktree or clone keeps them apart. |
+| Worktree | A second working folder attached to the same repository, so drafts in one folder do not sit beside your main working files. |
 
 **Agent self-check before asking.** Ask: "Would a non-technical person understand this question without reading any docs?" If not, rewrite it in outcomes — what changes, what stays untouched, how to undo or say no, and the safe default — and then ask again.
 
 **Answer in user terms.** You can answer in plain words, for example:
 
-- **"Yes, save it and show me the review page."** (The agent maps this to its technical steps: save the commit on a branch, push it, and open the pull request.)
-- **"Not yet — explain more."** (The agent explains what would change and the options, then asks again; nothing is saved yet.)
-- **"No, discard."** (The agent stops and leaves your main project unchanged; nothing is pushed, and any separate copy it made can be deleted.)
+- **"Yes, save it and show me the review page."** (The agent maps this to its technical steps: commit the drafts on a branch; in the pushed variant it also pushes the branch and opens the pull request. In the local-only variant it does not upload anything.)
+- **"Not yet — explain more."** (The agent explains what would change and the options, then asks again. The drafts are not added to main; they are left untouched or removed on request.)
+- **"No, discard."** (The agent removes the two draft files and the branch. If a review page was pushed, it also closes the pull request and deletes the uploaded branch — unless you prefer to leave the review page open, in which case the agent leaves it open and records that. Your main project stays unchanged.)
 
 Mapping your answer to the technical actions is the **agent's** job, not yours. This subsection is documentation: it changes no package behaviour, adds no capability, and if an agent asks for a bare technical yes/no, that is a defect to report rather than a question you must decode.
 
@@ -613,7 +621,8 @@ do not start Stage 2.
 - **Network/provider boundary.** Running this exercise inside a DeepSeek Harness chat session is allowed. The exercise makes **no additional** provider, network, telemetry or external-tool call beyond the chat session itself: no web search, no API request, no upload, no install/download action. The harness's own model data flow (the provider that serves the chat) is outside this exercise's control and should be treated as provider traffic; do not place participant data in prompts — the exercise inputs are fictional by design.
 - **Minimal templates.** `docs/requirements.md` must contain at least: a `FICTIONAL EXERCISE INPUT` declaration; the interview record of **all question/answer pairs** (one question per turn — not a fixed number of answers); `REQ-1…REQ-n` facts; `AS-1…AS-n` assumptions, explicitly labelled as assumptions; an out-of-scope list; and open questions. `docs/project-state.md` must contain at least: an append-only `STATE SNAPSHOT` row with the current stage (`Stage 1`), where we are and the next recommended action; and a decision log `D-*` for the choices made. An approval entry is allowed only as a consumer-local `A-*` record that a human genuinely authorised — never fabricated.
 - **Expected end state:** `docs/requirements.md` and `docs/project-state.md` exist with the required sections and the fictional-input declaration; the install remains intact and no package file is edited; no other file in the exercise repository is added or changed.
-- **Cleanup (do this while still on the exercise branch).** If you used a disposable repository, delete that folder. If you used a dedicated branch: while you are still on that branch, confirm with `git status` that only the two files you created are untracked, then remove only those two files; only after that switch back to your main branch and delete the exercise branch. Note that a dedicated branch does **not** isolate untracked files — switching branches would carry them into the working folder — so a **separate worktree or clone is the recommended isolation** for this exercise. Do not run a repository-wide clean.
+- **Cleanup — local-only variant (nothing uploaded).** If you used a disposable repository, delete that folder. Otherwise, while you are still on the exercise branch: confirm with `git status` that only the two files you created are untracked; remove only those two files; then switch back to your main branch and delete the exercise branch (or delete the separate worktree/clone). A dedicated branch does **not** isolate untracked files — switching branches would carry them into your main working folder — so a **separate worktree or clone is the recommended isolation**. Do not run a repository-wide clean.
+- **Cleanup — pushed / review-page variant.** Tell the agent to close the review page, delete the remote branch it created, and remove the local drafts and branch. If you prefer to keep the review page open for later, say so and the agent leaves it open and records that choice. Confirm the uploaded branch is deleted and your main branch is unchanged. The untracked-file caveat is the same: a branch alone does not isolate drafts, and a separate worktree or clone is recommended.
 - **Exclusions and limits:** no J1 completion, acceptance, consumer readiness, support or delivery claim follows from this task. Execution is **UNRUN** at this head — this page describes it; it is not evidence that anyone ran it, and human usability remains UNRUN.
 
 **Acceptance-ID mapping (existing J1 IDs only — engineering/structural mapping, not a J1 claim).** The P1 routes record maps this task and the steps above to existing J1 acceptance IDs: AC-03 (installation — the fresh install into the product repository; the v2 41-file form, execution belongs to P5 and is UNRUN), AC-08 (closure and payload/version pins — the P8 pin lines), AC-10 (the consumer install record and its aggregate — the P9 line and `docs/consumer-install-record.md`), AC-11 (consumer-role recognition — the S1 role probe and the S7 start), AC-35 (startup gate on the installed set — an engineering check; P5 runs it), and AC-16 (requirements-stage structure only — its human-input leg is UNRUN because these inputs are fictional). This mapping is engineering/structural only: no acceptance ID is claimed as passed, J1 completion is not claimed, and all execution remains UNRUN at this head. Source: the P1 record `CONSUMER-EXPERIENCE-P1-ROUTES-AND-FIRST-TASK-2026-11-13.md` (65,025 B / `b9d67561…`); no new acceptance IDs are introduced (CX-FT1 is a task label, not an acceptance ID).
