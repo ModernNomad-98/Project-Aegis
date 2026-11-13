@@ -7,11 +7,10 @@
 > capture, export, import and cohort arithmetic run for the owner only. Here
 > **owner-local** means **only the owner's own workflow data — no
 > external-participant intake, no hosted service and no publication**; the reporter
-> tool makes no network call. The owner's export may sit in an owner-controlled
-> local folder **or** an owner-controlled provider-synced folder (for example
-> Google Drive); if it is synced, the provider's metadata and backups apply — choose
-> a non-synced local folder if that is not acceptable. No external-participant data
-> is involved.
+> tool makes no network call. The owner chooses where exports are stored: a local folder, **or** an
+> owner-controlled provider-synced folder (for example Google Drive) — in the latter
+> case the provider's metadata and backups apply. No external-participant data is
+> involved.
 > The private **Google Drive** channel is designated, reviewed and rehearsed (the
 > owner's own export; a duplicate import; the file moved to processed) — but
 > **external participant intake remains closed** until the owner shares
@@ -39,7 +38,7 @@
    owner's channel/consent steps.*
 2. Complete the privacy and security review of the channel's logs, backups,
    access paths and unavoidable metadata. If the channel cannot meet the agreed
-   scope, stay local-only. *Local pilot: **owner-only** — the channel is
+   scope, stay owner-local (no external intake). *Local pilot: **owner-only** — the channel is
    designated/reviewed/rehearsed for the owner's own rehearsal. External
    participation: **closed**, pending the owner's channel review.*
 3. Prepare the consent text from [privacy-and-consent.md](privacy-and-consent.md):
@@ -158,5 +157,5 @@ A pilot may graduate only on measurement reliability — every synthetic
 contract, privacy, metric and lifecycle test passing, no unexpected
 transmission, every received start reconciled, duplicates and deletion drills
 handled, unknowns reported honestly and steward workload inside the approved
-budget. Low export volume means extend or stay local-only; it never means
+budget. Low export volume means extend or stay owner-local (no external intake); it never means
 inferring success.

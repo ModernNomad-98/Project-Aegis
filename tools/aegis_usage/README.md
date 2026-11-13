@@ -5,7 +5,7 @@ Two stdlib-only Python 3.14 programs that implement the contract in
 
 | File | Role |
 | --- | --- |
-| [`local_report.py`](local_report.py) | Participant side: per-workflow opt-in, bounded transition history, exact preview, local-only export. |
+| [`local_report.py`](local_report.py) | Participant side: per-workflow opt-in, bounded transition history, exact preview, local export (the tool never uploads). |
 | [`aggregate.py`](aggregate.py) | Steward side: manual admissions, import with revision invariants, 90-day retention, deletion, cohort arithmetic and suppression. |
 | [`tests/`](tests) | 205 behavioral tests, including mutant demonstrations, over synthetic fixtures only. |
 
@@ -19,10 +19,9 @@ Under the owner's recorded activation the owner is the first participant and the
 Lead is the local steward-operator; the private **Google Drive** channel is
 designated, reviewed and rehearsed. **Owner-local** means **only the owner's own workflow data** — no
 external-participant intake, no hosted service and no publication; the tool makes
-no network call, and the owner's export may sit in an owner-controlled local folder
-**or** an owner-controlled provider-synced folder (for example Google Drive) — if it
-is synced, the provider's metadata and backups apply; choose a non-synced local
-folder if that is not acceptable. **External participant intake is closed**
+no network call, and the owner chooses where exports are stored: a local folder, **or** an owner-controlled
+provider-synced folder (for example Google Drive) — in the latter case the provider's
+metadata and backups apply. **External participant intake is closed**
 until the owner shares per-participant subfolders and a consent supplement; **no
 external-participant data exists**, and publication is **not authorised**. The
 synthetic tests above are engineering evidence only — not human-usability or
