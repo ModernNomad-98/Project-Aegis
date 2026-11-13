@@ -596,7 +596,9 @@ To remove a separate worktree (a second working folder attached to the same repo
 
 **Saying it precisely.** Use **prepare** (or *write*) for creating drafts, **record** (or *commit*) for saving a snapshot, **upload** (or *push*) for sending it to the remote, and **Merge** for accepting it into main. Avoid an ambiguous "save it": say which of prepare / record / upload / Merge you mean. Do not hardcode how many files are involved — say "your draft files" (or name them).
 
-**Agent self-check.** Ask: "Would a non-technical person understand this without docs?" If not, rewrite it in outcomes. Never ask a compound question (for example upload + review page together); ask them as separate questions only if each actually happens.
+**Agent self-check.** Ask: "Would a non-technical person understand this without docs?" If not, rewrite it in outcomes. Never combine separate decisions in one question (for example, recording drafts and publishing them); Question 3 is a single publishing action whose two mechanical steps (upload, open the review page) are disclosed together.
+
+This guidance changes no package behaviour and adds no capability; the agent maps your plain-language answer to its own technical steps.
 ### The first useful task — CX-FT1 (described, not executed)
 
 Once installation is verified (CP6), the shared first useful task is a small **Stage 1 requirements brief with fictional inputs**.
