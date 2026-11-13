@@ -51,7 +51,7 @@ PowerShell. Local and online helpers remain unavailable; no provider is
 connected and no token saving is measured. Ordinary project work still starts
 with `project-orchestrator`. `aegis-setup` is MANUAL-ONLY and is **not** installed by the starter package: it is an optional setup conversation, not an installation route, and a completed starter install does not include it.
 
-**Optional, off by default: local workflow-outcomes reporting.** The opt-in, offline reporter in [the instrumentation directory](docs/instrumentation/README.md) lets a participant record locally whether a workflow reaches delivery, using allowlisted enums and day-precision dates only — no prompts, output, code, file or repository names, URLs or identities, and no network. It is **off by default**; nothing is recorded unless a workflow is explicitly opted in. A **local-only pilot** is currently active with the owner as first participant. **External reporting is not yet available** — it needs the owner-designated private channel plus its privacy and security review — and this pointer makes no adoption, readiness or human-evidence claim.
+**Optional, off by default: local workflow-outcomes reporting.** The opt-in, offline reporter in [the instrumentation directory](docs/instrumentation/README.md) lets a participant record locally whether a workflow reaches delivery, using allowlisted enums and day-precision dates only — no prompts, output, code, file or repository names, URLs or identities, and no network. It is **off by default**; nothing is recorded unless a workflow is explicitly opted in. A **local-only pilot** is currently active with the owner as first participant. **External reporting is not yet available** — the private channel is designated and reviewed, but the owner must share per-participant subfolders and a consent supplement first — and this pointer makes no adoption, readiness or human-evidence claim.
 
 ## What is included
 
@@ -700,7 +700,7 @@ is authorised by the owner's activation** (owner as first participant, Lead as
 local steward-operator). This documentation is **not itself an authorisation**
 for external participant intake, hosting or publication: the private external
 channel is designated and reviewed, but external intake remains closed until the
-owner sends upload-only links and a consent supplement, no external-participant
+owner shares per-participant subfolders and a consent supplement, no external-participant
 data exists, and hosting or publication of aggregates remains a separate owner
 decision.
 
