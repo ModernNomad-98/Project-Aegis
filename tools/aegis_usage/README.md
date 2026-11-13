@@ -15,15 +15,18 @@ no reconnect retry: an export happens only after the exact bytes are previewed
 and the preview SHA-256 is confirmed.
 
 **Status (2026-11-13): implemented and synthetic-tested; owner-local pilot active**
-(owner participant, Lead local steward-operator). The private **Google Drive**
-channel is designated, access-reviewed and privately rehearsed for the owner's own
-rehearsal; the **external-participant inbox is closed**, **no external-participant
-data exists**, and publication is **not authorised**. There is **no Aegis-hosted
+(owner participant, Lead local steward-operator). **Owner-local** means only the
+owner's own workflow data — no external-participant intake, no hosted service and
+no publication. The private **Google Drive** channel is designated, access-reviewed
+and privately rehearsed for the owner's own rehearsal; the **external-participant
+inbox is closed**, **no external-participant data has been collected (intake
+closed)**, and publication is **not authorised**. There is **no Aegis-hosted
 service**. Storage: the owner chooses an owner-controlled Google Drive folder
 (provider-synced) **or** a local non-synced folder; if the folder is synced, the
-provider can access, log, retain and back up the files themselves (not only
-metadata). The tool makes no network call, and the synthetic tests above are
-engineering evidence only — not human-usability or readiness evidence.
+**sync client — not the tool — transmits the files, and the provider can access,
+log, retain and back up them** (not only metadata). The tool itself makes no
+network call, and the synthetic tests above are engineering evidence only — not
+human-usability or readiness evidence.
 
 ## Quick start (synthetic data only)
 

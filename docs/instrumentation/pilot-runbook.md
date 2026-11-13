@@ -3,15 +3,17 @@
 > **Current status (2026-11-13): the authorised pilot is owner-local only.**
 > Under the owner's recorded activation the owner is the first participant and the
 > Lead is the local steward-operator; capture, export, import and cohort arithmetic
-> run for the owner only. The private **Google Drive** channel is designated,
-> access-reviewed and privately rehearsed for the owner's own rehearsal;
-> **external participant participation remains closed** pending the owner's
-> per-participant sharing + consent steps, and no external-participant data exists.
-> **This page is not itself an authorisation** for external intake, hosting or
-> publication; each remains a separate owner decision with its own review.
-> **Channel-failure fallback:** stay **local non-synced** (do not use a
-> provider-synced folder) and do not admit external participants. Synthetic tests
-> are engineering evidence, not permission to launch.
+> run for the owner only. **Owner-local** means only the owner's own workflow data —
+> no external-participant intake, no hosted service and no publication. The private
+> **Google Drive** channel is designated, access-reviewed and privately rehearsed for
+> the owner's own rehearsal; **external participant participation remains closed**
+> pending the owner's per-participant sharing + consent steps, and no
+> external-participant data has been collected (intake closed). **This page is not
+> itself an authorisation** for external intake, hosting or publication; each remains
+> a separate owner decision with its own review. **Channel-failure fallback:** stay
+> **local non-synced** (do not use a provider-synced folder) and do not admit
+> external participants. Synthetic tests are engineering evidence; the owner-local
+> pilot is active under the owner's recorded activation.
 
 ## Roles
 
@@ -22,7 +24,14 @@
   exports, and may withdraw.
 - **Maintainer reviewer** — reviews aggregates monthly against disclosure rules.
 
-## Before any participation
+## Prerequisites (owner-local completed; external future)
+
+**Owner-local pilot:** the prerequisites below are **completed** for the owner-local
+pilot under the owner's recorded activation and the current status block above
+(owner participant, Lead local steward-operator; Google Drive channel designated,
+access-reviewed and privately rehearsed for the owner's own rehearsal). **External
+participants:** they remain **future actions** — external participation is closed
+and this page is not an authorisation for it.
 
 1. Confirm a written collection approval, a private transport channel and a
    named steward. Email, public issues and pull-request comments are not intake.
@@ -41,6 +50,10 @@
    read-only flag before replacing an existing store, but the store must still
    sit in a directory whose ACL is user-only (a profile or `%TEMP%` directory,
    not a shared folder).
+
+> **Future / not yet available for external participants.** The external-participant
+> procedure runs from Start through Closure; external participation is closed, and
+> only the owner-local rehearsal currently applies.
 
 ## Start (day 0–7)
 
@@ -142,4 +155,5 @@ contract, privacy, metric and lifecycle test passing, no unexpected
 transmission, every received start reconciled, duplicates and deletion drills
 handled, unknowns reported honestly and steward workload inside the approved
 budget. Low export volume means extend or stay owner-local (no external intake);
-it never means inferring success.
+it never means inferring success. External participation remains closed until the
+owner approves the channel and consent steps for named participants.
