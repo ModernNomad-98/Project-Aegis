@@ -192,6 +192,7 @@ At dispatch:
 8. This policy is guidance, not a measurement or guarantee: do not claim model quality, cost savings, or independence beyond what the host actually exposes.
 
 Examples (role-based, never names): routine log extraction -> lightweight; requirements work or implementation -> balanced; architecture/security/threat modelling -> advanced; validation, final review or audit -> independent verification.
+
 ## Stop conditions
 
 - A consequential, authority-changing, or irreversible action is in a low-risk
