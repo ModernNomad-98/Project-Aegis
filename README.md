@@ -33,6 +33,15 @@ The library does not itself build, deploy or operate an application.
    skill discovery; you can also name a skill explicitly. Read the
    [skills catalog](docs/skills-catalog.md) to see the shipped roles.
 
+### Two ways to start — same route, same checks
+
+Both doors use the same [starter package](docs/consumer-starter-package.md), the same documented install procedure, the same verification steps and the same authorization rules; they differ only in how much explanation they add before the first command. If you are unsure which door you are, use the second one.
+
+- **Route A — you are comfortable with Git and a terminal, and you are new to Aegis.** Read the starter package's [guided route (Route B)](docs/consumer-starter-package.md#the-guided-route-route-b) once to see the shared steps, then follow the same S1–S9 actions with the page's [install procedure](docs/consumer-starter-package.md#7-the-install-procedure). Expect the exact output and exit codes it lists; there is no second procedure.
+- **Route B — you are new to Git, terminals and Aegis.** Start at the starter package's [guided route (Route B)](docs/consumer-starter-package.md#the-guided-route-route-b), which explains the concepts first, says where each action runs, gives the expected output per step and marks safe stopping points (CP1–CP9) before the same S1–S9 actions. You may stop at a checkpoint and resume there later; do not stop in the middle of a step.
+
+The first useful task both doors share is a small, fictional local requirements brief (Stage 1 only). It is described in the guided route, is not executed by this page and does not complete J1 or claim readiness. The [consumer readiness guide](docs/consumer-readiness/consumer-guide-v1.md) is a DRAFT / EVIDENCE-ONLY page that explains the evidence and limits; it is not an installation instruction.
+
 For an optional setup conversation, explicitly say **"Help me set up Aegis"**
 or **"Help me change my Aegis setup"** and invoke the manual-only
 [`aegis-setup`](.claude/skills/aegis-setup/SKILL.md) skill. It offers Aegis only,

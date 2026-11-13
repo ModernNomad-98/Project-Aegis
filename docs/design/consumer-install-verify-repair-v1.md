@@ -1,8 +1,8 @@
 # Consumer install, verify, repair and upgrade lifecycle - v1 design
 
-**Status:** design-first page for the **Consumer install / verify / repair / upgrade lifecycle** slice of the Aegis Maturity Package item **Consumer Packaging Manifest and Read-Only Verification** (plan row P-11; closure CL-15). **Base:** main `e99fa451cbd214a3155e07330436b3c87907e78a`, tree `f83e3153b6a107a38cae5f068b8c17690e084745`. **Scope:** this page plus new executable preservation tests. **It adds no verb, no installer code and no capability.** No install target is exercised by this slice, and the consumer install record remains **UNRUN**.
+**Status:** design-first page for the **Consumer install / verify / repair / upgrade lifecycle** slice of the Aegis Maturity Package item **Consumer Packaging Manifest and Read-Only Verification** (plan row P-11; closure CL-15). **Base:** main `e99fa451cbd214a3155e07330436b3c87907e78a`, tree `f83e3153b6a107a38cae5f068b8c17690e084745`. **Scope:** this page plus new executable preservation tests. **It adds no verb, no installer code and no capability.** No install target is exercised by this slice, and the consumer install record remains **UNRUN**. **Docs revision (2026-11-13, P4a):** the phase-aware recovery wording in the reading key, section 4, section 6 and section 7 was clarified against the documented installer phases (pre-write refusal, partial-copy failure, post-copy record failure, retry, verification), and the starter-package citations in section 2 were changed from line numbers to section identifiers because that page gained a guided route. No installer, test, payload-pin or non-claim changed.
 
-**Reading key.** *Role A* is the Project Aegis source library; *Role B* is a consumer/product repository that copies Aegis files into its workspace. **UNRUN** means not executed, with the exact remaining action named; it is never a pass. *Fail-closed* means the operation refuses and leaves the previous state intact. *Preservation invariant* is a property that must hold after every accepted, refused or interrupted operation.
+**Reading key.** *Role A* is the Project Aegis source library; *Role B* is a consumer/product repository that copies Aegis files into its workspace. **UNRUN** means not executed, with the exact remaining action named; it is never a pass. *Fail-closed* means the operation stops without attempting a repair. The target state a refusal leaves depends on its phase, and section 6 states it per refusal: a pre-write refusal leaves the target unchanged; a late failure (for example the `sh` probe after the package copy, exit 1, or the receipt write, exit 25) can occur after the 41 package files are written, leaving a complete package and no record (section 6.4). *Preservation invariant* is a property that must hold after every accepted, refused or interrupted operation.
 
 ## 1. Purpose and non-goals
 
@@ -14,7 +14,7 @@ The read-only verifier slice is merged (`docs/design/distributed-payload-manifes
 
 - no installer, updater, repair or prune command is written or executed here;
 - no consumer repository is chosen and no consumer install record is produced (that requires the owner target decision referenced by plan row P-11's route; closure CL-16 tracks the owner record);
-- no change to `docs/consumer-starter-package.md` (the documented procedure this page reasons about is read-only input);
+- no change to the documented procedure's commands, checks or exit codes in `docs/consumer-starter-package.md` (the page was later edited by the 2026-11-13 docs batch to add a guided route; the procedure itself is unchanged and was read-only input to this slice);
 - no claim about macOS or Linux behaviour, no CI wiring, and no approval, merge or delivery.
 
 ## 2. Verified starting state
@@ -28,10 +28,10 @@ Every row is a fact checked at the base commit, with its evidence. Rows marked *
 | F3 | The only report write is an explicit `--report-out` destination outside the target root and outside the declared package directories; it is written to a same-directory temporary file, fsynced, then renamed over the destination, and the temporary file is removed in a `finally` block. | `verify.py:126-165`; interruption cases I-1/I-2 below. |
 | F4 | A manifest build refuses an output path inside the payload root and validates before writing; the manifest is not part of any target tree. | `__main__.py:30-38`, `:56-62`; `manifest.py:469-484`. |
 | F5 | The repository ships no installer, updater, repair or prune script at any path. | Filesystem search over the base tree for `install*` / `*install*.ps1` / `*install*.py` returned no hit; the only install surface is the documented procedure in F6. |
-| F6 | `docs/consumer-starter-package.md` *documents* a Windows PowerShell 7 install procedure (P0-P9): it writes exactly 41 files (18 skill directories, `AGENTS.md`, `CLAUDE.md`) plus a consumer install record, and every check stops rather than warning and continuing. (documentary) | `docs/consumer-starter-package.md:454-465`, `:1511-1530`. |
-| F7 | That documented procedure's exit codes are: 1 prerequisite, 20 foreign material, 21 unsafe source, 22 startup-file conflict, 23 unsafe destination, 24 unusable record path, 25 record not written atomically, 30 closure/count/eval material, 31 pin or byte mismatch, 32 missing sibling dependency, 40 wrong repository role, 41 owner record missing, 42 commit identity missing/owner-matching on the agent-commit route, 43 install mode or authorization unstated/unrecognised. (documentary) | `docs/consumer-starter-package.md:1513-1530`. |
-| F8 | The documented v1->v2 transition re-runs the same procedure with a new record path: there is no updater, no downgrade engine and no in-place substitution of the old record; an already-existing skill directory carrying foreign material is refused at 20 and a differing byte at 31, before any write. (documentary) | `docs/consumer-starter-package.md:1532-1564`, `:1571-1587`. |
-| F9 | The consumer install record is the consumer's own artifact, written by that documented procedure, with one row per installed file and a computed aggregate; this slice neither writes one nor runs the procedure. | `docs/consumer-starter-package.md:1923-1944`; plan row P-11 route ("actual consumer installation requires P-20 target decision"). |
+| F6 | `docs/consumer-starter-package.md` *documents* a Windows PowerShell 7 install procedure (P0-P9): it writes exactly 41 files (18 skill directories, `AGENTS.md`, `CLAUDE.md`) plus a consumer install record, and every check stops rather than warning and continuing. (documentary) | `docs/consumer-starter-package.md` section 7 (target scope and P0–P9). |
+| F7 | That documented procedure's exit codes are: 1 prerequisite, 20 foreign material, 21 unsafe source, 22 startup-file conflict, 23 unsafe destination, 24 unusable record path, 25 record not written atomically, 30 closure/count/eval material, 31 pin or byte mismatch, 32 missing sibling dependency, 40 wrong repository role, 41 owner record missing, 42 commit identity missing/owner-matching on the agent-commit route, 43 install mode or authorization unstated/unrecognised. (documentary) | `docs/consumer-starter-package.md` section 7.2. |
+| F8 | The documented v1->v2 transition re-runs the same procedure with a new record path: there is no updater, no downgrade engine and no in-place substitution of the old record; an already-existing skill directory carrying foreign material is refused at 20 and a differing byte at 31, before any write. (documentary) | `docs/consumer-starter-package.md` sections 7.3 and 12 (limits). |
+| F9 | The consumer install record is the consumer's own artifact, written by that documented procedure, with one row per installed file and a computed aggregate; this slice neither writes one nor runs the procedure. | `docs/consumer-starter-package.md` sections 7.1 and 9; plan row P-11 route ("actual consumer installation requires P-20 target decision"). |
 | F10 | At the base commit, `docs/design/consumer-install-verify-repair-v1.md` does not exist (this page creates it); the closure re-derivation is in section 10. | Official closure form `captures/closures.ps1` CL-15; candidate-scoped re-derivation in section 10. |
 
 ## 3. Terms
@@ -56,7 +56,7 @@ States describe the *target*, not the caller's intent. Transitions are labelled 
 | **S1 installed, unverified** | The declared files are present but no verify run has been recorded against this manifest. |
 | **S2 verified clean** | A verify run over this target and manifest returned exit 0 (a findings state, not an approval). |
 | **S3 verified with findings** | A verify run returned exit 1; findings are reported and nothing was repaired. |
-| **S4 refused / blocked** | The last operation was refused (wrong role, unsafe path, unusable record, identity, etc.); the target is unchanged by that attempt. |
+| **S4 refused / blocked** | The last operation was refused (wrong role, unsafe path, unusable record, identity, etc.) and stopped without repair. Pre-write refusals leave the target unchanged; late failures in the documented procedure can occur after the package copy and are stated per code in section 6.2 and section 6.4. |
 | **S5 upgraded** | A new profile version and a new install record were installed by a fresh run; the previous record is retained byte-unchanged. |
 
 Transitions:
@@ -67,7 +67,7 @@ Transitions:
 | S1 -> S1 | install rerun with an existing record (`-AllowExistingRecord`) | operator-attested identical rerun; the record is left unchanged and its contents are not re-read (F7, code 25/24 semantics) |
 | S1/S3 -> S2 | verify (clean) | none beyond running the read-only verifier |
 | S1/S2 -> S3 | verify (findings) | none; findings are not repaired |
-| S2/S3 -> S4 | any refused operation | the refusal itself; target unchanged |
+| S2/S3 -> S4 | any refused operation | the refusal itself; scope per section 6.2/6.4 (pre-write refusals leave the target unchanged; late record-phase failures can follow a complete package copy) |
 | S1..S3 -> S5 | upgrade = fresh install run with a **new** record path | a **new** owner authorization for this transition; a v1 authorization is not reused (F8) |
 | S3 -> S2 | *not available in v1* | would require repair, which v1 refuses; the accepted remedy is a fresh install run (S5) with conflict checks |
 | any -> any | crash / interruption | no transition is claimed; section 9 states the crash windows |
@@ -100,7 +100,7 @@ The accepted upgrade path is a re-run of the documented procedure with a new pro
 
 ## 6. Refused paths
 
-Refusals are the lifecycle's safety surface: each one is fail-closed, and each leaves a stated state untouched.
+Refusals are the lifecycle's safety surface: each one is fail-closed — it stops and does not repair — and each leaves the state stated in its row. Most refusals are pre-write and leave the target unchanged; the record-phase exceptions are stated in section 6.2 and section 6.4.
 
 ### 6.1 Verify refusals (implemented, measured by N-3/N-6/N-7/N-9)
 
@@ -142,6 +142,22 @@ Refusals are the lifecycle's safety surface: each one is fail-closed, and each l
 | Upgrade of a v1 target to a v2 manifest by running `verify` | the v2-only entries are reported `ABSENT`; no directory or file is created | N-5 |
 | Upgrade with an existing record path | documented exit 24 before any package or record write | F7/F8 (documentary) |
 
+### 6.4 Phase truth for the documented install
+
+The documented install is phased, and "refused" does not by itself mean "nothing was written". The phases below are the documented ones; the exit codes are the procedure's own (section 6.2; `docs/consumer-starter-package.md` section 7.2).
+
+| Phase | What may already exist | Refusals in this phase | What the document states | Retry / recovery |
+| --- | --- | --- | --- | --- |
+| Pre-write checks | nothing from this run | 20, 21, 22, 23 (containment walk), 24 (preflight), 30, 31, 32, 40, 41, 42, 43 | stopped before any package or record write | fix the named condition and re-run; identical files already present are skipped, foreign material (20) and drift (31) are refused, never overwritten |
+| Package copy (P6) | a subset of the 41 declared files at most; existing identical files skipped, never overwritten | a crash mid-copy is not a refusal | no deletion, move, rename or in-place overwrite occurs; each conflict class is refused before that file is written | re-run the same procedure: identical files resume, foreign material (20) and drift (31) still refuse |
+| Post-copy, record phase (P9) | the 41 package files | 1 (the end-of-P8 `sh` probe), 23 (a reparse point that appeared at the record leaf after the walk), 24 (a record file that appeared after the preflight), 25 (atomic record write failed) | the message states that the package copy is complete and no record was written | a record-phase failure is not a partial install: re-run to write the record; `-AllowExistingRecord` keeps an existing record only as an operator-attested identical rerun and does not re-read it |
+| Verification (read-only) | whatever the target holds | verify exits 1 for findings; it never refuses by writing | verify reports `ABSENT` / `CHANGED` / `UNRECOGNIZED` and repairs nothing | verification never changes state; the accepted remedy for findings is a consumer-side restore from the pinned source or a fresh install run, never an invented repair/uninstall/update command |
+
+Two consequences, stated so they are not overread:
+
+- **A refusal is not automatically "target unchanged".** Only the pre-write phase has that property. A post-copy record failure leaves 41 valid package files and no receipt, and the documented message says so (section 6.2, code 25); the same scope applies to late 23/24 failures.
+- **There is no repair, uninstall or update verb, and this page invents none.** A partial copy is resumed by re-running the same documented procedure; an upgrade is a fresh install with a new record path (section 5.4); a findings run is evidence, never a fix.
+
 ## 7. Preservation invariants
 
 ### 7.1 Enforced by shipped code (measurable here)
@@ -157,7 +173,7 @@ Refusals are the lifecycle's safety surface: each one is fail-closed, and each l
 
 ### 7.2 Asserted by the documented install procedure (documentary; UNRUN here)
 
-- **PI-9 (additive copy).** The procedure copies declared files into the target and refuses every conflict rather than overwriting: foreign material (20), startup-file conflict (22), byte drift (31), unsafe destination (23). It does not move, rename or delete skill bytes (F6-F8).
+- **PI-9 (additive copy).** The procedure copies declared files into the target and refuses every conflict rather than overwriting: foreign material (20), startup-file conflict (22), byte drift (31), unsafe destination (23). It does not move, rename or delete skill bytes (F6-F8). Pre-write refusals leave the target unchanged; the record-phase failures in section 6.4 can follow a completed package copy and are stated by their codes.
 - **PI-10 (atomic receipt).** The install record is written create-new and atomically; on failure the temp file is removed and no partial receipt remains (25). An existing record is left unchanged, and its contents are not re-read (24 semantics) (F7).
 - **PI-11 (record retention on upgrade).** A v1->v2 transition uses a new record path; the previous record is retained byte-unchanged, and the transition requires its own authorization (F8).
 
@@ -168,7 +184,7 @@ To lose a skill, some operation must delete, move, rename, truncate, hide or ove
 1. **`build`** writes one manifest file at the operator-named `--out` and refuses a destination inside the payload root (`__main__.py:30-38`; F4). The guard constrains only the payload root and knows nothing about consumer trees: a consumer file - a skill file included - named directly as `--out` would be replaced. That direct call is an operator command outside the documented procedure (the first limit below), and the documented procedure never calls `build` against a consumer tree.
 2. **`verify`** writes nothing unless `--report-out` names a destination; that destination is refused inside the target and inside package directories, and it is written atomically outside the target (F3, PI-5/PI-6).
 3. **`check-manifest`** writes nothing; it prints a detached identity (F1).
-4. **The documented install procedure** copies declared files only, refuses every conflict class before writing, and writes its record at a new path with create-new atomic semantics (F6-F8, PI-9/PI-10).
+4. **The documented install procedure** copies declared files only, refuses its conflict classes (most before any write; the record-phase checks in section 6.4 can fire after the copy), and writes its record at a new path with create-new atomic semantics (F6-F8, PI-9/PI-10).
 5. **There is no other verb, script or flag** in the repository that writes into a consumer tree (F1, F5).
 
 No enumerated operation contains a delete, prune, move, rename or in-place package overwrite of skill bytes; every operation that could damage a skill is either absent (repair/prune/uninstall/upgrade-in-place) or refused before writing (20/22/23/31). A crash cannot leave a half-written skill: the copy is additive and the only non-additive write (the receipt) is atomic. Therefore, **within the enumerated surfaces, skill loss is not reachable by construction** - not merely "not observed". N-2/N-4/N-5/N-6/N-10 exercise the refusal and interruption paths and assert skill bytes and the skill file set are unchanged; I-1/I-2 exercise the receipt write.
@@ -250,7 +266,7 @@ and it returns `True` at the candidate. The official form still returns `False` 
 | --- | --- |
 | Plan row P-11 | This page and the new tests are its design-first slice; CL-15 is its closure. |
 | `docs/design/distributed-payload-manifest-v1.md` | Normative design of the manifest and read-only verifier this page builds on; unchanged. |
-| `docs/consumer-starter-package.md` | The documented install, exit-code and v1->v2 transition procedure this page reasons about; unchanged and not executed. |
+| `docs/consumer-starter-package.md` | The documented install, exit-code and v1->v2 transition procedure this page reasons about; its commands, checks and exit codes are unchanged and were not executed in this slice (the 2026-11-13 docs batch added a guided route only). |
 | `tools/distributed_payload/` | The shipped tool whose read-only guarantees PI-1..PI-8 describe; unchanged code. |
 | `docs/roadmaps/aegis-maturity-package.md` | Readable item name "Consumer Packaging Manifest and Read-Only Verification" and the program's preservation boundaries. |
 
