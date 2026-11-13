@@ -15,18 +15,20 @@ no reconnect retry: an export happens only after the exact bytes are previewed
 and the preview SHA-256 is confirmed.
 
 **Status (2026-11-13): implemented and synthetic-tested; owner-local pilot active**
-(owner participant, Lead local steward-operator). **Owner-local** means only the
-owner's own workflow data — no external-participant intake, no hosted service and
-no publication. The private **Google Drive** channel is designated, access-reviewed
-and privately rehearsed for the owner's own rehearsal; the **external-participant
-inbox is closed**, **no external-participant data has been collected (intake
-closed)**, and publication is **not authorised**. There is **no Aegis-hosted
-service**. Storage: the owner chooses an owner-controlled Google Drive folder
-(provider-synced) **or** a local non-synced folder; if the folder is synced, the
-**sync client — not the tool — transmits the files, and the provider can access,
-log, retain and back up them** (not only metadata). The tool itself makes no
-network call, and the synthetic tests above are engineering evidence only — not
-human-usability or readiness evidence.
+(owner participant, Lead local steward-operator). **Owner-local names the data scope
+only** — owner-only (single-owner) workflow data with no external-participant data —
+and does **not** mean data never leaves this machine. There is **no Aegis-operated
+or hosted service**, and publication is **not authorised**; the **external-participant
+inbox is closed**, and **no external-participant data has been collected (intake
+closed)**. **Channel policy:** the **primary channel is the owner-controlled Google
+Drive folder** (a **third-party provider**), designated, access-reviewed and
+privately rehearsed for the owner's own rehearsal; the **fallback is a local
+non-synced folder**, and the owner may keep data in a local non-synced folder
+instead of using the Drive channel. If the Drive folder is used, the **sync client —
+not the tool — transmits the files, and the provider can access, log, retain and
+back up them** (not only metadata). The tool itself makes no network call, and the
+synthetic tests above are engineering evidence only — not human-usability or
+readiness evidence.
 
 ## Quick start (synthetic data only)
 

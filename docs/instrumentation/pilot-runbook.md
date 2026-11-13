@@ -3,17 +3,20 @@
 > **Current status (2026-11-13): the authorised pilot is owner-local only.**
 > Under the owner's recorded activation the owner is the first participant and the
 > Lead is the local steward-operator; capture, export, import and cohort arithmetic
-> run for the owner only. **Owner-local** means only the owner's own workflow data —
-> no external-participant intake, no hosted service and no publication. The private
-> **Google Drive** channel is designated, access-reviewed and privately rehearsed for
-> the owner's own rehearsal; **external participant participation remains closed**
-> pending the owner's per-participant sharing + consent steps, and no
-> external-participant data has been collected (intake closed). **This page is not
-> itself an authorisation** for external intake, hosting or publication; each remains
-> a separate owner decision with its own review. **Channel-failure fallback:** stay
-> **local non-synced** (do not use a provider-synced folder) and do not admit
-> external participants. Synthetic tests are engineering evidence; the owner-local
-> pilot is active under the owner's recorded activation.
+> run for the owner only. **Owner-local names the data scope only** — owner-only
+> (single-owner) workflow data with no external-participant data — and does **not**
+> mean data never leaves this machine. **Channel policy:** the **primary channel is
+> the owner-controlled Google Drive folder** (a **third-party provider**), designated,
+> access-reviewed and privately rehearsed for the owner's own rehearsal; the
+> **fallback is a local non-synced folder**, with no external-participant intake.
+> There is **no Aegis-operated or hosted service**, and publication is **not
+> authorised**; **external participant participation remains closed** pending the
+> owner's per-participant sharing + consent steps, and no external-participant data
+> has been collected (intake closed). **This page is not itself an authorisation**
+> for external intake, hosting or publication; each remains a separate owner
+> decision with its own review. The owner may keep data in a local non-synced folder
+> instead of using the Drive channel. Synthetic tests are engineering evidence; the
+> owner-local pilot is active under the owner's recorded activation.
 
 ## Roles
 
@@ -26,19 +29,23 @@
 
 ## Prerequisites (owner-local completed; external future)
 
-**Owner-local pilot:** the prerequisites below are **completed** for the owner-local
-pilot under the owner's recorded activation and the current status block above
-(owner participant, Lead local steward-operator; Google Drive channel designated,
-access-reviewed and privately rehearsed for the owner's own rehearsal). **External
-participants:** they remain **future actions** — external participation is closed
-and this page is not an authorisation for it.
+**Owner-local pilot:** the prerequisites below are **completed in the recorded local
+form**, with evidence in the owner's activation record
+`OWNER-DECISIONS/OWNER-USAGE-REPORTING-PILOT-ACTIVATION-2026-11-13.md` and the
+current status block above: the owner is the participant, the Lead is the local
+steward-operator, the primary Google Drive channel is designated, access-reviewed and
+privately rehearsed for the owner's own rehearsal, and a local non-synced folder is
+available as fallback. This is not a blanket claim that future external-participation
+steps are done. **External participants:** the remaining steps are **future
+actions** — external participation is closed and this page is not an authorisation
+for it.
 
 1. Confirm a written collection approval, a private transport channel and a
    named steward. Email, public issues and pull-request comments are not intake.
 2. Complete the privacy and security review of the channel's logs, backups,
    access paths and unavoidable metadata. If the channel cannot meet the agreed
-   scope, stay local non-synced (do not use a provider-synced folder) and admit
-   no external participants.
+   scope, use the local non-synced fallback folder instead of the Drive channel and
+   admit no external participants.
 3. Prepare the consent text from [privacy-and-consent.md](privacy-and-consent.md):
    purpose, fields, recipient, retention, optional skill plane, withdrawal,
    deletion limits, missing-data limits and no public metrics.
