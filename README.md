@@ -42,6 +42,38 @@ Both doors use the same [starter package](docs/consumer-starter-package.md), the
 
 The first useful task both doors share is a small, fictional local requirements brief (Stage 1 only). It is described in the guided walkthrough, is not executed by this page and does not complete J1 or claim readiness. The [consumer readiness guide](docs/consumer-readiness/consumer-guide-v1.md) is a DRAFT / EVIDENCE-ONLY page that explains the evidence and limits; it is not an installation instruction.
 
+### Plain-language approvals (for guided work)
+
+When guided work reaches a decision point, the assistant must explain it in outcomes before asking. Say plainly: what will change; what stays untouched; how to undo or say no; and the safe default (usually no). Do not ask a bare technical yes/no, and explain any Git or GitHub term you use at that point. If a step is only part of the save-and-review flow, ask only about the part that will actually happen.
+
+A usable approval question follows; adapt the wording if needed, but do not skip the four parts:
+
+> I have finished the draft files for this step. I want to save them in a separate line of work (called a branch) so your main line stays exactly as it is. I will then upload that line and create a review page (a pull request) so you can see the changes; nothing in your main line changes until you press Merge. If you say no, I will not commit, upload or open a review page, and I will tell you what, if anything, already exists. OK to save the drafts in the separate line and show you the review page?
+
+Answer in your own words; these are equivalent:
+- Yes, save it and show me the review page.
+- Not yet - explain more.
+- No, do not save or upload these changes.
+
+The assistant maps the answer to its technical actions and states what it did. For 'no', it stops and says what, if anything, already exists (for example uncommitted draft files) so you can decide whether to remove them.
+
+Terms in plan words (define any you use at the decision point):
+
+| Term | What it means for you |
+| --- | --- |
+| Repository | The project folder Aegis is working in, including its history. |
+| Branch | A separate line of work, so your main line stays as it is. |
+| Commit | A saved snapshot of changes in that line of work. |
+| Push | Uploading that line so it can be shared for review. |
+| Pull request | A review page showing the changes and asking you to approve them. |
+| Merge | Applying the reviewed changes to your main line. |
+| Main | The main line of your project that others normally see or use. |
+| Clone | A separate copy of the repository, often used for experiments. |
+
+Agent self-check before a technical question: Would a non-technical person understand this without reading docs? If not, rewrite it in outcomes: what changes, what stays the same, how to undo, and what the default is.
+
+This guidance changes no package behaviour and adds no capability. It is not an approval, authority, readiness or human-usability claim. If an actual step differs, describe the actual change instead of replaying the example.
+
 For an optional setup conversation, explicitly say **"Help me set up Aegis"**
 or **"Help me change my Aegis setup"** and invoke the manual-only
 [`aegis-setup`](.claude/skills/aegis-setup/SKILL.md) skill. It offers Aegis only,
