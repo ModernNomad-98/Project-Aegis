@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "d0aa5a590004c250fd382916c9adcbd52f2ae07c",
-  "table_rows": 304,
+  "built_at_ref": "be688dbccf359c99acf7561d4846b30f949bb8ba",
+  "table_rows": 306,
   "events": [
     {
       "stable_id": "K-001",
@@ -3348,6 +3348,28 @@
       "reviewer": "batch20-page-reviewer",
       "evidence_source": "docs/evidence/documentation/readability-cp-rows6-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-458",
+      "path": "docs/delivery-workflow.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "2ae8f55616f9e635279d23dd1c69c31580b693d7",
+      "blob_id": "3df8a0890b2135cfce7f7f4c8d1a8e1a996a871e",
+      "quote": "**Do not merge before the final PR review is posted as a PR issue comment, accepted, and verified against the exact candidate head; the posted verdict names the exact 40-character head and the bound-fields hash, and a local F-AUDIT.md file is not a verdict.**",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-21-2026-11-13.md",
+      "date": "2026-11-13"
+    },
+    {
+      "stable_id": "K-459",
+      "path": ".claude/skills/skill-usage-ledger/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "2ae8f55616f9e635279d23dd1c69c31580b693d7",
+      "blob_id": "d263a5e5b55adc5a72a4834fa84a854f17d5c631",
+      "quote": "Make skill usage recordable, verifiable, and expected.",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-21-2026-11-13.md",
+      "date": "2026-11-13"
     }
   ],
   "reader_pages": [
@@ -4054,11 +4076,11 @@
     {
       "path": ".claude/skills/skill-usage-ledger/SKILL.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "e2a3e20b7c20ef8385b219b39c6405237163406f",
-      "blob_id": "594220d9701f964700030e1408a61b022f86b869",
-      "reviewer": "deepseek-v4-pro-apr117-keeper",
-      "evidence_source": "docs/evidence/documentation/readability-apr117-withdrawals-and-rerecord-2026-10-15.md",
-      "date": "2026-10-15",
+      "last_acceptance_sha": "2ae8f55616f9e635279d23dd1c69c31580b693d7",
+      "blob_id": "d263a5e5b55adc5a72a4834fa84a854f17d5c631",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-21-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
@@ -4214,11 +4236,11 @@
     {
       "path": "docs/delivery-workflow.md",
       "event_kind": "full-page-acceptance",
-      "last_acceptance_sha": "79c5c5901cd69101a58a696e0f03f1f7dd2264db",
-      "blob_id": "bff407a65ade2fc7f07871e9d57bf0dc20a55516",
-      "reviewer": "readability-closeout-implementer-c",
-      "evidence_source": "docs/evidence/documentation/readability-closeout-reread-2026-10-12.md",
-      "date": "2026-10-12",
+      "last_acceptance_sha": "2ae8f55616f9e635279d23dd1c69c31580b693d7",
+      "blob_id": "3df8a0890b2135cfce7f7f4c8d1a8e1a996a871e",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-operational-batch-21-2026-11-13.md",
+      "date": "2026-11-13",
       "acceptance_reachable": true
     },
     {
