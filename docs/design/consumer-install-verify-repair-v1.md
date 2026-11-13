@@ -235,7 +235,7 @@ Run from the candidate root:
 
     python -B -m unittest discover -s tools/distributed_payload/tests -p test_*.py -v
 
-The pre-existing suite is 37 tests (3 host-limited skips); this slice adds **thirteen** new test methods in one new module - the twelve contract cases (N-1..N-10 and I-1/I-2) plus the harness-hygiene regression (H-1) - so the expected total is **50** tests with the same 3 skips. The observed result is recorded in the lane receipt, not in this page.
+The pre-existing suite is 37 tests (3 host-limited skips); this slice adds **thirteen** new test methods in one new module, `tools/distributed_payload/tests/test_install_lifecycle.py` (the count is from that named file: the twelve contract cases N-1..N-10 and I-1/I-2 plus the harness-hygiene regression H-1) - so the expected total is **50** tests with the same 3 skips. The observed result is recorded in the lane receipt, not in this page.
 
 **CL-15 re-derivation.** The official closure form is `Test-Path -LiteralPath "$C/docs/design/consumer-install-verify-repair-v1.md"` where `$C` is the frozen main checkout (`captures/closures.ps1`, CL-15). Re-derived at this candidate, the same predicate is:
 

@@ -6,15 +6,14 @@
 > owner is the first participant and the Lead is the local steward-operator;
 > capture, export, import and cohort arithmetic run for the owner only. Here
 > **owner-local** means **only the owner's own workflow data — no
-> external-participant intake, no hosted service and no publication**; the reporter
-> tool makes no network call. The owner chooses where exports are stored: a local folder, **or** an
-> owner-controlled provider-synced folder (for example Google Drive) — in the latter
-> case the provider's metadata and backups apply. No external-participant data is
-> involved.
-> The private **Google Drive** channel is designated, reviewed and rehearsed (the
-> owner's own export; a duplicate import; the file moved to processed) — but
-> **external participant intake remains closed** until the owner shares
-> per-participant subfolders and sends a consent supplement, and **no
+> external-participant intake, no Aegis-hosted service or external inbox, and no
+> publication**; the reporter tool makes no network call. The owner decides where
+> exports are stored: a local folder, or an owner-controlled provider-synced folder
+> (for example Google Drive), in which case the provider can access, log, retain and
+> back up the files (not only metadata). No external-participant data is involved.
+> The private **Google Drive** channel is designated, access-reviewed and privately
+> rehearsed for the owner's own rehearsal; **external participation remains closed**
+> pending the owner's per-participant sharing + consent steps, and **no
 > external-participant data exists**. **This page is not itself an authorisation**
 > for hosting, external intake or publication; each of those remains a separate
 > owner decision with its own review. Synthetic tests are engineering evidence,
@@ -35,12 +34,13 @@
    named steward. Email, public issues and pull-request comments are not intake.
    *Local pilot: **owner-only** — the owner activation and the designated Google
    Drive channel are recorded. External participation: **closed**, pending the
-   owner's channel/consent steps.*
+   owner's per-participant sharing + consent steps.*
 2. Complete the privacy and security review of the channel's logs, backups,
    access paths and unavoidable metadata. If the channel cannot meet the agreed
    scope, stay owner-local (no external intake). *Local pilot: **owner-only** — the channel is
-   designated/reviewed/rehearsed for the owner's own rehearsal. External
-   participation: **closed**, pending the owner's channel review.*
+   designated/access-reviewed/rehearsed for the owner's own rehearsal. External
+   participation: **closed**, pending the owner's per-participant sharing + consent
+   steps.*
 3. Prepare the consent text from [privacy-and-consent.md](privacy-and-consent.md):
    purpose, fields, recipient, retention, optional skill plane, withdrawal,
    deletion limits, missing-data limits and no public metrics. *Local pilot:
