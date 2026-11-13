@@ -48,9 +48,9 @@ When guided work reaches a decision point, the assistant must explain it in outc
 
 A usable approval question follows; adapt the wording if needed, but do not skip the four parts:
 
-> I have finished the draft files for this step. I want to save them in a separate line of work (called a branch) so your main line stays exactly as it is. I will then upload that line and create a review page (a pull request) so you can see the changes; nothing in your main line changes until you press Merge. If you say no, I will not commit, upload or open a review page, and I will tell you what, if anything, already exists. OK to save the drafts in the separate line and show you the review page?
+> I have finished the draft files for this step. I want to save them in a separate line of work (called a branch) so your main line stays exactly as it is. I will then upload that line and create a review page (a pull request) so you can see the changes; nothing in your main line changes until you press Merge. If you change your mind before Merge, I can close the review page and delete the uploaded branch; your main line stays unchanged. The safe default is no. If you say no, I will not commit, upload or open a review page, and I will tell you what, if anything, already exists. OK to save the drafts in the separate line and show you the review page?
 
-Answer in your own words; these are equivalent:
+Answer in your own words. Any of these answers is valid:
 - Yes, save it and show me the review page.
 - Not yet - explain more.
 - No, do not save or upload these changes.
