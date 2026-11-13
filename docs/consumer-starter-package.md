@@ -494,7 +494,7 @@ never converted to a pass. The same fail-closed vocabulary applies to the govern
 
 ### Authoritative execution order (P0–P9)
 
-Run the install in this order. It is the order of the normative procedure in section 7; the `S` labels beside each row are only where the checkpoint/expected output lives in this walkthrough, not an execution order of their own. `P4` is a definition step with no separate checkpoint.
+Run the install in this order. It is the order of the normative procedure in section 7; the `S` labels beside each row are only where the checkpoint/expected output lives in this walkthrough, not an execution order of their own. `P4` is a definition step with no separate checkpoint. The `CP` labels therefore follow the `S` grouping, not the P0–P9 chronology.
 
 | # | Step | What you do (one line) | Walkthrough label / checkpoint |
 | --- | --- | --- | --- |
@@ -504,7 +504,7 @@ Run the install in this order. It is the order of the normative procedure in sec
 | P3 | Clone the source at a pinned commit, and prove the checkout | Clone at the pin, check out the pinned commit, verify HEAD/tree/clean status (section 7 P3) | **S3**; **CP3** |
 | P4 | Name the package | Confirm the 41-path copy list that the harness carries as `$package`; no writes and no separate checkpoint (section 7 P4) | install preparation for **S5**; no separate CP |
 | P5 | Destination pre-checks (before any write) | Destination containment, resume-or-refuse and record-path pre-checks, before any write (section 7 P5) | **S5**; **CP5** after the install completes |
-| P6 | Copy by allow-list only, then the startup files | Copy only the 41 listed files and the two startup files; existing identical files are skipped (section 7 P6) | **S5**; **CP5** |
+| P6 | Copy by allow-list only, then the startup files | Copy only the declared package files: **39 skill files + the 2 startup files = the 41 listed paths**; existing identical files are skipped (section 7 P6) | **S5**; **CP5** |
 | P7 | Refuse eval material, scoped to the installed skills | Refuse eval material inside the installed skill directories (section 7 P7) | **S5**; **CP5** |
 | P8 | Verify the closure and the pins, against independent values | Run the closure/pin checks and print the five `P8:` lines (section 7 P8) | **S5**; **CP5** |
 | P9 | Write the consumer install record | Write the create-new atomic install record with the 41 rows and aggregate (section 7 P9) | **S5/S6**; **CP5/CP6** |
@@ -562,7 +562,10 @@ Stage 1 only. Read the installed AGENTS.md startup items and the installed
 project-orchestrator Stage 1 instructions. Ask me exactly one plain-language
 question per turn. Every answer I give is a FICTIONAL EXERCISE INPUT; declare
 that in the output. Do not write code, tests, UI, a spec, a plan, a commit or a
-push, and do not call any provider, network or external tool. Write only
+push, and do not make any additional provider, network, telemetry or
+external-tool call beyond this chat session; do not put participant or real
+data in prompts (the harness's model data flow is provider traffic outside
+this exercise's control). Write only
 docs/requirements.md and docs/project-state.md. Stop after the Stage 1 summary;
 do not start Stage 2.
 ```
