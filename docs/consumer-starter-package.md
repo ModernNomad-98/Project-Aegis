@@ -492,6 +492,25 @@ never converted to a pass. The same fail-closed vocabulary applies to the govern
 
 **Installation success vs full-route completion.** *Installation success* is the exit-0 P8/P9 output plus the install record written at the chosen path (CP5/CP6). It is not "no red text". *Full guided-walkthrough completion* additionally requires the first-task files (CP7) and the fresh-chat resumption check (CP8). Neither is a support promise: this page and the evidence behind it establish neither consumer readiness nor human usability (both are UNRUN at this head).
 
+### Authoritative execution order (P0–P9)
+
+Run the install in this order. It is the order of the normative procedure in section 7; the `S` labels beside each row are only where the checkpoint/expected output lives in this walkthrough, not an execution order of their own. `P4` is a definition step with no separate checkpoint.
+
+| # | Step | What you do (one line) | Walkthrough label / checkpoint |
+| --- | --- | --- | --- |
+| P0 | Record the host | Capture the PowerShell 7, Git, resolved `sh` path and host-agent versions (section 7 P0) | supports **S2**; checkpoint **CP2** after S2 completes |
+| P1 | Prove the target is a consumer repository, not the library | Run the role probe: 0 of 4 Aegis source landmarks in your product repository (section 7 P1) | **S1**; **CP1** |
+| P2 | State the install mode, then verify the two identity records | State explicit `-Mode` and `-OwnerAuthorization`; the gate validates the owner/commit identity records (section 7 P2) | **S4**; **CP4** |
+| P3 | Clone the source at a pinned commit, and prove the checkout | Clone at the pin, check out the pinned commit, verify HEAD/tree/clean status (section 7 P3) | **S3**; **CP3** |
+| P4 | Name the package | Confirm the 41-path copy list that the harness carries as `$package`; no writes and no separate checkpoint (section 7 P4) | install preparation for **S5**; no separate CP |
+| P5 | Destination pre-checks (before any write) | Destination containment, resume-or-refuse and record-path pre-checks, before any write (section 7 P5) | **S5**; **CP5** after the install completes |
+| P6 | Copy by allow-list only, then the startup files | Copy only the 41 listed files and the two startup files; existing identical files are skipped (section 7 P6) | **S5**; **CP5** |
+| P7 | Refuse eval material, scoped to the installed skills | Refuse eval material inside the installed skill directories (section 7 P7) | **S5**; **CP5** |
+| P8 | Verify the closure and the pins, against independent values | Run the closure/pin checks and print the five `P8:` lines (section 7 P8) | **S5**; **CP5** |
+| P9 | Write the consumer install record | Write the create-new atomic install record with the 41 rows and aggregate (section 7 P9) | **S5/S6**; **CP5/CP6** |
+
+The table below groups actions by `S` label; **it is not the execution order**. Run P0 → P9 in the order above, and use the `S`/`CP` labels only to find the expected output and the checkpoint.
+
 ### Where each shared step runs, what you should see, and where it is safe to stop
 
 | Shared step | Where it runs | Documented action (reference; no new command) | Expected observable output | Safe stop |
@@ -507,7 +526,7 @@ never converted to a pass. The same fail-closed vocabulary applies to the govern
 | S8 Fresh-chat resumption | A new DeepSeek Harness chat on the same product folder | Start a fresh chat and ask a **read-only** status question: "Where am I? Read `docs/project-state.md` and tell me the latest STATE SNAPSHOT and the next action; do not continue work yet." | The agent reports the latest STATE SNAPSHOT and next action without restarting; it makes no file changes during this check | CP8 |
 | S9 Refusal and recovery (failure-only) | PowerShell 7 and/or the product session | **Only when a step stops:** map the exact refusal to section 7.2; use its permitted next action; record what happened; resume at the failed step | A recorded refusal with its exact code and message plus the next action | CP9 (failure-only) |
 
-**Safe stopping points.** CP1–CP9 are the same safe stops as the shared steps above:
+**Safe stopping points.** CP1–CP8 are the happy-path safe stops; CP9 is failure-only. They are the same stops as the shared steps above:
 
 | CP | After | Safe to stop? | What is guaranteed | How to resume |
 | --- | --- | --- | --- | --- |
@@ -548,7 +567,7 @@ docs/requirements.md and docs/project-state.md. Stop after the Stage 1 summary;
 do not start Stage 2.
 ```
 
-- **Network/provider boundary.** Running this exercise inside a DeepSeek Harness chat session is allowed — the local chat session is not a provider call. The exercise must make no *additional* network, provider, telemetry or external-tool call: no web search, no API request, no upload, no install/download action.
+- **Network/provider boundary.** Running this exercise inside a DeepSeek Harness chat session is allowed. The exercise makes **no additional** provider, network, telemetry or external-tool call beyond the chat session itself: no web search, no API request, no upload, no install/download action. The harness's own model data flow (the provider that serves the chat) is outside this exercise's control and should be treated as provider traffic; do not place participant data in prompts — the exercise inputs are fictional by design.
 - **Minimal templates.** `docs/requirements.md` must contain at least: a `FICTIONAL EXERCISE INPUT` declaration; the interview record (the six answers, with one question per turn); `REQ-1…REQ-n` facts; `AS-1…AS-n` assumptions, explicitly labelled as assumptions; an out-of-scope list; and open questions. `docs/project-state.md` must contain at least: an append-only `STATE SNAPSHOT` row with the current stage (`Stage 1`), where we are and the next recommended action; and a decision log `D-*` for the choices made. An approval entry is allowed only as a consumer-local `A-*` record that a human genuinely authorised — never fabricated.
 - **Expected end state:** `docs/requirements.md` and `docs/project-state.md` exist with the required sections and the fictional-input declaration; the install remains intact and no package file is edited; no other file in the exercise repository is added or changed.
 - **Cleanup.** If you used a disposable repository, delete that folder. If you used a dedicated branch, switch back to your main branch and delete the exercise branch; the two files are untracked in that branch, so confirm with `git status` and remove only the two files you created. Do not run a repository-wide clean.
