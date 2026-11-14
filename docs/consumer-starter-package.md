@@ -188,7 +188,7 @@ outside J1 is excluded (section 4).
 | `screenshot-evidence-planner` | J1 step 11, **policy half only**. J1 has no UI slice, so step 11 invokes the planner to produce the policy handoff (checkpoints, deterministic naming, pre-storage masking, retention) and nothing is captured; the handoff is recorded as AC-30's policy answer in the evidence record. It captures nothing by contract (`SKILL.md:16`; its Use-When 27-28 hands capture to a manual-only owner). |
 
 The two startup files are `AGENTS.md` (the role-detection and operating contract,
-25,228 B) and `CLAUDE.md` (`@AGENTS.md` import plus startup routing, 2,687 B).
+29,137 B) and `CLAUDE.md` (`@AGENTS.md` import plus startup routing, 2,687 B).
 Both are required because the role recognition J1 step 2 tests lives in them.
 
 ### 2.3 The file list (42 paths, bytes and LF at the pin `2fef11dd43fe6e943e99c7948ebeaca95d138072`)

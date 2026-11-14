@@ -24,7 +24,7 @@ This skill is the single authoritative routing policy for Aegis work: classify a
 
 ## Workflow
 
-This section is the single authoritative routing policy for this skill; other skills cite it and do not restate it. It is a decision contract for choosing models; it does not claim that Aegis can control the host's model selector.
+Apply the routing policy stated in Purpose above; the authoritative statement is not restated here. This Workflow is a decision contract for choosing models; it does not claim that Aegis can control the host's model selector.
 
 Classify the task into one of four capability roles (roles, not model names):
 - **Lightweight** - routine extraction, formatting, summarising, log scanning.
@@ -37,9 +37,9 @@ If a task spans roles, apply the highest-risk role and use independent verificat
 At dispatch:
 1. Classify the task and note whether independent verification is required.
 2. Obtain the host's available-model capability inventory at runtime. Do not hardcode model, family, provider or version names in this policy. A local capability map is data, not policy; store only opaque labels if a host supplies them, and never store secrets.
-3. Choose the least costly role that is sufficient on demonstrated capability, reliability, latency and cost. Default advanced tasks to the host's medium effort setting (or its equivalent); increase effort when complexity or risk justifies it. Never accept lower verification quality to reduce cost.
-4. For independent verification, use a model different from the implementer and a separate agent/instance. If the host exposes only one model, or cannot show the choice, do not claim independent verification: record the limitation and surface it. High-risk verification without a distinct model is an owner decision or a stop, never a silent pass.
-5. If the host exposes no model chooser, state that plainly, continue only with the limits this creates, and do not fabricate separation.
+3. Choose the least costly role that is sufficient on demonstrated capability, reliability, latency and cost. For advanced work, default to the host's medium effort setting (or its equivalent), escalating when complexity or risk justifies it. Never accept lower verification quality to reduce cost.
+4. For independent verification, use a model different from the implementer and a separate agent/instance. If the host exposes only one model, or cannot show the choice, do not claim independent verification: record the limitation and surface it. Ordinary tasks may continue under that recorded limitation, but high-risk verification without a distinct model is an owner decision or a stop, never a silent pass.
+5. If the host exposes no model chooser, state that plainly and continue with the limits this creates; ordinary routing is not a blanket stop, while high-risk verification without a distinct model follows step 4 and the Stop Conditions. Do not fabricate separation.
 6. Record in the existing turn/handoff/evidence: capability role, host-provided opaque label only if exposed, effort, rationale, and whether independence was available. Do not add a file, do not change the project-state schema, and do not store provider credentials or other secrets.
 7. Model upgrades or replacements must not require policy changes; re-check the host inventory instead of editing this policy.
 8. This policy is guidance, not a measurement or guarantee: do not claim model quality, cost savings, or independence beyond what the host actually exposes.
@@ -69,7 +69,7 @@ Examples (role-based, never names): routine log extraction -> lightweight; requi
 
 ## Stop Conditions
 
-- A high-risk verification lacks a distinct model and either the owner has not decided or no stop was taken.
+- A high-risk verification without a distinct model stops unless the owner has explicitly decided to proceed with that limitation, with the decision recorded.
 - The host cannot show the model choice and the work would be reported as independently verified.
 - The policy would need a hardcoded model, family, provider or version name.
 

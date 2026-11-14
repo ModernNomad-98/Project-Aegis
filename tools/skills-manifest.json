@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "c15a7ecab5699197e23293a88bdf74c756fa3c05",
+  "source_revision": "66620739818466d3fa9646e7fbf85671284e4ebf",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -706,7 +706,7 @@
     {
       "name": "model-routing-policy",
       "path": ".claude/skills/model-routing-policy/SKILL.md",
-      "sha256": "b0bf85910a7c58cb175283c6d842e95b6455f9ec78442046e0cb61f15fc7997f"
+      "sha256": "0c863621e19671f466b2f5984a49eb96fb5f137f1a56d7cfdd8accf681c62cbe"
     },
     {
       "name": "modernization-cutover-planner",
