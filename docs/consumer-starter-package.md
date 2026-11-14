@@ -1614,13 +1614,13 @@ Each code stops; none warns and continues.
 
 | Code | Meaning | What you see |
 | --- | --- | --- |
-| 1 | Prerequisite failure | `STOP: no Git sh.exe found`, a missing source/target clone, or a `sh` that did not answer. The source/target checks run before any write. The published harness probes `sh` at the end of P8, so that path stops **after** the 41 files are written - the install is resumable from there and no record is written |
+| 1 | Prerequisite failure | `STOP: no Git sh.exe found`, a missing source/target clone, or a `sh` that did not answer. The source/target checks run before any write. The published harness probes `sh` at the end of P8, so that path stops **after** the 42 files are written - the install is resumable from there and no record is written |
 | 20 | Foreign material in a destination skill directory | The exact file that is outside the package; nothing overwritten |
 | 21 | Unsafe or missing source path | The `..`/reparse-point segment or the missing file; nothing written |
 | 22 | Startup-file conflict | The differing file; existing bytes unchanged |
 | 23 | Unsafe destination path (junction, symbolic link or other reparse point) | The exact path and the link type/target; refused before any package or record write, including a reparse point at `-RecordPath`, which is a **23** and never a 24. P9 re-reads the record leaf's attributes after the preflight (attributes only, never followed), so a link swapped in after the walk is refused at **23** too; by then the package copy is complete and no record is written |
-| 24 | Install record path cannot be used | The exact path. An existing path at `-RecordPath`, an existing directory or other non-file under `-AllowExistingRecord`, and a path that equals, contains **or is nested under** one of the 41 package outputs are all refused before any package or record write. `-AllowExistingRecord` keeps a record only when the path was an existing regular file at the preflight, leaves it unchanged, and does not read or verify its contents (the identical-install claim is operator-attested). A record **file** that first appears after the preflight is refused at 24 with or without the switch and no new record is written, though the package copy has already completed. A reparse point at the record path is refused by the containment walk at **23**, not here, and P9 re-checks the leaf for one that appeared after that walk |
-| 25 | The install record could not be written atomically | The record path and the underlying error; the unique same-directory temp file is removed (best effort) and no new record is left at `-RecordPath`, so a partial receipt cannot be read as one. The message states that the **41 package files are already written** at this point ("the package copy is complete but no record was written"); a P9 containment failure on the record temp reports the same scope. Directory creation for the record is part of this same contract, so a directory-creation failure is 25, not 1 |
+| 24 | Install record path cannot be used | The exact path. An existing path at `-RecordPath`, an existing directory or other non-file under `-AllowExistingRecord`, and a path that equals, contains **or is nested under** one of the 42 package outputs are all refused before any package or record write. `-AllowExistingRecord` keeps a record only when the path was an existing regular file at the preflight, leaves it unchanged, and does not read or verify its contents (the identical-install claim is operator-attested). A record **file** that first appears after the preflight is refused at 24 with or without the switch and no new record is written, though the package copy has already completed. A reparse point at the record path is refused by the containment walk at **23**, not here, and P9 re-checks the leaf for one that appeared after that walk |
+| 25 | The install record could not be written atomically | The record path and the underlying error; the unique same-directory temp file is removed (best effort) and no new record is left at `-RecordPath`, so a partial receipt cannot be read as one. The message states that the **42 package files are already written** at this point ("the package copy is complete but no record was written"); a P9 containment failure on the record temp reports the same scope. Directory creation for the record is part of this same contract, so a directory-creation failure is 25, not 1 |
 | 30 | Closure, count or eval-material failure | The offending path or the count found |
 | 31 | Pin or byte mismatch (including a CRLF checkout or an aggregate mismatch) | The exact file, or the aggregate comparison that failed |
 | 32 | Missing sibling dependency | The installed skill that links it and the absent sibling it names, as `<skill> links <sibling>/SKILL.md` |
@@ -1634,7 +1634,9 @@ identical rerun is distinguishable from the initial run. Recover from the report
 message plus the record rule for that code; the governance-state equivalent and its permitted next
 actions are in [consumer-status-presentation-v1.md](consumer-status-presentation-v1.md).
 
-### 7.3 Transitioning an installed v1 package to v2
+### 7.3 Historical: transitioning an installed v1 package to v2
+
+This section is retained as history for the v1->v2 (39->41 file) transition. It is not the current 42-file package procedure; do not use its 41-row completion rule for the current package. The current definition is sections 2 and 7.1.
 
 A consumer repository that already holds the published 39-file v1 starter moves to
 the 41-file v2 starter by running the **same** procedure in sections P0-P9 with the
@@ -1683,7 +1685,7 @@ run, check the three preconditions the installer does not check for you:
 - **The v2 record path.** It must not exist for the initial run. Since AEP3-I9
   the installer enforces this: an existing file there stops the run with **exit
   24** before any package file or record is written (section 7.2). A path that is
-  not a regular file, and a path that equals one of the 41 package outputs (for
+  not a regular file, and a path that equals one of the 42 package outputs (for
   example `AGENTS.md`), are refused at **24** as well. The `Test-Path` guard in
   the block below still stops earlier, which is only a faster failure. If a file is already there - stale, partial, or copied from
   another run - quarantine it (move it aside) before the run, so audit evidence
