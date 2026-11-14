@@ -28,7 +28,7 @@ Every row is a fact checked at the base commit, with its evidence. Rows marked *
 | F3 | The only report write is an explicit `--report-out` destination outside the target root and outside the declared package directories; it is written to a same-directory temporary file, fsynced, then renamed over the destination, and the temporary file is removed in a `finally` block. | `verify.py:126-165`; interruption cases I-1/I-2 below. |
 | F4 | A manifest build refuses an output path inside the payload root and validates before writing; the manifest is not part of any target tree. | `__main__.py:30-38`, `:56-62`; `manifest.py:469-484`. |
 | F5 | The repository ships no installer, updater, repair or prune script at any path. | Filesystem search over the base tree for `install*` / `*install*.ps1` / `*install*.py` returned no hit; the only install surface is the documented procedure in F6. |
-| F6 | `docs/consumer-starter-package.md` *documents* a Windows PowerShell 7 install procedure (P0-P9): it writes exactly 41 files (18 skill directories, `AGENTS.md`, `CLAUDE.md`) plus a consumer install record, and every check stops rather than warning and continuing. (documentary) | `docs/consumer-starter-package.md` section 7 (target scope and P0–P9). |
+| F6 | `docs/consumer-starter-package.md` *documents* a Windows PowerShell 7 install procedure (P0-P9): it writes exactly 42 files (19 skill directories, `AGENTS.md`, `CLAUDE.md`) plus a consumer install record, and every check stops rather than warning and continuing. (documentary) | `docs/consumer-starter-package.md` section 7 (target scope and P0–P9). |
 | F7 | That documented procedure's exit codes are: 1 prerequisite, 20 foreign material, 21 unsafe source, 22 startup-file conflict, 23 unsafe destination, 24 unusable record path, 25 record not written atomically, 30 closure/count/eval material, 31 pin or byte mismatch, 32 missing sibling dependency, 40 wrong repository role, 41 owner record missing, 42 commit identity missing/owner-matching on the agent-commit route, 43 install mode or authorization unstated/unrecognised. (documentary) | `docs/consumer-starter-package.md` section 7.2. |
 | F8 | The documented v1->v2 transition re-runs the same procedure with a new record path: there is no updater, no downgrade engine and no in-place substitution of the old record; an already-existing skill directory carrying foreign material is refused at 20 and a differing byte at 31, before any write. (documentary) | `docs/consumer-starter-package.md` sections 7.3 and 12 (limits). |
 | F9 | The consumer install record is the consumer's own artifact, written by that documented procedure, with one row per installed file and a computed aggregate; this slice neither writes one nor runs the procedure. | `docs/consumer-starter-package.md` sections 7.1 and 9; plan row P-11 route ("actual consumer installation requires P-20 target decision"). |
@@ -116,7 +116,7 @@ Refusals are the lifecycle's safety surface: each one is fail-closed — it stop
 
 | Code | Refusal | Preservation effect stated by the document |
 | --- | --- | --- |
-| 1 | Prerequisite failure (no usable shell, missing source/target) | nothing written; the documented shell probe at the end of P8 is the one case stated as occurring after the 41 files are written, with no record |
+| 1 | Prerequisite failure (no usable shell, missing source/target) | nothing written; the documented shell probe at the end of P8 is the one case stated as occurring after the 42 files are written, with no record |
 | 20 | Foreign material in a destination skill directory | the exact offending file; nothing overwritten |
 | 21 | Unsafe or missing source path | nothing written |
 | 22 | Startup-file conflict (`AGENTS.md`/`CLAUDE.md` differ) | existing bytes unchanged |
@@ -226,7 +226,7 @@ A crash is not a lifecycle transition. The question for each window is only: *wh
 | I-2 | During the report rename (rename fails) | the previous complete report, byte-unchanged; no temp left | PI-6; target untouched | yes - `test_i02_interrupted_report_rename_preserves_previous_record` |
 | I-3 | During a verify read, before any report | nothing written; target unchanged | PI-2/PI-3 | pre-existing `test_a08_interrupted_verify_leaves_no_corruption` (process kill) |
 | I-4 | During the documented install copy, before the receipt (documentary) | some declared files copied, no receipt; the run is resumable and every conflict is refused on the retry | PI-9/PI-10 | **UNRUN** - no install target exercised |
-| I-5 | Between install copy and receipt write (documentary) | 41 files present, no receipt (codes 1/24/25 state that scope explicitly) | PI-10 | **UNRUN** |
+| I-5 | Between install copy and receipt write (documentary) | 42 files present, no receipt (codes 1/24/25 state that scope explicitly) | PI-10 | **UNRUN** |
 | I-6 | During the receipt write (documentary) | the temp file removed; no partial receipt; previous record unchanged if one existed | PI-10 | **UNRUN** |
 
 The I-1/I-2 tests are deterministic: they interrupt the write in-process rather than racing a process kill, so they do not depend on host timing.

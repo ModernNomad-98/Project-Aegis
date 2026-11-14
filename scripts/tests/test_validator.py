@@ -8200,8 +8200,8 @@ def test_consumer_starter_git_failure_classes():
 
 STARTER_MODE_HEADING = "### P2 "
 STARTER_HARNESS_HEADING = "### 7.1 "
-STARTER_PIN_COMMIT = "ffb040c7a363648856475280646bbd142dfabe4e"
-STARTER_PIN_TREE = "88a5aee4ad928a49c2fb945032585843ec652da7"
+STARTER_PIN_COMMIT = "2fef11dd43fe6e943e99c7948ebeaca95d138072"
+STARTER_PIN_TREE = "14133f917b2fc35ccac44fb844fd1664fb6839af"
 STARTER_SOLO = ("Peter Nguyen", "263130032+ModernNomad-98@users.noreply.github.com")
 STARTER_AGENT = ("Aegis Agent (DeepSeek V4 Flash)", "agent@example.invalid")
 STARTER_OWNER = ("Owner Person", "owner@example.invalid")
@@ -8718,7 +8718,7 @@ def test_consumer_install_mode_native():
             )
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             files = _install_mode_files(target)
-            assert len(files) == 42, "expected 41 package files plus the record, got %d" % len(files)
+            assert len(files) == 43, "expected 42 package files plus the record, got %d" % len(files)
             assert "docs/consumer-install-record.md" in files
             record = (target / "docs" / "consumer-install-record.md").read_text(encoding="utf-8")
             assert "Install mode: human-only" in record, record[:400]
@@ -8730,7 +8730,7 @@ def test_consumer_install_mode_native():
             assert _install_mode_config(target, env) == config_before, (
                 "the human-only install changed local Git config"
             )
-            ok("S3-1: the published harness completes a human-only install with 41 "
+            ok("S3-1: the published harness completes a human-only install with 42 "
                "files, the mode in the record, 0 commits and byte-identical config")
 
             # F3: a padded human-only token installs as human-only and the record
@@ -8749,7 +8749,7 @@ def test_consumer_install_mode_native():
             )
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             padded_files = _install_mode_files(padded_target)
-            assert len(padded_files) == 42, len(padded_files)
+            assert len(padded_files) == 43, len(padded_files)
             padded_text = padded_record.read_text(encoding="utf-8")
             assert "- Install mode: human-only (owner-stated;" in padded_text, padded_text[:400]
             assert "Install mode:  human-only" not in padded_text, padded_text[:400]
@@ -8969,7 +8969,7 @@ def test_consumer_install_destination_links():
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             first = _dest_snapshot(clean)
             assert len([row for row in first if row[1] == "FILE"]) == 42, first
-            ok("S4-1: an ordinary clean target still installs 41 files plus the "
+            ok("S4-1: an ordinary clean target still installs 42 files plus the "
                "declared record with the containment preflight in place")
 
             # S4-2: a linked target root is refused, and the external tree is
@@ -9037,10 +9037,10 @@ def test_consumer_install_destination_links():
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             assert ext_record.is_file(), "the declared ordinary external record was not written"
             rows = [row for row in _dest_snapshot(external) if row[1] == "FILE"]
-            assert len(rows) == 41, rows
+            assert len(rows) == 42, rows
             assert not (external / "docs" / "consumer-install-record.md").exists()
             ok("S4-6: an ordinary external record path remains allowed and is written "
-               "at its declared location, with 41 package files in the target")
+               "at its declared location, with 42 package files in the target")
 
             # S4-7: the existing startup-file refusal is not weakened or pre-empted.
             conflict = _install_mode_repo(tmp / "d-conflict", env)
@@ -9063,7 +9063,7 @@ def test_consumer_install_destination_links():
                             if row[1] != "FILE" or not row[0].startswith("docs/")]
             resumed_rows = [row for row in _dest_snapshot(clean)
                             if row[1] != "FILE" or not row[0].startswith("docs/")]
-            assert len([row for row in resumed_rows if row[1] == "FILE"]) == 41, resumed_rows
+            assert len([row for row in resumed_rows if row[1] == "FILE"]) == 42, resumed_rows
             assert package_rows == resumed_rows, (
                 "the resume changed an installed package file")
             assert (clean / "docs" / "consumer-install-record.md").is_file()
@@ -9890,7 +9890,7 @@ def test_consumer_install_record_temp_collision():
             assert stale_tmp.read_bytes() == sentinel, (
                 "the record write truncated the pre-existing .tmp leaf")
             files = [row for row in _dest_snapshot(stale) if row[1] == "FILE"]
-            assert len(files) == 43, files  # 41 package + record + stale .tmp
+            assert len(files) == 44, files  # 42 package + record + stale .tmp
             assert not list(stale_record.parent.glob("consumer-install-record.md.*.tmp")), (
                 "the record write left a unique GUID temp behind")
             ok("S4-12: a stale file at the old predictable <record>.tmp leaf is "
@@ -9996,7 +9996,7 @@ def test_consumer_install_record_write_failure():
             assert not blocked_record.exists(), "a record was left at the record path"
             assert not list(blocked.rglob("*.tmp")), "a temp file was left behind"
             files = [row for row in _dest_snapshot(blocked) if row[1] == "FILE"]
-            assert len(files) == 42, files  # 41 package + the blocker fixture
+            assert len(files) == 43, files  # 42 package + the blocker fixture
             ok("S4-15: a record-directory creation failure exits 25 with no record "
                "at -RecordPath and no temp, not a generic exit 1")
         finally:
@@ -10053,7 +10053,7 @@ def test_consumer_install_record_nonfile_switch():
             assert not list(fresh_record.parent.glob("consumer-install-record.md.*.tmp")), (
                 "a unique temp file was left behind")
             files = [row for row in _dest_snapshot(fresh) if row[1] == "FILE"]
-            assert len(files) == 42, files  # 41 package + record
+            assert len(files) == 43, files  # 42 package + record
             ok("S4-18: -AllowExistingRecord with no existing record still writes a "
                "fresh record and leaves no temp")
 
