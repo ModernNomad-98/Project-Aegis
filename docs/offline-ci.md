@@ -15,7 +15,7 @@ inputs; they do not run a live model evaluation.
    `validate-skills` and `gate-guard` run on every pull request to `main`;
    `windows-offline-checks` runs only when the change touches `tools/`,
    `requirements-ci.in` or `requirements-ci.txt`, and `tools-tests-linux` and
-   `tools-tests-windows` only when it touches `tools/`. A later push starts
+   `tools-tests-windows` only when it touches `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`. A later push starts
    new checks; older green results do not cover the new head.
 3. Read the job logs and retained evidence if a check fails. Fix a test or
    environment failure and rerun the new candidate. A documented protected
