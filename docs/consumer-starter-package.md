@@ -1636,7 +1636,7 @@ actions are in [consumer-status-presentation-v1.md](consumer-status-presentation
 
 ### 7.3 Historical: transitioning an installed v1 package to v2
 
-This section is retained as history for the v1->v2 (39->41 file) transition. It is not the current 42-file package procedure; do not use its 41-row completion rule for the current package. The current definition is sections 2 and 7.1.
+This section is retained as history for the v1->v2 (39->41 file) transition. It is not the current 42-file package procedure; do not use its 41-row completion rule for the current package. The current definition is sections 2, 7.1 and 7.2.
 
 A consumer repository that already holds the published 39-file v1 starter moves to
 the 41-file v2 starter by running the **same** procedure in sections P0-P9 with the
@@ -1685,7 +1685,8 @@ run, check the three preconditions the installer does not check for you:
 - **The v2 record path.** It must not exist for the initial run. Since AEP3-I9
   the installer enforces this: an existing file there stops the run with **exit
   24** before any package file or record is written (section 7.2). A path that is
-  not a regular file, and a path that equals one of the 42 package outputs (for
+  not a regular file, and a path that equals one of the 41 package outputs (the historical v2 package; section 7.2 records the
+  current 42-file rule; for
   example `AGENTS.md`), are refused at **24** as well. The `Test-Path` guard in
   the block below still stops earlier, which is only a faster failure. If a file is already there - stale, partial, or copied from
   another run - quarantine it (move it aside) before the run, so audit evidence
@@ -2184,7 +2185,7 @@ In J1 there is no UI slice, so the honest record is: **the planner is invoked fo
 the policy half only** — it produces the policy handoff (checkpoints, naming,
 masking, retention) that AC-30 records — with **no captures in J1**; the capture
 case is UNRUN with the exact remaining action (a human names the MANUAL-ONLY
-executor for the evidence type and records the override). The 41-file set
+executor for the evidence type and records the override). The 42-file set
 therefore includes the planner as a policy dependency, not as a capture
 dependency. The measured host has no Playwright runner and the
 local GUI answers unauthenticated, so even outside J1 a capture claim would be
@@ -2200,7 +2201,7 @@ a pass.
   array select the same rows, that each selected skill's allow-list closure
   (`SKILL.md` plus every `references/` file) is carried, and that removing either
   `scoped-approval-register` row from either selector fails deliberately. Nothing
-  checks that the 18-skill list is still the right *minimum*; the derivation rule,
+  checks that the 19-skill list is still the right *minimum*; the derivation rule,
   the install checks and this disclosure are the mitigation. A future change to the
   package needs a new measurement, not a memory.
 - **Five links do not resolve in your copy** (section 3), by design: rewriting them

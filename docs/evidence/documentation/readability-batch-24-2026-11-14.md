@@ -20,7 +20,7 @@
 
 ## Separate content fix (no K row)
 
-`docs/consumer-starter-package.md` is **not** one of the three accepted pages and takes **no K row** here. This PR corrects its current §7.2 exit-code references from the historical 41-file wording to the current 42 package files/outputs, retitles §7.3 as `### 7.3 Historical: transitioning an installed v1 package to v2`, and adds the explicit note that the section is retained history for the v1->v2 (39->41 file) transition, is not the current 42-file procedure and that its 41-row completion rule must not be used for the current package. The historical 39/41/aggregate text inside §7.3 is preserved. No reviewed page was edited by this PR.
+`docs/consumer-starter-package.md` is **not** one of the three accepted pages and takes **no K row** here. This PR corrects its current §7.2 exit-code references from the historical 41-file wording to the current 42 package files/outputs, retitles §7.3 as `### 7.3 Historical: transitioning an installed v1 package to v2`, and adds the explicit note that the section is retained history for the v1->v2 (39->41 file) transition, is not the current 42-file procedure and that its 41-row completion rule must not be used for the current package. The historical §7.3 text is preserved with one clarifying change: its historical 'one of the 41 package outputs' bullet is restored to 41 (the v2 package of that transition) and gains an explicit pointer to §7.2 for the current 42-file rule; the historical 39-file v1 text, the 41-file v2 transition text and both aggregates are otherwise unchanged, so no historical count is altered. No reviewed page was edited by this PR.
 
 ## Limits and non-claims
 
