@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "3d5954790fe233e9c1644b0ca88a49b56a294826",
-  "table_rows": 312,
+  "built_at_ref": "f268cf5a397ce0f0b444022a716835daf84ad123",
+  "table_rows": 315,
   "events": [
     {
       "stable_id": "K-001",
@@ -3436,6 +3436,39 @@
       "reviewer": "batch20-page-reviewer",
       "evidence_source": "docs/evidence/documentation/readability-phase-b-2026-11-14.md",
       "date": "2026-11-14"
+    },
+    {
+      "stable_id": "K-466",
+      "path": "docs/consumer-contract-manual-only.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "blob_id": "e88a3a66167f8d6b982677c2feceb071f81e5340",
+      "quote": "if the host cannot prove the human invocation, the named trigger, the current pin, or the override record, the manual-only skill is NOT applied",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "stable_id": "K-467",
+      "path": "docs/offline-ci.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "blob_id": "d4943a3a254262edac7ea42d78b075afdb2e48eb",
+      "quote": "re-run the workflow on the same head. A cancelled run is not a pass.",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "stable_id": "K-468",
+      "path": "docs/instrumentation/privacy-and-consent.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "blob_id": "565d1d2bfeb3c7f99e50982118c93577ca26a74b",
+      "quote": "The tool makes no anonymity claim.",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14"
     }
   ],
   "reader_pages": [
@@ -4270,6 +4303,16 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/consumer-contract-manual-only.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "blob_id": "e88a3a66167f8d6b982677c2feceb071f81e5340",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/consumer-readiness/compatibility-matrix-v1.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "1d7dd41766a81f7c8068c9ae100ce655207547ed",
@@ -4987,6 +5030,26 @@
       "reviewer": "pr-publisher",
       "evidence_source": "docs/evidence/documentation/full-page-readability-batch-after-709-2026-10-10.md",
       "date": "2026-10-10",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/instrumentation/privacy-and-consent.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "blob_id": "565d1d2bfeb3c7f99e50982118c93577ca26a74b",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/offline-ci.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "blob_id": "d4943a3a254262edac7ea42d78b075afdb2e48eb",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14",
       "acceptance_reachable": true
     },
     {
