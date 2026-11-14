@@ -391,7 +391,7 @@ jobs:
   # these jobs become required status checks is a branch-protection decision.
   tools-tests-linux:
     needs: [changes]
-    if: github.event_name == 'push' || (needs.changes.outputs.tools == 'true' && needs.changes.outputs.docs_skills != 'true')
+    if: github.event_name == 'push' || needs.changes.outputs.tools == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -465,7 +465,7 @@ jobs:
 
   tools-tests-windows:
     needs: [changes]
-    if: github.event_name == 'push' || (needs.changes.outputs.tools == 'true' && needs.changes.outputs.docs_skills != 'true')
+    if: github.event_name == 'push' || needs.changes.outputs.tools == 'true'
     runs-on: windows-latest
     timeout-minutes: 20
     permissions:

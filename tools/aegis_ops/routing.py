@@ -4,7 +4,8 @@ The matrix is closed over the six existing workflow checks.  'validate-skills'
 and 'gate-guard' are required and can never be routed away; an unmapped path
 fails closed.  The workflow analyser checks the E1 edit's bounded shape
 (routing/path-scope only): job set, required-job unconditionality, the push
-lane forcing every output true, the closed 'docs_skills' predicate and pinned
+lane forcing every output true, the closed 'docs_skills' predicate, per-job
+advisory routing and pinned
 actions.  It does not write the workflow and it makes no settings or
 required-context claim.
 """
@@ -146,7 +147,12 @@ def validate_matrix(document: typing.Mapping[str, object]) -> typing.Dict[str, o
                 % (path, ", ".join(missing_required)),
             )
     docs_skills = schema.classify_docs_skills(paths)
-    skipped_advisory = sorted(ADVISORY_CHECKS) if docs_skills else []
+    affected_union: typing.Set[str] = set()
+    for checks in affected.values():
+        affected_union.update(checks)
+    skipped_advisory = sorted(
+        check for check in ADVISORY_CHECKS if check not in affected_union
+    )
     return {
         **schema.base_report(schema.SCHEMA_ROUTING),
         "valid": report.valid,
@@ -237,15 +243,25 @@ def check_workflow_text(text: str) -> typing.Dict[str, object]:
             "gate-guard must stay pull-request-only (unchanged), not %r" % gate_if,
         )
     for name in ADVISORY_CHECKS:
+        job_text = "\n".join(jobs.get(name, []))
+        is_tools_job = name in ("tools-tests-linux", "tools-tests-windows")
+        if is_tools_job and "needs.changes.outputs.docs_skills != 'true'" in job_text:
+            report.add(
+                "E1_ADVISORY_TOOLS_DOCS_SKIP",
+                "%s must not carry the docs_skills skip: a schema-only PR sets "
+                "tools=true and docs_skills=true and must still run" % name,
+            )
         condition = _job_if(jobs.get(name, []))
         if condition is None or not condition.startswith("github.event_name == 'push'"):
             report.add("E1_ADVISORY_PUSH_LANE", "%s must still run on push" % name)
             continue
-        flag = "offline" if name == "windows-offline-checks" else "tools"
-        if "needs.changes.outputs.%s == 'true'" % flag not in condition:
-            report.add("E1_ADVISORY_ROUTE", "%s must route on %s" % (name, flag))
-        if "needs.changes.outputs.docs_skills != 'true'" not in condition:
-            report.add("E1_ADVISORY_DOCS_SKIP", "%s must skip docs/skills-only PRs" % name)
+        if name == "windows-offline-checks":
+            if "needs.changes.outputs.offline == 'true'" not in condition:
+                report.add("E1_ADVISORY_ROUTE", "%s must route on offline" % name)
+            if "needs.changes.outputs.docs_skills != 'true'" not in job_text:
+                report.add("E1_ADVISORY_DOCS_SKIP", "%s must skip docs/skills-only PRs" % name)
+        elif "needs.changes.outputs.tools == 'true'" not in condition:
+            report.add("E1_ADVISORY_ROUTE", "%s must route on tools" % name)
     changes_text = "\n".join(jobs.get("changes", []))
     for token in ("tools=true", "offline=true", "docs_skills=true"):
         if token not in changes_text:
