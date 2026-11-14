@@ -2,8 +2,8 @@
   "schema_version": 2,
   "generator": "tools/readability_acceptance/build_index.py",
   "source": "the ledger consolidated keeper table only (docs/roadmaps/aegis-documentation-readability-backlog.md, acceptance-index-schema: 1); stated-acceptances.json and the prose harvester are retired as inputs (D84)",
-  "built_at_ref": "f268cf5a397ce0f0b444022a716835daf84ad123",
-  "table_rows": 315,
+  "built_at_ref": "667f4409f552eacef9fce1e70c9ddaf963741b00",
+  "table_rows": 319,
   "events": [
     {
       "stable_id": "K-001",
@@ -3469,6 +3469,50 @@
       "reviewer": "batch24-page-reviewer",
       "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
       "date": "2026-11-14"
+    },
+    {
+      "stable_id": "K-469",
+      "path": "SECURITY.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "2ef1d7ea51a788065c7752b9a224188aa4381283",
+      "blob_id": "f5a4c5b379e5f39a1e4525bac2f2e0941f0c158b",
+      "quote": "This project ships from a single rolling `main` branch. Only `main` is supported;",
+      "reviewer": "batch25-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-25-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "stable_id": "K-470",
+      "path": "docs/manual-only-policy.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "2ef1d7ea51a788065c7752b9a224188aa4381283",
+      "blob_id": "a3c233439ed917fedd206f8b7440f48f096c7eab",
+      "quote": "An override is an authorization record, not a waiver.",
+      "reviewer": "batch25-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-25-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "stable_id": "K-471",
+      "path": "docs/paths/check-your-app.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "2ef1d7ea51a788065c7752b9a224188aa4381283",
+      "blob_id": "8a467f44e326de7bf53922d7ece94c2193df7c71",
+      "quote": "This is a guided order, not a guarantee.",
+      "reviewer": "batch25-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-25-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "stable_id": "K-472",
+      "path": "docs/instrumentation/pilot-runbook.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "2ef1d7ea51a788065c7752b9a224188aa4381283",
+      "blob_id": "9afa1ec0ec89123090f847c987ef047dcf92d672",
+      "quote": "Check that retention is pruning as specified: local 60 days, central 90 days.",
+      "reviewer": "batch25-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-25-2026-11-14.md",
+      "date": "2026-11-14"
     }
   ],
   "reader_pages": [
@@ -4240,6 +4284,16 @@
       "reviewer": "pr-publisher",
       "evidence_source": "docs/evidence/documentation/full-page-readability-batch-after-706-2026-10-10.md",
       "date": "2026-10-10",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "SECURITY.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "2ef1d7ea51a788065c7752b9a224188aa4381283",
+      "blob_id": "f5a4c5b379e5f39a1e4525bac2f2e0941f0c158b",
+      "reviewer": "batch25-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-25-2026-11-14.md",
+      "date": "2026-11-14",
       "acceptance_reachable": true
     },
     {
@@ -5033,12 +5087,32 @@
       "acceptance_reachable": true
     },
     {
+      "path": "docs/instrumentation/pilot-runbook.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "2ef1d7ea51a788065c7752b9a224188aa4381283",
+      "blob_id": "9afa1ec0ec89123090f847c987ef047dcf92d672",
+      "reviewer": "batch25-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-25-2026-11-14.md",
+      "date": "2026-11-14",
+      "acceptance_reachable": true
+    },
+    {
       "path": "docs/instrumentation/privacy-and-consent.md",
       "event_kind": "full-page-acceptance",
       "last_acceptance_sha": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
       "blob_id": "565d1d2bfeb3c7f99e50982118c93577ca26a74b",
       "reviewer": "batch24-page-reviewer",
       "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/manual-only-policy.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "2ef1d7ea51a788065c7752b9a224188aa4381283",
+      "blob_id": "a3c233439ed917fedd206f8b7440f48f096c7eab",
+      "reviewer": "batch25-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-25-2026-11-14.md",
       "date": "2026-11-14",
       "acceptance_reachable": true
     },
@@ -5120,6 +5194,16 @@
       "reviewer": "c03-contract-owner",
       "evidence_source": "docs/evidence/documentation/readability-operational-batch-5-2026-11-12.md",
       "date": "2026-11-12",
+      "acceptance_reachable": true
+    },
+    {
+      "path": "docs/paths/check-your-app.md",
+      "event_kind": "full-page-acceptance",
+      "last_acceptance_sha": "2ef1d7ea51a788065c7752b9a224188aa4381283",
+      "blob_id": "8a467f44e326de7bf53922d7ece94c2193df7c71",
+      "reviewer": "batch25-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-25-2026-11-14.md",
+      "date": "2026-11-14",
       "acceptance_reachable": true
     },
     {
