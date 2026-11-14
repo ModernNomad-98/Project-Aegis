@@ -24,7 +24,7 @@ This skill is the single authoritative routing policy for Aegis work: classify a
 
 ## Workflow
 
-This section is the single authoritative routing policy for this skill; other skills cite it and do not restate it. It is a decision contract for choosing models; it does not claim that Aegis can control the host's model selector.
+Apply the policy stated in Purpose; this Workflow does not restate its scope. It is a decision contract for choosing models; it does not claim that Aegis can control the host's model selector.
 
 Classify the task into one of four capability roles (roles, not model names):
 - **Lightweight** - routine extraction, formatting, summarising, log scanning.
@@ -37,7 +37,7 @@ If a task spans roles, apply the highest-risk role and use independent verificat
 At dispatch:
 1. Classify the task and note whether independent verification is required.
 2. Obtain the host's available-model capability inventory at runtime. Do not hardcode model, family, provider or version names in this policy. A local capability map is data, not policy; store only opaque labels if a host supplies them, and never store secrets.
-3. Choose the least costly role that is sufficient on demonstrated capability, reliability, latency and cost. Default advanced tasks to the host's medium effort setting (or its equivalent); increase effort when complexity or risk justifies it. Never accept lower verification quality to reduce cost.
+3. Choose the least costly role that is sufficient on demonstrated capability, reliability, latency and cost. Default advanced tasks to the host's medium effort setting (or its equivalent) - the host's medium effort is the default for advanced work, escalated when complexity or risk justifies it. Never accept lower verification quality to reduce cost.
 4. For independent verification, use a model different from the implementer and a separate agent/instance. If the host exposes only one model, or cannot show the choice, do not claim independent verification: record the limitation and surface it. High-risk verification without a distinct model is an owner decision or a stop, never a silent pass.
 5. If the host exposes no model chooser, state that plainly, continue only with the limits this creates, and do not fabricate separation.
 6. Record in the existing turn/handoff/evidence: capability role, host-provided opaque label only if exposed, effort, rationale, and whether independence was available. Do not add a file, do not change the project-state schema, and do not store provider credentials or other secrets.
@@ -69,7 +69,7 @@ Examples (role-based, never names): routine log extraction -> lightweight; requi
 
 ## Stop Conditions
 
-- A high-risk verification lacks a distinct model and either the owner has not decided or no stop was taken.
+- Stop unless the owner has explicitly decided to proceed with the limitation recorded.
 - The host cannot show the model choice and the work would be reported as independently verified.
 - The policy would need a hardcoded model, family, provider or version name.
 
