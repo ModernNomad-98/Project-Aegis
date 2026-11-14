@@ -1,0 +1,79 @@
+{
+  "changed_paths": [
+    "docs/operations/README.md",
+    "tools/aegis_ops/schema.py"
+  ],
+  "rows": [
+    {
+      "check": "changes",
+      "inputs": [
+        "**"
+      ],
+      "legitimate_passing_path": "always runs; computes path flags",
+      "min_affected_set": "the paths named by inputs",
+      "never_skip": false,
+      "push_lane_behaviour": "runs",
+      "required": false
+    },
+    {
+      "check": "validate-skills",
+      "inputs": [
+        "**"
+      ],
+      "legitimate_passing_path": "required context runs green at the exact head",
+      "min_affected_set": "the paths named by inputs",
+      "never_skip": true,
+      "push_lane_behaviour": "runs",
+      "required": true
+    },
+    {
+      "check": "gate-guard",
+      "inputs": [
+        "**"
+      ],
+      "legitimate_passing_path": "no protected path in the diff; pull requests only",
+      "min_affected_set": "the paths named by inputs",
+      "never_skip": true,
+      "push_lane_behaviour": "runs",
+      "required": true
+    },
+    {
+      "check": "windows-offline-checks",
+      "inputs": [
+        "tools/**",
+        "requirements-ci.in",
+        "requirements-ci.txt"
+      ],
+      "legitimate_passing_path": "push lane or affected tools/offline path",
+      "min_affected_set": "the paths named by inputs",
+      "never_skip": false,
+      "push_lane_behaviour": "runs",
+      "required": false
+    },
+    {
+      "check": "tools-tests-linux",
+      "inputs": [
+        "tools/**",
+        "docs/instrumentation/workflow-outcomes-v1.schema.json"
+      ],
+      "legitimate_passing_path": "push lane or affected tools path",
+      "min_affected_set": "the paths named by inputs",
+      "never_skip": false,
+      "push_lane_behaviour": "runs",
+      "required": false
+    },
+    {
+      "check": "tools-tests-windows",
+      "inputs": [
+        "tools/**",
+        "docs/instrumentation/workflow-outcomes-v1.schema.json"
+      ],
+      "legitimate_passing_path": "push lane or affected tools path",
+      "min_affected_set": "the paths named by inputs",
+      "never_skip": false,
+      "push_lane_behaviour": "runs",
+      "required": false
+    }
+  ],
+  "schema_version": "aegis.ops-routing/v1"
+}

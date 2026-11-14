@@ -36,12 +36,12 @@ the base branch) and selects:
 - `windows-offline-checks` only when the change touches `tools/`,
   `requirements-ci.in` or `requirements-ci.txt`;
 - `tools-tests-linux` and `tools-tests-windows` only when it touches
-  `tools/`.
+  `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`.
 
 A job the filter does not select is skipped. A pull request that touches
-nothing under `tools/` and neither lock file skips all three, whatever else
-it changes: skills, documentation, `scripts/` or `.github/` alone run
-neither the Windows verification job nor the tools-test jobs. On a push to
+none of those inputs skips all three, whatever else it changes: skills,
+documentation, `scripts/` or `.github/` alone run neither the Windows
+verification job nor the tools-test jobs. On a push to
 `main` the `changes` job selects all three, so the post-merge run is the
 full suite. `validate-skills` and `gate-guard` have no path filter. The three
 selected jobs need `changes`, so they are also skipped when `changes` itself
