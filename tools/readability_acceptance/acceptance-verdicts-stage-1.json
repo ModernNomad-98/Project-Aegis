@@ -2474,6 +2474,30 @@
       "reviewer": "batch21-page-reviewer",
       "evidence_source": "docs/evidence/documentation/readability-support-claims-p6-2026-11-13.md",
       "date": "2026-11-13"
+    },
+    {
+      "path": "docs/operations/ci-routing-matrix.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "6e2fc8c9a1e93080dcf2f74bb7aaa6d630a937ec",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-phase-b-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "path": "docs/consumer-readiness/consumer-guide-v1.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "6e2fc8c9a1e93080dcf2f74bb7aaa6d630a937ec",
+      "reviewer": "batch21-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-phase-b-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "path": ".claude/skills/model-routing-policy/SKILL.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "6e2fc8c9a1e93080dcf2f74bb7aaa6d630a937ec",
+      "reviewer": "batch20-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-phase-b-2026-11-14.md",
+      "date": "2026-11-14"
     }
   ]
 }
