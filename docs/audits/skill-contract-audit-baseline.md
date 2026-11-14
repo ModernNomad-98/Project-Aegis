@@ -7,15 +7,16 @@
 > **Regenerated 2026-11-13 under AEGIS-APR-169** (the Layer 2 one-time
 > baseline-regeneration grant recorded in the
 > [approval register](../approvals/APPROVAL_REGISTER.md) for the
-> model-routing-policy skill and 42-file starter-package registration) with
-> engine v1.14.0 **unchanged**: this is a corpus/baseline refresh, not an
-> engine change (engine v1.14.0 remains the same engine recorded by the prior
-> baseline). The audit runs over the Repo SHA below, the commit on the content
-> branch that contains every change the combined PR makes to the files the
-> audit reads (checkout with `core.autocrlf=false`, so the corpus hash is over
-> LF (line feed, Unix-style line ending) bytes; the branch field in the
-> generated header below records the checkout branch, empty when the
-> verification checkout is detached).
+> model-routing-policy skill and 42-file starter-package registration; see
+> AEGIS-APR-170 for the re-anchor at the final content commit after the
+> catalog-family fix) with engine v1.14.0 **unchanged**: this is a
+> corpus/baseline refresh, not an engine change (engine v1.14.0 remains the
+> same engine recorded by the prior baseline). The audit runs over the Repo
+> SHA below, a commit on the content branch that contains every change the
+> combined PR makes to the files the audit reads (checkout with
+> `core.autocrlf=false`, so the corpus hash is over LF (line feed, Unix-style
+> line ending) bytes; the branch field in the generated header below records
+> the checkout branch, empty when the verification checkout is detached).
 > The previous baseline (255 skills, 465 findings, engine v1.14.0 over
 > `7a55d783b7375451878d7a5375b65dcfb3bda4ec`, regenerated under AEGIS-APR-167
 > and consumed by AEGIS-APR-168) is in git history; this page reports the
@@ -25,7 +26,7 @@
 > not waived by this page.
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `d70aea40ce97329511dd5c65996c2d0edddf22e0` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
+- Repo SHA: `48ff9c17353563999d92c1754bb81650d1eb7aae` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
 - Corpus content hash: `1675a7cf2d5c9e3cec318f800b95ccb4bfb81803d5300418c3b40423afec288b` (995 files, 6874281 bytes)
 - Skills scanned: **256**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
 - Findings: **466** (369 mechanical, 97 semantic-review candidates)

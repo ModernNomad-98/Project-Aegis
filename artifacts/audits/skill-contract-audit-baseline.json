@@ -3,7 +3,7 @@
     "tool": "audit-skill-contracts",
     "version": "1.14.0",
     "engine_sha256": "1289e7e326c237754ea71c96ef72802a630199ea728523a3296c8219cbc83609",
-    "repo_sha": "d70aea40ce97329511dd5c65996c2d0edddf22e0",
+    "repo_sha": "48ff9c17353563999d92c1754bb81650d1eb7aae",
     "branch": "",
     "working_tree_dirty": false,
     "dirty_paths_in_scanned_surfaces": [],
@@ -14,7 +14,7 @@
     "auxiliary_inputs": {
       "skills_catalog": {
         "kind": "auxiliary content (feeds manifest `family`); not in corpus hash",
-        "sha256": "37b1d315107fbccad65281f16303938557388df47bf8f8b63827ed201c72f7a1"
+        "sha256": "bb0e415cb0fea22ef6578afd18ba72c8af0dedb2b9c62ab83925b0e6c46c99b4"
       },
       "agent_names_enumerated": {
         "kind": "enumerated name only (feeds known_names + manifest); not in corpus hash",
