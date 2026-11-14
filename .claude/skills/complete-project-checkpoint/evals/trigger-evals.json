@@ -57,20 +57,20 @@
     {
       "id": "urgent-stop",
       "prompt": "Stop immediately. Preserve only the permitted minimum recovery state; do not wait through a new drain workflow.",
-      "expected_skill": null,
+      "expected_route": ".claude/skills/complete-project-checkpoint/SKILL.md",
       "should_not_trigger": [
         "complete-project-checkpoint"
       ],
-      "reason": "Honor direct STOP and applicable emergency procedure without auto-invoking this manual-only workflow."
+      "reason": "Honor direct STOP and applicable emergency procedure without auto-invoking this manual-only workflow; the route points at the documented stop / stop-condition contract in the checkpoint skill (not an activation)."
     },
     {
       "id": "authoring-skill",
       "prompt": "Make this pasted universal save prompt into a skill. Keep all its sections; do not execute the save.",
-      "expected_skill": null,
+      "expected_route": "CONTRIBUTING.md#how-to-add-a-skill",
       "should_not_trigger": [
         "complete-project-checkpoint"
       ],
-      "reason": "Skill authoring is not invocation; choose an available authoring procedure under current instructions."
+      "reason": "Skill authoring is not invocation; the authoring route is documentation in CONTRIBUTING.md#how-to-add-a-skill, not an activation, so choose that documented procedure under current instructions."
     }
   ]
 }
