@@ -4,29 +4,31 @@
 > skill-contract audit, for maintainers checking which skill texts the audit
 > script flags for review. Everything below this note is script output.
 >
-> **Regenerated 2026-11-01 under AEGIS-APR-167** (the Route A one-time
+> **Regenerated 2026-11-13 under AEGIS-APR-169** (the Layer 2 one-time
 > baseline-regeneration grant recorded in the
 > [approval register](../approvals/APPROVAL_REGISTER.md) for the
-> complete-project-checkpoint integration) with engine v1.14.0 **unchanged**:
-> this is a corpus/baseline refresh, not an engine change (engine v1.14.0
-> remains the same engine recorded by the prior baseline). The audit runs over
-> the Repo SHA below, a commit on the content branch that contains every change
-> the combined PR makes to the files the audit reads (checkout with
-> `core.autocrlf=false`, so the corpus hash is over LF (line feed, Unix-style
-> line ending) bytes; the branch field in the generated header below records
-> the checkout branch, empty when the verification checkout is detached).
-> The previous baseline (254 skills, 462 findings, engine v1.14.0 over
-> `f697aa3848cfb791c61d69321311f91fe4a5d4e0`, regenerated under AEGIS-APR-145)
-> is in git history; this page reports the current baseline only.
+> model-routing-policy skill and 42-file starter-package registration) with
+> engine v1.14.0 **unchanged**: this is a corpus/baseline refresh, not an
+> engine change (engine v1.14.0 remains the same engine recorded by the prior
+> baseline). The audit runs over the Repo SHA below, the commit on the content
+> branch that contains every change the combined PR makes to the files the
+> audit reads (checkout with `core.autocrlf=false`, so the corpus hash is over
+> LF (line feed, Unix-style line ending) bytes; the branch field in the
+> generated header below records the checkout branch, empty when the
+> verification checkout is detached).
+> The previous baseline (255 skills, 465 findings, engine v1.14.0 over
+> `7a55d783b7375451878d7a5375b65dcfb3bda4ec`, regenerated under AEGIS-APR-167
+> and consumed by AEGIS-APR-168) is in git history; this page reports the
+> current baseline only.
 > Structural findings are not behavioral proof. The current PR's finding delta
-> and per-new-finding dispositions are recorded in the PR body/evidence, not
-> waived by this page.
+> and per-new-finding dispositions are recorded in the PR body/register entry,
+> not waived by this page.
 
 - Tool: `audit-skill-contracts` v1.14.0 (engine sha256 `1289e7e326c23775…`)
-- Repo SHA: `7a55d783b7375451878d7a5375b65dcfb3bda4ec` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
-- Corpus content hash: `29daa81eccc5e973ca7e564bfd3b7081154ca795a527207a173b3dcbbfd50171` (993 files, 6864329 bytes)
-- Skills scanned: **255**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
-- Findings: **465** (368 mechanical, 97 semantic-review candidates)
+- Repo SHA: `d70aea40ce97329511dd5c65996c2d0edddf22e0` (branch ``; working tree dirty: false; dirty scanned surfaces: none)
+- Corpus content hash: `1675a7cf2d5c9e3cec318f800b95ccb4bfb81803d5300418c3b40423afec288b` (995 files, 6874281 bytes)
+- Skills scanned: **256**; rules implemented: **28** (complete inventory, incl. zero-hit rules, in the JSON report)
+- Findings: **466** (369 mechanical, 97 semantic-review candidates)
 
 Findings are EXPECTED here: this report records the corpus as it is
 at the Repo SHA above, after whatever remediation that commit already
@@ -73,7 +75,7 @@ mechanically proven defects.
 | ROUTE-003 | P1 | mechanical | a Stage-2 route reaches the commitments skill without a readiness/NOT-COMMIT-ABLE guard ON THAT ROUTE, or the roadmap owner is not independently classified | 0 |
 | VOCAB-002 | P1 | semantic-candidate | committed used as a roadmap horizon label | 0 |
 | VOCAB-003 | P0 | semantic-candidate | approved scope described as a commitment | 0 |
-| PARITY-001 | P2 | mechanical | Validation Checklist with no checkable items | 37 |
+| PARITY-001 | P2 | mechanical | Validation Checklist with no checkable items | 38 |
 | PARITY-002 | P2 | mechanical | Output Format too thin to verify against | 0 |
 | EVAL-001 | P2 | mechanical | no negative discrimination case anywhere in the skill's evals (STRUCTURAL) | 0 |
 | EVAL-002 | P2 | mechanical | eval case unjudgeable as written (per schema) | 3 |
@@ -85,7 +87,7 @@ mechanically proven defects.
 
 ## Coverage (what was and was not reviewed)
 
-- **Mechanically scanned:** all 255 shipped skills' SKILL.md + references + eval JSONs (this report).
+- **Mechanically scanned:** all 256 shipped skills' SKILL.md + references + eval JSONs (this report).
 - **Enumerated only (NOT content-audited):** reviewer agents (`.claude/agents/`) and guided-path docs (`docs/paths/`) — their FILENAMES feed name resolution and the manifest; their content is left to `scripts/validate-skills.py`, which checks agent frontmatter and guided-path links.
 - **Auxiliary input (content read, NOT in the corpus hash):** `docs/skills-catalog.md` supplies the manifest `family` field. It, and the agent/guided-path filenames, are recorded separately under provenance `auxiliary_inputs`; the corpus content hash covers the skill corpus only. All input surfaces are containment-checked fail-closed before any read: a link or path that leads outside the repository stops the run.
 - **Semantically reviewed:** none by this tool — semantic candidates are queued for the named reviewer skills, not executed here.
@@ -96,7 +98,7 @@ mechanically proven defects.
 |---|---:|
 | P0 | 3 |
 | P1 | 96 |
-| P2 | 40 |
+| P2 | 41 |
 | info | 326 |
 
 | Rule | Count |
@@ -104,7 +106,7 @@ mechanically proven defects.
 | ARTF-001 | 10 |
 | EVAL-002 | 3 |
 | EVAL-003 | 3 |
-| PARITY-001 | 37 |
+| PARITY-001 | 38 |
 | REF-003 | 1 |
 | ROUTE-002 | 326 |
 | SIDE-004 | 82 |
@@ -216,7 +218,7 @@ mechanically proven defects.
 ## P2/info findings (summarized; full detail in the JSON report)
 
 - **EVAL-002** × 3 — e.g. `.claude/skills/complete-project-checkpoint/evals/trigger-evals.json`: trigger-evals case 'authoring-skill' names no expected_skill — unjudgeable as written
-- **PARITY-001** × 37 — e.g. `.claude/skills/application-layer-pattern-advisor/SKILL.md`: Validation Checklist contains no checkbox items — nothing verifiable
+- **PARITY-001** × 38 — e.g. `.claude/skills/application-layer-pattern-advisor/SKILL.md`: Validation Checklist contains no checkbox items — nothing verifiable
 - **ROUTE-002** × 326 — e.g. `.claude/skills/ab-test-designer/SKILL.md`: exclusion toward `event-schema-architect` is not reciprocated (event-schema-architect's description never mentions this skill) — census evidence, no AEGIS id
 
 ## Vocabulary census (non-zero skills)
@@ -346,6 +348,7 @@ mechanically proven defects.
 - `merge-is-deploy-governance`: accepted×7, deployed×2, proposed×4, verified×8
 - `mobile-journey-test-designer`: planned×1
 - `model-poisoning-reviewer`: targeted×3
+- `model-routing-policy`: verified×1
 - `modernization-cutover-planner`: verified×1
 - `multi-framework-crosswalk`: proposed×1, verified×13
 - `multi-tenant-data-architect`: verified×1
