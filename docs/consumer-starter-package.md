@@ -1081,6 +1081,7 @@ $package = @(
   '.claude/skills/domain-modeler/references/domain-artifacts.md'
   '.claude/skills/human-approval-boundary/SKILL.md'
   '.claude/skills/human-approval-boundary/references/consumer-manual-only-policy.md'
+  '.claude/skills/model-routing-policy/SKILL.md'
   '.claude/skills/phased-work-handoff-designer/SKILL.md'
   '.claude/skills/phased-work-handoff-designer/references/handoff-sheet.md'
   '.claude/skills/plan-audit-reviewer/SKILL.md'
