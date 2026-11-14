@@ -2498,6 +2498,30 @@
       "reviewer": "batch20-page-reviewer",
       "evidence_source": "docs/evidence/documentation/readability-phase-b-2026-11-14.md",
       "date": "2026-11-14"
+    },
+    {
+      "path": "docs/consumer-contract-manual-only.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "path": "docs/offline-ci.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14"
+    },
+    {
+      "path": "docs/instrumentation/privacy-and-consent.md",
+      "event_kind": "full-page-acceptance",
+      "revision": "a5a4dea8f2eed6128b973bc4933b8c43984e13e9",
+      "reviewer": "batch24-page-reviewer",
+      "evidence_source": "docs/evidence/documentation/readability-batch-24-2026-11-14.md",
+      "date": "2026-11-14"
     }
   ]
 }
