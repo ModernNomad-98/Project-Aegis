@@ -195,6 +195,8 @@ Both are required because the role recognition J1 step 2 tests lives in them.
 
 Every file is copied byte-identically by the allow-list rule: `SKILL.md` plus everything under `references/`, plus the two startup files. This is the exact closure measured at `2fef11dd43fe6e943e99c7948ebeaca95d138072` (tree `14133f917b2fc35ccac44fb844fd1664fb6839af`), sorted by path in ordinal order (the same order the install-record aggregate uses). The Layer 2 revision adds `.claude/skills/model-routing-policy/SKILL.md`, updates `project-orchestrator/SKILL.md` for the pointer, and returns `project-orchestrator/references/recording-and-authority.md` to its pre-Layer-1 bytes; every row below was recomputed at this pin, not carried from the v2 pin `ffb040c7`.
 
+**Pin delta from base `7e79ce0e`.** `2fef11dd` differs from the base only by the Layer 2 package registration: the new `.claude/skills/model-routing-policy/SKILL.md`, the orchestrator `SKILL.md` pointer change, the `recording-and-authority.md` section-5 move and the `tools/skills-manifest.json` refresh. Non-package repository files (README, docs, tests and artifacts) are outside the 42-file selection and do not affect the install closure.
+
 | Path (consumer-relative) | Bytes | LF |
 | --- | --- | --- |
 | `.claude/skills/agent-startup-context-gate/SKILL.md` | 21084 | 336 |
@@ -908,7 +910,6 @@ the first failure:
 1. **Count and scope:** exactly 42 packaged files present, and under the 19 installed skill directories no file outside the list (**exit 30**); 40 skill files plus the 2 startup files.
 2. **Skill pins:** each of the 19 `SKILL.md` files, with CRLF->LF normalization, equals its `tools/skills-manifest.json` entry (**exit 31**).
 3. **Reference and startup pins:** each of the 21 reference files and the 2 startup files (23 source pins) matches the pinned source, after P3 has proven the source is the pinned commit and tree and is clean (**exit 31**).
-   the source is the pinned commit and tree and is clean (**exit 31**).
 4. **Siblings:** every sibling `SKILL.md` linked by an installed skill exists in
    the destination (**exit 32**).
 5. **No forbidden material:** no eval material, `scripts/`, executable or other
@@ -2079,9 +2080,9 @@ A mismatch is a finding, not a rounding.
 
 The arithmetic makes the length checkable: the 42 consumer-relative paths total
 2,394 bytes and the 42 full 64-character digests total 2,688 bytes, so 5,082 bytes
-is the minimum before separators; adding three TABs per row (123), one LF per row
+is the minimum before separators; adding three TABs per row (126), one LF per row
 (42) and the decimal fields (289 characters across the `bytes` and `lf` columns)
-gives exactly 5,420.
+gives exactly 5,539.
 
 ## 10. Recording authority on the consumer route
 

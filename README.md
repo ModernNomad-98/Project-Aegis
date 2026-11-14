@@ -327,7 +327,7 @@ below starts from. Later, run `git pull` from the same folder to update to the l
 
 **Choose your installation route before you start a project.**
 
-- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 42-file set (40 skill files for 19 skills plus 2 startup files), its dependency ledger, the one Windows PowerShell install procedure with a runnable harness, its fail-closed checks, the owner record it requires, the explicit `human-only`/`agent-commit` install mode, and the commit identity the startup gate checks and requires. The install writes only the 18 skill directories, the two startup files, and the optional install record at the `-RecordPath` you pass; your repository's other files are outside its scope, and the clone must be an LF checkout (the procedure checks it).
+- **Starter package (first product slice).** [docs/consumer-starter-package.md](docs/consumer-starter-package.md) defines the fixed 42-file set (40 skill files for 19 skills plus 2 startup files), its dependency ledger, the one Windows PowerShell install procedure with a runnable harness, its fail-closed checks, the owner record it requires, the explicit `human-only`/`agent-commit` install mode, and the commit identity the startup gate checks and requires. The install writes only the 19 skill directories, the two startup files, and the optional install record at the `-RecordPath` you pass; your repository's other files are outside its scope, and the clone must be an LF checkout (the procedure checks it).
 - **Selected skills (any product slice).** Copy only the skills a slice needs with the allow-list block in [Using the skills in your own project](#using-the-skills-in-your-own-project); this is also how you extend the starter package.
 - **Full source checkout (library maintenance).** Keep this clone and work in it; only this route runs the repository's own validator and CI-equivalent checks.
 
@@ -884,7 +884,7 @@ entry in the reconciliation doc.
 
 ## What's in the library
 
-**Skill roles at a glance.** The <!-- SKILL-COUNT -->256<!-- /SKILL-COUNT --> skills comprise **255 in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> discipline families** (each a shipped
+**Skill roles at a glance.** The <!-- SKILL-COUNT -->256<!-- /SKILL-COUNT --> skills comprise **255 in <!-- FAMILY-COUNT -->24<!-- /FAMILY-COUNT --> discipline families** (each a shipped
 build batch) plus one beginner-facing orchestrator. This is the scannable map of what
 *kinds* of help exist; the full per-skill tables are in [Skills (shipped)](#skills-shipped) below. Abbreviations used below: SDLC = software development lifecycle; CI = continuous integration; PR = pull request; SAST/DAST = static/dynamic application security testing; E2E = end-to-end; IaC = infrastructure as code; LLM = large language model; OWASP = Open Worldwide Application Security Project; RAG = retrieval-augmented generation; PII = personally identifiable information; ADR = architecture decision record; AWS = Amazon Web Services; SLO = service level objective; PM = product management; IC = individual contributor; NIST AI RMF = the US National Institute of Standards and Technology AI Risk Management Framework.
 
@@ -896,10 +896,10 @@ plain-language business question, records each dated decision in a `docs/project
 keeps a human as the approval gate on anything irreversible. See
 *[Your first session](#your-first-session)* for the opening prompt.
 
-1. **Operating discipline** *(Phase 1, 11)* — the always-on rules that keep AI-assisted work
+1. **Operating discipline** *(Phase 1, 10)* — the always-on rules that keep AI-assisted work
    honest: classify before acting, verify against evidence, keep diffs small, halt for
    approval, close out honestly. *e.g.* `change-classification-gate`, `human-approval-boundary`,
-   `model-routing-policy`, `reviewable-diff-discipline`, `ai-closeout-reporter`, `complete-project-checkpoint`.
+   `reviewable-diff-discipline`, `ai-closeout-reporter`, `complete-project-checkpoint`.
 2. **AI-SDLC governance** *(Phase 1.5, 7)* — the human+agent lifecycle contract: named stages
    and gates, standing agent authority, memory governance, task planning, after-the-fact
    process audit.
@@ -1007,6 +1007,9 @@ keeps a human as the approval gate on anything irreversible. See
 23. **Optional Aegis setup** *(Issue #101 package 2, 1)* — the manual four-choice
     conversation and tested Windows PowerShell Aegis-only saved selection.
     Local and online helpers remain unavailable. *e.g.* `aegis-setup`.
+24. **Layer 2 addition (2026-11-13)** *(Layer 2, 1)* — the capability-based,
+    model-agnostic routing policy registered as its own model-invocable skill,
+    matching the catalog family of the same name. *e.g.* `model-routing-policy`.
 
 ## Maintainer reading routes
 
