@@ -8968,7 +8968,7 @@ def test_consumer_install_destination_links():
             proc = install(clean, clean / "docs" / "consumer-install-record.md")
             assert proc.returncode == 0, (proc.returncode, proc.stdout, proc.stderr)
             first = _dest_snapshot(clean)
-            assert len([row for row in first if row[1] == "FILE"]) == 42, first
+            assert len([row for row in first if row[1] == "FILE"]) == 43, first
             ok("S4-1: an ordinary clean target still installs 42 files plus the "
                "declared record with the containment preflight in place")
 
@@ -9182,7 +9182,7 @@ def test_consumer_install_destination_links():
             assert raced_record.read_bytes().startswith(b"raced-record"), (
                 "the appearing record was overwritten: %r" % raced_record.read_bytes()[:80])
             raced_rows = _dest_snapshot(raced_target)
-            assert len([row for row in raced_rows if row[1] == "FILE"]) == 42, raced_rows
+            assert len([row for row in raced_rows if row[1] == "FILE"]) == 43, raced_rows
             assert not [row for row in raced_rows if row[0].endswith(".tmp")], (
                 "the refused run left a temp file: %s" % (raced_rows,))
             ok("S4-19: a record that appears between the preflight and P9 exits 24 "
@@ -9200,7 +9200,7 @@ def test_consumer_install_destination_links():
             assert raced_record.read_bytes().startswith(b"raced-record"), (
                 "the switch overwrote the record that appeared during the run")
             raced_rows = _dest_snapshot(raced_target)
-            assert len([row for row in raced_rows if row[1] == "FILE"]) == 42, raced_rows
+            assert len([row for row in raced_rows if row[1] == "FILE"]) == 43, raced_rows
             assert not [row for row in raced_rows if row[0].endswith(".tmp")], (
                 "the refused run left a temp file: %s" % (raced_rows,))
             ok("S4-20: -AllowExistingRecord no longer skips a record that appears "
