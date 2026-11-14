@@ -1698,3 +1698,10 @@ Permanent [Linux and Windows offline CI](offline-ci.md) runs the runner's
 regression suite and acceptance checks. PR #88's calibration controls and PR #90's
 approval-grader corrections are implemented; these offline checks do not close
 measured calibration, live execution or WP-2B-7's behavioral advisory lane.
+
+
+## Layer 2 addition (2026-11-13)
+
+| Skill | Source | Model-invocable? | Trigger summary |
+| --- | --- | --- | --- |
+| `model-routing-policy` | Layer 2 (2026-11-13) | yes | Capability-based, model-agnostic routing policy: four capability roles, runtime host model inventory with no hardcoded model or provider names, least-cost sufficient role, and independent verification that records or stops when a distinct model is unavailable. |

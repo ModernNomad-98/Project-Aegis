@@ -701,6 +701,11 @@
       "declares_read_only": false
     },
     {
+      "name": "model-routing-policy",
+      "manual_only": false,
+      "declares_read_only": false
+    },
+    {
       "name": "modernization-cutover-planner",
       "manual_only": false,
       "declares_read_only": false
@@ -7710,6 +7715,7 @@
     "import-qa-strategy-designer",
     "inter-agent-comms-reviewer",
     "mobile-journey-test-designer",
+    "model-routing-policy",
     "modernization-cutover-planner",
     "outbound-integration-adapter-designer",
     "production-safe-smoke-tester",

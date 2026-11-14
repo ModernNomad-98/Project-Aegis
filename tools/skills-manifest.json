@@ -1,6 +1,6 @@
 {
   "schema": "aegis.skills-manifest/1",
-  "source_revision": "99589a554f4225aa3e5ed9214eba85b590f60f41",
+  "source_revision": "c15a7ecab5699197e23293a88bdf74c756fa3c05",
   "hash_input": "SKILL.md bytes, CRLF->LF normalized",
   "skills": [
     {
@@ -704,6 +704,11 @@
       "sha256": "66fd2aa6dd7998438bececfdb4272ee1a6b68c47962ec488b7558d323c3fab4c"
     },
     {
+      "name": "model-routing-policy",
+      "path": ".claude/skills/model-routing-policy/SKILL.md",
+      "sha256": "b0bf85910a7c58cb175283c6d842e95b6455f9ec78442046e0cb61f15fc7997f"
+    },
+    {
       "name": "modernization-cutover-planner",
       "path": ".claude/skills/modernization-cutover-planner/SKILL.md",
       "sha256": "0a9420b9de96db513781a461676dbd9dccde640164cc334d48ebd34afa2e7767"
@@ -836,7 +841,7 @@
     {
       "name": "project-orchestrator",
       "path": ".claude/skills/project-orchestrator/SKILL.md",
-      "sha256": "2a8265ab81be44a6201662e01bca421c9a9d084b4eeac1a4b6c71bab1f8a7aa0"
+      "sha256": "811261aaa103178906c69ba2b0b71c3d0d1eaef8fa7f9a4673312269ffcf68f1"
     },
     {
       "name": "promotion-packet-writer",

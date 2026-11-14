@@ -87,7 +87,7 @@ in-flight navigation).
 
 ## Workflow
 
-**Model routing.** Read and apply [references/recording-and-authority.md](references/recording-and-authority.md) section 5 before dispatching any task: capability-based, model-agnostic, no hardcoded model names, verification independent of the implementer, and honest degradation when the host exposes one model or no chooser. That section is the single routing policy; do not restate it.
+**Model routing.** Read and apply [the model-routing-policy skill](../model-routing-policy/SKILL.md) before dispatching any task: capability-based, model-agnostic, no hardcoded model names, verification independent of the implementer, and honest degradation when the host exposes one model or no chooser. That skill is the single routing policy; do not restate it.
 
 **Capability 1 — Detect the current stage (locate the project ON the map).**
 Read `docs/project-state.md` — the current stage and next recommended action

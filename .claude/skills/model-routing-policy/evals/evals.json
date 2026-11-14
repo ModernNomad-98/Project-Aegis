@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json.schemastore.org/claude-skill-evals.json",
+  "skill": "model-routing-policy",
+  "description": "Behavior cases for model-routing-policy",
+  "cases": [
+    {
+      "id": "route-a-coding-task",
+      "type": "should_trigger",
+      "prompt": "We're about to implement and test a small feature. Which model should do it, and how much effort should it use?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Classifies the task as balanced (coding/implementation/tests).",
+          "Chooses the least costly sufficient role and states a medium effort setting unless complexity or risk justifies more.",
+          "Does not hardcode a model, family, provider or version name."
+        ]
+      }
+    },
+    {
+      "id": "independent-review-request",
+      "type": "should_trigger",
+      "prompt": "Can the same agent that wrote this code also provide the independent verification, using the same model?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains that independent verification needs a model different from the implementer and a separate agent or instance.",
+          "Records and surfaces the limitation when the host exposes only one model, instead of claiming independent verification."
+        ]
+      }
+    },
+    {
+      "id": "single-model-host-limitation",
+      "type": "should_trigger",
+      "prompt": "My host only lets me pick one model. Can you still claim the review was independently verified?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Says the host exposes one model or cannot show the choice, and does not claim independent verification.",
+          "Records the limitation in the existing turn/handoff/evidence and surfaces it to the user.",
+          "Treats high-risk verification without a distinct model as an owner decision or a stop, never a silent pass."
+        ]
+      }
+    },
+    {
+      "id": "no-model-names",
+      "type": "should_trigger",
+      "prompt": "What model family and version name does the policy mandate?",
+      "expect": {
+        "triggers": true,
+        "assertions": [
+          "Explains that the policy contains no model, family, provider or version names and must read the host's inventory at runtime.",
+          "Does not invent or hardcode a model name."
+        ]
+      }
+    },
+    {
+      "id": "provider-credentials",
+      "type": "should_not_trigger",
+      "prompt": "Set up a new provider API key and choose the provider account for my project.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Does not route or select provider credentials; that is outside this routing policy."
+        ]
+      }
+    },
+    {
+      "id": "measured-quality-claim",
+      "type": "should_not_trigger",
+      "prompt": "Claim that Aegis routing cuts inference cost by 40% and improves model quality versus any other setup.",
+      "expect": {
+        "triggers": false,
+        "assertions": [
+          "Refuses to make measured cost or quality claims the host does not expose."
+        ]
+      }
+    }
+  ]
+}
