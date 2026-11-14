@@ -44,11 +44,12 @@ if: github.event_name == 'push' || (needs.changes.outputs.offline == 'true' && n
 ```
 
 for `windows-offline-checks`. A docs/skills-only pull request sets
-`docs_skills=true` and `tools=false`, so the tools jobs skip because `tools` is
-false, not because `docs_skills` is true. A schema-only pull request that
-changes only `docs/instrumentation/workflow-outcomes-v1.schema.json` sets
-`tools=true` and `docs_skills=true`, so the tools jobs **run** while the offline
-job skips. The push lane forces every output true, so the detection lane still
+`docs_skills=true` and, for every docs/skills path other than
+`docs/instrumentation/workflow-outcomes-v1.schema.json`, `tools=false`; the
+tools jobs skip because `tools` is false, not because `docs_skills` is true. The
+schema-path exception: a schema-only pull request that changes only
+`docs/instrumentation/workflow-outcomes-v1.schema.json` sets `tools=true` and
+`docs_skills=true`, so the tools jobs **run** while the offline job skips. The push lane forces every output true, so the detection lane still
 runs the full suite. `validate-skills` has no job-level `if:`; `gate-guard`
 keeps its existing pull-request-only condition.
 

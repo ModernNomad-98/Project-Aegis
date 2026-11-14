@@ -39,8 +39,11 @@ the base branch) and selects:
   `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`.
 
 A job the filter does not select is skipped. A pull request that touches
-none of those inputs skips all three, whatever else it changes: skills,
-documentation, `scripts/` or `.github/` alone run neither the Windows
+none of those inputs skips all three, whatever else it changes — with one
+exception: `docs/instrumentation/workflow-outcomes-v1.schema.json` is a tools
+input, so a change touching only that file runs `tools-tests-linux` and
+`tools-tests-windows` while `windows-offline-checks` stays skipped. Skills,
+other documentation, `scripts/` or `.github/` alone run neither the Windows
 verification job nor the tools-test jobs. On a push to
 `main` the `changes` job selects all three, so the post-merge run is the
 full suite. `validate-skills` and `gate-guard` have no path filter. The three

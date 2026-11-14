@@ -174,7 +174,7 @@ class DocsAndScopeTests(unittest.TestCase):
     def test_closed_file_counts(self) -> None:
         self.assertEqual(len(list(PACKAGE.glob("*.py"))), 9)
         self.assertEqual(len(list(TESTS.glob("*.py"))), 7)
-        self.assertEqual(len(list((TESTS / "fixtures").glob("*.json"))), 28)
+        self.assertEqual(len(list((TESTS / "fixtures").glob("*.json"))), 23)
         self.assertEqual(len(list(OPS_DOCS.glob("*.md"))), 7)
         self.assertTrue((PACKAGE / "README.md").is_file())
 
