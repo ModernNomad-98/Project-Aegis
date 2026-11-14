@@ -3751,7 +3751,7 @@ def test_coverage_map_batch4_deliveries():
     readme = (validator.REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert ("<!-- SKILL-COUNT -->" + str(COVERAGE_LIVE["manifest_skills"]) + "<!-- /SKILL-COUNT -->") in readme
     assert ("**" + str(COVERAGE_LIVE["manifest_skills"] - 1)
-            + " in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> "
+            + " in <!-- FAMILY-COUNT -->24<!-- /FAMILY-COUNT --> "
             "discipline families**" in readme)
     # DS-7c completion round: ledger matrix, latest-entry selection, digests,
     # snapshot mutations, manifest drift, writer guard and generated-MD structure.
@@ -4041,7 +4041,7 @@ def test_coverage_map_batch5_deliveries():
     readme = (validator.REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert ("<!-- SKILL-COUNT -->" + str(COVERAGE_LIVE["manifest_skills"]) + "<!-- /SKILL-COUNT -->") in readme
     assert ("**" + str(COVERAGE_LIVE["manifest_skills"] - 1)
-            + " in <!-- FAMILY-COUNT -->23<!-- /FAMILY-COUNT --> "
+            + " in <!-- FAMILY-COUNT -->24<!-- /FAMILY-COUNT --> "
             "discipline families**" in readme)
     for phase in ("*(Phase 3, 20)*", "*(Phase 4, 14)*", "*(Phase 5, 28)*",
                   "*(Phase 6, 15)*", "*(Phase 7, 16)*"):
