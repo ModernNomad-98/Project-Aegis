@@ -3,6 +3,7 @@
   "$id": "https://github.com/ModernNomad-98/Project-Aegis/docs/instrumentation/workflow-outcomes-v1.schema.json",
   "title": "Aegis workflow outcomes, version 1",
   "description": "Strict, minimized workflow-outcome snapshot. No identities, prompts, output or code, project/repository/path names, content hashes or free text. Every string is an allowlisted enum, a day-precision date or a random reference. additionalProperties is false at every level.",
+  "$comment": "Schema-only CI-routing evidence probe; no validation semantics changed.",
   "type": "object",
   "additionalProperties": false,
   "required": [
