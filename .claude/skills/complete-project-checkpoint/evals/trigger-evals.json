@@ -57,11 +57,11 @@
     {
       "id": "urgent-stop",
       "prompt": "Stop immediately. Preserve only the permitted minimum recovery state; do not wait through a new drain workflow.",
-      "expected_route": "AGENTS.md",
+      "expected_route": ".claude/skills/complete-project-checkpoint/SKILL.md",
       "should_not_trigger": [
         "complete-project-checkpoint"
       ],
-      "reason": "Honor direct STOP and applicable emergency procedure without auto-invoking this manual-only workflow; the stop route is documentation in AGENTS.md, not an activation."
+      "reason": "Honor direct STOP and applicable emergency procedure without auto-invoking this manual-only workflow; the route points at the documented stop / stop-condition contract in the checkpoint skill (not an activation)."
     },
     {
       "id": "authoring-skill",
