@@ -36,7 +36,7 @@ used** table, the security question and the reconciliation witness.
       report the work as done. `changes`, `validate-skills` and `gate-guard` run on every pull
       request to `main`; `windows-offline-checks` runs only when the change touches `tools/`,
       `requirements-ci.in` or `requirements-ci.txt`, and `tools-tests-linux` and
-      `tools-tests-windows` only when it touches `tools/`. Record a skipped job as skipped, not
+      `tools-tests-windows` only when it touches `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`. Record a skipped job as skipped, not
       as passed.
 - [ ] If any skills were added, renamed, or removed, every registration surface in step 3 of [How to add a skill](https://github.com/ModernNomad-98/Project-Aegis/blob/main/CONTRIBUTING.md#how-to-add-a-skill) is updated
 - [ ] Current skill totals in the README sit inside the validator-checked count markers (`SKILL-COUNT`, `FAMILY-COUNT`); dated historical counts

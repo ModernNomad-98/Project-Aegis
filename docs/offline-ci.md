@@ -15,7 +15,7 @@ inputs; they do not run a live model evaluation.
    `validate-skills` and `gate-guard` run on every pull request to `main`;
    `windows-offline-checks` runs only when the change touches `tools/`,
    `requirements-ci.in` or `requirements-ci.txt`, and `tools-tests-linux` and
-   `tools-tests-windows` only when it touches `tools/`. A later push starts
+   `tools-tests-windows` only when it touches `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`. A later push starts
    new checks; older green results do not cover the new head.
 3. Read the job logs and retained evidence if a check fails. Fix a test or
    environment failure and rerun the new candidate. A documented protected
@@ -36,12 +36,15 @@ the base branch) and selects:
 - `windows-offline-checks` only when the change touches `tools/`,
   `requirements-ci.in` or `requirements-ci.txt`;
 - `tools-tests-linux` and `tools-tests-windows` only when it touches
-  `tools/`.
+  `tools/` or `docs/instrumentation/workflow-outcomes-v1.schema.json`.
 
 A job the filter does not select is skipped. A pull request that touches
-nothing under `tools/` and neither lock file skips all three, whatever else
-it changes: skills, documentation, `scripts/` or `.github/` alone run
-neither the Windows verification job nor the tools-test jobs. On a push to
+none of those inputs skips all three, whatever else it changes — with one
+exception: `docs/instrumentation/workflow-outcomes-v1.schema.json` is a tools
+input, so a change touching only that file runs `tools-tests-linux` and
+`tools-tests-windows` while `windows-offline-checks` stays skipped. Skills,
+other documentation, `scripts/` or `.github/` alone run neither the Windows
+verification job nor the tools-test jobs. On a push to
 `main` the `changes` job selects all three, so the post-merge run is the
 full suite. `validate-skills` and `gate-guard` have no path filter. The three
 selected jobs need `changes`, so they are also skipped when `changes` itself

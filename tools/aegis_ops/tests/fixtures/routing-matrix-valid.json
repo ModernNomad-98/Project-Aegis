@@ -53,7 +53,8 @@
     {
       "check": "tools-tests-linux",
       "inputs": [
-        "tools/**"
+        "tools/**",
+        "docs/instrumentation/workflow-outcomes-v1.schema.json"
       ],
       "legitimate_passing_path": "push lane or affected tools path",
       "min_affected_set": "the paths named by inputs",
@@ -64,7 +65,8 @@
     {
       "check": "tools-tests-windows",
       "inputs": [
-        "tools/**"
+        "tools/**",
+        "docs/instrumentation/workflow-outcomes-v1.schema.json"
       ],
       "legitimate_passing_path": "push lane or affected tools path",
       "min_affected_set": "the paths named by inputs",

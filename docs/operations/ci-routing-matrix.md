@@ -16,8 +16,8 @@ The closed matrix (`aegis.ops-routing/v1`) has one row per existing job:
 | `validate-skills` | **yes** | every changed path | **yes** | runs |
 | `gate-guard` | **yes** (pull requests only) | every changed path | **yes** | pull-request-only |
 | `windows-offline-checks` | no | `tools/**`, `requirements-ci.in`, `requirements-ci.txt` | no | runs |
-| `tools-tests-linux` | no | `tools/**` | no | runs |
-| `tools-tests-windows` | no | `tools/**` | no | runs |
+| `tools-tests-linux` | no | `tools/**`, `docs/instrumentation/workflow-outcomes-v1.schema.json` | no | runs |
+| `tools-tests-windows` | no | `tools/**`, `docs/instrumentation/workflow-outcomes-v1.schema.json` | no | runs |
 
 Rules enforced by `tools/aegis_ops/routing.py`:
 
@@ -34,14 +34,39 @@ Rules enforced by `tools/aegis_ops/routing.py`:
 The advisory jobs are routed with:
 
 ```
-if: github.event_name == 'push' || (needs.changes.outputs.tools == 'true' && needs.changes.outputs.docs_skills != 'true')
+if: github.event_name == 'push' || needs.changes.outputs.tools == 'true'
 ```
 
-(and the `offline` equivalent for `windows-offline-checks`). A docs/skills-only
-pull request sets `docs_skills=true` and skips the advisory jobs; a mixed diff
-sets it false and runs them. The push lane forces every output true, so the
-detection lane still runs the full suite. `validate-skills` has no job-level
-`if:`; `gate-guard` keeps its existing pull-request-only condition.
+for `tools-tests-linux` and `tools-tests-windows`, and:
+
+```
+if: github.event_name == 'push' || (needs.changes.outputs.offline == 'true' && needs.changes.outputs.docs_skills != 'true')
+```
+
+for `windows-offline-checks`. A docs/skills-only pull request sets
+`docs_skills=true` and, for every docs/skills path other than
+`docs/instrumentation/workflow-outcomes-v1.schema.json`, `tools=false`; the
+tools jobs skip because `tools` is false, not because `docs_skills` is true. The
+schema-path exception: a schema-only pull request that changes only
+`docs/instrumentation/workflow-outcomes-v1.schema.json` sets `tools=true` and
+`docs_skills=true`, so the tools jobs **run** while the offline job skips. The push lane forces every output true, so the detection lane still
+runs the full suite. `validate-skills` has no job-level `if:`; `gate-guard`
+keeps its existing pull-request-only condition.
+
+## Regression fixed (2026-11-13)
+
+Before this fix the two tools jobs required both `tools=true` and
+`docs_skills != 'true'`. A schema-only PR changes only
+`docs/instrumentation/workflow-outcomes-v1.schema.json`; the `changes` job sets
+`tools=true` and `docs_skills=true`, so both tools jobs skipped before merge
+while the post-merge push lane ran them. The fix removes the `docs_skills`
+exclusion from `tools-tests-linux` and `tools-tests-windows` only;
+`windows-offline-checks` keeps it, and no required check, trigger, permission,
+pinned action or job set changes. Local condition simulation for the
+schema-only diff (recorded in the PR body): push lane true; pull-request flags
+`tools=true`, `offline=false`, `docs_skills=true` -> tools jobs run, offline
+skips. CI run ids at this PR's head are recorded in the PR receipt; this page
+makes no claim that the schema-only path ran in CI.
 
 ## E1 edit and expected gate-guard red
 
