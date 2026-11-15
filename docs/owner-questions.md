@@ -14,7 +14,7 @@ Answer (verbatim from the structured answer record): selected "Authorize me to m
 
 Question: The P0 preflight requires the audit evidence package. The expected roots were absent and a bounded search found nothing. Please supply the unzipped package or its actual nested folder (README.md, REPORT-full.md, plan/HANDOFF.md).
 
-Owner answer (verbatim): "[download path redacted for privacy] unzip and find it"
+Owner answer (verbatim except the download path, redacted for privacy): "[download path redacted for privacy] unzip and find it"
 
 ## Q-3 — 2026-11-14 (asked around 22:56-23:00 PST; exact time not recorded)
 
@@ -25,5 +25,12 @@ Owner answer: not recorded — the interactive question hit a tool timeout befor
 ## Q-4 — 2026-11-14 (asked with this tracker setup; exact time not recorded)
 
 Question: Which email address should consumers use to send experience and feedback (or should the repository issue tracker be the only route)? This is needed to complete docs/consumer-feedback.md.
+
+Owner answer: not recorded yet.
+
+
+## Q-5 — 2026-11-15 00:24 PST (from the independent tracker accuracy check)
+
+Question: two privacy/confirmation items before the tracker's first save: (P-1) may the consumer-feedback document keep the public repository issue-tracker address, which contains the project's public account/repository name, or should the send route be email-only / described generically? (P-2) the anonymized log states that no owner experience level was recorded — please confirm, or state the level so the required one-line context can be added.
 
 Owner answer: not recorded yet.

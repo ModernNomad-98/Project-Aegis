@@ -34,7 +34,7 @@ Entry index: owner-raised U-1..U-4; build-session A-1..A-12 (one "Worked well" c
 ### U-4 — Audit evidence package missing at the declared locations (2026-11-14)
 - In the owner's words: "Confirmed. The audit package is still absent, so P0 remains blocked at preflight." then later "[download path redacted for privacy] unzip and find it"
 - What happened: the checkpoint's declared audit-evidence roots were absent, and a bounded host search found no report file. The owner then supplied the package as a zip in the user Downloads folder (zip timestamp 19:23:28 PST); the build session extracted it, verified every bound artifact hash against its plan-binding file, and ran the closures.
-- Effect: measured — about 13 minutes between the zip being observed and full extraction/verification, after the task had already been blocked at preflight from the checkpoint time.
+- Effect: measured — under two minutes from the zip being observed (19:23:28 PST) to the verified closures measurement (19:25 PST); the task had already been blocked at preflight from the checkpoint time. (An earlier draft said about 13 minutes — that figure matched an unrelated worktree creation time and was corrected here before first save.)
 - Idea for Aegis: the checkpoint/save template should record how evidence will be delivered (path and form) and the preflight should check the delivery folder before declaring the task blocked.
 - Status: fixed for this project (package verified and used). Still open for Aegis: checkpoints do not carry evidence delivery instructions.
 
@@ -51,21 +51,21 @@ Entry index: owner-raised U-1..U-4; build-session A-1..A-12 (one "Worked well" c
 
 ### A-2 — The PR body was a pre-push draft at final review time (2026-11-14)
 - In the owner's words: not recorded.
-- What happened: the PR body drafted before the pull request existed said "no pull request has been opened", "CI: UNRUN" and "no automated review" while PR #1095 was open with check results and automated reviews. The Stage F reviewer rejected the body as stale (MAJOR-1).
+- What happened: the PR body drafted before the pull request existed said "no pull request has been opened" and "CI: UNRUN", and its stage table said no Stage F verdict existed, while PR #1095 was open with check results and automated reviews. The Stage F reviewer rejected the body as stale (MAJOR-1).
 - Effect: one extra review round; the body had to be regenerated against live facts.
 - Idea for Aegis: generate the PR body after the branch is pushed and CI has run, or make the body template require live-fact fields that cannot be filled before the PR exists.
-- Status: fixed for this project (body refreshed and re-bound). Still open for Aegis.
+- Status: open in this project at record time — the refreshed body exists locally but cannot be posted until condensed under GitHub's 65,536-character limit; the live PR #1095 body was still the pre-push draft at 2026-11-15 00:20 PST. Still open for Aegis.
 
 ### A-3 — No stage agent had authored its own skills-table row (2026-11-14)
 - In the owner's words: not recorded.
-- What happened: the PR body's machine-checked "Aegis skills used" table requires each stage agent's own row. Stages A/C/D had not authored rows; only the plan auditors had. Fixtures: Stage F review findings, body refresh requests to the implementers and plan author. One implementer correctly reported "no skill applied".
+- What happened: the PR body's machine-checked "Aegis skills used" table requires each stage agent's own row. The Stage C PR-body author had two self-authored rows and the Stage B auditor had its own row; the stages still missing rows were Stage A (plan author), the Stage C implementer, Stage D and Stage E validation. Fixtures: Stage F review findings, body refresh requests to the implementers and plan author. One implementer correctly reported "no skill applied".
 - Effect: one extra owner-side data-collection round across agents (about 30-40 minutes of agent work) before the skills field could be completed honestly.
 - Idea for Aegis: make "publish your own skills row" an explicit stage-exit deliverable, so the final body never has to chase earlier stages.
 - Status: fixed for this project (rows published by their authors, gaps disclosed). Still open for Aegis.
 
 ### A-4 — A CI test pinned a line that a legitimate marker edit split (2026-11-14)
 - In the owner's words: not recorded.
-- What happened: PR-A added an absent-skill marker in the middle of a project-orchestrator line that a contract-audit test requires to remain a contiguous substring. Two required CI jobs failed (run 43683321634, validate-skills and windows-offline-checks; test_audit_skill_contracts line 1302). The fix moved the marker to the end of the same line without editing scripts; the pinned substring is intact and the test passes.
+- What happened: PR-A added an absent-skill marker in the middle of a project-orchestrator line that a contract-audit test requires to remain a contiguous substring. Two CI jobs failed in run 43683321634 — validate-skills (a required check) and windows-offline-checks (an applicable but non-required job) — at test_audit_skill_contracts line 1302. The fix moved the marker to the end of the same line without editing scripts; the pinned substring is intact and the test passes.
 - Effect: one failed CI cycle (two required jobs) plus a fix commit; no merge occurred on the failed head.
 - Idea for Aegis: where validators pin literal sentences, document which substrings are pinned (or strip markup before comparison), so markers can be placed predictably.
 - Status: fixed for this project (marker moved; contract-audit passes). Still open for Aegis: pinned-substring tests are not discoverable from the skill/page that is being edited.
@@ -121,7 +121,12 @@ Entry index: owner-raised U-1..U-4; build-session A-1..A-12 (one "Worked well" c
 
 ### A-12 — Automated reviews multiplied across heads and doubled the disposition burden (2026-11-14)
 - In the owner's words: not recorded.
-- What happened: PR #1095 collected three automated review bodies plus inline comments across three heads; the final body needed about 50 review-disposition rows. The last review arrived after the body was being finalized.
+- What happened: PR #1095 collected six automated review bodies (five from the automated reviewer and one from the code-review connector) across five heads, plus 8 inline comments; the final body needed disposition rows for about 110 findings. The last review arrived after the body was being finalized.
 - Effect: a large disposition-writing effort in the PR body (not measured).
 - Idea for Aegis: keep one automated review per head, deduplicate findings across heads, and require the PR body to link one review summary rather than enumerate repeated findings.
 - Status: open for Aegis.
+
+---
+
+## Corrections applied before first save — 2026-11-15 (pre-save accuracy pass)
+An independent accuracy check (report: C:\tmp\aegis-p0-2026-11-14\tracker\TRACKER-ACCURACY-CHECK.md) examined 119 statements: 71 verified, 26 session-quote, 10 unverifiable, 12 incorrect. This pass corrected the factual items before the first save; nothing here had been saved to the main line when it was changed. Fixed: U-4 timing; A-2 quote and status; A-3 stage-row gap; A-4 required-vs-applicable checks; A-8 pin-break attribution; A-12 review counts; Q-2 verbatim label; time-log exact seconds; and the three anonymized-copy propagations. Owner-confirmation items (quotes/timings and the experience-level line) remain flagged, not changed.

@@ -40,13 +40,13 @@ Entries are numbered U-* for owner-raised and A-* for build-session-raised. Iden
 
 ## A-3 — No per-stage skill-use record existed
 - Stage: build/validate. Category: records.
-- Problem: the required skill-use table needed one self-authored row per stage; most stages had not written one, and rows had to be collected late.
+- Problem: the required skill-use table needs one self-authored row per stage; most stages had not written one when the final record was assembled, so rows were collected late.
 - Suggested improvement: make the self-authored row a stage-exit deliverable.
 - Still open for the framework: yes.
 
 ## A-4 — A pinned line was split by a legitimate edit
 - Stage: validate. Category: review and testing.
-- Problem: an edit placed a note inside a sentence that an automated check pins as a contiguous string; two required checks failed until the note was moved.
+- Problem: an edit placed a note inside a sentence that an automated check pins as a contiguous string; a required check and an applicable non-required check failed until the note was moved.
 - Suggested improvement: document pinned substrings where edits happen, or compare text with markup stripped.
 - Still open for the framework: yes.
 
@@ -70,7 +70,7 @@ Entries are numbered U-* for owner-raised and A-* for build-session-raised. Iden
 
 ## A-8 — Worked well: independent stage agents found real defects
 - Stage: validate/review. Category: review and testing.
-- What worked: separate agents found completion-check gaming, stale documents, contradictions, a pinned-line break and missing records before anything merged.
+- What worked: separate agents found completion-check gaming, stale documents, contradictions and missing records before anything merged; an automated CI check caught the pinned-line break and the stages verified the fix.
 - Keep: the different-agent stage separation.
 
 ## A-9 — Worked well: resume preserved prior state
@@ -95,3 +95,8 @@ Entries are numbered U-* for owner-raised and A-* for build-session-raised. Iden
 - Problem: several automated reviews across successive revisions produced a large duplication burden in the final record.
 - Suggested improvement: keep one review per revision head and deduplicate findings across revisions.
 - Still open for the framework: yes.
+
+---
+
+## Corrections applied before first save — 2026-11-15 (pre-save accuracy pass)
+An independent accuracy check (report: C:\tmp\aegis-p0-2026-11-14\tracker\TRACKER-ACCURACY-CHECK.md) examined 119 statements: 71 verified, 26 session-quote, 10 unverifiable, 12 incorrect. This pass corrected the factual items before the first save. Fixed: U-4 timing; A-2 quote and status; A-3 stage-row gap; A-4 required-vs-applicable checks; A-8 pin-break attribution; A-12 review counts; Q-2 verbatim label; time-log exact seconds; and the three anonymized-copy propagations. Owner-confirmation items (quotes/timings and the experience-level line) remain flagged, not changed.

@@ -4,7 +4,7 @@ Method: owner time is counted at the keyboard, from the times of the owner's mes
 
 ## 2026-11-14 — session entry (estimated)
 
-- Figure: about 4 h 09 min (15,000 s) estimated.
+- Figure: about 4 h 09 min (14,954 s exactly from the recorded timestamps; earlier wording rounded this to 15,000 s).
 - How obtained: estimated, from the 17 session timestamps recorded in this chat (19:10:38 through 23:19:52 PST). Consecutive recorded timestamps were treated as an upper-bound keyboard timeline; all observed gaps were under 30 minutes, so no break was deducted. The timestamps include turns caused by helper notifications and tool results, not only the owner's own messages, so the figure is an upper bound rather than a measured figure.
 - Limitation: the exact time of each owner message was not recorded separately from assistant and helper activity; this figure should be replaced by a measured figure when message times are exported.
 - Breaks: none detected above the 30-minute rule in the recorded timestamps.
