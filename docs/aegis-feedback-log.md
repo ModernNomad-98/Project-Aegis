@@ -93,7 +93,7 @@ Entry index: owner-raised U-1..U-4; build-session A-1..A-12 (one "Worked well" c
 
 ### A-8 — Worked well: independent stage agents caught real defects before merge (2026-11-14)
 - In the owner's words: not recorded.
-- What happened: separate agents for plan audit, implementation audit, validation and final review caught: closure window-gaming (A-1), stale pre-push body (A-2), contract self-contradictions, a CI pin break (A-4), and missing skills rows (A-3). No defect found by these stages was shipped or merged.
+- What happened: separate agents for plan audit, implementation audit, validation and final review caught closure window-gaming (A-1), the stale pre-push body (A-2), contract self-contradictions and missing skills rows (A-3); the CI pin break (A-4) was caught by the CI run (43683321634), not by a stage agent, and the stages verified the fix. No defect found by these stages was shipped or merged.
 - Effect: positive; it cost review rounds but prevented an unsound contract from merging.
 - Idea for Aegis: keep the different-agent stage separation; it is doing real work, not ceremony.
 - Status: working well in this project; keep for Aegis.
