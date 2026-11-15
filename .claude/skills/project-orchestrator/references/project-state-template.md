@@ -99,7 +99,10 @@ missing authority. A delayed register transcription does not invalidate a direct
     column. The recorded hash is the expected value: a later reader checks the artifact
     against it, because the record alone cannot supply the artifact. A hash that exists
     only in a chat confirmation does not satisfy the record requirement — the acceptance
-    is not recorded.
+    is not recorded. **This rule applies prospectively from 2026-11-14:** acceptance rows
+    recorded before it remain recorded and are not retroactively invalidated; where an
+    older acceptance row lacks the hash, append a reconciliation DECISION carrying the
+    artifact path and SHA-256 instead of reopening the gate.
 
 ## Section mutability — immutable evidence vs mutable projection
 

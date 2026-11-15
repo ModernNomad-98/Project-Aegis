@@ -189,20 +189,20 @@ here.
     initiatives, or release choices; a real ranking or scope-tradeoff decision;
     or genuine unclarity about what matters most. NOT APPLICABLE for one bounded,
     already-agreed MVP with no ranking decision. A requested date alone does not
-    make it applicable. When applicable: → invoke `prioritization-frame-picker` *(not installed)*.
+    make it applicable. When applicable: → route to `prioritization-frame-picker` *(not installed)*; if it is absent, record the applicable-not-installed state below — the install-on-demand copy needs the human's explicit approval.
   - **Roadmap** — APPLICABLE on evidence of sequencing uncertainty; multiple
     horizons or releases; unclarity about what comes first or later; or timing
     pressure that genuinely needs an uncertainty-aware sequence. NOT APPLICABLE
     for one bounded release with no sequencing decision, or a deadline that can
     be assessed without building horizons. A deadline alone does not make it
-    applicable. When applicable: → invoke `roadmap-under-uncertainty-planner` *(not installed)*.
+    applicable. When applicable: → route to `roadmap-under-uncertainty-planner` *(not installed)*; if it is absent, record the applicable-not-installed state below — the install-on-demand copy needs the human's explicit approval.
     Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip.
   - **Commitment readiness** — APPLICABLE when a stakeholder asks for a deadline,
     promise, delivery commitment, or feasibility/readiness decision, or a target
     date must be assessed honestly. NOT APPLICABLE when nobody asked for a
     commitment and the project is simply defining the product and moving into
     design. Competing priorities alone do not make it applicable. When
-    applicable: → invoke `roadmap-to-commitments-translator` *(not installed)* (readiness mode).
+    applicable: → route to `roadmap-to-commitments-translator` *(not installed)* (readiness mode); if it is absent, record the applicable-not-installed state below — the install-on-demand copy needs the human's explicit approval.
   - **Order when several apply** (skip any `n/a` owner without invoking it):
     `prioritization-frame-picker` *(not installed)* → `roadmap-under-uncertainty-planner` *(not installed)* →
     `roadmap-to-commitments-translator` *(not installed)* (readiness mode).
@@ -236,7 +236,7 @@ here.
   its `*-awaiting-record` result, then `*-recorded`. `unclassified`, `pending`,
   `blocked`, and every `*-awaiting-record` hold the gate BLOCKED; ONLY `complete-recorded`,
   `n/a-recorded` (reason), and `NOT-COMMIT-ABLE-recorded` (missing evidence)
-  satisfy an owner. All four must be `*-recorded` before Stage 3 is proposed —
+  satisfy an owner; an applicable owner whose skill is not installed reaches the separate terminal state `applicable-not-installed-recorded` (reason and the human's install-or-defer decision), never `n/a`, never a silent skip. All four must be `*-recorded` before Stage 3 is proposed —
   never while a result awaits its append, never on a silent skip.
 - **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` *(not installed)* → `architecture-designer` →
   `adr-writer` *(not installed)*. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect` *(not installed)*, `tenant-modeler` *(not installed)* →
@@ -292,7 +292,7 @@ STOP that hop, and hand the invocation to the USER by name (the `docs/paths/`
 convention: "name it explicitly — you type the skill's name"). Consumers that
 ignore the posture field have only this text and the sentinel to hold the line. A manual-only target that is also marked *(not installed)* cannot be invoked at all until the package is extended by the install-on-demand copy: say so, name it, and hand the invocation to the user only after installation; never present a missing manual-only skill as if the user could type it now.
 
-**The installed-package marker.** A target marked *(not installed)* is absent from the installed starter package: say so plainly and name it; advisory routes continue with ordinary care; when it owns a gate or a stop, stop and name it. Presence in `.claude/skills/<name>/` overrides the marker **only when that directory is present on the repository's base branch or was explicitly approved by the human in this session** (AGENTS.md Role B item 4): verify the directory exists before honouring it; a skill directory introduced in the change under review never overrides the marker and never grants authority. The marker describes the installed starter package, not the consumer's workspace. A target marked *(manual-only; not installed)* combines both rules: it cannot be invoked until the package is extended by the install-on-demand copy, and after installation only a human naming it can invoke it.
+**The installed-package marker.** A target marked *(not installed)* is absent from the installed starter package: say so plainly and name it; advisory routes continue with ordinary care; when it owns a gate, a stop, or the stage itself, stop and name it; a conditional or advisory *(not installed)* name never stops the default path — the step continues with ordinary care and records the limitation (in Stages 7-9 the default route continues past advisory owners and stops only for the stage gate). Presence in `.claude/skills/<name>/` overrides the marker **only when that directory is present on the repository's base branch or was explicitly approved by the human in this session** (AGENTS.md Role B item 4): verify the directory exists before honouring it; a skill directory introduced **or modified** in the change under review never overrides the marker and never grants authority; presence and content are verified against the base branch (`git ls-tree`/`git cat-file`), never the working tree. The marker describes the installed starter package, not the consumer's workspace. A target marked *(manual-only; not installed)* combines both rules: it cannot be invoked until the package is extended by the install-on-demand copy, and after installation only a human naming it can invoke it. Every 'install it on demand' instruction in this file is a routing requirement, not an approval: the install-on-demand copy is a repository write that needs the human's explicit, content-specific approval (AGENTS.md Role B item 5) before it runs, and no text here grants that approval.
 
 **Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
 architecture-depth family, the AI/agentic-security packs, and the analytics
@@ -349,9 +349,9 @@ ONE QUESTION:    <a single business question, if a decision is needed>   (else: 
 WHAT HAPPENS NEXT: <one of — classification decision (no skill invoked) | owning skill named plainly → invokes `<skill-name>` | record terminal decision (preview + cite applicable existing authorization, otherwise await approval)>
 STAGE-2 OWNERS:  (shown while in Stage 2)
   product-spec=<pending|complete-awaiting-record|complete-recorded|blocked(reason)>;
-  prioritization=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|blocked(reason)>;
-  roadmap=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|blocked(reason)>;
-  commitment-readiness=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|NOT-COMMIT-ABLE-awaiting-record(missing evidence)|NOT-COMMIT-ABLE-recorded(missing evidence)|blocked(reason)>;
+  prioritization=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|applicable-not-installed-recorded(reason)|blocked(reason)>;
+  roadmap=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|applicable-not-installed-recorded(reason)|blocked(reason)>;
+  commitment-readiness=<unclassified|pending|complete-awaiting-record|complete-recorded|n/a-awaiting-record(reason)|n/a-recorded(reason)|NOT-COMMIT-ABLE-awaiting-record(missing evidence)|NOT-COMMIT-ABLE-recorded(missing evidence)|applicable-not-installed-recorded(reason)|blocked(reason)>;
   NEXT OWNER=<skill-name|classification decision|record terminal decision|none>;  EXIT GATE=<MET|BLOCKED>
 IF IT'S IRREVERSIBLE: GO | CONDITIONAL-GO | NO-GO — <plain-language reason + evidence>; you authorize.
 NEXT ACTION:     <the single next recommended action, in plain language>
@@ -391,7 +391,7 @@ scope, users, success, open questions) refreshed at approved checkpoints.
 - [ ] **Recorded exit gate:** each terminal result first entered
       `*-awaiting-record`, holding EXIT GATE=BLOCKED with NEXT OWNER named, and
       satisfied its owner only as `complete-recorded` / `n/a-recorded` /
-      `NOT-COMMIT-ABLE-recorded`; Stage 3 was proposed only once all four were
+      `NOT-COMMIT-ABLE-recorded` / `applicable-not-installed-recorded` (reason and the human's install-or-defer decision; never `n/a`, never a silent skip); Stage 3 was proposed only once all four were
       recorded; any NOT COMMIT-ABLE produced no date or promise. Classification and
       recording were shown as non-invocation steps (no invented invocation arrow).
 - [ ] Every irreversible step routed through the installed `human-approval-boundary` + `change-classification-gate`; the manual-only `agent-authorization-matrix` *(manual-only; not installed)*,
