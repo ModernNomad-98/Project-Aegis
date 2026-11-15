@@ -133,6 +133,28 @@ procedure, including expiry and consumption, and never revive an invalidated
 predecessor. This checks existing grants; it does not demand the same approval
 again. Current direct user instructions remain usable source evidence.
 
+## Consumer (Role B) reading — solo verification, one record location, and the domain split
+
+This section applies only in a consumer/product repository (Role B). The
+Project Aegis source-library rules above are unchanged; a consumer does not inherit
+this source repository's approvals by copying Aegis files.
+
+- **Solo-consumer verification.** In a one-agent product repository the human's
+  content-specific yes to that exact path and content is the check that stands in for
+  independent verification — human confirmation, not a second independent agent — and
+  the DECISION entry records it as human confirmation. An agent's self-verification is
+  never recorded as one.
+- **One record location for decisions and approvals.** DECISIONs, APPROVALs (`A-*`) and
+  STATE SNAPSHOTs live in `docs/project-state.md` — nowhere else; do not open a second
+  state file. The one separate append-only record is the manual-only override register,
+  used only for a MANUAL-ONLY trigger (`docs/consumer-authority-register.md` when the
+  starter's install layout is followed).
+- **The domain split between the two records.** The override register governs only
+  manual-only triggers; `A-*` entries in `docs/project-state.md` govern everything else.
+  Where they overlap, the later lifecycle event wins. That ordering is this contract's
+  reading of two documents that do not address each other; if the case is genuinely
+  unclear, stop and ask rather than picking one.
+
 ## 3. Idempotent and exact recording
 
 - **Exact means complete, byte-for-byte.** A preview or confirmation that must

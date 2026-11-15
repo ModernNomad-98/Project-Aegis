@@ -83,7 +83,7 @@ in-flight navigation).
 5. **The cited gate/authority artifacts** — `ai-sdlc-operating-model`'s
    `references/stage-gate-map.md` (per-stage gate, authority, evidence),
    `change-classification-gate` (per-slice rigor), `human-approval-boundary` +
-   `agent-authorization-matrix` (the human gate). Read to CITE, never copy.
+   `agent-authorization-matrix` *(not installed)* (the human gate). Read to CITE, never copy.
 
 ## Workflow
 
@@ -99,7 +99,7 @@ in plain language. No repo, or a zero-commit product repo without app files
 or state, means stage zero (nothing started yet) → discovery, which is Stage 1 below. Propose opening `docs/project-state.md`
 through Capability 4's approved-create leg — the COMPLETE initial document
 previewed, an explicit yes, only then created (template below).
-**A setup request is not a product stage:** when the user asks to set up or change Aegis itself (Aegis only, or a future local or online helper), not to build a product, first say plainly that setup is the manual-only `aegis-setup` skill, started by typing `/aegis-setup`; do not run or read it, and start no product discovery before offering that.
+**A setup request is not a product stage:** when the user asks to set up or change Aegis itself (Aegis only, or a future local or online helper), not to build a product, first say plainly that setup is the manual-only `aegis-setup` *(not installed)* skill, started by typing `/aegis-setup`; do not run or read it, and start no product discovery before offering that.
 
 **Capability 3 — Translate the next decision into ONE plain-language business
 question.** Every technical fork surfaces to the user as a business question
@@ -189,23 +189,23 @@ here.
     initiatives, or release choices; a real ranking or scope-tradeoff decision;
     or genuine unclarity about what matters most. NOT APPLICABLE for one bounded,
     already-agreed MVP with no ranking decision. A requested date alone does not
-    make it applicable. When applicable: → invoke `prioritization-frame-picker`.
+    make it applicable. When applicable: → invoke `prioritization-frame-picker` *(not installed)*.
   - **Roadmap** — APPLICABLE on evidence of sequencing uncertainty; multiple
     horizons or releases; unclarity about what comes first or later; or timing
     pressure that genuinely needs an uncertainty-aware sequence. NOT APPLICABLE
     for one bounded release with no sequencing decision, or a deadline that can
     be assessed without building horizons. A deadline alone does not make it
-    applicable. When applicable: → invoke `roadmap-under-uncertainty-planner`.
-    Either way the turn ends with `roadmap-under-uncertainty-planner` classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip.
+    applicable. When applicable: → invoke `roadmap-under-uncertainty-planner` *(not installed)*.
+    Either way the turn ends with `roadmap-under-uncertainty-planner` *(not installed)* classified applicable or classified `n/a` (reason) — the recorded verdict, never an implicit skip.
   - **Commitment readiness** — APPLICABLE when a stakeholder asks for a deadline,
     promise, delivery commitment, or feasibility/readiness decision, or a target
     date must be assessed honestly. NOT APPLICABLE when nobody asked for a
     commitment and the project is simply defining the product and moving into
     design. Competing priorities alone do not make it applicable. When
-    applicable: → invoke `roadmap-to-commitments-translator` (readiness mode).
+    applicable: → invoke `roadmap-to-commitments-translator` *(not installed)* (readiness mode).
   - **Order when several apply** (skip any `n/a` owner without invoking it):
-    `prioritization-frame-picker` → `roadmap-under-uncertainty-planner` →
-    `roadmap-to-commitments-translator` (readiness mode).
+    `prioritization-frame-picker` *(not installed)* → `roadmap-under-uncertainty-planner` *(not installed)* →
+    `roadmap-to-commitments-translator` *(not installed)* (readiness mode).
   - **Worked classifications** (each asserted by an eval, a behavior test case in `evals/evals.json`): bounded MVP + deadline
     → only commitment readiness; competing capabilities, no deadline → prioritization
     (+ roadmap if sequencing); all three signals → all in order; bounded MVP, none → `n/a`.
@@ -221,7 +221,7 @@ here.
   COMMIT-ABLE` is a **completed** result — it does NOT trap the project in Stage
   2. Record the reassessment as a deferred next-action tied to its evidence
   milestone; when that milestone is later reached (e.g. architecture recorded at
-  Stage 3), re-invoke `roadmap-to-commitments-translator` (readiness mode) — a
+  Stage 3), re-invoke `roadmap-to-commitments-translator` *(not installed)* (readiness mode) — a
   requested date is never left unverified indefinitely.
 
   **Stage 2 exit gate (recorded, not merely reached).** Each owner carries one
@@ -238,48 +238,48 @@ here.
   `n/a-recorded` (reason), and `NOT-COMMIT-ABLE-recorded` (missing evidence)
   satisfy an owner. All four must be `*-recorded` before Stage 3 is proposed —
   never while a result awaits its append, never on a silent skip.
-- **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` → `architecture-designer` →
-  `adr-writer`. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect`, `tenant-modeler` →
-  `multi-tenant-data-architect`, `authorization-matrix-designer`. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect`, which asks its own flag-store question on a later turn.
-  The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of users or customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist`.
-- **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` / `ai-threat-modeler`;
-  `tenant-isolation-reviewer`, `share-link-access-architect`,
-  `file-upload-storage-architect`, `prompt-injection-defender` *(manual-only)*,
-  `structured-output-validator`, `ai-cost-guardrail-designer`. For AI agent
-  runtimes: `agent-harness-architect`, `model-context-designer`, conditional
-  `agentic-loop-designer` — follow [AI path](../../../docs/paths/add-ai-safely.md).
-- **Stage 5 — Plan the work.** → `tech-spec-writer` → `ai-task-decomposer` →
+- **Stage 3 — Design how it's built.** → `domain-modeler` → `architecture-advisor` *(not installed)* → `architecture-designer` →
+  `adr-writer` *(not installed)*. *By evidence of a software-as-a-service (SaaS)/multi-customer product:* `saas-platform-architect` *(not installed)*, `tenant-modeler` *(not installed)* →
+  `multi-tenant-data-architect` *(not installed)*, `authorization-matrix-designer` *(not installed)*. *By evidence of a need to turn a feature on for a few customers first, or switch it off within minutes without a release:* `feature-flag-architect` *(not installed)*, which asks its own flag-store question on a later turn.
+  The evidence is the spec's rollout intent. When the spec is silent and the product has more than a handful of users or customers, ask two atomic questions, one per turn, each after a plain explanation and a recommendation: first, turn a new feature on for a few customers first, or for everyone at once? Queued, only if "everyone at once": switch a misbehaving feature off within minutes without releasing code, or is a normal release fast enough? Either need routes; "everyone at once" plus "a normal release" is recorded with what it was chosen over, no route. One change's staged rollout stays with `feature-flag-rollout-strategist` *(not installed)*.
+- **Stage 4 — Make it safe.** *Only by evidence:* `threat-modeler` *(not installed)* / `ai-threat-modeler` *(not installed)*;
+  `tenant-isolation-reviewer` *(not installed)*, `share-link-access-architect` *(not installed)*,
+  `file-upload-storage-architect` *(not installed)*, `prompt-injection-defender` *(manual-only; not installed)*,
+  `structured-output-validator` *(not installed)*, `ai-cost-guardrail-designer` *(not installed)*. For AI agent
+  runtimes: `agent-harness-architect` *(not installed)*, `model-context-designer` *(not installed)*, conditional
+  `agentic-loop-designer` *(not installed)* — follow [AI path](../../../docs/paths/add-ai-safely.md).
+- **Stage 5 — Plan the work.** → `tech-spec-writer` → `ai-task-decomposer` *(not installed)* →
   `phased-work-handoff-designer` → `change-classification-gate` →
   `human-approval-boundary`.
 - **Stage 6 — Build it, one slice at a time.** Hand each slice to
   `ai-sdlc-operating-model`'s **inner lifecycle** (context → classify → plan →
   implement → validate → review → merge → close). Its `stage-gate-map.md` names
   the enforcers to invoke — `agent-startup-context-gate`,
-  `change-classification-gate`, `docs-first-implementer` *(manual-only)*,
-  `tdd-engineer` *(manual-only)*, `reviewable-diff-discipline` *(manual-only)*,
-  `local-ci-mirror-preflight` *(manual-only)*, `code-reviewer`, `security-pr-reviewer`,
-  `ai-closeout-reporter`. Route to them via that map; do not re-derive the gates. For user-interface slices, also follow the [UI path](../../../docs/paths/design-and-build-ui.md), which names the UI owners in order; it adds no gate and removes none.
-- **Stage 7 — Prove it works.** → `qa-strategy-architect` →
-  `test-plan-designer`. *By evidence:* `integration-test-designer`,
-  `api-contract-test-designer`, `playwright-e2e-engineer` *(manual-only)*,
-  `manual-test-case-creator`,
-  `accessibility-test-harness`, `performance-test-harness`.
-- **Stage 8 — Get it ready to run.** **First classify hosting applicability from actual approved requirements and artifacts — never from a folder label.** When they explicitly establish that no hosted service, account/tenant backend or infrastructure applies (single operator/browser, local artifact only), take the **local-only release branch before any provider routing**: keep local artifact integrity, persistence, recovery, validation and release verification proportionate, with rollback/recovery steps for the local artifact. This branch may not bypass a hosted requirement or a shared gate; if later approved requirements add hosting, return to the hosted branch below. The local route is explicitly **NOT a deployment, a production operation, or a CI-green claim**; when host applicability is unknown, silent or conflicting, PAUSE and ask the human rather than guessing from a folder/stack label. Minimum local release evidence (not left to 'proportionate'): actual artifact hash + opening command followed, persistence/recovery observation, validation results, rollback/recovery steps, and local data-at-rest security/privacy check, recorded through the applicable existing gates (change-classification-gate; release-readiness-reviewer at Stage 9; security-pr-reviewer where data sensitivity applies), with the shared gates still required. When hosting applies, start with `cloud-architecture-decider`,
-  then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect`; **Azure** → `azure-saas-architect`; **modern managed tier** (container platform-as-a-service (PaaS), managed
+  `change-classification-gate`, `docs-first-implementer` *(manual-only; not installed)*,
+  `tdd-engineer` *(manual-only; not installed)*, `reviewable-diff-discipline` *(manual-only; not installed)*,
+  `local-ci-mirror-preflight` *(manual-only; not installed)*, `code-reviewer`, `security-pr-reviewer` *(not installed)*,
+  `ai-closeout-reporter` *(not installed)*. Route to them via that map; do not re-derive the gates. For user-interface slices, also follow the [UI path](../../../docs/paths/design-and-build-ui.md), which names the UI owners in order; it adds no gate and removes none.
+- **Stage 7 — Prove it works.** → `qa-strategy-architect` *(not installed)* →
+  `test-plan-designer`. *By evidence:* `integration-test-designer` *(not installed)*,
+  `api-contract-test-designer` *(not installed)*, `playwright-e2e-engineer` *(manual-only; not installed)*,
+  `manual-test-case-creator` *(not installed)*,
+  `accessibility-test-harness` *(not installed)*, `performance-test-harness` *(not installed)*.
+- **Stage 8 — Get it ready to run.** **First classify hosting applicability from actual approved requirements and artifacts — never from a folder label.** When they explicitly establish that no hosted service, account/tenant backend or infrastructure applies (single operator/browser, local artifact only), take the **local-only release branch before any provider routing**: keep local artifact integrity, persistence, recovery, validation and release verification proportionate, with rollback/recovery steps for the local artifact. This branch may not bypass a hosted requirement or a shared gate; if later approved requirements add hosting, return to the hosted branch below. The local route is explicitly **NOT a deployment, a production operation, or a CI-green claim**; when host applicability is unknown, silent or conflicting, PAUSE and ask the human rather than guessing from a folder/stack label. Minimum local release evidence (not left to 'proportionate'): actual artifact hash + opening command followed, persistence/recovery observation, validation results, rollback/recovery steps, and local data-at-rest security/privacy check, recorded through the applicable existing gates (change-classification-gate; release-readiness-reviewer at Stage 9; security-pr-reviewer where data sensitivity applies), with the shared gates still required. When hosting applies, start with `cloud-architecture-decider` *(not installed)*,
+  then follow its ACTUAL outcome: **AWS** (Amazon Web Services) → `aws-saas-architect` *(not installed)*; **Azure** → `azure-saas-architect` *(not installed)*; **modern managed tier** (container platform-as-a-service (PaaS), managed
   Jamstack/server-side rendering (SSR), Postgres backend-as-a-service (BaaS), edge-serverless) → follow the tenancy, RLS, cost, and deployment handoffs the decider itself names — no dedicated
   mapper exists by design; **GCP** (Google Cloud Platform) → state plainly that no dedicated GCP
   mapping skill exists yet and PAUSE the provider-mapping hop for the human's direction (never invent a mapper, never silently reroute to
-  AWS/Azure), continuing below once directed. Then `iac-reviewer` ONLY when
+  AWS/Azure), continuing below once directed. Then `iac-reviewer` *(not installed)* ONLY when
   an actual IaC or config-as-code artifact exists, and unconditionally:
-  `ci-pipeline-architect` *(manual-only)* →
-  `slo-reliability-architect` → `observability-operator` *(manual-only)*
-  → `rollback-runbook-author` →
-  `incident-response-runbook`. *If merge == deploy on the platform:*
-  `merge-is-deploy-governance`. Route FROM the decider's result; never
+  `ci-pipeline-architect` *(manual-only; not installed)* →
+  `slo-reliability-architect` *(not installed)* → `observability-operator` *(manual-only; not installed)*
+  → `rollback-runbook-author` *(not installed)* →
+  `incident-response-runbook` *(not installed)*. *If merge == deploy on the platform:*
+  `merge-is-deploy-governance` *(not installed)*. Route FROM the decider's result; never
   re-derive or copy its decision model here; for several reviewers and plain-language skill explanations, use the [guided release path](../../../docs/paths/release-with-agents.md).
-- **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` → `sharded-validation-with-resume` → `release-readiness-reviewer`
+- **Stage 9 — Decide to release.** → `risk-tiered-validation-selector` *(not installed)* → `sharded-validation-with-resume` *(not installed)* → `release-readiness-reviewer`
   (and the read-only reviewer subagents in `.claude/agents/` when available and relevant); the reviewer advises and the owner authorizes; Aegis's control plane is synthetic only.
-  *At release, unless the owner has already answered it, ONE plain question:* is this change risky enough to ship behind a flag, with a gradual rollout and a kill switch (a fast off switch)? A yes routes to `feature-flag-rollout-strategist`, preceded by `feature-flag-architect` when no flag system exists yet.
+  *At release, unless the owner has already answered it, ONE plain question:* is this change risky enough to ship behind a flag, with a gradual rollout and a kill switch (a fast off switch)? A yes routes to `feature-flag-rollout-strategist` *(not installed)*, preceded by `feature-flag-architect` *(not installed)* when no flag system exists yet.
 
 **The manual-only routing invariant.** Before routing to ANY skill, check its
 invocation posture. A **manual-only** target (`disable-model-invocation: true`;
@@ -289,19 +289,21 @@ gate into an automatic hop. Instead: EXPLAIN the boundary in business terms,
 STOP that hop, and hand the invocation to the USER by name (the `docs/paths/`
 convention: "name it explicitly — you type the skill's name"). Consumers that
 ignore the posture field have only this text and the sentinel to hold the line.
+A target marked *(not installed)* is absent from the installed starter package: say
+so plainly and name it; advisory routes continue with ordinary care; when it owns a gate or a stop, stop and name it.
 
 **Invoke by evidence, not by default.** The stage-4 security skills, the SaaS
 architecture-depth family, the AI/agentic-security packs, and the analytics
 skills are CONDITIONAL — invoke a skill only when the project's actual features
-call for it (a file-upload feature earns `file-upload-storage-architect`; an
-large language model (LLM) feature earns `prompt-injection-defender`; a purely internal single-tenant
+call for it (a file-upload feature earns `file-upload-storage-architect` *(not installed)*; an
+large language model (LLM) feature earns `prompt-injection-defender` *(not installed)*; a purely internal single-tenant
 tool earns none of the tenancy skills).
 
 **The human gate (composed, never relaxed).** Before anything irreversible — a
 migration, a deploy, an authentication/authorization (auth) or permission change, a deletion, a merge, a public
 release — route through `human-approval-boundary` (the runtime halt),
 `change-classification-gate` (which rigor + approval path the slice needs), and
-`agent-authorization-matrix` *(manual-only)* (the standing floor: merge to a protected branch is
+`agent-authorization-matrix` *(manual-only; not installed)* (the standing floor: merge to a protected branch is
 a named human's decision; agents never arm auto-merge). Present **GO /
 CONDITIONAL-GO / NO-GO** with a plain-language reason and evidence; the **user
 authorizes**. This skill is model-invocable so it fires on the cold vague
@@ -381,8 +383,8 @@ scope, users, success, open questions) refreshed at approved checkpoints.
       `product-spec-writer`; each conditional owner was classified applicable or
       `n/a` (reason) on ITS OWN evidence, never predicted or hedged; when several
       applied the order
-      `prioritization-frame-picker` → `roadmap-under-uncertainty-planner` →
-      `roadmap-to-commitments-translator` held with the roadmap planner invoked
+      `prioritization-frame-picker` *(not installed)* → `roadmap-under-uncertainty-planner` *(not installed)* →
+      `roadmap-to-commitments-translator` *(not installed)* held with the roadmap planner invoked
       at most once; no owner was silently skipped.
 - [ ] **Recorded exit gate:** each terminal result first entered
       `*-awaiting-record`, holding EXIT GATE=BLOCKED with NEXT OWNER named, and
@@ -391,7 +393,7 @@ scope, users, success, open questions) refreshed at approved checkpoints.
       recorded; any NOT COMMIT-ABLE produced no date or promise. Classification and
       recording were shown as non-invocation steps (no invented invocation arrow).
 - [ ] Every irreversible step routed through `human-approval-boundary` +
-      `change-classification-gate` + `agent-authorization-matrix`; the user
+      `change-classification-gate` + `agent-authorization-matrix` *(not installed)*; the user
       authorized; nothing auto-merged or auto-deployed.
 - [ ] Recording followed propose → approve → append (approved-create at cold start): exact path, ID, date and byte-for-byte content shown BEFORE any write; a current valid grant (ID/issuer/action/path/EXACT content hash; scope never substitutes/issue+expiry/revocation, independently verified, named in the DECISION) is used without repeat consent, otherwise explicit content-specific yes; stale/revoked/conflicting is a hard stop with no explicit-yes fallback.
       After approval the previewed path and byte-for-byte content are UNCHANGED (any change requires new preview/approval); declined/ambiguous or missing/out-of-scope/stale/revoked/conflicting authority wrote nothing; no prior entry overwritten; Stage 2 stayed serial.
@@ -430,8 +432,8 @@ scope, users, success, open questions) refreshed at approved checkpoints.
 - **Auto-chaining a manual-only skill.** A manual-only target
   (`disable-model-invocation: true`) exists to be started by a human. The
   orchestrator is auto-invocable, so treating its own firing as license to
-  auto-invoke `ci-pipeline-architect`, `observability-operator`,
-  `playwright-e2e-engineer`, or `prompt-injection-defender` launders a human
+  auto-invoke `ci-pipeline-architect` *(not installed)*, `observability-operator` *(not installed)*,
+  `playwright-e2e-engineer` *(not installed)*, or `prompt-injection-defender` *(not installed)* launders a human
   gate into an automatic hop. Explain the boundary and hand the invocation to
   the user by name.
 - **Acceptance is not authority; a business answer is not write approval.**

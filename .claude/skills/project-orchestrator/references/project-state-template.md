@@ -92,6 +92,12 @@ missing authority. A delayed register transcription does not invalidate a direct
     the immutable record is authoritative and the projection is stale. A stale
     projection is refreshed (from the records) before a stage is reported
     complete; the projection never overrides the evidence.
+11. **Acceptance is anchored to the accepted artifact, in the row.** Any DECISION row
+    recording that the user accepted an artifact — the Stage 1 requirements brief, the
+    product specification, or a later design or spec — carries that artifact's path, the
+    SHA-256 of its exact bytes and the acceptance date in the row's Evidence column, so
+    a fresh session can verify integrity from the record alone. A hash that exists only
+    in a chat confirmation is not recorded.
 
 ## Section mutability — immutable evidence vs mutable projection
 
@@ -164,6 +170,11 @@ binding decisions. The Stage 3 STATE SNAPSHOT is appended only after all four
 owner DECISION entries are recorded and satisfy the exit gate. This adds NO new
 entry type — it uses the existing DECISION, APPROVAL, and STATE SNAPSHOT entry
 types exactly as defined above.
+
+The **Stage 1 brief acceptance** uses the same form: its DECISION row carries the
+requirements brief's path and the SHA-256 of the brief's exact bytes, so the recorded
+need is verifiable after an interruption without the conversation. A brief acceptance
+whose hash exists only in the write confirmation is not recorded.
 
 ---
 
